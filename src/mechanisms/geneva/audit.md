@@ -114,7 +114,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; polish 0.07 s, the window search the largest part |
 | R6 | PASS | FLAG · browser bench: plan 10.9, side 11.6, explode 13.7 ms; at 28° 17.4 ms at full detail (the first view measured, 41 ms, includes cache warm-up); 8 ms target met from dial C |
-| R7 | PASS | HAND · model.ts + polish.ts 17.8 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 17.7 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -172,5 +172,5 @@ Hand fixes that should become rules or primitives.
 - **Locking segment primitive.** A hardened arc segment cut from a part's outline and held by screws on the joint line, needed by any indexing disc (M14).
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.6 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.7 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #11) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 17.4 ms over the 8 ms target at full detail (flag, R6)

@@ -19,7 +19,7 @@ export interface Joined {
   /** bore: the build bores it; keyed: the model gave it a keyed bore; slot: the pin runs in a slot. */
   how: "bore" | "keyed" | "slot";
   slotW?: number;
-  /** Index of the slot hole in the part's holes. */
+  /** Index of the slot or keyed hole in the part's holes. */
   hole?: number;
   /** Width of a keyed bore. */
   bore?: number;

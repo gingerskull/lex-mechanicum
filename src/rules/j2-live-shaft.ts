@@ -36,7 +36,10 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
   // keyed parts (A5, F3): D-bore to Ø8, round bore with a feather key above
   for (const x of driven) {
     const host = ctx.solidOf[x.part.id]!;
-    if (x.how !== "keyed") host.holes.push(k ? disc(d / 2 + 0.01, ...x.L) : dBore(d / 2 + 0.025).map(([a, b]) => [a + x.L[0], b + x.L[1]] as [number, number]));
+    // the bore fits the shaft: a model's keyed hole only sizes the shaft (A3) and is cut again to it
+    const bore = k ? disc(d / 2 + 0.01, ...x.L) : dBore(d / 2 + 0.025).map(([a, b]) => [a + x.L[0], b + x.L[1]] as [number, number]);
+    if (x.how === "keyed" && x.hole !== undefined) host.holes[x.hole] = bore;
+    else host.holes.push(bore);
     // a D-flat transmits the torque itself (F3)
     if (!k && !(J.serves.F3 ??= []).includes(group)) J.serves.F3.push(group);
     if (k) {
