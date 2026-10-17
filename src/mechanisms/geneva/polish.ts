@@ -5,7 +5,7 @@
 // - a replaceable hardened locking segment on the disc (M14), a drag pack on the wheel (F6), lobe windows in the wheel
 //   (M2), station marks (F9), tapered arms (D1);
 // - notes, badges and build rules (A16).
-import { TAU, arcPts, bbox, circle, polar, roundedPoly, type Vec2 } from "../../core/geom";
+import { TAU, arcPts, bbox, circle, polar, type Vec2 } from "../../core/geom";
 import { edgeDist, inside } from "../../core/poly";
 import type { Polish } from "../../assemble/api";
 import { materials } from "../../rules/materials";

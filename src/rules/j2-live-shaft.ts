@@ -38,7 +38,7 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
     const host = ctx.solidOf[x.part.id]!;
     if (x.how !== "keyed") host.holes.push(k ? disc(d / 2 + 0.01, ...x.L) : dBore(d / 2 + 0.025).map(([a, b]) => [a + x.L[0], b + x.L[1]] as [number, number]));
     // a D-flat transmits the torque itself (F3)
-    if (!k) (J.serves.F3 ??= []).includes(group) || J.serves.F3.push(group);
+    if (!k && !(J.serves.F3 ??= []).includes(group)) J.serves.F3.push(group);
     if (k) {
       const kz0 = x.z0;
       const kz1 = x.z1;
