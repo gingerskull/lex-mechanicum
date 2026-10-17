@@ -1,6 +1,6 @@
 {
   "name": "mechanism-database",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "An online library of mechanical mechanisms, drawn live as bench assemblies in one house style.",
   "type": "module",

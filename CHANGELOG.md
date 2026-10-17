@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0 — 2026-10-18
+
+- Conformance passes to standard 2.0 for the four first mechanisms, each with its audit sheet judged `pass`: the
+  four-bar (clevis rocker, coupler plated for a 1.5 mm crank pin overhang, swing scale), the Geneva drive (clevis arm,
+  roller on hardened slot strips, replaceable locking segment, drag pack, lobe windows, station marks), the spur gear
+  pair (both shafts straddle mounted in a bridge, backlash eccentrics at both ends of the output shaft, output flange,
+  spoked gear) and the slider-crank (crosshead clevis, counterweighted crank, end stops at both ends).
+- Rules: drive leads laid as cables round the input housing; shoulder bolts and axles in ISO 7379 lengths with a
+  shim; keyed bores cut to the shaft; inner-race spacers capped at the inner ring on small shafts; a bridge whose
+  posts stand far from its pivot is built as two filleted arms; no stops on a part that indexes; the edge check
+  judges round holes only; D-flats count as torque transmission.
+- Catalogue: the slider-crank text says the slider is faster in the half of the stroke farther from the crank.
+
 ## 0.4.0 — 2026-10-17
 
 - Packages: every mechanism assembled at build time into a compressed binary package the browser loads (four-bar
