@@ -1,6 +1,7 @@
 ---
 // A library card (SS1): the pre-rendered drawing for each sheet, animated live on hover by the card island.
 import { FACETS, type Sheet } from "../data";
+import { url } from "../url";
 interface Props {
   sheet: Sheet;
 }
@@ -9,10 +10,10 @@ const r = sheet.rec;
 const data = Object.fromEntries(FACETS.map((f) => [`data-${f.key}`, f.of(r).join("|")]));
 const text = [r.name, ...(r.aka ?? []), r.summary, r.family, r.motion.label, ...r.tags.function, ...r.tags.property, ...r.tags.application, ...(r.tags.keywords ?? [])].join(" ").toLowerCase();
 ---
-<a class="card" href={`/mechanisms/${sheet.id}/`} data-id={sheet.id} data-text={text} {...data}>
+<a class="card" href={url(`/mechanisms/${sheet.id}/`)} data-id={sheet.id} data-text={text} {...data}>
   <div class="thumb">
-    <img class="t-dark" src={`/thumbs/${sheet.id}-dark.png`} alt={`${r.name}, drawing`} width="320" height="240" loading="lazy" decoding="async" />
-    <img class="t-light" src={`/thumbs/${sheet.id}-light.png`} alt="" width="320" height="240" loading="lazy" decoding="async" />
+    <img class="t-dark" src={url(`/thumbs/${sheet.id}-dark.png`)} alt={`${r.name}, drawing`} width="320" height="240" loading="lazy" decoding="async" />
+    <img class="t-light" src={url(`/thumbs/${sheet.id}-light.png`)} alt="" width="320" height="240" loading="lazy" decoding="async" />
     <canvas aria-hidden="true"></canvas>
   </div>
   <div class="body">

@@ -1,6 +1,6 @@
 // The engine as the browser gets it: the registry (each model its own chunk), the package loader and the renderer.
 // The stage imports it; a card imports it on first hover, so the library page loads no engine until then (R8, SS8).
-export { mechanisms } from "../../../src/mechanisms";
+export { models } from "../../../src/mechanisms/models";
 export { loadPackage } from "../../../src/package/loader";
 export { browserFactory } from "../../../src/render/canvas";
 export { defaultView } from "../../../src/render/draft";

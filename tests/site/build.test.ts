@@ -48,6 +48,15 @@ describe("site build", () => {
     }
   });
 
+  it("ships no polish, rule or hardware module to the browser (R4)", () => {
+    const files = new Set<string>();
+    for (const id of Object.keys(mechanisms)) for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files);
+    const all = [...files].map((f) => read(f)).join("\n");
+    // the engine chunk names every chunk it can load, dynamic imports included
+    expect(all).not.toMatch(/polish\.[\w-]+\.js/);
+    expect(all).not.toMatch(/(pins|materials|locking|j\d-[\w-]+)\.[\w-]+\.js/);
+  });
+
   it("shows the version in the footer and no colour literals in the page CSS", () => {
     const html = read("index.html");
     expect(html).toContain(`Version ${JSON.parse(readFileSync("package.json", "utf8")).version}`);

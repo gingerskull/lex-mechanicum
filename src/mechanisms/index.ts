@@ -1,27 +1,23 @@
-// Registry: mechanism id -> lazy import of its model and polish.
+// Registry: mechanism id -> its model (models.ts) and a lazy import of its polish. Node tools, assembly and packaging
+// load both; the browser loads models.ts only.
 import type { Polish } from "../assemble/api";
 import type { MechanismModel } from "../model/types";
+import { models } from "./models";
+
+export { models };
 
 export interface MechanismEntry {
   model: MechanismModel;
   polish?: Polish;
 }
 
-export const mechanisms: Record<string, () => Promise<MechanismEntry>> = {
-  "four-bar": async () => ({
-    model: (await import("./four-bar/model")).default,
-    polish: (await import("./four-bar/polish")).polish,
-  }),
-  geneva: async () => ({
-    model: (await import("./geneva/model")).default,
-    polish: (await import("./geneva/polish")).polish,
-  }),
-  "spur-gears": async () => ({
-    model: (await import("./spur-gears/model")).default,
-    polish: (await import("./spur-gears/polish")).polish,
-  }),
-  "slider-crank": async () => ({
-    model: (await import("./slider-crank/model")).default,
-    polish: (await import("./slider-crank/polish")).polish,
-  }),
+const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
+  "four-bar": () => import("./four-bar/polish"),
+  geneva: () => import("./geneva/polish"),
+  "spur-gears": () => import("./spur-gears/polish"),
+  "slider-crank": () => import("./slider-crank/polish"),
 };
+
+export const mechanisms: Record<string, () => Promise<MechanismEntry>> = Object.fromEntries(
+  Object.keys(models).map((id) => [id, async () => ({ model: await models[id]!(), polish: (await polishes[id]!()).polish })]),
+);

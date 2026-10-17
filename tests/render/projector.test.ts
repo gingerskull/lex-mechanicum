@@ -5,6 +5,11 @@ const size = { w: 800, h: 500 };
 const B = { minX: -100, minY: -80, maxX: 120, maxY: 90 };
 
 describe("projector", () => {
+  it("keeps a positive scale on a canvas smaller than its margins (a hidden stage)", () => {
+    const P = projector({ tilt: 28 }, { w: 0, h: 0 }, B, [-10, 30], 20);
+    expect(P.s).toBeGreaterThan(0);
+  });
+
   it("ignores z in plan", () => {
     const P = projector({ tilt: 0 }, size, B, [-10, 30], 20);
     expect(P.P(10, 20, 0)).toEqual(P.P(10, 20, 25));
