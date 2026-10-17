@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1 — 2026-10-18
+
+- The site is published on GitHub Pages at https://gingerskull.github.io/mechanism-database/ by a workflow on merges
+  to main; links, thumbnails, packages and fonts follow the deploy base path.
+
 ## 0.5.0 — 2026-10-18
 
 - Conformance passes to standard 2.0 for the four first mechanisms, each with its audit sheet judged `pass`: the

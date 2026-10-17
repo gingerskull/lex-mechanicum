@@ -64,6 +64,10 @@ job; `concurrency` cancels superseded runs; no CI on pushes to main (the PR alre
 run on main is the safety net. Time limits sit at about twice the observed run; reports are uploaded on failure only,
 with short retention. CI changes that save minutes are proposals, made in an issue.
 
+The `Pages` workflow publishes the site to GitHub Pages (https://gingerskull.github.io/mechanism-database/) when a
+merge to main changes what the site is built from, or on demand. It builds with `SITE_BASE=/mechanism-database/`, so
+every link and asset path in the site goes through `site/src/url.ts`; local builds keep `/`.
+
 Before pushing a fix for a CI failure, reproduce it locally under CI-like conditions and fix plausible sibling
 failures in the same push. One push per round. Rerun only failed jobs, only after triage.
 
