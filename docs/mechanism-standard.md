@@ -187,6 +187,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `locking` | M13 |
 | `materials` | M10 |
 | `fasteners (stage 3)` | A8, M4 |
+| `see-through` | L5 |
 | `explode` | E1, E2, E3, E5, E6, E7, E8 |
 | `hardware primitives` | A13, M1, M3, M5, M11, R3 |
 | `checks (clearance, clamp, edge distance)` | A12, A15, M6 |
@@ -396,7 +397,7 @@ The look is the blueprint / drafting scheme: dark Blueprint and light Drafting s
 | L2 | **Records carry no look.** A model and a polish supply geometry, roles, materials, marks, detail levels and `accent: true` on the input; the renderer decides how they look. | HAND (don't break it) |
 | L3 | **Roles carry the look.** Each role has its own surface: driver fine stipple, link sparse dots, output hatching, ground soft dashes, base a faint dot grid, bearings cross-hatch, hardware plain. Every solid's `role` must be right. | HAND |
 | L4 | **One accent colour** for the input shaft ring, the traced path and the forces. `accent: true` goes on the input only. | HAND (flag) / STYLE |
-| L5 | **Transparency stays.** Surfaces are semi-transparent and a covered edge becomes a dashed hidden line, so screws in holes, bearings in bores and shanks through plates show. Model them as real solids with real holes, never as a mark on a top face. | AUTO (stage 3) / HAND |
+| L5 | **Transparency stays.** Surfaces are semi-transparent and a covered edge becomes a dashed hidden line, so screws in holes, bearings in bores and shanks through plates show. Model them as real solids with real holes, never as a mark on a top face. A static solid that hides a working zone (the pitch point of a mesh, the run of a slot roller) is drawn see-through, so the zone stays in view. | AUTO (stage 3, see-through) / HAND |
 | L6 | **Correct depth order** at every tilt: solids sliced at every overlapping z boundary; nothing paints in front of what it sits behind. | AUTO |
 | L7 | **View:** tilt from 0° (true plan) to 88° (side elevation), no sideways shear. Pseudo-2D only. | STYLE |
 | L8 | **Drawing conventions the mechanism feeds:** chain centrelines through every joint head and base-plate dimensions are automatic. Engraved scales, index marks and match marks are `marks` and draw as fine ink lines. Fill patterns never get finer than the on-screen floor; a detail under about 1 mm becomes one mark or nothing. | AUTO / HAND |

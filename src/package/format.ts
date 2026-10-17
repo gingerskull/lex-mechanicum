@@ -17,7 +17,7 @@ import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 export const FORMAT = 1;
 
 /** Bits of `PackedSolid.flags`. */
-export const FLAG = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16 } as const;
+export const FLAG = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32 } as const;
 export type FlagName = keyof typeof FLAG;
 
 export interface PackedSolid {
@@ -44,7 +44,7 @@ export interface PackedSolid {
   chamfer?: number;
   /** Thread: nominal M size and the z range of the drawn thread. */
   thr?: [number, number, number];
-  /** FLAG bits: inset, accent, faint, isBase, headTop. */
+  /** FLAG bits: inset, accent, faint, isBase, headTop, seeThrough. */
   flags: number;
   /** x, y pairs, body-local mm: the outer outline, then each hole, then each mark. */
   pts: Float32Array;

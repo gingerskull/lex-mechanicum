@@ -1,6 +1,7 @@
 // The stage (SS5): loads the mechanism's package and solve, plays it, and wires the controls: play, scrubber and
-// drag-to-scrub, speed, tilt, explode, overlays, the detail pin and the keyboard. The detail dial adapts to the frame
-// time one rung at a time with hysteresis, never past G on its own (DL4); the title block shows the position.
+// drag-to-scrub, speed, tilt, explode, overlays, the detail dial and the keyboard. On Auto the dial adapts to the
+// frame time one rung at a time with hysteresis, never past G on its own (DL4), and the slider follows it; moving the
+// slider sets the dial by hand and turns Auto off. The title block shows the position.
 import * as E from "./engine";
 import { url } from "../url";
 
@@ -30,8 +31,8 @@ async function main(box: HTMLElement) {
     speed: 1,
     tilt: 28,
     explode: 0,
-    overlays: { paths: true, forces: true, velocity: false, angles: false } as Record<string, boolean>,
-    pinned: false,
+    overlays: { paths: true, forces: false, velocity: false, angles: false } as Record<string, boolean>,
+    auto: true,
     rung: 0,
     slow: 0,
     fast: 0,
@@ -43,7 +44,7 @@ async function main(box: HTMLElement) {
     overlays: { ...s.overlays },
     dims: true,
     sheet: { title: box.dataset.title ?? id, no: box.dataset.no ?? "" },
-    detail: s.pinned ? "full" : LADDER[s.rung]!,
+    detail: LADDER[s.rung]!,
     theme: E.pageTheme(),
   });
 
@@ -57,6 +58,15 @@ async function main(box: HTMLElement) {
   };
   plotSize();
 
+  // the detail slider: right is full detail, each step left drops one more rung
+  const detail = $<HTMLInputElement>("detail");
+  function showDial() {
+    detail.value = String(LADDER.length - 1 - s.rung);
+    const r = LADDER[s.rung]!;
+    $("detailv").textContent = r === "full" ? "Full" : r === "A" ? "−A" : `−A–${r}`;
+    $("detailv").title = r === "full" ? "Everything drawn" : `Not drawn: ${E.DETAIL.slice(0, E.DETAIL.findIndex((x) => x.id === r) + 1).map((x) => x.name.toLowerCase()).join("; ")}`;
+  }
+
   let dirty = true;
   const draw = () => {
     const t0 = performance.now();
@@ -69,18 +79,20 @@ async function main(box: HTMLElement) {
     dirty = false;
   };
   const adapt = (ms: number) => {
-    if (s.pinned || !s.playing) return;
+    if (!s.auto || !s.playing) return;
     if (ms > SLOW_MS) {
       s.fast = 0;
       if (++s.slow >= SLOW_N && s.rung < LADDER.length - 1) {
         s.rung++;
         s.slow = 0;
+        showDial();
       }
     } else if (ms < FAST_MS) {
       s.slow = 0;
       if (++s.fast >= FAST_N && s.rung > 0) {
         s.rung--;
         s.fast = 0;
+        showDial();
       }
     }
   };
@@ -134,13 +146,26 @@ async function main(box: HTMLElement) {
       c.setAttribute("aria-pressed", String(s.overlays[k]));
       dirty = true;
     });
-  const pin = $<HTMLButtonElement>("pin");
-  pin.addEventListener("click", () => {
-    s.pinned = !s.pinned;
-    s.rung = 0;
-    pin.setAttribute("aria-pressed", String(s.pinned));
+  const auto = $<HTMLButtonElement>("auto");
+  const setAuto = (v: boolean) => {
+    s.auto = v;
+    s.slow = s.fast = 0;
+    auto.setAttribute("aria-pressed", String(v));
+  };
+  auto.addEventListener("click", () => {
+    setAuto(!s.auto);
+    if (s.auto) s.rung = 0;
+    showDial();
     dirty = true;
   });
+  detail.max = String(LADDER.length - 1);
+  detail.addEventListener("input", () => {
+    setAuto(false);
+    s.rung = LADDER.length - 1 - Number(detail.value);
+    showDial();
+    dirty = true;
+  });
+  showDial();
   // drag to scrub, keyboard on the canvas
   canvas.tabIndex = 0;
   let drag: { x: number; u: number } | null = null;

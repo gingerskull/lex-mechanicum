@@ -29,7 +29,7 @@ src/hardware/                    tables (bearings, screws, circlips, keys, pulle
                                  eccentric mount, drag pack, follower train, sensor, drive by input kind)
 src/rules/                       context, classify, one module per rule, the registry and autoTable(); stage 3
                                  fasteners; the rigid explode pass
-src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> explode; the polish API;
+src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> see-through -> explode; the polish API;
                                  solid poses; clearance, clamp and edge-distance checks
 src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)
 src/audit/                       the audit generator and the conformance report
@@ -53,7 +53,8 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    record with the same id.
 2. **Assemble.** `assemble(model)` runs the rules (every joint built from its type, then base, standoffs, feet,
    lubrication, timing marks, materials, drive), then the mechanism's `polish(A, H)` (only what differs), then
-   stage 3 fasteners, then the rigid explode pass. The result is a list of solids: extruded outlines in body-local
+   stage 3 fasteners, then the see-through stage (a static solid that hides a working zone, such as the pitch point
+   of a mesh, is marked to be drawn see-through), then the rigid explode pass. The result is a list of solids: extruded outlines in body-local
    millimetres with z ranges, explode levels, detail rungs, roles, materials and joint membership.
 3. **Package.** At build time, `tools/package` assembles every mechanism and writes a compact package (typed arrays)
    with the solids, traced paths, bounds, plot data and joint notes. The rules engine, the hardware library and the

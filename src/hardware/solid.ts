@@ -63,6 +63,8 @@ export interface Solid {
   accent?: boolean;
   /** Drawn faint: internals of bought units. */
   faint?: boolean;
+  /** Drawn see-through: it covers a working zone of the mechanism (L5), set by the see-through stage. */
+  seeThrough?: boolean;
   motion?: Motion;
   /** Solids this one may overlap by design (a spigot in its bridge, a shank in its tapped hole). */
   allow?: string[];
