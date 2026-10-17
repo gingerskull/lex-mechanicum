@@ -1,9 +1,16 @@
 # Changelog
 
-## 0.5.1 — 2026-10-18
+## 0.6.0 — 2026-10-18
+
+First release: four mechanisms to standard 2.0 (four-bar linkage, Geneva drive, spur gear pair, slider-crank), the
+site, the tools and the docs.
 
 - The site is published on GitHub Pages at https://gingerskull.github.io/mechanism-database/ by a workflow on merges
   to main; links, thumbnails, packages and fonts follow the deploy base path.
+- The browser loads mechanism models only (`src/mechanisms/models.ts`); a site test fails if a polish, rule or
+  hardware module reaches a page (R4).
+- A stage smaller than its margins keeps a positive drawing scale instead of throwing on its first frame.
+- README and architecture describe the release; the bench report, its gaps and the follow-ups are on the board.
 
 ## 0.5.0 — 2026-10-18
 
