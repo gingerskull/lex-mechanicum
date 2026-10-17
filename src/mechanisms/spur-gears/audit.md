@@ -113,7 +113,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | R3 | PASS | AUTO · housing, bridge and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; polish 0.7 s, almost all of it the bridge's post search (promotion candidate) |
-| R6 | PASS | FLAG · browser bench: plan 8.6, side 36.4, explode 32.6, 28° 71 ms at full detail; 8 ms met only from dial D: the toothed outlines are costly to slice and shade (look at in #14) |
+| R6 | PASS | FLAG · browser bench (one run for all four): plan 50.5, 28° 75.6, side 39.3, explode 27.9 ms at full detail; 8 ms reached at dial D; runs on this machine vary by up to half (look at in #14) |
 | R7 | PASS | HAND · model.ts + polish.ts 12.7 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
@@ -149,15 +149,15 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 14 | 0 | 47.1 |
-| DL-B | 0 | 172 | 54.4 |
-| DL-C | 0 | 0 | 19.8 |
-| DL-D | 15 | 0 | 8.1 |
-| DL-E | 8 | 2 | 12.3 |
-| DL-F | 0 | 0 | 12.6 |
-| DL-G | 0 | 0 | 6.3 |
-| DL-H | 17 | 0 | 4.3 |
-| never | 88 | 164 | 68.5 (full) |
+| DL-A | 14 | 0 | 59.4 |
+| DL-B | 0 | 172 | 58.1 |
+| DL-C | 0 | 0 | 10.4 |
+| DL-D | 15 | 0 | 7.3 |
+| DL-E | 8 | 2 | 6.2 |
+| DL-F | 0 | 0 | 15.6 |
+| DL-G | 0 | 0 | 8.0 |
+| DL-H | 17 | 0 | 6.1 |
+| never | 88 | 164 | 73.2 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
@@ -170,4 +170,4 @@ Hand fixes that should become rules or primitives.
 
 ## Verification
 check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.6 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #12) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 71 ms at full detail, 8 ms reached at dial D (flag, R6)
+screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #12) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 75.6 ms at full detail, 8 ms reached at dial D (flag, R6)
