@@ -1,0 +1,27 @@
+name: Decision
+description: A choice that needs David's call before work can start. Answer in a comment.
+title: 'Decide: '
+labels: ['kind:decision']
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: The choice to make, in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options
+      description: Each option with what it costs and what it gives. Put the recommended one first.
+      value: |
+        1. **(Recommended)**
+        2.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What depends on this choice (linked issues), evidence, links. Optional.

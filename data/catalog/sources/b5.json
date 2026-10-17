@@ -1,0 +1,3696 @@
+[
+ {
+  "id": "sun-and-planet",
+  "name": "Sun and planet gear",
+  "aka": [
+   "sun and planet motion",
+   "Watt's sun and planet",
+   "Boulton and Watt planet gear"
+  ],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Intermediate",
+  "summary": "A planet gear fixed to a beam engine's connecting rod orbits a sun gear on the flywheel shaft, turning the shaft twice per orbit.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Rotary",
+   "label": "Oscillating → Rotary",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Step-up",
+   "class": "Low (<5:1)",
+   "typical": "shaft turns = 1 + zp/zs per planet orbit; 2 turns per beam double stroke with equal gears"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 5,
+   "revolute": 5,
+   "prismatic": 0,
+   "higher_pairs": 1,
+   "notes": "ground, beam, connecting rod with planet rigidly fixed, sun with flywheel, retaining link from sun shaft to planet centre; one gear mesh"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Speed increase"
+   ],
+   "property": [
+    "Positive drive",
+    "Historic",
+    "Singular positions"
+   ],
+   "application": [
+    "Steam & engines",
+    "Education"
+   ],
+   "keywords": [
+    "james watt",
+    "william murdoch",
+    "boulton and watt",
+    "beam engine",
+    "pickard crank patent",
+    "1781 patent",
+    "epicyclic"
+   ]
+  },
+  "explain": {
+   "motion": "The beam rocks and drives the connecting rod, whose lower end carries a planet gear that cannot turn relative to the rod. A retaining link keeps the planet in mesh as its centre orbits the sun gear on the flywheel shaft. Because the planet does not spin on its own axis, the sun is driven round by both the orbit and the rolling mesh, so with equal gears the shaft makes two turns per orbit.",
+   "forces": "The rod thrust acts at the mesh, tangential to the sun, so torque is the rod force times the pitch radius of the sun, varying with rod angle like a crank. The retaining link carries the radial separating force; the gear teeth and the link pivot are the weak points under shock.",
+   "benefits": "Gets rotary output from a reciprocating beam without a crank and doubles shaft speed compared with a crank. It has no dead centre in the way a single crank does at top and bottom.",
+   "limits": "More parts, gear wear and backlash than a simple crank, and the flywheel is still needed to smooth the torque. It fell out of use once the crank patent expired around 1794."
+  },
+  "build": {
+   "ground": "engine frame with beam pivot O_b and flywheel shaft O_s",
+   "input": "beam, oscillating about O_b by about ±24° (or drive the planet orbit angle directly for animation)",
+   "output": "sun gear and flywheel, rotation about O_s",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "beam pivot O_b at (0, 520), sun shaft O_s at (300, 0)"
+    },
+    {
+     "id": "beam",
+     "role": "driver",
+     "def": "O_b to beam end B, length 300 mm, oscillating"
+    },
+    {
+     "id": "rod",
+     "role": "link",
+     "def": "B to planet centre P, length 400 mm; planet gear rigidly fixed at P (no rotation relative to rod)"
+    },
+    {
+     "id": "planet",
+     "role": "gear",
+     "def": "z = 24, module 5, pitch radius 60 mm, part of rod"
+    },
+    {
+     "id": "sun",
+     "role": "output",
+     "def": "z = 24, module 5, pitch radius 60 mm, on flywheel shaft O_s"
+    },
+    {
+     "id": "retainer",
+     "role": "link",
+     "def": "O_s to P, length 120 mm = sun + planet pitch radii, keeps gears in mesh"
+    }
+   ],
+   "joints": [
+    {
+     "id": "Ob",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "beam"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "beam",
+      "rod"
+     ]
+    },
+    {
+     "id": "Os",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "sun"
+     ]
+    },
+    {
+     "id": "Or",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "retainer"
+     ]
+    },
+    {
+     "id": "P",
+     "type": "revolute",
+     "between": [
+      "retainer",
+      "rod"
+     ]
+    },
+    {
+     "id": "M",
+     "type": "gear mesh",
+     "between": [
+      "planet",
+      "sun"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "zs",
+     "value": 24,
+     "unit": "teeth",
+     "note": "sun teeth"
+    },
+    {
+     "name": "zp",
+     "value": 24,
+     "unit": "teeth",
+     "note": "planet teeth"
+    },
+    {
+     "name": "m",
+     "value": 5,
+     "unit": "mm",
+     "note": "module"
+    },
+    {
+     "name": "c",
+     "value": 120,
+     "unit": "mm",
+     "note": "orbit radius = m(zs+zp)/2"
+    },
+    {
+     "name": "beam",
+     "value": 300,
+     "unit": "mm",
+     "note": "beam arm O_b to B"
+    },
+    {
+     "name": "L",
+     "value": 400,
+     "unit": "mm",
+     "note": "connecting rod length B to P"
+    }
+   ],
+   "defining_relations": "Planet does not rotate in the frame of the rod. Willis: (w_s - w_r)/(w_p - w_r) = -zp/zs with w_r the retainer (orbit) speed. If the rod barely rotates (w_p about 0), w_s = w_r (1 + zp/zs). Equal gears give 2:1. Orbit radius c = m(zs+zp)/2; beam end vertical travel = 2c.",
+   "range": "planet orbits 360° continuously; beam swings about ±24°; sun turns 720° per orbit",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "sun angle vs orbit angle (nearly straight line of slope 2, with small ripple from rod tilt)",
+   "notes": "Planet angle equals rod angle, not orbit angle. Keep tooth phase consistent: sun angle = orbit angle + (zp/zs)(orbit angle - rod angle). The direction of rotation depends on which side of the sun the planet starts on during the down stroke; a flywheel carries it through."
+  },
+  "examples": [
+   {
+    "use": "Boulton and Watt rotative beam engines",
+    "detail": "Used from 1781 on mill engines to drive line shafting before the crank patent lapsed."
+   },
+   {
+    "use": "Museum and demonstration engines",
+    "detail": "Preserved Watt engines and working models show the gear driving a flywheel."
+   }
+  ],
+  "references": [
+   {
+    "title": "Sun and planet gear, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Sun_and_planet_gear",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Sun and Planet Gear Mechanism Explained, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/sun-and-planet-gear",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Epicyclic gearing, Princeton history of technology",
+    "url": "https://swh.princeton.edu/~maelabs/hpt/pro/epicyclic.htm",
+    "kind": "textbook"
+   }
+  ],
+  "media": [
+   {
+    "title": "Boulton and Watt Sun and Planet Gear Engine (YouTube)",
+    "url": "https://www.youtube.com/watch?v=cSoHmwuTs-M",
+    "kind": "video"
+   },
+   {
+    "title": "Model of Sun and Planet Gearing by James Watt, Science Museum Group",
+    "url": "https://collection.sciencemuseumgroup.org.uk/objects/co51167",
+    "kind": "photos"
+   },
+   {
+    "title": "507 Mechanical Movements No. 39, Sun and Planet Gear (YouTube)",
+    "url": "https://www.youtube.com/watch?v=bSWRFathxWM",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "planetary",
+   "slider-crank",
+   "locomotive-drive",
+   "gear-train",
+   "watt-linkage"
+  ]
+ },
+ {
+  "id": "wankel",
+  "name": "Wankel rotary engine",
+  "aka": [
+   "rotary engine",
+   "Wankel engine",
+   "KKM",
+   "epitrochoid rotary"
+  ],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "A triangular rotor orbits inside an epitrochoid housing, phased by a 3:2 internal gear, turning the eccentric shaft three times per rotor turn.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Continuous"
+   ],
+   "axes": "Offset parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Step-up",
+   "class": "Low (<5:1)",
+   "typical": "eccentric shaft 3 turns per rotor turn (rotor gear : fixed gear = 3:2)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 1,
+   "notes": "ground (housing with fixed external gear), eccentric shaft, rotor with internal gear; one gear mesh; apex seals sliding on the housing are redundant contacts"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Pumping & compression"
+   ],
+   "property": [
+    "Compact",
+    "Balanced",
+    "Few parts",
+    "Positive drive"
+   ],
+   "application": [
+    "Automotive",
+    "Aerospace",
+    "Steam & engines"
+   ],
+   "keywords": [
+    "felix wankel",
+    "nsu",
+    "mazda 13b",
+    "epitrochoid",
+    "reuleaux triangle",
+    "apex seal",
+    "eccentric shaft"
+   ]
+  },
+  "explain": {
+   "motion": "The rotor's internal gear rolls on a fixed gear on the housing, so the rotor centre orbits the shaft axis on the eccentric while the rotor turns slowly the same way. Its three apexes stay on the epitrochoid wall, forming three chambers that grow and shrink twice per rotor turn. The eccentric shaft turns three times for each rotor revolution, giving one power stroke per shaft turn per rotor.",
+   "forces": "Gas pressure on each rotor flank pushes through the rotor bearing onto the eccentric, producing torque equal to force times eccentricity. The phasing gears carry only the reaction that keeps the rotor in step, while apex seals take sliding contact loads and wear.",
+   "benefits": "Very compact and smooth for its power, with no reciprocating parts and few moving pieces.",
+   "limits": "Long thin combustion chambers burn poorly, giving higher fuel use and emissions. Apex seal wear and oil consumption limit life."
+  },
+  "build": {
+   "ground": "housing with epitrochoid bore and fixed external phasing gear coaxial with the shaft",
+   "input": "eccentric shaft, continuous rotation (in the engine the rotor gas forces drive it; for animation drive the shaft)",
+   "output": "rotor position and chamber volumes; shaft torque",
+   "members": [
+    {
+     "id": "housing",
+     "role": "ground",
+     "def": "epitrochoid x = e cos3a + R cos a, y = e sin3a + R sin a, with R = 103, e = 15"
+    },
+    {
+     "id": "fixed_gear",
+     "role": "gear",
+     "def": "external gear z = 30, module 2, pitch radius 30, fixed to housing at origin"
+    },
+    {
+     "id": "shaft",
+     "role": "driver",
+     "def": "eccentric shaft, journal offset e = 15 mm from origin"
+    },
+    {
+     "id": "rotor",
+     "role": "output",
+     "def": "curved triangle, apex radius R = 103 mm from rotor centre; internal gear z = 45, pitch radius 45"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "housing",
+      "shaft"
+     ]
+    },
+    {
+     "id": "E",
+     "type": "revolute",
+     "between": [
+      "shaft",
+      "rotor"
+     ]
+    },
+    {
+     "id": "G",
+     "type": "gear mesh",
+     "between": [
+      "fixed_gear",
+      "rotor"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "R",
+     "value": 103,
+     "unit": "mm",
+     "note": "generating radius (rotor centre to apex), Mazda 13B-REW"
+    },
+    {
+     "name": "e",
+     "value": 15,
+     "unit": "mm",
+     "note": "eccentricity"
+    },
+    {
+     "name": "z_fixed",
+     "value": 30,
+     "unit": "teeth",
+     "note": "stationary gear"
+    },
+    {
+     "name": "z_rotor",
+     "value": 45,
+     "unit": "teeth",
+     "note": "rotor internal gear, ratio 3:2"
+    },
+    {
+     "name": "m",
+     "value": 2,
+     "unit": "mm",
+     "note": "module, e = m(z_rotor - z_fixed)/2"
+    },
+    {
+     "name": "B",
+     "value": 80,
+     "unit": "mm",
+     "note": "housing width (for 3D extrusion)"
+    }
+   ],
+   "defining_relations": "Rotor angle = shaft angle / 3. Rotor centre = e(cos t, sin t). Apex k at angle t/3 + k*120° at distance R from rotor centre traces the epitrochoid. Gear centre distance e = m(z_rotor - z_fixed)/2 and z_rotor/z_fixed = 3/2. K = R/e about 6.9 (must exceed about 6 for a usable chamber).",
+   "range": "shaft 360° continuous; rotor turns 120° per shaft turn; each chamber goes through intake, compression, power, exhaust over 1080° of shaft",
+   "overlays": [
+    "paths",
+    "angles",
+    "plot"
+   ],
+   "plot": "chamber volume vs shaft angle for one chamber",
+   "notes": "Draw rotor flanks as arcs slightly inside the inner envelope so they clear the housing waist. Rotor and shaft turn the same direction. Ports and spark plugs are static decoration."
+  },
+  "examples": [
+   {
+    "use": "Mazda RX-7 and RX-8 cars",
+    "detail": "Twin-rotor 13B and Renesis engines in production sports cars."
+   },
+   {
+    "use": "Range extenders and UAV engines",
+    "detail": "Small rotaries power drones and the Mazda MX-30 range extender for their compactness."
+   },
+   {
+    "use": "NSU Spider and Ro 80",
+    "detail": "First production cars using Wankel engines in the 1960s."
+   }
+  ],
+  "references": [
+   {
+    "title": "Wankel engine, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Wankel_engine",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "US patent 3,824,746 (rotary engine)",
+    "url": "https://patents.google.com/patent/US3824746",
+    "kind": "patent"
+   },
+   {
+    "title": "Wankel Rotary Engine Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/wankel-rotary-engine",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "See Thru Rotary Engine in Slow Motion (Wankel Engine) 4K",
+    "url": "https://www.youtube.com/watch?v=pCteBhr4dGY",
+    "kind": "video"
+   },
+   {
+    "title": "Wankel Engine / Rotary Engine, How it works (Animation)",
+    "url": "https://www.youtube.com/watch?v=josJhz8VS8A",
+    "kind": "animation"
+   },
+   {
+    "title": "Explore a Wankel engine in a see-through video series, Interesting Engineering",
+    "url": "https://interestingengineering.com/video/explore-a-wankel-engine-in-this-cool-see-through-video-series",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "internal-gear-pair",
+   "planetary",
+   "slider-crank",
+   "cycloidal-drive"
+  ]
+ },
+ {
+  "id": "ravigneaux",
+  "name": "Ravigneaux planetary gearset",
+  "aka": [
+   "Ravigneaux gear",
+   "compound planetary",
+   "dual sun planetary"
+  ],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "Two suns, short and long pinions on one carrier and a single ring give several forward ratios and reverse in a compact automatic gearbox.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Continuous",
+    "Reversing"
+   ],
+   "axes": "Coaxial",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Selectable",
+   "class": "Low (<5:1)",
+   "typical": "with defaults: 1st 2.80:1, 2nd 1.54:1, 3rd 1:1, reverse -2.33:1"
+  },
+  "dof": 2,
+  "topology": {
+   "links": 7,
+   "revolute": 6,
+   "prismatic": 0,
+   "higher_pairs": 4,
+   "notes": "ground, small sun, large sun, carrier, short pinion, long pinion, ring (one pinion of each set shown, usually 3 of each); meshes: small sun-short, short-long, long-large sun, long-ring"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Speed reduction",
+    "Reversing",
+    "Differential & summing",
+    "Power splitting"
+   ],
+   "property": [
+    "Coaxial",
+    "Compact",
+    "Positive drive",
+    "High load"
+   ],
+   "application": [
+    "Automotive"
+   ],
+   "keywords": [
+    "pol ravigneaux",
+    "ford fmx",
+    "cruise-o-matic",
+    "automatic transmission",
+    "band brake",
+    "compound epicyclic",
+    "two-speed sun"
+   ]
+  },
+  "explain": {
+   "motion": "Short pinions mesh with the small sun and with the long pinions; long pinions mesh with the large sun and the ring. All pinions ride on one carrier. Holding one member with a brake and driving another fixes the ratio between input and output, so clutches and bands select the gear.",
+   "forces": "Torque splits between three pinion pairs, so tooth loads are shared and the unit carries high torque for its size. The held member's brake takes the reaction torque; the short-to-long pinion meshes see the highest tooth loads in low gear.",
+   "benefits": "Gives three or four forward speeds and reverse from one compact coaxial gearset with fewer parts than two simple planetaries.",
+   "limits": "Ratio spacing is constrained by shared tooth counts, and the long pinions and their bearings are a weak point. Shifts need coordinated clutch and brake timing."
+  },
+  "build": {
+   "ground": "transmission case with brakes able to hold the large sun, the carrier or the ring",
+   "input": "small sun (forward) or large sun (reverse), continuous rotation",
+   "output": "ring gear, coaxial with input",
+   "members": [
+    {
+     "id": "sun_small",
+     "role": "driver",
+     "def": "z = 30, module 2, pitch radius 30 mm at origin"
+    },
+    {
+     "id": "sun_large",
+     "role": "gear",
+     "def": "z = 36, pitch radius 36 mm at origin (axially offset)"
+    },
+    {
+     "id": "carrier",
+     "role": "link",
+     "def": "holds short pinions at radius 48 and long pinions at radius 60, 44.05° apart"
+    },
+    {
+     "id": "pinion_short",
+     "role": "gear",
+     "def": "z = 18, pitch radius 18, orbit radius 48"
+    },
+    {
+     "id": "pinion_long",
+     "role": "gear",
+     "def": "z = 24, pitch radius 24, orbit radius 60"
+    },
+    {
+     "id": "ring",
+     "role": "output",
+     "def": "internal z = 84, pitch radius 84 at origin"
+    }
+   ],
+   "joints": [
+    {
+     "id": "J1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "sun_small"
+     ]
+    },
+    {
+     "id": "J2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "sun_large"
+     ]
+    },
+    {
+     "id": "J3",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "carrier"
+     ]
+    },
+    {
+     "id": "J4",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "ring"
+     ]
+    },
+    {
+     "id": "J5",
+     "type": "revolute",
+     "between": [
+      "carrier",
+      "pinion_short"
+     ]
+    },
+    {
+     "id": "J6",
+     "type": "revolute",
+     "between": [
+      "carrier",
+      "pinion_long"
+     ]
+    },
+    {
+     "id": "M1",
+     "type": "gear mesh",
+     "between": [
+      "sun_small",
+      "pinion_short"
+     ]
+    },
+    {
+     "id": "M2",
+     "type": "gear mesh",
+     "between": [
+      "pinion_short",
+      "pinion_long"
+     ]
+    },
+    {
+     "id": "M3",
+     "type": "gear mesh",
+     "between": [
+      "pinion_long",
+      "sun_large"
+     ]
+    },
+    {
+     "id": "M4",
+     "type": "gear mesh",
+     "between": [
+      "pinion_long",
+      "ring"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "Ss",
+     "value": 30,
+     "unit": "teeth",
+     "note": "small sun"
+    },
+    {
+     "name": "Sl",
+     "value": 36,
+     "unit": "teeth",
+     "note": "large sun"
+    },
+    {
+     "name": "Ps",
+     "value": 18,
+     "unit": "teeth",
+     "note": "short pinion"
+    },
+    {
+     "name": "Pl",
+     "value": 24,
+     "unit": "teeth",
+     "note": "long pinion, R = Sl + 2 Pl"
+    },
+    {
+     "name": "R",
+     "value": 84,
+     "unit": "teeth",
+     "note": "ring"
+    },
+    {
+     "name": "m",
+     "value": 2,
+     "unit": "mm",
+     "note": "module"
+    },
+    {
+     "name": "n_sets",
+     "value": 3,
+     "unit": "",
+     "note": "pinion pairs around carrier, needs (Ss+R)/3 integer: 38"
+    }
+   ],
+   "defining_relations": "Large sun to ring via one pinion: (wR - wc)/(wSl - wc) = -Sl/R. Small sun to ring via two pinions: (wR - wc)/(wSs - wc) = +Ss/R. Gears: carrier held, input small sun: wR/wSs = Ss/R (1st). Large sun held: wR/wSs = Ss(R+Sl)/(R(Ss+Sl)) (2nd). Any two locked: 1:1 (3rd). Carrier held, input large sun: wR/wSl = -Sl/R (reverse). Geometry: R = Sl + 2Pl; short-long centre spacing (Ps+Pl)m/2 = 42 with orbit radii 48 and 60 gives 44.05° between them.",
+   "range": "all members rotate continuously; ratio depends on which member is held",
+   "overlays": [
+    "velocity",
+    "plot"
+   ],
+   "plot": "ring speed vs small sun speed for each selected gear (lever diagram)",
+   "notes": "Two DOF until a brake is applied; provide a gear selector that holds one member. Short and long pinions turn opposite ways. Check tooth phasing of 3 pinion pairs; the long pinion is twice the face width so it reaches both the large sun and the short pinion plane."
+  },
+  "examples": [
+   {
+    "use": "Ford FMX and Cruise-O-Matic automatics",
+    "detail": "Three-speed automatics built around a Ravigneaux set with band brakes and clutches."
+   },
+   {
+    "use": "Modern 4 to 6 speed automatics",
+    "detail": "Toyota U660E and similar transaxles combine a Ravigneaux set with a simple planetary."
+   },
+   {
+    "use": "Hobby and Meccano models",
+    "detail": "Built as demonstration gearboxes to show selectable ratios."
+   }
+  ],
+  "references": [
+   {
+    "title": "Ravigneaux planetary gearset, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ravigneaux_planetary_gearset",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Ravigneaux Gear, MathWorks Simscape Driveline",
+    "url": "https://www.mathworks.com/help/sdl/ref/ravigneauxgear.html",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "US patent 5690578, Ravigneaux planetary gear transmission",
+    "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/5690578",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "U660E / U760E 6-Speed Automatic Transaxle Ravigneaux Gear Set and Components",
+    "url": "https://www.youtube.com/watch?v=q7j-eYKjIYI",
+    "kind": "video"
+   },
+   {
+    "title": "Ravigneaux Planetary Transmission Meccano model, SELMEC",
+    "url": "https://selmec.org.uk/articles/14-ravigneaux-planetary-transmission",
+    "kind": "photos"
+   },
+   {
+    "title": "Ravigneaux Planetary Gear Set (Animation)",
+    "url": "https://www.youtube.com/watch?v=7iTn8OWxVFU",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "planetary",
+   "differential",
+   "gear-train",
+   "internal-gear-pair"
+  ]
+ },
+ {
+  "id": "cam-follower",
+  "name": "Cam and roller follower",
+  "aka": [
+   "plate cam",
+   "disc cam",
+   "radial cam",
+   "roller follower cam"
+  ],
+  "in_site": true,
+  "family": "Cam",
+  "level": "Intermediate",
+  "summary": "A shaped disc lifts a roller follower along its guide, so the output motion is whatever profile you cut into the cam.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Harmonic"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = rise h (22 mm by default) per cam turn"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 2,
+   "prismatic": 1,
+   "higher_pairs": 1,
+   "notes": "ground, cam, follower stem, roller; roller spin is a passive extra freedom; cam contact is the higher pair"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Function generation",
+    "Dwell",
+    "Valve timing"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Smooth (harmonic)"
+   ],
+   "application": [
+    "Automotive",
+    "Packaging & automation",
+    "Machine tools",
+    "Toys & kinetic art"
+   ],
+   "keywords": [
+    "pressure angle",
+    "base circle",
+    "cycloidal motion",
+    "rise-return",
+    "valve train",
+    "roller follower",
+    "force closure"
+   ]
+  },
+  "explain": {
+   "motion": "As the cam turns, the roller rides its edge and the follower rises and falls along its guide. In this default the profile rises cycloidally over 180° and returns cycloidally over 180°; any timing, including long dwells, can be drawn into the outline.",
+   "forces": "The cam can only push along the contact normal through the roller centre. The pressure angle between that normal and the follower path decides how much of the push goes sideways into the guide; keep it under about 30°. A spring or gravity must hold the follower on the cam.",
+   "benefits": "Almost any motion law with two moving parts and exact timing. A roller turns sliding into rolling contact, cutting wear.",
+   "limits": "Needs a return spring, which can float at high speed. Large lift in a short angle forces a big cam or high pressure angles."
+  },
+  "build": {
+   "ground": "frame carrying cam shaft O and two guide blocks for the follower stem (guide from y = 70 to 100 mm)",
+   "input": "cam, continuous rotation about O",
+   "output": "follower lift y (roller centre position along the vertical guide)",
+   "members": [
+    {
+     "id": "cam",
+     "role": "cam",
+     "def": "profile r(th) = 30 + 22 * s(f), f = th/180° on rise and (360°-th)/180° on return, s cycloidal"
+    },
+    {
+     "id": "follower",
+     "role": "follower",
+     "def": "vertical stem 70 mm long on the line through O (in-line, zero offset)"
+    },
+    {
+     "id": "roller",
+     "role": "follower",
+     "def": "roller radius 8 mm pinned at the stem foot"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "cam"
+     ]
+    },
+    {
+     "id": "guide",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "follower"
+     ]
+    },
+    {
+     "id": "pin",
+     "type": "revolute",
+     "between": [
+      "follower",
+      "roller"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "cam contact",
+     "between": [
+      "cam",
+      "roller"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "rb",
+     "value": 30,
+     "unit": "mm",
+     "note": "base circle radius of cam profile surface"
+    },
+    {
+     "name": "h",
+     "value": 22,
+     "unit": "mm",
+     "note": "rise (lift)"
+    },
+    {
+     "name": "rr",
+     "value": 8,
+     "unit": "mm",
+     "note": "roller radius"
+    },
+    {
+     "name": "beta_rise",
+     "value": 180,
+     "unit": "°",
+     "note": "rise angle"
+    },
+    {
+     "name": "beta_return",
+     "value": 180,
+     "unit": "°",
+     "note": "return angle"
+    },
+    {
+     "name": "dwell_top",
+     "value": 0,
+     "unit": "°",
+     "note": "no dwell in default profile"
+    },
+    {
+     "name": "dwell_bottom",
+     "value": 0,
+     "unit": "°",
+     "note": "no dwell in default profile"
+    },
+    {
+     "name": "law",
+     "value": "cycloidal",
+     "unit": "",
+     "note": "s(f) = f - sin(2 pi f)/(2 pi)"
+    },
+    {
+     "name": "offset",
+     "value": 0,
+     "unit": "mm",
+     "note": "in-line follower"
+    }
+   ],
+   "defining_relations": "Cycloidal law s = h(f - sin(2 pi f)/(2 pi)), f = theta/beta. The site cuts this law into the cam surface radius and finds lift as the highest roller position touching the profile, so actual lift is close to but not exactly cycloidal. Pressure angle phi = atan(s'/(rb + rr + s)) for an in-line follower; keep phi < 30°.",
+   "range": "cam 360° continuous; follower lift 0 to about 22 mm and back each turn",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot",
+    "velocity"
+   ],
+   "plot": "follower lift vs cam angle",
+   "notes": "Compute roller contact numerically (envelope); the label turns red past 30° pressure angle. Roller spin is cosmetic. Site rotates cam with th = -u."
+  },
+  "examples": [
+   {
+    "use": "Engine valve trains",
+    "detail": "Roller lifters follow camshaft lobes to open intake and exhaust valves."
+   },
+   {
+    "use": "Automatic screw machines",
+    "detail": "Plate cams time tool slide feeds on multi-spindle lathes."
+   },
+   {
+    "use": "Packaging machines and automata",
+    "detail": "Cams drive pick-and-place and figure motions from one main shaft."
+   }
+  ],
+  "references": [
+   {
+    "title": "Cam (mechanism), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Cam_(mechanism)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Cam follower, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Cam_follower",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Introduction to Mechanisms, Chapter 6 Cams, Carnegie Mellon",
+    "url": "https://www.cs.cmu.edu/~rapidproto/mechanisms/chpt6.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "CAM Follower Mechanism theory, IIT Kharagpur virtual lab",
+    "url": "https://mr-iitkgp.vlabs.ac.in/exp/cam-follower-mechanism/theory.html",
+    "kind": "textbook"
+   }
+  ],
+  "media": [
+   {
+    "title": "Single Overhead Camshaft (SOHC) operation in slow motion",
+    "url": "https://www.youtube.com/watch?v=6LmHegcDKd0",
+    "kind": "video"
+   },
+   {
+    "title": "KMODDL Kinematic Models for Design Digital Library, Cornell",
+    "url": "https://engineering.library.cornell.edu/kmoddl",
+    "kind": "photos"
+   },
+   {
+    "title": "Basic Mechanisms: Cam and Follower",
+    "url": "https://www.youtube.com/watch?v=a0Jk6ytDFac",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "flat-faced-cam",
+   "barrel-cam",
+   "face-groove-cam",
+   "desmodromic-cam",
+   "slider-crank",
+   "scotch-yoke"
+  ]
+ },
+ {
+  "id": "flat-faced-cam",
+  "name": "Cam with flat-faced follower",
+  "aka": [
+   "flat tappet",
+   "mushroom follower",
+   "bucket tappet",
+   "flat-face follower"
+  ],
+  "in_site": false,
+  "family": "Cam",
+  "level": "Intermediate",
+  "summary": "A disc cam pushes a follower with a flat face, so contact slides across the face and the push always stays square to the stroke.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Dwell"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = rise h (15 mm by default) per cam turn"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 1,
+   "prismatic": 1,
+   "higher_pairs": 1,
+   "notes": "ground, cam, flat-faced follower; cam contact slides along the face"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Valve timing",
+    "Dwell"
+   ],
+   "property": [
+    "Compact",
+    "Few parts",
+    "Exact",
+    "Smooth (harmonic)"
+   ],
+   "application": [
+    "Automotive",
+    "Machine tools",
+    "Steam & engines"
+   ],
+   "keywords": [
+    "flat tappet",
+    "bucket tappet",
+    "zero pressure angle",
+    "convex cam",
+    "direct acting overhead cam",
+    "face width",
+    "lifter rotation"
+   ]
+  },
+  "explain": {
+   "motion": "The cam turns and its lobe pushes the flat face of the follower up its guide. The contact point slides sideways across the face by a distance equal to ds/dtheta. The default profile rises cycloidally over 120°, dwells 60°, returns over 120° and dwells 60°.",
+   "forces": "The contact normal is always perpendicular to the face, so the pressure angle is zero for an in-line follower and guide side load comes only from friction and contact offset. The sliding contact carries high Hertz stress and needs good lubrication.",
+   "benefits": "Very compact and stiff with no side thrust from pressure angle, which suits direct-acting engine valves.",
+   "limits": "The cam must be convex everywhere (no concave flanks), and the face must be wide enough for the contact excursion. Sliding friction causes wear, so flat tappets need careful break-in."
+  },
+  "build": {
+   "ground": "frame with cam shaft O and a vertical guide on the line through O",
+   "input": "cam, continuous rotation about O",
+   "output": "follower lift y",
+   "members": [
+    {
+     "id": "cam",
+     "role": "cam",
+     "def": "profile from envelope of follower face lines at distance rb + s(theta) from O"
+    },
+    {
+     "id": "follower",
+     "role": "follower",
+     "def": "stem with flat face 40 mm wide, face perpendicular to stroke"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "cam"
+     ]
+    },
+    {
+     "id": "guide",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "follower"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "cam contact",
+     "between": [
+      "cam",
+      "follower"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "rb",
+     "value": 30,
+     "unit": "mm",
+     "note": "base circle radius"
+    },
+    {
+     "name": "h",
+     "value": 15,
+     "unit": "mm",
+     "note": "rise"
+    },
+    {
+     "name": "beta_rise",
+     "value": 120,
+     "unit": "°",
+     "note": "rise angle"
+    },
+    {
+     "name": "dwell_top",
+     "value": 60,
+     "unit": "°",
+     "note": "outer dwell"
+    },
+    {
+     "name": "beta_return",
+     "value": 120,
+     "unit": "°",
+     "note": "return angle"
+    },
+    {
+     "name": "dwell_bottom",
+     "value": 60,
+     "unit": "°",
+     "note": "inner dwell"
+    },
+    {
+     "name": "law",
+     "value": "cycloidal",
+     "unit": "",
+     "note": "rise and return"
+    },
+    {
+     "name": "face_w",
+     "value": 40,
+     "unit": "mm",
+     "note": "face width, must exceed 2 x max |ds/dtheta| = 28.6 mm"
+    }
+   ],
+   "defining_relations": "Cam profile point in cam frame: x = (rb + s) sin(theta) + s' cos(theta), y = (rb + s) cos(theta) - s' sin(theta). Contact offset on face = s' = ds/dtheta (max 2h/beta = 14.3 mm). Convexity: radius of curvature rho = rb + s + s'' > 0 everywhere (minimum about 9.9 mm with defaults).",
+   "range": "cam 360° continuous; follower 0 to 15 mm lift, dwells 60° at top and bottom",
+   "overlays": [
+    "forces",
+    "plot",
+    "velocity"
+   ],
+   "plot": "follower lift vs cam angle, with contact offset on the face as a second trace",
+   "notes": "Show the contact point sliding across the face. If params make rho negative the cam would cusp; warn and clamp. In engines the follower is often offset slightly so the tappet spins."
+  },
+  "examples": [
+   {
+    "use": "Direct-acting overhead cam engines",
+    "detail": "Bucket tappets sit between cam lobes and valves in many DOHC heads."
+   },
+   {
+    "use": "Pushrod engine flat tappet lifters",
+    "detail": "Classic V8 camshafts use flat-faced lifters that must be broken in carefully."
+   },
+   {
+    "use": "Fuel injection pumps",
+    "detail": "Cam-driven tappets stroke plungers in inline diesel injection pumps."
+   }
+  ],
+  "references": [
+   {
+    "title": "Cam follower, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Cam_follower",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "US4317433A, Flat-faced tappets for valve trains",
+    "url": "https://patents.google.com/patent/US4317433",
+    "kind": "patent"
+   },
+   {
+    "title": "Cam profile for a radial cam with flat faced oscillating follower, METU",
+    "url": "https://blog.metu.edu.tr/eresmech/mechanisms/ch8/8-5/flat_faced_oscillating/",
+    "kind": "textbook"
+   },
+   {
+    "title": "Design and Analysis of Cam Mechanisms with a Flat-Faced Follower",
+    "url": "https://www.scientific.net/AMR.711.506",
+    "kind": "paper"
+   }
+  ],
+  "media": [
+   {
+    "title": "FLAT TAPPET Cam Wear Pattern, check it before startup",
+    "url": "https://www.youtube.com/watch?v=cm3wUDTOC1k",
+    "kind": "video"
+   },
+   {
+    "title": "Fiesta ST180 Cam Bucket Replacement",
+    "url": "https://www.youtube.com/watch?v=uhgTUxvDUoo",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "cam-follower",
+   "desmodromic-cam",
+   "barrel-cam",
+   "eccentric-sheave"
+  ]
+ },
+ {
+  "id": "barrel-cam",
+  "name": "Barrel cam",
+  "aka": [
+   "cylindrical cam",
+   "drum cam",
+   "shift drum",
+   "grooved cylinder cam"
+  ],
+  "in_site": false,
+  "family": "Cam",
+  "level": "Intermediate",
+  "summary": "A helical groove around a rotating drum pushes a roller follower back and forth parallel to the drum axis.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Dwell"
+   ],
+   "axes": "Rotary-to-along-axis",
+   "plane": "Spatial"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = groove axial travel (40 mm by default) per drum turn"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 2,
+   "prismatic": 1,
+   "higher_pairs": 1,
+   "notes": "ground, drum, follower slide, roller; roller in groove is a form-closed cam contact"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Dwell",
+    "Positioning",
+    "Indexing"
+   ],
+   "property": [
+    "Positive drive",
+    "Exact",
+    "High load",
+    "Precision"
+   ],
+   "application": [
+    "Automotive",
+    "Packaging & automation",
+    "Machine tools",
+    "Printing & textiles"
+   ],
+   "keywords": [
+    "cylindrical cam",
+    "drum cam",
+    "shift drum",
+    "groove",
+    "form closure",
+    "spring-free",
+    "sewing machine"
+   ]
+  },
+  "explain": {
+   "motion": "A groove cut around the drum surface wanders along the axis. A roller sitting in the groove is carried with it, so the follower slide moves parallel to the drum axis as the drum turns. The default groove rises over 160°, dwells 20°, returns over 160° and dwells 20°.",
+   "forces": "Groove walls push both ways, so no return spring is needed. The pressure angle is set by groove slope: tan(phi) = s'/Rp, where Rp is the pitch radius; a larger drum gives a gentler slope and lower side load.",
+   "benefits": "Positive (form-closed) motion along the shaft axis, compact for long strokes, and can hold several followers on one drum.",
+   "limits": "Groove backlash means the roller flips walls at reversals, causing wear and noise. Machining a 3D groove is costlier than a plate cam."
+  },
+  "build": {
+   "ground": "frame with drum bearings and a slide guide parallel to the drum axis",
+   "input": "drum, continuous rotation about its axis",
+   "output": "follower slide position z along the drum axis",
+   "members": [
+    {
+     "id": "drum",
+     "role": "cam",
+     "def": "cylinder radius 50 mm, length 140 mm, groove centreline z(theta) = z0 + s(theta)"
+    },
+    {
+     "id": "slide",
+     "role": "follower",
+     "def": "carriage on guide parallel to drum axis, carrying radial roller pin"
+    },
+    {
+     "id": "roller",
+     "role": "follower",
+     "def": "roller dia 12 mm, groove width 12.1 mm, depth 8 mm"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "drum"
+     ]
+    },
+    {
+     "id": "guide",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "slide"
+     ]
+    },
+    {
+     "id": "pin",
+     "type": "revolute",
+     "between": [
+      "slide",
+      "roller"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "cam contact",
+     "between": [
+      "drum",
+      "roller"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "Rp",
+     "value": 50,
+     "unit": "mm",
+     "note": "drum pitch radius"
+    },
+    {
+     "name": "h",
+     "value": 40,
+     "unit": "mm",
+     "note": "axial stroke"
+    },
+    {
+     "name": "beta_rise",
+     "value": 160,
+     "unit": "°",
+     "note": "rise angle"
+    },
+    {
+     "name": "dwell_top",
+     "value": 20,
+     "unit": "°",
+     "note": "dwell at far end"
+    },
+    {
+     "name": "beta_return",
+     "value": 160,
+     "unit": "°",
+     "note": "return angle"
+    },
+    {
+     "name": "dwell_bottom",
+     "value": 20,
+     "unit": "°",
+     "note": "dwell at near end"
+    },
+    {
+     "name": "law",
+     "value": "cycloidal",
+     "unit": "",
+     "note": "rise and return"
+    },
+    {
+     "name": "d_roller",
+     "value": 12,
+     "unit": "mm",
+     "note": "roller diameter"
+    }
+   ],
+   "defining_relations": "z = s(theta), cycloidal s = h(f - sin(2 pi f)/(2 pi)). Groove slope ds/dx with x = Rp theta; pressure angle phi = atan(s'/Rp), max s' = 2h/beta = 28.6 mm/rad gives phi max about 30°.",
+   "range": "drum 360° continuous; slide 0 to 40 mm and back per turn",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "slide position vs drum angle (also the unrolled groove)",
+   "notes": "Pseudo-3D: show drum side view with the groove as a sinusoid-like band, or unrolled. The groove must be wider than the roller by a small clearance. Shift drums use stepped dwell grooves instead."
+  },
+  "examples": [
+   {
+    "use": "Motorcycle gearbox shift drum",
+    "detail": "Grooves on a drum move shift forks to select each gear as the drum indexes."
+   },
+   {
+    "use": "Indexing tables and transfer machines",
+    "detail": "Barrel cams drive pick-and-place slides and rotary tables in assembly lines."
+   },
+   {
+    "use": "Sewing machines and textile winders",
+    "detail": "Drum cams traverse thread guides back and forth."
+   }
+  ],
+  "references": [
+   {
+    "title": "Cam (mechanism), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Cam_(mechanism)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Cylindrical Cam Mechanism Explained, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/cylindrical-cam",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "US patent 8402859, Barrel cam shift mechanism",
+    "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8402859",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "Honda Nighthawk 700S transmission: how it works, shift drum",
+    "url": "https://www.youtube.com/watch?v=pX2m3xea8nc",
+    "kind": "video"
+   },
+   {
+    "title": "Cylindrical Cams (Barrel Cams), Nolte NC-Kurventechnik",
+    "url": "https://nolte-nc-kurventechnik.homepage.t-online.de/en/barrel-cams.html",
+    "kind": "photos"
+   },
+   {
+    "title": "Barrel Cam Indexing Tables",
+    "url": "https://www.youtube.com/watch?v=FihkVXBorrw",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "cam-follower",
+   "face-groove-cam",
+   "roller-gear-indexer",
+   "lead-screw",
+   "swash-plate"
+  ]
+ },
+ {
+  "id": "face-groove-cam",
+  "name": "Face groove cam",
+  "aka": [
+   "face cam",
+   "grooved plate cam",
+   "closed-track cam",
+   "positive-motion cam"
+  ],
+  "in_site": false,
+  "family": "Cam",
+  "level": "Intermediate",
+  "summary": "A roller runs in a closed groove cut into the face of a disc, so the cam drives the follower both out and back without a spring.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Dwell"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = rise h (20 mm by default) per cam turn"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 2,
+   "prismatic": 1,
+   "higher_pairs": 1,
+   "notes": "ground, grooved disc, radial follower slide, roller; groove gives form-closed cam contact"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Dwell",
+    "Function generation"
+   ],
+   "property": [
+    "Positive drive",
+    "Exact",
+    "Smooth (harmonic)"
+   ],
+   "application": [
+    "Packaging & automation",
+    "Printing & textiles",
+    "Machine tools"
+   ],
+   "keywords": [
+    "face cam",
+    "groove cam",
+    "form closure",
+    "closed track",
+    "3-4-5 polynomial",
+    "roller follower",
+    "no return spring"
+   ]
+  },
+  "explain": {
+   "motion": "The groove is a closed loop machined into the face of the disc; its distance from the centre varies with angle. The roller sits in the groove, so as the disc turns the follower is pulled in and pushed out along its radial guide. The default track rises over 120°, dwells 60°, returns over 120° and dwells 60° with a 3-4-5 polynomial law.",
+   "forces": "Either groove wall can push, so the follower is driven in both directions and cannot float. Pressure angle limits are the same as a plate cam; the roller reverses which wall it touches when acceleration changes sign.",
+   "benefits": "Positive motion with no return spring, so it works at high speed and in any orientation.",
+   "limits": "Roller wall-switching causes backlash, noise and wear, and the roller spins the wrong way when it touches the outer wall. A wider, heavier disc than a plate cam."
+  },
+  "build": {
+   "ground": "frame with disc shaft O and a radial guide for the follower",
+   "input": "disc, continuous rotation about O",
+   "output": "follower radial position r (roller centre)",
+   "members": [
+    {
+     "id": "disc",
+     "role": "cam",
+     "def": "disc radius 75 mm; groove centreline r(theta) = 35 + s(theta), groove width 10.2 mm"
+    },
+    {
+     "id": "follower",
+     "role": "follower",
+     "def": "radial slide on a guide through O"
+    },
+    {
+     "id": "roller",
+     "role": "follower",
+     "def": "roller dia 10 mm in groove"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "disc"
+     ]
+    },
+    {
+     "id": "guide",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "follower"
+     ]
+    },
+    {
+     "id": "pin",
+     "type": "revolute",
+     "between": [
+      "follower",
+      "roller"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "cam contact",
+     "between": [
+      "disc",
+      "roller"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "rb",
+     "value": 35,
+     "unit": "mm",
+     "note": "base (pitch) circle radius of groove centreline"
+    },
+    {
+     "name": "h",
+     "value": 20,
+     "unit": "mm",
+     "note": "rise"
+    },
+    {
+     "name": "beta_rise",
+     "value": 120,
+     "unit": "°",
+     "note": "rise angle"
+    },
+    {
+     "name": "dwell_top",
+     "value": 60,
+     "unit": "°",
+     "note": "outer dwell"
+    },
+    {
+     "name": "beta_return",
+     "value": 120,
+     "unit": "°",
+     "note": "return angle"
+    },
+    {
+     "name": "dwell_bottom",
+     "value": 60,
+     "unit": "°",
+     "note": "inner dwell"
+    },
+    {
+     "name": "law",
+     "value": "3-4-5 polynomial",
+     "unit": "",
+     "note": "s = h(10f^3 - 15f^4 + 6f^5)"
+    },
+    {
+     "name": "d_roller",
+     "value": 10,
+     "unit": "mm",
+     "note": "roller diameter"
+    },
+    {
+     "name": "groove_w",
+     "value": 10.2,
+     "unit": "mm",
+     "note": "groove width"
+    }
+   ],
+   "defining_relations": "Groove centreline (pitch curve) r = rb + s(theta). Groove walls are offset curves of the pitch curve by ±(groove_w/2). 3-4-5 law max velocity 1.875h/beta. Pressure angle phi = atan(s'/(rb + s)), max about 24° with defaults.",
+   "range": "disc 360° continuous; follower 0 to 20 mm radial travel, dwells 60° at each end",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot",
+    "velocity"
+   ],
+   "plot": "follower position vs disc angle",
+   "notes": "Draw both groove walls as offsets of the pitch curve; highlight which wall is in contact (sign of acceleration times load). Minimum radius of curvature of the inner wall must exceed the roller radius."
+  },
+  "examples": [
+   {
+    "use": "Packaging and assembly machines",
+    "detail": "Face groove cams drive gripper and pusher slides on cam-shaft-driven machines."
+   },
+   {
+    "use": "Mechanical counters and printing presses",
+    "detail": "Grooved face cams give positive timing at moderate speed."
+   },
+   {
+    "use": "Automatic lathes",
+    "detail": "Positive-motion cams drive tool slides without return springs."
+   }
+  ],
+  "references": [
+   {
+    "title": "Cam (mechanism), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Cam_(mechanism)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Module 4: Drives and Mechanisms, NPTEL",
+    "url": "https://archive.nptel.ac.in/content/storage2/courses/112103174/module4/lec3/3.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "EP1209381A2, Cam device",
+    "url": "https://patents.google.com/patent/EP1209381A2",
+    "kind": "patent"
+   },
+   {
+    "title": "Face Cam Mechanism Explained, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/face-cam",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Grooved Cam Reciprocating (form 1), FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/grooved-cam-reciprocating-form-1",
+    "kind": "animation"
+   },
+   {
+    "title": "How to design a Groove Cam and Follower Mechanism in Autodesk Fusion 360",
+    "url": "https://www.youtube.com/watch?v=YW4QUQm4BTI",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "cam-follower",
+   "barrel-cam",
+   "desmodromic-cam",
+   "geneva"
+  ]
+ },
+ {
+  "id": "desmodromic-cam",
+  "name": "Desmodromic valve cam",
+  "aka": [
+   "desmo",
+   "desmodromic valve",
+   "positive valve actuation",
+   "conjugate cams"
+  ],
+  "in_site": false,
+  "family": "Cam",
+  "level": "Advanced",
+  "summary": "Two matched cams and rockers open and close a valve mechanically, so the valve follows the cam with no return spring.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Dwell"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "valve lift 10 mm per cam turn (camshaft at half crank speed)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 5,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 4,
+   "notes": "ground, camshaft (opening and closing lobes), opening rocker, closing rocker, valve; cam-rocker and rocker-valve contacts; deliberately redundant (conjugate) constraint"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Valve timing",
+    "Motion conversion"
+   ],
+   "property": [
+    "Positive drive",
+    "Exact",
+    "Precision"
+   ],
+   "application": [
+    "Automotive",
+    "Steam & engines"
+   ],
+   "keywords": [
+    "ducati",
+    "fabio taglioni",
+    "mercedes w196",
+    "valve float",
+    "opening rocker",
+    "closing rocker",
+    "conjugate cam"
+   ]
+  },
+  "explain": {
+   "motion": "An opening lobe pushes the opening rocker down onto the valve stem, opening the valve. A second, conjugate closing lobe drives a forked closing rocker that pulls up on a collar on the valve stem, closing it. The two profiles are cut so that at every angle one rocker or the other holds the valve, so lift follows the law exactly.",
+   "forces": "The opening cam carries gas and inertia loads on opening; the closing cam carries the inertia of deceleration and the closing pull that a spring would normally supply. Rocker sliding contacts carry high loads and need tight clearance control.",
+   "benefits": "No valve float at high revs and no spring force to overcome, so aggressive lift laws are possible.",
+   "limits": "Two clearances per valve to set, more parts and sliding friction, and conjugate profiles must be ground very accurately. Modern valve springs and pneumatic returns reduce its advantage."
+  },
+  "build": {
+   "ground": "cylinder head with camshaft O, rocker pivots Q1 and Q2 and valve guide",
+   "input": "camshaft, continuous rotation about O",
+   "output": "valve lift y along the guide",
+   "members": [
+    {
+     "id": "camshaft",
+     "role": "cam",
+     "def": "opening lobe (base circle 18 mm, lift 10 mm) and closing lobe (conjugate, base 28 mm) on one shaft"
+    },
+    {
+     "id": "rocker_open",
+     "role": "follower",
+     "def": "pivot Q1, arm 30 mm to cam pad, arm 30 mm to valve tip (1:1)"
+    },
+    {
+     "id": "rocker_close",
+     "role": "follower",
+     "def": "pivot Q2, forked arm 30 mm to closing lobe, 30 mm to valve collar (1:1)"
+    },
+    {
+     "id": "valve",
+     "role": "slider",
+     "def": "stem in guide with split collar, head dia 34 mm"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "camshaft"
+     ]
+    },
+    {
+     "id": "Q1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker_open"
+     ]
+    },
+    {
+     "id": "Q2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker_close"
+     ]
+    },
+    {
+     "id": "G",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "valve"
+     ]
+    },
+    {
+     "id": "C1",
+     "type": "cam contact",
+     "between": [
+      "camshaft",
+      "rocker_open"
+     ]
+    },
+    {
+     "id": "C2",
+     "type": "cam contact",
+     "between": [
+      "camshaft",
+      "rocker_close"
+     ]
+    },
+    {
+     "id": "T1",
+     "type": "cam contact",
+     "between": [
+      "rocker_open",
+      "valve"
+     ]
+    },
+    {
+     "id": "T2",
+     "type": "cam contact",
+     "between": [
+      "rocker_close",
+      "valve"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "rb_open",
+     "value": 18,
+     "unit": "mm",
+     "note": "opening lobe base circle"
+    },
+    {
+     "name": "h",
+     "value": 10,
+     "unit": "mm",
+     "note": "valve lift"
+    },
+    {
+     "name": "beta_rise",
+     "value": 60,
+     "unit": "°",
+     "note": "opening (rise) cam angle"
+    },
+    {
+     "name": "dwell_top",
+     "value": 0,
+     "unit": "°",
+     "note": "no dwell at full lift"
+    },
+    {
+     "name": "beta_return",
+     "value": 60,
+     "unit": "°",
+     "note": "closing (return) cam angle"
+    },
+    {
+     "name": "dwell_bottom",
+     "value": 240,
+     "unit": "°",
+     "note": "valve closed"
+    },
+    {
+     "name": "law",
+     "value": "cycloidal",
+     "unit": "",
+     "note": "rise and return"
+    },
+    {
+     "name": "lash",
+     "value": 0.1,
+     "unit": "mm",
+     "note": "closing clearance, valve seated by gas pressure and a light helper spring"
+    }
+   ],
+   "defining_relations": "Valve lift y = s(theta). Opening rocker angle psi1 = asin(y/30) (1:1 rocker) and opening lobe profile is the envelope of the rocker pad at psi1. Closing rocker angle psi2 = -psi1 (forked rocker on opposite side); closing lobe is the envelope of its pad at psi2, so both lobes are conjugate: at every theta both rockers touch their lobes with only lash between.",
+   "range": "camshaft 360° continuous; valve 0 to 10 mm lift in 120° of cam, closed for 240°",
+   "overlays": [
+    "forces",
+    "plot",
+    "velocity"
+   ],
+   "plot": "valve lift vs cam angle, with acceleration showing which rocker carries load",
+   "notes": "Colour the rocker currently carrying load (opening cam during positive acceleration, closing cam during negative). Keep lash visible but tiny. Camshaft turns at half crank speed in a 4-stroke engine."
+  },
+  "examples": [
+   {
+    "use": "Ducati motorcycle engines",
+    "detail": "Desmo valve trains have been used on Ducati production bikes since 1968."
+   },
+   {
+    "use": "Mercedes-Benz W196 and 300 SLR",
+    "detail": "1954 to 1955 racing cars used desmodromic valves to rev higher."
+   },
+   {
+    "use": "Racing and research engines",
+    "detail": "Used where valve springs would float at very high engine speeds."
+   }
+  ],
+  "references": [
+   {
+    "title": "Desmodromic valve, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Desmodromic_valve",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Desmodromic valvegear, Motor Sport Magazine archive",
+    "url": "https://www.motorsportmagazine.com/archive/article/december-2007/92/desmodromic-valvegear/",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "US patent 7870842, Engine with desmodromically actuated rocker",
+    "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/7870842",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "Ducati Desmodromic valve operation",
+    "url": "https://www.youtube.com/watch?v=7DbCcSyMyNY",
+    "kind": "video"
+   },
+   {
+    "title": "Desmodromic Valve Assembly",
+    "url": "https://www.youtube.com/watch?v=0RcoN0e0cE0",
+    "kind": "video"
+   },
+   {
+    "title": "Ducati Desmodromic Valve Timing Demystified",
+    "url": "https://www.youtube.com/watch?v=aqxNZ0LzRFU",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "cam-follower",
+   "flat-faced-cam",
+   "face-groove-cam",
+   "bell-crank"
+  ]
+ },
+ {
+  "id": "geneva",
+  "name": "Geneva drive",
+  "aka": [
+   "Maltese cross",
+   "Geneva stop",
+   "Geneva mechanism",
+   "external Geneva"
+  ],
+  "in_site": true,
+  "family": "Intermittent",
+  "level": "Intermediate",
+  "summary": "A pin on a constantly turning crank enters a slot and steps a slotted wheel a quarter turn, then a locking disc holds it still.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Intermittent rotary",
+   "label": "Rotary → Intermittent rotary",
+   "output_character": [
+    "Intermittent",
+    "Dwell",
+    "Reversing"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Index step",
+   "class": "n/a",
+   "typical": "90° per index (4-slot), moving for 90° of crank, dwell 270°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 2,
+   "notes": "ground, crank (arm with pin and locking disc), slotted wheel; pin-in-slot and locking arc contact alternate"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Indexing",
+    "Dwell",
+    "Locking"
+   ],
+   "property": [
+    "Positive drive",
+    "Shock at engagement",
+    "Historic",
+    "Few parts"
+   ],
+   "application": [
+    "Film & optics",
+    "Packaging & automation",
+    "Clocks & watches",
+    "Machine tools"
+   ],
+   "keywords": [
+    "maltese cross",
+    "film projector",
+    "geneva stop",
+    "slot",
+    "locking disc",
+    "watch overwind",
+    "indexing table"
+   ]
+  },
+  "explain": {
+   "motion": "The crank turns continuously; its pin enters a slot tangentially, drives the wheel through a quarter turn and leaves tangentially. While the pin is out, a raised locking disc on the crank sits in a concave arc on the wheel and holds it still. With 4 slots the wheel moves during 90° of crank rotation and rests for 270°.",
+   "forces": "The pin pushes on the slot wall; torque on the wheel is highest mid-index when the pin is closest to the wheel centre. Acceleration jumps at entry and exit, so impact and wear grow quickly with speed.",
+   "benefits": "Positive indexing and locking with very few parts, and the entry and exit have zero wheel velocity.",
+   "limits": "Infinite jerk at entry and exit limits speed, and the index angle is fixed by the slot count. The ratio of motion to dwell cannot be chosen freely."
+  },
+  "build": {
+   "ground": "plate with crank axis O at (0,0) and wheel axis W at (110,0)",
+   "input": "crank (disc plus arm), continuous rotation about O, belt-driven from a pulley",
+   "output": "slotted wheel angle about W",
+   "members": [
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "arm O to pin R, length a = c sin(pi/4) = 77.8 mm; pin radius 5.5 mm"
+    },
+    {
+     "id": "lock_disc",
+     "role": "driver",
+     "def": "locking disc on crank, radius 0.65 a = 50.6 mm, with relief cut-out facing the pin"
+    },
+    {
+     "id": "wheel",
+     "role": "output",
+     "def": "4 radial slots, slot half-width 7 mm; slot mouth radius R = c cos(pi/4) = 77.8 mm; concave locking arcs between slots"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "W",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "wheel"
+     ]
+    },
+    {
+     "id": "S",
+     "type": "pin-in-slot",
+     "between": [
+      "crank",
+      "wheel"
+     ]
+    },
+    {
+     "id": "L",
+     "type": "cam contact",
+     "between": [
+      "lock_disc",
+      "wheel"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "n",
+     "value": 4,
+     "unit": "slots",
+     "note": "slot count"
+    },
+    {
+     "name": "c",
+     "value": 110,
+     "unit": "mm",
+     "note": "centre distance"
+    },
+    {
+     "name": "a",
+     "value": 77.8,
+     "unit": "mm",
+     "note": "crank radius = c sin(pi/n)"
+    },
+    {
+     "name": "R",
+     "value": 77.8,
+     "unit": "mm",
+     "note": "wheel radius at slot mouth = c cos(pi/n)"
+    },
+    {
+     "name": "pr",
+     "value": 5.5,
+     "unit": "mm",
+     "note": "pin radius"
+    },
+    {
+     "name": "hw",
+     "value": 7,
+     "unit": "mm",
+     "note": "slot half-width"
+    },
+    {
+     "name": "rl",
+     "value": 50.6,
+     "unit": "mm",
+     "note": "locking disc radius = 0.65 a"
+    }
+   ],
+   "defining_relations": "Tangential entry: a = c sin(pi/n), R = c cos(pi/n). Crank angle in motion = 180° - 360°/n = 90°; dwell = 180° + 360°/n = 270°. Wheel angle while engaged (alpha measured from line of centres): tan(beta) = sin(alpha)/(c/a - cos(alpha)), |alpha| < 90° - 180°/n.",
+   "range": "crank 360° continuous; wheel steps 90° per crank turn, moving during 90° and dwelling 270°",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot",
+    "velocity"
+   ],
+   "plot": "wheel angle vs crank angle (staircase with S-shaped risers)",
+   "notes": "Wheel turns opposite to crank. Locking disc relief must clear the wheel tips during engagement; site computes it from the intersection of radius rhoD = Rw + 3 around W. Show dwell with a tag."
+  },
+  "examples": [
+   {
+    "use": "Film projectors",
+    "detail": "A Maltese cross advances the intermittent sprocket one frame at a time while the shutter is closed."
+   },
+   {
+    "use": "Indexing tables",
+    "detail": "Rotary tables on assembly and filling machines step stations between operations."
+   },
+   {
+    "use": "Watch and music box stops",
+    "detail": "A Geneva stop with a closed slot limits mainspring winding."
+   },
+   {
+    "use": "Pen plotters and tool changers",
+    "detail": "Index turrets and carousels step tools into place."
+   }
+  ],
+  "references": [
+   {
+    "title": "Geneva drive, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Geneva_drive",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Introduction to Mechanisms, Chapter 8 Other Mechanisms (Geneva wheel), Carnegie Mellon",
+    "url": "https://www.cs.cmu.edu/~rapidproto/mechanisms/chpt8.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "Geneva mechanism, Britannica",
+    "url": "https://www.britannica.com/technology/Geneva-mechanism",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "KMODDL Kinematic Models for Design Digital Library, Cornell",
+    "url": "https://engineering.library.cornell.edu/kmoddl",
+    "kind": "kmoddl"
+   }
+  ],
+  "media": [
+   {
+    "title": "How a film projector Geneva drive or Maltese cross works",
+    "url": "https://www.youtube.com/watch?v=iIVy8JpLJQk",
+    "kind": "video"
+   },
+   {
+    "title": "35mm Projector Maltese Cross",
+    "url": "https://www.youtube.com/watch?v=YcQ4XeTwIXg",
+    "kind": "video"
+   },
+   {
+    "title": "Geneva Mechanisms: what they are and common uses, W.M. Berg",
+    "url": "https://wmberg.com/resources/blogs/how-geneva-mechanisms-work-and-what-they-do",
+    "kind": "photos"
+   },
+   {
+    "title": "Geneva Mechanism Animation",
+    "url": "https://www.youtube.com/watch?v=5y9Xn2oqSG4",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "internal-geneva",
+   "intermittent-gear",
+   "roller-gear-indexer",
+   "star-wheel",
+   "ratchet-pawl"
+  ]
+ },
+ {
+  "id": "internal-geneva",
+  "name": "Internal Geneva drive",
+  "aka": [
+   "internal Geneva",
+   "inside Geneva",
+   "internal Maltese cross"
+  ],
+  "in_site": false,
+  "family": "Intermittent",
+  "level": "Advanced",
+  "summary": "A crank pin works inside a cup-shaped slotted wheel, stepping it the same way as the crank with a longer, gentler move and shorter dwell.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Intermittent rotary",
+   "label": "Rotary → Intermittent rotary",
+   "output_character": [
+    "Intermittent",
+    "Dwell"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Index step",
+   "class": "n/a",
+   "typical": "90° per index (4-slot), moving for 270° of crank, dwell 90°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 2,
+   "notes": "ground, crank with pin and locking cam, internal slotted wheel; pin-in-slot and locking contact alternate"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Indexing",
+    "Dwell",
+    "Locking"
+   ],
+   "property": [
+    "Positive drive",
+    "Compact",
+    "Smooth (harmonic)"
+   ],
+   "application": [
+    "Film & optics",
+    "Clocks & watches",
+    "Packaging & automation"
+   ],
+   "keywords": [
+    "internal geneva",
+    "maltese cross",
+    "same direction",
+    "lower acceleration",
+    "cup wheel",
+    "overhung crank"
+   ]
+  },
+  "explain": {
+   "motion": "The slotted wheel is a cup with slots pointing inward from its rim; the crank sits inside the cup with its axis offset from the wheel axis. The pin enters a slot tangentially and drives the wheel the same way as the crank for 270° of crank rotation, then a locking cam on the crank holds the wheel for the remaining 90°.",
+   "forces": "Since the move is spread over a longer crank angle, peak angular acceleration is much lower than in an external Geneva of the same slot count. The crank must be overhung (supported on one side only) because the wheel surrounds it.",
+   "benefits": "Smoother motion with lower peak acceleration, same-direction rotation and a compact package.",
+   "limits": "Dwell is short (less than half the cycle), and the overhung crank limits load. Hard to make with few slots because the pin path must fit inside the cup."
+  },
+  "build": {
+   "ground": "plate with wheel axis W at (0,0) and crank axis O at (40,0) inside the wheel",
+   "input": "crank, continuous rotation about O",
+   "output": "internal slotted wheel angle about W",
+   "members": [
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O to pin P, length a = c sin(pi/4) = 28.3 mm; pin dia 8 mm"
+    },
+    {
+     "id": "lock_cam",
+     "role": "driver",
+     "def": "convex locking sector on crank, radius 16 mm, opposite the pin"
+    },
+    {
+     "id": "wheel",
+     "role": "output",
+     "def": "cup ring, rim inner radius 76, outer 88; 4 slots pointing inward from rim, inner slot end at radius c cos(pi/4) = 28.3 mm; concave locking arcs between slot roots"
+    }
+   ],
+   "joints": [
+    {
+     "id": "W",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "wheel"
+     ]
+    },
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "S",
+     "type": "pin-in-slot",
+     "between": [
+      "crank",
+      "wheel"
+     ]
+    },
+    {
+     "id": "L",
+     "type": "cam contact",
+     "between": [
+      "lock_cam",
+      "wheel"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "n",
+     "value": 4,
+     "unit": "slots",
+     "note": "slot count"
+    },
+    {
+     "name": "c",
+     "value": 40,
+     "unit": "mm",
+     "note": "centre distance W to O"
+    },
+    {
+     "name": "a",
+     "value": 28.3,
+     "unit": "mm",
+     "note": "crank radius = c sin(pi/n)"
+    },
+    {
+     "name": "d_pin",
+     "value": 8,
+     "unit": "mm",
+     "note": "pin diameter"
+    },
+    {
+     "name": "slot_w",
+     "value": 8.2,
+     "unit": "mm",
+     "note": "slot width"
+    },
+    {
+     "name": "R_rim",
+     "value": 88,
+     "unit": "mm",
+     "note": "wheel outer radius"
+    }
+   ],
+   "defining_relations": "Tangential entry: a = c sin(pi/n). Crank angle in motion = 180° + 360°/n = 270°; dwell = 180° - 360°/n = 90°. Pin distance from W reaches c + a = 68.3 mm, so slots run from about 28 mm to beyond 72 mm radius. Wheel angle while engaged: tan(beta) = a sin(alpha)/(c + a cos(alpha)) measured from the line of centres.",
+   "range": "crank 360° continuous; wheel steps 90° per crank turn, moving 270° and dwelling 90°",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot",
+    "velocity"
+   ],
+   "plot": "wheel angle vs crank angle (staircase with long gentle risers), compare with external Geneva",
+   "notes": "Wheel and crank rotate the same direction. Draw the crank overhung in front of the wheel web. Locking sector must swing clear of the slot roots while the pin is engaged."
+  },
+  "examples": [
+   {
+    "use": "Film and camera intermittent movements",
+    "detail": "Internal Geneva variants give gentler film pull-down at higher frame rates."
+   },
+   {
+    "use": "Day-of-week and calendar clocks",
+    "detail": "Internal Geneva wheels step display drums once per day."
+   },
+   {
+    "use": "On-load tap changers",
+    "detail": "Patented tap changer switching systems use internal Geneva gearing to step contacts."
+   }
+  ],
+  "references": [
+   {
+    "title": "Geneva drive, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Geneva_drive",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Geneva Internal Mechanism, Engineers Edge",
+    "url": "https://engineersedge.com/mechanics_machines/geneva_internal_mechanism_14920.htm",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Geneva Drive (internal) Mechanism and Indexing Calculator, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/geneva-drive-internal",
+    "kind": "calculator"
+   },
+   {
+    "title": "US patent 12165825, switching system for an on-load tap changer",
+    "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/12165825",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "Day of Week Clock, Internal Geneva Mechanism version",
+    "url": "https://www.youtube.com/watch?v=b4VNwRJ1d-Q",
+    "kind": "video"
+   },
+   {
+    "title": "How Internal Geneva Mechanism works",
+    "url": "https://www.youtube.com/watch?v=eoTKtihCtyI",
+    "kind": "animation"
+   },
+   {
+    "title": "Internal Geneva Drive",
+    "url": "https://www.youtube.com/watch?v=JF4yBnNoF1w",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "geneva",
+   "intermittent-gear",
+   "star-wheel",
+   "internal-gear-pair"
+  ]
+ },
+ {
+  "id": "intermittent-gear",
+  "name": "Intermittent gear",
+  "aka": [
+   "mutilated gear",
+   "partial gear",
+   "incomplete gear",
+   "interrupted gear",
+   "segment gear"
+  ],
+  "in_site": true,
+  "family": "Intermittent",
+  "level": "Intermediate",
+  "summary": "A gear with only a few teeth drives a full gear part of each turn; between bursts a locking rim holds the driven gear still.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Intermittent rotary",
+   "label": "Rotary → Intermittent rotary",
+   "output_character": [
+    "Intermittent",
+    "Dwell"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Index step",
+   "class": "n/a",
+   "typical": "90° per driver turn (5 of 20 teeth), dwell 270°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 2,
+   "notes": "ground, mutilated driver with locking disc, driven gear with locking arcs; gear mesh and locking contact alternate"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Indexing",
+    "Dwell",
+    "Locking"
+   ],
+   "property": [
+    "Positive drive",
+    "Shock at engagement",
+    "Few parts"
+   ],
+   "application": [
+    "Instruments",
+    "Packaging & automation",
+    "Toys & kinetic art",
+    "Consumer products"
+   ],
+   "keywords": [
+    "mutilated gear",
+    "partial gear",
+    "counter",
+    "odometer",
+    "locking ring",
+    "507 movements",
+    "dwell"
+   ]
+  },
+  "explain": {
+   "motion": "The driver has teeth on only part of its rim. While those teeth are in mesh, the driven gear turns at the normal gear ratio; when they pass, a plain locking disc on the driver rides in a concave arc on the driven gear and holds it still. Here 5 of 20 teeth advance the driven gear a quarter turn per driver turn.",
+   "forces": "During mesh it acts like an ordinary spur pair at a 20° pressure angle. The first tooth hits the driven gear at full pitch-line speed, so there is a shock at engagement that grows with speed.",
+   "benefits": "Any step size and dwell split can be set by tooth count, and the driven gear is positively located throughout.",
+   "limits": "Sudden start and stop cause impact, so it suits slow or light duty. Geneva or cam indexers are preferred at high speed or load."
+  },
+  "build": {
+   "ground": "plate with driver axis O1 at (0,0) and driven axis O2 at (80,0)",
+   "input": "driver gear, continuous rotation about O1",
+   "output": "driven gear angle about O2",
+   "members": [
+    {
+     "id": "driver",
+     "role": "driver",
+     "def": "module 4, z = 20 pitch spacing, only 5 consecutive teeth cut; pitch radius 40; locking disc radius 36 on the rest"
+    },
+    {
+     "id": "driven",
+     "role": "output",
+     "def": "module 4, z = 20 full teeth, pitch radius 40; locking plate with 4 concave arcs radius 36.5 between tooth groups"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "driver"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "driven"
+     ]
+    },
+    {
+     "id": "M",
+     "type": "gear mesh",
+     "between": [
+      "driver",
+      "driven"
+     ]
+    },
+    {
+     "id": "L",
+     "type": "cam contact",
+     "between": [
+      "driver",
+      "driven"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "m",
+     "value": 4,
+     "unit": "mm",
+     "note": "module"
+    },
+    {
+     "name": "z1",
+     "value": 20,
+     "unit": "teeth",
+     "note": "driver tooth spacing (full count)"
+    },
+    {
+     "name": "nT",
+     "value": 5,
+     "unit": "teeth",
+     "note": "teeth actually cut on driver"
+    },
+    {
+     "name": "z2",
+     "value": 20,
+     "unit": "teeth",
+     "note": "driven teeth"
+    },
+    {
+     "name": "cd",
+     "value": 80,
+     "unit": "mm",
+     "note": "centre distance = m(z1+z2)/2"
+    },
+    {
+     "name": "RL",
+     "value": 36,
+     "unit": "mm",
+     "note": "locking disc radius"
+    },
+    {
+     "name": "RC",
+     "value": 36.5,
+     "unit": "mm",
+     "note": "locking arc radius on driven"
+    }
+   ],
+   "defining_relations": "Index angle per driver turn = 360° x nT/z2 = 90°. Driver moves the output for 360° x nT/z1 = 90°, dwell 270°. Number of stops per driven turn = z2/nT = 4 (must be an integer). Centre distance cd = m(z1+z2)/2.",
+   "range": "driver 360° continuous; driven steps 90° per driver turn",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "driven angle vs driver angle (staircase with straight risers)",
+   "notes": "Driven turns opposite to driver. Site's kinematic model lets the first and last teeth overlap slightly in plan; real designs thin or shorten the end teeth. Effective mesh angle uses eff(u) clamp to nT pitches."
+  },
+  "examples": [
+   {
+    "use": "Mechanical counters and odometers",
+    "detail": "Two-tooth transfer pinions advance the next digit wheel one tenth of a turn per revolution."
+   },
+   {
+    "use": "Toys and automata",
+    "detail": "Partial gears give pauses in walking figures and kinetic sculptures."
+   },
+   {
+    "use": "Light indexing feeds",
+    "detail": "Slow feeders and dispensers step a wheel once per input turn."
+   }
+  ],
+  "references": [
+   {
+    "title": "Introduction to Mechanisms, Chapter 8, Intermittent Gearing, Carnegie Mellon",
+    "url": "https://www.cs.cmu.edu/~rapidproto/mechanisms/chpt8.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "Intermittent Gears Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/intermittent-gears",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Indexing mechanisms, Roymech",
+    "url": "https://roymech.org/Useful_Tables/Cams_Springs/Indexing.html",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Mechanical Counters, how they work",
+    "url": "https://www.youtube.com/watch?v=n4iFm1DGyYk",
+    "kind": "video"
+   },
+   {
+    "title": "Indexing Mechanism Using Mutilated Gears",
+    "url": "https://www.youtube.com/watch?v=hvjjsYxMKpY",
+    "kind": "video"
+   },
+   {
+    "title": "Mechanical Odometer Explained",
+    "url": "https://www.youtube.com/watch?v=pwaQUMRPUso",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "geneva",
+   "internal-geneva",
+   "spur-gears",
+   "star-wheel",
+   "ratchet-pawl"
+  ]
+ },
+ {
+  "id": "roller-gear-indexer",
+  "name": "Roller gear cam indexer",
+  "aka": [
+   "globoidal cam indexer",
+   "roller gear drive",
+   "cam index drive",
+   "Ferguson drive",
+   "right-angle indexer"
+  ],
+  "in_site": false,
+  "family": "Intermittent",
+  "level": "Advanced",
+  "summary": "A tapered rib cam on a constantly turning shaft steps a turret of rollers by one station, then locks it between the ribs.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Intermittent rotary",
+   "label": "Rotary → Intermittent rotary",
+   "output_character": [
+    "Intermittent",
+    "Dwell"
+   ],
+   "axes": "Perpendicular skew",
+   "plane": "Spatial"
+  },
+  "ratio": {
+   "kind": "Index step",
+   "class": "n/a",
+   "typical": "45° per index (8 stops), index in 120° of camshaft, dwell 240°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 2,
+   "notes": "ground, globoidal cam shaft, turret with radial rollers; two rollers in contact with the rib at all times (preloaded)"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Indexing",
+    "Dwell",
+    "Positioning",
+    "Locking"
+   ],
+   "property": [
+    "Low backlash",
+    "Precision",
+    "High load",
+    "Smooth (harmonic)",
+    "Positive drive"
+   ],
+   "application": [
+    "Packaging & automation",
+    "Machine tools",
+    "Robotics"
+   ],
+   "keywords": [
+    "globoidal cam",
+    "ferguson",
+    "camco",
+    "modified sine",
+    "rotary indexing table",
+    "preload",
+    "dial table"
+   ]
+  },
+  "explain": {
+   "motion": "The input camshaft turns at constant speed. A raised rib wraps part way round a waisted (globoidal) cam; in its straight section it holds two turret rollers and the turret dwells, and in its twisted section it pushes the rollers along, rotating the turret one station. One cam turn gives one index.",
+   "forces": "Rollers are preloaded against both rib flanks, so there is no backlash and the turret is locked during dwell. Torque passes through rolling contact, and the cam law (modified sine) keeps peak acceleration and jerk low.",
+   "benefits": "High precision, high speed and no backlash, with smooth motion set by the cam law. Very rigid locking in dwell.",
+   "limits": "Expensive to make, fixed stop count and index time once cut, and needs a clutch or brake for overload. Bulky compared with a Geneva for light loads."
+  },
+  "build": {
+   "ground": "housing with camshaft axis horizontal and turret axis vertical, offset by centre distance C",
+   "input": "globoidal camshaft, continuous rotation",
+   "output": "turret (dial) angle",
+   "members": [
+    {
+     "id": "camshaft",
+     "role": "cam",
+     "def": "globoidal rib cam, throat radius about 40 mm, rib dwell segment over 240°, twisted index segment over 120°"
+    },
+    {
+     "id": "turret",
+     "role": "output",
+     "def": "disc with 8 radial rollers at pitch radius 60 mm, 45° apart"
+    },
+    {
+     "id": "rollers",
+     "role": "follower",
+     "def": "dia 20 mm cam followers on radial studs"
+    }
+   ],
+   "joints": [
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "camshaft"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "turret"
+     ]
+    },
+    {
+     "id": "C1",
+     "type": "cam contact",
+     "between": [
+      "camshaft",
+      "rollers"
+     ]
+    },
+    {
+     "id": "C2",
+     "type": "cam contact",
+     "between": [
+      "camshaft",
+      "rollers"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "n",
+     "value": 8,
+     "unit": "stops",
+     "note": "turret stations"
+    },
+    {
+     "name": "C",
+     "value": 100,
+     "unit": "mm",
+     "note": "centre distance between camshaft and turret axes"
+    },
+    {
+     "name": "Rp",
+     "value": 60,
+     "unit": "mm",
+     "note": "roller pitch radius on turret"
+    },
+    {
+     "name": "d_roller",
+     "value": 20,
+     "unit": "mm",
+     "note": "roller diameter"
+    },
+    {
+     "name": "beta_index",
+     "value": 120,
+     "unit": "°",
+     "note": "camshaft angle for index (rise)"
+    },
+    {
+     "name": "dwell",
+     "value": 240,
+     "unit": "°",
+     "note": "camshaft angle for dwell"
+    },
+    {
+     "name": "law",
+     "value": "modified sine",
+     "unit": "",
+     "note": "peak accel coefficient 5.53, peak velocity 1.76"
+    }
+   ],
+   "defining_relations": "Turret angle phi = (360°/n) x s(theta/beta_index) during index, constant during dwell. Modified sine law: velocity coefficient Cv = 1.76, acceleration Ca = 5.53. Rib geometry is the envelope of roller cylinders swept by the turret motion about the turret axis, at centre distance C.",
+   "range": "camshaft 360° continuous; turret 45° per cam turn, moving 120° and dwelling 240°",
+   "overlays": [
+    "angles",
+    "plot",
+    "velocity"
+   ],
+   "plot": "turret angle vs camshaft angle, with velocity and acceleration curves",
+   "notes": "Pseudo-3D: show the cam side-on with rib and the turret plan view. Two adjacent rollers straddle the rib in dwell; during index one roller leaves while the next enters. Axes are perpendicular and non-intersecting."
+  },
+  "examples": [
+   {
+    "use": "Rotary dial tables on assembly machines",
+    "detail": "Ferguson and CAMCO index drives step part fixtures between stations."
+   },
+   {
+    "use": "Packaging lines",
+    "detail": "Index cartons and containers through filling and sealing stations."
+   },
+   {
+    "use": "Machine tool turrets and tool changers",
+    "detail": "Rigid zero-backlash indexing positions tools and pallets."
+   }
+  ],
+  "references": [
+   {
+    "title": "Ferguson G and H Roller Gear Index Drives catalogue, DESTACO",
+    "url": "https://destaco.com/assets/documents/pdf/catalogs/Ferguson_G_H_Roller_Gear_Index_Drives-13837.pdf",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "US3477305A, Spherical worm and pin gear indexing apparatus",
+    "url": "https://patents.google.com/patent/US3477305A/en",
+    "kind": "patent"
+   },
+   {
+    "title": "US5176240A, Indexing machine with roller cam drive",
+    "url": "https://patents.google.com/patent/US5176240",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "CAMCO Indexers at Work",
+    "url": "https://www.youtube.com/watch?v=QR80Gq-dqMM",
+    "kind": "video"
+   },
+   {
+    "title": "CAMCO Roller Gear Index Drives, RGD and RGS series, DESTACO",
+    "url": "https://www.destaco.com/products/mechanical-rotary-indexers-rgd-rgs",
+    "kind": "photos"
+   },
+   {
+    "title": "Globoidal Index Drive",
+    "url": "https://www.youtube.com/watch?v=QIUfBFyNvFg",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "geneva",
+   "barrel-cam",
+   "worm-drive",
+   "intermittent-gear",
+   "cam-follower"
+  ]
+ },
+ {
+  "id": "ratchet-pawl",
+  "name": "Ratchet and pawl",
+  "aka": [
+   "ratchet wheel",
+   "click and pawl",
+   "ratchet drive",
+   "pawl and ratchet feed"
+  ],
+  "in_site": true,
+  "family": "Clutch & ratchet",
+  "level": "Basic",
+  "summary": "A rocking lever's pawl pushes a toothed wheel forward one tooth per stroke while a second pawl stops it slipping back.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Intermittent rotary",
+   "label": "Oscillating → Intermittent rotary",
+   "output_character": [
+    "Intermittent",
+    "One-way"
+   ],
+   "axes": "Coaxial",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Index step",
+   "class": "n/a",
+   "typical": "one tooth (30°, 12 teeth) per lever stroke of 36°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 5,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 2,
+   "notes": "ground, lever, ratchet wheel, driving pawl, holding pawl; pawl tips contact wheel teeth; springs keep pawls engaged (pawl angles follow the wheel)"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "One-way drive",
+    "Indexing",
+    "Locking",
+    "Lifting"
+   ],
+   "property": [
+    "Positive drive",
+    "Few parts",
+    "Shock at engagement",
+    "Historic"
+   ],
+   "application": [
+    "Construction & lifting",
+    "Clocks & watches",
+    "Consumer products",
+    "Machine tools"
+   ],
+   "keywords": [
+    "pawl",
+    "click",
+    "socket wrench",
+    "winch",
+    "backlash",
+    "feed ratchet",
+    "anti-reverse"
+   ]
+  },
+  "explain": {
+   "motion": "The lever swings back and forth about the wheel axis. On the forward stroke its driving pawl catches the steep face of a tooth and pushes the wheel one tooth; on the return stroke it rides up over the sloped backs of the teeth. A holding pawl on the frame drops into each tooth to stop the wheel running back.",
+   "forces": "Load passes through the pawl tip on the steep tooth face; the face is undercut slightly so the pawl is pulled into engagement under load. The small backward movement before the holding pawl catches is the backlash, at most one tooth pitch.",
+   "benefits": "Simple, robust one-way drive and lock that can hold heavy loads.",
+   "limits": "Noisy, motion is in discrete steps, and backlash up to one pitch. Shock loads at engagement wear tooth faces and pawl tips."
+  },
+  "build": {
+   "ground": "frame with wheel axis O at (0,0) and holding pawl pivot H at radius 75.1 mm, angle about -32°",
+   "input": "lever, oscillating about O from 62° to 98° (36° stroke)",
+   "output": "ratchet wheel angle about O",
+   "members": [
+    {
+     "id": "wheel",
+     "role": "output",
+     "def": "12 sawtooth teeth, root radius 50, tip radius 62; steep face spans 3°, back slope 27°"
+    },
+    {
+     "id": "lever",
+     "role": "driver",
+     "def": "arm length 128 mm about O; pawl pivot D at radius Rp = hypot(50, 56) = 75.1 mm"
+    },
+    {
+     "id": "drive_pawl",
+     "role": "pawl",
+     "def": "beak length 56 mm from pivot D to tip, tip face 32° bevel, spring-loaded toward wheel"
+    },
+    {
+     "id": "hold_pawl",
+     "role": "pawl",
+     "def": "same beak, pivot H fixed on frame, spring-loaded"
+    }
+   ],
+   "joints": [
+    {
+     "id": "OW",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "wheel"
+     ]
+    },
+    {
+     "id": "OL",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "lever"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "lever",
+      "drive_pawl"
+     ]
+    },
+    {
+     "id": "H",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "hold_pawl"
+     ]
+    },
+    {
+     "id": "T1",
+     "type": "cam contact",
+     "between": [
+      "drive_pawl",
+      "wheel"
+     ]
+    },
+    {
+     "id": "T2",
+     "type": "cam contact",
+     "between": [
+      "hold_pawl",
+      "wheel"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "N",
+     "value": 12,
+     "unit": "teeth",
+     "note": "ratchet teeth, pitch 30°"
+    },
+    {
+     "name": "r_root",
+     "value": 50,
+     "unit": "mm",
+     "note": "root radius"
+    },
+    {
+     "name": "r_tip",
+     "value": 62,
+     "unit": "mm",
+     "note": "tip radius"
+    },
+    {
+     "name": "L_pawl",
+     "value": 56,
+     "unit": "mm",
+     "note": "pawl pivot to tip"
+    },
+    {
+     "name": "Rp",
+     "value": 75.1,
+     "unit": "mm",
+     "note": "pawl pivot radius from wheel centre"
+    },
+    {
+     "name": "Lh",
+     "value": 128,
+     "unit": "mm",
+     "note": "lever handle length"
+    },
+    {
+     "name": "stroke",
+     "value": 36,
+     "unit": "°",
+     "note": "lever swing = pitch + 6° overtravel"
+    }
+   ],
+   "defining_relations": "Wheel advance per stroke = 360°/N = 30° when lever stroke >= pitch + overtravel. Pawl pivot placed so the tip contact is tangent-ish: Rp = sqrt(r_root^2 + L^2), so the pawl line is tangent to the root circle at engagement. Pawl self-engages under load when the line from pivot to tip lies inside the tooth face normal (friction angle condition).",
+   "range": "lever oscillates 36°; wheel advances 30° per cycle, one-way, dwelling on the return stroke",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "wheel angle vs input cycle (staircase)",
+   "notes": "Pawl angle solved each frame by bisection so its tip rests on the tooth profile. Show the pawl clicking over tips on the return stroke. Lever moves forward during first half of the cycle (osc from lo to hi)."
+  },
+  "examples": [
+   {
+    "use": "Socket wrenches",
+    "detail": "A pawl and fine-toothed gear let the handle swing back without turning the bolt."
+   },
+   {
+    "use": "Winches and come-alongs",
+    "detail": "Ratchets hold load while the operator resets the lever."
+   },
+   {
+    "use": "Clock winding and machine feeds",
+    "detail": "Click and pawl hold the mainspring; ratchet feeds step shaper and planer tables."
+   }
+  ],
+  "references": [
+   {
+    "title": "Ratchet (device), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ratchet_(device)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Pawl, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Pawl",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Introduction to Mechanisms, Chapter 8, Ratchet Mechanisms, Carnegie Mellon",
+    "url": "https://www.cs.cmu.edu/~rapidproto/mechanisms/chpt8.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "Ratchet, Britannica",
+    "url": "https://www.britannica.com/technology/ratchet",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [],
+  "related": [
+   "sprag-clutch",
+   "geneva",
+   "intermittent-gear",
+   "anchor-escapement",
+   "star-wheel"
+  ]
+ },
+ {
+  "id": "sprag-clutch",
+  "name": "Sprag clutch",
+  "aka": [
+   "sprag freewheel",
+   "one-way clutch",
+   "overrunning clutch",
+   "backstop"
+  ],
+  "in_site": false,
+  "family": "Clutch & ratchet",
+  "level": "Intermediate",
+  "summary": "Tilted figure-eight sprags between two races slip one way and wedge the other, so torque passes in one direction only.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "One-way",
+    "Continuous"
+   ],
+   "axes": "Coaxial",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Unity",
+   "class": "1:1",
+   "typical": "1:1 when locked; free when the outer race overruns"
+  },
+  "dof": 2,
+  "topology": {
+   "links": 4,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 2,
+   "notes": "ground, inner race, outer race, one sprag (in practice 12 to 30 sprags in a cage with a garter spring); two friction contacts per sprag"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "One-way drive",
+    "Locking"
+   ],
+   "property": [
+    "Friction-based",
+    "Compact",
+    "Coaxial",
+    "High load",
+    "Low backlash"
+   ],
+   "application": [
+    "Automotive",
+    "Aerospace",
+    "Construction & lifting",
+    "Consumer products"
+   ],
+   "keywords": [
+    "freewheel",
+    "overrunning clutch",
+    "backstop",
+    "wedge angle",
+    "strut",
+    "autorotation",
+    "starter clutch"
+   ]
+  },
+  "explain": {
+   "motion": "Each sprag is a short strut slightly longer than the gap between the races, tilted by a light spring. When the inner race tries to turn faster than the outer in the driving direction, friction tips the sprags upright so they wedge and lock the races together. In the other direction the sprags lean over and slide, letting the outer race overrun freely.",
+   "forces": "Torque goes through many sprags in compression across the gap, so capacity is high for the size. Locking depends on the gripping angle staying below the friction angle (typically 3° to 5° against a friction coefficient around 0.1).",
+   "benefits": "Engages almost instantly with very little backlash and runs silently when overrunning, unlike a pawl ratchet.",
+   "limits": "Relies on friction and race hardness; wrong lubricant or worn races can let it slip or roll over. Drag and wear when overrunning at high speed."
+  },
+  "build": {
+   "ground": "housing supporting inner and outer races on a common axis O",
+   "input": "inner race, rotation about O (driving direction counterclockwise)",
+   "output": "outer race rotation about O; locked or overrunning state",
+   "members": [
+    {
+     "id": "inner",
+     "role": "driver",
+     "def": "inner race radius 20 mm"
+    },
+    {
+     "id": "outer",
+     "role": "output",
+     "def": "outer race bore radius 28 mm (gap 8 mm)"
+    },
+    {
+     "id": "sprag",
+     "role": "link",
+     "def": "16 figure-eight sprags, diagonal length 8.4 mm, contact surfaces as arcs of radius about 4.5 mm"
+    },
+    {
+     "id": "spring",
+     "role": "spring",
+     "def": "garter spring tilting all sprags toward engagement"
+    }
+   ],
+   "joints": [
+    {
+     "id": "Oi",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "inner"
+     ]
+    },
+    {
+     "id": "Oo",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "outer"
+     ]
+    },
+    {
+     "id": "Ci",
+     "type": "rolling",
+     "between": [
+      "inner",
+      "sprag"
+     ]
+    },
+    {
+     "id": "Co",
+     "type": "rolling",
+     "between": [
+      "sprag",
+      "outer"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "ri",
+     "value": 20,
+     "unit": "mm",
+     "note": "inner race radius"
+    },
+    {
+     "name": "ro",
+     "value": 28,
+     "unit": "mm",
+     "note": "outer race radius"
+    },
+    {
+     "name": "n_sprags",
+     "value": 16,
+     "unit": "",
+     "note": "sprag count"
+    },
+    {
+     "name": "L_sprag",
+     "value": 8.4,
+     "unit": "mm",
+     "note": "sprag diagonal, slightly longer than the gap"
+    },
+    {
+     "name": "grip_angle",
+     "value": 4,
+     "unit": "°",
+     "note": "strut angle at lock, must be < atan(mu)"
+    },
+    {
+     "name": "mu",
+     "value": 0.1,
+     "unit": "",
+     "note": "race friction coefficient (oil)"
+    }
+   ],
+   "defining_relations": "Lock condition: tan(grip_angle) < mu (about 5.7° for mu = 0.1). Gap g = ro - ri; sprag tilt from radial theta satisfies L cos(theta) = g at contact. Driving: w_outer = w_inner when inner leads in the driving sense; otherwise w_outer free (w_outer >= w_inner).",
+   "range": "inner race continuous; outer race follows 1:1 in drive, free to overrun the other way",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "outer race speed vs inner race speed over a cycle with overrun (shows lock and freewheel regions)",
+   "notes": "Animate a few sprags enlarged. Show tilt changing a few degrees between lock and overrun. Two-DOF when freewheeling: drive the inner race and let the outer race either follow or coast with decay."
+  },
+  "examples": [
+   {
+    "use": "Helicopter main rotor drive",
+    "detail": "Lets the rotor keep turning in autorotation if the engine fails."
+   },
+   {
+    "use": "Automatic transmissions",
+    "detail": "Holds a reaction member for smooth 1-2 shifts and free overrun on coast."
+   },
+   {
+    "use": "Conveyor backstops and starters",
+    "detail": "Stop inclined conveyors running back and disconnect starter motors once engines fire."
+   },
+   {
+    "use": "Bicycle hubs",
+    "detail": "Some hubs use a sprag clutch for silent instant engagement."
+   }
+  ],
+  "references": [
+   {
+    "title": "Sprag clutch, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Sprag_clutch",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Freewheel, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Freewheel",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Introduction to Mechanisms, Chapter 8, Overrunning Clutch, Carnegie Mellon",
+    "url": "https://www.cs.cmu.edu/~rapidproto/mechanisms/chpt8.html",
+    "kind": "textbook"
+   }
+  ],
+  "media": [
+   {
+    "title": "Onyx hubs technology, patented sprag clutch photos",
+    "url": "https://onyxhubseurope.com/technology/",
+    "kind": "photos"
+   },
+   {
+    "title": "Inside a Planetary Reduction Drive (cited by Wikipedia sprag clutch article)",
+    "url": "https://www.youtube.com/watch?v=N_gpIAfOrdo",
+    "kind": "video"
+   },
+   {
+    "title": "Roller clutch as fitted to Cheylesmore tricycle, Science Museum Group",
+    "url": "https://collection.sciencemuseumgroup.org.uk/objects/co25837/roller-clutch-as-fitted-to-cheylesmore-tricycle",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "ratchet-pawl",
+   "planetary",
+   "ravigneaux",
+   "friction-wheel-drive"
+  ]
+ },
+ {
+  "id": "star-wheel",
+  "name": "Star wheel and pin",
+  "aka": [
+   "star wheel",
+   "pin wheel index",
+   "jumper star",
+   "date star",
+   "star and finger"
+  ],
+  "in_site": false,
+  "family": "Intermittent",
+  "level": "Basic",
+  "summary": "A finger on a turning shaft knocks a star wheel on by one tooth per turn, and a sprung jumper snaps it into place and holds it.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Intermittent rotary",
+   "label": "Rotary → Intermittent rotary",
+   "output_character": [
+    "Intermittent",
+    "Dwell",
+    "One-way"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Index step",
+   "class": "n/a",
+   "typical": "36° per driver turn (10 teeth); 31 teeth for a date wheel"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 0,
+   "higher_pairs": 2,
+   "notes": "ground, driver with finger pin, star wheel, jumper lever with roller; finger-star and jumper-star contacts; jumper spring"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Indexing",
+    "Dwell",
+    "Locking"
+   ],
+   "property": [
+    "Few parts",
+    "Shock at engagement",
+    "Historic"
+   ],
+   "application": [
+    "Clocks & watches",
+    "Instruments",
+    "Consumer products"
+   ],
+   "keywords": [
+    "date star",
+    "jumper",
+    "calendar mechanism",
+    "detent",
+    "counter",
+    "finger",
+    "pin wheel"
+   ]
+  },
+  "explain": {
+   "motion": "A driver turns continuously and once per turn its finger enters a gap of the star wheel and pushes one tooth. A spring-loaded jumper rides up the tooth flank and, once the tooth passes its peak, snaps the star forward into the next gap. Between pushes the jumper holds the star still.",
+   "forces": "The finger works against the jumper spring until the tooth tip passes, then the spring does the last part of the step. The finger load is light but the snap gives a small impact and holding force depends entirely on the spring.",
+   "benefits": "Very simple, cheap and compact, with a crisp, well-defined rest position. The output can step through any number of positions per revolution.",
+   "limits": "Holding is only spring force, so it suits light loads and slow rates. Backdriving with enough force can jump the jumper."
+  },
+  "build": {
+   "ground": "plate with driver axis O1 at (0,0), star axis O2 at (28,0) and jumper pivot J at (40,22)",
+   "input": "driver, continuous rotation about O1",
+   "output": "star wheel angle about O2",
+   "members": [
+    {
+     "id": "driver",
+     "role": "driver",
+     "def": "disc with finger pin dia 3 mm at radius 12 mm"
+    },
+    {
+     "id": "star",
+     "role": "output",
+     "def": "10 pointed teeth, tip radius 20 mm, root radius 14 mm, 60° tooth angle"
+    },
+    {
+     "id": "jumper",
+     "role": "pawl",
+     "def": "lever from J, length 22 mm, roller or V-nose dia 4 mm seated in star gap"
+    },
+    {
+     "id": "spring",
+     "role": "spring",
+     "def": "leaf spring pressing jumper toward star, preload about 1 N"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "driver"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "star"
+     ]
+    },
+    {
+     "id": "J",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "jumper"
+     ]
+    },
+    {
+     "id": "F",
+     "type": "cam contact",
+     "between": [
+      "driver",
+      "star"
+     ]
+    },
+    {
+     "id": "K",
+     "type": "cam contact",
+     "between": [
+      "jumper",
+      "star"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "N",
+     "value": 10,
+     "unit": "teeth",
+     "note": "star teeth (31 for date wheel)"
+    },
+    {
+     "name": "c",
+     "value": 28,
+     "unit": "mm",
+     "note": "centre distance driver to star"
+    },
+    {
+     "name": "rf",
+     "value": 12,
+     "unit": "mm",
+     "note": "finger radius"
+    },
+    {
+     "name": "r_tip",
+     "value": 20,
+     "unit": "mm",
+     "note": "star tip radius"
+    },
+    {
+     "name": "r_root",
+     "value": 14,
+     "unit": "mm",
+     "note": "star root radius"
+    },
+    {
+     "name": "L_jumper",
+     "value": 22,
+     "unit": "mm",
+     "note": "jumper arm length"
+    }
+   ],
+   "defining_relations": "Index per driver turn = 360°/N. Finger path circle (radius rf about O1) must reach inside the star tip circle: c - rf < r_tip, overlap 4 mm here. The finger must push the star at least half a pitch (180°/N) past the jumper peak so the spring completes the step. Jumper rest position at a gap bisector.",
+   "range": "driver 360° continuous; star steps 36° once per driver turn, finger engagement about 60° of driver angle including the jumper snap",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "star angle vs driver angle (staircase; finger push then a fast snap)",
+   "notes": "Model in two phases: finger-driven (star follows finger contact) up to the tooth tip passing the jumper, then snap (animate quickly to the next detent). Star turns opposite to driver."
+  },
+  "examples": [
+   {
+    "use": "Watch and clock date displays",
+    "detail": "A 31-tooth date star is advanced once a day by a finger on the 24-hour wheel and held by a jumper."
+   },
+   {
+    "use": "Mechanical counters and tally devices",
+    "detail": "Star wheels with detents step counting wheels one unit at a time."
+   },
+   {
+    "use": "Selector and rotary switch detents",
+    "detail": "Star wheels with sprung jumpers give click positions on rotary switches."
+   }
+  ],
+  "references": [
+   {
+    "title": "Indexing mechanisms (star wheels, Geneva, mutilated gears), Roymech",
+    "url": "https://roymech.org/Useful_Tables/Cams_Springs/Indexing.html",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Geneva drive, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Geneva_drive",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Intermittent Transmission Mechanism Explained, FIRGELLI",
+    "url": "https://www.firgelliauto.com/en-mx/blogs/mechanisms/intermittent-transmission",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [],
+  "related": [
+   "geneva",
+   "intermittent-gear",
+   "ratchet-pawl",
+   "internal-geneva",
+   "lever-escapement"
+  ]
+ }
+]

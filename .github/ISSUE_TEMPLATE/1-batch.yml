@@ -1,0 +1,41 @@
+name: Batch of fixes
+description: A checklist of small changes to implement together in one PR. Add lines any time.
+title: 'Batch: '
+labels: ['kind:batch']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One line per change. Add more lines later by editing the issue. When a line grows into its
+        own piece of work, convert it to a sub-issue (hover the line → **Convert to sub-issue**).
+        Move the card to **Ready** when the batch should be picked up next.
+  - type: textarea
+    id: items
+    attributes:
+      label: Changes
+      description: What should change, as a task list. Where to see it helps (page, panel, command).
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: The main area, if the batch has one.
+      options:
+        - Mixed
+        - Mechanisms
+        - Rules & hardware
+        - Renderer & style
+        - Site
+        - Catalogue
+        - Tooling & tests
+        - CI & process
+        - Docs
+      default: 0
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Screenshots, priorities, anything that applies to the whole batch. Optional.

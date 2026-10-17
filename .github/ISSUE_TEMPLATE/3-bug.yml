@@ -1,0 +1,54 @@
+name: Bug
+description: Something works wrongly, breaks, or gives a wrong result (kinematics, assembly, drawing, page).
+title: 'Bug: '
+labels: ['kind:bug', 'bug']
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: From a clean start if possible. Attach input files or logs if they matter.
+      value: |
+        1.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots, files, console errors
+      description: Paste screenshots or drag files here. Optional.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The version in the site footer, or in package.json.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Blocks work (wrong kinematics, crash, broken build)
+        - Wrong result, with a workaround
+        - Cosmetic or minor
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Not sure
+        - Mechanisms
+        - Rules & hardware
+        - Renderer & style
+        - Site
+        - Catalogue
+        - Tooling & tests
+        - CI & process
+        - Docs
+      default: 0

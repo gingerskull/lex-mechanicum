@@ -1,0 +1,17 @@
+name: Idea
+description: A quick note for later. Lands in the Inbox; nothing is committed to it.
+title: 'Idea: '
+labels: ['kind:idea']
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: A sentence or two is enough. Sketches and screenshots welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it would help
+      description: Optional.

@@ -1,0 +1,3904 @@
+[
+ {
+  "id": "watt-six-bar",
+  "name": "Watt six-bar linkage",
+  "aka": [
+   "Watt chain",
+   "Watt II six-bar",
+   "Watt I six-bar",
+   "two four-bars in series"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "Two four-bar loops sharing a ternary rocker: a turning crank drives a first rocker, which drives a second rocker with a reshaped swing.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Oscillating",
+   "label": "Rotary → Oscillating",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "output swing set by the second loop, about 90° here for 360° of crank"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 7,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "Watt topology: the two ternary links (ground and the middle rocker) share joint O4; two four-bar loops"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Function generation",
+    "Dwell"
+   ],
+   "property": [
+    "Grashof",
+    "Few parts",
+    "Singular positions"
+   ],
+   "application": [
+    "Machine tools",
+    "Packaging & automation",
+    "Steam & engines",
+    "Education"
+   ],
+   "keywords": [
+    "six-bar",
+    "watt chain",
+    "ternary link",
+    "two loops",
+    "function generator",
+    "james watt"
+   ]
+  },
+  "explain": {
+   "motion": "A crank-rocker loop O2-A-B-O4 turns the crank's rotation into a rocking of the middle link. That middle rocker is a triangle: its second arm O4-C drives a second loop C-D-O6, so the output rocker at O6 swings by an amount and with a timing that the second loop reshapes.",
+   "forces": "Torque passes from the crank through two pin-ended couplers in series, so each coupler only pushes or pulls. Transmission angles in both loops must stay roughly between 40° and 140°; near a toggle in either loop the output force grows while the motion stalls.",
+   "benefits": "It gives more design freedom than a four-bar (amplified swing, dwell, better timing) while still using only pin joints.",
+   "limits": "Errors and clearances in two loops add up, and a poor second loop can lock or flip branch. Synthesis is harder than for a single four-bar."
+  },
+  "build": {
+   "ground": "frame holding O2 (0,0), O4 (100,0) and O6 (180,60)",
+   "input": "crank, continuous rotation about O2",
+   "output": "rocker2 angle about O6",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "ternary frame: O2 (0,0), O4 (100,0), O6 (180,60)"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, length 30"
+    },
+    {
+     "id": "coupler1",
+     "role": "link",
+     "def": "A→B, length 100"
+    },
+    {
+     "id": "rocker1",
+     "role": "link",
+     "def": "ternary plate pivoted at O4: O4→B 60 and O4→C 50, arm O4C set 90° clockwise from O4B"
+    },
+    {
+     "id": "coupler2",
+     "role": "link",
+     "def": "C→D, length 60"
+    },
+    {
+     "id": "rocker2",
+     "role": "output",
+     "def": "O6→D, length 30"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler1"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler1",
+      "rocker1"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker1"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "revolute",
+     "between": [
+      "rocker1",
+      "coupler2"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "coupler2",
+      "rocker2"
+     ]
+    },
+    {
+     "id": "O6",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker2"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 30,
+     "unit": "mm",
+     "note": "crank O2A"
+    },
+    {
+     "name": "b",
+     "value": 100,
+     "unit": "mm",
+     "note": "coupler AB"
+    },
+    {
+     "name": "c",
+     "value": 60,
+     "unit": "mm",
+     "note": "rocker O4B"
+    },
+    {
+     "name": "d",
+     "value": 100,
+     "unit": "mm",
+     "note": "ground O2O4"
+    },
+    {
+     "name": "c2",
+     "value": 50,
+     "unit": "mm",
+     "note": "second arm O4C"
+    },
+    {
+     "name": "gamma",
+     "value": -90,
+     "unit": "deg",
+     "note": "angle from O4B to O4C"
+    },
+    {
+     "name": "e",
+     "value": 60,
+     "unit": "mm",
+     "note": "coupler CD"
+    },
+    {
+     "name": "f",
+     "value": 30,
+     "unit": "mm",
+     "note": "output rocker O6D"
+    },
+    {
+     "name": "O6",
+     "value": [
+      180,
+      60
+     ],
+     "unit": "mm",
+     "note": "output pivot position"
+    }
+   ],
+   "defining_relations": "Loop 1 Grashof: s+l <= p+q, 30+100 <= 60+100, so the crank turns fully. Loop 2 is a closure C(theta4) to O6 with |CD| = e, |O6D| = f. Mobility 3(6-1)-2*7 = 1.",
+   "range": "crank 360° continuous; rocker1 swings 62° (74° to 136°); rocker2 swings about 91° (116° to 208°); transmission angle in loop 2 stays 56° to 123°",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "rocker1 and rocker2 angle vs crank angle",
+   "notes": "Solve loop 1 with B on the upper branch (circleX(A,b,O4,c,+1) in site convention), then C = O4 + 50 at angle(O4B) - 90°, then D = circleX(C,60,O6,30,+1). Keep the same branch all cycle. This is the Watt II arrangement (two four-bars in series); Watt I grounds a binary link instead."
+  },
+  "examples": [
+   {
+    "use": "Beam engine parallel motion",
+    "detail": "Watt's straight-line beam linkage with its copying links forms a Watt-type chain, as listed under six-bar applications."
+   },
+   {
+    "use": "Packaging and textile machines",
+    "detail": "Series four-bars drive tools that need a larger or dwelling swing than one four-bar gives."
+   },
+   {
+    "use": "Bicycle rear suspension",
+    "detail": "Some full-suspension frames use six-bar layouts to tune the wheel path and leverage ratio."
+   }
+  ],
+  "references": [
+   {
+    "title": "Six-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Six-bar_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Six bar linkage, Theory of Machines course notes, Universidad de Almeria",
+    "url": "https://ingmec.ual.es/tmm/L01_03b_six_bars.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "Watt Topology Six-bar Linkage, FIRGELLI",
+    "url": "https://www.firgelliauto.com/es/blogs/mechanisms/watt-topology-six-bar-linkage",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "A Task-Driven Unified Synthesis of Planar Four-Bar and Six-Bar Linkages, Stony Brook",
+    "url": "https://www.stonybrook.edu/designinnovation/_images/jounral_pdfs/A%20Task-Driven%20Unified%20Synthesis%20of%20Planar%20Four%20Bar%20and%20Six%20Bar.pdf",
+    "kind": "paper"
+   }
+  ],
+  "media": [
+   {
+    "title": "Watt's linkage beam engine model build (tubalcain)",
+    "url": "https://www.youtube.com/watch?v=RGSa2qLVCh8",
+    "kind": "video"
+   },
+   {
+    "title": "Watt six-bar linkage, SolidWorks motion",
+    "url": "https://www.youtube.com/watch?v=3MZfY2Ae9IQ",
+    "kind": "animation"
+   },
+   {
+    "title": "Watt's six-bar linkage, MATLAB animation",
+    "url": "https://www.youtube.com/watch?v=NpxcI-Y6a9Q",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "stephenson-six-bar",
+   "watt-linkage",
+   "double-rocker",
+   "pantograph"
+  ]
+ },
+ {
+  "id": "stephenson-six-bar",
+  "name": "Stephenson six-bar linkage",
+  "aka": [
+   "Stephenson chain",
+   "Stephenson III six-bar",
+   "Stephenson I",
+   "Stephenson II",
+   "dwell six-bar"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "A four-bar whose coupler point drives an extra two-link dyad, so the output follows the coupler curve and can dwell or swing widely.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Oscillating",
+   "label": "Rotary → Oscillating",
+   "output_character": [
+    "Reciprocating",
+    "Dwell",
+    "Non-uniform"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "about 54° of output swing per crank turn here"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 7,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "Stephenson topology: ternary ground and ternary coupler separated by binary links; one four-bar loop and one five-bar loop"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Dwell",
+    "Function generation",
+    "Path generation"
+   ],
+   "property": [
+    "Grashof",
+    "Few parts",
+    "Singular positions"
+   ],
+   "application": [
+    "Packaging & automation",
+    "Automotive",
+    "Robotics",
+    "Printing & textiles"
+   ],
+   "keywords": [
+    "six-bar",
+    "stephenson chain",
+    "coupler curve",
+    "dwell mechanism",
+    "george stephenson",
+    "dyad"
+   ]
+  },
+  "explain": {
+   "motion": "A crank-rocker four-bar O2-A-B-O4 has a triangular coupler; a point P on it traces a closed coupler curve. A link P-D ties that point to an output rocker O6-D, so the rocker follows the curve. Where the curve runs along an arc centred on D, the output pauses.",
+   "forces": "Crank torque passes through the ternary coupler and the dyad link, each pin-ended bar carrying push or pull. The output rocker sees high force but little motion near its toggle positions.",
+   "benefits": "It can give dwells, large swings or special timing with only pin joints and one input.",
+   "limits": "Coupler curves are sensitive to dimensions and wear, and branch flips are possible if the dyad nears a straight line. Design needs simulation or synthesis software."
+  },
+  "build": {
+   "ground": "frame with O2 (0,0), O4 (60,0), O6 (-20,-50)",
+   "input": "crank, continuous rotation about O2",
+   "output": "rocker2 angle about O6",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "ternary frame: O2 (0,0), O4 (60,0), O6 (-20,-50)"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, length 20"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "ternary plate: A→B 60, coupler point P at local (30,-40) from A with x along AB"
+    },
+    {
+     "id": "rocker1",
+     "role": "link",
+     "def": "O4→B, length 50"
+    },
+    {
+     "id": "link5",
+     "role": "link",
+     "def": "P→D, length 70"
+    },
+    {
+     "id": "rocker2",
+     "role": "output",
+     "def": "O6→D, length 40"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "rocker1"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker1"
+     ]
+    },
+    {
+     "id": "P",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "link5"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "link5",
+      "rocker2"
+     ]
+    },
+    {
+     "id": "O6",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker2"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 20,
+     "unit": "mm",
+     "note": "crank"
+    },
+    {
+     "name": "b",
+     "value": 60,
+     "unit": "mm",
+     "note": "coupler AB"
+    },
+    {
+     "name": "c",
+     "value": 50,
+     "unit": "mm",
+     "note": "rocker O4B"
+    },
+    {
+     "name": "d",
+     "value": 60,
+     "unit": "mm",
+     "note": "ground O2O4"
+    },
+    {
+     "name": "px",
+     "value": 30,
+     "unit": "mm",
+     "note": "coupler point along AB"
+    },
+    {
+     "name": "py",
+     "value": -40,
+     "unit": "mm",
+     "note": "coupler point offset"
+    },
+    {
+     "name": "e",
+     "value": 70,
+     "unit": "mm",
+     "note": "dyad link PD"
+    },
+    {
+     "name": "f",
+     "value": 40,
+     "unit": "mm",
+     "note": "output rocker O6D"
+    }
+   ],
+   "defining_relations": "Four-bar Grashof: 20+60 <= 50+60, crank fully rotates. Output closure |P(theta)D| = e, |O6D| = f. Mobility 3(6-1)-2*7 = 1. Stephenson I, II, III differ by which link is ground; this is III (dyad from coupler to ground).",
+   "range": "crank 360° continuous; coupler point P sweeps a 42 x 19 mm loop; rocker2 swings about 54° (-49° to 5°)",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "rocker2 angle vs crank angle, with the coupler curve of P",
+   "notes": "B = circleX(A,60,O4,50,+1); D = circleX(P,70,O6,40,+1). Show P's coupler curve as a path; the dyad PD and rocker2 must not pass straight or the branch flips."
+  },
+  "examples": [
+   {
+    "use": "Car hood and lid hinges",
+    "detail": "Stephenson six-bar hinges move a hood or lid on a controlled path with a gas spring."
+   },
+   {
+    "use": "Walking machines",
+    "detail": "The Klann leg is a modified Stephenson III chain."
+   },
+   {
+    "use": "Assistive wrist and knee braces",
+    "detail": "Six-bar chains shape torque and motion in orthoses."
+   }
+  ],
+  "references": [
+   {
+    "title": "Six-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Six-bar_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Six bar linkage, Theory of Machines course notes, Universidad de Almeria",
+    "url": "https://ingmec.ual.es/tmm/L01_03b_six_bars.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "Stephenson Topology Six-bar Linkage, FIRGELLI",
+    "url": "https://www.firgelliauto.com/es/blogs/mechanisms/stephenson-topology-six-bar-linkage",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Stephenson I car hood mechanism with gas spring",
+    "url": "https://www.youtube.com/watch?v=jc057w0qTNQ",
+    "kind": "animation"
+   },
+   {
+    "title": "Stephenson six-bar animation with graphical analysis, MATLAB",
+    "url": "https://www.youtube.com/watch?v=dKRRN2uUlUQ",
+    "kind": "animation"
+   },
+   {
+    "title": "3D printed walking robot using the Klann (Stephenson III) leg",
+    "url": "https://www.youtube.com/watch?v=INjZ6gpW_VE",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "watt-six-bar",
+   "klann-linkage",
+   "hoekens-linkage",
+   "double-rocker"
+  ]
+ },
+ {
+  "id": "five-bar",
+  "name": "Five-bar linkage",
+  "aka": [
+   "planar five-bar",
+   "parallel SCARA",
+   "double SCARA",
+   "pentagon robot",
+   "geared five-bar"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "A closed loop of five bars with two driven cranks, so one end point can be steered anywhere in a planar workspace.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Path",
+   "label": "Rotary → Path",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "n/a",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "None",
+   "class": "n/a",
+   "typical": "2 inputs map to an x-y point; scale set by arm lengths"
+  },
+  "dof": 2,
+  "topology": {
+   "links": 5,
+   "revolute": 5,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "two grounded motors; a gear pair between the cranks makes it a 1-DOF geared five-bar"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Positioning",
+    "Path generation",
+    "Drawing curves"
+   ],
+   "property": [
+    "Backdrivable",
+    "Precision",
+    "Singular positions",
+    "Few parts"
+   ],
+   "application": [
+    "Robotics",
+    "Medical",
+    "Toys & kinetic art",
+    "Instruments"
+   ],
+   "keywords": [
+    "parallel manipulator",
+    "parallel scara",
+    "haptic device",
+    "two degrees of freedom",
+    "inverse kinematics",
+    "plotter"
+   ]
+  },
+  "explain": {
+   "motion": "Two cranks turn about fixed pivots O1 and O2. Each carries a distal bar, and the two distal bars meet at the tip P. Setting both crank angles fixes P, so moving them together steers P along any path in the workspace.",
+   "forces": "Both motors sit on the base, so the moving parts are light and forces at P are shared by two arms. Near singular poses (distal bars in line, or a crank in line with its distal bar) stiffness or control is lost.",
+   "benefits": "Low moving inertia, high stiffness and easy backdriving make it good for fast pick-and-place, plotters and haptic devices.",
+   "limits": "The workspace is smaller than a serial arm's and is bounded by singularities. Two motors and inverse kinematics are needed."
+  },
+  "build": {
+   "ground": "base holding O1 (0,0) and O2 (50,0)",
+   "input": "crankL and crankR, each driven by its own motor (demo: thetaL = 120° + 30° sin u, thetaR = 60° + 30° sin(u + 90°))",
+   "output": "tip P position (x, y)",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O1 (0,0) to O2 (50,0), length 50"
+    },
+    {
+     "id": "crankL",
+     "role": "driver",
+     "def": "O1→A, length 60"
+    },
+    {
+     "id": "crankR",
+     "role": "driver",
+     "def": "O2→B, length 60"
+    },
+    {
+     "id": "distalL",
+     "role": "link",
+     "def": "A→P, length 80"
+    },
+    {
+     "id": "distalR",
+     "role": "output",
+     "def": "B→P, length 80"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crankL"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crankR"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crankL",
+      "distalL"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "crankR",
+      "distalR"
+     ]
+    },
+    {
+     "id": "P",
+     "type": "revolute",
+     "between": [
+      "distalL",
+      "distalR"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "d",
+     "value": 50,
+     "unit": "mm",
+     "note": "pivot spacing"
+    },
+    {
+     "name": "l1",
+     "value": 60,
+     "unit": "mm",
+     "note": "proximal arms"
+    },
+    {
+     "name": "l2",
+     "value": 80,
+     "unit": "mm",
+     "note": "distal arms"
+    },
+    {
+     "name": "amp",
+     "value": 30,
+     "unit": "deg",
+     "note": "demo swing of each crank"
+    }
+   ],
+   "defining_relations": "Forward kinematics: P = circleX(A, l2, B, l2, +1) with A = O1 + l1(cos thetaL, sin thetaL), B = O2 + l1(cos thetaR, sin thetaR). Inverse: each crank angle from the triangle O-joint-P with sides l1, l2, |OP|. Mobility 3(5-1)-2*5 = 2.",
+   "range": "each crank ±30° about its demo centre; tip P moves over a 62 x 59 mm loop (x -6 to 56, y 73 to 132)",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "tip x and y vs phase u",
+   "notes": "Use the elbows-out, tip-up branch (side +1). Two independent inputs; for a 1-DOF demo couple them with a fixed phase or a 1:1 gear. Avoid poses where A, P, B line up."
+  },
+  "examples": [
+   {
+    "use": "Parallel SCARA pick-and-place",
+    "detail": "Fast planar robots carry a light tool on a five-bar driven by two base motors."
+   },
+   {
+    "use": "Haptic force-feedback devices",
+    "detail": "Low-inertia five-bars give users a backdrivable handle."
+   },
+   {
+    "use": "Drawing machines and toys",
+    "detail": "Five-bar plotters and drawing toys trace pictures from two motors."
+   },
+   {
+    "use": "Prosthetics",
+    "detail": "A geared five-bar spring mechanism has been used in a powered ankle-foot prosthesis."
+   }
+  ],
+  "references": [
+   {
+    "title": "Five-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Five-bar_linkage",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Five-bar parallel robot (double SCARA)",
+    "url": "https://www.youtube.com/watch?v=05XyfAV1to4",
+    "kind": "video"
+   },
+   {
+    "title": "Prototype of SCARA robot with five-bar linkage mechanism",
+    "url": "https://www.youtube.com/watch?v=iumUr063PQk",
+    "kind": "video"
+   },
+   {
+    "title": "Pentagon five-bar parallel robot, top view",
+    "url": "https://www.youtube.com/watch?v=EhDIXmGVHPs",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "pantograph",
+   "double-crank",
+   "parallelogram-linkage"
+  ]
+ },
+ {
+  "id": "klann-linkage",
+  "name": "Klann linkage",
+  "aka": [
+   "Klann leg",
+   "Klann walking mechanism",
+   "mechanical spider leg",
+   "Mondo Spider leg"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Advanced",
+  "summary": "Joe Klann's six-bar walking leg: one crank moves a foot along a flat stance stroke and then lifts it high for the return step.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Path",
+   "label": "Rotary → Path",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "n/a",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "foot stride about 3.8 x crank radius, lift about 2 x crank radius"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 7,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "modified Stephenson III chain; ternary connecting member and ternary leg"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Walking",
+    "Path generation",
+    "Motion conversion"
+   ],
+   "property": [
+    "Approximate",
+    "Few parts",
+    "Historic"
+   ],
+   "application": [
+    "Robotics",
+    "Toys & kinetic art",
+    "Education"
+   ],
+   "keywords": [
+    "walking machine",
+    "joe klann",
+    "mondo spider",
+    "stephenson six-bar",
+    "burmester",
+    "legged robot"
+   ]
+  },
+  "explain": {
+   "motion": "The crank turns the connecting member, whose middle pin E is held by a short lower rocker, so its far end K swings in a loop. The leg is a rigid bar pinned at the hip H to an upper rocker and at the knee K to the connecting member. The foot at its tip moves along a nearly flat line for about a third of the turn and then lifts and swings back.",
+   "forces": "Ground reaction at the foot travels up the leg into the two rockers and the crank, so the long leg bar sees bending. Two legs half a cycle apart on one crank share the load and keep the frame level.",
+   "benefits": "High foot lift lets it step over obstacles and climb stairs, using only pin joints and one rotary drive per side.",
+   "limits": "The stance is not perfectly flat or constant speed, and the foot path is fixed by the geometry. The long leg bar must be stiff; joint play shows up as foot wobble."
+  },
+  "build": {
+   "ground": "frame with crank axis O (0,0), upper rocker pivot A (-17.4,46.0) and lower rocker pivot B (-44.0,-13.1)",
+   "input": "crank, continuous rotation about O",
+   "output": "foot point F on the leg, path traced",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O (0,0), A (-17.4,46.0), B (-44.0,-13.1); |OA| 49.2, |OB| 46.0, |AB| 64.8"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O→C, length 20"
+    },
+    {
+     "id": "connector",
+     "role": "link",
+     "def": "rigid triangle C, E, K: CE 44.0, EK 39.0, CK 82.5 (K at local (82.0,-8.7) in frame C→E)"
+    },
+    {
+     "id": "lowerRocker",
+     "role": "link",
+     "def": "B→E, length 23.9"
+    },
+    {
+     "id": "upperRocker",
+     "role": "link",
+     "def": "A→H, length 38.6"
+    },
+    {
+     "id": "leg",
+     "role": "output",
+     "def": "rigid triangle H, K, F: HK 66.9, KF 66.9, HF 129.3 (F at local (124.9,33.5) in frame H→K)"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "connector"
+     ]
+    },
+    {
+     "id": "E",
+     "type": "revolute",
+     "between": [
+      "connector",
+      "lowerRocker"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "lowerRocker"
+     ]
+    },
+    {
+     "id": "K",
+     "type": "revolute",
+     "between": [
+      "connector",
+      "leg"
+     ]
+    },
+    {
+     "id": "H",
+     "type": "revolute",
+     "between": [
+      "leg",
+      "upperRocker"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "upperRocker"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 20,
+     "unit": "mm",
+     "note": "crank radius"
+    },
+    {
+     "name": "CE",
+     "value": 44.0,
+     "unit": "mm",
+     "note": "connector, crank pin to elbow"
+    },
+    {
+     "name": "CK",
+     "value": 82.5,
+     "unit": "mm",
+     "note": "connector, crank pin to knee"
+    },
+    {
+     "name": "EK",
+     "value": 39.0,
+     "unit": "mm",
+     "note": "connector, elbow to knee"
+    },
+    {
+     "name": "BE",
+     "value": 23.9,
+     "unit": "mm",
+     "note": "lower rocker"
+    },
+    {
+     "name": "AH",
+     "value": 38.6,
+     "unit": "mm",
+     "note": "upper rocker"
+    },
+    {
+     "name": "HK",
+     "value": 66.9,
+     "unit": "mm",
+     "note": "leg, hip to knee"
+    },
+    {
+     "name": "HF",
+     "value": 129.3,
+     "unit": "mm",
+     "note": "leg, hip to foot"
+    },
+    {
+     "name": "KF",
+     "value": 66.9,
+     "unit": "mm",
+     "note": "leg, knee to foot"
+    }
+   ],
+   "defining_relations": "Dimensions scaled (x74.63) from the pivot coordinates in US patent 6,260,862 so that the crank is 20 mm. Mobility 3(6-1)-2*7 = 1. Foot path approx. 75 mm wide x 39 mm high at a 20 mm crank.",
+   "range": "crank 360° continuous; foot F sweeps x -119 to -44, y -60 to -20 (75 x 39 mm); flat stance over roughly a third of the turn",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "foot height vs crank angle",
+   "notes": "Crank angle 0 = C at (-20,0) (pointing toward the leg). E = circleX(C,44.0,B,23.9,-1); K from the connector frame; H = circleX(K,66.9,A,38.6,+1); F from the leg frame. These branches reproduce the patent pose at angle 0. For a walker, pair a mirror leg 180° out of phase."
+  },
+  "examples": [
+   {
+    "use": "Mondo Spider ride-on walker",
+    "detail": "An eight-legged rideable machine walks on Klann linkages."
+   },
+   {
+    "use": "Walking robots and kits",
+    "detail": "Hobby and educational walkers use Klann legs driven by one motor per side."
+   },
+   {
+    "use": "Kinetic toys and LEGO models",
+    "detail": "Klann spiders are a popular LEGO Technic and 3D-print build."
+   }
+  ],
+  "references": [
+   {
+    "title": "Klann linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Klann_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "US6364040B1 Walking device, Google Patents",
+    "url": "https://patents.google.com/patent/US6364040",
+    "kind": "patent"
+   },
+   {
+    "title": "Klann Linkage, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/klann-linkage",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Comparison of Klann and Jansen leg linkages, Mechanical Design 101",
+    "url": "https://mechanicaldesign101.com/2009/07/07/comparison-of-klann-and-jansen-leg-linkages",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "3D printed walking robot (Klann linkage)",
+    "url": "https://www.youtube.com/watch?v=INjZ6gpW_VE",
+    "kind": "video"
+   },
+   {
+    "title": "Klann mechanical spider in LEGO",
+    "url": "https://www.youtube.com/watch?v=ZGR8krkph4Q",
+    "kind": "video"
+   },
+   {
+    "title": "Walking Mechanism Using a Klann Linkage, Wolfram Demonstrations",
+    "url": "https://demonstrations.wolfram.com/WalkingMechanismUsingAKlannLinkage/",
+    "kind": "interactive"
+   },
+   {
+    "title": "Mondo Spider walking machine, Mechanical Design 101",
+    "url": "https://mechanicaldesign101.com/2009/07/07/mondo-spider-walking-machine/",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "jansen-linkage",
+   "stephenson-six-bar",
+   "chebyshev-linkage",
+   "hoekens-linkage",
+   "four-bar"
+  ]
+ },
+ {
+  "id": "jansen-linkage",
+  "name": "Jansen's linkage",
+  "aka": [
+   "Strandbeest leg",
+   "Theo Jansen mechanism",
+   "holy numbers linkage",
+   "Jansen leg"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Advanced",
+  "summary": "Theo Jansen's Strandbeest leg: one crank and eleven bars move the foot along a long flat stride and lift it on the way back.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Path",
+   "label": "Rotary → Path",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "n/a",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "flat stride about 4 x crank radius (124 mm at a 30 mm crank), lift about 45 mm"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 8,
+   "revolute": 10,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "ground, crank, bars j, k, c, f, upper triangle and foot triangle; joints at A, Y and C each join three bodies"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Walking",
+    "Path generation",
+    "Motion conversion"
+   ],
+   "property": [
+    "Approximate",
+    "Few parts",
+    "Balanced"
+   ],
+   "application": [
+    "Toys & kinetic art",
+    "Robotics",
+    "Education"
+   ],
+   "keywords": [
+    "strandbeest",
+    "theo jansen",
+    "holy numbers",
+    "kinetic sculpture",
+    "wind-powered",
+    "walking machine"
+   ]
+  },
+  "explain": {
+   "motion": "The crank turns about O. Bars j and k carry its motion to the upper triangle (pivoted at the fixed point Y) and to bar c, and the two rigid triangles pass it down to the foot. For about half the turn the foot slides along a nearly flat line, then it lifts and swings forward to start the next step.",
+   "forces": "During the stride the ground pushes up on the foot; the load travels through the foot triangle and bars into the fixed pivot Y and the crank. Every bar other than the two triangles is pinned at both ends, so it only pushes or pulls. Because the foot stays level, the crank does little lifting work during the stride.",
+   "benefits": "All joints are plain pins and the leg has one degree of freedom, so one shaft drives many legs. The flat stride keeps the body at a steady height.",
+   "limits": "Eleven bars and many pins add friction and play, and the foot path is fixed by the holy numbers. It walks well only on fairly flat ground and is slow to climb."
+  },
+  "build": {
+   "ground": "frame holding crank axis O (0,0) and pivot Y (-76,-15.6)",
+   "input": "crank, continuous rotation about O",
+   "output": "foot point F on the foot triangle, path traced",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O (0,0) and Y (-a,-l) = (-76,-15.6)"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O→A, m = 30"
+    },
+    {
+     "id": "j",
+     "role": "link",
+     "def": "A→B, 100"
+    },
+    {
+     "id": "k",
+     "role": "link",
+     "def": "A→C, 123.8"
+    },
+    {
+     "id": "upper",
+     "role": "link",
+     "def": "rigid triangle Y, B, D: YB b 83, BD e 111.6, YD d 80.2"
+    },
+    {
+     "id": "c",
+     "role": "link",
+     "def": "Y→C, 78.6"
+    },
+    {
+     "id": "f",
+     "role": "link",
+     "def": "D→E, 78.8"
+    },
+    {
+     "id": "foot",
+     "role": "output",
+     "def": "rigid triangle C, E, F: CE g 73.4, EF h 131.4, CF i 98"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A1",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "j"
+     ]
+    },
+    {
+     "id": "A2",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "k"
+     ]
+    },
+    {
+     "id": "Y1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "upper"
+     ]
+    },
+    {
+     "id": "Y2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "c"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "j",
+      "upper"
+     ]
+    },
+    {
+     "id": "C1",
+     "type": "revolute",
+     "between": [
+      "k",
+      "foot"
+     ]
+    },
+    {
+     "id": "C2",
+     "type": "revolute",
+     "between": [
+      "c",
+      "foot"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "upper",
+      "f"
+     ]
+    },
+    {
+     "id": "E",
+     "type": "revolute",
+     "between": [
+      "f",
+      "foot"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "S",
+     "value": 2,
+     "unit": "",
+     "note": "scale on Jansen's holy numbers"
+    },
+    {
+     "name": "a",
+     "value": 76,
+     "unit": "mm",
+     "note": "O to Y horizontal (38 x 2)"
+    },
+    {
+     "name": "l",
+     "value": 15.6,
+     "unit": "mm",
+     "note": "O to Y vertical (7.8 x 2)"
+    },
+    {
+     "name": "m",
+     "value": 30,
+     "unit": "mm",
+     "note": "crank (15 x 2)"
+    },
+    {
+     "name": "b",
+     "value": 83,
+     "unit": "mm",
+     "note": "41.5 x 2"
+    },
+    {
+     "name": "c",
+     "value": 78.6,
+     "unit": "mm",
+     "note": "39.3 x 2"
+    },
+    {
+     "name": "d",
+     "value": 80.2,
+     "unit": "mm",
+     "note": "40.1 x 2"
+    },
+    {
+     "name": "e",
+     "value": 111.6,
+     "unit": "mm",
+     "note": "55.8 x 2"
+    },
+    {
+     "name": "f",
+     "value": 78.8,
+     "unit": "mm",
+     "note": "39.4 x 2"
+    },
+    {
+     "name": "g",
+     "value": 73.4,
+     "unit": "mm",
+     "note": "36.7 x 2"
+    },
+    {
+     "name": "h",
+     "value": 131.4,
+     "unit": "mm",
+     "note": "65.7 x 2"
+    },
+    {
+     "name": "i",
+     "value": 98,
+     "unit": "mm",
+     "note": "49 x 2"
+    },
+    {
+     "name": "j",
+     "value": 100,
+     "unit": "mm",
+     "note": "50 x 2"
+    },
+    {
+     "name": "k",
+     "value": 123.8,
+     "unit": "mm",
+     "note": "61.9 x 2"
+    }
+   ],
+   "defining_relations": "Jansen's holy numbers a 38, b 41.5, c 39.3, d 40.1, e 55.8, f 39.4, g 36.7, h 65.7, i 49, j 50, k 61.9, l 7.8, m 15 (site scales by 2). Mobility 3(8-1)-2*10 = 1.",
+   "range": "crank 360° continuous; foot F spans x -143 to -7 and y -184 to -139 (136 x 45 mm); flat stance (within 3 mm of the lowest point) for about 48% of the turn over 124 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles"
+   ],
+   "plot": "foot height above its lowest point vs crank angle",
+   "notes": "Site solve: A = O + m(cos u, sin u); B = circleX(A,j,Y,b,-1); C = circleX(A,k,Y,c,+1); D = circleX(B,e,Y,d,-1); E = circleX(D,f,C,g,-1); F = circleX(E,h,C,i,-1). Built in three 5 mm planes; triangles as plate pairs straddling the bars. A full walker mirrors the leg about the crank and phases several legs on one crankshaft."
+  },
+  "examples": [
+   {
+    "use": "Strandbeest sculptures",
+    "detail": "Theo Jansen's wind-powered beach animals walk on dozens of these legs."
+   },
+   {
+    "use": "Walking robots",
+    "detail": "Hobby and research walkers use Jansen legs on a motor-driven crankshaft."
+   },
+   {
+    "use": "Kinetic kits and teaching",
+    "detail": "Strandbeest model kits and classroom builds teach linkage design."
+   }
+  ],
+  "references": [
+   {
+    "title": "Jansen's linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Jansen%27s_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Jansen's Linkage Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/jansen-s-linkage",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Strandbeest leg study, Cleveland State University (47A-2016)",
+    "url": "https://www.csuohio.edu/sites/default/files/47A-2016.pdf",
+    "kind": "paper"
+   }
+  ],
+  "media": [
+   {
+    "title": "Strandbeest Evolution 2017, Theo Jansen",
+    "url": "https://www.youtube.com/watch?v=LewVEF2B_pM",
+    "kind": "video"
+   },
+   {
+    "title": "Theo Jansen, Strandbeesten de nieuwe generatie",
+    "url": "https://www.youtube.com/watch?v=J7KXgA1-kGc",
+    "kind": "video"
+   },
+   {
+    "title": "Theo Jansen walks his Strandbeests on the beach in San Francisco, Laughing Squid",
+    "url": "https://laughingsquid.com/artist-theo-jansen-walks-his-magnificent-kinetic-strandbeests-along-the-beach-in-san-francisco/",
+    "kind": "photos"
+   },
+   {
+    "title": "Strandbeest mechanism explained",
+    "url": "https://www.youtube.com/watch?v=f5j4Jakg7-Y",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "klann-linkage",
+   "chebyshev-linkage",
+   "hoekens-linkage",
+   "four-bar",
+   "stephenson-six-bar"
+  ]
+ },
+ {
+  "id": "ackermann-steering",
+  "name": "Ackermann steering linkage",
+  "aka": [
+   "Ackermann geometry",
+   "steering trapezoid",
+   "Lankensperger steering",
+   "tie rod steering"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "A trapezoid of axle, steering arms and tie rod that turns the inner front wheel more than the outer so both roll round one centre.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Oscillating",
+   "label": "Oscillating → Oscillating",
+   "output_character": [
+    "Non-uniform",
+    "Reversing"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "outer angle about 0.83 x inner angle at 30° (24.9° vs 30°)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "four-bar: axle beam (ground), left knuckle arm, tie rod, right knuckle arm; real cars add a rack or drag link to drive it"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Steering",
+    "Function generation"
+   ],
+   "property": [
+    "Approximate",
+    "Few parts",
+    "Historic"
+   ],
+   "application": [
+    "Automotive",
+    "Agriculture",
+    "Robotics"
+   ],
+   "keywords": [
+    "ackermann",
+    "lankensperger",
+    "tie rod",
+    "kingpin",
+    "toe-out on turns",
+    "turning centre"
+   ]
+  },
+  "explain": {
+   "motion": "Each front wheel steers about its kingpin on a knuckle with a steering arm. The arms point inward toward the centre of the rear axle and are joined by a tie rod, forming a trapezoid. When one wheel steers, the tie rod turns the other wheel by a smaller angle on the outside of the turn.",
+   "forces": "Steering force enters one knuckle and crosses to the other through the tie rod in push or pull. Tyre side forces feed back through the same path, so the linkage is fully backdrivable.",
+   "benefits": "Wheels roll on concentric circles at low speed, cutting tyre scrub and wear and making tight turns smooth.",
+   "limits": "A four-bar only approximates the ideal relation, best near one design angle. At high speed tyre slip angles matter more, so race cars often use parallel or reverse Ackermann."
+  },
+  "build": {
+   "ground": "front axle beam with kingpins KL (-75,0) and KR (75,0); rear axle centre at (0,-250)",
+   "input": "left knuckle arm, rocked ±40° about KL",
+   "output": "right knuckle angle about KR (outer or inner wheel)",
+   "members": [
+    {
+     "id": "axle",
+     "role": "ground",
+     "def": "KL (-75,0) to KR (75,0), track 150"
+    },
+    {
+     "id": "armL",
+     "role": "driver",
+     "def": "knuckle + steering arm at KL, arm 30 pointing toward the rear axle centre (16.7° inward of straight back)"
+    },
+    {
+     "id": "tieRod",
+     "role": "link",
+     "def": "PL→PR, length 132.8"
+    },
+    {
+     "id": "armR",
+     "role": "output",
+     "def": "knuckle + steering arm at KR, arm 30, mirror of armL"
+    }
+   ],
+   "joints": [
+    {
+     "id": "KL",
+     "type": "revolute",
+     "between": [
+      "axle",
+      "armL"
+     ]
+    },
+    {
+     "id": "PL",
+     "type": "revolute",
+     "between": [
+      "armL",
+      "tieRod"
+     ]
+    },
+    {
+     "id": "PR",
+     "type": "revolute",
+     "between": [
+      "tieRod",
+      "armR"
+     ]
+    },
+    {
+     "id": "KR",
+     "type": "revolute",
+     "between": [
+      "axle",
+      "armR"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "w",
+     "value": 150,
+     "unit": "mm",
+     "note": "kingpin track"
+    },
+    {
+     "name": "L",
+     "value": 250,
+     "unit": "mm",
+     "note": "wheelbase"
+    },
+    {
+     "name": "r",
+     "value": 30,
+     "unit": "mm",
+     "note": "steering arm length"
+    },
+    {
+     "name": "beta",
+     "value": 16.7,
+     "unit": "deg",
+     "note": "arm angle inward, atan((w/2)/L)"
+    },
+    {
+     "name": "t",
+     "value": 132.8,
+     "unit": "mm",
+     "note": "tie rod, w - 2 r sin(beta)"
+    },
+    {
+     "name": "delta",
+     "value": 40,
+     "unit": "deg",
+     "note": "max input steer"
+    }
+   ],
+   "defining_relations": "Ideal Ackermann: cot(delta_outer) - cot(delta_inner) = w / L. Arms point at the rear axle centre: beta = atan((w/2)/L). Tie rod t = w - 2 r sin(beta).",
+   "range": "inner wheel 0 to ±40°; outer wheel 9.4°, 17.8°, 24.9°, 30.6° at inner 10°, 20°, 30°, 40° (ideal 9.1°, 16.6°, 23.2°, 29.2°)",
+   "overlays": [
+    "angles",
+    "plot",
+    "paths"
+   ],
+   "plot": "outer wheel angle vs inner wheel angle, with the ideal Ackermann curve",
+   "notes": "Tie rod behind the axle. PR = circleX(PL, t, KR, r, -1) (pick the branch with PR behind the axle). Draw wheel axis lines meeting near the rear-axle line to show the turning centre."
+  },
+  "examples": [
+   {
+    "use": "Cars and trucks",
+    "detail": "Road vehicles use Ackermann-type tie rod or rack geometry, often partly Ackermann."
+   },
+   {
+    "use": "Karts",
+    "detail": "Kart steering uses arm geometry to set Ackermann for tight tracks."
+   },
+   {
+    "use": "Tractors and farm vehicles",
+    "detail": "Steered front axles on tractors and trailers follow the Ackermann condition."
+   },
+   {
+    "use": "Mobile robots",
+    "detail": "Car-like robots and RC cars use the same trapezoid."
+   }
+  ],
+  "references": [
+   {
+    "title": "Ackermann steering geometry, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ackermann_steering_geometry",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Ackermann steering geometry, TKART tech talk",
+    "url": "https://tkart.it/en/magazine/tech-talk/ackermann-steering-geometry",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Ackermann Steering Geometry: A Complete Explanation, Flow Racers",
+    "url": "https://flowracers.com/blog/ackermann-steering-geometry/",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "How does Ackermann steering actually work? Pro and anti Ackermann",
+    "url": "https://www.youtube.com/watch?v=O2ONv5MrpFg",
+    "kind": "video"
+   },
+   {
+    "title": "Ackermann steering geometry simply explained",
+    "url": "https://www.youtube.com/watch?v=reZiM0aKEjo",
+    "kind": "video"
+   },
+   {
+    "title": "Parallel steering versus Ackermann steering, Cars Simplified",
+    "url": "https://www.youtube.com/watch?v=_mOwsORl7e8",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "double-rocker",
+   "rack-pinion",
+   "bell-crank"
+  ]
+ },
+ {
+  "id": "rhombic-drive",
+  "name": "Rhombic drive",
+  "aka": [
+   "rhombic crank drive",
+   "Philips rhombic drive",
+   "Meijer rhombic drive",
+   "Lanchester rhombic drive"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Advanced",
+  "summary": "Two geared counter-rotating cranks and a jointed rhombus drive two coaxial pistons with a phase lag and no side thrust.",
+  "motion": {
+   "input": "Linear",
+   "output": "Rotary",
+   "label": "Linear → Rotary",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "each piston stroke about 2.4 x crank radius here (47.7 mm at r = 20)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 9,
+   "revolute": 10,
+   "prismatic": 2,
+   "higher_pairs": 1,
+   "notes": "ground, two crank gears, four equal rods, power piston and displacer; the count is over-constrained and moves thanks to symmetry, the gear mesh keeps the cranks mirrored"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Pumping & compression"
+   ],
+   "property": [
+    "Balanced",
+    "Precision",
+    "Positive drive"
+   ],
+   "application": [
+    "Energy",
+    "Steam & engines",
+    "Aerospace"
+   ],
+   "keywords": [
+    "stirling engine",
+    "beta stirling",
+    "philips",
+    "meijer",
+    "lanchester",
+    "counter-rotating cranks",
+    "displacer"
+   ]
+  },
+  "explain": {
+   "motion": "Two equal gears mesh and turn in opposite directions, each with a crank pin. Four equal rods join the two pins to an upper yoke on the power piston and a lower yoke on the displacer, forming a rhombus. As the cranks turn, the rhombus flattens and stretches, and the two pistons slide along the same axis with a phase lag of about 70° to 90°.",
+   "forces": "Gas force on each piston splits equally into two rods, and the sideways components cancel, so the pistons need almost no side guidance. The gears carry the torque difference between the two cranks.",
+   "benefits": "Perfect dynamic balance with no side thrust on the seals lets beta Stirling engines run smooth, quiet and pressurised.",
+   "limits": "Many precise parts, close tolerances and a gear pair make it costly. Wear in the gears lets the cranks drift from mirror symmetry."
+  },
+  "build": {
+   "ground": "crankcase with gear centres G1 (-30,0) and G2 (30,0) and the cylinder axis x = 0",
+   "input": "gas force on the power piston (demo: drive gear1 at constant speed)",
+   "output": "gear angle and the two piston positions on the y axis",
+   "members": [
+    {
+     "id": "gear1",
+     "role": "gear",
+     "def": "centre G1 (-30,0), pitch radius 30, crank pin PL at 20 from centre"
+    },
+    {
+     "id": "gear2",
+     "role": "gear",
+     "def": "centre G2 (30,0), pitch radius 30, crank pin PR at 20, mirror of gear1"
+    },
+    {
+     "id": "rod1",
+     "role": "link",
+     "def": "PL→T, 60"
+    },
+    {
+     "id": "rod2",
+     "role": "link",
+     "def": "PR→T, 60"
+    },
+    {
+     "id": "rod3",
+     "role": "link",
+     "def": "PL→Bt, 60"
+    },
+    {
+     "id": "rod4",
+     "role": "link",
+     "def": "PR→Bt, 60"
+    },
+    {
+     "id": "piston",
+     "role": "slider",
+     "def": "power piston yoke T on the y axis, above"
+    },
+    {
+     "id": "displacer",
+     "role": "output",
+     "def": "displacer yoke Bt on the y axis, below"
+    }
+   ],
+   "joints": [
+    {
+     "id": "G1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "gear1"
+     ]
+    },
+    {
+     "id": "G2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "gear2"
+     ]
+    },
+    {
+     "id": "mesh",
+     "type": "gear mesh",
+     "between": [
+      "gear1",
+      "gear2"
+     ]
+    },
+    {
+     "id": "PL1",
+     "type": "revolute",
+     "between": [
+      "gear1",
+      "rod1"
+     ]
+    },
+    {
+     "id": "PL2",
+     "type": "revolute",
+     "between": [
+      "gear1",
+      "rod3"
+     ]
+    },
+    {
+     "id": "PR1",
+     "type": "revolute",
+     "between": [
+      "gear2",
+      "rod2"
+     ]
+    },
+    {
+     "id": "PR2",
+     "type": "revolute",
+     "between": [
+      "gear2",
+      "rod4"
+     ]
+    },
+    {
+     "id": "T1",
+     "type": "revolute",
+     "between": [
+      "rod1",
+      "piston"
+     ]
+    },
+    {
+     "id": "T2",
+     "type": "revolute",
+     "between": [
+      "rod2",
+      "piston"
+     ]
+    },
+    {
+     "id": "Bt1",
+     "type": "revolute",
+     "between": [
+      "rod3",
+      "displacer"
+     ]
+    },
+    {
+     "id": "Bt2",
+     "type": "revolute",
+     "between": [
+      "rod4",
+      "displacer"
+     ]
+    },
+    {
+     "id": "Sp",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "piston"
+     ]
+    },
+    {
+     "id": "Sd",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "displacer"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "e",
+     "value": 30,
+     "unit": "mm",
+     "note": "gear centre offset from the axis"
+    },
+    {
+     "name": "r",
+     "value": 20,
+     "unit": "mm",
+     "note": "crank radius"
+    },
+    {
+     "name": "L",
+     "value": 60,
+     "unit": "mm",
+     "note": "rhombus rod length (L > e + r)"
+    },
+    {
+     "name": "z",
+     "value": 30,
+     "unit": "",
+     "note": "teeth per gear, module 2, centres 60 apart"
+    }
+   ],
+   "defining_relations": "PR = (e + r cos t, r sin t), PL = (-e - r cos t, r sin t). y_piston = r sin t + sqrt(L^2 - (e + r cos t)^2); y_displacer = r sin t - sqrt(L^2 - (e + r cos t)^2). Gears 1:1 counter-rotating.",
+   "range": "gears 360° continuous; piston y 26.5 to 74.2 (stroke 47.7); displacer y -74.2 to -26.5 (stroke 47.7); displacer leads piston by about 70°; yokes never closer than 66 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "piston and displacer positions vs crank angle",
+   "notes": "Gears turn opposite ways; set gear2 angle = pi - gear1 angle so the pins stay mirrored. In a real engine the displacer rod passes through a hollow piston rod; draw them coaxial."
+  },
+  "examples": [
+   {
+    "use": "Philips beta Stirling engines",
+    "detail": "Philips developed the rhombic drive for its MP1002CA generator set and later Stirling engines."
+   },
+   {
+    "use": "Lanchester car engine",
+    "detail": "The Lanchester twin-cylinder car engine around 1900 used a rhombic drive to balance its pistons."
+   },
+   {
+    "use": "Stirling generators and coolers",
+    "detail": "Pressurised beta Stirling units for power or cooling use it for low vibration."
+   }
+  ],
+  "references": [
+   {
+    "title": "Rhombic drive, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Rhombic_drive",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "A review development of rhombic drive mechanism used in the Stirling engines, Gazi University",
+    "url": "https://avesis.gazi.edu.tr/yayin/cf6bd796-4d24-42ae-bce7-b8be1cd2b547/a-review-development-of-rhombic-drive-mechanism-used-in-the-stirling-engines",
+    "kind": "paper"
+   },
+   {
+    "title": "Rhombic Drive Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/rhombic-drive",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Rhombic drive Stirling running",
+    "url": "https://www.youtube.com/watch?v=g9VBfsD4TlE",
+    "kind": "video"
+   },
+   {
+    "title": "Stirling engine with rhombic drive",
+    "url": "https://www.youtube.com/watch?v=JYwpXrB5qDM",
+    "kind": "video"
+   },
+   {
+    "title": "Rhombic drive animation",
+    "url": "https://www.youtube.com/watch?v=8wNrDyrLSkM",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "slider-crank",
+   "spur-gears",
+   "scotch-yoke",
+   "locomotive-drive"
+  ]
+ },
+ {
+  "id": "watt-linkage",
+  "name": "Watt's linkage",
+  "aka": [
+   "Watt's parallel motion",
+   "Watts link",
+   "Watt straight-line linkage",
+   "Watt's four-bar"
+  ],
+  "in_site": true,
+  "family": "Straight-line linkage",
+  "level": "Basic",
+  "summary": "Two equal rockers joined by a short bar: the bar's midpoint moves on a nearly straight line, drawing a figure eight at the extremes.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Straight line",
+   "label": "Oscillating → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "about 74 mm of near-straight travel for ±24° of rocker swing at r = 90"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "crossed double-rocker four-bar; tracer at coupler midpoint"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Positioning"
+   ],
+   "property": [
+    "Approximate",
+    "Few parts",
+    "Historic",
+    "Singular positions"
+   ],
+   "application": [
+    "Automotive",
+    "Steam & engines",
+    "Railways"
+   ],
+   "keywords": [
+    "james watt",
+    "parallel motion",
+    "beam engine",
+    "lemniscate",
+    "rear axle locating",
+    "panhard rod"
+   ]
+  },
+  "explain": {
+   "motion": "Two equal rockers pivot on opposite sides, one high and one low, and a short coupler joins their tips. As the rockers swing, each tip moves on an arc, and the arcs bend opposite ways, so the coupler midpoint moves almost straight. Over the full swing the midpoint draws a figure eight.",
+   "forces": "Each rocker is pinned at both ends, so it only pushes or pulls along its length. Loads across the line of motion are carried, which is why it locates an axle sideways.",
+   "benefits": "Three moving pin-jointed parts give good straight motion without sliders, and it is symmetric left to right.",
+   "limits": "Straightness holds only near the middle of the swing; deviation grows quickly toward the toggles. It needs room for two long rockers."
+  },
+  "build": {
+   "ground": "pivots O1 (-90,30) and O2 (90,-30)",
+   "input": "rockerL oscillating ±24° (±0.42 rad) about O1",
+   "output": "coupler midpoint M, vertical travel",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O1 (-90,30) to O2 (90,-30)"
+    },
+    {
+     "id": "rockerL",
+     "role": "driver",
+     "def": "O1→A, r = 90"
+    },
+    {
+     "id": "rockerR",
+     "role": "output",
+     "def": "O2→B, r = 90"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "A→B, c = 60, tracer M at its midpoint"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rockerL"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "rockerL",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "rockerR"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rockerR"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 90,
+     "unit": "mm",
+     "note": "both rockers"
+    },
+    {
+     "name": "c",
+     "value": 60,
+     "unit": "mm",
+     "note": "coupler"
+    },
+    {
+     "name": "swing",
+     "value": 24,
+     "unit": "deg",
+     "note": "demo input amplitude (0.42 rad)"
+    }
+   ],
+   "defining_relations": "Equal rockers r, coupler c, pivots offset by c vertically and 2r horizontally so both rockers are horizontal when the coupler is vertical. Midpoint path is a Watt's curve (a lemniscate-like figure eight).",
+   "range": "rockerL ±24°; midpoint M travels y -36 to +38 (74 mm) with x deviation under 0.6 mm; full figure eight when swung to the toggles where |A O2| = r + c",
+   "overlays": [
+    "paths",
+    "angles",
+    "forces",
+    "plot"
+   ],
+   "plot": "midpoint offset from the ideal line vs input angle",
+   "notes": "Site solve: A = O1 + r(cos th, sin th); B = circleX(A,c,O2,r,-1); M = midpoint. The ghost tracer G draws the whole figure eight by swinging to the toggles and switching branch there."
+  },
+  "examples": [
+   {
+    "use": "Car rear axle location",
+    "detail": "A Watt's link centres a live rear axle sideways, replacing a Panhard rod, as in the Opel Astra J and Mustang upgrades."
+   },
+   {
+    "use": "Beam engine piston rod guide",
+    "detail": "James Watt used it in 1784 to guide the piston rod of his double-acting beam engine."
+   },
+   {
+    "use": "Railway and truck suspensions",
+    "detail": "Watt-type links guide axles and bogies laterally."
+   }
+  ],
+  "references": [
+   {
+    "title": "Watt's linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Watt%27s_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Watt's and Chebyshev's Linkage, Cut The Knot",
+    "url": "https://www.cut-the-knot.org/Curriculum/Geometry/Watt.shtml",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Straight-line mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Straight-line_mechanism",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "New Opel Astra J rear Watts link axle",
+    "url": "https://www.youtube.com/watch?v=aDvmTmKdPz8",
+    "kind": "video"
+   },
+   {
+    "title": "Watts link suspension design and rally test, Lada VFTS",
+    "url": "https://www.youtube.com/watch?v=dhX6NmkmVYo",
+    "kind": "video"
+   },
+   {
+    "title": "BMR Watt's link installed on a Trans Am, Street Muscle",
+    "url": "https://streetmusclemag.com/tech-stories/second-gen-suspension-boost-trans-am-gets-bmr-watts-link/",
+    "kind": "photos"
+   },
+   {
+    "title": "Watts linkage beam engine model (tubalcain)",
+    "url": "https://www.youtube.com/watch?v=RGSa2qLVCh8",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "chebyshev-linkage",
+   "roberts-linkage",
+   "hoekens-linkage",
+   "peaucellier-lipkin",
+   "double-rocker",
+   "watt-six-bar"
+  ]
+ },
+ {
+  "id": "chebyshev-linkage",
+  "name": "Chebyshev linkage",
+  "aka": [
+   "Tchebycheff straight-line mechanism",
+   "Chebyshev crossed four-bar",
+   "Chebyshev straight-line linkage"
+  ],
+  "in_site": true,
+  "family": "Straight-line linkage",
+  "level": "Basic",
+  "summary": "Crossed rockers in the ratio 4:5:2 make the coupler midpoint run very nearly straight between the two pivots' verticals.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Straight line",
+   "label": "Oscillating → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = ground length (120 mm here) for 53° of rocker swing"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "crossed double-rocker four-bar; tracer at coupler midpoint"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Walking"
+   ],
+   "property": [
+    "Approximate",
+    "Few parts",
+    "Historic"
+   ],
+   "application": [
+    "Education",
+    "Robotics",
+    "Steam & engines"
+   ],
+   "keywords": [
+    "chebyshev",
+    "tchebycheff",
+    "pafnuty chebyshev",
+    "crossed four-bar",
+    "plantigrade machine",
+    "4:5:2"
+   ]
+  },
+  "explain": {
+   "motion": "Two long rockers pivot on a common base and cross each other; a short coupler joins their tips. When the left rocker swings from about 37° to 90°, the coupler midpoint moves from directly above one pivot to directly above the other along a nearly flat line.",
+   "forces": "The rockers are two-force members carrying push or pull. Near the ends of the stroke the transmission angle falls and the input torque needed rises.",
+   "benefits": "Very good straightness (0.3 mm over 120 mm here) from three moving pin-jointed parts.",
+   "limits": "Only a limited swing is straight, and the crossed rockers must sit in different planes so they can pass each other."
+  },
+  "build": {
+   "ground": "pivots O1 (0,0) and O2 (120,0)",
+   "input": "rockerL oscillating from 36.9° to 90° about O1",
+   "output": "coupler midpoint M on the line y = 120",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O1 (0,0) to O2 (120,0), d = 4s = 120"
+    },
+    {
+     "id": "rockerL",
+     "role": "driver",
+     "def": "O1→B, r = 5s = 150"
+    },
+    {
+     "id": "rockerR",
+     "role": "output",
+     "def": "O2→A, r = 150, crosses rockerL"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "A→B, c = 2s = 60, tracer M at midpoint"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rockerL"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "rockerL",
+      "coupler"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "rockerR"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rockerR"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "s",
+     "value": 30,
+     "unit": "mm",
+     "note": "scale"
+    },
+    {
+     "name": "d",
+     "value": 120,
+     "unit": "mm",
+     "note": "ground 4s"
+    },
+    {
+     "name": "r",
+     "value": 150,
+     "unit": "mm",
+     "note": "rockers 5s"
+    },
+    {
+     "name": "c",
+     "value": 60,
+     "unit": "mm",
+     "note": "coupler 2s"
+    }
+   ],
+   "defining_relations": "Ratios ground : rocker : coupler = 4 : 5 : 2. Midpoint lies on y = d at both ends and the middle of the stroke. Input limits: acos(d/r) = 36.9° to 90°.",
+   "range": "rockerL 36.9° to 90° (53°); midpoint M runs x 0 to 120 at y = 120 with deviation up to 0.29 mm",
+   "overlays": [
+    "paths",
+    "angles",
+    "forces",
+    "plot"
+   ],
+   "plot": "midpoint offset from the ideal line vs input angle",
+   "notes": "Site solve: B = O1 + r(cos th, sin th); A = circleX(B,c,O2,r,-1); M = midpoint. Rockers on layers 0 and 2 with the coupler between, because at the stroke ends one tip pin lies on the other rocker."
+  },
+  "examples": [
+   {
+    "use": "Chebyshev's plantigrade walking machine",
+    "detail": "Chebyshev used his linkages in an 1878 walking machine shown in Paris."
+   },
+   {
+    "use": "Walking robots and LEGO walkers",
+    "detail": "Chebyshev legs give a flat stride in hobby walkers."
+   },
+   {
+    "use": "Steam engine crosshead guides",
+    "detail": "It was proposed as a straight-line guide for engine piston rods."
+   }
+  ],
+  "references": [
+   {
+    "title": "Chebyshev linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Chebyshev_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Chebyshev's Straight line Mechanism, Virtual Lab NITK",
+    "url": "https://mm2-nitk.vlabs.ac.in/exp/tchebichev-straight-line/theory.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "Linkages lecture notes, I. Pak, UCLA",
+    "url": "https://www.math.ucla.edu/~pak/lectures/Mech3.pdf",
+    "kind": "paper"
+   },
+   {
+    "title": "Chebyshev Linkage Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/chebyshev-linkage",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "LEGO walking robot using a Chebyshev linkage",
+    "url": "https://www.youtube.com/watch?v=C-rhtAeIHt0",
+    "kind": "video"
+   },
+   {
+    "title": "Levers and linkages, Chebyshev straight-line motion mechanism model",
+    "url": "https://www.youtube.com/watch?v=_KWfkewD0Rg",
+    "kind": "video"
+   },
+   {
+    "title": "Chebyshev's straight-line mechanism, GeoGebra",
+    "url": "https://mat.geogebra.org/m/PU8YPdEV",
+    "kind": "interactive"
+   }
+  ],
+  "related": [
+   "watt-linkage",
+   "hoekens-linkage",
+   "roberts-linkage",
+   "klann-linkage",
+   "jansen-linkage"
+  ]
+ },
+ {
+  "id": "hoekens-linkage",
+  "name": "Hoekens linkage",
+  "aka": [
+   "Hoecken linkage",
+   "Hoeken straight-line mechanism",
+   "Hoekens four-bar",
+   "cognate of Chebyshev linkage"
+  ],
+  "in_site": true,
+  "family": "Straight-line linkage",
+  "level": "Intermediate",
+  "summary": "A crank-rocker whose extended coupler tip runs along a straight line at nearly constant speed for half of every crank turn.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Straight line",
+   "label": "Rotary → Straight line",
+   "output_character": [
+    "Continuous",
+    "Dwell",
+    "Constant velocity"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "straight stroke = 4 x crank (160 mm at a 40 mm crank) per half turn"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "crank-rocker four-bar with the coupler extended past the rocker pin"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Walking",
+    "Motion conversion"
+   ],
+   "property": [
+    "Approximate",
+    "Grashof",
+    "Few parts"
+   ],
+   "application": [
+    "Robotics",
+    "Packaging & automation",
+    "Education"
+   ],
+   "keywords": [
+    "hoekens",
+    "hoecken",
+    "cognate",
+    "chebyshev lambda",
+    "constant velocity",
+    "1:2.5:2.5:2"
+   ]
+  },
+  "explain": {
+   "motion": "A short crank turns fully about O2 and a rocker of 2.5 crank lengths swings about O4. The coupler is pinned to both and extends to a tip twice the rocker-pin distance from the crank pin. For half the crank turn the tip moves along a straight line at almost constant speed, then it returns along a raised arc.",
+   "forces": "The rocker is a two-force member. The long coupler overhang sees bending from any load at the tip, and the transmission angle at B should be watched near the return.",
+   "benefits": "Continuous crank input with a long, steady-speed straight stroke makes it a good walking leg or film-advance claw.",
+   "limits": "The return arc needs clearance, and straightness and speed are only approximate. The overhung tip amplifies joint play."
+  },
+  "build": {
+   "ground": "pivots O2 (0,0) and O4 (80,0)",
+   "input": "crank, continuous rotation about O2",
+   "output": "coupler tip T, straight line y = 160 for crank 90° to 270°",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O2 (0,0) to O4 (80,0), d = 2s = 80"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, a = s = 40"
+    },
+    {
+     "id": "rocker",
+     "role": "link",
+     "def": "O4→B, c = 2.5s = 100"
+    },
+    {
+     "id": "coupler",
+     "role": "output",
+     "def": "A→B 100, extended along AB to tip T at 200 from A"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "rocker"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "s",
+     "value": 40,
+     "unit": "mm",
+     "note": "scale"
+    },
+    {
+     "name": "a",
+     "value": 40,
+     "unit": "mm",
+     "note": "crank 1s"
+    },
+    {
+     "name": "d",
+     "value": 80,
+     "unit": "mm",
+     "note": "ground 2s"
+    },
+    {
+     "name": "b",
+     "value": 100,
+     "unit": "mm",
+     "note": "coupler AB 2.5s"
+    },
+    {
+     "name": "c",
+     "value": 100,
+     "unit": "mm",
+     "note": "rocker 2.5s"
+    },
+    {
+     "name": "e",
+     "value": 200,
+     "unit": "mm",
+     "note": "A to tip 5s"
+    }
+   ],
+   "defining_relations": "Ratios crank : ground : coupler : rocker = 1 : 2 : 2.5 : 2.5, tip at 5 crank lengths from A along AB. Grashof 1+2.5 <= 2+2.5, crank rotates fully. Cognate of the Chebyshev linkage.",
+   "range": "crank 360° continuous; tip T on the line y = 160 from x 0 to 160 for crank 90° to 270° (deviation under 0.4 mm); return arc rises to y = 196; T spans x -14 to 174",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "tip speed as % of its mean on the line vs crank angle",
+   "notes": "Site solve: A = O2 + a(cos u, sin u); B = circleX(A,b,O4,c,+1); T = A + e(unit AB). Mean straight-line speed 4s per half turn."
+  },
+  "examples": [
+   {
+    "use": "Walking robots",
+    "detail": "Hoekens legs give a flat, steady stride from a continuously turning motor."
+   },
+   {
+    "use": "Film and conveyor advance",
+    "detail": "A tip that moves straight and steady then lifts away suits claw feeds and transfer bars."
+   },
+   {
+    "use": "Teaching models",
+    "detail": "Common demonstrator of four-bar coupler curves and cognates."
+   }
+  ],
+  "references": [
+   {
+    "title": "Hoecken linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Hoecken_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Hoekens Straight Line Linkage, UC Davis Integration Engineering Laboratory",
+    "url": "https://iel.ucdavis.edu/design/fourbar/fourbarHoekens.html",
+    "kind": "calculator"
+   },
+   {
+    "title": "Straight-line Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/straight-line-mechanism",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Straight line linkage, Hoecken mechanism",
+    "url": "https://www.youtube.com/watch?v=4ASjI-hryQU",
+    "kind": "video"
+   },
+   {
+    "title": "Hoecken mechanism",
+    "url": "https://www.youtube.com/watch?v=qVGOUKkVeQA",
+    "kind": "video"
+   },
+   {
+    "title": "Hoeken linkage, GeoGebra",
+    "url": "https://mat.geogebra.org/m/qfehqyce",
+    "kind": "interactive"
+   }
+  ],
+  "related": [
+   "chebyshev-linkage",
+   "watt-linkage",
+   "four-bar",
+   "jansen-linkage",
+   "klann-linkage"
+  ]
+ },
+ {
+  "id": "roberts-linkage",
+  "name": "Roberts linkage",
+  "aka": [
+   "Roberts straight-line mechanism",
+   "Roberts four-bar",
+   "Dreieckslenker von Roberts"
+  ],
+  "in_site": false,
+  "family": "Straight-line linkage",
+  "level": "Basic",
+  "summary": "Equal rockers carrying an isosceles triangle: the triangle's apex moves almost straight along the line through the two pivots.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Straight line",
+   "label": "Oscillating → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "about 80 mm of near-straight travel for 34° of rocker swing (ground 100)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "symmetric double-rocker four-bar; tracer at the apex of the triangular coupler"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation"
+   ],
+   "property": [
+    "Approximate",
+    "Few parts",
+    "Historic"
+   ],
+   "application": [
+    "Instruments",
+    "Machine tools",
+    "Education"
+   ],
+   "keywords": [
+    "richard roberts",
+    "isosceles coupler",
+    "reuleaux model",
+    "voigt s14",
+    "straight-line motion"
+   ]
+  },
+  "explain": {
+   "motion": "Two equal rockers stand on pivots a distance 2b apart. Their tips carry the base of a triangular coupler whose two equal sides hang down to an apex P. As the rockers lean, P slides along the ground line between the pivots, almost straight.",
+   "forces": "The rockers carry push or pull only; loads at P bend the coupler plate. Straightness and stiffness fall near the stroke ends where the rockers get steep.",
+   "benefits": "Symmetric, compact and all pin-jointed, with the straight path lying conveniently on the line of the fixed pivots.",
+   "limits": "Straightness is approximate and the usable stroke is shorter than the pivot spacing. The apex passes between the pivots, which constrains the frame layout."
+  },
+  "build": {
+   "ground": "pivots O1 (-50,0) and O2 (50,0)",
+   "input": "rockerL oscillating 50° to 84° about O1",
+   "output": "apex P of the coupler on the line y = 0",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O1 (-50,0) to O2 (50,0), 2b = 100"
+    },
+    {
+     "id": "rockerL",
+     "role": "driver",
+     "def": "O1→B1, a = 70"
+    },
+    {
+     "id": "rockerR",
+     "role": "link",
+     "def": "O2→C1, a = 70"
+    },
+    {
+     "id": "coupler",
+     "role": "output",
+     "def": "isosceles triangle: base B1C1 b = 50, sides B1P = C1P = a = 70, apex P on the ground side"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rockerL"
+     ]
+    },
+    {
+     "id": "B1",
+     "type": "revolute",
+     "between": [
+      "rockerL",
+      "coupler"
+     ]
+    },
+    {
+     "id": "C1",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "rockerR"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rockerR"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "b",
+     "value": 50,
+     "unit": "mm",
+     "note": "coupler base; ground is 2b"
+    },
+    {
+     "name": "a",
+     "value": 70,
+     "unit": "mm",
+     "note": "rockers and triangle sides"
+    },
+    {
+     "name": "swing",
+     "value": 34,
+     "unit": "deg",
+     "note": "usable rocker swing"
+    }
+   ],
+   "defining_relations": "Ground 2b, rockers a, coupler triangle sides a, a, b, apex P. At mid-stroke P lies on the pivot line; longer a (relative to b) gives straighter motion over a smaller fraction of the gap.",
+   "range": "rockerL 50° to 84°; apex P travels x -40 to +40 along y = 0 with deviation under 0.4 mm",
+   "overlays": [
+    "paths",
+    "angles",
+    "plot"
+   ],
+   "plot": "apex offset from the pivot line vs input angle",
+   "notes": "C1 = circleX(B1, b, O2, a, +1) (rockers leaning the same way, uncrossed). P = midpoint(B1C1) + h * unit normal pointing toward the ground line, h = sqrt(a^2 - b^2/4)."
+  },
+  "examples": [
+   {
+    "use": "Reuleaux teaching models",
+    "detail": "Cornell's Reuleaux collection holds Voigt models S14 and S15 of the Roberts linkage."
+   },
+   {
+    "use": "Instrument and balance guides",
+    "detail": "Approximate straight-line guides were used in weighing and drawing instruments."
+   },
+   {
+    "use": "Machine slides",
+    "detail": "Used as a pin-jointed guide where a sliding way would wear."
+   }
+  ],
+  "references": [
+   {
+    "title": "Roberts linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Roberts_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Roberts Straight Line Linkage, UC Davis Integration Engineering Laboratory",
+    "url": "https://iel.ucdavis.edu/design/fourbar/fourbarRoberts.html",
+    "kind": "calculator"
+   },
+   {
+    "title": "Inversion of a Roberts' Straight-line Linkage (Voigt S15), Cornell KMODDL",
+    "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:372689",
+    "kind": "kmoddl"
+   },
+   {
+    "title": "Roberts Linkage Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/roberts-linkage",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Approximate Four-bar Straight-line Linkage of Roberts (Voigt S14), Cornell KMODDL",
+    "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:372687",
+    "kind": "photos"
+   },
+   {
+    "title": "Roberts straight line mechanism",
+    "url": "https://www.youtube.com/watch?v=aUBiKFcBXQA",
+    "kind": "video"
+   },
+   {
+    "title": "Roberts mechanism, straight line motion mechanism",
+    "url": "https://www.youtube.com/watch?v=wweowLSJE-E",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "chebyshev-linkage",
+   "watt-linkage",
+   "hoekens-linkage",
+   "double-rocker"
+  ]
+ },
+ {
+  "id": "evans-grasshopper",
+  "name": "Evans grasshopper linkage",
+  "aka": [
+   "grasshopper linkage",
+   "Evans straight-line linkage",
+   "grasshopper beam",
+   "approximate Scott Russell"
+  ],
+  "in_site": false,
+  "family": "Straight-line linkage",
+  "level": "Intermediate",
+  "summary": "A Scott Russell linkage with the slider replaced by a long swinging link: the beam end moves nearly straight with only pin joints.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Straight line",
+   "label": "Oscillating → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "about 50 mm of near-straight travel for a 40° swing of the radius link (a = 50)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "four-bar: radius link, beam and long swing link; tracer at the free end of the beam"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Motion conversion"
+   ],
+   "property": [
+    "Approximate",
+    "Few parts",
+    "Historic"
+   ],
+   "application": [
+    "Steam & engines",
+    "Marine",
+    "Railways"
+   ],
+   "keywords": [
+    "oliver evans",
+    "grasshopper beam engine",
+    "half-beam engine",
+    "scott russell",
+    "paddle steamer",
+    "grasshopper locomotive"
+   ]
+  },
+  "explain": {
+   "motion": "A radius link of length a pivots at O1 and holds the middle of a beam of length 2a. One beam end B is held by a long swing link instead of a slider, so B moves on a gentle arc that is close to a straight line. The other end P then moves nearly straight along a line through O1, at right angles to B's path.",
+   "forces": "Load at P is shared by the radius link at mid-beam and the swing link at B; all three are pin-ended. The beam bends between its pins, and the swing link carries little load.",
+   "benefits": "Gives Scott Russell type straight motion without any sliding guide, so it lasts with little lubrication.",
+   "limits": "Straightness depends on the swing link being long, which makes the frame large. Deviation grows quickly outside the design stroke."
+  },
+  "build": {
+   "ground": "pivots O1 (0,0) and O2 (200,60)",
+   "input": "radius link oscillating 25° to 65° about O1",
+   "output": "beam end P moving along the x axis",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O1 (0,0) and O2 (200,60)"
+    },
+    {
+     "id": "radius",
+     "role": "driver",
+     "def": "O1→M, a = 50"
+    },
+    {
+     "id": "beam",
+     "role": "output",
+     "def": "B→P, 2a = 100, pinned at its midpoint M"
+    },
+    {
+     "id": "swing",
+     "role": "link",
+     "def": "O2→B, b = 200"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "radius"
+     ]
+    },
+    {
+     "id": "M",
+     "type": "revolute",
+     "between": [
+      "radius",
+      "beam"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "beam",
+      "swing"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "swing"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 50,
+     "unit": "mm",
+     "note": "radius link, half beam"
+    },
+    {
+     "name": "b",
+     "value": 200,
+     "unit": "mm",
+     "note": "swing link"
+    },
+    {
+     "name": "O2",
+     "value": [
+      200,
+      60
+     ],
+     "unit": "mm",
+     "note": "swing link pivot, set at the middle of B's travel"
+    },
+    {
+     "name": "swing",
+     "value": 40,
+     "unit": "deg",
+     "note": "radius link swing"
+    }
+   ],
+   "defining_relations": "Scott Russell core: |O1M| = |MB| = |MP| = a, so with B on the y axis P runs exactly on the x axis. The swing link of length b replaces the slider, giving an error of order (B travel)^2/(8b).",
+   "range": "radius link 25° to 65°; P moves x 40 to 90 (50 mm) with deviation under 1.4 mm from y = 0; B moves about y 44 to 92 near x = 0",
+   "overlays": [
+    "paths",
+    "angles",
+    "plot"
+   ],
+   "plot": "beam end offset from the ideal line vs input angle",
+   "notes": "B = the intersection of circle(M, a) and circle(O2, b) nearest to x = 0. P = 2M - B. In grasshopper engines the beam end drives the crank or is driven by the piston rod."
+  },
+  "examples": [
+   {
+    "use": "Grasshopper beam engines",
+    "detail": "Half-beam engines guided the piston rod or crankpin with grasshopper linkages."
+   },
+   {
+    "use": "Paddle steamers",
+    "detail": "The PS Comet of 1812 used a grasshopper marine engine, a pattern that lasted about half a century."
+   },
+   {
+    "use": "Early locomotives",
+    "detail": "Grasshopper locomotives of the Baltimore and Ohio railroad used the arrangement."
+   }
+  ],
+  "references": [
+   {
+    "title": "Straight-line mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Straight-line_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Evans Grasshopper Linkage Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/evans-grasshopper-linkage",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Scott Russell linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Scott_Russell_linkage",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Grasshopper beam engine, Wikipedia (photos of preserved engines)",
+    "url": "https://en.wikipedia.org/wiki/Grasshopper_beam_engine",
+    "kind": "photos"
+   },
+   {
+    "title": "Dancing metal, a grasshopper beam steam engine model in steam",
+    "url": "https://www.youtube.com/watch?v=emcl4aWDfAg",
+    "kind": "video"
+   },
+   {
+    "title": "A large model grasshopper beam steam engine",
+    "url": "https://www.youtube.com/watch?v=ghoNZgHRZoA",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "scott-russell",
+   "watt-linkage",
+   "elliptic-trammel",
+   "roberts-linkage"
+  ]
+ },
+ {
+  "id": "scott-russell",
+  "name": "Scott Russell linkage",
+  "aka": [
+   "Scott-Russell mechanism",
+   "Freemantle linkage",
+   "isosceles slider linkage",
+   "half trammel"
+  ],
+  "in_site": false,
+  "family": "Straight-line linkage",
+  "level": "Basic",
+  "summary": "A beam pinned at its midpoint to a crank of half its length: sliding one end along a line moves the other exactly at right angles.",
+  "motion": {
+   "input": "Linear",
+   "output": "Straight line",
+   "label": "Linear → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Same line",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "output y = 2a sin(phi), input x = 2a cos(phi); 1:1 at 45°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "ground, crank, beam, slider; exact straight line for the beam end"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Motion conversion"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Historic",
+    "Singular positions"
+   ],
+   "application": [
+    "Automotive",
+    "Instruments",
+    "Steam & engines"
+   ],
+   "keywords": [
+    "john scott russell",
+    "william freemantle",
+    "1803 patent",
+    "right-angle motion",
+    "rear axle locating",
+    "elliptic trammel"
+   ]
+  },
+  "explain": {
+   "motion": "A crank of length a pivots at O and holds the middle M of a beam of length 2a. One end B slides along the x axis. Because O, B and P all lie on a circle centred at M of radius a, the other end P moves exactly along the y axis through O.",
+   "forces": "The slider guide takes side load, which rises steeply as B approaches O and the crank lines up with the beam. The crank pin at M carries the main load in push or pull.",
+   "benefits": "An exact straight line at right angles to the input from only one slide and three pins, more compact than a Watt's linkage.",
+   "limits": "It needs a sliding or rolling guide for B, and it cannot pass through the position where B reaches O. Lateral force on the slider grows near that end."
+  },
+  "build": {
+   "ground": "pivot O (0,0) and a slide along the x axis",
+   "input": "slider B, linear along the x axis from x 95 to 20",
+   "output": "beam end P, straight line along the y axis",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "pivot O (0,0) and guide on y = 0"
+    },
+    {
+     "id": "crank",
+     "role": "link",
+     "def": "O→M, a = 50"
+    },
+    {
+     "id": "beam",
+     "role": "output",
+     "def": "B→P, 2a = 100, pinned at midpoint M"
+    },
+    {
+     "id": "slider",
+     "role": "driver",
+     "def": "block at B on the x axis"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "M",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "beam"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "beam",
+      "slider"
+     ]
+    },
+    {
+     "id": "S",
+     "type": "prismatic",
+     "between": [
+      "ground",
+      "slider"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 50,
+     "unit": "mm",
+     "note": "crank and half beam"
+    },
+    {
+     "name": "xB",
+     "value": [
+      20,
+      95
+     ],
+     "unit": "mm",
+     "note": "slider stroke"
+    }
+   ],
+   "defining_relations": "|OM| = |MB| = |MP| = a. With M = a(cos phi, sin phi): B = (2a cos phi, 0), P = (0, 2a sin phi). x_B^2 + y_P^2 = (2a)^2.",
+   "range": "slider x 95 to 20 (phi 18° to 78°); P moves y 31 to 98 along x = 0 exactly",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "P height vs slider position",
+   "notes": "Keep phi between about 10° and 80°; at phi = 90° B reaches O and the beam and crank turn together (singular). Other beam points trace ellipses, as in the elliptic trammel."
+  },
+  "examples": [
+   {
+    "use": "Rear axle lateral location",
+    "detail": "Some front-drive cars locate a solid rear axle with a Scott Russell type link using an elastomer joint in place of the slide."
+   },
+   {
+    "use": "Freemantle's 1803 patent",
+    "detail": "Watchmaker William Freemantle patented it in Britain (patent 2741) for straight motion."
+   },
+   {
+    "use": "Straight-line guides",
+    "detail": "Used inside larger linkages and instruments to turn a slide into motion at right angles."
+   }
+  ],
+  "references": [
+   {
+    "title": "Scott Russell linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Scott_Russell_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "US4545266A Straight line linkage, Google Patents",
+    "url": "https://patents.google.com/patent/US4545266",
+    "kind": "patent"
+   },
+   {
+    "title": "Scott Russell Linkage Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/scott-russell-linkage",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Scott Russell's mechanism",
+    "url": "https://www.youtube.com/watch?v=JP5UwaX5Kfw",
+    "kind": "video"
+   },
+   {
+    "title": "Scott-Russell straight line mechanism",
+    "url": "https://www.youtube.com/watch?v=rV2l9bcIkMk",
+    "kind": "video"
+   },
+   {
+    "title": "Scott Russell linkage HD",
+    "url": "https://www.youtube.com/watch?v=gv5ESOkvgEU",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "evans-grasshopper",
+   "elliptic-trammel",
+   "tusi-couple",
+   "slider-crank",
+   "watt-linkage"
+  ]
+ },
+ {
+  "id": "peaucellier-lipkin",
+  "name": "Peaucellier-Lipkin linkage",
+  "aka": [
+   "Peaucellier cell",
+   "Peaucellier inversor",
+   "Lipkin linkage",
+   "Peaucellier straight-line mechanism"
+  ],
+  "in_site": true,
+  "family": "Straight-line linkage",
+  "level": "Advanced",
+  "summary": "An eight-bar inversor: as the input point moves on a circle through the fixed pivot, the output point moves on an exactly straight line.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Straight line",
+   "label": "Oscillating → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "175 mm of exact straight travel for ±64° of input swing"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 8,
+   "revolute": 10,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "ground, input arm, two long arms, four rhombus sides; joints at O, A, B and C each join three bodies"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Drawing curves"
+   ],
+   "property": [
+    "Exact",
+    "Historic",
+    "Singular positions"
+   ],
+   "application": [
+    "Education",
+    "Instruments",
+    "Steam & engines"
+   ],
+   "keywords": [
+    "inversion",
+    "peaucellier",
+    "lipkin",
+    "inversor",
+    "exact straight line",
+    "rhombus cell",
+    "sylvester"
+   ]
+  },
+  "explain": {
+   "motion": "Two long arms from the fixed pivot O hold opposite corners A and B of a rhombus whose other corners are C and D. O, C and D stay in line and OC x OD stays constant, so D is the inverse of C. A short input arm pivoted at Q makes C move on a circle through O, and the inverse of such a circle is a straight line, which D traces exactly.",
+   "forces": "All bars are pin-ended and carry only push or pull. Force at D reaches the input through the rhombus and long arms; mechanical advantage falls as C approaches O and D runs far out.",
+   "benefits": "It was the first planar linkage to give an exact straight line using only pin joints, with no slide.",
+   "limits": "Eight links and ten pins add play, and the arms must cross in several planes. Straight travel is limited by the arms reaching full stretch."
+  },
+  "build": {
+   "ground": "pivots O (0,0) and Q (45,0)",
+   "input": "input arm oscillating ±64° about Q",
+   "output": "rhombus corner D moving along x = 140",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O (0,0) and Q (45,0), |OQ| = r"
+    },
+    {
+     "id": "input",
+     "role": "driver",
+     "def": "Q→C, r = 45"
+    },
+    {
+     "id": "armA",
+     "role": "link",
+     "def": "O→A, l = 125"
+    },
+    {
+     "id": "armB",
+     "role": "link",
+     "def": "O→B, l = 125"
+    },
+    {
+     "id": "AC",
+     "role": "link",
+     "def": "A→C, q = 55"
+    },
+    {
+     "id": "BC",
+     "role": "link",
+     "def": "B→C, q = 55"
+    },
+    {
+     "id": "AD",
+     "role": "output",
+     "def": "A→D, q = 55"
+    },
+    {
+     "id": "BD",
+     "role": "link",
+     "def": "B→D, q = 55"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "armA"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "armB"
+     ]
+    },
+    {
+     "id": "Q",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "input"
+     ]
+    },
+    {
+     "id": "C1",
+     "type": "revolute",
+     "between": [
+      "input",
+      "AC"
+     ]
+    },
+    {
+     "id": "C2",
+     "type": "revolute",
+     "between": [
+      "input",
+      "BC"
+     ]
+    },
+    {
+     "id": "A1",
+     "type": "revolute",
+     "between": [
+      "armA",
+      "AC"
+     ]
+    },
+    {
+     "id": "A2",
+     "type": "revolute",
+     "between": [
+      "armA",
+      "AD"
+     ]
+    },
+    {
+     "id": "B1",
+     "type": "revolute",
+     "between": [
+      "armB",
+      "BC"
+     ]
+    },
+    {
+     "id": "B2",
+     "type": "revolute",
+     "between": [
+      "armB",
+      "BD"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "AD",
+      "BD"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "l",
+     "value": 125,
+     "unit": "mm",
+     "note": "long arms"
+    },
+    {
+     "name": "q",
+     "value": 55,
+     "unit": "mm",
+     "note": "rhombus sides"
+    },
+    {
+     "name": "r",
+     "value": 45,
+     "unit": "mm",
+     "note": "input arm, equal to |OQ|"
+    },
+    {
+     "name": "swing",
+     "value": 64,
+     "unit": "deg",
+     "note": "input amplitude"
+    }
+   ],
+   "defining_relations": "OC x OD = l^2 - q^2 = 12600 mm^2. C on a circle of radius r through O gives D on the line x = (l^2 - q^2)/(2r) = 140.",
+   "range": "input ±64°; D moves y -87.5 to +87.5 (175 mm) on x = 140 exactly",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "D position along the line vs input angle",
+   "notes": "Site solve: C = Q + r(cos phi, sin phi); A = circleX(O,l,C,q,+1); B = circleX(O,l,C,q,-1); D = A + B - C. Built on four planes 1.5 mm apart so links never collide. At phi near ±180° C reaches O and D runs to infinity."
+  },
+  "examples": [
+   {
+    "use": "Steam engine and blowing engine guides",
+    "detail": "Exact pin-jointed guides were proposed and built to guide piston rods without a crosshead slide."
+   },
+   {
+    "use": "Museum and teaching models",
+    "detail": "Reuleaux and Matemateca collections hold Peaucellier models to teach inversion."
+   },
+   {
+    "use": "Drawing instruments",
+    "detail": "Inversors were built as instruments to draw exact lines and circles."
+   }
+  ],
+  "references": [
+   {
+    "title": "Peaucellier-Lipkin linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Peaucellier%E2%80%93Lipkin_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Peaucellier Straight-line Mechanism (Voigt S35), Cornell KMODDL",
+    "url": "https://digital-collections-portal.library.cornell.edu/catalog/ss:372718",
+    "kind": "kmoddl"
+   },
+   {
+    "title": "Peaucellier Inversor, Matemateca IME-USP",
+    "url": "https://matemateca.ime.usp.br/acervo/inversor_peaucellier_ingles.html",
+    "kind": "museum"
+   },
+   {
+    "title": "Peaucellier-Lipkin Linkage, Cut The Knot",
+    "url": "https://www.cut-the-knot.org/pythagoras/invert.shtml",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "How Peaucellier straight line motion mechanism works",
+    "url": "https://www.youtube.com/watch?v=AuayeQJu1rs",
+    "kind": "video"
+   },
+   {
+    "title": "Peaucellier's linkage (howround.com)",
+    "url": "https://www.youtube.com/watch?v=hSdW-i3nO1M",
+    "kind": "video"
+   },
+   {
+    "title": "Peaucellier inversor from the Matemateca collection",
+    "url": "https://matemateca.ime.usp.br/acervo/inversor_peaucellier_ingles.html",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "hart-inversor",
+   "watt-linkage",
+   "chebyshev-linkage",
+   "sarrus-linkage",
+   "antiparallelogram"
+  ]
+ },
+ {
+  "id": "hart-inversor",
+  "name": "Hart's inversor",
+  "aka": [
+   "Hart's first inversor",
+   "Hart's W-frame",
+   "Hart's antiparallelogram cell",
+   "Hart's straight-line mechanism"
+  ],
+  "in_site": false,
+  "family": "Straight-line linkage",
+  "level": "Advanced",
+  "summary": "A six-bar inversor built on a crossed antiparallelogram: a point on a circle through the fixed pivot drives another along an exact line.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Straight line",
+   "label": "Oscillating → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "about 113 mm of exact straight travel for ±80° of crank swing"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 7,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "ground, crank, and the four bars of an antiparallelogram (one short bar pivoted to ground at its midpoint)"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Drawing curves"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Historic",
+    "Singular positions"
+   ],
+   "application": [
+    "Education",
+    "Instruments"
+   ],
+   "keywords": [
+    "harry hart",
+    "1874",
+    "antiparallelogram",
+    "inversion",
+    "inversor",
+    "contraparallelogram"
+   ]
+  },
+  "explain": {
+   "motion": "Four bars form a crossed antiparallelogram: two long bars CD and EF and two short bars CE and FD. The midpoints of all four bars always lie on one line, and the product of distances from one midpoint to two others stays constant. With the midpoint A of CE fixed and the midpoint g of EF driven on a circle through A, the midpoint p of CD runs on an exact straight line.",
+   "forces": "All bars are pin-ended; the long bars also carry the mid-span pins g and p, so they see some bending. Near the ends of travel the crossed bars line up and force transmission drops.",
+   "benefits": "An exact straight line with six links instead of Peaucellier's eight.",
+   "limits": "The crank can only swing, not rotate, and the crossed bars must sit in different planes. Pins at mid-bar need stiff bars."
+  },
+  "build": {
+   "ground": "pivots A (0,0) and B (20,0)",
+   "input": "crank oscillating ±80° about B (from the position pointing away from A)",
+   "output": "point p, midpoint of CD, on the line x = 67.5",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "A (0,0) and B (20,0)"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "B→g, 20, so g moves on a circle through A"
+    },
+    {
+     "id": "CE",
+     "role": "link",
+     "def": "short bar 60, pivoted to ground at its midpoint A"
+    },
+    {
+     "id": "CD",
+     "role": "output",
+     "def": "long bar 120, tracer p at its midpoint"
+    },
+    {
+     "id": "EF",
+     "role": "link",
+     "def": "long bar 120, crank pin g at its midpoint"
+    },
+    {
+     "id": "FD",
+     "role": "link",
+     "def": "short bar 60"
+    }
+   ],
+   "joints": [
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "CE"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "g",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "EF"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "revolute",
+     "between": [
+      "CE",
+      "CD"
+     ]
+    },
+    {
+     "id": "E",
+     "type": "revolute",
+     "between": [
+      "CE",
+      "EF"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "CD",
+      "FD"
+     ]
+    },
+    {
+     "id": "F",
+     "type": "revolute",
+     "between": [
+      "EF",
+      "FD"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "l",
+     "value": 120,
+     "unit": "mm",
+     "note": "long bars CD, EF"
+    },
+    {
+     "name": "s",
+     "value": 60,
+     "unit": "mm",
+     "note": "short bars CE, FD"
+    },
+    {
+     "name": "AB",
+     "value": 20,
+     "unit": "mm",
+     "note": "ground"
+    },
+    {
+     "name": "Bg",
+     "value": 20,
+     "unit": "mm",
+     "note": "crank"
+    },
+    {
+     "name": "swing",
+     "value": 80,
+     "unit": "deg",
+     "note": "crank amplitude"
+    }
+   ],
+   "defining_relations": "Midpoints of the four bars are collinear; A p x A g = (l^2 - s^2)/4 = 2700 mm^2. With |AB| = |Bg| = 20, g lies on a circle through A, so p lies on the line x = 2700 / (2 x 20) = 67.5. Wikipedia example ratios AB = Bg = 2, CE = FD = 6, CD = EF = 12 (scaled x10).",
+   "range": "crank ±80° about the far position (limit ±82.8° where |Ag| = 30); p moves y -56.6 to +56.6 (113 mm) on x = 67.5 exactly",
+   "overlays": [
+    "paths",
+    "angles",
+    "forces",
+    "plot"
+   ],
+   "plot": "p position along the line vs crank angle",
+   "notes": "Solve numerically: given g, find the angle alpha of CE about A so that |E g| = 60 (two roots; keep the root that keeps p, A, g collinear and continue it smoothly through 0°), then F = 2g - E, D = circleX(C,120,F,60) on the branch with |DF| = 60 and the bars crossed, p = midpoint of CD. Put the long bars in separate planes."
+  },
+  "examples": [
+   {
+    "use": "Kinematic teaching models",
+    "detail": "Schilling's series of kinematic models included a Hart inversor, now at the Smithsonian."
+   },
+   {
+    "use": "Straight-line guides",
+    "detail": "Proposed as a simpler exact guide than the Peaucellier cell for engines and instruments."
+   },
+   {
+    "use": "Geometry instruments",
+    "detail": "Used to demonstrate inversion and draw lines and circles exactly."
+   }
+  ],
+  "references": [
+   {
+    "title": "Hart's inversors, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Hart%27s_inversors",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Hart's Inversor, Wolfram MathWorld",
+    "url": "https://mathworld.wolfram.com/HartsInversor.html",
+    "kind": "textbook"
+   },
+   {
+    "title": "Hart's Inversor, Cut The Knot",
+    "url": "https://www.cut-the-knot.org/Curriculum/Geometry/HartInversor.shtml",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Antiparallelogram, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Antiparallelogram",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Hart Inversor, kinematic model by Martin Schilling, Smithsonian",
+    "url": "https://si.edu/object/hart-inversor-kinematic-model-martin-schilling-series-24-model-11-number-350:nmah_1214011",
+    "kind": "photos"
+   },
+   {
+    "title": "Hart's straight line mechanism",
+    "url": "https://www.youtube.com/watch?v=zexSwHzUJGo",
+    "kind": "video"
+   },
+   {
+    "title": "Harts mechanism straight line",
+    "url": "https://www.youtube.com/watch?v=g-4WCCT5G7c",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "peaucellier-lipkin",
+   "antiparallelogram",
+   "watt-linkage",
+   "scott-russell"
+  ]
+ }
+]

@@ -1,0 +1,1200 @@
+[
+{
+  "id": "spur-gears",
+  "name": "Spur gear pair",
+  "aka": ["spur gears", "external gear pair", "involute gears", "pinion and gear", "straight-cut gears"],
+  "in_site": true,
+  "family": "Gears",
+  "level": "Basic",
+  "summary": "Two involute gears on parallel shafts turn in opposite directions at a fixed speed ratio set by their tooth counts.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity", "Reversing"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "1:1 to about 6:1 per pair; default 28/14 = 2:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, pinion, gear; one gear mesh higher pair" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Reversing"],
+    "property": ["Exact", "Positive drive", "Backdrivable", "Few parts", "High load"],
+    "application": ["Machine tools", "Automotive", "Clocks & watches", "Consumer products"],
+    "keywords": ["involute", "pressure angle", "module", "line of action", "pitch circle", "Euler", "gear ratio"]
+  },
+  "explain": {
+    "motion": "The 14-tooth pinion drives the 28-tooth gear, so the gear turns half as fast and the other way. Involute teeth roll and slide against each other so that the speed ratio stays exactly constant at every instant of the mesh, not just on average.",
+    "forces": "Tooth contact always lies on the line of action, tilted by the 20° pressure angle from the common tangent of the pitch circles. The tangential part turns the gear while the radial part pushes the shafts apart into the bearings; halving the speed doubles the torque, less about 1 to 2% friction.",
+    "benefits": "Constant velocity ratio, about 98% efficiency, simple to make and inspect, and the ratio is exact because it is counted in teeth. Involute teeth tolerate small centre-distance errors without changing the ratio.",
+    "limits": "Teeth engage across the full face at once, so spur gears are noisier than helical gears at speed. Ratios above about 6:1 in one pair need a tiny pinion that suffers undercut (below 17 teeth at 20° without profile shift)."
+  },
+  "build": {
+    "ground": "frame carrying both shaft bearings at a fixed centre distance",
+    "input": "pinion, continuous rotation about O1",
+    "output": "gear, rotation angle th2 about O2",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "frame with pivots O1 at (0,0) and O2 at (cd,0), cd = 84" },
+      { "id": "pinion", "role": "driver", "def": "spur gear z1 = 14, m = 4, pitch radius r1 = 28, tip radius 32" },
+      { "id": "gear", "role": "output", "def": "spur gear z2 = 28, m = 4, pitch radius r2 = 56, tip radius 60" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "gear"] },
+      { "id": "M", "type": "gear mesh", "between": ["pinion", "gear"] }
+    ],
+    "params": [
+      { "name": "m", "value": 4, "unit": "mm", "note": "module" },
+      { "name": "z1", "value": 14, "unit": "teeth", "note": "pinion teeth" },
+      { "name": "z2", "value": 28, "unit": "teeth", "note": "gear teeth" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle" },
+      { "name": "cd", "value": 84, "unit": "mm", "note": "centre distance = m(z1+z2)/2" },
+      { "name": "b", "value": 12, "unit": "mm", "note": "face width" }
+    ],
+    "defining_relations": "pitch radius r = m z / 2; centre distance a = m(z1+z2)/2; ratio i = z2/z1 = w1/w2, with opposite sense (th2 = -th1 z1/z2 + phase); base radius rb = r cos(alpha); circular pitch p = pi m must match on both gears; contact ratio > 1.2 for smooth running.",
+    "range": "pinion 360° continuous; gear turns 180° per pinion turn, opposite sense",
+    "overlays": ["velocity", "forces", "angles", "plot"],
+    "plot": "gear angle vs pinion angle (straight line, slope -0.5)",
+    "notes": "Phase the gear by half a tooth (pi/z2) so a tooth of one sits in a gap of the other on the centre line. 14 teeth at 20° is below the 17-tooth undercut limit, so draw a slight undercut or apply a small positive profile shift. Show the line of action through the pitch point at 20° to the common tangent."
+  },
+  "examples": [
+    { "use": "Machine tool gearboxes", "detail": "Sliding spur-gear clusters select spindle speeds in lathes and mills." },
+    { "use": "Clocks and watches", "detail": "Wheel-and-pinion pairs reduce the mainspring barrel speed down to the escapement." },
+    { "use": "Hobby and RC cars", "detail": "A small motor pinion drives a large plastic spur gear as the first reduction stage." }
+  ],
+  "references": [
+    { "title": "Spur gear, Wikipedia", "url": "https://en.wikipedia.org/wiki/Spur_gear", "kind": "wikipedia" },
+    { "title": "Involute gear, Wikipedia", "url": "https://en.wikipedia.org/wiki/Involute_gear", "kind": "wikipedia" },
+    { "title": "Spur Gears Mixed-teeth Profiles, Reuleaux model, Cornell KMODDL", "url": "https://digital.library.cornell.edu/catalog/ss:29272005", "kind": "kmoddl" },
+    { "title": "Exploring the hows and whys of choosing the proper center distance, KHK USA", "url": "https://www.khkgears.us/media/1215/exploring-the-hows-and-whys-of-choosing-the-proper-center-distance.pdf", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "RC Overload, how to mesh spur and pinion gears", "url": "https://www.youtube.com/watch?v=sKsDeedtIbA", "kind": "video" },
+    { "title": "Spur gears and velocity ratio explained using Lego", "url": "https://www.youtube.com/watch?v=3BTT_qa5_no", "kind": "video" },
+    { "title": "Category:Gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Gears", "kind": "photos" },
+    { "title": "Category:Animations of gears and gearboxes, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Animations_of_gears_and_gearboxes", "kind": "animation" }
+  ],
+  "related": ["gear-train", "internal-gear-pair", "helical-gears", "rack-pinion", "planetary"]
+},
+{
+  "id": "gear-train",
+  "name": "Compound gear train",
+  "aka": ["compound gears", "gear train", "reduction gear train", "double reduction", "wheel train"],
+  "in_site": true,
+  "family": "Gears",
+  "level": "Intermediate",
+  "summary": "Two gear pairs stacked on a shared middle shaft multiply their ratios, giving 3 x 3 = 9:1 in a compact space.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Reduction", "class": "Medium (5:1 to 50:1)", "typical": "product of stage ratios, e.g. 3 x 3 = 9:1; 2 stages give up to about 40:1" },
+  "dof": 1,
+  "topology": { "links": 4, "revolute": 3, "prismatic": 0, "higher_pairs": 2, "notes": "ground, input pinion a, cluster b+c (one rigid body), output gear d; two gear meshes" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication"],
+    "property": ["Exact", "Positive drive", "High ratio", "Backdrivable"],
+    "application": ["Clocks & watches", "Machine tools", "Automotive", "Consumer products"],
+    "keywords": ["compound gear", "cluster gear", "layshaft", "train value", "idler", "Reuleaux"]
+  },
+  "explain": {
+    "motion": "A 12-tooth input pinion drives a 36-tooth gear three times slower. A second 12-tooth pinion fixed to that same shaft, one layer up, drives a final 36-tooth gear another three times slower, so the output turns once for every nine input turns, in the same direction as the input.",
+    "forces": "Torque grows stage by stage: about 3x on the cluster shaft and 9x on the output, so the last mesh carries the highest tooth load and usually needs the widest face. Each mesh loses 1 to 2% to friction, so efficiency is the product of stage efficiencies.",
+    "benefits": "A single 9:1 pair would need a gear nine times the pinion size; compounding reaches the same ratio with small gears, and every extra stage multiplies the ratio again.",
+    "limits": "More stages add backlash, inertia and parts. Direction depends on the number of external meshes, and high ratios are usually more compact as planetary or worm drives."
+  },
+  "build": {
+    "ground": "frame with three bearing positions A, B, D",
+    "input": "gear a (12T), continuous rotation about A",
+    "output": "gear d (36T), rotation about D",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "A at (0,0), B at (72,0), D at B + 72 at 62° from the A-B line" },
+      { "id": "a", "role": "driver", "def": "pinion za = 12, m = 3, pitch radius 18, layer 0" },
+      { "id": "b", "role": "gear", "def": "gear zb = 36, m = 3, pitch radius 54, layer 0, on shaft B" },
+      { "id": "c", "role": "gear", "def": "pinion zc = 12, m = 3, pitch radius 18, layer 1, fixed to b on shaft B" },
+      { "id": "d", "role": "output", "def": "gear zd = 36, m = 3, pitch radius 54, layer 1, on shaft D" }
+    ],
+    "joints": [
+      { "id": "A", "type": "revolute", "between": ["ground", "a"] },
+      { "id": "B", "type": "revolute", "between": ["ground", "b"] },
+      { "id": "D", "type": "revolute", "between": ["ground", "d"] },
+      { "id": "M1", "type": "gear mesh", "between": ["a", "b"] },
+      { "id": "M2", "type": "gear mesh", "between": ["c", "d"] }
+    ],
+    "params": [
+      { "name": "m", "value": 3, "unit": "mm", "note": "module, both stages" },
+      { "name": "za", "value": 12, "unit": "teeth", "note": "input pinion" },
+      { "name": "zb", "value": 36, "unit": "teeth", "note": "first gear" },
+      { "name": "zc", "value": 12, "unit": "teeth", "note": "cluster pinion" },
+      { "name": "zd", "value": 36, "unit": "teeth", "note": "output gear" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle" },
+      { "name": "cd", "value": 72, "unit": "mm", "note": "centre distance of each stage = m(12+36)/2" },
+      { "name": "phi", "value": 62, "unit": "°", "note": "angle of second stage centre line from first" }
+    ],
+    "defining_relations": "train value i = (zb/za)(zd/zc) = (36/12)(36/12) = 9; output sense = (-1)^(number of external meshes) = same as input; each stage cd = m(z1+z2)/2; gears on one shaft share angle (th_c = th_b).",
+    "range": "input 360° continuous; output 40° per input turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "output angle vs input angle (straight line, slope 1/9)",
+    "notes": "Draw b and c on different layers so the second mesh sits above the first. Phase each mesh separately; the second mesh phase depends on the 62° centre-line angle. The 12-tooth pinions undercut at 20° unless profile-shifted."
+  },
+  "examples": [
+    { "use": "Clock movements", "detail": "Compound wheel-and-pinion trains reduce from the escape wheel to the minute and hour hands." },
+    { "use": "Lathe change gears", "detail": "Compound gears on a quadrant set the leadscrew ratio for thread cutting." },
+    { "use": "Gearmotors", "detail": "Small DC gearmotors stack four or five spur stages for 100:1 and more." }
+  ],
+  "references": [
+    { "title": "Gear train, Wikipedia", "url": "https://en.wikipedia.org/wiki/Gear_train", "kind": "wikipedia" },
+    { "title": "Compound Gear Train with Reversing Pinion Gear, Reuleaux model, Cornell KMODDL", "url": "https://digital.library.cornell.edu/catalog/ss:29271985", "kind": "kmoddl" },
+    { "title": "Theory of machinery, Ch. 7 Gears, Philadelphia University", "url": "https://www.philadelphia.edu.jo/academics/laithb/uploads/Ch.7. Gears.pdf", "kind": "textbook" }
+  ],
+  "media": [
+    { "title": "Compound gear train 1.1.3", "url": "https://www.youtube.com/watch?v=AdOY1VqsJLI", "kind": "video" },
+    { "title": "How compound gear train works", "url": "https://www.youtube.com/watch?v=XDrtNTDVa8Y", "kind": "video" },
+    { "title": "Category:Clock gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Clock_gears", "kind": "photos" },
+    { "title": "Category:Watchworks, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Watchworks", "kind": "photos" }
+  ],
+  "related": ["spur-gears", "planetary", "worm-drive", "helical-gears"]
+},
+{
+  "id": "internal-gear-pair",
+  "name": "Internal gear pair",
+  "aka": ["internal gear", "ring gear and pinion", "annulus gear", "internally toothed gear"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Intermediate",
+  "summary": "A pinion meshes inside a ring with teeth on its inner rim, so both turn the same way on close, parallel shafts.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "1.5:1 to 5:1 per pair; default 40/18 = 2.22:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, pinion, internal gear; one internal gear mesh" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication"],
+    "property": ["Compact", "Exact", "Positive drive", "High load"],
+    "application": ["Automotive", "Robotics", "Machine tools", "Construction & lifting"],
+    "keywords": ["ring gear", "annulus", "internal gear", "trochoid interference", "slewing ring", "507 movements"]
+  },
+  "explain": {
+    "motion": "The 18-tooth pinion rolls inside a 40-tooth internal gear. Because the teeth meet on the same side of both centres, ring and pinion turn in the same direction, the ring at 18/40 of the pinion speed.",
+    "forces": "A concave ring tooth wraps around a convex pinion tooth, so contact stress is lower and more teeth share the load than in an external pair. The radial separating force acts toward the ring centre and is taken by both bearings.",
+    "benefits": "Very short centre distance (half the tooth-count difference times the module), same-direction rotation without an idler, and a natural housing for planetary sets.",
+    "limits": "Too small a tooth difference causes tip and trochoid interference, so standard 20° gears need about 10 or more teeth difference and more than 34 ring teeth. Internal teeth must be shaped or broached rather than hobbed, which costs more."
+  },
+  "build": {
+    "ground": "frame carrying the ring bearing at O2 and the pinion bearing at O1",
+    "input": "pinion, continuous rotation about O1",
+    "output": "ring (internal gear), rotation about O2",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "O2 at (0,0), O1 at (33,0)" },
+      { "id": "pinion", "role": "driver", "def": "external gear z1 = 18, m = 3, pitch radius 27, tip radius 30" },
+      { "id": "ring", "role": "output", "def": "internal gear z2 = 40, m = 3, pitch radius 60, tip (inner) radius 57, rim outer radius 72" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "ring"] },
+      { "id": "M", "type": "gear mesh", "between": ["pinion", "ring"] }
+    ],
+    "params": [
+      { "name": "m", "value": 3, "unit": "mm", "note": "module" },
+      { "name": "z1", "value": 18, "unit": "teeth", "note": "pinion teeth" },
+      { "name": "z2", "value": 40, "unit": "teeth", "note": "internal gear teeth" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle" },
+      { "name": "cd", "value": 33, "unit": "mm", "note": "centre distance = m(z2 - z1)/2" }
+    ],
+    "defining_relations": "a = m(z2 - z1)/2; ratio i = z2/z1 with same sense (th2 = th1 z1/z2 + phase); avoid trochoid interference: z2 - z1 >= 10 for standard 20° gears; avoid involute interference: z2 > 34 at 20°.",
+    "range": "pinion 360° continuous; ring 162° per pinion turn, same sense",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "ring angle vs pinion angle (slope +0.45)",
+    "notes": "Ring tooth tips point inward; use the internal (concave) involute. Pinion centre is offset toward the mesh side. Phase so a pinion tooth sits centred in a ring gap on the centre line."
+  },
+  "examples": [
+    { "use": "Planetary gearboxes", "detail": "The fixed annulus of every planetary set is an internal gear meshing with the planets." },
+    { "use": "Excavator and crane slewing rings", "detail": "A hydraulic motor pinion drives a large internally toothed slewing bearing to turn the upper structure." },
+    { "use": "Bicycle hub gears", "detail": "Internal-gear hubs use ring gears around compact planetary trains." }
+  ],
+  "references": [
+    { "title": "Epicyclic gearing (ring gear), Wikipedia", "url": "https://en.wikipedia.org/wiki/Epicyclic_gearing", "kind": "wikipedia" },
+    { "title": "Internal ring gears, design and considerations, KHK USA", "url": "https://www.khkgears.us/media/1270/internal-ring-gears-design-and-considerations.pdf", "kind": "engineering-guide" },
+    { "title": "Gear types and axial arrangements; details of involute gearing, SDP/SI", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page2.php", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Making an Internal Gear Wheel", "url": "https://www.youtube.com/watch?v=AbeVLUFSmQs", "kind": "video" },
+    { "title": "507 Mechanical Movements No. 034, internally toothed spur gear and pinion", "url": "https://www.youtube.com/watch?v=1l41w-yRa_I", "kind": "animation" },
+    { "title": "KHK internal ring gears catalogue 2025", "url": "https://khkgears.us/media/404afki4/catalog-2025-internal-ring-gears.pdf", "kind": "photos" }
+  ],
+  "related": ["spur-gears", "planetary", "harmonic-drive", "cycloidal-drive", "sun-and-planet"]
+},
+{
+  "id": "helical-gears",
+  "name": "Helical gear pair",
+  "aka": ["helical gears", "parallel helical gears", "twisted-tooth gears"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Intermediate",
+  "summary": "Gears with teeth cut on a helix engage gradually, running quieter and stronger than spur gears but pushing their shafts axially.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity", "Reversing"],
+    "axes": "Offset parallel",
+    "plane": "Spatial"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "1:1 to about 10:1 per pair; default 34/17 = 2:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, pinion, gear; one helical gear mesh (line contact sweeps diagonally across the face)" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Speed increase"],
+    "property": ["Exact", "Positive drive", "High load", "Smooth (harmonic)", "Backdrivable"],
+    "application": ["Automotive", "Machine tools", "Energy", "Marine"],
+    "keywords": ["helix angle", "axial thrust", "normal module", "transverse module", "overlap ratio", "quiet gearing"]
+  },
+  "explain": {
+    "motion": "Seen end-on, a helical pair behaves exactly like a spur pair: the 17-tooth pinion drives the 34-tooth gear at half speed in the opposite direction. Along the face the teeth are twisted at 20°, so each tooth comes into contact at one end and the contact line sweeps across, with several teeth always sharing load.",
+    "forces": "The tooth force has a tangential part that does the work, a radial part, and an axial thrust equal to tangential force times tan(helix angle), here about 36% of it. That thrust must be taken by thrust-capable bearings, and the two gears must have opposite hands.",
+    "benefits": "Gradual engagement and a higher total contact ratio give much quieter running and higher load capacity than spur gears of the same size, which is why nearly all car gearboxes use them.",
+    "limits": "Axial thrust needs angular-contact or tapered bearings, and extra sliding lowers efficiency slightly. Gears cannot be slid in and out of mesh as easily as spur gears."
+  },
+  "build": {
+    "ground": "frame with two parallel bearings at centre distance a",
+    "input": "pinion (right hand), continuous rotation about O1",
+    "output": "gear (left hand), rotation about O2",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "O1 at (0,0), O2 at (81.41,0)" },
+      { "id": "pinion", "role": "driver", "def": "helical gear z1 = 17, normal module 3, helix 20° RH, pitch radius 27.14, face 30" },
+      { "id": "gear", "role": "output", "def": "helical gear z2 = 34, normal module 3, helix 20° LH, pitch radius 54.27, face 30" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "gear"] },
+      { "id": "M", "type": "gear mesh", "between": ["pinion", "gear"] }
+    ],
+    "params": [
+      { "name": "mn", "value": 3, "unit": "mm", "note": "normal module" },
+      { "name": "beta", "value": 20, "unit": "°", "note": "helix angle (opposite hands)" },
+      { "name": "mt", "value": 3.193, "unit": "mm", "note": "transverse module = mn / cos(beta)" },
+      { "name": "z1", "value": 17, "unit": "teeth", "note": "pinion" },
+      { "name": "z2", "value": 34, "unit": "teeth", "note": "gear" },
+      { "name": "alpha_n", "value": 20, "unit": "°", "note": "normal pressure angle" },
+      { "name": "cd", "value": 81.41, "unit": "mm", "note": "centre distance = mn(z1+z2)/(2 cos beta)" },
+      { "name": "b", "value": 30, "unit": "mm", "note": "face width" }
+    ],
+    "defining_relations": "mt = mn/cos(beta); d = z mt; a = mn(z1+z2)/(2 cos beta); tan(alpha_t) = tan(alpha_n)/cos(beta); ratio i = z2/z1, opposite sense; axial thrust Fa = Ft tan(beta); overlap ratio = b sin(beta)/(pi mn) = 30 x 0.342 / 9.42 = 1.09.",
+    "range": "pinion 360° continuous; gear 180° per pinion turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "gear angle vs pinion angle (slope -0.5)",
+    "notes": "In 2D draw the transverse section (looks like spur gears with module 3.193); in pseudo-3D show slanted teeth and an axial thrust arrow on each shaft in opposite directions. Hands must be opposite for parallel shafts."
+  },
+  "examples": [
+    { "use": "Car manual gearboxes", "detail": "Constant-mesh helical gears on the layshaft give quiet forward gears." },
+    { "use": "Industrial speed reducers", "detail": "Parallel-shaft helical reducers drive conveyors, mixers and pumps." },
+    { "use": "Turbine gearboxes", "detail": "High-speed helical stages couple gas or steam turbines to generators." }
+  ],
+  "references": [
+    { "title": "Gear, helical section, Wikipedia", "url": "https://en.wikipedia.org/wiki/Gear#Helical", "kind": "wikipedia" },
+    { "title": "Helix angle, Wikipedia", "url": "https://en.wikipedia.org/wiki/Helix_angle", "kind": "wikipedia" },
+    { "title": "Helical gear calculations, crossed helical gear meshes, and bevel gearing, SDP/SI", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page4.php", "kind": "engineering-guide" },
+    { "title": "Helical gears technical information, SDP/SI", "url": "https://shop.sdp-si.com/products/gears-differentials-pinions-racks/helical-gears-technical-information.html", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Helical gear thrust movement explained", "url": "https://www.youtube.com/watch?v=n6eYHdEpHa0", "kind": "video" },
+    { "title": "Spur gears vs helical gears, what's the difference?", "url": "https://www.youtube.com/watch?v=BMv6-OwMveg", "kind": "video" },
+    { "title": "Category:Animations of gears and gearboxes, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Animations_of_gears_and_gearboxes", "kind": "animation" }
+  ],
+  "related": ["spur-gears", "herringbone-gears", "crossed-helical-gears", "gear-train"]
+},
+{
+  "id": "herringbone-gears",
+  "name": "Herringbone gear pair",
+  "aka": ["double helical gears", "herringbone gears", "chevron gears", "Wuest gears"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Intermediate",
+  "summary": "Two opposite-hand helical halves side by side cancel each other's axial thrust, giving smooth, heavy-duty parallel-shaft drive.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity", "Reversing"],
+    "axes": "Offset parallel",
+    "plane": "Spatial"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "1:1 to about 10:1 per pair; default 40/20 = 2:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, pinion, gear; one double-helical mesh; one shaft usually allowed to float axially" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication"],
+    "property": ["High load", "Smooth (harmonic)", "Balanced", "Positive drive", "Historic"],
+    "application": ["Marine", "Energy", "Machine tools", "Steam & engines"],
+    "keywords": ["double helical", "chevron", "André Citroën", "Wüst", "Sykes gear shaper", "thrust balance"]
+  },
+  "explain": {
+    "motion": "Each gear is two helical gears of opposite hand joined face to face, forming a V of teeth. End-on it behaves like a spur pair, while along the face both halves engage gradually and many teeth share the load.",
+    "forces": "The axial thrust of the left half (Ft/2 x tan beta) is equal and opposite to that of the right half, so they cancel and only radial bearings are needed. One shaft is left free to float axially so the two halves share load equally.",
+    "benefits": "Allows large helix angles (25° to 45°) for very smooth, high-capacity drive without thrust bearings; historically key to marine steam turbine reduction gears.",
+    "limits": "Hard to manufacture accurately (needs a central relief groove or a Sykes-type shaper), and a mismatch between halves overloads one side. More expensive than single helical gears."
+  },
+  "build": {
+    "ground": "frame with two parallel bearings; the gear shaft is axially fixed, the pinion floats",
+    "input": "pinion, continuous rotation about O1",
+    "output": "gear, rotation about O2",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "O1 at (0,0), O2 at (103.92,0)" },
+      { "id": "pinion", "role": "driver", "def": "double helical z1 = 20, mn = 3, beta = 30° (RH + LH halves), pitch radius 34.64, two 25 mm halves with 10 mm gap" },
+      { "id": "gear", "role": "output", "def": "double helical z2 = 40, mn = 3, beta = 30°, pitch radius 69.28, two 25 mm halves" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "gear"] },
+      { "id": "M", "type": "gear mesh", "between": ["pinion", "gear"] }
+    ],
+    "params": [
+      { "name": "mn", "value": 3, "unit": "mm", "note": "normal module" },
+      { "name": "beta", "value": 30, "unit": "°", "note": "helix angle of each half" },
+      { "name": "mt", "value": 3.464, "unit": "mm", "note": "transverse module = mn / cos(beta)" },
+      { "name": "z1", "value": 20, "unit": "teeth", "note": "pinion" },
+      { "name": "z2", "value": 40, "unit": "teeth", "note": "gear" },
+      { "name": "alpha_n", "value": 20, "unit": "°", "note": "normal pressure angle" },
+      { "name": "cd", "value": 103.92, "unit": "mm", "note": "centre distance = mn(z1+z2)/(2 cos beta)" },
+      { "name": "b_half", "value": 25, "unit": "mm", "note": "face width of each half" },
+      { "name": "gap", "value": 10, "unit": "mm", "note": "central relief groove" }
+    ],
+    "defining_relations": "same as helical: a = mn(z1+z2)/(2 cos beta); ratio i = z2/z1, opposite sense; axial thrusts Fa = (Ft/2) tan(beta) per half, equal and opposite, net zero.",
+    "range": "pinion 360° continuous; gear 180° per pinion turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "gear angle vs pinion angle (slope -0.5)",
+    "notes": "In 2D draw the transverse section; in pseudo-3D draw the V teeth with apexes pointing the same way on both gears in the mesh. Show two opposed axial arrows cancelling. Optional Wuest (staggered, no gap) variant."
+  },
+  "examples": [
+    { "use": "Marine turbine reduction gears", "detail": "Large double helical gears reduce steam turbine speed to propeller speed on ships." },
+    { "use": "Rolling mills and heavy presses", "detail": "Herringbone pinion stands transmit very high torque to mill rolls." },
+    { "use": "Early Citroën final drives", "detail": "Herringbone bevel gears were used in early car rear axles, and inspired the Citroën double-chevron logo." }
+  ],
+  "references": [
+    { "title": "Herringbone gear, Wikipedia", "url": "https://en.wikipedia.org/wiki/Herringbone_gear", "kind": "wikipedia" },
+    { "title": "Helical gear calculations, SDP/SI Elements of Metric Gear Technology", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page4.php", "kind": "engineering-guide" },
+    { "title": "Double helical gears, Hewitt-Topham", "url": "http://www.hewitt-topham.co.uk/double-helical-gears.html", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Herringbone gear", "url": "https://www.youtube.com/watch?v=K_i4kU_L8Lw", "kind": "video" },
+    { "title": "Differences between double helical gear and herringbone gear", "url": "https://www.youtube.com/watch?v=GrVncfKxi3k", "kind": "video" },
+    { "title": "Category:Herringbone gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Herringbone_gears", "kind": "photos" }
+  ],
+  "related": ["helical-gears", "spur-gears", "bevel-gears", "crossed-helical-gears"]
+},
+{
+  "id": "bevel-gears",
+  "name": "Bevel gear pair",
+  "aka": ["bevel gears", "mitre gears", "miter gears", "straight bevel gears", "crown wheel and pinion"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Intermediate",
+  "summary": "Cone-shaped gears transmit rotation between intersecting shafts, usually at a right angle, with a fixed ratio.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Perpendicular intersecting",
+    "plane": "Spatial"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "1:1 (mitre) to about 6:1; default 32/16 = 2:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, pinion, gear; one bevel mesh; pitch cones share an apex at the shaft intersection" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Motion conversion"],
+    "property": ["Exact", "Positive drive", "Backdrivable", "High load"],
+    "application": ["Automotive", "Machine tools", "Consumer products", "Agriculture"],
+    "keywords": ["pitch cone", "cone angle", "mitre gear", "right-angle drive", "Gleason", "hand drill"]
+  },
+  "explain": {
+    "motion": "Two toothed cones roll on each other with a common apex where the shafts cross. The 16-tooth pinion turns the 32-tooth gear at half speed about an axis at 90°, and the pitch cone angles (26.6° and 63.4°) are set by the tooth ratio.",
+    "forces": "Tooth force splits into tangential, radial and axial parts; both gears are pushed away from the cone apex along their own axes, so each shaft needs a thrust-capable bearing. Load is concentrated toward the large end of the tooth.",
+    "benefits": "The simplest way to turn a drive through a corner with an exact ratio and high efficiency (about 97 to 98%).",
+    "limits": "Mounting must be precise because both apexes must coincide; errors shift the contact patch and cause noise or tooth breakage. Straight bevels are noisy at speed, so spiral bevels are used there."
+  },
+  "build": {
+    "ground": "housing with two bearing axes intersecting at apex P at 90°",
+    "input": "pinion, continuous rotation about the horizontal axis",
+    "output": "gear, rotation about the vertical axis",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "apex P at origin; pinion axis along x, gear axis along y" },
+      { "id": "pinion", "role": "driver", "def": "straight bevel z1 = 16, m = 4 (outer), pitch dia 64, pitch cone angle 26.57°" },
+      { "id": "gear", "role": "output", "def": "straight bevel z2 = 32, m = 4 (outer), pitch dia 128, pitch cone angle 63.43°" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "gear"] },
+      { "id": "M", "type": "gear mesh", "between": ["pinion", "gear"] }
+    ],
+    "params": [
+      { "name": "m", "value": 4, "unit": "mm", "note": "outer transverse module" },
+      { "name": "z1", "value": 16, "unit": "teeth", "note": "pinion" },
+      { "name": "z2", "value": 32, "unit": "teeth", "note": "gear" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle" },
+      { "name": "Sigma", "value": 90, "unit": "°", "note": "shaft angle" },
+      { "name": "delta1", "value": 26.57, "unit": "°", "note": "pinion pitch cone angle = atan(z1/z2)" },
+      { "name": "delta2", "value": 63.43, "unit": "°", "note": "gear pitch cone angle" },
+      { "name": "Re", "value": 71.55, "unit": "mm", "note": "outer cone distance; no centre distance, the axes intersect" },
+      { "name": "b", "value": 20, "unit": "mm", "note": "face width (<= Re/3)" }
+    ],
+    "defining_relations": "d = m z; for Sigma = 90°: tan(delta1) = z1/z2, delta2 = 90° - delta1; cone distance Re = d1/(2 sin delta1); ratio i = z2/z1 = sin(delta2)/sin(delta1); face width b <= Re/3.",
+    "range": "pinion 360° continuous; gear 180° per pinion turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "gear angle vs pinion angle (slope 0.5)",
+    "notes": "Pseudo-3D required: draw both cones from the common apex. In a 2D side view, show the pitch cones as triangles meeting at P. Sense of rotation depends on viewing side; both shafts are axially loaded away from P."
+  },
+  "examples": [
+    { "use": "Hand drills and egg beaters", "detail": "A large crown bevel on the crank turns a small bevel pinion on the chuck spindle." },
+    { "use": "Car differentials", "detail": "Straight bevel side gears and spider pinions inside the differential case split torque between wheels." },
+    { "use": "Right-angle gearboxes", "detail": "Mitre and bevel boxes turn conveyor and machine drives through 90°." }
+  ],
+  "references": [
+    { "title": "Bevel gear, Wikipedia", "url": "https://en.wikipedia.org/wiki/Bevel_gear", "kind": "wikipedia" },
+    { "title": "Bevel gearing, SDP/SI Elements of Metric Gear Technology", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page4.php", "kind": "engineering-guide" },
+    { "title": "Standards in terminology for bevel gearing, KHK USA", "url": "https://www.khkgears.us/media/1253/standards-in-terminology-for-bevel-gearing.pdf", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "How bevel gearbox works", "url": "https://www.youtube.com/watch?v=phDjP8OVMJE", "kind": "video" },
+    { "title": "Bevel gears explained", "url": "https://www.youtube.com/watch?v=Ayu93VdwkuU", "kind": "video" },
+    { "title": "Category:Bevel gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Bevel_gears", "kind": "photos" }
+  ],
+  "related": ["hypoid-gears", "differential", "spur-gears", "worm-drive", "crossed-helical-gears"]
+},
+{
+  "id": "hypoid-gears",
+  "name": "Hypoid gear pair",
+  "aka": ["hypoid gears", "hypoid bevel gears", "offset spiral bevel", "ring and pinion", "crown wheel and pinion"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "A spiral bevel pair with the pinion axis offset below the gear centre, so the shafts cross without meeting; used in car rear axles.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Perpendicular skew",
+    "plane": "Spatial"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "2.5:1 to 5:1 in car axles, up to about 10:1; default 41/10 = 4.1:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, pinion, ring gear; one hypoid mesh with sliding along the tooth" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Motion conversion"],
+    "property": ["High load", "Smooth (harmonic)", "Positive drive", "Precision"],
+    "application": ["Automotive", "Machine tools", "Robotics", "Agriculture"],
+    "keywords": ["hypoid offset", "spiral angle", "Gleason", "hypoid oil", "EP additives", "ring and pinion", "final drive"]
+  },
+  "explain": {
+    "motion": "The 10-tooth pinion drives a 41-tooth ring gear through 90°, but its axis passes 25 mm below the ring gear centre. To mesh at that offset the pinion has a larger spiral angle than the gear, which makes it larger and stronger than a spiral bevel pinion of the same ratio.",
+    "forces": "The offset adds sliding along the teeth, so tooth friction is higher than in a bevel pair and extreme-pressure hypoid oil is required. Contact is spread over several curved teeth at once, giving high load capacity and smooth, quiet running.",
+    "benefits": "The lowered pinion lets a car's propeller shaft sit lower (less floor tunnel), and the bigger pinion and higher contact ratio carry more torque quietly.",
+    "limits": "Efficiency (about 90 to 96%) is lower than bevel gears, requires special lubricant, and setup of pinion depth and backlash is critical. Manufacturing needs dedicated Gleason or Klingelnberg type machines."
+  },
+  "build": {
+    "ground": "axle housing with pinion axis along y at height -E and ring axis along x through origin",
+    "input": "pinion, continuous rotation about its axis (propeller shaft)",
+    "output": "ring gear, rotation about the axle axis",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "ring axis x through (0,0,0); pinion axis parallel to y at z = -25 (offset E)" },
+      { "id": "pinion", "role": "driver", "def": "hypoid pinion z1 = 10, spiral angle about 50°, mean dia about 50" },
+      { "id": "ring", "role": "output", "def": "hypoid ring gear z2 = 41, outer pitch dia 200 (m about 4.88), spiral angle about 30°" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "ring"] },
+      { "id": "M", "type": "gear mesh", "between": ["pinion", "ring"] }
+    ],
+    "params": [
+      { "name": "z1", "value": 10, "unit": "teeth", "note": "pinion; 10 and 41 share no factor, a hunting tooth pair" },
+      { "name": "z2", "value": 41, "unit": "teeth", "note": "ring gear" },
+      { "name": "m", "value": 4.88, "unit": "mm", "note": "outer transverse module of ring gear = 200/41" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "mean pressure angle (drive and coast sides often differ)" },
+      { "name": "E", "value": 25, "unit": "mm", "note": "hypoid offset, shortest distance between axes (stands in for centre distance)" },
+      { "name": "beta1", "value": 50, "unit": "°", "note": "pinion mean spiral angle" },
+      { "name": "beta2", "value": 30, "unit": "°", "note": "ring gear mean spiral angle" },
+      { "name": "Sigma", "value": 90, "unit": "°", "note": "shaft angle (projected)" }
+    ],
+    "defining_relations": "ratio i = z2/z1 = 4.1; offset angle relation sin(eps) approx E / gear pitch radius; pinion spiral angle beta1 = beta2 + eps (approx), which enlarges the pinion: d1 = d2 (z1/z2) cos(beta2)/cos(beta1).",
+    "range": "pinion 360° continuous; ring gear 87.8° per pinion turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "ring gear angle vs pinion angle (slope 1/4.1)",
+    "notes": "Pseudo-3D only; draw the pinion below the ring gear centre line (below-centre offset pairs with a left-hand pinion). Curved teeth can be approximated as arcs. Show the offset E as a dimension between the axes."
+  },
+  "examples": [
+    { "use": "Rear-wheel-drive car axles", "detail": "A hypoid ring and pinion turns the propeller shaft drive 90° into the differential and lowers the shaft." },
+    { "use": "Truck and tractor final drives", "detail": "Heavy hypoid sets carry high torque at 4:1 to 7:1 ratios." },
+    { "use": "Right-angle industrial gearmotors", "detail": "Hypoid gearmotors give a compact, efficient alternative to worm gear units." }
+  ],
+  "references": [
+    { "title": "Spiral bevel gear (hypoid gears), Wikipedia", "url": "https://en.wikipedia.org/wiki/Spiral_bevel_gear", "kind": "wikipedia" },
+    { "title": "Tribology aspects in angular transmission systems, Part VII: Hypoid gears, H. Stadtfeld, Gear Technology", "url": "https://ik.imagekit.io/agmamedia/gt/issues/0611x/hypoid.pdf", "kind": "paper" },
+    { "title": "Gear encyclopedia: hypoid offset, Gleason", "url": "https://www.gleason.com/de/encyclopedias/gear-encyclopedia/term/141/en", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Hypoid ring and pinion gears explained", "url": "https://www.youtube.com/watch?v=DhCyz7k7ifQ", "kind": "video" },
+    { "title": "Wisdom of Gears: thin shape hypoid gear tooth cutting", "url": "https://www.youtube.com/watch?v=bkShXcUc4ek", "kind": "video" },
+    { "title": "Category:Hypoid bevel gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Hypoid_bevel_gears", "kind": "photos" }
+  ],
+  "related": ["bevel-gears", "differential", "worm-drive", "crossed-helical-gears"]
+},
+{
+  "id": "worm-drive",
+  "name": "Worm drive",
+  "aka": ["worm gear", "worm and wheel", "worm gearbox", "endless screw"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Intermediate",
+  "summary": "A screw-like worm turns a toothed wheel on a crossing shaft, giving a large reduction in one stage that often cannot be driven backwards.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Self-locking"],
+    "axes": "Perpendicular skew",
+    "plane": "Spatial"
+  },
+  "ratio": { "kind": "Reduction", "class": "Medium (5:1 to 50:1)", "typical": "5:1 to 75:1 per stage (up to about 100:1); ratio = wheel teeth / worm starts; default 30:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, worm, wheel; one worm mesh (screw-type sliding contact)" },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Locking", "Positioning"],
+    "property": ["High ratio", "Self-locking", "Compact", "Smooth (harmonic)", "Friction-based"],
+    "application": ["Construction & lifting", "Machine tools", "Instruments", "Packaging & automation"],
+    "keywords": ["worm wheel", "lead angle", "starts", "self-locking", "tuning peg", "phosphor bronze"]
+  },
+  "explain": {
+    "motion": "The worm is a screw with one thread (start). Each worm turn advances the wheel by one tooth, so a 30-tooth wheel turns once per 30 worm turns. The shafts cross at 90° without intersecting.",
+    "forces": "Contact is mostly sliding along the thread, so friction is high and efficiency falls from about 90% at low ratios to under 50% at high ratios. With a small lead angle (here 5.7°) friction exceeds the driving component when the wheel tries to turn the worm, so the drive locks.",
+    "benefits": "Very high reduction in one compact, quiet stage, and a self-locking worm holds loads without a brake in many uses.",
+    "limits": "Low efficiency and heat build-up; a steel worm needs a bronze wheel and good lubrication. Self-locking is unreliable under vibration, so it should not replace a safety brake on hoists."
+  },
+  "build": {
+    "ground": "housing with the worm axis along x above the wheel and the wheel axis along z",
+    "input": "worm, continuous rotation about its own axis",
+    "output": "wheel, rotation about the perpendicular axis",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "wheel axis through (0,0); worm axis perpendicular, at distance a = 60 from wheel axis" },
+      { "id": "worm", "role": "driver", "def": "single-start worm, axial module 3, pitch dia 30 (q = 10), axial pitch 9.42, lead angle 5.71°, length 50" },
+      { "id": "wheel", "role": "output", "def": "worm wheel z2 = 30, module 3, pitch dia 90, throated rim" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "worm"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "wheel"] },
+      { "id": "M", "type": "gear mesh", "between": ["worm", "wheel"] }
+    ],
+    "params": [
+      { "name": "m", "value": 3, "unit": "mm", "note": "axial module of worm = transverse module of wheel" },
+      { "name": "z1", "value": 1, "unit": "starts", "note": "worm starts" },
+      { "name": "z2", "value": 30, "unit": "teeth", "note": "wheel teeth" },
+      { "name": "q", "value": 10, "unit": "", "note": "diameter factor, d1 = q m = 30" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle" },
+      { "name": "gamma", "value": 5.71, "unit": "°", "note": "lead angle = atan(z1/q)" },
+      { "name": "cd", "value": 60, "unit": "mm", "note": "centre distance = m(q + z2)/2" },
+      { "name": "mu", "value": 0.06, "unit": "", "note": "friction coefficient steel on bronze" }
+    ],
+    "defining_relations": "ratio i = z2/z1 = 30; lead L = z1 pi m; tan(gamma) = z1/q; a = m(q+z2)/2; efficiency (worm driving) = (cos an - mu tan g)/(cos an + mu cot g) approx tan g / tan(g + phi); self-locking (wheel cannot drive) when tan(gamma) < mu approximately.",
+    "range": "worm 360° continuous; wheel 12° per worm turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "wheel angle vs worm angle (slope 1/30)",
+    "notes": "Pseudo-3D: show the worm thread as a helix advancing one axial pitch per turn while the wheel rotates one tooth. In 2D side view, animate the worm thread profile translating like a rack. Show a lock icon if the wheel is driven."
+  },
+  "examples": [
+    { "use": "Guitar tuning machines", "detail": "A small worm on each tuning key turns a wheel on the string post and holds tension." },
+    { "use": "Lifts, hoists and winches", "detail": "Worm gearboxes give high reduction for traction machines and hand winches." },
+    { "use": "Indexing heads and rotary tables", "detail": "Precision worm sets give fine angular positioning on machine tools." }
+  ],
+  "references": [
+    { "title": "Worm drive, Wikipedia", "url": "https://en.wikipedia.org/wiki/Worm_gear", "kind": "wikipedia" },
+    { "title": "Worm gears: design, formula, efficiency, strength, RoyMech", "url": "https://www.roymech.co.uk/Useful_Tables/Drive/Worm_Gears.html", "kind": "engineering-guide" },
+    { "title": "Worm gear mesh geometry, SDP/SI Elements of Metric Gear Technology", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page5.php", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Right angle gearboxes: worm gear, bevel gear and hypoid gearbox", "url": "https://www.youtube.com/watch?v=rSBz3etUEGo", "kind": "video" },
+    { "title": "Various worm gearboxes, 3D models", "url": "https://www.youtube.com/watch?v=8nEoLnb-ndY", "kind": "animation" },
+    { "title": "Category:Worm gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Worm_gears", "kind": "photos" }
+  ],
+  "related": ["crossed-helical-gears", "lead-screw", "hypoid-gears", "bevel-gears", "gear-train"]
+},
+{
+  "id": "crossed-helical-gears",
+  "name": "Crossed helical gears",
+  "aka": ["screw gears", "spiral gears", "skew gears", "crossed-axis helical gears"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "Two helical gears on non-parallel, non-intersecting shafts touch at a point and drive each other, usually at 90°, for light loads.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Perpendicular skew",
+    "plane": "Spatial"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "1:1 to about 5:1; ratio = z2/z1 (not pitch diameter ratio); default 24/12 = 2:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, gear 1, gear 2; one point-contact crossed helical mesh" },
+  "backdrivable": "Partly",
+  "tags": {
+    "function": ["Speed reduction", "Motion conversion"],
+    "property": ["Positive drive", "Compact", "Few parts"],
+    "application": ["Automotive", "Printing & textiles", "Instruments", "Machine tools"],
+    "keywords": ["screw gear", "spiral gear", "skew shafts", "distributor drive", "point contact", "shaft angle"]
+  },
+  "explain": {
+    "motion": "Two ordinary helical gears of the same hand are mounted on shafts crossing at 90° at a set distance. With 45° helix angles the teeth line up and gear 1 (12 teeth) turns gear 2 (24 teeth) at half speed.",
+    "forces": "Contact is a single point that slides along the teeth, so load capacity is low and wear is high. Each gear sees an axial thrust that must be taken by its bearings.",
+    "benefits": "Lets two standard helical gears drive between skew shafts, and centre distance and ratio can be tuned by choosing different helix angles. Insensitive to small centre-distance errors.",
+    "limits": "Point contact and high sliding limit them to light power, such as camshaft-driven distributors and oil pumps; for real loads use a worm or hypoid set."
+  },
+  "build": {
+    "ground": "frame with gear 1 axis along x and gear 2 axis along y, offset by a = 76.37",
+    "input": "gear 1, continuous rotation",
+    "output": "gear 2, rotation about the crossed axis",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "gear 1 axis along x at z = 0; gear 2 axis along y at z = 76.37" },
+      { "id": "gear1", "role": "driver", "def": "helical z1 = 12, mn = 3, beta1 = 45° RH, pitch dia 50.91" },
+      { "id": "gear2", "role": "output", "def": "helical z2 = 24, mn = 3, beta2 = 45° RH, pitch dia 101.82" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["ground", "gear1"] },
+      { "id": "O2", "type": "revolute", "between": ["ground", "gear2"] },
+      { "id": "M", "type": "gear mesh", "between": ["gear1", "gear2"] }
+    ],
+    "params": [
+      { "name": "mn", "value": 3, "unit": "mm", "note": "normal module, must match" },
+      { "name": "z1", "value": 12, "unit": "teeth", "note": "driver" },
+      { "name": "z2", "value": 24, "unit": "teeth", "note": "driven" },
+      { "name": "beta1", "value": 45, "unit": "°", "note": "helix angle gear 1" },
+      { "name": "beta2", "value": 45, "unit": "°", "note": "helix angle gear 2 (same hand for 90°)" },
+      { "name": "Sigma", "value": 90, "unit": "°", "note": "shaft angle = beta1 + beta2" },
+      { "name": "alpha_n", "value": 20, "unit": "°", "note": "normal pressure angle, must match" },
+      { "name": "cd", "value": 76.37, "unit": "mm", "note": "centre distance = (d1 + d2)/2, d = z mn / cos(beta)" }
+    ],
+    "defining_relations": "Sigma = beta1 + beta2 (same hand); d1 = z1 mn/cos(beta1), d2 = z2 mn/cos(beta2); a = (d1 + d2)/2; ratio i = z2/z1 = d2 cos(beta2)/(d1 cos(beta1)); normal modules and normal pressure angles must be equal.",
+    "range": "gear 1 360° continuous; gear 2 180° per input turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "gear 2 angle vs gear 1 angle (slope 0.5)",
+    "notes": "Pseudo-3D only. Draw both gears as short helical cylinders, one above the other with axes at 90°; teeth at 45° line up at the contact point. Unequal helix angles (e.g. 30° + 60°) change diameters but not the tooth ratio."
+  },
+  "examples": [
+    { "use": "Distributor and oil pump drives", "detail": "A crossed helical gear on the camshaft drives the distributor and oil pump shaft at 90°." },
+    { "use": "Speedometer drives", "detail": "A small skew gear on the gearbox output shaft drove the mechanical speedometer cable." },
+    { "use": "Textile and printing machinery", "detail": "Light skew-shaft drives transfer timing between crossed shafts." }
+  ],
+  "references": [
+    { "title": "Screw gear or crossed helical gear meshes, SDP/SI Elements of Metric Gear Technology (section 7)", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page4.php", "kind": "engineering-guide" },
+    { "title": "Gear, helical section (crossed helical gears), Wikipedia", "url": "https://en.wikipedia.org/wiki/Gear#Helical", "kind": "wikipedia" },
+    { "title": "Gear types and axial arrangements, SDP/SI", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page2.php", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Category:Animations of gears and gearboxes, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Animations_of_gears_and_gearboxes", "kind": "animation" }
+  ],
+  "related": ["helical-gears", "worm-drive", "hypoid-gears", "bevel-gears"]
+},
+{
+  "id": "rack-pinion",
+  "name": "Rack and pinion",
+  "aka": ["rack and pinion", "gear rack", "pinion and rack", "linear gear"],
+  "in_site": true,
+  "family": "Gears",
+  "level": "Basic",
+  "summary": "A gear meshing with a straight toothed bar: every turn of the pinion moves the rack one pitch-circle circumference.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Linear",
+    "label": "Rotary → Linear",
+    "output_character": ["Reciprocating", "Constant velocity"],
+    "axes": "Rotary-to-in-plane",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Stroke", "class": "n/a", "typical": "travel = pitch radius x angle; 100.5 mm per pinion turn at m = 4, z = 16" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 1, "prismatic": 1, "higher_pairs": 1, "notes": "ground, pinion, rack; rack slides in a guide; one gear mesh" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Motion conversion", "Steering", "Positioning", "Lifting"],
+    "property": ["Exact", "Positive drive", "Backdrivable", "Few parts"],
+    "application": ["Automotive", "Machine tools", "Railways", "Robotics"],
+    "keywords": ["gear rack", "steering rack", "rack railway", "linear actuator", "cranequin", "pitch line"]
+  },
+  "explain": {
+    "motion": "The pinion swings back and forth and the rack slides with it. The rack moves exactly the pinion's pitch radius times the angle turned, so travel is proportional to rotation in both directions.",
+    "forces": "Torque on the pinion becomes a straight push on the rack equal to torque divided by pitch radius. The 20° pressure angle adds a force pushing rack and pinion apart, which the rack guide or a backing roller must resist so the teeth cannot climb out.",
+    "benefits": "Simple, stiff and reversible; long strokes only need a longer rack, and several pinions can share one rack.",
+    "limits": "Backlash makes precise reversal hard without preloaded or split pinions, and long racks need accurate joining and straight guides."
+  },
+  "build": {
+    "ground": "frame with pinion pivot O and a straight slideway below it",
+    "input": "pinion, oscillating ±150° about O",
+    "output": "rack, position x along the slideway",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "pivot O at (0,0); slideway parallel to x with rack pitch line at y = -32" },
+      { "id": "pinion", "role": "driver", "def": "spur gear z = 16, m = 4, pitch radius 32" },
+      { "id": "rack", "role": "slider", "def": "rack m = 4, 17 teeth (-8 to +8), pitch 12.566, pitch line at y = -32" },
+      { "id": "guide", "role": "ground", "def": "PTFE-faced slideway from x = -150 to 160, with a backing roller opposite the mesh" }
+    ],
+    "joints": [
+      { "id": "O", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "S", "type": "prismatic", "between": ["ground", "rack"] },
+      { "id": "M", "type": "gear mesh", "between": ["pinion", "rack"] }
+    ],
+    "params": [
+      { "name": "m", "value": 4, "unit": "mm", "note": "module" },
+      { "name": "z", "value": 16, "unit": "teeth", "note": "pinion teeth" },
+      { "name": "rp", "value": 32, "unit": "mm", "note": "pinion pitch radius = m z / 2; also distance from pinion axis to rack pitch line" },
+      { "name": "p", "value": 12.566, "unit": "mm", "note": "rack pitch = pi m" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle (rack flank angle)" },
+      { "name": "theta_max", "value": 150, "unit": "°", "note": "pinion swing amplitude" }
+    ],
+    "defining_relations": "x = rp theta (theta in radians); travel per turn = pi m z = 100.53 mm; force F = T / rp; separating force Fr = F tan(alpha). Rack teeth are straight-sided at the pressure angle.",
+    "range": "pinion ±150°; rack ±83.8 mm (167.6 mm total)",
+    "overlays": ["paths", "velocity", "forces", "angles", "plot"],
+    "plot": "rack travel vs pinion angle (straight line, slope 32 mm/rad)",
+    "notes": "Rack offset by half a pitch (p/2) so a pinion tooth sits in a rack gap at theta = 0. Keep the swing within the rack length: 17 teeth gives about 213 mm of rack. Rack speed is constant for constant pinion speed."
+  },
+  "examples": [
+    { "use": "Car steering", "detail": "The steering column pinion moves a transverse rack connected to the tie rods." },
+    { "use": "CNC routers and gantries", "detail": "Helical racks with servo pinions drive long axes beyond ball-screw lengths." },
+    { "use": "Rack railways", "detail": "A locomotive pinion engages a centre rack to climb steep gradients." },
+    { "use": "Drill and arbor presses", "detail": "A lever-turned pinion drives the toothed quill or ram up and down." }
+  ],
+  "references": [
+    { "title": "Rack and pinion, Wikipedia", "url": "https://en.wikipedia.org/wiki/Rack_and_pinion", "kind": "wikipedia" },
+    { "title": "Spur Gears Mixed-teeth Profiles (three-tooth pinion with rack), Reuleaux model, Cornell KMODDL", "url": "https://digital.library.cornell.edu/catalog/ss:29272005", "kind": "kmoddl" },
+    { "title": "Gear types and axial arrangements, SDP/SI", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page2.php", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Category:Rack gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Rack_gears", "kind": "photos" }
+  ],
+  "related": ["spur-gears", "lead-screw", "ackermann-steering", "scotch-yoke", "slider-crank"]
+},
+{
+  "id": "planetary",
+  "name": "Planetary gear set",
+  "aka": ["epicyclic gearing", "planetary gearbox", "sun and planet gears", "epicyclic train"],
+  "in_site": true,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "Planets orbit a central sun inside a ring gear; hold the ring, drive the sun, and the carrier turns slowly in line with the input.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Coaxial",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "3:1 to 10:1 per stage with ring fixed; default 1 + 35/13 = 3.69:1" },
+  "dof": 2,
+  "topology": { "links": 6, "revolute": 5, "prismatic": 0, "higher_pairs": 6, "notes": "ground+ring (fixed), sun, carrier, 3 planets; sun and carrier revolute to ground, each planet revolute on carrier; 3 sun-planet and 3 planet-ring meshes (redundant planets). Kinematic mobility 2 with ring free, 1 with ring fixed" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Differential & summing", "Power splitting"],
+    "property": ["Coaxial", "Compact", "High load", "Balanced", "Exact"],
+    "application": ["Automotive", "Robotics", "Energy", "Aerospace"],
+    "keywords": ["epicyclic", "sun gear", "ring gear", "planet carrier", "Willis equation", "automatic transmission", "hub gear"]
+  },
+  "explain": {
+    "motion": "The sun drives three planets, which roll around inside the fixed ring and carry the carrier with them. With 13 sun teeth and a 35-tooth ring, the carrier turns once for every 1 + 35/13 = 3.69 turns of the sun, in the same direction, while each planet spins backwards on its own pin.",
+    "forces": "Load is shared between three planets, so each mesh carries about a third of the torque and the radial pushes on the sun cancel. The ring reacts the difference between input and output torque.",
+    "benefits": "Coaxial input and output, very high torque density, and by choosing which of sun, ring or carrier is held, the same parts give different ratios; with two inputs it adds or subtracts speeds.",
+    "limits": "Tooth counts are constrained by assembly and spacing rules, load sharing needs accurate parts or floating members, and the many meshes make it costlier than a simple pair."
+  },
+  "build": {
+    "ground": "ring gear (internal, 35 teeth) fixed to the frame",
+    "input": "sun, continuous rotation about O",
+    "output": "carrier (arms to planet pins), rotation about O",
+    "members": [
+      { "id": "ring", "role": "ground", "def": "internal gear zr = 35, m = 4, pitch radius 70, rim radius 94, fixed" },
+      { "id": "sun", "role": "driver", "def": "spur gear zs = 13, m = 4, pitch radius 26" },
+      { "id": "planet0", "role": "gear", "def": "spur gear zp = 11, m = 4, pitch radius 22, centre on carrier at radius 48, angle 0°" },
+      { "id": "planet1", "role": "gear", "def": "as planet0 at 120°" },
+      { "id": "planet2", "role": "gear", "def": "as planet0 at 240°" },
+      { "id": "carrier", "role": "output", "def": "three arms O to C0, C1, C2, length a = 48" }
+    ],
+    "joints": [
+      { "id": "O_s", "type": "revolute", "between": ["ground", "sun"] },
+      { "id": "O_c", "type": "revolute", "between": ["ground", "carrier"] },
+      { "id": "C0", "type": "revolute", "between": ["carrier", "planet0"] },
+      { "id": "C1", "type": "revolute", "between": ["carrier", "planet1"] },
+      { "id": "C2", "type": "revolute", "between": ["carrier", "planet2"] },
+      { "id": "SP", "type": "gear mesh", "between": ["sun", "planet0"] },
+      { "id": "PR", "type": "gear mesh", "between": ["planet0", "ring"] }
+    ],
+    "params": [
+      { "name": "m", "value": 4, "unit": "mm", "note": "module" },
+      { "name": "zs", "value": 13, "unit": "teeth", "note": "sun" },
+      { "name": "zp", "value": 11, "unit": "teeth", "note": "planets (3 off)" },
+      { "name": "zr", "value": 35, "unit": "teeth", "note": "ring = zs + 2 zp" },
+      { "name": "n", "value": 3, "unit": "", "note": "number of planets" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle" },
+      { "name": "cd", "value": 48, "unit": "mm", "note": "sun-planet centre distance = m(zs+zp)/2 = carrier arm length" }
+    ],
+    "defining_relations": "Willis: (ws - wc)/(wr - wc) = -zr/zs; ring fixed: ws/wc = 1 + zr/zs = 48/13 = 3.69; concentricity zr = zs + 2 zp; equal spacing (zs + zr)/n integer: 48/3 = 16; planet spin relative to carrier = -(zr/zp)(wc) inside the ring.",
+    "range": "sun 360° continuous; carrier 97.5° per sun turn, same sense; planets spin backwards relative to carrier",
+    "overlays": ["paths", "velocity", "forces", "angles", "plot"],
+    "plot": "carrier angle vs sun angle (slope 13/48)",
+    "notes": "Planet phase must be computed from the ring mesh at each planet's carrier angle (site uses meshIn). Planet tooth paths are hypocycloid-like; trace a point on planet 0. 11-tooth planets are undercut at 20° unless profile-shifted. Planet tip circles (radius 26) clear each other since adjacent centres are 83 mm apart."
+  },
+  "examples": [
+    { "use": "Automatic transmissions", "detail": "Several planetary sets with clutches and brakes give each gear by holding different members." },
+    { "use": "Bicycle hub gears", "detail": "Internal hubs such as 3-speed hubs use planetary sets inside the wheel hub." },
+    { "use": "Wind turbine gearboxes", "detail": "Planetary first stages step up rotor speed with high torque density." },
+    { "use": "Cordless drills and robot actuators", "detail": "Stacked plastic or steel planetary stages reduce motor speed coaxially." }
+  ],
+  "references": [
+    { "title": "Epicyclic gearing, Wikipedia", "url": "https://en.wikipedia.org/wiki/Epicyclic_gearing", "kind": "wikipedia" },
+    { "title": "Relationship among the gears in a planetary gear system, SDP/SI", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page6.php", "kind": "engineering-guide" },
+    { "title": "Planetary Gear, Slider-Crank Kinematic Chain (O-5), Reuleaux model, Cornell KMODDL", "url": "https://digital.library.cornell.edu/catalog/ss:29272002", "kind": "kmoddl" }
+  ],
+  "media": [
+    { "title": "Category:Epicyclic gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Epicyclic_gears", "kind": "photos" },
+    { "title": "Epicyclic gearing animation, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/File:Epicyclic_gearing_animation.svg", "kind": "animation" },
+    { "title": "Planetary gear with fixed ring gear, tec-science animation", "url": "https://www.tec-science.com/wp-content/uploads/2018/09/en-planetary-gear.mp4", "kind": "animation" }
+  ],
+  "related": ["internal-gear-pair", "differential", "ravigneaux", "sun-and-planet", "harmonic-drive", "cycloidal-drive"]
+},
+{
+  "id": "differential",
+  "name": "Differential",
+  "aka": ["open differential", "bevel gear differential", "diff", "differential gear"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "Splits one input between two output shafts so they can turn at different speeds, their average always equal to the carrier speed.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Variable speed"],
+    "axes": "Perpendicular intersecting",
+    "plane": "Spatial"
+  },
+  "ratio": { "kind": "Reduction", "class": "Low (<5:1)", "typical": "final drive 2.5:1 to 5:1 into the case; 1:1 average to the two side shafts; default 41/10 = 4.1:1" },
+  "dof": 2,
+  "topology": { "links": 6, "revolute": 5, "prismatic": 0, "higher_pairs": 3, "notes": "ground, input pinion, ring gear+case (carrier), left side gear, right side gear, spider pinions (2, counted as 1 body type); meshes: pinion-ring, 2 spiders x 2 side gears. Mobility 2: case speed and wheel speed difference" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Differential & summing", "Power splitting", "Speed reduction"],
+    "property": ["Exact", "Positive drive", "Balanced", "High load"],
+    "application": ["Automotive", "Agriculture", "Instruments", "Railways"],
+    "keywords": ["spider gears", "side gears", "open differential", "limited slip", "Antikythera", "mechanical computer"]
+  },
+  "explain": {
+    "motion": "The input pinion turns the ring gear and the case it is bolted to. Spider pinions on a cross-pin in the case drive two side gears; when the car goes straight the spiders do not spin and both wheels turn with the case, and in a turn the spiders spin so the outer wheel speeds up as much as the inner slows down.",
+    "forces": "An open differential always gives equal torque to both outputs, so the wheel with least grip limits total traction. The spider pinions only carry load across their own teeth and turn only when the wheels differ in speed.",
+    "benefits": "Lets driven wheels on one axle cover different distances in a turn without scrubbing tyres, and as a mechanism it adds or averages two rotations exactly.",
+    "limits": "If one wheel loses grip it spins and the other gets almost no torque; limited-slip or locking differentials address this at the cost of complexity."
+  },
+  "build": {
+    "ground": "axle housing",
+    "input": "drive pinion, continuous rotation (propeller shaft)",
+    "output": "left and right side gears (half-shafts), angles thL and thR; read their sum and difference",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "housing; axle axis along x through origin; pinion axis along y" },
+      { "id": "pinion", "role": "driver", "def": "bevel pinion z = 10, m = 4.88, on axis y" },
+      { "id": "ring", "role": "gear", "def": "ring gear z = 41 bolted to the case, pitch dia 200" },
+      { "id": "case", "role": "link", "def": "differential case carrying a cross-pin along z through the origin" },
+      { "id": "spider", "role": "gear", "def": "two bevel pinions z = 10, m = 4, pitch dia 40, on the cross-pin at +z and -z" },
+      { "id": "sideL", "role": "output", "def": "bevel side gear z = 16, m = 4, pitch dia 64, on axle axis, left" },
+      { "id": "sideR", "role": "output", "def": "bevel side gear z = 16, m = 4, pitch dia 64, on axle axis, right" }
+    ],
+    "joints": [
+      { "id": "Op", "type": "revolute", "between": ["ground", "pinion"] },
+      { "id": "Oc", "type": "revolute", "between": ["ground", "case"] },
+      { "id": "Os", "type": "revolute", "between": ["case", "spider"] },
+      { "id": "OL", "type": "revolute", "between": ["case", "sideL"] },
+      { "id": "OR", "type": "revolute", "between": ["case", "sideR"] },
+      { "id": "Mpr", "type": "gear mesh", "between": ["pinion", "ring"] },
+      { "id": "MsL", "type": "gear mesh", "between": ["spider", "sideL"] },
+      { "id": "MsR", "type": "gear mesh", "between": ["spider", "sideR"] }
+    ],
+    "params": [
+      { "name": "z_pinion", "value": 10, "unit": "teeth", "note": "drive pinion" },
+      { "name": "z_ring", "value": 41, "unit": "teeth", "note": "ring gear" },
+      { "name": "z_spider", "value": 10, "unit": "teeth", "note": "spider pinions (2)" },
+      { "name": "z_side", "value": 16, "unit": "teeth", "note": "side gears (2)" },
+      { "name": "m", "value": 4, "unit": "mm", "note": "module of spider/side bevels" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle" },
+      { "name": "delta_side", "value": 57.99, "unit": "°", "note": "side gear pitch cone angle = atan(16/10); spider 32.01°" },
+      { "name": "Re", "value": 37.74, "unit": "mm", "note": "cone distance of spider/side bevels (axes intersect, no centre distance)" },
+      { "name": "split", "value": 0, "unit": "°/rev", "note": "user slider: speed difference between wheels" }
+    ],
+    "defining_relations": "w_case = w_pinion x 10/41; w_case = (wL + wR)/2; spider spin relative to case = (wL - w_case)(z_side/z_spider); torque TL = TR = T_case/2 (open, frictionless).",
+    "range": "pinion 360° continuous; case 87.8° per pinion turn; wheels equal when straight, differ by the user-set split in a turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "left and right wheel angles and their average vs case angle",
+    "notes": "Two inputs needed for an interesting animation: drive the case and add a turning offset (or hold one wheel to show the other at twice case speed). Spider pinions are stationary on their pin when wheel speeds are equal."
+  },
+  "examples": [
+    { "use": "Car and truck drive axles", "detail": "The rear or front axle differential lets the outer wheel run faster in a corner." },
+    { "use": "Four-wheel-drive centre differentials", "detail": "A centre differential splits torque between front and rear axles." },
+    { "use": "Mechanical computers", "detail": "Differentials added and subtracted shaft rotations in naval fire-control computers and in the ancient Antikythera mechanism hypothesis." }
+  ],
+  "references": [
+    { "title": "Differential (mechanical device), Wikipedia", "url": "https://en.wikipedia.org/wiki/Differential_(mechanical_device)", "kind": "wikipedia" },
+    { "title": "Bevel gear, Wikipedia", "url": "https://en.wikipedia.org/wiki/Bevel_gear", "kind": "wikipedia" },
+    { "title": "Bevel gearing, SDP/SI Elements of Metric Gear Technology", "url": "https://sdp-si.com/resources/elements-of-metric-gear-technology/page4.php", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Hypoid final drive, showing cornering differential", "url": "https://www.youtube.com/watch?v=2i9eRoRkx_U", "kind": "video" },
+    { "title": "Differential ring and pinion gear setup", "url": "https://www.youtube.com/watch?v=dAqAqODmcj4&vl=en", "kind": "video" },
+    { "title": "Car differential with spur gears 2", "url": "https://www.youtube.com/watch?v=R6nNknbQOZc", "kind": "animation" }
+  ],
+  "related": ["bevel-gears", "hypoid-gears", "planetary", "ravigneaux", "ball-disc-integrator"]
+},
+{
+  "id": "harmonic-drive",
+  "name": "Harmonic drive",
+  "aka": ["strain wave gearing", "harmonic gear", "flexspline gear", "wave gear"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "An elliptical wave generator flexes a thin toothed cup inside a rigid ring with two more teeth, giving a 50:1 to 160:1 coaxial reduction with no backlash.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity", "Reversing"],
+    "axes": "Coaxial",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Reduction", "class": "High (50:1 to 500:1)", "typical": "30:1 to 160:1 per stage; ratio = Zf / (Zc - Zf); default 100/2 = 50:1" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 2, "notes": "ground with circular spline, wave generator, flexspline (compliant), plus the wave generator bearing rolling on the flexspline; one multi-tooth mesh at two zones" },
+  "backdrivable": "Partly",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Positioning"],
+    "property": ["High ratio", "Low backlash", "Coaxial", "Compact", "Precision"],
+    "application": ["Robotics", "Aerospace", "Medical", "Machine tools"],
+    "keywords": ["strain wave", "flexspline", "circular spline", "wave generator", "C. Walton Musser", "Apollo lunar rover"]
+  },
+  "explain": {
+    "motion": "An elliptical cam with a thin ball bearing (the wave generator) spins inside a flexible cup with 100 external teeth (the flexspline), bending it so its teeth engage a rigid 102-tooth ring at the two ends of the long axis. Each wave generator turn shifts the flexspline back by two teeth relative to the ring, so the flexspline turns once, backwards, per 50 input turns.",
+    "forces": "About 30% of the teeth are in contact at once, giving high torque capacity and stiffness for the size. The flexspline is cyclically bent every half turn, so its fatigue strength sets the torque and life limits.",
+    "benefits": "High single-stage ratio, near-zero backlash, coaxial hollow-shaft design and light weight make it the standard robot joint reducer.",
+    "limits": "Torsional compliance is higher than in rigid gears, the flexspline can fail by fatigue or ratcheting under overload, and efficiency falls at high ratios and low temperatures."
+  },
+  "build": {
+    "ground": "circular spline (rigid internal ring, 102 teeth) fixed to the housing",
+    "input": "wave generator, continuous rotation about O",
+    "output": "flexspline, rotation about O (opposite sense)",
+    "members": [
+      { "id": "circular_spline", "role": "ground", "def": "internal gear Zc = 102, m = 0.5, pitch radius 25.5" },
+      { "id": "wave_gen", "role": "driver", "def": "elliptical cam, major semi-axis = flexspline bore radius + w0, minor = bore - w0, w0 = 0.5" },
+      { "id": "flexspline", "role": "output", "def": "thin cup with external teeth Zf = 100, m = 0.5, pitch radius 25 undeformed, deformed into the ellipse" }
+    ],
+    "joints": [
+      { "id": "Ow", "type": "revolute", "between": ["ground", "wave_gen"] },
+      { "id": "Of", "type": "revolute", "between": ["ground", "flexspline"] },
+      { "id": "WB", "type": "rolling", "between": ["wave_gen", "flexspline"] },
+      { "id": "M", "type": "gear mesh", "between": ["flexspline", "circular_spline"] }
+    ],
+    "params": [
+      { "name": "m", "value": 0.5, "unit": "mm", "note": "module" },
+      { "name": "Zc", "value": 102, "unit": "teeth", "note": "circular spline (fixed)" },
+      { "name": "Zf", "value": 100, "unit": "teeth", "note": "flexspline (output)" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "pressure angle (involute approximation; real units use special profiles)" },
+      { "name": "w0", "value": 0.5, "unit": "mm", "note": "radial deflection = m (Zc - Zf)/2; exaggerate 5x to 10x for animation" },
+      { "name": "cd", "value": 0, "unit": "mm", "note": "coaxial; mesh zones at the two ends of the major axis" }
+    ],
+    "defining_relations": "circular spline fixed: i = -Zf/(Zc - Zf) = -50 (output reverses); flexspline fixed, circular spline output: i = Zc/(Zc - Zf) = 51 (same sense); Zc - Zf = 2 (two lobes); radial deflection w0 = m (Zc - Zf)/2.",
+    "range": "wave generator 360° continuous; flexspline 7.2° per input turn, opposite sense",
+    "overlays": ["velocity", "plot", "angles"],
+    "plot": "flexspline angle vs wave generator angle (slope -1/50)",
+    "notes": "Teeth are tiny at this module; for clarity animate a scaled version (e.g. Zf = 30, Zc = 32, m = 2, 15:1) and exaggerate the ellipse. Draw the flexspline teeth on a curve that follows the rotating ellipse; a marker on the flexspline shows the slow backward rotation."
+  },
+  "examples": [
+    { "use": "Industrial and collaborative robot joints", "detail": "Hollow-shaft strain wave units sit in the wrist and elbow axes of robot arms." },
+    { "use": "Apollo 15 Lunar Roving Vehicle", "detail": "Each wheel motor drove its wheel through an 80:1 harmonic drive gear." },
+    { "use": "Satellite and telescope pointing mechanisms", "detail": "Backlash-free reduction gives fine, repeatable positioning of antennas and optics." }
+  ],
+  "references": [
+    { "title": "Strain wave gearing, Wikipedia", "url": "https://en.wikipedia.org/wiki/Strain_wave_gearing", "kind": "wikipedia" },
+    { "title": "US2906143 Strain wave gearing, C. W. Musser, 1959", "url": "https://patents.google.com/patent/US2906143", "kind": "patent" },
+    { "title": "Speed reducers for precision motion control, engineering data, Harmonic Drive LLC", "url": "https://www.harmonicdrive.net/_hd/content/documents1/FD_DifferentialGear.pdf", "kind": "engineering-guide" },
+    { "title": "Apollo 15, Harmonic Drive on the Moon, Harmonic Drive SE", "url": "https://newdrive.harmonicdrive.de/en/home/edition-one/apollo-15-harmonic-drive-on-the-moon", "kind": "engineering-guide" }
+  ],
+  "media": [],
+  "related": ["cycloidal-drive", "planetary", "internal-gear-pair", "flexure-hinge"]
+},
+{
+  "id": "cycloidal-drive",
+  "name": "Cycloidal drive",
+  "aka": ["cycloidal reducer", "cyclo drive", "cycloid speed reducer", "RV reducer", "trochoidal reducer"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "An eccentric drives a lobed disc around a ring of pins; one fewer lobe than pins gives a large, compact, shock-tolerant reduction.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Reversing"],
+    "axes": "Coaxial",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Reduction", "class": "Medium (5:1 to 50:1)", "typical": "10:1 to about 100:1 per stage; ratio = n / (N - n); default 11:1" },
+  "dof": 1,
+  "topology": { "links": 4, "revolute": 3, "prismatic": 0, "higher_pairs": 2, "notes": "ground with ring pins, eccentric input shaft, cycloidal disc, output flange with pins; higher pairs: disc lobes on ring pins (rolling), output pins in disc holes (pin-in-hole)" },
+  "backdrivable": "Partly",
+  "tags": {
+    "function": ["Speed reduction", "Torque multiplication", "Positioning"],
+    "property": ["High ratio", "Compact", "Coaxial", "Low backlash", "High load"],
+    "application": ["Robotics", "Machine tools", "Packaging & automation", "Construction & lifting"],
+    "keywords": ["cycloid disc", "epitrochoid", "ring pins", "Lorenz Braren", "Sumitomo Cyclo", "eccentric"]
+  },
+  "explain": {
+    "motion": "The input shaft carries an eccentric that makes the cycloidal disc wobble around inside a ring of 12 fixed pins. Because the disc has 11 lobes, one fewer than the pins, it rolls backwards by one lobe for every input turn, and pins on the output flange running in holes in the disc pick off that slow rotation.",
+    "forces": "Many lobes touch ring pins at once (in theory about half), so load is shared and the drive survives shock loads well. The eccentric disc creates an unbalanced force, so real units use two discs 180° apart.",
+    "benefits": "High ratio in one compact stage, rolling contact with high efficiency (often above 90%), high shock tolerance and low backlash.",
+    "limits": "Single discs vibrate unless balanced, the profile must be made precisely, and output torque has a small ripple. More parts than a planetary stage."
+  },
+  "build": {
+    "ground": "housing with N = 12 ring pins on a circle of radius R = 50",
+    "input": "eccentric shaft, continuous rotation about O, eccentricity e = 2",
+    "output": "output flange with 6 pins on radius 25, rotation about O",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "12 pins of radius 5 on circle R = 50 centred at O" },
+      { "id": "eccentric", "role": "driver", "def": "crank O to E, length e = 2" },
+      { "id": "disc", "role": "gear", "def": "11-lobe cycloidal disc centred at E; profile = curtate epitrochoid offset by pin radius; 6 holes of radius 5 + e = 7 on radius 25" },
+      { "id": "output", "role": "output", "def": "flange with 6 pins radius 5 on circle radius 25 centred at O" }
+    ],
+    "joints": [
+      { "id": "O_in", "type": "revolute", "between": ["ground", "eccentric"] },
+      { "id": "E", "type": "revolute", "between": ["eccentric", "disc"] },
+      { "id": "O_out", "type": "revolute", "between": ["ground", "output"] },
+      { "id": "RP", "type": "rolling", "between": ["disc", "ground"] },
+      { "id": "OP", "type": "pin-in-slot", "between": ["output", "disc"] }
+    ],
+    "params": [
+      { "name": "N", "value": 12, "unit": "pins", "note": "ring pins" },
+      { "name": "n", "value": 11, "unit": "lobes", "note": "disc lobes = N - 1" },
+      { "name": "R", "value": 50, "unit": "mm", "note": "ring pin circle radius" },
+      { "name": "Rr", "value": 5, "unit": "mm", "note": "ring pin radius" },
+      { "name": "e", "value": 2, "unit": "mm", "note": "eccentricity (must satisfy e < R/N)" },
+      { "name": "Ro", "value": 25, "unit": "mm", "note": "output pin circle radius" },
+      { "name": "ro", "value": 5, "unit": "mm", "note": "output pin radius; disc hole radius = ro + e" }
+    ],
+    "defining_relations": "ratio i = n/(N - n) = 11, output opposite to input; disc profile (t from 0 to 2 pi): x = R cos t - Rr cos(t + psi) - e cos(N t), y = -R sin t + Rr sin(t + psi) + e sin(N t), psi = atan2(sin((1-N)t), R/(e N) - cos((1-N)t)); disc angle = -th_in/n relative to ground, disc centre at e on input angle; output angle = disc angle.",
+    "range": "input 360° continuous; output 32.7° per input turn, opposite sense",
+    "overlays": ["paths", "velocity", "plot"],
+    "plot": "output angle vs input angle (slope -1/11)",
+    "notes": "Trace a point on the disc to show its epicyclic wobble. Output pins always touch their holes on one side; holes are larger than pins by exactly e. For balance draw a second disc 180° out of phase on another layer."
+  },
+  "examples": [
+    { "use": "Industrial robot joints (RV reducers)", "detail": "Two-stage cycloidal RV reducers sit in the heavy base and shoulder axes of robot arms." },
+    { "use": "Sumitomo Cyclo gearmotors", "detail": "Shock-tolerant cycloidal reducers drive conveyors, mixers and cranes." },
+    { "use": "Hobby robotics", "detail": "3D-printed cycloidal reducers give compact high-ratio joints for legged robots." }
+  ],
+  "references": [
+    { "title": "Cycloidal drive, Wikipedia", "url": "https://en.wikipedia.org/wiki/Cycloidal_drive", "kind": "wikipedia" },
+    { "title": "How does a cycloidal drive work?, tec-science", "url": "https://www.tec-science.com/mechanical-power-transmission/cycloidal-drive-speed-reducer-gear/how-does-a-cycloidal-gear-drive-work/", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Cycloidal drive operating principle, tec-science animation", "url": "https://www.tec-science.com/wp-content/uploads/2019/01/en-cycloidal-drive-speed-reducer-operating-principle.mp4", "kind": "animation" },
+    { "title": "Cycloidal drive with two discs, tec-science animation", "url": "https://www.tec-science.com/wp-content/uploads/2019/01/en-cycloidal-drive-speed-reducer-operating-principle-two-discs.mp4", "kind": "animation" },
+    { "title": "Cycloidal drive, tec-science video", "url": "https://www.youtube-nocookie.com/embed/dv2URKU5YNU?si=rbHCGSc53IgFG7Ml", "kind": "video" }
+  ],
+  "related": ["harmonic-drive", "planetary", "internal-gear-pair", "eccentric-sheave"]
+},
+{
+  "id": "non-circular-gears",
+  "name": "Non-circular gears",
+  "aka": ["elliptical gears", "oval gears", "eccentric gears", "variable ratio gears"],
+  "in_site": false,
+  "family": "Gears",
+  "level": "Advanced",
+  "summary": "Gears with non-round pitch curves, such as a pair of ellipses turning on their foci, give a speed ratio that varies through each turn.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Variable speed", "Non-uniform"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": { "kind": "Variable", "class": "Variable", "typical": "ratio swings between (1-e)/(1+e) and (1+e)/(1-e) each turn; 0.54 to 1.86 at e = 0.3" },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, gear 1, gear 2; one non-circular gear mesh" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Function generation", "Quick return", "Dwell", "Speed reduction"],
+    "property": ["Exact", "Positive drive", "Precision"],
+    "application": ["Printing & textiles", "Packaging & automation", "Instruments", "Clocks & watches"],
+    "keywords": ["elliptical gears", "oval gear flowmeter", "Litvin", "variable ratio", "focus pivot", "pitch curve"]
+  },
+  "explain": {
+    "motion": "Two identical elliptical gears each turn about one focus, with the foci 80 mm apart (the major axis length). As the driver turns steadily, the contact point moves along the ellipses, so the driven gear speeds up and slows down once per turn, from 0.54 to 1.86 times the input speed.",
+    "forces": "Torque transmitted scales inversely with the instantaneous speed ratio, so the driven shaft sees cyclic torque and the system sees inertia loads from the varying speed. Pressure angle varies along the profile, which limits the eccentricity before teeth jam or undercut.",
+    "benefits": "Produces an exact, repeatable non-uniform motion with continuous rotation, useful for quick-return strokes, matching cutter speed to web speed, or oval-gear flow metering.",
+    "limits": "Hard to design and manufacture (each tooth differs), noisier than round gears, and large eccentricity causes undercut and interference. Cams or linkages are often cheaper for one-off motion laws."
+  },
+  "build": {
+    "ground": "frame with pivots at F1 (0,0) and F2 (80,0)",
+    "input": "gear 1, continuous rotation about focus F1",
+    "output": "gear 2, rotation about focus F2 (non-uniform)",
+    "members": [
+      { "id": "ground", "role": "ground", "def": "F1 at (0,0), F2 at (80,0)" },
+      { "id": "gear1", "role": "driver", "def": "elliptical pitch curve a = 40, e = 0.3, b = 38.16, pivot at one focus, z = 26 teeth, m about 3.0" },
+      { "id": "gear2", "role": "output", "def": "identical ellipse, pivot at one focus, z = 26, starts 180° out of phase" }
+    ],
+    "joints": [
+      { "id": "F1", "type": "revolute", "between": ["ground", "gear1"] },
+      { "id": "F2", "type": "revolute", "between": ["ground", "gear2"] },
+      { "id": "M", "type": "gear mesh", "between": ["gear1", "gear2"] }
+    ],
+    "params": [
+      { "name": "a", "value": 40, "unit": "mm", "note": "semi-major axis" },
+      { "name": "e", "value": 0.3, "unit": "", "note": "eccentricity" },
+      { "name": "z", "value": 26, "unit": "teeth", "note": "teeth on each gear; perimeter 245.6 mm" },
+      { "name": "m", "value": 3.0, "unit": "mm", "note": "module = perimeter / (pi z)" },
+      { "name": "alpha", "value": 20, "unit": "°", "note": "nominal pressure angle of the generating rack" },
+      { "name": "cd", "value": 80, "unit": "mm", "note": "centre distance = 2a (focus to focus)" }
+    ],
+    "defining_relations": "pitch curve r1(th1) = a(1 - e^2)/(1 - e cos th1) about focus; contact on the centre line: r1 + r2 = 2a; ratio w2/w1 = r1/r2; for identical ellipses th2 follows tan(th2/2) = ((1+e)/(1-e)) tan(th1/2) (with phase), ratio range (1-e)/(1+e) to (1+e)/(1-e).",
+    "range": "input 360° continuous; output 360° per input turn, speed varying 0.54x to 1.86x",
+    "overlays": ["velocity", "angles", "plot"],
+    "plot": "output angle and speed ratio vs input angle",
+    "notes": "Mesh with the long radius of one gear against the short radius of the other. Solve contact with r1 + r2 = cd. Space teeth equally by arc length along the pitch curve, not by angle. Any tooth count works for identical ellipses because both gears complete a turn together."
+  },
+  "examples": [
+    { "use": "Oval gear flow meters", "detail": "Two meshing oval rotors trap fixed volumes of liquid, each turn counting a set volume." },
+    { "use": "Packaging and printing machines", "detail": "Non-circular gears vary a cutter speed so it matches the web speed during the cut." },
+    { "use": "Watchmaking", "detail": "Maurice Lacroix's Roue Carrée watch uses square and cloverleaf gears as a showpiece." }
+  ],
+  "references": [
+    { "title": "Non-circular gear, Wikipedia", "url": "https://en.wikipedia.org/wiki/Non-circular_gear", "kind": "wikipedia" },
+    { "title": "Design and manufacturing of non-circular gears by given transfer function, Laczik", "url": "http://www.hexagon.de/pdf/noncgear.pdf", "kind": "paper" },
+    { "title": "Designing of non-circular gears, Zarebski and Salacinski", "url": "http://oktoida.pl/art_2008_3_08.pdf", "kind": "paper" },
+    { "title": "Kinematic Models for Design Digital Library (KMODDL), Cornell", "url": "https://kmoddl.library.cornell.edu/index.php", "kind": "kmoddl" }
+  ],
+  "media": [
+    { "title": "Historic video of non-circular gears", "url": "https://www.youtube.com/watch?v=mkQ2pXkYjRM", "kind": "video" },
+    { "title": "Maurice Lacroix Masterpiece Roue Carree, Squaring the Circle (archived)", "url": "https://web.archive.org/web/20140509034723/http://www.mauricelacroix.com/Watch/Entry/Collection/masterpiece-3/Id/masterpiece_square_wheel-337.sls", "kind": "photos" }
+  ],
+  "related": ["spur-gears", "cam-follower", "intermittent-gear", "drag-link-quick-return", "whitworth"]
+}
+]

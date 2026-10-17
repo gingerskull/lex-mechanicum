@@ -1,0 +1,3808 @@
+[
+ {
+  "id": "sarrus-linkage",
+  "name": "Sarrus linkage",
+  "aka": [
+   "Sarrus mechanism",
+   "Sarrus straight-line motion",
+   "spatial 6R straight-line linkage"
+  ],
+  "in_site": false,
+  "family": "Spatial linkage",
+  "level": "Intermediate",
+  "summary": "Two hinged limbs set at right angles join a base and a top plate, so the top plate can only move straight up and down with no slide.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Straight line",
+   "label": "Oscillating → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Spatial"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "plate height h = 2L cos(theta), up to 2L"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 6,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "base, top plate and two limbs of two links each; overconstrained, the Grubler count gives 0 but the two limbs share the one vertical freedom"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Lifting",
+    "Positioning"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Historic",
+    "Singular positions"
+   ],
+   "application": [
+    "Robotics",
+    "Construction & lifting",
+    "Instruments",
+    "Education"
+   ],
+   "keywords": [
+    "Pierre Frederic Sarrus",
+    "1853",
+    "space crank",
+    "6R linkage",
+    "overconstrained",
+    "folding limbs"
+   ]
+  },
+  "explain": {
+   "motion": "Each limb is two equal links hinged to the base, to each other at a knee, and to the top plate, with all three hinge axes of a limb parallel. One limb alone lets the top plate move in one vertical plane; the second limb, turned 90 degrees, only allows motion in a plane at right angles. The only motion both allow is straight up and down, so the top plate rises along an exact line as the knees fold.",
+   "forces": "A vertical load on the plate becomes compression or tension in the limb links and a bending moment at the knees; near full extension the links are almost straight and carry large loads with little torque. Side loads and twisting are resisted by the hinges of the crossed limb, so hinge play shows up as wobble.",
+   "benefits": "An exact straight line with only revolute hinges, no guide rails, and the plates stay parallel with no rotation.",
+   "limits": "Travel is limited to less than twice the link length and the hinges must be stiff and accurate because the linkage is overconstrained. At full extension the knees reach a singular, straight position from which it cannot be driven back by a vertical push alone."
+  },
+  "build": {
+   "ground": "base plate (80 x 80 mm)",
+   "input": "lower link of limb 1, rocking about its base hinge (theta from vertical 10° to 80°)",
+   "output": "top plate height h above the base, and its straight-line path",
+   "members": [
+    {
+     "id": "base",
+     "role": "ground",
+     "def": "square plate 80 x 80, hinge lines on two adjacent edges"
+    },
+    {
+     "id": "l1a",
+     "role": "driver",
+     "def": "limb 1 lower link, base hinge to knee K1, length L"
+    },
+    {
+     "id": "l1b",
+     "role": "link",
+     "def": "limb 1 upper link, knee K1 to top plate, length L"
+    },
+    {
+     "id": "l2a",
+     "role": "link",
+     "def": "limb 2 lower link, base hinge to knee K2, length L, hinge axes at 90° to limb 1"
+    },
+    {
+     "id": "l2b",
+     "role": "link",
+     "def": "limb 2 upper link, knee K2 to top plate, length L"
+    },
+    {
+     "id": "top",
+     "role": "output",
+     "def": "top plate 80 x 80, parallel to base"
+    }
+   ],
+   "joints": [
+    {
+     "id": "H1",
+     "type": "revolute",
+     "between": [
+      "base",
+      "l1a"
+     ]
+    },
+    {
+     "id": "K1",
+     "type": "revolute",
+     "between": [
+      "l1a",
+      "l1b"
+     ]
+    },
+    {
+     "id": "T1",
+     "type": "revolute",
+     "between": [
+      "l1b",
+      "top"
+     ]
+    },
+    {
+     "id": "H2",
+     "type": "revolute",
+     "between": [
+      "base",
+      "l2a"
+     ]
+    },
+    {
+     "id": "K2",
+     "type": "revolute",
+     "between": [
+      "l2a",
+      "l2b"
+     ]
+    },
+    {
+     "id": "T2",
+     "type": "revolute",
+     "between": [
+      "l2b",
+      "top"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "L",
+     "value": 60,
+     "unit": "mm",
+     "note": "length of every limb link"
+    },
+    {
+     "name": "w",
+     "value": 80,
+     "unit": "mm",
+     "note": "plate side"
+    },
+    {
+     "name": "theta",
+     "value": 40,
+     "unit": "deg",
+     "note": "lower link angle from vertical, default pose"
+    },
+    {
+     "name": "limb_angle",
+     "value": 90,
+     "unit": "deg",
+     "note": "angle between the two limb hinge planes"
+    }
+   ],
+   "defining_relations": "Within each limb all three hinge axes are parallel; the two limbs' axes are not parallel (90° here). With equal links the knee lies at horizontal offset L sin(theta) and the plate height is h = 2L cos(theta); the plate translates with zero rotation and zero sideways motion.",
+   "range": "theta 10° to 80°; plate height 118.2 mm down to 20.8 mm, stroke about 97 mm along a straight vertical line",
+   "overlays": [
+    "paths",
+    "angles",
+    "plot"
+   ],
+   "plot": "top plate height h vs input link angle theta",
+   "notes": "Draw in pseudo-3D: the two limbs sit on adjacent faces of the plates. Both knees fold outward by the same angle theta. Avoid theta = 0 (straight limbs, singular) and theta = 90° (plates collide)."
+  },
+  "examples": [
+   {
+    "use": "Straight-line guides without rails",
+    "detail": "Compact lifting stages and vertical guides where a slide would bind or need lubrication."
+   },
+   {
+    "use": "Flexure-hinge positioning stages",
+    "detail": "Built as a folded flexure linkage for small exact vertical motions in robotics and prototyping."
+   },
+   {
+    "use": "Collapsible and folding structures",
+    "detail": "Used as the folding wall unit of deployable boxes and lift platforms."
+   }
+  ],
+  "references": [
+   {
+    "title": "Sarrus linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Sarrus_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Straight-line mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Straight-line_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Construction of Some Useful Linkages (UC Berkeley, R. Fearing)",
+    "url": "https://people.eecs.berkeley.edu/~ronf/DESKTOP/prototyping/linkages.html",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Sarrus Linkage, FIRGELLI mechanisms library",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/sarrus-linkage",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Sarrus Linkage Mark III (YouTube)",
+    "url": "https://www.youtube.com/watch?v=RpCHcZrsyNU",
+    "kind": "video"
+   },
+   {
+    "title": "Clamp of Sarrus linkage (YouTube)",
+    "url": "https://www.youtube.com/watch?v=Hg7hcgqIYzk",
+    "kind": "video"
+   },
+   {
+    "title": "Sarrus Linkage, Wolfram Demonstrations Project",
+    "url": "https://demonstrations.wolfram.com/SarrusLinkage/",
+    "kind": "interactive"
+   }
+  ],
+  "related": [
+   "peaucellier-lipkin",
+   "scissor-lift",
+   "bennett-linkage",
+   "flexure-hinge",
+   "hart-inversor"
+  ]
+ },
+ {
+  "id": "tusi-couple",
+  "name": "Tusi couple",
+  "aka": [
+   "Cardan gear",
+   "Cardan movement",
+   "hypocycloid straight-line mechanism",
+   "Tusi pair"
+  ],
+  "in_site": true,
+  "family": "Straight-line linkage",
+  "level": "Intermediate",
+  "summary": "A gear rolling inside a ring twice its size: every point on its pitch circle moves in a perfectly straight line.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Straight line",
+   "label": "Rotary → Straight line",
+   "output_character": [
+    "Reciprocating",
+    "Harmonic"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = ring pitch diameter = 4 x planet pitch radius (128 mm here)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 1,
+   "notes": "ground with fixed 32T ring, carrier arm, 16T planet; one internal gear mesh"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Straight-line generation",
+    "Motion conversion",
+    "Drawing curves"
+   ],
+   "property": [
+    "Exact",
+    "Smooth (harmonic)",
+    "Positive drive",
+    "Historic"
+   ],
+   "application": [
+    "Steam & engines",
+    "Instruments",
+    "Toys & kinetic art",
+    "Education"
+   ],
+   "keywords": [
+    "Nasir al-Din al-Tusi",
+    "1247",
+    "hypocycloid",
+    "Cardano",
+    "Murray hypocycloidal engine",
+    "internal gear",
+    "ellipse"
+   ]
+  },
+  "explain": {
+   "motion": "The arm carries the small gear around inside the fixed ring. Because the ring has exactly twice as many teeth, the small gear spins backwards once for each orbit, and any point on its pitch circle slides back and forth along a diameter of the ring. The two tracers here move on two straight lines at right angles.",
+   "forces": "Driving torque on the arm becomes a tangential tooth force against the ring, which turns the small gear. A load on the traced point acts through the gear's own pin and teeth, so there is no sliding guide at all, only rolling contact. Near the ends of the stroke the arm has little leverage on the tracer, so it cannot be driven from the tracer there.",
+   "benefits": "An exact straight line, and exact simple harmonic motion along it, from purely rotating parts.",
+   "limits": "Needs an accurate internal gear pair with exactly 2:1 teeth, and backlash shows up directly as error in the line. Points inside the pitch circle trace ellipses, not lines, so the tracer must sit exactly on the pitch circle."
+  },
+  "build": {
+   "ground": "ring gear, 32T module 4 (pitch radius 64 mm), centre O",
+   "input": "arm (carrier), continuous rotation about O",
+   "output": "tracers X and Y on the planet pitch circle, positions along the x and y diameters",
+   "members": [
+    {
+     "id": "ring",
+     "role": "ground",
+     "def": "internal gear 32T m4, pitch radius R = 64"
+    },
+    {
+     "id": "arm",
+     "role": "driver",
+     "def": "carrier O→C, length R - r = 32"
+    },
+    {
+     "id": "planet",
+     "role": "gear",
+     "def": "spur gear 16T m4, pitch radius r = 32, pinned at C"
+    },
+    {
+     "id": "t1",
+     "role": "output",
+     "def": "tracer X on the planet pitch circle, moves along the x axis"
+    },
+    {
+     "id": "t2",
+     "role": "output",
+     "def": "tracer Y on the planet pitch circle, 90° round from X, moves along the y axis"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ring",
+      "arm"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "revolute",
+     "between": [
+      "arm",
+      "planet"
+     ]
+    },
+    {
+     "id": "mesh",
+     "type": "gear mesh",
+     "between": [
+      "planet",
+      "ring"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "m",
+     "value": 4,
+     "unit": "mm",
+     "note": "gear module"
+    },
+    {
+     "name": "zr",
+     "value": 32,
+     "unit": "",
+     "note": "ring teeth"
+    },
+    {
+     "name": "zp",
+     "value": 16,
+     "unit": "",
+     "note": "planet teeth"
+    },
+    {
+     "name": "R",
+     "value": 64,
+     "unit": "mm",
+     "note": "ring pitch radius"
+    },
+    {
+     "name": "r",
+     "value": 32,
+     "unit": "mm",
+     "note": "planet pitch radius = arm length"
+    }
+   ],
+   "defining_relations": "R = 2r (zr = 2 zp). Planet absolute rotation = -(zr/zp - 1) x arm angle = -u. A point on the planet pitch circle that starts at (R, 0) is at x = R cos(u), y = 0, so it moves on a straight diameter with simple harmonic motion; a point 90° round moves on y = R sin(u). Points at radius rho < r trace ellipses with semi-axes r + rho and r - rho.",
+   "range": "arm 360° continuous; each tracer reciprocates 128 mm (from -64 to +64) per arm turn",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "tracer X position vs arm angle (a pure cosine)",
+   "notes": "Phase the planet so a tooth meshes at u = 0 (the site uses meshIn with tooth phase). Planet spins backwards relative to ground at the same rate as the arm turns forwards."
+  },
+  "examples": [
+   {
+    "use": "Murray's hypocycloidal steam engine",
+    "detail": "Matthew Murray used the couple in place of a crosshead guide to turn piston motion into rotation, around 1802."
+   },
+   {
+    "use": "Medieval planetary models",
+    "detail": "Al-Tusi used it in 1247 to produce straight-line oscillation from circular motions in astronomy."
+   },
+   {
+    "use": "Kinetic art and teaching models",
+    "detail": "Gear-driven Tusi couples make rows of dots slide on lines while appearing to rotate as a circle."
+   }
+  ],
+  "references": [
+   {
+    "title": "Tusi couple, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Tusi_couple",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Hypocycloid, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Hypocycloid",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Murray's Hypocycloidal Engine, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Murray's_Hypocycloidal_Engine",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "An explication of the Tusi couple (UNLV physics)",
+    "url": "https://www.physics.unlv.edu/~jeffery/astro/copernicus/tusi_couple.html",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Tusi Couple, FIRGELLI mechanisms library",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/tusi-couple",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Physics wave model using oscillating particles driven by Tusi couple gears (YouTube)",
+    "url": "https://www.youtube.com/watch?v=GIsFndF4gD4",
+    "kind": "video"
+   },
+   {
+    "title": "Satisfying Kinetic Art: Tusi Couple (YouTube)",
+    "url": "https://www.youtube.com/watch?v=XJ76Qmx0eIE",
+    "kind": "video"
+   },
+   {
+    "title": "Rolling Circles: The Tusi Couple (YouTube)",
+    "url": "https://www.youtube.com/watch?v=1apwd5X5EC0",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "planetary",
+   "internal-gear-pair",
+   "elliptic-trammel",
+   "scotch-yoke",
+   "peaucellier-lipkin"
+  ]
+ },
+ {
+  "id": "crank-shaper",
+  "name": "Crank and slotted lever quick-return",
+  "aka": [
+   "slotted-lever quick return",
+   "shaper mechanism",
+   "crank shaper",
+   "oscillating-lever quick return"
+  ],
+  "in_site": true,
+  "family": "Quick-return",
+  "level": "Intermediate",
+  "summary": "A crank pin slides in a slotted lever that rocks about a pivot below, pushing a ram slowly forward to cut and pulling it back fast.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Quick-return",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "cut:return = (180° + 2 asin(r/d)) : (180° - 2 asin(r/d)), 1.71:1 here; stroke 128 mm"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 5,
+   "prismatic": 2,
+   "higher_pairs": 0,
+   "notes": "ground, crank, slide block, slotted lever, link, ram; block slides in the lever slot (prismatic), ram on rails (prismatic)"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Quick return",
+    "Motion conversion"
+   ],
+   "property": [
+    "Exact",
+    "Singular positions",
+    "High load",
+    "Historic"
+   ],
+   "application": [
+    "Machine tools",
+    "Education"
+   ],
+   "keywords": [
+    "shaper",
+    "shaping machine",
+    "slotted lever",
+    "bull gear",
+    "time ratio",
+    "rocker arm"
+   ]
+  },
+  "explain": {
+   "motion": "The crank turns at constant speed and its pin, in a sliding block, drives a slotted lever that rocks about a pivot below the crank. The lever swings through the same angle either way, but the crank takes the long way round the circle for the cutting stroke and the short way for the return. A short link at the top of the lever pushes the ram along its rails.",
+   "forces": "The crank pin pushes the block at right angles to the slot, so the lever sees a torque that is largest when the pin is farthest from the lever pivot, which is during the cut. The cutting load on the ram returns through the link, lever pivot and block; side thrust on the ram goes into the rails.",
+   "benefits": "Simple, robust and gives a slow, nearly uniform cutting stroke with a quick idle return, saving cycle time.",
+   "limits": "Ram speed is not constant during the cut, and the block and slot wear and need lubrication. The time ratio is fixed by r/d; changing stroke by changing r also changes the ratio."
+  },
+  "build": {
+   "ground": "frame with crank bearing O2 at (0, 0), lever pivot O3 at (0, -100), ram rails on y = 64",
+   "input": "crank, continuous rotation about O2",
+   "output": "ram position x along the rails",
+   "members": [
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, r = 40"
+    },
+    {
+     "id": "block",
+     "role": "slider",
+     "def": "slide block on crank pin A, sliding in the lever slot"
+    },
+    {
+     "id": "lever",
+     "role": "link",
+     "def": "slotted lever pivoted at O3, length Ll = 160 to pin B"
+    },
+    {
+     "id": "link",
+     "role": "link",
+     "def": "B→C, l = 40"
+    },
+    {
+     "id": "ram",
+     "role": "output",
+     "def": "slider on line y = 64, pinned to link at C"
+    },
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "O2, O3, rails"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "block"
+     ]
+    },
+    {
+     "id": "slot",
+     "type": "prismatic",
+     "between": [
+      "block",
+      "lever"
+     ]
+    },
+    {
+     "id": "O3",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "lever"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "lever",
+      "link"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "revolute",
+     "between": [
+      "link",
+      "ram"
+     ]
+    },
+    {
+     "id": "rails",
+     "type": "prismatic",
+     "between": [
+      "ram",
+      "frame"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 40,
+     "unit": "mm",
+     "note": "crank radius"
+    },
+    {
+     "name": "d",
+     "value": 100,
+     "unit": "mm",
+     "note": "crank centre above lever pivot"
+    },
+    {
+     "name": "Ll",
+     "value": 160,
+     "unit": "mm",
+     "note": "lever length to B"
+    },
+    {
+     "name": "l",
+     "value": 40,
+     "unit": "mm",
+     "note": "link B to C"
+    },
+    {
+     "name": "yR",
+     "value": 64,
+     "unit": "mm",
+     "note": "ram line height above O2"
+    }
+   ],
+   "defining_relations": "Lever angle phi = atan2 of A from O3. Extreme lever positions occur when the slot is tangent to the crank circle: beta = asin(r/d) = 23.58°. Cut angle = 180° + 2 beta = 227.2°, return = 180° - 2 beta = 132.8°, time ratio 1.71:1. Lever swing ±beta; B = O3 + Ll(sin, cos); ram C = (Bx + sqrt(l^2 - (yR - By)^2), yR); stroke = 2 Ll sin(beta) = 128 mm.",
+   "range": "crank 360° continuous; lever rocks ±23.6°; ram stroke 128 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "ram position vs crank angle (slow cut, fast return)",
+   "notes": "Cutting phase is when ((u + beta) mod 360°) < 227.2°. Block rotates with the lever. Keep link short so its angularity barely affects the stroke (By is the same at both extremes, so stroke stays exact)."
+  },
+  "examples": [
+   {
+    "use": "Metal shaping machines",
+    "detail": "The bull gear crank pin drives the rocker arm and ram of a column shaper for planing flat and keyway surfaces."
+   },
+   {
+    "use": "Slotting machines",
+    "detail": "Vertical-ram slotters use the same slotted lever drive for internal keyways."
+   },
+   {
+    "use": "Powered hacksaws",
+    "detail": "Some power hacksaws use a quick-return crank so the blade cuts slowly and returns fast."
+   }
+  ],
+  "references": [
+   {
+    "title": "Quick return mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Quick_return_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Shaper, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Shaper",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Slotted-lever Quick-return Mechanism, FIRGELLI mechanisms library",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/slotted-lever-quick-return",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Kinematics of machinery course notes (RCET)",
+    "url": "https://rcet.org.in/uploads/academics/regulation2021/rohini_95447437177.pdf",
+    "kind": "textbook"
+   }
+  ],
+  "media": [
+   {
+    "title": "Shaper Quick Return Mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=ARNzmLrt2W8",
+    "kind": "video"
+   },
+   {
+    "title": "Shaper quick return mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=Ga8yoLfB-1U",
+    "kind": "video"
+   },
+   {
+    "title": "Quick Return Mechanism On Shaper, 3D animation (YouTube)",
+    "url": "https://www.youtube.com/watch?v=1xj8X90LnG0",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "whitworth",
+   "drag-link-quick-return",
+   "offset-slider-crank",
+   "slider-crank",
+   "oscillating-cylinder"
+  ]
+ },
+ {
+  "id": "whitworth",
+  "name": "Whitworth quick-return",
+  "aka": [
+   "Whitworth quick return motion",
+   "rotating slotted lever quick return",
+   "Whitworth mechanism"
+  ],
+  "in_site": true,
+  "family": "Quick-return",
+  "level": "Intermediate",
+  "summary": "A crank pin drives a slotted lever that turns fully round an offset pivot, so a rod-driven ram cuts slowly and returns quickly.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Quick-return",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "cut:return = (180° + 2 asin(e/r)) : (180° - 2 asin(e/r)), 1.59:1 here; stroke = 2R = 64 mm"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 7,
+   "revolute": 6,
+   "prismatic": 2,
+   "higher_pairs": 1,
+   "notes": "ground, 16T pinion, 50T bull gear (crank), slide block, slotted lever, rod, ram; one gear mesh"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Quick return",
+    "Motion conversion",
+    "Speed reduction"
+   ],
+   "property": [
+    "Exact",
+    "Positive drive",
+    "Historic"
+   ],
+   "application": [
+    "Machine tools",
+    "Education"
+   ],
+   "keywords": [
+    "Joseph Whitworth",
+    "slotted lever",
+    "inversion of slider-crank",
+    "bull gear",
+    "time ratio",
+    "shaper"
+   ]
+  },
+  "explain": {
+   "motion": "A pinion drives the bull gear, whose crank pin carries a block sliding in a slotted lever. The lever pivot sits inside the crank circle, offset by e, so the lever turns a full revolution but at varying speed. A short arm on the far side of the lever drives a connecting rod and ram, which moves slowly while the lever turns the long way and quickly on the short way.",
+   "forces": "Torque flows from pinion to bull gear, then as a normal force from the pin block onto the slot walls, then through the lever arm R and rod into the ram. The lever torque from the cutting load is largest when the slot is most tilted, loading the block and offset pivot.",
+   "benefits": "Smoother lever motion than the oscillating slotted lever, a compact layout with a short lever, and a fixed, reliable time ratio.",
+   "limits": "The ram speed varies through the stroke, and the time ratio depends only on e/r so it cannot be adjusted on the fly. Slot and block wear add backlash at stroke reversals."
+  },
+  "build": {
+   "ground": "frame with bull gear axis O2 at (0, 0), lever pivot O3 at (0, -14), pinion axis at 66 mm from O2, ram line y = -14",
+   "input": "pinion 16T, continuous rotation (bull gear turns 16/50 as fast, opposite way)",
+   "output": "ram position x along the line through O3",
+   "members": [
+    {
+     "id": "pinion",
+     "role": "driver",
+     "def": "spur gear 16T m2, axis at distance 66 from O2 at 200°"
+    },
+    {
+     "id": "bull",
+     "role": "gear",
+     "def": "spur gear 50T m2, crank pin A at r = 40 from O2"
+    },
+    {
+     "id": "block",
+     "role": "slider",
+     "def": "slide block on pin A, sliding in the lever slot"
+    },
+    {
+     "id": "lever",
+     "role": "link",
+     "def": "slotted lever pivoted at O3, slot side through A, arm R = 32 on the opposite side to pin B"
+    },
+    {
+     "id": "rod",
+     "role": "link",
+     "def": "B→C, Lr = 100"
+    },
+    {
+     "id": "ram",
+     "role": "output",
+     "def": "slider on y = -14 (line through O3)"
+    },
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "O2, O3, pinion bearing, rails"
+    }
+   ],
+   "joints": [
+    {
+     "id": "Op",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "pinion"
+     ]
+    },
+    {
+     "id": "mesh",
+     "type": "gear mesh",
+     "between": [
+      "pinion",
+      "bull"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "bull"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "bull",
+      "block"
+     ]
+    },
+    {
+     "id": "slot",
+     "type": "prismatic",
+     "between": [
+      "block",
+      "lever"
+     ]
+    },
+    {
+     "id": "O3",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "lever"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "lever",
+      "rod"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "revolute",
+     "between": [
+      "rod",
+      "ram"
+     ]
+    },
+    {
+     "id": "rails",
+     "type": "prismatic",
+     "between": [
+      "ram",
+      "frame"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 40,
+     "unit": "mm",
+     "note": "crank radius on bull gear"
+    },
+    {
+     "name": "e",
+     "value": 14,
+     "unit": "mm",
+     "note": "lever pivot offset below O2"
+    },
+    {
+     "name": "R",
+     "value": 32,
+     "unit": "mm",
+     "note": "lever arm to rod pin B"
+    },
+    {
+     "name": "Lr",
+     "value": 100,
+     "unit": "mm",
+     "note": "connecting rod"
+    },
+    {
+     "name": "z1",
+     "value": 50,
+     "unit": "",
+     "note": "bull gear teeth"
+    },
+    {
+     "name": "z2",
+     "value": 16,
+     "unit": "",
+     "note": "pinion teeth"
+    },
+    {
+     "name": "m",
+     "value": 2,
+     "unit": "mm",
+     "note": "module, centre distance 66"
+    }
+   ],
+   "defining_relations": "phi = angle of A seen from O3; B = O3 - R(cos phi, sin phi); C = (Bx + sqrt(Lr^2 - (By + e)^2), -e). Ram extremes when the lever is parallel to the ram line, at crank angles where sin = -e/r: beta = asin(e/r) = 20.49°, cut 180° + 2 beta = 221.0°, return 139.0°, ratio 1.59:1. Stroke = 2R = 64 mm. Gear ratio 50/16 = 3.125:1, pinion angle = -(z1/z2) x bull angle + phase.",
+   "range": "bull gear 360° continuous (pinion 3.125 turns); lever 360° non-uniform; ram stroke 64 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "ram position vs crank angle",
+   "notes": "Phase the pinion so teeth mesh: th2 = al + 180° - 180°/z2 - (z1/z2)(u - al) with al = 200°. Pivot O3 must lie inside the crank circle (e < r) or it becomes the oscillating slotted lever."
+  },
+  "examples": [
+   {
+    "use": "Shaping machines",
+    "detail": "Classic Victorian shapers used the Whitworth motion to give a slow cutting stroke and fast return."
+   },
+   {
+    "use": "Slotting and keyway machines",
+    "detail": "Vertical slotters with a rotating lever drive the ram for internal keyways."
+   },
+   {
+    "use": "Teaching models",
+    "detail": "A standard inversion of the slider-crank chain in theory of machines courses."
+   }
+  ],
+  "references": [
+   {
+    "title": "Quick return mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Quick_return_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Joseph Whitworth, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Joseph_Whitworth",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Whitworth Quick-return Mechanism, FIRGELLI mechanisms library",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/whitworth-quick-return",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Kinematics of machinery course notes (RCET)",
+    "url": "https://rcet.org.in/uploads/academics/regulation2021/rohini_95447437177.pdf",
+    "kind": "textbook"
+   }
+  ],
+  "media": [
+   {
+    "title": "A Simple 3D Printed Whitworth Quick Return Mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=W9FvxU11bDE",
+    "kind": "video"
+   },
+   {
+    "title": "The Whitworth Mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=9ghjDxqweW8",
+    "kind": "video"
+   },
+   {
+    "title": "Whitworth Quick Return Mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=UuTNtg7-Bwg",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "crank-shaper",
+   "drag-link-quick-return",
+   "slider-crank",
+   "spur-gears",
+   "offset-slider-crank"
+  ]
+ },
+ {
+  "id": "drag-link-quick-return",
+  "name": "Drag-link quick-return",
+  "aka": [
+   "drag link mechanism",
+   "double-crank quick return",
+   "four-bar drag link"
+  ],
+  "in_site": false,
+  "family": "Quick-return",
+  "level": "Advanced",
+  "summary": "A double-crank four-bar turns uniform input into uneven output rotation, which drives a ram slowly one way and fast back.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Quick-return",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "time ratio about 1.5:1 here (216.5° : 143.5°); stroke about 2 x ram crank radius"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 6,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "ground, input crank, coupler, output crank (with ram arm), connecting rod, ram"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Quick return",
+    "Motion conversion",
+    "Function generation"
+   ],
+   "property": [
+    "Grashof",
+    "Exact",
+    "Few parts"
+   ],
+   "application": [
+    "Machine tools",
+    "Packaging & automation",
+    "Printing & textiles"
+   ],
+   "keywords": [
+    "drag link",
+    "double crank",
+    "Grashof",
+    "time ratio",
+    "six-bar",
+    "shaper"
+   ]
+  },
+  "explain": {
+   "motion": "The fixed link is the shortest of a Grashof four-bar, so both cranks turn fully round. When the input turns at constant speed, the output crank speeds up over one half turn and slows down over the other. An arm fixed to the output crank drives a connecting rod and ram, and the ram's slow stroke is placed where the output crank is slow.",
+   "forces": "Torque passes from the input crank through the coupler to the output crank; the transmission angle swings widely, so force transfer is weakest when the coupler and output crank are nearly in line. The ram load comes back through the rod onto the output crank pivot.",
+   "benefits": "Only pin joints, no slots or sliding blocks except the ram, so it runs quietly and wears little.",
+   "limits": "The fixed link is short so the pivots crowd together, and the time ratio is modest unless transmission angles become poor (minimum about 30° here)."
+  },
+  "build": {
+   "ground": "frame with input pivot O2 at (0, 0), output pivot O4 at (25, 0), ram rails on y = 0",
+   "input": "input crank, continuous rotation about O2",
+   "output": "ram position x on the line through O2 and O4",
+   "members": [
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "O2→O4, d = 25"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, a = 60"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "A→B, b = 70"
+    },
+    {
+     "id": "follower",
+     "role": "link",
+     "def": "O4→B, c = 60, carries ram arm O4→D of r = 50 in line with O4→B"
+    },
+    {
+     "id": "rod",
+     "role": "link",
+     "def": "D→E, L = 180"
+    },
+    {
+     "id": "ram",
+     "role": "output",
+     "def": "slider on y = 0, pinned at E"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "follower"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "follower"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "follower",
+      "rod"
+     ]
+    },
+    {
+     "id": "E",
+     "type": "revolute",
+     "between": [
+      "rod",
+      "ram"
+     ]
+    },
+    {
+     "id": "rails",
+     "type": "prismatic",
+     "between": [
+      "ram",
+      "frame"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "d",
+     "value": 25,
+     "unit": "mm",
+     "note": "fixed link (shortest)"
+    },
+    {
+     "name": "a",
+     "value": 60,
+     "unit": "mm",
+     "note": "input crank"
+    },
+    {
+     "name": "b",
+     "value": 70,
+     "unit": "mm",
+     "note": "coupler"
+    },
+    {
+     "name": "c",
+     "value": 60,
+     "unit": "mm",
+     "note": "output crank"
+    },
+    {
+     "name": "r",
+     "value": 50,
+     "unit": "mm",
+     "note": "ram arm on output crank"
+    },
+    {
+     "name": "L",
+     "value": 180,
+     "unit": "mm",
+     "note": "connecting rod"
+    }
+   ],
+   "defining_relations": "Grashof with the ground shortest: s + l <= p + q (25 + 70 <= 60 + 60) gives a double crank. Output angle from the four-bar loop (open branch). Ram x = r cos(phi4) + sqrt(L^2 - (r sin phi4)^2) measured from O4. Ram extremes at phi4 = 0° and 180°; with these dimensions they occur at input angles about 305.5° and 89.0°, so the slow stroke takes 216.5° of input and the fast stroke 143.5°, ratio 1.51:1. Transmission angle ranges about 30° to 81°.",
+   "range": "input 360° continuous; output crank 360° non-uniform; ram stroke 100 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "ram position vs input crank angle, plus output crank angle vs input angle",
+   "notes": "Keep the same assembly branch throughout (open configuration). Rotating the ram arm relative to O4→B shifts where the slow stroke falls. A ratio near 1.8:1 is possible with d = 30, b = 80, c = 70 but the minimum transmission angle falls to about 22°."
+  },
+  "examples": [
+   {
+    "use": "Shapers and slotters",
+    "detail": "Used as an alternative to the slotted lever to drive a ram with a slow cut and fast return."
+   },
+   {
+    "use": "Packaging machines",
+    "detail": "Gives a slow, controlled push followed by a fast return on cartoners and feeders."
+   },
+   {
+    "use": "Printing and paper cutting",
+    "detail": "Provides uneven rotation to time knife or platen motions."
+   }
+  ],
+  "references": [
+   {
+    "title": "Quick return mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Quick_return_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Kinematics of Machinery question bank and notes (SRM Valliammai)",
+    "url": "https://srmvalliammai.ac.in/wp-content/uploads/2023/04/1909401-kinematics-of-machinery.pdf",
+    "kind": "textbook"
+   },
+   {
+    "title": "Drag link quick return, FIRGELLI mechanisms library",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/drag-link-quick-return",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "four bar drag link mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=byH6i8U76C8",
+    "kind": "video"
+   },
+   {
+    "title": "How to four bar drag linkage mechanism work (YouTube)",
+    "url": "https://www.youtube.com/watch?v=YRK6AQKKufE",
+    "kind": "video"
+   },
+   {
+    "title": "6-Bars Quick-Return Mechanism 3D Model (YouTube)",
+    "url": "https://www.youtube.com/watch?v=0HNZvR5e5SY",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "double-crank",
+   "four-bar",
+   "crank-shaper",
+   "whitworth",
+   "slider-crank"
+  ]
+ },
+ {
+  "id": "offset-slider-crank",
+  "name": "Offset slider-crank",
+  "aka": [
+   "eccentric slider crank",
+   "offset crank and piston",
+   "quick-return slider crank"
+  ],
+  "in_site": false,
+  "family": "Quick-return",
+  "level": "Basic",
+  "summary": "A slider-crank whose slide line misses the crank centre, so the forward and return strokes take different crank angles.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Quick-return",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke slightly over 2r (61.4 mm for r = 30); time ratio 1.09:1 for e = 20"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "ground, crank, connecting rod, slider"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Quick return"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Singular positions"
+   ],
+   "application": [
+    "Steam & engines",
+    "Automotive",
+    "Machine tools",
+    "Packaging & automation"
+   ],
+   "keywords": [
+    "desaxe",
+    "offset crank",
+    "eccentricity",
+    "time ratio",
+    "dead centre",
+    "piston"
+   ]
+  },
+  "explain": {
+   "motion": "The crank turns at constant speed and the rod pushes a slider along a line that is offset from the crank centre by e. The slider's two dead centres occur where crank and rod are in line, and because of the offset these two crank positions are not 180° apart. One stroke therefore takes slightly more crank angle than the other.",
+   "forces": "The rod force splits into a useful push along the slide and a side thrust on the guide; offsetting the crank reduces rod angularity during the working stroke, which lowers side thrust and friction there. Near the dead centres the crank has no leverage on the slider.",
+   "benefits": "The simplest quick-return, with only one more parameter than an ordinary slider-crank, and offset engines (desaxe) gain lower piston side load.",
+   "limits": "Only small time ratios are practical, as large offsets give poor transmission angles and high side thrust on the return stroke."
+  },
+  "build": {
+   "ground": "frame with crank bearing O at (0, 0), slide line y = e",
+   "input": "crank, continuous rotation about O",
+   "output": "slider position x along y = e",
+   "members": [
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "crank bearing O and slide guide on y = e"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O→A, r = 30"
+    },
+    {
+     "id": "rod",
+     "role": "link",
+     "def": "A→B, l = 100"
+    },
+    {
+     "id": "slider",
+     "role": "slider",
+     "def": "block at B on y = e"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "rod"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "rod",
+      "slider"
+     ]
+    },
+    {
+     "id": "guide",
+     "type": "prismatic",
+     "between": [
+      "slider",
+      "frame"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 30,
+     "unit": "mm",
+     "note": "crank radius"
+    },
+    {
+     "name": "l",
+     "value": 100,
+     "unit": "mm",
+     "note": "connecting rod"
+    },
+    {
+     "name": "e",
+     "value": 20,
+     "unit": "mm",
+     "note": "offset of slide line from crank centre"
+    }
+   ],
+   "defining_relations": "x = r cos(theta) + sqrt(l^2 - (e - r sin(theta))^2). Outer dead centre x1 = sqrt((l + r)^2 - e^2) = 128.5; inner x2 = sqrt((l - r)^2 - e^2) = 67.1; stroke = 61.4 mm. Dead-centre crank angles: asin(e/(l + r)) = 8.85° and 180° + asin(e/(l - r)) = 196.6°. alpha = asin(e/(l - r)) - asin(e/(l + r)) = 7.75°; time ratio (180° + alpha)/(180° - alpha) = 1.09:1. Needs r + e < l for full rotation.",
+   "range": "crank 360° continuous; slider stroke 61.4 mm; return stroke takes 172.2° and forward 187.8° of crank angle",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "slider position vs crank angle, with the two dead-centre angles marked",
+   "notes": "Choose the rotation direction so the slower stroke is the working one. Dead centres are singular for driving from the slider."
+  },
+  "examples": [
+   {
+    "use": "Desaxe engines",
+    "detail": "Some engines and compressors offset the cylinder from the crank to cut piston side thrust on the power stroke."
+   },
+   {
+    "use": "Feeding and pushing mechanisms",
+    "detail": "Small offsets give a slightly slower forward push in packaging pushers."
+   },
+   {
+    "use": "Teaching quick-return design",
+    "detail": "A standard problem for designing a crank slider to a given time ratio and stroke."
+   }
+  ],
+  "references": [
+   {
+    "title": "Slider-crank linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Slider-crank_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Quick return mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Quick_return_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "The Offset Slider Crank: Kinematic Pseudographic Analysis (Int. J. Engng Ed. 1997)",
+    "url": "https://www.ijee.ie/articles/Vol13-3/ijee922.pdf",
+    "kind": "paper"
+   }
+  ],
+  "media": [
+   {
+    "title": "Offset Crank and Piston Mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=dC3_wr2zxJQ",
+    "kind": "video"
+   },
+   {
+    "title": "Displacement analysis (quick-return ratio and stroke) of an offset slider-crank mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=zhvHeONLdks",
+    "kind": "video"
+   },
+   {
+    "title": "Design a Quick Return Crank Slider for given Time Ratio (YouTube)",
+    "url": "https://www.youtube.com/watch?v=4ZnlpRiD6IA",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "slider-crank",
+   "crank-shaper",
+   "whitworth",
+   "scotch-yoke",
+   "drag-link-quick-return"
+  ]
+ },
+ {
+  "id": "walschaerts-valve-gear",
+  "name": "Walschaerts valve gear",
+  "aka": [
+   "Walschaert gear",
+   "Heusinger valve gear",
+   "outside valve gear"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Advanced",
+  "summary": "A steam locomotive linkage that mixes motion from a return crank and the crosshead to time the valve, with reversing and cutoff control.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Reversing",
+    "Variable speed"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Selectable",
+   "class": "Variable",
+   "typical": "valve travel set by die position, about 2 x lap + lead in mid gear up to full travel at full gear"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 11,
+   "revolute": 12,
+   "prismatic": 2,
+   "higher_pairs": 1,
+   "notes": "frame, wheel with crank and return crank, main rod, crosshead, eccentric rod, expansion link, radius rod, combination lever, union link, valve spindle, lifting link; die block in curved link slot counted as one higher pair; reverser setting held fixed"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Valve timing",
+    "Reversing",
+    "Differential & summing",
+    "Motion conversion"
+   ],
+   "property": [
+    "Approximate",
+    "Historic",
+    "Precision"
+   ],
+   "application": [
+    "Railways",
+    "Steam & engines"
+   ],
+   "keywords": [
+    "Egide Walschaerts",
+    "Heusinger",
+    "expansion link",
+    "combination lever",
+    "cutoff",
+    "reverser",
+    "lap and lead"
+   ]
+  },
+  "explain": {
+   "motion": "A return crank on the driving wheel, set about 90° from the main crank, drives an eccentric rod that rocks the curved expansion link about its trunnion. A die block in the link moves the radius rod, whose end drives the top of the combination lever; the bottom of that lever is driven from the crosshead through the union link. The valve spindle, pinned between them, gets the sum: a lap and lead motion from the crosshead and a variable motion from the link.",
+   "forces": "Valve friction and steam pressure on the valve flow back through the combination lever into the crosshead and return crank, loads that are small compared with the piston loads. The die block and link slot carry the reversing load and wear most.",
+   "benefits": "Mounted outside the frames for easy inspection, light, and gives constant lead at all cutoffs, with reversing and cutoff from a single reverser.",
+   "limits": "Geometry is approximate, so valve events are unequal front and back unless carefully proportioned. Many pins wear and add lost motion."
+  },
+  "build": {
+   "ground": "locomotive frame carrying the cylinder, crosshead guides, valve chest guide, expansion link trunnion and reverser",
+   "input": "driving wheel with main crank, continuous rotation",
+   "output": "valve spindle position (valve travel) along the valve chest axis",
+   "members": [
+    {
+     "id": "wheel",
+     "role": "driver",
+     "def": "driving wheel axle O, main crankpin at r = 60, return crank pin at 25 from O, about 90° from main crank"
+    },
+    {
+     "id": "mainrod",
+     "role": "link",
+     "def": "crankpin to crosshead, 260"
+    },
+    {
+     "id": "crosshead",
+     "role": "slider",
+     "def": "slides on the piston axis"
+    },
+    {
+     "id": "eccrod",
+     "role": "link",
+     "def": "return crank to foot of expansion link, 220"
+    },
+    {
+     "id": "link",
+     "role": "link",
+     "def": "curved expansion link, slot radius 180 about the radius rod end, trunnion pivot fixed to frame"
+    },
+    {
+     "id": "radiusrod",
+     "role": "link",
+     "def": "die block in link slot to top of combination lever, 180"
+    },
+    {
+     "id": "comblever",
+     "role": "link",
+     "def": "combination lever, 110 total: radius rod pin at top, valve spindle pin 15 below, union link pin at bottom"
+    },
+    {
+     "id": "union",
+     "role": "link",
+     "def": "crosshead arm to bottom of combination lever, 60"
+    },
+    {
+     "id": "spindle",
+     "role": "output",
+     "def": "valve spindle sliding on the valve axis"
+    },
+    {
+     "id": "lifting",
+     "role": "link",
+     "def": "lifting link from reverse arm to radius rod, sets die position"
+    },
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "locomotive frame carrying the cylinder, crosshead guides, valve chest guide, expansion link trunnion and reverser"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "wheel"
+     ]
+    },
+    {
+     "id": "Cp",
+     "type": "revolute",
+     "between": [
+      "wheel",
+      "mainrod"
+     ]
+    },
+    {
+     "id": "Xh",
+     "type": "revolute",
+     "between": [
+      "mainrod",
+      "crosshead"
+     ]
+    },
+    {
+     "id": "Xg",
+     "type": "prismatic",
+     "between": [
+      "crosshead",
+      "frame"
+     ]
+    },
+    {
+     "id": "Rc",
+     "type": "revolute",
+     "between": [
+      "wheel",
+      "eccrod"
+     ]
+    },
+    {
+     "id": "Lf",
+     "type": "revolute",
+     "between": [
+      "eccrod",
+      "link"
+     ]
+    },
+    {
+     "id": "Lt",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "link"
+     ]
+    },
+    {
+     "id": "die",
+     "type": "pin-in-slot",
+     "between": [
+      "radiusrod",
+      "link"
+     ]
+    },
+    {
+     "id": "Rt",
+     "type": "revolute",
+     "between": [
+      "radiusrod",
+      "comblever"
+     ]
+    },
+    {
+     "id": "Vs",
+     "type": "revolute",
+     "between": [
+      "comblever",
+      "spindle"
+     ]
+    },
+    {
+     "id": "Vg",
+     "type": "prismatic",
+     "between": [
+      "spindle",
+      "frame"
+     ]
+    },
+    {
+     "id": "Ub",
+     "type": "revolute",
+     "between": [
+      "comblever",
+      "union"
+     ]
+    },
+    {
+     "id": "Uc",
+     "type": "revolute",
+     "between": [
+      "union",
+      "crosshead"
+     ]
+    },
+    {
+     "id": "Lr",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "lifting"
+     ]
+    },
+    {
+     "id": "Ll",
+     "type": "revolute",
+     "between": [
+      "lifting",
+      "radiusrod"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 60,
+     "unit": "mm",
+     "note": "main crank radius (piston stroke 120)"
+    },
+    {
+     "name": "rr",
+     "value": 25,
+     "unit": "mm",
+     "note": "return crank throw"
+    },
+    {
+     "name": "Rlink",
+     "value": 180,
+     "unit": "mm",
+     "note": "expansion link slot radius = radius rod length"
+    },
+    {
+     "name": "die",
+     "value": 0.8,
+     "unit": "",
+     "note": "die position in slot, -1 full reverse to +1 full forward, 0 mid gear"
+    },
+    {
+     "name": "lap",
+     "value": 10,
+     "unit": "mm",
+     "note": "valve steam lap"
+    },
+    {
+     "name": "lead",
+     "value": 2,
+     "unit": "mm",
+     "note": "valve lead"
+    }
+   ],
+   "defining_relations": "Valve displacement is approximately x_v = (lap + lead) x crosshead term + k x die x link term: the combination lever gives a component in phase with the piston of size (lap + lead) at the dead centres, and the link adds a component 90° ahead whose size and sign follow the die position. Link slot radius equals radius rod length so moving the die does not move the valve at mid stroke (constant lead). Cutoff shortens as the die approaches the trunnion.",
+   "range": "wheel 360° continuous; piston stroke 120 mm; valve travel about 24 mm in mid gear to about 60 mm in full gear; die position -1 to +1 reverses direction",
+   "overlays": [
+    "paths",
+    "angles",
+    "plot"
+   ],
+   "plot": "valve displacement vs crank angle for several die settings, with piston position overlaid",
+   "notes": "Proportions here are for a scaled model and approximate; solve as a chain of loop closures in order: crank, crosshead, expansion link angle, radius rod, combination lever, spindle. Keep the die block in the slot range. Draw the expansion link arc centred on the radius rod end at mid stroke."
+  },
+  "examples": [
+   {
+    "use": "Steam locomotives worldwide",
+    "detail": "The most common valve gear on 20th-century locomotives, nearly universal in Europe and widely used in North America."
+   },
+   {
+    "use": "Live steam models",
+    "detail": "Garden-scale and miniature locomotives use scaled Walschaerts gear that must be timed by hand."
+   },
+   {
+    "use": "Heritage railway restoration",
+    "detail": "Valve setting of restored engines involves adjusting rod lengths for equal events."
+   }
+  ],
+  "references": [
+   {
+    "title": "Walschaerts valve gear, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Walschaerts_valve_gear",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Valve gear, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Valve_gear",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Walschaerts Valve Gear, Grace's Guide to British Industrial History",
+    "url": "https://gracesguide.co.uk/Walschaerts_Valve_Gear",
+    "kind": "museum"
+   },
+   {
+    "title": "ValveGear Constructor (interactive design tool)",
+    "url": "https://www.constructor.valvegear.de/en/",
+    "kind": "calculator"
+   }
+  ],
+  "media": [
+   {
+    "title": "Timing Walschaert Valve Gear on a live steam locomotive (YouTube)",
+    "url": "https://www.youtube.com/watch?v=rRGGSr68miQ",
+    "kind": "video"
+   },
+   {
+    "title": "The Mechanical Genius Hiding on the Side of Every Steam Engine (YouTube)",
+    "url": "https://www.youtube.com/watch?v=KGLgUv6TaR0",
+    "kind": "video"
+   },
+   {
+    "title": "Walschaerts gear, Steam Workshop",
+    "url": "https://www.steamworkshop.co.uk/walschaerts-gear/",
+    "kind": "photos"
+   },
+   {
+    "title": "Valve Gear Demos (Dockstader)",
+    "url": "https://www.billp.org/Dockstader/ValveGear.html",
+    "kind": "interactive"
+   }
+  ],
+  "related": [
+   "locomotive-drive",
+   "slider-crank",
+   "eccentric-sheave",
+   "four-bar",
+   "watt-six-bar"
+  ]
+ },
+ {
+  "id": "bennett-linkage",
+  "name": "Bennett linkage",
+  "aka": [
+   "Bennett's linkage",
+   "Bennett mechanism",
+   "spatial 4R linkage",
+   "skew four-bar"
+  ],
+  "in_site": false,
+  "family": "Spatial linkage",
+  "level": "Advanced",
+  "summary": "A four-bar loop with skew hinge axes that still moves with one degree of freedom, thanks to a special balance of lengths and twists.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "n/a",
+   "plane": "Spatial"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "tan(th1/2) tan(th2/2) = sin((b + a)/2) / sin((b - a)/2) for twists a, b"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "spatial 4R, overconstrained: Kutzbach gives -2 but the special geometry gives 1"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Function generation",
+    "Motion conversion"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Singular positions",
+    "Historic"
+   ],
+   "application": [
+    "Aerospace",
+    "Construction & lifting",
+    "Robotics",
+    "Education"
+   ],
+   "keywords": [
+    "G. T. Bennett",
+    "1903",
+    "overconstrained",
+    "hyperboloid",
+    "deployable structures",
+    "4R"
+   ]
+  },
+  "explain": {
+   "motion": "Four links are joined in a loop by four hinges whose axes are skew, not parallel. Opposite links are equal in length and twist, and the lengths and twists obey a/sin(alpha) = b/sin(beta). With that balance the loop closes in a continuous family of positions, so turning one hinge drives the others, and the whole loop folds and unfolds in space.",
+   "forces": "Because the mobility depends on exact geometry, loads are shared redundantly across the joints and small errors in length or twist cause binding and internal stress. Torque between adjacent links varies strongly with position.",
+   "benefits": "The only movable spatial four-bar with revolute joints, very few parts, and it can fold flat in some configurations for deployable structures.",
+   "limits": "Very sensitive to manufacturing errors and joint play, and its spatial motion is hard to use for ordinary machine tasks."
+  },
+  "build": {
+   "ground": "link 1 (length a, twist alpha) holding hinge axes A and B",
+   "input": "link 2 rotating about hinge axis B (angle th1)",
+   "output": "link 4 rotating about hinge axis A (angle th2), and the folding shape of the loop",
+   "members": [
+    {
+     "id": "l1",
+     "role": "ground",
+     "def": "common normal a = 60 between axes A and B, twist alpha = 30°"
+    },
+    {
+     "id": "l2",
+     "role": "driver",
+     "def": "common normal b = 100 between axes B and C, twist beta = 56.44°"
+    },
+    {
+     "id": "l3",
+     "role": "link",
+     "def": "a = 60, twist alpha = 30°, between C and D"
+    },
+    {
+     "id": "l4",
+     "role": "output",
+     "def": "b = 100, twist beta = 56.44°, between D and A"
+    }
+   ],
+   "joints": [
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "l4",
+      "l1"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "l1",
+      "l2"
+     ]
+    },
+    {
+     "id": "C",
+     "type": "revolute",
+     "between": [
+      "l2",
+      "l3"
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "between": [
+      "l3",
+      "l4"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 60,
+     "unit": "mm",
+     "note": "length of links 1 and 3"
+    },
+    {
+     "name": "b",
+     "value": 100,
+     "unit": "mm",
+     "note": "length of links 2 and 4"
+    },
+    {
+     "name": "alpha",
+     "value": 30,
+     "unit": "deg",
+     "note": "twist of links 1 and 3"
+    },
+    {
+     "name": "beta",
+     "value": 56.44,
+     "unit": "deg",
+     "note": "twist of links 2 and 4, from a/sin(alpha) = b/sin(beta)"
+    },
+    {
+     "name": "offsets",
+     "value": 0,
+     "unit": "mm",
+     "note": "all joint offsets zero"
+    }
+   ],
+   "defining_relations": "a1 = a3 = a, a2 = a4 = b, alpha1 = alpha3 = alpha, alpha2 = alpha4 = beta, all offsets d_i = 0, and a/sin(alpha) = b/sin(beta) (here 60/sin30° = 100/sin56.44° = 120). Joint angles: th3 = -th1 (opposite joints equal and opposite), and tan(th1/2) tan(th2/2) = sin((beta + alpha)/2) / sin((beta - alpha)/2). The four axes lie on one hyperboloid of one sheet.",
+   "range": "input hinge 360° continuous; output hinge turns 360° in the opposite sense, non-uniformly",
+   "overlays": [
+    "paths",
+    "angles",
+    "plot"
+   ],
+   "plot": "output joint angle th2 vs input joint angle th1",
+   "notes": "Build with Denavit-Hartenberg frames: each link is a common normal of length a_i along x with twist alpha_i about x. Use the closed-form relation above rather than a numerical solver to avoid drift. Folded flat positions occur when th1 = 0 or 180°."
+  },
+  "examples": [
+   {
+    "use": "Deployable structures",
+    "detail": "Networks of Bennett loops form foldable shelters and space structures that open with one motion."
+   },
+   {
+    "use": "Overconstrained mechanism research",
+    "detail": "Used as a building block of 6R and other overconstrained linkages."
+   },
+   {
+    "use": "Nanoscale linkages",
+    "detail": "Built as DNA origami to study thermal motion of a spatial mechanism."
+   }
+  ],
+  "references": [
+   {
+    "title": "Overconstrained mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Overconstrained_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Bennett, G. T. (1903) A New Mechanism, Engineering (Internet Archive)",
+    "url": "https://archive.org/details/sim_engineering_july-december-1903_76/page/777/mode/1up",
+    "kind": "paper"
+   },
+   {
+    "title": "Bennett's Linkage, FIRGELLI mechanisms library",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/bennett-s-linkage",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Paper on Bennett linkage kinematics (Mechanika, KTU)",
+    "url": "https://mechanika.ktu.lt/index.php/Mech/article/view/22527/12718",
+    "kind": "paper"
+   }
+  ],
+  "media": [
+   {
+    "title": "Bennett's 4 bar linkage (YouTube)",
+    "url": "https://www.youtube.com/watch?v=U1IpMTTaMwY",
+    "kind": "video"
+   },
+   {
+    "title": "Thermal motion of a DNA origami Bennett linkage (YouTube)",
+    "url": "https://www.youtube.com/watch?v=p4PUWDfDIXY",
+    "kind": "video"
+   },
+   {
+    "title": "Bennett Linkage Animation (YouTube)",
+    "url": "https://www.youtube.com/watch?v=413JgGgojiY",
+    "kind": "animation"
+   },
+   {
+    "title": "Animation of Bennett's linkage (UCI synthetica, archived)",
+    "url": "https://web.archive.org/web/20170220094157/synthetica.eng.uci.edu/Animations-3/Bennett_Linkage.gif",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "sarrus-linkage",
+   "universal-joint",
+   "double-cardan"
+  ]
+ },
+ {
+  "id": "swash-plate",
+  "name": "Swash plate",
+  "aka": [
+   "swashplate",
+   "wobble plate",
+   "axial piston pump drive",
+   "slant plate"
+  ],
+  "in_site": false,
+  "family": "Spatial linkage",
+  "level": "Intermediate",
+  "summary": "A tilted disc on a shaft pushes a ring of pistons parallel to the shaft in and out once per turn, as in axial piston pumps.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Harmonic"
+   ],
+   "axes": "Rotary-to-along-axis",
+   "plane": "Spatial"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = 2 R tan(gamma), 21.4 mm for R = 40, gamma = 15°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 7,
+   "revolute": 1,
+   "prismatic": 5,
+   "higher_pairs": 5,
+   "notes": "ground (cylinder block), shaft with swash plate, 5 pistons; each piston shoe slides on the plate face (higher pair)"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Pumping & compression"
+   ],
+   "property": [
+    "Compact",
+    "Smooth (harmonic)",
+    "High load",
+    "Balanced"
+   ],
+   "application": [
+    "Construction & lifting",
+    "Automotive",
+    "Aerospace",
+    "Agriculture"
+   ],
+   "keywords": [
+    "axial piston pump",
+    "variable displacement",
+    "slipper",
+    "helicopter swashplate",
+    "AC compressor",
+    "barrel"
+   ]
+  },
+  "explain": {
+   "motion": "A disc set at an angle gamma to the shaft rotates with it. Pistons arranged in a circle parallel to the shaft press against the disc face through slippers, so each piston moves in and out once per turn with simple harmonic motion, the pistons phased evenly round the circle. Changing gamma changes the stroke, and at zero angle the pistons stop.",
+   "forces": "Piston pressure force acts normal to the plate face, splitting into an axial thrust on the shaft bearing and a tangential part that makes the driving or driven torque. Shoe friction and the side load on pistons grow with the swash angle, which is why angles are kept below about 18°.",
+   "benefits": "Very compact, many pistons share one shaft for smooth flow, and the angle can be varied for displacement control.",
+   "limits": "Slipper and piston side loads limit the swash angle, and high-pressure contact faces need hydrostatic lubrication and clean fluid."
+  },
+  "build": {
+   "ground": "cylinder block with 5 bores parallel to the shaft on pitch radius R",
+   "input": "shaft with swash plate, continuous rotation",
+   "output": "piston k axial position z_k",
+   "members": [
+    {
+     "id": "shaft",
+     "role": "driver",
+     "def": "shaft with plate face inclined at gamma = 15° to the plane normal to the shaft"
+    },
+    {
+     "id": "block",
+     "role": "ground",
+     "def": "5 bores on pitch radius R = 40, spaced 72°"
+    },
+    {
+     "id": "piston1",
+     "role": "slider",
+     "def": "piston with ball-jointed slipper bearing on the plate, bore 1"
+    },
+    {
+     "id": "piston2..5",
+     "role": "slider",
+     "def": "same, bores 2 to 5"
+    }
+   ],
+   "joints": [
+    {
+     "id": "S",
+     "type": "revolute",
+     "between": [
+      "block",
+      "shaft"
+     ]
+    },
+    {
+     "id": "Pk",
+     "type": "prismatic",
+     "between": [
+      "piston1",
+      "block"
+     ]
+    },
+    {
+     "id": "Ck",
+     "type": "cam contact",
+     "between": [
+      "piston1",
+      "shaft"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "R",
+     "value": 40,
+     "unit": "mm",
+     "note": "piston pitch radius"
+    },
+    {
+     "name": "gamma",
+     "value": 15,
+     "unit": "deg",
+     "note": "swash angle, 0 to 18"
+    },
+    {
+     "name": "n",
+     "value": 5,
+     "unit": "",
+     "note": "number of pistons"
+    },
+    {
+     "name": "dp",
+     "value": 12,
+     "unit": "mm",
+     "note": "piston bore"
+    }
+   ],
+   "defining_relations": "z_k = -R tan(gamma) cos(theta - 2 pi k/n). Stroke = 2 R tan(gamma). Displacement per rev = n (pi dp^2/4) 2R tan(gamma) = 12.1 cm^3 here. Odd piston counts give lower flow ripple.",
+   "range": "shaft 360° continuous; each piston stroke 21.4 mm; gamma adjustable 0° to 18° (stroke 0 to 26 mm)",
+   "overlays": [
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "piston positions vs shaft angle for all pistons",
+   "notes": "Two equivalent layouts: rotating plate with fixed block (shown) or fixed plate with rotating barrel. Draw pseudo-3D with the shaft horizontal. A wobble plate variant does not rotate with the shaft and drives pistons through rods."
+  },
+  "examples": [
+   {
+    "use": "Hydraulic axial piston pumps",
+    "detail": "Variable-displacement pumps in excavators and mobile machines vary the swash angle to control flow."
+   },
+   {
+    "use": "Automotive air-conditioning compressors",
+    "detail": "Swash plate compressors drive several pistons from the engine belt."
+   },
+   {
+    "use": "Helicopter rotor control",
+    "detail": "A swashplate transmits cyclic and collective pitch commands to the rotating blades."
+   }
+  ],
+  "references": [
+   {
+    "title": "Swashplate, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Swashplate",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Swash plate pump, HAWE Fluid Lexicon",
+    "url": "https://www.hawe.com/fluid-lexicon/detail/swash-plate-pump/",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Swashplate block, MathWorks Simscape Fluids",
+    "url": "https://www.mathworks.com/help/hydro/ref/swashplate.html",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "US 4576554, Swashplate axial piston pump",
+    "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/4576554",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "Axial Piston Pump Assembly (YouTube)",
+    "url": "https://m.youtube.com/watch?v=kA27UX4ajRI",
+    "kind": "video"
+   },
+   {
+    "title": "Axial piston pump. How it works? (YouTube)",
+    "url": "https://www.youtube.com/watch?v=2UYktuZuhr4",
+    "kind": "video"
+   },
+   {
+    "title": "Fixed Swashplate Rotating Barrel (YouTube)",
+    "url": "https://www.youtube.com/watch?v=-GZ5GEIrHkg",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "barrel-cam",
+   "cam-follower",
+   "slider-crank",
+   "rhombic-drive"
+  ]
+ },
+ {
+  "id": "flexure-hinge",
+  "name": "Flexure hinge",
+  "aka": [
+   "notch hinge",
+   "living hinge",
+   "flexure pivot",
+   "flexure bearing",
+   "compliant joint"
+  ],
+  "in_site": false,
+  "family": "Compliant",
+  "level": "Basic",
+  "summary": "A thin, bendable section of one solid part acts as a pivot, giving smooth, friction-free rotation over a small angle.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Oscillating",
+   "label": "Oscillating → Oscillating",
+   "output_character": [
+    "Reciprocating",
+    "Harmonic"
+   ],
+   "axes": "Coaxial",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Unity",
+   "class": "1:1",
+   "typical": "rotation stiffness K = 2 E b t^2.5 / (9 pi R^0.5), about 13 N·m/rad here"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 2,
+   "revolute": 1,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "one compliant joint modelled as a revolute with a torsional spring (pseudo-rigid-body model); in reality a single monolithic part"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Positioning",
+    "Energy storage"
+   ],
+   "property": [
+    "Precision",
+    "Low backlash",
+    "Few parts",
+    "Compact"
+   ],
+   "application": [
+    "Instruments",
+    "Film & optics",
+    "Medical",
+    "Consumer products"
+   ],
+   "keywords": [
+    "circular notch",
+    "Paros and Weisbord",
+    "pseudo-rigid-body model",
+    "living hinge",
+    "monolithic",
+    "nanopositioning"
+   ]
+  },
+  "explain": {
+   "motion": "A circular notch cut from both sides of a solid bar leaves a thin neck. Applying a moment bends the neck, so the part beyond it rotates almost about the neck centre, as if pinned. The rotation is limited to a few degrees in metal, or much more in a polypropylene living hinge.",
+   "forces": "The hinge behaves like a torsional spring of stiffness K, so the driver must supply both the load torque and K times the angle. Bending stress peaks at the thinnest section and limits the safe angle; the neck is weak against off-axis loads and buckling.",
+   "benefits": "No friction, no backlash and no wear, no lubrication, and precise repeatable motion that can be cut in one piece by wire EDM or moulding.",
+   "limits": "Small range of motion, fatigue at the neck if overstressed, and the centre of rotation shifts slightly with load and angle."
+  },
+  "build": {
+   "ground": "fixed block on one side of the notch",
+   "input": "lever arm, moment or force at its tip rocking it about the neck",
+   "output": "lever arm angle and tip displacement",
+   "members": [
+    {
+     "id": "base",
+     "role": "ground",
+     "def": "rigid block left of the notch"
+    },
+    {
+     "id": "lever",
+     "role": "driver",
+     "def": "rigid arm right of the notch, 60 long from neck centre to tip"
+    },
+    {
+     "id": "neck",
+     "role": "spring",
+     "def": "circular notch radius R = 5, minimum thickness t = 0.8, width b = 10"
+    }
+   ],
+   "joints": [
+    {
+     "id": "N",
+     "type": "revolute",
+     "between": [
+      "base",
+      "lever"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "R",
+     "value": 5,
+     "unit": "mm",
+     "note": "notch radius"
+    },
+    {
+     "name": "t",
+     "value": 0.8,
+     "unit": "mm",
+     "note": "minimum neck thickness"
+    },
+    {
+     "name": "b",
+     "value": 10,
+     "unit": "mm",
+     "note": "hinge width (out of plane)"
+    },
+    {
+     "name": "E",
+     "value": 71700,
+     "unit": "N/mm^2",
+     "note": "Young's modulus, aluminium 7075"
+    },
+    {
+     "name": "Larm",
+     "value": 60,
+     "unit": "mm",
+     "note": "lever arm length"
+    }
+   ],
+   "defining_relations": "Paros and Weisbord simplified circular-notch stiffness K = 2 E b t^2.5 / (9 pi sqrt(R)) = about 12,980 N·mm/rad. Tip deflection = Larm x angle. Max angle is set by allowable stress: angle_max is roughly proportional to sigma_allow sqrt(R) / (E sqrt(t)).",
+   "range": "lever rocks ±2°; tip moves ±2.1 mm",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "restoring torque vs lever angle (linear)",
+   "notes": "Draw the notch as two circular cutouts; animate by bending the neck smoothly rather than pivoting a pin. Exaggerate the angle visually if needed but label true values."
+  },
+  "examples": [
+   {
+    "use": "Nanopositioning stages",
+    "detail": "Piezo-driven flexure stages in microscopes and wafer tools use notch hinges for nanometre motion."
+   },
+   {
+    "use": "Living hinges",
+    "detail": "Polypropylene box lids and flip-top caps use a thin moulded hinge."
+   },
+   {
+    "use": "Precision instruments",
+    "detail": "Balances, gauges and optical mounts use flexure pivots for friction-free motion."
+   }
+  ],
+  "references": [
+   {
+    "title": "Flexure bearing, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Flexure_bearing",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Compliant mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Compliant_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Principles of microscale flexure hinge design for enhanced endurance (Harvard)",
+    "url": "https://scholar.harvard.edu/yufengchen/publications/principles-microscale-flexure-hinge-design-enhanced-endurance",
+    "kind": "paper"
+   },
+   {
+    "title": "BYU Compliant Mechanisms Research",
+    "url": "https://www.compliantmechanisms.byu.edu/",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Helical Flexure Hinge (YouTube)",
+    "url": "https://www.youtube.com/watch?v=96u1naUhbCU",
+    "kind": "video"
+   },
+   {
+    "title": "A robotic hand with cross-flexure hinge joint (YouTube)",
+    "url": "https://www.youtube.com/watch?v=y_jyF1sSSt0",
+    "kind": "video"
+   },
+   {
+    "title": "3D Printed Flexure Mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=a0H4bShj0-c",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "bistable-compliant",
+   "four-bar",
+   "parallelogram-linkage",
+   "sarrus-linkage"
+  ]
+ },
+ {
+  "id": "bistable-compliant",
+  "name": "Bistable compliant mechanism",
+  "aka": [
+   "bistable switch",
+   "snap-through mechanism",
+   "compliant toggle",
+   "von Mises truss"
+  ],
+  "in_site": false,
+  "family": "Compliant",
+  "level": "Intermediate",
+  "summary": "Flexible inclined beams hold a shuttle in either of two stable positions and snap it through the middle when pushed.",
+  "motion": {
+   "input": "Linear",
+   "output": "Linear",
+   "label": "Linear → Linear",
+   "output_character": [
+    "Toggle",
+    "Dwell"
+   ],
+   "axes": "Same line",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "None",
+   "class": "n/a",
+   "typical": "two stable positions at ±L0 sin(theta0) = ±6.9 mm; snap-through at the centre"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 4,
+   "prismatic": 3,
+   "higher_pairs": 0,
+   "notes": "pseudo-rigid-body model: ground, shuttle, and two beams each split into two telescoping parts with an axial spring; flex ends as pins; shuttle on a guide. Real part is one piece"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Locking",
+    "Energy storage",
+    "Positioning"
+   ],
+   "property": [
+    "Over-centre",
+    "Few parts",
+    "Shock at engagement"
+   ],
+   "application": [
+    "Consumer products",
+    "Medical",
+    "Instruments",
+    "Robotics"
+   ],
+   "keywords": [
+    "bistable",
+    "snap-through",
+    "Howell",
+    "BYU",
+    "von Mises truss",
+    "MEMS switch",
+    "pseudo-rigid-body model"
+   ]
+  },
+  "explain": {
+   "motion": "Two flexible beams angled from fixed anchors meet at a central shuttle. Pushing the shuttle toward the centre line compresses the beams, which store energy until the shuttle passes the middle, after which the beams push it on into the mirror-image stable position. It stays there with no power until pushed back.",
+   "forces": "Force rises from zero at a stable position to a peak, falls through zero at the unstable centre and becomes negative, so the shuttle snaps. The beams carry mostly axial compression, and peak strain occurs near the anchors and shuttle.",
+   "benefits": "Holds two positions with zero power, one-piece construction with no wear, and gives a crisp tactile switching action.",
+   "limits": "The snap can be violent and the switching force depends strongly on material and tolerance; plastic beams creep, lowering force over time."
+  },
+  "build": {
+   "ground": "two anchors at x = ±39.4 mm, y = 0",
+   "input": "shuttle pushed along y",
+   "output": "shuttle position y, and its stable state",
+   "members": [
+    {
+     "id": "anchors",
+     "role": "ground",
+     "def": "fixed ends of the beams at (±c, 0), c = L0 cos(theta0) = 39.4"
+    },
+    {
+     "id": "beamL",
+     "role": "spring",
+     "def": "left beam, free length L0 = 40, at theta0 = 10° in the as-made state"
+    },
+    {
+     "id": "beamR",
+     "role": "spring",
+     "def": "right beam, mirror of left"
+    },
+    {
+     "id": "shuttle",
+     "role": "slider",
+     "def": "central block guided along y, joined to both beam ends"
+    }
+   ],
+   "joints": [
+    {
+     "id": "AL",
+     "type": "revolute",
+     "between": [
+      "anchors",
+      "beamL"
+     ]
+    },
+    {
+     "id": "AR",
+     "type": "revolute",
+     "between": [
+      "anchors",
+      "beamR"
+     ]
+    },
+    {
+     "id": "SL",
+     "type": "revolute",
+     "between": [
+      "beamL",
+      "shuttle"
+     ]
+    },
+    {
+     "id": "SR",
+     "type": "revolute",
+     "between": [
+      "beamR",
+      "shuttle"
+     ]
+    },
+    {
+     "id": "guide",
+     "type": "prismatic",
+     "between": [
+      "shuttle",
+      "anchors"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "L0",
+     "value": 40,
+     "unit": "mm",
+     "note": "beam free length"
+    },
+    {
+     "name": "theta0",
+     "value": 10,
+     "unit": "deg",
+     "note": "as-made beam angle"
+    },
+    {
+     "name": "ka",
+     "value": 50,
+     "unit": "N/mm",
+     "note": "beam axial stiffness (pseudo-rigid model)"
+    },
+    {
+     "name": "h",
+     "value": 6.95,
+     "unit": "mm",
+     "note": "stable offset L0 sin(theta0)"
+    }
+   ],
+   "defining_relations": "Beam length at shuttle height y: L(y) = sqrt(c^2 + y^2) with c = L0 cos(theta0). Force on shuttle F(y) = 2 ka (L0 - L(y)) y / L(y). Stable at y = ±h = ±L0 sin(theta0), unstable at y = 0. Stored energy U(y) = ka (L(y) - L0)^2.",
+   "range": "shuttle travels from +6.95 mm to -6.95 mm; snaps at y = 0",
+   "overlays": [
+    "forces",
+    "plot"
+   ],
+   "plot": "push force vs shuttle position (S-shaped curve with two zero-force stable points)",
+   "notes": "Animate as a quasi-static push then snap: when the input passes the force peak (at about y = ±4 mm here), jump the shuttle quickly to the far side. Bend the beams visually rather than telescoping them."
+  },
+  "examples": [
+   {
+    "use": "Compliant switches",
+    "detail": "Light switches and power buttons with two positions and no separate spring."
+   },
+   {
+    "use": "MEMS relays and valves",
+    "detail": "Microscale bistable beams hold an optical or electrical switch state without power."
+   },
+   {
+    "use": "Bistable grippers and closures",
+    "detail": "Push-on push-off grippers and snap containers use a bistable element to latch."
+   }
+  ],
+  "references": [
+   {
+    "title": "Compliant mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Compliant_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Bistability, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Bistability",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Bistable Compliant Mechanisms (BYU technology page)",
+    "url": "https://llhwww.groups.et.byu.net/commercialization/BiStable.htm",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "Identification of Macro- and Micro-Compliant Mechanism Configurations Resulting in Bistable Behavior (BYU thesis)",
+    "url": "https://scholarsarchive.byu.edu/etd/83",
+    "kind": "paper"
+   }
+  ],
+  "media": [
+   {
+    "title": "3d-printed Bistable Compliant Switch Mechanism (YouTube)",
+    "url": "https://www.youtube.com/watch?v=2vnsXrmVDB0",
+    "kind": "video"
+   },
+   {
+    "title": "Push-on Push-off: A Compliant Bistable Gripper (YouTube)",
+    "url": "https://www.youtube.com/watch?v=z50dYYzYvls",
+    "kind": "video"
+   },
+   {
+    "title": "Bistable Compliant Switch, BYU print files and images (MakerWorld)",
+    "url": "https://makerworld.com/en/models/1185145-bistable-compliant-switch",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "flexure-hinge",
+   "toggle-clamp",
+   "four-bar",
+   "ratchet-pawl"
+  ]
+ },
+ {
+  "id": "centrifugal-governor",
+  "name": "Centrifugal governor",
+  "aka": [
+   "flyball governor",
+   "Watt governor",
+   "fly-ball governor",
+   "conical pendulum governor"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "Spinning weights swing out as speed rises and lift a sleeve that can close a throttle, holding an engine near a set speed.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Non-uniform",
+    "Variable speed"
+   ],
+   "axes": "Rotary-to-along-axis",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "None",
+   "class": "n/a",
+   "typical": "ball height below pivot h = g / omega^2 (Watt type)"
+  },
+  "dof": 2,
+  "topology": {
+   "links": 7,
+   "revolute": 7,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "frame, spindle, 2 ball arms, 2 links, sleeve; sleeve slides on the spindle; dof 2 = spindle speed plus ball height, the height settled by dynamics"
+  },
+  "backdrivable": "n/a",
+  "tags": {
+   "function": [
+    "Timing & regulation",
+    "Motion conversion"
+   ],
+   "property": [
+    "Approximate",
+    "Historic",
+    "Balanced"
+   ],
+   "application": [
+    "Steam & engines",
+    "Energy",
+    "Agriculture"
+   ],
+   "keywords": [
+    "James Watt",
+    "flyball",
+    "conical pendulum",
+    "feedback",
+    "Maxwell On Governors",
+    "Porter governor",
+    "throttle"
+   ]
+  },
+  "explain": {
+   "motion": "Two balls on arms hinged at the top of a vertical spindle are swung round by the engine. As speed rises they fly outward and upward like a conical pendulum, and links from the arms pull a sleeve up the spindle. The sleeve moves a lever that closes the steam valve or opens it again when speed falls.",
+   "forces": "Centrifugal force on each ball, m omega^2 times its radius, balances gravity and the sleeve load through the arm angle. The sleeve can supply only a small force, and friction in the sleeve and valve linkage makes the governor insensitive to small speed changes.",
+   "benefits": "Automatic feedback speed control with no external power, simple and robust, and a classic visual of control engineering.",
+   "limits": "The plain Watt governor has small sleeve force and changes speed setting with load (proportional droop), and can hunt or oscillate. Not usable at high speeds without springs or dead weights (Porter, Hartnell types)."
+  },
+  "build": {
+   "ground": "frame with vertical spindle bearing",
+   "input": "spindle, driven at engine speed omega about the vertical axis",
+   "output": "sleeve height on the spindle (and arm angle phi)",
+   "members": [
+    {
+     "id": "spindle",
+     "role": "driver",
+     "def": "vertical shaft, arm pivots at top P"
+    },
+    {
+     "id": "armL",
+     "role": "link",
+     "def": "P→ball, L = 100, ball at end, link pin at 60 from P"
+    },
+    {
+     "id": "armR",
+     "role": "link",
+     "def": "mirror of armL"
+    },
+    {
+     "id": "linkL",
+     "role": "link",
+     "def": "arm pin→sleeve, 60"
+    },
+    {
+     "id": "linkR",
+     "role": "link",
+     "def": "mirror of linkL"
+    },
+    {
+     "id": "sleeve",
+     "role": "output",
+     "def": "collar sliding on spindle, drives throttle lever"
+    },
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "frame with vertical spindle bearing"
+    }
+   ],
+   "joints": [
+    {
+     "id": "S",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "spindle"
+     ]
+    },
+    {
+     "id": "PL",
+     "type": "revolute",
+     "between": [
+      "spindle",
+      "armL"
+     ]
+    },
+    {
+     "id": "PR",
+     "type": "revolute",
+     "between": [
+      "spindle",
+      "armR"
+     ]
+    },
+    {
+     "id": "ML",
+     "type": "revolute",
+     "between": [
+      "armL",
+      "linkL"
+     ]
+    },
+    {
+     "id": "MR",
+     "type": "revolute",
+     "between": [
+      "armR",
+      "linkR"
+     ]
+    },
+    {
+     "id": "QL",
+     "type": "revolute",
+     "between": [
+      "linkL",
+      "sleeve"
+     ]
+    },
+    {
+     "id": "QR",
+     "type": "revolute",
+     "between": [
+      "linkR",
+      "sleeve"
+     ]
+    },
+    {
+     "id": "Sl",
+     "type": "prismatic",
+     "between": [
+      "sleeve",
+      "spindle"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "L",
+     "value": 100,
+     "unit": "mm",
+     "note": "arm length, pivot to ball centre"
+    },
+    {
+     "name": "p",
+     "value": 60,
+     "unit": "mm",
+     "note": "link pin distance along arm"
+    },
+    {
+     "name": "q",
+     "value": 60,
+     "unit": "mm",
+     "note": "link length"
+    },
+    {
+     "name": "m",
+     "value": 0.5,
+     "unit": "kg",
+     "note": "each ball"
+    },
+    {
+     "name": "phi",
+     "value": 30,
+     "unit": "deg",
+     "note": "arm angle from vertical, default pose"
+    }
+   ],
+   "defining_relations": "Watt (conical pendulum) balance, neglecting sleeve load: h = L cos(phi) = g / omega^2, so omega = sqrt(g / (L cos phi)). Sleeve position below P: y = -(p cos phi + sqrt(q^2 - (p sin phi)^2)) = -2p cos(phi) when p = q. Here phi 20° to 60° gives 97.6 to 133.8 rpm and sleeve lift 52.8 mm.",
+   "range": "spindle continuous; arm angle 20° to 60° over about 98 to 134 rpm; sleeve travels 52.8 mm",
+   "overlays": [
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "arm angle and sleeve height vs spindle speed",
+   "notes": "Drive the animation by a speed slider: compute phi from omega, and rotate the whole assembly about the spindle in pseudo-3D. Below about 94.6 rpm the balls hang at rest (phi = 0 limit)."
+  },
+  "examples": [
+   {
+    "use": "Steam engine speed control",
+    "detail": "Watt's engines from the 1780s used a flyball governor to throttle steam to hold speed."
+   },
+   {
+    "use": "Windmill millstone tentering",
+    "detail": "Mills used governors to adjust the gap between millstones as wind speed changed."
+   },
+   {
+    "use": "Hydro turbines and diesel engines",
+    "detail": "Mechanical governors on turbines and engines regulated speed before electronic control."
+   }
+  ],
+  "references": [
+   {
+    "title": "Centrifugal governor, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Centrifugal_governor",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Governor (device), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Governor_(device)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Maxwell, J. C. (1868) On Governors, Proc. Royal Society",
+    "url": "https://doi.org/10.1098%2Frspl.1867.0055",
+    "kind": "paper"
+   },
+   {
+    "title": "Centrifugal governor at Brixton Windmill",
+    "url": "https://www.brixtonwindmill.org/?p=9963",
+    "kind": "museum"
+   }
+  ],
+  "media": [
+   {
+    "title": "How a steam engine governor works, tubalcain (YouTube)",
+    "url": "https://www.youtube.com/watch?v=WLBTKBgTogo",
+    "kind": "video"
+   },
+   {
+    "title": "Playing with Watt-style Centrifugal Flyball Governor and Steam Engine (YouTube)",
+    "url": "https://youtube.com/watch?pp=ygUbI2NlbnRyaWZ1Z2FsZ292ZXJub3J3b3JraW5n&v=4ctTQEmJHTw",
+    "kind": "video"
+   },
+   {
+    "title": "Category: Centrifugal governors, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Centrifugal_governors",
+    "kind": "photos"
+   },
+   {
+    "title": "Watt Governor, working 3D animation (YouTube)",
+    "url": "https://www.youtube.com/watch?v=sJDVacqQHzE&pp=0gcJCfwAo7VqN5tD",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "anchor-escapement",
+   "scissor-lift",
+   "bell-crank",
+   "slider-crank"
+  ]
+ },
+ {
+  "id": "ball-disc-integrator",
+  "name": "Ball-and-disc integrator",
+  "aka": [
+   "ball-and-disk integrator",
+   "disc integrator",
+   "wheel-and-disc integrator",
+   "Thomson integrator"
+  ],
+  "in_site": false,
+  "family": "Friction drive",
+  "level": "Advanced",
+  "summary": "A ball set at an adjustable radius on a turning disc drives an output roller, so the output angle is the integral of the radius.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Variable speed",
+    "Reversing",
+    "Continuous"
+   ],
+   "axes": "Perpendicular skew",
+   "plane": "Spatial"
+  },
+  "ratio": {
+   "kind": "Continuously variable",
+   "class": "Variable",
+   "typical": "omega_out = omega_disc x x / r_c, reversing through zero at the disc centre"
+  },
+  "dof": 2,
+  "topology": {
+   "links": 5,
+   "revolute": 2,
+   "prismatic": 1,
+   "higher_pairs": 3,
+   "notes": "ground, disc, carriage, ball, output cylinder; ball rolls on disc and cylinder and is held in the carriage cage"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Differential & summing",
+    "Function generation",
+    "Speed reduction"
+   ],
+   "property": [
+    "Friction-based",
+    "Precision",
+    "Historic"
+   ],
+   "application": [
+    "Instruments",
+    "Marine",
+    "Aerospace",
+    "Education"
+   ],
+   "keywords": [
+    "James Thomson",
+    "Kelvin",
+    "harmonic analyser",
+    "differential analyser",
+    "Vannevar Bush",
+    "fire control",
+    "mechanical computer"
+   ]
+  },
+  "explain": {
+   "motion": "A flat disc turns with the input variable, say time. A ball pressed onto its face is held by a carriage at distance x from the disc centre, and the ball also touches a cylinder whose axis is parallel to the carriage travel. The ball turns at a speed proportional to x, so the cylinder angle accumulates the integral of x over the disc angle, and moving the ball past the centre reverses it.",
+   "forces": "Only a small torque can be passed by rolling friction, so the output must be very lightly loaded or followed by a torque amplifier. Sliding across the contact when the carriage moves causes slight error and wear.",
+   "benefits": "Solves integration continuously and exactly in principle with simple parts, and allows smooth reversal through zero.",
+   "limits": "Very low output torque, slip errors under load, and accuracy depends on flat, clean, hard surfaces."
+  },
+  "build": {
+   "ground": "frame carrying disc bearing, carriage rail and cylinder bearings",
+   "input": "disc rotation (variable of integration) and carriage position x (integrand)",
+   "output": "output cylinder rotation angle",
+   "members": [
+    {
+     "id": "disc",
+     "role": "driver",
+     "def": "flat disc radius 60, axis vertical through O"
+    },
+    {
+     "id": "carriage",
+     "role": "slider",
+     "def": "slides along a radius line of the disc, position x from -50 to +50"
+    },
+    {
+     "id": "ball",
+     "role": "link",
+     "def": "steel ball diameter 12, caged in the carriage, touching disc and cylinder"
+    },
+    {
+     "id": "cylinder",
+     "role": "output",
+     "def": "roller radius r_c = 15, axis horizontal and parallel to the carriage rail"
+    },
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "frame carrying disc bearing, carriage rail and cylinder bearings"
+    }
+   ],
+   "joints": [
+    {
+     "id": "Od",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "disc"
+     ]
+    },
+    {
+     "id": "rail",
+     "type": "prismatic",
+     "between": [
+      "carriage",
+      "frame"
+     ]
+    },
+    {
+     "id": "Oc",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "cylinder"
+     ]
+    },
+    {
+     "id": "c1",
+     "type": "rolling",
+     "between": [
+      "ball",
+      "disc"
+     ]
+    },
+    {
+     "id": "c2",
+     "type": "rolling",
+     "between": [
+      "ball",
+      "cylinder"
+     ]
+    },
+    {
+     "id": "cage",
+     "type": "spherical",
+     "between": [
+      "ball",
+      "carriage"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "Rd",
+     "value": 60,
+     "unit": "mm",
+     "note": "disc radius"
+    },
+    {
+     "name": "x",
+     "value": 30,
+     "unit": "mm",
+     "note": "ball radius on disc, -50 to 50"
+    },
+    {
+     "name": "db",
+     "value": 12,
+     "unit": "mm",
+     "note": "ball diameter"
+    },
+    {
+     "name": "rc",
+     "value": 15,
+     "unit": "mm",
+     "note": "output cylinder radius"
+    }
+   ],
+   "defining_relations": "Ball surface speed = omega_d x; cylinder speed omega_c = omega_d x / r_c. Output angle theta_c = (1/r_c) integral of x d(theta_d). Speed ratio range -50/15 to +50/15, about -3.3 to +3.3.",
+   "range": "disc continuous; carriage -50 to +50 mm; output turns either way at up to 3.3 x disc speed",
+   "overlays": [
+    "velocity",
+    "plot"
+   ],
+   "plot": "output angle vs disc angle while x follows a set function (shows integral)",
+   "notes": "Drive x from a function (e.g. sinusoid) to show the integral. Draw pseudo-3D: disc seen at an angle, cylinder behind the ball. At x = 0 the output stops."
+  },
+  "examples": [
+   {
+    "use": "Tide analysis",
+    "detail": "Kelvin's harmonic analyser used disc integrators to extract tidal Fourier coefficients."
+   },
+   {
+    "use": "Differential analysers",
+    "detail": "Vannevar Bush's 1930s analogue computers chained integrators to solve differential equations."
+   },
+   {
+    "use": "Naval fire control",
+    "detail": "Rangekeepers and the Dreyer table integrated target motion to aim guns."
+   }
+  ],
+  "references": [
+   {
+    "title": "Ball-and-disk integrator, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ball-and-disk_integrator",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Differential analyser, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Differential_analyser",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "The Mechanical Integrator, a machine that does calculus (YouTube)",
+    "url": "https://www.youtube.com/watch?v=s-y_lnzWQjk",
+    "kind": "video"
+   },
+   {
+    "title": "LEGO analogue adders, variable gears and integrator (YouTube)",
+    "url": "https://www.youtube.com/watch?v=OoRmgR5pk9E",
+    "kind": "video"
+   },
+   {
+    "title": "Mechanical disk integrator diagram, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Mechanical_disk_integrator.svg",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "friction-wheel-drive",
+   "differential",
+   "cvt-belt",
+   "gear-train"
+  ]
+ },
+ {
+  "id": "friction-wheel-drive",
+  "name": "Friction wheel drive",
+  "aka": [
+   "disc and wheel drive",
+   "friction disc drive",
+   "friction gearing",
+   "disc variator"
+  ],
+  "in_site": false,
+  "family": "Friction drive",
+  "level": "Basic",
+  "summary": "A rubber-rimmed wheel pressed on the face of a spinning disc turns faster the farther out it sits, giving a stepless, reversible ratio.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Continuous",
+    "Variable speed",
+    "Reversing"
+   ],
+   "axes": "Perpendicular intersecting",
+   "plane": "Spatial"
+  },
+  "ratio": {
+   "kind": "Continuously variable",
+   "class": "Variable",
+   "typical": "omega_w / omega_d = R / r_w, 0.5 to 3.0 here; through zero to reverse"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 2,
+   "prismatic": 0,
+   "higher_pairs": 1,
+   "notes": "ground, disc, wheel on a splined shaft; the wheel's position along its shaft is a ratio setting (extra slide not counted)"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Speed reduction",
+    "Speed increase",
+    "Reversing"
+   ],
+   "property": [
+    "Friction-based",
+    "Few parts",
+    "Historic"
+   ],
+   "application": [
+    "Consumer products",
+    "Agriculture",
+    "Automotive",
+    "Railways"
+   ],
+   "keywords": [
+    "friction disc",
+    "snowblower",
+    "Metz",
+    "cyclecar",
+    "Wickham trolley",
+    "variator"
+   ]
+  },
+  "explain": {
+   "motion": "The engine turns a flat disc. A wheel with a rubber or fibre rim presses on the disc face and can slide along its own shaft, which runs across the disc. Near the centre the wheel turns slowly, far out it turns fast, and moving it past the centre reverses it.",
+   "forces": "Torque transmitted is limited to mu x normal force x contact radius on the disc side. A spring or lever keeps the wheel pressed on; the high normal force loads both bearings. Different parts of the contact patch move at different speeds, causing scrubbing, heat and rim wear.",
+   "benefits": "Stepless, reversible ratio with very few parts, and it slips safely on overload.",
+   "limits": "Low power capacity, rim wear and glazing, slip in wet or oily conditions, and efficiency drops at small radii."
+  },
+  "build": {
+   "ground": "frame with disc bearing and wheel shaft bearings",
+   "input": "drive disc, continuous rotation",
+   "output": "friction wheel rotation; its contact radius R is the ratio setting",
+   "members": [
+    {
+     "id": "disc",
+     "role": "driver",
+     "def": "flat disc radius 100"
+    },
+    {
+     "id": "wheel",
+     "role": "output",
+     "def": "rubber-rimmed wheel radius r_w = 30, slides on a splined shaft along a disc radius"
+    },
+    {
+     "id": "frame",
+     "role": "ground",
+     "def": "bearings, wheel shaft axis lies parallel to the disc face 30 above it and crosses the disc axis"
+    }
+   ],
+   "joints": [
+    {
+     "id": "Od",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "disc"
+     ]
+    },
+    {
+     "id": "Ow",
+     "type": "revolute",
+     "between": [
+      "frame",
+      "wheel"
+     ]
+    },
+    {
+     "id": "contact",
+     "type": "rolling",
+     "between": [
+      "wheel",
+      "disc"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "Rd",
+     "value": 100,
+     "unit": "mm",
+     "note": "disc radius"
+    },
+    {
+     "name": "rw",
+     "value": 30,
+     "unit": "mm",
+     "note": "wheel radius"
+    },
+    {
+     "name": "R",
+     "value": 60,
+     "unit": "mm",
+     "note": "contact radius setting, -30 to 90"
+    },
+    {
+     "name": "mu",
+     "value": 0.5,
+     "unit": "",
+     "note": "rubber on steel"
+    },
+    {
+     "name": "N",
+     "value": 200,
+     "unit": "N",
+     "note": "normal force"
+    }
+   ],
+   "defining_relations": "omega_w = omega_d R / r_w (sign follows R). Max torque on wheel T = mu N r_w. Power limit P = mu N omega_d R.",
+   "range": "disc continuous; R from 15 to 90 gives 0.5 to 3.0 x disc speed; R negative reverses",
+   "overlays": [
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "wheel speed vs contact radius setting",
+   "notes": "Animate the shift as a slider moving the wheel along its shaft. Show the speed mismatch across the wheel width as small arrows to explain scrubbing."
+  },
+  "examples": [
+   {
+    "use": "Snowblower wheel drives",
+    "detail": "Walk-behind snowblowers select speed and reverse by moving a rubber wheel across an aluminium drive plate."
+   },
+   {
+    "use": "Early cars and cyclecars",
+    "detail": "Cars such as the Metz and Turicum used disc-and-wheel friction transmissions."
+   },
+   {
+    "use": "Railway inspection trolleys",
+    "detail": "Early Wickham trolleys used friction drive via a large flywheel."
+   }
+  ],
+  "references": [
+   {
+    "title": "Friction drive, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Friction_drive",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Friction Drive, Mills Archive glossary",
+    "url": "https://millsarchive.org/glossary/a-z-glossary/3159",
+    "kind": "museum"
+   },
+   {
+    "title": "US 3487705A friction drive patent (Google Patents)",
+    "url": "https://patents.google.com/patent/US3487705A/en",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "Snowblower friction wheel drive explained and how to maintain (YouTube)",
+    "url": "https://www.youtube.com/watch?v=CGpotB8Km4M",
+    "kind": "video"
+   },
+   {
+    "title": "Friction Wheel Drive on Lawnmower (YouTube)",
+    "url": "https://www.youtube.com/watch?v=IBXSLSYLNjY",
+    "kind": "video"
+   },
+   {
+    "title": "Friction disk variator 6 (YouTube)",
+    "url": "https://www.youtube.com/watch?v=HJutD78Av4A",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "ball-disc-integrator",
+   "cvt-belt",
+   "belt-drive",
+   "spur-gears"
+  ]
+ },
+ {
+  "id": "cvt-belt",
+  "name": "Belt CVT (variable pulley)",
+  "aka": [
+   "continuously variable transmission",
+   "Variomatic",
+   "push-belt CVT",
+   "variable-diameter pulley",
+   "scooter variator"
+  ],
+  "in_site": false,
+  "family": "Flexible drive",
+  "level": "Intermediate",
+  "summary": "Two V-pulleys with movable cone halves change their working diameters together, so a belt gives a stepless ratio.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Continuous",
+    "Variable speed"
+   ],
+   "axes": "Parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Continuously variable",
+   "class": "Variable",
+   "typical": "about 0.4:1 to 2.5:1 here (spread about 6.2); car CVTs typically spread 5 to 7"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 2,
+   "prismatic": 2,
+   "higher_pairs": 2,
+   "notes": "ground, input shaft with fixed sheave, input movable sheave, output shaft with fixed sheave, output movable sheave, belt; movable sheaves slide on splines; ratio setting is a second, controlled freedom"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Speed reduction",
+    "Speed increase",
+    "Torque multiplication"
+   ],
+   "property": [
+    "Friction-based",
+    "Backdrivable",
+    "High load"
+   ],
+   "application": [
+    "Automotive",
+    "Consumer products",
+    "Agriculture"
+   ],
+   "keywords": [
+    "Van Doorne",
+    "DAF Variomatic",
+    "pushbelt",
+    "sheave",
+    "scooter",
+    "snowmobile",
+    "Nissan Xtronic"
+   ]
+  },
+  "explain": {
+   "motion": "Each pulley is a pair of cones; one cone can slide along the shaft. Squeezing the input cones together pushes the belt outward to a larger radius, while the output cones spread so the belt sinks inward, which raises the output speed. Because the belt length is fixed, the two radii change together and the ratio moves smoothly between the limits.",
+   "forces": "Torque is carried by friction between the belt flanks and the sheave cones, so large clamping forces, from springs, flyweights or hydraulics, are needed. A steel push belt transmits by compression between its elements; rubber belts by tension.",
+   "benefits": "Keeps the engine at its best speed with no shift steps, simple to automate, and smooth.",
+   "limits": "Torque is limited by clamping force and belt strength, efficiency is a few percent below gears, and belts wear or slip if overloaded."
+  },
+  "build": {
+   "ground": "case with input and output shafts 150 mm apart",
+   "input": "input pulley, continuous rotation; ratio set by axial position of the input movable sheave",
+   "output": "output pulley speed",
+   "members": [
+    {
+     "id": "in_fixed",
+     "role": "driver",
+     "def": "input shaft with fixed cone, groove half-angle 11°"
+    },
+    {
+     "id": "in_move",
+     "role": "slider",
+     "def": "input movable cone on splines"
+    },
+    {
+     "id": "out_fixed",
+     "role": "output",
+     "def": "output shaft with fixed cone"
+    },
+    {
+     "id": "out_move",
+     "role": "slider",
+     "def": "output movable cone, spring loaded closed"
+    },
+    {
+     "id": "belt",
+     "role": "belt",
+     "def": "V-belt of fixed pitch length, pitch radii r1 and r2 between 25 and 62"
+    },
+    {
+     "id": "case",
+     "role": "ground",
+     "def": "case with input and output shafts 150 mm apart"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "between": [
+      "case",
+      "in_fixed"
+     ]
+    },
+    {
+     "id": "s1",
+     "type": "prismatic",
+     "between": [
+      "in_move",
+      "in_fixed"
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "case",
+      "out_fixed"
+     ]
+    },
+    {
+     "id": "s2",
+     "type": "prismatic",
+     "between": [
+      "out_move",
+      "out_fixed"
+     ]
+    },
+    {
+     "id": "b1",
+     "type": "belt",
+     "between": [
+      "belt",
+      "in_fixed"
+     ]
+    },
+    {
+     "id": "b2",
+     "type": "belt",
+     "between": [
+      "belt",
+      "out_fixed"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "C",
+     "value": 150,
+     "unit": "mm",
+     "note": "centre distance"
+    },
+    {
+     "name": "rmin",
+     "value": 25,
+     "unit": "mm",
+     "note": "minimum pitch radius"
+    },
+    {
+     "name": "rmax",
+     "value": 62,
+     "unit": "mm",
+     "note": "maximum pitch radius"
+    },
+    {
+     "name": "alpha",
+     "value": 11,
+     "unit": "deg",
+     "note": "sheave half-angle"
+    },
+    {
+     "name": "Lb",
+     "value": 582.7,
+     "unit": "mm",
+     "note": "belt pitch length, set from r1 = r2 = 45"
+    }
+   ],
+   "defining_relations": "Ratio i = omega1/omega2 = r2/r1. Belt length L = 2C cos(psi) + pi(r1 + r2) + 2 psi (r1 - r2) with psi = asin((r1 - r2)/C), approximately L = 2C + pi(r1 + r2) + (r1 - r2)^2 / C; hold L constant to find r2 from r1. Movable sheave shift ds = 2 dr tan(alpha), about 14.4 mm for the full 37 mm change in radius.",
+   "range": "input continuous; r1 from 25 to 62.1 mm while r2 goes from 62.1 to 25 mm; output speed 0.40 to 2.48 x input",
+   "overlays": [
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "speed ratio vs input movable sheave position",
+   "notes": "Solve r2 from constant belt length each frame (it is not exactly 90 - r1). Show sheaves edge-on with cones opening and closing in pseudo-3D. Push belt elements can be drawn as a row of small blocks."
+  },
+  "examples": [
+   {
+    "use": "Car CVTs",
+    "detail": "Push-belt and chain CVTs from Nissan, Honda, Subaru and others keep the engine at its most efficient speed."
+   },
+   {
+    "use": "Scooters and snowmobiles",
+    "detail": "Rubber-belt variators with centrifugal flyweights shift automatically with engine speed."
+   },
+   {
+    "use": "DAF Variomatic",
+    "detail": "The 1958 DAF 600 was the first mass-production car with a belt CVT."
+   }
+  ],
+  "references": [
+   {
+    "title": "Continuously variable transmission, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Continuously_variable_transmission",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Variomatic, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Variomatic",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Pushbelt, Bosch Mobility",
+    "url": "https://www.bosch-mobility.com/en/solutions/transmission-technology/pushbelt/",
+    "kind": "engineering-guide"
+   },
+   {
+    "title": "How CVTs Work, HowStuffWorks",
+    "url": "https://auto.howstuffworks.com/cvt2.htm",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Weber State CVT push belt (YouTube)",
+    "url": "https://www.youtube.com/watch?v=PiwRUfFEc5k",
+    "kind": "video"
+   },
+   {
+    "title": "Scooter CVT transmission explained (YouTube)",
+    "url": "https://www.youtube.com/watch?v=25tuxutT2ik",
+    "kind": "video"
+   },
+   {
+    "title": "Category: Continuously variable transmissions, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Continuously_variable_transmissions",
+    "kind": "photos"
+   },
+   {
+    "title": "Animation, how pulley based CVT works (YouTube)",
+    "url": "https://www.youtube.com/watch?v=gjUwJ1CJVq4",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "belt-drive",
+   "friction-wheel-drive",
+   "ball-disc-integrator",
+   "chain-drive",
+   "planetary"
+  ]
+ }
+]

@@ -1,0 +1,1184 @@
+[
+{
+  "id": "anchor-escapement",
+  "name": "Anchor escapement",
+  "aka": ["recoil escapement", "Clement escapement", "anchor and pendulum", "deadbeat escapement (Graham variant)"],
+  "in_site": false,
+  "family": "Escapement",
+  "level": "Intermediate",
+  "summary": "An anchor-shaped pallet rocked by a pendulum lets the clock's escape wheel advance one tooth every two swings, metering out the train's power.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Intermittent rotary",
+    "label": "Rotary → Intermittent rotary",
+    "output_character": ["Intermittent", "Reversing", "Dwell"],
+    "axes": "Parallel",
+    "plane": "Planar"
+  },
+  "ratio": {
+    "kind": "Index step",
+    "class": "n/a",
+    "typical": "1 tooth (12°) per full pendulum period on a 30-tooth wheel, 6° per beat; wheel turns once a minute with a seconds pendulum"
+  },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, escape wheel, anchor with pendulum rigidly attached; one intermittent cam-type contact between a wheel tooth and one of the two pallet faces" },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+    "function": ["Timing & regulation", "Indexing"],
+    "property": ["Historic", "Few parts", "Shock at engagement"],
+    "application": ["Clocks & watches", "Instruments"],
+    "keywords": ["William Clement", "longcase clock", "grandfather clock", "pallets", "recoil", "seconds pendulum", "Graham deadbeat", "escape wheel"]
+  },
+  "explain": {
+    "motion": "The weight or spring turns the escape wheel, but one of the two pallets of the anchor always blocks a tooth. As the pendulum swings, the anchor rocks on its arbor and lifts one pallet clear; the wheel jumps forward until a tooth drops onto the other pallet. Each swing releases half a tooth, so the wheel advances one tooth per full pendulum period. In the recoil form the wheel is pushed back slightly as the pendulum completes its swing.",
+    "forces": "The wheel tooth slides along the sloped pallet face and gives the pendulum a small push (impulse) each beat to make up for friction losses. The pendulum's own period, set by its length, governs the rate; the recoil couples train force into the pendulum, so rate varies with drive force.",
+    "benefits": "Only needs a small pendulum arc of about 4° to 6°, so long pendulums keep near-isochronous time. Simple, robust and cheap to make.",
+    "limits": "Recoil interferes with the pendulum and causes wear at the pallets, so accuracy is lower than the deadbeat form. Needs oiling at the pallet faces and is sensitive to clock being out of beat."
+  },
+  "build": {
+    "ground": "clock frame with escape wheel arbor E and anchor arbor A",
+    "input": "escape wheel, driven by a constant torque from the weight train about E (counter-clockwise)",
+    "output": "escape wheel angle (stepped) and anchor angle phi oscillating with the pendulum",
+    "members": [
+      { "id": "frame", "role": "ground", "def": "holds E at (0,0) and A at (0,70.7) directly above" },
+      { "id": "escapeWheel", "role": "driver", "def": "30 pointed, undercut teeth on radius r = 50 mm about E" },
+      { "id": "anchor", "role": "pawl", "def": "rigid anchor about A with entry and exit pallets spanning 7.5 teeth (90°), pallet faces inclined to give 3° to 4° of lift" },
+      { "id": "pendulum", "role": "output", "def": "rod fixed to the anchor (via crutch), bob at L = 994 mm below A for a 2 s period" }
+    ],
+    "joints": [
+      { "id": "E", "type": "revolute", "between": ["frame", "escapeWheel"] },
+      { "id": "A", "type": "revolute", "between": ["frame", "anchor"] },
+      { "id": "P", "type": "cam contact", "between": ["escapeWheel", "anchor"] }
+    ],
+    "params": [
+      { "name": "N", "value": 30, "unit": "teeth", "note": "escape wheel teeth" },
+      { "name": "r", "value": 50, "unit": "mm", "note": "escape wheel tip radius" },
+      { "name": "span", "value": 7.5, "unit": "teeth", "note": "teeth spanned by the pallets" },
+      { "name": "d", "value": 70.7, "unit": "mm", "note": "wheel to anchor arbor distance, r / cos(45°) so pallets act tangentially" },
+      { "name": "L", "value": 994, "unit": "mm", "note": "seconds pendulum length" },
+      { "name": "amp", "value": 3, "unit": "deg", "note": "pendulum semi-amplitude" }
+    ],
+    "defining_relations": "Pendulum period T = 2 pi sqrt(L/g), T = 2 s for L = 994 mm; wheel advances 360/N per period (one tooth per two beats); span 7.5 teeth = 90° so d = r / cos(45°); lift angle about 3° to 4°, smaller than amplitude so each pallet locks then gives impulse.",
+    "range": "pendulum ±3° (simple harmonic); anchor follows pendulum; escape wheel steps 6° per beat with brief recoil of about 1°",
+    "overlays": ["angles", "forces", "plot"],
+    "plot": "escape wheel angle (staircase with small recoil dips) and pendulum angle (sine) vs time",
+    "notes": "Animate on time, not on input angle: pendulum is the clock, phi = amp sin(2 pi t / T). Wheel stays locked except during the short release window near mid-swing, then drops by the remaining part of 6°. Show the drop and the recoil; keep the tooth that is locked on a pallet in contact as the pallet rotates."
+  },
+  "examples": [
+    { "use": "Longcase (grandfather) clocks", "detail": "The seconds-beating anchor escapement made the long pendulum case practical from about 1680." },
+    { "use": "Tower and turret clocks", "detail": "Public clocks used anchor and later deadbeat escapements with long heavy pendulums." },
+    { "use": "Wall and mantel clocks", "detail": "Mass-produced spring-driven pendulum clocks kept the recoil anchor for cheapness." }
+  ],
+  "references": [
+    { "title": "Anchor escapement, Wikipedia", "url": "https://en.wikipedia.org/wiki/Anchor_escapement", "kind": "wikipedia" },
+    { "title": "Escapement, Wikipedia", "url": "https://en.wikipedia.org/wiki/Escapement", "kind": "wikipedia" },
+    { "title": "Anchor Escapement Mechanism: How It Works, Diagram, Parts and Uses, FIRGELLI", "url": "https://www.firgelliauto.com/blogs/mechanisms/anchor-escapement", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Tower Clock: The Anchor Escapement and the Pendulum (YouTube)", "url": "https://www.youtube.com/watch?v=z_7rE8afFfo", "kind": "video" },
+    { "title": "DIY 3D printed mechanical clock with anchor escapement (YouTube)", "url": "https://www.youtube.com/watch?v=S8dp34yCYjM", "kind": "video" },
+    { "title": "Model of anchor escapement as used in bracket clocks, Science Museum Group", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co745/model-of-anchor-escapement", "kind": "photos" },
+    { "title": "The Graham Clock Escapement, Wolfram Demonstrations", "url": "https://demonstrations.wolfram.com/TheGrahamClockEscapement/", "kind": "interactive" }
+  ],
+  "related": ["lever-escapement", "verge-escapement", "ratchet-pawl", "centrifugal-governor"]
+},
+{
+  "id": "lever-escapement",
+  "name": "Lever escapement",
+  "aka": ["Swiss lever escapement", "detached lever escapement", "English lever", "club-tooth lever"],
+  "in_site": false,
+  "family": "Escapement",
+  "level": "Advanced",
+  "summary": "A pallet lever between escape wheel and balance wheel unlocks the train and kicks the balance once per swing, leaving it free the rest of the time.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Intermittent rotary",
+    "label": "Rotary → Intermittent rotary",
+    "output_character": ["Intermittent", "Dwell"],
+    "axes": "Parallel",
+    "plane": "Planar"
+  },
+  "ratio": {
+    "kind": "Index step",
+    "class": "n/a",
+    "typical": "half a tooth (12°) per beat on a 15-tooth wheel; 18,000 to 36,000 beats per hour"
+  },
+  "dof": 1,
+  "topology": { "links": 4, "revolute": 3, "prismatic": 0, "higher_pairs": 2, "notes": "ground, escape wheel, pallet lever (fork), balance with roller and impulse pin; higher pairs are wheel tooth on pallet stone and impulse pin in the fork slot; banking pins are stops on ground" },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+    "function": ["Timing & regulation", "Indexing"],
+    "property": ["Precision", "Shock at engagement", "Historic"],
+    "application": ["Clocks & watches", "Instruments"],
+    "keywords": ["Thomas Mudge", "pallet fork", "impulse jewel", "banking pins", "draw", "balance wheel", "hairspring", "detached escapement"]
+  },
+  "explain": {
+    "motion": "The balance wheel swings freely under its hairspring. Near the middle of each swing the impulse pin on the balance roller enters the lever fork and flicks the lever over, which lifts one pallet stone and lets an escape wheel tooth slide across the stone's impulse face. The tooth pushes the lever, the fork pushes the pin, and the balance gets its impulse; then the other pallet locks the next tooth and the lever rests against a banking pin while the balance completes its free arc.",
+    "forces": "Train torque reaches the balance only during the short impulse; the rest of the swing is detached. Draw, the angled locking faces, pulls the lever against its banking so shocks do not unlock it. Friction at the pallet stones needs oil and is the main loss.",
+    "benefits": "The balance is free for most of its swing, so timekeeping is good and robust to position and shock. It is the standard escapement of almost all mechanical watches.",
+    "limits": "Sliding friction at the pallets needs lubrication and wears; oil ageing changes the rate. Small, precise parts make it expensive to make and adjust."
+  },
+  "build": {
+    "ground": "watch plate holding the three arbors in a line or at an angle, plus two banking pins",
+    "input": "escapeWheel, constant torque from the going train about W",
+    "output": "balance angle (free oscillation, ±270°) and escape wheel stepping",
+    "members": [
+      { "id": "escapeWheel", "role": "driver", "def": "15 club teeth on radius 20 mm about W (scaled-up model)" },
+      { "id": "lever", "role": "pawl", "def": "pallet lever pivoted at L, 28 mm from W; entry and exit pallet stones spanning 2.5 teeth; fork slot at 30 mm from L toward the balance" },
+      { "id": "balance", "role": "output", "def": "balance wheel radius 25 mm about B, 30 mm beyond the fork; roller radius 8 mm with impulse pin" },
+      { "id": "hairspring", "role": "spring", "def": "spiral spring returning the balance to its rest angle" },
+      { "id": "plate", "role": "ground", "def": "pivots W, L, B in a straight line, banking pins either side of the lever" }
+    ],
+    "joints": [
+      { "id": "W", "type": "revolute", "between": ["plate", "escapeWheel"] },
+      { "id": "L", "type": "revolute", "between": ["plate", "lever"] },
+      { "id": "B", "type": "revolute", "between": ["plate", "balance"] },
+      { "id": "pallet", "type": "cam contact", "between": ["escapeWheel", "lever"] },
+      { "id": "fork", "type": "pin-in-slot", "between": ["balance", "lever"] }
+    ],
+    "params": [
+      { "name": "N", "value": 15, "unit": "teeth", "note": "escape wheel teeth, 24° pitch" },
+      { "name": "rw", "value": 20, "unit": "mm", "note": "escape wheel radius (model scale)" },
+      { "name": "dWL", "value": 28, "unit": "mm", "note": "escape wheel to lever pivot" },
+      { "name": "lf", "value": 30, "unit": "mm", "note": "lever pivot to fork" },
+      { "name": "rr", "value": 8, "unit": "mm", "note": "roller radius to impulse pin" },
+      { "name": "lift", "value": 10, "unit": "deg", "note": "total lever angle between banking pins (12° to 20° typical in watches incl. drop)" },
+      { "name": "amp", "value": 270, "unit": "deg", "note": "balance semi-amplitude" },
+      { "name": "f", "value": 4, "unit": "Hz", "note": "balance frequency, 28,800 beats per hour" }
+    ],
+    "defining_relations": "Balance period T = 2 pi sqrt(I/k) (inertia over hairspring stiffness); the wheel advances 12° per beat (half of 24° tooth pitch); lever angle ratio to balance angle while engaged is about rr/lf; lever rests on a banking pin outside the engagement window; draw angle about 12° holds the lever on the banking.",
+    "range": "balance ±270° continuous oscillation; lever flips ±5° once per beat; escape wheel steps 12° per beat",
+    "overlays": ["angles", "forces", "plot"],
+    "plot": "balance angle (sine), lever angle (square-ish wave) and escape wheel angle (staircase) vs time",
+    "notes": "Drive by time: theta_b = amp sin(2 pi f t). Lever is only coupled while the impulse pin is inside the fork (|theta_b| below about 20°); the rest of the time it sits on a banking pin. Wheel moves only during the unlocking-impulse window. Scale up a lot for visibility."
+  },
+  "examples": [
+    { "use": "Mechanical wristwatches", "detail": "Almost every mechanical watch movement uses the Swiss lever escapement." },
+    { "use": "Alarm clocks and carriage clocks", "detail": "Pin-pallet variants of the lever drive cheap balance-wheel clocks and timers." },
+    { "use": "Mechanical timers", "detail": "Kitchen and parking timers use simplified lever escapements to regulate a spring." }
+  ],
+  "references": [
+    { "title": "Lever escapement, Wikipedia", "url": "https://en.wikipedia.org/wiki/Lever_escapement", "kind": "wikipedia" },
+    { "title": "Distribution mechanism, Swiss lever escapement, Horopedia", "url": "https://horopedia.org/swiss-lever-escapement/", "kind": "engineering-guide" },
+    { "title": "An Analysis of the Lever Escapement, H. R. Playtner (Project Gutenberg)", "url": "https://gutenberg.org/cache/epub/21978/pg21978-images.html", "kind": "textbook" },
+    { "title": "Anchor escapement with lever (Ankerhemmung mit Unruhe), Reuleaux model X9, Cornell", "url": "https://digital.library.cornell.edu/catalog/ss:372785", "kind": "kmoddl" }
+  ],
+  "media": [
+    { "title": "Demo Swiss Lever Escapement by Omega (YouTube)", "url": "https://www.youtube.com/watch?v=DF8VOTPZlbc", "kind": "video" },
+    { "title": "Swiss Lever Escapement Model (YouTube)", "url": "https://www.youtube.com/watch?v=JgdO8kzuwig", "kind": "video" },
+    { "title": "Lever escapement with crank roller, Robert Roskell, about 1830, Science Museum Group", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co396", "kind": "photos" },
+    { "title": "Swiss Lever Escapement Simulation (YouTube)", "url": "https://www.youtube.com/watch?v=ejgyCZELQ64", "kind": "animation" }
+  ],
+  "related": ["anchor-escapement", "verge-escapement", "ratchet-pawl"]
+},
+{
+  "id": "verge-escapement",
+  "name": "Verge escapement",
+  "aka": ["verge and foliot", "crown wheel escapement", "verge and balance"],
+  "in_site": false,
+  "family": "Escapement",
+  "level": "Intermediate",
+  "summary": "A crown wheel's teeth push alternately on two flag pallets on a vertical verge, rocking a foliot bar to and fro and letting the wheel creep round.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Oscillating",
+    "label": "Rotary → Oscillating",
+    "output_character": ["Reciprocating", "Intermittent", "Reversing"],
+    "axes": "Perpendicular skew",
+    "plane": "Spatial"
+  },
+  "ratio": {
+    "kind": "Index step",
+    "class": "n/a",
+    "typical": "one tooth per full foliot swing (24° on a 15-tooth crown wheel); foliot swings 80° to 100°"
+  },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 2, "prismatic": 0, "higher_pairs": 1, "notes": "ground, crown wheel, verge with pallets and foliot; one intermittent cam-type contact between a crown tooth and the upper or lower pallet" },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+    "function": ["Timing & regulation", "Indexing", "Reversing"],
+    "property": ["Historic", "Few parts", "Shock at engagement"],
+    "application": ["Clocks & watches", "Education"],
+    "keywords": ["foliot", "crown wheel", "medieval clock", "Giovanni de Dondi", "pallets", "regulating weights", "tower clock"]
+  },
+  "explain": {
+    "motion": "The crown wheel has saw teeth on its rim, pointing along its axis, and odd tooth count. The verge is a rod across the wheel face carrying two flag pallets set about 90° to 105° apart, one engaging the top of the wheel and one the bottom. A tooth pushes one pallet round until it slips off, by which time the opposite pallet has swung into the path of a tooth on the far side, which stops and then reverses the verge. The foliot, a bar with weights, rocks back and forth with each push.",
+    "forces": "The wheel is in contact with a pallet nearly all the time, so drive torque directly sets the swing speed: there is no free natural period in the foliot form. Recoil happens every beat as the foliot's inertia drives the wheel backwards.",
+    "benefits": "Very simple and tolerant of crude workmanship, the first all-mechanical escapement. Works with a foliot, balance wheel or wide-swinging pendulum.",
+    "limits": "Rate depends strongly on drive force and friction, so early clocks drifted by up to an hour or more a day. Large swing and constant recoil cause wear."
+  },
+  "build": {
+    "ground": "clock frame holding the crown wheel arbor horizontal and the verge vertical, crossing just in front of the wheel face",
+    "input": "crownWheel, constant torque from the weight-driven train",
+    "output": "foliot angle psi, oscillating about the verge axis",
+    "members": [
+      { "id": "crownWheel", "role": "driver", "def": "15 saw teeth on a crown of radius 40 mm, teeth 8 mm tall, axis horizontal" },
+      { "id": "verge", "role": "pawl", "def": "vertical staff crossing the wheel axis at a 40 mm offset plane; upper and lower pallets 12 mm long at 95° to each other" },
+      { "id": "foliot", "role": "output", "def": "horizontal bar 160 mm long fixed to the top of the verge, with two adjustable weights at ±60 mm" },
+      { "id": "frame", "role": "ground", "def": "bearings for the crown wheel arbor and the verge" }
+    ],
+    "joints": [
+      { "id": "C", "type": "revolute", "between": ["frame", "crownWheel"] },
+      { "id": "V", "type": "revolute", "between": ["frame", "verge"] },
+      { "id": "P", "type": "cam contact", "between": ["crownWheel", "verge"] }
+    ],
+    "params": [
+      { "name": "N", "value": 15, "unit": "teeth", "note": "crown wheel teeth, must be odd" },
+      { "name": "R", "value": 40, "unit": "mm", "note": "crown wheel radius" },
+      { "name": "pal", "value": 95, "unit": "deg", "note": "angle between pallets (90° to 105° usual)" },
+      { "name": "lp", "value": 12, "unit": "mm", "note": "pallet length" },
+      { "name": "Lf", "value": 160, "unit": "mm", "note": "foliot bar length" },
+      { "name": "rw", "value": 60, "unit": "mm", "note": "regulating weight radius" }
+    ],
+    "defining_relations": "Odd tooth count so a tooth on the top meets the upper pallet while the bottom pallet faces a gap; wheel advances 360/N per full foliot cycle; swing amplitude about (180 - pallet angle) plus overswing, giving 80° to 100° total; rate rises with drive torque and falls as weights move outward (inertia).",
+    "range": "crown wheel creeps 24° per foliot cycle with a recoil each beat; foliot swings about ±45°",
+    "overlays": ["angles", "forces", "plot"],
+    "plot": "foliot angle and crown wheel angle vs time",
+    "notes": "Spatial: draw in pseudo-3D with the wheel face toward the viewer and the verge vertical in front of it. Upper and lower teeth move in opposite directions across the verge, which is why the pallets push alternately in opposite senses. Motion is driven by torque with recoil, so a simple time-based model is: foliot swings sinusoidally and the wheel follows the active pallet with backlash."
+  },
+  "examples": [
+    { "use": "Medieval tower and cathedral clocks", "detail": "From the late 13th century, weight-driven verge and foliot clocks struck the hours on church towers." },
+    { "use": "Early pocket watches", "detail": "Verge watches with a balance wheel and fusee were standard until the lever took over in the 19th century." },
+    { "use": "Bracket and early pendulum clocks", "detail": "Huygens' first pendulum clocks used a verge with a wide-swinging pendulum." }
+  ],
+  "references": [
+    { "title": "Verge escapement, Wikipedia", "url": "https://en.wikipedia.org/wiki/Verge_escapement", "kind": "wikipedia" },
+    { "title": "Verge and foliot escapement, Reuleaux model, Cornell University Library", "url": "https://digital.library.cornell.edu/catalog/ss:29272027", "kind": "kmoddl" },
+    { "title": "Mechanism for a bell tower clock with verge escapement and foliot, Museo Galileo", "url": "https://mostre.museogalileo.it/motoperpetuo/en/after-leonardo/between-uncertainty-and-fraud/mechanism-for-a-bell-tower-clock-with-verge-escapement-and-foliot.html", "kind": "museum" },
+    { "title": "Verge Escapement Mechanism: How It Works, FIRGELLI", "url": "https://www.firgelliauto.com/blogs/mechanisms/verge-escapement", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Brian Law's wooden clocks, Clock 16, Verge and Foliot (YouTube)", "url": "https://www.youtube.com/watch?v=0P5hQpLrm-I", "kind": "video" },
+    { "title": "The Verge Escapement, Craig Fay Builds a Clock, Episode 3 (YouTube)", "url": "https://www.youtube.com/watch?v=w4SyQp8aSvM", "kind": "video" },
+    { "title": "Modified verge escapement (Mulford's patent), Science Museum Group", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co432/modified-verge-escapement", "kind": "photos" },
+    { "title": "Explanation, how verge escapement works (YouTube)", "url": "https://www.youtube.com/watch?v=BoeP0adbDKg", "kind": "animation" }
+  ],
+  "related": ["anchor-escapement", "lever-escapement", "ratchet-pawl"]
+},
+{
+  "id": "lead-screw",
+  "name": "Lead screw",
+  "aka": ["leadscrew", "power screw", "translation screw", "Acme screw", "trapezoidal screw"],
+  "in_site": false,
+  "family": "Screw",
+  "level": "Basic",
+  "summary": "A threaded shaft turning in a nut that is kept from rotating moves the nut along the shaft by one lead per turn, giving slow, strong linear motion.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Linear",
+    "label": "Rotary → Linear",
+    "output_character": ["Continuous", "Self-locking"],
+    "axes": "Rotary-to-along-axis",
+    "plane": "Spatial"
+  },
+  "ratio": {
+    "kind": "Stroke",
+    "class": "n/a",
+    "typical": "travel = lead per turn, e.g. 3 mm per turn (Tr12x3); leads from under 1 mm to 50 mm"
+  },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 1, "prismatic": 1, "higher_pairs": 0, "notes": "ground, screw (revolute in end bearings), nut (prismatic on a guide); screw to nut is a helical (screw) pair, counted here as a lower pair outside revolute/prismatic" },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+    "function": ["Motion conversion", "Force amplification", "Positioning", "Lifting"],
+    "property": ["Self-locking", "Friction-based", "Few parts", "High load"],
+    "application": ["Machine tools", "Consumer products", "Construction & lifting", "Packaging & automation"],
+    "keywords": ["Acme thread", "trapezoidal thread", "square thread", "lead angle", "bronze nut", "anti-backlash nut", "screw jack", "vise"]
+  },
+  "explain": {
+    "motion": "The screw turns in bearings at its ends while the nut is held by a guide so it cannot spin. Each turn of the screw slides the nut along the axis by one lead, the pitch times the number of starts. Reversing the screw reverses the nut.",
+    "forces": "The thread is an inclined plane wrapped round a cylinder, so a small torque gives a large axial thrust: ideal thrust F = 2 pi T / lead. Sliding friction on the flanks eats much of this, giving efficiencies of about 20% to 80%, and with small lead angles the friction angle exceeds the lead angle so the load cannot drive the screw back.",
+    "benefits": "Cheap, quiet, compact and holds its position without a brake when self-locking. Takes high loads and suits manual drives.",
+    "limits": "Low efficiency means heat and wear, so not for continuous high-speed duty. Backlash grows as the nut wears, and long slender screws whip at high speed (critical speed)."
+  },
+  "build": {
+    "ground": "frame with two screw bearings and a straight guide rail for the nut",
+    "input": "screw, continuous rotation theta about its own axis (handwheel or motor)",
+    "output": "nut, axial position x along the guide",
+    "members": [
+      { "id": "frame", "role": "ground", "def": "bearings at x = 0 and x = 240 mm, guide rail parallel to the axis" },
+      { "id": "screw", "role": "driver", "def": "Tr12x3 trapezoidal thread, 12 mm major diameter, 10.5 mm mean diameter, length 240 mm" },
+      { "id": "nut", "role": "slider", "def": "bronze nut 24 mm long with a flag riding on the guide rail" }
+    ],
+    "joints": [
+      { "id": "B", "type": "revolute", "between": ["frame", "screw"] },
+      { "id": "S", "type": "screw", "between": ["screw", "nut"] },
+      { "id": "G", "type": "prismatic", "between": ["frame", "nut"] }
+    ],
+    "params": [
+      { "name": "d", "value": 12, "unit": "mm", "note": "major diameter" },
+      { "name": "dm", "value": 10.5, "unit": "mm", "note": "mean diameter" },
+      { "name": "p", "value": 3, "unit": "mm", "note": "pitch" },
+      { "name": "n", "value": 1, "unit": "starts", "note": "thread starts" },
+      { "name": "mu", "value": 0.15, "unit": "-", "note": "friction coefficient, steel on bronze" },
+      { "name": "stroke", "value": 200, "unit": "mm", "note": "nut travel" },
+      { "name": "alpha", "value": 30, "unit": "deg", "note": "trapezoidal thread angle (Acme 29°)" }
+    ],
+    "defining_relations": "x = (n p / 360) theta; lead angle lambda = atan(n p / (pi dm)) = 5.2°; friction angle phi = atan(mu) = 8.5°; self-locking if phi > lambda; raising torque T = F dm/2 tan(lambda + phi) (square thread); efficiency eta = tan(lambda) / tan(lambda + phi), about 35% here; back-drivable roughly when eta > 50%.",
+    "range": "screw about 24,000° (66.7 turns) for 200 mm of nut travel; output linear and proportional",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "nut position x vs screw angle (straight line, slope = lead)",
+    "notes": "Draw the screw side-on with a moving helix (shift the thread phase with theta) so the rotation is visible. Mark a stripe on the screw. Show the nut's anti-rotation flag on the guide. For 2D, the thread can be drawn as slanted lines whose phase advances by p per turn."
+  },
+  "examples": [
+    { "use": "Lathe leadscrew and cross slides", "detail": "Turns the carriage for thread cutting and feeds the cross slide by hand." },
+    { "use": "Bench vise and screw jack", "detail": "Self-locking threads hold clamping force or a raised car with no brake." },
+    { "use": "3D printer Z axis", "detail": "Stepper motors drive trapezoidal lead screws with plastic or brass nuts to lift the gantry." },
+    { "use": "Electric linear actuators", "detail": "Motorised lead screw actuators push hatches, beds and valves." }
+  ],
+  "references": [
+    { "title": "Leadscrew, Wikipedia", "url": "https://en.wikipedia.org/wiki/Leadscrew", "kind": "wikipedia" },
+    { "title": "Why Lead Screws are the Best Fit for Many Linear Motion Applications, Thomson (PDF)", "url": "https://www.thomsonlinear.com:443/downloads/articles/Why_Lead_Screws_Best_Fit_Linear_Motion_Applications_taen.pdf", "kind": "engineering-guide" },
+    { "title": "Efficiency and Backdriving, Roton Screw University", "url": "https://www.roton.com/screw-university/screw-actions/screw-backdriving-efficiency/", "kind": "engineering-guide" },
+    { "title": "Lead Screw Efficiency and Back-Driving Interactive Calculator, FIRGELLI", "url": "https://www.firgelliauto.com/en-de/blogs/engineering-calculators/lead-screw-efficiency-back-driving-calculator", "kind": "calculator" }
+  ],
+  "media": [
+    { "title": "How a Lead Screw Works (YouTube)", "url": "https://www.youtube.com/watch?v=v69odUFenOU", "kind": "video" },
+    { "title": "Non Captive Lead Screw Actuators (Motorized Assemblies) (YouTube)", "url": "https://www.youtube.com/watch?v=2arakJuK6tA", "kind": "video" },
+    { "title": "Lead Screws Explained, Fractory", "url": "https://fractory.com/lead-screws/", "kind": "photos" }
+  ],
+  "related": ["ball-screw", "differential-screw", "rack-pinion", "worm-drive"]
+},
+{
+  "id": "ball-screw",
+  "name": "Ball screw",
+  "aka": ["ballscrew", "recirculating ball screw", "ball bearing screw"],
+  "in_site": false,
+  "family": "Screw",
+  "level": "Intermediate",
+  "summary": "A screw and nut with a stream of recirculating steel balls rolling between their grooves, turning rotation into precise, efficient linear motion.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Linear",
+    "label": "Rotary → Linear",
+    "output_character": ["Continuous"],
+    "axes": "Rotary-to-along-axis",
+    "plane": "Spatial"
+  },
+  "ratio": {
+    "kind": "Stroke",
+    "class": "n/a",
+    "typical": "travel = lead per turn, commonly 5 to 12.7 mm per turn (16x5 default = 5 mm per turn)"
+  },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 1, "prismatic": 1, "higher_pairs": 1, "notes": "ground, screw, nut; the ball train is a rolling higher pair acting as a screw pair; individual balls are not separate kinematic links for the model" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Motion conversion", "Positioning", "Force amplification"],
+    "property": ["Precision", "Low backlash", "Backdrivable", "High load"],
+    "application": ["Machine tools", "Robotics", "Aerospace", "Automotive"],
+    "keywords": ["recirculation", "ball nut", "gothic arch", "preload", "CNC", "rolling contact", "return tube", "end cap"]
+  },
+  "explain": {
+    "motion": "Steel balls sit in matching helical grooves on the screw and inside the nut. As the screw turns, the balls roll along the groove and carry the nut axially by one lead per turn. At the end of the circuit a return tube, internal button or end cap lifts the balls out and feeds them back to the start, so they circulate endlessly.",
+    "forces": "Load passes through many rolling ball contacts instead of sliding flanks, so efficiency is around 90% and thrust is nearly 2 pi T / lead. Because it is so efficient, an axial load can spin the screw backwards, so vertical axes need a brake.",
+    "benefits": "High efficiency, long life, low heat and, with a preloaded double nut, zero backlash and high stiffness for precise positioning.",
+    "limits": "Not self-locking, more expensive than a lead screw, and sensitive to dirt and side load. Long screws are limited by critical speed and buckling."
+  },
+  "build": {
+    "ground": "machine base with fixed and floating end bearings and a linear guide carrying the table",
+    "input": "screw, continuous rotation theta by a servo motor through a coupling",
+    "output": "nut and table, axial position x",
+    "members": [
+      { "id": "base", "role": "ground", "def": "end bearings 360 mm apart, linear rail parallel to screw" },
+      { "id": "screw", "role": "driver", "def": "16 mm diameter screw, lead 5 mm, ground gothic-arch groove" },
+      { "id": "balls", "role": "link", "def": "3.175 mm balls in 3 circuits, recirculated through an end-cap return" },
+      { "id": "nut", "role": "slider", "def": "flanged ball nut 40 mm long, bolted to the table" },
+      { "id": "table", "role": "output", "def": "carriage on the linear rail, travels 300 mm" }
+    ],
+    "joints": [
+      { "id": "B", "type": "revolute", "between": ["base", "screw"] },
+      { "id": "S", "type": "screw", "between": ["screw", "nut"] },
+      { "id": "R", "type": "rolling", "between": ["balls", "screw"] },
+      { "id": "G", "type": "prismatic", "between": ["base", "table"] }
+    ],
+    "params": [
+      { "name": "d", "value": 16, "unit": "mm", "note": "nominal diameter" },
+      { "name": "l", "value": 5, "unit": "mm", "note": "lead" },
+      { "name": "db", "value": 3.175, "unit": "mm", "note": "ball diameter" },
+      { "name": "eta", "value": 0.9, "unit": "-", "note": "forward efficiency" },
+      { "name": "stroke", "value": 300, "unit": "mm", "note": "table travel" }
+    ],
+    "defining_relations": "x = l theta / 360; drive torque T = F l / (2 pi eta); backdrive torque T = F l eta' / (2 pi) with eta' about 0.8; balls move at about half the screw surface speed relative to the nut, so each ball travels axially at roughly x/2 relative to the nut before recirculating.",
+    "range": "screw 60 turns for 300 mm of travel; table linear and proportional to screw angle",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "table position vs screw angle (straight line, slope = lead)",
+    "notes": "Animate a cutaway of the nut: balls advance along the helix at half speed relative to the nut and jump through the return path. Keep ball count constant per circuit. Show a brake or note that the load backdrives when power is off."
+  },
+  "examples": [
+    { "use": "CNC machine tool axes", "detail": "Preloaded ball screws drive the X, Y and Z tables of mills and lathes." },
+    { "use": "Electric power steering", "detail": "A ball nut on the rack converts motor torque to rack thrust in many cars." },
+    { "use": "Aircraft flight control actuators", "detail": "Electromechanical actuators use ball screws to move control surfaces and flaps." },
+    { "use": "Semiconductor and robotics stages", "detail": "Precision positioning stages and linear robot axes rely on ball screws." }
+  ],
+  "references": [
+    { "title": "Ball screw, Wikipedia", "url": "https://en.wikipedia.org/wiki/Ball_screw", "kind": "wikipedia" },
+    { "title": "Accuracy of the Ball Screw, THK (PDF)", "url": "https://tech.thk.com/en/products/pdf/en_a15_011.pdf", "kind": "engineering-guide" },
+    { "title": "How are Ball Screws used?, KURODA Precision", "url": "https://kurodaprecision.com/global/products/technical-information/bs/bs019.html", "kind": "engineering-guide" },
+    { "title": "Ball Screw Efficiency and Life Calculator, FIRGELLI", "url": "https://www.firgelliauto.com/blogs/engineering-calculators/ball-screw-efficiency-and-life-calculator", "kind": "calculator" }
+  ],
+  "media": [
+    { "title": "How does a ball screw work? (YouTube)", "url": "https://www.youtube.com/watch?v=hj1pGhp9XsI", "kind": "video" },
+    { "title": "How Ballscrews Operate (YouTube)", "url": "https://www.youtube.com/watch?v=1lsngvO1rfc", "kind": "video" },
+    { "title": "What Is a Ball Screw?, Dynatect", "url": "https://dynatect.com/resources/what-is-a-ball-screw/", "kind": "photos" },
+    { "title": "How A Ball Screw Works (Animated) (YouTube)", "url": "https://www.youtube.com/watch?v=oEPrXljqeHA", "kind": "animation" }
+  ],
+  "related": ["lead-screw", "differential-screw", "rack-pinion"]
+},
+{
+  "id": "differential-screw",
+  "name": "Differential screw",
+  "aka": ["Prony screw", "compound screw", "differential thread", "micrometer screw"],
+  "in_site": false,
+  "family": "Screw",
+  "level": "Intermediate",
+  "summary": "One shaft with two threads of slightly different pitch moves a nut by only the pitch difference per turn, giving very fine adjustment.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Linear",
+    "label": "Rotary → Linear",
+    "output_character": ["Continuous", "Self-locking"],
+    "axes": "Rotary-to-along-axis",
+    "plane": "Spatial"
+  },
+  "ratio": {
+    "kind": "Stroke",
+    "class": "n/a",
+    "typical": "travel = p1 - p2 per turn, e.g. 1.0 - 0.8 = 0.2 mm per turn"
+  },
+  "dof": 1,
+  "topology": { "links": 3, "revolute": 0, "prismatic": 1, "higher_pairs": 0, "notes": "ground with fixed nut, screw with two threads, sliding nut on a guide; two screw (helical) pairs plus one prismatic guide" },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+    "function": ["Motion conversion", "Positioning", "Force amplification"],
+    "property": ["Precision", "Self-locking", "High ratio", "Compact"],
+    "application": ["Instruments", "Film & optics", "Machine tools"],
+    "keywords": ["Prony", "Towneley micrometer", "fine adjustment", "pitch difference", "microscope focus", "Reuleaux"]
+  },
+  "explain": {
+    "motion": "The screw carries two threads of the same hand but different pitch. One thread runs in a nut fixed to the frame, so each turn moves the screw itself forward by p1. The other thread carries a nut that is guided so it cannot turn; relative to the screw it moves back by p2, so its net motion is p1 - p2 per turn.",
+    "forces": "The effective lead is tiny, so the ideal force ratio is huge: F = 2 pi T / (p1 - p2). In practice friction in two thread pairs makes it strongly self-locking and fairly inefficient.",
+    "benefits": "Gives very fine motion with coarse, strong, easy-to-make threads instead of one very fine, fragile thread.",
+    "limits": "Low efficiency and slow travel, and backlash in two thread pairs adds up. Total stroke is limited by the length of the threads."
+  },
+  "build": {
+    "ground": "frame carrying the fixed nut and a guide for the moving nut",
+    "input": "screw, turned by a knob, angle theta",
+    "output": "movingNut, axial position x",
+    "members": [
+      { "id": "frame", "role": "ground", "def": "fixed nut with M6x1.0 thread and a straight guide slot" },
+      { "id": "screw", "role": "driver", "def": "shaft with M6x1.0 thread on the left 30 mm and M5x0.8 thread on the right 30 mm, knob at the left end" },
+      { "id": "movingNut", "role": "slider", "def": "M5x0.8 nut with a key in the guide slot, carries the pointer" }
+    ],
+    "joints": [
+      { "id": "S1", "type": "screw", "between": ["frame", "screw"] },
+      { "id": "S2", "type": "screw", "between": ["screw", "movingNut"] },
+      { "id": "G", "type": "prismatic", "between": ["frame", "movingNut"] }
+    ],
+    "params": [
+      { "name": "p1", "value": 1.0, "unit": "mm", "note": "pitch of the thread in the fixed nut" },
+      { "name": "p2", "value": 0.8, "unit": "mm", "note": "pitch of the thread in the moving nut" },
+      { "name": "turns", "value": 10, "unit": "turns", "note": "knob turns shown" },
+      { "name": "D", "value": 30, "unit": "mm", "note": "knob diameter" }
+    ],
+    "defining_relations": "screw advance xs = p1 theta / 360; nut position xn = (p1 - p2) theta / 360 (same hand threads); with opposite hands it becomes a compound screw xn = (p1 + p2) theta / 360; mechanical advantage F/Fknob = pi D / (p1 - p2).",
+    "range": "knob 3600° (10 turns); screw moves 10 mm, nut moves 2 mm",
+    "overlays": ["velocity", "plot"],
+    "plot": "screw position and nut position vs knob angle (two straight lines, slopes p1 and p1 - p2)",
+    "notes": "Show both motions: the screw visibly advancing through the fixed nut and the moving nut creeping slowly. Exaggerate pitches in the drawing (for example 10 and 8 mm) if needed but label real values. Switch for same hand versus opposite hand is a nice toggle."
+  },
+  "examples": [
+    { "use": "Microscope fine focus", "detail": "Differential threads give smooth sub-millimetre focusing with sturdy threads." },
+    { "use": "Optical mounts and positioning stages", "detail": "Differential adjusters set mirror and lens angles to fractions of a micrometre." },
+    { "use": "Micrometer heads", "detail": "Differential-screw micrometers read finer increments than a single-thread spindle." }
+  ],
+  "references": [
+    { "title": "Differential screw, Wikipedia", "url": "https://en.wikipedia.org/wiki/Differential_screw", "kind": "wikipedia" },
+    { "title": "Differential Screw Measurement Mechanism, Reuleaux model M7, Cornell University", "url": "https://digital.library.cornell.edu/catalog/ss:372595", "kind": "kmoddl" },
+    { "title": "Screw threads, The Theory of Machines, CodeCogs", "url": "http://www.codecogs.com/reference/engineering/the_theory__of__machines/screw_threads.php#sec8", "kind": "textbook" },
+    { "title": "Differential Screw (Lanz and Betancourt illustration), Old Book Illustrations", "url": "https://www.oldbookillustrations.com/illustrations/differential-screw/", "kind": "textbook" }
+  ],
+  "media": [
+    { "title": "Fine adjustment using a differential screw (YouTube)", "url": "https://www.youtube.com/watch?v=KeCqpoUoQlA", "kind": "video" },
+    { "title": "Differential screw mechanism (YouTube)", "url": "https://www.youtube.com/watch?v=YFzov0PbjpM", "kind": "video" },
+    { "title": "Reuleaux model M7 differential screw, photo, Cornell University", "url": "https://digital.library.cornell.edu/catalog/ss:372595", "kind": "photos" }
+  ],
+  "related": ["lead-screw", "ball-screw", "differential", "block-and-tackle"]
+},
+{
+  "id": "belt-drive",
+  "name": "Belt drive",
+  "aka": ["pulley and belt", "V-belt drive", "timing belt drive", "flat belt drive", "synchronous belt"],
+  "in_site": false,
+  "family": "Flexible drive",
+  "level": "Basic",
+  "summary": "A tensioned loop of belt wrapped round two pulleys carries rotation between distant shafts, changing speed by the ratio of pulley diameters.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": {
+    "kind": "Reduction",
+    "class": "Low (<5:1)",
+    "typical": "1:1 to 6:1 per stage, ratio = D2/D1 (2:1 default)"
+  },
+  "dof": 1,
+  "topology": { "links": 4, "revolute": 2, "prismatic": 0, "higher_pairs": 2, "notes": "ground, driving pulley, driven pulley, belt; two belt wraps as higher pairs; an idler/tensioner adds one revolute" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Speed increase", "Torque multiplication"],
+    "property": ["Friction-based", "Few parts", "Smooth (harmonic)", "Positive drive"],
+    "application": ["Automotive", "Machine tools", "Agriculture", "Consumer products"],
+    "keywords": ["pulley", "sheave", "V-belt", "timing belt", "serpentine belt", "line shaft", "capstan equation", "wrap angle"]
+  },
+  "explain": {
+    "motion": "Both pulleys are on parallel shafts and a tensioned belt runs round them. With no slip the belt speed is the same at each pulley rim, so the speeds are inversely proportional to the diameters. An open belt turns both pulleys the same way, a crossed belt reverses the output.",
+    "forces": "Torque is carried by the difference between the tight-side and slack-side tensions, limited by friction over the wrap angle (T1/T2 up to e^(mu theta)). Shaft bearings carry the sum of both tensions; small pulleys with short centre distance reduce wrap and grip.",
+    "benefits": "Quiet, cheap, tolerant of misalignment, spans long centre distances, needs no lubrication and slips on overload to protect the machine. Toothed timing belts add exact, slip-free timing.",
+    "limits": "Friction belts creep 0.5% to 1% and can slip, so the ratio is not exact. Belts stretch and age and need tension adjustment; not for very high torque in a small space."
+  },
+  "build": {
+    "ground": "frame carrying two parallel shafts at centre distance C",
+    "input": "driver pulley, continuous rotation theta1 about O1",
+    "output": "driven pulley, rotation theta2 about O2",
+    "members": [
+      { "id": "frame", "role": "ground", "def": "O1 at (0,0), O2 at (200,0)" },
+      { "id": "driver", "role": "driver", "def": "pulley pitch diameter d1 = 60 mm about O1" },
+      { "id": "driven", "role": "output", "def": "pulley pitch diameter d2 = 120 mm about O2" },
+      { "id": "belt", "role": "belt", "def": "endless belt: two tangent spans plus arcs of contact, pitch length about 687 mm" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["frame", "driver"] },
+      { "id": "O2", "type": "revolute", "between": ["frame", "driven"] },
+      { "id": "W1", "type": "belt", "between": ["driver", "belt"] },
+      { "id": "W2", "type": "belt", "between": ["driven", "belt"] }
+    ],
+    "params": [
+      { "name": "d1", "value": 60, "unit": "mm", "note": "driver pitch diameter" },
+      { "name": "d2", "value": 120, "unit": "mm", "note": "driven pitch diameter" },
+      { "name": "C", "value": 200, "unit": "mm", "note": "centre distance" },
+      { "name": "mu", "value": 0.3, "unit": "-", "note": "belt to pulley friction coefficient" },
+      { "name": "crossed", "value": 0, "unit": "bool", "note": "0 = open belt, 1 = crossed belt" }
+    ],
+    "defining_relations": "theta2 = -(d1/d2) theta1 for crossed, +(d1/d2) theta1 for open; open belt length L = 2C + pi(d1+d2)/2 + (d2-d1)^2/(4C) = 687.2 mm; small wrap angle = 180° - 2 asin((d2-d1)/(2C)) = 162.7°; tension ratio T1/T2 <= e^(mu theta); power = (T1 - T2) v.",
+    "range": "driver 360° continuous; driven turns 180° per driver turn",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "driven pulley angle vs driver angle (straight line, slope d1/d2)",
+    "notes": "Animate belt marks moving along the path at v = omega1 d1/2. Tangent points from external tangents of the two circles; for a crossed belt use internal tangents. Draw the tight side straight and the slack side with a slight sag."
+  },
+  "examples": [
+    { "use": "Car engine accessory (serpentine) drive", "detail": "A ribbed belt from the crankshaft drives the alternator, water pump and AC compressor." },
+    { "use": "Engine timing belt", "detail": "A toothed belt keeps the camshafts in exact phase with the crankshaft." },
+    { "use": "Drill press and lathe speed changes", "detail": "Stepped V-belt pulleys give a choice of spindle speeds." },
+    { "use": "Line-shaft workshops and farm machinery", "detail": "Flat belts once carried power from one engine to many machines." }
+  ],
+  "references": [
+    { "title": "Belt (mechanical), Wikipedia", "url": "https://en.wikipedia.org/wiki/Belt_(mechanical)", "kind": "wikipedia" },
+    { "title": "Belt drive, Encyclopaedia Britannica", "url": "https://www.britannica.com/print/article/60141", "kind": "engineering-guide" },
+    { "title": "Rope-Driving, J. J. Flather (Internet Archive)", "url": "https://archive.org/details/ropedrivingatre01flatgoog", "kind": "textbook" }
+  ],
+  "media": [
+    { "title": "How does a belt drive work? (sliding and elastic slip explained) (YouTube)", "url": "https://www.youtube.com/watch?v=cZeqLOSA_qE&pp=0gcJCfcAhR29_xXO", "kind": "video" },
+    { "title": "How I designed a two stage belt drive (YouTube)", "url": "https://www.youtube.com/watch?v=utBKRAg8tdw", "kind": "video" },
+    { "title": "Types of Belt Drive (YouTube)", "url": "https://www.youtube.com/watch?v=eljkrcjywLQ", "kind": "video" }
+  ],
+  "related": ["chain-drive", "cvt-belt", "friction-wheel-drive", "spur-gears", "block-and-tackle"]
+},
+{
+  "id": "chain-drive",
+  "name": "Chain drive",
+  "aka": ["roller chain drive", "sprocket and chain", "bush roller chain", "timing chain"],
+  "in_site": false,
+  "family": "Flexible drive",
+  "level": "Basic",
+  "summary": "A roller chain meshing with toothed sprockets carries rotation between parallel shafts with no slip, in the ratio of tooth counts.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Non-uniform"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": {
+    "kind": "Reduction",
+    "class": "Low (<5:1)",
+    "typical": "1:1 to 7:1 per stage, ratio = z2/z1 (30/15 = 2:1 default)"
+  },
+  "dof": 1,
+  "topology": { "links": 4, "revolute": 2, "prismatic": 0, "higher_pairs": 2, "notes": "ground, driving sprocket, driven sprocket, chain (treated as one flexible member); two sprocket-chain meshes as higher pairs; each chain link is internally a revolute chain" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Speed reduction", "Speed increase", "Torque multiplication"],
+    "property": ["Positive drive", "High load", "Few parts"],
+    "application": ["Automotive", "Agriculture", "Consumer products", "Packaging & automation"],
+    "keywords": ["sprocket", "roller chain", "Hans Renold", "ANSI 40", "ISO 606", "chordal action", "bicycle", "pitch"]
+  },
+  "explain": {
+    "motion": "The chain is a loop of pin-jointed links whose rollers sit between sprocket teeth. As the driver turns, each tooth pulls a roller, the tight span drags the driven sprocket round, and the slack span returns. Speeds are inversely proportional to tooth counts because the same number of links pass each sprocket.",
+    "forces": "Torque is carried only by the tight span tension; the slack span hangs nearly unloaded. Because the chain wraps as a polygon, the effective radius rises and falls once per tooth (chordal action), causing small speed ripple and impact as each roller seats, worst on small sprockets.",
+    "benefits": "No slip, high load in a compact width, efficiency up to about 98%, and long centre distances with simple parts. Several shafts can be driven from one chain.",
+    "limits": "Needs lubrication and protection from dirt, wears and stretches, and is noisier than a belt. Chordal speed variation and vibration limit high-speed use with small sprockets."
+  },
+  "build": {
+    "ground": "frame carrying two parallel shafts",
+    "input": "driver sprocket, continuous rotation theta1 about O1",
+    "output": "driven sprocket, rotation theta2 about O2",
+    "members": [
+      { "id": "frame", "role": "ground", "def": "O1 at (0,0), O2 at (254,0)" },
+      { "id": "driver", "role": "driver", "def": "15-tooth sprocket, pitch 12.7 mm, pitch diameter 61.1 mm" },
+      { "id": "driven", "role": "output", "def": "30-tooth sprocket, pitch diameter 121.5 mm" },
+      { "id": "chain", "role": "belt", "def": "ISO 08B / ANSI 40 roller chain, 12.7 mm pitch, 62 links, roller diameter 8.5 mm" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["frame", "driver"] },
+      { "id": "O2", "type": "revolute", "between": ["frame", "driven"] },
+      { "id": "M1", "type": "gear mesh", "between": ["driver", "chain"] },
+      { "id": "M2", "type": "gear mesh", "between": ["driven", "chain"] }
+    ],
+    "params": [
+      { "name": "p", "value": 12.7, "unit": "mm", "note": "chain pitch" },
+      { "name": "z1", "value": 15, "unit": "teeth", "note": "driver sprocket" },
+      { "name": "z2", "value": 30, "unit": "teeth", "note": "driven sprocket" },
+      { "name": "C", "value": 254, "unit": "mm", "note": "centre distance, 20 pitches" },
+      { "name": "N", "value": 62, "unit": "links", "note": "chain length in pitches (even, no offset link)" }
+    ],
+    "defining_relations": "theta2 = (z1/z2) theta1; pitch diameter D = p / sin(180°/z); links N = 2C/p + (z1+z2)/2 + ((z2-z1)/(2 pi))^2 p/C = 62.8, round to an even 62 and adjust C; chordal speed variation = 1 - cos(180°/z1) = 2.2% for 15 teeth.",
+    "range": "driver 360° continuous; driven turns 180° per driver turn, with a small ripple at tooth frequency",
+    "overlays": ["velocity", "forces", "plot"],
+    "plot": "driven angular velocity vs driver angle (showing chordal ripple), or driven angle vs driver angle",
+    "notes": "Model the chain as N rigid links: on the sprockets the pins sit on the pitch circle at 360/z spacing; on the spans they lie on a straight line. Advance the chain by arc so pins stay on the pitch polygon. Choose C so that the free span length is an integer multiple of p, or let the slack span sag."
+  },
+  "examples": [
+    { "use": "Bicycles", "detail": "A 1/2 inch pitch roller chain carries pedal torque from chainring to rear sprocket." },
+    { "use": "Motorcycle final drive", "detail": "Sealed O-ring chains drive the rear wheel from the gearbox sprocket." },
+    { "use": "Engine timing chains", "detail": "Chains keep the camshafts in step with the crankshaft in many engines." },
+    { "use": "Conveyors and farm machinery", "detail": "Combines, balers and roller conveyors use chain drives in dirty conditions." }
+  ],
+  "references": [
+    { "title": "Roller chain, Wikipedia", "url": "https://en.wikipedia.org/wiki/Roller_chain", "kind": "wikipedia" },
+    { "title": "ASME B29.1-2011 Precision Power Transmission Roller Chains, Attachments and Sprockets", "url": "https://www.asme.org/products/codes-standards/b291-2011-precision-power-transmission-roller", "kind": "standard" },
+    { "title": "Transmission Chains, The Complete Guide to Chain, Tsubakimoto", "url": "http://chain-guide.com/applications/1-transmission-chains.html", "kind": "engineering-guide" },
+    { "title": "Roller chain, Encyclopaedia Britannica", "url": "https://britannica.com/technology/roller-chain", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Basics of Sprockets and Roller Chain (YouTube)", "url": "https://youtube.com/watch?pp=0gcJCf0Ao7VqN5tD&v=OIBcxHeUnLw", "kind": "video" },
+    { "title": "Roller Chain 101 (YouTube)", "url": "https://www.youtube.com/watch?v=yCO2dZiqF1g", "kind": "video" },
+    { "title": "Drive roller chains (DIN 8187 / ISO 606), TYMA", "url": "https://tyma.eu/products/chains/drive-roller-chains", "kind": "photos" },
+    { "title": "Chain and Sprocket Drive Animation (YouTube)", "url": "https://www.youtube.com/watch?v=bH9VuurFOA8", "kind": "animation" }
+  ],
+  "related": ["belt-drive", "spur-gears", "gear-train", "locomotive-drive"]
+},
+{
+  "id": "block-and-tackle",
+  "name": "Block and tackle",
+  "aka": ["pulley system", "compound pulley", "tackle", "purchase", "hoist"],
+  "in_site": false,
+  "family": "Flexible drive",
+  "level": "Basic",
+  "summary": "A rope reeved through a fixed and a moving block of pulleys lifts a load with a pull divided by the number of rope parts holding it.",
+  "motion": {
+    "input": "Linear",
+    "output": "Linear",
+    "label": "Linear → Linear",
+    "output_character": ["Continuous"],
+    "axes": "Same line",
+    "plane": "Planar"
+  },
+  "ratio": {
+    "kind": "Force amplification",
+    "class": "Low (<5:1)",
+    "typical": "MA = number of supporting rope parts, 2:1 (gun tackle) to 6:1 (threefold purchase); 4:1 default"
+  },
+  "dof": 1,
+  "topology": { "links": 6, "revolute": 4, "prismatic": 1, "higher_pairs": 4, "notes": "ground with fixed block, moving block (vertical guide idealised as prismatic), 4 sheaves on their pins; rope wraps on each sheave as higher pairs; rope is a flexible member" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Force amplification", "Lifting"],
+    "property": ["Few parts", "Friction-based", "Backdrivable"],
+    "application": ["Construction & lifting", "Marine", "Education"],
+    "keywords": ["sheave", "fall", "gun tackle", "luff tackle", "double tackle", "Hero of Alexandria", "rove to advantage", "rigging"]
+  },
+  "explain": {
+    "motion": "The rope is tied to one block and threaded alternately round the sheaves of the fixed upper block and the moving lower block. Pulling the free end (the fall) shortens every rope part between the blocks equally, so the load rises by the pull distance divided by the number of supporting parts.",
+    "forces": "Each supporting part carries the same tension, so the hauling force is the load divided by n in the ideal case. Sheave bearing and rope bending friction add a few percent per sheave, so real advantage is lower and too many sheaves can cancel the gain.",
+    "benefits": "Very simple, light and portable, uses ordinary rope, and the advantage is easy to change by re-reeving.",
+    "limits": "Long hauling distance for a small lift, friction losses and twisting of the rope. Not self-locking: the load runs back if the fall is released, so a cleat or brake is needed."
+  },
+  "build": {
+    "ground": "beam carrying the upper (fixed) block and the rope's dead end",
+    "input": "fall (free rope end), pulled down by distance s",
+    "output": "lower block with hook and load, vertical rise y",
+    "members": [
+      { "id": "beam", "role": "ground", "def": "upper block pin at (0,0)" },
+      { "id": "upperSheaves", "role": "link", "def": "two sheaves of 60 mm diameter side by side on the upper block pin" },
+      { "id": "lowerBlock", "role": "output", "def": "lower block with two 60 mm sheaves, starts 400 mm below the upper pin, carries the load hook" },
+      { "id": "lowerSheaves", "role": "link", "def": "two sheaves on the lower block pin" },
+      { "id": "rope", "role": "belt", "def": "rope dead-ended on the upper block, reeved through 4 sheaves, 4 parts between blocks, fall leaving from an upper sheave" }
+    ],
+    "joints": [
+      { "id": "U", "type": "revolute", "between": ["beam", "upperSheaves"] },
+      { "id": "L", "type": "revolute", "between": ["lowerBlock", "lowerSheaves"] },
+      { "id": "V", "type": "prismatic", "between": ["beam", "lowerBlock"] },
+      { "id": "R", "type": "belt", "between": ["rope", "upperSheaves"] },
+      { "id": "R2", "type": "belt", "between": ["rope", "lowerSheaves"] }
+    ],
+    "params": [
+      { "name": "n", "value": 4, "unit": "parts", "note": "rope parts supporting the lower block (double tackle)" },
+      { "name": "Ds", "value": 60, "unit": "mm", "note": "sheave diameter" },
+      { "name": "h0", "value": 400, "unit": "mm", "note": "initial block separation" },
+      { "name": "W", "value": 400, "unit": "N", "note": "load" },
+      { "name": "K", "value": 1.09, "unit": "-", "note": "sheave friction factor (plain bearings)" }
+    ],
+    "defining_relations": "y = s / n; ideal hauling force F = W / n; with friction factor K per sheave over N sheaves, F = W K^N (K - 1) / (K^n - 1) approximately; sheave i turns at a rate proportional to the rope speed through it, rope speed in part k = k v_load.",
+    "range": "fall pulled 1000 mm; load rises 250 mm (block separation 400 to 150 mm)",
+    "overlays": ["forces", "velocity", "plot"],
+    "plot": "load height vs fall pulled, and hauling force vs number of parts",
+    "notes": "Rope parts move at different speeds: 1x, 2x, 3x, 4x the load speed from the dead end toward the fall, so each sheave spins at a different rate. Animate rope dashes to show this. Make n a parameter that re-reeves (2 to 6) with the dead end alternating between blocks for odd n."
+  },
+  "examples": [
+    { "use": "Sailing ships and yachts", "detail": "Tackles trim sails and haul halyards and mainsheets." },
+    { "use": "Cranes and drilling rigs", "detail": "Crown blocks and travelling blocks multiply hoist-line pull for heavy lifts." },
+    { "use": "Workshop and rescue hoists", "detail": "Portable 3:1 to 5:1 haul systems lift engines and people." }
+  ],
+  "references": [
+    { "title": "Block and tackle, Wikipedia", "url": "https://en.wikipedia.org/wiki/Block_and_tackle", "kind": "wikipedia" },
+    { "title": "Pulley, Wikipedia", "url": "https://en.wikipedia.org/wiki/Pulley", "kind": "wikipedia" },
+    { "title": "API RP 9B, Application, Care and Use of Wire Rope for Oil Field Service", "url": "http://www.techstreet.com/standards/API/RP_9B?product_id=1221365", "kind": "standard" },
+    { "title": "Six simple machines, ConstructionKnowledge.net", "url": "http://www.constructionknowledge.net/general_technical_knowledge/general_tech_basic_six_simple_machines.php", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Block and tackle pulley (YouTube)", "url": "https://www.youtube.com/watch?v=BQY8QOpFbNA", "kind": "video" },
+    { "title": "Easy to Build 4 to 1 Block and Tackle Haul System (YouTube)", "url": "https://www.youtube.com/watch?v=RZpAUQogCEk", "kind": "video" },
+    { "title": "Block (sailing), Wikipedia (photos of Mary Rose and modern blocks)", "url": "https://en.wikipedia.org/wiki/Block_(sailing)", "kind": "photos" },
+    { "title": "Pulley system simulation, Walter Fendt", "url": "https://www.walter-fendt.de/html5/phen/pulleysystem_en.htm", "kind": "interactive" }
+  ],
+  "related": ["belt-drive", "differential-screw", "bell-crank", "toggle-clamp"]
+},
+{
+  "id": "oldham-coupling",
+  "name": "Oldham coupling",
+  "aka": ["Oldham coupler", "cross-slider coupling", "tongue and groove coupling", "disc coupling"],
+  "in_site": true,
+  "family": "Coupling",
+  "level": "Intermediate",
+  "summary": "Two parallel offset shafts joined by a floating disc with crossed tongues; the output turns at exactly input speed while the disc centre circles twice per turn.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": {
+    "kind": "Unity",
+    "class": "1:1",
+    "typical": "exactly 1:1 at every instant; disc centre orbits at 2x shaft speed on a circle of diameter e"
+  },
+  "dof": 1,
+  "topology": { "links": 4, "revolute": 2, "prismatic": 2, "higher_pairs": 0, "notes": "ground, input hub, floating disc (with both tongues), output hub; two prismatic tongue-in-slot pairs at right angles; a double-slider (elliptic trammel inversion)" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Shaft coupling", "Misalignment compensation"],
+    "property": ["Exact", "Compact", "Few parts", "Historic"],
+    "application": ["Packaging & automation", "Robotics", "Instruments", "Consumer products"],
+    "keywords": ["John Oldham", "paddle steamer", "parallel offset", "double slider", "acetal disc", "stepper motor", "torque fuse"]
+  },
+  "explain": {
+    "motion": "Each shaft carries a hub with a straight slot across its face. The middle disc has two tongues at right angles, one on each face, and each tongue slides in one hub's slot. Because the tongues are square to each other, both hubs must turn through the same angle, and the disc's centre runs round a small circle between the two shaft centres, twice for every turn of the shafts.",
+    "forces": "Torque passes as side forces between the tongues and the walls of the slots, square to each slot. The offset itself puts little bending on the shafts, but the tongues slide back and forth once per turn, so the faces need lubrication or a low-friction disc and wear grows with offset and speed.",
+    "benefits": "The speed ratio is exactly one at every instant, unlike a single universal joint. It takes up parallel offset in a short length, and the middle disc can be a cheap plastic part that also insulates and acts as a torque fuse.",
+    "limits": "Only small offsets in practice (a few percent of diameter) because sliding wear and the orbiting disc's unbalance grow with offset. Little angular misalignment capacity and some backlash unless spring-loaded."
+  },
+  "build": {
+    "ground": "frame with the input axis O1 at (0,0) and the output axis O2 at (e,0), parallel",
+    "input": "hubIn, continuous rotation theta about O1",
+    "output": "hubOut, rotation theta about O2 (same angle); disc centre C path",
+    "members": [
+      { "id": "hubIn", "role": "driver", "def": "hub of radius R = 68 mm about O1 with a slot ws = 18 mm wide along its local x axis" },
+      { "id": "disc", "role": "link", "def": "floating disc radius 50 mm with tongue 16 x 48 mm along local x on one face and another along local y on the other face" },
+      { "id": "hubOut", "role": "output", "def": "hub of radius 68 mm about O2 with an 18 mm slot along its local y axis" },
+      { "id": "frame", "role": "ground", "def": "shaft bearings at O1 and O2, offset e = 28 mm" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["frame", "hubIn"] },
+      { "id": "O2", "type": "revolute", "between": ["frame", "hubOut"] },
+      { "id": "T1", "type": "prismatic", "between": ["hubIn", "disc"] },
+      { "id": "T2", "type": "prismatic", "between": ["disc", "hubOut"] }
+    ],
+    "params": [
+      { "name": "e", "value": 28, "unit": "mm", "note": "shaft offset" },
+      { "name": "R", "value": 68, "unit": "mm", "note": "hub radius" },
+      { "name": "Rm", "value": 50, "unit": "mm", "note": "disc radius" },
+      { "name": "ws", "value": 18, "unit": "mm", "note": "slot width" },
+      { "name": "wr", "value": 16, "unit": "mm", "note": "tongue width (1 mm clearance each side)" },
+      { "name": "Lt", "value": 48, "unit": "mm", "note": "tongue length" }
+    ],
+    "defining_relations": "theta_out = theta_in exactly; disc pose = (C, theta) with C = e cos(theta) (cos theta, sin theta), the foot of the perpendicular from O2 onto the input slot line; C runs on a circle of diameter e centred at (e/2, 0) at twice shaft speed; each tongue slides ±e along its slot, so slot half-length >= e + Lt/2.",
+    "range": "input 360° continuous; output 360° in phase; disc centre goes round its 28 mm circle twice per turn; each tongue strokes ±28 mm",
+    "overlays": ["paths", "velocity", "forces", "angles", "plot"],
+    "plot": "disc centre position on its circle (degrees) vs input angle, a straight line of slope 2",
+    "notes": "Matches the site build(): e = 28, R = 68, Rm = 50, ws = 18, wr = 16, Lt = 48. Draw the input slot as a groove (not a hole) since the shaft is behind the hub. Disc orientation equals theta, it only translates relative to the hub frames. At e = 0 it reduces to a rigid coupling."
+  },
+  "examples": [
+    { "use": "Stepper motor to lead screw couplings", "detail": "Small Oldham couplings with acetal discs join motors to lead screws in 3D printers and CNC routers." },
+    { "use": "Encoders and pumps", "detail": "They accept small parallel offset while passing exact angle to encoders and metering pumps." },
+    { "use": "Scroll compressors", "detail": "An Oldham ring keeps the orbiting scroll from rotating in refrigeration compressors." },
+    { "use": "Paper feed rollers and printers", "detail": "Roller drives in office machines use Oldham couplings to tolerate misalignment." }
+  ],
+  "references": [
+    { "title": "Oldham coupler (in Coupling), Wikipedia", "url": "https://en.wikipedia.org/wiki/Oldham_coupler", "kind": "wikipedia" }
+  ],
+  "media": [
+    { "title": "Actual Working Of Oldham's Coupling (YouTube)", "url": "https://www.youtube.com/watch?v=vUuOudJ829w", "kind": "video" },
+    { "title": "Fix your Z axis with Oldham couplings, dual Z screws and thrust bearings (YouTube)", "url": "https://www.youtube.com/watch?v=RXgwOikiBdg", "kind": "video" },
+    { "title": "What are Oldham Couplings? (YouTube)", "url": "https://www.youtube.com/watch?v=utEKKox2WHA", "kind": "video" },
+    { "title": "Oldham Coupling Mechanism Explained, wooden model (YouTube)", "url": "https://www.youtube.com/watch?v=7-jrf3z3FuI", "kind": "video" }
+  ],
+  "related": ["schmidt-coupling", "elliptic-trammel", "universal-joint", "double-cardan", "tusi-couple"]
+},
+{
+  "id": "universal-joint",
+  "name": "Universal joint",
+  "aka": ["Cardan joint", "Hooke's joint", "U-joint", "Hardy-Spicer joint", "cross joint"],
+  "in_site": false,
+  "family": "Coupling",
+  "level": "Intermediate",
+  "summary": "Two yokes joined by a cross let shafts at an angle drive each other, but the output speed speeds up and slows down twice per turn.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Non-uniform"],
+    "axes": "Angled intersecting",
+    "plane": "Spatial"
+  },
+  "ratio": {
+    "kind": "Unity",
+    "class": "1:1",
+    "typical": "1:1 on average; instantaneous ratio swings between cos(beta) and 1/cos(beta), 0.866 to 1.155 at 30°"
+  },
+  "dof": 1,
+  "topology": { "links": 4, "revolute": 4, "prismatic": 0, "higher_pairs": 0, "notes": "ground, input yoke, cross (spider), output yoke; a spherical 4R chain with all four axes meeting at the cross centre" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Shaft coupling", "Misalignment compensation", "Steering"],
+    "property": ["Singular positions", "Few parts", "Historic", "High load"],
+    "application": ["Automotive", "Agriculture", "Machine tools", "Railways"],
+    "keywords": ["Cardano", "Robert Hooke", "spider", "trunnion", "needle bearings", "driveshaft", "speed fluctuation", "Willis"]
+  },
+  "explain": {
+    "motion": "Each shaft ends in a fork (yoke), and the two forks are joined by a cross whose arms run in bearings in the forks. As the input turns, the cross wobbles so the output yoke follows round at an angle. Over a full turn both shafts turn 360°, but within the turn the output runs ahead and then behind, twice per revolution.",
+    "forces": "Torque passes through the cross arms as forces in the yoke bearings. The speed fluctuation causes angular acceleration of the output and its inertia, giving torque ripple and vibration that grows sharply with angle; the yokes also feel a secondary bending couple.",
+    "benefits": "Simple, strong and compact, it carries large torque across angles of up to about 30° to 45° and is cheap to make with needle-bearing crosses.",
+    "limits": "Not constant velocity: at 30° the output speed varies by about ±15%. Above about 45° it locks up, and it needs pairs (double cardan or phased driveshaft) to cancel the fluctuation."
+  },
+  "build": {
+    "ground": "two bearings whose axes meet at the joint centre J at angle beta",
+    "input": "input yoke, continuous rotation theta1 about axis 1",
+    "output": "output yoke angle theta2 about axis 2 and its speed ratio",
+    "members": [
+      { "id": "yokeIn", "role": "driver", "def": "fork of radius 30 mm on shaft 1 (along x), arms at ±30 mm across its axis" },
+      { "id": "cross", "role": "link", "def": "spider with two perpendicular arms of half-length 30 mm, centred at J" },
+      { "id": "yokeOut", "role": "output", "def": "fork of radius 30 mm on shaft 2, inclined at beta to shaft 1 in the x-y plane" },
+      { "id": "frame", "role": "ground", "def": "bearings for both shafts, axes intersecting at J" }
+    ],
+    "joints": [
+      { "id": "B1", "type": "revolute", "between": ["frame", "yokeIn"] },
+      { "id": "B2", "type": "revolute", "between": ["frame", "yokeOut"] },
+      { "id": "C1", "type": "revolute", "between": ["yokeIn", "cross"] },
+      { "id": "C2", "type": "revolute", "between": ["cross", "yokeOut"] }
+    ],
+    "params": [
+      { "name": "beta", "value": 30, "unit": "deg", "note": "shaft angle (0° to 45°)" },
+      { "name": "r", "value": 30, "unit": "mm", "note": "yoke and cross arm radius" },
+      { "name": "Ls", "value": 120, "unit": "mm", "note": "shaft stub length drawn" }
+    ],
+    "defining_relations": "tan(theta2) = tan(theta1) / cos(beta) (angles measured from the plane of the two shafts); omega2/omega1 = cos(beta) / (1 - sin^2(beta) cos^2(theta1)); ratio extremes cos(beta) and 1/cos(beta); maximum angle error about atan((1 - cos beta) / (2 sqrt(cos beta))) = 4.1° at 30°.",
+    "range": "input 360° continuous; output 360° with a lead/lag of up to ±4.1° at beta = 30°",
+    "overlays": ["angles", "velocity", "plot"],
+    "plot": "output speed ratio omega2/omega1 vs input angle (two humps per turn), and angle error theta2 - theta1",
+    "notes": "Pseudo-3D required. The cross arm in yoke 1 is always perpendicular to shaft 1, the other arm perpendicular to shaft 2, and the two arms perpendicular to each other: arm2 = normalize(cross(shaft2_axis, arm1)). Use atan2 to keep theta2 on the correct branch through 90° and 270°. Beta slider from 0 to 45°."
+  },
+  "examples": [
+    { "use": "Rear-wheel-drive propeller shafts", "detail": "A U-joint at each end of the driveshaft, phased so their fluctuations cancel." },
+    { "use": "Steering columns", "detail": "U-joints route the steering shaft around the engine and pedals." },
+    { "use": "Tractor PTO shafts", "detail": "Agricultural power take-off shafts use cross joints at both ends." },
+    { "use": "Socket wrench extensions", "detail": "Small universal joints let a socket turn a bolt at an angle." }
+  ],
+  "references": [
+    { "title": "Universal joint, Wikipedia", "url": "https://en.wikipedia.org/wiki/Universal_joint", "kind": "wikipedia" },
+    { "title": "Principles of Mechanism, Robert Willis (1870), Google Books", "url": "https://books.google.com/books?id=KFjHSfh561MC&pg=PA437", "kind": "textbook" },
+    { "title": "Universal Joints and Driveshafts, Seherr-Thoss et al., Google Books", "url": "https://books.google.com/books?id=-iLyCAAAQBAJ&pg=PA1", "kind": "textbook" },
+    { "title": "Mills (2007), Notes and Records of the Royal Society, on Hooke's universal joint", "url": "http://rsnr.royalsocietypublishing.org/content/61/2/219.full.pdf+html", "kind": "paper" },
+    { "title": "Historical Notes: Universal Joints, Motor Sport Magazine (1952)", "url": "https://www.motorsportmagazine.com/archive/page/december-1952/33", "kind": "paper" }
+  ],
+  "media": [
+    { "title": "Study of Cardan universal joint (YouTube)", "url": "https://www.youtube.com/watch?v=ZQt6cAmsgXQ", "kind": "video" },
+    { "title": "Universal joint, Cardan joints, design and applications (YouTube)", "url": "https://www.youtube.com/watch?v=fQhuR50m9qo", "kind": "video" },
+    { "title": "Universal Joint, Wolfram Demonstrations", "url": "http://demonstrations.wolfram.com/UniversalJoint/", "kind": "interactive" }
+  ],
+  "related": ["double-cardan", "rzeppa-cv-joint", "oldham-coupling", "schmidt-coupling", "bevel-gears"]
+},
+{
+  "id": "double-cardan",
+  "name": "Double Cardan joint",
+  "aka": ["double universal joint", "double U-joint", "CV double cardan", "double Hooke's joint"],
+  "in_site": false,
+  "family": "Coupling",
+  "level": "Advanced",
+  "summary": "Two universal joints back to back with a short centre yoke cancel each other's speed wobble, giving constant velocity across an angle.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Angled intersecting",
+    "plane": "Spatial"
+  },
+  "ratio": {
+    "kind": "Unity",
+    "class": "1:1",
+    "typical": "exactly 1:1 when both joint angles are equal and the centre yokes are in phase"
+  },
+  "dof": 1,
+  "topology": { "links": 6, "revolute": 6, "prismatic": 0, "higher_pairs": 0, "notes": "ground, input yoke, cross 1, centre yoke, cross 2, output yoke; 2 shaft bearings plus 2 cross bearings per joint; a ball-and-socket centring device (spherical pair, not counted) keeps the two joint angles equal" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Shaft coupling", "Misalignment compensation"],
+    "property": ["Exact", "High load", "Singular positions"],
+    "application": ["Automotive", "Agriculture", "Machine tools"],
+    "keywords": ["centring ball", "phasing", "Hooke 1683", "Thompson coupling", "4x4 driveshaft", "constant velocity", "centre yoke"]
+  },
+  "explain": {
+    "motion": "The input yoke drives a first cross, which drives a short centre yoke, which drives a second cross and the output yoke. Each single joint makes the speed fluctuate, but because the two joints are set at equal angles with the centre yoke forks in the same plane, the second joint's speed-up exactly cancels the first one's slow-down. A centring ball and socket between the two shafts keeps the two angles equal as the total angle changes.",
+    "forces": "Torque passes through both crosses, each carrying it as yoke-bearing forces; the centre yoke still accelerates twice per turn, but the output does not. The centring device carries the small forces that keep the joint angles equal.",
+    "benefits": "Constant velocity at larger angles than a single U-joint can tolerate, using rugged, serviceable cross-and-bearing parts.",
+    "limits": "Longer, heavier and more complex than a single joint; constant velocity only holds when the two angles stay equal, and the centring ball wears."
+  },
+  "build": {
+    "ground": "input and output bearings whose axes meet at a point midway along the centre yoke, total angle 2 beta",
+    "input": "input yoke, continuous rotation theta1",
+    "output": "output yoke, theta3 (equal to theta1); centre yoke theta2 fluctuates",
+    "members": [
+      { "id": "yokeIn", "role": "driver", "def": "fork radius 30 mm on shaft 1" },
+      { "id": "cross1", "role": "link", "def": "spider with 30 mm arms, centre J1" },
+      { "id": "centre", "role": "link", "def": "centre yoke, J1 to J2 = 60 mm, forks at both ends in the same plane" },
+      { "id": "cross2", "role": "link", "def": "spider with 30 mm arms, centre J2" },
+      { "id": "yokeOut", "role": "output", "def": "fork radius 30 mm on shaft 2" },
+      { "id": "frame", "role": "ground", "def": "bearings for both shafts; shaft 1 at beta to the centre yoke, shaft 2 at beta on the other side" }
+    ],
+    "joints": [
+      { "id": "B1", "type": "revolute", "between": ["frame", "yokeIn"] },
+      { "id": "a1", "type": "universal", "between": ["yokeIn", "centre"] },
+      { "id": "a2", "type": "universal", "between": ["centre", "yokeOut"] },
+      { "id": "B2", "type": "revolute", "between": ["frame", "yokeOut"] },
+      { "id": "ball", "type": "spherical", "between": ["yokeIn", "yokeOut"] }
+    ],
+    "params": [
+      { "name": "beta", "value": 15, "unit": "deg", "note": "angle at each joint (total 30°)" },
+      { "name": "r", "value": 30, "unit": "mm", "note": "yoke radius" },
+      { "name": "Lc", "value": 60, "unit": "mm", "note": "centre yoke length J1 to J2" }
+    ],
+    "defining_relations": "Joint 1: tan(theta2) = tan(theta1)/cos(beta1); joint 2 reversed: tan(theta3) = tan(theta2) cos(beta2); with beta1 = beta2 and centre forks in phase, theta3 = theta1 exactly; input and output shafts may be in different planes as long as both angles to the centre yoke are equal.",
+    "range": "input 360° continuous; output 360° exactly in phase; centre yoke leads and lags by up to about 1° at beta = 15°",
+    "overlays": ["angles", "velocity", "plot"],
+    "plot": "centre yoke speed ratio and output speed ratio vs input angle (centre fluctuates, output flat at 1)",
+    "notes": "Provide a toggle to put the centre yoke forks 90° out of phase to show the fluctuations adding instead of cancelling. Keep the centre yoke on the bisector of the total angle. Reuse the single universal-joint solver twice."
+  },
+  "examples": [
+    { "use": "4x4 front driveshafts", "detail": "Double cardan joints at the transfer case end allow steep driveshaft angles on lifted trucks." },
+    { "use": "Steering columns and PTO shafts", "detail": "Wide-angle tractor PTO shafts use double cardan heads for smooth drive when turning." },
+    { "use": "Machine tool spindles and rolling mills", "detail": "Double cross joints transmit power to offset or tilted spindles." }
+  ],
+  "references": [
+    { "title": "Universal joint, double Cardan shaft section, Wikipedia", "url": "https://en.wikipedia.org/wiki/Universal_joint", "kind": "wikipedia" },
+    { "title": "Constant-velocity joint, Wikipedia", "url": "https://en.wikipedia.org/wiki/Constant-velocity_joint", "kind": "wikipedia" },
+    { "title": "Centering mechanism for double cardan joints, US patent 9784327", "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9784327", "kind": "patent" },
+    { "title": "Double Universal Joint, Pearce, US patent 1979768 (Espacenet)", "url": "https://worldwide.espacenet.com/textdoc?DB=EPODOC&IDX=US1979768", "kind": "patent" }
+  ],
+  "media": [
+    { "title": "How To Replace a Double Cardan Joint (YouTube)", "url": "https://www.youtube.com/watch?v=VQl68ZbMWrM", "kind": "video" },
+    { "title": "Double Cardan Drive Shaft Rebuild (YouTube)", "url": "https://www.youtube.com/watch?v=KXn1nBkafNk", "kind": "video" },
+    { "title": "Study of double Cardan universal joint 2a (YouTube)", "url": "https://www.youtube.com/watch?v=cydmR0lX2t8", "kind": "video" }
+  ],
+  "related": ["universal-joint", "rzeppa-cv-joint", "schmidt-coupling", "oldham-coupling"]
+},
+{
+  "id": "rzeppa-cv-joint",
+  "name": "Rzeppa CV joint",
+  "aka": ["Rzeppa joint", "ball-type CV joint", "constant velocity joint", "fixed ball joint", "Birfield joint"],
+  "in_site": false,
+  "family": "Coupling",
+  "level": "Advanced",
+  "summary": "Six balls held in a cage between grooved inner and outer races stay in the plane bisecting the shaft angle, so the output turns at constant speed.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Angled intersecting",
+    "plane": "Spatial"
+  },
+  "ratio": {
+    "kind": "Unity",
+    "class": "1:1",
+    "typical": "exactly 1:1 up to about 45° to 48° joint angle"
+  },
+  "dof": 1,
+  "topology": { "links": 10, "revolute": 2, "prismatic": 0, "higher_pairs": 18, "notes": "ground, inner race with shaft, outer race (bell) with shaft, cage, 6 balls; each ball contacts an inner groove, an outer groove and a cage window (18 rolling/sliding higher pairs); cage to races are spherical sliding fits" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Shaft coupling", "Misalignment compensation", "Steering"],
+    "property": ["Exact", "Compact", "High load", "Precision"],
+    "application": ["Automotive", "Agriculture", "Robotics"],
+    "keywords": ["Alfred Rzeppa", "homokinetic", "bisecting plane", "ball cage", "front-wheel drive", "CV boot", "outer race", "half shaft"]
+  },
+  "explain": {
+    "motion": "The inner race on one shaft and the bell-shaped outer race on the other each have six curved grooves. Six balls sit in pairs of facing grooves and in windows of a cage that lies between the races. The groove shapes force the balls, and so the cage, to stay in the plane that bisects the angle between the shafts, which makes the joint symmetric and the two shafts turn at exactly the same speed.",
+    "forces": "Torque passes from inner race to balls to outer race as contact forces at the groove flanks; the cage only positions the balls. Load is shared between six balls, so it is compact for its torque, but contact stresses are high and need clean grease.",
+    "benefits": "True constant velocity at large angles in a compact package, ideal for steered driven wheels.",
+    "limits": "Needs a sealed boot full of grease; a torn boot lets in grit and it fails by clicking and wear. Fixed-type joints do not plunge, so a sliding (tripod or plunging) joint is needed at the other end of the shaft."
+  },
+  "build": {
+    "ground": "input and output shaft bearings with axes meeting at the joint centre J at angle beta",
+    "input": "inner race shaft, continuous rotation theta about axis 1",
+    "output": "outer race shaft, rotation theta about axis 2; ball positions",
+    "members": [
+      { "id": "inner", "role": "driver", "def": "spherical inner race (star) with 6 grooves, outer sphere radius 24 mm, on shaft 1" },
+      { "id": "outer", "role": "output", "def": "bell outer race with 6 grooves, inner sphere radius 33 mm, on shaft 2" },
+      { "id": "cage", "role": "link", "def": "spherical shell between races with 6 windows at 60° spacing" },
+      { "id": "balls", "role": "link", "def": "6 balls of 16 mm diameter on a 50 mm pitch circle diameter" },
+      { "id": "frame", "role": "ground", "def": "bearings for both shafts intersecting at J" }
+    ],
+    "joints": [
+      { "id": "B1", "type": "revolute", "between": ["frame", "inner"] },
+      { "id": "B2", "type": "revolute", "between": ["frame", "outer"] },
+      { "id": "G1", "type": "rolling", "between": ["balls", "inner"] },
+      { "id": "G2", "type": "rolling", "between": ["balls", "outer"] },
+      { "id": "W", "type": "cam contact", "between": ["balls", "cage"] }
+    ],
+    "params": [
+      { "name": "beta", "value": 20, "unit": "deg", "note": "joint angle (max about 45°)" },
+      { "name": "n", "value": 6, "unit": "balls", "note": "ball count" },
+      { "name": "Rp", "value": 25, "unit": "mm", "note": "ball pitch circle radius" },
+      { "name": "db", "value": 16, "unit": "mm", "note": "ball diameter" },
+      { "name": "off", "value": 3, "unit": "mm", "note": "groove centre offset either side of J that steers the balls to the bisecting plane" }
+    ],
+    "defining_relations": "Balls lie in the homokinetic plane through J whose normal bisects the two shaft axes (tilted beta/2 from each); omega_out = omega_in; ball k sits at angle theta + 60k on a circle of radius Rp in that plane; each ball oscillates along its grooves by about ±Rp tan(beta/2) per turn.",
+    "range": "input 360° continuous; output 360° in phase; cage tilts by beta/2; ball excursion along grooves about ±4.4 mm at beta = 20°",
+    "overlays": ["angles", "velocity", "plot"],
+    "plot": "output angle minus input angle (flat zero) and ball axial excursion vs input angle",
+    "notes": "Pseudo-3D. Simplest model: place the cage in the bisecting plane, rotate it by theta, put balls on its pitch circle, then draw inner race rotated by theta about axis 1 and outer by theta about axis 2. Show the bisecting plane as a translucent disc. Compare with a single U-joint at the same angle."
+  },
+  "examples": [
+    { "use": "Front-wheel-drive car half shafts", "detail": "The outboard joint at each front wheel is a Rzeppa-type fixed ball joint that allows steering and suspension travel." },
+    { "use": "Independent rear suspension drive shafts", "detail": "Ball CV joints link the differential to rear hubs that move with the suspension." },
+    { "use": "4x4 front axles and driveshafts", "detail": "Rzeppa CV driveshafts replace U-joints on lifted off-road vehicles." }
+  ],
+  "references": [
+    { "title": "Constant-velocity joint, Wikipedia", "url": "https://en.wikipedia.org/wiki/Constant-velocity_joint", "kind": "wikipedia" },
+    { "title": "Alfred H. Rzeppa, Wikipedia", "url": "https://en.wikipedia.org/wiki/Alfred_H._Rzeppa", "kind": "wikipedia" },
+    { "title": "Universal Joint, A. H. Rzeppa, US patent 1665280 (Espacenet)", "url": "http://v3.espacenet.com/origdoc?DB=EPODOC&IDX=US1665280&F=0&QPN=US1665280", "kind": "patent" },
+    { "title": "NTN Technical Review No. 75, 54° fixed CV joint (archived PDF)", "url": "https://web.archive.org/web/20190730143903/https://www.ntnglobal.com/en/products/review/pdf/NTN_TR75_en_P016.pdf", "kind": "paper" },
+    { "title": "The Rzeppa Constant-velocity Joint, Commercial Motor, 2 June 1933", "url": "https://archive.commercialmotor.com/article/2nd-june-1933/67/the-rzeppa-constant-velocity-joint", "kind": "paper" }
+  ],
+  "media": [
+    { "title": "How does a constant velocity joint work? (Rzeppa) (YouTube)", "url": "https://www.youtube.com/watch?v=4MapbpsRDeY", "kind": "video" },
+    { "title": "How To Assemble a CV Joint, Air Cooled VW Tech Tips (YouTube)", "url": "https://www.youtube.com/watch?v=pmhPYCJWurc", "kind": "video" },
+    { "title": "3D Print Rzeppa Joint (Constant Velocity) Mechanism (YouTube)", "url": "https://www.youtube.com/watch?v=1Ky5V9HLle4", "kind": "video" }
+  ],
+  "related": ["universal-joint", "double-cardan", "differential", "schmidt-coupling"]
+},
+{
+  "id": "schmidt-coupling",
+  "name": "Schmidt coupling",
+  "aka": ["Schmidt offset coupling", "three-disc offset coupling", "parallel link coupling", "Zero-Max Schmidt"],
+  "in_site": false,
+  "family": "Coupling",
+  "level": "Advanced",
+  "summary": "Three discs joined by sets of parallel links connect widely offset parallel shafts at exactly the same speed, with no side load.",
+  "motion": {
+    "input": "Rotary",
+    "output": "Rotary",
+    "label": "Rotary → Rotary",
+    "output_character": ["Continuous", "Constant velocity"],
+    "axes": "Offset parallel",
+    "plane": "Planar"
+  },
+  "ratio": {
+    "kind": "Unity",
+    "class": "1:1",
+    "typical": "exactly 1:1 for any offset from near zero up to 2 x link length"
+  },
+  "dof": 1,
+  "topology": { "links": 10, "revolute": 14, "prismatic": 0, "higher_pairs": 0, "notes": "ground, input disc, middle disc, output disc, 3 links between input and middle, 3 links between middle and output; 12 link-end pins plus 2 shaft bearings; overconstrained parallelogram sets (3 links where 2 would do, to pass dead centres)" },
+  "backdrivable": "Yes",
+  "tags": {
+    "function": ["Shaft coupling", "Misalignment compensation"],
+    "property": ["Exact", "Balanced", "Singular positions", "High load"],
+    "application": ["Printing & textiles", "Packaging & automation", "Machine tools"],
+    "keywords": ["Richard Schmidt", "Zero-Max", "parallel offset", "three discs", "parallelogram links", "NASA 1960", "dynamic offset"]
+  },
+  "explain": {
+    "motion": "The input disc is linked to a middle disc by three equal links whose pins sit on equal pitch circles 120° apart, and the middle disc is linked the same way to the output disc. Each set of links forms parallelograms, so the joined discs always keep the same orientation: all three discs turn at the same angle. The links themselves do not rotate; they only translate in circles, while the middle disc spins about a fixed point set by the offset.",
+    "forces": "Torque passes through the links in tension and compression, with the three links of each set sharing load so no set ever sits at a dead centre. Because the parallelograms leave no reaction at the shafts, there is no side load on the bearings from the offset.",
+    "benefits": "Exact constant velocity with large parallel offsets, and the offset can even change while running. Compact axially compared with a cardan shaft.",
+    "limits": "Many pins and bearings make it costlier and heavier than an Oldham or bellows coupling. Near zero offset the middle disc position becomes undetermined, so a small minimum offset or support is needed, and it takes little angular misalignment."
+  },
+  "build": {
+    "ground": "frame with input axis O1 at (0,0) and output axis O3 at (e,0)",
+    "input": "input disc, continuous rotation theta about O1",
+    "output": "output disc, rotation theta about O3; middle disc centre C and link paths",
+    "members": [
+      { "id": "discIn", "role": "driver", "def": "disc about O1 with 3 pins at radius r = 40 mm, 120° apart" },
+      { "id": "linksA", "role": "link", "def": "3 links of length L = 60 mm from discIn pins to discMid pins" },
+      { "id": "discMid", "role": "link", "def": "floating middle disc with 6 pins: 3 at r = 40 mm for set A and 3 at r = 40 mm, offset 60° for set B (on the other face)" },
+      { "id": "linksB", "role": "link", "def": "3 links of length L = 60 mm from discMid pins to discOut pins" },
+      { "id": "discOut", "role": "output", "def": "disc about O3 with 3 pins at r = 40 mm" },
+      { "id": "frame", "role": "ground", "def": "shaft bearings at O1 and O3" }
+    ],
+    "joints": [
+      { "id": "O1", "type": "revolute", "between": ["frame", "discIn"] },
+      { "id": "O3", "type": "revolute", "between": ["frame", "discOut"] },
+      { "id": "A1-3", "type": "revolute", "between": ["discIn", "linksA"] },
+      { "id": "A4-6", "type": "revolute", "between": ["linksA", "discMid"] },
+      { "id": "B1-3", "type": "revolute", "between": ["discMid", "linksB"] },
+      { "id": "B4-6", "type": "revolute", "between": ["linksB", "discOut"] }
+    ],
+    "params": [
+      { "name": "e", "value": 50, "unit": "mm", "note": "shaft offset (0 < e < 2L)" },
+      { "name": "L", "value": 60, "unit": "mm", "note": "link length" },
+      { "name": "r", "value": 40, "unit": "mm", "note": "pin pitch circle radius on every disc" },
+      { "name": "branch", "value": 1, "unit": "+1/-1", "note": "side of the shaft line the middle disc centre lies on" }
+    ],
+    "defining_relations": "All discs share angle theta; middle centre C satisfies |C - O1| = |C - O3| = L, so C = (e/2, branch sqrt(L^2 - (e/2)^2)) and is fixed in space; link A_k joins O1 + r u(theta + 120k) to C + r u(theta + 120k), its vector is the constant C - O1; link B_k vector is the constant O3 - C; offset range 0 < e < 2L.",
+    "range": "input 360° continuous; output 360° in phase; middle disc spins about the fixed point C (here 52 mm off the shaft line); each link point circles with radius r",
+    "overlays": ["paths", "velocity", "angles", "plot"],
+    "plot": "output angle minus input angle (zero) and link force share vs input angle; optionally middle centre position vs offset e",
+    "notes": "Draw link set A in front of the middle disc and set B behind it (pseudo-3D layering). Offset the B pins by 60° on the middle disc so links do not collide. Offer a slider for e to show the offset changing while running: C moves along the perpendicular bisector of O1 O3. At e = 2L the links are collinear (singular)."
+  },
+  "examples": [
+    { "use": "Printing press roller drives", "detail": "Schmidt couplings drive rollers whose position is adjusted while running, at exact speed." },
+    { "use": "Paper and textile machinery", "detail": "Calender and feed rolls with adjustable nip gaps use offset couplings." },
+    { "use": "Rolling mills and packaging machines", "detail": "Drives to offset or moving shafts that need constant velocity and no side load." }
+  ],
+  "references": [
+    { "title": "Schmidt coupling, Wikipedia", "url": "https://en.wikipedia.org/wiki/Schmidt_coupling", "kind": "wikipedia" },
+    { "title": "DE1233667B, Schmidt coupling patent (Espacenet)", "url": "https://worldwide.espacenet.com/patent/search/family/007432735/publication/DE1233667B?q=pn%3DDE1233667B", "kind": "patent" },
+    { "title": "Zero-Max Schmidt Couplings Connect Parallel Offset Shafts Without Sideloads, Automation.com", "url": "https://www.automation.com/en-us/articles/2003-2/zero-max-schmidt-couplings-connect-parallel-offset", "kind": "engineering-guide" },
+    { "title": "Schmidt Couplings Connect Offset Shafts While Ensuring Constant Rotating Speed, Automation World", "url": "https://www.automationworld.com/products/product/21107559/zero-max-inc-schmidt-couplings-connect-offset-shafts-while-ensuring-constant-rotating-speed", "kind": "engineering-guide" }
+  ],
+  "media": [
+    { "title": "Zero-Max Schmidt Offset Coupling (YouTube)", "url": "https://www.youtube.com/watch?v=zVt1tvD7rqk", "kind": "video" },
+    { "title": "What is a Schmidt Offset Coupling? (YouTube)", "url": "https://www.youtube.com/watch?v=iZUC5Q2kp8E", "kind": "video" },
+    { "title": "ABSSAC 2020, the unique Schmidt offset shaft coupling (YouTube)", "url": "https://www.youtube.com/watch?v=ubtz8d0qGQ4", "kind": "video" }
+  ],
+  "related": ["oldham-coupling", "parallelogram-linkage", "universal-joint", "double-cardan", "locomotive-drive"]
+}
+]

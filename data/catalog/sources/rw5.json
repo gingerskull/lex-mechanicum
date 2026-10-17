@@ -1,0 +1,64 @@
+{
+ "sun-and-planet": {"real_world": [
+  {"product": "Boulton and Watt rotative steam engine, 1788 (Science Museum, London)", "maker": "Boulton and Watt", "use": "A planet gear on the connecting rod orbits a sun gear on the flywheel shaft, turning the beam's rocking into rotation instead of using a crank.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co50948/rotative-steam-engine-by-boulton-and-watt-1788", "kind": "museum", "checked": true},
+  {"product": "Boulton and Watt rotative engine of 1785 (Whitbread engine), Powerhouse Museum, Sydney", "maker": "Boulton and Watt", "use": "The oldest operable rotative Boulton and Watt engine uses sun-and-planet gearing to turn its flywheel shaft; it is an ASME landmark.", "url": "https://cdn.asme.org/About-ASME/Engineering-History/Landmarks/111-boulton-watt-rotative-steam-engine", "kind": "museum", "checked": true},
+  {"product": "Boulton and Watt Lap Engine, 1788 (Science Museum, London)", "maker": "Boulton and Watt", "use": "Mill engine that drove lapping machines in the Soho Manufactory through sun-and-planet gearing.", "url": "https://en.wikipedia.org/wiki/Lap_Engine", "kind": "museum", "checked": false}
+ ]},
+ "wankel": {"real_world": [
+  {"product": "Mazda MX-30 R-EV range-extender rotary engine", "maker": "Mazda", "use": "A single-rotor Wankel engine runs a generator that charges the battery of the plug-in hybrid.", "url": "https://www.thedrive.com/news/mazdas-first-rotary-engine-in-more-than-a-decade-is-an-mx-30-range-extender", "kind": "in-product", "checked": true},
+  {"product": "Mazda RX-7 (FD) 13B-REW twin-rotor engine teardown", "maker": "Mazda", "use": "Video series fully disassembling and rebuilding a 1993 JDM twin-turbo two-rotor Wankel engine.", "url": "https://speed.academy/fd-mazda-rx7-13b-rotary-engine-build-part-1/", "kind": "real-video", "checked": true}
+ ]},
+ "ravigneaux": {"real_world": [
+  {"product": "ZF 6HP26 six-speed automatic (Range Rover Sport) teardown", "maker": "ZF", "use": "First-hand teardown removing the Ravigneaux epicyclic that, with a simple front planetary, gives the six ratios.", "url": "https://xoutpost.com/x5-e53-forum/90167-zf-6hp26-teardown-print.html", "kind": "real-video", "checked": true},
+  {"product": "ZF 6HP, Ford 6R60 and GM 6L80 six-speed automatics", "maker": "ZF / Ford / GM", "use": "Lepelletier layout pairing a simple front planetary with a Ravigneaux compound rear set.", "url": "https://www.transmissiondigest.com/?p=17981", "kind": "case-study", "checked": true},
+  {"product": "Ford Cruise-O-Matic (FX, MX, FMX) three-speed automatic", "maker": "Ford / Borg-Warner", "use": "Three forward speeds and reverse are taken from one Ravigneaux planetary set controlled by bands and clutches.", "url": "https://en.wikipedia.org/wiki/Cruise-O-Matic", "kind": "in-product", "checked": true}
+ ]},
+ "cam-follower": {"real_world": [
+  {"product": "THK CF / CFH series cam followers", "maker": "THK", "use": "Stud-mounted needle roller followers that ride on cams and tracks in machinery.", "url": "https://store-na.thk.com/Catalog/rotation/cam-follower", "kind": "product", "checked": true},
+  {"product": "McGill CAMROL CF 1-1/4 S stud cam follower", "maker": "McGill (Regal Rexnord)", "use": "Roller follower for cam mechanisms in packaging machinery and conveyors.", "url": "https://www.mrosupply.com/products/2249467/as-markdown/", "kind": "product", "checked": true}
+ ]},
+ "flat-faced-cam": {"real_world": [
+  {"product": "COMP Cams 84000-16 race hydraulic flat tappet lifters (Chevrolet small and big block)", "maker": "COMP Cams", "use": "Flat-faced lifters slide on the camshaft lobes of pushrod V8 engines.", "url": "https://enginemaster.com.au/products/comp-cams-race-hydraulic-flat-tappet-lifters-chev-big-small-block-co84000-16", "kind": "product", "checked": true},
+  {"product": "Shim-under-bucket valve adjusters in modern motorcycle engines", "maker": "", "use": "Cam lobes press directly on flat-faced bucket tappets over each valve, with shims setting clearance.", "url": "https://www.revzilla.com/common-tread/why-do-bikes-use-shim-under-bucket-valve-adjusters", "kind": "case-study", "checked": false}
+ ]},
+ "barrel-cam": {"real_world": [
+  {"product": "WEISS Pick-O-Mat mechanical assembly machine", "maker": "WEISS", "use": "One turn of a barrel cam on the central drive unit gives a full pick-and-place cycle.", "url": "https://www.machinery.co.uk/content/product-launches/mechanical-alternative-for-pneumatic-assembly-machines", "kind": "product", "checked": true},
+  {"product": "Kawasaki KX450 (2023) gear change drum and shift forks", "maker": "Kawasaki", "use": "Grooves in the shift drum move the shift forks to select gears as the drum indexes.", "url": "https://www.revzilla.com/oem/kawasaki/2023-kawasaki-kx450/gear-change-drumshift-forks", "kind": "in-product", "checked": false},
+  {"product": "CAMCO custom barrel cams", "maker": "DESTACO (CAMCO)", "use": "Grooved cylindrical cams made to order for machine motions.", "url": "https://destaco.com/solutions/by-applications-and-topics/custom-cams.html", "kind": "product", "checked": true}
+ ]},
+ "face-groove-cam": {"real_world": [
+  {"product": "CAMCO custom face-grooved cams", "maker": "DESTACO (CAMCO)", "use": "Medium speed cams with a groove slightly wider than the follower, giving positive drive in both directions.", "url": "https://destaco.com/solutions/by-applications-and-topics/custom-cams.html", "kind": "product", "checked": true}
+ ], "note": "Only one source found naming face-grooved cams as a product; they are usually buried inside packaging and automatic machines without public pages."},
+ "desmodromic-cam": {"real_world": [
+  {"product": "Mercedes-Benz W 196 R (1954) with M 196 engine", "maker": "Mercedes-Benz", "use": "The straight-eight uses desmodromic valve gear instead of valve springs.", "url": "https://rmsothebys.com/auctions/tt25/lots/r0001-1954-mercedesbenz-w-196-r-stromlinienwagen/", "kind": "in-product", "checked": true},
+  {"product": "Ducati Desmosedici Stradale V4 (Panigale V4)", "maker": "Ducati", "use": "Separate cams and rockers open and close the valves, with no valve springs.", "url": "https://motorcyclenews.com/news/new-bikes/2017/september/ducati-panigale-v4-engine", "kind": "in-product", "checked": true},
+  {"product": "Mercedes-Benz W 196 and 300 SLR desmodromic engines", "maker": "Mercedes-Benz", "use": "Detailed history of the desmodromic valve trains used on the 1954 to 1955 racing cars.", "url": "https://desmodromology.nl/mercedes-benz-w-196-300-slr", "kind": "case-study", "checked": false}
+ ]},
+ "geneva": {"real_world": [
+  {"product": "Kershaw Kalee sound projector (Science Museum Group)", "maker": "Kershaw Soho (Sales) Ltd, Leeds", "use": "A Maltese cross intermittent advances the film one frame at a time.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co205552/kershaw-kalee-sound-projector-projector", "kind": "museum", "checked": true},
+  {"product": "35mm film projector, Kodak Museum Collection (Science Museum Group)", "maker": "", "use": "35mm projector for 1000 ft reels with a Maltese cross intermittent driving the film sprocket.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8187098/35mm-film-projector-cine-camera-projector-maltese-cross", "kind": "museum", "checked": true},
+  {"product": "8-point Maltese cross mechanism from a projector (Science Museum Group)", "maker": "", "use": "Removed projector intermittent showing the Geneva wheel itself.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8206936/maltese-cross-mechanism", "kind": "museum", "checked": true}
+ ]},
+ "internal-geneva": {"real_world": [], "note": "No real product or museum page specifically showing an internal Geneva drive was found in search; sources only describe it generically or as patents/demos."},
+ "intermittent-gear": {"real_world": [
+  {"product": "John Deere FH312371 intermittent gear (fits 328, 338, 348, 349, 359, 459, 468 small square balers)", "maker": "John Deere", "use": "OEM partly toothed gear giving controlled intermittent rotation in the machine's drive; in these balers it times the knotter drive.", "url": "https://shop.deere.com/us/product/FH312371%3A-Intermittent-Gear/p/FH312371", "kind": "product", "checked": true},
+  {"product": "LVU14840 41-tooth intermittent spur gear for John Deere drivetrains", "maker": "BTI (aftermarket for John Deere)", "use": "Replacement intermittent gear that controls timing and rotational movement in John Deere equipment.", "url": "https://bti-direct.com/products/lvu14840-intermittent-gear.oembed", "kind": "product", "checked": true}
+ ], "note": "Pages confirm the part names and machines; the knotter role is from general baler knowledge, not stated on the pages."},
+ "roller-gear-indexer": {"real_world": [
+  {"product": "DESTACO (CAMCO/Ferguson) RGD and RGS roller gear index drives", "maker": "DESTACO", "use": "Cam-actuated roller gear drives step rotary dials and conveyors between stations.", "url": "https://www.destaco.com/rotary-positioning/indexers", "kind": "product", "checked": true},
+  {"product": "Ferguson roller gear, roller dial and parallel dial index drives", "maker": "Ferguson (DESTACO)", "use": "Index drives that move a load in controlled steps and hold it at set positions.", "url": "https://www.destaco.com/en/products-by-brand/ferguson", "kind": "product", "checked": true},
+  {"product": "CAMCO E-Series heavy duty index drive", "maker": "DESTACO (CAMCO)", "use": "Precision cam with preloaded followers on a center rib indexes heavy rotary dials.", "url": "https://destaco.com/rotary-positioning/mechanical-indexers/mechanical-rotary-indexers-e.html", "kind": "product", "checked": true}
+ ]},
+ "ratchet-pawl": {"real_world": [
+  {"product": "STANLEY STMT82666-0 1/4 in. 72-tooth ratchet", "maker": "STANLEY", "use": "A single pawl on a 72-tooth gear gives 5 degree steps, reversible by a switch lever.", "url": "https://www.stanleytools.co.uk/product/stmt82666-0/stanley-14-72t-ratchet-and-socket-set-11-pc", "kind": "product", "checked": true},
+  {"product": "Harrington LB 1 ton lever hoist (come-along)", "maker": "Harrington Hoists", "use": "Two brake pawls on a ratchet wheel work with a Weston load brake to hold the load as the lever is reset.", "url": "https://www.aceindustries.com/harrington-lb-1-ton-lever-hoist-come-along/", "kind": "product", "checked": true}
+ ]},
+ "sprag-clutch": {"real_world": [
+  {"product": "Formsprag aerospace sprag overrunning clutches", "maker": "Formsprag (Regal Rexnord)", "use": "Sprag clutches in helicopter main drive gearboxes and accessory gearboxes drive one way and freewheel the other.", "url": "https://aerospace.regalrexnord.com/Products/Clutches-and-Brakes", "kind": "product", "checked": true},
+  {"product": "Formsprag FS-300 sprag-type overrunning clutch (CL4010-5RH)", "maker": "Formsprag", "use": "Industrial shaft-mounted sprag clutch rated 440 ft-lb for overrunning and backstopping.", "url": "https://www.mrosupply.com/products/404496/as-markdown/", "kind": "product", "checked": true}
+ ]},
+ "star-wheel": {"real_world": [
+  {"product": "Omega calibre 561 date mechanism (service walkthrough)", "maker": "Omega", "use": "A sprung jumper holds the 31-tooth date ring, which a peg on the daily wheel advances one tooth per day.", "url": "https://omegaforums.net/threads/cal-561-a-simple-summary.17131/page-2", "kind": "real-video", "checked": true},
+  {"product": "ETA 2824-2 automatic movement date ring and jumper", "maker": "ETA", "use": "Watchmakers discuss the integrated date jumper spring that indexes the toothed date ring.", "url": "https://www.watchrepairtalk.com/topic/2739-aligning-the-date-in-the-dial-window", "kind": "case-study", "checked": true}
+ ]}
+}

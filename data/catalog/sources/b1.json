@@ -1,0 +1,3555 @@
+[
+ {
+  "id": "four-bar",
+  "name": "Four-bar linkage",
+  "aka": [
+   "crank-rocker",
+   "four-bar mechanism",
+   "quadric crank chain",
+   "4-bar linkage"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "A crank turns fully while a rocker swings back and forth, and every point on the coupler between them traces a closed curve.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Oscillating",
+   "label": "Rotary → Oscillating",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform",
+    "Quick-return"
+   ],
+   "axes": "Offset parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "rocker swing 73.8° per crank turn; time ratio about 1.36 with default lengths"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "crank, coupler, rocker and ground; count includes ground"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Path generation",
+    "Function generation"
+   ],
+   "property": [
+    "Grashof",
+    "Few parts",
+    "Approximate",
+    "Singular positions"
+   ],
+   "application": [
+    "Automotive",
+    "Packaging & automation",
+    "Film & optics",
+    "Education"
+   ],
+   "keywords": [
+    "crank-rocker",
+    "grashof",
+    "coupler curve",
+    "transmission angle",
+    "reuleaux",
+    "burmester",
+    "dead centre"
+   ]
+  },
+  "explain": {
+   "motion": "The short crank turns continuously about O2. The coupler carries that motion to the rocker, which can only swing back and forth over a fixed arc about O4. Every point on the coupler traces its own closed coupler curve, and choosing that point is how designers make the linkage draw a path.",
+   "forces": "With no load on the coupler it is a two-force member, pushing or pulling only along the line between its pins. How well that push turns the rocker depends on the transmission angle at B, best near 90° and poor below about 40°.",
+   "benefits": "Only four pin joints and no sliding surfaces, so it is cheap, stiff and long-lived. Changing four lengths gives an enormous range of output motions and coupler paths.",
+   "limits": "Output motion is fixed by the geometry and is never exact for a given function, only approximate. Near the extreme rocker positions the transmission angle falls and the linkage can bind or chatter if backdriven."
+  },
+  "build": {
+   "ground": "frame link O2 to O4, length d",
+   "input": "crank, continuous rotation about O2",
+   "output": "rocker angle about O4, and coupler point C path",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O2→O4, length d = 100 mm along x"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, length a = 40 mm"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "triangular plate A→B, length b = 120 mm, coupler point C at 0.45 b along AB and 43 mm off the line"
+    },
+    {
+     "id": "rocker",
+     "role": "output",
+     "def": "O4→B, length c = 80 mm"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "rocker"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "rocker",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 40,
+     "unit": "mm",
+     "note": "crank length"
+    },
+    {
+     "name": "b",
+     "value": 120,
+     "unit": "mm",
+     "note": "coupler length A to B"
+    },
+    {
+     "name": "c",
+     "value": 80,
+     "unit": "mm",
+     "note": "rocker length"
+    },
+    {
+     "name": "d",
+     "value": 100,
+     "unit": "mm",
+     "note": "ground length O2 to O4"
+    },
+    {
+     "name": "cpx",
+     "value": 54,
+     "unit": "mm",
+     "note": "coupler point along AB"
+    },
+    {
+     "name": "cpy",
+     "value": 43,
+     "unit": "mm",
+     "note": "coupler point offset from AB"
+    }
+   ],
+   "defining_relations": "Grashof: s + l <= p + q (40 + 120 = 160 <= 180) with the crank shortest gives a crank-rocker. Loop closure O2A + AB = O2O4 + O4B; B found by intersecting circle(A, b) with circle(O4, c). Transmission angle mu from cos mu = (b^2 + c^2 - |O4A|^2) / (2bc).",
+   "range": "crank 360° continuous; rocker swings 73.8° (54.9° to 128.7° from the ground line); transmission angle 26° to 86°",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "rocker angle vs crank angle",
+   "notes": "Use one assembly branch throughout (site uses circleX branch +1). Rocker extremes occur when crank and coupler are collinear (crank at 24° and 231°), giving a time ratio of about 207:153. Transmission angle dips to 26°, which the site flags in red below 40°."
+  },
+  "examples": [
+   {
+    "use": "Windscreen wipers",
+    "detail": "A motor-driven crank rocks the wiper arm through a four-bar linkage."
+   },
+   {
+    "use": "Oil-well pumpjack",
+    "detail": "The beam pump is a crank-rocker that rocks the walking beam to lift the sucker rod."
+   },
+   {
+    "use": "Bicycle rear suspension",
+    "detail": "Four-bar suspensions shape the axle path to control pedal bob."
+   },
+   {
+    "use": "Film advance claw",
+    "detail": "Coupler curves move a claw into the film perforations and pull it down a frame."
+   }
+  ],
+  "references": [
+   {
+    "title": "Four-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Four-bar_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Linkage (mechanical), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Linkage_(mechanical)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Four-bar Linkage, Reuleaux model C1 (rocker-rocker), Cornell KMODDL",
+    "url": "https://digital.library.cornell.edu/catalog/ss:29272037",
+    "kind": "kmoddl"
+   },
+   {
+    "title": "Four-bar linkages, University of Illinois dynamics reference",
+    "url": "https://dynref.engr.illinois.edu/aml.html",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Four-Bar Linkage and Its Three Possible Motions",
+    "url": "https://www.youtube.com/watch?v=EBqrDj-Wkiw",
+    "kind": "video"
+   },
+   {
+    "title": "Working Model: Crank-Rocker Four-Bar Linkage",
+    "url": "https://www.youtube.com/watch?v=XZLstI9wkII",
+    "kind": "video"
+   },
+   {
+    "title": "Category:Four-bar linkage, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Four-bar_linkage",
+    "kind": "photos"
+   },
+   {
+    "title": "Crank-Rocker 4-bar Linkage animation, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Crank-Rocker_4-bar_Linkage.gif",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "double-crank",
+   "double-rocker",
+   "parallelogram-linkage",
+   "antiparallelogram",
+   "slider-crank",
+   "hoekens-linkage",
+   "watt-six-bar"
+  ]
+ },
+ {
+  "id": "slider-crank",
+  "name": "Slider-crank",
+  "aka": [
+   "crank and slider",
+   "piston and crank",
+   "reciprocating engine mechanism",
+   "crank-slider linkage"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "A turning crank and a connecting rod drive a slider straight back and forth, the heart of every piston engine and pump.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = 2 x crank radius (70 mm with r = 35 mm)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "crank, connecting rod, slider and ground; count includes ground"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Pumping & compression"
+   ],
+   "property": [
+    "Few parts",
+    "Singular positions",
+    "High load"
+   ],
+   "application": [
+    "Automotive",
+    "Steam & engines",
+    "Machine tools",
+    "Energy"
+   ],
+   "keywords": [
+    "piston",
+    "connecting rod",
+    "dead centre",
+    "crankshaft",
+    "obliquity",
+    "reciprocating engine",
+    "compressor"
+   ]
+  },
+  "explain": {
+   "motion": "The crank turns at constant speed and the slider runs back and forth along its guide with a stroke of twice the crank radius. Because the rod is tilted for most of the turn, the slider motion is not a pure sine: it moves faster in the half of the stroke nearer the crank. Run backwards, a pushed slider turns the crank, as in an engine.",
+   "forces": "The rod is a two-force member and carries only push or pull. Its tilt (obliquity) splits that force into a useful axial part and a side thrust on the guide walls. At the two dead centres the rod lines up with the crank and a slider force produces no torque at all.",
+   "benefits": "Simple, compact and able to carry very large loads with plain bearings. Turns rotation into straight reciprocation, or the reverse, with a fixed stroke.",
+   "limits": "A slider-driven crank cannot start from a dead centre and needs a flywheel or a second cylinder to carry it through. Side thrust wears the guide, and the motion carries second-harmonic shaking forces."
+  },
+  "build": {
+   "ground": "crank bearing O and the straight slider guide through O",
+   "input": "crank, continuous rotation about O",
+   "output": "slider position x along the guide",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "bearing O at origin, guide along +x through O"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O→A, radius r = 35 mm"
+    },
+    {
+     "id": "rod",
+     "role": "link",
+     "def": "A→B, length l = 110 mm"
+    },
+    {
+     "id": "block",
+     "role": "slider",
+     "def": "block pinned at B, sliding on the x axis"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "rod"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "rod",
+      "block"
+     ]
+    },
+    {
+     "id": "P",
+     "type": "prismatic",
+     "between": [
+      "block",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 35,
+     "unit": "mm",
+     "note": "crank radius"
+    },
+    {
+     "name": "l",
+     "value": 110,
+     "unit": "mm",
+     "note": "connecting rod length"
+    },
+    {
+     "name": "e",
+     "value": 0,
+     "unit": "mm",
+     "note": "guide offset (zero, in-line)"
+    }
+   ],
+   "defining_relations": "x = r cos θ + sqrt(l^2 - r^2 sin^2 θ). Stroke = 2r. Obliquity φ = asin(r sin θ / l). Approx. x ≈ r cos θ + l - (r^2 / 4l)(1 - cos 2θ).",
+   "range": "crank 360° continuous; slider moves 70 mm from x = 75 to x = 145 mm; rod obliquity up to 18.6°",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "slider position vs crank angle",
+   "notes": "Dead centres at θ = 0° and 180°; animate with the crank as driver so it passes through them. l/r = 3.14 here, which makes the non-sinusoidal motion visible."
+  },
+  "examples": [
+   {
+    "use": "Internal combustion engine",
+    "detail": "Each piston, rod and crank throw is a slider-crank driven from the slider."
+   },
+   {
+    "use": "Reciprocating compressor",
+    "detail": "An electric motor turns the crank to drive the piston that compresses gas."
+   },
+   {
+    "use": "Mechanical press",
+    "detail": "A crank drives the ram down to punch or form sheet metal."
+   },
+   {
+    "use": "Steam engine",
+    "detail": "Steam on the piston drives the crank via crosshead and rod."
+   }
+  ],
+  "references": [
+   {
+    "title": "Slider-crank linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Slider-crank_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Slider crank chain inversion, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Slider_crank_chain_inversion",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Slider-crank mechanism, Britannica",
+    "url": "https://britannica.com/technology/slider-crank-mechanism",
+    "kind": "textbook"
+   },
+   {
+    "title": "Connecting rod, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Connecting_rod",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Slider-crank Mechanism in Engine",
+    "url": "https://www.youtube.com/watch?v=CIF2XMydKuM",
+    "kind": "video"
+   },
+   {
+    "title": "Slider-crank mechanism converts straight-line motion to rotary motion, as in a reciprocating engine",
+    "url": "https://www.youtube.com/watch?v=1EI7BI5DbF8",
+    "kind": "video"
+   },
+   {
+    "title": "Category:Connecting rods, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Connecting_rods",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "offset-slider-crank",
+   "oscillating-cylinder",
+   "scotch-yoke",
+   "four-bar",
+   "locomotive-drive",
+   "whitworth",
+   "crank-shaper"
+  ]
+ },
+ {
+  "id": "scotch-yoke",
+  "name": "Scotch yoke",
+  "aka": [
+   "slotted link mechanism",
+   "crank and slotted crosshead",
+   "sine generator"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "A crank pin sliding in a slotted yoke drives a rod back and forth in exact simple harmonic motion.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Harmonic"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = 2 x crank radius (80 mm with r = 40 mm)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 3,
+   "revolute": 1,
+   "prismatic": 1,
+   "higher_pairs": 1,
+   "notes": "crank, yoke and ground; crank pin in yoke slot is a pin-in-slot higher pair (a sliding block makes it 4 links, 2 revolute, 2 prismatic)"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Pumping & compression",
+    "Function generation"
+   ],
+   "property": [
+    "Exact",
+    "Smooth (harmonic)",
+    "Compact",
+    "Few parts"
+   ],
+   "application": [
+    "Energy",
+    "Packaging & automation",
+    "Steam & engines",
+    "Instruments"
+   ],
+   "keywords": [
+    "simple harmonic motion",
+    "slotted yoke",
+    "sine function",
+    "valve actuator",
+    "bourke engine",
+    "quarter-turn"
+   ]
+  },
+  "explain": {
+   "motion": "The crank pin runs up and down in the yoke slot while its sideways movement carries the yoke with it. The yoke position is exactly the crank radius times the cosine of the crank angle, so the output is pure simple harmonic motion with no connecting rod to tilt.",
+   "forces": "The pin pushes on the slot wall at right angles to the slot, and only the component along the guide moves the yoke. Torque transfer is greatest mid-stroke and zero at the ends; contact stress at the pin and slot is high, so wear concentrates there.",
+   "benefits": "Exact sinusoidal output, shorter than a slider-crank for the same stroke and with no rod angle side thrust. In valve actuators run in reverse it gives high torque at the start and end of a quarter turn.",
+   "limits": "The sliding pin-in-slot contact wears and needs lubrication or a roller block. Not suited to high speeds with heavy loads, and in actuators it is poor for fine positioning."
+  },
+  "build": {
+   "ground": "crank bearing O and the straight guide for the yoke rod",
+   "input": "crank, continuous rotation about O",
+   "output": "yoke position x along the guide",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "bearing O at origin, guide along x"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O→A, radius r = 40 mm"
+    },
+    {
+     "id": "yoke",
+     "role": "output",
+     "def": "slotted crosshead with slot perpendicular to x, slot length ±41 mm, slot width 12 mm, rigid with rod"
+    },
+    {
+     "id": "rod",
+     "role": "output",
+     "def": "rod rigid with yoke running in guide from x = 95 to 135 mm"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "pin-in-slot",
+     "between": [
+      "crank",
+      "yoke"
+     ]
+    },
+    {
+     "id": "G",
+     "type": "prismatic",
+     "between": [
+      "yoke",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 40,
+     "unit": "mm",
+     "note": "crank radius"
+    },
+    {
+     "name": "slotHalf",
+     "value": 41,
+     "unit": "mm",
+     "note": "slot half length, must exceed r"
+    }
+   ],
+   "defining_relations": "x = r cos θ, v = -r ω sin θ, a = -r ω^2 cos θ. Stroke = 2r. Slot half length > r.",
+   "range": "crank 360° continuous; yoke moves 80 mm from x = -40 to +40 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "yoke position vs crank angle (pure cosine)",
+   "notes": "Pin travels the full slot length 2r each half turn. Force on slot reverses direction as the pin crosses the guide line."
+  },
+  "examples": [
+   {
+    "use": "Quarter-turn valve actuator",
+    "detail": "Pneumatic or hydraulic pistons drive a scotch yoke to turn ball and butterfly valves 90°."
+   },
+   {
+    "use": "Bourke and Mamba engines",
+    "detail": "Opposed pistons share a yoke to remove rod side thrust."
+   },
+   {
+    "use": "Shaker and test rigs",
+    "detail": "Sinusoidal vibration tables use a scotch yoke for clean harmonic motion."
+   },
+   {
+    "use": "Steam pumps",
+    "detail": "Early steam pumps and fire engines used yokes to drive pump rams."
+   }
+  ],
+  "references": [
+   {
+    "title": "Scotch yoke, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Scotch_yoke",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Bourke engine, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Bourke_engine",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Scotch Yoke Mechanism: How It Works, Diagram, Formula, Calculator and Uses, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/scotch-yoke",
+    "kind": "calculator"
+   },
+   {
+    "title": "Scotch-yoke mechanism for redundant actuation applications, US patent 8070455",
+    "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8070455",
+    "kind": "patent"
+   }
+  ],
+  "media": [
+   {
+    "title": "Valworx Air Actuated Stainless Steel Ball Valves, Scotch Yoke video",
+    "url": "https://www.valworx.com/air-actuated-stainless-ball-valves-scotch-yoke-video",
+    "kind": "video"
+   },
+   {
+    "title": "Scotch Yoke mechanism application",
+    "url": "https://www.youtube.com/watch?v=qbFAr3_1TOI",
+    "kind": "video"
+   },
+   {
+    "title": "Category:Scotch yokes, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Scotch_yokes",
+    "kind": "photos"
+   },
+   {
+    "title": "Scotch yoke animation, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Scotch_yoke_animation.gif",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "slider-crank",
+   "eccentric-sheave",
+   "tusi-couple",
+   "elliptic-trammel",
+   "crank-shaper"
+  ]
+ },
+ {
+  "id": "oscillating-cylinder",
+  "name": "Oscillating cylinder engine",
+  "aka": [
+   "oscillating steam engine",
+   "wobbler engine",
+   "swinging block mechanism",
+   "rocking cylinder engine"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "A cylinder rocks on a trunnion while its piston rod drives a crank directly, so the swing of the cylinder also opens and closes its ports.",
+  "motion": {
+   "input": "Linear",
+   "output": "Rotary",
+   "label": "Linear → Rotary",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "stroke = 2 x crank radius (70 mm); cylinder swing ±asin(r/d) = ±17°"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "crank, piston and rod, cylinder and ground; the swinging-block inversion of the slider-crank; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Valve timing",
+    "Pumping & compression"
+   ],
+   "property": [
+    "Few parts",
+    "Singular positions",
+    "Historic",
+    "Compact"
+   ],
+   "application": [
+    "Steam & engines",
+    "Marine",
+    "Toys & kinetic art",
+    "Education"
+   ],
+   "keywords": [
+    "wobbler",
+    "trunnion",
+    "port face",
+    "paddle steamer",
+    "toy steam engine",
+    "slider-crank inversion",
+    "mamod"
+   ]
+  },
+  "explain": {
+   "motion": "The piston rod is pinned straight to the crank pin and the cylinder hangs on a trunnion so it can rock to follow the rod. As the crank turns, the piston slides in and out of the bore while the whole cylinder swings a few degrees either side. Holes in the swinging port face line up with steam and exhaust holes in the fixed standard, so the swing itself does the valve timing.",
+   "forces": "Steam pressure on the piston pushes along the cylinder axis straight into the crank pin, and the trunnion takes the reaction. Torque is zero at the two dead centres, so a flywheel carries it through; a spring holds the port faces together and limits pressure.",
+   "benefits": "Very few parts: no crosshead, no connecting rod and no separate valve gear. Easy to make, self-starting in most positions with a double-acting or twin layout.",
+   "limits": "The sliding port face leaks and wears, and the spring-loaded face limits steam pressure. Large cylinders have heavy swinging masses."
+  },
+  "build": {
+   "ground": "crankshaft bearing O2 and trunnion/standard O3 at distance d",
+   "input": "piston pushed by steam along the cylinder axis",
+   "output": "crank rotation about O2",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O2 at origin, trunnion O3 at (d, 0) with d = 120 mm; port standard disc radius 24 mm with ports at ±11° on radius 13 mm"
+    },
+    {
+     "id": "crank",
+     "role": "output",
+     "def": "O2→A, radius r = 35 mm"
+    },
+    {
+     "id": "cylinder",
+     "role": "link",
+     "def": "rocks about O3 and always points at A; bore length 90 mm"
+    },
+    {
+     "id": "rod",
+     "role": "driver",
+     "def": "piston and rod rigid, crank pin A to piston centre Pc, Lp = 120 mm along A→O3"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "rod"
+     ]
+    },
+    {
+     "id": "O3",
+     "type": "revolute",
+     "between": [
+      "cylinder",
+      "ground"
+     ]
+    },
+    {
+     "id": "S",
+     "type": "prismatic",
+     "between": [
+      "rod",
+      "cylinder"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r",
+     "value": 35,
+     "unit": "mm",
+     "note": "crank radius"
+    },
+    {
+     "name": "d",
+     "value": 120,
+     "unit": "mm",
+     "note": "crankshaft to trunnion distance"
+    },
+    {
+     "name": "Lp",
+     "value": 120,
+     "unit": "mm",
+     "note": "crank pin to piston centre"
+    },
+    {
+     "name": "ports",
+     "value": 11,
+     "unit": "°",
+     "note": "port angle either side of centre"
+    }
+   ],
+   "defining_relations": "Cylinder angle ψ = atan2(A - O3). Piston position along bore s = |A - O3| - Lp, range d - r to d + r. Swing amplitude = asin(r/d). Steam admitted when the port face angle is on one side (sin θ > 0), exhausted on the other.",
+   "range": "crank 360° continuous; cylinder swings ±17.0°; piston travels 70 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "cylinder swing angle vs crank angle",
+   "notes": "Crank is the output but is animated as driver. Port opening switches at the dead centres in the site model (power stroke when sin θ > 0)."
+  },
+  "examples": [
+   {
+    "use": "Toy and model steam engines",
+    "detail": "Mamod-style and hobby engines use a single-acting oscillator."
+   },
+   {
+    "use": "Paddle steamers",
+    "detail": "Large oscillating engines drove paddle wheels on 19th century ships."
+   },
+   {
+    "use": "Hydraulic and pneumatic drives",
+    "detail": "Rocking cylinders drive cranks in some pumps and air motors."
+   },
+   {
+    "use": "Education",
+    "detail": "Simple oscillators are a classic first lathe project for model engineers."
+   }
+  ],
+  "references": [
+   {
+    "title": "Oscillating cylinder steam engine, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Oscillating_cylinder_steam_engine",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Slider crank chain inversion, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Slider_crank_chain_inversion",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Oscillating engines, Shipping Wonders of the World",
+    "url": "https://www.shippingwondersoftheworld.com/oscillating_engines.html",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "5 small oscillating steam engine models, tubalcain",
+    "url": "https://www.youtube.com/watch?v=bu15HNg-OVE",
+    "kind": "video"
+   },
+   {
+    "title": "Large model oscillating steam engine first run on steam",
+    "url": "https://www.youtube.com/watch?v=-JhjPvtWuAk",
+    "kind": "video"
+   },
+   {
+    "title": "Oscillating single-cylinder steam engine, 1830s, Museums Victoria",
+    "url": "https://collections.museumsvictoria.com.au/items/408075",
+    "kind": "photos"
+   },
+   {
+    "title": "Category:Oscillating cylinder steam engines, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Oscillating_cylinder_steam_engines",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "slider-crank",
+   "whitworth",
+   "crank-shaper",
+   "locomotive-drive",
+   "eccentric-sheave"
+  ]
+ },
+ {
+  "id": "double-crank",
+  "name": "Double-crank linkage",
+  "aka": [
+   "drag-link mechanism",
+   "crank-crank linkage",
+   "drag link"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "A four-bar with the shortest link fixed, so both side links turn full circles but the output speeds up and slows down each turn.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Continuous",
+    "Variable speed",
+    "Non-uniform"
+   ],
+   "axes": "Offset parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "1:1 average; output speed swings 0.51x to 2.07x input with defaults"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "input crank, coupler, output crank and short ground link; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Function generation",
+    "Quick return"
+   ],
+   "property": [
+    "Grashof",
+    "Few parts",
+    "Approximate"
+   ],
+   "application": [
+    "Machine tools",
+    "Packaging & automation",
+    "Education"
+   ],
+   "keywords": [
+    "drag link",
+    "grashof",
+    "crank-crank",
+    "inversion",
+    "variable speed",
+    "quick return"
+   ]
+  },
+  "explain": {
+   "motion": "With the shortest link as the frame, both links pinned to it can make full turns. The input crank turns steadily and the output crank also goes round once per turn, but it lags and leads, so its speed varies through the cycle.",
+   "forces": "Torque passes through the coupler as push or pull. The transmission angle stays reasonable (24° to 78° with defaults) as long as the frame is much shorter than the others, but it is lowest when the cranks are nearly aligned with the frame.",
+   "benefits": "Gives a continuous rotary output with built-in speed variation, useful for quick-return drives and for feeding a slider-crank. Only pin joints.",
+   "limits": "The very short frame link makes the two bearings crowded and the cranks overlap. Speed variation is fixed by the geometry and cannot be adjusted in use."
+  },
+  "build": {
+   "ground": "short frame link O2 to O4, length d",
+   "input": "crank a, continuous rotation about O2",
+   "output": "crank c angle about O4",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O2→O4, length d = 40 mm"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, length a = 80 mm"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "A→B, length b = 100 mm"
+    },
+    {
+     "id": "follower",
+     "role": "output",
+     "def": "O4→B, length c = 90 mm"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "follower"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "follower",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 80,
+     "unit": "mm",
+     "note": "input crank"
+    },
+    {
+     "name": "b",
+     "value": 100,
+     "unit": "mm",
+     "note": "coupler"
+    },
+    {
+     "name": "c",
+     "value": 90,
+     "unit": "mm",
+     "note": "output crank"
+    },
+    {
+     "name": "d",
+     "value": 40,
+     "unit": "mm",
+     "note": "ground, the shortest link"
+    }
+   ],
+   "defining_relations": "Grashof s + l <= p + q (40 + 100 = 140 <= 170) with the shortest link fixed gives a double crank. B = circle(A, b) ∩ circle(O4, c). Angular velocity ratio ω4/ω2 = (a sin(θ2 - θ3)) / (c sin(θ4 - θ3)).",
+   "range": "input crank 360° continuous; output crank 360° continuous; ω_out/ω_in from 0.51 to 2.07; transmission angle 24° to 78°",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "output crank angle (and angle difference) vs input crank angle",
+   "notes": "Keep one assembly branch; plotting output minus input angle shows the lead and lag clearly. Draw the cranks on separate layers since they sweep over each other."
+  },
+  "examples": [
+   {
+    "use": "Drag-link quick return",
+    "detail": "A drag link drives a slider-crank so the cutting stroke is slow and the return fast on shapers and slotters."
+   },
+   {
+    "use": "Locomotive coupling rods",
+    "detail": "The parallel double crank is the special case that couples driving wheels."
+   },
+   {
+    "use": "Rotary feeders",
+    "detail": "Variable-speed output synchronises with intermittent product flows on packaging lines."
+   }
+  ],
+  "references": [
+   {
+    "title": "Four-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Four-bar_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Four-bar Linkage, Reuleaux model C1 (crank-crank), Cornell KMODDL",
+    "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:29272038",
+    "kind": "kmoddl"
+   },
+   {
+    "title": "Four-bar linkages, University of Illinois dynamics reference",
+    "url": "https://dynref.engr.illinois.edu/aml.html",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "How Four Bar Linkage: Double Crank Mechanism Works",
+    "url": "https://www.youtube.com/watch?v=g5dt5seKfEI",
+    "kind": "video"
+   },
+   {
+    "title": "Double Crank linkage mechanism",
+    "url": "https://www.youtube.com/watch?v=VPBjbdZpQAE",
+    "kind": "video"
+   },
+   {
+    "title": "Double-Crank 4-bar Linkage animation, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Double-Crank_4-bar_Linkage.gif",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "drag-link-quick-return",
+   "parallelogram-linkage",
+   "antiparallelogram",
+   "double-rocker"
+  ]
+ },
+ {
+  "id": "double-rocker",
+  "name": "Double-rocker linkage",
+  "aka": [
+   "rocker-rocker linkage",
+   "triple rocker",
+   "double-lever mechanism"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "A four-bar in which neither ground-pivoted link can turn fully: an input lever swings and drives an output lever through a different arc.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Oscillating",
+   "label": "Oscillating → Oscillating",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform",
+    "Toggle"
+   ],
+   "axes": "Offset parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "input swing about 70° gives output swing about 41° with defaults"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "two rockers, coupler and ground; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Function generation",
+    "Motion conversion",
+    "Steering"
+   ],
+   "property": [
+    "Grashof",
+    "Singular positions",
+    "Few parts",
+    "Approximate"
+   ],
+   "application": [
+    "Automotive",
+    "Construction & lifting",
+    "Aerospace",
+    "Education"
+   ],
+   "keywords": [
+    "rocker-rocker",
+    "ackermann",
+    "grashof",
+    "toggle position",
+    "luffing crane",
+    "coupler shortest"
+   ]
+  },
+  "explain": {
+   "motion": "Both links pinned to the frame can only swing over limited arcs. When the coupler is the shortest link, it can turn fully relative to the rockers, but the rockers themselves stop at toggle positions where the coupler lines up with one of them.",
+   "forces": "The coupler carries push or pull only. At each end of the input range the coupler is in line with the output rocker, the transmission angle approaches 0° or 180°, and the linkage cannot be driven further from the input.",
+   "benefits": "Converts one swing into another with a chosen, non-linear relation, and can be designed to hold a load near a toggle. Common for steering and luffing where neither side needs to rotate fully.",
+   "limits": "Range is bounded by toggle positions where the linkage locks or jumps branch. Transmission angle varies a lot, so drive torque must rise near the ends."
+  },
+  "build": {
+   "ground": "frame link O2 to O4, length d",
+   "input": "input rocker, oscillating about O2 between about 20° and 86°",
+   "output": "output rocker angle about O4",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O2→O4, length d = 100 mm"
+    },
+    {
+     "id": "rocker_in",
+     "role": "driver",
+     "def": "O2→A, length a = 70 mm"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "A→B, length b = 40 mm (the shortest link)"
+    },
+    {
+     "id": "rocker_out",
+     "role": "output",
+     "def": "O4→B, length c = 80 mm"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "rocker_in"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "rocker_in",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "rocker_out"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "rocker_out",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 70,
+     "unit": "mm",
+     "note": "input rocker"
+    },
+    {
+     "name": "b",
+     "value": 40,
+     "unit": "mm",
+     "note": "coupler, shortest"
+    },
+    {
+     "name": "c",
+     "value": 80,
+     "unit": "mm",
+     "note": "output rocker"
+    },
+    {
+     "name": "d",
+     "value": 100,
+     "unit": "mm",
+     "note": "ground"
+    }
+   ],
+   "defining_relations": "Grashof s + l <= p + q (40 + 100 = 140 <= 150) with the shortest link as coupler gives a Grashof double rocker. Input limits where |O4A| = c ± b (toggle). B = circle(A, b) ∩ circle(O4, c).",
+   "range": "input rocker from 18.2° to 87.9° (about 70°) between toggle positions; output rocker between 105.6° and 146.2° (about 41°)",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "output rocker angle vs input rocker angle",
+   "notes": "Drive the input with an oscillation kept a degree or two inside the toggle limits (e.g. 20° to 86°) to avoid the singular positions. Output is not monotonic over the full input range, so stay on one branch."
+  },
+  "examples": [
+   {
+    "use": "Ackermann steering",
+    "detail": "The trapezoid steering linkage is a double rocker that turns the inner wheel more than the outer."
+   },
+   {
+    "use": "Level-luffing crane",
+    "detail": "A double rocker keeps the hook moving nearly level as the jib luffs."
+   },
+   {
+    "use": "Aircraft landing gear",
+    "detail": "Double rockers fold and lock gear legs at toggle."
+   },
+   {
+    "use": "Fan oscillator",
+    "detail": "A rocker-rocker drives the swing of desk fans in some designs."
+   }
+  ],
+  "references": [
+   {
+    "title": "Four-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Four-bar_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Four-bar Linkage, Reuleaux model C1 (rocker-rocker), Cornell KMODDL",
+    "url": "https://digital.library.cornell.edu/catalog/ss:29272037",
+    "kind": "kmoddl"
+   },
+   {
+    "title": "Four-bar linkages, University of Illinois dynamics reference",
+    "url": "https://dynref.engr.illinois.edu/aml.html",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Double Rocker Mechanism",
+    "url": "https://www.youtube.com/watch?v=3kUoqw8D5sU",
+    "kind": "video"
+   },
+   {
+    "title": "Double rocker four bar link mechanism animation",
+    "url": "https://www.youtube.com/watch?v=MTmxAUXBFJE",
+    "kind": "video"
+   },
+   {
+    "title": "Double-Rocker 4-bar Linkage animation, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Double-Rocker_4-bar_Linkage.gif",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "ackermann-steering",
+   "double-crank",
+   "toggle-clamp",
+   "watt-six-bar"
+  ]
+ },
+ {
+  "id": "parallelogram-linkage",
+  "name": "Parallelogram linkage",
+  "aka": [
+   "parallel crank",
+   "parallel four-bar",
+   "parallel motion linkage"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "Opposite links of equal length keep the coupler always parallel to the frame, so it translates without turning.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Path",
+   "label": "Rotary → Path",
+   "output_character": [
+    "Continuous",
+    "Constant velocity"
+   ],
+   "axes": "Offset parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Unity",
+   "class": "1:1",
+   "typical": "output crank turns exactly with the input, 1:1"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "two equal cranks, coupler equal to the frame; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Positioning",
+    "Lifting",
+    "Shaft coupling"
+   ],
+   "property": [
+    "Exact",
+    "Singular positions",
+    "Few parts",
+    "Grashof"
+   ],
+   "application": [
+    "Railways",
+    "Consumer products",
+    "Robotics",
+    "Construction & lifting"
+   ],
+   "keywords": [
+    "parallel crank",
+    "desk lamp",
+    "balanced arm",
+    "coupling rod",
+    "change point",
+    "translation"
+   ]
+  },
+  "explain": {
+   "motion": "The two cranks are equal and the coupler equals the frame, so the four pins always form a parallelogram. Both cranks turn together at the same speed and the coupler moves in a circular translation, staying parallel to the frame while every point on it circles at crank radius.",
+   "forces": "Load on the coupler is shared by both cranks with no twisting of the coupler. When both cranks line up with the frame the linkage reaches a change point where it can flip into an antiparallelogram, so a third crank or a guide is needed to pass it under load.",
+   "benefits": "Exact 1:1 transfer and pure translation of the coupler with only pin joints. Easy to stack for lamps, lifts and tool holders.",
+   "limits": "At the two change points the motion is indeterminate and the linkage can switch branches. Needs a third offset crank or stiff guide to be driven reliably through full rotation."
+  },
+  "build": {
+   "ground": "frame O2 to O4, length d",
+   "input": "crank, continuous rotation about O2",
+   "output": "coupler translation (any coupler point traces a circle of radius a) and follower crank angle",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O2→O4, length d = 100 mm"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, length a = 40 mm"
+    },
+    {
+     "id": "coupler",
+     "role": "output",
+     "def": "A→B, length b = 100 mm, stays parallel to ground"
+    },
+    {
+     "id": "follower",
+     "role": "link",
+     "def": "O4→B, length c = 40 mm"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "follower"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "follower",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 40,
+     "unit": "mm",
+     "note": "crank length"
+    },
+    {
+     "name": "b",
+     "value": 100,
+     "unit": "mm",
+     "note": "coupler, equals d"
+    },
+    {
+     "name": "c",
+     "value": 40,
+     "unit": "mm",
+     "note": "follower, equals a"
+    },
+    {
+     "name": "d",
+     "value": 100,
+     "unit": "mm",
+     "note": "ground"
+    }
+   ],
+   "defining_relations": "a = c and b = d. θ4 = θ2 always on the parallel branch; coupler angle constant. s + l = p + q, a change-point Grashof linkage.",
+   "range": "crank 360° continuous; follower 360° in step; coupler orientation fixed",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "follower angle vs crank angle (a straight 45° line)",
+   "notes": "Force the parallel branch (B = A + (d, 0)) rather than solving circle intersections, otherwise the solver may flip to the antiparallelogram at θ = 0° and 180°."
+  },
+  "examples": [
+   {
+    "use": "Balanced-arm desk lamp",
+    "detail": "Parallelogram arms keep the lamp head at a constant angle as it moves."
+   },
+   {
+    "use": "Locomotive coupling rods",
+    "detail": "Coupling rods form parallelograms that turn all driving wheels together."
+   },
+   {
+    "use": "Scale pans and Roberval balance",
+    "detail": "Parallelogram links keep pans level wherever the load sits."
+   },
+   {
+    "use": "Tool box trays and lift arms",
+    "detail": "Cantilever trays and loader arms keep platforms level as they swing out."
+   }
+  ],
+  "references": [
+   {
+    "title": "Four-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Four-bar_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Linkage (mechanical), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Linkage_(mechanical)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Parallel motion, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Parallel_motion",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Desk lamp world record for arm reach and freedom",
+    "url": "https://www.youtube.com/watch?v=ECP4g7NZgJg",
+    "kind": "video"
+   },
+   {
+    "title": "Four Bar Linkage: Parallelogram",
+    "url": "https://www.youtube.com/watch?v=yApSDquQe9M",
+    "kind": "video"
+   },
+   {
+    "title": "Parallel 4-bar Linkage animation, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Parallel_4-bar_Linkage_1.gif",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "four-bar",
+   "antiparallelogram",
+   "double-crank",
+   "locomotive-drive",
+   "pantograph",
+   "scissor-lift"
+  ]
+ },
+ {
+  "id": "antiparallelogram",
+  "name": "Antiparallelogram linkage",
+  "aka": [
+   "contraparallelogram",
+   "crossed parallelogram",
+   "butterfly linkage",
+   "bow-tie linkage",
+   "antiparallel crank"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "A crossed four-bar with opposite links equal: the two cranks turn in opposite directions at varying speeds, like a pair of elliptical gears.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Rotary",
+   "label": "Rotary → Rotary",
+   "output_character": [
+    "Continuous",
+    "Reversing",
+    "Variable speed"
+   ],
+   "axes": "Offset parallel",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "1:1 average, reversed; instantaneous 0.43x to 2.33x with defaults"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 4,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "two long crossed cranks, short coupler equal to the short frame; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Reversing",
+    "Function generation",
+    "Path generation"
+   ],
+   "property": [
+    "Exact",
+    "Singular positions",
+    "Few parts"
+   ],
+   "application": [
+    "Education",
+    "Automotive",
+    "Instruments"
+   ],
+   "keywords": [
+    "contraparallelogram",
+    "elliptic gears",
+    "kempe",
+    "hart's inversor",
+    "lemniscate",
+    "butterfly linkage"
+   ]
+  },
+  "explain": {
+   "motion": "The two long links cross like scissors. With the short link fixed, both long cranks make full turns in opposite directions, and their crossing point stays on an ellipse whose foci are the fixed pivots, exactly like a pair of rolling elliptical gears. The midpoint of the free long link traces a figure-eight.",
+   "forces": "Each crank drives the other through the short coupler as push or pull. The speed ratio and torque ratio change continuously and are inverses of each other, so torque rises when the output slows.",
+   "benefits": "An exact, gearless replacement for elliptical gears and a compact way to reverse rotation with a built-in speed variation. A building block for Kempe angle multipliers and Hart's inversor.",
+   "limits": "Passes through change points where it can flip into a parallelogram, so it needs bracing or a guide. Large speed variation causes heavy inertia loads at speed."
+  },
+  "build": {
+   "ground": "short frame link O2 to O4, length d",
+   "input": "long crank, continuous rotation about O2",
+   "output": "crossed long crank angle about O4, and crossing point path",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "O2→O4, length d = 40 mm"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O2→A, length a = 100 mm"
+    },
+    {
+     "id": "coupler",
+     "role": "link",
+     "def": "A→B, length b = 40 mm, equals d"
+    },
+    {
+     "id": "follower",
+     "role": "output",
+     "def": "O4→B, length c = 100 mm, crossing the input crank"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "coupler"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "coupler",
+      "follower"
+     ]
+    },
+    {
+     "id": "O4",
+     "type": "revolute",
+     "between": [
+      "follower",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 100,
+     "unit": "mm",
+     "note": "input crank, long"
+    },
+    {
+     "name": "b",
+     "value": 40,
+     "unit": "mm",
+     "note": "coupler, short"
+    },
+    {
+     "name": "c",
+     "value": 100,
+     "unit": "mm",
+     "note": "output crank, long"
+    },
+    {
+     "name": "d",
+     "value": 40,
+     "unit": "mm",
+     "note": "ground, short"
+    }
+   ],
+   "defining_relations": "a = c, b = d, crossed assembly. Crossing point X of the two long links satisfies |O2X| + |O4X| = a, an ellipse with foci O2, O4 and major axis a. Speed ratio ω4/ω2 = -|O2X| / |O4X|, between (a - d)/(a + d) and (a + d)/(a - d).",
+   "range": "input crank 360° continuous; output crank 360° in the opposite sense; speed ratio 0.43 to 2.33",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "output crank angle vs input crank angle",
+   "notes": "Solve on the crossed branch and keep it; at θ = 0° and 180° the links are collinear (change points) and a naive solver jumps to the parallelogram branch. Show the crossing point tracing the ellipse."
+  },
+  "examples": [
+   {
+    "use": "Elliptic gear substitute",
+    "detail": "Antiparallelograms reproduce the motion of elliptical gears for non-uniform drives."
+   },
+   {
+    "use": "Hart's inversor",
+    "detail": "Hart's straight-line linkage is built on an antiparallelogram."
+   },
+   {
+    "use": "Short turning radius vehicles",
+    "detail": "Linking front and rear axles with an antiparallelogram steers both axles oppositely."
+   },
+   {
+    "use": "Kempe angle multiplier",
+    "detail": "Nested antiparallelograms multiply or divide angles."
+   }
+  ],
+  "references": [
+   {
+    "title": "Antiparallelogram, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Antiparallelogram",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Four-bar linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Four-bar_linkage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Non-circular gear, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Non-circular_gear",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Abbott, Generalizations of Kempe's Universality Theorem, MIT thesis",
+    "url": "https://web.mit.edu/tabbott/www/papers/mthesis.pdf",
+    "kind": "paper"
+   }
+  ],
+  "media": [
+   {
+    "title": "Anti-parallelogram mechanism",
+    "url": "https://www.youtube.com/watch?v=Abzg9j4ZJKQ",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "parallelogram-linkage",
+   "four-bar",
+   "hart-inversor",
+   "non-circular-gears",
+   "double-crank"
+  ]
+ },
+ {
+  "id": "bell-crank",
+  "name": "Bell crank",
+  "aka": [
+   "bellcrank",
+   "angle lever",
+   "L-lever",
+   "control horn"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "A two-armed lever on one pivot that turns a push or pull through an angle, usually 90°, and can change its size by the arm ratio.",
+  "motion": {
+   "input": "Linear",
+   "output": "Linear",
+   "label": "Linear → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Reversing"
+   ],
+   "axes": "Perpendicular intersecting",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Force amplification",
+   "class": "Low (<5:1)",
+   "typical": "force ratio = input arm / output arm, typically 1:3 to 3:1"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "modelled as ground, bell crank, input rod and output rod with the output on a guide (6 links, 5 revolute, 2 prismatic if both rods end in sliders)"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Force amplification",
+    "Reversing"
+   ],
+   "property": [
+    "Few parts",
+    "Backdrivable",
+    "Approximate"
+   ],
+   "application": [
+    "Aerospace",
+    "Automotive",
+    "Consumer products",
+    "Construction & lifting"
+   ],
+   "keywords": [
+    "bellcrank",
+    "angle lever",
+    "bell pull",
+    "control horn",
+    "pushrod suspension",
+    "throttle linkage",
+    "pull-rod"
+   ]
+  },
+  "explain": {
+   "motion": "The L-shaped lever turns about its corner pivot. A rod pulling on one arm swings it, and the other arm, set at about 90°, pushes or pulls a second rod in a new direction. For small swings the output motion is the input motion times the arm ratio.",
+   "forces": "Moments balance about the pivot, so output force = input force x input arm / output arm. The pivot carries the vector sum of both rod forces; rod angles away from 90° to the arms reduce effectiveness.",
+   "benefits": "Redirects force around corners in a compact, stiff, easily adjusted package. Arm ratio sets the gain without gears.",
+   "limits": "Output is only linear with input for small swings; large angles add cosine error. Pins and rod ends wear and add play."
+  },
+  "build": {
+   "ground": "pivot O of the bell crank and guides for the rods",
+   "input": "input rod pulled horizontally, rotating the bell crank about O ±20°",
+   "output": "output rod vertical position",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "pivot O at origin"
+    },
+    {
+     "id": "lever",
+     "role": "link",
+     "def": "L-shaped plate with arm OA = 60 mm along -y and arm OB = 40 mm along +x, 90° apart"
+    },
+    {
+     "id": "rod_in",
+     "role": "driver",
+     "def": "horizontal pull rod, length 120 mm, pinned at A"
+    },
+    {
+     "id": "rod_out",
+     "role": "output",
+     "def": "vertical push rod, length 100 mm, pinned at B, sliding in a vertical guide"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "lever"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "rod_in",
+      "lever"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "lever",
+      "rod_out"
+     ]
+    },
+    {
+     "id": "G",
+     "type": "prismatic",
+     "between": [
+      "rod_out",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "r1",
+     "value": 60,
+     "unit": "mm",
+     "note": "input arm"
+    },
+    {
+     "name": "r2",
+     "value": 40,
+     "unit": "mm",
+     "note": "output arm"
+    },
+    {
+     "name": "alpha",
+     "value": 90,
+     "unit": "°",
+     "note": "angle between arms"
+    },
+    {
+     "name": "swing",
+     "value": 20,
+     "unit": "°",
+     "note": "half swing of lever"
+    }
+   ],
+   "defining_relations": "Moment balance F_out r2 = F_in r1, so mechanical advantage = r1 / r2 = 1.5. Small-angle displacement ratio y_out / x_in = r2 / r1. Exact: x_in ≈ r1 sin φ, y_out ≈ r2 sin φ.",
+   "range": "lever oscillates ±20°; input rod moves about 41 mm; output rod moves about 27 mm",
+   "overlays": [
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "output displacement vs input displacement",
+   "notes": "Rods should be long compared with arms to keep the motion near linear. Show the moment arms as dimension lines."
+  },
+  "examples": [
+   {
+    "use": "Aircraft flight controls",
+    "detail": "Bellcranks route cable and pushrod motion to rudders and ailerons."
+   },
+   {
+    "use": "Pushrod and pullrod suspension",
+    "detail": "Racing cars use a bellcrank to turn vertical wheel motion into horizontal spring motion."
+   },
+   {
+    "use": "Throttle and brake linkages",
+    "detail": "Bellcranks link pedals to carburettors and master cylinders."
+   },
+   {
+    "use": "San Francisco door openers",
+    "detail": "Victorian flats used bellcrank levers to open the street door from upstairs."
+   }
+  ],
+  "references": [
+   {
+    "title": "Bellcrank, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Bellcrank",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Mechanical advantage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Mechanical_advantage",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "How Bell Crank Rear Suspension Setup Works in a Truck",
+    "url": "https://www.youtube.com/watch?v=VrOHoJAvLD4",
+    "kind": "video"
+   },
+   {
+    "title": "Quick Bell Crank Demo",
+    "url": "https://www.youtube.com/watch?v=WPS6jfn7bQM",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "toggle-clamp",
+   "four-bar",
+   "double-rocker",
+   "ackermann-steering"
+  ]
+ },
+ {
+  "id": "toggle-clamp",
+  "name": "Toggle clamp",
+  "aka": [
+   "toggle lever",
+   "over-centre clamp",
+   "push-pull clamp",
+   "toggle mechanism"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Intermediate",
+  "summary": "A handle drives a link nearly into line with its arm, multiplying hand force hugely and locking just past centre.",
+  "motion": {
+   "input": "Oscillating",
+   "output": "Linear",
+   "label": "Oscillating → Linear",
+   "output_character": [
+    "Toggle",
+    "Self-locking",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Force amplification",
+   "class": "Variable",
+   "typical": "mechanical advantage rises without limit toward toggle; about 10:1 to 60:1 in the last few degrees"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "handle, link, plunger and ground: a slider-crank used near dead centre; count includes ground"
+  },
+  "backdrivable": "No (self-locking)",
+  "tags": {
+   "function": [
+    "Clamping",
+    "Force amplification",
+    "Locking"
+   ],
+   "property": [
+    "Over-centre",
+    "Self-locking",
+    "Singular positions",
+    "Few parts"
+   ],
+   "application": [
+    "Machine tools",
+    "Packaging & automation",
+    "Automotive",
+    "Consumer products"
+   ],
+   "keywords": [
+    "toggle",
+    "over-centre",
+    "dead centre",
+    "destaco",
+    "push-pull clamp",
+    "jig",
+    "fixture"
+   ]
+  },
+  "explain": {
+   "motion": "Pushing the handle swings its short arm round the pivot and the link drives the plunger out along its guides. Near the end of the throw the arm and link come into line, the toggle position, and the plunger almost stops while the handle still turns. The handle goes a few degrees past that line and rests against a stop.",
+   "forces": "Because the plunger barely moves for a large handle motion near toggle, the force ratio becomes very large. Just past centre a push on the plunger tries to turn the handle further onto its stop, so clamp force locks itself and the handle needs no holding.",
+   "benefits": "Very high clamping force from a small hand force, a positive lock, and fast open and close. Simple pin-jointed parts.",
+   "limits": "Clamp force depends on the exact stack height and spring of the parts, so it needs adjustment. Wear in the pins lets the lock slip, and the force is very sensitive near toggle."
+  },
+  "build": {
+   "ground": "handle pivot O, plunger guide on the x axis, and a fixed stop pin",
+   "input": "handle, oscillating from -70° (open) to +3° (past centre)",
+   "output": "plunger position x and clamp force",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "pivot O at origin, guide for plunger along +x from x = 55 to 125 mm, work piece face at x = 173.2 mm"
+    },
+    {
+     "id": "handle",
+     "role": "driver",
+     "def": "triangular plate: arm O→A, a = 40 mm, grip T at radius H = 95 mm at 165° from the arm"
+    },
+    {
+     "id": "link",
+     "role": "link",
+     "def": "A→B, b = 70 mm"
+    },
+    {
+     "id": "plunger",
+     "role": "output",
+     "def": "body from -15 to +55 mm with clamp pad at 63 mm, pinned at B, sliding on x axis"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "handle"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "handle",
+      "link"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "link",
+      "plunger"
+     ]
+    },
+    {
+     "id": "G",
+     "type": "prismatic",
+     "between": [
+      "plunger",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "a",
+     "value": 40,
+     "unit": "mm",
+     "note": "handle arm to knee"
+    },
+    {
+     "name": "b",
+     "value": 70,
+     "unit": "mm",
+     "note": "link length"
+    },
+    {
+     "name": "H",
+     "value": 95,
+     "unit": "mm",
+     "note": "grip radius"
+    },
+    {
+     "name": "g",
+     "value": 165,
+     "unit": "°",
+     "note": "grip direction relative to arm"
+    },
+    {
+     "name": "open",
+     "value": -70,
+     "unit": "°",
+     "note": "handle open angle"
+    },
+    {
+     "name": "over",
+     "value": 3,
+     "unit": "°",
+     "note": "over-centre angle past toggle"
+    }
+   ],
+   "defining_relations": "x_B = a cos t + sqrt(b^2 - a^2 sin^2 t). dx/dt = -(a sin t + a^2 sin t cos t / sqrt(b^2 - a^2 sin^2 t)). Mechanical advantage at the grip MA = H / |dx/dt|, infinite at t = 0 (toggle).",
+   "range": "handle swings 73° from -70° to +3°; plunger travels about 37 mm (B from 72.7 to 110 mm); toggle at t = 0°",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "mechanical advantage (log scale) and plunger position vs handle angle",
+   "notes": "Cap MA in drawings (site caps at 60). Stop pin sits where the handle touches it at +3°. Plunger travel in the last 10° is under 1 mm, so zoom the plot."
+  },
+  "examples": [
+   {
+    "use": "Welding and assembly fixtures",
+    "detail": "Banks of toggle clamps hold parts in jigs for welding and machining."
+   },
+   {
+    "use": "Woodworking jigs",
+    "detail": "Hold-down toggle clamps fix stock to router and saw sleds."
+   },
+   {
+    "use": "Latches and lids",
+    "detail": "Draw latches on cases and drums use the same over-centre action."
+   },
+   {
+    "use": "Pneumatic clamps",
+    "detail": "Air cylinders drive toggles in automated lines for high holding force."
+   }
+  ],
+  "references": [
+   {
+    "title": "Linkage (mechanical), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Linkage_(mechanical)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Mechanical advantage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Mechanical_advantage",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Slider-crank linkage, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Slider-crank_linkage",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Toggle Clamps: Different Types and Where They Are Used",
+    "url": "https://www.youtube.com/watch?v=HmAuAiFl2hM",
+    "kind": "video"
+   },
+   {
+    "title": "Toggle Clamps by Carr Lane Manufacturing",
+    "url": "https://www.youtube.com/watch?v=vRIuotEKuvI",
+    "kind": "video"
+   },
+   {
+    "title": "Toggle-clamp manual vertical, animated, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Toggle-clamp_manual_vertical_3D_animated.gif",
+    "kind": "animation"
+   },
+   {
+    "title": "Category:Clamps, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Clamps",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "slider-crank",
+   "bell-crank",
+   "double-rocker",
+   "four-bar"
+  ]
+ },
+ {
+  "id": "scissor-lift",
+  "name": "Scissor lift",
+  "aka": [
+   "scissor mechanism",
+   "lazy tongs",
+   "pantograph lift",
+   "scissor jack",
+   "lift table"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "Stacked pairs of crossed bars extend vertically when their bottom ends are pushed together, raising a platform that stays level.",
+  "motion": {
+   "input": "Linear",
+   "output": "Linear",
+   "label": "Linear → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Non-uniform"
+   ],
+   "axes": "Perpendicular intersecting",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Variable",
+   "class": "Variable",
+   "typical": "lift per unit slider travel = n w / h, here from about 0.6 (raised) to 8.6 (lowered)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 10,
+   "revolute": 13,
+   "prismatic": 2,
+   "higher_pairs": 0,
+   "notes": "3 stages: 6 bars, ground, bottom carriage and platform, plus slot block; middle and end pins counted separately; a pin-in-slot at the top platform; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Lifting",
+    "Positioning",
+    "Motion conversion"
+   ],
+   "property": [
+    "Compact",
+    "Singular positions",
+    "High load",
+    "Few parts"
+   ],
+   "application": [
+    "Construction & lifting",
+    "Automotive",
+    "Packaging & automation",
+    "Consumer products"
+   ],
+   "keywords": [
+    "lazy tongs",
+    "scissor jack",
+    "aerial work platform",
+    "lift table",
+    "nested parallelograms",
+    "x-frame"
+   ]
+  },
+  "explain": {
+   "motion": "Each stage is a pair of equal bars pinned at their middles like scissors, and the stages are pinned end to end. One bottom bar end is fixed and the other rides on a slider. Pushing that slider toward the fixed pin narrows every stage and each gets taller, so the platform rises by the sum of all the stage gains while staying level.",
+   "forces": "Platform load W needs a horizontal slider force F = W n w / h, so the push is huge when the lift is nearly flat and small when it is high. Bars carry bending as well as axial load; the lowest position is where actuators work hardest.",
+   "benefits": "Very compact when lowered and tall when raised, with a level platform and simple pin joints. Stages can be added for more height.",
+   "limits": "Force demand at the bottom of travel is very high, and stiffness falls with height so tall lifts sway. Pin wear multiplies through all stages."
+  },
+  "build": {
+   "ground": "fixed bottom pin L0 and horizontal track for the carriage",
+   "input": "carriage at R0 sliding along the track, span w from 85 to 50 mm",
+   "output": "platform height H = n h and platform point C",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "fixed pin L0 at origin, track along +x from 30 to 105 mm"
+    },
+    {
+     "id": "carriage",
+     "role": "slider",
+     "def": "carries pin R0 at (w, 0)"
+    },
+    {
+     "id": "bars_a",
+     "role": "link",
+     "def": "bar a_k from L_k to R_{k+1}, length L = 90 mm, k = 0..2"
+    },
+    {
+     "id": "bars_b",
+     "role": "link",
+     "def": "bar b_k from R_k to L_{k+1}, length L = 90 mm, crossing a_k at midpoint M_k"
+    },
+    {
+     "id": "platform",
+     "role": "output",
+     "def": "pinned at L3, slotted at R3, 120 mm long; point C 45 mm from L3"
+    }
+   ],
+   "joints": [
+    {
+     "id": "L0",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "bars_a"
+     ]
+    },
+    {
+     "id": "R0",
+     "type": "revolute",
+     "between": [
+      "carriage",
+      "bars_b"
+     ]
+    },
+    {
+     "id": "S0",
+     "type": "prismatic",
+     "between": [
+      "carriage",
+      "ground"
+     ]
+    },
+    {
+     "id": "Mk",
+     "type": "revolute",
+     "between": [
+      "bars_a",
+      "bars_b"
+     ]
+    },
+    {
+     "id": "Lk/Rk",
+     "type": "revolute",
+     "between": [
+      "bars_a",
+      "bars_b"
+     ]
+    },
+    {
+     "id": "L3",
+     "type": "revolute",
+     "between": [
+      "bars_b",
+      "platform"
+     ]
+    },
+    {
+     "id": "R3",
+     "type": "pin-in-slot",
+     "between": [
+      "bars_a",
+      "platform"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "L",
+     "value": 90,
+     "unit": "mm",
+     "note": "bar length"
+    },
+    {
+     "name": "n",
+     "value": 3,
+     "unit": "",
+     "note": "number of stages"
+    },
+    {
+     "name": "w_low",
+     "value": 85,
+     "unit": "mm",
+     "note": "span when lowered"
+    },
+    {
+     "name": "w_high",
+     "value": 50,
+     "unit": "mm",
+     "note": "span when raised"
+    },
+    {
+     "name": "plat",
+     "value": 45,
+     "unit": "mm",
+     "note": "platform point C from L3"
+    }
+   ],
+   "defining_relations": "Stage height h = sqrt(L^2 - w^2); total H = n h. dH/dw = -n w / h. Force on carriage F = W n w / h (virtual work).",
+   "range": "carriage span 85 to 50 mm (35 mm travel); stage height 29.6 to 74.8 mm; platform height 88.8 to 224.5 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "platform height vs carriage position, and force ratio F/W",
+   "notes": "Keep w well below L to avoid the flat singularity (h → 0) and above 0 to avoid the vertical one. Pins L_k on x = 0 and R_k on x = w, midpoints M_k at (w/2, (k + 0.5) h)."
+  },
+  "examples": [
+   {
+    "use": "Aerial work platforms",
+    "detail": "Self-propelled scissor lifts raise workers to ceilings on construction sites."
+   },
+   {
+    "use": "Scissor car jack",
+    "detail": "A screw pulls the two corners of a single scissor stage together to lift a car."
+   },
+   {
+    "use": "Hydraulic lift tables",
+    "detail": "Pallet and workshop tables raise loads to working height."
+   },
+   {
+    "use": "Laptop keyboards",
+    "detail": "Low-profile keys use a tiny scissor mechanism to stay level."
+   }
+  ],
+  "references": [
+   {
+    "title": "Scissors mechanism, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Scissors_mechanism",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Scissor lift, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Scissor_lift",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Pantographs or scissor mechanisms, University of South Australia learning resource",
+    "url": "https://lo.unisa.edu.au/mod/book/view.php?id=424248&chapterid=69954",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "What Is a Scissor Lift? MEWP Basics Explained",
+    "url": "https://www.youtube.com/watch?v=5AeWRqO09Zg",
+    "kind": "video"
+   },
+   {
+    "title": "Lead screw operated simple scissor lifting table mechanism",
+    "url": "https://www.youtube.com/watch?v=ZxordrekQSg",
+    "kind": "video"
+   },
+   {
+    "title": "Category:Scissor lifts, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Scissor_lifts",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "pantograph",
+   "parallelogram-linkage",
+   "lead-screw",
+   "sarrus-linkage",
+   "toggle-clamp"
+  ]
+ },
+ {
+  "id": "pantograph",
+  "name": "Pantograph",
+  "aka": [
+   "pantagraph",
+   "eidograph",
+   "copying linkage",
+   "scaling linkage"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "A jointed parallelogram that copies any path traced by a stylus, scaled up or down by a fixed ratio.",
+  "motion": {
+   "input": "Path",
+   "output": "Path",
+   "label": "Path → Path",
+   "output_character": [
+    "Continuous"
+   ],
+   "axes": "n/a",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Scaling",
+   "class": "Low (<5:1)",
+   "typical": "scale = OE / OT, 2:1 here; drawing pantographs typically 1:1 to 10:1"
+  },
+  "dof": 2,
+  "topology": {
+   "links": 5,
+   "revolute": 6,
+   "prismatic": 0,
+   "higher_pairs": 0,
+   "notes": "two long arms and two short bars forming a parallelogram, plus ground; pivot, elbow, two midpoints, stylus and pen joints; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Scaling & copying",
+    "Drawing curves",
+    "Path generation"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Historic"
+   ],
+   "application": [
+    "Instruments",
+    "Machine tools",
+    "Education",
+    "Toys & kinetic art"
+   ],
+   "keywords": [
+    "christoph scheiner",
+    "eidograph",
+    "similar triangles",
+    "engraving",
+    "copy milling",
+    "parallelogram",
+    "hero of alexandria"
+   ]
+  },
+  "explain": {
+   "motion": "Two long arms hinge at the elbow A, and two short bars complete a parallelogram between their midpoints and the stylus T. However the stylus moves, the fixed pivot O, the stylus and the pen E stay on one straight line with the pen twice as far from O. So the pen copies every path of the stylus at twice the size.",
+   "forces": "Drawing loads are tiny; the bars mainly carry push and pull. Friction at the pen and the weight of long arms, plus play in the pins, scale up with the ratio and blur fine detail.",
+   "benefits": "Exact geometric scaling of any path with only pin joints, adjustable by moving pivots along the bars. Works in reverse to reduce.",
+   "limits": "Errors and pin play are magnified by the scale ratio. Reach is limited near full stretch where the elbow straightens."
+  },
+  "build": {
+   "ground": "fixed pivot O",
+   "input": "stylus T moved along a path (here a five-lobed flower centred at (72, 14), r = 25 + 5 cos 5u)",
+   "output": "pen E path, = 2 T",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "pivot O at origin"
+    },
+    {
+     "id": "armO",
+     "role": "link",
+     "def": "O→A, length 2h = 110 mm"
+    },
+    {
+     "id": "armE",
+     "role": "output",
+     "def": "A→E, length 2h = 110 mm, pen at E"
+    },
+    {
+     "id": "barM1",
+     "role": "driver",
+     "def": "M1→T, length h = 55 mm, M1 midpoint of OA"
+    },
+    {
+     "id": "barM2",
+     "role": "driver",
+     "def": "T→M2, length h = 55 mm, M2 midpoint of AE"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "armO"
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "armO",
+      "armE"
+     ]
+    },
+    {
+     "id": "M1",
+     "type": "revolute",
+     "between": [
+      "armO",
+      "barM1"
+     ]
+    },
+    {
+     "id": "M2",
+     "type": "revolute",
+     "between": [
+      "armE",
+      "barM2"
+     ]
+    },
+    {
+     "id": "T",
+     "type": "revolute",
+     "between": [
+      "barM1",
+      "barM2"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "h",
+     "value": 55,
+     "unit": "mm",
+     "note": "half arm length and short bar length"
+    },
+    {
+     "name": "k",
+     "value": 2,
+     "unit": "",
+     "note": "scale factor OE / OT"
+    },
+    {
+     "name": "cx",
+     "value": 72,
+     "unit": "mm",
+     "note": "stylus path centre x"
+    },
+    {
+     "name": "cy",
+     "value": 14,
+     "unit": "mm",
+     "note": "stylus path centre y"
+    },
+    {
+     "name": "r0",
+     "value": 25,
+     "unit": "mm",
+     "note": "stylus path mean radius"
+    }
+   ],
+   "defining_relations": "M1, A, M2, T form a parallelogram, so T = (O + E)/2 and O, T, E are collinear with OE = k OT (k = 2 here). In general scale k = OE / OT from similar triangles.",
+   "range": "stylus traces a closed flower within |OT| about 42 to 104 mm; pen traces it at 2x; elbow stays under 160°",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "scale factor OE / OT vs path parameter (constant 2)",
+   "notes": "2 DOF: drive the stylus position directly, then E = 2T and A = circle(O, 2h) ∩ circle(E, 2h) on branch +1. Keep |OE| < 4h to avoid the straight-arm singularity."
+  },
+  "examples": [
+   {
+    "use": "Drawing enlargement",
+    "detail": "Artists and draughtsmen copy and scale drawings with a pantograph."
+   },
+   {
+    "use": "Engraving machines",
+    "detail": "Pantograph engravers cut lettering on nameplates and tools from a master template."
+   },
+   {
+    "use": "Coin and medal reduction",
+    "detail": "Reducing machines copied large reliefs down to coin size."
+   },
+   {
+    "use": "Sculpture copying",
+    "detail": "Three-dimensional pantographs enlarge or reduce statues."
+   }
+  ],
+  "references": [
+   {
+    "title": "Pantograph, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Pantograph",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Christoph Scheiner, Galileo Project, Rice University",
+    "url": "http://galileo.rice.edu/Catalog/NewFiles/scheiner.html",
+    "kind": "museum"
+   }
+  ],
+  "media": [
+   {
+    "title": "How to use a manual pantograph",
+    "url": "https://www.youtube.com/watch?v=2LGr1PKm-Uo",
+    "kind": "video"
+   },
+   {
+    "title": "Enlarge drawings with a home-made pantograph",
+    "url": "https://www.youtube.com/watch?v=UpK7hkth-n0",
+    "kind": "video"
+   },
+   {
+    "title": "Category:Pantographs (instrument), Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Pantographs_(instrument)",
+    "kind": "photos"
+   },
+   {
+    "title": "Pantograph 2X animation, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:Pantograph_2X.gif",
+    "kind": "animation"
+   }
+  ],
+  "related": [
+   "parallelogram-linkage",
+   "scissor-lift",
+   "five-bar",
+   "elliptic-trammel"
+  ]
+ },
+ {
+  "id": "elliptic-trammel",
+  "name": "Trammel of Archimedes",
+  "aka": [
+   "elliptic trammel",
+   "ellipsograph",
+   "do-nothing machine",
+   "ellipse trammel"
+  ],
+  "in_site": true,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "Two blocks sliding in crossed grooves carry a rod whose points draw exact ellipses.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Path",
+   "label": "Rotary → Path",
+   "output_character": [
+    "Continuous",
+    "Harmonic"
+   ],
+   "axes": "n/a",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "None",
+   "class": "n/a",
+   "typical": "ellipse half-axes = distances from pen to each block (40 x 100 mm here)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 5,
+   "revolute": 3,
+   "prismatic": 2,
+   "higher_pairs": 0,
+   "notes": "ground with crossed grooves, two blocks, rod, and a drive crank to the rod midpoint (redundant constraint); count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Drawing curves",
+    "Path generation",
+    "Straight-line generation"
+   ],
+   "property": [
+    "Exact",
+    "Few parts",
+    "Historic",
+    "Smooth (harmonic)"
+   ],
+   "application": [
+    "Instruments",
+    "Toys & kinetic art",
+    "Education",
+    "Machine tools"
+   ],
+   "keywords": [
+    "ellipsograph",
+    "proclus",
+    "archimedes",
+    "do-nothing machine",
+    "ellipse",
+    "cross slide"
+   ]
+  },
+  "explain": {
+   "motion": "One block slides along the horizontal groove and the other along the vertical one, and a rod joins them. A crank from the crossing to the rod midpoint turns it round. The blocks pass through the crossing one at a time, and a pen on the extended rod traces an ellipse whose half-axes are its distances to the two blocks.",
+   "forces": "Each groove can only push its block at right angles to the groove, so the blocks feel side forces only. Driving from the midpoint crank works but the crank and rod rotate in opposite directions, causing friction and wear at the midpoint pin.",
+   "benefits": "Exact ellipses of any proportion from two adjustable distances on a straight bar, with no curved guide. The blocks themselves give exact straight-line motion and the midpoint traces a circle.",
+   "limits": "Sliders need clean, low-play grooves or the ellipse distorts. Blocks must pass through the crossing, so the groove ends need cut-backs."
+  },
+  "build": {
+   "ground": "base with crossed grooves along x and y through O, and a bridge holding the crank shaft at O",
+   "input": "crank O→M, continuous rotation",
+   "output": "pen point P path (ellipse)",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "crossed grooves along x and y, cut back within 19 mm of O, extending to ±82 mm"
+    },
+    {
+     "id": "blockX",
+     "role": "slider",
+     "def": "block at A = (L cos θ, 0)"
+    },
+    {
+     "id": "blockY",
+     "role": "slider",
+     "def": "block at B = (0, L sin θ)"
+    },
+    {
+     "id": "rod",
+     "role": "link",
+     "def": "A→B length L = 60 mm, extended p = 40 mm past B to pen P"
+    },
+    {
+     "id": "crank",
+     "role": "driver",
+     "def": "O→M, length L/2 = 30 mm, M midpoint of AB"
+    }
+   ],
+   "joints": [
+    {
+     "id": "A",
+     "type": "revolute",
+     "between": [
+      "rod",
+      "blockX"
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "between": [
+      "rod",
+      "blockY"
+     ]
+    },
+    {
+     "id": "SX",
+     "type": "prismatic",
+     "between": [
+      "blockX",
+      "ground"
+     ]
+    },
+    {
+     "id": "SY",
+     "type": "prismatic",
+     "between": [
+      "blockY",
+      "ground"
+     ]
+    },
+    {
+     "id": "M",
+     "type": "revolute",
+     "between": [
+      "crank",
+      "rod"
+     ]
+    },
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "crank"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "L",
+     "value": 60,
+     "unit": "mm",
+     "note": "block to block distance"
+    },
+    {
+     "name": "p",
+     "value": 40,
+     "unit": "mm",
+     "note": "pen beyond vertical block"
+    },
+    {
+     "name": "c",
+     "value": 19,
+     "unit": "mm",
+     "note": "groove cut-back at crossing"
+    },
+    {
+     "name": "ext",
+     "value": 82,
+     "unit": "mm",
+     "note": "groove half length"
+    }
+   ],
+   "defining_relations": "A = (L cos θ, 0), B = (0, L sin θ), P = A + (L + p)/L (B - A) = (-p cos θ, (L + p) sin θ). Ellipse x^2/p^2 + y^2/(L + p)^2 = 1. Midpoint M traces circle radius L/2.",
+   "range": "crank 360° continuous; blocks travel ±60 mm; pen ellipse half-axes a = 40 mm (x) and b = 100 mm (y)",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "angles",
+    "plot"
+   ],
+   "plot": "pen x and y vs crank angle",
+   "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Crank sits on a raised bridge layer so it clears the rod and blocks."
+  },
+  "examples": [
+   {
+    "use": "Drawing ellipses",
+    "detail": "Draughtsmen and woodworkers use trammels to lay out elliptical tables and arches."
+   },
+   {
+    "use": "Elliptical router jigs",
+    "detail": "Trammel jigs guide a router to cut oval frames and mirrors."
+   },
+   {
+    "use": "Do-nothing machine toy",
+    "detail": "The crank-driven trammel is a popular desk toy and kinetic sculpture."
+   },
+   {
+    "use": "Oval lathe chucks",
+    "detail": "Ellipse chucks on ornamental lathes use the same principle."
+   }
+  ],
+  "references": [
+   {
+    "title": "Trammel of Archimedes, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Trammel_of_Archimedes",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Ellipsograph, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Ellipsograph",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Do nothing machine, Trammel of Archimedes, part 1, Homemade Science with Bruce Yeany",
+    "url": "https://www.youtube.com/watch?v=iM-r8bhTT8k",
+    "kind": "video"
+   },
+   {
+    "title": "Trammel of Archimedes, Ellipsograph",
+    "url": "https://www.youtube.com/watch?v=Hfw0yYur5S4",
+    "kind": "video"
+   },
+   {
+    "title": "Smithsonian ellipsograph photo, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/File:SI_ellipsograph.jpg",
+    "kind": "photos"
+   },
+   {
+    "title": "Category:Trammel of Archimedes, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Trammel_of_Archimedes",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "tusi-couple",
+   "scotch-yoke",
+   "pantograph",
+   "peaucellier-lipkin"
+  ]
+ },
+ {
+  "id": "eccentric-sheave",
+  "name": "Eccentric sheave and strap",
+  "aka": [
+   "eccentric",
+   "eccentric and rod",
+   "eccentric crank",
+   "sheave and strap"
+  ],
+  "in_site": false,
+  "family": "Linkage",
+  "level": "Basic",
+  "summary": "An off-centre disc on a shaft, ringed by a strap and rod, works as a crank with no break in the shaft to drive a valve or pump.",
+  "motion": {
+   "input": "Rotary",
+   "output": "Linear",
+   "label": "Rotary → Linear",
+   "output_character": [
+    "Reciprocating",
+    "Harmonic"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Stroke",
+   "class": "n/a",
+   "typical": "travel = 2 x eccentricity (24 mm with e = 12 mm)"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 4,
+   "revolute": 3,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "sheave (crank of radius e), strap and rod, valve rod slider, ground; the large sheave-in-strap bearing is the crank pin; count includes ground"
+  },
+  "backdrivable": "Partly",
+  "tags": {
+   "function": [
+    "Valve timing",
+    "Motion conversion",
+    "Pumping & compression"
+   ],
+   "property": [
+    "Compact",
+    "Few parts",
+    "Historic",
+    "Approximate"
+   ],
+   "application": [
+    "Steam & engines",
+    "Railways",
+    "Marine",
+    "Machine tools"
+   ],
+   "keywords": [
+    "eccentric strap",
+    "throw",
+    "angular advance",
+    "slide valve",
+    "stephenson valve gear",
+    "eccentric rod"
+   ]
+  },
+  "explain": {
+   "motion": "A round disc is keyed to the shaft with its centre offset by the eccentricity e. A strap rides round the disc and its rod pushes a slider, so the disc acts like a crank of radius e. Because the shaft passes straight through, the eccentric can sit anywhere along a crankshaft.",
+   "forces": "The rod force acts through the large sheave bearing, which has big rubbing area and friction. That makes the eccentric good for light loads like valves and poor for driving heavy power strokes; it is rarely backdriven.",
+   "benefits": "Gives a small crank throw anywhere on a continuous shaft without a split crank. Setting the sheave angle (angular advance) times the valve directly.",
+   "limits": "Large diameter bearing means high friction and heat, and the throw is small. Motion is only near-harmonic because the rod tilts."
+  },
+  "build": {
+   "ground": "main shaft bearing O and valve rod guide along x",
+   "input": "shaft and sheave, continuous rotation about O",
+   "output": "valve rod position x",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "shaft bearing O at origin, guide along +x"
+    },
+    {
+     "id": "sheave",
+     "role": "driver",
+     "def": "disc radius R = 40 mm, centre E offset e = 12 mm from O"
+    },
+    {
+     "id": "strap",
+     "role": "link",
+     "def": "ring around sheave rigid with eccentric rod, E→V length 150 mm"
+    },
+    {
+     "id": "valve_rod",
+     "role": "output",
+     "def": "slider pinned at V on x axis"
+    }
+   ],
+   "joints": [
+    {
+     "id": "O",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "sheave"
+     ]
+    },
+    {
+     "id": "E",
+     "type": "revolute",
+     "between": [
+      "sheave",
+      "strap"
+     ]
+    },
+    {
+     "id": "V",
+     "type": "revolute",
+     "between": [
+      "strap",
+      "valve_rod"
+     ]
+    },
+    {
+     "id": "G",
+     "type": "prismatic",
+     "between": [
+      "valve_rod",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "e",
+     "value": 12,
+     "unit": "mm",
+     "note": "eccentricity (throw)"
+    },
+    {
+     "name": "R",
+     "value": 40,
+     "unit": "mm",
+     "note": "sheave radius"
+    },
+    {
+     "name": "l",
+     "value": 150,
+     "unit": "mm",
+     "note": "eccentric rod length, centre E to pin V"
+    },
+    {
+     "name": "advance",
+     "value": 30,
+     "unit": "°",
+     "note": "angular advance of sheave ahead of the main crank"
+    }
+   ],
+   "defining_relations": "Same as slider-crank with crank radius e: x = e cos θ + sqrt(l^2 - e^2 sin^2 θ). Travel = 2e. Valve displacement ≈ e cos(θ + 90° + δ) relative to crank for advance δ.",
+   "range": "shaft 360° continuous; valve rod moves 24 mm; rod obliquity under 4.6°",
+   "overlays": [
+    "paths",
+    "velocity",
+    "angles",
+    "plot"
+   ],
+   "plot": "valve rod position vs shaft angle",
+   "notes": "Draw the sheave with the shaft hole off-centre so it is clear it is a crank. The strap must not rotate with the sheave; it rocks slightly with the rod."
+  },
+  "examples": [
+   {
+    "use": "Steam engine slide valves",
+    "detail": "Eccentrics on the crankshaft drive the slide valve, often through Stephenson or Walschaerts gear."
+   },
+   {
+    "use": "Locomotive valve gear",
+    "detail": "Pairs of eccentrics with a link give forward and reverse."
+   },
+   {
+    "use": "Pumps and compressors",
+    "detail": "Eccentric-driven plungers in fuel and lubricator pumps."
+   },
+   {
+    "use": "Model engineering",
+    "detail": "Small engines use a sheave and strap as an easy-to-make crank."
+   }
+  ],
+  "references": [
+   {
+    "title": "Eccentric (mechanism), Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Eccentric_(mechanism)",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Valve Motion Eccentric Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/valve-motion-eccentric",
+    "kind": "calculator"
+   },
+   {
+    "title": "Single Eccentric Valve Gear Mechanism, FIRGELLI",
+    "url": "https://www.firgelliauto.com/blogs/mechanisms/single-eccentric-valve-gear",
+    "kind": "engineering-guide"
+   }
+  ],
+  "media": [
+   {
+    "title": "Making a Stuart Half Beam Steam Engine, the eccentric strap and sheave",
+    "url": "https://www.youtube.com/watch?v=DAt3gtaZTko",
+    "kind": "video"
+   },
+   {
+    "title": "Making eccentrics for steam engines, tubalcain",
+    "url": "https://www.youtube.com/watch?v=Li8UlyU8AUM",
+    "kind": "video"
+   }
+  ],
+  "related": [
+   "slider-crank",
+   "scotch-yoke",
+   "walschaerts-valve-gear",
+   "locomotive-drive",
+   "cam-follower"
+  ]
+ },
+ {
+  "id": "locomotive-drive",
+  "name": "Locomotive driving gear",
+  "aka": [
+   "coupling rods",
+   "side rods",
+   "main rod and coupling rod",
+   "rod drive"
+  ],
+  "in_site": true,
+  "family": "Coupling",
+  "level": "Intermediate",
+  "summary": "A piston, crosshead and main rod turn one driving wheel, and a coupling rod makes the next wheel turn exactly with it.",
+  "motion": {
+   "input": "Linear",
+   "output": "Rotary",
+   "label": "Linear → Rotary",
+   "output_character": [
+    "Continuous",
+    "Non-uniform"
+   ],
+   "axes": "Rotary-to-in-plane",
+   "plane": "Planar"
+  },
+  "ratio": {
+   "kind": "Unity",
+   "class": "1:1",
+   "typical": "stroke = 2 x crank radius (34 mm); coupled wheels turn 1:1"
+  },
+  "dof": 1,
+  "topology": {
+   "links": 6,
+   "revolute": 6,
+   "prismatic": 1,
+   "higher_pairs": 0,
+   "notes": "crosshead, main rod, two wheels, coupling rod, ground; the coupling loop is a parallelogram four-bar; count includes ground"
+  },
+  "backdrivable": "Yes",
+  "tags": {
+   "function": [
+    "Motion conversion",
+    "Shaft coupling",
+    "Power splitting"
+   ],
+   "property": [
+    "Singular positions",
+    "Balanced",
+    "High load",
+    "Historic"
+   ],
+   "application": [
+    "Railways",
+    "Steam & engines",
+    "Education"
+   ],
+   "keywords": [
+    "steam locomotive",
+    "coupling rod",
+    "main rod",
+    "crosshead",
+    "dead centre",
+    "quartering",
+    "crank pin"
+   ]
+  },
+  "explain": {
+   "motion": "Steam pushes the piston back and forth. The crosshead, sliding between guide bars, carries the piston rod and turns that push into the swinging main rod, which drives the crank pin on the main wheel. The coupling rod joins crank pins set at the same angle on both wheels, so it stays level, every point on it circles at crank radius, and the wheels turn together.",
+   "forces": "The crosshead takes the side thrust of the tilted main rod so the piston does not. Torque falls to zero at each dead centre, so real locomotives set the cranks on the two sides 90° apart (quartered) to always have one side able to start.",
+   "benefits": "Spreads tractive effort over several wheels for grip, with a simple, robust and inspectable rod drive.",
+   "limits": "Rods and counterweights cause hammer blow and shaking that pound the track. Each side alone has dead centres, and the parallelogram has change points where a slack rod could jam."
+  },
+  "build": {
+   "ground": "frame carrying both axles, cylinder and crosshead guides",
+   "input": "crosshead X driven along the guide by the piston",
+   "output": "driving wheel rotation (both wheels)",
+   "members": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "def": "axles W1 at (0,0) and W2 at (80,0), cylinder bore from x = -173 to -123, guides from x = -108 to -46"
+    },
+    {
+     "id": "wheel1",
+     "role": "output",
+     "def": "driving wheel radius R = 34 mm, crank pin C1 at r = 17 mm"
+    },
+    {
+     "id": "wheel2",
+     "role": "output",
+     "def": "coupled wheel radius 34 mm, crank pin C2 at r = 17 mm, same phase"
+    },
+    {
+     "id": "coupling",
+     "role": "link",
+     "def": "C1→C2, length 80 mm = axle spacing"
+    },
+    {
+     "id": "main",
+     "role": "link",
+     "def": "X→C1, length Lm = 80 mm"
+    },
+    {
+     "id": "crosshead",
+     "role": "driver",
+     "def": "slider on the guide at X, carrying the piston rod"
+    }
+   ],
+   "joints": [
+    {
+     "id": "W1",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "wheel1"
+     ]
+    },
+    {
+     "id": "W2",
+     "type": "revolute",
+     "between": [
+      "ground",
+      "wheel2"
+     ]
+    },
+    {
+     "id": "C1",
+     "type": "revolute",
+     "between": [
+      "wheel1",
+      "main"
+     ]
+    },
+    {
+     "id": "C1b",
+     "type": "revolute",
+     "between": [
+      "wheel1",
+      "coupling"
+     ]
+    },
+    {
+     "id": "C2",
+     "type": "revolute",
+     "between": [
+      "coupling",
+      "wheel2"
+     ]
+    },
+    {
+     "id": "X",
+     "type": "revolute",
+     "between": [
+      "main",
+      "crosshead"
+     ]
+    },
+    {
+     "id": "G",
+     "type": "prismatic",
+     "between": [
+      "crosshead",
+      "ground"
+     ]
+    }
+   ],
+   "params": [
+    {
+     "name": "R",
+     "value": 34,
+     "unit": "mm",
+     "note": "wheel radius"
+    },
+    {
+     "name": "sp",
+     "value": 80,
+     "unit": "mm",
+     "note": "axle spacing"
+    },
+    {
+     "name": "r",
+     "value": 17,
+     "unit": "mm",
+     "note": "crank pin radius"
+    },
+    {
+     "name": "Lm",
+     "value": 80,
+     "unit": "mm",
+     "note": "main rod length"
+    }
+   ],
+   "defining_relations": "Crosshead x = -(Lm^2 - r^2 sin^2 θ)^0.5 + r cos θ (slider-crank). Coupling: C2 = C1 + (sp, 0), wheels rotate equally (parallelogram). Stroke = 2r.",
+   "range": "wheels 360° continuous; crosshead travels 34 mm; coupling rod translates in a circle of radius 17 mm",
+   "overlays": [
+    "paths",
+    "velocity",
+    "forces",
+    "plot"
+   ],
+   "plot": "crosshead position vs wheel angle",
+   "notes": "Drive the wheel angle and derive the crosshead so the animation passes the dead centres. Main rod on a layer outside the coupling rod, both on C1. Keep the coupling as a translation (not a circle intersection) to avoid the antiparallelogram branch."
+  },
+  "examples": [
+   {
+    "use": "Steam locomotives",
+    "detail": "Main and coupling rods drive and couple the driving wheels."
+   },
+   {
+    "use": "Rod-drive diesel and electric shunters",
+    "detail": "Jackshaft locomotives use coupling rods from a single motor."
+   },
+   {
+    "use": "Model locomotives",
+    "detail": "Live steam and model engines reproduce the rod drive at scale."
+   }
+  ],
+  "references": [
+   {
+    "title": "Coupling rod, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Coupling_rod",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Crosshead, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Crosshead",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Driving wheel, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Driving_wheel",
+    "kind": "wikipedia"
+   },
+   {
+    "title": "Connecting rod, Wikipedia",
+    "url": "https://en.wikipedia.org/wiki/Connecting_rod",
+    "kind": "wikipedia"
+   }
+  ],
+  "media": [
+   {
+    "title": "Amazing Steam Locomotive Main Rod Video",
+    "url": "https://www.youtube.com/watch?v=MCGrTeEy0vo",
+    "kind": "video"
+   },
+   {
+    "title": "How Steam Locomotive Wheels Stay Perfectly Synced",
+    "url": "https://www.youtube.com/watch?v=69C4Iq2xjF4",
+    "kind": "video"
+   },
+   {
+    "title": "Working at the steam workshop #9, fitting the coupling rods",
+    "url": "https://www.youtube.com/watch?v=9qGOJlHvhiA",
+    "kind": "video"
+   },
+   {
+    "title": "Category:Locomotive parts, Wikimedia Commons",
+    "url": "https://commons.wikimedia.org/wiki/Category:Locomotive_parts",
+    "kind": "photos"
+   }
+  ],
+  "related": [
+   "slider-crank",
+   "parallelogram-linkage",
+   "walschaerts-valve-gear",
+   "eccentric-sheave",
+   "double-crank"
+  ]
+ }
+]

@@ -1,0 +1,14 @@
+{
+  "name": "mechanism-database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An online library of mechanical mechanisms, drawn live as bench assemblies in one house style.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gingerskull/mechanism-database.git"
+  }
+}

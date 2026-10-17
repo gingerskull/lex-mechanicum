@@ -1,0 +1,74 @@
+name: Feature or rework (plan)
+description: A larger piece of work. This issue holds the plan; each step becomes a sub-issue.
+title: 'Plan: '
+labels: ['kind:feature']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Write as much or as little as you know. The first implementation step is always to
+        complete this plan here (design, steps, acceptance) and create one sub-issue per step; the
+        plan is reviewed in this issue before any code. Mermaid diagrams render in issues
+        (```mermaid … ```), and screenshots can be pasted.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should be possible afterwards, from the user's side.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The problem it solves, or what prompted it.
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is in, and what is explicitly out (deferred, not wanted).
+      value: |
+        **In:**
+        -
+
+        **Out:**
+        -
+  - type: textarea
+    id: design
+    attributes:
+      label: Design and decisions
+      description: Behaviour, UI, data or format changes, constraints, links (artifacts, references). Optional at first.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      description: Rough steps if you have them; they become sub-issues. Leave empty to let the planning step propose them.
+      value: |
+        - [ ] Complete this plan and create the step sub-issues
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Done when
+      description: How we know it's finished (behaviour to check, tests, numbers).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Mechanisms
+        - Rules & hardware
+        - Renderer & style
+        - Site
+        - Catalogue
+        - Tooling & tests
+        - CI & process
+        - Docs
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size (rough)
+      options:
+        - S (a day or less)
+        - M (a few days)
+        - L (a week or two)
+        - XL (a milestone)

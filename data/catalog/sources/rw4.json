@@ -1,0 +1,68 @@
+{
+ "spur-gears": {"real_world": [
+  {"product": "KHK stock metric spur gears (SS, SSG, MSGA series)", "maker": "KHK (Kohara Gear Industry) / KHK USA", "use": "Off-the-shelf straight-tooth spur gears sold for transmitting power between parallel shafts in machinery.", "url": "https://www.globalspec.com/FeaturedProducts/Detail/KHKUSA/335456/Spur_Gears", "kind": "product", "checked": true},
+  {"product": "Martin S672 steel spur gear, 6 DP, 72 teeth", "maker": "Martin Sprocket & Gear", "use": "A stock 14.5 degree pressure angle spur gear used in industrial drives to mesh with a matching pinion on a parallel shaft.", "url": "https://sourceatlantic.ca/Product/S672", "kind": "product", "checked": true}
+ ]},
+ "gear-train": {"real_world": [
+  {"product": "Three-train flatbed turret clock, c. 1939", "maker": "E. Dent & Co. (Science Museum Group collection)", "use": "Separate going, striking and Westminster quarter trains of wheels and pinions reduce the weight-driven power to hand and hammer motions.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co936", "kind": "museum", "checked": true},
+  {"product": "Glass faced skeleton clock, 1937-1938", "maker": "Jaeger-LeCoultre (Science Museum Group collection)", "use": "An exposed skeleton movement in which the compound wheel train from the power source to the hands is visible through the glass.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co48392/glass-faced-skeleton-clock", "kind": "museum", "checked": false},
+  {"product": "Tamiya 72002 High Speed Gearbox kit", "maker": "Tamiya", "use": "A compound train of plastic spur gears reduces a small DC motor's speed, assemblable at 11.6:1 or 18:1.", "url": "https://core-electronics.com.au/tamiya-72002-high-speed-gearbox-kit.html.md", "kind": "product", "checked": true}
+ ]},
+ "internal-gear-pair": {"real_world": [
+  {"product": "KHK SI1-60 internal ring gear, module 1, 60 teeth", "maker": "KHK (Kohara Gear Industry)", "use": "A stock steel internal gear that meshes with a smaller external pinion inside it, as used for planetary annuli and compact drives.", "url": "https://khkgears.us/id/SI1-60", "kind": "product", "checked": true},
+  {"product": "Kaydon RK series internal-toothed slewing bearing", "maker": "Kaydon (SKF)", "use": "A slewing ring with internal teeth driven by a pinion to rotate small cranes, booms, lifts and rotary tables.", "url": "https://www.directindustry.com/prod/kaydon/product-14280-534903.html", "kind": "product", "checked": true}
+ ]},
+ "helical-gears": {"real_world": [
+  {"product": "SEW-EURODRIVE R/RX/RM series helical gear units", "maker": "SEW-EURODRIVE", "use": "Parallel-shaft helical gear stages reduce motor speed for conveyors, mixers and other industrial drives.", "url": "https://kz.sew-eurodrive.com/products/gear-units/standard-gear-units/helical-gear-units-r/helical-gear-units-r.html", "kind": "product", "checked": true},
+  {"product": "KHK metric helical gears (KHG ground and SH series)", "maker": "KHK (Kohara Gear Industry)", "use": "Stock helical gears sold for quiet, high-speed power transmission between parallel shafts.", "url": "https://www.manufacturing.net/home/mechanical-components/product/22525741/khk-usa-extensive-line-of-metric-helical-gears", "kind": "product", "checked": true},
+  {"product": "SEW-EURODRIVE R27 DRN71M4 helical gearmotor", "maker": "SEW-EURODRIVE", "use": "A specific R-series helical gear reducer combined with an asynchronous motor.", "url": "https://www.eurosensor.com/en/product/sew-eurodrIve-r27-drn71m4-be05-th-r-series-helical-gear-reducer-with-a-drn71m4-asynchronous-motor", "kind": "product", "checked": false}
+ ]},
+ "herringbone-gears": {"real_world": [
+  {"product": "Radicon CODOG marine propulsion gearbox", "maker": "Radicon (Elecon)", "use": "Ground double helical gears with an inbuilt clutch reduce engine speed to propeller speed on larger ships, including naval vessels.", "url": "https://radicon.com/product/codog-gearbox/", "kind": "product", "checked": true},
+  {"product": "Main reduction gears of DD-692 class destroyers (US Navy NavPers 10813-B, 1966)", "maker": "US Navy", "use": "Double helical gears reduce steam turbine speed to propeller shaft speed, cancelling axial thrust between the two helices.", "url": "https://www.eugeneleeslover.com/ENGINEERING/CHAPTER-7-REDUCTION-GEARS.php", "kind": "in-product", "checked": true}
+ ]},
+ "bevel-gears": {"real_world": [
+  {"product": "Boston Gear L107Y miter gear, 6 DP, 24 teeth", "maker": "Boston Gear", "use": "A 1:1 bevel (miter) gear for turning a drive through 90 degrees between intersecting shafts.", "url": "https://www.mrosupply.com/products/35995/as-markdown/", "kind": "product", "checked": true},
+  {"product": "SEW-EURODRIVE K series helical-bevel gear units", "maker": "SEW-EURODRIVE", "use": "A bevel gear stage turns the motor drive through a right angle in industrial gearmotors.", "url": "https://kz.sew-eurodrive.com/products/gear-units/standard-gear-units/helical-bevel-gear-units-k/helical-bevel-gear-units-k.html", "kind": "product", "checked": true},
+  {"product": "Bell OH-58D helicopter main-rotor transmission spiral bevel set", "maker": "Bell / NASA test (Gear Technology article)", "use": "A spiral bevel gear set turns the horizontal engine input up to the vertical main rotor shaft.", "url": "https://www.geartechnology.com/evaluation-of-a-low-noise-formate-spiral-bevel-gear-set", "kind": "case-study", "checked": true}
+ ]},
+ "hypoid-gears": {"real_world": [
+  {"product": "Spicer 27518X Dana 60 ring and pinion, 5.38:1 (Jeep Wrangler)", "maker": "Spicer (Dana)", "use": "An offset hypoid ring gear and pinion turns the propeller shaft drive 90 degrees into the rear differential.", "url": "https://www.summitracing.com/parts/sdh-27518x/make/jeep/model/wrangler/year/2008", "kind": "product", "checked": true},
+  {"product": "1926 Packard passenger car rear axle", "maker": "Packard (gears by Gleason)", "use": "Packard adopted hypoid final drives across its line in 1926, lowering the propeller shaft a decade before most of the industry.", "url": "https://macsmotorcitygarage.com/1926-packard-pioneers-the-hypoid-final-drive/", "kind": "in-product", "checked": true}
+ ]},
+ "worm-drive": {"real_world": [
+  {"product": "Schaller M6 Mini Locking tuning machines (1:18)", "maker": "Schaller", "use": "A small worm on each tuning key turns a wheel on the string post and self-locks against string tension.", "url": "https://avlgear.com/products/schaller-100402230336-m6-mini-locking-tuning-machines-3l-3r-chrome", "kind": "product", "checked": true},
+  {"product": "Boston Gear 700 Series worm gear speed reducer", "maker": "Boston Gear", "use": "A right-angle single-reduction worm and wheel gives high ratios such as 30:1 or 50:1 for industrial drives.", "url": "https://www.directindustry.com/prod/boston-gear/product-9195-36258.html", "kind": "product", "checked": true}
+ ]},
+ "crossed-helical-gears": {"real_world": [
+  {"product": "JEGS 555-40652 distributor drive gear for Chevrolet small-block and big-block V8", "maker": "JEGS", "use": "A skew gear on the distributor shaft is driven at 90 degrees by a gear cut on the camshaft, also turning the oil pump.", "url": "https://www.jegs.com/i/jegs-555-40652-distributor-drive-gear-fits-chevy-262-400-small-block-396-454-big-block-engines-w-491-in-dia-distributor-shaft", "kind": "product", "checked": true},
+  {"product": "KHK metric screw gears (SN, AN, SUN series)", "maker": "KHK (Kohara Gear Industry)", "use": "Stock screw gears that transmit motion between non-parallel, non-intersecting shafts.", "url": "https://www.khkgears.us/products/screw-gears", "kind": "product", "checked": true}
+ ]},
+ "rack-pinion": {"real_world": [
+  {"product": "Pilatusbahn rack railway (Locher system), Switzerland", "maker": "Pilatus-Bahnen (designed by Eduard Locher)", "use": "Opposing horizontal pinions grip a sideways-toothed rack so cars climb gradients up to 48 percent; an ASME landmark.", "url": "https://www.asme.org/about-asme/engineering-history/landmarks/220-pilatusbahn", "kind": "in-product", "checked": true},
+  {"product": "Atlanta Drive Systems helical rack and pinion drive", "maker": "Atlanta Drive Systems", "use": "A hardened ground pinion on a servo reducer drives along a helical rack to move long machine and gantry axes.", "url": "https://www.directindustry.com/prod/atlanta-drive-systems/product-28259-1309333.html", "kind": "product", "checked": true}
+ ]},
+ "planetary": {"real_world": [
+  {"product": "Toyota Prius P111 hybrid transaxle power split device", "maker": "Toyota", "use": "A planetary gear set splits engine power between the wheels and generator MG1, acting as a continuously variable transmission.", "url": "https://www.transmissiondigest.com/the-toyota-prius-p111-hybrid-transaxle/", "kind": "in-product", "checked": true},
+  {"product": "Shimano Nexus Inter-3 SG-3R75-B hub", "maker": "Shimano", "use": "An epicyclic gear set inside the rear hub gives three speeds by holding or driving different members.", "url": "https://bike.shimano.com/en-US/product/component/nexus-inter3/SG-3R75-B.html", "kind": "product", "checked": true},
+  {"product": "Flender PLANUREX central drive gear units for sugar mills", "maker": "Flender", "use": "Planetary gear units deliver very high torque to sugar cane mill rolls.", "url": "https://flender.com/en/Products/Gear-Units/PLANUREX-Central-Drive-Gear-Units-for-Sugar-Mills/p/PLANUREX-sugar-mills-central-drives", "kind": "product", "checked": false}
+ ]},
+ "differential": {"real_world": [
+  {"product": "Torsen centre differential in Audi quattro (from Audi 80 quattro, 1986)", "maker": "Audi / Torsen", "use": "A centre differential splits drive between front and rear axles, sending up to 75 percent to the axle with better grip.", "url": "https://www.audi-technology-portal.de/en/drivetrain/quattro_en/torsen-differential", "kind": "in-product", "checked": true},
+  {"product": "Eaton Detroit Locker 187SL16D for Dana 44 axles", "maker": "Eaton", "use": "A replacement axle differential that lets wheels differentiate in turns but locks them together under drive torque.", "url": "https://www.eaton.com/ca/fr-ca/skuPage.187SL16D.html", "kind": "product", "checked": true},
+  {"product": "1996 Mazda Miata Torsen rear differential", "maker": "Mazda (Grassroots Motorsports project car)", "use": "A real teardown of the car's rear limited-slip differential after a failure, with an open spare unit.", "url": "https://grassrootsmotorsports.com/project-cars/1996-mazda-miata/project-turbo-miata-differential-teardown", "kind": "in-product", "checked": true}
+ ]},
+ "harmonic-drive": {"real_world": [
+  {"product": "Harmonic Drive CSF/CSG zero-backlash gear units", "maker": "Harmonic Drive LLC", "use": "Housed strain wave component sets with a cross roller output bearing for robot joints and precision positioning.", "url": "https://www.automate.org/products/harmonic-drive-llc/gear-unit-zero-backlash", "kind": "product", "checked": true},
+  {"product": "Apollo 15 Lunar Roving Vehicle wheel drives", "maker": "Boeing / GM (Harmonic Drive gearing)", "use": "Each wheel's electric motor drove the wheel through an 80:1 Harmonic Drive gear.", "url": "https://newdrive.harmonicdrive.de/en/home/edition-one/apollo-15-harmonic-drive-on-the-moon", "kind": "in-product", "checked": true}
+ ]},
+ "cycloidal-drive": {"real_world": [
+  {"product": "Nabtesco RV-900N cycloidal gearbox", "maker": "Nabtesco", "use": "A two-stage RV (cycloidal) reducer for heavy robot axes and medical devices.", "url": "https://www.directindustry.com/prod/nabtesco-precision-europe/product-17051-2566248.html", "kind": "product", "checked": true},
+  {"product": "Sumitomo Cyclo 6000 gearmotor", "maker": "Sumitomo Drive Technologies", "use": "A cycloidal disc rolling on ring pins gives shock-tolerant reduction for conveyors, mixers and cranes.", "url": "https://www.im-tek.com/sumitomo-cyclor-6000-gearmotor", "kind": "product", "checked": true},
+  {"product": "Nabtesco RV-C series hollow-shaft reduction gears", "maker": "Nabtesco", "use": "Hollow-shaft RV reducers with built-in main bearings used in robot base and arm joints.", "url": "https://www.automate.org/products/nabtesco-motion-control-inc/rv-c-series", "kind": "product", "checked": true}
+ ]},
+ "non-circular-gears": {"real_world": [
+  {"product": "Macnaught MX Series oval gear flow meter", "maker": "Macnaught", "use": "Two meshing oval gears turn with the flow, each rotation sweeping a known volume of liquid.", "url": "https://macnaughtusa.com/products/oval-gear-meter", "kind": "product", "checked": true},
+  {"product": "Maurice Lacroix Masterpiece Roue Carree Seconde watch", "maker": "Maurice Lacroix", "use": "A clover-shaped wheel drives a square wheel that shows the seconds at 6 o'clock.", "url": "https://watchesbysjx.com/2011/01/news-maurice-lacroix-masterpiece-roue-carree-seconde-with-square-gears.html", "kind": "in-product", "checked": true}
+ ]}
+}
