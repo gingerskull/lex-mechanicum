@@ -1,12 +1,12 @@
 // The model contract: what a mechanism's model.ts provides. Kinematics only; no prose and no style.
 import type { Pose, Vec2 } from "../core/geom";
+import type { RungId } from "../style/detail";
+import type { Role } from "../style/kinds";
 
-export type { Pose, Vec2 };
+// Role and the rung ids are the detail ladder's vocabulary (src/style); the model shares them, never redefines them.
+export type { Pose, Role, RungId, Vec2 };
 
 export type InputKind = "rotary" | "oscillating" | "linear" | "manual";
-export type Role = "driver" | "link" | "output" | "ground" | "pin" | "trace";
-/** Detail ladder rung; "never" is never drawn. */
-export type Rung = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "never";
 
 export interface Shape {
   outer: Vec2[];
@@ -80,5 +80,6 @@ export interface MechanismModel {
   forces?(s: Solved, u: number): OverlayItem[];
   angles?(s: Solved, u: number): OverlayItem[];
   plot?: Plot;
-  detail?: Rung;
+  /** Detail ladder rung of the whole mechanism; "never" is never dropped. */
+  detail?: RungId;
 }

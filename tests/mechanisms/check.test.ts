@@ -14,11 +14,11 @@ describe("mechanisms", () => {
       expect(r.findings).toEqual([]);
       expect(r.maxLinkErr).toBeLessThan(1e-9);
       if (id === "four-bar") {
-        // K6: the catalogue gives 73.8° (54.9° to 128.7°); sampled at 0.5° of crank the swing measures 73.6 ± 0.2
+        // K6: the catalogue gives 73.8° (54.9° to 128.7°); the exact swing is 73.78°; sampled at 0.5° of crank it must land within 0.2° of 73.8
         const f = model.plot!.f;
         const v: number[] = [];
         for (let i = 0; i < 720; i++) v.push(f(model.solve((i / 720) * TAU), (i / 720) * TAU));
-        expect(Math.abs(Math.max(...v) - Math.min(...v) - 73.6)).toBeLessThanOrEqual(0.2);
+        expect(Math.abs(Math.max(...v) - Math.min(...v) - 73.8)).toBeLessThanOrEqual(0.2);
       }
     });
 });
