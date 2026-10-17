@@ -4,8 +4,11 @@ An online library of mechanical mechanisms. Each mechanism is drawn live as a me
 in one house style (blueprint and drafting sheets), with explanations, motion overlays and faceted tags from a
 master catalogue of 89 mechanisms.
 
-Status: foundations. The first release builds four mechanisms to the standard: four-bar linkage, Geneva drive, spur
-gear pair, slider-crank.
+Status: first release (0.6.0). Four mechanisms are built to standard 2.0, each with its audit sheet: four-bar
+linkage, Geneva drive, spur gear pair, slider-crank. The next mechanisms, the rule promotions and the performance
+work are on the project board.
+
+The site: https://gingerskull.github.io/mechanism-database/
 
 ## Documents
 

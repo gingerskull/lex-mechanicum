@@ -40,7 +40,9 @@ export function projector(view: View, size: { w: number; h: number }, b: Bounds2
     y0 = Math.min(y0, v);
     y1 = Math.max(y1, v);
   }
-  const s = Math.min((size.w - 2 * pad) / (b.maxX - b.minX || 1), (size.h - 2 * pad) / (y1 - y0 || 1));
+  // a canvas smaller than its margins (a hidden or collapsed stage) still gets a positive scale: arcs refuse a negative
+  // radius in the browser, and the first frame would throw
+  const s = Math.max(1e-3, Math.min((size.w - 2 * pad) / (b.maxX - b.minX || 1), (size.h - 2 * pad) / (y1 - y0 || 1)));
   const ox = size.w / 2 - (s * (b.minX + b.maxX)) / 2;
   const oy = size.h / 2 + (s * (y0 + y1)) / 2;
   return {

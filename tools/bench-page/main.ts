@@ -1,6 +1,6 @@
 // The browser bench (tools/bench.ts --browser): draws each packaged mechanism on a 1393 x 870 stage at the page's DPR
 // and reports frame times per view and dial position in window.__bench.
-import { mechanisms } from "../../src/mechanisms";
+import { models } from "../../src/mechanisms/models";
 import { loadPackage } from "../../src/package/loader";
 import { browserFactory } from "../../src/render/canvas";
 import type { Dial } from "../../src/render/detail";
@@ -26,11 +26,11 @@ async function frameMs(draw: (u: number) => void): Promise<number> {
 }
 
 async function run() {
-  const ids = (new URLSearchParams(location.search).get("ids") ?? Object.keys(mechanisms).join(",")).split(",");
+  const ids = (new URLSearchParams(location.search).get("ids") ?? Object.keys(models).join(",")).split(",");
   const dpr = Number(new URLSearchParams(location.search).get("dpr") ?? devicePixelRatio);
   const out: unknown[] = [];
   for (const id of ids) {
-    const { model } = await mechanisms[id]!();
+    const model = await models[id]!();
     const t0 = performance.now();
     const pkg = await loadPackage(`./${id}.mxp`);
     const loadMs = performance.now() - t0;

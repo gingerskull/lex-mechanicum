@@ -2,6 +2,7 @@
 // drag-to-scrub, speed, tilt, explode, overlays, the detail pin and the keyboard. The detail dial adapts to the frame
 // time one rung at a time with hysteresis, never past G on its own (DL4); the title block shows the position.
 import * as E from "./engine";
+import { url } from "../url";
 
 const TAU = Math.PI * 2;
 /** Seconds per cycle at 1x. */
@@ -19,7 +20,7 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 async function main(box: HTMLElement) {
   const id = box.dataset.id!;
   const canvas = $<HTMLCanvasElement>("stage");
-  const [{ model }, pkg] = await Promise.all([E.mechanisms[id]!(), E.loadPackage(`/packages/${id}.mxp`)]);
+  const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
   const size = () => canvas.getBoundingClientRect();
   const sess = E.createSession(canvas, pkg, model, { factory: E.browserFactory, w: size().width, h: size().height, dpr: E.pixelRatio() });
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;

@@ -5,6 +5,7 @@ import Sheet from "../../layouts/Sheet.astro";
 import Bar from "../../components/Bar.astro";
 import Stage from "../../components/Stage.astro";
 import { SHEETS, driveOf, type Sheet as SheetInfo } from "../../data";
+import { url } from "../../url";
 
 export function getStaticPaths() {
   return SHEETS.map((s) => ({ params: { id: s.id }, props: { sheet: s } }));
@@ -45,11 +46,11 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
   <Bar />
   <main class="wrap detail">
     <nav class="crumbs" aria-label="Sheets">
-      <a class="btn" href="/"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>All mechanisms</a>
+      <a class="btn" href={url("/")}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>All mechanisms</a>
       {SHEETS.length > 1 && (
         <div class="nav">
-          <a class="btn quiet" href={`/mechanisms/${prev.id}/`}>{prev.rec.name}</a>
-          <a class="btn quiet" href={`/mechanisms/${next.id}/`}>{next.rec.name}</a>
+          <a class="btn quiet" href={url(`/mechanisms/${prev.id}/`)}>{prev.rec.name}</a>
+          <a class="btn quiet" href={url(`/mechanisms/${next.id}/`)}>{next.rec.name}</a>
         </div>
       )}
     </nav>

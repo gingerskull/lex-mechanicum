@@ -38,7 +38,8 @@ src/render/                      canvas factory, projector, world solids, slices
 src/mechanisms/<id>/model.ts     kinematics only
 src/mechanisms/<id>/polish.ts    overrides and additions to the generated assembly
 src/mechanisms/<id>/audit.md     conformance record
-src/mechanisms/index.ts          registry: id -> lazy import
+src/mechanisms/models.ts         id -> lazy import of the model: all the browser loads
+src/mechanisms/index.ts          registry: the models plus a lazy import of each polish, for Node
 site/                            Astro: layout, pages (library, one page per mechanism), components, islands
                                  (theme, filters, card, stage, engine), CSS on the generated tokens.css
 tools/                           command-line tools (below)

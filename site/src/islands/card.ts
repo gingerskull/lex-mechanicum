@@ -1,5 +1,6 @@
 // Library cards (SS1, R8): the thumbnail is a pre-rendered image; on hover the engine loads (once) and the card's
 // canvas animates the mechanism until the pointer leaves. Reduced motion keeps the images still.
+import { url } from "../url";
 type Engine = typeof import("./engine");
 
 let engine: Promise<Engine> | null = null;
@@ -24,7 +25,7 @@ async function start(card: HTMLAnchorElement) {
   if (!card.matches(":hover")) return;
   let L = live.get(thumb);
   if (!L) {
-    const [{ model }, pkg] = await Promise.all([E.mechanisms[id]!(), E.loadPackage(`/packages/${id}.mxp`)]);
+    const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
     const r = thumb.getBoundingClientRect();
     const sess = E.createSession(canvas, pkg, model, { factory: E.browserFactory, w: r.width, h: r.height, dpr: E.pixelRatio() });
     L = { sess, raf: 0, u: 1.1, t: performance.now() };
