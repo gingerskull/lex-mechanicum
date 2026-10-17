@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "DOM"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "types": ["node"],
@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", "tools", "tests", "*.ts"]
+  "include": ["src", "tools", "tests", "site/src/**/*.ts", "*.ts", "site/*.ts"]
 }

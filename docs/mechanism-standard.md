@@ -162,6 +162,36 @@ feet, lubrication, timing marks, materials and the drive.
 | A7 | **Base plate** 8 mm thick, 2 mm under the lowest part, four counterbored mounting holes on the corner-arc centres, rubber feet unless a housing hangs there, traced paths engraved, 5 mm engraved scale along the front edge, a clearance hole for every live shaft. | AUTO |
 | A8 | **Stage 3 fasteners** (after the polish): every head gets its threaded shank from `thread` (never along a shoulder), including heads seated over a pre-drilled hole or in a counterbore; every plate a shank passes gets a clearance hole, tapped where it ends; blind tapped holes are marks, not through holes; two screws meeting in a standoff stop short of the middle. | AUTO |
 
+The rules run in registry order (`src/rules/registry.ts`). Which rule or stage serves which AUTO requirement,
+generated from `autoTable()` by `tools/standard-table.ts`:
+
+<!-- auto-table:start (generated, do not edit) -->
+| Rule or stage | Serves |
+|---|---|
+| `classify` | A1, A2, A3 |
+| `base` | A7, D4, M4 |
+| `j6-mesh` | J6, F7 |
+| `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
+| `j3-moving-pin` | J3, A12, M3 |
+| `j4-slot-roller` | J4, M14 |
+| `j5-slide` | J5, F5, F7 |
+| `j7-cam` | J7, F6 |
+| `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
+| `stops` | F5 |
+| `standoffs` | A6 |
+| `drive` | V1, V2, V3, V5, V6, F10 |
+| `j8-belt` | J8, V4 |
+| `feet` | A7, D4 |
+| `lubrication` | F8 |
+| `timing-marks` | F9 |
+| `locking` | M13 |
+| `materials` | M10 |
+| `fasteners (stage 3)` | A8, M4 |
+| `explode` | E1, E2, E3, E5, E6, E7, E8 |
+| `hardware primitives` | A13, M1, M3, M5, M11, R3 |
+| `checks (clearance, clamp, edge distance)` | A12, A15, M6 |
+<!-- auto-table:end -->
+
 ### 5.2 Stage 2: hand polish (HAND, mandatory for every mechanism)
 
 The rules know nothing about loads or sweeps. The polish (`polish.ts`, API `A` and `H`) states only what differs
@@ -438,7 +468,11 @@ renderer change. Q4 and Q5 run locally.
 
 ## 11. Audit sheet template
 
-`tools/audit <id>` writes this; rows it can decide are filled, the rest are `?`. Judged rows survive regeneration.
+`tools/audit <id>` writes this. A row the tools decide outright (P1, K2, A12, A15, M6, R7, Q1, Q2) is filled and
+regenerated every time; every other row gets its tier and the evidence the tools collect (rule firing, joint types,
+names, sizes, materials, locking, rungs) and a `?` to judge. Judged rows, hand entries in the joints table, the
+header, deferrals, variants, promotion candidates and measured frame times survive regeneration. A deferral is a line
+`defer: <ids or version> · <reason>`; no reason, no deferral.
 
 ```markdown
 # Audit: <name> (<id>)
@@ -450,7 +484,7 @@ PASS n · FAIL n · N/A n · open: ...
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| P1 | PASS | check clean |
+| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
 | ... | | |
 
 ## Joints
@@ -470,7 +504,8 @@ PASS n · FAIL n · N/A n · open: ...
 Hand fixes that should become rules or primitives.
 
 ## Verification
-check · clearance · package · screenshots (paths) · bench (flags)
+check · clearance · clamp · edge distance · package
+screenshots (paths) · bench (flags)
 ```
 
 ---

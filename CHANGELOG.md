@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.0 — 2026-10-17
+
+- Packages: every mechanism assembled at build time into a compressed binary package the browser loads (four-bar
+  22.9 KB); the audit generator and the conformance report, part of `npm run check`; the four-bar draft audit.
+- The drafting renderer: one code path for the stage, cards, screenshots and tests, in the browser and in Node
+  (@napi-rs/canvas); both sheets, every tilt, explode, overlays, plot, sheet frame and title block, the detail dial;
+  screenshot, thumbnail and bench tools; visual snapshots against our own baselines (local).
+- The static site: library with pre-rendered thumbnails, search and facets, cards that animate on hover; one page
+  per mechanism with the live stage, controls, adaptive detail, facts, plot, tags, explanation and links; theme
+  switch; self-hosted IBM Plex; the version in the footer. CI builds and checks it when it changes.
+- Docs: the standard's AUTO table and the style reference's Part VI are generated from the code and checked; the
+  audit template matches the generator; architecture and README describe the modules and tools as built.
+
 ## 0.3.0 — 2026-10-17
 
 - Style files: tokens for both sheets, form, drafting knobs and the detail ladder; `tokens.css` generated from them;

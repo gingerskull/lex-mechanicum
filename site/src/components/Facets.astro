@@ -1,0 +1,20 @@
+---
+import { FACETS, SHEETS } from "../data";
+const rows = FACETS.map((f) => {
+  const counts = new Map<string, number>();
+  for (const s of SHEETS) for (const v of f.of(s.rec)) counts.set(v, (counts.get(v) ?? 0) + 1);
+  return { ...f, values: [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])) };
+});
+---
+<div class="wrap facets" id="facets" hidden>
+  {rows.map((f) => (
+    <div class="facet">
+      <span class="lbl">{f.label}</span>
+      <div class="chips">
+        {f.values.map(([v, n]) => (
+          <button class="chip" type="button" aria-pressed="false" data-f={f.key} data-v={v}>{v}<span class="n">{n}</span></button>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>

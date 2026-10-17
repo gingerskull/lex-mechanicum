@@ -1,0 +1,37 @@
+---
+// The stage and its controls (SS5): play, scrubber, speed, tilt, explode, the detail pin and the overlay chips.
+interface Props {
+  id: string;
+  no: string;
+  title: string;
+}
+const { id, no, title } = Astro.props;
+const overlays = [
+  ["paths", "Paths", true],
+  ["velocity", "Velocity", false],
+  ["forces", "Forces", true],
+  ["angles", "Angles", false],
+] as const;
+---
+<div class="stagebox" data-id={id} data-no={no} data-title={title}>
+  <div class="stage"><canvas id="stage" role="img" aria-label={`${title}, live drawing`}></canvas></div>
+  <div class="controls">
+    <button class="play" id="play" type="button" aria-pressed="true" aria-label="Pause">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path id="playicon" d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor"></path></svg>
+    </button>
+    <label class="scrub"><span class="lbl">Cycle</span><input id="scrub" type="range" min="0" max="360" step="1" value="63" /><output id="scrubv">63°</output></label>
+    <div class="seg" role="group" aria-label="Speed" id="speed">
+      <button type="button" data-v="0.5" aria-pressed="false">½×</button><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="2" aria-pressed="false">2×</button>
+    </div>
+  </div>
+  <div class="controls">
+    <label class="sl"><span class="lbl">View</span><input id="tilt" type="range" min="0" max="88" step="1" value="28" /><output id="tiltv">28°</output></label>
+    <label class="sl"><span class="lbl">Explode</span><input id="explode" type="range" min="0" max="100" step="1" value="0" /><output id="explodev">0%</output></label>
+    <button class="btn" id="pin" type="button" aria-pressed="false" title="Keep full detail even when the drawing is slow">Full detail</button>
+  </div>
+  <div class="ovl" role="group" aria-label="Overlays">
+    {overlays.map(([k, label, on]) => (
+      <button class="chip" type="button" data-o={k} aria-pressed={on ? "true" : "false"}><i></i>{label}</button>
+    ))}
+  </div>
+</div>

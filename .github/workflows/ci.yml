@@ -27,18 +27,22 @@ jobs:
       pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
+      site: ${{ steps.filter.outputs.site }}
     steps:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           predicate-quantifier: every
-          # Everything except prose. The site build job (step 8) adds its own filter here.
+          # code: everything except prose. site: what the pages, packages and thumbnails are built from.
           filters: |
             code:
               - "**"
               - "!**/*.md"
               - "!docs/**"
               - "!.github/ISSUE_TEMPLATE/**"
+            # one pattern: the quantifier "every" applies to every filter
+            site:
+              - "{site/**,src/**,data/catalog/**,tools/**,package.json,package-lock.json}"
 
   check:
     name: Check
@@ -55,3 +59,22 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  site:
+    name: Site build
+    needs: changes
+    # Scheduled and manual runs skip "What changed" and always build.
+    if: always() && (github.event_name != 'pull_request' || needs.changes.outputs.site == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      ASTRO_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test:site

@@ -16,29 +16,33 @@ Dependencies point downward only; nothing below imports from above.
 ```
 data/catalog/sources/*.json      research records (hand-edited, validated)
 data/catalog/mechanisms.json     generated merge, committed; the site, tools and tests read it
-src/style/                       tokens (palettes, type, sizes), form (geometry-affecting: base plate, chamfers,
-                                 thread, fasteners, explode), draft (renderer knobs), detail (the detail ladder).
-                                 One source per value; the site's tokens.css is generated from tokens.
-src/core/                        geometry, vectors, kinematic helpers, involute gears, meshing
+src/catalog/                     record schema and vocabularies, merge, validator, views, loadCatalog / recordById
+src/style/                       tokens (palettes, type, sizes), form (geometry-affecting values), draft (renderer
+                                 knobs), detail (the detail ladder), kinds (solid kinds, roles, mark kinds, effects),
+                                 theme (rgb resolution, font strings). One source per value; tokens.css is generated.
+src/core/                        geometry, vectors, involute gears and meshing, polygon queries (poly.ts)
 src/parts/                       the part family: link, plate, cap, slider, rails, slotLink, gear, ringGear, rack,
-                                 disc, custom, tracer
-src/model/                       the MechanismModel type (parts, input kind, solve, overlays), poseOf, sampling
-src/hardware/                    catalogue tables as data (bearings, screws, circlips, keys, pulleys, springs);
-                                 primitives H.* (stepped shafts, heads, washers, clips, dowels, springs, nipples,
-                                 sensors); subassemblies (housing, bridge, slide, eccentric, stops, drag pack,
-                                 belt drive, follower train)
-src/rules/                       stage 1: one module per rule, a registry that runs them in order; stage 3
-                                 fasteners; rigid explode
-src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> explode; the polish API
-src/package/                     build-time packaging of the assembled mechanism, and the loader
-src/render/                      projector, slicing, the drafting renderer, overlays, plot, sheet frame
+                                 disc, custom, tracer; heights()
+src/model/                       the MechanismModel contract, defineMechanism, poseOf, sample, basePlate, checkModel
+src/hardware/                    tables (bearings, screws, circlips, keys, pulleys, springs, motors) as data; the
+                                 Solid type; primitives H.*; subassemblies in sub/ (housing, bridge, slide, stops,
+                                 eccentric mount, drag pack, follower train, sensor, drive by input kind)
+src/rules/                       context, classify, one module per rule, the registry and autoTable(); stage 3
+                                 fasteners; the rigid explode pass
+src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> explode; the polish API;
+                                 solid poses; clearance, clamp and edge-distance checks
+src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)
+src/audit/                       the audit generator and the conformance report
+src/render/                      canvas factory, projector, world solids, slices, session, the drafting frame,
+                                 detail dial, patterns, sheet frame and title block, overlays, plot
 src/mechanisms/<id>/model.ts     kinematics only
 src/mechanisms/<id>/polish.ts    overrides and additions to the generated assembly
 src/mechanisms/<id>/audit.md     conformance record
 src/mechanisms/index.ts          registry: id -> lazy import
-site/                            Astro layouts, pages, the stage island, CSS generated from tokens
-tools/                           command-line tools
-tests/                           unit, per-mechanism checks, visual snapshots
+site/                            Astro: layout, pages (library, one page per mechanism), components, islands
+                                 (theme, filters, card, stage, engine), CSS on the generated tokens.css
+tools/                           command-line tools (below)
+tests/                           unit and fixture tests, per-mechanism checks, site build test, visual snapshots
 ```
 
 ## From model to page
@@ -56,9 +60,33 @@ tests/                           unit, per-mechanism checks, visual snapshots
 4. **Render.** The renderer loads a package and the mechanism's `solve`, keeps a per-card session with its caches
    (paths, slice lists, paper tiles) and draws a frame for a given u and view (tilt, explode, overlays, detail
    position). Thumbnails, the stage, the screenshot tool and the visual tests all use this one renderer.
-5. **Site.** Astro builds one static page per catalogue record: the drawing stage, controls, at-a-glance facts,
+5. **Site.** Astro builds one static page per registered mechanism: the drawing stage, controls, at-a-glance facts,
    plot, tags, explanation, references and media. Library thumbnails are pre-rendered images; the engine loads on
    hover or navigation.
+
+## Tools
+
+`npx tsx tools/<name>.ts` (or the npm script in brackets):
+
+| Tool | What it does |
+|---|---|
+| `catalog` (`npm run catalog`) | merges and validates the sources, writes `mechanisms.json` and the CSV and Markdown views |
+| `check <id>` | kinematic checks of a model (standard Q1) |
+| `clearance <id \| all>` | assembles and reports clashes, clamp faults and hole walls (Q2) |
+| `package [id ...]` (`npm run package`) | writes `dist/packages/<id>.mxp` (Q3) |
+| `audit <id>` (`npm run audit`) | writes or regenerates `src/mechanisms/<id>/audit.md` (Q6) |
+| `conformance` (`npm run conformance`) | audited standard version per mechanism (Q7), part of `npm run check` |
+| `shot <id> [options]` (`npm run shot`) | one frame to a PNG (Q4) |
+| `thumbs [id ...]` (`npm run thumbs`) | the library thumbnails |
+| `bench [id ...]` (`npm run bench`) | frame times per view and dial position, rung counts (Q5); `bench-page/build.ts` builds the same bench as a browser page |
+| `tokens-css` (`npm run tokens`) | writes `site/styles/tokens.css` and its `@font-face` rules |
+| `site-assets` (in `prebuild`) | fonts, packages and thumbnails into `site/public` |
+| `lint-style` (in `npm run lint`) | colour and font literals outside `src/style`, style keys in records |
+| `standard-table`, `style-table` (`npm run docs:tables`) | the generated tables of the standard and the style reference |
+
+Node draws with **@napi-rs/canvas** (`tools/canvas-node.ts`): prebuilt for Windows and Linux, with `Path2D`,
+`DOMMatrix`, pattern transforms and WOFF2 fonts (the IBM Plex faces from the `@fontsource` packages). The renderer
+only sees a `CanvasFactory`, so the same code draws in the browser.
 
 ## Invariants
 

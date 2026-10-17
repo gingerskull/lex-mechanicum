@@ -1,0 +1,36 @@
+---
+// The page shell: tokens and site CSS, the theme set before first paint (SS7), the footer with the version (SS12).
+import "../../styles/tokens.css";
+import "../../styles/base.css";
+import "../../styles/layout.css";
+import "../../styles/components.css";
+import Footer from "../components/Footer.astro";
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem("theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+        else if (matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.dataset.theme = "light";
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <slot />
+    <Footer />
+    <script>
+      import "../islands/theme";
+    </script>
+  </body>
+</html>
