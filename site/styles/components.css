@@ -382,6 +382,13 @@
 .sl {
   flex: 1 1 200px;
 }
+.dial {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 260px;
+  min-width: 0;
+}
 .scrub input,
 .sl input {
   flex: 1;

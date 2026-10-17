@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.0 — 2026-10-18
+
+- Working zones stay in view (L5): a see-through stage after the fasteners marks every static solid that hides the
+  pitch point of a mesh or the run of a slot roller, and the renderer draws it at 50 % opacity (paper and
+  occlusion halved), once at its top face. The spur gear bridge now shows the mesh under it. A check in the clearance tests
+  fails when a working zone is hidden.
+- The base plate lets a tenth of the lines under it through.
+- Stage: the forces overlay is off by default; the "Full detail" button is replaced by Auto and a Detail slider (Auto
+  adapts to the frame time and the slider follows it; moving the slider sets the level by hand).
+- README rewritten for visitors, with screenshots, the controls and the parts of a mechanism's page.
+
 ## 0.6.0 — 2026-10-18
 
 First release: four mechanisms to standard 2.0 (four-bar linkage, Geneva drive, spur gear pair, slider-crank), the

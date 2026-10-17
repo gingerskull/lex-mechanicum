@@ -89,7 +89,10 @@ export const DRAFT = {
     wall: 0.55,
     baseWallGain: 0.8, // factor on `wall` for the base plate's walls
     wallOcclude: 0.9, // factor on the occlusion for side walls
-    occlude: { plate: 1, other: 0.85 },
+    occlude: { plate: 1, other: 0.85, base: 0.9 }, // the base lets a tenth of what is under it show through
+    // A solid over a working zone of the mechanism (a mesh, a slot roller's run, L5): its opacity, a factor on its paper
+    // and on its occlusion, so the zone reads through it at half strength.
+    seeThrough: { opacity: 0.5 },
     // Ink shade on side walls, stepped by facing: alpha = shade * (from + span * i / (steps - 1)).
     wallShade: {
       shade: 0.045, // 0..1 ink alpha

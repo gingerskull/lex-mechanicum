@@ -173,15 +173,18 @@ export function drawFrame(sess: Session, u: number, view: DrawView): { s: Solved
     const isBase = p.base;
     const isPlate = PLATE.has(p.s.kind) && p.s.role !== "trace";
     const R: RoleSurface = (isBase ? DRAFT.role.base : DRAFT.role[p.s.role as SurfaceKey]) ?? DRAFT.role.link;
-    const occ = isPlate ? F.occlude.plate : F.occlude.other;
-    const faceA = isBase ? F.base : isPlate ? F.plate : F.other;
+    // a see-through solid covers once, at its top face: its inner slices and walls add no paper over the zone
+    const see = p.seeThrough ? F.seeThrough : null;
+    const seeK = see ? (S.isTop ? 1 : 0) : 1;
+    const occ = (isBase ? F.occlude.base : isPlate ? F.occlude.plate : F.occlude.other) * (see?.opacity ?? 1) * seeK;
+    const faceA = (isBase ? F.base : isPlate ? F.plate : F.other) * (see?.opacity ?? 1) * seeK;
     const Tf = { outer: at(w.outer, S.top), holes: w.holes.map((h) => at(h, S.top)) };
     const B0 = Pr.P(0, 0, S.z0);
     const B1 = Pr.P(0, 0, S.top);
     const d: Vec2 = [B0[0] - B1[0], B0[1] - B1[1]];
     const Wo = wallsOf(Tf.outer, d, area(Tf.outer) > 0 ? 1 : -1, F.wallShade.steps);
     // 1. side walls: paper, then an ink shade stepped by facing
-    surface((c) => { for (const bk of Wo.buckets) wallPath(c, bk, d); }, F.wall * (isBase ? F.baseWallGain : 1), occ * F.wallOcclude, "nonzero");
+    surface((c) => { for (const bk of Wo.buckets) wallPath(c, bk, d); }, F.wall * (isBase ? F.baseWallGain : 1) * (see?.opacity ?? 1), see ? 0 : occ * F.wallOcclude, "nonzero");
     if (LD.effect("wallShade")) {
       const WS = F.wallShade;
       const n = WS.steps - 1 || 1;

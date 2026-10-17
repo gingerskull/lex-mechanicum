@@ -145,7 +145,7 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | Id | Requirement |
 |---|---|
 | SD1 | **Depth order is sacred.** Solids are sliced at every overlapping z boundary and painted far to near; a new effect is inserted into this order, never layered over the finished frame unless it is an annotation (steps 5 to 10). |
-| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads. |
+| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a tenth of the lines under it through. A solid the build marks see-through (it hides a working zone, standard L5) covers once, at its top face, at half opacity (its paper and its occlusion halved), so the zone reads through it. |
 | SD3 | **Hidden lines by construction.** Every edge is drawn twice: bold and solid on a separate lines layer, and thin and dashed on the frame. Each later surface erases the lines layer where it covers, by its occlusion value. An edge seen directly is bold; the same edge seen through a part is dashed. Fine detail (chamfers, threads, engraving) lives only on the lines layer, so it disappears behind parts instead of turning into dashes. The dashed copy is drawn only for edges that can be covered (the renderer tests against occluder bounds). |
 | SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's pose (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns only on top faces, never on walls. |
 | SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout. A second accent use needs a reason written here. |
@@ -301,8 +301,10 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.fill.wall` | 0.55 |  |
 | `draft.fill.baseWallGain` | 0.8 | factor on `wall` for the base plate's walls |
 | `draft.fill.wallOcclude` | 0.9 | factor on the occlusion for side walls |
-| `draft.fill.occlude.plate` | 1 |  |
-| `draft.fill.occlude.other` | 0.85 |  |
+| `draft.fill.occlude.plate` | 1 | the base lets a tenth of what is under it show through |
+| `draft.fill.occlude.other` | 0.85 | the base lets a tenth of what is under it show through |
+| `draft.fill.occlude.base` | 0.9 | the base lets a tenth of what is under it show through |
+| `draft.fill.seeThrough.opacity` | 0.5 |  |
 | `draft.fill.wallShade.shade` | 0.045 | 0..1 ink alpha |
 | `draft.fill.wallShade.steps` | 5 | count of facing buckets |
 | `draft.fill.wallShade.outer.from` | 0.4 | factors, outer walls |

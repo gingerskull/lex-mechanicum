@@ -1,18 +1,20 @@
 // A15 and A12 for every registered mechanism: zero clashes over the cycle and no rotating part clamped against
-// ground. One `it` per id, so a changed-files filter can select it.
+// ground; L5: no working zone hidden under solid paper. One `it` per id, so a changed-files filter can select it.
 import { describe, expect, it } from "vitest";
-import { assemble } from "../../src/assemble";
+import { assemble, assembleWith } from "../../src/assemble";
 import { clampCheck } from "../../src/assemble/clamp";
 import { clearance } from "../../src/assemble/clearance";
 import { mechanisms } from "../../src/mechanisms";
+import { HIDDEN, hiddenShare } from "../../src/rules/see-through";
 
 describe("clearance", () => {
   for (const id of Object.keys(mechanisms))
     it(id, { timeout: 60_000 }, async () => {
       const { model, polish } = await mechanisms[id]!();
-      const a = assemble(model, undefined, polish ? { polish } : {});
+      const { assembly: a, ctx } = assembleWith(model, polish ? { polish } : {});
       expect(clearance(model, a).map((c) => `${c.a} x ${c.b} ${c.depth.toFixed(2)} mm`)).toEqual([]);
       expect(clampCheck(model, a)).toEqual([]);
+      expect(hiddenShare(ctx).filter((z) => z.hidden >= HIDDEN)).toEqual([]);
     });
 });
 

@@ -18,6 +18,7 @@ export interface Prepared {
   inset: boolean;
   accent: boolean;
   faint: boolean;
+  seeThrough: boolean;
   headTop: boolean;
 }
 
@@ -69,6 +70,7 @@ export function prepare(pkg: Package): Prepared[] {
       inset: hasFlag(s, "inset"),
       accent: hasFlag(s, "accent"),
       faint: hasFlag(s, "faint"),
+      seeThrough: hasFlag(s, "seeThrough"),
       headTop: hasFlag(s, "headTop"),
     };
   });

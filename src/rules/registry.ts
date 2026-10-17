@@ -29,6 +29,7 @@ export const rules: Rule[] = [classify, base, j6, j2, j3, j4, j5, j7, j1, stops,
 /** Stages and code outside the rule list that serve AUTO requirements. */
 export const PROVIDERS: { id: string; ids: string[] }[] = [
   { id: "fasteners (stage 3)", ids: ["A8", "M4"] },
+  { id: "see-through", ids: ["L5"] },
   { id: "explode", ids: ["E1", "E2", "E3", "E5", "E6", "E7", "E8"] },
   { id: "hardware primitives", ids: ["A13", "M1", "M3", "M5", "M11", "R3"] },
   { id: "checks (clearance, clamp, edge distance)", ids: ["A12", "A15", "M6"] },

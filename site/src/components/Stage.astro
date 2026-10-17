@@ -1,5 +1,6 @@
 ---
-// The stage and its controls (SS5): play, scrubber, speed, tilt, explode, the detail pin and the overlay chips.
+// The stage and its controls (SS5): play, scrubber, speed, tilt, explode, the detail dial (auto or by hand) and the
+// overlay chips.
 interface Props {
   id: string;
   no: string;
@@ -9,7 +10,7 @@ const { id, no, title } = Astro.props;
 const overlays = [
   ["paths", "Paths", true],
   ["velocity", "Velocity", false],
-  ["forces", "Forces", true],
+  ["forces", "Forces", false],
   ["angles", "Angles", false],
 ] as const;
 ---
@@ -27,7 +28,10 @@ const overlays = [
   <div class="controls">
     <label class="sl"><span class="lbl">View</span><input id="tilt" type="range" min="0" max="88" step="1" value="28" /><output id="tiltv">28°</output></label>
     <label class="sl"><span class="lbl">Explode</span><input id="explode" type="range" min="0" max="100" step="1" value="0" /><output id="explodev">0%</output></label>
-    <button class="btn" id="pin" type="button" aria-pressed="false" title="Keep full detail even when the drawing is slow">Full detail</button>
+    <div class="dial">
+      <button class="btn" id="auto" type="button" aria-pressed="true" title="Drop detail on its own when the drawing is slow">Auto</button>
+      <label class="sl"><span class="lbl">Detail</span><input id="detail" type="range" min="0" max="7" step="1" value="7" /><output id="detailv">Full</output></label>
+    </div>
   </div>
   <div class="ovl" role="group" aria-label="Overlays">
     {overlays.map(([k, label, on]) => (
