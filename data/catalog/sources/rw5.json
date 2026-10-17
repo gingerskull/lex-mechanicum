@@ -28,7 +28,7 @@
  ]},
  "face-groove-cam": {"real_world": [
   {"product": "CAMCO custom face-grooved cams", "maker": "DESTACO (CAMCO)", "use": "Medium speed cams with a groove slightly wider than the follower, giving positive drive in both directions.", "url": "https://destaco.com/solutions/by-applications-and-topics/custom-cams.html", "kind": "product", "checked": true}
- ], "note": "Only one source found naming face-grooved cams as a product; they are usually buried inside packaging and automatic machines without public pages."},
+ ], "waive": ["real_world"], "note": "Only one source found naming face-grooved cams as a product; they are usually buried inside packaging and automatic machines without public pages."},
  "desmodromic-cam": {"real_world": [
   {"product": "Mercedes-Benz W 196 R (1954) with M 196 engine", "maker": "Mercedes-Benz", "use": "The straight-eight uses desmodromic valve gear instead of valve springs.", "url": "https://rmsothebys.com/auctions/tt25/lots/r0001-1954-mercedesbenz-w-196-r-stromlinienwagen/", "kind": "in-product", "checked": true},
   {"product": "Ducati Desmosedici Stradale V4 (Panigale V4)", "maker": "Ducati", "use": "Separate cams and rockers open and close the valves, with no valve springs.", "url": "https://motorcyclenews.com/news/new-bikes/2017/september/ducati-panigale-v4-engine", "kind": "in-product", "checked": true},
@@ -39,7 +39,7 @@
   {"product": "35mm film projector, Kodak Museum Collection (Science Museum Group)", "maker": "", "use": "35mm projector for 1000 ft reels with a Maltese cross intermittent driving the film sprocket.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8187098/35mm-film-projector-cine-camera-projector-maltese-cross", "kind": "museum", "checked": true},
   {"product": "8-point Maltese cross mechanism from a projector (Science Museum Group)", "maker": "", "use": "Removed projector intermittent showing the Geneva wheel itself.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8206936/maltese-cross-mechanism", "kind": "museum", "checked": true}
  ]},
- "internal-geneva": {"real_world": [], "note": "No real product or museum page specifically showing an internal Geneva drive was found in search; sources only describe it generically or as patents/demos."},
+ "internal-geneva": {"real_world": [], "waive": ["real_world"], "note": "No real product or museum page specifically showing an internal Geneva drive was found in search; sources only describe it generically or as patents/demos."},
  "intermittent-gear": {"real_world": [
   {"product": "John Deere FH312371 intermittent gear (fits 328, 338, 348, 349, 359, 459, 468 small square balers)", "maker": "John Deere", "use": "OEM partly toothed gear giving controlled intermittent rotation in the machine's drive; in these balers it times the knotter drive.", "url": "https://shop.deere.com/us/product/FH312371%3A-Intermittent-Gear/p/FH312371", "kind": "product", "checked": true},
   {"product": "LVU14840 41-tooth intermittent spur gear for John Deere drivetrains", "maker": "BTI (aftermarket for John Deere)", "use": "Replacement intermittent gear that controls timing and rotational movement in John Deere equipment.", "url": "https://bti-direct.com/products/lvu14840-intermittent-gear.oembed", "kind": "product", "checked": true}

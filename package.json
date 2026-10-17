@@ -1,14 +1,31 @@
 {
   "name": "mechanism-database",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "An online library of mechanical mechanisms, drawn live as bench assemblies in one house style.",
   "type": "module",
   "engines": {
     "node": ">=22"
   },
+  "scripts": {
+    "catalog": "tsx tools/catalog.ts",
+    "typecheck": "tsc",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "prepare": "git config core.hooksPath .githooks || true"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/gingerskull/mechanism-database.git"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.5"
   }
 }
