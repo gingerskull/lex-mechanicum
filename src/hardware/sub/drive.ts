@@ -4,7 +4,8 @@
 // clamped to the input slider through a slot in the base, a tensioner on the far pulley. manual: a handle on the input
 // and stops at the ends of its range, no motor. Every motorised build has a home flag, a fork sensor, leads to a
 // terminal block on the base edge and a cable clip.
-import { TAU, circle, roundedPoly, type Pose, type Vec2 } from "../../core/geom";
+import { TAU, bbox, circle, roundedPoly, type Pose, type Vec2 } from "../../core/geom";
+import { growBase } from "../../rules/base";
 import { depth, toWorld } from "../../core/poly";
 import { poseOf } from "../../model/pose";
 import { heights } from "../../parts";
@@ -32,6 +33,22 @@ function band(ri: number, ro: number, t0: number, t1: number, n = 48): Vec2[] {
   for (let i = 0; i <= n; i++) pts.push([ro * Math.cos(t0 + ((t1 - t0) * i) / n), ro * Math.sin(t0 + ((t1 - t0) * i) / n)]);
   for (let i = n; i >= 0; i--) pts.push([ri * Math.cos(t0 + ((t1 - t0) * i) / n), ri * Math.sin(t0 + ((t1 - t0) * i) / n)]);
   return pts;
+}
+
+/**
+ * Where no spot under the base fits, the motor goes beside the mechanism, away from the base centre, and the base grows
+ * to carry its bracket.
+ */
+function grownSpot(ctx: RuleContext, from: Vec2, R: number, c: number): Vec2 {
+  const [x0, y0, x1, y1] = bbox(ctx.get("base")!.outer);
+  const cx = (x0 + x1) / 2;
+  const cy = (y0 + y1) / 2;
+  const L = Math.hypot(from[0] - cx, from[1] - cy);
+  const u: Vec2 = L > 1 ? [(from[0] - cx) / L, (from[1] - cy) / L] : [0, -1];
+  const M: Vec2 = [from[0] + c * u[0], from[1] + c * u[1]];
+  const m = R + 8;
+  growBase(ctx, [M[0] - m, M[1] - m, M[0] + m, M[1] + m]);
+  return M;
 }
 
 /** A clear spot for a motor bracket of radius R under the base, at distance c from `from` (closest first). */
@@ -100,7 +117,7 @@ function motorUnit(ctx: RuleContext, M: Vec2, toward: Vec2, zp0: number, kind: M
 }
 
 /** Leads from the motor and the sensor to a terminal block on the base edge, one cable clip under the base (V6). */
-function cabling(ctx: RuleContext, from: Vec2[]): void {
+function cabling(ctx: RuleContext, from: Vec2[], via: Vec2[][] = []): void {
   const base = ctx.get("base")!;
   const xs = base.outer.map((p) => p[0]);
   const ys = base.outer.map((p) => p[1]);
@@ -121,7 +138,7 @@ function cabling(ctx: RuleContext, from: Vec2[]): void {
   ctx.add(screw("drive-terminal-sc", "button", 3, 14, { ...G, at: [T[0], T[1], 0], face: z0, dir: 1, name: "Button head M3 x 14, terminal block to base" }));
   from.forEach((p, k) => {
     const mid: Vec2 = [(p[0] + T[0]) / 2, (p[1] + T[1]) / 2];
-    ctx.add(lead(`drive-lead${k}`, [p, mid, T], { ...G, z0: ctx.b0 - 2.6, z1: ctx.b0 - 0.8, name: k ? "Sensor lead, 3-core" : "Motor phase leads, 3-core" }));
+    ctx.add(lead(`drive-lead${k}`, [p, ...(via[k]?.length ? via[k]! : [mid]), T], { ...G, z0: ctx.b0 - 2.6, z1: ctx.b0 - 0.8, name: k ? "Sensor lead, 3-core" : "Motor phase leads, 3-core" }));
     if (k === 0) {
       ctx.add(cableClip("drive-clip", { ...G, at: [mid[0], mid[1], Math.atan2(T[1] - p[1], T[0] - p[0]) + Math.PI / 2], z0: ctx.b0 - 3.2, z1: ctx.b0 }));
       ctx.add(screw("drive-clip-sc", "button", 3, 6, { ...G, at: [mid[0], mid[1], 0], face: ctx.b0 - 3.2, dir: 1, name: "Button head M3 x 6, cable clip" }));
@@ -148,8 +165,7 @@ function rotary(ctx: RuleContext, kind: MotorKind): string {
   const pin = PULLEYS[TIN];
   const pm = PULLEYS[TM];
   const R = MOTORS[kind].R;
-  const M = motorSpot(ctx, j.P, R, zp0 - 25, R + 22, R + 60);
-  if (!M) return "No room under the base for the motor bracket.";
+  const M = motorSpot(ctx, j.P, R, zp0 - 25, R + 22, R + 60) ?? grownSpot(ctx, j.P, R, R + 24);
   const ratio = TIN / TM;
   const unit = motorUnit(ctx, M, j.P, zp0, kind, { body: j.body, motion: { type: "geared", around: M, ratio } });
   // input pulley, hub with two set screws at 90° (F3), spacer up to the lower housing bearing
@@ -179,8 +195,11 @@ function rotary(ctx: RuleContext, kind: MotorKind): string {
   ctx.belts.push({ belt: "drive-belt", pulleys: ["drive-pulley-m", "drive-pulley-in"], mount: unit.bracketTop, joint: "drive" });
   const away = Math.atan2(j.P[1] - M[1], j.P[0] - M[0]);
   homing(ctx, j, hubR, zp0 + 11.5, away);
-  const sp: Vec2 = [j.P[0] + (hubR + 12) * Math.cos(away), j.P[1] + (hubR + 12) * Math.sin(away)];
-  cabling(ctx, [unit.leadFrom, sp]);
+  // the sensor lead leaves radially and goes round the housing, clear of the shaft
+  const Rh = 30;
+  const pt = (r: number, a: number): Vec2 => [j.P[0] + r * Math.cos(a), j.P[1] + r * Math.sin(a)];
+  const sp = pt(hubR + 12, away);
+  cabling(ctx, [unit.leadFrom, sp], [[], [pt(Rh, away), pt(Rh, away + Math.PI / 2), pt(Rh, away + Math.PI)]]);
   const c = Math.hypot(M[0] - j.P[0], M[1] - j.P[1]);
   return `${kind === "pancake" ? "Brushless pancake motor Ø50 x 18" : "Brushed DC motor Ø36"} under the base in a one-piece bracket, GT2 belt ${TIN}:${TM} over ${fmt(c)} mm to the input pulley; home flag on the input hub read by a fork sensor on the housing, leads to a terminal block on the base edge.`;
 }
@@ -193,29 +212,47 @@ function oscillating(ctx: RuleContext, kind: MotorKind): string {
   const zl = j.below.z0;
   const rho = 22;
   // the lever points away from the part; its tip's extremes set the crank and link at their dead centres
-  const mid = (r[0] + r[1]) / 2;
   const off = Math.PI;
   const tip = (th: number): Vec2 => [j.P[0] + rho * Math.cos(th + off), j.P[1] + rho * Math.sin(th + off)];
   const Tlo = tip(r[0]);
   const Thi = tip(r[1]);
-  const chord: Vec2 = [Thi[0] - Tlo[0], Thi[1] - Tlo[1]];
-  const cl = Math.hypot(...chord) || 1;
-  const u: Vec2 = [chord[0] / cl, chord[1] / cl];
-  const n: Vec2 = [Math.cos(mid + off), Math.sin(mid + off)];
   const Tm: Vec2 = [(Tlo[0] + Thi[0]) / 2, (Tlo[1] + Thi[1]) / 2];
   const R = MOTORS[kind].R;
+  // the motor where its crank comes out at least 5 mm, the link at least 2.5 cranks long, the bracket clear
   let M: Vec2 | null = null;
-  for (const D of [3, 3.5, 4, 5]) {
-    for (const phi of [Math.PI / 4, -Math.PI / 4, Math.PI / 3, -Math.PI / 3]) {
-      const p: Vec2 = [Tm[0] + D * rho * (Math.cos(phi) * u[0] + Math.sin(Math.abs(phi)) * n[0]), Tm[1] + D * rho * (Math.cos(phi) * u[1] + Math.sin(Math.abs(phi)) * n[1])];
-      if (depth(ctx.get("base")!.outer, [], p) >= R + 3 && ctx.clearance(p, R + 1, zl - 40, ctx.b0, (t) => t.isBase === true) >= 0) {
-        M = p;
-        break;
-      }
+  let bestD = Infinity;
+  for (let D = 2 * rho; D <= 8 * rho; D += rho / 2)
+    for (let k = 0; k < 24; k++) {
+      const p: Vec2 = [Tm[0] + D * Math.cos((k / 24) * TAU), Tm[1] + D * Math.sin((k / 24) * TAU)];
+      const rc0 = Math.abs(Math.hypot(p[0] - Thi[0], p[1] - Thi[1]) - Math.hypot(p[0] - Tlo[0], p[1] - Tlo[1])) / 2;
+      const L0 = (Math.hypot(p[0] - Thi[0], p[1] - Thi[1]) + Math.hypot(p[0] - Tlo[0], p[1] - Tlo[1])) / 2;
+      if (rc0 < 5 || L0 < 2.5 * rc0 || D >= bestD) continue;
+      if (Math.hypot(p[0] - j.P[0], p[1] - j.P[1]) < R + 22) continue;
+      if (depth(ctx.get("base")!.outer, [], p) < R + 3) continue;
+      if (ctx.clearance(p, R + 1, zl - 40, ctx.b0, (t) => t.isBase === true) < 0) continue;
+      M = p;
+      bestD = D;
     }
-    if (M) break;
+  if (!M) {
+    // beside the mechanism on a grown base: the direction round the swing that gives the longest usable crank
+    const [bx0, by0, bx1, by1] = bbox(ctx.get("base")!.outer);
+    const out: Vec2 = [j.P[0] - (bx0 + bx1) / 2, j.P[1] - (by0 + by1) / 2];
+    let best: { p: Vec2; s: number } | null = null;
+    const D = R + 30 + rho;
+    for (let k = 0; k < 24; k++) {
+      const a = (k / 24) * TAU;
+      const p: Vec2 = [Tm[0] + D * Math.cos(a), Tm[1] + D * Math.sin(a)];
+      const dh = Math.hypot(p[0] - Thi[0], p[1] - Thi[1]);
+      const dl = Math.hypot(p[0] - Tlo[0], p[1] - Tlo[1]);
+      const rc0 = Math.abs(dh - dl) / 2;
+      if (rc0 < 5 || (dh + dl) / 2 < 2.5 * rc0) continue;
+      const s = rc0 + 0.2 * (Math.cos(a) * out[0] + Math.sin(a) * out[1]) / (Math.hypot(...out) || 1);
+      if (!best || s > best.s) best = { p, s };
+    }
+    M = best?.p ?? [Tm[0] + D, Tm[1]];
+    const m = R + 8;
+    growBase(ctx, [M[0] - m, M[1] - m, M[0] + m, M[1] + m]);
   }
-  if (!M) return "No room under the base for the oscillating drive.";
   const dHi = Math.hypot(M[0] - Thi[0], M[1] - Thi[1]);
   const dLo = Math.hypot(M[0] - Tlo[0], M[1] - Tlo[1]);
   const L = (dHi + dLo) / 2;
@@ -225,7 +262,7 @@ function oscillating(ctx: RuleContext, kind: MotorKind): string {
   const motion = (type: "crank" | "link"): Motion => ({ type, motor: M!, r: rc, L, pivot: j.P, rho, off });
   ctx.add(solid("drive-lever", { ...G, at: [j.at[0], j.at[1], off], kind: "part", role: "driver", name: `Drive lever, ${rho} mm`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rho, 0]], 6), holes: [disc(j.d / 2 + 0.01)], z0: zl, z1: zl + 6 }));
   ctx.add(solid("drive-link", { ...G, at: [0, 0, 0], motion: motion("link"), kind: "part", role: "link", name: `Drive link, ${fmt(L)} mm`, mat: "Steel C45", outer: roundedPoly([[0, 0], [L, 0]], 5), z0: zl - 5, z1: zl - 0.5 }));
-  ctx.add(solid("drive-crank", { ...G, at: [0, 0, 0], motion: motion("crank"), kind: "part", role: "driver", name: `Drive crank, ${fmt(rc)} mm, on the motor shaft`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rc, 0]], 6), z0: zl - 10, z1: zl - 5.5 }));
+  ctx.add(solid("drive-crank", { ...G, at: [0, 0, 0], motion: motion("crank"), kind: "part", role: "driver", name: `Drive crank, ${fmt(rc)} mm, on the motor shaft`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rc, 0]], 6), holes: [disc(2.05)], z0: zl - 10, z1: zl - 5.5 }));
   ctx.add(solid("drive-flag", { ...G, at: [0, 0, 0], motion: motion("crank"), kind: "flag", name: "Home flag on the drive crank", mat: "Stainless steel, 1 mm", outer: [[-2, -0.5], [-10, -0.5], [-10, 0.5], [-2, 0.5]].map(([x, y]) => [x, y] as Vec2), z0: zl - 14, z1: zl - 13 }));
   sensor(ctx, "drive-sensor", { axis: M, a: 0, rIn: 4, rOut: 12, zv: zl - 14, t: 1, joint: "drive", ex: -6 });
   cabling(ctx, [unit.leadFrom, [M[0] + 18, M[1]]]);

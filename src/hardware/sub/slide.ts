@@ -1,8 +1,9 @@
 // H.slide (J5): a prismatic slide on two rails. Keeper plate over one rail (F2), a bronze gib strip with adjusting
 // screws and lock nuts on the other (F7), felt wipers at both ends of the slider and a grease nipple feeding the guide
 // (F8), end stops with neoprene bumpers just beyond the travel (F5).
-import { bbox, type Pose, type Vec2 } from "../../core/geom";
-import { toLocal, toWorld } from "../../core/poly";
+import { TAU, bbox, xf, type Pose, type Vec2 } from "../../core/geom";
+import { overlap, region, toLocal, toWorld } from "../../core/poly";
+import { poseOf } from "../../model/pose";
 import { heights } from "../../parts";
 import { clearOf } from "../../rules/space";
 import type { RuleContext, SlideJoint } from "../../rules/types";
@@ -15,6 +16,24 @@ const rect = (x0: number, x1: number, y0: number, y1: number): Vec2[] => [
   [Math.max(x0, x1), Math.max(y0, y1)],
   [Math.min(x0, x1), Math.max(y0, y1)],
 ];
+
+/** A wiper on the slider stays clear of every other moving part over the cycle (the contact end of a cam follower). */
+function wiperClear(ctx: RuleContext, j: SlideJoint, local: Vec2[], z0: number, z1: number): boolean {
+  for (let i = 0; i < 36; i++) {
+    const s = ctx.model.solve((i / 36) * TAU);
+    const q = poseOf(j.slider, s);
+    if (!q) continue;
+    const g = region(xf(local, q), []);
+    for (const p of ctx.model.parts) {
+      if (p === j.slider || p.fixed || p.role === "pin" || p.role === "trace") continue;
+      const [a, b] = heights(p);
+      if (Math.min(b, z1) - Math.max(a, z0) <= 0.05) continue;
+      const pq = poseOf(p, s);
+      if (pq && overlap(g, region(xf(p.shape.outer, pq), p.shape.holes.map((h) => xf(h, pq)))) > 0.05) return false;
+    }
+  }
+  return true;
+}
 
 export function slide(ctx: RuleContext, j: SlideJoint): void {
   const J = ctx.joint(j.id)!;
@@ -40,7 +59,7 @@ export function slide(ctx: RuleContext, j: SlideJoint): void {
   serve("F2", keeper.id);
   [0.15, 0.5, 0.85].forEach((f, k) => {
     const p = toWorld(F, [Lr * f, yA]);
-    ctx.add(screw(`${j.id}-keeper-sc${k}`, "button", 3, keeper.z1 - rz1 + 4, { ...G, at: [p[0], p[1], 0], face: keeper.z1, dir: -1, name: k ? "" : undefined, qty: k ? 0 : 3 }));
+    ctx.add(screw(`${j.id}-keeper-sc${k}`, "csk", 3, keeper.z1 - rz1 + 4, { ...G, at: [p[0], p[1], 0], face: keeper.z1, dir: -1, name: k ? "" : undefined, qty: k ? 0 : 3 }));
   });
 
   // gib along rail b's inner edge, adjusting screws and lock nuts on its outer half (F7)
@@ -57,6 +76,10 @@ export function slide(ctx: RuleContext, j: SlideJoint): void {
   // felt wipers at both ends of the slider (F8)
   const sl = ctx.solidOf[j.slider.id]!;
   for (const [k, x0, x1] of [[0, sx1, sx1 + 2], [1, sx0 - 2, sx0]] as const) {
+    if (!wiperClear(ctx, j, rect(x0, x1, sy0 + 1, sy1 - 1), sz0 + 1, sz1 - 1)) {
+      J.note += ` No wiper at the ${k ? "lower" : "upper"} end: a moving part meets the slider there.`;
+      continue;
+    }
     const w = wiper(`${j.id}-wiper${k}`, rect(x0, x1, sy0 + 1, sy1 - 1), { body: j.slider.id, z0: sz0 + 1, z1: sz1 - 1, ex: sl.ex, joints: [j.id], name: k ? "" : undefined, qty: k ? 0 : 2 });
     ctx.add(w);
     serve("F8", w.id);
@@ -79,7 +102,7 @@ export function slide(ctx: RuleContext, j: SlideJoint): void {
     ctx.add(s, b);
     serve("F5", s.id);
     const c = toWorld(F, [x + dir * 7.5, (yIn0 + yIn1) / 2]);
-    ctx.add(screw(`${j.id}-stop${k}-sc`, "socket", 4, sz1 - 1 - ctx.b1 + 6, { ...G, at: [c[0], c[1], 0], face: sz1 - 1, dir: -1, name: k ? "" : undefined }));
+    ctx.add(screw(`${j.id}-stop${k}-sc`, "button", 4, sz1 - 1 - ctx.b1 + 6, { ...G, at: [c[0], c[1], 0], face: sz1 - 1, dir: -1, name: k ? "" : undefined }));
   });
 
   // grease nipple on the keeper, where nothing passes over it (F8)

@@ -26,6 +26,7 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
   const S = assembly.solids.filter((t) => !t.faint && t.role !== "trace");
   const motionKey = (t: Solid) => (t.motion ? `m:${JSON.stringify(t.motion)}:${t.body}` : isGround(parts, t.body) ? "ground" : t.body);
   const keys = S.map(motionKey);
+  const contact = new Set((model.cams ?? []).flatMap((c) => [`${c.cam}|${c.follower}`, `${c.follower}|${c.cam}`]));
   const pairs: [number, number][] = [];
   for (let i = 0; i < S.length; i++)
     for (let k = i + 1; k < S.length; k++) {
@@ -33,7 +34,7 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
       const a = S[i]!;
       const b = S[k]!;
       if (a.group && a.group === b.group) continue;
-      if (a.allow?.includes(b.id) || b.allow?.includes(a.id)) continue;
+      if (a.allow?.includes(b.id) || b.allow?.includes(a.id) || contact.has(`${a.id}|${b.id}`)) continue;
       if (Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0) <= 0.05) continue;
       pairs.push([i, k]);
     }

@@ -42,12 +42,12 @@ export function stops(ctx: RuleContext, o: StopSpec): string[] {
   const margin = o.margin ?? (2 * Math.PI) / 180;
   const [pz0, pz1] = heights(o.part);
   const reach = Math.max(...o.part.shape.outer.map(([x, y]) => Math.hypot(x, y)));
-  const RS = Math.max(20, reach * 0.6);
+  const RS = Math.max(20, reach * 0.7);
   const top = pz0 + (pz1 - pz0) * 0.7;
   const out: string[] = [];
   for (const [k, a0, sg] of [[0, o.range[1] + margin, 1], [1, o.range[0] - margin, -1]] as const) {
     let found: Vec2 | null = null;
-    for (let s = 0; s < 0.3; s += 0.002) {
+    for (let s = 0; s < 0.7; s += 0.002) {
       const a = a0 + sg * s;
       const p: Vec2 = [o.pivot[0] + RS * Math.cos(a), o.pivot[1] + RS * Math.sin(a)];
       if (ctx.clearance(p, R_STOP, ctx.b1, top + 2.3, (t) => t.isBase === true) >= 1) {

@@ -47,7 +47,9 @@ export function followerTrain(ctx: RuleContext, j: CamJoint): void {
   const camQ = poseOf(j.cam, ctx.s0)!;
   const toCam = (camQ[0] - q0[0]) * tr.dir[0] + (camQ[1] - q0[1]) * tr.dir[1];
   const back = toCam > 0 ? -1 : 1;
-  const [bx0, , bx1] = bbox(f.shape.outer.map(([x, y]) => [x * Math.cos(-a) - y * Math.sin(-a), x * Math.sin(-a) + y * Math.cos(-a)] as Vec2));
+  // everything riding the follower (its wipers too) in the travel frame
+  const carried = [f.shape.outer, ...ctx.solids.filter((t) => t.body === f.id && t.id !== f.id).map((t) => t.outer)].flat();
+  const [bx0, , bx1] = bbox(carried.map(([x, y]) => [x * Math.cos(-a) - y * Math.sin(-a), x * Math.sin(-a) + y * Math.cos(-a)] as Vec2));
   const face = back > 0 ? bx1 : bx0;
   const s = SPRINGS[1]!;
   const reach = back > 0 ? tr.hi : -tr.lo;

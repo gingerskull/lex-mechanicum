@@ -562,9 +562,33 @@ export const terminalBlock = (id: string, ways = 4, o: Opts = {}): Solid =>
 export const cableClip = (id: string, o: Opts = {}): Solid =>
   solid(id, { name: "P-clip, nylon, 6 mm", kind: "cableClip", mat: "Polyamide 6.6", outer: roundedPoly([[-4, 0], [4, 0]], 2.5), ...o });
 
-/** A lead as a thin rounded strip along a polyline (world or body-local points). */
+/** Outline of a stroke of half-width r along a polyline, mitred at the bends. */
+export function stroke(pts: Vec2[], r: number): Vec2[] {
+  const n = pts.length;
+  const nrm = (a: Vec2, b: Vec2): Vec2 => {
+    const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    return [-(b[1] - a[1]) / L, (b[0] - a[0]) / L];
+  };
+  const left: Vec2[] = [];
+  const right: Vec2[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = i > 0 ? nrm(pts[i - 1]!, pts[i]!) : nrm(pts[0]!, pts[1]!);
+    const b = i < n - 1 ? nrm(pts[i]!, pts[i + 1]!) : a;
+    const mx = a[0] + b[0];
+    const my = a[1] + b[1];
+    const L = Math.hypot(mx, my) || 1;
+    // mitre: along the bisector, long enough to keep the strip r wide, capped at 3 r
+    const k = Math.min(3 * r, r / Math.max(0.2, (mx * a[0] + my * a[1]) / L));
+    const p = pts[i]!;
+    left.push([p[0] + (mx / L) * k, p[1] + (my / L) * k]);
+    right.push([p[0] - (mx / L) * k, p[1] - (my / L) * k]);
+  }
+  return [...left, ...right.reverse()];
+}
+
+/** A lead as a thin strip along a polyline (world or body-local points). */
 export const lead = (id: string, pts: Vec2[], o: Opts = {}): Solid =>
-  solid(id, { name: "Lead, silicone insulated", kind: "lead", mat: "Tinned copper, silicone", outer: roundedPoly(pts, 0.9), ...o });
+  solid(id, { name: "Lead, silicone insulated", kind: "lead", mat: "Tinned copper, silicone", outer: stroke(pts, 0.9), ...o });
 
 export const H = {
   disc, hex, hexAF, taper, boltCircle, hullOf, window, oilSink, boreChamfers,

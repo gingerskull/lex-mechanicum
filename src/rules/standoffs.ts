@@ -1,7 +1,7 @@
 // A6: fixed plates floating above the base sit on Ø10 standoffs, screwed from both sides, spigoted when the plate
 // holds a bearing (F1).
 import { xf, type Vec2 } from "../core/geom";
-import { inside, toLocal } from "../core/poly";
+import { edgeDist, inside, toLocal } from "../core/poly";
 import { disc, screw, spigot, standoff } from "../hardware/primitives";
 import { STANDOFF } from "../hardware/tables";
 import type { Rule } from "./types";
@@ -28,25 +28,35 @@ export const standoffs: Rule = {
         }
       const cx = O.reduce((a, v) => a + v[0], 0) / O.length;
       const cy = O.reduce((a, v) => a + v[1], 0) / O.length;
-      const pts: Vec2[] = best[2] > 40 ? [O[best[0]]!, O[best[1]]!] : [[cx, cy]];
+      const ends: Vec2[] = [O[best[0]]!, O[best[1]]!];
+      const ux = (ends[1]![0] - ends[0]![0]) / (best[2] || 1);
+      const uy = (ends[1]![1] - ends[0]![1]) / (best[2] || 1);
+      const h = best[2] / 2;
+      const pts: Vec2[] = best[2] > 40 ? [[cx - ux * (h - 8), cy - uy * (h - 8)], [cx + ux * (h - 8), cy + uy * (h - 8)]] : [[cx, cy]];
       const holdsBearing = ctx.solids.some((t) => t.body === p.id && (t.kind === "bearing" || t.kind === "bushing"));
       const jid = `${p.id}-post`;
       let n = 0;
-      pts.forEach((p0, k) => {
-        const dx = cx - p0[0];
-        const dy = cy - p0[1];
-        const L = Math.hypot(dx, dy) || 1;
-        const ins = Math.min(8, L);
-        const c: Vec2 = [p0[0] + (dx / L) * ins, p0[1] + (dy / L) * ins];
+      pts.forEach((c0, k) => {
+        // centre the post across the plate: the deepest point on the line across it
+        let c = c0;
+        for (let t = -6; t <= 6; t += 0.1) {
+          const q: Vec2 = [c0[0] - uy * t, c0[1] + ux * t];
+          if (inside(O, q) && edgeDist(O, q) > edgeDist(O, c) + 1e-9) c = q;
+        }
         if (!inside(O, c)) return;
         const at: [number, number, number] = [c[0], c[1], 0];
         const G = { at, joints: [jid] };
         const l = toLocal(p.fixed!, c);
-        q.holes.push(disc(holdsBearing ? STANDOFF.spigotD / 2 : STANDOFF.M / 2 + 0.3, ...l));
-        ctx.add(standoff(`${jid}${k}`, { ...G, name: n ? "" : `Standoff Ø${STANDOFF.D} x ${fmt(q.z0 - ctx.b1)}, M${STANDOFF.M}${holdsBearing ? `, Ø${STANDOFF.spigotD} spigot` : ""}`, z0: ctx.b1, z1: q.z0, span: [-1, q.ex], ex: -1 }));
-        if (holdsBearing) ctx.add(spigot(`${jid}${k}-spigot`, { ...G, z0: q.z0, z1: q.z0 + Math.min(3, q.z1 - q.z0), ex: q.ex, allow: [p.id] }));
-        ctx.add(screw(`${jid}${k}-top`, "button", STANDOFF.M, q.z1 - q.z0 + 1.5 * STANDOFF.M, { ...G, face: q.z1, dir: -1, ex: q.ex }));
-        ctx.add(screw(`${jid}${k}-bot`, "button", STANDOFF.M, ctx.b1 - ctx.b0 + 1.5 * STANDOFF.M, { ...G, face: ctx.b0, dir: 1, ex: -1 }));
+        // a plate narrower than a Ø10 post (a rail) sits on a post its own width, fastened by a flush M3
+        const width = 2 * edgeDist(p.shape.outer, l);
+        const narrow = width < STANDOFF.D + 2;
+        const D = narrow ? Math.max(5, Math.floor(width - 1)) : STANDOFF.D;
+        const M = narrow ? 3 : STANDOFF.M;
+        q.holes.push(disc(holdsBearing && !narrow ? STANDOFF.spigotD / 2 : M / 2 + 0.3, ...l));
+        ctx.add(standoff(`${jid}${k}`, { ...G, name: n ? "" : `Standoff Ø${D} x ${fmt(q.z0 - ctx.b1)}, M${M}${holdsBearing && !narrow ? `, Ø${STANDOFF.spigotD} spigot` : ""}`, outer: disc(D / 2), D, z0: ctx.b1, z1: q.z0, span: [-1, q.ex], ex: -1 }));
+        if (holdsBearing && !narrow) ctx.add(spigot(`${jid}${k}-spigot`, { ...G, z0: q.z0, z1: q.z0 + Math.min(3, q.z1 - q.z0), ex: q.ex, allow: [p.id] }));
+        ctx.add(screw(`${jid}${k}-top`, narrow ? "csk" : "button", M, q.z1 - q.z0 + 1.5 * M, { ...G, face: q.z1, dir: -1, ex: q.ex }));
+        ctx.add(screw(`${jid}${k}-bot`, "button", M, ctx.b1 - ctx.b0 + 1.5 * M, { ...G, face: ctx.b0, dir: 1, ex: -1 }));
         n++;
       });
       if (!n) continue;

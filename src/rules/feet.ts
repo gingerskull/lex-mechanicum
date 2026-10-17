@@ -1,6 +1,6 @@
 // A7, D4: rubber feet under the four mounting holes, concentric with the corner arcs, unless something hangs there.
 import { circle, xf } from "../core/geom";
-import { basePlate } from "../model/sample";
+import { baseCorners } from "./base";
 import { disc } from "../hardware/primitives";
 import { marks, solid } from "../hardware/solid";
 import type { Rule } from "./types";
@@ -11,10 +11,9 @@ export const feet: Rule = {
   ids: ["A7", "D4"],
   applies: () => true,
   apply(ctx) {
-    const bp = basePlate(ctx.model, ctx.sampled, ctx.form.base);
     const fr = ctx.form.base.footR;
     const under = ctx.solids.filter((t) => t.z0 < ctx.b0 - 0.1 && t.z1 > ctx.b0 - 12);
-    bp.corners.forEach(([x, y], k) => {
+    baseCorners(ctx).forEach(([x, y], k) => {
       const hit = under.some((t) => {
         const q = ctx.world(t);
         if (!q) return false;
