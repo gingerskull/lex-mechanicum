@@ -185,6 +185,10 @@ function cabling(ctx: RuleContext, runs: Run[], motor: Vec2): void {
     const corner = k === 0 ? corners[0]! : corners.reduce((p, q) => (Math.min(segClear(last, q), segClear(q, approach)) > Math.min(segClear(last, p), segClear(p, approach)) ? q : p));
     if (Math.hypot(corner[0] - last[0], corner[1] - last[1]) > 1 && Math.hypot(corner[0] - approach[0], corner[1] - approach[1]) > 1) pts.push(corner);
     pts.push(approach, clamp);
+    // no zero-length runs: the strip outline needs a direction at every point
+    const run2 = pts.filter((p, i) => i === 0 || Math.hypot(p[0] - pts[i - 1]![0], p[1] - pts[i - 1]![1]) > 0.01);
+    pts.length = 0;
+    pts.push(...run2);
     ctx.add(lead(`drive-lead${k}`, pts, { ...G, z0: ctx.b0 - 2.6, z1: ctx.b0 - 0.8, name: k ? "Sensor lead, 3-core" : "Motor phase leads, 3-core" }));
     if (k === 0) {
       // the clip holds the motor lead on its longest run

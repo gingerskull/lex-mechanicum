@@ -86,7 +86,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | M4 | PASS | AUTO / HAND · countersinks for every strip, segment and end screw; counterbored housing screws and base corners |
 | M5 | PASS | AUTO / HAND · window cutter radius 3 mm; slot ends full radius |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | PASS | HAND · 6 mm fillet in the bridge's crotch where the load turns |
+| M7 | PASS | HAND · the bridge arms run into the pivot boss: their crotch falls inside it, so there is no inside corner to fillet |
 | M8 | PASS | AUTO · undercuts on the stud and axle threads |
 | M9 | PASS | AUTO / HAND · stud M5 into the steel rear arm over 6 mm (1 d); axle through the base to a nyloc (M8 would sit short in 8 mm of aluminium); standard lengths |
 | M10 | PASS | AUTO / HAND · steel arm plates, hard-anodised wheel and disc, hardened strips and segment, bronze drag disc |

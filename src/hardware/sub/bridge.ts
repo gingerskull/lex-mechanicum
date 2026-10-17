@@ -41,7 +41,8 @@ const densify = (P: Vec2[], step = 1): Vec2[] =>
   });
 
 /** Two straight arms of half-width w from a boss of radius rB at P to bosses at the posts, the crotch filleted. */
-function arms(P: Vec2, posts: [Vec2, Vec2], rB: number, w: number): Vec2[] {
+function arms(P: Vec2, posts: [Vec2, Vec2], rB0: number, w: number): Vec2[] {
+  const rB = Math.max(rB0, w + 0.5);
   const shapes = [circle(rB, P[0], P[1], 64), ...posts.map((q) => hullOf([[P[0], P[1], w], [q[0], q[1], w]]))].map((t) => densify(t));
   const ang = (p: Vec2) => Math.atan2(p[1] - P[1], p[0] - P[0]);
   let pts = shapes.flatMap((t, i) => t.filter((p) => shapes.every((u, j) => j === i || !inside(u, p))));
@@ -54,9 +55,10 @@ function arms(P: Vec2, posts: [Vec2, Vec2], rB: number, w: number): Vec2[] {
   const by = u[0]![1] + u[1]![1];
   const bl = Math.hypot(bx, by);
   const half = Math.acos(Math.max(-1, Math.min(1, u[0]![0] * u[1]![0] + u[0]![1] * u[1]![1]))) / 2;
-  if (bl > 1e-6 && half > 0.1) {
+  const dc = (w + FILLET) / Math.sin(half);
+  // a wide V has its crotch inside the pivot boss: the union is already right there
+  if (bl > 1e-6 && half > 0.1 && dc - FILLET > rB) {
     const b: Vec2 = [bx / bl, by / bl];
-    const dc = (w + FILLET) / Math.sin(half);
     const C: Vec2 = [P[0] + b[0] * dc, P[1] + b[1] * dc];
     const T = u.map((v): Vec2 => {
       const t = dc * Math.cos(half);
