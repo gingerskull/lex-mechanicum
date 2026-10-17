@@ -12,7 +12,8 @@ import { heights } from "../../parts";
 import type { PinJoint, RuleContext, SlideJoint } from "../../rules/types";
 import { cableClip, disc, flag, hullOf, lead, plate, screw, setScrew, shaft, spacer, terminalBlock, tube } from "../primitives";
 import { solid, marks, type Motion, type Solid } from "../solid";
-import { MOTORS, PULLEYS, BELT } from "../tables";
+import { MOTORS, PULLEYS, BELT, innerRingD } from "../tables";
+import { housingBearing } from "./housing";
 import { sensor } from "./misc";
 import { stops, swing } from "./stops";
 
@@ -116,31 +117,86 @@ function motorUnit(ctx: RuleContext, M: Vec2, toward: Vec2, zp0: number, kind: M
   return { M, bracketTop: "drive-top", zFloor: zf0, leadFrom: [M[0] + RO * Math.cos(beta + Math.PI), M[1] + RO * Math.sin(beta + Math.PI)] };
 }
 
-/** Leads from the motor and the sensor to a terminal block on the base edge, one cable clip under the base (V6). */
-function cabling(ctx: RuleContext, from: Vec2[], via: Vec2[][] = []): void {
+/** A lead's start, and optionally a part it must go round on an arc (the input housing) before it heads for the block. */
+interface Run {
+  from: Vec2;
+  around?: { c: Vec2; r: number };
+}
+
+/**
+ * Leads from the motor and the sensor to a terminal block on the base edge, one cable clip under the base (V6). Each
+ * lead is routed as a cable is laid: an arc round a housing it must clear (the way that keeps it away from the motor),
+ * runs parallel to the base edges, and a last run square to the block into its own clamp.
+ */
+function cabling(ctx: RuleContext, runs: Run[], motor: Vec2): void {
   const base = ctx.get("base")!;
   const xs = base.outer.map((p) => p[0]);
   const ys = base.outer.map((p) => p[1]);
   const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
-  const f = from[0]!;
-  // the edge nearest the motor
-  const cand: [Vec2, number][] = [
-    [[f[0], y0 + 6], 0],
-    [[f[0], y1 - 6], 0],
-    [[x0 + 6, f[1]], Math.PI / 2],
-    [[x1 - 6, f[1]], Math.PI / 2],
+  const f = runs[0]!.from;
+  // the edge nearest the motor; n is the inward normal of that edge
+  const cand: [Vec2, number, Vec2][] = [
+    [[f[0], y0 + 6], 0, [0, 1]],
+    [[f[0], y1 - 6], 0, [0, -1]],
+    [[x0 + 6, f[1]], Math.PI / 2, [1, 0]],
+    [[x1 - 6, f[1]], Math.PI / 2, [-1, 0]],
   ];
   cand.sort((a, b) => Math.hypot(a[0][0] - f[0], a[0][1] - f[1]) - Math.hypot(b[0][0] - f[0], b[0][1] - f[1]));
-  const [T, rot] = cand[0]!;
+  const [T, rot, n] = cand[0]!;
+  const along: Vec2 = [Math.cos(rot), Math.sin(rot)];
   const z0 = ctx.b0 - 8;
   const G = { joints: ["drive"], ex: -2 };
   ctx.add(terminalBlock("drive-terminal", 4, { ...G, at: [T[0], T[1], rot], z0, z1: ctx.b0 }));
   ctx.add(screw("drive-terminal-sc", "button", 3, 14, { ...G, at: [T[0], T[1], 0], face: z0, dir: 1, name: "Button head M3 x 14, terminal block to base" }));
-  from.forEach((p, k) => {
-    const mid: Vec2 = [(p[0] + T[0]) / 2, (p[1] + T[1]) / 2];
-    ctx.add(lead(`drive-lead${k}`, [p, ...(via[k]?.length ? via[k]! : [mid]), T], { ...G, z0: ctx.b0 - 2.6, z1: ctx.b0 - 0.8, name: k ? "Sensor lead, 3-core" : "Motor phase leads, 3-core" }));
+  const vertical = n[0] === 0;
+  runs.forEach((run, k) => {
+    // its own clamp: the motor lead left of centre, the sensor lead right
+    const off = (k ? 1 : -1) * 5;
+    const clamp: Vec2 = [T[0] + along[0] * off + n[0] * 4, T[1] + along[1] * off + n[1] * 4];
+    const approach: Vec2 = [clamp[0] + n[0] * 10, clamp[1] + n[1] * 10];
+    const pts: Vec2[] = [run.from];
+    if (run.around) {
+      const { c, r } = run.around;
+      const a0 = Math.atan2(run.from[1] - c[1], run.from[0] - c[0]);
+      const a1 = Math.atan2(approach[1] - c[1], approach[0] - c[0]);
+      const ccw = ((a1 - a0) % TAU + TAU) % TAU;
+      const arc = (sweep: number): Vec2[] => {
+        const steps = Math.max(1, Math.ceil(Math.abs(sweep) / (Math.PI / 12)));
+        return Array.from({ length: steps + 1 }, (_, i): Vec2 => {
+          const a = a0 + (sweep * i) / steps;
+          return [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
+        });
+      };
+      const clear = (p: Vec2[]) => Math.min(...p.map((q) => Math.hypot(q[0] - motor[0], q[1] - motor[1])));
+      const A = arc(ccw);
+      const B = arc(ccw - TAU);
+      pts.push(...(clear(A) >= clear(B) ? A : B));
+    }
+    const last = pts[pts.length - 1]!;
+    // runs parallel to the base edges, turning at the corner that keeps the lead farther from the motor bracket,
+    // then square into the block
+    const segClear = (a: Vec2, b: Vec2) => {
+      const dx = b[0] - a[0];
+      const dy = b[1] - a[1];
+      const t = Math.max(0, Math.min(1, ((motor[0] - a[0]) * dx + (motor[1] - a[1]) * dy) / (dx * dx + dy * dy || 1)));
+      return Math.hypot(a[0] + t * dx - motor[0], a[1] + t * dy - motor[1]);
+    };
+    const corners: Vec2[] = [vertical ? [approach[0], last[1]] : [last[0], approach[1]], vertical ? [last[0], approach[1]] : [approach[0], last[1]]];
+    const corner = k === 0 ? corners[0]! : corners.reduce((p, q) => (Math.min(segClear(last, q), segClear(q, approach)) > Math.min(segClear(last, p), segClear(p, approach)) ? q : p));
+    if (Math.hypot(corner[0] - last[0], corner[1] - last[1]) > 1 && Math.hypot(corner[0] - approach[0], corner[1] - approach[1]) > 1) pts.push(corner);
+    pts.push(approach, clamp);
+    // no zero-length runs: the strip outline needs a direction at every point
+    const run2 = pts.filter((p, i) => i === 0 || Math.hypot(p[0] - pts[i - 1]![0], p[1] - pts[i - 1]![1]) > 0.01);
+    pts.length = 0;
+    pts.push(...run2);
+    ctx.add(lead(`drive-lead${k}`, pts, { ...G, z0: ctx.b0 - 2.6, z1: ctx.b0 - 0.8, name: k ? "Sensor lead, 3-core" : "Motor phase leads, 3-core" }));
     if (k === 0) {
-      ctx.add(cableClip("drive-clip", { ...G, at: [mid[0], mid[1], Math.atan2(T[1] - p[1], T[0] - p[0]) + Math.PI / 2], z0: ctx.b0 - 3.2, z1: ctx.b0 }));
+      // the clip holds the motor lead on its longest run
+      let best = 0;
+      for (let i = 1; i < pts.length; i++) if (Math.hypot(pts[i]![0] - pts[i - 1]![0], pts[i]![1] - pts[i - 1]![1]) > Math.hypot(pts[best + 1]![0] - pts[best]![0], pts[best + 1]![1] - pts[best]![1])) best = i - 1;
+      const [p, q] = [pts[best]!, pts[best + 1]!];
+      const mid: Vec2 = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+      ctx.add(cableClip("drive-clip", { ...G, at: [mid[0], mid[1], Math.atan2(q[1] - p[1], q[0] - p[0]) + Math.PI / 2], z0: ctx.b0 - 3.2, z1: ctx.b0 }));
       ctx.add(screw("drive-clip-sc", "button", 3, 6, { ...G, at: [mid[0], mid[1], 0], face: ctx.b0 - 3.2, dir: 1, name: "Button head M3 x 6, cable clip" }));
     }
   });
@@ -175,7 +231,7 @@ function rotary(ctx: RuleContext, kind: MotorKind): string {
   ctx.add(solid("drive-hub-in", { ...G, kind: "pulley", role: "driver", name: "Pulley hub, 2 x M3 set screws at 90°", outer: disc(hubR), holes: [disc(j.d / 2 + 0.01)], z0: zp0 + 7, z1: zp0 + 12.5 }));
   ctx.add(setScrew("drive-hub-ss0", 3, { ...G, at: [j.at[0] + hubR - 1.6, j.at[1], 0], z0: zp0 + 8, z1: zp0 + 10 }));
   ctx.add(setScrew("drive-hub-ss1", 3, { ...G, at: [j.at[0], j.at[1] + hubR - 1.6, 0], z0: zp0 + 8, z1: zp0 + 10, name: "" }));
-  if (j.below.z1 - (zp0 + 12.5) > 0.3) ctx.add(spacer("drive-spacer-in", j.d + 0.2, j.d + 3.2, { ...G, name: "Spacer, hub to the lower inner race", z0: zp0 + 12.5, z1: j.below.z1 }));
+  if (j.below.z1 - (zp0 + 12.5) > 0.3) ctx.add(spacer("drive-spacer-in", j.d + 0.2, Math.min(j.d + 3.2, innerRingD(housingBearing(j.d))), { ...G, name: "Spacer, hub to the lower inner race", z0: zp0 + 12.5, z1: j.below.z1 }));
   // motor pulley on the motor shaft, turning at the belt ratio; J8 adds its flanges
   ctx.add(solid("drive-pulley-m", { body: j.body, at: [0, 0, 0], motion: { type: "geared", around: M, ratio }, joints: ["drive"], ex: -6, kind: "pulley", role: "driver", name: `Motor pulley GT2 ${TM}T, D-bore`, mat: "Aluminium 6061-T6", outer: disc(pm.od / 2), holes: [disc(2.05)], z0: zp0, z1: zp0 + 7 }));
   ctx.add(
@@ -197,9 +253,8 @@ function rotary(ctx: RuleContext, kind: MotorKind): string {
   homing(ctx, j, hubR, zp0 + 11.5, away);
   // the sensor lead leaves radially and goes round the housing, clear of the shaft
   const Rh = 30;
-  const pt = (r: number, a: number): Vec2 => [j.P[0] + r * Math.cos(a), j.P[1] + r * Math.sin(a)];
-  const sp = pt(hubR + 12, away);
-  cabling(ctx, [unit.leadFrom, sp], [[], [pt(Rh, away), pt(Rh, away + Math.PI / 2), pt(Rh, away + Math.PI)]]);
+  const sp: Vec2 = [j.P[0] + Rh * Math.cos(away), j.P[1] + Rh * Math.sin(away)];
+  cabling(ctx, [{ from: unit.leadFrom }, { from: sp, around: { c: j.P, r: Rh } }], M);
   const c = Math.hypot(M[0] - j.P[0], M[1] - j.P[1]);
   return `${kind === "pancake" ? "Brushless pancake motor Ø50 x 18" : "Brushed DC motor Ø36"} under the base in a one-piece bracket, GT2 belt ${TIN}:${TM} over ${fmt(c)} mm to the input pulley; home flag on the input hub read by a fork sensor on the housing, leads to a terminal block on the base edge.`;
 }
@@ -265,7 +320,7 @@ function oscillating(ctx: RuleContext, kind: MotorKind): string {
   ctx.add(solid("drive-crank", { ...G, at: [0, 0, 0], motion: motion("crank"), kind: "part", role: "driver", name: `Drive crank, ${fmt(rc)} mm, on the motor shaft`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rc, 0]], 6), holes: [disc(2.05)], z0: zl - 10, z1: zl - 5.5 }));
   ctx.add(solid("drive-flag", { ...G, at: [0, 0, 0], motion: motion("crank"), kind: "flag", name: "Home flag on the drive crank", mat: "Stainless steel, 1 mm", outer: [[-2, -0.5], [-10, -0.5], [-10, 0.5], [-2, 0.5]].map(([x, y]) => [x, y] as Vec2), z0: zl - 14, z1: zl - 13 }));
   sensor(ctx, "drive-sensor", { axis: M, a: 0, rIn: 4, rOut: 12, zv: zl - 14, t: 1, joint: "drive", ex: -6 });
-  cabling(ctx, [unit.leadFrom, [M[0] + 18, M[1]]]);
+  cabling(ctx, [{ from: unit.leadFrom }, { from: [M[0] + 18, M[1]] }], M);
   return `Motor turns a ${fmt(rc)} mm crank; a ${fmt(L)} mm link swings a ${rho} mm lever on the input shaft through exactly the modelled ${(((r[1] - r[0]) * 180) / Math.PI).toFixed(0)}° (dead centres at the ends of the swing).`;
 }
 
@@ -300,7 +355,7 @@ function linear(ctx: RuleContext, kind: MotorKind): string {
   base.holes.push(roundedPoly([line(s.range[0], rp), line(s.range[1], rp)], 5));
   ctx.add(solid("drive-carriage", { ...G, body: s.slider.id, kind: "part", role: "driver", name: "Belt carriage, clamped to the slider", mat: "Aluminium 6061-T6", outer: roundedPoly([[-6, rp], [6, rp]], 4), z0: zp0, z1: z0s, ex: ctx.solidOf[s.slider.id]!.ex }));
   ctx.add(flag("drive-flag", 0, 8, Math.PI / 2, { ...G, body: s.slider.id, at: [0, rp + 4, 0], z0: zp0 + 8, z1: zp0 + 9 }));
-  cabling(ctx, [unit.leadFrom, line(s.range[0] - 10, rp + 12)]);
+  cabling(ctx, [{ from: unit.leadFrom }, { from: line(s.range[0] - 10, rp + 12) }], M);
   return `Belt loop under the base along the ${fmt(s.range[1] - s.range[0])} mm stroke, a carriage through a slot in the base clamped to the slider, tensioner arm on the far pulley.`;
 }
 

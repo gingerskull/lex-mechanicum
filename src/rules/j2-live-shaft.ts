@@ -5,7 +5,7 @@
 import { dBore } from "../core/geom";
 import { circlip, collar, disc, key, plainWasher, screw, setScrew, shaft, thrustWasher, tube } from "../hardware/primitives";
 import { housing } from "../hardware/sub/housing";
-import { circlipExt, keyFor } from "../hardware/tables";
+import { circlipExt, innerRingD, keyFor, standardLength } from "../hardware/tables";
 import { elements, partName, stackSpacers } from "./pins";
 import type { PinJoint, Rule, RuleContext } from "./types";
 
@@ -36,7 +36,12 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
   // keyed parts (A5, F3): D-bore to Ø8, round bore with a feather key above
   for (const x of driven) {
     const host = ctx.solidOf[x.part.id]!;
-    if (x.how !== "keyed") host.holes.push(k ? disc(d / 2 + 0.01, ...x.L) : dBore(d / 2 + 0.025).map(([a, b]) => [a + x.L[0], b + x.L[1]] as [number, number]));
+    // the bore fits the shaft: a model's keyed hole only sizes the shaft (A3) and is cut again to it
+    const bore = k ? disc(d / 2 + 0.01, ...x.L) : dBore(d / 2 + 0.025).map(([a, b]) => [a + x.L[0], b + x.L[1]] as [number, number]);
+    if (x.how === "keyed" && x.hole !== undefined) host.holes[x.hole] = bore;
+    else host.holes.push(bore);
+    // a D-flat transmits the torque itself (F3)
+    if (!k && !(J.serves.F3 ??= []).includes(group)) J.serves.F3.push(group);
     if (k) {
       const kz0 = x.z0;
       const kz1 = x.z1;
@@ -66,7 +71,7 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
     (J.serves.F2 ??= []).push(`${j.id}-cl-top`);
   } else {
     z1 = topZ - 0.5;
-    ctx.add(screw(`${j.id}-end`, "csk", endM, 2 * endM + 2, { body: j.body, at: j.at, face: topZ, dir: -1, ex: ctx.solidOf[topDriven.part.id]!.ex + 1, joints: [j.id], accent: input, headTop: true, name: `Countersunk M${endM} into the shaft end, flush` }));
+    ctx.add(screw(`${j.id}-end`, "csk", endM, 2 * endM + 2, { body: j.body, at: j.at, face: topZ, dir: -1, ex: ctx.solidOf[topDriven.part.id]!.ex + 1, joints: [j.id], accent: input, headTop: true, name: `Countersunk M${endM} x ${standardLength(2 * endM + 2)} (ISO 10642), into the shaft end, flush` }));
     (J.serves.F2 ??= []).push(`${j.id}-end`);
   }
   // below the housing: the input leaves room for the pulley (drive rule); other shafts end in a collar
@@ -80,13 +85,13 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
     joints: [j.id],
   });
   ctx.add(segs);
-  ctx.add(tube(`${j.id}-hsleeve`, d + 0.2, d + 3, { name: "Spacer sleeve between the housing bearings, inner races", body: j.body, at: j.at, z0: H.lower[1], z1: H.upper[0], ex: -3, joints: [j.id], inset: true }));
+  ctx.add(tube(`${j.id}-hsleeve`, d + 0.2, Math.min(d + 3, innerRingD(H.bearing)), { name: "Spacer sleeve between the housing bearings, inner races", body: j.body, at: j.at, z0: H.lower[1], z1: H.upper[0], ex: -3, joints: [j.id], inset: true }));
   if (input) {
     j.below = { z0: zb, z1: H.lower[0] };
     // end retainer (F2): a washer and a socket screw into the shaft end
     const M = endM;
     ctx.add(plainWasher(`${j.id}-rw`, M, { name: `Retaining washer Ø${d + 6} x 1.5`, body: j.body, at: j.at, z0: zb - 1.5, z1: zb, outer: disc((d + 6) / 2), ex: -5, joints: [j.id], group: `${j.id}-rs` }));
-    ctx.add(screw(`${j.id}-rs`, "socket", M, 2 * M, { body: j.body, at: j.at, face: zb - 1.5, dir: 1, ex: -5, joints: [j.id], name: `Socket head M${M} x ${2 * M}, into the shaft end` }));
+    ctx.add(screw(`${j.id}-rs`, "socket", M, 2 * M, { body: j.body, at: j.at, face: zb - 1.5, dir: 1, ex: -5, joints: [j.id], name: `Socket head M${M} x ${standardLength(2 * M)} (ISO 4762), into the shaft end` }));
     (J.serves.F2 ??= []).push(`${j.id}-rs`);
   } else {
     ctx.add(collar(`${j.id}-collar`, d, d + 10, { body: j.body, at: j.at, z0: H.z0 - 5, z1: H.z0 - 0.5, ex: -4, joints: [j.id] }));

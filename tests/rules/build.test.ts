@@ -5,6 +5,8 @@ import { TAU } from "../../src/core/geom";
 import { assembleWith } from "../../src/assemble";
 import { solidPose } from "../../src/assemble/pose";
 import fourBar from "../../src/mechanisms/four-bar/model";
+import geneva from "../../src/mechanisms/geneva/model";
+import { hullOf } from "../../src/hardware/primitives";
 import { defineMechanism } from "../../src/model/define";
 import { P } from "../../src/parts";
 import { V } from "../../src/core/vec";
@@ -54,6 +56,23 @@ describe("stops", () => {
     expect(kinds(added)).toEqual({ bumper: 2, head: 2, shank: 2 });
     expect(added.every((s) => s.joints.includes("pO4"))).toBe(true);
   });
+
+  it("gives a part that indexes (a Geneva wheel) no stops: it ends the cycle at another angle", () => {
+    const ctx = contextBefore(geneva, stops);
+    expect(run(ctx, stops)).toEqual([]);
+  });
+});
+
+describe("bridge", () => {
+  it("is two filleted arms when its posts stand far from the pivot, one plate when they are close", () => {
+    const area = (P: [number, number][]) => Math.abs(P.reduce((s, p, i) => s + p[0] * P[(i + 1) % P.length]![1] - P[(i + 1) % P.length]![0] * p[1], 0) / 2);
+    const far = assembleWith(geneva).assembly.solids.find((s) => s.id === "pW-bridge")!;
+    const close = assembleWith(fourBar).assembly.solids.find((s) => s.id === "pO4-bridge")!;
+    // the arms leave out the triangle between them: well under the hull of the same circles
+    const hull = (s: typeof far) => area(hullOf(s.outer.map(([x, y]): [number, number, number] => [x, y, 0])));
+    expect(area(far.outer)).toBeLessThan(0.75 * hull(far));
+    expect(area(close.outer)).toBeGreaterThan(0.97 * hull(close));
+  });
 });
 
 describe("drive", () => {
@@ -64,6 +83,25 @@ describe("drive", () => {
     expect(k.pulley).toBeGreaterThanOrEqual(2);
     expect(k.sensor).toBe(3);
     expect(a.joints.find((j) => j.id === "drive")!.badge).toEqual(["motorised", "ok"]);
+  });
+
+  it("rotary: the leads are laid as cables, round the input housing and square into the terminal block", () => {
+    const { assembly: a } = assembleWith(fourBar);
+    const housing = a.solids.find((s) => s.kind === "housing")!;
+    const hR = Math.max(...housing.outer.map(([x, y]) => Math.hypot(x, y)));
+    const block = a.solids.find((s) => s.id === "drive-terminal")!;
+    for (const id of ["drive-lead0", "drive-lead1"]) {
+      const lead = a.solids.find((s) => s.id === id)!;
+      // the strip's centre line: every point clear of the housing's footprint
+      for (const [x, y] of lead.outer) expect(Math.hypot(x - housing.at[0], y - housing.at[1])).toBeGreaterThan(hR);
+      // the last point lies on the block, the run into it square to the block's long side
+      const n = lead.outer.length / 2;
+      const end = [(lead.outer[n - 1]![0] + lead.outer[n]![0]) / 2, (lead.outer[n - 1]![1] + lead.outer[n]![1]) / 2];
+      expect(Math.hypot(end[0]! - block.at[0], end[1]! - block.at[1])).toBeLessThan(10);
+      const prev = [(lead.outer[n - 2]![0] + lead.outer[n + 1]![0]) / 2, (lead.outer[n - 2]![1] + lead.outer[n + 1]![1]) / 2];
+      const along = [Math.cos(block.at[2]), Math.sin(block.at[2])];
+      expect(Math.abs((end[0]! - prev[0]!) * along[0]! + (end[1]! - prev[1]!) * along[1]!)).toBeLessThan(1e-6);
+    }
   });
 
   it("oscillating: a crank and link whose far pin follows the rocker through its whole modelled range", () => {

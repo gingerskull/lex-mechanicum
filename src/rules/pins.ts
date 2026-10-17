@@ -1,9 +1,9 @@
 // Shared build steps of the pin joints (J1, J3, J4): bearing seats with their retention, inner-race spacers, the
 // shoulder bolt or axle, and the track roller with its wear strips. The rule modules decide which steps a type gets.
 import { bbox, circle, offsetPoly, type Pose, type Vec2 } from "../core/geom";
-import { boreChamfers, bearing, bushing, circlip, disc, felt, head, roller, screw, shaft, spacer, thrustWasher, tube, wearStrip } from "../hardware/primitives";
+import { boreChamfers, bearing, bushing, circlip, disc, felt, head, roller, screw, shaft, spacer, thrustWasher, tube, washer, wearStrip } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
-import { CIRCLIP_ROOM, FLANGE, SHOULDER_BOLTS, bearingFor, circlipInt, threadFor } from "../hardware/tables";
+import { CIRCLIP_ROOM, FLANGE, SHOULDER_BOLTS, bearingFor, circlipInt, innerRingD, shoulderLength, threadFor } from "../hardware/tables";
 import type { Joined, PinJoint, RuleContext } from "./types";
 
 /** An element of the stack on the shaft or bolt: a part face or a bearing inner race. */
@@ -115,7 +115,7 @@ export function raceD(ctx: RuleContext, j: PinJoint, want: number): number {
   let cap = Infinity;
   for (const t of ctx.solids)
     if (t.kind === "bearing" && t.joints.includes(j.id) && t.d === j.d && t.D !== undefined && !t.id.endsWith("-fl"))
-      cap = Math.min(cap, t.d + (t.D - t.d) * 0.36 - 0.1);
+      cap = Math.min(cap, innerRingD({ d: t.d, D: t.D }));
   return Math.max(j.d + 1.6, Math.min(want, cap));
 }
 
@@ -142,8 +142,9 @@ export function stackSpacers(ctx: RuleContext, j: PinJoint, els: Element[], body
 }
 
 /**
- * A shoulder bolt (ISO 7379) or a headed axle: the shoulder Ø d from `z0` to `z1`, the thread below it with its
- * undercut, the head on top. One explode group (E2).
+ * A shoulder bolt (ISO 7379) or a headed axle: the shoulder Ø d from `z0`, the thread below it with its undercut, the
+ * head on top. The stack needs the head at `z1`; the shoulder is the next standard length (M9, A13) and a hardened shim
+ * under the head makes up the difference. One explode group (E2).
  */
 export function shoulderBolt(
   ctx: RuleContext,
@@ -152,7 +153,8 @@ export function shoulderBolt(
 ): Solid[] {
   const sb = SHOULDER_BOLTS[j.d];
   const M = sb?.M ?? threadFor(j.d);
-  const segs = shaft(o.id, { d: j.d, z0: Math.min(o.thread[0], o.z0), z1: o.z1, thread: { M, z0: o.thread[0], z1: o.thread[1] } }, {
+  const zh = o.z0 + shoulderLength(o.z1 - o.z0);
+  const segs = shaft(o.id, { d: j.d, z0: Math.min(o.thread[0], o.z0), z1: zh, thread: { M, z0: o.thread[0], z1: o.thread[1] } }, {
     name: o.name,
     body: o.body,
     at: o.at,
@@ -160,25 +162,30 @@ export function shoulderBolt(
     joints: [j.id],
     mat: "Alloy steel 12.9, ground shoulder, black oxide",
   });
+  const dk = sb?.dk ?? j.d * 1.66;
+  const out: Solid[] = [...segs];
+  if (zh - o.z1 > 0.05)
+    out.push(washer(`${o.id}-shim`, j.d + 0.2, dk, { name: `Shim washer ${fmt(j.d + 0.2)}x${fmt(dk)}x${fmt(zh - o.z1)}, under the head`, body: o.body, at: o.at, z0: o.z1, z1: zh, ex: o.ex, joints: [j.id], inset: false }));
   const h = head(`${o.id}-head`, "socket", M, {
     name: "",
     body: o.body,
     at: o.at,
-    z0: o.z1,
-    z1: o.z1 + (sb?.k ?? 5),
-    outer: disc((sb?.dk ?? j.d * 1.66) / 2),
-    D: sb?.dk ?? j.d * 1.66,
+    z0: zh,
+    z1: zh + (sb?.k ?? 5),
+    outer: disc(dk / 2),
+    D: dk,
     ex: o.ex,
     joints: [j.id],
     group: o.id,
     headTop: true,
     accent: !!j.pin.accent,
   });
-  ctx.add(segs, h);
-  return [...segs, h];
+  out.push(h);
+  ctx.add(out);
+  return out;
 }
 
-export const boltName = (d: number, L: number) => `Shoulder bolt Ø${d} x ${fmt(L)}, M${SHOULDER_BOLTS[d]?.M ?? threadFor(d)} (ISO 7379)`;
+export const boltName = (d: number, L: number) => `Shoulder bolt Ø${d} x ${shoulderLength(L)}, M${SHOULDER_BOLTS[d]?.M ?? threadFor(d)} (ISO 7379)`;
 
 /** The elements a pin's parts put on its stack, and bore chamfers on every seat (M3). */
 export function elements(ctx: RuleContext, j: PinJoint, body: string, at: Pose, group: string, closure: "open" | "shield" | "seal"): { els: Element[]; names: string[] } {

@@ -15,7 +15,12 @@ const cpy = 43;
 const O2: Vec2 = [0, 0];
 const O4: Vec2 = [d, 0];
 
-// The coupler sits one layer up (the hand-off had it at 0.75 of a layer); its plating height is a polish matter.
+/**
+ * Plating offsets from the layer grid (K1: heights may change, centres may not), applied by the polish. The coupler
+ * sits 2.5 mm under its layer so the crank pin overhang is 1.5 mm (A9).
+ */
+export const PLATING: Record<string, number> = { coupler: -2.5, cp: -2.5 };
+
 const tracer = P.tracer("cp", 1, { at: "C", name: "Coupler point" });
 
 export default defineMechanism({
@@ -31,7 +36,7 @@ export default defineMechanism({
     P.cap("pB", 0, 5.5, { at: "B" }),
     tracer,
   ],
-  traceZ: heights(tracer)[1],
+  traceZ: heights(tracer)[1] + PLATING.cp!,
   solve(u) {
     const A = V.at(O2, u, a);
     // one assembly branch throughout (+1, B above the ground line)

@@ -33,6 +33,8 @@ export function swing(ctx: RuleContext, part: Part, n = 180): [number, number] |
     lo = Math.min(lo, acc);
     hi = Math.max(hi, acc);
   }
+  // a part that ends the cycle at another angle indexes (a Geneva wheel) and is not an oscillation
+  if (Math.abs(acc - (poseOf(part, ctx.model.solve(0))?.[2] ?? acc)) > 1e-3) return null;
   return hi - lo < TAU - 0.2 ? [lo, hi] : null;
 }
 
