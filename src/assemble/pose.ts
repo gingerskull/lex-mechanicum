@@ -26,7 +26,7 @@ function direction(model: MechanismModel, parts: PartIndex, body: string, u: num
   return a && b && b[2] < a[2] ? -1 : 1;
 }
 
-export function solidPose(model: MechanismModel, parts: PartIndex, t: Solid, s: Solved, u: number): Pose | null {
+export function solidPose(model: MechanismModel, parts: PartIndex, t: Pick<Solid, "body" | "at" | "motion">, s: Solved, u: number): Pose | null {
   const B = bodyPose(parts, t.body, s);
   if (!B) return null;
   const m = t.motion;
