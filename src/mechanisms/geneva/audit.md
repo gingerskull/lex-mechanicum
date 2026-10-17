@@ -33,7 +33,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | D2 | PASS | HAND · bosses round every pin; windows only in the wheel, the inertia-critical indexed member |
 | D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
 | D4 | PASS | AUTO · feet concentric with the corner arcs |
-| D5 | PASS | AUTO / HAND · one bridge over W on two spigoted posts, built as two filleted arms because its posts stand outside the wheel |
+| D5 | PASS | AUTO / HAND · one bridge over W on two spigoted posts, built as two arms because its posts stand outside the wheel |
 | D6 | PASS | HAND / STYLE · strips, felts, screws and leads read quieter than the wheel, disc and arm |
 | D7 | PASS | HAND · wheel, disc, arm and bridge carry only load shape and manufacturing marks |
 | A1 | PASS | AUTO · pD J2, pW J1; pR J4 (built in the polish: open slots) |
