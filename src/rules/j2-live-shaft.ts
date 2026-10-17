@@ -5,7 +5,7 @@
 import { dBore } from "../core/geom";
 import { circlip, collar, disc, key, plainWasher, screw, setScrew, shaft, thrustWasher, tube } from "../hardware/primitives";
 import { housing } from "../hardware/sub/housing";
-import { circlipExt, keyFor } from "../hardware/tables";
+import { circlipExt, keyFor, standardLength } from "../hardware/tables";
 import { elements, partName, stackSpacers } from "./pins";
 import type { PinJoint, Rule, RuleContext } from "./types";
 
@@ -66,7 +66,7 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
     (J.serves.F2 ??= []).push(`${j.id}-cl-top`);
   } else {
     z1 = topZ - 0.5;
-    ctx.add(screw(`${j.id}-end`, "csk", endM, 2 * endM + 2, { body: j.body, at: j.at, face: topZ, dir: -1, ex: ctx.solidOf[topDriven.part.id]!.ex + 1, joints: [j.id], accent: input, headTop: true, name: `Countersunk M${endM} into the shaft end, flush` }));
+    ctx.add(screw(`${j.id}-end`, "csk", endM, 2 * endM + 2, { body: j.body, at: j.at, face: topZ, dir: -1, ex: ctx.solidOf[topDriven.part.id]!.ex + 1, joints: [j.id], accent: input, headTop: true, name: `Countersunk M${endM} x ${standardLength(2 * endM + 2)} (ISO 10642), into the shaft end, flush` }));
     (J.serves.F2 ??= []).push(`${j.id}-end`);
   }
   // below the housing: the input leaves room for the pulley (drive rule); other shafts end in a collar
@@ -86,7 +86,7 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
     // end retainer (F2): a washer and a socket screw into the shaft end
     const M = endM;
     ctx.add(plainWasher(`${j.id}-rw`, M, { name: `Retaining washer Ø${d + 6} x 1.5`, body: j.body, at: j.at, z0: zb - 1.5, z1: zb, outer: disc((d + 6) / 2), ex: -5, joints: [j.id], group: `${j.id}-rs` }));
-    ctx.add(screw(`${j.id}-rs`, "socket", M, 2 * M, { body: j.body, at: j.at, face: zb - 1.5, dir: 1, ex: -5, joints: [j.id], name: `Socket head M${M} x ${2 * M}, into the shaft end` }));
+    ctx.add(screw(`${j.id}-rs`, "socket", M, 2 * M, { body: j.body, at: j.at, face: zb - 1.5, dir: 1, ex: -5, joints: [j.id], name: `Socket head M${M} x ${standardLength(2 * M)} (ISO 4762), into the shaft end` }));
     (J.serves.F2 ??= []).push(`${j.id}-rs`);
   } else {
     ctx.add(collar(`${j.id}-collar`, d, d + 10, { body: j.body, at: j.at, z0: H.z0 - 5, z1: H.z0 - 0.5, ex: -4, joints: [j.id] }));

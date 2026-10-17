@@ -25,7 +25,7 @@ describe("four-bar without polish", () => {
       // J1 at O4
       /Axle, shoulder bolt Ø6/, /Bearing F?686/, /Internal circlip DIN 472/, /Thrust washer/, /Bridge over the pivot/, /Standoff Ø10 x .*spigot/,
       // J2 at O2
-      /Bearing housing/, /Bearing 6800-2RS/, /Wave washer/, /Dowel pin Ø3/, /Input shaft Ø10 h6, feather key/, /Feather key 3 x 3/, /Countersunk M5 into the shaft end/, /Retaining washer/,
+      /Bearing housing/, /Bearing 6800-2RS/, /Wave washer/, /Dowel pin Ø3/, /Input shaft Ø10 h6, feather key/, /Feather key 3 x 3/, /Countersunk M5 x \d+ \(ISO 10642\), into the shaft end/, /Retaining washer/,
       // J3 at A and B
       /Shoulder bolt Ø8 x .*M6 \(ISO 7379\)/, /Bearing F?688/, /Inner-race spacer/,
       // drive

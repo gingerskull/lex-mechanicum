@@ -66,6 +66,25 @@ describe("drive", () => {
     expect(a.joints.find((j) => j.id === "drive")!.badge).toEqual(["motorised", "ok"]);
   });
 
+  it("rotary: the leads are laid as cables, round the input housing and square into the terminal block", () => {
+    const { assembly: a } = assembleWith(fourBar);
+    const housing = a.solids.find((s) => s.kind === "housing")!;
+    const hR = Math.max(...housing.outer.map(([x, y]) => Math.hypot(x, y)));
+    const block = a.solids.find((s) => s.id === "drive-terminal")!;
+    for (const id of ["drive-lead0", "drive-lead1"]) {
+      const lead = a.solids.find((s) => s.id === id)!;
+      // the strip's centre line: every point clear of the housing's footprint
+      for (const [x, y] of lead.outer) expect(Math.hypot(x - housing.at[0], y - housing.at[1])).toBeGreaterThan(hR);
+      // the last point lies on the block, the run into it square to the block's long side
+      const n = lead.outer.length / 2;
+      const end = [(lead.outer[n - 1]![0] + lead.outer[n]![0]) / 2, (lead.outer[n - 1]![1] + lead.outer[n]![1]) / 2];
+      expect(Math.hypot(end[0]! - block.at[0], end[1]! - block.at[1])).toBeLessThan(10);
+      const prev = [(lead.outer[n - 2]![0] + lead.outer[n + 1]![0]) / 2, (lead.outer[n - 2]![1] + lead.outer[n + 1]![1]) / 2];
+      const along = [Math.cos(block.at[2]), Math.sin(block.at[2])];
+      expect(Math.abs((end[0]! - prev[0]!) * along[0]! + (end[1]! - prev[1]!) * along[1]!)).toBeLessThan(1e-6);
+    }
+  });
+
   it("oscillating: a crank and link whose far pin follows the rocker through its whole modelled range", () => {
     const { assembly: a, ctx } = assembleWith(oscModel);
     const crank = a.solids.find((s) => s.id === "drive-crank")!;

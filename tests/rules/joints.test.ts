@@ -1,5 +1,6 @@
 // One fixture model per joint type: each rule adds the solids its standard row names, and nothing else.
 import { describe, expect, it } from "vitest";
+import { SHOULDER_LENGTHS } from "../../src/hardware/tables";
 import { j1 } from "../../src/rules/j1-dead-axle";
 import { j2 } from "../../src/rules/j2-live-shaft";
 import { j3 } from "../../src/rules/j3-moving-pin";
@@ -29,7 +30,7 @@ describe("J1 dead axle", () => {
       bridge: 1,
       standoff: 2,
       spigot: 2,
-      washer: 1,
+      washer: 2, // under the nut, and the shim making up the axle's standard shoulder length
       nut: 1,
     });
     const bridge = added.find((s) => s.kind === "bridge")!;
@@ -56,7 +57,13 @@ describe("J3 moving pin", () => {
   it("threads the shoulder bolt through the lowest part and seats a bearing in the other", () => {
     const ctx = contextBefore(j3Model, j3);
     const added = run(ctx, j3).filter((s) => s.joints.includes("pA"));
-    expect(only(kinds(added))).toEqual(["bearing", "bearingBalls", "bearingCage", "circlipInternal", "head", "shaft", "sleeve", "spacer"]);
+    expect(only(kinds(added))).toEqual(["bearing", "bearingBalls", "bearingCage", "circlipInternal", "head", "shaft", "sleeve", "spacer", "washer"]);
+    // the shoulder is a standard ISO 7379 length; a shim under the head makes up the stack
+    const bolt = added.find((s) => s.id === "pA-bolt")!;
+    const L = Number(/x (\d+(?:\.\d+)?),/.exec(bolt.name)![1]);
+    expect(SHOULDER_LENGTHS).toContain(L);
+    expect(added.find((s) => s.id === "pA-bolt-head")!.z0).toBeCloseTo(6 + L, 6);
+    expect(added.find((s) => s.id === "pA-bolt-shim")!.z1).toBeCloseTo(6 + L, 6);
     const thread = added.find((s) => s.kind === "shaft" && s.marks.some((m) => m.kind === "thread"))!;
     // the thread lies in the crank (z 0 to 6), the shoulder above it
     expect([thread.z0, thread.z1]).toEqual([0, 6]);
@@ -69,7 +76,7 @@ describe("J4 pin in slot", () => {
     const ctx = contextBefore(j4Model, j4);
     const k = kinds(run(ctx, j4));
     expect(k).toMatchObject({ roller: 1, wearStrip: 2, felt: 1 });
-    expect(only(k)).toEqual(["felt", "head", "roller", "shaft", "shank", "sleeve", "spacer", "wearStrip"]);
+    expect(only(k)).toEqual(["felt", "head", "roller", "shaft", "shank", "sleeve", "spacer", "washer", "wearStrip"]);
     expect(ctx.get("pA-lever-roller")!.D).toBeCloseTo(12 - 0.3, 6);
   });
 });
