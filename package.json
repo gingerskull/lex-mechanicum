@@ -19,7 +19,11 @@
     "test": "vitest run",
     "check": "npm run typecheck && npm run lint && npm run test && npm run conformance",
     "prepare": "git config core.hooksPath .githooks || true",
-    "docs:tables": "tsx tools/standard-table.ts && tsx tools/style-table.ts"
+    "docs:tables": "tsx tools/standard-table.ts && tsx tools/style-table.ts",
+    "shot": "tsx tools/shot.ts",
+    "thumbs": "tsx tools/thumbs.ts",
+    "bench": "tsx tools/bench.ts",
+    "test:visual": "vitest run --config vitest.visual.config.ts"
   },
   "repository": {
     "type": "git",
@@ -27,8 +31,16 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/ibm-plex-sans-condensed": "^5.3.0",
+    "@napi-rs/canvas": "^1.0.11",
     "@types/node": "^26.6.5",
+    "@types/pngjs": "^6.0.5",
+    "esbuild": "^0.28.2",
     "eslint": "^10.13.0",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.2",

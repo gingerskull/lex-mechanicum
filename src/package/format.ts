@@ -261,7 +261,7 @@ function encodeBody(p: Package): Uint8Array {
 }
 
 async function pipe(data: Uint8Array, stream: CompressionStream | DecompressionStream): Promise<Uint8Array> {
-  const out = new Response(new Response(data).body!.pipeThrough(stream));
+  const out = new Response(new Response(data as BodyInit).body!.pipeThrough(stream as ReadableWritablePair<Uint8Array, Uint8Array>));
   return new Uint8Array(await out.arrayBuffer());
 }
 
