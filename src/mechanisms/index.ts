@@ -1,10 +1,10 @@
 // Registry: mechanism id -> lazy import of its model and polish.
+import type { Polish } from "../assemble/api";
 import type { MechanismModel } from "../model/types";
 
 export interface MechanismEntry {
   model: MechanismModel;
-  // the polish signature is set by the assembly API; any function fits until then
-  polish?: (...args: never[]) => void;
+  polish?: Polish;
 }
 
 export const mechanisms: Record<string, () => Promise<MechanismEntry>> = {

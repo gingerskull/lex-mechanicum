@@ -80,6 +80,8 @@ export interface MechanismModel {
   forces?(s: Solved, u: number): OverlayItem[];
   angles?(s: Solved, u: number): OverlayItem[];
   plot?: Plot;
+  /** Cam contacts (J7): the cam part and the follower it drives. Other joints are read from the parts. */
+  cams?: { cam: string; follower: string }[];
   /** Detail ladder rung of the whole mechanism; "never" is never dropped. */
   detail?: RungId;
 }
