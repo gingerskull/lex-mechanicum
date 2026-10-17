@@ -13,3 +13,14 @@ describe("generated doc tables", () => {
     expect(styleDoc()).toBe(readFileSync(STYLE_REF, "utf8"));
   });
 });
+
+describe("audit template", () => {
+  it("has the sections the generator writes, in the same order", async () => {
+    const std = readFileSync(STANDARD, "utf8");
+    const tpl = std.slice(std.indexOf("## 11. Audit sheet template"));
+    const block = tpl.slice(tpl.indexOf("```markdown"), tpl.indexOf("```\n", tpl.indexOf("```markdown") + 3));
+    const heads = (t: string) => [...t.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
+    const sheet = readFileSync(new URL("../../src/mechanisms/four-bar/audit.md", import.meta.url), "utf8");
+    expect(heads(block)).toEqual(heads(sheet));
+  });
+});

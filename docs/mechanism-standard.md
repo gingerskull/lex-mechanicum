@@ -468,7 +468,11 @@ renderer change. Q4 and Q5 run locally.
 
 ## 11. Audit sheet template
 
-`tools/audit <id>` writes this; rows it can decide are filled, the rest are `?`. Judged rows survive regeneration.
+`tools/audit <id>` writes this. A row the tools decide outright (P1, K2, A12, A15, M6, R7, Q1, Q2) is filled and
+regenerated every time; every other row gets its tier and the evidence the tools collect (rule firing, joint types,
+names, sizes, materials, locking, rungs) and a `?` to judge. Judged rows, hand entries in the joints table, the
+header, deferrals, variants, promotion candidates and measured frame times survive regeneration. A deferral is a line
+`defer: <ids or version> · <reason>`; no reason, no deferral.
 
 ```markdown
 # Audit: <name> (<id>)
@@ -480,7 +484,7 @@ PASS n · FAIL n · N/A n · open: ...
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| P1 | PASS | check clean |
+| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
 | ... | | |
 
 ## Joints
@@ -500,7 +504,8 @@ PASS n · FAIL n · N/A n · open: ...
 Hand fixes that should become rules or primitives.
 
 ## Verification
-check · clearance · package · screenshots (paths) · bench (flags)
+check · clearance · clamp · edge distance · package
+screenshots (paths) · bench (flags)
 ```
 
 ---
