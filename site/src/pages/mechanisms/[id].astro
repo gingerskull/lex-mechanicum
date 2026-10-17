@@ -1,0 +1,108 @@
+---
+// One page per registered mechanism (SS5, SS8): crumbs, header, stage, side panels, explanation, links. The catalogue
+// supplies every word; the drawing comes from the package and the model's solve.
+import Sheet from "../../layouts/Sheet.astro";
+import Bar from "../../components/Bar.astro";
+import Stage from "../../components/Stage.astro";
+import { SHEETS, driveOf, type Sheet as SheetInfo } from "../../data";
+
+export function getStaticPaths() {
+  return SHEETS.map((s) => ({ params: { id: s.id }, props: { sheet: s } }));
+}
+const { sheet } = Astro.props as { sheet: SheetInfo };
+const r = sheet.rec;
+const i = SHEETS.indexOf(sheet);
+const prev = SHEETS[(i - 1 + SHEETS.length) % SHEETS.length]!;
+const next = SHEETS[(i + 1) % SHEETS.length]!;
+const drive = await driveOf(sheet.id);
+const facts: [string, string][] = [
+  ["Family", r.family],
+  ["Motion", `${r.motion.label} (${r.motion.output_character.join(", ").toLowerCase()})`],
+  ["Ratio", [r.ratio.kind, r.ratio.class === r.ratio.kind || r.ratio.class === "n/a" ? "" : r.ratio.class].filter(Boolean).join(", ") + (r.ratio.typical ? `: ${r.ratio.typical}` : "")],
+  ["Axes", r.motion.axes],
+  ["Backdrivable", r.backdrivable],
+  ["Level", r.level],
+  ["DOF", String(r.dof)],
+  ["Drive", drive],
+  ...(r.aka?.length ? ([["Also called", r.aka.join(", ")]] as [string, string][]) : []),
+];
+const explain: [string, string][] = [
+  ["How it moves", r.explain.motion],
+  ["Forces", r.explain.forces],
+  ["Why use it", r.explain.benefits],
+  ["Limits", r.explain.limits],
+];
+const tagsets = [
+  ["Function", r.tags.function],
+  ["Property", r.tags.property],
+  ["Application", r.tags.application],
+  ["Keywords", r.tags.keywords ?? []],
+] as const;
+const media = r.media.filter((m) => m.kind === "video" || m.kind === "photos");
+const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
+---
+<Sheet title={`${r.name} · Mechanism Library`} description={r.summary}>
+  <Bar />
+  <main class="wrap detail">
+    <nav class="crumbs" aria-label="Sheets">
+      <a class="btn" href="/"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>All mechanisms</a>
+      {SHEETS.length > 1 && (
+        <div class="nav">
+          <a class="btn quiet" href={`/mechanisms/${prev.id}/`}>{prev.rec.name}</a>
+          <a class="btn quiet" href={`/mechanisms/${next.id}/`}>{next.rec.name}</a>
+        </div>
+      )}
+    </nav>
+    <div class="dhead">
+      <div class="meta"><b>{sheet.no}</b> · {r.family} · {r.motion.label}</div>
+      <h1>{r.name}</h1>
+      <p>{r.summary}</p>
+    </div>
+    <div class="dlayout">
+      <Stage id={sheet.id} no={sheet.no} title={r.name} />
+      <aside class="side">
+        <section class="panel">
+          <h2>At a glance</h2>
+          <dl class="facts">{facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}</dl>
+        </section>
+        {r.build.plot && (
+          <section class="panel plot">
+            <h2>{r.build.plot}</h2>
+            <canvas id="plot" role="img" aria-label={r.build.plot}></canvas>
+          </section>
+        )}
+        <section class="panel">
+          <h2>Tags</h2>
+          <div class="tagsets">
+            {tagsets.filter(([, v]) => v.length > 0).map(([k, v]) => (
+              <div><span class="lbl">{k}</span><div class="tags">{v.map((t) => <span class="tag ro">{t}</span>)}</div></div>
+            ))}
+          </div>
+        </section>
+      </aside>
+    </div>
+    <div class="explain">
+      {explain.map(([h, t], k) => (
+        <section><span class="k">{String(k + 1).padStart(2, "0")}</span><h2>{h}</h2><p>{t}</p></section>
+      ))}
+      {(r.examples?.length ?? 0) > 0 && (
+        <section class="wide"><span class="k">05</span><h2>Where you will find it</h2>
+          <ul class="uses">{r.examples!.map((x) => <li><b>{x.use}</b><span>{x.detail}</span></li>)}</ul>
+        </section>
+      )}
+      {(r.real_world?.length ?? 0) > 0 && (
+        <section class="wide"><span class="k">06</span><h2>In the real world</h2>
+          <ul class="uses">{r.real_world!.map((x) => <li><b><a href={x.url} rel="noopener">{x.product}</a></b><span>{x.use}</span></li>)}</ul>
+        </section>
+      )}
+    </div>
+    <div class="reflist">
+      <section><h2>References</h2><ul class="refs">{r.references.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>
+      {media.length > 0 && <section><h2>Photos and video</h2><ul class="refs">{media.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>}
+      {demos.length > 0 && <section><h2>Animations</h2><ul class="refs">{demos.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>}
+    </div>
+  </main>
+  <script>
+    import "../../islands/stage";
+  </script>
+</Sheet>

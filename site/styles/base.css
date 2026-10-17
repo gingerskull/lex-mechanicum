@@ -1,0 +1,68 @@
+/* Base: the page is a gridded drawing sheet (SF12); every colour and family comes from tokens.css (SS12). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  background: var(--bg);
+}
+body {
+  margin: 0;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid-2) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-2) 1px, transparent 1px),
+    linear-gradient(var(--grid-1) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-1) 1px, transparent 1px);
+  background-size:
+    calc(var(--size-grid) * var(--size-grid-major)) calc(var(--size-grid) * var(--size-grid-major)),
+    calc(var(--size-grid) * var(--size-grid-major)) calc(var(--size-grid) * var(--size-grid-major)),
+    var(--size-grid) var(--size-grid),
+    var(--size-grid) var(--size-grid);
+  background-position: -1px -1px;
+  color: var(--ink);
+  font: var(--text-body) / var(--leading-body) var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(var(--size-gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--size-gutter), env(safe-area-inset-right, 0px));
+}
+a {
+  color: inherit;
+}
+[hidden] {
+  display: none !important;
+}
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 1.5px dashed var(--accent);
+  outline-offset: var(--size-focus-offset);
+}
+.wrap {
+  max-width: var(--size-max-width);
+  margin: 0 auto;
+}
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}

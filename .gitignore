@@ -9,3 +9,6 @@ playwright-report/
 Thumbs.db
 *.zip
 site/styles/tokens.css
+site/public/fonts/
+site/public/packages/
+site/public/thumbs/

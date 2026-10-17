@@ -1,0 +1,35 @@
+---
+// The library (SS1 to SS3): every drawn mechanism as a sheet of the set.
+import Sheet from "../layouts/Sheet.astro";
+import Bar from "../components/Bar.astro";
+import Facets from "../components/Facets.astro";
+import Card from "../components/Card.astro";
+import { SHEETS, VERSION } from "../data";
+---
+<Sheet title="Mechanism Library" description="Mechanical mechanisms drawn live as working bench assemblies: linkages, gears, cams, indexing drives.">
+  <header class="wrap top">
+    <div class="brand">
+      <p class="kicker">Mechanism Database · drawing set</p>
+      <h1>Mechanism Library <span>{SHEETS.length}</span></h1>
+      <p>Linkages, gears, cams and indexing drives, each built as a bench assembly from real hardware and drawn live as a working drawing. Open a sheet to scrub it, tilt it, pull it apart and see the forces.</p>
+    </div>
+    <div class="tblock" aria-hidden="true">
+      <div><i>Set</i><b>MX</b></div>
+      <div><i>Sheets</i><b>{SHEETS.length}</b></div>
+      <div><i>Drawn</i><b>As built</b></div>
+      <div><i>Rev</i><b>{VERSION}</b></div>
+    </div>
+  </header>
+  <Bar library><Facets /></Bar>
+  <main class="wrap" id="library">
+    <div class="status"><span id="shown">{SHEETS.length} sheets</span><button id="clear" type="button" hidden>Clear filters</button></div>
+    <div class="grid" id="grid">
+      {SHEETS.map((s) => <Card sheet={s} />)}
+      <p class="empty" id="empty" hidden>No mechanism matches. Clear a filter or the search.</p>
+    </div>
+  </main>
+  <script>
+    import "../islands/filters";
+    import "../islands/card";
+  </script>
+</Sheet>

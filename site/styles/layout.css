@@ -1,0 +1,179 @@
+/* Layout: header with the set title block (SS2), sticky bar (SS3), library grid (SS1), mechanism page (SS5),
+   responsive rules (SS9). Breakpoints are tokens.size.bpWide (1000 px) and bpPhone (640 px). */
+header.top {
+  padding-block: var(--size-header-pad-y) var(--size-header-pad-x);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+  align-items: flex-end;
+}
+.brand {
+  min-width: 0;
+  flex: 1 1 480px;
+}
+.brand .kicker {
+  font: 500 11px var(--font-mono);
+  letter-spacing: var(--tracking-mono-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 10px;
+}
+.brand h1 {
+  font: 700 clamp(32px, 5vw, 58px) / 0.95 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  text-wrap: balance;
+}
+.brand h1 span {
+  color: var(--faint);
+  font-weight: 500;
+}
+.brand p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 62ch;
+}
+.bar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-block: 1px solid var(--line-2);
+  margin-left: calc(-1 * max(var(--size-gutter), env(safe-area-inset-left, 0px)));
+  margin-right: calc(-1 * max(var(--size-gutter), env(safe-area-inset-right, 0px)));
+}
+.bar .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding-block: var(--size-bar-pad);
+  padding-left: max(var(--size-gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--size-gutter), env(safe-area-inset-right, 0px));
+}
+.spacer {
+  flex: 1;
+}
+.facets {
+  display: grid;
+  gap: 10px;
+  padding-block: 8px 16px;
+  padding-left: max(var(--size-gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--size-gutter), env(safe-area-inset-right, 0px));
+  max-height: 60vh;
+  overflow: auto;
+}
+.facet {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+.facet .lbl {
+  padding-top: 6px;
+}
+.status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-block: 18px 12px;
+  color: var(--muted);
+  font: 500 11px var(--font-mono);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--size-card-min), 100%), 1fr));
+  gap: var(--size-gap);
+  padding-bottom: 56px;
+}
+.detail {
+  padding-block: 20px 64px;
+}
+.crumbs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.nav {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+.dhead {
+  margin-bottom: 18px;
+}
+.dhead .meta {
+  font: 500 11px var(--font-mono);
+  letter-spacing: var(--tracking-mono-wide);
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 8px;
+}
+.dhead .meta b {
+  color: var(--accent);
+  font-weight: 600;
+}
+.dhead h1 {
+  font: 700 clamp(32px, 4.6vw, 56px) / 0.98 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+.dhead p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 70ch;
+  font-size: 16px;
+}
+.dlayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--size-side);
+  gap: var(--size-gap);
+  align-items: start;
+}
+.side {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+footer {
+  color: var(--faint);
+  font: 500 10.5px var(--font-mono);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  padding-block: 0 40px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+@media (max-width: 1000px) {
+  .dlayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side {
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .facet {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .facet .lbl {
+    padding-top: 0;
+  }
+  .bar .hide-s,
+  .tblock {
+    display: none;
+  }
+}

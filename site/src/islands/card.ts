@@ -1,0 +1,58 @@
+// Library cards (SS1, R8): the thumbnail is a pre-rendered image; on hover the engine loads (once) and the card's
+// canvas animates the mechanism until the pointer leaves. Reduced motion keeps the images still.
+type Engine = typeof import("./engine");
+
+let engine: Promise<Engine> | null = null;
+const load = () => (engine ??= import("./engine"));
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+interface Live {
+  sess: import("./engine").Session;
+  raf: number;
+  u: number;
+  t: number;
+}
+
+const live = new WeakMap<HTMLElement, Live>();
+
+async function start(card: HTMLAnchorElement) {
+  const thumb = card.querySelector<HTMLElement>(".thumb");
+  const canvas = thumb?.querySelector("canvas");
+  const id = card.dataset.id;
+  if (!thumb || !canvas || !id || reduced) return;
+  const E = await load();
+  if (!card.matches(":hover")) return;
+  let L = live.get(thumb);
+  if (!L) {
+    const [{ model }, pkg] = await Promise.all([E.mechanisms[id]!(), E.loadPackage(`/packages/${id}.mxp`)]);
+    const r = thumb.getBoundingClientRect();
+    const sess = E.createSession(canvas, pkg, model, { factory: E.browserFactory, w: r.width, h: r.height, dpr: E.pixelRatio() });
+    L = { sess, raf: 0, u: 1.1, t: performance.now() };
+    live.set(thumb, L);
+  }
+  const it = L;
+  thumb.classList.add("live");
+  it.t = performance.now();
+  const frame = (now: number) => {
+    it.u += ((now - it.t) / 1000) * (Math.PI / 3);
+    it.t = now;
+    it.sess.draw(it.u, { ...E.defaultView(), theme: E.pageTheme() });
+    it.raf = requestAnimationFrame(frame);
+  };
+  cancelAnimationFrame(it.raf);
+  it.raf = requestAnimationFrame(frame);
+}
+
+function stop(card: HTMLAnchorElement) {
+  const thumb = card.querySelector<HTMLElement>(".thumb");
+  const L = thumb && live.get(thumb);
+  if (!thumb || !L) return;
+  cancelAnimationFrame(L.raf);
+  thumb.classList.remove("live");
+}
+
+for (const card of document.querySelectorAll<HTMLAnchorElement>(".card")) {
+  card.addEventListener("pointerenter", () => void start(card));
+  card.addEventListener("pointerleave", () => stop(card));
+  card.addEventListener("focus", () => void load());
+}
