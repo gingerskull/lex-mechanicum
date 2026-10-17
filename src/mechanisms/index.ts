@@ -12,4 +12,8 @@ export const mechanisms: Record<string, () => Promise<MechanismEntry>> = {
     model: (await import("./four-bar/model")).default,
     polish: (await import("./four-bar/polish")).polish,
   }),
+  geneva: async () => ({
+    model: (await import("./geneva/model")).default,
+    polish: (await import("./geneva/polish")).polish,
+  }),
 };
