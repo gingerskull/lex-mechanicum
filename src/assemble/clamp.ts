@@ -57,6 +57,8 @@ export function edgeCheck(assembly: Assembly): string[] {
       const r = (x1 - x0) / 2;
       if (Math.abs((y1 - y0) / 2 - r) > 0.05) continue;
       const c: [number, number] = [(x0 + x1) / 2, (y0 + y1) / 2];
+      // round holes only: a window with a square bounding box is not one
+      if (h.some((p) => Math.abs(Math.hypot(p[0] - c[0], p[1] - c[1]) - r) > 0.1)) continue;
       const wall = edgeDist(t.outer, c) - r;
       const seat = assembly.solids.some((b) => b.kind === "bearing" && b.body === t.body && Math.hypot(b.at[0] - c[0], b.at[1] - c[1]) < 0.1);
       const min = seat ? 1.2 : 1.5;

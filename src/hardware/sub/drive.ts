@@ -12,7 +12,8 @@ import { heights } from "../../parts";
 import type { PinJoint, RuleContext, SlideJoint } from "../../rules/types";
 import { cableClip, disc, flag, hullOf, lead, plate, screw, setScrew, shaft, spacer, terminalBlock, tube } from "../primitives";
 import { solid, marks, type Motion, type Solid } from "../solid";
-import { MOTORS, PULLEYS, BELT } from "../tables";
+import { MOTORS, PULLEYS, BELT, innerRingD } from "../tables";
+import { housingBearing } from "./housing";
 import { sensor } from "./misc";
 import { stops, swing } from "./stops";
 
@@ -226,7 +227,7 @@ function rotary(ctx: RuleContext, kind: MotorKind): string {
   ctx.add(solid("drive-hub-in", { ...G, kind: "pulley", role: "driver", name: "Pulley hub, 2 x M3 set screws at 90°", outer: disc(hubR), holes: [disc(j.d / 2 + 0.01)], z0: zp0 + 7, z1: zp0 + 12.5 }));
   ctx.add(setScrew("drive-hub-ss0", 3, { ...G, at: [j.at[0] + hubR - 1.6, j.at[1], 0], z0: zp0 + 8, z1: zp0 + 10 }));
   ctx.add(setScrew("drive-hub-ss1", 3, { ...G, at: [j.at[0], j.at[1] + hubR - 1.6, 0], z0: zp0 + 8, z1: zp0 + 10, name: "" }));
-  if (j.below.z1 - (zp0 + 12.5) > 0.3) ctx.add(spacer("drive-spacer-in", j.d + 0.2, j.d + 3.2, { ...G, name: "Spacer, hub to the lower inner race", z0: zp0 + 12.5, z1: j.below.z1 }));
+  if (j.below.z1 - (zp0 + 12.5) > 0.3) ctx.add(spacer("drive-spacer-in", j.d + 0.2, Math.min(j.d + 3.2, innerRingD(housingBearing(j.d))), { ...G, name: "Spacer, hub to the lower inner race", z0: zp0 + 12.5, z1: j.below.z1 }));
   // motor pulley on the motor shaft, turning at the belt ratio; J8 adds its flanges
   ctx.add(solid("drive-pulley-m", { body: j.body, at: [0, 0, 0], motion: { type: "geared", around: M, ratio }, joints: ["drive"], ex: -6, kind: "pulley", role: "driver", name: `Motor pulley GT2 ${TM}T, D-bore`, mat: "Aluminium 6061-T6", outer: disc(pm.od / 2), holes: [disc(2.05)], z0: zp0, z1: zp0 + 7 }));
   ctx.add(

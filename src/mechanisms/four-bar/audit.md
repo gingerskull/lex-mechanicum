@@ -113,7 +113,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | R3 | PASS | AUTO · housing, bridge, stops and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; samples the swing once (180 steps); polish 0.6 s, 0.5 s of it the rebuilt bridge search (promotion candidate) |
-| R6 | PASS | FLAG · browser bench: frame 8.8 ms plan, 27.2 ms at 28°, 22.9 ms side, 15.5 ms explode; the 8 ms target is met from dial C; setup 1.6 ms |
+| R6 | PASS | FLAG · browser bench: frame 8.8 ms plan, 17.0 ms at 28°, 11.6 ms side, 12.4 ms explode; the 8 ms target is met from dial C; setup 1.5 ms |
 | R7 | PASS | HAND · model.ts + polish.ts 13.1 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
@@ -154,15 +154,15 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 14 | 0 | 24.8 |
-| DL-B | 0 | 200 | 31.6 |
-| DL-C | 0 | 0 | 8.2 |
-| DL-D | 23 | 0 | 5.8 |
-| DL-E | 8 | 2 | 5.2 |
-| DL-F | 0 | 0 | 5.6 |
-| DL-G | 0 | 0 | 4.2 |
-| DL-H | 8 | 0 | 4.3 |
-| never | 86 | 169 | 38.3 (full) |
+| DL-A | 14 | 0 | 11.9 |
+| DL-B | 0 | 200 | 12.2 |
+| DL-C | 0 | 0 | 6.5 |
+| DL-D | 23 | 0 | 5.4 |
+| DL-E | 8 | 2 | 4.7 |
+| DL-F | 0 | 0 | 4.6 |
+| DL-G | 0 | 0 | 4.3 |
+| DL-H | 8 | 0 | 3.1 |
+| never | 86 | 169 | 17.9 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
@@ -175,4 +175,4 @@ Hand fixes that should become rules or primitives.
 
 ## Verification
 check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.6 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #10) · bench: browser, DPR 1.5, 2026-10-17; 28° frame 27.2 ms over the 8 ms target at full detail (flag, R6)
+screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #10) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 17.0 ms over the 8 ms target at full detail (flag, R6)

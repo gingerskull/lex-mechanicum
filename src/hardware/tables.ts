@@ -100,6 +100,9 @@ export const SHOULDER_BOLTS: Record<number, { M: number; dk: number; k: number; 
 /** ISO 7379 shoulder lengths, mm. */
 export const SHOULDER_LENGTHS = [4, 5, 6, 8, 10, 12, 16, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90, 100] as const;
 
+/** Largest outside Ø of a spacer that bears only on a bearing's inner ring (A12). */
+export const innerRingD = (b: { d: number; D: number }): number => b.d + (b.D - b.d) * 0.36 - 0.1;
+
 /** The shortest ISO 7379 shoulder length at least L. */
 export const shoulderLength = (L: number): number => SHOULDER_LENGTHS.find((l) => l >= L - 0.05) ?? Math.ceil(L / 10) * 10;
 

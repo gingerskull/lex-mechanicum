@@ -3,7 +3,7 @@
 import { bbox, circle, offsetPoly, type Pose, type Vec2 } from "../core/geom";
 import { boreChamfers, bearing, bushing, circlip, disc, felt, head, roller, screw, shaft, spacer, thrustWasher, tube, washer, wearStrip } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
-import { CIRCLIP_ROOM, FLANGE, SHOULDER_BOLTS, bearingFor, circlipInt, shoulderLength, threadFor } from "../hardware/tables";
+import { CIRCLIP_ROOM, FLANGE, SHOULDER_BOLTS, bearingFor, circlipInt, innerRingD, shoulderLength, threadFor } from "../hardware/tables";
 import type { Joined, PinJoint, RuleContext } from "./types";
 
 /** An element of the stack on the shaft or bolt: a part face or a bearing inner race. */
@@ -115,7 +115,7 @@ export function raceD(ctx: RuleContext, j: PinJoint, want: number): number {
   let cap = Infinity;
   for (const t of ctx.solids)
     if (t.kind === "bearing" && t.joints.includes(j.id) && t.d === j.d && t.D !== undefined && !t.id.endsWith("-fl"))
-      cap = Math.min(cap, t.d + (t.D - t.d) * 0.36 - 0.1);
+      cap = Math.min(cap, innerRingD({ d: t.d, D: t.D }));
   return Math.max(j.d + 1.6, Math.min(want, cap));
 }
 

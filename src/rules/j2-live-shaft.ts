@@ -5,7 +5,7 @@
 import { dBore } from "../core/geom";
 import { circlip, collar, disc, key, plainWasher, screw, setScrew, shaft, thrustWasher, tube } from "../hardware/primitives";
 import { housing } from "../hardware/sub/housing";
-import { circlipExt, keyFor, standardLength } from "../hardware/tables";
+import { circlipExt, innerRingD, keyFor, standardLength } from "../hardware/tables";
 import { elements, partName, stackSpacers } from "./pins";
 import type { PinJoint, Rule, RuleContext } from "./types";
 
@@ -37,6 +37,8 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
   for (const x of driven) {
     const host = ctx.solidOf[x.part.id]!;
     if (x.how !== "keyed") host.holes.push(k ? disc(d / 2 + 0.01, ...x.L) : dBore(d / 2 + 0.025).map(([a, b]) => [a + x.L[0], b + x.L[1]] as [number, number]));
+    // a D-flat transmits the torque itself (F3)
+    if (!k) (J.serves.F3 ??= []).includes(group) || J.serves.F3.push(group);
     if (k) {
       const kz0 = x.z0;
       const kz1 = x.z1;
@@ -80,7 +82,7 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
     joints: [j.id],
   });
   ctx.add(segs);
-  ctx.add(tube(`${j.id}-hsleeve`, d + 0.2, d + 3, { name: "Spacer sleeve between the housing bearings, inner races", body: j.body, at: j.at, z0: H.lower[1], z1: H.upper[0], ex: -3, joints: [j.id], inset: true }));
+  ctx.add(tube(`${j.id}-hsleeve`, d + 0.2, Math.min(d + 3, innerRingD(H.bearing)), { name: "Spacer sleeve between the housing bearings, inner races", body: j.body, at: j.at, z0: H.lower[1], z1: H.upper[0], ex: -3, joints: [j.id], inset: true }));
   if (input) {
     j.below = { z0: zb, z1: H.lower[0] };
     // end retainer (F2): a washer and a socket screw into the shaft end

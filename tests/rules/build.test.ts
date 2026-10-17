@@ -5,6 +5,8 @@ import { TAU } from "../../src/core/geom";
 import { assembleWith } from "../../src/assemble";
 import { solidPose } from "../../src/assemble/pose";
 import fourBar from "../../src/mechanisms/four-bar/model";
+import geneva from "../../src/mechanisms/geneva/model";
+import { hullOf } from "../../src/hardware/primitives";
 import { defineMechanism } from "../../src/model/define";
 import { P } from "../../src/parts";
 import { V } from "../../src/core/vec";
@@ -53,6 +55,23 @@ describe("stops", () => {
     const added = run(ctx, stops);
     expect(kinds(added)).toEqual({ bumper: 2, head: 2, shank: 2 });
     expect(added.every((s) => s.joints.includes("pO4"))).toBe(true);
+  });
+
+  it("gives a part that indexes (a Geneva wheel) no stops: it ends the cycle at another angle", () => {
+    const ctx = contextBefore(geneva, stops);
+    expect(run(ctx, stops)).toEqual([]);
+  });
+});
+
+describe("bridge", () => {
+  it("is two filleted arms when its posts stand far from the pivot, one plate when they are close", () => {
+    const area = (P: [number, number][]) => Math.abs(P.reduce((s, p, i) => s + p[0] * P[(i + 1) % P.length]![1] - P[(i + 1) % P.length]![0] * p[1], 0) / 2);
+    const far = assembleWith(geneva).assembly.solids.find((s) => s.id === "pW-bridge")!;
+    const close = assembleWith(fourBar).assembly.solids.find((s) => s.id === "pO4-bridge")!;
+    // the arms leave out the triangle between them: well under the hull of the same circles
+    const hull = (s: typeof far) => area(hullOf(s.outer.map(([x, y]): [number, number, number] => [x, y, 0])));
+    expect(area(far.outer)).toBeLessThan(0.75 * hull(far));
+    expect(area(close.outer)).toBeGreaterThan(0.97 * hull(close));
   });
 });
 
