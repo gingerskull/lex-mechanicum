@@ -40,15 +40,15 @@ export interface Built {
   pkg: Package;
 }
 
-/** Assembles and packs a registered mechanism. The package's standard is its audit's, or "none". */
-export async function buildPackage(id: string): Promise<Built> {
+/** Assembles and packs a registered mechanism. The package's standard and result are its audit's, or "none". */
+export async function buildPackage(id: string, opts: { polish?: boolean } = {}): Promise<Built> {
   const load = mechanisms[id];
   if (!load) throw new Error(`unknown mechanism "${id}"; registered: ${Object.keys(mechanisms).join(", ")}`);
   const { model, polish } = await load();
   const sampled = sample(model);
-  const assembly = assemble(model, sampled, polish ? { polish } : {});
+  const assembly = assemble(model, sampled, polish && opts.polish !== false ? { polish } : {});
   const audit = readAudit(id);
-  const standard = (audit && parseHeader(audit)?.standard) || "none";
-  const pkg = pack({ id, standard, ...assembly, envelope: envelope(model, assembly) }, sampled);
+  const header = audit ? parseHeader(audit) : null;
+  const pkg = pack({ id, standard: header?.standard || "none", result: header?.result || "none", ...assembly, envelope: envelope(model, assembly) }, sampled);
   return { model, assembly, sampled, pkg };
 }

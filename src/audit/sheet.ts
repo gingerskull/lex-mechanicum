@@ -145,7 +145,9 @@ export function requirements(standard: string): Requirement[] {
     const bold = /\*\*(.+?)\*\*/.exec(text);
     const title = (bold ? bold[1]! : text.split(/[.:;]/)[0]!).replace(/`/g, "").trim();
     const tierCell = c.slice(2).find((x) => TIERS.some((t) => x.startsWith(t))) ?? "";
-    out.push({ id: c[0]!, section: sec, title: title.length > 70 ? title.slice(0, 67) + "..." : title, tiers: TIERS.filter((t) => tierCell.includes(t)) });
+    // the joint-type catalogue (5b) has no tier column: the rules generate every row
+    const tiers = sec === "5b" ? ["AUTO" as const] : TIERS.filter((t) => tierCell.includes(t));
+    out.push({ id: c[0]!, section: sec, title: title.length > 70 ? title.slice(0, 67) + "..." : title, tiers });
   }
   return out;
 }

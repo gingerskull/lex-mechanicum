@@ -71,6 +71,8 @@ export interface Package {
   id: string;
   /** Standard version of the mechanism's audit, or "none" before its first audit. */
   standard: string;
+  /** The audit's result: "pass", "open", or "none" before its first audit. */
+  result: string;
   /** Swept envelope of every solid over the cycle, plus the z range. */
   bounds: PackageBounds;
   /** Grid steps per mm the coordinates are snapped to. */
@@ -122,6 +124,7 @@ const flat = (pts: Vec2[], out: number[]) => {
 export interface PackInput {
   id: string;
   standard?: string;
+  result?: string;
   solids: Solid[];
   joints: Joint[];
   levels: number[];
@@ -187,6 +190,7 @@ export function pack(a: PackInput, sampled: Sampled): Package {
     v: FORMAT,
     id: a.id,
     standard: a.standard ?? "none",
+    result: a.result ?? "none",
     bounds: { ...a.envelope, z0, z1 },
     grid,
     b0: a.b0,
