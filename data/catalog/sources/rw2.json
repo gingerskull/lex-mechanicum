@@ -43,7 +43,7 @@
  ]},
  "hoekens-linkage": {"real_world": [
   {"product": "Chebyshev plantigrade (walking) machine, 1878", "maker": "P. L. Chebyshev; Polytechnic Museum, Moscow", "use": "Its legs use the lambda linkage, whose coupler point traces the same near-straight hoof path as the Hoekens linkage.", "url": "https://en.tcheb.ru/plantigrade-machine/", "kind": "museum", "checked": true, "note": "Closest real object: the lambda mechanism is a cognate of the Hoekens linkage, not a Hoekens linkage itself; no industrial Hoekens product found."}
- ]},
+ ], "waive": ["real_world"]},
  "roberts-linkage": {"real_world": [
   {"product": "Reuleaux model S14, Roberts straight-line linkage (Dreieckslenker von Roberts), 1882", "maker": "Gustav Voigt Werkstatt; Cornell Reuleaux collection", "use": "Cast-iron and brass model showing the coupler point of the Roberts four-bar tracing an approximate straight line.", "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:372687", "kind": "museum", "checked": true},
   {"product": "De Voglie underwater pile-sawing machine, c. 1756 to 1760", "maker": "De Voglie (published by Pierre Patte 1769; in Ferguson, Kinematics of Mechanisms)", "use": "A Roberts-type linkage guided a bar at the rear of the machine.", "url": "https://www.gutenberg.org/files/27106/27106-h/27106-h.htm", "kind": "case-study", "checked": true, "note": "Historic machine; modern real uses are scarce."},

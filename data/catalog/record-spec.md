@@ -152,4 +152,7 @@ eccentric-sheave, locomotive-drive, flexure-hinge, bistable-compliant
 `{ "product": "Genie GS-1930 scissor lift", "maker": "Genie", "use": "one sentence", "url": "https://...",
    "kind": "product|in-product|museum|real-video|case-study", "checked": true, "note": "optional caveat" }`
 `checked` = the page was opened and shows the part; false = picked from a search result only.
-Patch files sources/rw*.json (and gap*.json) are merged by tools/build.mjs.
+Patch files sources/rw*.json (and gap*.json) are merged by `npm run catalog` (tools/catalog.ts): their `media`,
+`references` and `real_world` entries are added by URL. Where research found no more than the minimum allows, the
+patch entry says so with `"waive": ["real_world"]` (or `"media"`, `"references"`) and a `note`; the validator then
+skips that count for the record.

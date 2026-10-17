@@ -1,0 +1,3 @@
+#!/bin/sh
+# Runs what CI runs before anything is pushed.
+exec npm run check
