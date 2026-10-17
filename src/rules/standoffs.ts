@@ -36,6 +36,8 @@ export const standoffs: Rule = {
       const holdsBearing = ctx.solids.some((t) => t.body === p.id && (t.kind === "bearing" || t.kind === "bushing"));
       const jid = `${p.id}-post`;
       let n = 0;
+      let size = `Ø${STANDOFF.D}`;
+      let heads = `M${STANDOFF.M} button heads from both sides`;
       pts.forEach((c0, k) => {
         // centre the post across the plate: the deepest point on the line across it
         let c = c0;
@@ -52,6 +54,10 @@ export const standoffs: Rule = {
         const narrow = width < STANDOFF.D + 2;
         const D = narrow ? Math.max(5, Math.floor(width - 1)) : STANDOFF.D;
         const M = narrow ? 3 : STANDOFF.M;
+        if (narrow) {
+          size = `Ø${D}, the rail's width,`;
+          heads = `a flush M${M} on top, an M${M} button head under the base`;
+        }
         q.holes.push(disc(holdsBearing && !narrow ? STANDOFF.spigotD / 2 : M / 2 + 0.3, ...l));
         ctx.add(standoff(`${jid}${k}`, { ...G, name: n ? "" : `Standoff Ø${D} x ${fmt(q.z0 - ctx.b1)}, M${M}${holdsBearing && !narrow ? `, Ø${STANDOFF.spigotD} spigot` : ""}`, outer: disc(D / 2), D, z0: ctx.b1, z1: q.z0, span: [-1, q.ex], ex: -1 }));
         if (holdsBearing && !narrow) ctx.add(spigot(`${jid}${k}-spigot`, { ...G, z0: q.z0, z1: q.z0 + Math.min(3, q.z1 - q.z0), ex: q.ex, allow: [p.id] }));
@@ -65,7 +71,7 @@ export const standoffs: Rule = {
         type: "post",
         at: pts[0]!,
         title: `Post · ${q.name}`,
-        note: `Ø${STANDOFF.D} standoff${n > 1 ? "s" : ""}, ${fmt(q.z0 - ctx.b1)} mm, holding the ${q.name.toLowerCase()} off the base; M${STANDOFF.M} button heads from both sides${holdsBearing ? "; spigoted because the plate carries a bearing" : ""}.`,
+        note: `${size} standoff${n > 1 ? "s" : ""}, ${fmt(q.z0 - ctx.b1)} mm, holding the ${q.name.toLowerCase()} off the base; ${heads}${holdsBearing ? "; spigoted because the plate carries a bearing" : ""}.`,
         badge: ["check sweep", "warn"],
         serves: holdsBearing ? { F1: pts.map((_, k) => `${jid}${k}-spigot`) } : {},
       });

@@ -319,7 +319,7 @@
    ]
   },
   "explain": {
-   "motion": "The crank turns at constant speed and the slider runs back and forth along its guide with a stroke of twice the crank radius. Because the rod is tilted for most of the turn, the slider motion is not a pure sine: it moves faster in the half of the stroke nearer the crank. Run backwards, a pushed slider turns the crank, as in an engine.",
+   "motion": "The crank turns at constant speed and the slider runs back and forth along its guide with a stroke of twice the crank radius. Because the rod is tilted for most of the turn, the slider motion is not a pure sine: it moves faster in the half of the stroke farther from the crank. Run backwards, a pushed slider turns the crank, as in an engine.",
    "forces": "The rod is a two-force member and carries only push or pull. Its tilt (obliquity) splits that force into a useful axial part and a side thrust on the guide walls. At the two dead centres the rod lines up with the crank and a slider force produces no torque at all.",
    "benefits": "Simple, compact and able to carry very large loads with plain bearings. Turns rotation into straight reciprocation, or the reverse, with a fixed stroke.",
    "limits": "A slider-driven crank cannot start from a dead centre and needs a flywheel or a second cylinder to carry it through. Side thrust wears the guide, and the motion carries second-harmonic shaking forces."
