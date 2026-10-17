@@ -9,8 +9,10 @@
   },
   "scripts": {
     "catalog": "tsx tools/catalog.ts",
+    "tokens": "tsx tools/tokens-css.ts",
+    "prebuild": "npm run tokens",
     "typecheck": "tsc",
-    "lint": "eslint .",
+    "lint": "eslint . && tsx tools/lint-style.ts",
     "test": "vitest run",
     "check": "npm run typecheck && npm run lint && npm run test",
     "prepare": "git config core.hooksPath .githooks || true"
