@@ -31,11 +31,6 @@ export const polish: Polish = (A, H) => {
     note: `Crosshead clevis: the crosshead below and a cap 1.5 mm over the rod, the cap on a post at x ${postX} where the rod never swings, so the wrist pin works in double shear. ${A.get("pB-bolt")?.name ?? ""} threaded into the crosshead, shoulder through a plain hole in the cap; the rod's bearing between inner-race spacers.`,
     badge: ["double shear", "ok"],
   });
-  for (const id of ["raila-post", "railb-post"]) {
-    const j = A.joint(id);
-    j.note += " Clear of every sweep (clearance 0).";
-    j.badge = ["clear of sweeps", "ok"];
-  }
   A.rules.push(
     { title: "Crank and crosshead low, rod above", text: "Crank, crosshead and rails work near the base; the rod rides over the slide's keeper, so the crank is lifted to keep the crank pin's overhang at 1.5 mm." },
     { title: "Clevis at the crosshead", text: "The wrist pin is held above and below: a cap on a post on the side the rod never swings to." },

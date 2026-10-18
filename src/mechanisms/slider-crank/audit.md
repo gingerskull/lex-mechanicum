@@ -33,7 +33,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | D2 | PASS | HAND · bosses round every pin; material in the crank where it balances; no windows |
 | D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
 | D4 | PASS | AUTO · feet concentric with the corner arcs |
-| D5 | PASS | AUTO / HAND · rails on posts their own width; the cap on a single shaped post |
+| D5 | PASS | AUTO / HAND · rails seated on ground pads on the base; the cap on a single shaped post |
 | D6 | PASS | HAND / STYLE · slide hardware, stops and leads read quieter than crank, rod and crosshead |
 | D7 | PASS | HAND · crank, rod, crosshead, rails and base carry only load shape and manufacturing marks |
 | A1 | PASS | AUTO · pO J2, pA J3, pB J3, slide J5 |
@@ -41,18 +41,18 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | A3 | PASS | AUTO · 6800-2RS on the Ø10 input, F686ZZ on the Ø6 crank pin and on the Ø6 wrist pin; spacers in every gap |
 | A4 | PASS | AUTO · stepped shoulder bolts with undercut threads; keyed input shaft with end retainer |
 | A5 | PASS | AUTO · feather key 3 x 3 on the Ø10 input shaft |
-| A6 | PASS | AUTO · the rails sit on 2 mm posts their own width with flush M3 |
+| A6 | PASS | AUTO · the rails sit on 2 mm ground steel pads, four each, a countersunk M3 into the base at each |
 | A7 | PASS | AUTO · 8 mm base 2 mm under the crosshead, counterbored corners, feet, crank pin path engraved, front scale, clearance hole for the input shaft |
 | A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 |
 | A9 | PASS | HAND · B a clevis (crosshead and cap): double shear. A single shear (the rod sweeps over the input boss), overhang 1.5 mm: the crank is plated up because the rod cannot come down over the keeper; the input shaft carries it on two bearings |
 | A10 | PASS | HAND · crank, crosshead and rails near the base; rod 1.5 mm over the crank; cap 1.5 mm over the rod |
-| A11 | PASS | HAND · crank pin to crank to keyed input to the housing (screwed and dowelled); wrist pin to crosshead and cap to the rails, keeper and gib; rails screwed to their posts and the base |
+| A11 | PASS | HAND · crank pin to crank to keyed input to the housing (screwed and dowelled); wrist pin to crosshead and cap to the rails, keeper and gib; rails screwed through their pads into the base and dowelled |
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · every solid named with catalogue sizes, sets counted |
 | A14 | PASS | HAND · the cap post at x 14 clears the rod's big end by 2 mm; the lower end stop shortened to clear the crank's sweep by 3 mm; clearance 0 |
 | A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
 | A16 | PASS | HAND · a note and a badge on every joint, five build rules |
-| A17 | PASS | HAND · housing and shaft, crank; rails on their posts, gib, crosshead, keeper; rod on both pins; cap post, cap and its screw; wrist pin last |
+| A17 | PASS | HAND · housing and shaft, crank; rail pads and rails, dowels, gib, crosshead, keeper; rod on both pins; cap post, cap and its screw; wrist pin last |
 | E1 | PASS | AUTO · one level per solid |
 | E2 | PASS | AUTO · screws, bolts with their shims, shafts and bought units are groups |
 | E3 | PASS | AUTO · pins and cap screw upward, housing and drive screws downward |
@@ -70,7 +70,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | J6 | N/A | no gear mesh |
 | J7 | N/A | no cam |
 | J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension |
-| F1 | PASS | AUTO · housing dowelled; the rails are located by their posts and screws; no removable bearing plate on a moving pin |
+| F1 | PASS | AUTO · housing dowelled; each rail located by two dowels through its end pads into the base; no removable bearing plate on a moving pin |
 | F2 | PASS | AUTO · bearings held by a circlip and their flange; keeper holds the crosshead down; shaft end retainer |
 | F3 | PASS | AUTO · feather key at the input |
 | F4 | PASS | AUTO · bronze thrust washer on the base under the crank, wave washer preloading the input |
@@ -96,7 +96,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | M14 | PASS | AUTO · the sliding pair is hardened screwed rails against a bronze crosshead, with a bronze gib: rails and gib are the replaceable wear parts |
 | V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 |
 | V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
-| V3 | PASS | AUTO / HAND · belt and pulleys clear of feet, housing and post screws; clearance 0 |
+| V3 | PASS | AUTO / HAND · belt and pulleys clear of feet and housing; clearance 0 |
 | V4 | PASS | AUTO · flanges, set screws, slotted mount |
 | V5 | PASS | AUTO · rotary: belt to the input pulley |
 | V6 | PASS | AUTO · home flag, fork sensor on the housing, leads laid round the housing to the terminal block, one P-clip |
@@ -114,7 +114,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; no sampling; rules 0.03 s, polish under 1 ms |
 | R6 | PASS | FLAG · browser bench: plan 7.0, side 20.9, explode 17.5, 28° 62.6 ms at full detail; 8 ms reached at dial D; runs on this machine vary by up to half (look at in #14) |
-| R7 | PASS | HAND · model.ts + polish.ts 5.4 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 5.2 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -135,9 +135,9 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | pO | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – turns fully | – driven through the belt | – belt tension at the motor mount (drive) | – sealed bearings | – one input, nothing in phase | – see drive |
 | pA | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
 | pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – the cap is clamped on the shoulder; no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the slide's stops | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
-| slide-block | J5 | – the rails are screwed to their posts | Keeper plate, holds the slider down | – prismatic, no torque | – the keeper takes the lift, the base the weight | 2 x End stop block, hardened | – driven | Gib strip 3 x 6 x 123, bronze | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – stops never touched in running |
-| raila-post | post | – screwed through | – screwed from both sides | – static | – static | – static | – static | – the gib on the other rail adjusts the fit | – static | – static | – static |
-| railb-post | post | – screwed through | – screwed from both sides | – static | – static | – static | – static | – the gib on this rail adjusts the fit | – static | – static | – static |
+| slide-block | J5 | – the rails are dowelled to the base | Keeper plate, holds the slider down | – prismatic, no torque | – the keeper takes the lift, the base the weight | 2 x End stop block, hardened | – driven | Gib strip 3 x 6 x 123, bronze | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – stops never touched in running |
+| raila-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib on the other rail adjusts the fit | – static | – static | – static |
+| railb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib on this rail adjusts the fit | – static | – static | – static |
 | drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
 
 ## Variants and overrides
@@ -152,22 +152,21 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 10 | 0 | 44.4 |
-| DL-B | 0 | 186 | 41.8 |
+| DL-B | 0 | 190 | 41.8 |
 | DL-C | 0 | 0 | 15.2 |
 | DL-D | 18 | 0 | 4.9 |
 | DL-E | 11 | 0 | 4.4 |
 | DL-F | 0 | 0 | 4.1 |
 | DL-G | 0 | 0 | 3.8 |
-| DL-H | 15 | 0 | 3.2 |
-| never | 98 | 130 | 54.1 (full) |
+| DL-H | 19 | 0 | 3.2 |
+| never | 102 | 130 | 54.1 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- **Rail standoffs.** Rails 2 mm off the base on posts their own width work, but a rail would usually sit on the base on ground pads.
-
-Promoted in standard 2.1: plating offsets read by the rules, the clevis twin, slide end stops that shorten to fit.
+- None open. Promoted in standard 2.1: plating offsets read by the rules, the clevis twin, slide end stops that shorten
+  to fit; in 2.2: rails seated on ground pads.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.3 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.6 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #13) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 62.6 ms at full detail, 8 ms reached at dial D (flag, R6)

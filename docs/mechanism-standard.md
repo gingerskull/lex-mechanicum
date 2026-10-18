@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.1
+version: 2.2
 date: 2026-10-18
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -158,7 +158,7 @@ feet, lubrication, timing marks, materials and the drive.
 | A3 | **Catalogue sizing:** bore = largest catalogue bore every boss on the joint can take; each part gets the largest bearing its boss fits with a 1.2 mm wall, else a bronze bushing; gaps get inner-race spacers. | AUTO |
 | A4 | **Shafts are stepped profiles** (`H.shaft`): shoulders at every seat, circlip grooves, set-screw flats, thread with undercut, chamfered ends, wrench flats where tightened without a head, centre holes on turned ends. | AUTO |
 | A5 | **Keys by shaft size:** D-flat to Ø8; feather key and keyway above Ø8; taper pin on cross-pinned small parts. Every keyed part gets the matching bore. | AUTO |
-| A6 | Fixed plates floating above the base sit on Ø10 **standoffs**, screwed from both sides; **spigoted** when the plate holds a bearing. | AUTO |
+| A6 | Fixed plates floating above the base sit on Ø10 **standoffs**, screwed from both sides; **spigoted** when the plate holds a bearing. A slide rail sits on the base on **ground steel pads**, one under each fixing, screwed down through rail and pad into the base and dowelled at its ends (F1). | AUTO |
 | A7 | **Base plate** 8 mm thick, 2 mm under the lowest part, four counterbored mounting holes on the corner-arc centres, rubber feet unless a housing hangs there, traced paths engraved, 5 mm engraved scale along the front edge, a clearance hole for every live shaft. | AUTO |
 | A8 | **Stage 3 fasteners** (after the polish): every head gets its threaded shank from `thread` (never along a shoulder), including heads seated over a pre-drilled hole or in a counterbore; every plate a shank passes gets a clearance hole, tapped where it ends; blind tapped holes are marks, not through holes; two screws meeting in a standoff stop short of the middle. | AUTO |
 
@@ -566,6 +566,8 @@ default detail level.
 
 ## Changelog
 
+- **2.2 (2026-10-18).** Slide rails sit on ground steel pads, screwed through into the base and dowelled at the ends,
+  instead of on posts [A6, F1, AUTO].
 - **2.1 (2026-10-18).** Hand fixes from the first four conformance passes promoted to rules and primitives, and one new
   stage. Working zones stay in view: a static solid over a mesh pitch point or a slot roller's run is drawn see-through
   [L5, AUTO]. Plating offsets (`dz`) and clevis twins (`twin`) in the model contract, read by the rules [K1, A9, AUTO].

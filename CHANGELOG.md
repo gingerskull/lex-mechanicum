@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 — 2026-10-18
+
+- Slide rails sit on the base on ground steel pads, one under each fixing at most 45 mm apart, a countersunk M3 down
+  through rail and pad into the base at each and a Ø3 dowel through each end pad (standard 2.2, A6, F1). Nothing hangs
+  under the base for them any more; on the slider-crank the motor moves in closer (belt span 83 to 47 mm).
+
 ## 0.8.0 — 2026-10-18
 
 The hand fixes of the first four conformance passes promoted to rules and primitives (standard 2.1); the polishes
