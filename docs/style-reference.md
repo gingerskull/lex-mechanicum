@@ -297,7 +297,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.accentRing.hiddenAlpha` | 0.7 | 0..1 on the frame (shows through covering parts) |
 | `draft.fill.plate` | 0.64 |  |
 | `draft.fill.other` | 0.8 |  |
-| `draft.fill.base` | 0.42 |  |
+| `draft.fill.base` | 0.96 | laid once, on the top face (the parts under it read only through `occlude.base`) |
 | `draft.fill.wall` | 0.55 |  |
 | `draft.fill.baseWallGain` | 0.8 | factor on `wall` for the base plate's walls |
 | `draft.fill.wallOcclude` | 0.9 | factor on the occlusion for side walls |

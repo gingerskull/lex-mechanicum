@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.1 — 2026-10-18
+
+- The base plate lets a tenth of the parts under it show through, as meant in 0.7.0: the parts passing through it cut
+  it into slices and each slice hid what was under it again, so nothing showed. The base now covers once, at its top
+  face (paper 0.96, which keeps its look).
+
 ## 0.10.0 — 2026-10-18
 
 - Real-world examples on every mechanism page are YouTube videos of real products and machines at work, never product

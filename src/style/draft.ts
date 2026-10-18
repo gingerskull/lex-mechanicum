@@ -85,7 +85,7 @@ export const DRAFT = {
   fill: {
     plate: 0.64,
     other: 0.8,
-    base: 0.42,
+    base: 0.96, // laid once, on the top face (the parts under it read only through `occlude.base`)
     wall: 0.55,
     baseWallGain: 0.8, // factor on `wall` for the base plate's walls
     wallOcclude: 0.9, // factor on the occlusion for side walls
