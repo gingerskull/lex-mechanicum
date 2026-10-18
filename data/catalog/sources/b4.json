@@ -57,7 +57,7 @@
     "range": "pinion 360° continuous; gear turns 180° per pinion turn, opposite sense",
     "overlays": ["velocity", "forces", "angles", "plot"],
     "plot": "gear angle vs pinion angle (straight line, slope -0.5)",
-    "notes": "Phase the gear by half a tooth (pi/z2) so a tooth of one sits in a gap of the other on the centre line. 14 teeth at 20° is below the 17-tooth undercut limit, so draw a slight undercut or apply a small positive profile shift. Show the line of action through the pitch point at 20° to the common tangent."
+    "notes": "Phase the gear by half a tooth (pi/z2) so a tooth of one sits in a gap of the other on the centre line. 14 teeth at 20° is below the 17-tooth undercut limit, so draw a slight undercut or apply a small positive profile shift."
   },
   "examples": [
     { "use": "Machine tool gearboxes", "detail": "Sliding spur-gear clusters select spindle speeds in lathes and mills." },

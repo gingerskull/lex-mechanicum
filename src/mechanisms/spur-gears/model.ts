@@ -36,8 +36,6 @@ export default defineMechanism({
   forces: () => [
     { type: "spin", c: [0, 0], r: r1 + 12, key: "input" },
     { type: "spin", c: [cd, 0], r: r2 + 10, dir: -1, key: "output" },
-    // the tooth force acts along the line of action: tangent to both base circles, through the pitch point
-    { type: "axial", a: polar(r1 * Math.cos(alpha), alpha), b: polar(r2 * Math.cos(alpha), Math.PI + alpha, cd, 0), key: "line of action" },
   ],
   angles: () => [{ type: "angle", c: [r1, 0], a: [r1, 22], b: polar(22, Math.PI / 2 + alpha, r1, 0), r: 18, key: "pressure angle", value: 20 }],
   plot: { label: "Gear angle", unit: "°", f: (_s, u) => (-u / 2) * (180 / Math.PI) },
