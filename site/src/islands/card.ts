@@ -14,9 +14,12 @@ interface Live {
   raf: number;
   u: number;
   t: number;
+  running: boolean;
 }
 
 const live = new WeakMap<HTMLElement, Live>();
+// the card animating now: on touch there is no pointer leaving, so one card runs at a time and a tap elsewhere stops it
+let active: HTMLAnchorElement | null = null;
 
 async function start(card: HTMLAnchorElement) {
   const thumb = card.querySelector<HTMLElement>(".thumb");
@@ -30,10 +33,14 @@ async function start(card: HTMLAnchorElement) {
     const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
     const r = thumb.getBoundingClientRect();
     const sess = E.createSession(canvas, pkg, model, { factory: E.browserFactory, w: r.width, h: r.height, dpr: E.pixelRatio() });
-    L = { sess, raf: 0, u: START_U, t: performance.now() };
+    L = { sess, raf: 0, u: START_U, t: performance.now(), running: false };
     live.set(thumb, L);
   }
   const it = L;
+  if (it.running) return; // a repeat enter (a tap while it plays, a scroll) never restarts it
+  if (active && active !== card) stop(active);
+  active = card;
+  it.running = true;
   it.u = START_U;
   thumb.classList.add("live");
   it.t = performance.now();
@@ -52,11 +59,18 @@ function stop(card: HTMLAnchorElement) {
   const L = thumb && live.get(thumb);
   if (!thumb || !L) return;
   cancelAnimationFrame(L.raf);
+  L.running = false;
   thumb.classList.remove("live");
+  if (active === card) active = null;
 }
 
 for (const card of document.querySelectorAll<HTMLAnchorElement>(".card")) {
   card.addEventListener("pointerenter", () => void start(card));
-  card.addEventListener("pointerleave", () => stop(card));
+  card.addEventListener("pointerleave", (e) => {
+    if (e.pointerType === "mouse") stop(card);
+  });
   card.addEventListener("focus", () => void load());
 }
+document.addEventListener("pointerdown", (e) => {
+  if (e.pointerType !== "mouse" && active && !active.contains(e.target as Node)) stop(active);
+});
