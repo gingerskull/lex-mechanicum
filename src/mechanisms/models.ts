@@ -13,4 +13,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "tusi-couple": async () => (await import("./tusi-couple/model")).default,
   "rack-pinion": async () => (await import("./rack-pinion/model")).default,
   "cam-follower": async () => (await import("./cam-follower/model")).default,
+  "ratchet-pawl": async () => (await import("./ratchet-pawl/model")).default,
 };
