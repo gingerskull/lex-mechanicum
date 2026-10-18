@@ -34,6 +34,7 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "watt-linkage": () => import("./watt-linkage/polish"),
   "roberts-linkage": () => import("./roberts-linkage/polish"),
   "scott-russell": () => import("./scott-russell/polish"),
+  "evans-grasshopper": () => import("./evans-grasshopper/polish"),
   "locomotive-drive": () => import("./locomotive-drive/polish"),
   whitworth: () => import("./whitworth/polish"),
   "oldham-coupling": () => import("./oldham-coupling/polish"),
