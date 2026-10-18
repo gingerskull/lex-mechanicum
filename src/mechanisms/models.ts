@@ -10,4 +10,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "jansen-linkage": async () => (await import("./jansen-linkage/model")).default,
   "slider-crank": async () => (await import("./slider-crank/model")).default,
   "toggle-clamp": async () => (await import("./toggle-clamp/model")).default,
+  "tusi-couple": async () => (await import("./tusi-couple/model")).default,
 };
