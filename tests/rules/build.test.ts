@@ -39,13 +39,23 @@ describe("feet", () => {
 });
 
 describe("standoffs", () => {
-  it("carries each rail on two posts, a post narrower than the rail with a flush M3", () => {
+  it("seats each slide rail on ground pads, screwed into the base at each and dowelled at the ends", () => {
     const ctx = contextBefore(j5Model, standoffs);
     const added = run(ctx, standoffs);
-    const posts = added.filter((s) => s.kind === "standoff");
-    expect(posts).toHaveLength(4);
-    for (const p of posts) expect(p.D!).toBeLessThan(7);
-    expect(added.filter((s) => s.headKind === "csk")).toHaveLength(4);
+    const pads = added.filter((s) => s.kind === "standoff");
+    // two rails, 117 mm of straight run each: pads at most 45 mm apart
+    expect(pads.length).toBe(8);
+    for (const p of pads) expect([p.z0, p.z1]).toEqual([ctx.b1, 0]);
+    expect(added.filter((s) => s.headKind === "csk")).toHaveLength(8);
+    expect(added.filter((s) => s.kind === "dowel")).toHaveLength(4);
+    // nothing hangs under the base
+    expect(added.filter((s) => s.z1 <= ctx.b0)).toEqual([]);
+    expect(ctx.joint("raila-seat")!.serves.F1).toHaveLength(2);
+  });
+
+  it("gives a rail no posts", () => {
+    const ctx = contextBefore(j5Model, standoffs);
+    expect(ctx.solids.some((s) => s.id.startsWith("raila-post"))).toBe(false);
   });
 });
 
