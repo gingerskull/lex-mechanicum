@@ -72,13 +72,13 @@ export interface Link<K extends string> {
   kind: K;
 }
 
+/** A real product or machine using the mechanism, shown in a YouTube video of real footage (no animations or renders). */
 export interface RealWorld {
   product: string;
   maker?: string;
   use: string;
+  /** youtube.com/watch, youtube.com/shorts or youtu.be. */
   url: string;
-  kind: "product" | "in-product" | "museum" | "real-video" | "case-study";
-  checked?: boolean;
   note?: string;
 }
 
@@ -128,13 +128,14 @@ export interface CatalogRecord {
   examples?: { use: string; detail: string }[];
   references: Link<ReferenceKind>[];
   media: Link<MediaKind>[];
+  /** May be empty: no video is better than a wrong one. */
   real_world?: RealWorld[];
   related: string[];
   /** Minimum counts this record is exempt from, set in a patch file where research found no more. */
   waive?: Waivable[];
 }
 
-export const WAIVABLE = ["media", "references", "real_world"] as const;
+export const WAIVABLE = ["media", "references"] as const;
 export type Waivable = (typeof WAIVABLE)[number];
 
 export interface Catalog {

@@ -64,8 +64,8 @@ interface Row {
 const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : /(s|sh|ch)$/.test(w) ? "es" : "s"}`;
 const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
 
-/** P1's record fields (standard 2). */
-const RECORD_FIELDS = ["name", "aka", "family", "level", "summary", "motion", "ratio", "dof", "topology", "backdrivable", "tags", "explain", "build", "examples", "references", "media", "real_world"];
+/** P1's record fields (standard 2); `real_world` may be empty (standard 2.3). */
+const RECORD_FIELDS = ["name", "aka", "family", "level", "summary", "motion", "ratio", "dof", "topology", "backdrivable", "tags", "explain", "build", "examples", "references", "media"];
 
 function recordMissing(id: string): string[] | null {
   const r = recordById(id) as unknown as Record<string, unknown> | undefined;

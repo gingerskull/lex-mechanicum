@@ -120,9 +120,8 @@ function entry(r: CatalogRecord, byId: Map<string, CatalogRecord>): string[] {
 
   if (r.real_world?.length || r.examples?.length) {
     L.push("**In the real world**", "");
-    const tag = { "real-video": " (video)", museum: " (museum object)" } as Record<string, string>;
     for (const x of r.real_world ?? [])
-      L.push(`- **[${x.product}](${x.url})**${x.maker ? ` (${x.maker})` : ""}: ${x.use}${tag[x.kind] ?? ""}${x.note ? ` *(${x.note})*` : ""}`);
+      L.push(`- **[${x.product}](${x.url})**${x.maker ? ` (${x.maker})` : ""}: ${x.use} (video)${x.note ? ` *(${x.note})*` : ""}`);
     const named = (r.real_world ?? []).map((x) => x.product.toLowerCase()).join(" ");
     for (const x of r.examples ?? []) if (!named.includes(x.use.toLowerCase())) L.push(`- ${x.use}: ${x.detail}`);
     L.push("");

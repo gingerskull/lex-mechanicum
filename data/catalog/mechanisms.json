@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-10-17",
+  "generated": "2026-10-18",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -419,25 +419,7 @@
         "rack-pinion",
         "bell-crank"
       ],
-      "real_world": [
-        {
-          "product": "Parolin Racing Kart adjustable steering column support",
-          "maker": "Parolin Racing Kart",
-          "use": "A slide moves the steering column mount to change the kart's Ackermann angle in seconds.",
-          "url": "https://tkart.it/en/magazine/tech-focus/adjustable-steering-column-support-quick-change-ackermann-angle-parolin-racing-kart-chassis-mini-ok-okj-kz",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "L'Obeissante steam omnibus, 1873",
-          "maker": "Amedee Bollee; Musee des arts et metiers, Paris",
-          "use": "Early road vehicle with double-pivot steering of the front wheels, an early working application of Ackermann-type geometry.",
-          "url": "https://artsandculture.google.com/asset/l-ob%C3%A9issante-steam-powered-omnibus-am%C3%A9d%C3%A9e-boll%C3%A9e/1AEtYSOCVBmKuA?hl=en",
-          "kind": "museum",
-          "checked": true,
-          "note": "Page notes its smooth steering but does not detail the geometry."
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "bell-crank",
@@ -660,32 +642,7 @@
         "double-rocker",
         "ackermann-steering"
       ],
-      "real_world": [
-        {
-          "product": "Boeing 251A3139-3 bellcrank, rudder pedal (737NG/737 MAX)",
-          "maker": "Boeing",
-          "use": "Turns rudder pedal travel through a right angle into the rudder control run.",
-          "url": "https://shop.boeing.com/cpd/bpp_251a3139-3",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Boeing 113A2610-5 bellcrank assembly, inboard aft flap drive (737NG)",
-          "maker": "Boeing",
-          "use": "Redirects the trailing-edge flap drive motion to the inboard aft flap.",
-          "url": "https://shop.boeing.com/cpd/bpp_113a2610-5",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Bell Helicopter directional control bellcrank (Bell 407)",
-          "maker": "Bell",
-          "use": "Routes tail rotor pedal input around the airframe.",
-          "url": "https://shop.boeing.com/cpd/bdi_407-001-724-105%3Dtr",
-          "kind": "product",
-          "checked": false
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "eccentric-sheave",
@@ -914,25 +871,7 @@
         "locomotive-drive",
         "cam-follower"
       ],
-      "real_world": [
-        {
-          "product": "Southwold Railway 'Blyth' replica locomotive (North Bay Engineering)",
-          "maker": "North Bay Engineering / Southwold Railway Trust",
-          "use": "Newly cast eccentric sheaves on the axle will drive the slide valves of this working narrow-gauge steam locomotive.",
-          "url": "https://www.southwoldrailway.co.uk/news-from-darlington/",
-          "kind": "case-study",
-          "checked": true
-        },
-        {
-          "product": "Stephenson's Rocket (1829), Science Museum Group",
-          "maker": "Robert Stephenson and Co.",
-          "use": "Slip eccentrics on the driving axle worked the valves of the original locomotive.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co26704",
-          "kind": "museum",
-          "checked": false,
-          "note": "The collection page does not itself describe the valve gear."
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "four-bar",
@@ -1190,20 +1129,14 @@
       ],
       "real_world": [
         {
-          "product": "SLB conventional crank-balanced and beam-balanced surface pumping units (pumpjacks)",
-          "maker": "SLB",
-          "use": "A motor-driven crank and pitman rock the walking beam as a crank-rocker four-bar to stroke the sucker rod string.",
-          "url": "https://www.slb.com/zh-cn/products-and-services/innovating-in-oil-and-gas/completions/artificial-lift/sucker-rod-pumps/surface-pumping-units/conventional-and-beam-balanced-pumping-unit",
-          "kind": "product",
-          "checked": true
+          "product": "Air balanced oil well pumpjack",
+          "use": "The motor turns a crank and a pitman link rocks the walking beam, a four-bar that nods the horsehead up and down.",
+          "url": "https://www.youtube.com/watch?v=sYmE_M4mgYM"
         },
         {
-          "product": "Horst-link (four-bar) mountain bikes: Specialized S-Works Stumpjumper 15, Santa Cruz Vala, Marin Alpine Trail XR",
-          "maker": "Specialized / Santa Cruz / Marin",
-          "use": "The rear triangle is a four-bar linkage whose geometry shapes the rear axle path and shock leverage.",
-          "url": "https://www.bikeradar.com/advice/buyers-guides/what-is-horst-link-suspension",
-          "kind": "in-product",
-          "checked": true
+          "product": "Texas crude oil pumpjacks",
+          "use": "Each crank and counterweight swings a pitman arm that rocks the beam and strokes the downhole pump.",
+          "url": "https://www.youtube.com/watch?v=BugnfrZlZC4"
         }
       ]
     },
@@ -1454,28 +1387,16 @@
       ],
       "real_world": [
         {
-          "product": "Gorton P1-2 Pantomill pantograph engraving machine, s/n 41693 (1961)",
-          "maker": "George Gorton Machine Co.",
-          "use": "A 2-D pantograph reduces a stylus traced over a master to a cutter path for engraving and matrix making.",
-          "url": "https://circuitousroot.com/artifice/letters/press/typemaking/pantograph/gorton-p1-2-41693/index.html",
-          "kind": "case-study",
-          "checked": true
+          "product": "Gorton pantograph engraver",
+          "maker": "Gorton",
+          "use": "A stylus traces a master pattern and the jointed parallelogram arm moves the cutter over the work at a reduced scale.",
+          "url": "https://www.youtube.com/watch?v=NerulKDVddI"
         },
         {
-          "product": "Pantograph by George Adams, London, 1765 (1927-1151)",
-          "maker": "George Adams / Science Museum Group",
-          "use": "A drawing pantograph copies and scales drawings; from the King George III collection.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co1540/pantograph-by-george-adams",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "Pantograph by Coradi No. 525",
-          "maker": "G. Coradi / Science Museum Group",
-          "use": "A precision draughting pantograph for enlarging and reducing plans.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co59954/pantograph-by-coradi-no-525-in-box",
-          "kind": "museum",
-          "checked": false
+          "product": "Gorton P1-2 pantograph engraver",
+          "maker": "Gorton",
+          "use": "The pantograph arms copy the tracer path to the cutting spindle at a set ratio.",
+          "url": "https://www.youtube.com/watch?v=tgjgwHo0t-0"
         }
       ]
     },
@@ -1713,20 +1634,15 @@
       ],
       "real_world": [
         {
-          "product": "Anglepoise lamp model 1227 (1938), V&A M.23-2013",
-          "maker": "Herbert Terry and Sons (designer George Carwardine)",
-          "use": "Spring-balanced parallel arms let the shade hold any position while keeping its orientation.",
-          "url": "https://collections.vam.ac.uk/item/O301712/",
-          "kind": "museum",
-          "checked": true
+          "product": "Anglepoise Original 1227 desk lamp",
+          "maker": "Anglepoise",
+          "use": "Two parallelogram arms keep the lamp head at the same angle as it is moved, balanced by a spring.",
+          "url": "https://www.youtube.com/watch?v=OmPssCZNEzQ"
         },
         {
-          "product": "Anglepoise Original 1227 desk lamp (current reissue)",
-          "maker": "Anglepoise",
-          "use": "Parallel arm pairs with constant-tension springs balance and orient the lamp head.",
-          "url": "https://www.scp.co.uk/products/type-1227-desk-lamp",
-          "kind": "product",
-          "checked": true
+          "product": "Multi-arm balanced desk lamp build",
+          "use": "A chain of parallelogram arms lets the lamp head reach and hold positions without tilting.",
+          "url": "https://www.youtube.com/watch?v=ECP4g7NZgJg"
         }
       ]
     },
@@ -1995,28 +1911,16 @@
       ],
       "real_world": [
         {
-          "product": "Genie GS-1930 self-propelled scissor lift",
-          "maker": "Genie (Terex)",
-          "use": "Stacked scissor arms raise a work platform to 25 ft working height.",
-          "url": "https://www.constructionequipment.com/genie-gs-1530-and-gs-1930",
-          "kind": "product",
-          "checked": true
+          "product": "300kg hydraulic scissor lift table SC-300-D-M",
+          "maker": "LLM Handling",
+          "use": "A foot pump pushes the crossed arms together so the platform rises and stays level.",
+          "url": "https://www.youtube.com/watch?v=dZHUxXZpBcM"
         },
         {
-          "product": "Southworth LT587 floor-height hydraulic scissor lift table, 4000 lb",
-          "maker": "Southworth",
-          "use": "Two hydraulic cylinders open a scissor leg pair to raise pallets 35 in to working height.",
-          "url": "https://www.tenaquip.com/product/southworth-hydraulic-floor-height-scissor-lift-tables-steel-4000-lbs-capacity-4429424-lt587",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Clarke CSJ1500 1.5 tonne scissor jack",
-          "maker": "Clarke (Machine Mart)",
-          "use": "A screw closes the scissor diamond to lift a car corner for a wheel change.",
-          "url": "https://www.carthrottle.com/news/never-get-caught-out-clarke-csj1500-15-tonne-scissor-jack",
-          "kind": "product",
-          "checked": true
+          "product": "TMG ALS10 mobile scissor lift table",
+          "maker": "TMG Industrial",
+          "use": "A hydraulic cylinder drives stacked crossed bars to raise a 2200 lb platform.",
+          "url": "https://www.youtube.com/watch?v=5buXJTQ72NA"
         }
       ]
     },
@@ -2239,20 +2143,22 @@
       ],
       "real_world": [
         {
-          "product": "Neles heavy duty scotch yoke actuator, series N1",
-          "maker": "Valmet",
-          "use": "Pneumatic pistons push a pin in a slotted yoke to rotate quarter-turn ball and butterfly valves through 90 degrees.",
-          "url": "https://valmet.com/flowcontrol/valve-automation/actuators/pneumatic-actuators/neles-heavy-duty-scotch-yoke-actuator-series-n1",
-          "kind": "product",
-          "checked": true
+          "product": "Spring-return scotch yoke valve actuator",
+          "maker": "Paladon Systems",
+          "use": "A pin on the piston rod slides in a slotted yoke on the output shaft, turning linear piston travel into a quarter-turn valve stroke.",
+          "url": "https://www.youtube.com/watch?v=m6mpmcAnetw"
         },
         {
-          "product": "Rotork CP pneumatic scotch yoke actuator",
-          "maker": "Rotork",
-          "use": "A scotch yoke converts the linear stroke of a double-acting or spring-return cylinder into quarter-turn valve rotation.",
-          "url": "https://www.vytlcontrols.com/valve-automation-actuators/heavy-duty-scotch-yoke-actuators/pid11075/rotork-cp-pneumatic-scotch-yoke-actuator/",
-          "kind": "product",
-          "checked": true
+          "product": "Bourke engine, running model",
+          "maker": "thefuelman1",
+          "use": "Opposed pistons drive a scotch yoke in place of a crankshaft, so the piston rod moves straight while the crank pin slides in the yoke slot.",
+          "url": "https://www.youtube.com/watch?v=Vx_G0-9PJIE"
+        },
+        {
+          "product": "Bourke engine, running build",
+          "maker": "Bourke Engine TV",
+          "use": "The opposed piston pair is joined to a slotted yoke, and a crank pin riding in the slot turns the reciprocating push into rotation.",
+          "url": "https://www.youtube.com/watch?v=feidFI42yUQ"
         }
       ]
     },
@@ -2486,20 +2392,14 @@
       ],
       "real_world": [
         {
-          "product": "Ariel JGC/JGD/JGF reciprocating gas compressors",
-          "maker": "Ariel Corporation",
-          "use": "A forged crankshaft drives I-section connecting rods and crossheads that reciprocate the compressor pistons.",
-          "url": "https://pdf.directindustry.com/pdf/ariel/jgc-jgd-jgf-reciprocating-gas-compressors/113409-664971.html",
-          "kind": "in-product",
-          "checked": true
+          "product": "Running cutaway engine",
+          "use": "The crankshaft, connecting rods and pistons turn visibly as each piston slides in its bore.",
+          "url": "https://www.youtube.com/watch?v=Kt_TSQXkaNM"
         },
         {
-          "product": "Briggs & Stratton 807900S connecting rod",
-          "maker": "Briggs & Stratton",
-          "use": "The rod links the piston to the crankshaft of single-cylinder small engines, forming the slider-crank.",
-          "url": "https://shop.briggsandstratton.com/products/briggs-and-stratton-807900s-connecting-rod",
-          "kind": "product",
-          "checked": true
+          "product": "Ford Model T cutaway engine",
+          "use": "A cut-away Model T engine runs so the crank, rods and pistons can be seen converting reciprocation to rotation.",
+          "url": "https://www.youtube.com/watch?v=S3liL4tL3RI"
         }
       ]
     },
@@ -2753,28 +2653,15 @@
       ],
       "real_world": [
         {
-          "product": "Elliptical trammel by Joseph Finney, Liverpool, 1760-1772 (1927-1210)",
-          "maker": "Joseph Finney / Science Museum Group",
-          "use": "Two pins sliding in crossed grooves guide a pencil arm around an ellipse.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co1541/elliptical-trammel",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "Elliptic trammels by Shuttleworth, London, 1760-1811",
-          "maker": "Shuttleworth / Science Museum Group",
-          "use": "A draughting trammel for laying out ellipses.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co60174",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "Rockler Ellipse/Circle Cutting Jig for compact routers (item 55819)",
+          "product": "Rockler Ellipse and Circle Jig",
           "maker": "Rockler",
-          "use": "Two dovetail trammel bars slide in crossed ways so the router arm cuts ellipses from 6x11 to 19x24 in.",
-          "url": "https://www.rockler.com/rockler-compact-router-ellipse-and-circle-jig",
-          "kind": "product",
-          "checked": true
+          "use": "Two pins slide in crossed grooves so the router rides an exact ellipse.",
+          "url": "https://www.youtube.com/watch?v=-61bH15tJmw"
+        },
+        {
+          "product": "Trammel of Archimedes do-nothing machine",
+          "use": "Two blocks slide in crossed slots and the carried rod's points trace ellipses.",
+          "url": "https://www.youtube.com/watch?v=iM-r8bhTT8k"
         }
       ]
     },
@@ -3000,26 +2887,7 @@
         "non-circular-gears",
         "double-crank"
       ],
-      "real_world": [
-        {
-          "product": "Hart Inversor kinematic model, Martin Schilling series 24 model 11 (c. 1900)",
-          "maker": "Martin Schilling / Smithsonian NMAH",
-          "use": "A contraparallelogram of four pin-connected links forms the core of Hart's exact straight-line inversor.",
-          "url": "https://si.edu/object/hart-inversor-kinematic-model-martin-schilling-series-24-model-11-number-350:nmah_1214011",
-          "kind": "museum",
-          "checked": true,
-          "note": "Museum teaching model; real products using a true antiparallelogram are scarce."
-        },
-        {
-          "product": "Ottobock 3R60-PRO polycentric prosthetic knee",
-          "maker": "Ottobock",
-          "use": "A crossed multi-axis linkage gives a moving instant centre so the knee is stable in stance and flexes easily in swing.",
-          "url": "https://www.ottobock.com/en-gb/product/3R60-PRO",
-          "kind": "product",
-          "checked": true,
-          "note": "Closest real thing: a crossed four-bar style polycentric knee, not an equal-sided antiparallelogram."
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "centrifugal-governor",
@@ -3305,20 +3173,19 @@
       ],
       "real_world": [
         {
-          "product": "Boulton and Watt rotative steam engine (Lap Engine), 1788, Science Museum",
-          "maker": "Boulton and Watt",
-          "use": "The first engine fitted with the centrifugal governor, whose flyballs throttle steam to hold engine speed.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co50948/rotative-steam-engine-by-boulton-and-watt-1788",
-          "kind": "museum",
-          "checked": true
+          "product": "Flyball governor on a dual oscillating steam engine",
+          "use": "The spinning balls swing out as speed rises and move a lever that throttles the steam.",
+          "url": "https://www.youtube.com/watch?v=Gbl3XxCJbP0"
         },
         {
-          "product": "Woodward PG dial and lever governors",
-          "maker": "Woodward",
-          "use": "A centrifugal flyweight head and pilot valve control oil to a power cylinder that sets the fuel rack of diesel and gas engines.",
-          "url": "https://www.mshs.com/wp-content/uploads/2022/05/Woodward_PG-Dial-and-Lever-Governors.pdf",
-          "kind": "product",
-          "checked": true
+          "product": "Mill steam engine with flyball governor",
+          "use": "Belt-driven balls lift a sleeve that closes the steam valve to hold the speed steady.",
+          "url": "https://www.youtube.com/watch?v=4LXwcehG0ag"
+        },
+        {
+          "product": "Steam engine flyball governor",
+          "use": "Balls fling outward with speed and a linkage cuts the steam supply to keep rpm near a set value.",
+          "url": "https://www.youtube.com/watch?v=WLBTKBgTogo"
         }
       ]
     },
@@ -3550,22 +3417,14 @@
       ],
       "real_world": [
         {
-          "product": "Driving and coupling rods for 150/165 bhp 0-4-0 diesel shunting locomotive, drawing 6681 (1948)",
-          "maker": "Peckett and Sons / Fox Walker",
-          "use": "Coupling rods join two equal wheel cranks so both axles rotate fully, the parallel special case of a double crank.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/documents/aa110114911",
-          "kind": "museum",
-          "checked": true,
-          "note": "Archive drawing of a real production part, not the part itself."
+          "product": "Steam locomotive driving wheels with coupling rods",
+          "use": "The coupling rod links two crank pins on equal-radius wheels, so both wheels turn full circles at the same speed as a parallel double-crank linkage.",
+          "url": "https://www.youtube.com/watch?v=f2aA0aVUnJA"
         },
         {
-          "product": "AIDA Dwell Link Motion for PMX progressive die presses",
-          "maker": "AIDA",
-          "use": "A link drive between crank and slide slows the slide 38 percent through the working stroke and speeds it through the rest, the drag-link quick-return idea in a modern press.",
-          "url": "https://www.aida-global.com/stamping-press-technology/dwell-link-motion/",
-          "kind": "in-product",
-          "checked": true,
-          "note": "Closest real product: a multi-link press drive built on the drag-link principle, not a bare four-bar double crank."
+          "product": "Steam locomotive driving wheels with coupling rods (running, close up)",
+          "use": "The side rod ties the crank pins of the coupled wheels together so they rotate in step while the loco moves.",
+          "url": "https://www.youtube.com/watch?v=ggImdgYwd64"
         }
       ]
     },
@@ -3804,22 +3663,9 @@
       ],
       "real_world": [
         {
-          "product": "1925 Babcock and Wilcox level luffing crane, Victoria Quay, Fremantle",
-          "maker": "Babcock and Wilcox / Fremantle Ports",
-          "use": "Jib linkage rocks so the hook travels nearly level as the crane luffs; last of its type at any Australian port.",
-          "url": "https://fremantleports.com.au/news/victoria-quay-heritage-cranes-to-be-restored-repaired-and-repurposed",
-          "kind": "case-study",
-          "checked": true,
-          "note": "Page confirms level luffing but does not detail the linkage geometry."
-        },
-        {
-          "product": "1951 Stothert and Pitt level luffing crane, Queens Wharf, Wellington",
-          "maker": "Stothert and Pitt",
-          "use": "A level luffing jib keeps the load at constant height while the jib rocks in and out.",
-          "url": "https://wellington.govt.nz/About-Wellington/History/History-of-Wellington-Waterfront/Waterfront-Stories/Cranes",
-          "kind": "case-study",
-          "checked": true,
-          "note": "Page confirms level luffing but does not detail the linkage geometry."
+          "product": "Bristol Dockside level luffing crane No. 29",
+          "use": "The jib and its rocking links swing so the hook stays level while the load is luffed in and out.",
+          "url": "https://www.youtube.com/watch?v=GauUhA-Bv9c"
         }
       ]
     },
@@ -4060,21 +3906,19 @@
       ],
       "real_world": [
         {
-          "product": "MELFA RP series compact assembly robots (RP-1AH to RP-5AH)",
-          "maker": "Mitsubishi Electric",
-          "use": "A closed five-link arm driven by two base motors places small parts with high positioning accuracy.",
-          "url": "https://www.mitsubishielectric.com/fa/products/rbt/robot/pmerit/micro/index.html",
-          "kind": "product",
-          "checked": true
+          "product": "DexTAR high-speed five-bar parallel robot",
+          "use": "Two driven arms joined by two forearms steer a single end point anywhere in the plane.",
+          "url": "https://www.youtube.com/watch?v=dnixuCu49o4"
         },
         {
-          "product": "Line-us internet-connected drawing robot",
-          "maker": "Line-us (Durrell Bishop and Robert Poll)",
-          "use": "A small motor-driven arm moves a pen across paper to copy what the user draws on screen.",
-          "url": "https://develop3d.com/develop3d-blog/line-us-a-little-robot-drawing-arm-that-copies-your-doodles/",
-          "kind": "product",
-          "checked": false,
-          "note": "The fetched article confirms the product but does not describe the arm as a five-bar."
+          "product": "Janus Jr five-bar parallel robot",
+          "use": "Two brushless motors drive the proximal arms of a five-bar chain so the pen end follows commanded paths.",
+          "url": "https://www.youtube.com/watch?v=umr-SqC9WUI"
+        },
+        {
+          "product": "Laser-cut double SCARA five-bar robot",
+          "use": "Two motor-driven cranks move a shared end point in a planar workspace.",
+          "url": "https://www.youtube.com/watch?v=05XyfAV1to4"
         }
       ]
     },
@@ -4314,20 +4158,20 @@
       ],
       "real_world": [
         {
-          "product": "Paddle steamer Diesbar, two-cylinder oscillating engine (John Penn and Sons, 1841), ASME landmark #245",
-          "maker": "John Penn and Sons / Saechsische Dampfschiffahrt",
-          "use": "Two rocking cylinders drive the paddle-wheel crankshaft directly; still in service on the Elbe at Dresden.",
-          "url": "https://www.asme.org/about-asme/engineering-history/landmarks/245-oscillating-steam-engine",
-          "kind": "in-product",
-          "checked": true
+          "product": "Paddle steamer Diesbar oscillating engine",
+          "maker": "John Penn and Sons",
+          "use": "The two cylinders rock on trunnions while their piston rods drive the paddle crankshaft directly.",
+          "url": "https://www.youtube.com/watch?v=xVo9JlWDEn0"
         },
         {
-          "product": "Steam engine, single cylinder, oscillating, England, 1830s (ST 19971)",
-          "maker": "Museums Victoria",
-          "use": "A full-size 1 hp oscillating engine whose cylinder pivots on trunnions so the piston rod drives the crank without a connecting rod.",
-          "url": "https://collections.museumsvictoria.com.au/items/408075",
-          "kind": "museum",
-          "checked": true
+          "product": "Large model oscillating steam engine",
+          "use": "The cylinder rocks on its trunnion as the piston rod turns the crank, and the rocking opens and closes the ports.",
+          "url": "https://www.youtube.com/watch?v=-JhjPvtWuAk"
+        },
+        {
+          "product": "Small oscillating model steam engines",
+          "use": "Five small wobbler engines run, each with a cylinder swinging on a pivot to work its own ports.",
+          "url": "https://www.youtube.com/watch?v=bu15HNg-OVE"
         }
       ]
     },
@@ -4618,28 +4462,14 @@
         {
           "product": "Yeti 160E electric enduro mountain bike (Sixfinity suspension)",
           "maker": "Yeti Cycles",
-          "use": "A six-bar rear suspension sets anti-squat, leverage ratio and progression of the rear wheel path.",
-          "url": "https://www.bikeradar.com/news/2022-yeti-160e/",
-          "kind": "in-product",
-          "checked": true,
-          "note": "Source says six-bar; the Stephenson classification is inferred from the published link layout (two ternary bodies not sharing a joint)."
-        },
-        {
-          "product": "Level One Engineering bicycle rear suspension system (US10160512B2)",
-          "maker": "Level One Engineering LLC",
-          "use": "Patented bicycle rear suspension built on a Stephenson III (and Stephenson II) six-bar to tune the axle path.",
-          "url": "https://patents.google.com/patent/US10160512",
-          "kind": "case-study",
-          "checked": true,
-          "note": "Patent, not a named retail product."
+          "use": "A six-bar linkage between frame, rocker links and shock steers the rear wheel path as the suspension compresses.",
+          "url": "https://www.youtube.com/watch?v=BbB6DdgzUJE"
         },
         {
           "product": "Mondo Spider ride-on walking machine",
-          "maker": "eatART (Vancouver)",
-          "use": "Its eight steel legs are Klann linkages, a Stephenson III six-bar, driven from a common crank.",
-          "url": "https://en.wikipedia.org/wiki/Mondo_spider",
-          "kind": "in-product",
-          "checked": true
+          "maker": "eatART",
+          "use": "Each leg is a Klann six-bar of Stephenson type, so one crank sweeps the foot along a flat stance stroke and lifts it for the return.",
+          "url": "https://www.youtube.com/watch?v=L9_Cm8lLumo"
         }
       ]
     },
@@ -4891,20 +4721,16 @@
       ],
       "real_world": [
         {
-          "product": "DESTACO 202-U hold-down toggle clamp",
+          "product": "DESTACO manual toggle clamps in workholding fixtures",
           "maker": "DESTACO",
-          "use": "Handle drives links past centre so the clamp arm locks down on the workpiece.",
-          "url": "https://destaco.com/clamping/manual/hold-down-clamps/hold-down-clamps-202/productdetails.202-U-BLK.html",
-          "kind": "product",
-          "checked": true
+          "use": "The handle drives the link past dead centre so the clamp locks and holds the part with high force.",
+          "url": "https://www.youtube.com/watch?v=PJEud9A3sY4"
         },
         {
-          "product": "DESTACO 802 series pneumatic toggle clamps",
+          "product": "DESTACO manual toggle clamps",
           "maker": "DESTACO",
-          "use": "An air cylinder drives the 202-U toggle so it stays locked even on total loss of air, for welding and assembly fixtures.",
-          "url": "https://www.destaco.com/en/clamping/pneumatic-clamping/pneumatic-toggle-clamp/standard-pneumatic-clamps-802",
-          "kind": "product",
-          "checked": true
+          "use": "Demonstration of vertical, horizontal and linear action clamps closing and locking on fixtures.",
+          "url": "https://www.youtube.com/watch?v=YMtREbxd1HM"
         }
       ]
     },
@@ -5204,21 +5030,16 @@
       ],
       "real_world": [
         {
-          "product": "Whitbread Engine, Boulton and Watt rotative beam engine of 1785",
+          "product": "Crofton Pumping Station Boulton and Watt beam engine in steam",
           "maker": "Boulton and Watt",
-          "use": "Watt's parallel motion with its copying links guides the piston rod straight from the rocking beam; preserved at the Powerhouse Museum, Sydney.",
-          "url": "https://www.farmcollector.com/steam-traction/british-steam-engine-recognized-as-first-boulton-and-watt-with-parallel-motion/",
-          "kind": "case-study",
-          "checked": true,
-          "note": "The beam plus parallel-motion links form the Watt-type chain listed for this mechanism; the source names it parallel motion, not a six-bar."
+          "use": "The engine's parallel motion linkage guides the piston rod straight while the beam swings in an arc.",
+          "url": "https://www.youtube.com/watch?v=7ZCFLRQudRI"
         },
         {
-          "product": "Model Boulton and Watt condensing beam engine, c. 1800 (object 1869-64)",
-          "maker": "Boulton and Watt (model); Science Museum Group",
-          "use": "Working scale model of a double-acting beam engine showing the parallel motion linkage on the beam.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co50950",
-          "kind": "museum",
-          "checked": true
+          "product": "Boulton and Watt rotative beam engine",
+          "maker": "Boulton and Watt",
+          "use": "The beam and its linked rods turn the piston's reciprocating stroke into rotation with a jointed parallel motion.",
+          "url": "https://www.youtube.com/watch?v=-2o-4LCsOuM"
         }
       ]
     },
@@ -5578,28 +5399,22 @@
       ],
       "real_world": [
         {
-          "product": "Theo Jansen Strandbeests (Animaris Rigide Properans, Animaris Mulus and others) exhibition",
-          "maker": "Theo Jansen; Contemporary Art Museum Kumamoto",
-          "use": "Full-size wind-powered beach animals walk on crank-driven Jansen legs.",
-          "url": "https://www.camk.jp/english/exhibitions/theojansen/",
-          "kind": "museum",
-          "checked": true
+          "product": "Theo Jansen Strandbeest at the Exploratorium",
+          "maker": "Theo Jansen",
+          "use": "Each leg's eleven-bar Jansen linkage turns a crank into a long flat stride and a high return lift.",
+          "url": "https://www.youtube.com/watch?v=U02qqB-2nbs"
         },
         {
-          "product": "Animaris Ordis Strandbeests at MIT Media Lab",
-          "maker": "Theo Jansen; MIT Arts",
-          "use": "Real Strandbeests walked on their leg linkages and crankshaft; Jansen explained the leg mechanism.",
-          "url": "https://arts.mit.edu/strandbeests-stalk-the-mit-media-lab",
-          "kind": "case-study",
-          "checked": true
+          "product": "Strandbeest walking in 4K",
+          "maker": "Theo Jansen",
+          "use": "Wind-driven crankshaft moves many Jansen legs in a rolling walking gait.",
+          "url": "https://www.youtube.com/watch?v=DHMKg94BoZg"
         },
         {
-          "product": "Strandbeests (Animaris Suspendisse and others)",
-          "maker": "Theo Jansen; Science Friday",
-          "use": "Sails drive a central crankshaft that moves an array of rotating legs.",
-          "url": "https://www.sciencefriday.com/articles/building-a-beest-fit-for-the-beach/",
-          "kind": "case-study",
-          "checked": true
+          "product": "Strandbeest new generation on the Dutch coast",
+          "maker": "Theo Jansen",
+          "use": "Jansen legs carry the wind-powered beast along the beach.",
+          "url": "https://www.youtube.com/watch?v=J7KXgA1-kGc"
         }
       ]
     },
@@ -5900,30 +5715,21 @@
       ],
       "real_world": [
         {
-          "product": "Mondo Spider ride-on walking machine",
-          "maker": "eatART (Vancouver)",
-          "use": "Eight Klann-linkage legs carry a rider; originally hydraulic-driven by a Honda V-twin, later electric.",
-          "url": "https://en.wikipedia.org/wiki/Mondo_spider",
-          "kind": "in-product",
-          "checked": true
+          "product": "Mondo Spider at Burning Man 2009",
+          "maker": "eatART",
+          "use": "Eight Klann legs walk the rider-carrying machine, each foot tracing a flat stance stroke and a lifted return.",
+          "url": "https://www.youtube.com/watch?v=sLOVdo_Qu3E"
         },
         {
-          "product": "Mondo Spider (eatART) machine profile",
-          "maker": "eatART / Protocase spotlight",
-          "use": "Describes the full-size eight-legged electro-mechanical walker as built and run by its Vancouver team.",
-          "url": "https://www.protocase.com/community/spotlight/exosapien/",
-          "kind": "case-study",
-          "checked": true,
-          "note": "Same machine as above; the page does not name the linkage."
+          "product": "Mondo Spider in operation",
+          "maker": "eatART",
+          "use": "The machine's eight Klann legs step in sequence as cranks turn the six-bar legs.",
+          "url": "https://www.youtube.com/watch?v=M4dSmbc2a8I"
         },
         {
-          "product": "Joe Klann walking device patent US6364040",
-          "maker": "Joseph C. Klann",
-          "use": "The original patent for the single-crank walking leg whose foot moves straight on the ground then lifts and steps.",
-          "url": "https://patents.google.com/patent/US6364040",
-          "kind": "case-study",
-          "checked": true,
-          "note": "Patent rather than product; real Klann-leg products are scarce beyond the Mondo Spider."
+          "product": "LEGO Klann mechanical spider",
+          "use": "Crank-driven Klann legs make the LEGO spider walk with a lifted return step.",
+          "url": "https://www.youtube.com/watch?v=ZGR8krkph4Q"
         }
       ]
     },
@@ -6246,30 +6052,19 @@
       ],
       "real_world": [
         {
-          "product": "Kontax Nano Rhombic Stirling engine",
-          "maker": "Kontax Engineering Ltd",
-          "use": "Four short rods and two drive rods form a rhombus with two meshing gears to phase the displacer and piston of a beta Stirling engine.",
-          "url": "https://stirlingengine.co.uk/products/nano-rhombic-stirling-engine",
-          "kind": "product",
-          "checked": true
+          "product": "Rhombic drive Stirling engine",
+          "use": "Two counter-rotating geared cranks and a rhombus yoke drive the piston and displacer without side thrust.",
+          "url": "https://www.youtube.com/watch?v=g9VBfsD4TlE"
         },
         {
-          "product": "Lanchester 10 hp car engine, c. 1900",
-          "maker": "Lanchester Engine Co",
-          "use": "Each piston drives two contra-rotating crankshafts through connecting rods, giving perfect balance and no side thrust.",
-          "url": "https://www.motorsportmagazine.com/archive/article/june-1946/13/the-genius-lanchester/",
-          "kind": "case-study",
-          "checked": true,
-          "note": "Article describes the twin-crankshaft rod arrangement but does not use the word rhombic."
+          "product": "Stirling engine with rhombic drive, high speed",
+          "use": "The rhombic linkage drives the coaxial piston and displacer at speed.",
+          "url": "https://www.youtube.com/watch?v=loi4Uln2VLQ"
         },
         {
-          "product": "1901 Lanchester 10/12 HP Tonneau (FRW 766)",
-          "maker": "Lanchester; Jaguar Daimler Heritage Trust",
-          "use": "Surviving car with the balanced flat-twin Lanchester engine of the rhombic-drive era.",
-          "url": "https://www.jaguarheritage.com/car/1901_lanchester_10-12hp_tonneau/",
-          "kind": "museum",
-          "checked": true,
-          "note": "Page confirms the car and flat-twin engine but not the crank arrangement."
+          "product": "Balanced rhombic Stirling engine",
+          "use": "The rhombic linkage is balanced so the engine runs smoothly with the geared cranks.",
+          "url": "https://www.youtube.com/watch?v=huwXFMeobK8"
         }
       ]
     },
@@ -6641,20 +6436,14 @@
       ],
       "real_world": [
         {
-          "product": "Walschaerts valve gear from double Fairlie locomotive Snake (1874), National Railway Museum",
-          "maker": "Avonside Engine Co",
-          "use": "The actual right-hand valve gear from a New Zealand 0-4-4-0T, believed among the first British-built locomotives with Walschaerts gear.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co27892/walschaerts-valve-gear-from-double-fairlie-locomotive",
-          "kind": "museum",
-          "checked": true
+          "product": "Live steam locomotive with Walschaerts gear",
+          "use": "The return crank and crosshead motion are mixed in the combination lever to time the valve.",
+          "url": "https://www.youtube.com/watch?v=rRGGSr68miQ"
         },
         {
-          "product": "LNER Peppercorn A1 class and new-build 60163 Tornado",
-          "maker": "LNER / A1 Steam Locomotive Trust",
-          "use": "Three independent sets of Walschaerts valve gear control steam admission to the three cylinders.",
-          "url": "https://www.steamlocomotives.org/locomotives/lner-peppercorn-a1-class",
-          "kind": "in-product",
-          "checked": true
+          "product": "Live steam locomotive with Walschaerts gear",
+          "use": "Eccentric crank, radius rod and combination lever move the valve in step with the piston.",
+          "url": "https://www.youtube.com/watch?v=lgUtFRsJUKI"
         }
       ]
     },
@@ -6889,29 +6678,14 @@
       ],
       "real_world": [
         {
-          "product": "Yeti Cycles six-bar rear suspension (US 2020/0247500)",
-          "maker": "Yeti Cycles",
-          "use": "A Chebyshev four-bar guides the swingarm's lower pivot along a nearly straight path.",
-          "url": "https://www.pinkbike.com/news/yetis-new-suspension-design.html",
-          "kind": "in-product",
-          "checked": true
+          "product": "Clockwork plantigrade walking machine (Chebyshev lambda linkage)",
+          "use": "A Chebyshev lambda linkage gives each foot a flat stance stroke as the machine walks.",
+          "url": "https://www.youtube.com/watch?v=oW5yTjMCQ2w"
         },
         {
-          "product": "Steam engine at the 1873 Vienna Exhibition",
-          "maker": "P. L. Chebyshev (reported in Ferguson, Kinematics of Mechanisms from the Time of Watt)",
-          "use": "Chebyshev's straight-line mechanism, combined with an Evans linkage, guided the engine's piston rod.",
-          "url": "https://www.gutenberg.org/files/27106/27106-h/27106-h.htm",
-          "kind": "case-study",
-          "checked": true
-        },
-        {
-          "product": "Chebyshev plantigrade (walking) machine, 1878",
-          "maker": "P. L. Chebyshev; Polytechnic Museum, Moscow",
-          "use": "The original walking machine moves its feet on a near-straight path using Chebyshev's lambda linkage.",
-          "url": "https://en.tcheb.ru/plantigrade-machine/",
-          "kind": "museum",
-          "checked": true,
-          "note": "Uses the lambda form, a cognate of the Chebyshev linkage."
+          "product": "LEGO walker with Chebyshev linkage",
+          "use": "The linkage moves the foot in a straight line for three quarters of each cycle.",
+          "url": "https://www.youtube.com/watch?v=C-rhtAeIHt0"
         }
       ]
     },
@@ -7129,33 +6903,7 @@
         "hoekens-linkage",
         "double-rocker"
       ],
-      "real_world": [
-        {
-          "product": "Reuleaux model S14, Roberts straight-line linkage (Dreieckslenker von Roberts), 1882",
-          "maker": "Gustav Voigt Werkstatt; Cornell Reuleaux collection",
-          "use": "Cast-iron and brass model showing the coupler point of the Roberts four-bar tracing an approximate straight line.",
-          "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:372687",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "De Voglie underwater pile-sawing machine, c. 1756 to 1760",
-          "maker": "De Voglie (published by Pierre Patte 1769; in Ferguson, Kinematics of Mechanisms)",
-          "use": "A Roberts-type linkage guided a bar at the rear of the machine.",
-          "url": "https://www.gutenberg.org/files/27106/27106-h/27106-h.htm",
-          "kind": "case-study",
-          "checked": true,
-          "note": "Historic machine; modern real uses are scarce."
-        },
-        {
-          "product": "Reuleaux model S15, inversion of Roberts linkage, 1882",
-          "maker": "Gustav Voigt Werkstatt; Cornell Reuleaux collection",
-          "use": "Model of the inverted Roberts triangle linkage.",
-          "url": "https://digital.library.cornell.edu/catalog/ss:372689",
-          "kind": "museum",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "scott-russell",
@@ -7374,25 +7122,7 @@
         "slider-crank",
         "watt-linkage"
       ],
-      "real_world": [
-        {
-          "product": "Nissan Sentra SE-R Spec V (B15) rear beam axle",
-          "maker": "Nissan",
-          "use": "A Scott Russell linkage locates the twist-beam rear axle sideways.",
-          "url": "https://motoiq.com/project-nissan-sentra-spec-v-part-5-lessons-in-geometry/4",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Nissan Almera N16 and related Nissans (B14, N15, P11) rear axle",
-          "maker": "Nissan",
-          "use": "Factory Scott Russell lateral link on the rear beam, discussed with an adjustable aftermarket version.",
-          "url": "https://almeraownersclub.com/threads/scott-russell-linkage-modification-for-lowered-cars-discuss.32437",
-          "kind": "in-product",
-          "checked": true,
-          "note": "Owners' forum source."
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "watt-linkage",
@@ -7617,28 +7347,20 @@
       ],
       "real_world": [
         {
-          "product": "Vauxhall/Opel Astra (sixth generation, Astra J) rear suspension",
-          "maker": "Vauxhall / Opel (GM)",
-          "use": "A Watt's linkage on the torsion beam locates the axle sideways so softer bushes can be used.",
-          "url": "https://www.autocar.co.uk/node/31344",
-          "kind": "in-product",
-          "checked": true
+          "product": "Model beam engine with Watt's parallel motion",
+          "use": "The Watt linkage keeps the piston rod moving in a nearly straight line as the beam swings.",
+          "url": "https://www.youtube.com/watch?v=RGSa2qLVCh8"
         },
         {
-          "product": "Chevrolet Cruze rear suspension",
-          "maker": "Chevrolet (GM)",
-          "use": "Two equal horizontal links on each side form a Watt's linkage that locates the rear beam laterally.",
-          "url": "https://www.underhoodservice.com/?p=120204",
-          "kind": "in-product",
-          "checked": true
+          "product": "Lada VFTS rally car with Watts link rear axle",
+          "use": "The Watts link locates the solid rear axle laterally while it moves up and down.",
+          "url": "https://www.youtube.com/watch?v=dhX6NmkmVYo"
         },
         {
-          "product": "Whiteline Watts linkage KDT916 for 2005-on Ford Mustang",
+          "product": "Ford Mustang with Whiteline Watts link rear suspension",
           "maker": "Whiteline",
-          "use": "Bolt-on kit that centres the 8.8 live rear axle with a Watt's link in place of a Panhard rod.",
-          "url": "https://motoiq.com/whiteline-performance-watts-linkage-for-ford-mustangs/",
-          "kind": "product",
-          "checked": true
+          "use": "The Watts link replaces the Panhard rod so the axle stays centred through its travel.",
+          "url": "https://www.youtube.com/watch?v=98iLLQ1MsFw"
         }
       ]
     },
@@ -7865,29 +7587,19 @@
       ],
       "real_world": [
         {
-          "product": "Grasshopper engine from Clyde Wharf Works, c. 1840",
-          "maker": "Unknown; Science Museum Group",
-          "use": "Full-size half-beam grasshopper engine that powered the Clyde Wharf Works from 1840 to 1928.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8405033/grasshopper-engine",
-          "kind": "museum",
-          "checked": true,
-          "note": "Page does not name the linkage; grasshopper engines are the type that used it."
+          "product": "Model grasshopper beam steam engine",
+          "use": "The grasshopper linkage guides the piston rod nearly straight from a pivoted beam.",
+          "url": "https://www.youtube.com/watch?v=emcl4aWDfAg"
         },
         {
-          "product": "Oliver Evans Columbian engine, before 1813",
-          "maker": "Oliver Evans (in Ferguson, Kinematics of Mechanisms)",
-          "use": "The Evans linkage guided the piston rod and allowed a much lighter beam than Watt's motion.",
-          "url": "https://www.gutenberg.org/files/27106/27106-h/27106-h.htm",
-          "kind": "case-study",
-          "checked": true
+          "product": "Large model grasshopper beam steam engine",
+          "use": "The half beam pivots at one end and its linkage guides the rod during the steam stroke.",
+          "url": "https://www.youtube.com/watch?v=ghoNZgHRZoA"
         },
         {
-          "product": "Reuleaux model S5, four-bar straight-line mechanism after Evans, 1882",
-          "maker": "Gustav Voigt Werkstatt; Cornell Reuleaux collection",
-          "use": "Model of Evans' approximate straight-line four-bar.",
-          "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:372675",
-          "kind": "museum",
-          "checked": true
+          "product": "Potty grasshopper engine",
+          "use": "The grasshopper beam rocks and links the piston to the flywheel crank.",
+          "url": "https://www.youtube.com/watch?v=W3tvB7WwxJA"
         }
       ]
     },
@@ -8125,20 +7837,7 @@
         "jansen-linkage",
         "klann-linkage"
       ],
-      "real_world": [
-        {
-          "product": "Chebyshev plantigrade (walking) machine, 1878",
-          "maker": "P. L. Chebyshev; Polytechnic Museum, Moscow",
-          "use": "Its legs use the lambda linkage, whose coupler point traces the same near-straight hoof path as the Hoekens linkage.",
-          "url": "https://en.tcheb.ru/plantigrade-machine/",
-          "kind": "museum",
-          "checked": true,
-          "note": "Closest real object: the lambda mechanism is a cognate of the Hoekens linkage, not a Hoekens linkage itself; no industrial Hoekens product found."
-        }
-      ],
-      "waive": [
-        "real_world"
-      ]
+      "real_world": []
     },
     {
       "id": "tusi-couple",
@@ -8379,20 +8078,19 @@
       ],
       "real_world": [
         {
-          "product": "Matthew Murray's hypocycloidal steam engine (c.1805), Thinktank Birmingham Science Museum",
-          "maker": "Matthew Murray / Fenton, Murray and Wood",
-          "use": "A planet gear rolling inside a ring of twice its diameter guides the piston rod end in a straight line and turns it into crankshaft rotation, replacing a crosshead guide.",
-          "url": "https://en.wikipedia.org/wiki/Murray%27s_Hypocycloidal_Engine",
-          "kind": "museum",
-          "checked": true
+          "product": "Model of Murray's hypocycloidal steam engine",
+          "use": "A small gear rolling inside a ring twice its size gives the piston rod a straight-line path without a guide.",
+          "url": "https://www.youtube.com/watch?v=RztnuW93Vvk"
         },
         {
-          "product": "Wiseman hypocycloid engine alpha prototype (30cc two-stroke)",
-          "maker": "Wiseman Technologies",
-          "use": "A 2:1 internal gear hypocycloid keeps piston and connecting rod moving in a straight line; the built prototype was dynamometer tested at MTD Southwest.",
-          "url": "https://keep.lib.asu.edu/system/files/c160/Analysis_and_simulation_of_Wiseman_2014.pdf",
-          "kind": "case-study",
-          "checked": true
+          "product": "Model of Matthew Murray's hypocycloidal steam engine",
+          "use": "The planet gear pin follows a straight line, so the piston rod needs no slide or parallel motion.",
+          "url": "https://www.youtube.com/watch?v=q2cOHsHIUvQ"
+        },
+        {
+          "product": "Murray hypocycloidal engine build",
+          "use": "The crank pin rides on a gear rolling inside a fixed ring, turning reciprocating motion into rotation.",
+          "url": "https://www.youtube.com/watch?v=h0NTwoYp_2E"
         }
       ]
     },
@@ -8662,21 +8360,9 @@
       ],
       "real_world": [
         {
-          "product": "Hart Inversor, Schilling series 24 model 11, c. 1900",
-          "maker": "Martin Schilling; Smithsonian NMAH",
-          "use": "Hourglass four-bar model in which one point moves in a circle and another in an exact straight line.",
-          "url": "https://si.edu/object/hart-inversor-kinematic-model-martin-schilling-series-24-model-11-number-350:nmah_1214011",
-          "kind": "museum",
-          "checked": true,
-          "note": "No real machine using Hart's inversor found; museum models are the closest real objects."
-        },
-        {
-          "product": "A. P. Rollett set of straight-line linkage models (accession 6636.3, Hart's inversor)",
-          "maker": "A. P. Rollett; Whipple Museum, Cambridge",
-          "use": "Wooden board model of Hart's inversor giving exact straight-line motion.",
-          "url": "https://collections.whipplemuseum.cam.ac.uk/objects/15377",
-          "kind": "museum",
-          "checked": true
+          "product": "Engino Hart's A-frame linkage build",
+          "use": "The crossed antiparallelogram frame moves a point on a straight line from a circular input.",
+          "url": "https://www.youtube.com/watch?v=gfmoNkLJCA0"
         }
       ]
     },
@@ -8977,28 +8663,14 @@
       ],
       "real_world": [
         {
-          "product": "Prim's blowing engine for House of Commons ventilation, 1877",
-          "maker": "Mr. Prim, engineer to the Houses of Parliament (in Ferguson, Kinematics of Mechanisms)",
-          "use": "A Peaucellier cell guided the crosshead of the steam-driven air pump and ran unusually quietly.",
-          "url": "https://www.gutenberg.org/files/27106/27106-h/27106-h.htm",
-          "kind": "case-study",
-          "checked": true
+          "product": "Beam engine using a Peaucellier linkage",
+          "use": "The Peaucellier cell guides the piston rod in an exact straight line in place of Watt's linkage.",
+          "url": "https://www.youtube.com/watch?v=5kB1ANokcs8"
         },
         {
-          "product": "Peaucellier Inversor, Schilling series 24 model 10, c. 1900",
-          "maker": "Martin Schilling; Smithsonian NMAH",
-          "use": "Metal kinematic model in which the crank turns and one point traces an exact straight line.",
-          "url": "https://www.si.edu/object/peaucellier-inversor-kinematic-model-martin-schilling-series-24-model-10-number-349%3Anmah_1213848",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "Reuleaux model S35, Peaucellier straight-line mechanism, 1882",
-          "maker": "Gustav Voigt Werkstatt; Cornell Reuleaux collection",
-          "use": "Eight-link cast-iron and brass model giving exact straight-line motion.",
-          "url": "https://digital-collections-portal.library.cornell.edu/catalog/ss:372718",
-          "kind": "museum",
-          "checked": true
+          "product": "Physical Peaucellier linkage model",
+          "use": "A rhombus and two long arms turn circular input motion into a straight line.",
+          "url": "https://www.youtube.com/watch?v=hSdW-i3nO1M"
         }
       ]
     },
@@ -9218,24 +8890,7 @@
         "scotch-yoke",
         "drag-link-quick-return"
       ],
-      "real_world": [
-        {
-          "product": "Honda K20C1 engine (Civic Type R)",
-          "maker": "Honda",
-          "use": "The crankshaft is offset relative to the bores so the connecting rod is more upright on the power stroke, reducing piston side thrust and friction.",
-          "url": "https://www.enginebuildermag.com/2019/02/eotw-civic-type-r-k20c1-engine/",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Yamaha MT-09 CP3 three-cylinder engine",
-          "maker": "Yamaha",
-          "use": "The cylinder bores are offset 5 mm toward the exhaust side of the crank to reduce friction between pistons and cylinder walls.",
-          "url": "https://www.webbikeworld.com/2020-yamaha-mt-09-model-overview/",
-          "kind": "in-product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "crank-shaper",
@@ -9511,28 +9166,20 @@
       ],
       "real_world": [
         {
-          "product": "Gould & Eberhardt 16 inch industrial universal shaper",
-          "maker": "Gould & Eberhardt",
-          "use": "A real shop shaper whose ram is driven from the bull gear crank with the Eberhardt quick-return mechanism so the ram returns faster than it cuts.",
-          "url": "https://anvilfire.com/tailgate/machinery-sales-GandE-shaper.php.htm",
-          "kind": "in-product",
-          "checked": true
+          "product": "Atlas 7B bench shaper",
+          "use": "A crank pin in a slotted lever rocks the ram slowly forward to cut and quickly back.",
+          "url": "https://www.youtube.com/watch?v=xhaePKPsHJQ"
         },
         {
-          "product": "Gould & Eberhardt 16 inch shaper restoration reference",
+          "product": "Gould & Eberhardt 16 inch shaper",
           "maker": "Gould & Eberhardt",
-          "use": "Describes the ram driven by a crank or bull gear in the column body, including crank-pin bearing wear that causes a thumping stroke.",
-          "url": "https://industrialmonitordirect.com/blogs/knowledgebase/gould-eberhardt-16-inch-shaper-restoration-reference",
-          "kind": "case-study",
-          "checked": true
+          "use": "The slotted rocker driven by a crank pin pushes the ram through the cut and returns it faster.",
+          "url": "https://www.youtube.com/watch?v=bg2yppzEmBo"
         },
         {
-          "product": "Atlas 7B bench shaper teardown and rebuild",
-          "maker": "Atlas Press Company",
-          "use": "Photo teardown of a real shaper showing the crank gear, crank pin and sliding block, and crank arm that drive the ram.",
-          "url": "https://www.hobby-machinist.com/threads/atlas-7b-disassembly-and-teardown-pic-heavy.84697/post-756653",
-          "kind": "real-video",
-          "checked": true
+          "product": "Atlas 7 inch metal shaper",
+          "use": "A rotating crank pin sliding in a rocking arm gives the ram a slow cutting stroke and a quick return.",
+          "url": "https://www.youtube.com/watch?v=P7usJq7Qlhk"
         }
       ]
     },
@@ -9837,20 +9484,14 @@
       ],
       "real_world": [
         {
-          "product": "Warner & Whitney vertical metal shaper (1872), American Precision Museum",
-          "maker": "Warner & Whitney, Nashua NH",
-          "use": "The crank is driven through double gearing and a Whitworth quick-return motion so the vertical ram cuts slowly and returns fast.",
-          "url": "https://americanprecision.org/learning-resources/12-machines-of-christmas/",
-          "kind": "museum",
-          "checked": true
+          "product": "Atlas Rhodes shaper",
+          "use": "A crank pin turns a slotted lever fully round an offset pivot to drive the ram with a slow cut and fast return.",
+          "url": "https://www.youtube.com/watch?v=Jx5nOn0tf_k"
         },
         {
-          "product": "Whitworth crank planing machine (c.1850), Musee des Arts et Metiers, Paris",
-          "maker": "Joseph Whitworth and Co",
-          "use": "The crank-driven planer table has the quick-return motion credited to Whitworth.",
-          "url": "https://gracesguide.co.uk/Whitworth_Planing_Machines",
-          "kind": "museum",
-          "checked": true
+          "product": "Atlas Rhodes shaper drive",
+          "use": "The Whitworth drive shown on a real shaper spins the slotted link a full turn so the return stroke is quick.",
+          "url": "https://www.youtube.com/watch?v=c0zdeh-LF-o"
         }
       ]
     },
@@ -10126,24 +9767,7 @@
         "whitworth",
         "slider-crank"
       ],
-      "real_world": [
-        {
-          "product": "Drag-link mechanical press drive (prior art in US patent 4107973)",
-          "maker": "E.W. Bliss / Gulf and Western",
-          "use": "In drag-link presses the crank drives the slide through a drag link that slows the slide on the working stroke for a mechanical advantage of up to 5:1.",
-          "url": "https://patents.google.com/patent/US4107973A/en",
-          "kind": "case-study",
-          "checked": true
-        },
-        {
-          "product": "Reuleaux model: drag-link orientation mechanism (Morgan feathering paddle wheel), 1882",
-          "maker": "Gustav Voigt workshop / Cornell KMODDL",
-          "use": "Four-bar drag-link arms drive feathering paddles as on steam paddle boats, a double-crank drag-link chain in physical form.",
-          "url": "https://digital.library.cornell.edu/catalog/ss:372745",
-          "kind": "museum",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "rack-pinion",
@@ -10373,24 +9997,7 @@
         "scotch-yoke",
         "slider-crank"
       ],
-      "real_world": [
-        {
-          "product": "Pilatusbahn rack railway (Locher system), Switzerland",
-          "maker": "Pilatus-Bahnen (designed by Eduard Locher)",
-          "use": "Opposing horizontal pinions grip a sideways-toothed rack so cars climb gradients up to 48 percent; an ASME landmark.",
-          "url": "https://www.asme.org/about-asme/engineering-history/landmarks/220-pilatusbahn",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Atlanta Drive Systems helical rack and pinion drive",
-          "maker": "Atlanta Drive Systems",
-          "use": "A hardened ground pinion on a servo reducer drives along a helical rack to move long machine and gantry axes.",
-          "url": "https://www.directindustry.com/prod/atlanta-drive-systems/product-28259-1309333.html",
-          "kind": "product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "spur-gears",
@@ -10630,20 +10237,9 @@
       ],
       "real_world": [
         {
-          "product": "KHK stock metric spur gears (SS, SSG, MSGA series)",
-          "maker": "KHK (Kohara Gear Industry) / KHK USA",
-          "use": "Off-the-shelf straight-tooth spur gears sold for transmitting power between parallel shafts in machinery.",
-          "url": "https://www.globalspec.com/FeaturedProducts/Detail/KHKUSA/335456/Spur_Gears",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Martin S672 steel spur gear, 6 DP, 72 teeth",
-          "maker": "Martin Sprocket & Gear",
-          "use": "A stock 14.5 degree pressure angle spur gear used in industrial drives to mesh with a matching pinion on a parallel shaft.",
-          "url": "https://sourceatlantic.ca/Product/S672",
-          "kind": "product",
-          "checked": true
+          "product": "Homemade 150:1 five-stage spur gear reducer",
+          "use": "Five pairs of spur gears are stacked in a hand-built box so each pair multiplies the reduction, shown turning on the bench.",
+          "url": "https://www.youtube.com/watch?v=8rGYe9lTIHY"
         }
       ]
     },
@@ -10889,28 +10485,9 @@
       ],
       "real_world": [
         {
-          "product": "Boston Gear L107Y miter gear, 6 DP, 24 teeth",
-          "maker": "Boston Gear",
-          "use": "A 1:1 bevel (miter) gear for turning a drive through 90 degrees between intersecting shafts.",
-          "url": "https://www.mrosupply.com/products/35995/as-markdown/",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "SEW-EURODRIVE K series helical-bevel gear units",
-          "maker": "SEW-EURODRIVE",
-          "use": "A bevel gear stage turns the motor drive through a right angle in industrial gearmotors.",
-          "url": "https://kz.sew-eurodrive.com/products/gear-units/standard-gear-units/helical-bevel-gear-units-k/helical-bevel-gear-units-k.html",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Bell OH-58D helicopter main-rotor transmission spiral bevel set",
-          "maker": "Bell / NASA test (Gear Technology article)",
-          "use": "A spiral bevel gear set turns the horizontal engine input up to the vertical main rotor shaft.",
-          "url": "https://www.geartechnology.com/evaluation-of-a-low-noise-formate-spiral-bevel-gear-set",
-          "kind": "case-study",
-          "checked": true
+          "product": "Eggbeater style hand drill",
+          "use": "The hand crank turns a large bevel gear that meshes with a small pinion on the chuck shaft, turning the rotation through a right angle and speeding it up.",
+          "url": "https://www.youtube.com/shorts/pTMZ3TJxZso"
         }
       ]
     },
@@ -11179,28 +10756,14 @@
       ],
       "real_world": [
         {
-          "product": "Three-train flatbed turret clock, c. 1939",
-          "maker": "E. Dent & Co. (Science Museum Group collection)",
-          "use": "Separate going, striking and Westminster quarter trains of wheels and pinions reduce the weight-driven power to hand and hammer motions.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co936",
-          "kind": "museum",
-          "checked": true
+          "product": "Clock movement with its motion works (dial train)",
+          "use": "Pinions and wheels mesh in series inside the movement, stepping the speed down from the minute hand to the hour hand.",
+          "url": "https://www.youtube.com/watch?v=Ttzo4ioPAfY"
         },
         {
-          "product": "Glass faced skeleton clock, 1937-1938",
-          "maker": "Jaeger-LeCoultre (Science Museum Group collection)",
-          "use": "An exposed skeleton movement in which the compound wheel train from the power source to the hands is visible through the glass.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co48392/glass-faced-skeleton-clock",
-          "kind": "museum",
-          "checked": false
-        },
-        {
-          "product": "Tamiya 72002 High Speed Gearbox kit",
-          "maker": "Tamiya",
-          "use": "A compound train of plastic spur gears reduces a small DC motor's speed, assemblable at 11.6:1 or 18:1.",
-          "url": "https://core-electronics.com.au/tamiya-72002-high-speed-gearbox-kit.html.md",
-          "kind": "product",
-          "checked": true
+          "product": "Hand-built clock using compound gears",
+          "use": "Two gear pairs share a middle shaft so their ratios multiply, filmed as a working physical build.",
+          "url": "https://www.youtube.com/watch?v=ZqPFaQ0fFrw"
         }
       ]
     },
@@ -11449,28 +11012,15 @@
       ],
       "real_world": [
         {
-          "product": "SEW-EURODRIVE R/RX/RM series helical gear units",
-          "maker": "SEW-EURODRIVE",
-          "use": "Parallel-shaft helical gear stages reduce motor speed for conveyors, mixers and other industrial drives.",
-          "url": "https://kz.sew-eurodrive.com/products/gear-units/standard-gear-units/helical-gear-units-r/helical-gear-units-r.html",
-          "kind": "product",
-          "checked": true
+          "product": "Helical reduction gearbox (industrial)",
+          "use": "Helical gear pairs in a multi-stage reducer are shown being taken apart, with the slanted teeth meshing between shafts.",
+          "url": "https://www.youtube.com/watch?v=s9DR37SnNeA"
         },
         {
-          "product": "KHK metric helical gears (KHG ground and SH series)",
-          "maker": "KHK (Kohara Gear Industry)",
-          "use": "Stock helical gears sold for quiet, high-speed power transmission between parallel shafts.",
-          "url": "https://www.manufacturing.net/home/mechanical-components/product/22525741/khk-usa-extensive-line-of-metric-helical-gears",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "SEW-EURODRIVE R27 DRN71M4 helical gearmotor",
+          "product": "SEW-EURODRIVE R77 helical gear reducer",
           "maker": "SEW-EURODRIVE",
-          "use": "A specific R-series helical gear reducer combined with an asynchronous motor.",
-          "url": "https://www.eurosensor.com/en/product/sew-eurodrIve-r27-drn71m4-be05-th-r-series-helical-gear-reducer-with-a-drn71m4-asynchronous-motor",
-          "kind": "product",
-          "checked": false
+          "use": "Helical gear stages are assembled on parallel shafts inside the housing to reduce motor speed.",
+          "url": "https://www.youtube.com/watch?v=bU08UbEVjSM"
         }
       ]
     },
@@ -11713,24 +11263,7 @@
         "bevel-gears",
         "crossed-helical-gears"
       ],
-      "real_world": [
-        {
-          "product": "Radicon CODOG marine propulsion gearbox",
-          "maker": "Radicon (Elecon)",
-          "use": "Ground double helical gears with an inbuilt clutch reduce engine speed to propeller speed on larger ships, including naval vessels.",
-          "url": "https://radicon.com/product/codog-gearbox/",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Main reduction gears of DD-692 class destroyers (US Navy NavPers 10813-B, 1966)",
-          "maker": "US Navy",
-          "use": "Double helical gears reduce steam turbine speed to propeller shaft speed, cancelling axial thrust between the two helices.",
-          "url": "https://www.eugeneleeslover.com/ENGINEERING/CHAPTER-7-REDUCTION-GEARS.php",
-          "kind": "in-product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "internal-gear-pair",
@@ -11946,24 +11479,7 @@
         "cycloidal-drive",
         "sun-and-planet"
       ],
-      "real_world": [
-        {
-          "product": "KHK SI1-60 internal ring gear, module 1, 60 teeth",
-          "maker": "KHK (Kohara Gear Industry)",
-          "use": "A stock steel internal gear that meshes with a smaller external pinion inside it, as used for planetary annuli and compact drives.",
-          "url": "https://khkgears.us/id/SI1-60",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Kaydon RK series internal-toothed slewing bearing",
-          "maker": "Kaydon (SKF)",
-          "use": "A slewing ring with internal teeth driven by a pinion to rotate small cranes, booms, lifts and rotary tables.",
-          "url": "https://www.directindustry.com/prod/kaydon/product-14280-534903.html",
-          "kind": "product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "sun-and-planet",
@@ -12220,28 +11736,22 @@
       ],
       "real_world": [
         {
-          "product": "Boulton and Watt rotative steam engine, 1788 (Science Museum, London)",
+          "product": "Boulton and Watt rotative steam engine of 1785 (Whitbread engine), Powerhouse Museum, Sydney",
           "maker": "Boulton and Watt",
-          "use": "A planet gear on the connecting rod orbits a sun gear on the flywheel shaft, turning the beam's rocking into rotation instead of using a crank.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co50948/rotative-steam-engine-by-boulton-and-watt-1788",
-          "kind": "museum",
-          "checked": true
+          "use": "The beam's connecting rod carries a planet gear that orbits a sun gear on the flywheel shaft, turning the flywheel twice per stroke cycle without a crank.",
+          "url": "https://www.youtube.com/watch?v=Krmhkj2pI4Y"
         },
         {
-          "product": "Boulton and Watt rotative engine of 1785 (Whitbread engine), Powerhouse Museum, Sydney",
+          "product": "Boulton and Watt 1785 engine, Powerhouse Museum, Sydney",
           "maker": "Boulton and Watt",
-          "use": "The oldest operable rotative Boulton and Watt engine uses sun-and-planet gearing to turn its flywheel shaft; it is an ASME landmark.",
-          "url": "https://cdn.asme.org/About-ASME/Engineering-History/Landmarks/111-boulton-watt-rotative-steam-engine",
-          "kind": "museum",
-          "checked": true
+          "use": "The planet gear on the connecting rod rolls around the sun gear on the flywheel shaft to turn the beam's rocking into rotation.",
+          "url": "https://www.youtube.com/watch?v=U9i8C6J9MgU"
         },
         {
-          "product": "Boulton and Watt Lap Engine, 1788 (Science Museum, London)",
-          "maker": "Boulton and Watt",
-          "use": "Mill engine that drove lapping machines in the Soho Manufactory through sun-and-planet gearing.",
-          "url": "https://en.wikipedia.org/wiki/Lap_Engine",
-          "kind": "museum",
-          "checked": false
+          "product": "Peake No 5 model beam engine",
+          "maker": "Peake",
+          "use": "A working model beam engine whose connecting rod drives a planet gear around a sun gear to turn the flywheel.",
+          "url": "https://www.youtube.com/watch?v=3utfgIBeoE0"
         }
       ]
     },
@@ -12480,24 +11990,7 @@
         "bevel-gears",
         "gear-train"
       ],
-      "real_world": [
-        {
-          "product": "Schaller M6 Mini Locking tuning machines (1:18)",
-          "maker": "Schaller",
-          "use": "A small worm on each tuning key turns a wheel on the string post and self-locks against string tension.",
-          "url": "https://avlgear.com/products/schaller-100402230336-m6-mini-locking-tuning-machines-3l-3r-chrome",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Boston Gear 700 Series worm gear speed reducer",
-          "maker": "Boston Gear",
-          "use": "A right-angle single-reduction worm and wheel gives high ratios such as 30:1 or 50:1 for industrial drives.",
-          "url": "https://www.directindustry.com/prod/boston-gear/product-9195-36258.html",
-          "kind": "product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "crossed-helical-gears",
@@ -12729,24 +12222,7 @@
         "hypoid-gears",
         "bevel-gears"
       ],
-      "real_world": [
-        {
-          "product": "JEGS 555-40652 distributor drive gear for Chevrolet small-block and big-block V8",
-          "maker": "JEGS",
-          "use": "A skew gear on the distributor shaft is driven at 90 degrees by a gear cut on the camshaft, also turning the oil pump.",
-          "url": "https://www.jegs.com/i/jegs-555-40652-distributor-drive-gear-fits-chevy-262-400-small-block-396-454-big-block-engines-w-491-in-dia-distributor-shaft",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "KHK metric screw gears (SN, AN, SUN series)",
-          "maker": "KHK (Kohara Gear Industry)",
-          "use": "Stock screw gears that transmit motion between non-parallel, non-intersecting shafts.",
-          "url": "https://www.khkgears.us/products/screw-gears",
-          "kind": "product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "cycloidal-drive",
@@ -12997,32 +12473,7 @@
         "internal-gear-pair",
         "eccentric-sheave"
       ],
-      "real_world": [
-        {
-          "product": "Nabtesco RV-900N cycloidal gearbox",
-          "maker": "Nabtesco",
-          "use": "A two-stage RV (cycloidal) reducer for heavy robot axes and medical devices.",
-          "url": "https://www.directindustry.com/prod/nabtesco-precision-europe/product-17051-2566248.html",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Sumitomo Cyclo 6000 gearmotor",
-          "maker": "Sumitomo Drive Technologies",
-          "use": "A cycloidal disc rolling on ring pins gives shock-tolerant reduction for conveyors, mixers and cranes.",
-          "url": "https://www.im-tek.com/sumitomo-cyclor-6000-gearmotor",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Nabtesco RV-C series hollow-shaft reduction gears",
-          "maker": "Nabtesco",
-          "use": "Hollow-shaft RV reducers with built-in main bearings used in robot base and arm joints.",
-          "url": "https://www.automate.org/products/nabtesco-motion-control-inc/rv-c-series",
-          "kind": "product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "differential",
@@ -13330,28 +12781,22 @@
       ],
       "real_world": [
         {
-          "product": "Torsen centre differential in Audi quattro (from Audi 80 quattro, 1986)",
-          "maker": "Audi / Torsen",
-          "use": "A centre differential splits drive between front and rear axles, sending up to 75 percent to the axle with better grip.",
-          "url": "https://www.audi-technology-portal.de/en/drivetrain/quattro_en/torsen-differential",
-          "kind": "in-product",
-          "checked": true
+          "product": "AAM 11.5 axle with Torsen and Eaton TruTrac anti-spin differentials",
+          "maker": "American Axle",
+          "use": "Gear sets inside the carrier let the two wheels turn at different speeds while still sharing torque, demonstrated on real axle hardware.",
+          "url": "https://www.youtube.com/watch?v=0UrV4CzIh7c"
         },
         {
-          "product": "Eaton Detroit Locker 187SL16D for Dana 44 axles",
-          "maker": "Eaton",
-          "use": "A replacement axle differential that lets wheels differentiate in turns but locks them together under drive torque.",
-          "url": "https://www.eaton.com/ca/fr-ca/skuPage.187SL16D.html",
-          "kind": "product",
-          "checked": true
+          "product": "Helical limited slip (Torsen type) differential, Acura Integra Type R",
+          "maker": "Acura",
+          "use": "Worm-like helical gears in the carrier couple the two axle shafts so a slipping wheel hands torque to the other, shown as the unit is opened up.",
+          "url": "https://www.youtube.com/watch?v=H-JQ-byHx6M"
         },
         {
-          "product": "1996 Mazda Miata Torsen rear differential",
-          "maker": "Mazda (Grassroots Motorsports project car)",
-          "use": "A real teardown of the car's rear limited-slip differential after a failure, with an open spare unit.",
-          "url": "https://grassrootsmotorsports.com/project-cars/1996-mazda-miata/project-turbo-miata-differential-teardown",
-          "kind": "in-product",
-          "checked": true
+          "product": "Ford F-150 Tremor front axle Torsen differential",
+          "maker": "Ford",
+          "use": "A torque-sensing helical differential in the front axle is shown splitting drive between wheels on the real truck.",
+          "url": "https://www.youtube.com/watch?v=EWJBZ5c3vMI"
         }
       ]
     },
@@ -13587,20 +13032,22 @@
       ],
       "real_world": [
         {
-          "product": "Harmonic Drive CSF/CSG zero-backlash gear units",
-          "maker": "Harmonic Drive LLC",
-          "use": "Housed strain wave component sets with a cross roller output bearing for robot joints and precision positioning.",
-          "url": "https://www.automate.org/products/harmonic-drive-llc/gear-unit-zero-backlash",
-          "kind": "product",
-          "checked": true
+          "product": "Harmonic Drive HD25-100 gear unit",
+          "maker": "Harmonic Drive",
+          "use": "The unit is taken apart to show the elliptical wave generator flexing the thin flexspline against the circular spline.",
+          "url": "https://www.youtube.com/watch?v=FB3PPG3qMdU"
         },
         {
-          "product": "Apollo 15 Lunar Roving Vehicle wheel drives",
-          "maker": "Boeing / GM (Harmonic Drive gearing)",
-          "use": "Each wheel's electric motor drove the wheel through an 80:1 Harmonic Drive gear.",
-          "url": "https://newdrive.harmonicdrive.de/en/home/edition-one/apollo-15-harmonic-drive-on-the-moon",
-          "kind": "in-product",
-          "checked": true
+          "product": "Harmonic Drive FHA-17C-50 servo actuator",
+          "maker": "Harmonic Drive",
+          "use": "A servo actuator is opened to show the strain wave gear stage that gives the 50:1 reduction at the output.",
+          "url": "https://www.youtube.com/watch?v=qbj_rfw2Cs4"
+        },
+        {
+          "product": "Vexta stepper with miniature harmonic drive",
+          "maker": "Vexta",
+          "use": "A small stepper-mounted harmonic drive is disassembled to show the flexspline, wave generator and ring.",
+          "url": "https://www.youtube.com/watch?v=02wR0U_7SfM"
         }
       ]
     },
@@ -13840,20 +13287,10 @@
       ],
       "real_world": [
         {
-          "product": "Spicer 27518X Dana 60 ring and pinion, 5.38:1 (Jeep Wrangler)",
-          "maker": "Spicer (Dana)",
-          "use": "An offset hypoid ring gear and pinion turns the propeller shaft drive 90 degrees into the rear differential.",
-          "url": "https://www.summitracing.com/parts/sdh-27518x/make/jeep/model/wrangler/year/2008",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "1926 Packard passenger car rear axle",
-          "maker": "Packard (gears by Gleason)",
-          "use": "Packard adopted hypoid final drives across its line in 1926, lowering the propeller shaft a decade before most of the industry.",
-          "url": "https://macsmotorcitygarage.com/1926-packard-pioneers-the-hypoid-final-drive/",
-          "kind": "in-product",
-          "checked": true
+          "product": "Automotive differential ring and pinion set",
+          "maker": "Weber State University Automotive",
+          "use": "The pinion sits below the ring gear centre, so the shafts cross without meeting and the pair is set up by hand-turning for tooth contact and preload.",
+          "url": "https://www.youtube.com/watch?v=dAqAqODmcj4"
         }
       ]
     },
@@ -14081,20 +13518,16 @@
       ],
       "real_world": [
         {
-          "product": "Macnaught MX Series oval gear flow meter",
-          "maker": "Macnaught",
-          "use": "Two meshing oval gears turn with the flow, each rotation sweeping a known volume of liquid.",
-          "url": "https://macnaughtusa.com/products/oval-gear-meter",
-          "kind": "product",
-          "checked": true
+          "product": "Physical non-circular and elliptical gear models in Mechanical Principles (1930 film)",
+          "maker": "Ralph Steiner",
+          "use": "Real elliptical gears are filmed meshing, with the speed ratio visibly surging and easing through each turn.",
+          "url": "https://www.youtube.com/watch?v=mkQ2pXkYjRM"
         },
         {
           "product": "Maurice Lacroix Masterpiece Roue Carree Seconde watch",
           "maker": "Maurice Lacroix",
-          "use": "A clover-shaped wheel drives a square wheel that shows the seconds at 6 o'clock.",
-          "url": "https://watchesbysjx.com/2011/01/news-maurice-lacroix-masterpiece-roue-carree-seconde-with-square-gears.html",
-          "kind": "in-product",
-          "checked": true
+          "use": "A square wheel drives a clover-leaf wheel, a non-circular pair whose ratio varies so the seconds hand steps in a distinctive way.",
+          "url": "https://www.youtube.com/watch?v=dejcT8LKe58"
         }
       ]
     },
@@ -14389,28 +13822,16 @@
       ],
       "real_world": [
         {
-          "product": "Toyota Prius P111 hybrid transaxle power split device",
-          "maker": "Toyota",
-          "use": "A planetary gear set splits engine power between the wheels and generator MG1, acting as a continuously variable transmission.",
-          "url": "https://www.transmissiondigest.com/the-toyota-prius-p111-hybrid-transaxle/",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Shimano Nexus Inter-3 SG-3R75-B hub",
+          "product": "Shimano Nexus 8 speed internal gear hub",
           "maker": "Shimano",
-          "use": "An epicyclic gear set inside the rear hub gives three speeds by holding or driving different members.",
-          "url": "https://bike.shimano.com/en-US/product/component/nexus-inter3/SG-3R75-B.html",
-          "kind": "product",
-          "checked": true
+          "use": "Planetary gear sets inside the hub shell are locked or freed by clutches to give eight ratios, shown as the hub is taken apart.",
+          "url": "https://www.youtube.com/watch?v=k8qAn2D05R8"
         },
         {
-          "product": "Flender PLANUREX central drive gear units for sugar mills",
-          "maker": "Flender",
-          "use": "Planetary gear units deliver very high torque to sugar cane mill rolls.",
-          "url": "https://flender.com/en/Products/Gear-Units/PLANUREX-Central-Drive-Gear-Units-for-Sugar-Mills/p/PLANUREX-sugar-mills-central-drives",
-          "kind": "product",
-          "checked": false
+          "product": "Toyota Prius Synergy Drive hybrid transaxle",
+          "maker": "Toyota",
+          "use": "A planetary power split device joins the engine, generator and motor, so the engine power is divided between the wheels and the generator.",
+          "url": "https://www.youtube.com/watch?v=Eg8c2_eS-do"
         }
       ]
     },
@@ -14710,28 +14131,10 @@
       ],
       "real_world": [
         {
-          "product": "ZF 6HP26 six-speed automatic (Range Rover Sport) teardown",
-          "maker": "ZF",
-          "use": "First-hand teardown removing the Ravigneaux epicyclic that, with a simple front planetary, gives the six ratios.",
-          "url": "https://xoutpost.com/x5-e53-forum/90167-zf-6hp26-teardown-print.html",
-          "kind": "real-video",
-          "checked": true
-        },
-        {
-          "product": "ZF 6HP, Ford 6R60 and GM 6L80 six-speed automatics",
-          "maker": "ZF / Ford / GM",
-          "use": "Lepelletier layout pairing a simple front planetary with a Ravigneaux compound rear set.",
-          "url": "https://www.transmissiondigest.com/?p=17981",
-          "kind": "case-study",
-          "checked": true
-        },
-        {
-          "product": "Ford Cruise-O-Matic (FX, MX, FMX) three-speed automatic",
-          "maker": "Ford / Borg-Warner",
-          "use": "Three forward speeds and reverse are taken from one Ravigneaux planetary set controlled by bands and clutches.",
-          "url": "https://en.wikipedia.org/wiki/Cruise-O-Matic",
-          "kind": "in-product",
-          "checked": true
+          "product": "Toyota U660E / U760E six-speed automatic transaxle",
+          "maker": "Toyota",
+          "use": "The real Ravigneaux gear set with its two suns, long and short pinions on one carrier and a single ring is shown and handled as the heart of the gearbox.",
+          "url": "https://www.youtube.com/watch?v=q7j-eYKjIYI"
         }
       ]
     },
@@ -14965,20 +14368,15 @@
       ],
       "real_world": [
         {
-          "product": "Mazda MX-30 R-EV range-extender rotary engine",
-          "maker": "Mazda",
-          "use": "A single-rotor Wankel engine runs a generator that charges the battery of the plug-in hybrid.",
-          "url": "https://www.thedrive.com/news/mazdas-first-rotary-engine-in-more-than-a-decade-is-an-mx-30-range-extender",
-          "kind": "in-product",
-          "checked": true
+          "product": "See-through running Wankel rotary engine",
+          "use": "A triangular rotor orbits inside a transparent epitrochoid housing, so each combustion stroke is visible as the eccentric shaft turns.",
+          "url": "https://www.youtube.com/watch?v=pCteBhr4dGY"
         },
         {
-          "product": "Mazda RX-7 (FD) 13B-REW twin-rotor engine teardown",
+          "product": "Mazda rotary engine cutaway at the Detroit auto show",
           "maker": "Mazda",
-          "use": "Video series fully disassembling and rebuilding a 1993 JDM twin-turbo two-rotor Wankel engine.",
-          "url": "https://speed.academy/fd-mazda-rx7-13b-rotary-engine-build-part-1/",
-          "kind": "real-video",
-          "checked": true
+          "use": "A cutaway Mazda rotary engine turning over shows the rotor orbiting in its housing and driving the eccentric shaft.",
+          "url": "https://www.youtube.com/watch?v=9UxfScCTrTo"
         }
       ]
     },
@@ -15217,20 +14615,10 @@
       ],
       "real_world": [
         {
-          "product": "Omega calibre 561 date mechanism (service walkthrough)",
-          "maker": "Omega",
-          "use": "A sprung jumper holds the 31-tooth date ring, which a peg on the daily wheel advances one tooth per day.",
-          "url": "https://omegaforums.net/threads/cal-561-a-simple-summary.17131/page-2",
-          "kind": "real-video",
-          "checked": true
-        },
-        {
-          "product": "ETA 2824-2 automatic movement date ring and jumper",
+          "product": "ETA 2824-2 automatic watch movement",
           "maker": "ETA",
-          "use": "Watchmakers discuss the integrated date jumper spring that indexes the toothed date ring.",
-          "url": "https://www.watchrepairtalk.com/topic/2739-aligning-the-date-in-the-dial-window",
-          "kind": "case-study",
-          "checked": true
+          "use": "A finger on the hour wheel advances the date ring one tooth each day while a sprung jumper snaps it into place and holds it.",
+          "url": "https://www.youtube.com/watch?v=72k3wD0x9Y8"
         }
       ]
     },
@@ -15488,28 +14876,9 @@
       ],
       "real_world": [
         {
-          "product": "Kershaw Kalee sound projector (Science Museum Group)",
-          "maker": "Kershaw Soho (Sales) Ltd, Leeds",
-          "use": "A Maltese cross intermittent advances the film one frame at a time.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co205552/kershaw-kalee-sound-projector-projector",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "35mm film projector, Kodak Museum Collection (Science Museum Group)",
-          "maker": "",
-          "use": "35mm projector for 1000 ft reels with a Maltese cross intermittent driving the film sprocket.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8187098/35mm-film-projector-cine-camera-projector-maltese-cross",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "8-point Maltese cross mechanism from a projector (Science Museum Group)",
-          "maker": "",
-          "use": "Removed projector intermittent showing the Geneva wheel itself.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8206936/maltese-cross-mechanism",
-          "kind": "museum",
-          "checked": true
+          "product": "35mm cinema projector",
+          "use": "A pin on the constantly turning drive disc enters the Maltese cross slots and steps the film sprocket one frame at a time.",
+          "url": "https://www.youtube.com/watch?v=YcQ4XeTwIXg"
         }
       ]
     },
@@ -15744,24 +15113,7 @@
         "star-wheel",
         "ratchet-pawl"
       ],
-      "real_world": [
-        {
-          "product": "John Deere FH312371 intermittent gear (fits 328, 338, 348, 349, 359, 459, 468 small square balers)",
-          "maker": "John Deere",
-          "use": "OEM partly toothed gear giving controlled intermittent rotation in the machine's drive; in these balers it times the knotter drive.",
-          "url": "https://shop.deere.com/us/product/FH312371%3A-Intermittent-Gear/p/FH312371",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "LVU14840 41-tooth intermittent spur gear for John Deere drivetrains",
-          "maker": "BTI (aftermarket for John Deere)",
-          "use": "Replacement intermittent gear that controls timing and rotational movement in John Deere equipment.",
-          "url": "https://bti-direct.com/products/lvu14840-intermittent-gear.oembed",
-          "kind": "product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "internal-geneva",
@@ -15994,9 +15346,12 @@
         "star-wheel",
         "internal-gear-pair"
       ],
-      "real_world": [],
-      "waive": [
-        "real_world"
+      "real_world": [
+        {
+          "product": "3D-printed day of week clock",
+          "use": "A crank pin enters slots inside a cup-shaped wheel and steps the day wheel one position per turn, in the same direction as the crank.",
+          "url": "https://www.youtube.com/watch?v=b4VNwRJ1d-Q"
+        }
       ]
     },
     {
@@ -16239,28 +15594,16 @@
       ],
       "real_world": [
         {
-          "product": "DESTACO (CAMCO/Ferguson) RGD and RGS roller gear index drives",
+          "product": "CAMCO roller gear index drives on production machines",
           "maker": "DESTACO",
-          "use": "Cam-actuated roller gear drives step rotary dials and conveyors between stations.",
-          "url": "https://www.destaco.com/rotary-positioning/indexers",
-          "kind": "product",
-          "checked": true
+          "use": "A ribbed cam on a constantly turning shaft steps a turret of rollers one station at a time and locks it between steps.",
+          "url": "https://www.youtube.com/watch?v=QR80Gq-dqMM"
         },
         {
-          "product": "Ferguson roller gear, roller dial and parallel dial index drives",
-          "maker": "Ferguson (DESTACO)",
-          "use": "Index drives that move a load in controlled steps and hold it at set positions.",
-          "url": "https://www.destaco.com/en/products-by-brand/ferguson",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "CAMCO E-Series heavy duty index drive",
-          "maker": "DESTACO (CAMCO)",
-          "use": "Precision cam with preloaded followers on a center rib indexes heavy rotary dials.",
-          "url": "https://destaco.com/rotary-positioning/mechanical-indexers/mechanical-rotary-indexers-e.html",
-          "kind": "product",
-          "checked": true
+          "product": "Globoidal cam index drive",
+          "maker": "Motion Index Drives",
+          "use": "A globoidal cam on the input shaft engages rollers on the output turret to index it with a dwell between steps.",
+          "url": "https://www.youtube.com/watch?v=QIUfBFyNvFg"
         }
       ]
     },
@@ -16509,28 +15852,10 @@
       ],
       "real_world": [
         {
-          "product": "WEISS Pick-O-Mat mechanical assembly machine",
-          "maker": "WEISS",
-          "use": "One turn of a barrel cam on the central drive unit gives a full pick-and-place cycle.",
-          "url": "https://www.machinery.co.uk/content/product-launches/mechanical-alternative-for-pneumatic-assembly-machines",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Kawasaki KX450 (2023) gear change drum and shift forks",
-          "maker": "Kawasaki",
-          "use": "Grooves in the shift drum move the shift forks to select gears as the drum indexes.",
-          "url": "https://www.revzilla.com/oem/kawasaki/2023-kawasaki-kx450/gear-change-drumshift-forks",
-          "kind": "in-product",
-          "checked": false
-        },
-        {
-          "product": "CAMCO custom barrel cams",
-          "maker": "DESTACO (CAMCO)",
-          "use": "Grooved cylindrical cams made to order for machine motions.",
-          "url": "https://destaco.com/solutions/by-applications-and-topics/custom-cams.html",
-          "kind": "product",
-          "checked": true
+          "product": "Honda Nighthawk 700S gearbox",
+          "maker": "Honda",
+          "use": "The grooved shift drum turns and its grooves slide the shift forks sideways to select gears.",
+          "url": "https://www.youtube.com/watch?v=pX2m3xea8nc"
         }
       ]
     },
@@ -16791,20 +16116,10 @@
       ],
       "real_world": [
         {
-          "product": "THK CF / CFH series cam followers",
-          "maker": "THK",
-          "use": "Stud-mounted needle roller followers that ride on cams and tracks in machinery.",
-          "url": "https://store-na.thk.com/Catalog/rotation/cam-follower",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "McGill CAMROL CF 1-1/4 S stud cam follower",
-          "maker": "McGill (Regal Rexnord)",
-          "use": "Roller follower for cam mechanisms in packaging machinery and conveyors.",
-          "url": "https://www.mrosupply.com/products/2249467/as-markdown/",
-          "kind": "product",
-          "checked": true
+          "product": "Toyota 4A-C single overhead cam engine (1986 Corolla)",
+          "maker": "Toyota",
+          "use": "Cam lobes press the rocker arms, whose rollers or pads follow the lobe profile to open the valves in turn.",
+          "url": "https://www.youtube.com/watch?v=6LmHegcDKd0"
         }
       ]
     },
@@ -17035,24 +16350,7 @@
         "barrel-cam",
         "eccentric-sheave"
       ],
-      "real_world": [
-        {
-          "product": "COMP Cams 84000-16 race hydraulic flat tappet lifters (Chevrolet small and big block)",
-          "maker": "COMP Cams",
-          "use": "Flat-faced lifters slide on the camshaft lobes of pushrod V8 engines.",
-          "url": "https://enginemaster.com.au/products/comp-cams-race-hydraulic-flat-tappet-lifters-chev-big-small-block-co84000-16",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Shim-under-bucket valve adjusters in modern motorcycle engines",
-          "maker": "",
-          "use": "Cam lobes press directly on flat-faced bucket tappets over each valve, with shims setting clearance.",
-          "url": "https://www.revzilla.com/common-tread/why-do-bikes-use-shim-under-bucket-valve-adjusters",
-          "kind": "case-study",
-          "checked": false
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "face-groove-cam",
@@ -17305,19 +16603,7 @@
         "desmodromic-cam",
         "geneva"
       ],
-      "real_world": [
-        {
-          "product": "CAMCO custom face-grooved cams",
-          "maker": "DESTACO (CAMCO)",
-          "use": "Medium speed cams with a groove slightly wider than the follower, giving positive drive in both directions.",
-          "url": "https://destaco.com/solutions/by-applications-and-topics/custom-cams.html",
-          "kind": "product",
-          "checked": true
-        }
-      ],
-      "waive": [
-        "real_world"
-      ]
+      "real_world": []
     },
     {
       "id": "desmodromic-cam",
@@ -17598,32 +16884,7 @@
         "face-groove-cam",
         "bell-crank"
       ],
-      "real_world": [
-        {
-          "product": "Mercedes-Benz W 196 R (1954) with M 196 engine",
-          "maker": "Mercedes-Benz",
-          "use": "The straight-eight uses desmodromic valve gear instead of valve springs.",
-          "url": "https://rmsothebys.com/auctions/tt25/lots/r0001-1954-mercedesbenz-w-196-r-stromlinienwagen/",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Ducati Desmosedici Stradale V4 (Panigale V4)",
-          "maker": "Ducati",
-          "use": "Separate cams and rockers open and close the valves, with no valve springs.",
-          "url": "https://motorcyclenews.com/news/new-bikes/2017/september/ducati-panigale-v4-engine",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Mercedes-Benz W 196 and 300 SLR desmodromic engines",
-          "maker": "Mercedes-Benz",
-          "use": "Detailed history of the desmodromic valve trains used on the 1954 to 1955 racing cars.",
-          "url": "https://desmodromology.nl/mercedes-benz-w-196-300-slr",
-          "kind": "case-study",
-          "checked": false
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "locomotive-drive",
@@ -17894,28 +17155,15 @@
       ],
       "real_world": [
         {
-          "product": "LNER A3 4-6-2 'Flying Scotsman' (1923)",
-          "maker": "LNER Doncaster / Science Museum Group",
-          "use": "Connecting rods from the cylinders drive cranked wheels and coupling rods tie the three driving axles together.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8052657/london-north-eastern-railway-steam-locomotive-flying-scotsman",
-          "kind": "museum",
-          "checked": true
+          "product": "Steam locomotive main rod",
+          "use": "The main rod and crosshead turn the driving wheel while the coupling rod keeps the next wheel in step.",
+          "url": "https://www.youtube.com/watch?v=MCGrTeEy0vo"
         },
         {
-          "product": "Union Pacific 4014 'Big Boy' 4-8-8-4",
-          "maker": "Union Pacific / ALCO",
-          "use": "Two engine units each drive eight 68 in driving wheels through main and side rods.",
-          "url": "https://www.up.com/content/dam/upcom/migration/uprr/newsinfo/documents/up-pdf-nativedocs/pdf-up-media-4014-fact-sheet.pdf",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Fitter servicing coupling and connecting rod bearings, Montreal Locomotive Works, 1940",
-          "maker": "Montreal Locomotive Works / Ingenium",
-          "use": "Photo of real rod drive bearings being maintained on a steam locomotive.",
-          "url": "https://collections.ingenium.ca/en/id/42012/",
-          "kind": "museum",
-          "checked": true
+          "product": "Union Pacific 4014 Big Boy",
+          "maker": "Union Pacific",
+          "use": "Pacing footage of the running gear, with main and coupling rods driving the wheels at speed.",
+          "url": "https://www.youtube.com/watch?v=3GtEX0rDUU8"
         }
       ]
     },
@@ -18166,20 +17414,16 @@
       ],
       "real_world": [
         {
-          "product": "Ruland Oldham couplings (aluminum or stainless hubs, acetal, nylon or PEEK disk)",
-          "maker": "Ruland Manufacturing",
-          "use": "A sliding center disk between two slotted hubs passes torque while taking up parallel shaft offset, and breaks cleanly on overload.",
-          "url": "https://www.ruland.com/servo-couplings/oldham-couplings.html",
-          "kind": "product",
-          "checked": true
+          "product": "Printrbot Go 3D printer Z lead screw",
+          "maker": "John Davis",
+          "use": "An Oldham coupler links the motor shaft and lead screw, absorbing offset between them.",
+          "url": "https://www.youtube.com/watch?v=08WQxpkgdAk"
         },
         {
-          "product": "Ruland Oldham couplings on conveyor roller drives",
-          "maker": "Ruland Manufacturing (PIB Sales article)",
-          "use": "Join motors to conveyor rollers in packaging and sorting lines, absorbing frame misalignment with zero backlash.",
-          "url": "https://pibsales.com/bearings/ruland-oldham-couplings-solutions-for-conveyors/",
-          "kind": "in-product",
-          "checked": true
+          "product": "CraftBot 3D printer Z lead screw",
+          "maker": "Craftbot",
+          "use": "The coupler's floating disc absorbs a bent lead screw so the Z axis does not wobble.",
+          "url": "https://www.youtube.com/watch?v=tmMrsJ1Jmy8"
         }
       ]
     },
@@ -18423,20 +17667,9 @@
       ],
       "real_world": [
         {
-          "product": "Dana Spicer Spicer Life 1310 driveshaft U-joint for 1945-2006 Jeep CJ and Wrangler",
-          "maker": "Dana (Spicer)",
-          "use": "A cross and bearing cap joint at each end of the driveshaft lets it turn through changing angles as the axle moves.",
-          "url": "https://oms.quadratec.com/dana-spicer-spicer-life-1310-driveshaft-u-joint.html",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Spicer cardan and Wing Bearing industrial driveshafts",
-          "maker": "Dana (Spicer), via Rowland Company",
-          "use": "Cardan joints transmit torque at an angle in steel and paper mill machinery, pumps, marine drives and excavators.",
-          "url": "https://www.rowlandcompany.com/manufacturer/dana-spicer/",
-          "kind": "product",
-          "checked": true
+          "product": "Automotive propeller shaft with U-joints (shop demonstration)",
+          "use": "Two cross-and-yoke joints at an angle carry torque to the axle, and the working angles set how much the output speed fluctuates.",
+          "url": "https://www.youtube.com/watch?v=f1m-Fh5kiRU"
         }
       ]
     },
@@ -18683,20 +17916,16 @@
       ],
       "real_world": [
         {
-          "product": "Tom Wood's small diameter 1310 double cardan front driveshaft for Jeep CJ/YJ",
-          "maker": "Tom Wood's Custom Drive Shafts",
-          "use": "1310-series double cardan joints with a centering ball give smooth constant velocity drive at steep front shaft angles.",
-          "url": "https://4xshaft.com/products/small-diameter-1310-double-cardan-shaft",
-          "kind": "product",
-          "checked": true
+          "product": "Ford Bronco / F-150 front driveshaft double Cardan joint",
+          "maker": "Ford",
+          "use": "Two U-joints joined by a centering yoke let the front driveshaft run at a steering and suspension angle while the output turns at even speed.",
+          "url": "https://www.youtube.com/watch?v=rsmH0YPeKhU"
         },
         {
-          "product": "Torque King high-angle CV driveshafts for Ram 2500/3500 4x4 (e.g. TKA3130)",
-          "maker": "Torque King",
-          "use": "A double cardan 1410 joint at the transfer case end runs at up to 30 degrees on lifted heavy-duty trucks.",
-          "url": "https://torqueking.com/blog/a-closer-look-at-highperformance-highangle-cv-driveshafts/",
-          "kind": "product",
-          "checked": true
+          "product": "Jeep front driveshaft double Cardan joint",
+          "maker": "Jeep",
+          "use": "The rebuilt joint shows two spiders and a center yoke that split the shaft angle between them so speed fluctuation cancels.",
+          "url": "https://www.youtube.com/watch?v=3Bp7E7miYYk"
         }
       ]
     },
@@ -18959,29 +18188,10 @@
       ],
       "real_world": [
         {
-          "product": "Rzeppa high angle constant velocity joint, 1.25 in, 37.5 degrees (object 1935-614)",
-          "maker": "Universal Power Drives Ltd (Science Museum Group collection)",
-          "use": "A dismantled real Rzeppa joint showing the bell, cage, inner race and six balls that keep the shafts at constant velocity.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co25100",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "VW Rabbit front axle outer CV joint",
-          "maker": "Volkswagen (service article by Ralph Birnbaum)",
-          "use": "Shop article on disassembling, inspecting and rebuilding the Rzeppa-style outer joint on a real front-drive car.",
-          "url": "https://automotivetechinfo.com/wp-content/uploads/1988/02/Servicing-Rzeppa-Joints.pdf",
-          "kind": "case-study",
-          "checked": true
-        },
-        {
-          "product": "GKN Lobro AC and UF fixed ball joints for car sideshafts",
-          "maker": "GKN Automotive",
-          "use": "Fixed ball joints at the wheel end of front sideshafts allow up to 47 to 50 degrees for steering.",
-          "url": "https://www.gknautomotive.com/globalassets/downloads/aftermarket-download-archive-files/driveshafts-technology/driveshafts_technology_loebro_gb.pdf",
-          "kind": "product",
-          "checked": true,
-          "note": "The brochure calls them fixed ball joints, the Rzeppa-derived type; it does not use the word Rzeppa."
+          "product": "Air-cooled VW CV joint",
+          "maker": "Volkswagen",
+          "use": "The balls, cage and grooved races of a ball-type CV joint are assembled by hand, showing how the balls sit in the bisecting plane.",
+          "url": "https://www.youtube.com/watch?v=pmhPYCJWurc"
         }
       ]
     },
@@ -19245,28 +18455,10 @@
       ],
       "real_world": [
         {
-          "product": "Zero-Max Schmidt offset couplings",
+          "product": "Zero-Max Schmidt offset coupling",
           "maker": "Zero-Max",
-          "use": "Link offset shafts at constant speed for print registration in printing presses, nip rolls in metal processing and assembly machines.",
-          "url": "https://www.automationworld.com/products/product/21107559/zero-max-inc-schmidt-couplings-connect-offset-shafts-while-ensuring-constant-rotating-speed",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Schmidt-Kupplung Standard, Power Plus and Offset Plus series",
-          "maker": "Abssac (Schmidt-Kupplung)",
-          "use": "Constant velocity offset couplings driving printing, roll forming, laminating and corrugated paper machine rolls.",
-          "url": "https://eurekamagazine.co.uk/content/technology-spotlights/close-together-far-apart-the-precision-schmidt-kupplung",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Zero-Max Schmidt offset couplings in printing presses and paper converting",
-          "maker": "Zero-Max (Design World article)",
-          "use": "Compact offset couplings save space between parallel shafts in presses, embossing and pharmaceutical machinery.",
-          "url": "https://www.designworldonline.com/?p=1615",
-          "kind": "product",
-          "checked": true
+          "use": "Three discs joined by parallel links carry torque between offset parallel shafts at constant speed, shown on the manufacturer's own hardware.",
+          "url": "https://www.youtube.com/watch?v=zVt1tvD7rqk"
         }
       ]
     },
@@ -19511,28 +18703,22 @@
       ],
       "real_world": [
         {
-          "product": "Kerk 3/4 in (19 mm) lead screw with ZBA, NTB, VHD and BFW nuts",
-          "maker": "Haydon Kerk Pittman (AMETEK)",
-          "use": "A TFE-coated modified acme lead screw drives a polymer nut for motorised linear positioning.",
-          "url": "https://www.haydonkerkpittman.com/products/lead-screws-and-nuts/lead-screws-by-size/3-4-19mm",
-          "kind": "product",
-          "checked": true
+          "product": "Monarch engine lathe",
+          "maker": "Abom79",
+          "use": "The lathe leadscrew drives the carriage through the half nut, with a reverse lever to cut left hand threads.",
+          "url": "https://www.youtube.com/watch?v=9Hb-96Z7cRc"
         },
         {
-          "product": "Joyce/Dayton 6 in x 1 1/3 single lead acme machine screw (AS600R075A) with bronze nut",
-          "maker": "Joyce/Dayton",
-          "use": "A heavy acme lead screw and bronze nut rated to 150,000 lb dynamic load for lifting and positioning.",
-          "url": "https://www.joycedayton.com/products/screws-and-nuts/machine-screws-and-nuts/6-1-13-single-lead-acme",
-          "kind": "product",
-          "checked": true
+          "product": "Engine lathe with lead screw and half nut lever",
+          "maker": "Trev Kongable",
+          "use": "Engaging the half nut on the lead screw advances the carriage at a steady rate.",
+          "url": "https://www.youtube.com/watch?v=QjFVFCs3Z7g"
         },
         {
-          "product": "Machine (acme) screw jack actuator",
-          "maker": "Columbus McKinnon (CMCO)",
-          "use": "A worm-driven acme lifting screw raises loads and self-locks at higher ratios.",
-          "url": "https://www.cmco.com/en-gb/products/power-and-motion-technology/actuators/mechanical-actuators/acme-screw-jack/",
-          "kind": "product",
-          "checked": true
+          "product": "Lathe leadscrew thread cutting",
+          "maker": "LSCAD",
+          "use": "The carriage follows the leadscrew through the half nut while a thread is cut.",
+          "url": "https://www.youtube.com/watch?v=p_NHCBdpXFo"
         }
       ]
     },
@@ -19783,20 +18969,10 @@
       ],
       "real_world": [
         {
-          "product": "THK SBK high-speed compact ball screw",
-          "maker": "THK",
-          "use": "A caged recirculating-ball nut on a ground screw gives fast, low-noise feed for machine tool and automation axes.",
-          "url": "https://www.automation.com/article/thk-introduces-sbk-high-speed-compact-ball-screw",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "THK standard ball screw assemblies",
-          "maker": "THK (via Acorn Industrial)",
-          "use": "Ball screw and nut assemblies for precise linear motion in industrial machines.",
-          "url": "https://www.acorn-ind.co.uk/thk/linear-motion/ball-screws/ball-screw-assemblies/",
-          "kind": "product",
-          "checked": true
+          "product": "Homebuilt multi-axis CNC machine with ballscrews",
+          "maker": "FloweringElbow 4SuperNerds",
+          "use": "Motor-turned ballscrews carry the machine axes along their rails.",
+          "url": "https://www.youtube.com/watch?v=k47LBPEemvU"
         }
       ]
     },
@@ -20013,20 +19189,10 @@
       ],
       "real_world": [
         {
-          "product": "Newport DM-13 differential micrometer head (13 mm coarse, 0.2 mm fine)",
-          "maker": "Newport (MKS Instruments)",
-          "use": "Two threads of slightly different pitch give sub-micron fine motion on top of normal coarse travel for optical stages.",
-          "url": "https://www.newport.com/p/DM-13",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Siskiyou 100TPI-0.5d differential adjustment screw",
-          "maker": "Siskiyou Corporation",
-          "use": "A differential screw with 0.5 in lockable coarse travel and 0.030 in fine travel for ultraprecise optical mount adjustment.",
-          "url": "https://www.photonics.com/Product.aspx?PRID=47567",
-          "kind": "product",
-          "checked": true
+          "product": "Machine shop differential screw fine-adjust fixture",
+          "maker": "Solid Rock Machine Shop Inc.",
+          "use": "Two threads of slightly different pitch move a part by only the pitch difference per turn, giving very fine adjustment.",
+          "url": "https://www.youtube.com/watch?v=KeCqpoUoQlA"
         }
       ]
     },
@@ -20271,20 +19437,22 @@
       ],
       "real_world": [
         {
-          "product": "Gates Micro-V automotive serpentine belts",
-          "maker": "Gates",
-          "use": "A V-ribbed belt from the crankshaft pulley drives the engine accessories on a car serpentine drive.",
-          "url": "https://www.gates.com/us/en/power-transmission/micro-v-belts/automotive-micro-v-belts.p.8550-000000-000000.html",
-          "kind": "product",
-          "checked": true
+          "product": "Line-shaft machine shop",
+          "maker": "mrpete222",
+          "use": "Flat belts carry power from an overhead line shaft down to each machine.",
+          "url": "https://www.youtube.com/watch?v=cXDbH5pzagc"
         },
         {
-          "product": "Gates industrial timing belts (metric, imperial and Twin Power double-sided)",
-          "maker": "Gates (via Acorn Industrial)",
-          "use": "Toothed synchronous belts transmit power between pulleys without slip in industrial machinery.",
-          "url": "https://www.acorn-ind.co.uk/gates/power-transmission/industrial-belts/timing-belts",
-          "kind": "product",
-          "checked": true
+          "product": "Century-old line-shaft machine shop",
+          "maker": "Dave Maloney",
+          "use": "Leather flat belts from the line shaft drive lathes and other machines.",
+          "url": "https://www.youtube.com/watch?v=E-2qJNtFgvs"
+        },
+        {
+          "product": "Line-shaft machine shop at Rough and Tumble",
+          "maker": "Shark River Machine",
+          "use": "Belts run from line shaft pulleys to the machines in a museum shop.",
+          "url": "https://www.youtube.com/watch?v=131Vug8y9_0"
         }
       ]
     },
@@ -20539,20 +19707,10 @@
       ],
       "real_world": [
         {
-          "product": "Harken 10:1 mainsheet Carbo Air base block (HC8454) with matching top block",
-          "maker": "Harken",
-          "use": "A 5-sheave base block and its top block form a 10:1 tackle so a sailor can trim a loaded mainsail by hand.",
-          "url": "https://murrays.com/products/harken-block-10-1-mainsheet-carbo-air-base",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "UPET drilling rig crown blocks (4 to 6 sheaves, 30 to 225 tf)",
-          "maker": "UPET",
-          "use": "The fixed multi-sheave crown block and the traveling block reeve the drill line to multiply drawworks pull for lifting the drill string.",
-          "url": "https://upet.com/equipment/crownblocks/",
-          "kind": "product",
-          "checked": true
+          "product": "Gin pole with block and tackle lifting logs",
+          "maker": "Medieval Trebuchet",
+          "use": "A rope reeved through multiple sheaves lets a person lift heavy logs with a small pull.",
+          "url": "https://www.youtube.com/watch?v=R3Yk2-hGGFI"
         }
       ]
     },
@@ -20800,28 +19958,10 @@
       ],
       "real_world": [
         {
-          "product": "Tsubaki RS double pitch roller chain A2080RB (ANSI 80, 2 in pitch)",
-          "maker": "Tsubaki",
-          "use": "Roller chain for economical drives at low speed, moderate load or long centre distance.",
-          "url": "https://catalog.tsubaki.ca/tr/item/double-pitch-roller-chain/rs-double-pitch-roller-chains-2/a2080rb",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Shimano CN-HG53 9-speed bicycle chain",
-          "maker": "Shimano",
-          "use": "Carries pedal torque from chainring to rear sprockets on 9-speed road and mountain bikes.",
-          "url": "https://www.rosebikes.com/p/shimano-cn-hg53-9-speed-chain-38137",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Tsubaki engineering class straight sidebar drive chain",
-          "maker": "Tsubaki",
-          "use": "Heavy roller drive chain for drum drives, draw benches and crawler crane drives in mining and cement plants.",
-          "url": "https://catalog.tsubaki.ca/viewitems/drive-chains_/drive-chain---straight-sidebar",
-          "kind": "product",
-          "checked": true
+          "product": "Lantech chain driven live roller conveyor",
+          "maker": "SIGMA Equipment",
+          "use": "A roller chain and sprockets turn the conveyor rollers together from a single drive.",
+          "url": "https://www.youtube.com/watch?v=HAu7vDjM3mI"
         }
       ]
     },
@@ -21091,28 +20231,21 @@
       ],
       "real_world": [
         {
-          "product": "Nissan XTRONIC CVT",
-          "maker": "Nissan / JATCO",
-          "use": "Two variable-width pulleys change the running radius of a steel belt to vary the ratio continuously.",
-          "url": "https://www.nissan-global.com/EN/INNOVATION/TECHNOLOGY/ARCHIVE/XTRONIC_CVT/",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Bosch CVT pushbelt",
-          "maker": "Bosch (Tilburg)",
-          "use": "Hundreds of steel elements held by steel bands push between the variator pulleys of car CVTs.",
-          "url": "https://www.bosch-presse.de/pressportal/de/en/production-of-the-100-millionth-pushbelt-266839.html",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "DAF 600 Variomatic",
+          "product": "DAF Variomatic",
           "maker": "DAF",
-          "use": "V-section rubber belts run on split cone pulleys whose halves move apart or together to change ratio automatically.",
-          "url": "https://driventowrite.com/2021/04/26/variomatic-for-the-people-daf-600-750-daffodil-30-31-32-33-44-55-66-77-volvo-343/",
-          "kind": "in-product",
-          "checked": true
+          "use": "Two V-pulleys with moving cone halves change the belt radii for a stepless ratio.",
+          "url": "https://www.youtube.com/watch?v=n03FAEAZN80"
+        },
+        {
+          "product": "DAF Variomatic test drives (1965 film)",
+          "maker": "DAF",
+          "use": "Rubber belts on variable-width pulleys serve as the automatic gearbox.",
+          "url": "https://www.youtube.com/watch?v=hl8KDZh_O0w"
+        },
+        {
+          "product": "Car CVT steel push belt",
+          "use": "A stack of steel segments rides between conical pulley faces to carry the drive at varying ratios.",
+          "url": "https://www.youtube.com/watch?v=PiwRUfFEc5k"
         }
       ]
     },
@@ -21337,28 +20470,15 @@
       ],
       "real_world": [
         {
-          "product": "MTD snow blower friction wheel 935-0243B",
-          "maker": "MTD",
-          "use": "A rubber friction wheel rides on the drive plate and is shifted across it to set speed and direction of the snow blower wheels.",
-          "url": "https://appliancepartspros.com/mtd-wheel-friction-4-935-0243b-ap6051806.html",
-          "kind": "product",
-          "checked": true
+          "product": "Snowblower friction wheel drive",
+          "use": "A rubber wheel pressed on a spinning disc changes speed and direction as it moves across the face.",
+          "url": "https://www.youtube.com/watch?v=CGpotB8Km4M"
         },
         {
-          "product": "1914 Metz Model 22 Roadster",
-          "maker": "Metz Company",
-          "use": "A friction-drive transmission with a driven disc and movable friction wheel gives variable ratio without gears.",
-          "url": "https://rmsothebys.com/auctions/hf19/lots/r0053-1914-metz-model-22-roadster/",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "1913 Metz driving review",
-          "maker": "Metz Company",
-          "use": "Drive of a real 1913 Metz whose friction transmission pairs a paper disc with an aluminium disc as a manual CVT.",
-          "url": "https://jalopnik.com/what-its-like-to-drive-a-car-with-a-transmission-half-m-1833297218",
-          "kind": "in-product",
-          "checked": true
+          "product": "1915 Metz touring car",
+          "maker": "Metz",
+          "use": "The driven wheel slides across a flywheel face to give stepless speeds and reverse.",
+          "url": "https://www.youtube.com/watch?v=veh58rYybVQ"
         }
       ]
     },
@@ -21606,28 +20726,9 @@
       ],
       "real_world": [
         {
-          "product": "Ford Instrument Company five-inch disc integrator (Smithsonian NMAH)",
-          "maker": "Ford Instrument Company",
-          "use": "Two stacked steel balls on a movable carriage between a disc and a cylinder integrate inputs in U.S. Navy gun fire control computers.",
-          "url": "https://www.si.edu/object/analog-computing-component-integrator-five-inch-disc%3Anmah_690606",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "Kelvin's Harmonic Analyser (1878), Science Museum",
-          "maker": "R W Munro and Company, design by Lord Kelvin",
-          "use": "Seven discs turned by the tracing point drive rolling spheres that pass integrated motion to the recording rollers to extract harmonic coefficients.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co60669/kelvins-harmonic-analyser",
-          "kind": "museum",
-          "checked": true
-        },
-        {
-          "product": "Manchester University differential analyser (1935), Science Museum",
-          "maker": "Metropolitan-Vickers",
-          "use": "Four disc-and-wheel integrators (the wheel variant, not ball) chained to solve differential equations.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8555617",
-          "kind": "museum",
-          "checked": true
+          "product": "Rebuilt Meccano differential analyser",
+          "use": "Disc-and-wheel integrators turn the wheel by the integral of the disc radius setting.",
+          "url": "https://www.youtube.com/watch?v=YDBU36LbC2o"
         }
       ]
     },
@@ -21862,20 +20963,22 @@
       ],
       "real_world": [
         {
-          "product": "Thomas Tompion longcase clock movement, London 1700",
-          "maker": "Thomas Tompion (Science Museum Group collection)",
-          "use": "The anchor escapement releases the going train one tooth per swing of the long seconds pendulum.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8557970/longcase-clock-movement",
-          "kind": "museum",
-          "checked": true
+          "product": "English longcase clock movement, Cornish",
+          "maker": "Fine Antique Clocks, P A Oxley",
+          "use": "The anchor pallets catch and release the escape wheel one tooth per pendulum swing in an antique longcase.",
+          "url": "https://www.youtube.com/watch?v=678bSxUyiEw"
         },
         {
-          "product": "William Clement longcase clock, London c.1685-1690 (V&A W.6:1-1938)",
-          "maker": "William Clement (Victoria and Albert Museum)",
-          "use": "A weight-driven longcase clock regulated by an anchor escapement, by one of the earliest makers to use it.",
-          "url": "https://collections.vam.ac.uk/item/O165205/longcase-clock-clement-william",
-          "kind": "museum",
-          "checked": true
+          "product": "London longcase clock movement",
+          "maker": "Fine Antique Clocks, P A Oxley",
+          "use": "The anchor rocks with the pendulum, locking and releasing the escape wheel and receiving a small push each beat.",
+          "url": "https://www.youtube.com/watch?v=axV5is5p-4U"
+        },
+        {
+          "product": "Turret clock with anchor escapement and pendulum",
+          "maker": "Trevor Murphy",
+          "use": "A large tower clock anchor is driven back and forth by the pendulum, metering out the going train.",
+          "url": "https://www.youtube.com/watch?v=z_7rE8afFfo"
         }
       ]
     },
@@ -22113,28 +21216,22 @@
       ],
       "real_world": [
         {
-          "product": "Thomas Savege full-plate fusee pocket watch movement, c.1678 (ZAA0672)",
-          "maker": "Thomas Savege (Royal Museums Greenwich)",
-          "use": "A verge escapement with crown wheel releases the fusee-driven train in this early pocket watch.",
-          "url": "https://rmg.co.uk/collections/objects/rmgc-object-79777",
-          "kind": "museum",
-          "checked": true
+          "product": "Antique English bracket clock",
+          "maker": "Halbe Hageman",
+          "use": "The crown wheel pushes alternately on the verge pallets, rocking the balance or pendulum.",
+          "url": "https://www.youtube.com/watch?v=qne88OuXegs"
         },
         {
-          "product": "John Midnall oval silver verge watch, London 1610-1620 (1874,0718.48)",
-          "maker": "John Midnall (British Museum)",
-          "use": "A pre-balance-spring verge escapement regulates this early 17th century watch.",
-          "url": "https://www.britishmuseum.org/collection/object/H_1874-0718-48",
-          "kind": "museum",
-          "checked": true
+          "product": "Austrian one-day clock movement",
+          "maker": "Bill Stoddard",
+          "use": "A crown wheel engages two pallets on the verge to release the train one tooth at a time.",
+          "url": "https://www.youtube.com/watch?v=S8LOVjIXiKg"
         },
         {
-          "product": "Salisbury Cathedral clock (c.1386)",
-          "maker": "Salisbury Cathedral",
-          "use": "The medieval iron turret clock runs today with a reproduction verge and foliot escapement installed in the 1956 restoration.",
-          "url": "https://en.wikipedia.org/wiki/Salisbury_Cathedral_clock",
-          "kind": "case-study",
-          "checked": true
+          "product": "Resting-wheel verge clock build",
+          "maker": "James Stanley",
+          "use": "A homemade weight-driven clock using a verge escapement variant that is shown running.",
+          "url": "https://www.youtube.com/watch?v=Rg_UF_32OEQ"
         }
       ]
     },
@@ -22405,28 +21502,16 @@
       ],
       "real_world": [
         {
-          "product": "Jaeger-LeCoultre miniature wristwatch movement (1929 calibre)",
-          "maker": "Jaeger-LeCoultre (Science Museum Group collection)",
-          "use": "A Swiss lever escapement gives impulse to the balance and releases the train in this tiny wristwatch movement.",
-          "url": "https://collection.sciencemuseumgroup.org.uk/objects/co757/miniature-wrist-watch-movement-spring-driven-watch-movement-lever-escapement",
-          "kind": "museum",
-          "checked": true
+          "product": "Mechanical wristwatch movement",
+          "maker": "Watch Affinity",
+          "use": "The pallet fork alternately locks and releases the escape wheel while the balance swings, shown in slow motion.",
+          "url": "https://www.youtube.com/watch?v=ZUCVBCFUW5I"
         },
         {
-          "product": "Helvetia calibre 800 manual-wind watch movement (1950)",
-          "maker": "Helvetia",
-          "use": "The movement's escapement is listed as Swiss lever, regulating the balance at each beat.",
-          "url": "https://ranfft.org/caliber/6487-Helvetia-800",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Sellita SW200-1 automatic movement in Circula SuperSport, AquaSport and ProTrail watches",
-          "maker": "Sellita / Circula",
-          "use": "A 28,800 vph mechanical lever movement whose lever escapement meters the mainspring through the balance.",
-          "url": "https://circulawatches.com/us/blog/Sellita-SW200-1-A-top-class-Swiss-movement",
-          "kind": "in-product",
-          "checked": true
+          "product": "Lever platform escapement, running",
+          "maker": "Stephen Baguley",
+          "use": "A pallet lever on a platform escapement unlocks the escape wheel and impulses the balance each swing.",
+          "url": "https://www.youtube.com/watch?v=7LnC1OyLo04"
         }
       ]
     },
@@ -22690,20 +21775,10 @@
       ],
       "real_world": [
         {
-          "product": "STANLEY STMT82666-0 1/4 in. 72-tooth ratchet",
-          "maker": "STANLEY",
-          "use": "A single pawl on a 72-tooth gear gives 5 degree steps, reversible by a switch lever.",
-          "url": "https://www.stanleytools.co.uk/product/stmt82666-0/stanley-14-72t-ratchet-and-socket-set-11-pc",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Harrington LB 1 ton lever hoist (come-along)",
-          "maker": "Harrington Hoists",
-          "use": "Two brake pawls on a ratchet wheel work with a Weston load brake to hold the load as the lever is reset.",
-          "url": "https://www.aceindustries.com/harrington-lb-1-ton-lever-hoist-come-along/",
-          "kind": "product",
-          "checked": true
+          "product": "Coffing LSB-C ratchet lever hoist",
+          "maker": "CMCO Coffing",
+          "use": "Each lever stroke drives a pawl against a toothed wheel to haul the load chain while a holding pawl stops it slipping back.",
+          "url": "https://www.youtube.com/watch?v=cnlvxyQ6nzc"
         }
       ]
     },
@@ -22945,24 +22020,7 @@
         "ravigneaux",
         "friction-wheel-drive"
       ],
-      "real_world": [
-        {
-          "product": "Formsprag aerospace sprag overrunning clutches",
-          "maker": "Formsprag (Regal Rexnord)",
-          "use": "Sprag clutches in helicopter main drive gearboxes and accessory gearboxes drive one way and freewheel the other.",
-          "url": "https://aerospace.regalrexnord.com/Products/Clutches-and-Brakes",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Formsprag FS-300 sprag-type overrunning clutch (CL4010-5RH)",
-          "maker": "Formsprag",
-          "use": "Industrial shaft-mounted sprag clutch rated 440 ft-lb for overrunning and backstopping.",
-          "url": "https://www.mrosupply.com/products/404496/as-markdown/",
-          "kind": "product",
-          "checked": true
-        }
-      ]
+      "real_world": []
     },
     {
       "id": "sarrus-linkage",
@@ -23218,20 +22276,9 @@
       ],
       "real_world": [
         {
-          "product": "Automated mooring robot (US patent 12325494)",
-          "maker": "Ipalco BV",
-          "use": "A Sarrus linkage between base and attachment element lets the mooring pad extend straight out from the quay toward the ship while fully supporting its weight and retracting to a small footprint.",
-          "url": "https://ipiq.io/patents/424341",
-          "kind": "case-study",
-          "checked": true
-        },
-        {
-          "product": "Flexure linear-motion stage (US patent 9879974)",
-          "maker": "",
-          "use": "Monolithic flexure stage that builds on two Sarrus double-arm linkages set at 90 degrees to guide a carriage along a straight line without bearings.",
-          "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9879974",
-          "kind": "case-study",
-          "checked": true
+          "product": "Sarrus linkage axis on a homebuilt 3D printer",
+          "use": "Two sets of hinged plates at right angles let the platform rise and fall in a straight line without a slide.",
+          "url": "https://www.youtube.com/watch?v=_UIoOVhxdMk"
         }
       ]
     },
@@ -23460,28 +22507,20 @@
       ],
       "real_world": [
         {
-          "product": "Rexroth A10VSO 71 DFR series 31 axial piston variable pump",
-          "maker": "Bosch Rexroth",
-          "use": "An adjustable swashplate sets piston stroke so the pump varies its displacement and flow.",
-          "url": "https://www.jhf.com/parts/rexroth-axial-piston-variable-pump-a10vso-series-31/r902400074",
-          "kind": "product",
-          "checked": true
+          "product": "Axial swashplate piston pump cutaway",
+          "use": "A tilted plate pushes the pistons in and out as the barrel turns.",
+          "url": "https://www.youtube.com/watch?v=Athbk7JvGRQ"
         },
         {
-          "product": "Robinson R44 helicopter swashplate (Service Bulletin SB-10)",
-          "maker": "Robinson Helicopter Company",
-          "use": "Upper and lower swashplates with scissor linkages pass cyclic and collective pitch from the stationary controls to the rotating main rotor blades.",
-          "url": "https://shop.robinsonheli.com/wp-content/uploads/2015/12/r44_sb10.pdf",
-          "kind": "in-product",
-          "checked": true
+          "product": "Axial variable displacement A/C compressor cutaway",
+          "maker": "NADA Scientific",
+          "use": "A tilting swash plate sets the piston stroke and so the refrigerant flow.",
+          "url": "https://www.youtube.com/watch?v=yMp2MtcQ9rk"
         },
         {
-          "product": "Sanden swash plate automotive A/C compressor",
-          "maker": "Sanden",
-          "use": "A swash plate on the belt-driven shaft reciprocates several pistons to compress refrigerant for passenger car air conditioning.",
-          "url": "https://www.sanden-europe.com/about-sanden/history/",
-          "kind": "in-product",
-          "checked": true
+          "product": "Double acting swash plate car A/C compressor",
+          "use": "The swash plate on the shaft drives pistons back and forth on both of its faces.",
+          "url": "https://www.youtube.com/watch?v=5Vea2qcbEXI"
         }
       ]
     },
@@ -23728,20 +22767,9 @@
       ],
       "real_world": [
         {
-          "product": "8 m span deployable Bennett-linkage arch shelter prototype",
-          "maker": "University of Oxford, Department of Engineering Science",
-          "use": "Tiled Bennett linkages with nylon hinges and carbon fibre tubes form a 49 kg arch that folds for transport and is erected by a small team.",
-          "url": "https://www.eng.ox.ac.uk/media/6788/shelters-draft.pdf",
-          "kind": "case-study",
-          "checked": true
-        },
-        {
-          "product": "Deployable parabolic cylindrical antenna prototype",
-          "maker": "Harbin Institute of Technology",
-          "use": "A network of Bennett linkages deploys the antenna support structure with a single degree of freedom; a physical prototype was constructed.",
-          "url": "https://hit.globalimpact.cn/en/publications/networking-of-bennett-linkages-and-its-application-on-deployable-/",
-          "kind": "case-study",
-          "checked": true
+          "product": "Bennett linkage physical toy model",
+          "use": "Four skew hinge axes give a loop that still folds and unfolds with one degree of freedom.",
+          "url": "https://www.youtube.com/watch?v=U1IpMTTaMwY"
         }
       ]
     },
@@ -23955,20 +22983,10 @@
       ],
       "real_world": [
         {
-          "product": "PI P-733.Z high-dynamics Z nanopositioner",
-          "maker": "Physik Instrumente (PI)",
-          "use": "Zero-play flexure guides with lever amplification give 100 micrometre piezo-driven travel without friction or backlash.",
-          "url": "https://www.physikinstrumente.com/en/products/nanopositioning-piezo-flexure-stages/linear-piezo-flexure-stages/p-733z-high-dynamics-z-nanopositioner-scanner-201270",
-          "kind": "product",
-          "checked": true
-        },
-        {
-          "product": "Free-Flex flexural pivots",
-          "maker": "Riverhawk Company",
-          "use": "Crossed-spring flexure pivot bearings give frictionless, lubrication-free limited rotation in gimbals, sensors and aerospace linkages.",
-          "url": "https://flexpivots.com/?p=249",
-          "kind": "product",
-          "checked": true
+          "product": "NanoCube XYZ piezo flexure stage",
+          "maker": "Physik Instrumente",
+          "use": "Flexure hinges flex to guide the stage over a tiny range with no friction or backlash.",
+          "url": "https://www.youtube.com/watch?v=FD9CBWKmIBM"
         }
       ]
     },
@@ -24205,24 +23223,7 @@
         "four-bar",
         "ratchet-pawl"
       ],
-      "real_world": [
-        {
-          "product": "Slap bracelet (originally sold as Slap Wrap)",
-          "maker": "Stuart Anders (inventor)",
-          "use": "Layered bistable stainless steel spring bands stay straight until slapped, then snap into a stable curled state around the wrist.",
-          "url": "https://en.wikipedia.org/wiki/Slap_bracelet",
-          "kind": "in-product",
-          "checked": true
-        },
-        {
-          "product": "Aptar Flip Lid beverage closure",
-          "maker": "AptarGroup",
-          "use": "A moulded 270 degree lockage hinge snaps the lid open and closes it with an audible click; the snap-hinge behaviour is implied, not stated as bistable.",
-          "url": "https://aptar.com/news-events/aptar-launches-the-new-flip-lid-beverage-closure",
-          "kind": "product",
-          "checked": false
-        }
-      ]
+      "real_world": []
     }
   ]
 }

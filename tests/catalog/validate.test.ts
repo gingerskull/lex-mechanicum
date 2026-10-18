@@ -26,10 +26,16 @@ describe("validate", () => {
     expect(validate([r])).toEqual(["x: bad url www.example.org"]);
   });
 
-  it("names too few references and real-world examples, unless waived", () => {
+  it("names too few references, unless waived; real-world examples may be none", () => {
     const r = record("x", { references: [], real_world: [] });
-    expect(validate([r])).toEqual(["x: 0 references, at least 2 needed", "x: 0 real-world examples, at least 2 needed"]);
-    expect(validate([{ ...r, waive: ["references", "real_world"] }])).toEqual([]);
+    expect(validate([r])).toEqual(["x: 0 references, at least 2 needed"]);
+    expect(validate([{ ...r, waive: ["references"] }])).toEqual([]);
+  });
+
+  it("takes only YouTube videos as real-world examples", () => {
+    const r = record("x");
+    r.real_world![1]!.url = "https://www.example.org/product";
+    expect(validate([r])).toEqual(["x: real-world example not a YouTube video: https://www.example.org/product"]);
   });
 
   it("names a duplicate id", () => {

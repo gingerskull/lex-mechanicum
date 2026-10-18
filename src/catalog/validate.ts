@@ -1,6 +1,7 @@
 import { VOCABULARIES, type CatalogRecord, type Vocabularies, type Waivable } from "./schema";
 
 const URL_OK = /^https?:\/\//;
+const YOUTUBE = /^https:\/\/(www\.youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]{11}/;
 
 /** Checks merged records against record-spec.md. Each problem is one line, `<id>: <what>`; none means valid. */
 export function validate(records: CatalogRecord[]): string[] {
@@ -34,10 +35,8 @@ export function validate(records: CatalogRecord[]): string[] {
     if (!waived("media") && !(r.media ?? []).some((m) => m.kind === "video")) say("no video");
     const refs = (r.references ?? []).length;
     if (!waived("references") && refs < 2) say(`${refs} references, at least 2 needed`);
-    const real = (r.real_world ?? []).length;
-    if (!waived("real_world") && real < 2) say(`${real} real-world examples, at least 2 needed`);
-    for (const x of [...(r.references ?? []), ...(r.media ?? []), ...(r.real_world ?? [])])
-      if (!URL_OK.test(x.url ?? "")) say(`bad url ${String(x.url)}`);
+    for (const x of [...(r.references ?? []), ...(r.media ?? [])]) if (!URL_OK.test(x.url ?? "")) say(`bad url ${String(x.url)}`);
+    for (const x of r.real_world ?? []) if (!YOUTUBE.test(x.url ?? "")) say(`real-world example not a YouTube video: ${String(x.url)}`);
   }
 
   const seen = new Set<string>();
