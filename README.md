@@ -52,7 +52,7 @@ On the library page, search by name, use or tag, or open Filters to narrow the s
 Each mechanism starts from its kinematics alone. A rules engine then builds the hardware a real build would need:
 bearings sized to the load, shafts and their retention, bridges over the pivots, stops, lubrication, fasteners and a
 drive. Every build is checked for clashes over the whole cycle before it is drawn. The site is static: each page
-loads one small package and draws it in the browser with Canvas 2D.
+loads one small package and draws it in the browser with WebGL2.
 
 For contributors, the details are in [docs/architecture.md](docs/architecture.md),
 [docs/mechanism-standard.md](docs/mechanism-standard.md), [docs/style-reference.md](docs/style-reference.md) and
@@ -65,7 +65,8 @@ npm ci                    install
 npm run dev               the site with live reload
 npm run check             typecheck, lint, unit tests, conformance
 npm run build             the static site into dist/site
-npm run shot <id>         render one frame of a mechanism to a PNG
+npm run shot <id>         draw one frame of a mechanism to a PNG (local Chrome)
+npm run thumbs            redraw the library thumbnails that are out of date
 ```
 
 Work is tracked on the project board (see [docs/workflow.md](docs/workflow.md)).

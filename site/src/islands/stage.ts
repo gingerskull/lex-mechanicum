@@ -1,9 +1,12 @@
 // The stage (SS5): loads the mechanism's package and solve, plays it, and wires the controls: play, scrubber and
 // drag-to-scrub, speed, tilt, explode, overlays, the detail dial and the keyboard. On Auto the dial adapts to the
 // frame time one rung at a time with hysteresis, never past G on its own (DL4), and the slider follows it; moving the
-// slider sets the dial by hand and turns Auto off. The title block shows the position.
-import * as E from "./engine";
+// slider sets the dial by hand and turns Auto off. The title block shows the position. A browser without WebGL2 gets
+// a still drawing (site/thumbs, drawn with the thumbnails) and a one-line note instead; the rest of the page works.
+import { hasWebGL2 } from "../gl";
 import { url } from "../url";
+import type { Dial, DrawView } from "./engine";
+type Engine = typeof import("./engine");
 
 const TAU = Math.PI * 2;
 /** Seconds per cycle at 1x. */
@@ -13,12 +16,47 @@ const SLOW_MS = 14;
 const FAST_MS = 7;
 const SLOW_N = 30;
 const FAST_N = 180;
-const LADDER: E.Dial[] = ["full", ...E.DETAIL.map((r) => r.id).filter((id) => id !== "H")];
+/** A frame is missed when its interval is this much longer than the display's (the shortest interval seen lately). */
+const MISSED = 1.5;
 
 const box = document.querySelector<HTMLElement>(".stagebox");
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
+/** Without WebGL2: the still for each sheet in place of the canvas, the controls off, and the plot drawn once. */
+async function still(box: HTMLElement) {
+  const id = box.dataset.id!;
+  const stage = box.querySelector<HTMLElement>(".stage")!;
+  for (const t of ["dark", "light"]) {
+    const img = document.createElement("img");
+    img.className = `still t-${t}`;
+    img.src = url(`/thumbs/${id}-${t}-still.webp`);
+    img.alt = t === "dark" ? `${box.dataset.title ?? id}, drawing` : "";
+    stage.append(img);
+  }
+  $("stage").hidden = true;
+  const note = document.createElement("p");
+  note.className = "stagenote";
+  note.textContent = "This browser has no WebGL2, so the drawing is a still image and its controls are off.";
+  stage.after(note);
+  for (const c of box.querySelectorAll<HTMLButtonElement | HTMLInputElement>("button, input")) c.disabled = true;
+  const plotCanvas = document.getElementById("plot") as HTMLCanvasElement | null;
+  if (!plotCanvas) return;
+  const E = await import("./engine");
+  const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
+  if (!pkg.plot) return;
+  const plot = E.makeCard(plotCanvas, E.browserFactory);
+  const draw = () => {
+    const r = plotCanvas.getBoundingClientRect();
+    E.sizeCard(plot, r.width, r.height, Math.min(2, E.pixelRatio()));
+    E.drawPlot(plot, E.theme(E.pageTheme()), pkg.plot!, (63 / 360) * TAU, model.plot?.unit ?? "");
+  };
+  draw();
+  window.addEventListener("themechange", draw);
+}
+
 async function main(box: HTMLElement) {
+  const E: Engine = await import("./engine");
+  const LADDER: Dial[] = ["full", ...E.DETAIL.map((r) => r.id).filter((id) => id !== "H")];
   const id = box.dataset.id!;
   const canvas = $<HTMLCanvasElement>("stage");
   const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
@@ -37,7 +75,7 @@ async function main(box: HTMLElement) {
     slow: 0,
     fast: 0,
   };
-  const view = (): E.DrawView => ({
+  const view = (): DrawView => ({
     ...E.defaultView(),
     tilt: s.tilt,
     explode: s.explode,
@@ -68,19 +106,33 @@ async function main(box: HTMLElement) {
   }
 
   let dirty = true;
+  // a lost GPU context came back: redraw, even when paused
+  sess.onRestored = () => (dirty = true);
+  // the display's frame interval, the shortest of the last few seconds: a frame much longer than it was missed, which
+  // is how a GPU-bound frame shows (its work is paid after the draw call returns)
+  const gaps: number[] = [];
+  let lastDraw = 0;
   const draw = () => {
     const t0 = performance.now();
+    const gap = lastDraw ? t0 - lastDraw : 0;
+    lastDraw = t0;
     sess.draw(s.u, view());
     const ms = performance.now() - t0;
     if (plot && pkg.plot) E.drawPlot(plot, E.theme(E.pageTheme()), pkg.plot, s.u, model.plot?.unit ?? "");
-    adapt(ms);
+    let missed = false;
+    if (gap > 0 && gap < 250) {
+      gaps.push(gap);
+      if (gaps.length > 180) gaps.shift();
+      missed = gaps.length > 30 && gap > MISSED * Math.min(...gaps);
+    }
+    adapt(ms, missed);
     ($<HTMLInputElement>("scrub")).value = String(Math.round((((s.u % TAU) + TAU) % TAU) / TAU * 360));
     $("scrubv").textContent = `${($<HTMLInputElement>("scrub")).value}°`;
     dirty = false;
   };
-  const adapt = (ms: number) => {
+  const adapt = (ms: number, missed: boolean) => {
     if (!s.auto || !s.playing) return;
-    if (ms > SLOW_MS) {
+    if (ms > SLOW_MS || missed) {
       s.fast = 0;
       if (++s.slow >= SLOW_N && s.rung < LADDER.length - 1) {
         s.rung++;
@@ -199,4 +251,4 @@ async function main(box: HTMLElement) {
   requestAnimationFrame(tick);
 }
 
-if (box) void main(box);
+if (box) void (hasWebGL2() ? main(box) : still(box));

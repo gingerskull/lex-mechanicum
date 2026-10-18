@@ -242,8 +242,18 @@
   opacity: 1;
 }
 :root:not([data-theme="light"]) .thumb .t-light,
-:root[data-theme="light"] .thumb .t-dark {
+:root[data-theme="light"] .thumb .t-dark,
+:root:not([data-theme="light"]) .stage .t-light,
+:root[data-theme="light"] .stage .t-dark {
   display: none;
+}
+/* off-screen cards cost no layout or paint as the library grows (on the parts, so the card's corner marks still show) */
+.thumb,
+.card .body {
+  content-visibility: auto;
+}
+.card .body {
+  contain-intrinsic-size: auto 150px;
 }
 .card .body {
   flex: 1;
@@ -331,6 +341,19 @@
   overflow: hidden;
   border: 1px solid var(--line-2);
   background: var(--paper);
+}
+/* without WebGL2: the still drawing in the canvas's place, and a line saying why */
+.stage .still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.stagenote {
+  font: 400 12px var(--font-mono);
+  color: var(--muted);
+  margin: 6px 0 0;
 }
 .stage canvas {
   position: absolute;

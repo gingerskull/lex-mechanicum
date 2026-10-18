@@ -6,10 +6,11 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { mechanisms } from "../../src/mechanisms";
 import type { ThemeKey } from "../../src/style/tokens";
-import { shot } from "../../tools/shot";
+import { openChrome, type Chrome } from "../../tools/chrome";
+import { stageShot } from "../../tools/shot";
 
 const DIR = join(import.meta.dirname, "__baselines__");
 const OUT = join("dist", "visual");
@@ -23,18 +24,24 @@ const VIEWS = [
 const TOLERANCE = 0.002;
 
 describe("visual snapshots", () => {
+  let chrome: Chrome;
+  beforeAll(async () => {
+    chrome = await openChrome();
+  }, 120_000);
+  afterAll(() => chrome?.close());
   for (const id of Object.keys(mechanisms))
     for (const theme of ["dark", "light"] as ThemeKey[])
       for (const [name, v] of VIEWS)
         it(`${id} ${theme} ${name}`, { timeout: 60_000 }, async () => {
           // dial A drops only the paper grain and the faint bearing and motor internals: the grain is noise, which would
           // make every baseline large and every diff noisy
-          const png = await shot(id, { w: 720, h: 450, dpr: 1, u: 1.1, view: { ...v, theme, detail: "A", overlays: { paths: true, forces: true, angles: true } } });
+          const png = await chrome.shot(id, stageShot(id, { w: 720, h: 450, dpr: 1, view: { ...v, theme, detail: "A", overlays: { paths: true, forces: true, angles: true } } }));
           const file = `${id}-${theme}-${name}.png`;
           const base = join(DIR, file);
           if (process.env.UPDATE_SNAPSHOTS || !existsSync(base)) {
             mkdirSync(DIR, { recursive: true });
-            writeFileSync(base, png);
+            // RGB at full compression: Chrome's PNGs are larger than they need to be
+            writeFileSync(base, PNG.sync.write(PNG.sync.read(png), { deflateLevel: 9, colorType: 2, inputHasAlpha: true } as Parameters<typeof PNG.sync.write>[1]));
             return;
           }
           const a = PNG.sync.read(readFileSync(base));

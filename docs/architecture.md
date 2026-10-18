@@ -5,9 +5,10 @@ must meet are in `docs/mechanism-standard.md`; the look is in `docs/style-refere
 
 ## Stack
 
-TypeScript, Vite, Astro (static site, one page per mechanism), Canvas 2D for the drawings, Vitest for unit and
-headless checks, Playwright (local) for visual snapshots. Everything under `src/` runs in Node without a DOM: the
-renderer takes a canvas factory, so checks, packaging, audit generation and benchmarks run headless.
+TypeScript, Vite, Astro (static site, one page per mechanism), WebGL2 for the solids with a Canvas 2D layer for the
+sheet around them, Vitest for unit and headless checks, local Chrome (playwright-core) for everything that draws.
+Packaging, rules, checks and audits run in Node without a DOM; drawing needs WebGL2, so shots, thumbnails, the bench
+and the visual snapshots draw in local Chrome, never in Node.
 
 ## Layout and dependency direction
 
@@ -37,7 +38,9 @@ src/assemble/                    assemble(model): rules -> polish(A, H) -> faste
 src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)
 src/audit/                       the audit generator and the conformance report
 src/render/                      canvas factory, projector, world solids, slices, session, the drafting frame,
-                                 detail dial, patterns, sheet frame and title block, overlays, plot
+                                 detail dial, pattern tiles, sheet frame and title block, overlays, plot
+src/render/gl/                   the solids on the GPU: geometry (items, once per session), plan (a frame as slice
+                                 and chunk tables, pure, unit-tested in Node), shaders, the page's one shared context
 src/mechanisms/<id>/model.ts     kinematics only
 src/mechanisms/<id>/polish.ts    overrides and additions to the generated assembly
 src/mechanisms/<id>/audit.md     conformance record
@@ -46,6 +49,7 @@ src/mechanisms/index.ts          registry: the models plus a lazy import of each
 site/                            Astro: layout, pages (library, one page per mechanism), components, islands
                                  (theme, filters, card, stage, engine), CSS on the generated tokens.css
 tools/                           command-line tools (below)
+site/thumbs/                     the committed card thumbnails and stage stills (WebP) and their fingerprint manifest
 tests/                           unit and fixture tests, per-mechanism checks, site build test, visual snapshots
 ```
 
@@ -65,12 +69,17 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 3. **Package.** At build time, `tools/package` assembles every mechanism and writes a compact package (typed arrays)
    with the solids, traced paths, bounds, plot data and joint notes. The rules engine, the hardware library and the
    polishes never reach the browser.
-4. **Render.** The renderer loads a package and the mechanism's `solve`, keeps a per-card session with its caches
-   (paths, slice lists, paper tiles) and draws a frame for a given u and view (tilt, explode, overlays, detail
-   position). Thumbnails, the stage, the screenshot tool and the visual tests all use this one renderer.
+4. **Render.** The renderer loads a package and the mechanism's `solve`, keeps a per-canvas session (paper tile,
+   slice cuts, its geometry on the GPU) and draws a frame for a given u and view (tilt, explode, overlays, detail
+   position). The paper and construction lines go on the 2D canvas; the solids are planned on the CPU as slice and
+   chunk tables and drawn on the GPU in one instanced call per target (the frame and the lines layer), each chunk's op
+   number written as depth so a fill or stroke covers a pixel once and the paint order holds; the result is
+   composited onto the canvas, and centrelines, dimensions, traces, sheet and overlays are drawn over it. Every
+   session on a page shares one WebGL2 context; a lost context is rebuilt and the drawing redrawn. Thumbnails, the
+   stage, the screenshot tool and the visual tests all use this one renderer.
 5. **Site.** Astro builds one static page per registered mechanism: the drawing stage, controls, at-a-glance facts,
-   plot, tags, explanation, references and media. Library thumbnails are pre-rendered images; the engine loads on
-   hover or navigation.
+   plot, tags, explanation, references and media. Library thumbnails are committed images; the engine loads on hover
+   or navigation. A browser without WebGL2 gets the stage's still and a one-line note; the rest of the page works.
 
 ## Tools
 
@@ -85,16 +94,23 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 | `audit <id>` (`npm run audit`) | writes or regenerates `src/mechanisms/<id>/audit.md` (Q6) |
 | `conformance` (`npm run conformance`) | audited standard version per mechanism (Q7), part of `npm run check` |
 | `shot <id> [options]` (`npm run shot`) | one frame to a PNG (Q4) |
-| `thumbs [id ...]` (`npm run thumbs`) | the library thumbnails |
-| `bench [id ...]` (`npm run bench`) | frame times per view and dial position, rung counts (Q5); `bench-page/build.ts` builds the same bench as a browser page |
+| `thumbs [id ...] [--all] [--hook]` (`npm run thumbs`) | redraws the stale thumbnails and stills in `site/thumbs` and their manifest |
+| `bench [id ...]` (`npm run bench`) | the browser bench: frame times per view and dial position, draw counters, package size, rung counts (Q5, DL5) |
+| `compare [--shots --ref dir] [--cards] [--lose]` | the renderer's look against reference images, card drawings per dial position, the lost-context check |
 | `tokens-css` (`npm run tokens`) | writes `site/styles/tokens.css` and its `@font-face` rules |
-| `site-assets` (in `prebuild`) | fonts, packages and thumbnails into `site/public` |
+| `site-assets` (in `prebuild`) | fonts and packages into `site/public`; checks the thumbnails' fingerprints and copies them (never draws) |
 | `lint-style` (in `npm run lint`) | colour and font literals outside `src/style`, style keys in records |
 | `standard-table`, `style-table` (`npm run docs:tables`) | the generated tables of the standard and the style reference |
 
-Node draws with **@napi-rs/canvas** (`tools/canvas-node.ts`): prebuilt for Windows and Linux, with `Path2D`,
-`DOMMatrix`, pattern transforms and WOFF2 fonts (the IBM Plex faces from the `@fontsource` packages). The renderer
-only sees a `CanvasFactory`, so the same code draws in the browser.
+Tools that draw go through `tools/chrome.ts`: it bundles the drawing page (`tools/draw-page`), serves it with the
+IBM Plex faces and the packages built from the current code, and opens it in the installed Chrome (playwright-core,
+channel `chrome`, no browser download) on the real GPU with the frame-rate cap off. Frame times are measured on
+paced animation frames; reading a pixel back each frame would stall Chrome's canvas and give false costs.
+
+Thumbnails are committed: `site/thumbs/manifest.json` holds each mechanism's fingerprint (its package bytes, its
+model, the renderer, the style and the thumbnail view, the source parts taken from the drawing page's bundle inputs),
+so a mechanism change redraws its own images, a renderer or style change redraws all, and catalogue or site changes
+none. The pre-push hook redraws what is stale; the site build only compares.
 
 ## Invariants
 
@@ -102,5 +118,6 @@ only sees a `CanvasFactory`, so the same code draws in the browser.
 - Every look value is global in `src/style`; no colour, weight or font anywhere else (standard L1, style SA).
 - Rules are modules with fixture tests; the standard's AUTO table is generated from the registry.
 - Depth order is kept by slicing every solid at every overlapping z boundary and painting far to near.
+- Nothing draws in Node: drawing is WebGL2, in the browser or in local Chrome.
 - The detail ladder is one data table (`src/style/detail.ts`) ordered by what a viewer notices; the mechanism is
   always packaged at full detail.

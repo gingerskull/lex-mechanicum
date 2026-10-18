@@ -1,9 +1,9 @@
-// Role surfaces (SD4): one tile per pattern and ink, mapped onto a top face through the part's pose so the pattern rides
-// with the part and foreshortens with the tilt. The paper tooth is a seeded noise tile, the same on every run.
-import { DRAFT, type PatternKind, type RoleSurface } from "../style/draft";
+// Role surfaces (SD4): one tile per pattern and ink; the GPU pass maps it onto a top face through the part's pose, so
+// the pattern rides with the part and foreshortens with the tilt. The paper tooth is a seeded noise tile, the same on
+// every run.
+import { DRAFT, type PatternKind } from "../style/draft";
 import { rgba as paint, type RGB } from "../style/theme";
 import type { Card, CanvasLike } from "./canvas";
-import type { Projector } from "./projector";
 
 const P = DRAFT.pattern;
 const tiles = new Map<string, CanvasLike>();
@@ -50,36 +50,6 @@ export function tile(card: Card, type: PatternKind, ink: RGB): CanvasLike {
   }
   tiles.set(key, c);
   return c;
-}
-
-/** Fills the face path with the role pattern, registered to the pose (x, y, a) at height z. */
-export function fillPattern(
-  card: Card,
-  ctx: CanvasRenderingContext2D,
-  face: Path2D,
-  pose: [number, number, number],
-  z: number,
-  Pr: Projector,
-  R: RoleSurface,
-  ink: RGB,
-  alpha: number,
-): void {
-  if (!R.pattern || R.pattern === "none" || !R.step || Pr.ct < P.offBelowCos || alpha <= 0) return;
-  const s = Pr.s;
-  const stepPx = Math.max(DRAFT.minPx, R.step * s);
-  const mm = stepPx / s / P.tile;
-  const o = Pr.P(pose[0], pose[1], z);
-  const ca = Math.cos(pose[2]);
-  const sa = Math.sin(pose[2]);
-  const ct = Pr.ct;
-  const pat = ctx.createPattern(tile(card, R.pattern, ink) as unknown as CanvasImageSource, "repeat");
-  if (!pat) return;
-  pat.setTransform(card.f.matrix([s * ca * mm, -s * ct * sa * mm, -s * sa * mm, -s * ct * ca * mm, o[0], o[1]]));
-  const ga = ctx.globalAlpha;
-  ctx.globalAlpha = ga * alpha;
-  ctx.fillStyle = pat;
-  ctx.fill(face, "evenodd");
-  ctx.globalAlpha = ga;
 }
 
 let noiseTile: CanvasLike | null = null;

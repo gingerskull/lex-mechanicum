@@ -1,7 +1,7 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 2.2
+version: 2.3
 date: 2026-10-18
 supersedes: 1.0 (the hand-off style reference of 2026-10-16)
 ```
@@ -76,7 +76,7 @@ site/styles/*.css        base, layout, components: var(--…) and color-mix() of
 | Id | Requirement |
 |---|---|
 | SA1 | **One source per value.** Each palette colour, font family and shared size exists once, in the tokens. |
-| SA2 | **Tokens are TypeScript, CSS is generated.** The renderer runs headless in Node, so it cannot read CSS. The site's `tokens.css` is generated from the tokens at build time (`:root` and `:root[data-theme="light"]` blocks, plus derived ink tiers). Never the other way round: no `getComputedStyle` in a renderer. |
+| SA2 | **Tokens are TypeScript, CSS is generated.** The renderer draws on canvases and the GPU, and its frame is planned in Node in tests, so it cannot read CSS. The site's `tokens.css` is generated from the tokens at build time (`:root` and `:root[data-theme="light"]` blocks, plus derived ink tiers). Never the other way round: no `getComputedStyle` in a renderer. |
 | SA3 | **Semantic names:** `accent`, `ink`, `paper`, `warn`, `vel`, never `orange` or `red`. A theme maps names to values; code asks for the name. |
 | SA4 | **Drawing style never reaches into the site, and the site never reaches into drawing style.** The only shared thing is the tokens. A legend swatch on the page uses the same token as the canvas line it explains. |
 | SA5 | **Form is separate from look.** A value that changes geometry or what the build adds lives in form and applies everywhere. A value that changes only appearance lives in the drawing style. |
@@ -159,8 +159,8 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | SD13 | **Supporting hardware reads quieter.** Motor internals are faint; hardware has no pattern; the base is the faintest surface. Brackets and tall parts still get full outlines and silhouettes. |
 | SD14 | **Overlays use the sheet's colours:** forces in accent (warn when out of range), velocity in `vel`, angles in ink, labels in mono on a paper panel with an ink hairline. Overlays never change the drawing beneath. |
 | SD15 | **Output plot** (detail side panel) is drawn on the sheet: ink grid dashed, curve in ink, current point in accent, mono labels. |
-| SD16 | **Thumbnails and the detail stage share one renderer and one style.** The only differences are the annotation set (SD8, SD10), scale-dependent switches (SF11, SD6) and the card rules: a card (thumbnail and hover animation) draws at detail dial A-D (`card.detail`) and its two bold outlines, `lines.plateTop` and `lines.baseTop`, are scaled by `card.plateTopFactor` and `card.baseTopFactor`. Never a second thumbnail style. Thumbnails are rendered to images at build time by the same renderer. |
-| SD17 | **Performance is part of the style.** Paper and pattern tiles are cached per theme and size; outlines are cached paths drawn through transforms; slicing is recomputed only when the view's z arrangement changes; nothing draws unless u, view or theme changed; no per-frame blur. A new effect that costs per-frame passes is measured with the bench before it lands. |
+| SD16 | **Thumbnails and the detail stage share one renderer and one style.** The only differences are the annotation set (SD8, SD10), scale-dependent switches (SF11, SD6) and the card rules: a card (thumbnail and hover animation) draws at detail dial A-B (`card.detail`), sharp at full pixel ratio with wall shading, and its two bold outlines, `lines.plateTop` and `lines.baseTop`, are scaled by `card.plateTopFactor` and `card.baseTopFactor`. Never a second thumbnail style. Thumbnails are drawn to images by the same renderer and committed; they are redrawn when what they are drawn from changes. |
+| SD17 | **Performance is part of the style.** Paper and pattern tiles are cached per theme and size; a session's geometry is uploaded to the GPU once and a frame sends only its slice and chunk tables, drawn in one instanced call per target; slicing is recomputed only when the view's z arrangement changes; nothing draws unless u, view or theme changed; no per-frame blur. A new effect that costs per-frame passes is measured with the browser bench before it lands. |
 | SD18 | **The detail ladder** (standard 9b) is the only way the drawing drops anything. Render effects sit in the ladder at the rung their noticeability earns: paper grain in the first rung, wall shading and inner-slice silhouettes and the DPR cap in the third, role patterns in the sixth, hidden lines in the seventh. The order is data in `src/style/detail.ts`. |
 
 ---
@@ -269,7 +269,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.majorAlpha` | 0.14 | 0..1 |
 | `draft.grid.minorWidth` | 0.5 | px |
 | `draft.grid.majorWidth` | 0.8 | px |
-| `draft.card.detail` | `D` | detail dial position of a card drawing (DL) |
+| `draft.gpu.samples` | 8 | antialiasing samples per pixel |
+| `draft.gpu.samplesDense` | 4 | coarse pointer or device pixel ratio of 2 and more |
+| `draft.card.detail` | `B` | detail dial position of a card drawing (DL): sharp, with wall shading |
 | `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
 | `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
 | `draft.lines.plateTop` | 1.7 | px, bold top outline of plates |
@@ -298,6 +300,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.accentRing.radius` | 0.62 | factor on the head's projected half-size, per axis |
 | `draft.lines.accentRing.alpha` | 1 | 0..1 on the lines layer |
 | `draft.lines.accentRing.hiddenAlpha` | 0.7 | 0..1 on the frame (shows through covering parts) |
+| `draft.lines.accentRing.segments` | 72 | straight pieces of the ring |
 | `draft.fill.plate` | 0.64 |  |
 | `draft.fill.other` | 0.8 |  |
 | `draft.fill.base` | 0.96 | laid once, on the top face (the parts under it read only through `occlude.base`) |
@@ -540,11 +543,11 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 |---|---|---|---|
 | A | Paper grain, bearing balls and cages, motor internals | kinds: bearingBalls, bearingCage, motorInternal; effects: grain |  |
 | B | Manufacturing marks | marks: chamfer, boreEntry, headFlute, hexSocket, knurl, keyway, thread | atSide: skip |
-| C | Wall shading, inner-slice silhouettes, full pixel ratio | effects: wallShade, innerSilhouettes, fullDpr |  |
+| C | Wall shading, inner-slice silhouettes | effects: wallShade, innerSilhouettes |  |
 | D | Stack hardware inside a joint | kinds: spacer, washer, thrustWasher, waveWasher, sleeve, shim, circlipInternal | whenExplode: draw |
 | E | Service and sensing parts, timing marks | kinds: nipple, felt, wiper, flag, sensor, terminalBlock, cableClip, lead; marks: oilSink, timing |  |
 | F | Role surface patterns | effects: rolePatterns |  |
-| G | Hidden lines | effects: hiddenLines |  |
+| G | Hidden lines, full pixel ratio | effects: hiddenLines, fullDpr |  |
 | H | Retention and adjustment parts | kinds: circlipExternal, retainerPlate, nut, setScrew, collar, eccentric, gib, stop, bumper, spring, wearStrip, dowel, spigot |  |
 <!-- style-ladder:end -->
 
@@ -583,7 +586,7 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 | SQ2 | Look match | The four mechanisms, side by side with the hand-off proposal at plan, 28° and side view in both sheets, read as the same style and overall look to the eye. Not pixel for pixel. |
 | SQ3 | One-knob test | Changing `tokens.themes.dark.accent` changes the input ring, paths, forces, play button, kicker, sheet numbers and focus ring together, and nothing else. Changing `draft.lines.plateTop` changes every mechanism. |
 | SQ4 | Theme switch | Every visible card and the stage redraw in the new theme with no stale cached paper, patterns or thumbnails. |
-| SQ5 | Headless | Checks, clearance, packaging, audit generation and bench run in Node (style must not need the DOM). |
+| SQ5 | Headless | Checks, clearance, packaging and audit generation run in Node (style must not need the DOM); the bench, shots and snapshots draw in local Chrome. |
 | SQ6 | Records clean | No style values in `src/mechanisms` (standard L1). |
 | SQ7 | Phone width | 375 px wide: no horizontal scroll, 16 px gutters, stage 4:3, controls wrap. |
 | SQ8 | Contrast | Body and secondary text pass SF5 on both sheets. |
@@ -593,6 +596,9 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 
 ## Changelog
 
+- **2.3 (2026-10-18).** The solids are drawn with WebGL2 (SD17); cards draw at dial A-B, sharp at full pixel ratio
+  with wall shading, and thumbnails are committed images redrawn when what they are drawn from changes (SD16); the
+  bench, shots and snapshots draw in local Chrome (SQ5).
 - **2.2 (2026-10-18).** Mechanism page (SS5): tags leave the side column for a full-width band above the
   explanation, and tags and the at-a-glance family, input, output and level link to the library filtered by them
   (SS3).

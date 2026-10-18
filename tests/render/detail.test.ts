@@ -39,7 +39,8 @@ describe("detail ladder on the four-bar", () => {
     expect(ladder("full", { tilt: 28, explode: 0 }).mark("chamfer")).toBe(true);
     expect(ladder("full", { tilt: 28, explode: 0 }).label).toBe("FULL");
     expect(ladder("D", { tilt: 28, explode: 0 }).label).toBe("DETAIL A-D");
-    expect(ladder("C", { tilt: 28, explode: 0 }).effect("fullDpr")).toBe(false);
+    expect(ladder("C", { tilt: 28, explode: 0 }).effect("fullDpr")).toBe(true);
+    expect(ladder("G", { tilt: 28, explode: 0 }).effect("fullDpr")).toBe(false);
     expect(ladder("F", { tilt: 28, explode: 0 }).effect("hiddenLines")).toBe(true);
   });
 });
