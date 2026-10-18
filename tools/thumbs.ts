@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mechanisms } from "../src/mechanisms";
 import type { ThemeKey } from "../src/style/tokens";
+import { cardView } from "../src/render/draft";
 import { shot } from "./shot";
 
 export const THUMB = { w: 320, h: 240, dpr: 2, u: 1.1, tilt: 28 };
@@ -14,7 +15,7 @@ export async function thumbs(ids = Object.keys(mechanisms), out = "dist/thumbs")
   const files: string[] = [];
   for (const id of ids)
     for (const theme of ["dark", "light"] as ThemeKey[]) {
-      const png = await shot(id, { w: THUMB.w, h: THUMB.h, dpr: THUMB.dpr, u: THUMB.u, view: { tilt: THUMB.tilt, theme, sheet: null, dims: false, overlays: { paths: true } } });
+      const png = await shot(id, { w: THUMB.w, h: THUMB.h, dpr: THUMB.dpr, u: THUMB.u, view: { ...cardView(), tilt: THUMB.tilt, theme, sheet: null, dims: false, overlays: { paths: true } } });
       const f = join(out, `${id}-${theme}.png`);
       writeFileSync(f, png);
       files.push(f);

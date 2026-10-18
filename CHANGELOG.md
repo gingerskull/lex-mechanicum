@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.12.3 — 2026-10-18
+
+- Spur gear pair: the forces overlay no longer draws the line-of-action arrow (it ran the full length between the base
+  circles and was labelled push / pull, which a gear tooth is not); the spin arrows and the 20° pressure angle stay.
+- Library cards: the hover animation draws at detail D and always restarts from the thumbnail's pose; the bold plate
+  and base outlines are drawn thinner on cards (style value `DRAFT.card`), and the thumbnails use the same view.
+- Library page on phones: the set title block is one low strip across the header (shown at every width), and the
+  bar is two rows, search and Filters on the first and the sheet switch alone on the second (SS2, SS3).
+
+
 ## 0.12.2 — 2026-10-18
 
 - Standard 2.4: a linear guide is a few blocks. Each slide is now two rails on one riser each, a bronze gib clamped
