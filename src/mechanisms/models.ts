@@ -32,4 +32,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "ackermann-steering": async () => (await import("./ackermann-steering/model")).default,
   "parallelogram-linkage": async () => (await import("./parallelogram-linkage/model")).default,
   antiparallelogram: async () => (await import("./antiparallelogram/model")).default,
+  "double-crank": async () => (await import("./double-crank/model")).default,
 };
