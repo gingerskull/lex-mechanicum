@@ -195,18 +195,34 @@ async function main(box: HTMLElement) {
   showDial();
   // drag to scrub, keyboard on the canvas
   canvas.tabIndex = 0;
-  let drag: { x: number; u: number } | null = null;
+  // a sideways drag scrubs and pauses; an up or down drag is the page scrolling (touch-action: pan-y hands it to the
+  // browser, which cancels the pointer) and leaves the animation playing; a tap without moving plays or pauses
+  const SCRUB_PX = 8;
+  let drag: { id: number; x: number; y: number; u: number; scrubbing: boolean } | null = null;
   canvas.addEventListener("pointerdown", (e) => {
-    drag = { x: e.clientX, u: s.u };
-    canvas.setPointerCapture(e.pointerId);
-    setPlaying(false);
+    if (e.button !== 0) return;
+    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, u: s.u, scrubbing: false };
   });
   canvas.addEventListener("pointermove", (e) => {
-    if (!drag) return;
-    s.u = drag.u + ((e.clientX - drag.x) / size().width) * TAU;
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.scrubbing) {
+      if (Math.abs(dx) < SCRUB_PX || Math.abs(dx) < Math.abs(e.clientY - drag.y)) return;
+      drag.scrubbing = true;
+      drag.x = e.clientX;
+      drag.u = s.u;
+      canvas.setPointerCapture(e.pointerId);
+      setPlaying(false);
+      return;
+    }
+    s.u = drag.u + (dx / size().width) * TAU;
     dirty = true;
   });
-  canvas.addEventListener("pointerup", () => (drag = null));
+  canvas.addEventListener("pointerup", (e) => {
+    if (drag && e.pointerId === drag.id && !drag.scrubbing && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < SCRUB_PX) setPlaying(!s.playing);
+    drag = null;
+  });
+  canvas.addEventListener("pointercancel", () => (drag = null));
   canvas.addEventListener("keydown", (e) => {
     if (e.key === " ") setPlaying(!s.playing);
     else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {

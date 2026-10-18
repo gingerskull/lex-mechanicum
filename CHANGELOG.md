@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.14.2 — 2026-10-19
+
+- "All mechanisms" on a mechanism page returns to the library as it was left: the same filters, search and scroll
+  position, as Back when the page was opened from the library, and from the tab's last library state after moving
+  between mechanisms. The library's filters and search now live in its URL.
+- Library thumbnails for the current sheet are fetched once the page is idle, so they no longer pop in while
+  scrolling.
+- Scrolling the page with a finger on the drawing no longer pauses it: only a sideways drag (which scrubs) or a tap
+  (which plays or pauses) does.
+
 ## 0.14.1 — 2026-10-18
 
 - The stage's Auto dial no longer drops detail on a phone when the page scrolls, and no longer steps down and up:

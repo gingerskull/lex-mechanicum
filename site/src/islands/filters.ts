@@ -1,5 +1,9 @@
 // Search and facets on the library (SS3): any chip of a facet matches (or), every facet must match (and), and the
-// search matches name, other names, summary, tags and keywords. All data is on the cards; nothing is fetched.
+// search matches name, other names, summary, tags and keywords. All data is on the cards; nothing is fetched. The
+// filters and search live in the page's URL as they change, and the state is kept for the tab when the page is left,
+// so a mechanism page's "All mechanisms" brings the library back as it was.
+import { readLibrary, saveLibrary, takeReturn } from "../library";
+
 const cards = [...document.querySelectorAll<HTMLAnchorElement>(".card")];
 const q = document.getElementById("q") as HTMLInputElement | null;
 const toggle = document.getElementById("ftoggle");
@@ -34,6 +38,12 @@ function apply() {
   }
   if (clear) clear.hidden = on.length === 0 && words.length === 0;
   if (empty) empty.hidden = n > 0;
+  // the URL says what is shown: ?<facet>=<value>... and ?q=<words>
+  const p = new URLSearchParams();
+  for (const c of on) p.append(c.dataset.f!, c.dataset.v!);
+  if (q?.value.trim()) p.set("q", q.value.trim());
+  const search = p.toString() ? `?${p.toString()}` : "";
+  if (search !== location.search) history.replaceState(history.state, "", location.pathname + search + location.hash);
 }
 
 toggle?.addEventListener("click", () => {
@@ -67,3 +77,8 @@ if (pressed && toggle && panel) {
 }
 if (q && params.has("q")) q.value = params.get("q")!;
 if (pressed || params.has("q")) apply();
+
+// leaving the page keeps its state for the way back; arriving by "All mechanisms" scrolls to where it was
+addEventListener("pagehide", () => saveLibrary({ href: location.pathname + location.search, y: scrollY }));
+const back = takeReturn() ? readLibrary() : null;
+if (back) requestAnimationFrame(() => scrollTo(0, back.y));
