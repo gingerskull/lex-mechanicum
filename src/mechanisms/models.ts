@@ -16,4 +16,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "ratchet-pawl": async () => (await import("./ratchet-pawl/model")).default,
   "chebyshev-linkage": async () => (await import("./chebyshev-linkage/model")).default,
   pantograph: async () => (await import("./pantograph/model")).default,
+  "crank-shaper": async () => (await import("./crank-shaper/model")).default,
 };
