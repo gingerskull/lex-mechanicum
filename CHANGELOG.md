@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.0 — 2026-10-19
+
+- Offset slider-crank is built to standard 2.0: a slider-crank whose slide line sits 20 mm off the crank centre, stroke
+  61.4 mm, time ratio 1.09:1.
+- Eccentric sheave and strap is built to standard 2.0: a 12 mm eccentric disc in a strap on a bronze liner with flange
+  rings, driving a valve rod block 24 mm.
+
 ## 0.15.0 — 2026-10-19
 
 - The sheet switch is one button with a sun or moon icon, on the library's bar beside the search and Filters and on a
