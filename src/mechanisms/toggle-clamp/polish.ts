@@ -4,8 +4,9 @@
 // them. What differs from the rules:
 // - the hand grip at the end of the handle, in place of the generated knob (it would sit off the handle);
 // - the handle stops on the grip arm, where the handle really lands, in place of the generated ones on the arm axis;
-// - the clamp spindle and its lock nut in the plunger's notch (F7), and no forward slide stop (the spindle tip passes
-//   where it would stand);
+// - the clamp spindle and its lock nut in the plunger's notch (F7), and no generated forward slide stop (the spindle
+//   tip passes where it would stand): a fixed work-piece (fixture anvil) between the rails, screwed and dowelled to the
+//   base, takes its place as the forward stop, the pad closing against its face at the over-centre pose (F5);
 // - notes, badges and build rules (A16).
 import { solid } from "../../hardware/solid";
 import type { Polish } from "../../assemble/api";
@@ -13,7 +14,7 @@ import { swing } from "../../hardware/sub/stops";
 import { NUTS } from "../../hardware/tables";
 import { locking } from "../../rules/locking";
 import { materials } from "../../rules/materials";
-import { g, T } from "./model";
+import { a, b, g, over, T } from "./model";
 
 /** Spindle M5, clamp pad head 4 mm thick and 12 wide, lock nut on the notch's back wall at x 28. */
 const M = 5;
@@ -81,8 +82,27 @@ export const polish: Polish = (A, H) => {
   A.add(spindle, lock);
   slideJ.serves.F7 = [...(slideJ.serves.F7 ?? []), spindle.id, lock.id];
 
-  // the forward slide stop stood where the spindle tip passes: the over-centre stop and the work face end the travel
+  // ---- the work-piece: a fixture anvil between the rails, its face where the pad lands at the over-centre pose, so the
+  // clamp visibly closes on something and the block is the plunger's forward stop (F5) ----
+  const Bc = a * Math.cos(over) + Math.sqrt(b * b - (a * Math.sin(over)) ** 2);
+  const fx = Bc + FACE;
+  const WL = 17;
+  const WH = 7.5;
+  const wz1 = z1;
+  const WG = { joints: ["slide-plunger"], ex: ctx.solidOf["railb"]!.ex };
+  const work = H.stop("workpiece", [[fx, -WH], [fx + WL, -WH], [fx + WL, WH], [fx, WH]], { ...WG, name: `Work-piece, fixture anvil ${WL} x ${2 * WH} x ${(wz1 - ctx.b1).toFixed(0)}, ground steel`, mat: "Steel C45, ground faces", z0: ctx.b1, z1: wz1 });
+  A.add(work);
+  slideJ.serves.F5 = [...(slideJ.serves.F5 ?? []), work.id];
+  [fx + 4.5, fx + 12.5].forEach((x, i) =>
+    A.add(H.screw(`workpiece-sc${i}`, "button", 4, wz1 - ctx.b1 + 6, { ...WG, at: [x, 0, 0], face: wz1, dir: -1, name: i ? "" : undefined, qty: i ? 0 : 2 })),
+  );
+  [-4.5, 4.5].forEach((y, i) =>
+    A.add(H.dowel(`workpiece-dw${i}`, 3, { ...WG, at: [fx + 8.5, y, 0], z0: ctx.b0 + 4, z1: ctx.b1 + 6, name: i ? "" : "Dowel pin Ø3 h6 (ISO 8734), work-piece to base", qty: i ? 0 : 2 })),
+  );
+
+  // the generated forward slide stop stood where the spindle tip passes: the over-centre stop and the work face end the travel
   const gone = A.drop(/^slide-plunger-(stop|bump)0/);
+  slideJ.serves.F5 = (slideJ.serves.F5 ?? []);
   slideJ.serves.F5 = (slideJ.serves.F5 ?? []).filter((id) => !gone.some((s) => s.id === id));
 
   locking.apply(ctx);
@@ -101,10 +121,11 @@ export const polish: Polish = (A, H) => {
   });
   slideJ.note += ` The clamp spindle sits in a notch in the plunger: M${M} threaded into the notch's back wall (a blind tapped hole along the axis, not drawn), a thin lock nut on that wall, a hardened pad head at the tip, whose face is the clamp pad at 63 mm. Turn the spindle to set the clamp height, then lock the nut.`;
   A.rules.push(
+    { title: "Closes on a work-piece", text: "The pad face lands on a fixed work-piece screwed and dowelled to the base, so the stroke ends against something and the clamping shows." },
     { title: "Over centre, held by a stop", text: "The handle goes 3° past the line of arm and link and lands on a stop on its grip arm: the load tries to turn it further onto the stop, so the clamp holds itself." },
     { title: "Clevis at both joints that carry the toggle load", text: "The handle's two plates straddle the link at the knee and the plunger's cap closes over it at the plunger, so both pins work in double shear." },
     { title: "Adjustable spindle, locked", text: "The pad height is set with the spindle and fixed with a lock nut, so made parts meet the modelled clamp stack." },
-    { title: "Plunger guided both sides", text: "Keeper on one rail, a bronze gib with adjusting screws on the other, hardened rails, wipers and a grease nipple; the forward stop is the work face and the over-centre stop." },
+    { title: "Plunger guided both sides", text: "Keeper on one rail, a bronze gib with adjusting screws on the other, hardened rails, wipers and a grease nipple; the forward stop is the work-piece and the over-centre stop." },
     { title: "Kinematics untouched", text: "Pin centres, the guide line, the handle swing and the pad face are the model's; the hardware is designed round them." },
   );
 };
