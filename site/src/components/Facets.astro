@@ -7,6 +7,7 @@ const rows = FACETS.map((f) => {
 });
 ---
 <div class="wrap facets" id="facets" hidden>
+  <div class="facethead"><button class="btn" id="fclear" type="button" disabled>Clear all filters</button></div>
   {rows.map((f) => (
     <div class="facet">
       <span class="lbl">{f.label}</span>

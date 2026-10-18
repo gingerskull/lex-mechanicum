@@ -1,7 +1,7 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 2.3
+version: 2.4
 date: 2026-10-18
 supersedes: 1.0 (the hand-off style reference of 2026-10-16)
 ```
@@ -175,11 +175,11 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 |---|---|
 | SS1 | **Library grid:** cards in an auto-fill grid (min 290 px, 20 px gap). A card is a sheet: the drawing in a framed field (4:3, a pre-rendered image until hover) with a title block under it: name (display, uppercase) and sheet number (mono, accent) on the first row, family · motion · level meta row, two-line summary, dashed tags. Hover: ink border plus accent corner ticks at two opposite corners, and the drawing animates at the same dial and line weights as the thumbnail (`card.*`), so the swap does not jump. |
 | SS2 | **Header:** kicker (mono, accent), large condensed uppercase title, short intro, and a set title block (mono grid of label/value cells). Search field and the Filters button in the same row. Below 1000 px the title block is one low strip across the header, its four cells in a row with dividers, shown at every width. |
-| SS3 | **Sticky bar:** segmented controls (theme Blueprint / Drafting) and the Filters button; translucent paper with blur, hairline top and bottom. On a phone (below 640 px) the bar is two rows, apart from each other: search and Filters on the first, the sheet switch with its label alone on the second; elsewhere it is one row with the switch at the right. Filters hidden behind the button; facets open as chip rows in a scrollable panel. The library takes `?<facet>=<value>` and `?q=<words>` from the address, so a page can link to a filtered set. |
+| SS3 | **Sticky bar:** on the library, search, the Filters button and the sheet switch on one row, the switch at the right; translucent paper with blur, hairline top and bottom. Filters hidden behind the button; facets open as chip rows in a scrollable panel with a "Clear all filters" button. The library keeps its filters and search in its address (`?<facet>=<value>`, `?q=<words>`), so a page can link to a filtered set. A mechanism page has no bar at the top: its sheet switch sits at the right of its name, and once the name scrolls away a compact bar slides in with the name (one line, cut with an ellipsis) and the switch. "Back to library" returns to the library as it was left, showing the card of the mechanism the visitor is on; Previous and Next step through what the library shows. |
 | SS4 | **Controls:** segmented buttons and chips are square, hairline, mono uppercase; pressed = ink fill with paper text. Tags are dashed outlines, solid on hover. The play button is the one round control (accent outline, fills on hover). Range inputs use `accent-color` (accent for the scrubber, ink for view sliders). |
 | SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number, title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, tilt, explode, detail pin) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
 | SS6 | **Panels:** paper fill, hairline frame, a mono uppercase header strip with a rule under it; fact lists as label/value rows with dashed separators. |
-| SS7 | **Theme switch** is a site-wide segmented control, remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
+| SS7 | **Theme switch** is one square button with an icon of the sheet it switches to (a sun on Blueprint, a moon on Drafting), remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
 | SS8 | **Real pages:** one static page per mechanism at `/mechanisms/<id>/`, prev and next from the catalogue order, the library at `/`. The engine loads only on the mechanism page or on card hover. |
 | SS9 | **Responsive:** works at phone width with a 16 px side gutter (respecting safe areas) and no horizontal scroll; the mechanism layout drops to one column under 1000 px; the set title block hides under 640 px. |
 | SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. |
@@ -596,6 +596,9 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 
 ## Changelog
 
+- **2.4 (2026-10-19).** The sheet switch is one icon button (SS7); the library's bar is one row on a phone, a
+  mechanism page shows the switch beside its name and a compact name bar once scrolled, and the library is returned
+  to as it was left (SS3).
 - **2.3 (2026-10-18).** The solids are drawn with WebGL2 (SD17); cards draw at dial A-B, sharp at full pixel ratio
   with wall shading, and thumbnails are committed images redrawn when what they are drawn from changes (SD16); the
   bench, shots and snapshots draw in local Chrome (SQ5).

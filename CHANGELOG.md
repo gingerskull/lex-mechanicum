@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.0 — 2026-10-19
+
+- The sheet switch is one button with a sun or moon icon, on the library's bar beside the search and Filters and on a
+  mechanism page beside its name; the "Sheet" label is gone. On a mechanism page, once the heading scrolls away, a
+  compact bar shows the mechanism's name and the switch.
+- "All mechanisms" is now "Back to library", and it returns to the mechanism you are on: the library shows that
+  mechanism's card, with the filters and search as you left them.
+- Previous and Next on a mechanism page step through what the library shows, filters and search included.
+- The filter panel has a "Clear all filters" button.
+- Switching the sheet on a mechanism page and going back to the library keeps the new sheet.
+
 ## 0.14.2 — 2026-10-19
 
 - "All mechanisms" on a mechanism page returns to the library as it was left: the same filters, search and scroll

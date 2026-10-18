@@ -1,5 +1,6 @@
-// The library's state as the visitor left it (filters and search in its URL, and the scroll position), kept for the
-// tab in sessionStorage, so "All mechanisms" on a mechanism page returns to the library as it was.
+// The library's state as the visitor left it (filters and search in its URL, the scroll position and the mechanisms it
+// shows), kept for the tab in sessionStorage: "Back to library" on a mechanism page returns to it, and Previous and Next step
+// through what it shows.
 import { url } from "./url";
 
 const KEY = "library";
@@ -9,6 +10,10 @@ export interface LibraryState {
   /** Path and query of the library page, filters and search included. */
   href: string;
   y: number;
+  /** The mechanisms shown, in the library's order. */
+  list: { id: string; name: string }[];
+  /** True when filters or a search narrow the list. */
+  filtered: boolean;
 }
 
 const store = (): Storage | null => {
@@ -26,19 +31,19 @@ export function saveLibrary(s: LibraryState): void {
 export function readLibrary(): LibraryState | null {
   try {
     const v = JSON.parse(store()?.getItem(KEY) ?? "null") as LibraryState | null;
-    return v && typeof v.href === "string" && typeof v.y === "number" ? v : null;
+    return v && typeof v.href === "string" && typeof v.y === "number" && Array.isArray(v.list) ? v : null;
   } catch {
     return null;
   }
 }
 
-/** Marks the next library load as a return, so it scrolls to where the visitor was. */
-export const markReturn = () => store()?.setItem(RESTORE, "1");
+/** Marks the next library load as a return from mechanism `id`, so it scrolls to that mechanism's card. */
+export const markReturn = (id: string) => store()?.setItem(RESTORE, id);
 
-/** True once, on the library load that follows markReturn. */
-export function takeReturn(): boolean {
+/** The mechanism returned from, once, on the library load that follows markReturn. */
+export function takeReturn(): string | null {
   const s = store();
-  const v = s?.getItem(RESTORE) === "1";
+  const v = s?.getItem(RESTORE) ?? null;
   s?.removeItem(RESTORE);
   return v;
 }

@@ -3,6 +3,7 @@
 // supplies every word; the drawing comes from the package and the model's solve.
 import Sheet from "../../layouts/Sheet.astro";
 import Bar from "../../components/Bar.astro";
+import ThemeToggle from "../../components/ThemeToggle.astro";
 import Stage from "../../components/Stage.astro";
 import { SHEETS, driveOf, type Sheet as SheetInfo } from "../../data";
 import { url } from "../../url";
@@ -50,20 +51,20 @@ const media = r.media.filter((m) => m.kind === "video" || m.kind === "photos");
 const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
 ---
 <Sheet title={`${r.name} · Mechanism Library`} description={r.summary}>
-  <Bar />
+  <Bar title={r.name} />
   <main class="wrap detail">
     <nav class="crumbs" aria-label="Sheets">
-      <a class="btn" id="back" href={url("/")}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>All mechanisms</a>
+      <a class="btn" id="back" href={url("/")}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>Back to library</a>
       {SHEETS.length > 1 && (
         <div class="nav">
-          <a class="btn quiet" href={url(`/mechanisms/${prev.id}/`)}>{prev.rec.name}</a>
-          <a class="btn quiet" href={url(`/mechanisms/${next.id}/`)}>{next.rec.name}</a>
+          <a class="btn quiet" id="prev" href={url(`/mechanisms/${prev.id}/`)}>{prev.rec.name}</a>
+          <a class="btn quiet" id="next" href={url(`/mechanisms/${next.id}/`)}>{next.rec.name}</a>
         </div>
       )}
     </nav>
     <div class="dhead">
       <div class="meta"><b>{sheet.no}</b> · {r.family} · {r.motion.label}</div>
-      <h1>{r.name}</h1>
+      <div class="hrow"><h1>{r.name}</h1><ThemeToggle /></div>
       <p>{r.summary}</p>
     </div>
     <div class="dlayout">
@@ -109,6 +110,6 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
   </main>
   <script>
     import "../../islands/stage";
-    import "../../islands/back";
+    import "../../islands/sheetnav";
   </script>
 </Sheet>

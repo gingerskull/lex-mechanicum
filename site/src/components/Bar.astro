@@ -1,11 +1,15 @@
 ---
-// The sticky bar (SS3): search and filters on the library, the sheet switch everywhere.
+// The sticky bar (SS3). On the library: search, filters and the sheet switch on one row, the filter panel under it. On a
+// mechanism page: the mechanism's name and the sheet switch, shown once the page's own heading has scrolled away.
+import ThemeToggle from "./ThemeToggle.astro";
 interface Props {
   library?: boolean;
+  /** A mechanism page's name: the bar becomes the compact page bar. */
+  title?: string;
 }
-const { library = false } = Astro.props;
+const { library = false, title } = Astro.props;
 ---
-<div class="bar">
+<div class:list={["bar", { pagebar: !!title }]} id={title ? "pagebar" : undefined}>
   <div class="wrap row">
     {library && (
       <>
@@ -18,11 +22,9 @@ const { library = false } = Astro.props;
         </button>
       </>
     )}
+    {title && <span class="bartitle">{title}</span>}
     <span class="spacer"></span>
-    <span class="lbl">Sheet</span>
-    <div class="seg" role="group" aria-label="Sheet" id="theme">
-      <button type="button" data-v="dark" aria-pressed="true">Blueprint</button><button type="button" data-v="light" aria-pressed="false">Drafting</button>
-    </div>
+    <ThemeToggle />
   </div>
   <slot />
 </div>

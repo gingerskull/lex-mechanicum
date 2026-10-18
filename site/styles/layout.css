@@ -57,6 +57,35 @@ header.top {
 .spacer {
   flex: 1;
 }
+/* a mechanism page's compact bar: its name and the sheet switch, in once the page's heading has scrolled away */
+.pagebar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin: 0;
+  border-top: 0;
+  transform: translateY(-110%);
+  visibility: hidden;
+  transition: transform var(--size-transition), visibility 0s linear var(--size-transition);
+}
+.pagebar.shown {
+  transform: none;
+  visibility: visible;
+  transition: transform var(--size-transition);
+}
+.bartitle {
+  flex: 1;
+  min-width: 0;
+  font: 700 18px / 1.1 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pagebar .spacer {
+  display: none;
+}
 .facets {
   display: grid;
   gap: 10px;
@@ -65,6 +94,10 @@ header.top {
   padding-right: max(var(--size-gutter), env(safe-area-inset-right, 0px));
   max-height: 60vh;
   overflow: auto;
+}
+.facethead {
+  display: flex;
+  justify-content: flex-end;
 }
 .facet {
   display: grid;
@@ -121,11 +154,20 @@ header.top {
   color: var(--accent);
   font-weight: 600;
 }
+/* the name, with the sheet switch at its right */
+.dhead .hrow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 0 0 10px;
+}
 .dhead h1 {
+  flex: 1;
+  min-width: 0;
   font: 700 clamp(32px, 4.6vw, 56px) / 0.98 var(--font-display);
   letter-spacing: var(--tracking-display);
   text-transform: uppercase;
-  margin: 0 0 10px;
+  margin: 0;
   text-wrap: balance;
 }
 .dhead p {
@@ -187,36 +229,23 @@ footer {
   .facet .lbl {
     padding-top: 0;
   }
-  /* the bar reads as two groups: search and Filters on the first row, the sheet switch alone on the second (SS3) */
+  /* one row: the search takes what Filters and the sheet switch leave (SS3) */
   .bar .row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 8px 10px;
+    flex-wrap: nowrap;
+    gap: 8px;
   }
   .bar .spacer {
     display: none;
   }
   .bar .search {
-    grid-column: 1;
-    flex: none;
+    flex: 1;
   }
   .bar .fbtn {
-    grid-column: 2;
     align-self: stretch;
     justify-content: center;
   }
-  /* the bar's own row only: the filter panel inside the bar has labels too */
-  .bar .row > .lbl {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .bar .row > .seg {
-    grid-column: 2;
-    grid-row: 2;
-  }
-  .bar .row > .lbl,
-  .bar .row > .seg {
-    margin-top: 2px;
+  .bartitle {
+    font-size: 16px;
   }
   header.top .tblock b {
     font-size: 10.5px;

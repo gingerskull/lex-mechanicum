@@ -1,7 +1,7 @@
 // Search and facets on the library (SS3): any chip of a facet matches (or), every facet must match (and), and the
 // search matches name, other names, summary, tags and keywords. All data is on the cards; nothing is fetched. The
 // filters and search live in the page's URL as they change, and the state is kept for the tab when the page is left,
-// so a mechanism page's "All mechanisms" brings the library back as it was.
+// so a mechanism page's "Back to library" brings the library back as it was and its Previous and Next follow what it shows.
 import { readLibrary, saveLibrary, takeReturn } from "../library";
 
 const cards = [...document.querySelectorAll<HTMLAnchorElement>(".card")];
@@ -11,6 +11,7 @@ const panel = document.getElementById("facets");
 const badge = document.getElementById("fcount");
 const shown = document.getElementById("shown");
 const clear = document.getElementById("clear");
+const fclear = document.getElementById("fclear") as HTMLButtonElement | null;
 const empty = document.getElementById("empty");
 const chips = [...document.querySelectorAll<HTMLButtonElement>("#facets .chip")];
 
@@ -37,6 +38,7 @@ function apply() {
     badge.textContent = String(on.length);
   }
   if (clear) clear.hidden = on.length === 0 && words.length === 0;
+  if (fclear) fclear.disabled = on.length === 0 && words.length === 0;
   if (empty) empty.hidden = n > 0;
   // the URL says what is shown: ?<facet>=<value>... and ?q=<words>
   const p = new URLSearchParams();
@@ -57,11 +59,13 @@ for (const c of chips)
     apply();
   });
 q?.addEventListener("input", apply);
-clear?.addEventListener("click", () => {
+const clearAll = () => {
   for (const c of chips) c.setAttribute("aria-pressed", "false");
   if (q) q.value = "";
   apply();
-});
+};
+clear?.addEventListener("click", clearAll);
+fclear?.addEventListener("click", clearAll);
 
 // a link from a mechanism page's tags: ?<facet>=<value> presses that chip and opens the panel, ?q=<words> searches
 const params = new URLSearchParams(location.search);
@@ -78,7 +82,15 @@ if (pressed && toggle && panel) {
 if (q && params.has("q")) q.value = params.get("q")!;
 if (pressed || params.has("q")) apply();
 
-// leaving the page keeps its state for the way back; arriving by "All mechanisms" scrolls to where it was
-addEventListener("pagehide", () => saveLibrary({ href: location.pathname + location.search, y: scrollY }));
-const back = takeReturn() ? readLibrary() : null;
-if (back) requestAnimationFrame(() => scrollTo(0, back.y));
+// leaving the page keeps its state for the way back; arriving by "Back to library" from a mechanism page shows that
+// mechanism's card (or, if the filters hide it, the place the library was left)
+addEventListener("pagehide", () => {
+  const list = cards.filter((c) => !c.hidden).map((c) => ({ id: c.dataset.id!, name: c.querySelector("h2")?.textContent ?? c.dataset.id! }));
+  saveLibrary({ href: location.pathname + location.search, y: scrollY, list, filtered: list.length < cards.length });
+});
+const from = takeReturn();
+if (from) {
+  const lib = readLibrary();
+  const card = cards.find((c) => c.dataset.id === from && !c.hidden);
+  requestAnimationFrame(() => (card ? card.scrollIntoView({ block: "center" }) : scrollTo(0, lib?.y ?? 0)));
+}
