@@ -30,4 +30,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "scotch-yoke": async () => (await import("./scotch-yoke/model")).default,
   "hoekens-linkage": async () => (await import("./hoekens-linkage/model")).default,
   "offset-slider-crank": async () => (await import("./offset-slider-crank/model")).default,
+  "eccentric-sheave": async () => (await import("./eccentric-sheave/model")).default,
 };
