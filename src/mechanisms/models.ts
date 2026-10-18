@@ -4,6 +4,7 @@ import type { MechanismModel } from "../model/types";
 
 export const models: Record<string, () => Promise<MechanismModel>> = {
   "four-bar": async () => (await import("./four-bar/model")).default,
+  "peaucellier-lipkin": async () => (await import("./peaucellier-lipkin/model")).default,
   "intermittent-gear": async () => (await import("./intermittent-gear/model")).default,
   geneva: async () => (await import("./geneva/model")).default,
   "spur-gears": async () => (await import("./spur-gears/model")).default,
