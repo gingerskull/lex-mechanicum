@@ -22,4 +22,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "scissor-lift": async () => (await import("./scissor-lift/model")).default,
   "elliptic-trammel": async () => (await import("./elliptic-trammel/model")).default,
   "watt-linkage": async () => (await import("./watt-linkage/model")).default,
+  "locomotive-drive": async () => (await import("./locomotive-drive/model")).default,
 };
