@@ -66,7 +66,7 @@ PASS 114 · FAIL 0 · N/A 7 · open: none
 | J2 | PASS | AUTO · input: housing with two sealed bearings, sleeve, wave washer, circlips, screwed and dowelled; keyed shaft, pulley hub with set screws, end retainer, thrust washer, home flag |
 | J3 | PASS | AUTO · M, A and B: shoulder bolts into the lower part, bearings in the rod (M) and the blocks (A, B), inner-race spacers, threadlocker; no clevis (full-circle sweeps) |
 | J4 | N/A | AUTO · no pin in a slot: the blocks are slides |
-| J5 | PASS | HAND · hand-built on the plate (the slide rule needs rails): per half arm a keeper plate, a bronze gib with three adjusting screws and lock nuts, a grease nipple on the keeper, a felt wiper at each block end and a neoprene end pad; the groove walls are ground. DIFFERS: the adjusting screws are drawn standing in the wall top, not through it (see promotion candidates) |
+| J5 | PASS | HAND · hand-built on the plate (the slide rule needs rails), as the rule builds a slide (v2.4): per half arm a bronze gib on one wall clamped under a keeper plate that laps the block, by the keeper's two screws, the other wall the reference; a grease nipple per groove, a felt wiper at each block end and a neoprene end pad; the groove walls are ground |
 | J6 | N/A | AUTO · no gear mesh |
 | J7 | N/A | AUTO · no cam |
 | J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension |
@@ -76,7 +76,7 @@ PASS 114 · FAIL 0 · N/A 7 · open: none
 | F4 | PASS | AUTO / HAND · bronze thrust washer on the base under the crank, wave washer preloading the input |
 | F5 | PASS | HAND · neoprene pad on every closed groove end, 2 mm past the block's wiper at the end of its travel; the groove end wall is the stop |
 | F6 | N/A | AUTO / HAND · driven; no rest position to hold |
-| F7 | PASS | AUTO / HAND · bronze gib with adjusting screws and lock nuts on every half arm; belt tension at the motor mount. L 60 and p 40 are fixed pin centres: no adjustable link is built (see open) |
+| F7 | PASS | AUTO / HAND · a bronze gib on every half arm, set and clamped under its keeper; belt tension at the motor mount. L 60 and p 40 are fixed pin centres: no adjustable link is built (see open) |
 | F8 | PASS | AUTO · felt wipers at both ends of each block, grease nipples on the keepers; shielded and sealed bearings |
 | F9 | N/A | AUTO / HAND · one input; the blocks and rod are fixed by their pins, so the build cannot go together out of phase |
 | F10 | PASS | AUTO / HAND · pulley flanges, home flag and fork sensor; no slip clutch: the pads are never touched in running |
@@ -92,7 +92,7 @@ PASS 114 · FAIL 0 · N/A 7 · open: none
 | M10 | PASS | AUTO / HAND · steel crank and rod and ground steel plate, bronze blocks, bronze gib |
 | M11 | PASS | AUTO · centre holes and chamfered ends on the shafts |
 | M12 | PASS | HAND · every head reachable; bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw, lock nuts on the gib screws; the hand-built hardware calls the locking rule |
+| M13 | PASS | AUTO / HAND · threadlocker on every screw; the gibs are held by the keepers' clamp, no lock nuts; the hand-built hardware calls the locking rule |
 | M14 | PASS | HAND · bronze blocks and gib wearing against the ground steel walls; the gib and blocks are the replaceable wear parts |
 | V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 |
 | V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
@@ -114,7 +114,7 @@ PASS 114 · FAIL 0 · N/A 7 · open: none
 | R4 | PASS | AUTO · package built at build time, 31.9 KB |
 | R5 | PASS | HAND · states only what differs; no sampling; polish 4 ms |
 | R6 | PASS | FLAG · FLAG: Node CPU bench, not the browser: plan 276, 28° 312, side 269, explode 227 ms at full detail; 42 ms at dial H; setup 1.7 ms |
-| R7 | PASS | HAND · model.ts + polish.ts 17.4 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 17.2 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -138,8 +138,8 @@ PASS 114 · FAIL 0 · N/A 7 · open: none
 | pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – no keyed part | F685ZZ located by flange and circlip, inner race clamped | – limited by the slide's stops | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
 | drive | drive | none | none | none | none | none | none | bracket | none | none | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
 | groove-plate-post | post | 3 x spigot | none | none | none | none | none | none | none | none | none |
-| slide-blockX | J5 | – the rails are dowelled to the base | 2 x Keeper plate, holds the block down | – prismatic, no torque | – the keeper takes the lift, the base the weight | 2 x Stop pad, neoprene 2 mm | – driven | 2 x Gib strip 1.2 x 6.5 x 60, bronze | 2 x nipple; 2 x Felt wiper in a steel clip | – no phase to keep | – stops never touched in running |
-| slide-blockY | J5 | – the rails are dowelled to the base | 2 x Keeper plate, holds the block down | – prismatic, no torque | – the keeper takes the lift, the base the weight | 2 x Stop pad, neoprene 2 mm | – driven | 2 x Gib strip 1.2 x 6.5 x 60, bronze | 2 x nipple; 2 x Felt wiper in a steel clip | – no phase to keep | – stops never touched in running |
+| slide-blockX | J5 | – the grooves are the plate's, located on its spigots | 2 x Keeper plate, holds the block down and clamps the gib | – prismatic, no torque | – the keeper takes the lift, the base the weight | 2 x Stop pad, neoprene 2 mm | – driven | 2 x Gib strip 1.2 x 7.1 x 58, bronze, clamped under the keeper | Grease nipple M6 (DIN 71412); 2 x Felt wiper in a steel clip | – no phase to keep | – stops never touched in running |
+| slide-blockY | J5 | – the grooves are the plate's, located on its spigots | 2 x Keeper plate, holds the block down and clamps the gib | – prismatic, no torque | – the keeper takes the lift, the base the weight | 2 x Stop pad, neoprene 2 mm | – driven | 2 x Gib strip 1.2 x 7.1 x 58, bronze, clamped under the keeper | Grease nipple M6 (DIN 71412); 2 x Felt wiper in a steel clip | – no phase to keep | – stops never touched in running |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -151,20 +151,19 @@ PASS 114 · FAIL 0 · N/A 7 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 12 | 0 | 219 |
-| DL-B | 0 | 235 | 207 |
+| DL-B | 0 | 211 | 207 |
 | DL-C | 0 | 0 | 84 |
 | DL-D | 18 | 0 | 65 |
-| DL-E | 16 | 0 | 60 |
+| DL-E | 14 | 0 | 60 |
 | DL-F | 0 | 0 | 61 |
 | DL-G | 0 | 0 | 58 |
-| DL-H | 39 | 0 | 42 |
-| never | 113 | 152 | 42 |
+| DL-H | 15 | 0 | 42 |
+| never | 105 | 138 | 42 |
 
 ## Promotion candidates
 - A slide whose guide is one plate (a groove cut through it, a cross of two grooves): `slides()` in `rules/classify.ts` finds a slider only between a rail pair, so the plate's keeper, gib, wipers, nipple and end pads are built by hand here. A rule that reads a through groove in a ground plate as a slide, and gives it the `H.slide` kit, would serve this and any other grooved plate.
 - A check that treats a fixed pin inside a groove cut as not rigid with the plate: `model/check.ts` reports a fixed pin at the crossing as rigid with a plate whose outline contains it, so the plate is hardware here rather than a model part, and the classify rules (slot roller, slide) never see it.
-- Gib adjusting screws through the groove wall (horizontal) instead of standing in the wall top: needs a sideways screw primitive.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.6 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.8 KB
 screenshots: plan, 28 degrees, side, explode at 28 and 70 degrees in both sheets, made with tools/shot (to attach to #24) · bench (Node CPU, median of 24, ms): plan 275.7, 28 degrees 312.4, side 269.3, explode 226.7; setup 1.69; dial full 294.6 to H 41.7
