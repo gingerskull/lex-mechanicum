@@ -21,6 +21,6 @@ describe("thumbnail fingerprints", () => {
 
   it("draw a new mechanism and a missing image", () => {
     expect(stale({}, { a: fp() }, all)).toEqual([{ id: "a", why: ["new"] }]);
-    expect(stale({ a: fp() }, { a: fp() }, (f) => !f.endsWith("a-light.webp"))).toEqual([{ id: "a", why: ["missing"] }]);
+    expect(stale({ a: fp() }, { a: fp() }, (f) => !f.endsWith("a-light-still.webp"))).toEqual([{ id: "a", why: ["missing"] }]);
   });
 });

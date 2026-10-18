@@ -271,7 +271,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.majorWidth` | 0.8 | px |
 | `draft.gpu.samples` | 8 | antialiasing samples per pixel |
 | `draft.gpu.samplesDense` | 4 | coarse pointer or device pixel ratio of 2 and more |
-| `draft.card.detail` | `D` | detail dial position of a card drawing (DL) |
+| `draft.card.detail` | `B` | detail dial position of a card drawing (DL): sharp, with wall shading |
 | `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
 | `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
 | `draft.lines.plateTop` | 1.7 | px, bold top outline of plates |

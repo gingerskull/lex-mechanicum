@@ -58,7 +58,7 @@ export const DRAFT = {
   },
 
   card: {
-    detail: "D" as const, // detail dial position of a card drawing (DL)
+    detail: "B" as const, // detail dial position of a card drawing (DL): sharp, with wall shading
     plateTopFactor: 0.7, // factor on lines.plateTop on a card
     baseTopFactor: 0.7, // factor on lines.baseTop on a card
   },

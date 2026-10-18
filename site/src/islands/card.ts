@@ -1,5 +1,8 @@
 // Library cards (SS1, R8): the thumbnail is a pre-rendered image; on hover the engine loads (once) and the card's
-// canvas animates the mechanism from the thumbnail's pose until the pointer leaves, and starts again from it on the next hover. Reduced motion keeps the images still.
+// canvas animates the mechanism from the thumbnail's pose until the pointer leaves, and starts again from it on the next
+// hover. Only the last few cards keep a live session; older ones are freed. Reduced motion, or a browser without
+// WebGL2, keeps the images still.
+import { hasWebGL2 } from "../gl";
 import { url } from "../url";
 type Engine = typeof import("./engine");
 
@@ -17,7 +20,22 @@ interface Live {
   running: boolean;
 }
 
-const live = new WeakMap<HTMLElement, Live>();
+/** Live card sessions kept: hovering through the library frees the older ones, so memory stays flat. */
+const KEEP = 3;
+// insertion order is use order: the first entry is the one used longest ago
+const live = new Map<HTMLElement, Live>();
+const making = new Map<HTMLElement, Promise<Live>>();
+
+function keep(thumb: HTMLElement, L: Live) {
+  live.delete(thumb);
+  live.set(thumb, L);
+  for (const [t, old] of live) {
+    if (live.size <= KEEP) break;
+    if (old.running) continue;
+    old.sess.dispose();
+    live.delete(t);
+  }
+}
 // the card animating now: on touch there is no pointer leaving, so one card runs at a time and a tap elsewhere stops it
 let active: HTMLAnchorElement | null = null;
 
@@ -25,17 +43,23 @@ async function start(card: HTMLAnchorElement) {
   const thumb = card.querySelector<HTMLElement>(".thumb");
   const canvas = thumb?.querySelector("canvas");
   const id = card.dataset.id;
-  if (!thumb || !canvas || !id || reduced) return;
+  if (!thumb || !canvas || !id || reduced || !hasWebGL2()) return;
   const E = await load();
   if (!card.matches(":hover")) return;
-  let L = live.get(thumb);
-  if (!L) {
-    const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
-    const r = thumb.getBoundingClientRect();
-    const sess = E.createSession(canvas, pkg, model, { factory: E.browserFactory, w: r.width, h: r.height, dpr: E.pixelRatio() });
-    L = { sess, raf: 0, u: START_U, t: performance.now(), running: false };
-    live.set(thumb, L);
+  // one session per card, however many enters arrive while it loads
+  let made = making.get(thumb);
+  if (!live.has(thumb) && !made) {
+    made = (async () => {
+      const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
+      const r = thumb.getBoundingClientRect();
+      const sess = E.createSession(canvas, pkg, model, { factory: E.browserFactory, w: r.width, h: r.height, dpr: E.pixelRatio() });
+      return { sess, raf: 0, u: START_U, t: performance.now(), running: false };
+    })();
+    making.set(thumb, made);
   }
+  const L = live.get(thumb) ?? (await made!);
+  making.delete(thumb);
+  keep(thumb, L);
   const it = L;
   if (it.running) return; // a repeat enter (a tap while it plays, a scroll) never restarts it
   if (active && active !== card) stop(active);
@@ -69,7 +93,9 @@ for (const card of document.querySelectorAll<HTMLAnchorElement>(".card")) {
   card.addEventListener("pointerleave", (e) => {
     if (e.pointerType === "mouse") stop(card);
   });
-  card.addEventListener("focus", () => void load());
+  card.addEventListener("focus", () => {
+    if (hasWebGL2()) void load();
+  });
 }
 document.addEventListener("pointerdown", (e) => {
   if (e.pointerType !== "mouse" && active && !active.contains(e.target as Node)) stop(active);

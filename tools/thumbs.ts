@@ -1,6 +1,7 @@
 // npx tsx tools/thumbs.ts [id ...] [--all] [--hook]: the library thumbnails (standard R8, style SS1), drawn in local
 // Chrome and committed: site/thumbs/<id>-<theme>.webp, 4:3 at DPR 2, phase 1.1, tilt 28, no sheet, the traced path
-// only. site/thumbs/manifest.json holds each mechanism's fingerprint: its package bytes, its model, the renderer, the
+// only; and <id>-<theme>-still.webp, the stage's opening view as one large still, shown where a browser has no WebGL2
+// (no title block, which comes from the catalogue). site/thumbs/manifest.json holds each mechanism's fingerprint: its package bytes, its model, the renderer, the
 // style and the thumbnail view. Only thumbnails whose fingerprint changed are drawn (--all draws every one). The site
 // build checks the fingerprints and never draws (checkThumbs); the pre-push hook runs --hook, which redraws what is
 // stale and stops the push while site/thumbs has changes to commit.
@@ -18,6 +19,9 @@ import type { ThemeKey } from "../src/style/tokens";
 import { openChrome } from "./chrome";
 
 export const THUMB = { w: 320, h: 240, dpr: 2, u: 1.1, tilt: 28 };
+/** The still: the stage's opening frame (63° of the cycle, tilt 28, dimensions on) at dial A, since paper grain is noise
+ * that would make each image several times larger. */
+export const STILL = { w: 1200, h: 750, dpr: 1, u: (63 / 360) * Math.PI * 2, tilt: 28, detail: "A" as const, quality: 0.75 };
 const THEMES: ThemeKey[] = ["dark", "light"];
 const QUALITY = 0.92;
 
@@ -41,8 +45,9 @@ const hash = (...parts: (string | Uint8Array)[]) => {
   return h.digest("hex").slice(0, 16);
 };
 
-/** The thumbnail's drawing options, the same for every mechanism. */
+/** The thumbnail's and the still's drawing options, the same for every mechanism. */
 const thumbView = (theme: ThemeKey) => ({ w: THUMB.w, h: THUMB.h, dpr: THUMB.dpr, u: THUMB.u, card: true as const, view: { tilt: THUMB.tilt, theme, sheet: null, dims: false, overlays: { paths: true } } });
+const stillView = (theme: ThemeKey) => ({ w: STILL.w, h: STILL.h, dpr: STILL.dpr, u: STILL.u, view: { tilt: STILL.tilt, theme, sheet: null, dims: true, detail: STILL.detail, overlays: { paths: true } } });
 
 /**
  * The parts of the fingerprints that come from source: the files the drawing page bundles, split into each mechanism's
@@ -69,7 +74,7 @@ async function sources(): Promise<{ renderer: string; style: string; model: Reco
 /** Each mechanism's fingerprint now. `packages` reuses package bytes already built (the site build has them). */
 export async function fingerprints(ids = Object.keys(mechanisms), packages?: Map<string, Uint8Array>): Promise<Manifest> {
   const src = await sources();
-  const view = hash(JSON.stringify([THUMB, cardView(), thumbView("dark")]));
+  const view = hash(JSON.stringify([THUMB, cardView(), thumbView("dark"), STILL, stillView("dark"), QUALITY]));
   const out: Manifest = {};
   for (const id of ids) {
     const bytes = packages?.get(id) ?? (await encode((await buildPackage(id)).pkg));
@@ -82,7 +87,9 @@ export function readManifest(): Manifest {
   return existsSync(MANIFEST) ? (JSON.parse(readFileSync(MANIFEST, "utf8")) as Manifest) : {};
 }
 
-const file = (id: string, theme: ThemeKey) => join(THUMBS_DIR, `${id}-${theme}.webp`);
+const file = (id: string, theme: ThemeKey, still = false) => join(THUMBS_DIR, `${id}-${theme}${still ? "-still" : ""}.webp`);
+/** The images of one mechanism, by file name in site/thumbs. */
+export const imagesOf = (id: string): string[] => THEMES.flatMap((t) => [`${id}-${t}.webp`, `${id}-${t}-still.webp`]);
 
 /** Mechanisms whose thumbnails are missing or drawn from something else, with what changed. */
 export function stale(manifest: Manifest, now: Manifest, exists: (f: string) => boolean = existsSync): { id: string; why: string[] }[] {
@@ -90,7 +97,7 @@ export function stale(manifest: Manifest, now: Manifest, exists: (f: string) => 
   for (const [id, fp] of Object.entries(now)) {
     const was = manifest[id];
     const why = was ? (Object.keys(fp) as (keyof Fingerprint)[]).filter((k) => fp[k] !== was[k]) : ["new"];
-    if (THEMES.some((t) => !exists(file(id, t)))) why.push("missing");
+    if (imagesOf(id).some((f) => !exists(join(THUMBS_DIR, f)))) why.push("missing");
     if (why.length) out.push({ id, why });
   }
   return out;
@@ -116,7 +123,8 @@ export async function thumbs(ids = Object.keys(mechanisms), all = false): Promis
       for (const id of todo) {
         for (const theme of THEMES) {
           writeFileSync(file(id, theme), await chrome.shot(id, thumbView(theme), { type: "image/webp", quality: QUALITY }));
-          files.push(file(id, theme));
+          writeFileSync(file(id, theme, true), await chrome.shot(id, stillView(theme), { type: "image/webp", quality: STILL.quality }));
+          files.push(file(id, theme), file(id, theme, true));
         }
         manifest[id] = now[id]!;
       }
