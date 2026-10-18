@@ -1,6 +1,6 @@
-// The canvas the renderer draws on, the same code path in the browser and in Node: a factory makes offscreen canvases,
-// paths and matrices (the browser's DOM, or @napi-rs/canvas in Node; see tools/canvas-node.ts). No DOM is touched
-// outside the factory, so checks, packaging, screenshots and the bench run headless.
+// The canvas the renderer draws on: a factory makes the offscreen canvases (layers, tiles, the shared GPU canvas), so
+// nothing else in the renderer touches the DOM. Drawing needs a browser with WebGL2; the tools draw in local Chrome
+// (tools/chrome.ts), while packaging, rules, checks and audits run in Node without a canvas.
 
 export interface CanvasLike {
   width: number;
@@ -13,8 +13,6 @@ export type Affine = [number, number, number, number, number, number];
 
 export interface CanvasFactory {
   canvas(w: number, h: number): CanvasLike;
-  path(): Path2D;
-  matrix(m: Affine): DOMMatrix;
 }
 
 /** The browser's factory. */
@@ -25,8 +23,6 @@ export const browserFactory: CanvasFactory = {
     c.height = h;
     return c;
   },
-  path: () => new Path2D(),
-  matrix: (m) => new DOMMatrix(m),
 };
 
 /** A canvas with its size in CSS px and device pixels. */

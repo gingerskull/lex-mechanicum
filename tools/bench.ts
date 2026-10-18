@@ -1,88 +1,93 @@
-// npx tsx tools/bench.ts [id ...]: per mechanism, package size, session setup, frame time at plan, 28°, side and full
-// explode and at every dial position, and the solids and marks on each rung (standard R6, DL5). Writes
-// dist/bench/report.md and report.json. Node canvas timings are CPU rasterisation: they rank views and rungs; the
-// browser numbers of the site are measured on its stage (step 8).
+// npx tsx tools/bench.ts [id ...] [--runs 3] [--dpr 1.5] [--frames 40]: the browser bench (standard R6, DL5), in local
+// Chrome on the GPU: per mechanism, frame time at plan, 28°, side and full explode and at every dial position, the
+// draw counters of one frame, the package size and the solids and marks on each rung. Frames are drawn back to back
+// on animation frames with the frame-rate cap off, so each frame's GPU work is paid before the next (what the stage
+// gets); the median of the runs. Writes dist/bench/report.md and report.json.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { mechanisms } from "../src/mechanisms";
 import { buildPackage } from "../src/package/build";
 import { encode } from "../src/package/format";
-import { ladder, type Dial } from "../src/render/detail";
-import { defaultView, type DrawView } from "../src/render/draft";
-import { createSession } from "../src/render/session";
+import type { Dial } from "../src/render/detail";
 import { prepare } from "../src/render/world";
 import { DETAIL, rungOf } from "../src/style/detail";
-import { nodeCanvas, nodeFactory } from "./canvas-node";
+import { openChrome, type BenchResult } from "./chrome";
 
 const W = 1393;
 const H = 870;
-const DPR = 1.5;
-const FRAMES = 24;
 
-export interface BenchRow {
-  id: string;
+export interface BenchRow extends BenchResult {
   packageKB: number;
-  setupMs: number;
-  views: Record<string, number>;
-  dial: Record<string, number>;
   rungs: Record<string, { solids: number; marks: number }>;
+  /** Largest spread of a view's frame time across the runs, as a fraction of its median. */
+  spread: number;
 }
 
-function frameMs(draw: (u: number) => void): number {
-  for (let i = 0; i < 3; i++) draw(0.3 + i * 0.01);
-  const t: number[] = [];
-  for (let i = 0; i < FRAMES; i++) {
-    const t0 = performance.now();
-    draw(1 + i * 0.05);
-    t.push(performance.now() - t0);
-  }
-  t.sort((a, b) => a - b);
-  return +t[Math.floor(t.length / 2)]!.toFixed(2);
-}
+const med = (v: number[]) => [...v].sort((a, b) => a - b)[Math.floor(v.length / 2)]!;
 
-export async function bench(id: string): Promise<BenchRow> {
-  const { model } = await mechanisms[id]!();
+/** The solids and marks each rung drops, and the package size: data, no drawing. */
+async function inventory(id: string): Promise<Pick<BenchRow, "packageKB" | "rungs">> {
   const { pkg } = await buildPackage(id);
-  const bytes = (await encode(pkg)).byteLength;
-  const canvas = nodeCanvas(Math.round(W * DPR), Math.round(H * DPR));
-  const t0 = performance.now();
-  const sess = createSession(canvas as never, pkg, model, { factory: nodeFactory, w: W, h: H, dpr: DPR });
-  const setupMs = +(performance.now() - t0).toFixed(2);
-  const base: DrawView = { ...defaultView(), dims: true, sheet: { title: id, no: id }, overlays: { paths: true } };
-  const views: Record<string, number> = {};
-  for (const [k, v] of [["plan", { tilt: 0 }], ["28", { tilt: 28 }], ["side", { tilt: 88 }], ["explode", { tilt: 70, explode: 1 }]] as const)
-    views[k] = frameMs((u) => sess.draw(u, { ...base, ...v }));
-  const dial: Record<string, number> = {};
-  for (const d of ["full", ...DETAIL.map((r) => r.id)] as Dial[]) dial[d] = frameMs((u) => sess.draw(u, { ...base, detail: d }));
-  const rungs: Record<string, { solids: number; marks: number }> = {};
+  const rungs: BenchRow["rungs"] = {};
   for (const p of prepare(pkg)) {
-    const r = (rungs[p.s.detail] ??= { solids: 0, marks: 0 });
-    r.solids++;
+    (rungs[p.s.detail] ??= { solids: 0, marks: 0 }).solids++;
     for (const m of p.marks) (rungs[rungOf({ mark: m.kind }).id] ??= { solids: 0, marks: 0 }).marks++;
   }
-  void ladder;
-  return { id, packageKB: +(bytes / 1024).toFixed(1), setupMs, views, dial, rungs };
+  return { packageKB: +((await encode(pkg)).byteLength / 1024).toFixed(1), rungs };
 }
 
-function report(rows: BenchRow[]): string {
-  const L = [`# Bench`, ``, `${W} x ${H} at DPR ${DPR}, Node canvas (CPU), median of ${FRAMES} frames, ms.`, ``];
-  for (const r of rows) {
-    L.push(`## ${r.id}`, ``, `Package ${r.packageKB} KB, session setup ${r.setupMs} ms.`, ``);
-    L.push(`| View | plan | 28° | side | explode 70° |`, `|---|---|---|---|---|`, `| frame ms | ${r.views.plan} | ${r.views["28"]} | ${r.views.side} | ${r.views.explode} |`, ``);
-    const ks = Object.keys(r.dial);
-    L.push(`| Dial | ${ks.join(" | ")} |`, `|${ks.map(() => "---").join("|")}|---|`, `| frame ms | ${ks.map((k) => r.dial[k]).join(" | ")} |`, ``);
-    const rs = Object.keys(r.rungs).sort();
-    L.push(`| Rung | ${rs.join(" | ")} |`, `|---|${rs.map(() => "---").join("|")}|`, `| solids | ${rs.map((k) => r.rungs[k]!.solids).join(" | ")} |`, `| marks | ${rs.map((k) => r.rungs[k]!.marks).join(" | ")} |`, ``);
+export async function benchAll(ids: string[], o: { runs: number; dpr: number; frames: number }): Promise<{ gpu: string; rows: BenchRow[] }> {
+  const chrome = await openChrome();
+  const dials: Dial[] = ["full", ...DETAIL.map((r) => r.id)];
+  const rows: BenchRow[] = [];
+  try {
+    for (const id of ids) {
+      const runs: BenchResult[] = [];
+      for (let i = 0; i < o.runs; i++) runs.push(await chrome.bench(id, { w: W, h: H, dpr: o.dpr, frames: o.frames, dials }));
+      const pick = (k: "views" | "cpu" | "dial") => Object.fromEntries(Object.keys(runs[0]![k]).map((x) => [x, med(runs.map((r) => r[k][x]!))]));
+      const spread = Math.max(...Object.keys(runs[0]!.views).map((k) => {
+        const v = runs.map((r) => r.views[k]!);
+        return (Math.max(...v) - Math.min(...v)) / med(v);
+      }));
+      rows.push({ ...runs[0]!, setupMs: med(runs.map((r) => r.setupMs)), views: pick("views"), cpu: pick("cpu"), dial: pick("dial"), spread, ...(await inventory(id)) });
+      console.log(`bench ${id}`);
+    }
+  } finally {
+    await chrome.close();
   }
-  return L.join("\n");
+  return { gpu: chrome.gpu, rows };
+}
+
+export function report(gpu: string, rows: BenchRow[], o: { runs: number; dpr: number; frames: number }): string {
+  const L = [`# Browser bench`, ``, `${W} x ${H} at DPR ${o.dpr}, ${gpu}, ${rows[0]?.samples ?? 0}x MSAA. Frame: mean interval of ${o.frames} frames drawn back to back on animation frames, frame-rate cap off, ms; median of ${o.runs} runs. Script: median time inside the draw call.`, ``];
+  L.push(`| Mechanism | package KB | setup ms | plan | 28° | side | explode 70° | script at 28° | run spread |`, `|---|---|---|---|---|---|---|---|---|`);
+  for (const r of rows) L.push(`| ${r.id} | ${r.packageKB} | ${r.setupMs} | ${r.views.plan} | ${r.views["28"]} | ${r.views.side} | ${r.views.explode} | ${r.cpu["28"]} | ${(100 * r.spread).toFixed(0)} % |`);
+  const dials = Object.keys(rows[0]?.dial ?? {});
+  L.push(``, `Frame at 28° by dial position (ms):`, ``, `| Mechanism | ${dials.join(" | ")} |`, `|---|${dials.map(() => "---").join("|")}|`);
+  for (const r of rows) L.push(`| ${r.id} | ${dials.map((d) => r.dial[d]).join(" | ")} |`);
+  L.push(``, `Draw counters at 28°, full detail (one frame):`, ``, `| Mechanism | solids | slices | 2D fills | 2D strokes | GL draws | GL chunks | GL instances |`, `|---|---|---|---|---|---|---|---|`);
+  for (const r of rows) {
+    const c = r.counters["28"]!;
+    const n = (k: string) => c[k] ?? 0;
+    L.push(`| ${r.id} | ${n("solids")} | ${n("slices")} | ${n("fill")} | ${n("stroke")} | ${n("glDraws")} | ${n("glChunks")} | ${n("glInstances")} |`);
+  }
+  const rs = [...DETAIL.map((r) => r.id), "never"];
+  L.push(``, `Solids and marks per rung:`, ``, `| Mechanism | ${rs.join(" | ")} |`, `|---|${rs.map(() => "---").join("|")}|`);
+  for (const r of rows) L.push(`| ${r.id} | ${rs.map((k) => (r.rungs[k] ? `${r.rungs[k].solids} / ${r.rungs[k].marks}` : "")).join(" | ")} |`);
+  return L.join("\n") + "\n";
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const ids = process.argv.slice(2);
-  const rows: BenchRow[] = [];
-  for (const id of ids.length ? ids : Object.keys(mechanisms)) rows.push(await bench(id));
+  const arg = (k: string, d: string) => {
+    const i = process.argv.indexOf(`--${k}`);
+    return i > 0 ? process.argv[i + 1]! : d;
+  };
+  const opts = { runs: Number(arg("runs", "3")), dpr: Number(arg("dpr", "1.5")), frames: Number(arg("frames", "40")) };
+  const flags = new Set(["--runs", "--dpr", "--frames"]);
+  const ids = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && !flags.has(all[i - 1] ?? ""));
+  const { gpu, rows } = await benchAll(ids.length ? ids : Object.keys(mechanisms), opts);
   mkdirSync("dist/bench", { recursive: true });
-  writeFileSync("dist/bench/report.json", JSON.stringify(rows, null, 2));
-  writeFileSync("dist/bench/report.md", report(rows));
-  console.log(report(rows));
+  writeFileSync("dist/bench/report.json", JSON.stringify({ gpu, ...opts, rows }, null, 2));
+  writeFileSync("dist/bench/report.md", report(gpu, rows, opts));
+  console.log(report(gpu, rows, opts));
 }
