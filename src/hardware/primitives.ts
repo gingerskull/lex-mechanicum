@@ -1,6 +1,6 @@
 // H: the hardware primitives (standard Appendix B). Real catalogue sizes, a default material, a default locking method
 // where threaded and the detail rung of their kind. Each returns finished solids; callers place them.
-import { TAU, bbox, circle, dBore, polar, roundedPoly, type Vec2 } from "../core/geom";
+import { TAU, arcPts, bbox, circle, dBore, polar, roundedPoly, type Vec2 } from "../core/geom";
 import { FORM } from "../style/form";
 import { solid, marks, type Mark, type Solid } from "./solid";
 import {
@@ -18,14 +18,8 @@ export const hex = (r: number, x = 0, y = 0, a = 0): Vec2[] =>
 /** Hex of width s across flats. */
 export const hexAF = (s: number, x = 0, y = 0, a = 0): Vec2[] => hex(s / Math.sqrt(3), x, y, a);
 
-/** Link outline with boss radii r0 at (0, 0) and r1 at (L, 0), joined by outer tangents. */
-export function taper(L: number, r0: number, r1: number, n = 40): Vec2[] {
-  const a = Math.acos((r0 - r1) / L);
-  const pts: Vec2[] = [];
-  for (let i = 0; i <= n / 2; i++) pts.push(polar(r1, -a + (2 * a * i) / (n / 2), L, 0));
-  for (let i = 0; i <= n; i++) pts.push(polar(r0, a + ((TAU - 2 * a) * i) / n));
-  return pts;
-}
+import { taper } from "../core/geom";
+export { taper };
 
 /** Centres of n holes on a circle of radius R. */
 export const boltCircle = (n: number, R: number, a0 = 0, x = 0, y = 0): Vec2[] =>
@@ -51,19 +45,75 @@ export function hullOf(cs: [number, number, number][]): Vec2[] {
 /** Lightening window through the points `pieces` with a cutter radius of at least 1.5 mm (M5). */
 export const window = (pieces: Vec2[], r: number): Vec2[] => roundedPoly(pieces, Math.max(1.5, r));
 
+/** Round every corner of a closed outline with radius r, convex and concave alike: a milled window (M5). */
+export function filletPoly(P: Vec2[], r: number): Vec2[] {
+  const out: Vec2[] = [];
+  const n = P.length;
+  for (let i = 0; i < n; i++) {
+    const p = P[(i - 1 + n) % n]!;
+    const c = P[i]!;
+    const q = P[(i + 1) % n]!;
+    const u: Vec2 = [p[0] - c[0], p[1] - c[1]];
+    const v: Vec2 = [q[0] - c[0], q[1] - c[1]];
+    const lu = Math.hypot(...u);
+    const lv = Math.hypot(...v);
+    const th = Math.acos(Math.max(-1, Math.min(1, (u[0] * v[0] + u[1] * v[1]) / (lu * lv))));
+    const t = r / Math.tan(th / 2);
+    if (th > Math.PI - 0.15 || t > 0.45 * Math.min(lu, lv)) {
+      out.push(c);
+      continue;
+    }
+    const a: Vec2 = [c[0] + (u[0] / lu) * t, c[1] + (u[1] / lu) * t];
+    const b: Vec2 = [c[0] + (v[0] / lv) * t, c[1] + (v[1] / lv) * t];
+    const bis: Vec2 = [u[0] / lu + v[0] / lv, u[1] / lu + v[1] / lv];
+    const bl = Math.hypot(...bis);
+    const h = r / Math.sin(th / 2);
+    const C: Vec2 = [c[0] + (bis[0] / bl) * h, c[1] + (bis[1] / bl) * h];
+    const a0 = Math.atan2(a[1] - C[1], a[0] - C[0]);
+    let a1 = Math.atan2(b[1] - C[1], b[0] - C[0]);
+    while (a1 - a0 > Math.PI) a1 -= TAU;
+    while (a0 - a1 > Math.PI) a1 += TAU;
+    out.push(...arcPts(C[0], C[1], r, a0, a1, Math.PI / 12));
+  }
+  return out;
+}
+
+/**
+ * The windows of a spoked wheel (M2): hub of radius rIn, rim of inner radius rOut, n straight spokes of half-width
+ * `half`, every corner filleted. The first window is centred between spokes at a0 + pi / n.
+ */
+export function spokes(o: { rIn: number; rOut: number; n: number; half: number; fillet: number; a0?: number }): Vec2[][] {
+  const e0 = Math.asin(o.half / o.rIn);
+  const f0 = Math.asin(o.half / o.rOut);
+  return Array.from({ length: o.n }, (_, k) => {
+    const a0 = (o.a0 ?? 0) + (k * TAU) / o.n + Math.PI / o.n;
+    const a1 = a0 + TAU / o.n;
+    return filletPoly([...arcPts(0, 0, o.rOut, a0 + f0, a1 - f0, Math.PI / 40), ...arcPts(0, 0, o.rIn, a1 - e0, a0 + e0, Math.PI / 40)], o.fillet);
+  });
+}
+
 /** Oil sink round a pivot on a bridge (F8): a countersunk cup drawn as two rings. */
 export const oilSink = (r: number, x = 0, y = 0): Mark[] =>
   marks("oilSink", circle(r + 0.9, x, y, 40), circle(r + 1.8, x, y, 44));
 
-/** Bore entry chamfers (M3): a second ring just outside every round hole of radius at least minR. */
+/**
+ * Bore entry chamfers (M3): a second ring just outside every round hole of radius at least minR. Idempotent: a hole
+ * that already has its ring gets no second one.
+ */
 export function boreChamfers(s: Solid, minR = 1.9, c = 0.5): void {
+  const has = new Set(s.marks.filter((m) => m.kind === "boreEntry").map((m) => ringKey(bbox(m.pts))));
   for (const h of s.holes) {
     const [x0, y0, x1, y1] = bbox(h);
     const r = (x1 - x0) / 2;
-    if (r >= minR && Math.abs((y1 - y0) / 2 - r) < 0.05)
-      s.marks.push({ kind: "boreEntry", pts: circle(r + c, (x0 + x1) / 2, (y0 + y1) / 2, Math.max(28, Math.round(r * 3))) });
+    if (r < minR || Math.abs((y1 - y0) / 2 - r) >= 0.05) continue;
+    const pts = circle(r + c, (x0 + x1) / 2, (y0 + y1) / 2, Math.max(28, Math.round(r * 3)));
+    const k = ringKey(bbox(pts));
+    if (has.has(k)) continue;
+    has.add(k);
+    s.marks.push({ kind: "boreEntry", pts });
   }
 }
+const ringKey = ([x0, y0, x1, y1]: [number, number, number, number]) => `${((x0 + x1) / 2).toFixed(2)},${((y0 + y1) / 2).toFixed(2)},${((x1 - x0) / 2).toFixed(2)}`;
 
 const ticks = (r0: number, r1: number, n: number): Vec2[][] =>
   Array.from({ length: n }, (_, i) => [polar(r0, (i * TAU) / n), polar(r1, (i * TAU) / n)]);
@@ -591,7 +641,7 @@ export const lead = (id: string, pts: Vec2[], o: Opts = {}): Solid =>
   solid(id, { name: "Lead, silicone insulated", kind: "lead", mat: "Tinned copper, silicone", outer: stroke(pts, 0.9), ...o });
 
 export const H = {
-  disc, hex, hexAF, taper, boltCircle, hullOf, window, oilSink, boreChamfers,
+  disc, hex, hexAF, taper, boltCircle, hullOf, window, filletPoly, spokes, oilSink, boreChamfers,
   shaft, bearing, roller, bushing, washer, spacer, thrustWasher, waveWasher, tube, shank, head, screw, nut, plainWasher,
   plate, standoff, spigot, dowel, circlip, retainerPlate, key, setScrew, collar, spring, stop, bumper, nipple, felt,
   wiper, wearStrip, eccentric, gib, flag, sensor, terminalBlock, cableClip, lead, solid,

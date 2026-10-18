@@ -8,7 +8,7 @@ import { bridge } from "../hardware/sub/bridge";
 import { drive } from "../hardware/sub/drive";
 import { followerTrain } from "../hardware/sub/followerTrain";
 import { housing } from "../hardware/sub/housing";
-import { dragPack, eccentricMount, sensor } from "../hardware/sub/misc";
+import { dragPack, eccentricMount, lockingSegment, outputCoupling, sensor } from "../hardware/sub/misc";
 import { slide } from "../hardware/sub/slide";
 import { stops } from "../hardware/sub/stops";
 import type { MechanismModel, Solved } from "../model/types";
@@ -55,6 +55,8 @@ export const HP = {
   eccentricMount: (a: Ctx, jid: string, o: Parameters<typeof eccentricMount>[2]) => eccentricMount(ctxOf(a), jid, o),
   stops: (a: Ctx, o: Parameters<typeof stops>[1]) => stops(ctxOf(a), o),
   dragPack: (a: Ctx, jid: string, o: Parameters<typeof dragPack>[2]) => dragPack(ctxOf(a), jid, o),
+  lockingSegment: (a: Ctx, host: Solid, o: Parameters<typeof lockingSegment>[2]) => lockingSegment(ctxOf(a), host, o),
+  outputCoupling: (a: Ctx, jid: string, o: Parameters<typeof outputCoupling>[2]) => outputCoupling(ctxOf(a), jid, o),
   followerTrain: (a: Ctx, j: Parameters<typeof followerTrain>[1]) => followerTrain(ctxOf(a), j),
   drive: (a: Ctx, o?: Parameters<typeof drive>[1]) => drive(ctxOf(a), o),
   sensor: (a: Ctx, id: string, o: Parameters<typeof sensor>[2]) => sensor(ctxOf(a), id, o),

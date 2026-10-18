@@ -3,7 +3,7 @@
 // circlip over a hub (F2), an end retainer below (F2), a clearance hole in the base (A7). The drive rule adds the
 // pulley, the home flag and the sensor (F10, V6).
 import { dBore } from "../core/geom";
-import { circlip, collar, disc, key, plainWasher, screw, setScrew, shaft, thrustWasher, tube } from "../hardware/primitives";
+import { circlip, collar, disc, key, plainWasher, screw, setScrew, shaft, spacer, thrustWasher, tube } from "../hardware/primitives";
 import { housing } from "../hardware/sub/housing";
 import { circlipExt, innerRingD, keyFor, standardLength } from "../hardware/tables";
 import { elements, partName, stackSpacers } from "./pins";
@@ -12,6 +12,9 @@ import type { PinJoint, Rule, RuleContext } from "./types";
 const fmt = (v: number) => String(+v.toFixed(1));
 /** Space a live input shaft leaves below its housing for the pulley, its spacer and the end retainer, mm. */
 export const INPUT_END = 15;
+/** The thrust washer fills a gap over the base up to this, mm; a wider gap gets a TW washer and a spacer. */
+const TW_MAX = 3.2;
+const TW = 1.5;
 
 export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
   const J = ctx.joint(j.id)!;
@@ -21,10 +24,15 @@ export function buildLiveShaft(ctx: RuleContext, j: PinJoint): void {
   const H = housing(ctx, j.id, { at: j.P, d, ...(j.eccentric ? { eccentric: true } : {}) });
   const { els, names } = elements(ctx, j, j.body, j.at, group, "shield");
   // the gap over the base under the first part: a bronze thrust washer (F4)
+  // a part plated high over the base: the washer stays on the base and a spacer turning with the shaft fills the rest
   const first = els[0]!;
-  if (first.z0 - ctx.b1 > 0.3) {
-    ctx.add(thrustWasher(`${j.id}-tw`, d + 0.2, d + 6, { body: j.body, at: j.at, z0: ctx.b1, z1: first.z0, ex: first.ex, joints: [j.id], why: "takes the downward load of the driven part on the base (F4)" }));
+  const gap = first.z0 - ctx.b1;
+  if (gap > 0.3) {
+    const tw = gap > TW_MAX ? TW : gap;
+    ctx.add(thrustWasher(`${j.id}-tw`, d + 0.2, d + 6, { body: j.body, at: j.at, z0: ctx.b1, z1: ctx.b1 + tw, ex: first.ex, joints: [j.id], why: "takes the downward load of the driven part on the base (F4)" }));
     (J.serves.F4 ??= []).push(`${j.id}-tw`);
+    if (gap > TW_MAX)
+      ctx.add(spacer(`${j.id}-tw-sp`, d + 0.2, d + 6, { name: `Spacer, thrust washer to the ${partName(ctx, j.joined[0]!)}`, body: j.body, at: j.at, z0: ctx.b1 + tw, z1: first.z0, ex: first.ex, joints: [j.id] }));
   }
   stackSpacers(ctx, j, els, j.body, j.at, false);
   const driven = j.driven;

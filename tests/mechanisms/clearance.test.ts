@@ -25,7 +25,7 @@ describe("four-bar without polish", () => {
     const names = a.solids.map((s) => s.name).filter(Boolean).join("\n");
     for (const re of [
       // J1 at O4
-      /Axle, shoulder bolt Ø6/, /Bearing F?686/, /Internal circlip DIN 472/, /Thrust washer/, /Bridge over the pivot/, /Standoff Ø10 x .*spigot/,
+      /Axle, shoulder bolt Ø10/, /Bearing F6800 \(10x19x5\)/, /M8 nyloc/, /Internal circlip DIN 472/, /Thrust washer/, /Bridge over the pivot/, /Standoff Ø10 x .*spigot/,
       // J2 at O2
       /Bearing housing/, /Bearing 6800-2RS/, /Wave washer/, /Dowel pin Ø3/, /Input shaft Ø10 h6, feather key/, /Feather key 3 x 3/, /Countersunk M5 x \d+ \(ISO 10642\), into the shaft end/, /Retaining washer/,
       // J3 at A and B

@@ -108,13 +108,13 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · match marks and tapped-hole rings are marks |
-| R1 | PASS | HAND · the polish reuses H.bridge, H.bearing, H.eccentric, H.shaft and H.key; no inline standard part |
+| R1 | PASS | HAND · the polish reuses H.outputCoupling and H.spokes; the straddle bridge and the top eccentric are the rules'; no inline standard part |
 | R2 | PASS | HAND · threads M3, M4, M5, M6; shafts Ø10 and 12; two bearing sizes |
 | R3 | PASS | AUTO · housing, bridge and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time |
-| R5 | PASS | HAND · states only what differs; polish 0.7 s, almost all of it the bridge's post search (promotion candidate) |
+| R5 | PASS | HAND · states only what differs; rules 0.07 s, polish under 1 ms |
 | R6 | PASS | FLAG · browser bench (one run for all four): plan 50.5, 28° 75.6, side 39.3, explode 27.9 ms at full detail; 8 ms reached at dial D; runs on this machine vary by up to half (look at in #14) |
-| R7 | PASS | HAND · model.ts + polish.ts 12.7 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 4.8 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -133,24 +133,22 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | p1 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 3 x Internal circlip DIN 472, Ø19; External circlip DIN 471, Ø10; Socket head M5 x 10 (ISO 4762), into the shaft end; Bearing F6800ZZ (10x19x5), floating | Feather key 3 x 3 x 7 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – turns fully | – driven through the belt | – backlash set on the output shaft | – sealed and shielded bearings | Match mark on the pinion tooth at the line of centres | – see drive |
-| p2 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 3 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12; Shaft collar 12x22, set screw; Bearing F6801ZZ (12x21x5), floating; Countersunk M6 x 14 (ISO 10642), into the shaft end, flush | Feather key 4 x 4 x 7 (DIN 6885); Feather key 4 x 4 x 6 (DIN 6885) | Wave washer 16.5x20.8, spring steel; Thrust washer 12.2x18, bronze | – turns fully | – driven through the mesh | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | – sealed and shielded bearings | Match mark on the gear gap at the line of centres | – none needed |
-| mesh-pinion-gear | J6 | – the shafts locate the gears | – circlips over the hubs (p1, p2) | Gear hub Ø22, set screw M3 on the key; 2 x Set screw M3 (DIN 916), threadlocked; Gear hub Ø24, set screw M3 on the key | – thrust washers under the gears (p1, p2) | – continuous rotation | – driven | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged; Eccentric bushing Ø27, 0.3 mm offset bore Ø21, flanged, top of the output shaft | Open gears, greased at assembly | Pinion, 14 teeth; Gear, 28 teeth | – none needed |
+| p2 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 3 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12; Shaft collar 12x22, set screw; Bearing F6801ZZ (12x21x5), floating; Countersunk M6 x 14 (ISO 10642), into the shaft end, flush | Feather key 4 x 4 x 7 (DIN 6885); Feather key 4 x 4 x 6 (DIN 6885) | Wave washer 16.5x20.8, spring steel; Thrust washer 12.2x18, bronze | – turns fully | – driven through the mesh | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged; Eccentric bushing Ø27, 0.3 mm offset bore Ø21, flanged, top of the shaft | – sealed and shielded bearings | Match mark on the gear gap at the line of centres | – none needed |
+| mesh-pinion-gear | J6 | – the shafts locate the gears | – circlips over the hubs (p1, p2) | Gear hub Ø22, set screw M3 on the key; 2 x Set screw M3 (DIN 916), threadlocked; Gear hub Ø24, set screw M3 on the key | – thrust washers under the gears (p1, p2) | – continuous rotation | – driven | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged; Eccentric bushing Ø27, 0.3 mm offset bore Ø21, flanged, top of the shaft | Open gears, greased at assembly | Pinion, 14 teeth; Gear, 28 teeth | – none needed |
 | drive | drive | – bracket screwed up into the base | – pulley hub set screws (p1) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
-| bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – spigot in a slot takes the hole tolerance | – static | – static | – static |
+| p1-p2-bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – spigot in a slot takes the hole tolerance | – static | – static | – static |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| p1, p2 | live shafts in housing pairs, the gears overhung | straddle mounted: shafts run up into floating bearings in a bridge over both | A9: nothing sweeps over the gears |
-| mesh backlash | one eccentric, under the output housing | a second eccentric in the bridge at the top of the output shaft, set together | the bridge holds the shaft's top; one eccentric alone would tilt it |
-| p2 | shaft ends at the gear hub | runs on above the bridge to a keyed output flange with 4 x M4 tapped holes | where the load is coupled |
-| gear | solid web | hub and six spokes, windows filleted R3 | M2 |
+| p2 | shaft ends in its bridge bearing | runs on above the bridge to a keyed output flange with 4 x M4 tapped holes (H.outputCoupling) | where the load is coupled |
+| gear | solid web | hub and six spokes, windows filleted R3 (H.spokes) | M2 |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 14 | 0 | 59.4 |
-| DL-B | 0 | 172 | 58.1 |
+| DL-B | 0 | 169 | 58.1 |
 | DL-C | 0 | 0 | 10.4 |
 | DL-D | 15 | 0 | 7.3 |
 | DL-E | 8 | 2 | 6.2 |
@@ -162,12 +160,9 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- **Straddle bridge for live shafts (J2).** A9 asks for double shear wherever nothing sweeps over a live shaft; the bridge with a floating bearing per shaft is built here by hand. As a J2 variant it would serve every gear train.
-- **Eccentric at both ends.** When a bridge holds a shaft's top, J6's backlash eccentric needs a twin in the bridge; part of the same J2 variant.
-- **Output coupling.** An output shaft needs somewhere to take its load (a flange or a shaft end with a key); a small primitive would serve every mechanism with a rotary output.
-- **Spoke windows.** H.window makes convex windows only; a spoked-wheel helper (hub, rim, n spokes, filleted) would serve every large gear.
-- **H.bridge cost** (as on the four-bar): about 0.7 s here, two pivots.
+- None open. The straddle bridge for live gear shafts with the eccentric at both ends, the output coupling, the
+  spoked-wheel helper and a cheaper bridge post search were promoted in standard 2.1.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.6 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.4 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #12) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 75.6 ms at full detail, 8 ms reached at dial D (flag, R6)

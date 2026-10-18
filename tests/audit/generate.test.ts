@@ -2,9 +2,10 @@
 // assembly, judged rows kept on regeneration.
 import { beforeAll, describe, expect, it } from "vitest";
 import { generateAudit } from "../../src/audit/generate";
-import { parseHeader, readStandard, requirements, section, tableRows } from "../../src/audit/sheet";
+import { parseHeader, readStandard, requirements, section, standardVersion, tableRows } from "../../src/audit/sheet";
 
 const opts = { existing: null, date: "2026-10-17", polish: false } as const;
+const current = standardVersion(readStandard());
 let sheet: string;
 
 beforeAll(async () => {
@@ -22,7 +23,7 @@ describe("generateAudit on four-bar without polish", () => {
 
   it("starts with the header of section 11, open and at the current standard", () => {
     const h = parseHeader(sheet)!;
-    expect(h).toMatchObject({ id: "four-bar", standard: "2.0", date: "2026-10-17", result: "open", detail: "full" });
+    expect(h).toMatchObject({ id: "four-bar", standard: current, date: "2026-10-17", result: "open", detail: "full" });
   });
 
   it("decides tool rows and leaves the rest unjudged", () => {
@@ -45,7 +46,7 @@ describe("generateAudit on four-bar without polish", () => {
 
   it("keeps hand-judged rows, hand joint cells and the header on regeneration", async () => {
     const judged = sheet
-      .replace(/^standard: 2\.0 · date: 2026-10-17 · result: open/m, "standard: 2.0 · date: 2026-10-01 · result: open")
+      .replace(`standard: ${current} · date: 2026-10-17 · result: open`, `standard: ${current} · date: 2026-10-01 · result: open`)
       .replace(/^\| A9 \| \? \|.*$/m, "| A9 | PASS | clevis pair at A and B, double shear |")
       .replace(/^\| A15 \| PASS \|.*$/m, "| A15 | FAIL | stale hand entry |")
       .replace(/^(\| pO2 \| J2 \|(?: [^|]* \|){4}) none \|/m, "$1 – input, the drive limits nothing |")

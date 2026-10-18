@@ -26,7 +26,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
 | K3 | PASS | HAND · link, slider, plate (crosshead cap), rails, caps; between, at and fixed placement |
 | K4 | PASS | HAND · roles driver, link, output, ground, pin; accent only on the input cap pO |
-| K5 | PASS | HAND · check clean: crank, crosshead and rails layer 0, rod layer 1, cap layer 2; the plating offsets are declared as PLATING in model.ts (K1) |
+| K5 | PASS | HAND · check clean: crank, crosshead and rails layer 0, rod layer 1, cap layer 2; the crank is plated 2.5 mm up and the cap 2.5 mm down with `dz` in model.ts, and the rules build every stack on them (K1) |
 | K6 | PASS | DATA · r 35, l 110, in-line, stroke 70 from x 75 to 145: as the catalogue |
 | K7 | PASS | HAND · input rotary on the crank |
 | D1 | PASS | HAND · tapered rod (R8.5 and R8), crank with bosses and a counterweight lobe, slider with square ends on two stadium rails |
@@ -38,7 +38,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | D7 | PASS | HAND · crank, rod, crosshead, rails and base carry only load shape and manufacturing marks |
 | A1 | PASS | AUTO · pO J2, pA J3, pB J3, slide J5 |
 | A2 | PASS | AUTO · live input shaft, shoulder bolts at A and B, slide on the rails |
-| A3 | PASS | AUTO · 6800-2RS on the Ø10 input, F686ZZ on the Ø6 crank pin, F695ZZ on the Ø5 wrist pin; spacers in every gap |
+| A3 | PASS | AUTO · 6800-2RS on the Ø10 input, F686ZZ on the Ø6 crank pin and on the Ø6 wrist pin; spacers in every gap |
 | A4 | PASS | AUTO · stepped shoulder bolts with undercut threads; keyed input shaft with end retainer |
 | A5 | PASS | AUTO · feather key 3 x 3 on the Ø10 input shaft |
 | A6 | PASS | AUTO · the rails sit on 2 mm posts their own width with flush M3 |
@@ -66,7 +66,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | J2 | PASS | AUTO · input: housing with two sealed bearings, sleeve, wave washer, circlips, screwed and dowelled; keyed shaft, pulley hub with two set screws, end retainer, thrust washer, home flag |
 | J3 | PASS | AUTO · A and B: shoulder bolts threaded into the crank and the crosshead, bearings in the rod, inner-race spacers, threadlocked; clevis at B (variant) |
 | J4 | N/A | no pin in a slot |
-| J5 | PASS | AUTO / HAND · rails, keeper, bronze gib with three adjusting screws and lock nuts, felt wipers at both ends, grease nipple, end stops with neoprene pads (the lower one placed by hand) |
+| J5 | PASS | AUTO / HAND · rails, keeper, bronze gib with three adjusting screws and lock nuts, felt wipers at both ends, grease nipple, end stops with neoprene pads (the lower one shortened to clear the crank) |
 | J6 | N/A | no gear mesh |
 | J7 | N/A | no cam |
 | J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension |
@@ -108,13 +108,13 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · engraved crank pin path and scale are marks |
-| R1 | PASS | HAND · the polish reuses the J3 builder, H.taper, H.stop, H.bumper, H.standoff and H.screw; no inline standard part |
+| R1 | PASS | HAND · the polish reuses H.standoff and H.screw; plating, the clevis twin, the counterweighted crank and the tapered rod are the model's; no inline standard part |
 | R2 | PASS | HAND · threads M2.5, M3, M4, M5; joints Ø5, 6, 10; three bearing sizes |
 | R3 | PASS | AUTO · housing, bridge and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time |
-| R5 | PASS | HAND · states only what differs; no sampling; polish under 2 ms |
+| R5 | PASS | HAND · states only what differs; no sampling; rules 0.03 s, polish under 1 ms |
 | R6 | PASS | FLAG · browser bench: plan 7.0, side 20.9, explode 17.5, 28° 62.6 ms at full detail; 8 ms reached at dial D; runs on this machine vary by up to half (look at in #14) |
-| R7 | PASS | HAND · model.ts + polish.ts 9.4 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 5.4 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -134,7 +134,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | pO | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – turns fully | – driven through the belt | – belt tension at the motor mount (drive) | – sealed bearings | – one input, nothing in phase | – see drive |
 | pA | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
-| pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F695ZZ (5x13x4); head | – the cap is clamped on the shoulder; no keyed part | F695ZZ located by flange and circlip, inner race clamped | – limited by the slide's stops | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
+| pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – the cap is clamped on the shoulder; no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the slide's stops | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
 | slide-block | J5 | – the rails are screwed to their posts | Keeper plate, holds the slider down | – prismatic, no torque | – the keeper takes the lift, the base the weight | 2 x End stop block, hardened | – driven | Gib strip 3 x 6 x 123, bronze | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – stops never touched in running |
 | raila-post | post | – screwed through | – screwed from both sides | – static | – static | – static | – static | – the gib on the other rail adjusts the fit | – static | – static | – static |
 | railb-post | post | – screwed through | – screwed from both sides | – static | – static | – static | – static | – the gib on this rail adjusts the fit | – static | – static | – static |
@@ -143,34 +143,31 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| crank | layer 0, z 0 to 6 | plated 2.5 mm up, z 2.5 to 8.5 | A9: 1.5 mm overhang under the rod at A; the rod cannot come down, the keeper runs under it |
-| pB | wrist pin through crosshead and rod, single shear | crosshead clevis: a cap 1.5 mm over the rod on a post at x 14, the cap clamped on the shoulder | A9: double shear |
-| pO | thrust washer from the base to the crank | thrust washer on the base and a spacer turning with the shaft up to the lifted crank | the plating |
-| slide, lower end stop | not placed (the crank sweeps there) | a shorter block, 3 mm clear of the crank's sweep | F5 at both ends |
-| crank | straight stadium | counterweighted plate | M2: balance |
-| rod | straight stadium | tapered, bosses R8.5 and R8 | D1 |
+| crank | layer 0, z 0 to 6 | plated 2.5 mm up in the model (`dz`), z 2.5 to 8.5 | A9: 1.5 mm overhang under the rod at A; the rod cannot come down, the keeper runs under it |
+| pB | wrist pin through crosshead and rod, single shear | crosshead clevis: the cap twinned with the crosshead in the model, 1.5 mm over the rod, on a post at x 14 screwed into the crosshead | A9: double shear |
+| crank | straight stadium | counterweighted plate, in the model | M2: balance |
+| rod | straight stadium | tapered in the model, bosses R8.5 and R8 | D1 |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 10 | 0 | 44.4 |
-| DL-B | 0 | 185 | 41.8 |
+| DL-B | 0 | 186 | 41.8 |
 | DL-C | 0 | 0 | 15.2 |
 | DL-D | 18 | 0 | 4.9 |
 | DL-E | 11 | 0 | 4.4 |
 | DL-F | 0 | 0 | 4.1 |
 | DL-G | 0 | 0 | 3.8 |
 | DL-H | 15 | 0 | 3.2 |
-| never | 98 | 128 | 54.1 (full) |
+| never | 98 | 130 | 54.1 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- **Plating offsets read by the rules** (as on the four-bar): the polish rebuilds A and B and shifts the input stack by hand.
-- **Clevis twin** (as on the four-bar and the Geneva): the crosshead cap is a second model part rebuilt with a plain hole and moved to the crosshead's body. Three mechanisms now carry this hand fix: it is due for a rule.
-- **Slide end stops that fit.** H.slide gives up on a stop that would meet a sweep; it could shorten the block first, as done here.
 - **Rail standoffs.** Rails 2 mm off the base on posts their own width work, but a rail would usually sit on the base on ground pads.
 
+Promoted in standard 2.1: plating offsets read by the rules, the clevis twin, slide end stops that shorten to fit.
+
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.3 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.3 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #13) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 62.6 ms at full detail, 8 ms reached at dial D (flag, R6)

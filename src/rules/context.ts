@@ -2,7 +2,7 @@
 import { TAU, xf, type Vec2 } from "../core/geom";
 import { circleClearance, region, type Region } from "../core/poly";
 import { marks, solid, type Solid } from "../hardware/solid";
-import { heights } from "../parts";
+import { heights, layerZ } from "../parts";
 import { poseOf } from "../model/pose";
 import { sample, type Sampled } from "../model/sample";
 import type { MechanismModel, Part } from "../model/types";
@@ -23,7 +23,8 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
   const parts = indexParts(model);
   const s0 = model.solve(U0);
   const plates = model.parts.filter((p) => p.role !== "pin");
-  const levels = [...new Set(plates.map((p) => heights(p)[0]))].sort((a, b) => a - b);
+  // explode levels follow the layer grid: a plated part keeps its layer's level
+  const levels = [...new Set(plates.map(layerZ))].sort((a, b) => a - b);
   const exOf = (z: number) => Math.max(0, levels.findIndex((l) => l >= z - 1e-6));
   const b1 = Math.min(...plates.map((p) => heights(p)[0])) - 2;
   const solids: Solid[] = [];
@@ -40,7 +41,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       outer: p.shape.outer.slice(),
       holes: p.shape.holes.map((h) => h.slice()),
       marks: marks("boss", ...p.marks),
-      ex: exOf(z0),
+      ex: exOf(layerZ(p)),
       chamfer: FORM.chamfer.plate,
     });
     solids.push(solidOf[p.id]!);
@@ -126,6 +127,20 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
         for (const g of sweptSolid(t)) m = Math.min(m, circleClearance(c, r, g));
       }
       return m;
+    },
+    hits(c: Vec2, r: number, z0: number, z1: number, ignore?: (t: Solid) => boolean) {
+      const zHit = (a0: number, a1: number) => Math.min(a1, z1) - Math.max(a0, z0) > 0.05;
+      // a region whose box the circle cannot reach is skipped before the exact test
+      const near = (g: Region) => c[0] + r > g.box[0] && c[0] - r < g.box[2] && c[1] + r > g.box[1] && c[1] - r < g.box[3];
+      for (const sw of ctx.sweeps()) {
+        if (!zHit(sw.z0, sw.z1)) continue;
+        for (const g of sw.regions) if (near(g) && circleClearance(c, r, g) < 0) return true;
+      }
+      for (const t of solids) {
+        if ((solidOf[t.id] === t && !isGround(parts, t.body)) || !zHit(t.z0, t.z1) || ignore?.(t)) continue;
+        for (const g of sweptSolid(t)) if (near(g) && circleClearance(c, r, g) < 0) return true;
+      }
+      return false;
     },
     fired: {},
     rule: "context",

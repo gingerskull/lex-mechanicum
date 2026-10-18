@@ -1,5 +1,5 @@
-// assemble(model): the rules, then the mechanism's polish (only what differs), then stage 3 fasteners, the see-through
-// stage, then the rigid explode pass (standard 5). The result is everything the packager and the renderer need.
+// assemble(model): the rules, then the mechanism's polish (only what differs), then stage 3 fasteners, the shoulder
+// bolt headroom and see-through stages, then the rigid explode pass (standard 5). The result is everything the packager and the renderer need.
 import type { Solid } from "../hardware/solid";
 import { sample, type Sampled } from "../model/sample";
 import type { MechanismModel } from "../model/types";
@@ -7,6 +7,7 @@ import { createContext } from "../rules/context";
 import { rigidExplode } from "../rules/explode";
 import { fasteners } from "../rules/fasteners";
 import { rules as defaultRules, runRules } from "../rules/registry";
+import { headroom } from "../rules/headroom";
 import { seeThrough } from "../rules/see-through";
 import type { BuildRule, Joint, JointInfo, Rule, RuleContext } from "../rules/types";
 import { HP, polishApi, type Polish } from "./api";
@@ -49,7 +50,10 @@ export function assembleWith(model: MechanismModel, opts: AssembleOptions = {}):
   const t1 = performance.now();
   if (opts.polish) opts.polish(polishApi(ctx, buildRules), HP);
   const tPolish = performance.now() - t1;
+  // a clevis twin rides its partner's body: one rigid part in the package and the explode
+  for (const p of model.parts) if (p.twin) for (const s of ctx.solids) if (s.body === p.id) s.body = p.twin;
   fasteners(ctx);
+  headroom(ctx);
   seeThrough(ctx);
   rigidExplode(ctx);
   let zmin = Infinity;

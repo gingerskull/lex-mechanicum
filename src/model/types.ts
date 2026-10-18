@@ -28,8 +28,19 @@ export interface Solved {
 export interface Part {
   id: string;
   role: Role;
-  /** Integer layer, LAYER mm apart; z0 = layer · LAYER. */
+  /** Integer layer, LAYER mm apart; z0 = layer · LAYER + dz. */
   layer: number;
+  /**
+   * Plating offset from the layer grid, mm (K1: heights may change, centres may not): a part plated low over a pin
+   * shortens the pin's overhang (A9). The explode level stays the layer's.
+   */
+  dz?: number;
+  /**
+   * Clevis twin: the id of the part this one pairs with round a pin (A9). It has the same pose, turns with the bolt
+   * where its partner anchors it (a plain hole on the shoulder), gets its own bearing on a ground pivot, shares its
+   * partner's stops, and rides its partner's body in the build.
+   */
+  twin?: string;
   thick: number;
   shape: Shape;
   marks: Vec2[][];

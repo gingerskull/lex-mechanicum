@@ -124,6 +124,15 @@ export function gearOutline(z: number, m: number, ad = 1, de = 1.25, teeth?: (k:
   return pts;
 }
 
+/** Link outline with boss radii r0 at (0, 0) and r1 at (L, 0), joined by outer tangents (D1). */
+export function taper(L: number, r0: number, r1: number, n = 40): Vec2[] {
+  const a = Math.acos((r0 - r1) / L);
+  const pts: Vec2[] = [];
+  for (let i = 0; i <= n / 2; i++) pts.push(polar(r1, -a + (2 * a * i) / (n / 2), L, 0));
+  for (let i = 0; i <= n; i++) pts.push(polar(r0, a + ((TAU - 2 * a) * i) / n));
+  return pts;
+}
+
 /** Local points placed by a pose. */
 export const xf = (pts: Vec2[], [x, y, a]: Pose): Vec2[] => {
   const c = Math.cos(a);

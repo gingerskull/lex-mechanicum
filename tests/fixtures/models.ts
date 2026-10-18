@@ -119,3 +119,26 @@ export const j3Model: MechanismModel = defineMechanism({
     return { pts: { O2: [0, 0], O4: [100, 0], A, B: circleX(A, 120, [100, 0], 80, 1) } };
   },
 });
+
+/**
+ * Promotions: the J3 four-bar with a plated coupler (dz), tapered links and a clevis rocker (a front plate twinned with
+ * the rear one round B and O4).
+ */
+export const clevisModel: MechanismModel = defineMechanism({
+  id: "fx-clevis",
+  input: { kind: "rotary", part: "crank" },
+  parts: [
+    P.link("crank", 40, { role: "driver", r: [13, 9.5], between: ["O2", "A"] }),
+    P.link("rocker", 80, { role: "output", r: [12, 9.5], between: ["O4", "B"] }),
+    P.link("coupler", 120, { layer: 1, w: 22, dz: -2.5, between: ["A", "B"] }),
+    P.link("front", 80, { role: "output", r: [12, 9.5], layer: 2, dz: -5, twin: "rocker", between: ["O4", "B"] }),
+    P.cap("pO2", -1, 7, { fixed: [0, 0, 0], accent: true }),
+    P.cap("pO4", -1, 7, { fixed: [100, 0, 0], span: 3 }),
+    P.cap("pA", 0, 5.5, { at: "A" }),
+    P.cap("pB", 0, 5.5, { at: "B", span: 2 }),
+  ],
+  solve(u) {
+    const A = V.at([0, 0], u, 40);
+    return { pts: { O2: [0, 0], O4: [100, 0], A, B: circleX(A, 120, [100, 0], 80, 1) } };
+  },
+});

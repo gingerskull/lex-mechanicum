@@ -1,13 +1,19 @@
 // The rules engine contract (standard 5.1): one module per rule, run in registry order on a shared context.
 import type { Pose, Vec2 } from "../core/geom";
-import type { Region } from "../core/poly";
+import type { Region, Slot } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { Sampled } from "../model/sample";
+import type { Bearing } from "../hardware/tables";
 import type { MechanismModel, Part, Solved } from "../model/types";
 import type { Form } from "../style/form";
 import type { PartIndex } from "../assemble/pose";
 
 export type JointType = "J1" | "J2" | "J3" | "J4" | "J5" | "J6" | "J7" | "J8";
+
+/** A slot a pin runs in over the cycle, with the range of the pin centre along it (from the closed end's centre). */
+export interface SlotVisit extends Slot {
+  reach: [number, number];
+}
 
 /** A part a pin passes through, at the assembly phase. */
 export interface Joined {
@@ -19,6 +25,8 @@ export interface Joined {
   /** bore: the build bores it; keyed: the model gave it a keyed bore; slot: the pin runs in a slot. */
   how: "bore" | "keyed" | "slot";
   slotW?: number;
+  /** Every slot of the part the pin runs in over the cycle (an indexing part's slots in turn), closed or open. */
+  slots?: SlotVisit[];
   /** Index of the slot or keyed hole in the part's holes. */
   hole?: number;
   /** Width of a keyed bore. */
@@ -46,6 +54,11 @@ export interface PinJoint {
   eccentric?: boolean;
   /** Where the drive mounts on a live input shaft: the free shaft end below the housing. */
   below?: { z0: number; z1: number };
+  /**
+   * A straddle-mounted live shaft's top (A9): the top of its bearing seat in the bridge and the z from which the shaft
+   * end above it is free for a coupling (H.outputCoupling).
+   */
+  top?: { seat: number; free: number; bearing: Bearing };
   /** The part the bolt threads into (J3, J4), or the first driven part (J2). */
   anchor: Joined | null;
   /** Shaft or bolt Ø (A3). */
@@ -146,6 +159,8 @@ export interface RuleContext {
    * already built, mm (negative when it hits). `ignore` skips solids by id.
    */
   clearance(c: Vec2, r: number, z0: number, z1: number, ignore?: (t: Solid) => boolean): number;
+  /** Whether a circle over the z range hits anything `clearance` would measure: the same test, sign only, cheaper. */
+  hits(c: Vec2, r: number, z0: number, z1: number, ignore?: (t: Solid) => boolean): boolean;
   /** Record which rule added what (the audit reads it). */
   fired: Record<string, string[]>;
   rule: string;

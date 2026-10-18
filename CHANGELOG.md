@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.8.0 — 2026-10-18
+
+The hand fixes of the first four conformance passes promoted to rules and primitives (standard 2.1); the polishes
+shrink to what is particular to each mechanism, and their audits are regenerated.
+
+- Model: parts carry a plating offset (`dz`) and a clevis twin (`twin`); `P.link` takes boss radii and draws a tapered
+  link. The rules build every stack on the plated heights, turn a twin with the bolt (plain hole on the shoulder),
+  give each twinned plate its bearing on a ground pivot and the pair one set of stops, and put the twin on its
+  partner's body. Explode levels follow the layer grid.
+- J4: open slots (notches in an outline) are classified as slots, over the whole cycle and over as many cycles as an
+  indexing part takes to come round; the roller, the wear strips on every slot wall and a felt in every slot end come
+  from the rule. The Geneva drive's roller stud is now built by the rules.
+- J2: live gear shafts with nothing sweeping over them are straddle mounted in a bridge, a floating bearing per shaft,
+  the backlash eccentric at both ends. A plated part high over the base gets a thrust washer and a spacer.
+- Primitives: `H.dragPack` takes the inner and outer diameter of the face it bears on; `H.lockingSegment`,
+  `H.outputCoupling`, `H.spokes` and `H.filletPoly`; bore chamfers no longer repeat on a hole that has them.
+- Slide end stops are shortened to clear a sweep before they are dropped; a shoulder bolt head lifted on a shim that
+  would meet a solid gets a shoulder ground to length, a clear one is noted.
+- The bridge post search tests only pairs that can beat the best so far, with a sign-only hit test; assembly time per
+  mechanism falls from 0.6 to 1.3 s to 0.03 to 0.2 s.
+- With the real outlines in the model, the rules size some pins up (A3): the four-bar's O4 axle Ø10, the Geneva
+  roller stud Ø8, the slider-crank wrist pin Ø6.
+
 ## 0.7.0 — 2026-10-18
 
 - Working zones stay in view (L5): a see-through stage after the fasteners marks every static solid that hides the
