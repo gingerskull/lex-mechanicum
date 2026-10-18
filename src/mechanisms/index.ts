@@ -16,6 +16,7 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "intermittent-gear": () => import("./intermittent-gear/polish"),
   geneva: () => import("./geneva/polish"),
   "spur-gears": () => import("./spur-gears/polish"),
+  "jansen-linkage": () => import("./jansen-linkage/polish"),
   "slider-crank": () => import("./slider-crank/polish"),
   "toggle-clamp": () => import("./toggle-clamp/polish"),
 };

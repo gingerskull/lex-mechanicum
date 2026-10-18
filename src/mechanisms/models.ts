@@ -7,6 +7,7 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "intermittent-gear": async () => (await import("./intermittent-gear/model")).default,
   geneva: async () => (await import("./geneva/model")).default,
   "spur-gears": async () => (await import("./spur-gears/model")).default,
+  "jansen-linkage": async () => (await import("./jansen-linkage/model")).default,
   "slider-crank": async () => (await import("./slider-crank/model")).default,
   "toggle-clamp": async () => (await import("./toggle-clamp/model")).default,
 };
