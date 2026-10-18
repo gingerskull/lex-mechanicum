@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.11.1 — 2026-10-18
+
+- Licensed: the code under MIT (`LICENSE`), the catalogue, documents and drawings under Creative Commons
+  Attribution-ShareAlike 4.0 (`LICENSE-CONTENT`); the README says which covers what and the site footer names both.
+
 ## 0.11.0 — 2026-10-18
 
 - Mechanism pages: the tags move from the side column to a full-width band above the explanation, one column per
