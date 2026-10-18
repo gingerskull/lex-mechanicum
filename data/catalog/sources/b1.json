@@ -2881,17 +2881,17 @@
    "motion": "One block slides along the horizontal groove and the other along the vertical one, and a rod joins them. A crank from the crossing to the rod midpoint turns it round. The blocks pass through the crossing one at a time, and a pen on the extended rod traces an ellipse whose half-axes are its distances to the two blocks.",
    "forces": "Each groove can only push its block at right angles to the groove, so the blocks feel side forces only. Driving from the midpoint crank works but the crank and rod rotate in opposite directions, causing friction and wear at the midpoint pin.",
    "benefits": "Exact ellipses of any proportion from two adjustable distances on a straight bar, with no curved guide. The blocks themselves give exact straight-line motion and the midpoint traces a circle.",
-   "limits": "Sliders need clean, low-play grooves or the ellipse distorts. Blocks must pass through the crossing, so the groove ends need cut-backs."
+   "limits": "Sliders need clean, low-play grooves or the ellipse distorts. The blocks must cross the middle of the plate, so both grooves are cut through one plate and meet there, and everything that turns must stay under or clear of that plate."
   },
   "build": {
-   "ground": "base with crossed grooves along x and y through O, each a pair of rails on ground pads, and the crank shaft coming up at O under the blocks",
+   "ground": "one cross-shaped groove plate (a + sign, both grooves cut through it and meeting at O) standing on posts over the base, and the crank shaft coming up at O under the plate",
    "input": "crank O→M, continuous rotation",
    "output": "pen point P path (ellipse)",
    "members": [
     {
      "id": "ground",
      "role": "ground",
-     "def": "crossed grooves along x and y, cut back within 40 mm of O, extending to ±91 mm"
+     "def": "one-piece cross-shaped plate with grooves along x and y through O, each running to ±86 mm"
     },
     {
      "id": "blockX",
@@ -2978,14 +2978,8 @@
      "note": "pen beyond vertical block"
     },
     {
-     "name": "c",
-     "value": 40,
-     "unit": "mm",
-     "note": "groove cut-back at crossing"
-    },
-    {
      "name": "ext",
-     "value": 91,
+     "value": 86,
      "unit": "mm",
      "note": "groove half length"
     }
@@ -3000,7 +2994,7 @@
     "plot"
    ],
    "plot": "pen x and y vs crank angle",
-   "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Crank sits under the blocks and the rod over them; the grooves are cut back to the crank pin circle (radius 30 mm plus its pin), so the blocks cross the opening unguided on the rod."
+   "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Crank and rod turn under the groove plate (crank lowest, rod over it); only the blocks stand in the plate, in its grooves, and their pins go down onto the rod, so nothing crosses where it cannot."
   },
   "examples": [
    {
