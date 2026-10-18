@@ -9997,7 +9997,20 @@
         "scotch-yoke",
         "slider-crank"
       ],
-      "real_world": []
+      "real_world": [
+        {
+          "product": "Pilatus Railway, Switzerland",
+          "maker": "Pilatus-Bahnen",
+          "use": "Two horizontal pinions under the railcar engage a double toothed rack between the rails, so the car climbs a 48 percent grade without relying on wheel grip.",
+          "url": "https://www.youtube.com/watch?v=EAXG-UPg910"
+        },
+        {
+          "product": "Gantry router on rack and pinion drive",
+          "maker": "Avid CNC",
+          "use": "Servo-driven pinions run along toothed racks and carry the gantry, so each turn of a pinion moves the machine a fixed distance.",
+          "url": "https://www.youtube.com/watch?v=BbSN-jbr7xs"
+        }
+      ]
     },
     {
       "id": "spur-gears",
