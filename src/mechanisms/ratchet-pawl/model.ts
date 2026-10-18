@@ -121,14 +121,18 @@ export default defineMechanism({
   ],
   traceZ: 16.8,
   solve(u): Solved {
-    const a = osc(swingLo, swingHi)(u);
+    // the player runs u on past 2π: fold it into one cycle, so every loop meets the first tooth where the first loop did
+    // (the end of the cycle, u = 2π, keeps its own state: the wheel one pitch on, which looks the same as at u = 0)
+    const f = u - TAU * Math.floor(u / TAU);
+    const ph = u > 0 && f < 1e-9 ? TAU : f;
+    const a = osc(swingLo, swingHi)(ph);
     // the wheel is pushed one pitch while the lever goes forward from alphaPush to the end of the stroke, and stays put
-    const w = omega0 + (u <= Math.PI ? clamp(a - alphaPush, 0, pitch) : pitch);
+    const w = omega0 + (ph <= Math.PI ? clamp(a - alphaPush, 0, pitch) : pitch);
     const D = polar(Rp, a);
     const H = polar(Rp, holdAt);
     const TD = polar(profile(mod(tipAngle(a, w) - w)), tipAngle(a, w));
     const TH = polar(profile(mod(tipAngle(holdAt, w) - w)), tipAngle(holdAt, w));
-    const driving = u <= Math.PI && a > alphaPush;
+    const driving = ph <= Math.PI && a > alphaPush;
     return { pts: { O: [0, 0], E: polar(leverLen, a), D, TD, H, TH }, th: a, wheel: w, driving };
   },
   paths: ["TD"],

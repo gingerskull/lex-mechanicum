@@ -120,6 +120,17 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     const d = b ? Math.hypot(a[0] - b[0], a[1] - b[1]) : Infinity;
     if (d > PERIOD_TOL) add("PERIODICITY", `point "${k}" moves ${d.toFixed(3)} mm over one cycle`);
   }
+  // the player runs u on past 2π: later loops must repeat the first (a model keyed on absolute u fails here)
+  for (const [i, at] of [0, Math.floor(n / 4), Math.floor(n / 2), Math.floor((3 * n) / 4)].entries()) {
+    const u = (at / n) * TAU;
+    const a = S[at]!;
+    const b = model.solve(u + 2 * TAU);
+    for (const [k, q] of Object.entries(a.pts)) {
+      const r = b.pts[k];
+      const d = r ? Math.hypot(q[0] - r[0], q[1] - r[1]) : Infinity;
+      if (d > PERIOD_TOL) add("PERIODICITY", `point "${k}" differs ${d.toFixed(3)} mm two loops on (sample ${i}, u=${u.toFixed(2)})`);
+    }
+  }
 
   // POSE_JUMP
   for (const p of model.parts) {
