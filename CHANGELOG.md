@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.13.1 — 2026-10-18
+
+- Library cards on touch screens: a tap or a scroll that touches a card while its animation plays no longer restarts
+  it from the first frame. One card animates at a time; a tap on another card or on the page stops it. With a mouse,
+  hover still starts it from the thumbnail's pose and leaving stops it.
+
+
 ## 0.13.0 — 2026-10-18
 
 - Standard 2.5 (F7, HAND): `H.turnbuckle`, an adjuster for a moving link. It cuts the link across, joins the halves with
