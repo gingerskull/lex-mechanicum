@@ -27,6 +27,11 @@ export interface GpuStats {
   chunks: number;
   items: number;
   samples: number;
+  /**
+   * How long the GPU had been on the previous frame and was still not done when this one started, ms (0 when it was
+   * done): the honest sign of a GPU-bound drawing, whatever the display's rate or the page's scrolling does.
+   */
+  gpuLagMs: number;
 }
 
 /** A session's own GPU state: its items (kept across a lost context) and their textures (one context generation). */
@@ -37,6 +42,9 @@ export interface GpuSession {
   staticRows: number;
   holesTex: Table | null;
   stats: GpuStats;
+  /** Set after each frame; checked, without waiting, at the next. */
+  fence: WebGLSync | null;
+  fenceAt: number;
 }
 
 /** Everything the solids pass of a frame needs. */
@@ -60,11 +68,12 @@ function own(f: SolidsPass, g: Gpu | null): GpuSession {
   let o = f.own;
   if (!o) {
     const items = buildItems(f.prepared);
-    o = { items, gen: 0, itemsTex: null, staticRows: Math.max(1, Math.ceil(items.data.length / (4 * ROW))), holesTex: null, stats: { slices: 0, draws: 0, instances: 0, chunks: 0, items: items.count, samples: 0 } };
+    o = { items, gen: 0, itemsTex: null, staticRows: Math.max(1, Math.ceil(items.data.length / (4 * ROW))), holesTex: null, stats: { slices: 0, draws: 0, instances: 0, chunks: 0, items: items.count, samples: 0, gpuLagMs: 0 }, fence: null, fenceAt: 0 };
   }
   if (g && o.gen !== g.gen) {
-    // a new context: the old textures went with the old one
+    // a new context: the old textures (and fence) went with the old one
     o.gen = g.gen;
+    o.fence = null;
     o.itemsTex = new Table(g.gl, ROW);
     o.itemsTex.write(o.items.data, o.items.data.length);
     const H = o.items.holes;
@@ -82,6 +91,7 @@ export function disposeSolids(o: GpuSession | null): void {
   o.itemsTex?.drop();
   o.holesTex?.drop();
   o.itemsTex = o.holesTex = null;
+  o.fence = null;
   o.gen = 0;
 }
 
@@ -91,10 +101,16 @@ export function drawSolids(f: SolidsPass): { own: GpuSession; heads: Heads } {
   const g = gpu(card);
   const o = own(f, g.lost ? null : g);
   const plan = planFrame({ list, T, LD, cardK, Pr, items: o.items, dynStart: o.staticRows * PER_ROW });
-  o.stats = { slices: list.length, draws: 0, instances: 0, chunks: plan.frame.n + plan.lines.n, items: o.items.count, samples: g.samples };
+  o.stats = { slices: list.length, draws: 0, instances: 0, chunks: plan.frame.n + plan.lines.n, items: o.items.count, samples: g.samples, gpuLagMs: 0 };
   // a lost context draws nothing until it is back; onRestored listeners redraw then
   if (g.lost || g.gl.isContextLost() || !o.itemsTex || !o.holesTex) return { own: o, heads: plan.heads };
   const gl = g.gl;
+  // is the GPU done with the previous frame?
+  if (o.fence) {
+    if (gl.getSyncParameter(o.fence, gl.SYNC_STATUS) !== gl.SIGNALED) o.stats.gpuLagMs = performance.now() - o.fenceAt;
+    gl.deleteSync(o.fence);
+    o.fence = null;
+  }
 
   // the frame's tables: slices, chunks, dash phases, and the screen-space items after the static ones
   g.slices.write(plan.slices, list.length * 8);
@@ -182,5 +198,8 @@ export function drawSolids(f: SolidsPass): { own: GpuSession; heads: Heads } {
   main.globalCompositeOperation = "source-over";
   main.drawImage(g.canvas, 0, g.h - ch, cw, ch, 0, 0, cw, ch);
   main.restore();
+  o.fence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+  o.fenceAt = performance.now();
+  gl.flush();
   return { own: o, heads: plan.heads };
 }

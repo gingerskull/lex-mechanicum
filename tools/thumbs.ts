@@ -1,5 +1,5 @@
 // npx tsx tools/thumbs.ts [id ...] [--all] [--hook]: the library thumbnails (standard R8, style SS1), drawn in local
-// Chrome and committed: site/thumbs/<id>-<theme>.webp, 4:3 at DPR 2, phase 1.1, tilt 28, no sheet, the traced path
+// Chrome and committed (a redraw that looks the same keeps the committed file): site/thumbs/<id>-<theme>.webp, 4:3 at DPR 2, phase 1.1, tilt 28, no sheet, the traced path
 // only; and <id>-<theme>-still.webp, the stage's opening view as one large still, shown where a browser has no WebGL2
 // (no title block, which comes from the catalogue). site/thumbs/manifest.json holds each mechanism's fingerprint: its package bytes, its model, the renderer, the
 // style and the thumbnail view. Only thumbnails whose fingerprint changed are drawn (--all draws every one). The site
@@ -24,6 +24,8 @@ export const THUMB = { w: 320, h: 240, dpr: 2, u: 1.1, tilt: 28 };
 export const STILL = { w: 1200, h: 750, dpr: 1, u: (63 / 360) * Math.PI * 2, tilt: 28, detail: "A" as const, quality: 0.75 };
 const THEMES: ThemeKey[] = ["dark", "light"];
 const QUALITY = 0.92;
+/** A redraw that differs from the committed image in fewer pixels than this share keeps the committed file. */
+const SAME = 0.001;
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 export const THUMBS_DIR = join(root, "site", "thumbs");
@@ -121,11 +123,14 @@ export async function thumbs(ids = Object.keys(mechanisms), all = false): Promis
     const chrome = await openChrome();
     try {
       for (const id of todo) {
-        for (const theme of THEMES) {
-          writeFileSync(file(id, theme), await chrome.shot(id, thumbView(theme), { type: "image/webp", quality: QUALITY }));
-          writeFileSync(file(id, theme, true), await chrome.shot(id, stillView(theme), { type: "image/webp", quality: STILL.quality }));
-          files.push(file(id, theme), file(id, theme, true));
-        }
+        for (const theme of THEMES)
+          for (const [f, o, q] of [[file(id, theme), thumbView(theme), QUALITY], [file(id, theme, true), stillView(theme), STILL.quality]] as const) {
+            const img = await chrome.shot(id, o, { type: "image/webp", quality: q });
+            // a change that does not show (a renderer refactor, antialiasing noise) keeps the committed file
+            if (existsSync(f) && (await chrome.differ(readFileSync(f), img)) <= SAME * o.w * o.h * o.dpr * o.dpr) continue;
+            writeFileSync(f, img);
+            files.push(f);
+          }
         manifest[id] = now[id]!;
       }
     } finally {
