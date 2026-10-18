@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.13.0 — 2026-10-18
+
+- Standard 2.5 (F7, HAND): `H.turnbuckle`, an adjuster for a moving link. It cuts the link across, joins the halves with
+  a left- and a right-hand stud, a flat body and a jam nut on each stud, all inside the link's own plane, set at the
+  model's length with the drawn length exact. Hoekens, the pantograph and Jansen use it (Jansen's hand-built one is
+  replaced); Hoekens and the pantograph now pass F7. The other audits were re-checked for F7 and moved to 2.5; the
+  trammel and the locomotive drive defer it for their next pass.
+- Pantograph: the elbow arm's front plate is a strap from A to M2, so the adjuster is in view.
+
+
 ## 0.12.3 — 2026-10-18
 
 - Spur gear pair: the forces overlay no longer draws the line-of-action arrow (it ran the full length between the base

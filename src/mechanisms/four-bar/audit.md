@@ -1,5 +1,5 @@
 # Audit: Four-bar linkage (four-bar)
-standard: 2.0 · date: 2026-10-17 · result: pass · detail: full · pass: audit+fix
+standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: audit+fix
 
 ## Summary
 PASS 115 · FAIL 0 · N/A 6 · open: none

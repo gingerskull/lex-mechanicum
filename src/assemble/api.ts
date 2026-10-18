@@ -8,7 +8,7 @@ import { bridge } from "../hardware/sub/bridge";
 import { drive } from "../hardware/sub/drive";
 import { followerTrain } from "../hardware/sub/followerTrain";
 import { housing } from "../hardware/sub/housing";
-import { dragPack, eccentricMount, lockingSegment, outputCoupling, sensor } from "../hardware/sub/misc";
+import { dragPack, eccentricMount, lockingSegment, outputCoupling, sensor, turnbuckle } from "../hardware/sub/misc";
 import { slide } from "../hardware/sub/slide";
 import { stops } from "../hardware/sub/stops";
 import type { MechanismModel, Solved } from "../model/types";
@@ -53,6 +53,12 @@ export const HP = {
   housing: (a: Ctx, jid: string, o: Parameters<typeof housing>[2]) => housing(ctxOf(a), jid, o),
   slide: (a: Ctx, j: Parameters<typeof slide>[1]) => slide(ctxOf(a), j),
   eccentricMount: (a: Ctx, jid: string, o: Parameters<typeof eccentricMount>[2]) => eccentricMount(ctxOf(a), jid, o),
+  turnbuckle: (a: Ctx, host: Solid | string, o: Parameters<typeof turnbuckle>[2]) => {
+    const c = ctxOf(a);
+    const s = typeof host === "string" ? c.get(host) : host;
+    if (!s) throw new Error(`turnbuckle: no solid ${String(host)}`);
+    return turnbuckle(c, s, o);
+  },
   stops: (a: Ctx, o: Parameters<typeof stops>[1]) => stops(ctxOf(a), o),
   dragPack: (a: Ctx, jid: string, o: Parameters<typeof dragPack>[2]) => dragPack(ctxOf(a), jid, o),
   lockingSegment: (a: Ctx, host: Solid, o: Parameters<typeof lockingSegment>[2]) => lockingSegment(ctxOf(a), host, o),

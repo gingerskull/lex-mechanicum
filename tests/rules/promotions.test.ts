@@ -5,7 +5,9 @@ import { describe, expect, it } from "vitest";
 import { TAU, arcPts, bbox } from "../../src/core/geom";
 import { holeSlot, notchAt } from "../../src/core/poly";
 import { assemble, assembleWith } from "../../src/assemble";
-import { HP } from "../../src/assemble/api";
+import { HP, type Polish } from "../../src/assemble/api";
+import { clampCheck } from "../../src/assemble/clamp";
+import { clearance } from "../../src/assemble/clearance";
 import { solid } from "../../src/hardware/solid";
 import geneva from "../../src/mechanisms/geneva/model";
 import locomotive from "../../src/mechanisms/locomotive-drive/model";
@@ -179,6 +181,51 @@ describe("H.dragPack, H.lockingSegment, H.outputCoupling, H.spokes", () => {
     const w = HP.spokes({ rIn: 18, rOut: 40, n: 6, half: 4, fillet: 3 });
     expect(w).toHaveLength(6);
     for (const win of w) for (const [x, y] of win) expect(Math.hypot(x, y)).toBeGreaterThan(17.9);
+  });
+});
+
+describe("H.turnbuckle (F7 on a moving link)", () => {
+  const polish: Polish = (A, H) => {
+    H.turnbuckle(A, "coupler", { at: [60, 0], set: 120 });
+  };
+
+  it("cuts the link in two halves in its own plane, studs, body and jam nuts flush inside it", () => {
+    const ctx = built(clevisModel);
+    const coupler = ctx.get("coupler")!;
+    const [z0, z1, holes] = [coupler.z0, coupler.z1, coupler.holes.length];
+    const { half, parts } = HP.turnbuckle(ctx, coupler, { at: [60, 0], set: 120 });
+    expect(kinds(parts)).toMatchObject({ collar: 1, nut: 2, shaft: 2 });
+    // the halves ride the link's body, end either side of the gap, and keep the bores they hold
+    expect(half.body).toBe(coupler.body);
+    expect(bbox(coupler.outer)[2]).toBeLessThan(60 - 7.5);
+    expect(bbox(half.outer)[0]).toBeGreaterThan(60 + 7.5);
+    expect(coupler.holes.length + half.holes.length).toBe(holes);
+    expect(coupler.holes.every((h) => bbox(h)[2] < 60) && half.holes.every((h) => bbox(h)[0] > 60)).toBe(true);
+    // M3 in a 6 mm link: 1.5 mm of wall to both faces; everything inside the link's z range
+    const body = parts.find((p) => p.kind === "collar")!;
+    expect(body.name).toMatch(/M3 left and right hand/);
+    for (const p of parts) {
+      expect(p.z0).toBeGreaterThanOrEqual(z0 - 1e-9);
+      expect(p.z1).toBeLessThanOrEqual(z1 + 1e-9);
+      expect(p.body).toBe(coupler.body);
+    }
+    const J = ctx.joint("coupler-adjust")!;
+    expect(J.serves.F7).toEqual(expect.arrayContaining([body.id]));
+    expect(J.note).toMatch(/Set at 120 mm between pin centres/);
+  });
+
+  it("leaves the pin centres and the clearance as they were", () => {
+    const { assembly } = assembleWith(clevisModel, { polish });
+    expect(assembly.solids.some((s) => s.id === "coupler-half")).toBe(true);
+    expect(clearance(clevisModel, assembly)).toEqual([]);
+    expect(clampCheck(clevisModel, assembly)).toEqual([]);
+  });
+
+  it("refuses a link too narrow for the body, or a cut within reach of a bore", () => {
+    const ctx = built(clevisModel);
+    expect(() => HP.turnbuckle(ctx, "coupler", { at: [12, 0] })).toThrow(/within reach/);
+    const strip = solid("strip", { kind: "part", role: "link", outer: [[0, -4], [80, -4], [80, 4], [0, 4]], z0: 0, z1: 6 });
+    expect(() => HP.turnbuckle(ctx, strip, { at: [40, 0] })).toThrow(/too narrow/);
   });
 });
 

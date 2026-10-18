@@ -1,5 +1,6 @@
 # Audit: Trammel of Archimedes (elliptic-trammel)
 standard: 2.3 · date: 2026-10-18 · result: pass · detail: full · pass: build
+defer: F7 · H.turnbuckle (2.5) could make the trammel's L or p adjustable (Appendix A: adjustable slider pins); F7 passes on the gibs and belt, judged again in its next pass
 
 ## Summary
 PASS 114 · FAIL 0 · N/A 7 · open: none

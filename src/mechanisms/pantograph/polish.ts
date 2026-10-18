@@ -4,6 +4,7 @@
 // - the hand knob sits on the arm between the input boss and the first pivot (the rule's spot is off a link this narrow);
 // - the lower stop, which the rule cannot place because the working zone fills the base round the arm's other end;
 // - the arm's swing engraved on the base with an index line on the arm (F9);
+// - the elbow arm's rear plate made adjustable between M2 and the pen by H.turnbuckle (F7);
 // - notes, badges and build rules (A16).
 import { D2R, arcPts, polar, type Vec2 } from "../../core/geom";
 import { edgeDist, inside } from "../../core/poly";
@@ -63,6 +64,16 @@ export const polish: Polish = (A, H) => {
   base.marks.push({ kind: "scale", pts: arcPts(O[0], O[1], R0, sw[0], sw[1], Math.PI / 90) });
   A.get("armO")!.marks.push({ kind: "index", pts: [[2 * h + 6, 0], [2 * h + 9.2, 0]] });
 
+  // ---- F7: the pen stays on the line O-T at twice the stylus distance only while M2 divides the elbow arm as M1 divides
+  // the arm O-A (A-M2 : A-E = O-M1 : O-A, both 1 : 2). M1 and M2 are free pins, so the rear plate of the elbow arm is
+  // made adjustable past M2: a turnbuckle between M2 and the pen sets A-E, and with it where M2 sits on the arm ----
+  H.turnbuckle(A, "armE", {
+    at: [(h + 2 * h) / 2, 0],
+    set: 2 * h,
+    title: "Adjuster · arm A-E",
+    why: `It sets A to E against the drilled A to M2, so M2 is the arm's midpoint as M1 is the other's and the pen copies the stylus at exactly 2 : 1. The bars and the arm O-A are drilled; the front strap ends at M2, so the turnbuckle is in view and the pen half rides the rear plate alone.`,
+  });
+
   // ---- A16: notes, badges, build rules ----
   const sz = (id: string) => A.get(id)?.name ?? "";
   A.joint("pO", {
@@ -77,7 +88,7 @@ export const polish: Polish = (A, H) => {
     badge: ["double shear", "ok"],
   });
   A.joint("pM2", {
-    note: `Clevis: the elbow arm's two plates straddle the bar T-M2, so M2 works in double shear. The front plate ends 20 mm short of the pen, so the pen sits in the rear plate alone.`,
+    note: `Clevis: the elbow arm's two plates straddle the bar T-M2, so M2 works in double shear. The front plate is a strap that ends at M2, so the turnbuckle and the pen sit in the rear plate alone.`,
     badge: ["double shear", "ok"],
   });
   A.joint("pT", {
@@ -89,6 +100,6 @@ export const polish: Polish = (A, H) => {
     { title: "Parallelogram, not a guess", text: "M1 and M2 are the midpoints of the two 110 mm arms and the bars are 55 mm, so M1-A-M2-T is a rhombus and the pen stays on the line O-T at twice its distance. The pivots are drilled to those centres; the model's centres are never altered by the hardware." },
     { title: "Hand operated, banked by stops", text: "A knob on the arm between the input boss and the first pivot moves the whole linkage. Rubber-faced stop posts just outside the arm's swing keep the elbow off the straight-arm singularity with the hand off." },
     { title: "Spacers on inner races only", text: "Every bearing is clamped through its inner race, so tightening a bolt never squeezes a moving part." },
-    { title: "Pen on the rear plate", text: "The front plate of the elbow arm stops short of the pen, so the pen can be lifted and replaced without taking the clevis apart." },
+    { title: "Pen on the rear plate, ratio on the turnbuckle", text: "The front plate of the elbow arm is a strap from A to M2, so the pen can be lifted and replaced without taking the clevis apart, and the turnbuckle past M2 that sets the 2 : 1 ratio can be reached and read." },
   );
 };

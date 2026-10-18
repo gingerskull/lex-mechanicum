@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.4
+version: 2.5
 date: 2026-10-18
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -288,7 +288,7 @@ changing what the mechanism is.
 | F4 | **Carry thrust, set end-shake** | Endstones | Bronze thrust washer, shims, wave or Belleville washer for preload or drag | Every rotating part free axially | AUTO (J1, J2, J6) / HAND (drag) |
 | F5 | **Limit travel** | Banking pins | Hard stop with elastomer bumper, stop pin, end-of-stroke block, just outside the working range | Oscillating or linear outputs that could over-travel with the drive off | AUTO (`H.stops` from the solved range; slide end stops shortened to clear a sweep before they are dropped) / HAND (placement check) |
 | F6 | **Hold a position** | Click and click spring, jumper | Spring ball or roller detent, pawl spring, drag pack (wave washer + bronze disc) | Rest positions not positively locked; ratchets; anything that rattles in a clearance | HAND (call) / AUTO (`H.dragPack`, `H.spring`) |
-| F7 | **Adjust** so made parts meet the exact model | Regulator, eccentric bankings | Slotted holes + clamp, eccentric bushing, shims, gib strip, idler on an eccentric, turnbuckle | Every belt drive, every gear mesh, every slide, every exact length ratio | AUTO (J5, J6, J8) / HAND (links) |
+| F7 | **Adjust** so made parts meet the exact model | Regulator, eccentric bankings | Slotted holes + clamp, eccentric bushing, shims, gib strip, idler on an eccentric, turnbuckle | Every belt drive, every gear mesh, every slide, every exact length ratio | AUTO (J5, J6, J8) / HAND (links: call `H.eccentricMount` where a ground pivot carries the exact dimension, `H.turnbuckle` on a moving link) |
 | F8 | **Lubricate** | Oil sinks, oil cups | Oil sink at an exposed pivot, oil hole and groove to a bushing, grease nipple on a slide, felt wiper on a sliding surface | Sliding contacts, plain bushings, open bearings. Not sealed bearings | AUTO by joint type |
 | F9 | **Time and reference** for reassembly in phase | Beat marks, wheel index dots | Match marks at meshing teeth, zero line, index station marks, timing dowel | Anything with phase: gears, cams, Geneva, indexers, multi-crank linkages | AUTO (J6, J7, Geneva stations) / HAND (linkages) |
 | F10 | **Protect and sense** | Shock protection, case | Pulley flanges, slip clutch or shear pin, home flag + fork sensor, see-through guard | Motor-driven builds | AUTO (flanges, sensor) / HAND (clutch) |
@@ -339,6 +339,7 @@ changing what the mechanism is.
 | Eccentric bushing | Ø16 with offset Ø10 bore, flanged | F7 | Arc slots, two clamp screws, spanner holes, index line |
 | Gib strip | the rail's width, as thick as the slider stands over the rail, slotted at each rail screw | F7 | On the keeper rail of every slide, clamped under the keeper by the rail's screws |
 | Jack screw + slots | M4 | F7 | Slots in a mount flange, screw against a lug |
+| Turnbuckle (`H.turnbuckle`) | M3 studs in a 6 mm link, body 5d long, as wide as the link allows (2d + 2 to 4d), milled flat to the link's thickness; DIN 439 jam nuts | F7, M13 | The link cut in two halves on one body, left and right hand studs threadlocked into the half ends, the body and the nuts flush in the link's plane; index line on the body |
 | Idler pulley | bearing on a stud | F7 | On a slotted arm |
 | Oil sink | Ø3 to 4 countersink at a pivot | F8 | One ring round an axle end on a bridge |
 | Grease nipple DIN 71412 | M6, hex 7 | F8 | On a boss feeding a slide; reachable |
@@ -520,8 +521,10 @@ Start here, then run the full ten-function audit.
 
 **Linkages** (four-bar, Watt, Chebyshev, Hoekens, Peaucellier, Jansen, pantograph, scissor lift)
 - F5 stops just outside the rocker's range (`H.stops`); F2 circlips or shoulder bolts on every moving pin.
-- F7 where the model depends on an exact length ratio (straight-line linkages), one link is adjustable (turnbuckle
-  or slotted clamp) shown at its set point; drawn length stays exact.
+- F7 where the model depends on an exact length ratio (straight-line linkages, pantographs), one length is adjustable,
+  shown at its set point, drawn length exact: `H.eccentricMount` where a ground pivot carries the exact dimension,
+  `H.turnbuckle` on a moving link otherwise (in the link's own plane, so it fits a swept stack with no room above or
+  below the link).
 - Scissor lift and pantograph: `manual` input with a handle and stops, or `linear` with a belt carriage.
 
 **Gears** (spur, gear train, planetary, rack and pinion)
@@ -558,9 +561,10 @@ retainer plate, key, set screw, collar, spring (compression / torsion / leaf), s
 
 Subassemblies: `H.housing` (J2 cartridge), `H.bridge` (posts, spigots, dowels, lobes), `H.slide` (J5, a few
 blocks) with `seatRail` and `railLayout` (A6: the rail's riser, or pads clear of what passes under it, and its screws),
-`H.eccentric` (J6 backlash), `H.stops` (F5 from the solved range), `H.dragPack` (F6, sized to the face it bears on),
-`H.lockingSegment` (M14), `H.outputCoupling` (a keyed flange on a straddle-mounted output), `H.followerTrain` (J7),
-`H.drive` (V1 to V6 by input kind), `H.sensor` (V6).
+`H.eccentric` (J6 backlash), `H.eccentricMount` (F7 at a ground pivot), `H.turnbuckle` (F7 on a moving link: the
+link in two halves joined in its own plane by left and right hand studs, a flat body and jam nuts), `H.stops` (F5 from
+the solved range), `H.dragPack` (F6, sized to the face it bears on), `H.lockingSegment` (M14), `H.outputCoupling` (a
+keyed flange on a straddle-mounted output), `H.followerTrain` (J7), `H.drive` (V1 to V6 by input kind), `H.sensor` (V6).
 
 Every primitive has real catalogue sizes, a default material, a default locking method where threaded, and a
 default detail level.
@@ -569,6 +573,11 @@ default detail level.
 
 ## Changelog
 
+- **2.5 (2026-10-18).** An F7 adjuster for moving links: `H.turnbuckle` makes a link adjustable at its set point in its
+  own plane (two halves on one body, left and right hand studs, a body milled flat to the link's thickness, jam nuts), so
+  an exact length that sits between free pins, or on a link with no room above or below in the swept stack, can be
+  trimmed with the drawn length exact. A polish calls it on the link that carries the exact dimension; the Linkages
+  playbook says which adjuster goes where [F7, HAND].
 - **2.4 (2026-10-18).** Linear guides are a few blocks with retaining screws and end stops. A slide is a dowelled
   reference rail and a rail carrying a bronze gib clamped under the keeper; the keeper's screws are the rail's fixing
   screws, so the shim, the separate keeper screws, the gib adjusting screws and their lock nuts go: the gib is set on
