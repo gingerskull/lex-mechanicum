@@ -1,3 +1,5 @@
 #!/bin/sh
-# Runs what CI runs before anything is pushed.
+# Redraws stale library thumbnails in local Chrome and stops the push while they are uncommitted, then runs what CI
+# runs before anything is pushed.
+npx tsx tools/thumbs.ts --hook || exit 1
 exec npm run check

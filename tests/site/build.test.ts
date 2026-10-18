@@ -25,7 +25,7 @@ describe("site build", () => {
     for (const id of Object.keys(mechanisms)) {
       expect(existsSync(join(OUT, "mechanisms", id, "index.html")), id).toBe(true);
       expect(existsSync(join(OUT, "packages", `${id}.mxp`)), id).toBe(true);
-      expect(existsSync(join(OUT, "thumbs", `${id}-dark.png`)), id).toBe(true);
+      expect(existsSync(join(OUT, "thumbs", `${id}-dark.webp`)), id).toBe(true);
     }
   });
 
