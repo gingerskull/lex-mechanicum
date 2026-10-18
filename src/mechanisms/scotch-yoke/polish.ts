@@ -47,13 +47,13 @@ export const polish: Polish = (A, H) => {
     badge: ["single shear", "warn"],
   });
   A.joint("slide-block", {
-    note: `${A.joint("slide-block").note} The tie bar (${sz("bar")}) is screwed and dowelled to the yoke tongue and the crosshead, so the yoke, bar and crosshead move as one body; the rails are hardened, ground and screwed down through their pads.`,
+    note: `${A.joint("slide-block").note} The tie bar (${sz("bar")}) is screwed and dowelled to the yoke tongue and the crosshead, so the yoke, bar and crosshead move as one body; the rails are hardened, ground and screwed down through their risers.`,
   });
   A.rules.push(
     { title: "Crank low, yoke over it", text: `The crank runs under the yoke so the input shaft ends below it; the crank is lifted until the yoke clears it by 1.5 mm.` },
     { title: "Roller in the slot", text: "The crank pin carries a track roller that rolls between hardened wear strips screwed to both walls of the slot; a felt in the slot end oils them." },
     { title: "One rigid body", text: `The yoke, the ${d} mm tie bar and the crosshead are screwed together and dowelled at both ends, so the slot stays exactly square to the guide.` },
-    { title: "Guided, adjustable, wiped", text: "Keeper over one rail, a bronze gib with adjusting screws on the other, felt wipers and a grease nipple; the stroke is set by the crank, so the end stops only catch a fault." },
+    { title: "Guided, adjustable, wiped", text: "A bronze gib clamped under a keeper on one rail, the other rail the dowelled reference, felt wipers and a grease nipple; the stroke is set by the crank, so the end stops only catch a fault." },
     { title: "Kinematics untouched", text: "Crank radius, slot centre line and guide line are the model's; the hardware is designed round them." },
   );
 };

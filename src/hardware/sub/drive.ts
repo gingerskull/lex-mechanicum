@@ -121,6 +121,8 @@ function motorUnit(ctx: RuleContext, M: Vec2, toward: Vec2, zp0: number, kind: M
 interface Run {
   from: Vec2;
   around?: { c: Vec2; r: number };
+  /** Waypoints the lead passes before it heads for the block (a lead that must stay outside a part's sweep). */
+  via?: Vec2[];
 }
 
 /**
@@ -172,6 +174,7 @@ function cabling(ctx: RuleContext, runs: Run[], motor: Vec2): void {
       const B = arc(ccw - TAU);
       pts.push(...(clear(A) >= clear(B) ? A : B));
     }
+    if (run.via) pts.push(...run.via);
     const last = pts[pts.length - 1]!;
     // runs parallel to the base edges, turning at the corner that keeps the lead farther from the motor bracket,
     // then square into the block
@@ -342,6 +345,12 @@ function linear(ctx: RuleContext, kind: MotorKind): string {
   const M = line(tA, 0);
   const I = line(tB, 0);
   const zp0 = ctx.b0 - 12;
+  // the base holds the whole loop: the motor bracket at one end, the idler and its tensioner arm (6 mm end radius) at the other
+  const E = line(tB - 14, 0);
+  const mm = MOTORS[kind].R + 8;
+  const ee = pm.od / 2 + 8;
+  growBase(ctx, [M[0] - mm, M[1] - mm, M[0] + mm, M[1] + mm]);
+  growBase(ctx, [Math.min(E[0], I[0]) - ee, Math.min(E[1], I[1]) - ee, Math.max(E[0], I[0]) + ee, Math.max(E[1], I[1]) + ee]);
   const unit = motorUnit(ctx, M, I, zp0, kind, { body: s.slider.id, motion: { type: "rolling", around: M, axis: s.axis, r: rp } });
   const G = { joints: ["drive"], ex: -5 };
   ctx.add(solid("drive-pulley-m", { ...G, body: s.slider.id, motion: { type: "rolling", around: M, axis: s.axis, r: rp }, kind: "pulley", role: "driver", name: `Motor pulley GT2 ${TM}T`, outer: disc(pm.od / 2), holes: [disc(2.05)], z0: zp0, z1: zp0 + 7 }));
@@ -352,10 +361,17 @@ function linear(ctx: RuleContext, kind: MotorKind): string {
   // carriage: clamps the belt's near span and rises through a slot in the base to the slider
   const [z0s] = heights(s.slider);
   const base = ctx.get("base")!;
-  base.holes.push(roundedPoly([line(s.range[0], rp), line(s.range[1], rp)], 5));
-  ctx.add(solid("drive-carriage", { ...G, body: s.slider.id, kind: "part", role: "driver", name: "Belt carriage, clamped to the slider", mat: "Aluminium 6061-T6", outer: roundedPoly([[-6, rp], [6, rp]], 4), z0: zp0, z1: z0s, ex: ctx.solidOf[s.slider.id]!.ex }));
+  // the carriage reaches 10 mm past its centre: the slot's centreline runs 5.5 mm past the stroke, so 0.5 mm of slot is left past the carriage
+  base.holes.push(roundedPoly([line(s.range[0] - 5.5, rp), line(s.range[1] + 5.5, rp)], 5));
+  ctx.add(solid("drive-carriage", { ...G, body: s.slider.id, kind: "part", role: "driver", name: "Belt carriage, clamped to the slider", mat: "Aluminium 6061-T6", outer: roundedPoly([[-6, rp], [6, rp]], 4), z0: zp0 + 6.6, z1: z0s, ex: ctx.solidOf[s.slider.id]!.ex }));
+  // V6: the home flag is a vane sticking out past the carriage; the fork sensor stands beside the carriage at the motor end
+  // of the stroke, its arms taking the vane in, and its lead leaves along the outside of the carriage's sweep
   ctx.add(flag("drive-flag", 0, 8, Math.PI / 2, { ...G, body: s.slider.id, at: [0, rp + 4, 0], z0: zp0 + 8, z1: zp0 + 9 }));
-  cabling(ctx, [{ from: unit.leadFrom }, { from: line(s.range[0] - 10, rp + 12) }], M);
+  const fa = line(s.range[1], rp + 4);
+  sensor(ctx, "drive-sensor", { axis: fa, a: Math.atan2(nrm[1], nrm[0]), rIn: 4, rOut: 10, zv: zp0 + 8, t: 1, joint: "drive", ex: -5 });
+  const lead0 = line(s.range[1], rp + 4 + 13);
+  const past = line(s.range[1] + sx1 + 6, rp + 4 + 13);
+  cabling(ctx, [{ from: unit.leadFrom }, { from: lead0, via: [past] }], M);
   return `Belt loop under the base along the ${fmt(s.range[1] - s.range[0])} mm stroke, a carriage through a slot in the base clamped to the slider, tensioner arm on the far pulley.`;
 }
 

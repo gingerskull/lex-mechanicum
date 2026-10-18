@@ -1,5 +1,5 @@
 // Overrides and additions to the generated cam assembly (standard 5.2). The rules build the keyed live shaft, the roller
-// pin (a clevis, so double shear), the slide on its pads, and the follower train (return spring, preload screw, felt
+// pin (a clevis, so double shear), the slide on its risers, and the follower train (return spring, preload screw, felt
 // oiler, zero line); the cam itself comes out as case-hardened steel. What differs from the rules:
 // - the track is a replaceable hardened ring let into the rim (M14); the cam body is cut back behind it;
 // - spoke windows in the cam body (M2), inside the base circle so the track and the working profile are untouched;

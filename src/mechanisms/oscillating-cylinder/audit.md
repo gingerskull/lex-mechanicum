@@ -114,7 +114,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; no sampling; polish about 1 ms |
 | R6 | PASS | FLAG · Node CPU canvas, DPR 1.5, 2026-10-18: plan 335, 28° 358, side 226, explode 210 ms at full detail; ladder below. Browser numbers not measured in this pass (flag, to look at) |
-| R7 | PASS | HAND · model.ts + polish.ts 16.4 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 15.9 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -172,7 +172,6 @@ Hand fixes that should become rules or primitives.
 - A fixed stud in a rod's open notch (J4) builds the bridge at the lowest height; a spring on the stud (F6) had to lift the bridge, its posts, the axle and the sleeve by hand. A `spring` option on `H.bridge` or on the J1/J4 axle would do it.
 - Bore wear strips (M14) on a sliding piston, the same as the slot roller's strips but on a through bore.
 
-- `H.stops` (F5) never keeps its posts over the base: its clearance test ignores the base, so a stop can land outside the plate (seen: two stops 14 mm past the edge). Patch: in `src/hardware/sub/stops.ts`, after `found` is chosen, call `growBase(ctx, [found[0] - R_STOP - 8, found[1] - R_STOP - 8, found[0] + R_STOP + 8, found[1] + R_STOP + 8])` and move the feet to `baseCorners(ctx)` (or make `growBase` move the feet). Worked around in the polish.
 - The see-through stage (L5) only handles static solids over mesh or slot-roller zones; a moving covering solid (the cylinder cover over the piston's run) needs a zone for a sliding piston in a bore and `hiders` to accept `t.motion`. Set by hand in the polish.
 
 ## Verification

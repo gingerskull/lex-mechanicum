@@ -1,40 +1,13 @@
 // Overrides and additions to the generated scissor-lift assembly (standard 5.2). The clevis (every b bar a rear and a
 // front plate, the front a twin), the platform plating and the carriage on the track are the model's; the rules build
 // every stack, the slide, the stops and the belt drive on them. What differs from the rules:
-// - the carriage's slot in the base cut 5.5 mm longer at each end (the rule cuts it to the travel, the carriage is
-//   20 mm long), and the carriage face seated on the belt instead of through it (the rule leaves it overlapping the belt);
-// - the home flag shortened and raised to the base's underside, with the fork sensor the linear drive leaves out (V6);
 // - a height scale engraved on the base with an index on the platform (F9);
 // - notes, badges and build rules (A16).
-import { bbox, roundedPoly, type Vec2 } from "../../core/geom";
 import type { Polish } from "../../assemble/api";
 import { H_LOW, H_HIGH } from "./model";
 
-export const polish: Polish = (A, H) => {
+export const polish: Polish = (A) => {
   const base = A.get("base")!;
-
-  // ---- the carriage's slot: the rule cuts it travel + 5 each end, the carriage reaches 10 past its centre ----
-  const hi = base.holes.findIndex((h) => {
-    const [x0, y0, x1, y1] = bbox(h);
-    return y1 - y0 > 9.5 && y1 - y0 < 10.5 && x1 - x0 > 30;
-  });
-  if (hi >= 0) {
-    const [x0, y0, x1, y1] = bbox(base.holes[hi]!);
-    const yc = (y0 + y1) / 2;
-    base.holes[hi] = roundedPoly([[x0 - 0.5, yc], [x1 + 0.5, yc]] as Vec2[], 5);
-  }
-  // the carriage's clamp face presses on the belt's top instead of running through it
-  const belt = A.get("drive-belt")!;
-  A.set("drive-carriage", { z0: belt.z1 + 0.1 });
-
-  // ---- V6: the linear drive leaves its home flag without a sensor; the vane goes up against the base's underside and a fork
-  // sensor screwed to it takes the vane in at the raised end of the travel, where the rule's sensor lead starts ----
-  const old = A.get("drive-flag")!;
-  A.drop("drive-flag");
-  A.add(H.flag("drive-flag", 0, 6, Math.PI / 2, { body: old.body, at: old.at, joints: old.joints, ex: old.ex, z0: -13.2, z1: -12.2 }));
-  const fork = H.sensor(A, "drive-sensor", { axis: [53, 15.5], a: Math.PI, rIn: 0, rOut: 10, zv: -13.2, t: 1, joint: "drive", ex: -5 });
-  const drive = A.joint("drive");
-  (drive.serves.F10 ??= []).push(...fork.map((f) => f.id));
 
   // ---- F9: the platform height engraved beside the left column, read off an index line on the platform ----
   const x0 = -14.5;

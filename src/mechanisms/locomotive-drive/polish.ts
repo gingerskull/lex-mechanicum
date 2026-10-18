@@ -5,14 +5,13 @@
 //   sweep) would put the axle through the rods. Each axle ends below the wheel face on a circlip, with a sealed bearing
 //   and a hub cap, and the rods run clear over it;
 // - six spokes' worth of windows in each wheel (M2), kept away from the crank pin boss; quartering marks (F9);
-// - the belt carriage clamped to the belt, the base slot cut to its full travel, the base grown left to hold the tensioner arm, a fork sensor on the home flag (V6);
+// - a clamp plate under the belt carriage and its screws;
 // - notes, badges and build rules (A16).
 import { bbox, polar, roundedPoly, type Vec2 } from "../../core/geom";
 import type { Polish } from "../../assemble/api";
 import { BEARINGS } from "../../hardware/tables";
 import { locking } from "../../rules/locking";
 import { materials } from "../../rules/materials";
-import { growBase } from "../../rules/base";
 import { R, r } from "./model";
 
 /** Z of the circlip's lower face on each axle: the top of the wheel bearing's inner race. */
@@ -58,37 +57,14 @@ export const polish: Polish = (A, H) => {
     H.boreChamfers(wheel);
   }
 
-  // ---- the belt carriage: over the belt, a clamp plate under it, the base slot cut to its full travel ----
+  // ---- the belt carriage: over the belt, a clamp plate under it ----
   const car = A.get("drive-carriage")!;
   const belt = A.get("drive-belt")!;
-  const [cx0, cy0, cx1, cy1] = bbox(car.outer);
-  const base = A.get("base")!;
-  // the linear drive's tensioner arm and idler stand past the base's left edge (the rule never calls growBase for the
-  // far pulley): grow the plate to hold the arm's end with the same margin the plate keeps elsewhere
-  const arm = A.get("drive-tensioner")!;
-  growBase(ctx, [Math.min(...arm.outer.map((p) => p[0])) + arm.at[0] - 8, bbox(base.outer)[1], bbox(base.outer)[2], bbox(base.outer)[3]]);
-  const old = base.holes.findIndex((h) => {
-    const [a, b, c, d] = bbox(h);
-    return Math.abs((b + d) / 2 - (cy0 + cy1) / 2) < 0.2 && c - a > 30;
-  });
+  const [, cy0, , cy1] = bbox(car.outer);
   const yc = (cy0 + cy1) / 2;
-  const [h0, , h1] = bbox(base.holes[old]!);
-  if (old >= 0) base.holes.splice(old, 1);
-  base.holes.push(roundedPoly([[h0 + 5 - (cx1 - cx0) / 2 + 5, yc], [h1 - 5 + (cx1 - cx0) / 2 - 5, yc]], 5.5));
   const zClampTop = belt.z0;
-  car.z0 = belt.z1 + 0.2;
   A.add(H.plate("drive-clamp", roundedPoly([[-6, yc], [6, yc]], 6), { body: car.body, at: car.at, kind: "bracket", role: "driver", name: "Belt clamp plate, 2 mm", mat: "Aluminium 6061-T6", z0: zClampTop - 2.2, z1: zClampTop - 0.2, ex: car.ex, joints: ["drive"] }));
   [-4.2, 4.2].forEach((x, i) => A.add(H.screw("drive-clamp-sc" + i, "button", 3, 2.2 + belt.z1 - belt.z0 + 4.4, { body: car.body, at: [x, yc - 2.4, 0], face: zClampTop - 2.2, dir: 1, ex: car.ex, joints: ["drive"], name: i ? "" : undefined, qty: i ? 0 : 2 })));
-
-  // ---- V6: the fork sensor on the home flag (home at the inner dead centre, u = 0), the sensor lead routed round the motor ----
-  const flag = A.get("drive-flag")!;
-  const home = ctx.model.solve(0).pts.X!;
-  const sens = H.sensor(A, "drive-sensor", { axis: [home[0], 0], a: Math.PI / 2, rIn: flag.at[1] + 3, rOut: flag.at[1] + 9.6, zv: flag.z0, t: flag.z1 - flag.z0, joint: "drive", ex: -5 });
-  A.add(H.screw("drive-sensor-sc", "button", 3, 8, { at: [home[0], flag.at[1] + 9.6 + 3, 0], face: sens[0]!.z1, dir: 1, ex: -5, joints: ["drive"], name: "Button head M3 x 8, sensor to base" }));
-  const term = A.get("drive-terminal")!;
-  A.drop("drive-lead1");
-  const clamp: Vec2 = [term.at[0] + 5, term.at[1] + 4];
-  A.add(H.lead("drive-lead1", [[home[0], flag.at[1] + 9.6 + 3], [home[0], 32], [clamp[0], 32], [clamp[0], clamp[1] + 10], clamp], { joints: ["drive"], ex: -2, z0: ctx.b0 - 2.6, z1: ctx.b0 - 0.8, name: "Sensor lead, 3-core" }));
 
   locking.apply(ctx);
   materials.apply(ctx);
@@ -107,11 +83,11 @@ export const polish: Polish = (A, H) => {
   A.joint("drive").serves.F10 = ["drive-flag", "drive-sensor"];
   rod("pC1", "The main rod rides outside the coupling rod on the same pin, as the catalogue has it. The pin is threaded through the 14 mm wheel and is the one fixed to the wheel.", ["stacked", "warn"]);
   A.joint("pX", { note: `${A.joint("pX").note} The wrist pin holds the main rod to the crosshead; the keeper plate runs under the rod.` });
-  A.joint("drive", { note: `${A.joint("drive").note} The carriage clamps the belt between itself and a plate, and the base slot is cut to the carriage's full length of travel.` });
+  A.joint("drive", { note: `${A.joint("drive").note} The carriage clamps the belt between itself and a plate, and the rules cut the base slot to its full length of travel.` });
   A.rules.push(
     { title: "Rods over the wheels", text: "The coupling rod and the main rod both sweep over the axle ends, so the axles stop below the wheel faces and the rods run clear over them." },
     { title: "Both wheels read the same", text: "A mark on each rim at the crank pin: the coupling rod only fits when both wheels read alike." },
-    { title: "Crosshead low, rod high", text: "The crosshead and its guide bars sit under the main rod, which runs over the keeper plate. The guide bars stand on tall ground pads." },
+    { title: "Crosshead low, rod high", text: "The crosshead and its guide bars sit under the main rod, which runs over the keeper plate. The guide bars stand on tall ground risers." },
     { title: "Windows away from the pin", text: "The wheel windows stop short of the crank pin boss so its tapped hole keeps its edge distance." },
     { title: "Kinematics untouched", text: "Wheel radius 34, crank 17, rod lengths 80 and the guide line are the model's; the hardware is designed round them." },
   );

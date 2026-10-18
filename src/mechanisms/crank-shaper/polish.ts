@@ -27,7 +27,7 @@ export const polish: Polish = (A) => {
     note: `Clevis: the ram below and its cap 1.5 mm over the link, the cap on a post on the side the link never swings to, so the wrist pin works in double shear. ${sz("pC-bolt")} threaded into the ram, shoulder through a plain hole in the cap; the link's bearing between inner-race spacers.`,
     badge: ["double shear", "ok"],
   });
-  A.joint("slide-ram", { note: `${A.joint("slide-ram").note} The rails are hardened, ground and screwed down on pads: they and the bronze gib are the replaceable wear parts.` });
+  A.joint("slide-ram", { note: `${A.joint("slide-ram").note} The rails are hardened, ground and screwed down on their risers: they and the bronze gib are the replaceable wear parts.` });
 
   A.rules.push(
     { title: "Crank and link low, lever above", text: "Crank and link share one plane; the lever rides 1.5 mm over both, so the crank pin and the link's pin both work with a 1.5 mm overhang under the lever." },

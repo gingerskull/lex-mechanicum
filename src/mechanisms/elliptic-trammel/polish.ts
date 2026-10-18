@@ -3,8 +3,9 @@
 // states (#61, review fix):
 // - the groove plate, one piece, a + with both grooves cut through it, on three posts outside the rod's sweep, drawn
 //   see-through because the crank and rod turn under it;
-// - the slide hardware of its four half-arms: keeper plate, bronze gib with adjusting screws and lock nuts, felt wipers,
-//   grease nipple, neoprene end pads (J5, F2, F5, F7, F8), as the slide rule gives a pair of rails;
+// - the slide hardware of its four half-arms, as the slide rule builds a slide: a bronze gib on one wall clamped under a
+//   keeper plate that laps the block, by the keeper's two screws; the other wall is the reference; felt wipers on the
+//   blocks, a grease nipple per groove, neoprene end pads (J5, F2, F5, F7, F8);
 // - the base grown to the plate, notes, badges and build rules (A16).
 import { type Vec2 } from "../../core/geom";
 import { toWorld } from "../../core/poly";
@@ -20,7 +21,7 @@ const g = GAP / 2;
 const Z = 20;
 /** Keeper plate thickness, the lap it takes over the block, the gib thickness, the pad thickness, mm. */
 const KEEP = 2.5;
-const LAP = 1.5;
+const LAP = 1;
 const GIB = 1.2;
 const PAD = 2;
 /** The slide hardware runs from the crossing's edge to just short of the pad. */
@@ -87,7 +88,6 @@ export const polish: Polish = (A, H) => {
     A.get(bk)!.joints.push(slideJ[bk]!);
   }
   const z0 = Z + PLATE_T;
-  const sz1 = A.get("blockX")!.z1;
   arms.forEach(([tag, a]) => {
     const bk = blocks[tag]!;
     const jid = slideJ[bk]!;
@@ -98,25 +98,19 @@ export const polish: Polish = (A, H) => {
     const serve = (k: "F2" | "F5" | "F7" | "F8", id: string) => (J.serves[k] ??= []).push(id);
     const n = 2;
 
-    // keeper over the wall on the + side, riding on the plate, lapping the block by 1.5 mm (F2)
-    const keeper = H.plate(`${jid}-${tag}-keeper`, W(rect(X0, X1, g - LAP, g + WALL)), { ...G, name: lead ? "Keeper plate, holds the block down" : "", qty: lead ? n : 0, z0, z1: z0 + KEEP, mat: "Steel, ground" });
-    A.add(keeper);
-    serve("F2", keeper.id);
-    [0.12, 0.5, 0.88].forEach((f, k) => {
-      const p = toWorld([0, 0, a], [X0 + (X1 - X0) * f, g + WALL / 2]);
-      A.add(H.screw(`${jid}-${tag}-keeper-sc${k}`, "csk", 3, KEEP + 4, { ...G, at: [p[0], p[1], 0], face: keeper.z1, dir: -1, name: lead && k === 0 ? undefined : "", qty: lead && k === 0 ? 6 : 0 }));
-    });
-
-    // bronze gib on the - wall, adjusting screws and lock nuts on the wall (F7)
-    const gb = H.gib(`${jid}-${tag}-gib`, X1 - X0, { ...G, outer: W(rect(X0, X1, -g, -g + GIB)), z0: Z + 0.2, z1: sz1 - 0.2, name: lead ? "Gib strip 1.2 x 6.5 x 60, bronze" : "", qty: lead ? n : 0 });
+    // bronze gib on the - wall, up to the plate's top, so the keeper over it clamps it once it is set (F7)
+    const gb = H.gib(`${jid}-${tag}-gib`, X1 - X0, { ...G, outer: W(rect(X0, X1, -g, -g + GIB)), z0: Z + 0.2, z1: z0, name: lead ? `Gib strip ${GIB} x ${+(z0 - Z - 0.2).toFixed(1)} x ${X1 - X0}, bronze, clamped under the keeper` : "", qty: lead ? n : 0 });
     A.add(gb);
     serve("F7", gb.id);
-    [0.2, 0.5, 0.8].forEach((f, k) => {
+    // keeper over the - wall and the gib, riding on the plate, lapping the block by 1.5 mm (F2); its two screws clamp
+    // the gib
+    const keeper = H.plate(`${jid}-${tag}-keeper`, W(rect(X0, X1, -g - WALL, -BLOCK_W / 2 + LAP)), { ...G, name: lead ? "Keeper plate, holds the block down and clamps the gib" : "", qty: lead ? n : 0, z0, z1: z0 + KEEP, mat: "Steel, ground" });
+    A.add(keeper);
+    serve("F2", keeper.id);
+    [0.15, 0.85].forEach((f, k) => {
       const p = toWorld([0, 0, a], [X0 + (X1 - X0) * f, -g - WALL / 2]);
-      const at: [number, number, number] = [p[0], p[1], 0];
-      const sid = `${jid}-${tag}-gib-ss${k}`;
-      A.add(H.setScrew(sid, 2.5, { ...G, at, z0: z0 - 4, z1: z0, name: lead && k === 0 ? "Gib adjusting screw M2.5 (DIN 916)" : "", qty: lead && k === 0 ? 6 : 0, group: sid }));
-      A.add(H.nut(`${jid}-${tag}-gib-nut${k}`, 2.5, { ...G, at, z0: z0, z1: z0 + 2, name: lead && k === 0 ? "Lock nut M2.5" : "", qty: lead && k === 0 ? 6 : 0, lock: "jam nut", group: sid }));
+      const first = lead && k === 0;
+      A.add(H.screw(`${jid}-${tag}-keeper-sc${k}`, "csk", 3, KEEP + 4, { ...G, at: [p[0], p[1], 0], face: keeper.z1, dir: -1, name: first ? undefined : "", qty: first ? 2 * n : 0 }));
     });
 
     // neoprene end pad on the groove's closed end (F5): the wall is the stop
@@ -124,11 +118,13 @@ export const polish: Polish = (A, H) => {
     A.add(pad);
     serve("F5", pad.id);
 
-    // grease nipple on the keeper (F8)
-    const pn = toWorld([0, 0, a], [(X0 + X1) / 2, g + WALL / 2]);
-    const nip = H.nipple(`${jid}-${tag}-nipple`, { ...G, at: [pn[0], pn[1], 0], z0: keeper.z1, name: lead ? undefined : "", qty: lead ? n : 0 });
-    A.add(nip);
-    serve("F8", nip.id);
+    // a grease nipple on the keeper of each groove's leading half arm (F8): the grease runs the groove's length
+    if (lead) {
+      const pn = toWorld([0, 0, a], [(X0 + X1) / 2, -g - WALL / 2]);
+      const nip = H.nipple(`${jid}-${tag}-nipple`, { ...G, at: [pn[0], pn[1], 0], z0: keeper.z1 });
+      A.add(nip);
+      serve("F8", nip.id);
+    }
   });
   // felt wipers at the ends of each block (F8): on the block, so they travel with it
   for (const bk of ["blockX", "blockY"]) {
@@ -143,7 +139,7 @@ export const polish: Polish = (A, H) => {
   for (const bk of ["blockX", "blockY"]) {
     const J = A.joint(slideJ[bk]!);
     J.badge = ["guided both sides", "ok"];
-    J.note = `${A.get(bk)!.name} runs in a groove of the one-piece plate, 20 mm wide, ground; it crosses the centre in the groove. A keeper plate on each half arm laps it by ${LAP} mm and holds it down; a bronze gib with three adjusting screws and lock nuts on the other wall takes the play out; felt wipers at both ends of the block, a grease nipple on each keeper, and a neoprene pad on each closed groove end, 2 mm past the block's travel.`;
+    J.note = `${A.get(bk)!.name} runs in a groove of the one-piece plate, 20 mm wide, ground; it crosses the centre in the groove. On each half arm a bronze gib on one wall takes the play out against the other wall, the reference, and a keeper plate over it laps the block by ${LAP} mm and holds it down; the keeper's two screws clamp the gib once it is set. Felt wipers at both ends of the block, a grease nipple on one keeper per groove, and a neoprene pad on each closed groove end, 2 mm past the block's travel.`;
   }
 
   // hardware is new: locking and materials as the rules give the rest
@@ -168,7 +164,7 @@ export const polish: Polish = (A, H) => {
     { title: "One plate, both grooves", text: "The two grooves are cut through one plate and meet at its centre, so a block crosses the middle in a groove and nothing is cut back; the plate is ground, then the blocks are dropped into it from above." },
     { title: "Everything that turns is under the plate", text: "The crank on the input shaft, the rod over it, and the pen on the rod. Only the blocks stand in the plate's layer and the pins go down from them onto the rod, so no part crosses another where it cannot." },
     { title: "Posts outside the sweep", text: "The plate stands on three spigoted posts, two at the ends of the y arm beyond the pen's reach and one at the closed x end, none under the rod's sweep." },
-    { title: "Slide hardware once per half arm", text: "Keeper, gib with adjusting screws, wipers, nipple and neoprene pad serve each half arm; fit the keepers last, after the blocks are in." },
+    { title: "Slide hardware once per half arm", text: "A gib clamped under a keeper and a neoprene pad serve each half arm, a nipple each groove; set the gibs and fit the keepers last, after the blocks are in." },
     { title: "Single shear at every pin", text: "Rod and crank each turn a full circle, so no cap or post can reach over a pin: bolts thread into the lower part, bearings sit in the rod between inner-race spacers." },
   );
 };

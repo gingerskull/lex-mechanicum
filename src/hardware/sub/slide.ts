@@ -1,18 +1,30 @@
-// H.slide (J5): a prismatic slide on two rails. Keeper plate over one rail (F2), a bronze gib strip with adjusting
-// screws and lock nuts on the other (F7), felt wipers at both ends of the slider and a grease nipple feeding the guide
-// (F8), end stops with neoprene bumpers just beyond the travel (F5).
-import { TAU, bbox, circle, xf, type Pose, type Vec2 } from "../../core/geom";
+// H.slide (J5): a prismatic slide as a few blocks. Two rails: the plain one is the reference, dowelled to the base; the
+// other carries a bronze gib on its top, bearing on the slider's side, and a keeper plate over the gib lapping the
+// slider (F2). The gib is set across on slotted holes and clamped by the keeper's screws, which are the rail's own
+// fixing screws, down through keeper, gib, rail and riser into the base (F7, M13). A felt wiper at each end of the
+// slider and a grease nipple on the keeper (F8); one end stop block with a neoprene pad just past each end of the travel
+// (F5). The rails sit on ground risers (A6, `seatRail`): one per rail, split into pads only where a moving part passes
+// under it.
+import { TAU, bbox, circle, roundedPoly, xf, type Pose, type Vec2 } from "../../core/geom";
 import { overlap, region, toLocal, toWorld } from "../../core/poly";
 import { poseOf } from "../../model/pose";
+import type { Part } from "../../model/types";
 import { heights } from "../../parts";
 import { clearOf } from "../../rules/space";
 import type { RuleContext, SlideJoint } from "../../rules/types";
-import { bumper, gib, nipple, nut, plate, screw, setScrew, stop, wiper } from "../primitives";
-import { solid } from "../solid";
+import { bumper, disc, dowel, gib, nipple, plate, screw, standoff, stop, wiper } from "../primitives";
 import { HEADS } from "../tables";
 
 /** End stop block lengths along the slide, longest first: a stop is shortened to clear a sweep before it is dropped. */
 const STOP_LENGTHS = [8, 7, 6, 5];
+
+/**
+ * Rail fixings: shortest riser or pad, the screw's inset from a riser end, the most one screw may be from the next,
+ * the screw and dowel sizes, the step of the free-run search along the rail.
+ */
+export const RAIL = { pad: 12, inset: 6, pitch: 100, M: 3, dowel: 3, dowelIn: 5, step: 2 };
+
+const fmt = (v: number) => String(+v.toFixed(1));
 
 const rect = (x0: number, x1: number, y0: number, y1: number): Vec2[] => [
   [Math.min(x0, x1), Math.min(y0, y1)],
@@ -20,6 +32,129 @@ const rect = (x0: number, x1: number, y0: number, y1: number): Vec2[] => [
   [Math.max(x0, x1), Math.max(y0, y1)],
   [Math.min(x0, x1), Math.max(y0, y1)],
 ];
+
+/** Where a rail sits and is screwed, in the rail's own frame: riser spans along x and screw positions. */
+export interface RailLayout {
+  risers: [number, number][];
+  screws: number[];
+}
+
+const layouts = new WeakMap<RuleContext, Map<string, RailLayout>>();
+
+/**
+ * The rail's seat (A6): one riser under the rail's straight run where nothing moving passes under it; where something
+ * does, the riser is split into pads on the free runs (2.2), each at least `RAIL.pad` long. A screw near each end of a
+ * riser and between them at most `RAIL.pitch` apart. Decided once per rail, so the slide and the seat agree.
+ */
+export function railLayout(ctx: RuleContext, p: Part): RailLayout {
+  let m = layouts.get(ctx);
+  if (!m) layouts.set(ctx, (m = new Map()));
+  const known = m.get(p.id);
+  if (known) return known;
+  const F = p.fixed!;
+  const [x0, y0, x1, y1] = bbox(p.shape.outer);
+  const w = y1 - y0;
+  // the straight run of a stadium rail
+  const a = x0 + w / 2 + 0.5;
+  const b = x1 - w / 2 - 0.5;
+  const z0 = ctx.b1;
+  const z1 = ctx.solidOf[p.id]!.z0;
+  const free = (s: number, e: number) => z1 - z0 < 0.3 || clearOf(ctx, rect(s, e, -w / 2, w / 2).map((q) => toWorld(F, q)), z0, z1);
+  const risers: [number, number][] = [];
+  if (free(a, b)) risers.push([a, b]);
+  else {
+    // free runs along the rail, in steps
+    let s: number | null = null;
+    for (let x = a; x < b + 1e-9; x += RAIL.step) {
+      const e = Math.min(b, x + RAIL.step);
+      const ok = free(x, e);
+      if (ok && s === null) s = x;
+      if ((!ok || e >= b) && s !== null) {
+        const end = ok ? e : x;
+        if (end - s >= RAIL.pad) risers.push([s, end]);
+        s = null;
+      }
+    }
+    // nothing free: pads at the ends as the rail would have without a clearance search
+    if (!risers.length) risers.push([a, a + RAIL.pad], [b - RAIL.pad, b]);
+  }
+  const screws: number[] = [];
+  for (const [s, e] of risers) {
+    const p0 = s + RAIL.inset;
+    const p1 = e - RAIL.inset;
+    if (p1 - p0 < 1) {
+      screws.push((s + e) / 2);
+      continue;
+    }
+    const n = Math.ceil((p1 - p0) / RAIL.pitch) + 1;
+    for (let i = 0; i < n; i++) screws.push(p0 + ((p1 - p0) * i) / (n - 1));
+  }
+  const out = { risers, screws };
+  m.set(p.id, out);
+  return out;
+}
+
+/**
+ * Seat a slide rail (A6, F1): its risers or pads, ground to the gap over the base; a countersunk screw at each fixing,
+ * down from `top` (the keeper on the gib rail, the rail itself on the reference rail) into the base; on the reference
+ * rail, a dowel by each end screw, so the slider's bearing face goes back straight after a rebuild.
+ */
+export function seatRail(ctx: RuleContext, p: Part, jid: string, o: { ref: boolean; top?: { id: string; z1: number; ex: number } }): void {
+  const q = ctx.solidOf[p.id]!;
+  const F = p.fixed!;
+  const [, y0, , y1] = bbox(p.shape.outer);
+  const w = y1 - y0;
+  const { risers, screws } = railLayout(ctx, p);
+  const h = q.z0 - ctx.b1;
+  const serves: string[] = [];
+  const top = o.top ?? { id: q.id, z1: q.z1, ex: q.ex };
+  if (h >= 0.3) {
+    const same = risers.every(([s, e]) => Math.abs(e - s - (risers[0]![1] - risers[0]![0])) < 0.05);
+    risers.forEach(([s, e], k) => {
+      const one = risers.length === 1;
+      const named = !same || k === 0;
+      ctx.add(standoff(`${jid}${k}`, {
+        name: named ? `${one ? "Rail riser" : "Rail pad"} ${fmt(w)} x ${fmt(e - s)} x ${fmt(h)}, steel, ground` : "",
+        qty: named ? (same ? risers.length : 1) : 0,
+        mat: "Steel C45, ground",
+        outer: rect(s, e, -w / 2, w / 2),
+        D: undefined,
+        at: F,
+        z0: ctx.b1,
+        z1: q.z0,
+        ex: -1,
+        joints: [jid],
+      }));
+    });
+  }
+  screws.forEach((x, k) => {
+    const c = toWorld(F, [x, 0]);
+    q.holes.push(disc(RAIL.M / 2 + 0.3, x, 0));
+    ctx.add(screw(`${jid}${k}-sc`, "csk", RAIL.M, top.z1 - ctx.b1 + 1.5 * RAIL.M, { at: [c[0], c[1], 0], face: top.z1, dir: -1, ex: top.ex, joints: [jid], name: k ? "" : undefined, qty: k ? 0 : screws.length }));
+  });
+  if (o.ref && screws.length >= 2) {
+    // a dowel just outside each end screw, into the base and up into the rail
+    const ends: [number, number][] = [[screws[0]!, -1], [screws[screws.length - 1]!, 1]];
+    ends.forEach(([x, dir], k) => {
+      const d = toWorld(F, [x + dir * (RAIL.pad / 2 - RAIL.dowel / 2 - 1.5), 0]);
+      const id = `${jid}${k}-dowel`;
+      ctx.add(dowel(id, RAIL.dowel, { at: [d[0], d[1], 0], z0: ctx.b1 - RAIL.dowelIn, z1: q.z0 + Math.min(3, (q.z1 - q.z0) / 2), ex: -1, joints: [jid], name: k ? "" : `Dowel pin Ø${RAIL.dowel} h6 (ISO 8734), rail to base`, qty: k ? 0 : 2 }));
+      serves.push(id);
+    });
+  }
+  const seat = h >= 0.3 ? (risers.length === 1 ? "a ground steel riser" : `${risers.length} ground steel pads, clear of what passes under it`) : "the base";
+  const n = screws.length;
+  ctx.joints.push({
+    id: jid,
+    type: "post",
+    at: toWorld(F, [screws[0]!, 0]),
+    title: `Seat · ${q.name}`,
+    note: `Seated on ${seat}${h >= 0.3 ? ` ${fmt(h)} mm thick` : ""}; ${n} countersunk M${RAIL.M} down ${o.top ? "through keeper, gib and rail" : "through the rail"} into the base.${o.ref ? ` The reference rail: two Ø${RAIL.dowel} dowels by its end screws locate it, so the slider's bearing face goes back straight after a rebuild.` : " Not dowelled: the gib on it takes up the fit against the reference rail."}`,
+    badge: [o.ref ? "seated and dowelled" : "seated", "ok"],
+    serves: o.ref ? { F1: serves } : {},
+  });
+  q.joints.push(jid);
+}
 
 /** A wiper on the slider stays clear of every other moving part over the cycle (the contact end of a cam follower). */
 function wiperClear(ctx: RuleContext, j: SlideJoint, local: Vec2[], z0: number, z1: number): boolean {
@@ -48,34 +183,28 @@ export function slide(ctx: RuleContext, j: SlideJoint): void {
   const sg = Math.sign(yA) || 1;
   const [, , Lr0] = bbox(rb.shape.outer);
   const Lr = Lr0 - 3.5;
-  const rz1 = heights(rb)[1];
+  const rz1 = heights(ra)[1];
   const [sz0, sz1] = heights(j.slider);
   const [sx0, sy0, sx1, sy1] = bbox(j.slider.shape.outer);
   const yAi = yA - 3.5 * sg;
-  const G = { joints: [j.id], ex: ctx.solidOf[rb.id]!.ex };
+  const G = { joints: [j.id], ex: ctx.solidOf[ra.id]!.ex };
   const serve = (k: "F2" | "F5" | "F7" | "F8", id: string) => (J.serves[k] ??= []).push(id);
 
-  // keeper over rail a, riding on a shim so it clears the slider top by 0.3 mm
-  const kz0 = sz1 + 0.3;
-  const keeper = plate(`${j.id}-keeper`, W(rect(-2.5, Lr + 2.5, yAi - 2 * sg, yA + 3.5 * sg)), { ...G, name: "Keeper plate, holds the slider down", z0: kz0, z1: kz0 + 2.5, mat: "Steel, ground" });
-  const shim = solid(`${j.id}-shim`, { ...G, name: "Shim under the keeper", kind: "shim", outer: W(rect(-2.5, Lr + 2.5, yA - 3.5 * sg, yA + 3.5 * sg)), z0: rz1, z1: kz0, mat: "Steel shim stock" });
-  ctx.add(keeper, shim);
-  serve("F2", keeper.id);
-  [0.15, 0.5, 0.85].forEach((f, k) => {
-    const p = toWorld(F, [Lr * f, yA]);
-    ctx.add(screw(`${j.id}-keeper-sc${k}`, "csk", 3, keeper.z1 - rz1 + 4, { ...G, at: [p[0], p[1], 0], face: keeper.z1, dir: -1, name: k ? "" : undefined, qty: k ? 0 : 3 }));
-  });
+  // rail a's fixings, in the slide's frame (the keeper's screws are the rail's)
+  const aL = railLayout(ctx, ra);
+  const fix = aL.screws.map((x) => toLocal(F, toWorld(ra.fixed!, [x, 0]))[0]);
 
-  // gib along rail b's inner edge, adjusting screws and lock nuts on its outer half (F7)
-  const g = gib(`${j.id}-gib`, Lr, { ...G, outer: W(rect(0, Lr, 1 * sg, 3.5 * sg)), z0: rz1, z1: sz1 - 0.2 });
+  // the gib on rail a, its inner edge on the slider's side, 0.3 mm proud of the slider's top: slotted across at each
+  // fixing, so it is set against the slider and clamped by the keeper screws (F7)
+  const kz0 = sz1 + 0.3;
+  const slots = fix.map((x) => W(roundedPoly([[x, yA - 0.4], [x, yA + 0.4]], RAIL.M / 2 + 0.3)));
+  const g = gib(`${j.id}-gib`, Lr + 5, { ...G, outer: W(rect(-2.5, Lr + 2.5, yAi, yA + 3.5 * sg)), holes: slots, z0: rz1, z1: kz0, name: `Gib strip ${fmt(Lr + 5)} x 7 x ${fmt(kz0 - rz1)}, bronze, slotted, clamped under the keeper` });
   ctx.add(g);
   serve("F7", g.id);
-  [0.2, 0.5, 0.8].forEach((f, k) => {
-    const p = toWorld(F, [Lr * f, -2 * sg]);
-    const at: [number, number, number] = [p[0], p[1], 0];
-    ctx.add(setScrew(`${j.id}-gib-ss${k}`, 2.5, { ...G, at, z0: rz1, z1: rz1 + 3, name: k ? "" : "Gib adjusting screw M2.5 (DIN 916)", qty: k ? 0 : 3, group: `${j.id}-gib-ss${k}` }));
-    ctx.add(nut(`${j.id}-gib-nut${k}`, 2.5, { ...G, at, z0: rz1, z1: rz1 + 2, name: k ? "" : "Lock nut M2.5", qty: k ? 0 : 3, lock: "jam nut", group: `${j.id}-gib-ss${k}` }));
-  });
+  // the keeper over the gib, lapping the slider by 2 mm (F2)
+  const keeper = plate(`${j.id}-keeper`, W(rect(-2.5, Lr + 2.5, yAi - 2 * sg, yA + 3.5 * sg)), { ...G, name: "Keeper plate, holds the slider down", z0: kz0, z1: kz0 + 2.5, mat: "Steel, ground" });
+  ctx.add(keeper);
+  serve("F2", keeper.id);
 
   // felt wipers at both ends of the slider (F8)
   const sl = ctx.solidOf[j.slider.id]!;
@@ -126,15 +255,22 @@ export function slide(ctx: RuleContext, j: SlideJoint): void {
     ctx.add(screw(`${j.id}-stop${k}-sc`, "button", 4, sz1 - 1 - ctx.b1 + 6, { ...G, at: [c[0], c[1], 0], face: sz1 - 1, dir: -1, name: first ? undefined : "" }));
   });
 
-  // grease nipple on the keeper, where nothing passes over it (F8)
-  for (const f of [0.08, 0.92, 0.3, 0.7, 0.5]) {
-    const p = toWorld(F, [Lr * f, yA + 0.5 * sg]);
-    const n = nipple(`${j.id}-nipple`, { ...G, at: [p[0], p[1], 0], z0: keeper.z1 });
-    if (!clearOf(ctx, n.outer.map(([x, y]) => [x + p[0], y + p[1]] as Vec2), n.z0, n.z1)) continue;
-    ctx.add(n);
-    serve("F8", n.id);
+  // grease nipple on the keeper between its screws, where nothing passes over it (F8)
+  const cand: number[] = [];
+  for (let i = 0; i + 1 < fix.length; i++) {
+    const [p, q] = [Math.min(fix[i]!, fix[i + 1]!), Math.max(fix[i]!, fix[i + 1]!)];
+    if (q - p > 20) cand.push(p + 9, q - 9);
+    cand.push((p + q) / 2);
+  }
+  if (!cand.length) cand.push(Lr / 2);
+  for (const x of cand) {
+    const p = toWorld(F, [x, yA + 0.5 * sg]);
+    const nip = nipple(`${j.id}-nipple`, { ...G, at: [p[0], p[1], 0], z0: keeper.z1 });
+    if (!clearOf(ctx, nip.outer.map(([u, v]) => [u + p[0], v + p[1]] as Vec2), nip.z0, nip.z1)) continue;
+    ctx.add(nip);
+    serve("F8", nip.id);
     break;
   }
-  J.note = `Slide on two rails: keeper plate on one, a bronze gib with three adjusting screws and lock nuts on the other, felt wipers at both ends of the slider${J.serves.F8?.some((s) => s.endsWith("nipple")) ? ", a grease nipple on the keeper" : ""}, end stops just past the travel.${J.note}`;
+  J.note = `Slide on two rails: the plain rail is the dowelled reference; on the other a bronze gib bears on the slider's side and a keeper over it holds the slider down, both clamped by the rail's own screws (the gib is set across on its slotted holes first). Felt wipers at both ends of the slider${J.serves.F8?.some((s) => s.endsWith("nipple")) ? ", a grease nipple on the keeper" : ""}, an end stop block with a neoprene pad just past each end of the travel.${J.note}`;
   J.badge = ["guided both sides", "ok"];
 }

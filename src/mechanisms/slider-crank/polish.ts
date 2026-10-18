@@ -35,7 +35,7 @@ export const polish: Polish = (A, H) => {
     { title: "Crank and crosshead low, rod above", text: "Crank, crosshead and rails work near the base; the rod rides over the slide's keeper, so the crank is lifted to keep the crank pin's overhang at 1.5 mm." },
     { title: "Clevis at the crosshead", text: "The wrist pin is held above and below: a cap on a post on the side the rod never swings to." },
     { title: "Balanced crank", text: "A counterweight lobe opposite the pin balances the pin, the big end and part of the rod." },
-    { title: "Guided, adjustable, wiped", text: "Keeper on one rail, a bronze gib with adjusting screws on the other, hardened rails, felt wipers, a grease nipple, rubber end stops just past the stroke." },
+    { title: "Guided, adjustable, wiped", text: "A bronze gib clamped under a keeper on one rail, the other rail the dowelled reference, hardened rails, felt wipers, a grease nipple, rubber end stops just past the stroke." },
     { title: "Kinematics untouched", text: "Pin centres, the guide line and the stroke are the model's; the hardware is designed round them." },
   );
 };

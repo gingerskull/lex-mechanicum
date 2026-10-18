@@ -125,7 +125,7 @@ export const polish: Polish = (A, H) => {
     { title: "Over centre, held by a stop", text: "The handle goes 3° past the line of arm and link and lands on a stop on its grip arm: the load tries to turn it further onto the stop, so the clamp holds itself." },
     { title: "Clevis at both joints that carry the toggle load", text: "The handle's two plates straddle the link at the knee and the plunger's cap closes over it at the plunger, so both pins work in double shear." },
     { title: "Adjustable spindle, locked", text: "The pad height is set with the spindle and fixed with a lock nut, so made parts meet the modelled clamp stack." },
-    { title: "Plunger guided both sides", text: "Keeper on one rail, a bronze gib with adjusting screws on the other, hardened rails, wipers and a grease nipple; the forward stop is the work-piece and the over-centre stop." },
+    { title: "Plunger guided both sides", text: "A bronze gib clamped under a keeper on one rail, the other rail the dowelled reference, hardened rails, wipers and a grease nipple; the forward stop is the work-piece and the over-centre stop." },
     { title: "Kinematics untouched", text: "Pin centres, the guide line, the handle swing and the pad face are the model's; the hardware is designed round them." },
   );
 };

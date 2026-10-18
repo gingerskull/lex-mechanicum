@@ -8,10 +8,13 @@ import { assemble, assembleWith } from "../../src/assemble";
 import { HP } from "../../src/assemble/api";
 import { solid } from "../../src/hardware/solid";
 import geneva from "../../src/mechanisms/geneva/model";
+import locomotive from "../../src/mechanisms/locomotive-drive/model";
+import scissor from "../../src/mechanisms/scissor-lift/model";
 import fourBar from "../../src/mechanisms/four-bar/model";
 import sliderCrank from "../../src/mechanisms/slider-crank/model";
 import { heights } from "../../src/parts";
 import { createContext } from "../../src/rules/context";
+import { baseCorners } from "../../src/rules/base";
 import { headroom } from "../../src/rules/headroom";
 import { j2Straddle } from "../../src/rules/j2-straddle";
 import { j4 } from "../../src/rules/j4-slot-roller";
@@ -221,4 +224,52 @@ describe("shoulder bolt headroom", () => {
     expect(ctx.get("pO4-axle-shim")).toBeDefined();
     expect(ctx.joint("pO4")!.note).toMatch(/lifts the head 4 mm on a shim/);
   });
+});
+
+describe("stops grow the base (F5, #65)", () => {
+  it("keeps every stop post, with an 8 mm margin, over the base, and the feet on the grown corners", () => {
+    const ctx = built(clevisModel);
+    const [x0, y0, x1, y1] = bbox(ctx.get("base")!.outer);
+    const posts = ctx.solids.filter((t) => /-stop\d$/.test(t.id));
+    expect(posts.length).toBeGreaterThan(0);
+    for (const p of posts) {
+      expect(p.at[0] - 6 - 8).toBeGreaterThanOrEqual(x0 - 1e-6);
+      expect(p.at[0] + 6 + 8).toBeLessThanOrEqual(x1 + 1e-6);
+      expect(p.at[1] - 6 - 8).toBeGreaterThanOrEqual(y0 - 1e-6);
+      expect(p.at[1] + 6 + 8).toBeLessThanOrEqual(y1 + 1e-6);
+    }
+    for (const f of ctx.solids.filter((t) => t.kind === "foot")) {
+      expect(baseCorners(ctx).some(([x, y]) => Math.hypot(f.at[0] - x, f.at[1] - y) < 1e-6)).toBe(true);
+    }
+  });
+});
+
+describe("linear drive (V6, #65)", () => {
+  for (const [name, model] of [["locomotive-drive", locomotive], ["scissor-lift", scissor]] as const) {
+    it(`${name}: base holds the loop, slot clears the carriage, carriage sits on the belt, a fork sensor takes the vane`, () => {
+      const ctx = built(model);
+      const base = ctx.get("base")!;
+      const [x0, y0, x1, y1] = bbox(base.outer);
+      for (const id of ["drive-tensioner", "drive-idler", "drive-sensor", "drive-floor"]) {
+        const t = ctx.get(id)!;
+        const [a, b, c, d] = bbox(t.outer);
+        const q = t.at;
+        expect(a + q[0]).toBeGreaterThanOrEqual(x0 - 1e-6);
+        expect(c + q[0]).toBeLessThanOrEqual(x1 + 1e-6);
+        expect(b + q[1]).toBeGreaterThanOrEqual(y0 - 1e-6);
+        expect(d + q[1]).toBeLessThanOrEqual(y1 + 1e-6);
+      }
+      // the carriage seats on the belt's top
+      expect(ctx.get("drive-carriage")!.z0).toBeGreaterThanOrEqual(ctx.get("drive-belt")!.z1);
+      // the slot reaches 10.5 mm past the carriage centre at each end of the stroke
+      const slot = base.holes.find((h) => { const [a, b, c, d] = bbox(h); return Math.min(c - a, d - b) > 9.5 && Math.min(c - a, d - b) < 10.5 && Math.max(c - a, d - b) > 30; })!;
+      const car = ctx.get("drive-carriage")!;
+      const [a, b, c, d] = bbox(slot);
+      const [ca, cb, cc, cd] = bbox(car.outer);
+      expect(Math.max(c - a, d - b)).toBeGreaterThan(Math.max(cc - ca, cd - cb));
+      expect(ctx.get("drive-sensor")).toBeDefined();
+      expect(ctx.get("drive-sensor-arm0")).toBeDefined();
+      expect(ctx.get("drive-lead1")).toBeDefined();
+    });
+  }
 });
