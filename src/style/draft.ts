@@ -51,6 +51,12 @@ export const DRAFT = {
 
   // Library cards (SS1): the thumbnail and the hover animation draw a small sheet, so they leave out detail nobody sees
   // and thin the two bold outlines. Used only for a view with `card` set; the mechanism page is untouched.
+  // The GPU solids pass: antialiasing samples per pixel, fewer on a phone or a dense screen, where a pixel is smaller.
+  gpu: {
+    samples: 8, // antialiasing samples per pixel
+    samplesDense: 4, // coarse pointer or device pixel ratio of 2 and more
+  },
+
   card: {
     detail: "D" as const, // detail dial position of a card drawing (DL)
     plateTopFactor: 0.7, // factor on lines.plateTop on a card
@@ -86,6 +92,7 @@ export const DRAFT = {
       radius: 0.62, // factor on the head's projected half-size, per axis
       alpha: 1, // 0..1 on the lines layer
       hiddenAlpha: 0.7, // 0..1 on the frame (shows through covering parts)
+      segments: 72, // straight pieces of the ring
     },
   },
 

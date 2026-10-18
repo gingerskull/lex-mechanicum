@@ -57,6 +57,16 @@ export function slices<T extends Sliceable>(W: T[], cache?: { last?: SliceCache 
   return out;
 }
 
+/**
+ * How a wall faces: it is seen when its outward screen normal n has n . d > eps for the extrusion vector d, and its shade
+ * step comes from n . light. The GPU pass (gl/shaders.ts) uses the same numbers.
+ */
+export const FACING = { eps: 1e-6, light: [0.75, -0.25] as const };
+
+/** The shade step of a seen wall with outward screen normal (nx, ny). */
+export const facingStep = (nx: number, ny: number, steps: number): number =>
+  Math.max(0, Math.min(steps - 1, Math.round(((nx * FACING.light[0] + ny * FACING.light[1] + 1) * (steps - 1)) / 2)));
+
 /** Side walls of a projected outline that face the viewer, for the extrusion vector d, in five facing buckets. */
 export function wallsOf(P: Vec2[], d: Vec2, sg: number, steps = 5): { vis: boolean[]; buckets: [Vec2, Vec2][][] } {
   const n = P.length;
@@ -70,19 +80,9 @@ export function wallsOf(P: Vec2[], d: Vec2, sg: number, steps = 5): { vis: boole
     const L = Math.hypot(dx, dy) || 1;
     const nx = (sg * dy) / L;
     const ny = (-sg * dx) / L;
-    const v = nx * d[0] + ny * d[1] > 1e-6;
+    const v = nx * d[0] + ny * d[1] > FACING.eps;
     vis.push(v);
-    if (v) buckets[Math.max(0, Math.min(steps - 1, Math.round(((nx * 0.75 - ny * 0.25 + 1) * (steps - 1)) / 2)))]!.push([a, b]);
+    if (v) buckets[facingStep(nx, ny, steps)]!.push([a, b]);
   }
   return { vis, buckets };
-}
-
-export function wallPath(c: CanvasRenderingContext2D | Path2D, edges: [Vec2, Vec2][], d: Vec2): void {
-  for (const [a, b] of edges) {
-    c.moveTo(a[0], a[1]);
-    c.lineTo(b[0], b[1]);
-    c.lineTo(b[0] + d[0], b[1] + d[1]);
-    c.lineTo(a[0] + d[0], a[1] + d[1]);
-    c.closePath();
-  }
 }

@@ -269,6 +269,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.majorAlpha` | 0.14 | 0..1 |
 | `draft.grid.minorWidth` | 0.5 | px |
 | `draft.grid.majorWidth` | 0.8 | px |
+| `draft.gpu.samples` | 8 | antialiasing samples per pixel |
+| `draft.gpu.samplesDense` | 4 | coarse pointer or device pixel ratio of 2 and more |
 | `draft.card.detail` | `D` | detail dial position of a card drawing (DL) |
 | `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
 | `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
@@ -298,6 +300,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.accentRing.radius` | 0.62 | factor on the head's projected half-size, per axis |
 | `draft.lines.accentRing.alpha` | 1 | 0..1 on the lines layer |
 | `draft.lines.accentRing.hiddenAlpha` | 0.7 | 0..1 on the frame (shows through covering parts) |
+| `draft.lines.accentRing.segments` | 72 | straight pieces of the ring |
 | `draft.fill.plate` | 0.64 |  |
 | `draft.fill.other` | 0.8 |  |
 | `draft.fill.base` | 0.96 | laid once, on the top face (the parts under it read only through `occlude.base`) |
@@ -540,11 +543,11 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 |---|---|---|---|
 | A | Paper grain, bearing balls and cages, motor internals | kinds: bearingBalls, bearingCage, motorInternal; effects: grain |  |
 | B | Manufacturing marks | marks: chamfer, boreEntry, headFlute, hexSocket, knurl, keyway, thread | atSide: skip |
-| C | Wall shading, inner-slice silhouettes, full pixel ratio | effects: wallShade, innerSilhouettes, fullDpr |  |
+| C | Wall shading, inner-slice silhouettes | effects: wallShade, innerSilhouettes |  |
 | D | Stack hardware inside a joint | kinds: spacer, washer, thrustWasher, waveWasher, sleeve, shim, circlipInternal | whenExplode: draw |
 | E | Service and sensing parts, timing marks | kinds: nipple, felt, wiper, flag, sensor, terminalBlock, cableClip, lead; marks: oilSink, timing |  |
 | F | Role surface patterns | effects: rolePatterns |  |
-| G | Hidden lines | effects: hiddenLines |  |
+| G | Hidden lines, full pixel ratio | effects: hiddenLines, fullDpr |  |
 | H | Retention and adjustment parts | kinds: circlipExternal, retainerPlate, nut, setScrew, collar, eccentric, gib, stop, bumper, spring, wearStrip, dowel, spigot |  |
 <!-- style-ladder:end -->
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cover } from "../../src/render/draft";
+import { cover } from "../../src/render/gl/plan";
 import { DRAFT } from "../../src/style/draft";
 
 const F = DRAFT.fill;

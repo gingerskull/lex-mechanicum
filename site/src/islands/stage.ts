@@ -68,6 +68,8 @@ async function main(box: HTMLElement) {
   }
 
   let dirty = true;
+  // a lost GPU context came back: redraw, even when paused
+  sess.onRestored = () => (dirty = true);
   const draw = () => {
     const t0 = performance.now();
     sess.draw(s.u, view());

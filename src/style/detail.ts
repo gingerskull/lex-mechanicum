@@ -33,8 +33,8 @@ export const DETAIL: Rung[] = [
   },
   {
     id: "C",
-    name: "Wall shading, inner-slice silhouettes, full pixel ratio",
-    drops: { effects: ["wallShade", "innerSilhouettes", "fullDpr"] },
+    name: "Wall shading, inner-slice silhouettes",
+    drops: { effects: ["wallShade", "innerSilhouettes"] },
   },
   {
     id: "D",
@@ -57,8 +57,8 @@ export const DETAIL: Rung[] = [
   },
   {
     id: "G",
-    name: "Hidden lines",
-    drops: { effects: ["hiddenLines"] },
+    name: "Hidden lines, full pixel ratio",
+    drops: { effects: ["hiddenLines", "fullDpr"] },
   },
   {
     id: "H",

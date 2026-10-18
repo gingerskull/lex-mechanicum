@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.5
+version: 2.6
 date: 2026-10-18
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -436,11 +436,11 @@ performance and perception tests later.
 |---|---|---|---|
 | DL-A | first | Paper grain; bearing balls and cages; motor internals (stator, windings, magnets, commutator) | Faint by design; nothing about the build is lost |
 | DL-B | | Manufacturing marks: chamfer lines, bore-entry rings, head flutes, hex sockets, knurls, keyway marks, thread helices | Texture of the parts, not their presence |
-| DL-C | | Wall shading steps (walls flat), silhouette lines on inner slices (kept on the top slice), device pixel ratio capped at 1 | Softens the drawing without removing a line that carries meaning |
+| DL-C | | Wall shading steps (walls flat), silhouette lines on inner slices (kept on the top slice) | Softens the drawing without removing a line that carries meaning |
 | DL-D | | Stack hardware hidden inside a joint: inner-race spacers, thrust and plain washers, sleeves, shims, internal circlips | Invisible inside the stack unless exploded; drawn again whenever explode > 0 |
 | DL-E | | Service and sensing parts: oil sinks, nipples, felts, wipers, home flag, sensor, terminal block, cable clip, leads, timing marks | Small distinct parts off the load path; the build still reads complete |
 | DL-F | | Role surface patterns (roles then read by tone and outline only) | Large areas change; roles get harder to tell apart |
-| DL-G | | Hidden lines (the dashed copies of covered edges) | A drafting convention the whole look leans on |
+| DL-G | | Hidden lines (the dashed copies of covered edges); device pixel ratio capped at 1 | A drafting convention the whole look leans on; a soft image is seen at once |
 | DL-H | last | Retention and adjustment parts: external circlips, retainer plates, nuts, set screws, eccentric bushings, gib strips, stops, springs, wear strips, dowels, spigots | Without these the build reads as incomplete |
 | never | | The mechanism's parts, base plate, every joint's main hardware (shaft or bolt, head, bearings, housing, bridge, standoffs), motor, bracket, belt, pulleys, traced paths, overlays | The build itself and what the page is for |
 
@@ -573,6 +573,9 @@ default detail level.
 
 ## Changelog
 
+- **2.6 (2026-10-18).** The device pixel ratio cap moves from DL-C to DL-G: a soft drawing is seen at once, and on the
+  GPU renderer a frame's cost hardly follows its pixel count (browser bench, DL5), so it goes last of the effects
+  [DL-C, DL-G, AUTO].
 - **2.5 (2026-10-18).** An F7 adjuster for moving links: `H.turnbuckle` makes a link adjustable at its set point in its
   own plane (two halves on one body, left and right hand studs, a body milled flat to the link's thickness, jam nuts), so
   an exact length that sits between free pins, or on a link with no room above or below in the swept stack, can be
