@@ -47,6 +47,8 @@ export function stops(ctx: RuleContext, o: StopSpec): string[] {
   const RS = Math.max(20, reach * 0.7);
   const top = pz0 + (pz1 - pz0) * 0.7;
   const out: string[] = [];
+  // two parts swinging on one pivot (the long arms of a Peaucellier cell) each get their own pair
+  const key = ctx.get(`${o.joint}-stop0`) ? `${o.joint}-${o.part.id}` : o.joint;
   for (const [k, a0, sg] of [[0, o.range[1] + margin, 1], [1, o.range[0] - margin, -1]] as const) {
     let found: Vec2 | null = null;
     for (let s = 0; s < 0.7; s += 0.002) {
@@ -60,9 +62,9 @@ export function stops(ctx: RuleContext, o: StopSpec): string[] {
     if (!found) continue;
     const at: [number, number, number] = [found[0], found[1], 0];
     const G = { at, joints: [o.joint], ex: 0 };
-    ctx.add(bumper(`${o.joint}-stop${k}`, 4.3, 2 * R_STOP, { ...G, name: k ? "" : `Stop bumper, neoprene sleeve Ø${2 * R_STOP}`, qty: k ? 0 : 2, z0: ctx.b1, z1: top }));
-    ctx.add(screw(`${o.joint}-stop${k}-sc`, "button", 4, top - ctx.b1 + 6, { ...G, face: top, dir: -1, name: k ? "" : undefined, qty: k ? 0 : 2 }));
-    out.push(`${o.joint}-stop${k}`);
+    ctx.add(bumper(`${key}-stop${k}`, 4.3, 2 * R_STOP, { ...G, name: k ? "" : `Stop bumper, neoprene sleeve Ø${2 * R_STOP}`, qty: k ? 0 : 2, z0: ctx.b1, z1: top }));
+    ctx.add(screw(`${key}-stop${k}-sc`, "button", 4, top - ctx.b1 + 6, { ...G, face: top, dir: -1, name: k ? "" : undefined, qty: k ? 0 : 2 }));
+    out.push(`${key}-stop${k}`);
   }
   return out;
 }

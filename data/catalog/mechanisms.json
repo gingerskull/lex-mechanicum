@@ -1674,7 +1674,7 @@
       "ratio": {
         "kind": "Variable",
         "class": "Variable",
-        "typical": "lift per unit slider travel = n w / h, here from about 0.6 (raised) to 8.6 (lowered)"
+        "typical": "lift per unit slider travel = n w / h, here from about 2.0 (raised) to 8.6 (lowered)"
       },
       "dof": 1,
       "topology": {
@@ -1746,7 +1746,7 @@
           {
             "id": "platform",
             "role": "output",
-            "def": "pinned at L3, slotted at R3, 120 mm long; point C 45 mm from L3"
+            "def": "pinned at L3, slotted at R3, 150 mm long; point C 45 mm from L3"
           }
         ],
         "joints": [
@@ -2017,7 +2017,7 @@
           {
             "id": "rod",
             "role": "output",
-            "def": "rod rigid with yoke running in guide from x = 95 to 135 mm"
+            "def": "tie bar rigid with the yoke, carrying a crosshead 120 mm from the slot centre in the guide, so the crosshead moves from x = 80 to 160 mm"
           }
         ],
         "joints": [
@@ -2475,14 +2475,14 @@
         "limits": "Sliders need clean, low-play grooves or the ellipse distorts. Blocks must pass through the crossing, so the groove ends need cut-backs."
       },
       "build": {
-        "ground": "base with crossed grooves along x and y through O, and a bridge holding the crank shaft at O",
+        "ground": "base with crossed grooves along x and y through O, each a pair of rails on ground pads, and the crank shaft coming up at O under the blocks",
         "input": "crank O→M, continuous rotation",
         "output": "pen point P path (ellipse)",
         "members": [
           {
             "id": "ground",
             "role": "ground",
-            "def": "crossed grooves along x and y, cut back within 19 mm of O, extending to ±82 mm"
+            "def": "crossed grooves along x and y, cut back within 40 mm of O, extending to ±91 mm"
           },
           {
             "id": "blockX",
@@ -2570,13 +2570,13 @@
           },
           {
             "name": "c",
-            "value": 19,
+            "value": 40,
             "unit": "mm",
             "note": "groove cut-back at crossing"
           },
           {
             "name": "ext",
-            "value": 82,
+            "value": 91,
             "unit": "mm",
             "note": "groove half length"
           }
@@ -2591,7 +2591,7 @@
           "plot"
         ],
         "plot": "pen x and y vs crank angle",
-        "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Crank sits on a raised bridge layer so it clears the rod and blocks."
+        "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Crank sits under the blocks and the rod over them; the grooves are cut back to the crank pin circle (radius 30 mm plus its pin), so the blocks cross the opening unguided on the rod."
       },
       "examples": [
         {
@@ -8064,9 +8064,9 @@
           "kind": "video"
         },
         {
-          "title": "Rolling Circles: The Tusi Couple (YouTube)",
-          "url": "https://www.youtube.com/watch?v=1apwd5X5EC0",
-          "kind": "animation"
+          "title": "Murray's hypocycloidal engine at Thinktank, photos and video (Wikimedia Commons)",
+          "url": "https://commons.wikimedia.org/wiki/Category:Murray_engine_(Thinktank)",
+          "kind": "photos"
         }
       ],
       "related": [
@@ -9997,7 +9997,20 @@
         "scotch-yoke",
         "slider-crank"
       ],
-      "real_world": []
+      "real_world": [
+        {
+          "product": "Pilatus Railway, Switzerland",
+          "maker": "Pilatus-Bahnen",
+          "use": "Two horizontal pinions under the railcar engage a double toothed rack between the rails, so the car climbs a 48 percent grade without relying on wheel grip.",
+          "url": "https://www.youtube.com/watch?v=EAXG-UPg910"
+        },
+        {
+          "product": "Gantry router on rack and pinion drive",
+          "maker": "Avid CNC",
+          "use": "Servo-driven pinions run along toothed racks and carry the gantry, so each turn of a pinion moves the machine a fixed distance.",
+          "url": "https://www.youtube.com/watch?v=BbSN-jbr7xs"
+        }
+      ]
     },
     {
       "id": "spur-gears",
@@ -21584,7 +21597,7 @@
       },
       "explain": {
         "motion": "The lever swings back and forth about the wheel axis. On the forward stroke its driving pawl catches the steep face of a tooth and pushes the wheel one tooth; on the return stroke it rides up over the sloped backs of the teeth. A holding pawl on the frame drops into each tooth to stop the wheel running back.",
-        "forces": "Load passes through the pawl tip on the steep tooth face; the face is undercut slightly so the pawl is pulled into engagement under load. The small backward movement before the holding pawl catches is the backlash, at most one tooth pitch.",
+        "forces": "Load passes through the pawl tip on the steep tooth face; the pawl line runs tangent to the root circle, so the load keeps the tip seated in the root. The small backward movement before the holding pawl catches is the backlash, at most one tooth pitch.",
         "benefits": "Simple, robust one-way drive and lock that can hold heavy loads.",
         "limits": "Noisy, motion is in discrete steps, and backlash up to one pitch. Shock loads at engagement wear tooth faces and pawl tips."
       },

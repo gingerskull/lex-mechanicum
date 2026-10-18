@@ -20,7 +20,10 @@
  ]},
  "worm-drive": {"real_world": []},
  "crossed-helical-gears": {"real_world": []},
- "rack-pinion": {"real_world": []},
+ "rack-pinion": {"real_world": [
+  {"product":"Pilatus Railway, Switzerland","maker":"Pilatus-Bahnen","use":"Two horizontal pinions under the railcar engage a double toothed rack between the rails, so the car climbs a 48 percent grade without relying on wheel grip.","url":"https://www.youtube.com/watch?v=EAXG-UPg910"},
+  {"product":"Gantry router on rack and pinion drive","maker":"Avid CNC","use":"Servo-driven pinions run along toothed racks and carry the gantry, so each turn of a pinion moves the machine a fixed distance.","url":"https://www.youtube.com/watch?v=BbSN-jbr7xs"}
+ ]},
  "planetary": {"real_world": [
   {"product":"Shimano Nexus 8 speed internal gear hub","maker":"Shimano","use":"Planetary gear sets inside the hub shell are locked or freed by clutches to give eight ratios, shown as the hub is taken apart.","url":"https://www.youtube.com/watch?v=k8qAn2D05R8"},
   {"product":"Toyota Prius Synergy Drive hybrid transaxle","maker":"Toyota","use":"A planetary power split device joins the engine, generator and motor, so the engine power is divided between the wheels and the generator.","url":"https://www.youtube.com/watch?v=Eg8c2_eS-do"}
