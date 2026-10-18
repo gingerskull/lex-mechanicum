@@ -105,6 +105,39 @@
   color: var(--paper);
   border-color: var(--ink);
 }
+/* the sheet switch: one square button showing the sheet it switches to */
+.themebtn {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color var(--size-transition);
+}
+/* in a bar it is as tall as the search and Filters beside it */
+.bar .themebtn {
+  align-self: stretch;
+  height: auto;
+  width: auto;
+  min-height: 34px;
+  aspect-ratio: 1;
+}
+.themebtn:hover {
+  border-color: var(--ink);
+}
+.themebtn svg {
+  width: 17px;
+  height: 17px;
+}
+:root:not([data-theme="light"]) .themebtn .to-dark,
+:root[data-theme="light"] .themebtn .to-light {
+  display: none;
+}
 .badge {
   font: 600 10px / 1 var(--font-mono);
   background: var(--accent);
