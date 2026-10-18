@@ -120,6 +120,42 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     const d = b ? Math.hypot(a[0] - b[0], a[1] - b[1]) : Infinity;
     if (d > PERIOD_TOL) add("PERIODICITY", `point "${k}" moves ${d.toFixed(3)} mm over one cycle`);
   }
+  // the player runs u on past 2π, so loops 0..4 are checked as one run: every solved point repeats from loop to loop
+  // (a model keyed on absolute u fails here), and no part's pose steps, at a loop point or anywhere in a later loop,
+  // by more than a few times the largest step the part makes in loop 0 (a wheel that falls back one pitch per loop does)
+  const LOOPS = 5;
+  const loop = (k: number): Solved[] => (k === 0 ? S : S.map((_, i) => model.solve(((i + k * n) / n) * TAU)));
+  const later = Array.from({ length: LOOPS - 1 }, (_, k) => loop(k + 1));
+  for (let i = 0; i <= n; i += Math.max(1, Math.floor(n / 90)))
+    for (const [k, q] of Object.entries(S[i]!.pts)) {
+      let worst = 0;
+      for (const L of later) {
+        const r = L[i]!.pts[k];
+        worst = Math.max(worst, r ? Math.hypot(q[0] - r[0], q[1] - r[1]) : Infinity);
+      }
+      if (worst > PERIOD_TOL) add("PERIODICITY", `point "${k}" differs ${worst.toFixed(3)} mm in a later loop (sample ${i})`);
+    }
+  const run: Solved[] = [...S, ...later.flatMap((L) => L.slice(1))];
+  for (const p of model.parts) {
+    const step = (i: number): number => {
+      const a = poseOf(p, run[i - 1]!);
+      const b = poseOf(p, run[i]!);
+      if (!a || !b) return 0;
+      return Math.max(Math.hypot(b[0] - a[0], b[1] - a[1]), Math.abs(((b[2] - a[2] + 3 * Math.PI) % TAU) - Math.PI) * 30);
+    };
+    let ref = 0;
+    for (let i = 1; i <= n; i++) ref = Math.max(ref, step(i));
+    let worst = 0;
+    let at = 0;
+    for (let i = n + 1; i < run.length; i++) {
+      const d = step(i);
+      if (d > worst) {
+        worst = d;
+        at = i;
+      }
+    }
+    if (worst > 3 * ref + 0.05) add("POSE_JUMP", `step ${worst.toFixed(2)} at loop ${(at / n).toFixed(2)} against ${ref.toFixed(2)} in loop 0`, p.id);
+  }
 
   // POSE_JUMP
   for (const p of model.parts) {

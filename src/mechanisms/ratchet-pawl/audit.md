@@ -114,7 +114,7 @@ PASS 111 · FAIL 0 · N/A 8 · open: none
 | R4 | PASS | AUTO · package 20.6 KB · package 20.6 KB |
 | R5 | PASS | HAND · polish 6 ms; one 180-step sample for the spring placement |
 | R6 | FLAG | FLAG · bench: package 20.6 KB, setup 1.4 ms; frame 238 ms plan, 237 ms 28°, 256 ms side, 233 ms explode 70° (Node CPU raster, as for the other mechanisms; the site measures its own). Dial H 28 ms |
-| R7 | PASS | HAND · model.ts + polish.ts 15.9 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 16.3 KB |
 | R8 | PASS | AUTO / SITE · site behaviour, unchanged |
 | DL1 | PASS | AUTO / HAND · 48 of 132 solids on a dropping rung · 48 of 132 solids on a dropping rung; nothing moved |
 | DL2 | PASS | HAND · model detail full · default dial full |

@@ -114,7 +114,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; no sampling; polish about 1 ms |
 | R6 | PASS | FLAG · Node CPU canvas, DPR 1.5, 2026-10-18: plan 335, 28° 358, side 226, explode 210 ms at full detail; ladder below. Browser numbers not measured in this pass (flag, to look at) |
-| R7 | PASS | HAND · model.ts + polish.ts 15.8 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 16.4 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -148,20 +148,22 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | standard top screws | button head | countersunk, flush | A14: the port face of the floor runs 0.4 mm above them |
 | trunnion bridge | zMin over the cover bearing flange | lifted 11 mm with its posts, axle and sleeve | F6: room for the port-face spring on a bronze washer |
 | bore | sharp T cut | corners filleted at 2 mm; walls relieved 1.5 mm behind hardened wear strips | M5, M14 |
+| base plate | outline follows the mechanism | grown 28 mm to the right, feet and mounting holes moved with it | A7: the two stop posts stand just beyond the swing, past the old edge |
+| cylinder cover | opaque static or moving plate | drawn see-through | L5: it covers the piston and rod that move in and out of the block |
 | block fasteners | stage 3 holes in plates of the same body | clearance holes cut in the polish | floor, frame and cover are separate bodies |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 12 | 0 | 238.58 |
-| DL-B | 0 | 267 | 231.15 |
+| DL-B | 0 | 269 | 231.15 |
 | DL-C | 0 | 0 | 62.33 |
 | DL-D | 25 | 0 | 51.43 |
 | DL-E | 10 | 2 | 45.48 |
 | DL-F | 0 | 0 | 45.98 |
 | DL-G | 0 | 0 | 43.47 |
 | DL-H | 16 | 0 | 39.39 |
-| never | 114 | 157 | 366.05 (full) |
+| never | 114 | 163 | 366.05 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
@@ -170,6 +172,9 @@ Hand fixes that should become rules or primitives.
 - A fixed stud in a rod's open notch (J4) builds the bridge at the lowest height; a spring on the stud (F6) had to lift the bridge, its posts, the axle and the sleeve by hand. A `spring` option on `H.bridge` or on the J1/J4 axle would do it.
 - Bore wear strips (M14) on a sliding piston, the same as the slot roller's strips but on a through bore.
 
+- `H.stops` (F5) never keeps its posts over the base: its clearance test ignores the base, so a stop can land outside the plate (seen: two stops 14 mm past the edge). Patch: in `src/hardware/sub/stops.ts`, after `found` is chosen, call `growBase(ctx, [found[0] - R_STOP - 8, found[1] - R_STOP - 8, found[0] + R_STOP + 8, found[1] + R_STOP + 8])` and move the feet to `baseCorners(ctx)` (or make `growBase` move the feet). Worked around in the polish.
+- The see-through stage (L5) only handles static solids over mesh or slot-roller zones; a moving covering solid (the cylinder cover over the piston's run) needs a zone for a sliding piston in a bore and `hiders` to accept `t.motion`. Set by hand in the polish.
+
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 28.8 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 28.9 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, dark and light (dist/shots; to attach to #31); baselines: 8 written once · bench: Node CPU canvas, DPR 1.5, 2026-10-18; plan 335, 28° 358, side 226, explode 210 ms at full detail; browser numbers not measured (flag, R6)

@@ -49,7 +49,7 @@ PASS 108 · FAIL 0 · N/A 13 · open: none
 | A11 | PASS | HAND · knee pin to rear plate to key to shaft to housing (screwed, dowelled) to base; plunger pin to plunger to rails, keeper and gib; stops screwed into the base; spindle to the plunger's back wall |
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · 125 solids, 67 unnamed (further items of a listed set) · every solid named with catalogue sizes, sets counted |
-| A14 | PASS | HAND · stops placed clear of the handle's swept area by the generator, rear slide stop and spindle clear of every sweep; clearance 0 |
+| A14 | PASS | HAND · stops placed clear of the handle's swept area by the generator, rear slide stop and spindle clear of every sweep; the work-piece stands beyond the pad's stroke, touching it only at the closed pose (0.08 mm overlap at the toggle, under the 0.1 mm tolerance); clearance 0 |
 | A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
 | A16 | PASS | HAND · a note and a badge on pO, pA, pB and the slide, five build rules |
 | A17 | PASS | HAND · housing and shaft, handle rear plate with key, rails, gib, plunger with spindle and nut, link, front plate and cap last; grip last |
@@ -66,7 +66,7 @@ PASS 108 · FAIL 0 · N/A 13 · open: none
 | J2 | PASS | AUTO · input: housing with two bearings, sleeve, wave washer, circlips, screwed and dowelled; keyed shaft, end retainer, thrust washer; no pulley (hand operated) |
 | J3 | PASS | AUTO · A and B: shoulder bolts, bearings in the link, inner-race spacers, threadlocked; clevis at both (variant) |
 | J4 | N/A | no pin in a slot |
-| J5 | PASS | AUTO / HAND · rails, keeper, bronze gib with adjusting screws and lock nuts, wipers, grease nipple, rear end stop; no forward stop: the spindle tip passes there (see F5) |
+| J5 | PASS | AUTO / HAND · rails, keeper, bronze gib with adjusting screws and lock nuts, wipers, grease nipple, rear end stop; forward stop is the work-piece (see F5) |
 | J6 | N/A | no gear mesh |
 | J7 | N/A | no cam |
 | J8 | N/A | no belt: hand operated |
@@ -74,7 +74,7 @@ PASS 108 · FAIL 0 · N/A 13 · open: none
 | F2 | PASS | AUTO · served at pO, pA, pB, slide-plunger; fired: j2-live-shaft (30 solids) · the spindle is retained by its thread and lock nut |
 | F3 | PASS | AUTO · feather keys at the input |
 | F4 | PASS | AUTO · bronze thrust washer, wave washer preload at the input |
-| F5 | PASS | HAND · the over-centre stop (neoprene bumper on a screw into the base) is on the handle's grip arm and takes it at +3°, an open stop at -70°; the rear slide stop remains; the forward slide stop is dropped because the spindle tip passes where it would stand: the link, the handle stops and the work face end the plunger's travel |
+| F5 | PASS | HAND · the over-centre stop (neoprene bumper on a screw into the base) is on the handle's grip arm and takes it at +3°, an open stop at -70°; the rear slide stop remains; the generated forward slide stop is dropped because the spindle tip passes where it would stand, and a fixed work-piece (fixture anvil, 17 x 15 mm, steel, screwed with two M4 and dowelled with two Ø3 to the base between the rails) takes its place as the forward stop: the pad face (63 mm) lands on its face at the over-centre pose, contact within the 0.1 mm clash tolerance, so the clamping is shown |
 | F6 | N/A | the closed position is held by the over-centre lock against its stop; the open position rests on its stop |
 | F7 | PASS | HAND · clamp spindle M5 in the plunger's notch with a thin lock nut and a hardened pad head, setting the clamp height; gib strip with adjusting screws on the slide |
 | F8 | PASS | AUTO · wipers, grease nipple on the keeper; sealed and shielded bearings |
@@ -114,7 +114,7 @@ PASS 108 · FAIL 0 · N/A 13 · open: none
 | R4 | PASS | AUTO · package built at build time, 16.8 KB |
 | R5 | PASS | HAND · states only what differs; no sampling beyond swing(); rules 0.07 s, polish 21 ms |
 | R6 | PASS | FLAG · Node CPU bench at DPR 1.5: plan 212, 28° 271, side 172, explode 213 ms at full detail; dial D 30 ms (Node canvas, not a browser; looked at in #44) |
-| R7 | PASS | HAND · model.ts + polish.ts 10.2 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 12.0 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · 46 of 125 solids on a dropping rung · the polish moves nothing on the ladder |
 | DL2 | PASS | HAND · default dial full |
@@ -135,7 +135,7 @@ PASS 108 · FAIL 0 · N/A 13 · open: none
 | pO | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | 2 x Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – turns by hand between its stops (drive) | – held by the over-centre lock and the stops | – no adjustable length | – sealed bearings | – both ends are stops | – hand operated |
 | pA | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the handle stops | – driven by hand | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
 | pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – the cap is clamped on the shoulder; no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – driven by hand | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
-| slide-plunger | J5 | – the rails are dowelled to the base | Keeper plate, holds the slider down | none | – the keeper takes the lift, the base the weight | End stop block, hardened (rear); the over-centre stop on the handle | – linkage driven | Gib strip 3 x 6 x 136, bronze; Clamp spindle M5, 35 long, hardened pad head Ø12; Lock nut M5 (DIN 439, thin) | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – hand operated |
+| slide-plunger | J5 | – the rails are dowelled to the base | Keeper plate, holds the slider down | none | – the keeper takes the lift, the base the weight | Work-piece, fixture anvil 17 x 15 x 8, ground steel | – linkage driven | Gib strip 3 x 6 x 136, bronze; Clamp spindle M5, 35 long, hardened pad head Ø12; Lock nut M5 (DIN 439, thin) | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – hand operated |
 | raila-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib adjusts the fit | – static | – static | – static |
 | railb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib adjusts the fit | – static | – static | – static |
 | drive | drive | – hand operated | – the grip screw is threadlocked | Handle grip Ø16, phenolic, on an M4 screw | – hand | 2 x Stop bumper, neoprene sleeve Ø12 | – the over-centre lock holds the closed position | – no adjustment | – no sliding | – none | – hand operated, no motor |
@@ -148,20 +148,20 @@ PASS 108 · FAIL 0 · N/A 13 · open: none
 | pB | pin through plunger and link, single shear | plunger clevis: cap twinned with the plunger, on a post at x 14 screwed into the plunger | A9: double shear |
 | plunger | slider block | notched at the back (notch 9.4 wide from x 28), in the model | F7: holds the clamp spindle; pad face stays at 63 mm |
 | drive handle and stops | knob placed off the handle, stops on the arm axis | dropped; grip standoff at the grip point, H.stops on the grip arm with margin 0 | the generator treats the arm axis as the part's reach, the toggle's handle lands on its grip arm |
-| slide forward end stop | block 1.5 mm past the plunger's travel | dropped | the spindle tip passes there; the over-centre stop ends the travel |
+| slide forward end stop | block 1.5 mm past the plunger's travel | dropped; a work-piece (fixture anvil) between the rails, its face at the pad's closed position | the spindle tip passes where the generated stop stands; the anvil is the forward stop and shows the clamping |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 8 | 0 | 182.7 |
-| DL-B | 0 | 183 | 177.2 |
+| DL-B | 0 | 187 | 177.2 |
 | DL-C | 0 | 0 | 40.8 |
 | DL-D | 19 | 0 | 30.5 |
 | DL-E | 3 | 0 | 35.4 |
 | DL-F | 0 | 0 | 41.4 |
 | DL-G | 0 | 0 | 25.4 |
-| DL-H | 16 | 0 | 21.1 |
-| never | 79 | 138 | 269.4 (full) |
+| DL-H | 19 | 0 | 21.1 |
+| never | 83 | 138 | 269.4 (full) |
 
 ## Promotion candidates
 - An in-plane spindle primitive: a threaded rod with its axis in the drawing plane, a jam nut and a pad head (drawn inline here; needed by any clamp, turnbuckle or adjustable link, F7).
@@ -169,5 +169,5 @@ PASS 108 · FAIL 0 · N/A 13 · open: none
 - Slide end stops: let a polish declare the stop is replaced (no forward stop where a part passes beyond the slider body).
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.8 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.0 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (local, dist/shots) · bench: Node CPU canvas, DPR 1.5; 28° 271 ms at full detail, 21 ms at dial H (flag, R6)

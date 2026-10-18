@@ -123,6 +123,8 @@ export const polish: Polish = (A, H) => {
 
   // ---- F9: an index dot on tooth 8 of the wheel and its line on the base: at rest after a stroke the marked tooth sits
   // on the line, so the wheel goes back in phase ----
+  // The wheel keeps its count across loops (one pitch per stroke), so the dot travels with its tooth and passes the line
+  // once in twelve strokes: the first stroke of a revolution ends with it on the line.
   const omega0 = model.solve(0).wheel as number;
   const mark = 8;
   wheel.marks.push({ kind: "timing", pts: circle(0.8, ...polar(rRoot - 3, mark * pitch + 0.5 * D2R), 12) });

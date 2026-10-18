@@ -205,7 +205,8 @@ function meshes(ctx: RuleContext): MeshJoint[] {
         const int = Math.abs(c - Math.abs(ra - rb)) < 0.05 * m && c > 1e-6;
         if (!ext && !int) continue;
         const u: Vec2 = [(B[0] - A[0]) / c, (B[1] - A[1]) / c];
-        const s = ext ? ra : ringA ? -ra : ra;
+        // the mesh point lies on the line of centres: toward B from A (external, or A the ring), away from B on the small gear
+        const s = ext ? ra : ringA ? ra : -ra;
         out.push({ kind: "mesh", id: `mesh-${a.id}-${b.id}`, type: "J6", a, b, form: ext ? "external" : "internal", at: [A[0] + u[0] * s, A[1] + u[1] * s] });
       } else {
         // rack and pinion: the pinion centre sits one pitch radius off the rack's pitch line
