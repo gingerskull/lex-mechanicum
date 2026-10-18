@@ -46,7 +46,7 @@ export default defineMechanism({
     P.link("rod", Lr, { layer: 3, dz: 0.5, r: [8.5, 8], between: ["B", "C"], name: "Connecting rod" }),
     P.slider("ram", 28, 20, { layer: 2, at: "C", name: "Ram" }),
     P.plate("cap", [[0, 0], [14, 0]], { role: "output", layer: 4, r: 7, dz: -2, twin: "ram", at: "C", name: "Ram cap" }),
-    ...P.rails("rail", 68, 150, 20, { layer: 2, fixed: [0, -e, 0], name: "Ram rail" }),
+    ...P.rails("rail", 54, 150, 20, { layer: 2, fixed: [0, -e, 0], name: "Ram rail" }),
     P.cap("pPn", -1, 7, { fixed: [Pn[0], Pn[1], 0], accent: true }),
     P.cap("pO3", -1, 7, { fixed: [O3[0], O3[1], 0], span: 2, over: 2.3 }),
     P.cap("pA", 0, 5.5, { at: "A", over: 2.3 }),

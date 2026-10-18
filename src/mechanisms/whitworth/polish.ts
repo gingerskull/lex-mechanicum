@@ -20,6 +20,8 @@ const GZ0 = -3;
 const GZ1 = 4;
 const T_W = 1.5;
 const RET = 2;
+/** The first rail pad moves this far along the rail, out of the lever's sweep. */
+const PAD_SHIFT = 14;
 
 export const polish: Polish = (A, H) => {
   const ctx = A.ctx;
@@ -178,6 +180,17 @@ export const polish: Polish = (A, H) => {
     }
   }
 
+  // ---- the rails run from 54 so the ram (28 wide, C from 68 to 132) stays on them over the whole stroke; the first
+  // pad stood in the lever's 66 mm sweep, so it and its screw and dowel move 14 mm along, clear of the sweep ----
+  for (const k of ["a", "b"]) {
+    const pad = A.get(`rail${k}-seat0`)!;
+    A.set(`rail${k}-seat0`, { outer: (pad.outer as [number, number][]).map(([x, y]): [number, number] => [x + PAD_SHIFT, y]) });
+    for (const id of [`rail${k}-seat0-sc`, `rail${k}-seat0-sc-sh`, `rail${k}-seat0-dowel`]) {
+      const s = A.get(id);
+      if (s) A.set(id, { at: [s.at[0] + PAD_SHIFT, s.at[1], s.at[2]] });
+    }
+  }
+
   locking.apply(ctx);
   materials.apply(ctx);
   ctx.rule = rule;
@@ -198,7 +211,7 @@ export const polish: Polish = (A, H) => {
     note: `Clevis: the ram below the rod and its cap 1.5 mm over it, the cap on a post on the side the rod never swings to, so the wrist pin works in double shear. ${sz("pC-bolt")} threaded into the ram; the rod's bearing between inner-race spacers.`,
     badge: ["double shear", "ok"],
   });
-  A.joint("slide-ram", { note: `${A.joint("slide-ram").note} The rails are hardened, ground and screwed down on pads: they and the bronze gib are the replaceable wear parts. They start 68 mm from O3, past the lever's sweep.` });
+  A.joint("slide-ram", { note: `${A.joint("slide-ram").note} The rails are hardened, ground and screwed down on pads: they and the bronze gib are the replaceable wear parts. They start 54 mm from O3, so the ram (28 wide) stays on them over its whole stroke; the lever passes under their near end, and the first pad stands past its sweep.` });
 
   A.rules.push(
     { title: "Ring gear on a fixed hub", text: "The lever pivot sits inside the bull gear's circle, so the gear is a ring on a hub that carries the pivot stud: a bronze bushing, thrust washers above and below, a retainer plate." },
