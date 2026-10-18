@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.14.1 — 2026-10-18
+
+- The stage's Auto dial no longer drops detail on a phone when the page scrolls, and no longer steps down and up:
+  it asks the GPU whether the previous frame is done instead of timing the gaps between frames, which scrolling and
+  a phone's changing refresh rate stretch. The stage draws nothing while it is scrolled out of view.
+- Redrawing the thumbnails keeps the committed images when a redraw looks the same, so a renderer change that does
+  not show no longer rewrites every image.
+
 ## 0.14.0 — 2026-10-18
 
 - The drawings are drawn with WebGL2 in place of Canvas 2D: a full-detail frame takes 1.4–3.6 ms on desktop for

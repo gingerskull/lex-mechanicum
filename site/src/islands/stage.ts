@@ -3,6 +3,7 @@
 // frame time one rung at a time with hysteresis, never past G on its own (DL4), and the slider follows it; moving the
 // slider sets the dial by hand and turns Auto off. The title block shows the position. A browser without WebGL2 gets
 // a still drawing (site/thumbs, drawn with the thumbnails) and a one-line note instead; the rest of the page works.
+import { autoStep } from "../autodial";
 import { hasWebGL2 } from "../gl";
 import { url } from "../url";
 import type { Dial, DrawView } from "./engine";
@@ -12,12 +13,6 @@ const TAU = Math.PI * 2;
 /** Seconds per cycle at 1x. */
 const CYCLE = 6;
 /** Adaptive dial: step down after this many slow frames, back up after this many fast ones. */
-const SLOW_MS = 14;
-const FAST_MS = 7;
-const SLOW_N = 30;
-const FAST_N = 180;
-/** A frame is missed when its interval is this much longer than the display's (the shortest interval seen lately). */
-const MISSED = 1.5;
 
 const box = document.querySelector<HTMLElement>(".stagebox");
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -108,46 +103,26 @@ async function main(box: HTMLElement) {
   let dirty = true;
   // a lost GPU context came back: redraw, even when paused
   sess.onRestored = () => (dirty = true);
-  // the display's frame interval, the shortest of the last few seconds: a frame much longer than it was missed, which
-  // is how a GPU-bound frame shows (its work is paid after the draw call returns)
-  const gaps: number[] = [];
-  let lastDraw = 0;
   const draw = () => {
     const t0 = performance.now();
-    const gap = lastDraw ? t0 - lastDraw : 0;
-    lastDraw = t0;
     sess.draw(s.u, view());
     const ms = performance.now() - t0;
     if (plot && pkg.plot) E.drawPlot(plot, E.theme(E.pageTheme()), pkg.plot, s.u, model.plot?.unit ?? "");
-    let missed = false;
-    if (gap > 0 && gap < 250) {
-      gaps.push(gap);
-      if (gaps.length > 180) gaps.shift();
-      missed = gaps.length > 30 && gap > MISSED * Math.min(...gaps);
-    }
-    adapt(ms, missed);
+    adapt(ms, sess.stats?.gpuLagMs ?? 0);
     ($<HTMLInputElement>("scrub")).value = String(Math.round((((s.u % TAU) + TAU) % TAU) / TAU * 360));
     $("scrubv").textContent = `${($<HTMLInputElement>("scrub")).value}°`;
     dirty = false;
   };
-  const adapt = (ms: number, missed: boolean) => {
-    if (!s.auto || !s.playing) return;
-    if (ms > SLOW_MS || missed) {
-      s.fast = 0;
-      if (++s.slow >= SLOW_N && s.rung < LADDER.length - 1) {
-        s.rung++;
-        s.slow = 0;
-        showDial();
-      }
-    } else if (ms < FAST_MS) {
-      s.slow = 0;
-      if (++s.fast >= FAST_N && s.rung > 0) {
-        s.rung--;
-        s.fast = 0;
-        showDial();
-      }
-    }
+  const adapt = (ms: number, gpuLagMs: number) => {
+    if (s.auto && s.playing && autoStep(s, ms, gpuLagMs, LADDER.length - 1)) showDial();
   };
+
+  // nothing is drawn (or measured) while the stage is scrolled out of view
+  let inView = true;
+  new IntersectionObserver(([e]) => {
+    inView = !!e?.isIntersecting;
+    if (inView) dirty = true;
+  }).observe(canvas);
 
   let last = performance.now();
   const tick = (now: number) => {
@@ -157,7 +132,7 @@ async function main(box: HTMLElement) {
       s.u += (dt * s.speed * TAU) / CYCLE;
       dirty = true;
     }
-    if (dirty) draw();
+    if (dirty && inView) draw();
     requestAnimationFrame(tick);
   };
 

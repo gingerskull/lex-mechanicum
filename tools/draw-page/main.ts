@@ -166,6 +166,27 @@ async function compose(g: { w: number; h: number; pad: number; columns: string[]
   return c.toDataURL("image/png");
 }
 
+/** Pixels of two images (data URLs, same size) whose channels differ by more than `tolerance` of 255. */
+async function differ(a: string, b: string, tolerance: number): Promise<number> {
+  const px = async (u: string) => {
+    const img = new Image();
+    img.src = u;
+    await img.decode();
+    const c = document.createElement("canvas");
+    c.width = img.naturalWidth;
+    c.height = img.naturalHeight;
+    const x = c.getContext("2d", { willReadFrequently: true })!;
+    x.drawImage(img, 0, 0);
+    return x.getImageData(0, 0, c.width, c.height).data;
+  };
+  const [A, B] = await Promise.all([px(a), px(b)]);
+  if (A.length !== B.length) return Infinity;
+  let n = 0;
+  for (let i = 0; i < A.length; i += 4)
+    if (Math.max(Math.abs(A[i]! - B[i]!), Math.abs(A[i + 1]! - B[i + 1]!), Math.abs(A[i + 2]! - B[i + 2]!), Math.abs(A[i + 3]! - B[i + 3]!)) > tolerance * 255) n++;
+  return n;
+}
+
 /** The GPU's name, for reports. */
 function gpu(): string {
   const gl = document.createElement("canvas").getContext("webgl2");
@@ -173,7 +194,7 @@ function gpu(): string {
   return x ? String(gl!.getParameter(x.UNMASKED_RENDERER_WEBGL)) : gl ? "unknown" : "no WebGL2";
 }
 
-const api = { shot, lose, bench, compose, gpu };
+const api = { shot, lose, bench, compose, differ, gpu };
 export type DrawPage = typeof api;
 Object.assign(window, { draw: api });
 // the canvas lettering needs the Plex faces loaded before the first frame

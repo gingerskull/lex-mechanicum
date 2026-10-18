@@ -76,12 +76,15 @@ export interface Chrome {
   /** One frame drawn, the GPU context lost and restored, and the frame drawn again. */
   lose(id: string, o: DrawOptions): Promise<Buffer>;
   bench(id: string, o: { w: number; h: number; dpr: number; frames: number; dials: Dial[] }): Promise<BenchResult>;
+  /** Pixels of two images that differ by more than `tolerance` (0..1) in a channel; Infinity when the sizes differ. */
+  differ(a: Buffer, b: Buffer, tolerance?: number): Promise<number>;
   /** Images laid out in labelled rows (PNG). */
   compose(g: { w: number; h: number; pad: number; columns: string[]; rows: { label: string; cells: (Buffer | null)[] }[] }): Promise<Buffer>;
   close(): Promise<void>;
 }
 
-const dataUrl = (b: Buffer) => `data:image/png;base64,${b.toString("base64")}`;
+const dataUrl = (b: Buffer, type = "image/png") => `data:${type};base64,${b.toString("base64")}`;
+const typeOf = (b: Buffer) => (b.subarray(8, 12).toString("latin1") === "WEBP" ? "image/webp" : "image/png");
 const fromUrl = (u: string) => Buffer.from(u.slice(u.indexOf(",") + 1), "base64");
 
 /** Opens the drawing page in local Chrome. Close it when done. */
@@ -110,6 +113,7 @@ export async function openChrome(): Promise<Chrome> {
     shot: async (id, o, out = {}) => fromUrl(await page.evaluate(([i, oo, x]) => (window as unknown as W).draw.shot(i, oo, x), [id, o, out] as const)),
     lose: async (id, o) => fromUrl(await page.evaluate(([i, oo]) => (window as unknown as W).draw.lose(i, oo), [id, o] as const)),
     bench: (id, o) => page.evaluate(([i, oo]) => (window as unknown as W).draw.bench(i, oo), [id, o] as const),
+    differ: (a, b, tolerance = 0.1) => page.evaluate(([x, y, t]) => (window as unknown as W).draw.differ(x, y, t), [dataUrl(a, typeOf(a)), dataUrl(b, typeOf(b)), tolerance] as const),
     compose: async (g) => {
       const rows = g.rows.map((r) => ({ label: r.label, cells: r.cells.map((c) => (c ? dataUrl(c) : null)) }));
       return fromUrl(await page.evaluate((gg) => (window as unknown as W).draw.compose(gg), { ...g, rows }));
