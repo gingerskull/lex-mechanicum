@@ -312,7 +312,8 @@
   border: 1px dashed var(--line-2);
   padding: 0 6px;
 }
-.tag:hover {
+.tag:hover,
+.tag:focus-visible {
   color: var(--ink);
   border-style: solid;
 }
@@ -481,22 +482,21 @@
 .facts dd {
   margin: 0;
 }
+.facts a {
+  text-decoration: underline dotted var(--faint);
+  text-underline-offset: 3px;
+}
+.facts a:hover {
+  text-decoration: underline solid var(--accent);
+}
 .facts dt:nth-last-child(2),
 .facts dd:last-child {
   border-bottom: 0;
 }
 .plot canvas {
-  width: 100%;
+  width: calc(100% - 24px); /* inside the panel's 12px margins */
   height: 160px;
   display: block;
-}
-.tagsets {
-  display: grid;
-  gap: 10px;
-}
-.tagsets > div {
-  display: grid;
-  gap: 5px;
 }
 .tag.ro {
   border-style: solid;
@@ -571,6 +571,31 @@
 .uses span {
   color: var(--body);
   font-size: 14px;
+}
+.tagband {
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-2);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 14px 32px;
+}
+/* one column per group, the label over its chips, so the groups line up whatever their length */
+.tagband > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 5px;
+}
+.tagband .lbl {
+  flex-basis: 100%;
+  margin-bottom: 2px;
+}
+.tagband a.tag {
+  text-decoration: none;
+}
+.tagband + .explain {
+  margin-top: 22px;
 }
 .reflist {
   margin-top: 34px;

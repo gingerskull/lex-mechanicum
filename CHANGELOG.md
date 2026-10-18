@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.11.0 — 2026-10-18
+
+- Mechanism pages: the tags move from the side column to a full-width band above the explanation, one column per
+  group, so the explanation follows the stage with no empty area under it (style reference 2.2, SS5).
+- Tags and the at-a-glance family, input, output and level link to the library, filtered by that value or searching
+  for it; the library reads its filters and search from the address (SS3).
+- The output plot no longer runs past the right edge of its panel.
+
 ## 0.10.1 — 2026-10-18
 
 - The base plate lets a tenth of the parts under it show through, as meant in 0.7.0: the parts passing through it cut

@@ -52,3 +52,18 @@ clear?.addEventListener("click", () => {
   if (q) q.value = "";
   apply();
 });
+
+// a link from a mechanism page's tags: ?<facet>=<value> presses that chip and opens the panel, ?q=<words> searches
+const params = new URLSearchParams(location.search);
+let pressed = false;
+for (const c of chips)
+  if (params.getAll(c.dataset.f!).includes(c.dataset.v!)) {
+    c.setAttribute("aria-pressed", "true");
+    pressed = true;
+  }
+if (pressed && toggle && panel) {
+  toggle.setAttribute("aria-expanded", "true");
+  panel.hidden = false;
+}
+if (q && params.has("q")) q.value = params.get("q")!;
+if (pressed || params.has("q")) apply();

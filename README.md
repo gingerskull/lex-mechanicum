@@ -20,7 +20,7 @@ references, so the drawing and the text describe the same thing.
 
 ## Using a mechanism's page
 
-![A mechanism's page: the drawing with its controls on the left, the facts, the output plot and the tags on the right](docs/images/page.png)
+![A mechanism's page: the drawing with its controls on the left, the facts and the output plot on the right](docs/images/page.png)
 
 **The drawing and its controls**
 
@@ -38,9 +38,9 @@ references, so the drawing and the text describe the same thing.
 **Around the drawing**
 
 - **At a glance:** family, kind of motion, ratio, axes, whether it can be driven backwards, level, degrees of
-  freedom and how this build is driven.
+  freedom and how this build is driven. Family, motion and level link to the library filtered by them.
 - **The plot:** the output over one cycle, with a marker that follows the drawing.
-- **Tags:** what it does, its properties and where it is used.
+- **Tags:** what it does, its properties and where it is used, each a link to the mechanisms that share it.
 - **How it moves, Forces, Why use it, Limits:** a short explanation in four parts.
 - **Where you will find it** and **In the real world:** typical uses and real products that use it.
 - **References, photos, video and animations** for further reading.
