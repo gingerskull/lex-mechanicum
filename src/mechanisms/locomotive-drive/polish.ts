@@ -5,13 +5,14 @@
 //   sweep) would put the axle through the rods. Each axle ends below the wheel face on a circlip, with a sealed bearing
 //   and a hub cap, and the rods run clear over it;
 // - six spokes' worth of windows in each wheel (M2), kept away from the crank pin boss; quartering marks (F9);
-// - the belt carriage clamped to the belt, the base slot cut to its full travel, a fork sensor on the home flag (V6);
+// - the belt carriage clamped to the belt, the base slot cut to its full travel, the base grown left to hold the tensioner arm, a fork sensor on the home flag (V6);
 // - notes, badges and build rules (A16).
 import { bbox, polar, roundedPoly, type Vec2 } from "../../core/geom";
 import type { Polish } from "../../assemble/api";
 import { BEARINGS } from "../../hardware/tables";
 import { locking } from "../../rules/locking";
 import { materials } from "../../rules/materials";
+import { growBase } from "../../rules/base";
 import { R, r } from "./model";
 
 /** Z of the circlip's lower face on each axle: the top of the wheel bearing's inner race. */
@@ -62,6 +63,10 @@ export const polish: Polish = (A, H) => {
   const belt = A.get("drive-belt")!;
   const [cx0, cy0, cx1, cy1] = bbox(car.outer);
   const base = A.get("base")!;
+  // the linear drive's tensioner arm and idler stand past the base's left edge (the rule never calls growBase for the
+  // far pulley): grow the plate to hold the arm's end with the same margin the plate keeps elsewhere
+  const arm = A.get("drive-tensioner")!;
+  growBase(ctx, [Math.min(...arm.outer.map((p) => p[0])) + arm.at[0] - 8, bbox(base.outer)[1], bbox(base.outer)[2], bbox(base.outer)[3]]);
   const old = base.holes.findIndex((h) => {
     const [a, b, c, d] = bbox(h);
     return Math.abs((b + d) / 2 - (cy0 + cy1) / 2) < 0.2 && c - a > 30;

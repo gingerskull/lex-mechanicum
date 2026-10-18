@@ -114,7 +114,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | R4 | PASS | package built at build time, 24 KB |
 | R5 | PASS | states only what differs; no sampling; polish about 3 ms |
 | R6 | PASS | Node CPU bench: plan 327, 28° 367, side 222, explode 222 ms at full detail; browser frame times not measured in this session (Node numbers rank views, not devices) |
-| R7 | PASS | HAND · model.ts + polish.ts 11.4 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 11.9 KB |
 | R8 | PASS | pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | default dial full |
@@ -148,6 +148,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | pW1, pW2 axle top | shoulder bolt, bridge on two posts above every sweep, the axle running up through the rods | stub axle ending below the wheel face on an external circlip; the bridge, its posts and the sleeve removed; sealed bearing | A9, A11: both rods sweep over each axle, so a bridge above them puts the axle through the rods; the thick wheel recesses the axle end |
 | wheel1, wheel2 | plain disc | four windows, rim 5 mm, hub 19 mm, none within 12 mm of the crank pin; timing mark on the rim | M2, F9 |
 | drive carriage | clamped to the belt by overlapping it | carriage 0.2 mm over the belt, clamp plate and two M3 screws under it; base slot cut 5 mm longer each end | A15: the rules' slot was shorter than the carriage's travel |
+| base plate | outline from the mechanism's extent only | grown 14.5 mm to the left (x -150) to hold the tensioner arm (x -142 to -116, it stood 6.5 mm outside the plate) | review finding #61: the base must contain every part fixed to it |
 | drive sensor | none for a linear input | fork sensor on the home flag, lead routed round the motor | V6 |
 
 ## Detail ladder
@@ -161,11 +162,11 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | DL-F | 0 | 0 | 115.3 |
 | DL-G | 0 | 0 | 101.2 |
 | DL-H | 19 | 0 | 47.5 |
-| never | 105 | 163 | 367.1 (full) |
+| never | 105 | 166 | 367.1 (full) |
 
 ## Promotion candidates
 - J1 dead axle: when a moving part sweeps over the axle above the top part, the rule builds a bridge above every sweep and runs the axle up through the sweeping parts (clashes). It should finish the axle below the sweep on an external circlip with a sealed bearing, as done here by hand.
-- H.drive linear (first real use of that branch): (1) the base slot is cut for the slider origin's travel only, 5 mm short of the carriage at each end (clash with the base); (2) the carriage overlaps the belt instead of clamping it (clash, clamp fault); (3) no fork sensor is built (V6), and the sensor lead runs through the carriage's sweep. Fixed here by hand in the polish.
+- H.drive linear (first real use of that branch): (1) the base slot is cut for the slider origin's travel only, 5 mm short of the carriage at each end (clash with the base); (2) the carriage overlaps the belt instead of clamping it (clash, clamp fault); (4) the base is never grown for the far pulley's tensioner arm (`growBase` is not called), so the arm stands outside the plate (6.5 mm here). Patch in `linear` in `src/hardware/sub/drive.ts`, right after `I` is known: `const E = line(tB - 14, 0); growBase(ctx, [Math.min(E[0], I[0]) - 8, Math.min(E[1], I[1]) - 8, Math.max(E[0], I[0]) + 8, Math.max(E[1], I[1]) + 8]);`, the same for the motor end `M` (the motor bracket is checked separately); fixed here in the polish by growing the plate to x -150. (3) no fork sensor is built (V6), and the sensor lead runs through the carriage's sweep. Fixed here by hand in the polish.
 - `P.rails` could take `dz`: here it is set by mapping over the returned parts.
 
 ## Verification
