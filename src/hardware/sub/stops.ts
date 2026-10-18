@@ -1,10 +1,11 @@
 // H.stops (F5): two stop posts just beyond each end of an oscillating part's swing, from the solved range. Each is a
 // neoprene bumper sleeve on an M4 button-head screw into the base. Never touched while driven; with the drive off the
 // part lands on rubber.
-import { TAU, type Vec2 } from "../../core/geom";
+import { TAU, bbox, type Vec2 } from "../../core/geom";
 import { poseOf } from "../../model/pose";
 import type { Part } from "../../model/types";
 import { heights } from "../../parts";
+import { growBase } from "../../rules/base";
 import type { RuleContext } from "../../rules/types";
 import { bumper, screw } from "../primitives";
 
@@ -60,6 +61,10 @@ export function stops(ctx: RuleContext, o: StopSpec): string[] {
       }
     }
     if (!found) continue;
+    // the post stands on the base: grow the plate (mounting holes and counterbores move with it; the feet follow, they come last)
+    const m = R_STOP + 8;
+    const [b0, b1, b2, b3] = bbox(ctx.get("base")!.outer);
+    if (found[0] - m < b0 || found[1] - m < b1 || found[0] + m > b2 || found[1] + m > b3) growBase(ctx, [found[0] - m, found[1] - m, found[0] + m, found[1] + m]);
     const at: [number, number, number] = [found[0], found[1], 0];
     const G = { at, joints: [o.joint], ex: 0 };
     ctx.add(bumper(`${key}-stop${k}`, 4.3, 2 * R_STOP, { ...G, name: k ? "" : `Stop bumper, neoprene sleeve Ø${2 * R_STOP}`, qty: k ? 0 : 2, z0: ctx.b1, z1: top }));

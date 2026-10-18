@@ -114,7 +114,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; one 72-hole scan of the base, no sampling; rules 1.1 s, polish 1 ms |
 | R6 | PASS | FLAG · Node CPU bench at DPR 1.5: plan 294, 28° 320, side 328, explode 256 ms at full detail (slider-crank on the same machine: 283, 264, 235, 233); 8 ms not reached by dial H (43.1 ms) on this CPU path; 275 solids is the cost: look at in the perf work (#44) |
-| R7 | PASS | HAND · model.ts + polish.ts 9.7 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 8.0 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -147,7 +147,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | pL0-bridge-post | post | 2 x spigot | – static | – static | – static | – static | – static | – static | – static | – static | – static |
 | raila-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib on the other rail adjusts the fit | – static | – static | – static |
 | railb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib on this rail adjusts the fit | – static | – static | – static |
-| drive | drive | – bracket screwed up into the base | – pulleys on D-flat shaft and bearing | Motor pulley, D-bore on a D-flat shaft | – motor bearings | – motor turns freely | – motor holds when powered | Tensioner arm, slotted, 2 x M4 | – belt runs dry | Home flag read by the fork sensor at the raised end | Home flag, 1 mm steel vane; Pulley flanges; 3 x Fork sensor, slotted optical, 5 mm gap |
+| drive | drive | – bracket screwed up into the base | – pulleys on D-flat shaft and bearing | Motor pulley, D-bore on a D-flat shaft | – motor bearings | – motor turns freely | – motor holds when powered | Tensioner arm, slotted, 2 x M4 | – belt runs dry | Home flag read by the fork sensor at the raised end | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -174,14 +174,8 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | never | 163 | 266 | 287.9 (full) |
 
 ## Promotion candidates
-Shared-code problems worked around in `polish.ts` (the first linear-input mechanism found them; the patches are in `src/hardware/sub/drive.ts`, function `linear`):
-
-1. **Base growth.** `linear` puts the motor at the far end of the travel plus the carriage and the motor radius and never calls `growBase`, so a base that follows only the mechanism leaves the motor bracket off the plate (seen: motor 10 mm outside). Patch: `growBase(ctx, [M[0] - R - 8, M[1] - R - 8, M[0] + R + 8, M[1] + R + 8])` before the motor unit is built. Worked around by a longer platform in the model.
-2. **Carriage slot.** The base slot is the stroke plus 5 mm each end, but the carriage outline reaches 10 mm past its centre: 5 mm of base inside the carriage at the end of the stroke. Patch: cut the slot with a centreline 5.5 mm longer at each end (the carriage's half length minus the slot radius, plus 0.5). Worked around by lengthening the slot in the polish.
-3. **Carriage on the belt.** The carriage solid starts at the belt's plane (`zp0`), 0.49 mm into the belt. Patch: start it at the belt's top, `zp0 + 6.6`, or give it a belt-shaped pocket. Worked around in the polish.
-4. **Sensor.** `linear` adds a home flag and no fork sensor (V6), and the sensor lead starts at `(range[0] - 10, rp + 12)` where nothing is. Patch: add `sensor(...)` with arms along the slide axis at the lead's start. Worked around by a flag, a sensor and the lead's start in the polish.
-5. A pin's `span` in the model counts the layers above its own (span 1 reaches two layers); the check's INTERFERE message prints `[lo..hi]`. Worth one line in the standard's K5.
+- A pin's `span` in the model counts the layers above its own (span 1 reaches two layers); the check's INTERFERE message prints `[lo..hi]`. Worth one line in the standard's K5.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.5 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.6 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets, looked at (dist/shots, local) · bench: Node CPU, DPR 1.5, 2026-10-18; 28° frame 320 ms at full detail, 43 ms at dial H (flag, R6)

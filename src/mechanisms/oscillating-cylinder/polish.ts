@@ -8,12 +8,11 @@
 // - the cylinder block (floor, frame, cover) is screwed together and dowelled (F1, A17); its bore corners are rounded
 //   (M5); a grease nipple feeds the bore (F8);
 // - the swing engraved on the base with an index line on the cover (F9);
-// - the base grown over the stops, the cover drawn see-through over the piston (A7, L5);
+// - the cover drawn see-through over the piston (L5);
 // - notes, badges and build rules (A16).
-import { D2R, arcPts, bbox, polar, type Vec2 } from "../../core/geom";
+import { D2R, arcPts, polar, type Vec2 } from "../../core/geom";
 import type { Polish } from "../../assemble/api";
 import type { Solid } from "../../hardware/solid";
-import { baseCorners, growBase } from "../../rules/base";
 import { locking } from "../../rules/locking";
 import { materials } from "../../rules/materials";
 import { swing } from "../../hardware/sub/stops";
@@ -45,22 +44,6 @@ export const polish: Polish = (A, H) => {
   const std = A.get("standard")!;
   const base = A.get("base")!;
   const rod = A.get("rod")!;
-
-  // ---- A7: the base takes the stops: they stand just beyond the swing, past the old right edge (H.stops does not grow the
-  // base, promotion candidate); the feet and mounting holes move with the grown corners ----
-  const [bx0, by0, bx1, by1] = bbox(base.outer);
-  let sx1 = bx1;
-  for (const k of [0, 1]) {
-    const st = A.get(`pO3-stop${k}`);
-    if (st) sx1 = Math.max(sx1, st.at[0] + 6 + 8);
-  }
-  if (sx1 > bx1) {
-    growBase(ctx, [bx0, by0, sx1, by1]);
-    baseCorners(ctx).forEach((c, i) => {
-      const f = A.get(`foot${i}`);
-      if (f) f.at = [c[0], c[1], 0];
-    });
-  }
 
   // ---- L5: the cover and the floor hide the piston and its rod, which move in and out of the block: drawn see-through ----
   cover.seeThrough = true;
