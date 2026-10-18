@@ -16,16 +16,20 @@ const i = SHEETS.indexOf(sheet);
 const prev = SHEETS[(i - 1 + SHEETS.length) % SHEETS.length]!;
 const next = SHEETS[(i + 1) % SHEETS.length]!;
 const drive = await driveOf(sheet.id);
-const facts: [string, string][] = [
-  ["Family", r.family],
-  ["Motion", `${r.motion.label} (${r.motion.output_character.join(", ").toLowerCase()})`],
-  ["Ratio", [r.ratio.kind, r.ratio.class === r.ratio.kind || r.ratio.class === "n/a" ? "" : r.ratio.class].filter(Boolean).join(", ") + (r.ratio.typical ? `: ${r.ratio.typical}` : "")],
-  ["Axes", r.motion.axes],
-  ["Backdrivable", r.backdrivable],
-  ["Level", r.level],
-  ["DOF", String(r.dof)],
-  ["Drive", drive],
-  ...(r.aka?.length ? ([["Also called", r.aka.join(", ")]] as [string, string][]) : []),
+// a fact's value: plain text, or [text, href] for a value the library filters by
+type Part = string | [string, string];
+const facetLink = (key: string, v: string) => url(`/?${key}=${encodeURIComponent(v)}`);
+const searchLink = (v: string) => url(`/?q=${encodeURIComponent(v.toLowerCase())}`);
+const facts: [string, Part[]][] = [
+  ["Family", [[r.family, facetLink("family", r.family)]]],
+  ["Motion", [[r.motion.input, facetLink("input", r.motion.input)], " → ", [r.motion.output, facetLink("output", r.motion.output)], ` (${r.motion.output_character.join(", ").toLowerCase()})`]],
+  ["Ratio", [[r.ratio.kind, r.ratio.class === r.ratio.kind || r.ratio.class === "n/a" ? "" : r.ratio.class].filter(Boolean).join(", ") + (r.ratio.typical ? `: ${r.ratio.typical}` : "")]],
+  ["Axes", [r.motion.axes]],
+  ["Backdrivable", [r.backdrivable]],
+  ["Level", [[r.level, facetLink("level", r.level)]]],
+  ["DOF", [String(r.dof)]],
+  ["Drive", [drive]],
+  ...(r.aka?.length ? ([["Also called", [r.aka.join(", ")]]] as [string, Part[]][]) : []),
 ];
 const explain: [string, string][] = [
   ["How it moves", r.explain.motion],
@@ -33,12 +37,15 @@ const explain: [string, string][] = [
   ["Why use it", r.explain.benefits],
   ["Limits", r.explain.limits],
 ];
-const tagsets = [
-  ["Function", r.tags.function],
-  ["Property", r.tags.property],
-  ["Application", r.tags.application],
-  ["Keywords", r.tags.keywords ?? []],
-] as const;
+// tags link back to the library: a facet value presses its chip there, any other tag searches for it
+const tagsets = (
+  [
+    ["Function", r.tags.function.map((v) => [v, facetLink("function", v)])],
+    ["Property", r.tags.property.map((v) => [v, searchLink(v)])],
+    ["Application", r.tags.application.map((v) => [v, searchLink(v)])],
+    ["Keywords", (r.tags.keywords ?? []).map((v) => [v, searchLink(v)])],
+  ] as [string, [string, string][]][]
+).filter(([, v]) => v.length > 0);
 const media = r.media.filter((m) => m.kind === "video" || m.kind === "photos");
 const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
 ---
@@ -64,7 +71,7 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
       <aside class="side">
         <section class="panel">
           <h2>At a glance</h2>
-          <dl class="facts">{facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}</dl>
+          <dl class="facts">{facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v.map((x) => (typeof x === "string" ? x : <a href={x[1]}>{x[0]}</a>))}</dd></>))}</dl>
         </section>
         {r.build.plot && (
           <section class="panel plot">
@@ -72,16 +79,13 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
             <canvas id="plot" role="img" aria-label={r.build.plot}></canvas>
           </section>
         )}
-        <section class="panel">
-          <h2>Tags</h2>
-          <div class="tagsets">
-            {tagsets.filter(([, v]) => v.length > 0).map(([k, v]) => (
-              <div><span class="lbl">{k}</span><div class="tags">{v.map((t) => <span class="tag ro">{t}</span>)}</div></div>
-            ))}
-          </div>
-        </section>
       </aside>
     </div>
+    <section class="tagband" aria-label="Tags">
+      {tagsets.map(([k, v]) => (
+        <div><span class="lbl">{k}</span>{v.map(([t, href]) => <a class="tag ro" href={href}>{t}</a>)}</div>
+      ))}
+    </section>
     <div class="explain">
       {explain.map(([h, t], k) => (
         <section><span class="k">{String(k + 1).padStart(2, "0")}</span><h2>{h}</h2><p>{t}</p></section>

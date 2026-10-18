@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 2.1
-date: 2026-10-17
+version: 2.2
+date: 2026-10-18
 supersedes: 1.0 (the hand-off style reference of 2026-10-16)
 ```
 
@@ -175,9 +175,9 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 |---|---|
 | SS1 | **Library grid:** cards in an auto-fill grid (min 290 px, 20 px gap). A card is a sheet: the drawing in a framed field (4:3, a pre-rendered image until hover) with a title block under it: name (display, uppercase) and sheet number (mono, accent) on the first row, family · motion · level meta row, two-line summary, dashed tags. Hover: ink border plus accent corner ticks at two opposite corners, and the drawing animates. |
 | SS2 | **Header:** kicker (mono, accent), large condensed uppercase title, short intro, and a set title block (mono grid of label/value cells). Search field and the Filters button in the same row. |
-| SS3 | **Sticky bar:** segmented controls (theme Blueprint / Drafting) and the Filters button; translucent paper with blur, hairline top and bottom. Filters hidden behind the button; facets open as chip rows in a scrollable panel. |
+| SS3 | **Sticky bar:** segmented controls (theme Blueprint / Drafting) and the Filters button; translucent paper with blur, hairline top and bottom. Filters hidden behind the button; facets open as chip rows in a scrollable panel. The library takes `?<facet>=<value>` and `?q=<words>` from the address, so a page can link to a filtered set. |
 | SS4 | **Controls:** segmented buttons and chips are square, hairline, mono uppercase; pressed = ink fill with paper text. Tags are dashed outlines, solid on hover. The play button is the one round control (accent outline, fills on hover). Range inputs use `accent-color` (accent for the scrubber, ink for view sliders). |
-| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number, title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, tilt, explode, detail pin) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, output plot, tags by group); explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
+| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number, title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, tilt, explode, detail pin) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
 | SS6 | **Panels:** paper fill, hairline frame, a mono uppercase header strip with a rule under it; fact lists as label/value rows with dashed separators. |
 | SS7 | **Theme switch** is a site-wide segmented control, remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
 | SS8 | **Real pages:** one static page per mechanism at `/mechanisms/<id>/`, prev and next from the catalogue order, the library at `/`. The engine loads only on the mechanism page or on card hover. |
@@ -590,6 +590,9 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 
 ## Changelog
 
+- **2.2 (2026-10-18).** Mechanism page (SS5): tags leave the side column for a full-width band above the
+  explanation, and tags and the at-a-glance family, input, output and level link to the library filtered by them
+  (SS3).
 - **2.1 (2026-10-17).** Part VI generated from the style files [STYLE]; the page grid alphas are `--grid-1` and
   `--grid-2` (`--grid` is the grid colour) [STYLE].
 - **2.0 (2026-10-17).** Rewritten for the rebuilt engine: glow scheme removed; style files renamed and `detail.ts`
