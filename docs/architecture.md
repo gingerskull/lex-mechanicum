@@ -21,16 +21,19 @@ src/style/                       tokens (palettes, type, sizes), form (geometry-
                                  knobs), detail (the detail ladder), kinds (solid kinds, roles, mark kinds, effects),
                                  theme (rgb resolution, font strings). One source per value; tokens.css is generated.
 src/core/                        geometry, vectors, involute gears and meshing, polygon queries (poly.ts)
-src/parts/                       the part family: link, plate, cap, slider, rails, slotLink, gear, ringGear, rack,
-                                 disc, custom, tracer; heights()
+src/parts/                       the part family: link (stadium or tapered), plate, cap, slider, rails, slotLink, gear,
+                                 ringGear, rack, disc, custom, tracer; every part may carry a plating offset (dz) and
+                                 a clevis twin; heights()
 src/model/                       the MechanismModel contract, defineMechanism, poseOf, sample, basePlate, checkModel
 src/hardware/                    tables (bearings, screws, circlips, keys, pulleys, springs, motors) as data; the
                                  Solid type; primitives H.*; subassemblies in sub/ (housing, bridge, slide, stops,
-                                 eccentric mount, drag pack, follower train, sensor, drive by input kind)
-src/rules/                       context, classify, one module per rule, the registry and autoTable(); stage 3
-                                 fasteners; the rigid explode pass
-src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> see-through -> explode; the polish API;
-                                 solid poses; clearance, clamp and edge-distance checks
+                                 eccentric mount, drag pack, locking segment, output coupling, follower train, sensor,
+                                 drive by input kind)
+src/rules/                       context, classify (slots closed and open, over the cycle), one module per rule, the
+                                 registry and autoTable(); stage 3 fasteners; the headroom and see-through stages; the
+                                 rigid explode pass
+src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> headroom -> see-through ->
+                                 explode; the polish API; solid poses; clearance, clamp and edge-distance checks
 src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)
 src/audit/                       the audit generator and the conformance report
 src/render/                      canvas factory, projector, world solids, slices, session, the drafting frame,
@@ -49,13 +52,16 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 ## From model to page
 
 1. **Model.** `src/mechanisms/<id>/model.ts` defines parts from the part family, the input kind, and `solve(u)` for
-   the cycle phase u in 0..2π. It holds no prose and no style; name, text, tags and links come from the catalogue
-   record with the same id.
+   the cycle phase u in 0..2π. Heights belong to the model too: a part plated off its layer (`dz`), a clevis plate
+   twinned with its partner (`twin`), tapered links sized to their bosses. It holds no prose and no style; name, text,
+   tags and links come from the catalogue record with the same id.
 2. **Assemble.** `assemble(model)` runs the rules (every joint built from its type, then base, standoffs, feet,
-   lubrication, timing marks, materials, drive), then the mechanism's `polish(A, H)` (only what differs), then
-   stage 3 fasteners, then the see-through stage (a static solid that hides a working zone, such as the pitch point
-   of a mesh, is marked to be drawn see-through), then the rigid explode pass. The result is a list of solids: extruded outlines in body-local
-   millimetres with z ranges, explode levels, detail rungs, roles, materials and joint membership.
+   lubrication, timing marks, materials, drive, straddle bridges over live gear shafts), then the mechanism's
+   `polish(A, H)` (only what differs), then stage 3 fasteners, then the headroom stage (a shoulder bolt head lifted on
+   a shim that would meet a solid gets a shoulder ground to length), then the see-through stage (a static solid that
+   hides a working zone, such as the pitch point of a mesh, is marked to be drawn see-through), then the rigid explode
+   pass. The result is a list of solids: extruded outlines in body-local millimetres with z ranges, explode levels,
+   detail rungs, roles, materials and joint membership.
 3. **Package.** At build time, `tools/package` assembles every mechanism and writes a compact package (typed arrays)
    with the solids, traced paths, bounds, plot data and joint notes. The rules engine, the hardware library and the
    polishes never reach the browser.

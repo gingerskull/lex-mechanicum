@@ -70,6 +70,8 @@ function discOutline(): Vec2[] {
 
 /** Keyed bore of the three parts on the input shaft (D-bore, A5). */
 const KEYED = dBore(5);
+/** Arm boss radii (D1): round the keyed Ø8 input, round the Ø6 roller stud. */
+const ARM_R: [number, number] = [12, 8];
 
 export default defineMechanism({
   id: "geneva",
@@ -77,8 +79,8 @@ export default defineMechanism({
   parts: [
     P.custom("disc", discOutline(), { role: "driver", holes: [KEYED], marks: [ring(30)], between: ["O", "Ox"], name: "Locking disc" }),
     P.custom("wheel", wheelOutline(), { role: "output", marks: [ring(14)], at: "W", spin: (s) => s.wheel as number, name: "Geneva wheel" }),
-    P.link("armRear", a, { role: "driver", layer: -1, w: 16, holes: [KEYED], between: ["O", "R"], name: "Drive arm, rear plate" }),
-    P.link("arm", a, { role: "driver", layer: 1, w: 16, holes: [KEYED], between: ["O", "R"], name: "Drive arm, front plate" }),
+    P.link("armRear", a, { role: "driver", layer: -1, r: ARM_R, holes: [KEYED], between: ["O", "R"], name: "Drive arm, rear plate" }),
+    P.link("arm", a, { role: "driver", layer: 1, r: ARM_R, holes: [KEYED], twin: "armRear", between: ["O", "R"], name: "Drive arm, front plate" }),
     P.cap("pD", -1, 7, { fixed: [0, 0, 0], accent: true, span: 2 }),
     P.cap("pW", 0, 7, { fixed: [c, 0, 0], span: 0 }),
     P.cap("pR", -1, pr, { at: "R", span: 2 }),

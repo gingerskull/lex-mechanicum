@@ -12,7 +12,8 @@ export const stops: Rule = {
     for (const j of ctx.info) {
       if (j.kind !== "pin" || !j.fixed) continue;
       for (const x of j.joined) {
-        if (!x.moving || x.part.id === ctx.model.input.part) continue;
+        // a clevis twin shares its partner's stops
+        if (!x.moving || x.part.id === ctx.model.input.part || x.part.twin) continue;
         const r = swing(ctx, x.part);
         if (!r) continue;
         const ids = stopPosts(ctx, { part: x.part, pivot: j.P, range: r, joint: j.id });

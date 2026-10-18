@@ -1,6 +1,7 @@
 // Shared build steps of the pin joints (J1, J3, J4): bearing seats with their retention, inner-race spacers, the
 // shoulder bolt or axle, and the track roller with its wear strips. The rule modules decide which steps a type gets.
-import { bbox, circle, offsetPoly, type Pose, type Vec2 } from "../core/geom";
+import { circle, offsetPoly, type Pose, type Vec2 } from "../core/geom";
+import { holeSlot, type Slot } from "../core/poly";
 import { boreChamfers, bearing, bushing, circlip, disc, felt, head, roller, screw, shaft, spacer, thrustWasher, tube, washer, wearStrip } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { CIRCLIP_ROOM, FLANGE, SHOULDER_BOLTS, bearingFor, circlipInt, innerRingD, shoulderLength, threadFor } from "../hardware/tables";
@@ -71,40 +72,110 @@ export function seatBearing(ctx: RuleContext, j: PinJoint, x: Joined, closure: "
 }
 
 /**
- * J4: a track roller on the stud in the slot, hardened wear strips screwed into the slot walls (the strips' faces are
- * the modelled slot walls, the slot is relieved behind them), a felt oiler at the slot end.
+ * Relieves an open slot (a notch in the outline) by `strip` behind its walls and round its end, so strips of that
+ * thickness have the modelled walls as their faces. The mouth corners slide along the rim edges they meet. Returns
+ * the relieved wall length from the end centre to the mouth.
+ */
+function relieveNotch(host: Solid, s: Slot, strip: number): number {
+  const n: Vec2 = [-s.u[1], s.u[0]];
+  const loc = (p: Vec2): [number, number] => {
+    const dx = p[0] - s.c0[0];
+    const dy = p[1] - s.c0[1];
+    return [dx * s.u[0] + dy * s.u[1], dx * n[0] + dy * n[1]];
+  };
+  const at = (a: number, b: number): Vec2 => [s.c0[0] + s.u[0] * a + n[0] * b, s.c0[1] + s.u[1] * a + n[1] * b];
+  const P = host.outer;
+  const on = P.map((p) => {
+    const [a, b] = loc(p);
+    if (a >= 0) return a <= s.len + 0.3 && Math.abs(Math.abs(b) - s.w) < 0.2;
+    return Math.abs(Math.hypot(a, b) - s.w) < 0.2;
+  });
+  const out = P.map((p, i): Vec2 => {
+    if (!on[i]) return p;
+    const [a, b] = loc(p);
+    if (a >= 0) return at(a, Math.sign(b) * (s.w + strip));
+    const r = Math.hypot(a, b);
+    return at((a / r) * (s.w + strip), (b / r) * (s.w + strip));
+  });
+  let len = s.len;
+  const m = P.length;
+  for (let i = 0; i < m; i++) {
+    if (!on[i]) continue;
+    for (const k of [(i + 1) % m, (i - 1 + m) % m]) {
+      if (on[k]) continue;
+      // the mouth corner: where the relieved wall line meets the rim edge it ran into
+      const [a0, b0] = loc(P[i]!);
+      const [a1, b1] = loc(P[k]!);
+      const bw = Math.sign(b0) * (s.w + strip);
+      if (Math.abs(b1 - b0) < 1e-9) continue;
+      const t = (bw - b0) / (b1 - b0);
+      const a = a0 + (a1 - a0) * t;
+      out[i] = at(a, bw);
+      len = Math.min(len, a);
+    }
+  }
+  host.outer = out;
+  return len;
+}
+
+/**
+ * J4: a track roller on the stud, hardened wear strips screwed into the walls of every slot the roller runs in (the
+ * strips' faces are the modelled walls, the slot is relieved behind them), a felt oiler at each slot's end: in the
+ * relieved end, brushing the roller at its deepest point, where the roller leaves room, else on the top face past it.
  */
 export function slotRoller(ctx: RuleContext, j: PinJoint, x: Joined, body: string, at: Pose, group: string): Element {
   const host = ctx.solidOf[x.part.id]!;
-  const hole = host.holes[x.hole!]!;
-  const [x0, y0, x1, y1] = bbox(hole);
-  const along = x1 - x0 >= y1 - y0;
-  const w = along ? y1 - y0 : x1 - x0;
   const strip = 1.5;
-  host.holes[x.hole!] = offsetPoly(hole, strip);
+  const slots = x.slots?.length ? x.slots : (() => {
+    const h = holeSlot(host.holes[x.hole!]!, x.hole!, 0);
+    return h ? [{ ...h, reach: [0, h.len] as [number, number] }] : [];
+  })();
   const sid = `${j.id}-${x.part.id}`;
   const common = { body: x.part.id, at: [0, 0, 0] as Pose, ex: host.ex, joints: [j.id], z0: x.z0, z1: x.z1 };
-  const rect = (a0: number, a1: number, b0: number, b1: number): Vec2[] =>
-    along ? [[a0, b0], [a1, b0], [a1, b1], [a0, b1]] : [[b0, a0], [b0, a1], [b1, a1], [b1, a0]];
-  const [s0, s1] = along ? [x0 + w / 2, x1 - w / 2] : [y0 + w / 2, y1 - w / 2];
-  const [c0, c1] = along ? [y0, y1] : [x0, x1];
-  for (const [k, lo, hi] of [[0, c1, c1 + strip], [1, c0 - strip, c0]] as const) {
-    ctx.add(wearStrip(`${sid}-ws${k}`, rect(s0, s1, lo, hi), { ...common, name: k ? "" : `Wear strip ${fmt(s1 - s0)} x ${strip}, hardened, 2 x M2 csk`, qty: k ? 0 : 2 }));
-    // two countersunk M2 per strip, half in the strip, half in the wall, clear of the roller
-    for (const [i, f] of [[0, 0.2], [1, 0.8]] as const) {
-      const a = s0 + (s1 - s0) * f;
-      const b = k ? c0 - strip - 0.7 : c1 + strip + 0.7;
-      const pos: Vec2 = along ? [a, b] : [b, a];
-      ctx.add(screw(`${sid}-ws${k}-sc${i}`, "csk", 2, 5, { body: x.part.id, at: [pos[0], pos[1], 0], face: x.z1, dir: -1, ex: host.ex, joints: [j.id], name: "" }));
+  const D = 2 * Math.min(...slots.map((s) => s.w)) - 0.3;
+  const N = slots.length;
+  const J = ctx.joint(j.id)!;
+  let over = x.z1;
+  slots.forEach((s, k) => {
+    const n: Vec2 = [-s.u[1], s.u[0]];
+    const P = (a: number, b: number): Vec2 => [s.c0[0] + s.u[0] * a + n[0] * b, s.c0[1] + s.u[1] * a + n[1] * b];
+    const rect = (a0: number, a1: number, b0: number, b1: number): Vec2[] => [P(a0, b0), P(a1, b0), P(a1, b1), P(a0, b1)];
+    let len = s.len;
+    if (s.hole !== undefined) host.holes[s.hole] = offsetPoly(host.holes[s.hole]!, strip);
+    else len = relieveNotch(host, s, strip);
+    for (const [side, lo, hi] of [[0, s.w, s.w + strip], [1, -s.w - strip, -s.w]] as const) {
+      const i = 2 * k + side;
+      ctx.add(wearStrip(`${sid}-ws${i}`, rect(0, len, lo, hi), { ...common, name: i ? "" : `Wear strip ${fmt(len)} x ${strip}, hardened, 2 x M2 csk`, qty: i ? 0 : 2 * N }));
+      // two countersunk M2 per strip, half in the strip, half in the wall, clear of the roller
+      for (const [c, f] of [[0, 0.2], [1, 0.8]] as const) {
+        const p = P(len * f, side ? -s.w - strip - 0.7 : s.w + strip + 0.7);
+        ctx.add(screw(`${sid}-ws${i}-sc${c}`, "csk", 2, 5, { body: x.part.id, at: [p[0], p[1], 0], face: x.z1, dir: -1, ex: host.ex, joints: [j.id], name: "" }));
+      }
     }
-  }
-  ctx.add(felt(`${sid}-felt`, rect(s1 + w / 2 + strip + 1.5, s1 + w / 2 + strip + 5.5, -2.5 + (c0 + c1) / 2, 2.5 + (c0 + c1) / 2), { ...common, z0: x.z1, z1: x.z1 + 1.2, why: "keeps the roller track oiled (F8)" }));
-  const D = w - 0.3;
+    const fid = N > 1 ? `${sid}-felt${k}` : `${sid}-felt`;
+    const fname = k ? "" : `Felt oiler${s.open ? " in the slot end" : ""}, oil-soaked wool felt`;
+    // in the relieved end of an open slot, cut to brush the roller at its deepest point
+    const rEnd = s.w + strip - 0.1;
+    const brush = s.reach[0] - D / 2 + 0.25;
+    if (s.open && brush > -rEnd + 1) {
+      const t0 = Math.acos(Math.max(-1, Math.min(1, brush / rEnd)));
+      const pts: Vec2[] = [];
+      for (let q = 0; q <= 24; q++) {
+        const t = t0 + ((2 * Math.PI - 2 * t0) * q) / 24;
+        pts.push(P(rEnd * Math.cos(t), rEnd * Math.sin(t)));
+      }
+      ctx.add(felt(fid, pts, { ...common, name: fname, qty: k ? 0 : N, z0: x.z0 + 1, z1: x.z1 - 1, allow: [`${sid}-roller`], why: "keeps the roller track oiled (F8)" }));
+    } else {
+      const a0 = s.open ? -s.w - strip - 5.5 : len + s.w / 2 + strip + 1.5;
+      ctx.add(felt(fid, rect(a0, a0 + 4, -2.5, 2.5), { ...common, name: fname, qty: k ? 0 : N, z0: x.z1, z1: x.z1 + 1.2, why: "keeps the roller track oiled (F8)" }));
+      over = x.z1 + 1.2;
+    }
+    (J.serves.F8 ??= []).push(fid);
+  });
   const r = roller(`${sid}-roller`, j.d, D, { body, at, z0: x.z0 + 0.3, z1: x.z1 - 0.3, ex: host.ex, joints: [j.id], group });
   ctx.add(r);
-  const J = ctx.joint(j.id)!;
-  (J.serves.F8 ??= []).push(`${sid}-felt`);
-  return { z0: x.z0 + 0.3, z1: x.z1 - 0.3, ex: host.ex, over: x.z1 + 1.2, label: `a Ø${fmt(D)} track roller in the ${partName(ctx, x)} slot, between hardened wear strips` };
+  const where = N > 1 ? `each of the ${N} ${partName(ctx, x)} slots` : `the ${partName(ctx, x)} slot`;
+  return { z0: x.z0 + 0.3, z1: x.z1 - 0.3, ex: host.ex, over, label: `a Ø${fmt(D)} track roller in ${where}, between hardened wear strips` };
 }
 
 /**

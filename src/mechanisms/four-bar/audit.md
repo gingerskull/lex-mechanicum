@@ -26,7 +26,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
 | K3 | PASS | HAND · link, plate, cap, tracer; between and fixed placement |
 | K4 | PASS | HAND · roles driver, output, link, pin, trace; accent only on the input cap pO2 |
-| K5 | PASS | HAND · check clean, integer layers in the model; the coupler's 2.5 mm plating offset is declared as PLATING in model.ts and applied by the polish (K1) |
+| K5 | PASS | HAND · check clean, integer layers in the model; the coupler is plated 2.5 mm low and the front rocker plate 5 mm low with `dz` in model.ts, and the rules build every stack on them (K1) |
 | K6 | PASS | DATA · a 40, b 120, c 80, d 100, C at 0.45 b and 43 off, as the catalogue; Grashof s + l = 160 <= p + q = 180, crank shortest |
 | K7 | PASS | HAND · input rotary on the crank |
 | D1 | PASS | HAND · tapered stadium links sized to their bearings (crank bosses R13 and R9.5, rocker R12 and R9.5) with boss rings; flush caps; squircle base |
@@ -38,7 +38,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | D7 | PASS | HAND · links, coupler, bridge and base carry only load shape and manufacturing marks |
 | A1 | PASS | AUTO · pO2 J2, pO4 J1, pA J3, pB J3 |
 | A2 | PASS | AUTO · live shaft at the accent input, dead axle at O4, shoulder bolts at A and B |
-| A3 | PASS | AUTO · 6800-2RS on the Ø10 input, F688ZZ on the Ø8 pins, F696 on the Ø6 axle; spacers in every gap |
+| A3 | PASS | AUTO · 6800-2RS on the Ø10 input, F688ZZ on the Ø8 pins, F6800 on the Ø10 axle (the largest bore the tapered rocker boss takes); spacers in every gap |
 | A4 | PASS | AUTO · stepped shoulder bolts with undercut threads; keyed input shaft with end retainer |
 | A5 | PASS | AUTO · feather key 3 x 3 on the Ø10 input shaft |
 | A6 | PASS | AUTO · no floating fixed plate besides the bridge, which sits on spigoted Ø10 standoffs |
@@ -108,13 +108,13 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · swing scale and index line are marks; centrelines and dimensions automatic |
-| R1 | PASS | HAND · the polish reuses H.taper, H.window, H.stops and the J1 and J3 builders; no inline standard part |
+| R1 | PASS | HAND · the polish reuses H.window and the swing of H.stops; plating, the clevis twin and the tapered links are the model's and the rules build on them; no inline standard part |
 | R2 | PASS | HAND · threads M3, M4, M5, M6; joints Ø6, 8, 10; three bearing sizes |
 | R3 | PASS | AUTO · housing, bridge, stops and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time |
-| R5 | PASS | HAND · states only what differs; samples the swing once (180 steps); polish 0.6 s, 0.5 s of it the rebuilt bridge search (promotion candidate) |
+| R5 | PASS | HAND · states only what differs; samples the swing once (180 steps); rules 0.14 s, polish under 1 ms |
 | R6 | PASS | FLAG · browser bench (one run for all four): plan 7.9, 28° 33.5, side 23.6, explode 10.8 ms at full detail; 8 ms reached at dial C; runs on this machine vary by up to half (look at in #14) |
-| R7 | PASS | HAND · model.ts + polish.ts 13.1 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 7.7 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -133,46 +133,39 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | pO2 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – the input turns fully | – driven through the belt, nothing to hold | – belt tension at the motor mount (drive) | – sealed bearings | – one input, no phase to keep | – see drive |
-| pO4 | J1 | 2 x spigot | 2 x Internal circlip DIN 472, Ø15; Bearing F696-2RS (6x15x5); Bearing F696 (6x15x5) | – no keyed part; plates turn on bearings | Thrust washer 6.2x9.1, bronze | 2 x Stop bumper, neoprene sleeve Ø12 | – belt-driven, no rest position | – no exact length ratio in a crank-rocker | Bridge over the pivot, on two spigoted posts | Swing scale engraved on the base, index line on the rocker | – protected by the stops (F5) |
+| pO4 | J1 | 2 x spigot | 2 x Internal circlip DIN 472, Ø19; Bearing F6800-2RS (10x19x5); Bearing F6800 (10x19x5) | – no keyed part; plates turn on bearings | Thrust washer 10.2x13.1, bronze | 2 x Stop bumper, neoprene sleeve Ø12 | – belt-driven, no rest position | – no exact length ratio in a crank-rocker | Bridge over the pivot, on two spigoted posts | Swing scale engraved on the base, index line on the rocker | – protected by the stops (F5) |
 | pA | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – belt-driven, no rest position | – no exact length ratio | – shielded bearing, greased for life | – no phase between crank and coupler | – none needed |
 | pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – front plate clamped on the shoulder; no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – belt-driven, no rest position | – no exact length ratio | – shielded bearing, greased for life | – no phase between coupler and rocker | – none needed |
-| drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO2) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
 | pO4-bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – spigot in a slot takes the hole tolerance | – static | – static | – static |
+| drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO2) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| coupler | layer 1, z 10 to 16 | plated 2.5 mm low, z 7.5 to 13.5 | A9: 1.5 mm overhang at the single-shear pin A |
-| rocker | one plate | clevis: rear plate plus a front plate at z 15 to 21 | A9: B in double shear |
-| pB, front plate | a bearing, as a part turning on the bolt | plain Ø8.2 hole on the shoulder, clamped with the bolt | the front plate turns with the bolt in a clevis |
-| pA, pB, pO4 stacks | built on the model's plating | rebuilt by the J1 and J3 builders on the new plating | plating and clevis |
+| coupler | layer 1, z 10 to 16 | plated 2.5 mm low in the model (`dz`), z 7.5 to 13.5 | A9: 1.5 mm overhang at the single-shear pin A |
+| rocker | one plate | clevis: a front plate twinned with the rear one in the model (`twin`), z 15 to 21 | A9: B in double shear |
+| crank, rocker | straight stadium | tapered in the model, bosses R13/R9.5 and R12/R9.5 | D1: sized to what each boss carries |
 | pO4, rear bearing | open, oiled from the bridge | sealed (2RS) | the bridge's oil sink cannot reach it under the front plate |
-| crank, rocker | straight stadium from the part family | tapered, bosses R13/R9.5 and R12/R9.5 | D1: sized to the bearings |
-| pO4 stops | placed for the straight rocker | placed again for the tapered rocker | A15 |
-| bridge | explode level 2 | level 3 | E4: off before the front plate it caps |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 14 | 0 | 28.8 |
-| DL-B | 0 | 200 | 24.8 |
+| DL-B | 0 | 207 | 24.8 |
 | DL-C | 0 | 0 | 5.8 |
-| DL-D | 23 | 0 | 4.7 |
+| DL-D | 24 | 0 | 4.7 |
 | DL-E | 8 | 2 | 3.8 |
 | DL-F | 0 | 0 | 3.9 |
 | DL-G | 0 | 0 | 3.4 |
-| DL-H | 8 | 0 | 2.9 |
-| never | 86 | 169 | 28.6 (full) |
+| DL-H | 9 | 0 | 2.9 |
+| never | 86 | 176 | 28.6 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- **Plating offsets read by the rules.** The model declares per-part z offsets from the layer grid; the rules build every stack on them. Removes this polish's strip-and-rebuild of A, B and O4, its sweeps override and the traceZ correction.
-- **Clevis twin.** A part declared as the clevis partner of another: J3 treats it as turning with the bolt (plain hole on the shoulder), J1 gives each plate its bearing, the stops rule skips it. Needed again by the Geneva drive arm.
-- **Tapered links in the part family (D1).** Links sized to their bearings before the rules run, so classify, sweeps, stops and the bridge see the real outline (here the stops had to be placed again).
-- **Stops rule, rigid plates.** Two plates of one body on one pivot would get two stop pairs with the same ids; it should give one pair.
-- **H.bridge cost.** The post search takes about 0.5 s per bridge; worth a cheaper candidate filter.
+- None open. Plating offsets, the clevis twin, tapered links, one set of stops for twinned plates and a cheaper bridge
+  post search were promoted in standard 2.1.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.6 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.0 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #10) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 33.5 ms at full detail, 8 ms reached at dial C (flag, R6)

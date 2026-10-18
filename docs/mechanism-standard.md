@@ -1,8 +1,8 @@
 # Mechanism standard
 
 ```
-version: 2.0
-date: 2026-10-17
+version: 2.1
+date: 2026-10-18
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
 
@@ -130,7 +130,7 @@ forms, reused everywhere.
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| D1 | **One element, one form, everywhere.** Link: tapered stadium sized to its bearings, engraved boss rings. Pivot: flush cap, ground larger. Slider and rail: link profile with square ends on two thin stadium rails. Slot link: stadium slot with walls as wide as the end radius. Gear: true involute teeth, plain web or hub and arms, keyed bore. Cam: profile with one engraved base circle, roller follower. Base plate: squircle slab, paths engraved, corner holes. | HAND | screenshot against other mechanisms |
+| D1 | **One element, one form, everywhere.** Link: tapered stadium sized to its bearings, engraved boss rings. Pivot: flush cap, ground larger. Slider and rail: link profile with square ends on two thin stadium rails. Slot link: stadium slot with walls as wide as the end radius. Gear: true involute teeth, plain web or hub and arms, keyed bore. Cam: profile with one engraved base circle, roller follower. Base plate: squircle slab, paths engraved, corner holes. Tapered links are part of the part family (`P.link` with boss radii), so the rules see the real outline. | HAND | screenshot against other mechanisms |
 | D2 | Shapes follow load: material where the load runs, bosses round every pin, lightening windows only on big plates and inertia-critical parts. | HAND | review |
 | D3 | Roles told apart by surface pattern and tone, never hue. | STYLE | theme switch |
 | D4 | Consistent radii: base-plate corners from the form style; feet and corner standoffs concentric with the corner arcs. | AUTO | screenshot |
@@ -153,7 +153,7 @@ feet, lubrication, timing marks, materials and the drive.
 
 | Id | Rule | Tier |
 |---|---|---|
-| A1 | Every joint is classified by type (J1 to J8) from the model: fixed or moving pin, keyed or bored part, slot, slide, mesh, cam contact, belt. The canonical build of that type is generated in full. | AUTO |
+| A1 | Every joint is classified by type (J1 to J8) from the model: fixed or moving pin, keyed or bored part, slot (closed, or open at the rim), slide, mesh, cam contact, belt. Slots are found over the whole cycle, and over as many cycles as an indexing part takes to come round, so an intermittent contact is seen whatever the assembly phase. The canonical build of that type is generated in full. | AUTO |
 | A2 | A fixed pin that drives (the accent input, or a fixed pin with a keyed part) is a **live shaft** (J2); any other fixed pin is a **dead axle** (J1); a moving pin is a **shoulder bolt** joint (J3); a pin in a slot carries a **track roller** (J4); rails carry a **slide** (J5); meshing gears get **mesh hardware** (J6); a cam gets its **follower train** (J7). | AUTO |
 | A3 | **Catalogue sizing:** bore = largest catalogue bore every boss on the joint can take; each part gets the largest bearing its boss fits with a 1.2 mm wall, else a bronze bushing; gaps get inner-race spacers. | AUTO |
 | A4 | **Shafts are stepped profiles** (`H.shaft`): shoulders at every seat, circlip grooves, set-screw flats, thread with undercut, chamfered ends, wrench flats where tightened without a head, centre holes on turned ends. | AUTO |
@@ -181,12 +181,14 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `standoffs` | A6 |
 | `drive` | V1, V2, V3, V5, V6, F10 |
 | `j8-belt` | J8, V4 |
+| `j2-straddle` | A9, J2 |
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
 | `timing-marks` | F9 |
 | `locking` | M13 |
 | `materials` | M10 |
 | `fasteners (stage 3)` | A8, M4 |
+| `headroom` | A13 |
 | `see-through` | L5 |
 | `explode` | E1, E2, E3, E5, E6, E7, E8 |
 | `hardware primitives` | A13, M1, M3, M5, M11, R3 |
@@ -201,7 +203,7 @@ meet:
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| A9 | **Double shear wherever the sweeps allow** (clevis pairs, a bridge over a ground pivot, a fork end). Single shear only where a part sweeps over the joint, then with the shortest overhang (1 to 1.5 mm) and two bearings far apart. | HAND | joint note + badge |
+| A9 | **Double shear wherever the sweeps allow** (clevis pairs, a bridge over a ground pivot, a fork end). Single shear only where a part sweeps over the joint, then with the shortest overhang (1 to 1.5 mm) and two bearings far apart. A clevis is declared in the model (a part's `twin`, plating with `dz`); a live gear shaft with nothing over it is straddle mounted by the rules. | HAND (choice) / AUTO (clevis twin, plating, straddle J2) | joint note + badge |
 | A10 | **Balanced stack:** parts whose sweeps never meet share one plane; nothing is stacked only to clear something. | HAND | side view |
 | A11 | **Load path closed:** for every joint you can say where its load goes to ground (bolt → bearing → housing → base). Both ends of a dead axle held. Every housing and bridge screwed and dowelled. | HAND (choice) / AUTO (parts) | joint note |
 | A12 | **Bearings clamped through inner-race spacers**, so tightening never squeezes a moving part. A rotating stack never touches a ground face. | AUTO (spacers) / AUTO check | `tools/check` clamp check |
@@ -238,9 +240,9 @@ every line of its row exists or is marked N/A with a reason in the audit.
 | Id | Joint kind | Canonical build |
 |---|---|---|
 | J1 | **Ground revolute, dead axle** | Shouldered axle (A4); a bearing in every turning part; inner-race spacers; circlip or retainer plate on both sides of each bearing (F2); thrust washer against the base (F4); bridge over the top on spigoted posts, dowelled (F1); axle through the base to a washer and nyloc, or threaded with an undercut where the base is thick enough (M9); oil sink on the bridge over an open bearing (F8). |
-| J2 | **Ground revolute, live shaft** | Housing cartridge behind the base: two bearings, spacer sleeve, wave-washer preload, circlips, shield or seal (F2, F4); housing screwed and dowelled to the base (F1, A11); keyed shaft (A5) with pulley on a hub with two set screws at 90° or a clamp hub (F3); end retainer on the shaft end (F2); thrust washer under the first part (F4); home flag on the pulley or shaft (F10); clearance hole in the base (A7). |
+| J2 | **Ground revolute, live shaft** | Housing cartridge behind the base: two bearings, spacer sleeve, wave-washer preload, circlips, shield or seal (F2, F4); housing screwed and dowelled to the base (F1, A11); keyed shaft (A5) with pulley on a hub with two set screws at 90° or a clamp hub (F3); end retainer on the shaft end (F2); thrust washer under the first part (F4); home flag on the pulley or shaft (F10); clearance hole in the base (A7). A gear shaft with nothing sweeping over it is straddle mounted: a bridge over the shafts of the mesh, a floating flanged bearing in it per shaft, the backlash eccentric at the top as well as the bottom (A9, F7). |
 | J3 | **Moving revolute** (pin between links) | Shoulder bolt threaded into the lowest part, bearing in every other part, inner-race spacers, threadlocker or nyloc (M13), clevis where the sweeps allow (A9), bore chamfers (M3). |
-| J4 | **Pin in slot** | Track roller on a stud; hardened wear strips screwed into the slot walls (M14); felt oiler (F8); relief at the slot ends. |
+| J4 | **Pin in slot** | Track roller on a stud; hardened wear strips screwed into the walls of every slot the roller runs in (M14); felt oiler per slot, in the relieved end where the roller leaves room (F8); relief at the slot ends. |
 | J5 | **Prismatic slide** | Guide body; gib strip with adjusting screws and lock nuts on one side (F7); keeper plate; wipers at both ends; grease nipple feeding the guide (F8); end stops with bumpers (F5). |
 | J6 | **Gear mesh** | Hubs with key or D-flat and set screw (F3); eccentric bushing with flange, arc slots and clamp screws on one shaft for backlash (F7); timing marks at the mesh (F9); thrust washers and retaining rings on each shaft (F2, F4). |
 | J7 | **Cam contact** | Roller follower on a stud; return spring with seat, guide and preload screw, or form closure (F6); follower guide bushing with circlip (F2); anti-rotation key on flat followers (F3); felt oiler on the track (F8); zero line (F9); hardened cam (M10). |
@@ -284,7 +286,7 @@ changing what the mechanism is.
 | F2 | **Retain axially** | Screwed chatons, cap jewels | External circlip on shafts, internal circlip or shoulder + retainer plate in bores, E-clips on small pins, shaft collars, end retainers | Every bearing; every part on a shaft that is not clamped | AUTO (J1 to J7) |
 | F3 | **Transmit torque** | Squared arbors, cannon pinion | D-flat, feather key, clamp hub, set screw on a flat, taper or shear pin | Every keyed part | AUTO (A5) |
 | F4 | **Carry thrust, set end-shake** | Endstones | Bronze thrust washer, shims, wave or Belleville washer for preload or drag | Every rotating part free axially | AUTO (J1, J2, J6) / HAND (drag) |
-| F5 | **Limit travel** | Banking pins | Hard stop with elastomer bumper, stop pin, end-of-stroke block, just outside the working range | Oscillating or linear outputs that could over-travel with the drive off | AUTO (`H.stops` from the solved range) / HAND (placement check) |
+| F5 | **Limit travel** | Banking pins | Hard stop with elastomer bumper, stop pin, end-of-stroke block, just outside the working range | Oscillating or linear outputs that could over-travel with the drive off | AUTO (`H.stops` from the solved range; slide end stops shortened to clear a sweep before they are dropped) / HAND (placement check) |
 | F6 | **Hold a position** | Click and click spring, jumper | Spring ball or roller detent, pawl spring, drag pack (wave washer + bronze disc) | Rest positions not positively locked; ratchets; anything that rattles in a clearance | HAND (call) / AUTO (`H.dragPack`, `H.spring`) |
 | F7 | **Adjust** so made parts meet the exact model | Regulator, eccentric bankings | Slotted holes + clamp, eccentric bushing, shims, gib strip, idler on an eccentric, turnbuckle | Every belt drive, every gear mesh, every slide, every exact length ratio | AUTO (J5, J6, J8) / HAND (links) |
 | F8 | **Lubricate** | Oil sinks, oil cups | Oil sink at an exposed pivot, oil hole and groove to a bushing, grease nipple on a slide, felt wiper on a sliding surface | Sliding contacts, plain bushings, open bearings. Not sealed bearings | AUTO by joint type |
@@ -357,7 +359,7 @@ definition, as long as they are readable.
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
 | M1 | **Outer edge breaks:** every top-face edge chamfered (sizes per part kind in the form style). | AUTO | screenshot |
-| M2 | **Load- and inertia-driven shaping:** bosses round every loaded hole; hub and arms on wheels that start, stop or reverse; webs or ribs on long brackets; lightening windows (`H.window`, filleted) only where mass or inertia matters. | HAND | review |
+| M2 | **Load- and inertia-driven shaping:** bosses round every loaded hole; hub and arms on wheels that start, stop or reverse; webs or ribs on long brackets; lightening windows (`H.window`, `H.spokes`, filleted) only where mass or inertia matters. | HAND | review |
 | M3 | **Bore entry chamfers** on every bearing seat and through hole, drawn as a second ring. | AUTO | screenshot |
 | M4 | **Seats for heads:** counterbores for socket heads, countersinks for countersunk screws, spot faces on rough or curved faces. | AUTO (base, csk, housings) / HAND (others) | screenshot |
 | M5 | **No sharp inside corners on milled parts:** pockets, windows and slots carry a cutter radius ≥ 1.5 mm; slots have full-radius ends. | AUTO (`H.window`) / HAND | outline review |
@@ -369,7 +371,7 @@ definition, as long as they are readable.
 | M11 | **Turned-part marks:** centre holes on shaft ends, wrench flats, chamfered shaft ends. | AUTO (A4) | screenshot |
 | M12 | **Tool access** (with A17): every screw reachable by its key; every pressed bearing removable (a hole or slot behind it). | HAND | explode |
 | M13 | **Locking on every threaded fastener:** nyloc nut, threadlocker (named), spring washer, tab washer or wire. Drawn where it is a part (nut insert ring, washer); named otherwise. | AUTO (default per joint type) / HAND (variant) | names |
-| M14 | **Replaceable wear parts** where there is sliding contact: slot liners, locking segments, cam track inserts, slide strips, as separate screwed solids of hard material. | AUTO (J4, J5, J7) / HAND (Geneva locking segment, special surfaces) | solids |
+| M14 | **Replaceable wear parts** where there is sliding contact: slot liners, locking segments, cam track inserts, slide strips, as separate screwed solids of hard material. | AUTO (J4, J5, J7) / HAND (call `H.lockingSegment` for a locking arc, special surfaces) | solids |
 
 ---
 
@@ -550,10 +552,11 @@ Primitives (`H.*`): `plate, shaft (stepped profile), bearing (open / shield / se
 washer, tube, shank, head (socket / button / csk), nut, standoff, spigot, dowel, circlip (internal / external),
 retainer plate, key, set screw, collar, spring (compression / torsion / leaf), stop, bumper, nipple, felt, oil sink
 (marks), wear strip, eccentric bushing, gib, wiper, flag, sensor, terminal block, cable clip, lead`, helpers
-`disc, hex, taper, boltCircle, hullOf, window, boreChamfers`.
+`disc, hex, taper, boltCircle, hullOf, window, filletPoly, spokes, boreChamfers`.
 
 Subassemblies: `H.housing` (J2 cartridge), `H.bridge` (posts, spigots, dowels, lobes), `H.slide` (J5),
-`H.eccentric` (J6 backlash), `H.stops` (F5 from the solved range), `H.dragPack` (F6), `H.followerTrain` (J7),
+`H.eccentric` (J6 backlash), `H.stops` (F5 from the solved range), `H.dragPack` (F6, sized to the face it bears on),
+`H.lockingSegment` (M14), `H.outputCoupling` (a keyed flange on a straddle-mounted output), `H.followerTrain` (J7),
 `H.drive` (V1 to V6 by input kind), `H.sensor` (V6).
 
 Every primitive has real catalogue sizes, a default material, a default locking method where threaded, and a
@@ -563,6 +566,14 @@ default detail level.
 
 ## Changelog
 
+- **2.1 (2026-10-18).** Hand fixes from the first four conformance passes promoted to rules and primitives, and one new
+  stage. Working zones stay in view: a static solid over a mesh pitch point or a slot roller's run is drawn see-through
+  [L5, AUTO]. Plating offsets (`dz`) and clevis twins (`twin`) in the model contract, read by the rules [K1, A9, AUTO].
+  Tapered links in the part family [D1, AUTO]. Open slots, and pins classified over the cycle [A1, J4, M14, AUTO].
+  Straddle-mounted live gear shafts with the top eccentric [J2, F7, AUTO]. `H.dragPack` sized to the face it bears on,
+  `H.lockingSegment`, `H.outputCoupling`, `H.spokes` [F6, M14, M2, AUTO]. Slide end stops shortened before they are
+  dropped [F5, AUTO]. Shoulder bolt headroom: a lifted head that would meet a solid gets a shoulder ground to length,
+  a clear one is reported [A13, AUTO].
 - **2.0 (2026-10-17).** Rewritten for the rebuilt engine. Section 0 added (versioning, conformance tool, audit
   generator) [S1 to S4, DATA/AUTO]. Detail budget of 6.0 replaced by functional completeness [F, HAND → mostly AUTO by
   joint type]. Joint-type catalogue added [J1 to J8, AUTO]. Shafts as stepped profiles, keys by size, locking on every

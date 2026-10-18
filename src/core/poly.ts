@@ -97,3 +97,107 @@ export function circleClearance(c: Vec2, r: number, g: Region): number {
   if (c[0] + r < g.box[0] - 50 || c[0] - r > g.box[2] + 50 || c[1] + r < g.box[1] - 50 || c[1] - r > g.box[3] + 50) return 50;
   return -depth(g.outer, g.holes, c) - r;
 }
+
+/** Distance from p along the unit direction d to the first crossing of polygon P's boundary; Infinity if none. */
+export function rayHit(P: Vec2[], p: Vec2, d: Vec2): number {
+  let t = Infinity;
+  for (let i = 0; i < P.length; i++) {
+    const a = P[i]!;
+    const b = P[(i + 1) % P.length]!;
+    const ex = b[0] - a[0];
+    const ey = b[1] - a[1];
+    const den = d[0] * ey - d[1] * ex;
+    if (Math.abs(den) < 1e-12) continue;
+    const ax = a[0] - p[0];
+    const ay = a[1] - p[1];
+    const tt = (ax * ey - ay * ex) / den;
+    const ss = (ax * d[1] - ay * d[0]) / den;
+    if (tt > 1e-9 && ss >= 0 && ss <= 1 && tt < t) t = tt;
+  }
+  return t;
+}
+
+/**
+ * A straight slot in a part, local mm: the centre of its closed end c0, the unit axis u from there along the slot,
+ * the length len along u to the other end's centre (a closed slot) or to where the walls end (an open one, a notch in
+ * the outline), and the half-width w. `hole` is its index in the part's holes for a closed slot.
+ */
+export interface Slot {
+  c0: Vec2;
+  u: Vec2;
+  len: number;
+  w: number;
+  open: boolean;
+  hole?: number;
+}
+
+/**
+ * A closed stadium slot from a hole's box (the slot runs along x or y), or null for a hole shorter than `minLen` widths
+ * (a round hole).
+ */
+export function holeSlot(h: Vec2[], hole: number, minLen = 0.3): Slot | null {
+  const [x0, y0, x1, y1] = boxOf(h);
+  const along = x1 - x0 >= y1 - y0;
+  const w = (along ? y1 - y0 : x1 - x0) / 2;
+  const L = (along ? x1 - x0 : y1 - y0) - 2 * w;
+  if (L < minLen * w) return null;
+  const c0: Vec2 = along ? [x0 + w, (y0 + y1) / 2] : [(x0 + x1) / 2, y0 + w];
+  return { c0, u: along ? [1, 0] : [0, 1], len: L, w, open: false, hole };
+}
+
+const boxOf = (P: Vec2[]): [number, number, number, number] => region(P, []).box;
+
+/**
+ * The open slot (a notch in the outline) that holds p, a point outside the material: the walls run parallel on both
+ * sides within maxW, the end is closed behind p and the mouth open ahead. Null when p is not in a notch.
+ */
+export function notchAt(P: Vec2[], p: Vec2, maxW: number): Slot | null {
+  if (inside(P, p) || edgeDist(P, p) > maxW) return null;
+  const width = (th: number) => {
+    const n: Vec2 = [-Math.sin(th), Math.cos(th)];
+    return rayHit(P, p, n) + rayHit(P, p, [-n[0], -n[1]]);
+  };
+  // the axis: a direction p escapes along, with the narrowest walls across it
+  let best = -1;
+  let bw = Infinity;
+  const N = 144;
+  for (let k = 0; k < N; k++) {
+    const th = (k / N) * 2 * Math.PI;
+    if (rayHit(P, p, [Math.cos(th), Math.sin(th)]) < Infinity) continue;
+    const w = width(th);
+    if (w < bw) {
+      bw = w;
+      best = th;
+    }
+  }
+  if (best < 0 || bw > 2 * maxW) return null;
+  let lo = best - Math.PI / N;
+  let hi = best + Math.PI / N;
+  for (let i = 0; i < 30; i++) {
+    const a = lo + (hi - lo) / 3;
+    const b = hi - (hi - lo) / 3;
+    if (width(a) < width(b)) hi = b;
+    else lo = a;
+  }
+  const th = (lo + hi) / 2;
+  const u: Vec2 = [Math.cos(th), Math.sin(th)];
+  const n: Vec2 = [-u[1], u[0]];
+  const h1 = rayHit(P, p, n);
+  const h2 = rayHit(P, p, [-n[0], -n[1]]);
+  const w = (h1 + h2) / 2;
+  const q: Vec2 = [p[0] + (n[0] * (h1 - h2)) / 2, p[1] + (n[1] * (h1 - h2)) / 2];
+  const back = rayHit(P, q, [-u[0], -u[1]]);
+  if (back === Infinity) return null;
+  const c0: Vec2 = [q[0] - u[0] * (back - w), q[1] - u[1] * (back - w)];
+  // the walls end at the mouth; they run parallel all the way, or this is a corner, not a slot
+  let len = 0;
+  for (let s = 0; s < 400; s += 0.25) {
+    const c: Vec2 = [c0[0] + u[0] * s, c0[1] + u[1] * s];
+    const a = rayHit(P, c, n);
+    const b = rayHit(P, c, [-n[0], -n[1]]);
+    if (a > w + 0.3 || b > w + 0.3) break;
+    if (a < w - 0.3 || b < w - 0.3) return null;
+    len = s;
+  }
+  return len >= w ? { c0, u, len, w, open: true } : null;
+}

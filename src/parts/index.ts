@@ -1,7 +1,7 @@
 // The part family. Every mechanism is built only from these elements (standard K3): stadium links with a ring at each
 // boss, flush pivot caps, square-ended sliders on twin stadium rails, stadium slots, involute gears with a D-bore,
 // discs, custom outlines and the tracer.
-import { capsule, circle, dBore, gearOutline, ring, roundRect, roundedPoly, slot, D2R, xfPose } from "../core/geom";
+import { capsule, circle, dBore, gearOutline, ring, roundRect, roundedPoly, slot, taper, D2R, xfPose } from "../core/geom";
 import type { Part, Pose, Role, Shape, Solved, Vec2 } from "../model/types";
 
 /** Layer pitch and default plate thickness, mm. */
@@ -10,6 +10,10 @@ export const THICK = 6;
 
 /** Placement options every constructor passes through. */
 export interface Place {
+  /** Plating offset from the layer grid, mm. */
+  dz?: number;
+  /** Clevis partner: the part this one pairs with round a pin. */
+  twin?: string;
   fixed?: Pose;
   between?: [string, string];
   at?: string;
@@ -30,6 +34,8 @@ const S = (outer: Vec2[], holes: Vec2[][] = []): Shape => ({ outer, holes });
 
 const place = (o: Place): Place => {
   const c: Place = {};
+  if (o.dz !== undefined) c.dz = o.dz;
+  if (o.twin !== undefined) c.twin = o.twin;
   if (o.fixed !== undefined) c.fixed = o.fixed;
   if (o.between !== undefined) c.between = o.between;
   if (o.at !== undefined) c.at = o.at;
@@ -51,11 +57,15 @@ const base = (id: string, role: Role, layer: number, shape: Shape, o: Partial<Pa
 
 export const P = {
   S,
-  /** Two-boss link from (0, 0) to (L, 0), width w, a ring at each boss. */
-  link(id: string, L: number, o: PartOpts & { w?: number } = {}): Part {
+  /**
+   * Two-boss link from (0, 0) to (L, 0), a ring at each boss: a stadium of width w, or tapered (D1) with boss radii
+   * `r` sized to what each boss carries (a keyed shaft, a bearing, a tapped bolt).
+   */
+  link(id: string, L: number, o: PartOpts & { w?: number; r?: [number, number] } = {}): Part {
     const w = o.w ?? 16;
-    return base(id, o.role ?? "link", o.layer ?? 0, S(capsule(L, w), o.holes ?? []), {
-      marks: [ring(w * 0.5 - 1.6), ring(w * 0.5 - 1.6, L, 0)],
+    const [r0, r1] = o.r ?? [w / 2, w / 2];
+    return base(id, o.role ?? "link", o.layer ?? 0, S(o.r ? taper(L, r0, r1) : capsule(L, w), o.holes ?? []), {
+      marks: [ring(r0 - 1.6), ring(r1 - 1.6, L, 0)],
       len: L,
       ...place(o),
     });
@@ -160,9 +170,12 @@ export const P = {
   },
 };
 
-/** z range of a part, mm. A pin runs from its layer through `span` layers plus its cap and overhang. */
+/** z of a part's layer on the grid, before plating: its explode level. */
+export const layerZ = (p: Part): number => p.layer * LAYER;
+
+/** z range of a part, mm, plating included. A pin runs from its layer through `span` layers plus its cap and overhang. */
 export function heights(p: Part): [number, number] {
-  const z0 = p.layer * LAYER;
+  const z0 = p.layer * LAYER + (p.dz ?? 0);
   if (p.role === "pin") return [z0, (p.layer + (p.span ?? 1)) * LAYER + (p.th ?? THICK) + (p.over ?? 0.8)];
   return [z0, z0 + p.thick];
 }

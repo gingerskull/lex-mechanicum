@@ -1,13 +1,72 @@
 // A1, A2: reads the model once and classifies every joint by type. Pins: which parts each joins, in what order up the
 // stack, bored, keyed or slotted; slides: rails and the block between them; meshes: gear pairs at their centre
 // distance; cams: declared by the model.
-import { TAU, bbox, type Vec2 } from "../core/geom";
-import { edgeDist, inside, toLocal } from "../core/poly";
+import { TAU, bbox, wrap, type Vec2 } from "../core/geom";
+import { edgeDist, holeSlot, inside, notchAt, toLocal, type Slot } from "../core/poly";
 import { BORES, bearingFor } from "../hardware/tables";
 import { poseOf } from "../model/pose";
 import type { Part } from "../model/types";
 import { heights } from "../parts";
-import type { Joined, JointInfo, MeshJoint, PinJoint, Rule, RuleContext, SlideJoint } from "./types";
+import type { Joined, JointInfo, MeshJoint, PinJoint, Rule, RuleContext, SlideJoint, SlotVisit } from "./types";
+
+/** Cycles until an indexing part (a Geneva wheel) is back where it started; 1 for anything that does not index. */
+function cyclesOf(ctx: RuleContext, part: Part): number {
+  if (part.fixed) return 1;
+  const a = poseOf(part, ctx.model.solve(0));
+  const b = poseOf(part, ctx.model.solve(TAU));
+  if (!a || !b) return 1;
+  const d = Math.abs(wrap(b[2] - a[2]));
+  if (d < 1e-6) return 1;
+  const n = TAU / d;
+  return Math.abs(n - Math.round(n)) < 1e-3 && Math.round(n) <= 12 ? Math.round(n) : 1;
+}
+
+const STEPS = 72;
+
+/**
+ * Every slot of `part` the pin runs in over the cycle (A1): closed slots among its holes and open ones cut in its
+ * outline, sampled over as many cycles as the part takes to index round, so an intermittent contact is seen whatever
+ * the assembly phase (a Geneva roller in each slot in turn).
+ */
+function visits(ctx: RuleContext, pin: Part, part: Part, capR: number): SlotVisit[] {
+  const out: SlotVisit[] = [];
+  const steps = pin.fixed && part.fixed ? 1 : STEPS * cyclesOf(ctx, part);
+  const local = (s: Slot, L: Vec2): [number, number] => {
+    const dx = L[0] - s.c0[0];
+    const dy = L[1] - s.c0[1];
+    return [dx * s.u[0] + dy * s.u[1], -dx * s.u[1] + dy * s.u[0]];
+  };
+  for (let i = 0; i < steps; i++) {
+    const s = steps === 1 ? ctx.s0 : ctx.model.solve((i / STEPS) * TAU);
+    const qp = poseOf(pin, s);
+    const qa = poseOf(part, s);
+    if (!qp || !qa) continue;
+    const L = toLocal(qa, [qp[0], qp[1]]);
+    // a slot already found: only extend the pin's reach along it
+    const known = out.find((v) => {
+      const [a, b] = local(v, L);
+      return Math.abs(b) <= v.w + 0.1 && a >= -v.w && a <= v.len + v.w;
+    });
+    if (known) {
+      const a = local(known, L)[0];
+      known.reach = [Math.min(known.reach[0], a), Math.max(known.reach[1], a)];
+      continue;
+    }
+    let sl: Slot | null = null;
+    const hi = part.shape.holes.findIndex((h) => inside(h, L));
+    if (hi >= 0) {
+      sl = holeSlot(part.shape.holes[hi]!, hi);
+      if (sl && 2 * sl.w > 4 * capR) sl = null;
+    } else if (!inside(part.shape.outer, L)) {
+      sl = notchAt(part.shape.outer, L, 2 * capR);
+      if (sl && sl.w < 0.75 * capR) sl = null;
+    }
+    if (!sl) continue;
+    const a = local(sl, L)[0];
+    out.push({ ...sl, reach: [a, a] });
+  }
+  return out;
+}
 
 const pinLabel = (p: Part) => p.id.replace(/^p(?=[A-Z0-9])/, "").replace(/^pin-?/i, "") || p.id;
 
@@ -25,7 +84,12 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
     const q = poseOf(p, ctx.s0);
     if (!q) continue;
     const L = toLocal(q, P);
-    if (!inside(p.shape.outer, L)) continue;
+    if (!inside(p.shape.outer, L)) {
+      // an open slot, a notch in the outline (a Geneva wheel), the pin in it at some phase of the cycle
+      const slots = visits(ctx, c, p, capR);
+      if (slots.length) joined.push({ part: p, L, R: 0, z0, z1, moving: !p.fixed, how: "slot", slotW: 2 * Math.min(...slots.map((v) => v.w)), slots });
+      continue;
+    }
     const R = edgeDist(p.shape.outer, L);
     const hi = p.shape.holes.findIndex((h) => inside(h, L));
     const base = { part: p, L, R, z0, z1, moving: !p.fixed };
@@ -39,7 +103,7 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
     const centred = Math.hypot((x0 + x1) / 2 - L[0], (y0 + y1) / 2 - L[1]) < 1.6;
     if (centred && Math.max(w, h) / Math.min(w, h) < 1.3) joined.push({ ...base, how: "keyed", bore: Math.max(w, h), hole: hi });
     // a big opening round the pin (ring gear, hub bore) is not a joint
-    else if (Math.min(w, h) <= 4 * capR) joined.push({ ...base, how: "slot", slotW: Math.min(w, h), hole: hi });
+    else if (Math.min(w, h) <= 4 * capR) joined.push({ ...base, how: "slot", slotW: Math.min(w, h), hole: hi, slots: visits(ctx, c, p, capR) });
   }
   if (!joined.length) return null;
   joined.sort((a, b) => a.z0 - b.z0);
@@ -48,9 +112,14 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
   const keyed = moving.filter((j) => j.how === "keyed");
   const bored = moving.filter((j) => j.how === "bore");
   const live = fixed && (!!c.accent || keyed.length > 0) && (keyed.length > 0 || bored.length > 0);
+  // a clevis twin never anchors a bolt its partner can take
+  const partnered = (x: Joined) => !!x.part.twin && bored.some((y) => y.part.id === x.part.twin);
+  const firstBored = bored.filter((x) => !partnered(x)).slice(0, 1);
   let driven: Joined[] = [];
-  if (live) driven = keyed.length ? keyed : bored.slice(0, 1);
-  else if (!fixed) driven = keyed.length ? [keyed[0]!] : bored.slice(0, 1);
+  if (live) driven = keyed.length ? keyed : firstBored;
+  else if (!fixed) driven = keyed.length ? [keyed[0]!] : firstBored;
+  // a clevis twin turns with its partner: a plain hole on the shoulder, no bearing of its own
+  for (const x of joined) if (x.part.twin && driven.some((y) => y.part.id === x.part.twin) && !driven.includes(x)) driven.push(x);
   const anchor = driven[0] ?? null;
   const slots = joined.filter((j) => j.how === "slot");
   const turning = moving.filter((j) => j.how === "bore" && !driven.includes(j));

@@ -1,7 +1,7 @@
 // H.slide (J5): a prismatic slide on two rails. Keeper plate over one rail (F2), a bronze gib strip with adjusting
 // screws and lock nuts on the other (F7), felt wipers at both ends of the slider and a grease nipple feeding the guide
 // (F8), end stops with neoprene bumpers just beyond the travel (F5).
-import { TAU, bbox, xf, type Pose, type Vec2 } from "../../core/geom";
+import { TAU, bbox, circle, xf, type Pose, type Vec2 } from "../../core/geom";
 import { overlap, region, toLocal, toWorld } from "../../core/poly";
 import { poseOf } from "../../model/pose";
 import { heights } from "../../parts";
@@ -9,6 +9,10 @@ import { clearOf } from "../../rules/space";
 import type { RuleContext, SlideJoint } from "../../rules/types";
 import { bumper, gib, nipple, nut, plate, screw, setScrew, stop, wiper } from "../primitives";
 import { solid } from "../solid";
+import { HEADS } from "../tables";
+
+/** End stop block lengths along the slide, longest first: a stop is shortened to clear a sweep before it is dropped. */
+const STOP_LENGTHS = [8, 7, 6, 5];
 
 const rect = (x0: number, x1: number, y0: number, y1: number): Vec2[] => [
   [Math.min(x0, x1), Math.min(y0, y1)],
@@ -85,24 +89,41 @@ export function slide(ctx: RuleContext, j: SlideJoint): void {
     serve("F8", w.id);
   }
 
-  // end stops (F5): a hardened block with a neoprene pad, 1.5 mm past each end of the travel
+  // end stops (F5): a hardened block with a neoprene pad, 1.5 mm past each end of the travel; where a moving part passes
+  // behind the pad, the block is shortened before the stop is given up
   const off = F[0] * j.axis[0] + F[1] * j.axis[1];
   const ends: [number, number][] = [[j.range[1] - off + sx1 + 2, 1], [j.range[0] - off + sx0 - 2, -1]];
   const yIn0 = 3.5 * sg + 0.5 * sg;
   const yIn1 = yAi - 0.5 * sg;
-  ends.forEach(([x, dir], k) => {
+  // the block length each end takes, decided first so the parts list counts what is placed
+  const H4 = HEADS.button[4]!;
+  const fit = ends.map(([x, dir]) => {
     const pad = rect(x + dir * 1.5, x + dir * 3.5, yIn0, yIn1);
-    const blk = rect(x + dir * 3.5, x + dir * 11.5, yIn0, yIn1);
-    if (!clearOf(ctx, W(blk), ctx.b1, sz1) || !clearOf(ctx, W(pad), ctx.b1, sz1 - 1)) {
+    // the block and the head of its screw, at the block's centre, both clear
+    const fits = (len: number) => {
+      const c = toWorld(F, [x + dir * (3.5 + len / 2), (yIn0 + yIn1) / 2]);
+      return clearOf(ctx, W(rect(x + dir * 3.5, x + dir * (3.5 + len), yIn0, yIn1)), ctx.b1, sz1) && clearOf(ctx, circle(H4.dk / 2, c[0], c[1], 24), sz1 - 1, sz1 - 1 + H4.k);
+    };
+    return clearOf(ctx, W(pad), ctx.b1, sz1 - 1) ? STOP_LENGTHS.find(fits) : undefined;
+  });
+  const n = fit.filter((L) => L !== undefined).length;
+  let placed = 0;
+  ends.forEach(([x, dir], k) => {
+    const L = fit[k];
+    if (L === undefined) {
       J.note += ` No room for the ${k ? "lower" : "upper"} end stop: something moving passes there.`;
       return;
     }
-    const s = stop(`${j.id}-stop${k}`, W(blk), { ...G, z0: ctx.b1, z1: sz1 - 1, name: k ? "" : "End stop block, hardened", qty: k ? 0 : 2 });
-    const b = bumper(`${j.id}-bump${k}`, 0, 0, { ...G, outer: W(pad), z0: ctx.b1 + 1, z1: sz1 - 1.5, name: k ? "" : "Stop pad, neoprene 2 mm", qty: k ? 0 : 2 });
+    const pad = rect(x + dir * 1.5, x + dir * 3.5, yIn0, yIn1);
+    const blk = rect(x + dir * 3.5, x + dir * (3.5 + L), yIn0, yIn1);
+    if (L < STOP_LENGTHS[0]!) J.note += ` The ${k ? "lower" : "upper"} end stop is ${L} mm long instead of ${STOP_LENGTHS[0]}, to clear a moving part's sweep.`;
+    const first = placed++ === 0;
+    const s = stop(`${j.id}-stop${k}`, W(blk), { ...G, z0: ctx.b1, z1: sz1 - 1, name: first ? "End stop block, hardened" : "", qty: first ? n : 0 });
+    const b = bumper(`${j.id}-bump${k}`, 0, 0, { ...G, outer: W(pad), z0: ctx.b1 + 1, z1: sz1 - 1.5, name: first ? "Stop pad, neoprene 2 mm" : "", qty: first ? n : 0 });
     ctx.add(s, b);
     serve("F5", s.id);
-    const c = toWorld(F, [x + dir * 7.5, (yIn0 + yIn1) / 2]);
-    ctx.add(screw(`${j.id}-stop${k}-sc`, "button", 4, sz1 - 1 - ctx.b1 + 6, { ...G, at: [c[0], c[1], 0], face: sz1 - 1, dir: -1, name: k ? "" : undefined }));
+    const c = toWorld(F, [x + dir * (3.5 + L / 2), (yIn0 + yIn1) / 2]);
+    ctx.add(screw(`${j.id}-stop${k}-sc`, "button", 4, sz1 - 1 - ctx.b1 + 6, { ...G, at: [c[0], c[1], 0], face: sz1 - 1, dir: -1, name: first ? undefined : "" }));
   });
 
   // grease nipple on the keeper, where nothing passes over it (F8)

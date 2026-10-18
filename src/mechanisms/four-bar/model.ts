@@ -16,27 +16,32 @@ const O2: Vec2 = [0, 0];
 const O4: Vec2 = [d, 0];
 
 /**
- * Plating offsets from the layer grid (K1: heights may change, centres may not), applied by the polish. The coupler
- * sits 2.5 mm under its layer so the crank pin overhang is 1.5 mm (A9).
+ * Plating (K1: heights may change, centres may not): the coupler sits 2.5 mm under its layer so the crank pin overhang
+ * is 1.5 mm (A9); the rocker's front plate 5 mm under its layer, 1.5 mm over the coupler.
  */
-export const PLATING: Record<string, number> = { coupler: -2.5, cp: -2.5 };
+const COUPLER_DZ = -2.5;
+/** Boss radii of the tapered links (D1): the input boss round the keyed Ø10 shaft, the pin bosses round their bearings. */
+const CRANK_R: [number, number] = [13, 9.5];
+const ROCKER_R: [number, number] = [12, 9.5];
 
-const tracer = P.tracer("cp", 1, { at: "C", name: "Coupler point" });
+const tracer = P.tracer("cp", 1, { at: "C", name: "Coupler point", dz: COUPLER_DZ });
 
 export default defineMechanism({
   id: "four-bar",
   input: { kind: "rotary", part: "crank" },
   parts: [
-    P.link("crank", a, { role: "driver", w: 19, between: ["O2", "A"] }),
-    P.link("rocker", c, { role: "output", w: 16, between: ["O4", "B"] }),
-    P.plate("coupler", [[0, 0], [b, 0], [cpx, cpy]], { layer: 1, r: 11, between: ["A", "B"] }),
+    P.link("crank", a, { role: "driver", r: CRANK_R, between: ["O2", "A"] }),
+    P.link("rocker", c, { role: "output", r: ROCKER_R, between: ["O4", "B"], name: "Rocker, rear plate" }),
+    P.plate("coupler", [[0, 0], [b, 0], [cpx, cpy]], { layer: 1, r: 11, dz: COUPLER_DZ, between: ["A", "B"] }),
+    // the rocker is a clevis: a front plate above the coupler puts B in double shear (A9)
+    P.link("rocker-front", c, { role: "output", r: ROCKER_R, layer: 2, dz: -5, twin: "rocker", between: ["O4", "B"], name: "Rocker, front plate" }),
     P.cap("pO2", -1, 7, { fixed: [0, 0, 0], accent: true }),
-    P.cap("pO4", -1, 7, { fixed: [d, 0, 0] }),
+    P.cap("pO4", -1, 7, { fixed: [d, 0, 0], span: 3 }),
     P.cap("pA", 0, 5.5, { at: "A" }),
-    P.cap("pB", 0, 5.5, { at: "B" }),
+    P.cap("pB", 0, 5.5, { at: "B", span: 2 }),
     tracer,
   ],
-  traceZ: heights(tracer)[1] + PLATING.cp!,
+  traceZ: heights(tracer)[1],
   solve(u) {
     const A = V.at(O2, u, a);
     // one assembly branch throughout (+1, B above the ground line)

@@ -36,9 +36,9 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | D5 | PASS | AUTO / HAND · one bridge over W on two spigoted posts, built as two arms because its posts stand outside the wheel |
 | D6 | PASS | HAND / STYLE · strips, felts, screws and leads read quieter than the wheel, disc and arm |
 | D7 | PASS | HAND · wheel, disc, arm and bridge carry only load shape and manufacturing marks |
-| A1 | PASS | AUTO · pD J2, pW J1; pR J4 (built in the polish: open slots) |
+| A1 | PASS | AUTO · pD J2, pW J1; pR J4, the open slots found over the four cycles the wheel takes to index round |
 | A2 | PASS | AUTO · live shaft at the accent input, dead axle at W, shoulder bolt with a track roller at R |
-| A3 | PASS | AUTO · 688-2RS on the Ø8 input, F6800 in the wheel; track roller Ø13.7 on the Ø6 stud |
+| A3 | PASS | AUTO · 688-2RS on the Ø8 input, F6800 in the wheel; track roller Ø13.7 on the Ø8 stud |
 | A4 | PASS | AUTO · stepped D-flat input shaft with end retainer; shouldered axle and stud with undercut threads |
 | A5 | PASS | AUTO · D-flat on the Ø8 input for both arm plates and the disc |
 | A6 | PASS | AUTO · no floating fixed plate besides the bridge, on spigoted Ø10 standoffs |
@@ -65,7 +65,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | J1 | PASS | AUTO · W: shouldered axle through the base to a nyloc, bearing with circlip and flange, spacers, thrust washer, bridge on spigoted posts, oil sink over the open bearing |
 | J2 | PASS | AUTO · D: housing with two sealed bearings, sleeve, wave washer, circlips, screwed and dowelled; D-flat shaft, pulley hub with two set screws, end retainer, thrust washer, home flag |
 | J3 | N/A | no plain moving pin; the stud is J4 |
-| J4 | PASS | HAND (open slots) · track roller on the stud, hardened wear strips screwed to every slot wall with the slots relieved behind them, felt oiler in every slot end |
+| J4 | PASS | AUTO · track roller on the stud, hardened wear strips screwed to every slot wall with the slots relieved behind them, felt oiler in every slot end |
 | J5 | N/A | no slide |
 | J6 | N/A | no gear mesh |
 | J7 | N/A | the locking disc and wheel are a clearance fit, not a cam with a follower |
@@ -108,13 +108,13 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · station dots and the base index line are timing marks |
-| R1 | PASS | HAND · the polish reuses H.roller, H.wearStrip, H.felt, H.screw, H.window and the pin builders; no inline standard part |
+| R1 | PASS | HAND · the polish reuses H.lockingSegment, H.dragPack and H.window; the roller stud, strips and felts are the rules'; no inline standard part |
 | R2 | PASS | HAND · threads M2, M3, M4, M5, M8; joints Ø6, 8, 10; two bearing sizes and one roller |
 | R3 | PASS | AUTO · housing, bridge and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time |
-| R5 | PASS | HAND · states only what differs; polish 0.07 s, the window search the largest part |
+| R5 | PASS | HAND · states only what differs; rules 0.13 s, polish 0.07 s, the window search the largest part |
 | R6 | PASS | FLAG · browser bench (one run for all four): plan 10.7, 28° 50.3, side 12.6, explode 32.1 ms at full detail; 8 ms reached at dial E; runs on this machine vary by up to half (look at in #14) |
-| R7 | PASS | HAND · model.ts + polish.ts 17.7 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 12.2 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -141,19 +141,16 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| pR | J3 with a bearing in the front arm and no roller (the open slots are not holes, so the rules see no slot) | J4 built in the polish: track roller between the arm plates, plain hole in the front arm on the shoulder | clevis arm, open Geneva slots |
-| wheel slots | slot walls are the part outline | relieved 1.5 mm behind screwed hardened wear strips; felt oiler in every slot end | J4, M14, F8 |
-| disc | one piece | locking arc as a screwed, hardened segment | M14 |
-| pW | rigid bearing stack | drag pack on the outer ring flange under the bridge | F6: the locking arcs run with 1.5 mm clearance |
+| disc | one piece | locking arc as a screwed, hardened segment (H.lockingSegment) | M14 |
+| pW | rigid bearing stack | drag pack on the outer ring flange under the bridge (H.dragPack) | F6: the locking arcs run with 1.5 mm clearance |
 | wheel | plain | four lobe windows, 30% of its area | M2 |
-| arm plates | straight stadium | tapered, bosses R12 and R8 | D1 |
-| arm, front plate | its own body | rides the rear plate's body | one rigid clevis arm |
+| arm plates | straight stadium | tapered in the model, bosses R12 and R8; the front plate twinned with the rear one | D1, A9 |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 8 | 0 | 40.9 |
-| DL-B | 0 | 225 | 39.4 |
+| DL-B | 0 | 228 | 39.4 |
 | DL-C | 0 | 0 | 17.4 |
 | DL-D | 21 | 0 | 12.7 |
 | DL-E | 12 | 13 | 5.9 |
@@ -165,12 +162,9 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- **J4 for open slots.** The classifier reads slots as holes, so a Geneva wheel's slots, open at the rim, give no J4; the polish builds the roller, strips and felts by hand. A classify step for notches in the outline would make this automatic (also for intermittent gears and slotted cranks).
-- **Clevis twin** (as on the four-bar): the front arm plate is a second model part so the pin builders see it; a declared twin would get the plain hole and the shared body without a rebuild.
-- **Pins classified at one phase.** An intermittent contact is only seen if the assembly phase has it engaged; the model puts u = 0 at mid-index for that reason.
-- **H.dragPack sizes.** It sizes its rings for the inner race (d + 6); a drag needs to bear on the turning part, here the outer ring flange: it should take inner and outer Ø.
-- **Locking segment primitive.** A hardened arc segment cut from a part's outline and held by screws on the joint line, needed by any indexing disc (M14).
+- None open. J4 for open slots, pins classified over the cycle, the clevis twin, H.dragPack sizes and the locking
+  segment primitive were promoted in standard 2.1.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.7 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.1 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #11) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 50.3 ms at full detail, 8 ms reached at dial E (flag, R6)

@@ -5,6 +5,7 @@ import { drive } from "./drive";
 import { feet } from "./feet";
 import { j1 } from "./j1-dead-axle";
 import { j2 } from "./j2-live-shaft";
+import { j2Straddle } from "./j2-straddle";
 import { j3 } from "./j3-moving-pin";
 import { j4 } from "./j4-slot-roller";
 import { j5 } from "./j5-slide";
@@ -21,14 +22,16 @@ import type { Rule, RuleContext } from "./types";
 
 /**
  * Order matters: the mesh rule asks J2 for hubs and an eccentric before the shafts are built; the bridges (J1) are
- * placed after every moving pin's hardware exists; the drive after every housing; the feet after everything that
- * hangs under the base; lubrication, timing, locking and materials last, over everything.
+ * placed after every moving pin's hardware exists; the drive after every housing; the straddle bridges over live gear
+ * shafts after the drive, whose motor they keep clear of; the feet after everything that hangs under the base;
+ * lubrication, timing, locking and materials last, over everything.
  */
-export const rules: Rule[] = [classify, base, j6, j2, j3, j4, j5, j7, j1, stops, standoffs, drive, j8, feet, lubrication, timingMarks, locking, materials];
+export const rules: Rule[] = [classify, base, j6, j2, j3, j4, j5, j7, j1, stops, standoffs, drive, j8, j2Straddle, feet, lubrication, timingMarks, locking, materials];
 
 /** Stages and code outside the rule list that serve AUTO requirements. */
 export const PROVIDERS: { id: string; ids: string[] }[] = [
   { id: "fasteners (stage 3)", ids: ["A8", "M4"] },
+  { id: "headroom", ids: ["A13"] },
   { id: "see-through", ids: ["L5"] },
   { id: "explode", ids: ["E1", "E2", "E3", "E5", "E6", "E7", "E8"] },
   { id: "hardware primitives", ids: ["A13", "M1", "M3", "M5", "M11", "R3"] },

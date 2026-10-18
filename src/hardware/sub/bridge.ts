@@ -94,30 +94,33 @@ export function bridge(ctx: RuleContext, o: BridgeSpec): BridgeResult | null {
   const rB = o.rBoss ?? 10.5;
   const c: Vec2 = [o.over.reduce((s, p) => s + p[0], 0) / o.over.length, o.over.reduce((s, p) => s + p[1], 0) / o.over.length];
   const R = STANDOFF.D / 2;
-  const cands: { p: Vec2; r: number; a: number }[] = [];
+  // candidates in order of distance; the sweep clearance, the costly test, is run only for a pair that would beat the
+  // best so far (cost >= rA + rB, so the search stops as soon as no pair can)
+  const cands: { p: Vec2; r: number; a: number; ok?: boolean }[] = [];
   for (let r = 24; r <= 124; r += 4)
     for (let k = 0; k < 60; k++) {
       const a = (k / 60) * TAU;
       const p: Vec2 = [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
       if (depth(base.outer, [], p) < R + 9) continue;
       if (o.over.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 16)) continue;
-      if (ctx.clearance(p, R + POST_MARGIN, ctx.b1, ctx.b1 + 80, (t) => t.isBase === true) < 0) continue;
       cands.push({ p, r, a });
     }
+  const clear = (x: (typeof cands)[0]) => (x.ok ??= !ctx.hits(x.p, R + POST_MARGIN, ctx.b1, ctx.b1 + 80, (t) => t.isBase === true));
   let best: [typeof cands[0], typeof cands[0]] | null = null;
   let cost = Infinity;
-  for (let i = 0; i < cands.length; i++)
-    for (let j = i + 1; j < cands.length; j++) {
-      const A = cands[i]!;
+  for (let i = 0; i < cands.length && 2 * cands[i]!.r < cost; i++) {
+    const A = cands[i]!;
+    for (let j = i + 1; j < cands.length && A.r + cands[j]!.r < cost; j++) {
       const B = cands[j]!;
       const sep = Math.abs(Math.atan2(Math.sin(A.a - B.a), Math.cos(A.a - B.a))) * (180 / Math.PI);
       if (sep < 50 || sep > 160 || Math.hypot(A.p[0] - B.p[0], A.p[1] - B.p[1]) < 20) continue;
       const k = A.r + B.r + 0.3 * Math.abs(sep - 100);
-      if (k < cost) {
+      if (k < cost && clear(A) && clear(B)) {
         cost = k;
         best = [A, B];
       }
     }
+  }
   if (!best) return null;
   const posts: [Vec2, Vec2] = [best[0].p, best[1].p];
   // posts far from a single pivot: two arms with a filleted crotch, material only where the load runs (D2, M7);
@@ -130,7 +133,9 @@ export function bridge(ctx: RuleContext, o: BridgeSpec): BridgeResult | null {
   const foot = region(outer, []);
   let z0 = o.zMin;
   for (const sw of ctx.sweeps()) if (sw.regions.some((g) => overlap(foot, g) > 0.05)) z0 = Math.max(z0, sw.z1 + 0.8);
-  for (const t of ctx.solids) {
+  // highest first: a solid whose top cannot raise the underside any more is never swept
+  for (const t of [...ctx.solids].sort((p, q) => q.z1 - p.z1)) {
+    if (t.z1 + 0.8 <= z0) break;
     if (t.body === "ground" && !t.motion) continue;
     if (ctx.solidOf[t.id] === t) continue;
     if (ctx.swept(t).some((g) => overlap(foot, g) > 0.05)) z0 = Math.max(z0, t.z1 + 0.8);
