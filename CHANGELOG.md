@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.12.1 — 2026-10-18
+
+- Trammel of Archimedes: one cross-shaped groove plate; the crank and rod turn under it and only the blocks run in the
+  grooves, so nothing crosses where it cannot.
+- Oscillating cylinder: the cover plate is see-through so the piston and rod read; the base grows to hold the stop
+  posts.
+- Toggle clamp: closes against a fixed work-piece, which is also the forward stop.
+- Whitworth: the rails start where the ram's left end reaches, so the ram stays on them over the whole stroke.
+- Locomotive driving gear: the base grows to hold the drive's tensioner arm.
+- Ratchet and pawl: the wheel turns continuously over any number of loops (it jumped back one pitch at each loop
+  point, which also made the spokes hop). A new model check compares five loops: every point must repeat and no
+  part may jump at a loop point.
+- Planetary: the F9 timing mark of an internal mesh was drawn on the wrong side and orbited the canvas; fixed in the
+  mesh classifier. Geneva: the bore-entry ring is only drawn on round holes, so the wheel windows lose their faint
+  circle.
+
+
 ## 0.12.0 — 2026-10-18
 
 - Twenty-two more mechanisms built to standard 2.3 through the conformance pass: cam and roller follower, Chebyshev,
