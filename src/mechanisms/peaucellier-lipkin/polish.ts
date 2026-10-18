@@ -27,7 +27,7 @@ export const polish: Polish = (A, H) => {
 
   // ---- the drive: the link crosses the input shaft end, so the retaining washer and screw there would foul it.
   // Retain the lever from above with an external circlip instead; the shaft end is flush with the lever. The lever's
-  // wall round the Ø10 bore is under 1.5 mm: widen it ----
+  // wall round the Ã10 bore is under 1.5 mm: widen it ----
   const lever = A.get("drive-lever");
   const rw = A.get("pQ-rw");
   if (lever && rw) {
@@ -57,7 +57,7 @@ export const polish: Polish = (A, H) => {
   }
 
   // ---- F5: the rule skips the input arm (its drive limits it); with the drive off it would still over-travel, so
-  // it gets its own pair of stops 2° beyond each end (Appendix A) ----
+  // it gets its own pair of stops 2Â° beyond each end (Appendix A) ----
   const inp = ctx.parts["input"]!;
   const swI = swingOf(ctx, inp)!;
   const pQ = ctx.pinJoint("pQ")!;
@@ -68,7 +68,7 @@ export const polish: Polish = (A, H) => {
   if (lone.length === 1) {
     for (const id of sI) {
       const s = A.get(id);
-      if (s && !s.name) Object.assign(s, { name: id.endsWith("-sc") ? "Button head M4 (ISO 7380)" : "Stop bumper, neoprene sleeve �12", qty: 1 });
+      if (s && !s.name) Object.assign(s, { name: id.endsWith("-sc") ? "Button head M4 (ISO 7380)" : "Stop bumper, neoprene sleeve Ø12", qty: 1 });
     }
   }
 
@@ -77,7 +77,7 @@ export const polish: Polish = (A, H) => {
   const sb = A.get("pO-armB-stop1");
   const sbs = A.get("pO-armB-stop1-sc");
   const ref = A.get("pO-stop0-sc");
-  if (sb && !sb.name) Object.assign(sb, { name: "Stop bumper, neoprene sleeve �12", qty: 1 });
+  if (sb && !sb.name) Object.assign(sb, { name: "Stop bumper, neoprene sleeve Ø12", qty: 1 });
   if (sbs && !sbs.name) Object.assign(sbs, { name: ref?.name ?? "Button head M4 (ISO 7380)", qty: 1 });
 
   // ---- M13, M10: the eccentric's screws and the new stops are named and threadlocked like every other fastener ----
@@ -104,7 +104,7 @@ export const polish: Polish = (A, H) => {
 
   // ---- A16: notes, badges, build rules ----
   A.joint("pQ", {
-    note: `${A.joint("pQ").note} Oscillating input: the shaft carries the drive lever below the base, held by a circlip, and two stops stand 2° beyond the ends of the 128° swing. The input arm sits alone on the lowest layer, under both long arms.`,
+    note: `${A.joint("pQ").note} Oscillating input: the shaft carries the drive lever below the base, held by a circlip, and two stops stand 2Â° beyond the ends of the 128Â° swing. The input arm sits alone on the lowest layer, under both long arms.`,
   });
   A.joint("pO", {
     note: `${A.joint("pO").note} The axle sits in an eccentric bushing in the base: turn it to set the ground length OQ = 45 mm exactly (the drawing is at the set point), then clamp it with its two screws. Both long arms turn on it, one above the other.`,
@@ -114,7 +114,7 @@ export const polish: Polish = (A, H) => {
     { title: "Five planes, no crossing parts meet", text: "The input arm is alone on the lowest layer; the long arms and the rhombus sides sit on four more, so every pin joins only the parts it carries and no link passes through another." },
     { title: "OQ = QC is exact", text: "The inversion is exact only when the input arm is as long as the ground distance OQ, so C runs on a circle through O. The ground length is set by an eccentric bushing at O; the drawing shows it at the set point." },
     { title: "Rhombus on bearings", text: "A, B, C and D are bearing pins with inner-race spacers in the gaps between the layers; the long arms are l = 125 and the sides q = 55, so D runs on x = 140 mm." },
-    { title: "Stops outside the swing", text: "Rubber-faced stop posts 2° beyond each end of the input arm's travel catch it with the drive off." },
+    { title: "Stops outside the swing", text: "Rubber-faced stop posts 2Â° beyond each end of the input arm's travel catch it with the drive off." },
     { title: "Kinematics untouched", text: "Pin centres are the solver's; plating heights, outlines and hardware are designed around them." },
   );
 };
