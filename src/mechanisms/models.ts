@@ -24,6 +24,7 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "elliptic-trammel": async () => (await import("./elliptic-trammel/model")).default,
   "watt-linkage": async () => (await import("./watt-linkage/model")).default,
   "roberts-linkage": async () => (await import("./roberts-linkage/model")).default,
+  "scott-russell": async () => (await import("./scott-russell/model")).default,
   "locomotive-drive": async () => (await import("./locomotive-drive/model")).default,
   whitworth: async () => (await import("./whitworth/model")).default,
   "oldham-coupling": async () => (await import("./oldham-coupling/model")).default,
