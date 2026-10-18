@@ -13,6 +13,7 @@ export interface MechanismEntry {
 
 const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "four-bar": () => import("./four-bar/polish"),
+  "intermittent-gear": () => import("./intermittent-gear/polish"),
   geneva: () => import("./geneva/polish"),
   "spur-gears": () => import("./spur-gears/polish"),
   "slider-crank": () => import("./slider-crank/polish"),
