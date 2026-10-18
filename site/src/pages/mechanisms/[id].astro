@@ -53,7 +53,7 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
   <Bar />
   <main class="wrap detail">
     <nav class="crumbs" aria-label="Sheets">
-      <a class="btn" href={url("/")}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>All mechanisms</a>
+      <a class="btn" id="back" href={url("/")}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>All mechanisms</a>
       {SHEETS.length > 1 && (
         <div class="nav">
           <a class="btn quiet" href={url(`/mechanisms/${prev.id}/`)}>{prev.rec.name}</a>
@@ -109,5 +109,6 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
   </main>
   <script>
     import "../../islands/stage";
+    import "../../islands/back";
   </script>
 </Sheet>

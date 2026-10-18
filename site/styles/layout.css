@@ -205,11 +205,12 @@ footer {
     align-self: stretch;
     justify-content: center;
   }
-  .bar .lbl {
+  /* the bar's own row only: the filter panel inside the bar has labels too */
+  .bar .row > .lbl {
     grid-column: 1;
     grid-row: 2;
   }
-  .bar .seg {
+  .bar .row > .seg {
     grid-column: 2;
     grid-row: 2;
   }

@@ -97,6 +97,17 @@ for (const card of document.querySelectorAll<HTMLAnchorElement>(".card")) {
     if (hasWebGL2()) void load();
   });
 }
+// the thumbnails load lazily; once the page is idle, every card's image for the current sheet is fetched ahead of
+// scrolling, so none pops in (the other sheet's images wait until the sheet is switched)
+const ahead = () => {
+  const t = document.documentElement.dataset.theme === "light" ? "light" : "dark";
+  for (const img of document.querySelectorAll<HTMLImageElement>(`.thumb img.t-${t}`)) img.loading = "eager";
+};
+const idle = (f: () => void) => ("requestIdleCallback" in window ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 300));
+if (document.readyState === "complete") idle(ahead);
+else addEventListener("load", () => idle(ahead), { once: true });
+addEventListener("themechange", ahead);
+
 document.addEventListener("pointerdown", (e) => {
   if (e.pointerType !== "mouse" && active && !active.contains(e.target as Node)) stop(active);
 });

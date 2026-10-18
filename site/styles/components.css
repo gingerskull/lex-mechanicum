@@ -247,8 +247,8 @@
 :root[data-theme="light"] .stage .t-dark {
   display: none;
 }
-/* off-screen cards cost no layout or paint as the library grows (on the parts, so the card's corner marks still show) */
-.thumb,
+/* off-screen cards cost no layout or paint as the library grows (on the title block only: on the drawing it would hold
+   its image back until it is nearly in view, and on the card it would clip the corner marks) */
 .card .body {
   content-visibility: auto;
 }
