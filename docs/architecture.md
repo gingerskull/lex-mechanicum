@@ -26,7 +26,7 @@ src/parts/                       the part family: link (stadium or tapered), pla
                                  a clevis twin; heights()
 src/model/                       the MechanismModel contract, defineMechanism, poseOf, sample, basePlate, checkModel
 src/hardware/                    tables (bearings, screws, circlips, keys, pulleys, springs, motors) as data; the
-                                 Solid type; primitives H.*; subassemblies in sub/ (housing, bridge, slide, stops,
+                                 Solid type; primitives H.*; subassemblies in sub/ (housing, bridge, slide and its rail seat, stops,
                                  eccentric mount, drag pack, locking segment, output coupling, follower train, sensor,
                                  drive by input kind)
 src/rules/                       context, classify (slots closed and open, over the cycle), one module per rule, the

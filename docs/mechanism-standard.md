@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.3
+version: 2.4
 date: 2026-10-18
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -158,7 +158,7 @@ feet, lubrication, timing marks, materials and the drive.
 | A3 | **Catalogue sizing:** bore = largest catalogue bore every boss on the joint can take; each part gets the largest bearing its boss fits with a 1.2 mm wall, else a bronze bushing; gaps get inner-race spacers. | AUTO |
 | A4 | **Shafts are stepped profiles** (`H.shaft`): shoulders at every seat, circlip grooves, set-screw flats, thread with undercut, chamfered ends, wrench flats where tightened without a head, centre holes on turned ends. | AUTO |
 | A5 | **Keys by shaft size:** D-flat to Ø8; feather key and keyway above Ø8; taper pin on cross-pinned small parts. Every keyed part gets the matching bore. | AUTO |
-| A6 | Fixed plates floating above the base sit on Ø10 **standoffs**, screwed from both sides; **spigoted** when the plate holds a bearing. A slide rail sits on the base on **ground steel pads**, one under each fixing, screwed down through rail and pad into the base and dowelled at its ends (F1). | AUTO |
+| A6 | Fixed plates floating above the base sit on Ø10 **standoffs**, screwed from both sides; **spigoted** when the plate holds a bearing. A slide rail sits on the base on a **ground steel riser** along its straight run, split into pads on the free runs where a moving part passes under the rail; a countersunk screw at each fixing, near each end of a riser and at most 100 mm apart, down through rail and riser into the base; the reference rail of the slide dowelled by its end screws (F1). | AUTO |
 | A7 | **Base plate** 8 mm thick, 2 mm under the lowest part, four counterbored mounting holes on the corner-arc centres, rubber feet unless a housing hangs there, traced paths engraved, 5 mm engraved scale along the front edge, a clearance hole for every live shaft. | AUTO |
 | A8 | **Stage 3 fasteners** (after the polish): every head gets its threaded shank from `thread` (never along a shoulder), including heads seated over a pre-drilled hole or in a counterbore; every plate a shank passes gets a clearance hole, tapped where it ends; blind tapped holes are marks, not through holes; two screws meeting in a standoff stop short of the middle. | AUTO |
 
@@ -243,7 +243,7 @@ every line of its row exists or is marked N/A with a reason in the audit.
 | J2 | **Ground revolute, live shaft** | Housing cartridge behind the base: two bearings, spacer sleeve, wave-washer preload, circlips, shield or seal (F2, F4); housing screwed and dowelled to the base (F1, A11); keyed shaft (A5) with pulley on a hub with two set screws at 90° or a clamp hub (F3); end retainer on the shaft end (F2); thrust washer under the first part (F4); home flag on the pulley or shaft (F10); clearance hole in the base (A7). A gear shaft with nothing sweeping over it is straddle mounted: a bridge over the shafts of the mesh, a floating flanged bearing in it per shaft, the backlash eccentric at the top as well as the bottom (A9, F7). |
 | J3 | **Moving revolute** (pin between links) | Shoulder bolt threaded into the lowest part, bearing in every other part, inner-race spacers, threadlocker or nyloc (M13), clevis where the sweeps allow (A9), bore chamfers (M3). |
 | J4 | **Pin in slot** | Track roller on a stud; hardened wear strips screwed into the walls of every slot the roller runs in (M14); felt oiler per slot, in the relieved end where the roller leaves room (F8); relief at the slot ends. |
-| J5 | **Prismatic slide** | Guide body; gib strip with adjusting screws and lock nuts on one side (F7); keeper plate; wipers at both ends; grease nipple feeding the guide (F8); end stops with bumpers (F5). |
+| J5 | **Prismatic slide** | A few blocks. One rail is the plain reference, dowelled (F1); on the other a bronze gib bears on the slider's side and a keeper plate over it laps the slider (F2); the gib is slotted, set across against the slider and clamped by the keeper's screws, which are the rail's own fixing screws, down through keeper, gib, rail and riser (F7, A6, M13). A felt wiper at each end of the slider, a grease nipple on the keeper (F8); one end stop block with a neoprene pad just past each end of the travel (F5). No separate shim, gib adjusting screws or lock nuts. |
 | J6 | **Gear mesh** | Hubs with key or D-flat and set screw (F3); eccentric bushing with flange, arc slots and clamp screws on one shaft for backlash (F7); timing marks at the mesh (F9); thrust washers and retaining rings on each shaft (F2, F4). |
 | J7 | **Cam contact** | Roller follower on a stud; return spring with seat, guide and preload screw, or form closure (F6); follower guide bushing with circlip (F2); anti-rotation key on flat followers (F3); felt oiler on the track (F8); zero line (F9); hardened cam (M10). |
 | J8 | **Belt** | Flanged small pulley (F10); slotted mount for tension (F7); idler on a slotted arm where the wrap is short; belt guard only if see-through. |
@@ -311,8 +311,9 @@ changing what the mechanism is.
 - **Pulleys and belts:** flanges on the small pulley, two set screws at 90° or a clamp hub, tension slot, idler.
 - **Springs** (`H.spring`): compression (seat, guide pin or bore, preload screw), torsion (post and tail stop), leaf
   (screwed at one end, bearing on a hardened pad). Drawn as the coil or leaf outline with its seat as a real part.
-- **Slides:** gib strip, adjusting screws with lock nuts, keeper plate, wipers, nipple, end stops; hardened wear
-  strips as separate screwed parts (M14).
+- **Slides** (J5): a few blocks, each guide function carried by one of them. A dowelled reference rail; a gib clamped
+  under the keeper by the rail's screws, set on its slotted holes; a wiper at each end of the slider, a nipple, one end
+  stop block at each end. The hardened, screwed rails and the gib are the replaceable wear parts (M14).
 - **Sensing and cabling** (motorised builds): 1 mm vane on the input pulley or shaft collar, fork sensor on the
   bracket or a post, leads from motor and sensor to a terminal block on the base edge, one cable clip under the base.
 
@@ -336,7 +337,7 @@ changing what the mechanism is.
 | Compression spring | Ø6 to 10 wire 0.8 | F6 | Seat and guide as parts |
 | Leaf or pawl spring | 0.8 wire or thin leaf | F6 | Thin curved plate screwed at one end |
 | Eccentric bushing | Ø16 with offset Ø10 bore, flanged | F7 | Arc slots, two clamp screws, spanner holes, index line |
-| Gib strip | 3 x 6 section, 3 adjusting screws + lock nuts | F7 | Along one side of every slide |
+| Gib strip | the rail's width, as thick as the slider stands over the rail, slotted at each rail screw | F7 | On the keeper rail of every slide, clamped under the keeper by the rail's screws |
 | Jack screw + slots | M4 | F7 | Slots in a mount flange, screw against a lug |
 | Idler pulley | bearing on a stud | F7 | On a slotted arm |
 | Oil sink | Ø3 to 4 countersink at a pivot | F8 | One ring round an axle end on a bridge |
@@ -532,7 +533,8 @@ Start here, then run the full ten-function audit.
   Geneva disc; ratchet: real pawl spring screwed down, second holding pawl if the model has one; F10 home sensor.
 
 **Quick-return and slider** (slider-crank, scotch yoke, crank shaper, Whitworth, oscillating cylinder, locomotive drive, toggle clamp)
-- J5 on every slide (gib, keeper, wipers, nipple, stops); J4 in every slot with wear strips.
+- J5 on every slide (reference rail, gib under the keeper, wipers, nipple, an end stop at each end); J4 in every slot
+  with wear strips.
 - Scotch yoke: slide block in the slot (M14 liners). Toggle clamp: `manual`, over-centre stop visible (F5), adjustable
   spindle with lock nut (F7). Oscillating cylinder: pivot pin retained (F2); spring holding the port face (F6).
 
@@ -554,7 +556,8 @@ retainer plate, key, set screw, collar, spring (compression / torsion / leaf), s
 (marks), wear strip, eccentric bushing, gib, wiper, flag, sensor, terminal block, cable clip, lead`, helpers
 `disc, hex, taper, boltCircle, hullOf, window, filletPoly, spokes, boreChamfers`.
 
-Subassemblies: `H.housing` (J2 cartridge), `H.bridge` (posts, spigots, dowels, lobes), `H.slide` (J5),
+Subassemblies: `H.housing` (J2 cartridge), `H.bridge` (posts, spigots, dowels, lobes), `H.slide` (J5, a few
+blocks) with `seatRail` and `railLayout` (A6: the rail's riser, or pads clear of what passes under it, and its screws),
 `H.eccentric` (J6 backlash), `H.stops` (F5 from the solved range), `H.dragPack` (F6, sized to the face it bears on),
 `H.lockingSegment` (M14), `H.outputCoupling` (a keyed flange on a straddle-mounted output), `H.followerTrain` (J7),
 `H.drive` (V1 to V6 by input kind), `H.sensor` (V6).
@@ -566,6 +569,13 @@ default detail level.
 
 ## Changelog
 
+- **2.4 (2026-10-18).** Linear guides are a few blocks with retaining screws and end stops. A slide is a dowelled
+  reference rail and a rail carrying a bronze gib clamped under the keeper; the keeper's screws are the rail's fixing
+  screws, so the shim, the separate keeper screws, the gib adjusting screws and their lock nuts go: the gib is set on
+  slotted holes and clamped (adjust kept, by the clamp). One end stop block with a pad at each end, a wiper at each end
+  of the slider, one nipple [J5, F2, F5, F7, F8, M13, AUTO]. Rails sit on one ground riser each, split into pads only on
+  the runs where nothing passes under the rail, screws near each riser end and at most 100 mm apart; only the reference
+  rail is dowelled [A6, F1, AUTO].
 - **2.3 (2026-10-18).** Real-world examples are YouTube videos of real footage, never product pages, animations or
   renders, and may be none [P1, P6, DATA].
 - **2.2 (2026-10-18).** Slide rails sit on ground steel pads, screwed through into the base and dowelled at the ends,
