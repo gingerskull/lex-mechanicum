@@ -315,7 +315,7 @@ function oscillating(ctx: RuleContext, kind: MotorKind): string {
   const unit = motorUnit(ctx, M, j.P, zl - 18, kind, null, zl - 5.5);
   const G = { body: j.body, joints: ["drive", j.id], ex: -5 };
   const motion = (type: "crank" | "link"): Motion => ({ type, motor: M!, r: rc, L, pivot: j.P, rho, off });
-  ctx.add(solid("drive-lever", { ...G, at: [j.at[0], j.at[1], off], kind: "part", role: "driver", name: `Drive lever, ${rho} mm`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rho, 0]], 6), holes: [disc(j.d / 2 + 0.01)], z0: zl, z1: zl + 6 }));
+  ctx.add(solid("drive-lever", { ...G, at: [j.at[0], j.at[1], off], kind: "part", role: "driver", name: `Drive lever, ${rho} mm`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rho, 0]], 7), holes: [disc(j.d / 2 + 0.01)], z0: zl, z1: zl + 6 }));
   ctx.add(solid("drive-link", { ...G, at: [0, 0, 0], motion: motion("link"), kind: "part", role: "link", name: `Drive link, ${fmt(L)} mm`, mat: "Steel C45", outer: roundedPoly([[0, 0], [L, 0]], 5), z0: zl - 5, z1: zl - 0.5 }));
   ctx.add(solid("drive-crank", { ...G, at: [0, 0, 0], motion: motion("crank"), kind: "part", role: "driver", name: `Drive crank, ${fmt(rc)} mm, on the motor shaft`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rc, 0]], 6), holes: [disc(2.05)], z0: zl - 10, z1: zl - 5.5 }));
   ctx.add(solid("drive-flag", { ...G, at: [0, 0, 0], motion: motion("crank"), kind: "flag", name: "Home flag on the drive crank", mat: "Stainless steel, 1 mm", outer: [[-2, -0.5], [-10, -0.5], [-10, 0.5], [-2, 0.5]].map(([x, y]) => [x, y] as Vec2), z0: zl - 14, z1: zl - 13 }));
