@@ -69,3 +69,13 @@ npm run shot <id>         render one frame of a mechanism to a PNG
 ```
 
 Work is tracked on the project board (see [docs/workflow.md](docs/workflow.md)).
+
+## Licence
+
+- **Code** (everything not listed below): MIT, see [LICENSE](LICENSE).
+- **Content**: the catalogue (`data/catalog/`), the documents and images in `docs/`, and the drawings the site
+  renders: Creative Commons Attribution-ShareAlike 4.0, see [LICENSE-CONTENT](LICENSE-CONTENT). Credit
+  "Mechanism Database" with a link to this repository, and share adaptations under the same licence.
+
+Linked references, photos and videos belong to their owners and are not covered. The IBM Plex fonts the site ships are
+under the SIL Open Font License 1.1.
