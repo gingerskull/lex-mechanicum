@@ -20,6 +20,27 @@ export function segDist(q: Vec2, a: Vec2, b: Vec2): number {
   return Math.hypot(q[0] - a[0] - t * dx, q[1] - a[1] - t * dy);
 }
 
+/**
+ * The part of polygon P where (p - p0) · n >= 0 (Sutherland-Hodgman against one line). Exact for a cut that leaves
+ * one piece, as a line across a bar does.
+ */
+export function clipHalfPlane(P: Vec2[], p0: Vec2, n: Vec2): Vec2[] {
+  const f = (p: Vec2) => (p[0] - p0[0]) * n[0] + (p[1] - p0[1]) * n[1];
+  const out: Vec2[] = [];
+  for (let i = 0; i < P.length; i++) {
+    const a = P[i]!;
+    const b = P[(i + 1) % P.length]!;
+    const fa = f(a);
+    const fb = f(b);
+    if (fa >= 0) out.push(a);
+    if (fa >= 0 !== fb >= 0) {
+      const t = fa / (fa - fb);
+      out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+    }
+  }
+  return out;
+}
+
 /** Distance from q to the boundary of P. */
 export function edgeDist(P: Vec2[], q: Vec2): number {
   let d = Infinity;

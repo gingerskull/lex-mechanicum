@@ -1,13 +1,13 @@
 # Audit: Hoekens linkage (hoekens-linkage)
-standard: 2.3 · date: 2026-10-18 · result: open · detail: full · pass: build
+standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: build
 
 ## Summary
-PASS 114 · FAIL 1 · N/A 6 · open: FAIL F7
+PASS 115 · FAIL 0 · N/A 6 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.3 and its changelog |
+| S1 | PASS | DATA · the standard carries version 2.5 and its changelog |
 | S2 | PASS | HAND · header with standard, date, result, detail, pass |
 | S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
 | S4 | PASS | SITE · #26 holds only this mechanism's decisions and open items |
@@ -48,16 +48,16 @@ PASS 114 · FAIL 1 · N/A 6 · open: FAIL F7
 | A10 | PASS | HAND · crank and rear rocker share z 0 to 6, coupler 7.5 to 13.5, front rocker plate 15 to 21 |
 | A11 | PASS | HAND · load paths in the joint notes: pins to bearings to links; axle to base and bridge; bridge screwed and located by spigots; housing screwed and dowelled |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes (shoulder lengths, bearing designations); sets counted |
+| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes (shoulder lengths, bearing designations, the turnbuckle with its M3 thread and stud length); sets counted |
 | A14 | PASS | HAND · posts, stops and leads clear every sweep; stops 2° beyond the swing; clearance 0 |
 | A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
 | A16 | PASS | HAND · a note and a badge on every joint, five build rules |
-| A17 | PASS | HAND · goes together from the base up: housing and shaft, crank, rear rocker on the axle, coupler on both pins, front plate, B bolt, bridge, axle; every screw reachable; bearings pressed out past their circlips |
+| A17 | PASS | HAND · goes together from the base up: housing and shaft, crank, rear rocker on the axle, coupler (its two halves first joined and set on the turnbuckle at 100 mm) on both pins, front plate, B bolt, bridge, axle; every screw reachable; the turnbuckle body and nuts reachable from above between A and B; bearings pressed out past their circlips |
 | E1 | PASS | AUTO · one level per solid |
 | E2 | PASS | AUTO · every screw, shoulder bolt with its shim, shaft and bought unit is one group |
 | E3 | PASS | AUTO · bolts and axle leave upward, housing and drive screws downward |
 | E4 | PASS | HAND · axle, B bolt, bridge, front plate, coupler, rear plate: the last part fitted goes furthest |
-| E5 | PASS | AUTO · bearings and circlips stay in their plates |
+| E5 | PASS | AUTO · bearings and circlips stay in their plates; the turnbuckle stays in the coupler's plane with both halves (it is assembled along the link, not up a pin axis) |
 | E6 | PASS | AUTO · motor with its bracket, bearings whole |
 | E7 | PASS | AUTO · spacers midway |
 | E8 | PASS | AUTO · crank, key and pulley keep their order on the input shaft |
@@ -71,17 +71,17 @@ PASS 114 · FAIL 1 · N/A 6 · open: FAIL F7
 | J7 | N/A | no cam |
 | J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension |
 | F1 | PASS | AUTO · housing dowelled, bridge spigoted; the moving pins carry no removable plate |
-| F2 | PASS | AUTO · every bearing held by a circlip and its flange, or two circlips; shaft end retainer; bolt heads |
+| F2 | PASS | AUTO · every bearing held by a circlip and its flange, or two circlips; shaft end retainer; bolt heads; the turnbuckle body held by its two jam nuts |
 | F3 | PASS | AUTO · feather key at the input; no other keyed part |
 | F4 | PASS | AUTO / HAND · bronze thrust washers on the base under crank and rocker, wave washer preloading the input; no drag needed |
 | F5 | PASS | AUTO / HAND · neoprene stops 2° beyond the rocker's swing; the input turns fully |
 | F6 | N/A | driven through a toothed belt; no rest position or rattling clearance to hold |
-| F7 | FAIL | AUTO / HAND · belt tension by the slotted mount, but Appendix A asks for one link adjustable at the exact ratio (this is an exact-ratio linkage) and none is: no turnbuckle or slotted-clamp link primitive exists and the swept stack leaves no room for a hand-built clamp on the rocker, crank or coupler. Needs a design decision (see Promotion candidates and #26) |
+| F7 | PASS | AUTO / HAND · belt tension by the slotted mount; the coupler is the adjustable link (Appendix A): H.turnbuckle halfway between A and B, in the coupler's own plane (the front rocker plate rides 1.5 mm over the coupler and the crank and rear rocker 1.5 mm under it, so nothing fits above or below), M3 left and right hand studs, a 12 x 6 x 15 body milled flat, two DIN 439 jam nuts; set at 100 mm between A and B, drawn length exact; the tip is drilled 100 mm on from B in the same half |
 | F8 | PASS | AUTO · oil sink on the bridge over the open front O4 bearing; the others are sealed or shielded |
 | F9 | PASS | HAND · swing scale engraved on the base, index line on the rocker: shows it went back together on the modelled branch |
 | F10 | PASS | AUTO / HAND · pulley flanges, home flag and fork sensor; no slip clutch: the crank turns fully and nothing in the linkage can jam while it is connected |
 | M1 | PASS | AUTO · edge breaks on every top face |
-| M2 | PASS | HAND · bosses round every pin; no window (slender bars) |
+| M2 | PASS | HAND · bosses round every pin; no window (slender bars); the coupler's halves end square at the turnbuckle, 30 mm of web from each end to its bore |
 | M3 | PASS | AUTO · bore entry chamfers on every seat and through hole |
 | M4 | PASS | AUTO / HAND · counterbored base corners and housing screws, countersink for the crank end screw |
 | M5 | PASS | AUTO / HAND · no pockets or windows; slots have full-radius ends |
@@ -92,7 +92,7 @@ PASS 114 · FAIL 1 · N/A 6 · open: FAIL F7
 | M10 | PASS | AUTO / HAND · materials named on every solid |
 | M11 | PASS | AUTO · centre holes and chamfered ends on the shafts |
 | M12 | PASS | HAND · every head reachable from above or below when assembled; bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw and bolt, set screws low strength |
+| M13 | PASS | AUTO / HAND · threadlocker on every screw and bolt, set screws low strength; turnbuckle studs threadlocked into the halves, the body locked by jam nuts |
 | M14 | N/A | no sliding contact |
 | V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 |
 | V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
@@ -108,15 +108,15 @@ PASS 114 · FAIL 1 · N/A 6 · open: FAIL F7
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · swing scale and index line are marks; centrelines and dimensions automatic |
-| R1 | PASS | HAND · the polish reuses the swing of H.stops and bearingName; plating, the clevis twin and the tapered links are the model's; no inline standard part |
+| R1 | PASS | HAND · the polish reuses the swing of H.stops, bearingName and H.turnbuckle; plating, the clevis twin and the tapered links are the model's; no inline standard part |
 | R2 | PASS | HAND · threads M3, M4, M5, M6, M8; joints Ø8, 10; bearings 6800-2RS, F688ZZ, F6800 |
 | R3 | PASS | AUTO · housing, bridge, stops and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time, 23.1 KB |
 | R5 | PASS | HAND · states only what differs; one swing sample; rules 0.18 s, polish under 1 ms |
 | R6 | PASS | FLAG · Node canvas (CPU) at DPR 1.5: plan 231.5, 28° 265.9, side 288.0, explode at 70° 285.9 ms at full detail; 44.7 ms at dial C and 27.1 ms at dial H; a CPU canvas is far slower than a browser, so these are for comparing rungs, not against the 8 ms target; session setup 1.5 ms |
-| R7 | PASS | HAND · model.ts + polish.ts 8.3 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 9.1 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
+| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the turnbuckle body and nuts DL-H, the studs and the coupler's second half never; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
 | DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
 | DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
@@ -124,20 +124,21 @@ PASS 114 · FAIL 1 · N/A 6 · open: FAIL F7
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes |
 | Q3 | PASS | package written, 23.1 KB; site build not run in this pass |
-| Q4 | PASS | plan, 28°, side, explode at 28° and 70°, both sheets, rendered with tools/shot |
+| Q4 | PASS | plan, 28°, side, explode at 28° and 70°, both sheets, rendered with tools/shot and looked at again with the turnbuckle |
 | Q5 | PASS | bench run; flags under R6 |
-| Q6 | PASS | every row judged; F7 listed as open |
-| Q7 | PASS | conformance: hoekens-linkage at 2.3, open on F7 |
+| Q6 | PASS | every row judged; no FAIL |
+| Q7 | PASS | conformance: hoekens-linkage at 2.5, pass |
 
 ## Joints
 | Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | pO2 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – the input turns fully | – driven through the belt, nothing to hold | – belt tension at the motor mount (drive) | – sealed bearings | – one input, no phase to keep | – see drive |
-| pO4 | J1 | 2 x spigot | 2 x Internal circlip DIN 472, Ø19; Bearing F6800-2RS (10x19x5); Bearing F6800 (10x19x5) | – no keyed part; plates turn on bearings | Thrust washer 10.2x13.1, bronze | bumper | – belt-driven, no rest position | none (open, F7) | Bridge over the pivot, on two spigoted posts | Swing scale engraved on the base, index line on the rocker | – protected by the stops (F5) |
-| pA | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – belt-driven, no rest position | none (open, F7) | – shielded bearing, greased for life | – no phase between crank and coupler | – none needed |
-| pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – front plate clamped on the shoulder; no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – belt-driven, no rest position | none (open, F7) | – shielded bearing, greased for life | – no phase between coupler and rocker | – none needed |
+| pO4 | J1 | 2 x spigot | 2 x Internal circlip DIN 472, Ø19; Bearing F6800-2RS (10x19x5); Bearing F6800 (10x19x5) | – no keyed part; plates turn on bearings | Thrust washer 10.2x13.1, bronze | bumper | – belt-driven, no rest position | – no exact length at the ground pivot; the coupler carries the adjuster | Bridge over the pivot, on two spigoted posts | Swing scale engraved on the base, index line on the rocker | – protected by the stops (F5) |
+| pA | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – belt-driven, no rest position | – see coupler-adjust | – shielded bearing, greased for life | – no phase between crank and coupler | – none needed |
+| pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – front plate clamped on the shoulder; no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – belt-driven, no rest position | – see coupler-adjust | – shielded bearing, greased for life | – no phase between coupler and rocker | – none needed |
 | pO4-bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – spigot in a slot takes the hole tolerance | – static | – static | – static |
 | drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO2) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
+| coupler-adjust | post | – the halves are located by the studs in the body | 2 x Jam nut M3 (DIN 439), one left hand and one right hand | – static: the studs are threadlocked into the halves | – static | – static | – static | Turnbuckle body 12 x 6 x 15, milled flat, M3 left and right hand; 2 x Jam nut M3 (DIN 439), one left hand and one right hand; 2 x Stud M3 x 13.8, one left hand and one right hand, threadlocked into the halves | – static | Index line across the body at the set point | – static |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -146,26 +147,26 @@ PASS 114 · FAIL 1 · N/A 6 · open: FAIL F7
 | rocker | one plate | clevis: a front plate twinned with the rear one in the model (`twin`), z 15 to 21 | A9: B in double shear |
 | crank, rocker | straight stadium | tapered in the model, bosses R13/R9.5 and R12/R9.5 | D1: sized to what each boss carries |
 | pO4, rear bearing | open, oiled from the bridge | sealed (2RS) | the bridge's oil sink cannot reach it under the front plate |
+| coupler | one plate from A to the tip | two halves on one body, joined by H.turnbuckle halfway between A and B | F7: the straight line needs the exact ratios; the turnbuckle sits in the coupler's plane because the stack has no room above or below it |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 14 | 0 | 189.4 |
-| DL-B | 0 | 205 | 185.8 |
+| DL-B | 0 | 209 | 185.8 |
 | DL-C | 0 | 0 | 44.7 |
 | DL-D | 24 | 0 | 35.6 |
 | DL-E | 8 | 2 | 33.4 |
 | DL-F | 0 | 0 | 31.9 |
 | DL-G | 0 | 0 | 30.9 |
-| DL-H | 8 | 0 | 27.1 |
-| never | 84 | 180 | 271.4 (full) |
+| DL-H | 11 | 0 | 27.1 |
+| never | 87 | 181 | 271.4 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- F7 for exact-ratio linkages: a turnbuckle or slotted-clamp link (or an eccentric pivot) as a part or primitive that fits inside the swept stack, so Hoekens, Chebyshev, Watt and similar linkages can show one adjustable link at its set point with the drawn length exact. Without it no hand fix is possible here.
 - The swing scale and index line (F9) now appear in four-bar and this mechanism: a rule or `H.stops` option for a rocker's swing scale is due at three.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.1 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (tools/shot) · bench: Node canvas, DPR 1.5, 2026-10-18; 28° frame 265.9 ms at full detail (CPU canvas, flag only, R6)
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.1 KB
+screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (tools/shot), again with the turnbuckle · bench: Node canvas, DPR 1.5, 2026-10-18, before the turnbuckle (not re-run; 11 small solids added); 28° frame 265.9 ms at full detail (CPU canvas, flag only, R6)

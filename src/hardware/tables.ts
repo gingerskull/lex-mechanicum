@@ -82,6 +82,9 @@ export const NUTS: Record<number, { s: number; m: number }> = {
   8: { s: 13, m: 8 }, 10: { s: 16, m: 10 },
 };
 
+/** Thin jam nuts DIN 439: heights (widths across flats as NUTS). */
+export const JAM_NUTS: Record<number, { m: number }> = { 3: { m: 1.8 }, 4: { m: 2.2 }, 5: { m: 2.7 }, 6: { m: 3.2 }, 8: { m: 4 } };
+
 /** Plain washers ISO 7089: outside Ø and thickness. */
 export const WASHERS: Record<number, { D: number; h: number }> = {
   2: { D: 5, h: 0.3 }, 2.5: { D: 6, h: 0.5 }, 3: { D: 7, h: 0.5 }, 4: { D: 9, h: 0.8 }, 5: { D: 10, h: 1 }, 6: { D: 12, h: 1.6 },

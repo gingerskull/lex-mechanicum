@@ -2,13 +2,12 @@
 // are the model's; the rules build every stack on them: a live shaft at O, a dead axle and bridge at Y, shoulder bolts
 // at A to E, stops for the two parts that swing on Y, the base and the drive. What differs from the rules:
 // - lightening windows in the two triangles, the big oscillating plates (D2, M2);
-// - a turnbuckle sleeve in bar k, set at its exact length (F7, by hand: no primitive yet);
+// - bar k made adjustable by H.turnbuckle, set at its exact length (F7);
 // - an index on the crank and a zero line on the base, so the crank goes back in phase (F9);
 // - notes, badges and build rules (A16).
-import { polar, roundedPoly, type Vec2 } from "../../core/geom";
+import { polar, type Vec2 } from "../../core/geom";
 import { edgeDist, inside } from "../../core/poly";
 import type { Polish } from "../../assemble/api";
-import { solid } from "../../hardware/solid";
 
 /** The triangles' plan corners (the pins), body-local, as in the model. */
 const third = (pq: number, pr: number, qr: number): Vec2 => {
@@ -24,10 +23,9 @@ const WEB = 6;
 /** Window cutter radius (M5). */
 const CUTTER = 4;
 
-/** Bar k: its length, the bow of its outline (the model's) and the turnbuckle at its middle. */
+/** Bar k: its length and the bow of its outline (the model's); the turnbuckle sits at the bow's crest. */
 const K = 123.8;
 const K_BOW = 7;
-const TB = { half: 14, w: 5.5, sleeve: 9, nut: 4, thread: 5 };
 
 export const polish: Polish = (A, H) => {
   const ctx = A.ctx;
@@ -51,45 +49,13 @@ export const polish: Polish = (A, H) => {
   window("upper", UPPER);
   window("foot", FOOT);
 
-  // ---- F7: bar k carries a turnbuckle sleeve at its middle, set at its exact 123.8 mm between pin centres (K1). The
-  // sleeve is an Ø10 steel barrel on left and right hand M5 rods, each locked by a jam nut. Drawn in a window cut in
-  // the bar at its bow's crest, flush with the bar's top face; the drawn length stays exact. No primitive builds this
-  // yet: it is listed as a promotion candidate ----
-  const bar = A.get("bar-k")!;
-  const cx = K / 2;
-  const cy = K_BOW;
-  bar.holes.push(H.window([[cx - TB.half + 1.5, cy - TB.w + 1.5], [cx + TB.half - 1.5, cy - TB.w + 1.5], [cx + TB.half - 1.5, cy + TB.w - 1.5], [cx - TB.half + 1.5, cy + TB.w - 1.5]], 1.5));
-  const part = (id: string, name: string, x0: number, x1: number, over: number, kind: "collar" | "nut", mat: string, extra: Partial<ReturnType<typeof solid>> = {}) =>
-    solid(id, {
-      kind,
-      role: "hw",
-      body: "bar-k",
-      name,
-      mat,
-      outer: roundedPoly([[cx + x0 + 1, cy - 4.4], [cx + x1 - 1, cy - 4.4], [cx + x1 - 1, cy + 4.4], [cx + x0 + 1, cy + 4.4]], 1),
-      z0: bar.z0,
-      z1: bar.z1 + over,
-      ex: bar.ex,
-      joints: ["bar-k-adjust"],
-      ...extra,
-    });
-  A.add(
-    part("bar-k-sleeve", `Turnbuckle sleeve Ø10 x ${2 * TB.sleeve}, M${TB.thread} left and right hand`, -TB.sleeve, TB.sleeve, 0.8, "collar", "Steel C45, zinc plated", {
-      marks: [{ kind: "index", pts: [[cx, cy - 4.4], [cx, cy + 4.4]] }],
-    }),
-    part("bar-k-jam0", `Jam nut M${TB.thread} (DIN 439), one left hand and one right hand`, -TB.sleeve - TB.nut, -TB.sleeve, 0, "nut", "Steel 8, zinc plated", { thread: TB.thread, lock: "jam nut against the sleeve" }),
-    part("bar-k-jam1", "", TB.sleeve, TB.sleeve + TB.nut, 0, "nut", "Steel 8, zinc plated", { thread: TB.thread, lock: "jam nut against the sleeve", qty: 0 }),
-  );
-  A.get("bar-k-jam0")!.qty = 2;
-  const pA = A.pin("pA")!;
-  const pC = A.pin("pC")!;
-  A.joint("bar-k-adjust", {
-    type: "post",
-    at: [(pA[0] + pC[0]) / 2, (pA[1] + pC[1]) / 2],
+  // ---- F7: bar k is the one adjustable link, a turnbuckle at its bow's crest, where the bar runs straight along x,
+  // set at its exact 123.8 mm between pin centres (K1) ----
+  H.turnbuckle(A, "bar-k", {
+    at: [K / 2, K_BOW],
+    set: K,
     title: "Adjuster · bar k",
-    note: `Turnbuckle sleeve in the middle of bar k: left and right hand M${TB.thread} rods from the two halves, a jam nut on each so a set length cannot creep. The sleeve index is set when the bar is made to its ${K} mm centre distance; the drawn length stays exact. Bar k is the one adjustable link: a Jansen leg walks right only while its holy numbers hold, so one length is made trimmable.`,
-    badge: ["adjustable", "ok"],
-    serves: { F7: ["bar-k-sleeve", "bar-k-jam0", "bar-k-jam1"] },
+    why: "Bar k is the one adjustable link: a Jansen leg walks right only while its holy numbers hold, so one length is made trimmable.",
   });
 
   // ---- F9: the crank's phase. An index line on the crank and a zero line on the base at crank angle 0, with a tick every
@@ -132,7 +98,7 @@ export const polish: Polish = (A, H) => {
   A.rules.push(
     { title: "Crank lowest, bar k on top", text: "Every bar passes over the crank hub, so the crank takes the bottom plane; the two triangles share it, the bars j, c and f the next, bar k the top. Nothing is stacked only to clear something." },
     { title: "Bar k bowed", text: "The Y pivot sits 2.3 mm from a straight bar k, so k is a shallow arc, bowed 7 mm away from it: the pin centres, and the length, are unchanged." },
-    { title: "Exact numbers", text: "The leg walks only while Jansen's holy numbers hold, so bar k carries a turnbuckle with jam nuts, set at 123.8 mm between pin centres." },
+    { title: "Exact numbers", text: "The leg walks only while Jansen's holy numbers hold, so bar k is made in two halves joined by a turnbuckle with jam nuts, set at 123.8 mm between pin centres." },
     { title: "Two parts swing on Y", text: "The upper triangle and bar c each turn on their own bearing on one axle held at both ends, with a stop pair for each just beyond its swing." },
     { title: "Set the crank to the zero line", text: "Index line on the crank and zero line on the base: with the crank at the zero line the foot is at the start of its stride. Rebuild from there." },
   );

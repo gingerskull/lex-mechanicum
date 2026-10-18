@@ -1,14 +1,17 @@
 // Small subassemblies a polish calls by name: H.dragPack (F6), H.lockingSegment (M14), H.outputCoupling,
-// H.eccentricMount (F7), H.sensor (V6).
+// H.eccentricMount (F7 at a ground pivot), H.turnbuckle (F7 on a moving link), H.sensor (V6).
 import { TAU, arcPts, circle, dBore, polar, type Vec2 } from "../../core/geom";
+import { clipHalfPlane, edgeDist, inside, toWorld } from "../../core/poly";
 import type { RuleContext } from "../../rules/types";
 import { boltCircle, disc, eccentric, key as keyPart, plate, screw, sensor as fork, shaft, spacer, thrustWasher, waveWasher, wearStrip } from "../primitives";
-import type { Solid } from "../solid";
-import { SENSOR, innerRingD, keyFor, standardLength } from "../tables";
+import { solid, type Solid } from "../solid";
+import { JAM_NUTS, NUTS, SENSOR, innerRingD, keyFor, standardLength } from "../tables";
+
+const fmt = (v: number) => String(+v.toFixed(1));
 
 /**
  * H.dragPack (F6): a bronze friction disc and the wave washer that preloads it, so a part resting in a clearance cannot
- * rattle. The rings bear on the turning part, not on an inner race: inner Ø d and outer Ø D are those of the face they
+ * rattle. The rings bear on the turning part, not on an inner race: inner Ã˜ d and outer Ã˜ D are those of the face they
  * press (a bearing's outer ring flange, a hub). The pack fills the gap [z0, z1] on the joint's axis with the disc
  * against the turning part, which is below the pack unless `part` says "above".
  */
@@ -96,7 +99,7 @@ export function outputCoupling(ctx: RuleContext, jid: string, o: { R: number; t:
   const key = keyFor(d);
   const holes = boltCircle(o.holes, o.pcd, o.a0 ?? Math.PI / 4);
   const fl = plate(`${jid}-flange`, disc(o.R), {
-    name: `Output flange Ø${2 * o.R}, ${key ? "keyed" : "on the D-flat"}, ${o.holes} x M${o.M} tapped for the load`,
+    name: `Output flange Ã˜${2 * o.R}, ${key ? "keyed" : "on the D-flat"}, ${o.holes} x M${o.M} tapped for the load`,
     role: "output",
     ...G,
     z0: zf,
@@ -136,6 +139,139 @@ export function eccentricMount(ctx: RuleContext, jid: string, o: { at: Vec2; d: 
   const J = ctx.joint(jid);
   if (J) (J.serves.F7 ??= []).push(e.id);
   return out;
+}
+
+/**
+ * H.turnbuckle (F7, Appendix A linkages): a moving link made adjustable at its set point, in its own plane. The link is
+ * cut across at `at` (host-local, on its axis `dir`, default local x) into two halves; a left and a right hand stud is
+ * threadlocked into the end of each half, and a turnbuckle body milled flat to the link's thickness joins them, a thin
+ * jam nut on each stud against it. Everything sits flush inside the link's z range and outline, so a swept stack with
+ * no room above or below the link still takes it. The halves ride the link's body and the pin centres are untouched:
+ * the drawn length is the modelled one (K1), shown at its set point. Rod thread: the largest that leaves 1.5 mm of
+ * wall to both faces (M3 in a 6 mm link) unless `M` is given. The half without the body origin becomes a new solid
+ * `<host>-half`; holes and marks go with the half they lie in.
+ */
+export function turnbuckle(
+  ctx: RuleContext,
+  host: Solid,
+  o: { at: Vec2; dir?: Vec2; M?: number; set?: number; joint?: string; title?: string; why?: string },
+): { half: Solid; parts: Solid[] } {
+  const t = host.z1 - host.z0;
+  const zm = (host.z0 + host.z1) / 2;
+  const M = o.M ?? [6, 5, 4, 3].find((m) => m <= t - 3 && NUTS[m]!.s <= t + 1) ?? 3;
+  const nut = NUTS[M] ?? NUTS[3]!;
+  const jam = JAM_NUTS[M] ?? JAM_NUTS[3]!;
+  const L = 5 * M;
+  const AC = (2 * nut.s) / Math.sqrt(3);
+  const g = L / 2 + jam.m + M / 2;
+  const tap = 1.5 * M;
+  const len = Math.hypot(...(o.dir ?? [1, 0]));
+  const u: Vec2 = o.dir ? [o.dir[0] / len, o.dir[1] / len] : [1, 0];
+  const v: Vec2 = [-u[1], u[0]];
+  const c = o.at;
+  const along = (p: Vec2) => (p[0] - c[0]) * u[0] + (p[1] - c[1]) * u[1];
+  const pt = (a: number, b: number): Vec2 => [c[0] + u[0] * a + v[0] * b, c[1] + u[1] * a + v[1] * b];
+  // the body is as wide as the link allows with a 3 mm shoulder each side, from 2M + 2 up to 4M
+  let hw = 0;
+  while (hw < 60 && inside(host.outer, pt(0, hw + 0.25)) && inside(host.outer, pt(0, -hw - 0.25))) hw += 0.25;
+  const W = Math.max(2 * M + 2, Math.min(4 * M, 2 * hw - 6));
+  const rect = (a0: number, a1: number, hw: number): Vec2[] => [pt(a0, -hw), pt(a1, -hw), pt(a1, hw), pt(a0, hw)];
+  const jid = o.joint ?? `${host.id}-adjust`;
+
+  // the body must sit in the link with a wall round it, and every hole must stand clear of the stud ends
+  if (!rect(-L / 2, L / 2, W / 2).every((p) => inside(host.outer, p) && edgeDist(host.outer, p) >= 1))
+    throw new Error(`turnbuckle: ${host.id} is too narrow for an M${M} turnbuckle body at (${c[0]}, ${c[1]})`);
+  for (const h of host.holes)
+    if (Math.min(...h.map((p) => Math.abs(along(p)))) < g + tap + 1.5) throw new Error(`turnbuckle: a hole in ${host.id} is within reach of the M${M} studs`);
+
+  // the cut: the host keeps the half holding its origin (a pin), the other half is a new solid on the same body
+  const side = Math.sign(along([0, 0])) || -1;
+  const near = clipHalfPlane(host.outer, pt(side * g, 0), [u[0] * side, u[1] * side]);
+  const far = clipHalfPlane(host.outer, pt(-side * g, 0), [-u[0] * side, -u[1] * side]);
+  const mid = (P: Vec2[]) => along([P.reduce((s, p) => s + p[0], 0) / P.length, P.reduce((s, p) => s + p[1], 0) / P.length]);
+  const onFar = (P: Vec2[]) => Math.sign(mid(P)) === -side;
+  const across = (P: Vec2[]) => P.some((p) => Math.abs(along(p)) < g);
+  const half: Solid = {
+    ...host,
+    id: `${host.id}-half`,
+    name: `${host.name}, second half (turnbuckle)`,
+    outer: far,
+    holes: host.holes.filter(onFar),
+    marks: host.marks.filter((k) => !across(k.pts) && onFar(k.pts)),
+    joints: [...new Set([...host.joints, jid])],
+    ...(host.allow ? { allow: [...host.allow] } : {}),
+  };
+  delete half.qty;
+  host.outer = near;
+  host.holes = host.holes.filter((h) => !onFar(h));
+  host.marks = host.marks.filter((k) => !across(k.pts) && !onFar(k.pts));
+  if (!host.joints.includes(jid)) host.joints.push(jid);
+
+  const G = { role: "hw" as const, body: host.body, at: host.at, ex: host.ex, joints: [jid] };
+  const body = solid(`${host.id}-tb-body`, {
+    ...G,
+    kind: "collar",
+    name: `Turnbuckle body ${W} x ${fmt(t)} x ${L}, milled flat, M${M} left and right hand`,
+    mat: "Steel C45, zinc plated",
+    outer: rect(-L / 2, L / 2, W / 2),
+    z0: host.z0,
+    z1: host.z1,
+    marks: [{ kind: "index", pts: [pt(0, -W / 2), pt(0, W / 2)] }],
+  });
+  const nuts = [-1, 1].map((k, i) =>
+    solid(`${host.id}-tb-jam${i}`, {
+      ...G,
+      kind: "nut",
+      name: i ? "" : `Jam nut M${M} (DIN 439), one left hand and one right hand`,
+      qty: i ? 0 : 2,
+      mat: "Steel 8, zinc plated",
+      outer: rect(k < 0 ? -L / 2 - jam.m : L / 2, k < 0 ? -L / 2 : L / 2 + jam.m, AC / 2),
+      z0: zm - nut.s / 2,
+      z1: zm + nut.s / 2,
+      thread: M,
+      lock: "jam nut against the turnbuckle body",
+    }),
+  );
+  const studLen = g + tap - (L / 2 - 2 * M);
+  const studs = [-1, 1].map((k, i) => {
+    const a0 = k * (L / 2 - 2 * M);
+    const a1 = k * (g + tap);
+    const ticks = [0.33, 0.67].map((f) => k * (L / 2 + jam.m + (M / 2) * f));
+    return solid(`${host.id}-tb-stud${i}`, {
+      ...G,
+      kind: "shaft",
+      name: i ? "" : `Stud M${M} x ${fmt(studLen)}, one left hand and one right hand, threadlocked into the halves`,
+      qty: i ? 0 : 2,
+      mat: "Steel 8.8, zinc plated",
+      outer: rect(Math.min(a0, a1), Math.max(a0, a1), M / 2),
+      marks: ticks.map((a) => ({ kind: "thread" as const, pts: [pt(a, -M / 2 + 0.3), pt(a, M / 2 - 0.3)] })),
+      z0: zm - M / 2,
+      z1: zm + M / 2,
+      thread: M,
+      group: `${host.id}-tb-stud${i}`,
+      lock: "threadlocker, medium strength (Loctite 243), into the half",
+    });
+  });
+  const parts = [body, ...nuts, ...studs];
+  ctx.add(half, ...parts);
+
+  const q = ctx.world(host);
+  const w = q ? toWorld(q, c) : c;
+  const J = ctx.joint(jid);
+  const set = o.set !== undefined ? ` Set at ${fmt(o.set)} mm between pin centres; the drawn length is exact.` : " The drawn length is exact.";
+  const note = `Turnbuckle in ${host.name.toLowerCase()}, in the link's own plane: the link is made in two halves, a left and a right hand M${M} stud threadlocked into the end of each; the body, milled flat to the ${fmt(t)} mm thickness, joins them and turns to set the length, a jam nut on each stud locks it.${set}${o.why ? ` ${o.why}` : ""}`;
+  const rec = {
+    id: jid,
+    type: "post" as const,
+    at: w,
+    title: o.title ?? `Adjuster Â· ${host.name}`,
+    note,
+    badge: ["adjustable", "ok"] as [string, "ok"],
+    serves: { F2: nuts.map((n) => n.id), F7: [body.id, ...nuts.map((n) => n.id), ...studs.map((s) => s.id)], F9: [body.id] },
+  };
+  if (J) Object.assign(J, rec);
+  else ctx.joints.push(rec);
+  return { half, parts };
 }
 
 /**

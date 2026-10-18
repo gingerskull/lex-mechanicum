@@ -1,5 +1,5 @@
 # Audit: Geneva drive (geneva)
-standard: 2.0 · date: 2026-10-18 · result: pass · detail: full · pass: audit+fix
+standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: audit+fix
 
 ## Summary
 PASS 116 · FAIL 0 · N/A 5 · open: none

@@ -29,8 +29,11 @@ const BAR: [number, number] = [9.5, 9.5];
 
 /** The pen is carried by the rear plate alone, past the end of the front one. */
 const pen = P.tracer("pen", 0, { at: "E", name: "Pen" });
-/** The front plate of the elbow arm clevis ends 20 mm short of the pen (the clevis is needed at A and M2 only). */
-const FRONT_LEN = 2 * h - 20;
+/**
+ * The front plate of the elbow arm clevis is a strap from A to M2 (the clevis is needed at A and M2 only), so the rear
+ * plate's run from M2 to the pen, where its turnbuckle sits, is open to view.
+ */
+const FRONT_LEN = h;
 
 export default defineMechanism({
   id: "pantograph",
@@ -38,7 +41,7 @@ export default defineMechanism({
   parts: [
     P.link("armO", 2 * h, { role: "driver", r: ARM_O, layer: 1, dz: MID_DZ, between: ["O", "A"], name: "Arm O-A" }),
     P.link("armE", 2 * h, { role: "output", r: ARM_E, between: ["A", "E"], name: "Arm A-E, rear plate" }),
-    P.custom("armE-front", taper(FRONT_LEN, ARM_E[0], 9.5), { role: "output", layer: 2, dz: FRONT_DZ, twin: "armE", between: ["A", "E"], name: "Arm A-E, front plate", marks: [ring(ARM_E[0] - 1.6), ring(7.9, FRONT_LEN, 0)] }),
+    P.custom("armE-front", taper(FRONT_LEN, ARM_E[0], ARM_E[0]), { role: "output", layer: 2, dz: FRONT_DZ, twin: "armE", between: ["A", "E"], name: "Arm A-E, front plate", marks: [ring(ARM_E[0] - 1.6), ring(ARM_E[0] - 1.6, FRONT_LEN, 0)] }),
     P.link("barM1", h, { r: BAR, between: ["M1", "T"], name: "Bar M1-T, rear plate" }),
     P.link("barM1-front", h, { r: BAR, layer: 2, dz: FRONT_DZ, twin: "barM1", between: ["M1", "T"], name: "Bar M1-T, front plate" }),
     P.link("barM2", h, { r: BAR, layer: 1, dz: MID_DZ, between: ["T", "M2"], name: "Bar T-M2" }),

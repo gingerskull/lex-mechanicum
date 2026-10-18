@@ -1,5 +1,5 @@
 # Audit: Jansen's linkage (jansen-linkage)
-standard: 2.3 · date: 2026-10-18 · result: pass · detail: full · pass: build
+standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: build
 
 ## Summary
 PASS 115 · FAIL 0 · N/A 6 · open: none
@@ -7,7 +7,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.3 and its changelog |
+| S1 | PASS | DATA · the standard carries version 2.5 and its changelog |
 | S2 | PASS | HAND · header with standard, date, result, detail, pass |
 | S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
 | S4 | PASS | SITE · #28 holds only this mechanism's decisions and open items |
@@ -48,16 +48,16 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | A10 | PASS | HAND · crank and both triangles share z 0 to 6, bars j, c and f z 10 to 16, bar k z 20 to 26; nothing stacked only to clear something |
 | A11 | PASS | HAND · load paths in the joint notes: pins to bearings to bars; Y axle to base and bridge, bridge screwed and located by spigots; input shaft to housing to base, housing screwed and dowelled |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes; sets counted; the turnbuckle named with its thread |
+| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes; sets counted; the turnbuckle named with its M3 thread and stud length |
 | A14 | PASS | HAND · posts, stops and leads clear every sweep; bar k's edge stays 8.8 mm from the Y axle centre (axle spacers Ø10.8); clearance 0 |
 | A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
 | A16 | PASS | HAND · a note and a badge on every pin and on the adjuster, five build rules |
-| A17 | PASS | HAND · goes together from the base up: housing and shaft, crank, upper triangle and foot on their planes, bars j, c, f, bar k, the Y axle with its bridge, the pins last; every screw reachable; bearings pressed out past their circlips |
+| A17 | PASS | HAND · goes together from the base up: housing and shaft, crank, upper triangle and foot on their planes, bars j, c, f, bar k (its two halves first joined and set on the turnbuckle at 123.8 mm), the Y axle with its bridge, the pins last; every screw reachable; bearings pressed out past their circlips |
 | E1 | PASS | AUTO · every solid has one explode level |
 | E2 | PASS | AUTO · every screw, bolt with its shim, shaft and bought unit is one group |
 | E3 | PASS | AUTO · bolts and the Y axle leave upward, housing and drive screws downward |
 | E4 | PASS | HAND · the last part fitted goes furthest: pins above bar k, bridge above the bars, base-side parts below |
-| E5 | PASS | AUTO · bearings and circlips stay in their bars and plates; the turnbuckle stays with bar k |
+| E5 | PASS | AUTO · bearings and circlips stay in their bars and plates; the turnbuckle stays in bar k's plane with both halves (it is assembled along the bar, not up a pin axis) |
 | E6 | PASS | AUTO · motor with its bracket, bearings whole |
 | E7 | PASS | AUTO · spacers midway |
 | E8 | PASS | AUTO · crank, key and pulley keep their order on the input shaft |
@@ -76,7 +76,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | F4 | PASS | AUTO / HAND · bronze thrust washers under the first part on each ground pivot, wave washer preloading the input; no drag needed |
 | F5 | PASS | AUTO / HAND · two neoprene stops beyond the 86° swing of bar c; the upper triangle's 57° swing has no room for stops (the rule finds none outside its sweep and every other plane), it is held by bar j and the closed loop; the input turns fully |
 | F6 | N/A | driven through a toothed belt; no rest position or rattling clearance to hold |
-| F7 | PASS | AUTO / HAND · belt tension by the slotted mount; bar k carries a hand-built turnbuckle sleeve with two jam nuts, shown at its set point of 123.8 mm between pin centres, drawn length exact (no primitive yet, see promotion candidates) |
+| F7 | PASS | AUTO / HAND · belt tension by the slotted mount; bar k is the adjustable link: H.turnbuckle at the bow's crest, bar k in two halves joined by M3 left and right hand studs, a 12 x 6 x 15 body milled flat and two DIN 439 jam nuts, flush in the bar's plane; shown at its set point of 123.8 mm between pin centres, drawn length exact |
 | F8 | PASS | AUTO · oil sink on the bridge over the open Y bearing; the others are sealed or shielded |
 | F9 | PASS | HAND · index line on the crank and a zero line with 90° ticks engraved on the base: the crank goes back on the shaft in phase |
 | F10 | PASS | AUTO / HAND · pulley flanges, home flag and fork sensor; no slip clutch: the crank turns fully and the loop cannot jam while it is connected |
@@ -84,7 +84,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | M2 | PASS | HAND · bosses round every pin; windows in the two swinging triangles only, 6 mm of web to every edge and boss |
 | M3 | PASS | AUTO · bore entry chamfers on every seat and through hole |
 | M4 | PASS | AUTO / HAND · counterbored base corners and housing screws, countersink for the crank end screw |
-| M5 | PASS | AUTO / HAND · window cutter radius 4 mm; turnbuckle window cutter radius 1.5 mm |
+| M5 | PASS | AUTO / HAND · window cutter radius 4 mm; no other pocket (bar k's halves end square at the turnbuckle) |
 | M6 | PASS | AUTO · edge distance and walls clean |
 | M7 | PASS | HAND · the bridge arms are filleted by H.bridge; no other bracket |
 | M8 | PASS | AUTO · undercut on every shoulder bolt thread |
@@ -92,7 +92,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | M10 | PASS | AUTO / HAND · materials named on every solid; steel bars, aluminium triangles and bridge |
 | M11 | PASS | AUTO · centre holes and chamfered ends on the shafts |
 | M12 | PASS | HAND · every head reachable from above or below when assembled; bearings pressed out past their circlips; jam nuts reachable from above |
-| M13 | PASS | AUTO / HAND · threadlocker or nyloc on every screw and bolt, set screws low strength, jam nuts against the sleeve |
+| M13 | PASS | AUTO / HAND · threadlocker or nyloc on every screw and bolt, set screws low strength, turnbuckle studs threadlocked into the halves, jam nuts against the turnbuckle body |
 | M14 | N/A | no sliding contact |
 | V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 |
 | V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
@@ -108,15 +108,15 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · zero line and ticks are marks; centrelines and dimensions automatic |
-| R1 | PASS | HAND · the polish reuses H.window and the plating, tapers and clearance are the model's; the turnbuckle is the one part drawn inline (no primitive yet, listed below) |
-| R2 | PASS | HAND · threads M3, M4, M5, M6; joints Ø8, 10; three bearing sizes |
+| R1 | PASS | HAND · the polish reuses H.window and H.turnbuckle; the plating, tapers and clearance are the model's; no inline standard part |
+| R2 | PASS | HAND · threads M3, M4, M5, M6 (the turnbuckle now M3, was M5); joints Ø8, 10; three bearing sizes |
 | R3 | PASS | AUTO · housing, bridge, stops and drive from their subassemblies |
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; no sampling in the polish; rules 0.9 s, polish about 1 ms |
 | R6 | PASS | FLAG · Node CPU canvas bench (the browser bench is not run here), DPR 1.5: plan 346, 28° 340, side 292, explode 266 ms at full detail, session setup 9.3 ms; not comparable with the browser numbers of the first four passes. 189 solids |
-| R7 | PASS | HAND · model.ts + polish.ts 13.7 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 11.5 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the turnbuckle sleeve and nuts are collar and nut kinds, DL-H; the polish moves nothing |
+| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the turnbuckle body and nuts are collar and nut kinds, DL-H, the studs and bar k's second half never; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
 | DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
 | DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
@@ -127,7 +127,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | Q4 | PASS | plan, 28°, side, explode at 28° and 70°, both sheets, overlays on at plan; attached to #28 |
 | Q5 | PASS | Node bench at DPR 1.5; flags under R6 |
 | Q6 | PASS | every row judged |
-| Q7 | PASS | conformance: jansen-linkage at 2.3, pass |
+| Q7 | PASS | conformance: jansen-linkage at 2.5, pass |
 
 ## Joints
 | Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
@@ -141,13 +141,13 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | pE | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – belt-driven, no rest position | – see bar k | – shielded bearing, greased for life | – no phase of its own | – none needed |
 | pY-bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – spigot in a slot takes the hole tolerance | – static | – static | – static |
 | drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
-| bar-k-adjust | post | – the sleeve sits in its window in bar k | 2 x Jam nut M5 (DIN 439), one left hand and one right hand | – static | – static | – static | – static | Turnbuckle sleeve Ø10 x 18, M5 left and right hand; 2 x Jam nut M5 (DIN 439), one left hand and one right hand | – static | Index line across the sleeve at the set point | – static |
+| bar-k-adjust | post | – the halves are located by the studs in the body | 2 x Jam nut M3 (DIN 439), one left hand and one right hand | – static: the studs are threadlocked into the halves | – static | – static | – static | Turnbuckle body 12 x 6 x 15, milled flat, M3 left and right hand; 2 x Jam nut M3 (DIN 439), one left hand and one right hand; 2 x Stud M3 x 13.8, one left hand and one right hand, threadlocked into the halves | – static | Index line across the body at the set point | – static |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
 | bar k | straight stadium | bowed 7 mm in the model (an arc through both pin centres, length exact) | the Y pivot lies 2.3 mm outside a straight bar k; its axle, spacers and bridge need 8.8 mm |
-| bar k, middle | plain bar | window with a turnbuckle sleeve and two jam nuts, hand-built in the polish | F7: the leg depends on exact lengths; bar k is the longest bar |
+| bar k, middle | one bar | two halves on one body, joined by H.turnbuckle at the bow's crest | F7: the leg depends on exact lengths; bar k is the longest bar |
 | upper triangle, foot triangle | solid plates | one lightening window each, 6 mm of web | D2, M2: both swing, so their mass is inertia |
 | upper triangle, foot triangle | layers by hand | both on layer 0 with the crank, bars on 1 and 2 | a search over the sweeps: the fewest layers with no pin passing through a part (three planes) |
 | crank, base | no marks | index line on the crank, zero line and 90° ticks on the base | F9 |
@@ -156,20 +156,18 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 24 | 0 | 216.6 |
-| DL-B | 0 | 290 | 187.1 |
+| DL-B | 0 | 294 | 187.1 |
 | DL-C | 0 | 0 | 69.8 |
 | DL-D | 38 | 0 | 54.0 |
 | DL-E | 8 | 2 | 50.9 |
 | DL-F | 0 | 0 | 41.4 |
 | DL-G | 0 | 0 | 40.7 |
 | DL-H | 11 | 0 | 39.9 |
-| never | 108 | 261 | 306.0 (full) |
+| never | 111 | 261 | 306.0 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- `H.turnbuckle` (F7, Appendix A linkages): an adjustable link at its set point, with the window, sleeve, rods and jam
-  nuts built from one call. Built by hand here for the second time (Hoekens failed F7 for lack of it).
 - `H.stops` (rules/stops): two oscillating parts on one ground pivot (the upper triangle and bar c on Y) give the same
   stop ids; it passes here only because the upper triangle finds no room for stops. A second part with room crashes the
   assembly with "duplicate solid id pY-stop0". The id needs the part's id.
@@ -181,5 +179,5 @@ Hand fixes that should become rules or primitives.
 - Stops for large plates: `stops()` looks for room at 0.7 of the part's reach and finds none for the upper triangle.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.4 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.8 KB
 screenshots: plan with overlays, 28°, side, explode at 28° and 70°, both sheets (attached to #28) · bench: Node CPU canvas, DPR 1.5, 2026-10-18; 28° frame 340 ms at full detail, 70 ms at dial C (flag, R6)

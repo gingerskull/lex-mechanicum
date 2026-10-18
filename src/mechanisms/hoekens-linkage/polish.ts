@@ -3,6 +3,7 @@
 // differs from the rules:
 // - the rear rocker bearing at O4 sealed: it sits under the front plate where no oil reaches it;
 // - the rocker's swing engraved on the base with an index line on the rocker (F9);
+// - the coupler made adjustable between A and B by H.turnbuckle, in its own plane (F7);
 // - notes, badges and build rules (A16).
 import { D2R, arcPts, polar, type Vec2 } from "../../core/geom";
 import type { Polish } from "../../assemble/api";
@@ -10,11 +11,11 @@ import { bearingName } from "../../hardware/primitives";
 import { swing } from "../../hardware/sub/stops";
 import { s } from "./model";
 
+const b = 2.5 * s;
 const c = 2.5 * s;
 const O4: Vec2 = [2 * s, 0];
 
 export const polish: Polish = (A, H) => {
-  void H;
   const ctx = A.ctx;
   const pB = ctx.pinJoint("pB")!;
 
@@ -34,6 +35,16 @@ export const polish: Polish = (A, H) => {
   base.marks.push({ kind: "scale", pts: arcPts(O4[0], O4[1], R0, sw[0], sw[1], Math.PI / 90) });
   A.get("rocker-front")!.marks.push({ kind: "index", pts: [[c + 6, 0], [c + 9.2, 0]] });
 
+  // ---- F7: the straight line holds only at the exact ratios, so one link is adjustable: the coupler, halfway between
+  // A and B. The swept stack leaves no room above or below it (the front rocker plate rides 1.5 mm over it), so the
+  // turnbuckle sits in the coupler's own plane; the B half carries the 100 mm run on to the tip, drilled with B ----
+  H.turnbuckle(A, "coupler", {
+    at: [b / 2, 0],
+    set: b,
+    title: "Adjuster · coupler",
+    why: `It sets A to B, the coupler's share of the 1 : 2 : 2.5 : 2.5 : 5 ratios; the tip, 100 mm on from B in the same half, keeps A to T at twice A to B. Nothing sweeps in the coupler's plane between A and B, so the body and nuts stay clear.`,
+  });
+
   // ---- A16: notes, badges, build rules ----
   const sz = (id: string) => A.get(id)?.name ?? "";
   A.joint("pO2", {
@@ -52,7 +63,7 @@ export const polish: Polish = (A, H) => {
     badge: ["both ends held", "ok"],
   });
   A.rules.push(
-    { title: "Exact ratios 1 : 2 : 2.5 : 2.5 : 5", text: "The straight line depends on the length ratios, not on the scale: every centre is the solver's, and any adjustment has to be set at the modelled lengths." },
+    { title: "Exact ratios 1 : 2 : 2.5 : 2.5 : 5", text: "The straight line depends on the length ratios, not on the scale: every centre is the solver's, and the coupler's turnbuckle is set at the modelled 100 mm from A to B." },
     { title: "Crank and rear rocker share one plane", text: "Their sweeps never meet, so both sit at the base layer; the coupler rides 1.5 mm above and the front rocker plate 1.5 mm above that. Nothing is stacked only to clear something." },
     { title: "Double shear where the sweeps allow", text: "B is a clevis and O4 is held by the base and a bridge. A and the input are single shear because the coupler sweeps over them: the input gets two bearings far apart, the crank pin the shortest overhang." },
     { title: "Stops outside the swing", text: "Rubber-faced stop posts 2° beyond each end of the rocker's travel: untouched in running, they catch the rocker with the belt off or the coupler out." },

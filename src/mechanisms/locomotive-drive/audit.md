@@ -1,5 +1,6 @@
 # Audit: Locomotive driving gear (locomotive-drive)
 standard: 2.3 · date: 2026-10-18 · result: pass · detail: full · pass: build
+defer: F7 · H.turnbuckle (2.5) could make a rod length adjustable; F7 passes on the gib and belt, judged again in its next pass
 
 ## Summary
 PASS 113 · FAIL 0 · N/A 8 · open: none

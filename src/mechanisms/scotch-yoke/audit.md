@@ -1,5 +1,5 @@
 # Audit: Scotch yoke (scotch-yoke)
-standard: 2.3 · date: 2026-10-18 · result: pass · detail: full · pass: build
+standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: build
 
 ## Summary
 PASS 116 · FAIL 0 · N/A 5 · open: none
