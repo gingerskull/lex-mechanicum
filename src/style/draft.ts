@@ -49,6 +49,14 @@ export const DRAFT = {
     majorWidth: 0.8, // px
   },
 
+  // Library cards (SS1): the thumbnail and the hover animation draw a small sheet, so they leave out detail nobody sees
+  // and thin the two bold outlines. Used only for a view with `card` set; the mechanism page is untouched.
+  card: {
+    detail: "D" as const, // detail dial position of a card drawing (DL)
+    plateTopFactor: 0.7, // factor on lines.plateTop on a card
+    baseTopFactor: 0.7, // factor on lines.baseTop on a card
+  },
+
   // Line hierarchy, thick to thin (SF10). Colour is ink unless a key says otherwise.
   lines: {
     plateTop: 1.7, // px, bold top outline of plates

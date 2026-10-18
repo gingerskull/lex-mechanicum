@@ -49,6 +49,8 @@ export interface DrawView {
   /** A joint id to ring with a callout. */
   highlight: string | null;
   theme: ThemeKey;
+  /** A library card drawing (thumbnail or hover): bold outlines thinner by DRAFT.card. */
+  card?: boolean;
 }
 
 export const defaultView = (): DrawView => ({
@@ -62,6 +64,9 @@ export const defaultView = (): DrawView => ({
   highlight: null,
   theme: "dark",
 });
+
+/** The view of a library card (SS1): the default view at the card's dial position and line weights. */
+export const cardView = (): DrawView => ({ ...defaultView(), detail: DRAFT.card.detail, card: true });
 
 const PLATE = new Set(["part", "plate", "bracket", "bridge", "housing", "base"]);
 const L = DRAFT.lines;
@@ -104,6 +109,7 @@ export function drawFrame(sess: Session, u: number, view: DrawView): { s: Solved
   const card = sess.card;
   const T = theme(view.theme);
   const LD = ladder(view.detail, view);
+  const cardK = view.card ? { plate: DRAFT.card.plateTopFactor, base: DRAFT.card.baseTopFactor } : { plate: 1, base: 1 };
   const s = sess.model.solve(u);
   const e = view.explode;
   const pad = Math.max(16, Math.min(card.w, card.h) * 0.07);
@@ -310,7 +316,7 @@ export function drawFrame(sess: Session, u: number, view: DrawView): { s: Solved
         lx.strokeStyle = paint(ink, L.marksAlpha * (isBase ? L.baseMarksGain : 1));
         lx.stroke();
       }
-      pen((c) => face(c, Tf), isBase ? L.baseTop : isPlate ? L.plateTop : L.otherTop, 1);
+      pen((c) => face(c, Tf), isBase ? L.baseTop * cardK.base : isPlate ? L.plateTop * cardK.plate : L.otherTop, 1);
       // a second, offset pencil pass round the base plate: the one loose line on the sheet
       if (isBase && SK.doubleAlpha > 0) {
         const o = SK.doubleOffset;

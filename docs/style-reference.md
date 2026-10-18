@@ -159,7 +159,7 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | SD13 | **Supporting hardware reads quieter.** Motor internals are faint; hardware has no pattern; the base is the faintest surface. Brackets and tall parts still get full outlines and silhouettes. |
 | SD14 | **Overlays use the sheet's colours:** forces in accent (warn when out of range), velocity in `vel`, angles in ink, labels in mono on a paper panel with an ink hairline. Overlays never change the drawing beneath. |
 | SD15 | **Output plot** (detail side panel) is drawn on the sheet: ink grid dashed, curve in ink, current point in accent, mono labels. |
-| SD16 | **Thumbnails and the detail stage share one renderer and one style.** The only differences are the annotation set (SD8, SD10) and scale-dependent switches (SF11, SD6). Never a second thumbnail style. Thumbnails are rendered to images at build time by the same renderer. |
+| SD16 | **Thumbnails and the detail stage share one renderer and one style.** The only differences are the annotation set (SD8, SD10), scale-dependent switches (SF11, SD6) and the card rules: a card (thumbnail and hover animation) draws at detail dial A-D (`card.detail`) and its two bold outlines, `lines.plateTop` and `lines.baseTop`, are scaled by `card.plateTopFactor` and `card.baseTopFactor`. Never a second thumbnail style. Thumbnails are rendered to images at build time by the same renderer. |
 | SD17 | **Performance is part of the style.** Paper and pattern tiles are cached per theme and size; outlines are cached paths drawn through transforms; slicing is recomputed only when the view's z arrangement changes; nothing draws unless u, view or theme changed; no per-frame blur. A new effect that costs per-frame passes is measured with the bench before it lands. |
 | SD18 | **The detail ladder** (standard 9b) is the only way the drawing drops anything. Render effects sit in the ladder at the rung their noticeability earns: paper grain in the first rung, wall shading and inner-slice silhouettes and the DPR cap in the third, role patterns in the sixth, hidden lines in the seventh. The order is data in `src/style/detail.ts`. |
 
@@ -173,7 +173,7 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 
 | Id | Requirement |
 |---|---|
-| SS1 | **Library grid:** cards in an auto-fill grid (min 290 px, 20 px gap). A card is a sheet: the drawing in a framed field (4:3, a pre-rendered image until hover) with a title block under it: name (display, uppercase) and sheet number (mono, accent) on the first row, family · motion · level meta row, two-line summary, dashed tags. Hover: ink border plus accent corner ticks at two opposite corners, and the drawing animates. |
+| SS1 | **Library grid:** cards in an auto-fill grid (min 290 px, 20 px gap). A card is a sheet: the drawing in a framed field (4:3, a pre-rendered image until hover) with a title block under it: name (display, uppercase) and sheet number (mono, accent) on the first row, family · motion · level meta row, two-line summary, dashed tags. Hover: ink border plus accent corner ticks at two opposite corners, and the drawing animates at the same dial and line weights as the thumbnail (`card.*`), so the swap does not jump. |
 | SS2 | **Header:** kicker (mono, accent), large condensed uppercase title, short intro, and a set title block (mono grid of label/value cells). Search field and the Filters button in the same row. Below 1000 px the title block is one low strip across the header, its four cells in a row with dividers, shown at every width. |
 | SS3 | **Sticky bar:** segmented controls (theme Blueprint / Drafting) and the Filters button; translucent paper with blur, hairline top and bottom. On a phone (below 640 px) the bar is two rows, apart from each other: search and Filters on the first, the sheet switch with its label alone on the second; elsewhere it is one row with the switch at the right. Filters hidden behind the button; facets open as chip rows in a scrollable panel. The library takes `?<facet>=<value>` and `?q=<words>` from the address, so a page can link to a filtered set. |
 | SS4 | **Controls:** segmented buttons and chips are square, hairline, mono uppercase; pressed = ink fill with paper text. Tags are dashed outlines, solid on hover. The play button is the one round control (accent outline, fills on hover). Range inputs use `accent-color` (accent for the scrubber, ink for view sliders). |
@@ -269,6 +269,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.majorAlpha` | 0.14 | 0..1 |
 | `draft.grid.minorWidth` | 0.5 | px |
 | `draft.grid.majorWidth` | 0.8 | px |
+| `draft.card.detail` | `D` | detail dial position of a card drawing (DL) |
+| `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
+| `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
 | `draft.lines.plateTop` | 1.7 | px, bold top outline of plates |
 | `draft.lines.otherTop` | 1.1 | px, top outline of everything else |
 | `draft.lines.baseTop` | 1.5 | px, top outline of the base plate |

@@ -37,7 +37,7 @@ async function start(card: HTMLAnchorElement) {
   const frame = (now: number) => {
     it.u += ((now - it.t) / 1000) * (Math.PI / 3);
     it.t = now;
-    it.sess.draw(it.u, { ...E.defaultView(), theme: E.pageTheme() });
+    it.sess.draw(it.u, { ...E.cardView(), theme: E.pageTheme() });
     it.raf = requestAnimationFrame(frame);
   };
   cancelAnimationFrame(it.raf);
