@@ -146,13 +146,19 @@ lead-screw, ball-screw, differential-screw, belt-drive, chain-drive, block-and-t
 universal-joint, double-cardan, rzeppa-cv-joint, schmidt-coupling, friction-wheel-drive, cvt-belt, ball-disc-integrator,
 eccentric-sheave, locomotive-drive, flexure-hinge, bistable-compliant
 
-## real_world (added 2026-10-16)
+## real_world (YouTube videos since 2026-10-18)
 
-2 to 3 concrete products or machines that contain the mechanism, each linked:
-`{ "product": "Genie GS-1930 scissor lift", "maker": "Genie", "use": "one sentence", "url": "https://...",
-   "kind": "product|in-product|museum|real-video|case-study", "checked": true, "note": "optional caveat" }`
-`checked` = the page was opened and shows the part; false = picked from a search result only.
+0 to 3 YouTube videos of real footage of a named product or machine using the mechanism at work: a vehicle, engine,
+machine tool, clock, industrial device, museum machine or a physical working build. No animations, CAD renders,
+simulations or explainer graphics; a video that is mostly animation with a few seconds of footage does not count.
+Different products per entry rather than three videos of one thing.
+`{ "product": "Genie GS-1930 scissor lift", "maker": "Genie", "use": "one sentence on how the mechanism works in it",
+   "url": "https://www.youtube.com/watch?v=<id>", "note": "optional caveat" }`
+URLs are `https://www.youtube.com/watch?v=<id>`, `https://www.youtube.com/shorts/<id>` or `https://youtu.be/<id>`;
+the validator rejects any other link here. Each video is found by search and confirmed to exist (its YouTube oEmbed
+answers with the title) before it is added. Where nothing solid is found the list stays empty and the page shows no
+"In the real world" section: no video is better than a wrong one.
 Patch files sources/rw*.json (and gap*.json) are merged by `npm run catalog` (tools/catalog.ts): their `media`,
-`references` and `real_world` entries are added by URL. Where research found no more than the minimum allows, the
-patch entry says so with `"waive": ["real_world"]` (or `"media"`, `"references"`) and a `note`; the validator then
-skips that count for the record.
+`references` and `real_world` entries are added by URL. Where research found fewer media or references than the
+minimum allows, the patch entry says so with `"waive": ["media"]` (or `"references"`) and a `note`; the validator
+then skips that count for the record.

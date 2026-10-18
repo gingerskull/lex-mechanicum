@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { mergeSources } from "../../src/catalog/merge";
 import { record } from "./fixtures";
 
-const p3 = { product: "p3", use: "u", url: "https://example.org/p3", kind: "product" };
+const p3 = { product: "p3", use: "u", url: "https://www.youtube.com/shorts/aaaaaaaaaa3" };
 
 describe("mergeSources", () => {
   const files = [
     { name: "b2.json", json: [record("c", { related: ["a", "c", "nope"] })] },
     { name: "b1.json", json: [record("a"), record("b")] },
-    { name: "rw1.json", json: { a: { real_world: [p3, { ...p3, url: "https://example.org/p1" }] } } },
+    { name: "rw1.json", json: { a: { real_world: [p3, { ...p3, url: "https://www.youtube.com/watch?v=aaaaaaaaaa1" }] } } },
   ];
 
   it("concatenates batches in name order and applies patches", () => {
@@ -20,7 +20,7 @@ describe("mergeSources", () => {
 
   it("does not duplicate a patch URL already present", () => {
     const { records } = mergeSources(files);
-    expect(records[0]!.real_world!.filter((x) => x.url === "https://example.org/p1")).toHaveLength(1);
+    expect(records[0]!.real_world!.filter((x) => x.url === "https://www.youtube.com/watch?v=aaaaaaaaaa1")).toHaveLength(1);
   });
 
   it("derives the motion label and keeps only known related ids", () => {
@@ -36,8 +36,8 @@ describe("mergeSources", () => {
   });
 
   it("merges waivers and rejects unknown ones", () => {
-    const { records, problems } = mergeSources([...files, { name: "rw2.json", json: { b: { waive: ["real_world", "x"] } } }]);
-    expect(records[1]!.waive).toEqual(["real_world"]);
+    const { records, problems } = mergeSources([...files, { name: "rw2.json", json: { b: { waive: ["media", "x"] } } }]);
+    expect(records[1]!.waive).toEqual(["media"]);
     expect(problems).toEqual(['rw2.json: b waives unknown "x"']);
   });
 

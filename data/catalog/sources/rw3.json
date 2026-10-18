@@ -1,102 +1,54 @@
 {
-  "sarrus-linkage": {
-    "note": "Real products using a true Sarrus linkage are scarce; both examples are patented industrial designs rather than catalogue products.",
-    "real_world": [
-      {"product": "Automated mooring robot (US patent 12325494)", "maker": "Ipalco BV", "use": "A Sarrus linkage between base and attachment element lets the mooring pad extend straight out from the quay toward the ship while fully supporting its weight and retracting to a small footprint.", "url": "https://ipiq.io/patents/424341", "kind": "case-study", "checked": true},
-      {"product": "Flexure linear-motion stage (US patent 9879974)", "maker": "", "use": "Monolithic flexure stage that builds on two Sarrus double-arm linkages set at 90 degrees to guide a carriage along a straight line without bearings.", "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9879974", "kind": "case-study", "checked": true}
-    ]
-  },
-  "tusi-couple": {
-    "note": "Rare in products; the surviving Murray engine is the classic real machine, plus a modern prototype engine using the same 2:1 hypocycloid (Cardan) gear.",
-    "real_world": [
-      {"product": "Matthew Murray's hypocycloidal steam engine (c.1805), Thinktank Birmingham Science Museum", "maker": "Matthew Murray / Fenton, Murray and Wood", "use": "A planet gear rolling inside a ring of twice its diameter guides the piston rod end in a straight line and turns it into crankshaft rotation, replacing a crosshead guide.", "url": "https://en.wikipedia.org/wiki/Murray%27s_Hypocycloidal_Engine", "kind": "museum", "checked": true},
-      {"product": "Wiseman hypocycloid engine alpha prototype (30cc two-stroke)", "maker": "Wiseman Technologies", "use": "A 2:1 internal gear hypocycloid keeps piston and connecting rod moving in a straight line; the built prototype was dynamometer tested at MTD Southwest.", "url": "https://keep.lib.asu.edu/system/files/c160/Analysis_and_simulation_of_Wiseman_2014.pdf", "kind": "case-study", "checked": true}
-    ]
-  },
-  "crank-shaper": {
-    "real_world": [
-      {"product": "Gould & Eberhardt 16 inch industrial universal shaper", "maker": "Gould & Eberhardt", "use": "A real shop shaper whose ram is driven from the bull gear crank with the Eberhardt quick-return mechanism so the ram returns faster than it cuts.", "url": "https://anvilfire.com/tailgate/machinery-sales-GandE-shaper.php.htm", "kind": "in-product", "checked": true},
-      {"product": "Gould & Eberhardt 16 inch shaper restoration reference", "maker": "Gould & Eberhardt", "use": "Describes the ram driven by a crank or bull gear in the column body, including crank-pin bearing wear that causes a thumping stroke.", "url": "https://industrialmonitordirect.com/blogs/knowledgebase/gould-eberhardt-16-inch-shaper-restoration-reference", "kind": "case-study", "checked": true},
-      {"product": "Atlas 7B bench shaper teardown and rebuild", "maker": "Atlas Press Company", "use": "Photo teardown of a real shaper showing the crank gear, crank pin and sliding block, and crank arm that drive the ram.", "url": "https://www.hobby-machinist.com/threads/atlas-7b-disassembly-and-teardown-pic-heavy.84697/post-756653", "kind": "real-video", "checked": true}
-    ]
-  },
-  "whitworth": {
-    "real_world": [
-      {"product": "Warner & Whitney vertical metal shaper (1872), American Precision Museum", "maker": "Warner & Whitney, Nashua NH", "use": "The crank is driven through double gearing and a Whitworth quick-return motion so the vertical ram cuts slowly and returns fast.", "url": "https://americanprecision.org/learning-resources/12-machines-of-christmas/", "kind": "museum", "checked": true},
-      {"product": "Whitworth crank planing machine (c.1850), Musee des Arts et Metiers, Paris", "maker": "Joseph Whitworth and Co", "use": "The crank-driven planer table has the quick-return motion credited to Whitworth.", "url": "https://gracesguide.co.uk/Whitworth_Planing_Machines", "kind": "museum", "checked": true}
-    ]
-  },
-  "drag-link-quick-return": {
-    "note": "No current catalogue product found naming a drag-link quick return; examples are press-drive prior art from Bliss and a historic museum model of a drag-link mechanism.",
-    "real_world": [
-      {"product": "Drag-link mechanical press drive (prior art in US patent 4107973)", "maker": "E.W. Bliss / Gulf and Western", "use": "In drag-link presses the crank drives the slide through a drag link that slows the slide on the working stroke for a mechanical advantage of up to 5:1.", "url": "https://patents.google.com/patent/US4107973A/en", "kind": "case-study", "checked": true},
-      {"product": "Reuleaux model: drag-link orientation mechanism (Morgan feathering paddle wheel), 1882", "maker": "Gustav Voigt workshop / Cornell KMODDL", "use": "Four-bar drag-link arms drive feathering paddles as on steam paddle boats, a double-crank drag-link chain in physical form.", "url": "https://digital.library.cornell.edu/catalog/ss:372745", "kind": "museum", "checked": true}
-    ]
-  },
-  "offset-slider-crank": {
-    "real_world": [
-      {"product": "Honda K20C1 engine (Civic Type R)", "maker": "Honda", "use": "The crankshaft is offset relative to the bores so the connecting rod is more upright on the power stroke, reducing piston side thrust and friction.", "url": "https://www.enginebuildermag.com/2019/02/eotw-civic-type-r-k20c1-engine/", "kind": "in-product", "checked": true},
-      {"product": "Yamaha MT-09 CP3 three-cylinder engine", "maker": "Yamaha", "use": "The cylinder bores are offset 5 mm toward the exhaust side of the crank to reduce friction between pistons and cylinder walls.", "url": "https://www.webbikeworld.com/2020-yamaha-mt-09-model-overview/", "kind": "in-product", "checked": true}
-    ]
-  },
-  "walschaerts-valve-gear": {
-    "real_world": [
-      {"product": "Walschaerts valve gear from double Fairlie locomotive Snake (1874), National Railway Museum", "maker": "Avonside Engine Co", "use": "The actual right-hand valve gear from a New Zealand 0-4-4-0T, believed among the first British-built locomotives with Walschaerts gear.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co27892/walschaerts-valve-gear-from-double-fairlie-locomotive", "kind": "museum", "checked": true},
-      {"product": "LNER Peppercorn A1 class and new-build 60163 Tornado", "maker": "LNER / A1 Steam Locomotive Trust", "use": "Three independent sets of Walschaerts valve gear control steam admission to the three cylinders.", "url": "https://www.steamlocomotives.org/locomotives/lner-peppercorn-a1-class", "kind": "in-product", "checked": true}
-    ]
-  },
-  "bennett-linkage": {
-    "note": "No commercial products; both examples are built large-scale research prototypes.",
-    "real_world": [
-      {"product": "8 m span deployable Bennett-linkage arch shelter prototype", "maker": "University of Oxford, Department of Engineering Science", "use": "Tiled Bennett linkages with nylon hinges and carbon fibre tubes form a 49 kg arch that folds for transport and is erected by a small team.", "url": "https://www.eng.ox.ac.uk/media/6788/shelters-draft.pdf", "kind": "case-study", "checked": true},
-      {"product": "Deployable parabolic cylindrical antenna prototype", "maker": "Harbin Institute of Technology", "use": "A network of Bennett linkages deploys the antenna support structure with a single degree of freedom; a physical prototype was constructed.", "url": "https://hit.globalimpact.cn/en/publications/networking-of-bennett-linkages-and-its-application-on-deployable-/", "kind": "case-study", "checked": true}
-    ]
-  },
-  "swash-plate": {
-    "real_world": [
-      {"product": "Rexroth A10VSO 71 DFR series 31 axial piston variable pump", "maker": "Bosch Rexroth", "use": "An adjustable swashplate sets piston stroke so the pump varies its displacement and flow.", "url": "https://www.jhf.com/parts/rexroth-axial-piston-variable-pump-a10vso-series-31/r902400074", "kind": "product", "checked": true},
-      {"product": "Robinson R44 helicopter swashplate (Service Bulletin SB-10)", "maker": "Robinson Helicopter Company", "use": "Upper and lower swashplates with scissor linkages pass cyclic and collective pitch from the stationary controls to the rotating main rotor blades.", "url": "https://shop.robinsonheli.com/wp-content/uploads/2015/12/r44_sb10.pdf", "kind": "in-product", "checked": true},
-      {"product": "Sanden swash plate automotive A/C compressor", "maker": "Sanden", "use": "A swash plate on the belt-driven shaft reciprocates several pistons to compress refrigerant for passenger car air conditioning.", "url": "https://www.sanden-europe.com/about-sanden/history/", "kind": "in-product", "checked": true}
-    ]
-  },
-  "flexure-hinge": {
-    "real_world": [
-      {"product": "PI P-733.Z high-dynamics Z nanopositioner", "maker": "Physik Instrumente (PI)", "use": "Zero-play flexure guides with lever amplification give 100 micrometre piezo-driven travel without friction or backlash.", "url": "https://www.physikinstrumente.com/en/products/nanopositioning-piezo-flexure-stages/linear-piezo-flexure-stages/p-733z-high-dynamics-z-nanopositioner-scanner-201270", "kind": "product", "checked": true},
-      {"product": "Free-Flex flexural pivots", "maker": "Riverhawk Company", "use": "Crossed-spring flexure pivot bearings give frictionless, lubrication-free limited rotation in gimbals, sensors and aerospace linkages.", "url": "https://flexpivots.com/?p=249", "kind": "product", "checked": true}
-    ]
-  },
-  "bistable-compliant": {
-    "note": "Bistable compliant parts in products are rarely documented as such; the slap bracelet is a bistable tape-spring shell and flip-top closures use a snap hinge.",
-    "real_world": [
-      {"product": "Slap bracelet (originally sold as Slap Wrap)", "maker": "Stuart Anders (inventor)", "use": "Layered bistable stainless steel spring bands stay straight until slapped, then snap into a stable curled state around the wrist.", "url": "https://en.wikipedia.org/wiki/Slap_bracelet", "kind": "in-product", "checked": true},
-      {"product": "Aptar Flip Lid beverage closure", "maker": "AptarGroup", "use": "A moulded 270 degree lockage hinge snaps the lid open and closes it with an audible click; the snap-hinge behaviour is implied, not stated as bistable.", "url": "https://aptar.com/news-events/aptar-launches-the-new-flip-lid-beverage-closure", "kind": "product", "checked": false}
-    ]
-  },
-  "centrifugal-governor": {
-    "real_world": [
-      {"product": "Boulton and Watt rotative steam engine (Lap Engine), 1788, Science Museum", "maker": "Boulton and Watt", "use": "The first engine fitted with the centrifugal governor, whose flyballs throttle steam to hold engine speed.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co50948/rotative-steam-engine-by-boulton-and-watt-1788", "kind": "museum", "checked": true},
-      {"product": "Woodward PG dial and lever governors", "maker": "Woodward", "use": "A centrifugal flyweight head and pilot valve control oil to a power cylinder that sets the fuel rack of diesel and gas engines.", "url": "https://www.mshs.com/wp-content/uploads/2022/05/Woodward_PG-Dial-and-Lever-Governors.pdf", "kind": "product", "checked": true}
-    ]
-  },
-  "ball-disc-integrator": {
-    "real_world": [
-      {"product": "Ford Instrument Company five-inch disc integrator (Smithsonian NMAH)", "maker": "Ford Instrument Company", "use": "Two stacked steel balls on a movable carriage between a disc and a cylinder integrate inputs in U.S. Navy gun fire control computers.", "url": "https://www.si.edu/object/analog-computing-component-integrator-five-inch-disc%3Anmah_690606", "kind": "museum", "checked": true},
-      {"product": "Kelvin's Harmonic Analyser (1878), Science Museum", "maker": "R W Munro and Company, design by Lord Kelvin", "use": "Seven discs turned by the tracing point drive rolling spheres that pass integrated motion to the recording rollers to extract harmonic coefficients.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co60669/kelvins-harmonic-analyser", "kind": "museum", "checked": true},
-      {"product": "Manchester University differential analyser (1935), Science Museum", "maker": "Metropolitan-Vickers", "use": "Four disc-and-wheel integrators (the wheel variant, not ball) chained to solve differential equations.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8555617", "kind": "museum", "checked": true}
-    ]
-  },
-  "friction-wheel-drive": {
-    "real_world": [
-      {"product": "MTD snow blower friction wheel 935-0243B", "maker": "MTD", "use": "A rubber friction wheel rides on the drive plate and is shifted across it to set speed and direction of the snow blower wheels.", "url": "https://appliancepartspros.com/mtd-wheel-friction-4-935-0243b-ap6051806.html", "kind": "product", "checked": true},
-      {"product": "1914 Metz Model 22 Roadster", "maker": "Metz Company", "use": "A friction-drive transmission with a driven disc and movable friction wheel gives variable ratio without gears.", "url": "https://rmsothebys.com/auctions/hf19/lots/r0053-1914-metz-model-22-roadster/", "kind": "in-product", "checked": true},
-      {"product": "1913 Metz driving review", "maker": "Metz Company", "use": "Drive of a real 1913 Metz whose friction transmission pairs a paper disc with an aluminium disc as a manual CVT.", "url": "https://jalopnik.com/what-its-like-to-drive-a-car-with-a-transmission-half-m-1833297218", "kind": "in-product", "checked": true}
-    ]
-  },
-  "cvt-belt": {
-    "real_world": [
-      {"product": "Nissan XTRONIC CVT", "maker": "Nissan / JATCO", "use": "Two variable-width pulleys change the running radius of a steel belt to vary the ratio continuously.", "url": "https://www.nissan-global.com/EN/INNOVATION/TECHNOLOGY/ARCHIVE/XTRONIC_CVT/", "kind": "in-product", "checked": true},
-      {"product": "Bosch CVT pushbelt", "maker": "Bosch (Tilburg)", "use": "Hundreds of steel elements held by steel bands push between the variator pulleys of car CVTs.", "url": "https://www.bosch-presse.de/pressportal/de/en/production-of-the-100-millionth-pushbelt-266839.html", "kind": "product", "checked": true},
-      {"product": "DAF 600 Variomatic", "maker": "DAF", "use": "V-section rubber belts run on split cone pulleys whose halves move apart or together to change ratio automatically.", "url": "https://driventowrite.com/2021/04/26/variomatic-for-the-people-daf-600-750-daffodil-30-31-32-33-44-55-66-77-volvo-343/", "kind": "in-product", "checked": true}
-    ]
-  }
+ "sarrus-linkage": {"real_world": [
+  {"product":"Sarrus linkage axis on a homebuilt 3D printer","use":"Two sets of hinged plates at right angles let the platform rise and fall in a straight line without a slide.","url":"https://www.youtube.com/watch?v=_UIoOVhxdMk"}
+ ]},
+ "tusi-couple": {"real_world": [
+  {"product":"Model of Murray's hypocycloidal steam engine","use":"A small gear rolling inside a ring twice its size gives the piston rod a straight-line path without a guide.","url":"https://www.youtube.com/watch?v=RztnuW93Vvk"},
+  {"product":"Model of Matthew Murray's hypocycloidal steam engine","use":"The planet gear pin follows a straight line, so the piston rod needs no slide or parallel motion.","url":"https://www.youtube.com/watch?v=q2cOHsHIUvQ"},
+  {"product":"Murray hypocycloidal engine build","use":"The crank pin rides on a gear rolling inside a fixed ring, turning reciprocating motion into rotation.","url":"https://www.youtube.com/watch?v=h0NTwoYp_2E"}
+ ]},
+ "crank-shaper": {"real_world": [
+  {"product":"Atlas 7B bench shaper","use":"A crank pin in a slotted lever rocks the ram slowly forward to cut and quickly back.","url":"https://www.youtube.com/watch?v=xhaePKPsHJQ"},
+  {"product":"Gould & Eberhardt 16 inch shaper","maker":"Gould & Eberhardt","use":"The slotted rocker driven by a crank pin pushes the ram through the cut and returns it faster.","url":"https://www.youtube.com/watch?v=bg2yppzEmBo"},
+  {"product":"Atlas 7 inch metal shaper","use":"A rotating crank pin sliding in a rocking arm gives the ram a slow cutting stroke and a quick return.","url":"https://www.youtube.com/watch?v=P7usJq7Qlhk"}
+ ]},
+ "whitworth": {"real_world": [
+  {"product":"Atlas Rhodes shaper","use":"A crank pin turns a slotted lever fully round an offset pivot to drive the ram with a slow cut and fast return.","url":"https://www.youtube.com/watch?v=Jx5nOn0tf_k"},
+  {"product":"Atlas Rhodes shaper drive","use":"The Whitworth drive shown on a real shaper spins the slotted link a full turn so the return stroke is quick.","url":"https://www.youtube.com/watch?v=c0zdeh-LF-o"}
+ ]},
+ "drag-link-quick-return": {"real_world": []},
+ "offset-slider-crank": {"real_world": []},
+ "walschaerts-valve-gear": {"real_world": [
+  {"product":"Live steam locomotive with Walschaerts gear","use":"The return crank and crosshead motion are mixed in the combination lever to time the valve.","url":"https://www.youtube.com/watch?v=rRGGSr68miQ"},
+  {"product":"Live steam locomotive with Walschaerts gear","use":"Eccentric crank, radius rod and combination lever move the valve in step with the piston.","url":"https://www.youtube.com/watch?v=lgUtFRsJUKI"}
+ ]},
+ "bennett-linkage": {"real_world": [
+  {"product":"Bennett linkage physical toy model","use":"Four skew hinge axes give a loop that still folds and unfolds with one degree of freedom.","url":"https://www.youtube.com/watch?v=U1IpMTTaMwY"}
+ ]},
+ "swash-plate": {"real_world": [
+  {"product":"Axial swashplate piston pump cutaway","use":"A tilted plate pushes the pistons in and out as the barrel turns.","url":"https://www.youtube.com/watch?v=Athbk7JvGRQ"},
+  {"product":"Axial variable displacement A/C compressor cutaway","maker":"NADA Scientific","use":"A tilting swash plate sets the piston stroke and so the refrigerant flow.","url":"https://www.youtube.com/watch?v=yMp2MtcQ9rk"},
+  {"product":"Double acting swash plate car A/C compressor","use":"The swash plate on the shaft drives pistons back and forth on both of its faces.","url":"https://www.youtube.com/watch?v=5Vea2qcbEXI"}
+ ]},
+ "flexure-hinge": {"real_world": [
+  {"product":"NanoCube XYZ piezo flexure stage","maker":"Physik Instrumente","use":"Flexure hinges flex to guide the stage over a tiny range with no friction or backlash.","url":"https://www.youtube.com/watch?v=FD9CBWKmIBM"}
+ ]},
+ "bistable-compliant": {"real_world": []},
+ "centrifugal-governor": {"real_world": [
+  {"product":"Flyball governor on a dual oscillating steam engine","use":"The spinning balls swing out as speed rises and move a lever that throttles the steam.","url":"https://www.youtube.com/watch?v=Gbl3XxCJbP0"},
+  {"product":"Mill steam engine with flyball governor","use":"Belt-driven balls lift a sleeve that closes the steam valve to hold the speed steady.","url":"https://www.youtube.com/watch?v=4LXwcehG0ag"},
+  {"product":"Steam engine flyball governor","use":"Balls fling outward with speed and a linkage cuts the steam supply to keep rpm near a set value.","url":"https://www.youtube.com/watch?v=WLBTKBgTogo"}
+ ]},
+ "ball-disc-integrator": {"real_world": [
+  {"product":"Rebuilt Meccano differential analyser","use":"Disc-and-wheel integrators turn the wheel by the integral of the disc radius setting.","url":"https://www.youtube.com/watch?v=YDBU36LbC2o"}
+ ]},
+ "friction-wheel-drive": {"real_world": [
+  {"product":"Snowblower friction wheel drive","use":"A rubber wheel pressed on a spinning disc changes speed and direction as it moves across the face.","url":"https://www.youtube.com/watch?v=CGpotB8Km4M"},
+  {"product":"1915 Metz touring car","maker":"Metz","use":"The driven wheel slides across a flywheel face to give stepless speeds and reverse.","url":"https://www.youtube.com/watch?v=veh58rYybVQ"}
+ ]},
+ "cvt-belt": {"real_world": [
+  {"product":"DAF Variomatic","maker":"DAF","use":"Two V-pulleys with moving cone halves change the belt radii for a stepless ratio.","url":"https://www.youtube.com/watch?v=n03FAEAZN80"},
+  {"product":"DAF Variomatic test drives (1965 film)","maker":"DAF","use":"Rubber belts on variable-width pulleys serve as the automatic gearbox.","url":"https://www.youtube.com/watch?v=hl8KDZh_O0w"},
+  {"product":"Car CVT steel push belt","use":"A stack of steel segments rides between conical pulley faces to carry the drive at varying ratios.","url":"https://www.youtube.com/watch?v=PiwRUfFEc5k"}
+ ]}
 }

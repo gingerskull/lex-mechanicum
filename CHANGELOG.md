@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.10.0 — 2026-10-18
+
+- Real-world examples on every mechanism page are YouTube videos of real products and machines at work, never product
+  pages, animations or renders (standard 2.3, P1, P6). The catalogue validator takes only YouTube links there and no
+  longer asks for a minimum: a mechanism with no solid video shows no "In the real world" section.
+
 ## 0.9.0 — 2026-10-18
 
 - Slide rails sit on the base on ground steel pads, one under each fixing at most 45 mm apart, a countersunk M3 down

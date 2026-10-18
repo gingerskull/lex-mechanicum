@@ -1,64 +1,55 @@
 {
-"anchor-escapement": {"real_world": [
- {"product": "Thomas Tompion longcase clock movement, London 1700", "maker": "Thomas Tompion (Science Museum Group collection)", "use": "The anchor escapement releases the going train one tooth per swing of the long seconds pendulum.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co8557970/longcase-clock-movement", "kind": "museum", "checked": true},
- {"product": "William Clement longcase clock, London c.1685-1690 (V&A W.6:1-1938)", "maker": "William Clement (Victoria and Albert Museum)", "use": "A weight-driven longcase clock regulated by an anchor escapement, by one of the earliest makers to use it.", "url": "https://collections.vam.ac.uk/item/O165205/longcase-clock-clement-william", "kind": "museum", "checked": true}
-]},
-"lever-escapement": {"real_world": [
- {"product": "Jaeger-LeCoultre miniature wristwatch movement (1929 calibre)", "maker": "Jaeger-LeCoultre (Science Museum Group collection)", "use": "A Swiss lever escapement gives impulse to the balance and releases the train in this tiny wristwatch movement.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co757/miniature-wrist-watch-movement-spring-driven-watch-movement-lever-escapement", "kind": "museum", "checked": true},
- {"product": "Helvetia calibre 800 manual-wind watch movement (1950)", "maker": "Helvetia", "use": "The movement's escapement is listed as Swiss lever, regulating the balance at each beat.", "url": "https://ranfft.org/caliber/6487-Helvetia-800", "kind": "product", "checked": true},
- {"product": "Sellita SW200-1 automatic movement in Circula SuperSport, AquaSport and ProTrail watches", "maker": "Sellita / Circula", "use": "A 28,800 vph mechanical lever movement whose lever escapement meters the mainspring through the balance.", "url": "https://circulawatches.com/us/blog/Sellita-SW200-1-A-top-class-Swiss-movement", "kind": "in-product", "checked": true}
-]},
-"verge-escapement": {"real_world": [
- {"product": "Thomas Savege full-plate fusee pocket watch movement, c.1678 (ZAA0672)", "maker": "Thomas Savege (Royal Museums Greenwich)", "use": "A verge escapement with crown wheel releases the fusee-driven train in this early pocket watch.", "url": "https://rmg.co.uk/collections/objects/rmgc-object-79777", "kind": "museum", "checked": true},
- {"product": "John Midnall oval silver verge watch, London 1610-1620 (1874,0718.48)", "maker": "John Midnall (British Museum)", "use": "A pre-balance-spring verge escapement regulates this early 17th century watch.", "url": "https://www.britishmuseum.org/collection/object/H_1874-0718-48", "kind": "museum", "checked": true},
- {"product": "Salisbury Cathedral clock (c.1386)", "maker": "Salisbury Cathedral", "use": "The medieval iron turret clock runs today with a reproduction verge and foliot escapement installed in the 1956 restoration.", "url": "https://en.wikipedia.org/wiki/Salisbury_Cathedral_clock", "kind": "case-study", "checked": true}
-]},
-"lead-screw": {"real_world": [
- {"product": "Kerk 3/4 in (19 mm) lead screw with ZBA, NTB, VHD and BFW nuts", "maker": "Haydon Kerk Pittman (AMETEK)", "use": "A TFE-coated modified acme lead screw drives a polymer nut for motorised linear positioning.", "url": "https://www.haydonkerkpittman.com/products/lead-screws-and-nuts/lead-screws-by-size/3-4-19mm", "kind": "product", "checked": true},
- {"product": "Joyce/Dayton 6 in x 1 1/3 single lead acme machine screw (AS600R075A) with bronze nut", "maker": "Joyce/Dayton", "use": "A heavy acme lead screw and bronze nut rated to 150,000 lb dynamic load for lifting and positioning.", "url": "https://www.joycedayton.com/products/screws-and-nuts/machine-screws-and-nuts/6-1-13-single-lead-acme", "kind": "product", "checked": true},
- {"product": "Machine (acme) screw jack actuator", "maker": "Columbus McKinnon (CMCO)", "use": "A worm-driven acme lifting screw raises loads and self-locks at higher ratios.", "url": "https://www.cmco.com/en-gb/products/power-and-motion-technology/actuators/mechanical-actuators/acme-screw-jack/", "kind": "product", "checked": true}
-]},
-"ball-screw": {"real_world": [
- {"product": "THK SBK high-speed compact ball screw", "maker": "THK", "use": "A caged recirculating-ball nut on a ground screw gives fast, low-noise feed for machine tool and automation axes.", "url": "https://www.automation.com/article/thk-introduces-sbk-high-speed-compact-ball-screw", "kind": "product", "checked": true},
- {"product": "THK standard ball screw assemblies", "maker": "THK (via Acorn Industrial)", "use": "Ball screw and nut assemblies for precise linear motion in industrial machines.", "url": "https://www.acorn-ind.co.uk/thk/linear-motion/ball-screws/ball-screw-assemblies/", "kind": "product", "checked": true}
-]},
-"differential-screw": {"real_world": [
- {"product": "Newport DM-13 differential micrometer head (13 mm coarse, 0.2 mm fine)", "maker": "Newport (MKS Instruments)", "use": "Two threads of slightly different pitch give sub-micron fine motion on top of normal coarse travel for optical stages.", "url": "https://www.newport.com/p/DM-13", "kind": "product", "checked": true},
- {"product": "Siskiyou 100TPI-0.5d differential adjustment screw", "maker": "Siskiyou Corporation", "use": "A differential screw with 0.5 in lockable coarse travel and 0.030 in fine travel for ultraprecise optical mount adjustment.", "url": "https://www.photonics.com/Product.aspx?PRID=47567", "kind": "product", "checked": true}
-]},
-"belt-drive": {"real_world": [
- {"product": "Gates Micro-V automotive serpentine belts", "maker": "Gates", "use": "A V-ribbed belt from the crankshaft pulley drives the engine accessories on a car serpentine drive.", "url": "https://www.gates.com/us/en/power-transmission/micro-v-belts/automotive-micro-v-belts.p.8550-000000-000000.html", "kind": "product", "checked": true},
- {"product": "Gates industrial timing belts (metric, imperial and Twin Power double-sided)", "maker": "Gates (via Acorn Industrial)", "use": "Toothed synchronous belts transmit power between pulleys without slip in industrial machinery.", "url": "https://www.acorn-ind.co.uk/gates/power-transmission/industrial-belts/timing-belts", "kind": "product", "checked": true}
-]},
-"chain-drive": {"real_world": [
- {"product": "Tsubaki RS double pitch roller chain A2080RB (ANSI 80, 2 in pitch)", "maker": "Tsubaki", "use": "Roller chain for economical drives at low speed, moderate load or long centre distance.", "url": "https://catalog.tsubaki.ca/tr/item/double-pitch-roller-chain/rs-double-pitch-roller-chains-2/a2080rb", "kind": "product", "checked": true},
- {"product": "Shimano CN-HG53 9-speed bicycle chain", "maker": "Shimano", "use": "Carries pedal torque from chainring to rear sprockets on 9-speed road and mountain bikes.", "url": "https://www.rosebikes.com/p/shimano-cn-hg53-9-speed-chain-38137", "kind": "product", "checked": true},
- {"product": "Tsubaki engineering class straight sidebar drive chain", "maker": "Tsubaki", "use": "Heavy roller drive chain for drum drives, draw benches and crawler crane drives in mining and cement plants.", "url": "https://catalog.tsubaki.ca/viewitems/drive-chains_/drive-chain---straight-sidebar", "kind": "product", "checked": true}
-]},
-"block-and-tackle": {"real_world": [
- {"product": "Harken 10:1 mainsheet Carbo Air base block (HC8454) with matching top block", "maker": "Harken", "use": "A 5-sheave base block and its top block form a 10:1 tackle so a sailor can trim a loaded mainsail by hand.", "url": "https://murrays.com/products/harken-block-10-1-mainsheet-carbo-air-base", "kind": "product", "checked": true},
- {"product": "UPET drilling rig crown blocks (4 to 6 sheaves, 30 to 225 tf)", "maker": "UPET", "use": "The fixed multi-sheave crown block and the traveling block reeve the drill line to multiply drawworks pull for lifting the drill string.", "url": "https://upet.com/equipment/crownblocks/", "kind": "product", "checked": true}
-]},
-"oldham-coupling": {"real_world": [
- {"product": "Ruland Oldham couplings (aluminum or stainless hubs, acetal, nylon or PEEK disk)", "maker": "Ruland Manufacturing", "use": "A sliding center disk between two slotted hubs passes torque while taking up parallel shaft offset, and breaks cleanly on overload.", "url": "https://www.ruland.com/servo-couplings/oldham-couplings.html", "kind": "product", "checked": true},
- {"product": "Ruland Oldham couplings on conveyor roller drives", "maker": "Ruland Manufacturing (PIB Sales article)", "use": "Join motors to conveyor rollers in packaging and sorting lines, absorbing frame misalignment with zero backlash.", "url": "https://pibsales.com/bearings/ruland-oldham-couplings-solutions-for-conveyors/", "kind": "in-product", "checked": true}
-]},
-"universal-joint": {"real_world": [
- {"product": "Dana Spicer Spicer Life 1310 driveshaft U-joint for 1945-2006 Jeep CJ and Wrangler", "maker": "Dana (Spicer)", "use": "A cross and bearing cap joint at each end of the driveshaft lets it turn through changing angles as the axle moves.", "url": "https://oms.quadratec.com/dana-spicer-spicer-life-1310-driveshaft-u-joint.html", "kind": "product", "checked": true},
- {"product": "Spicer cardan and Wing Bearing industrial driveshafts", "maker": "Dana (Spicer), via Rowland Company", "use": "Cardan joints transmit torque at an angle in steel and paper mill machinery, pumps, marine drives and excavators.", "url": "https://www.rowlandcompany.com/manufacturer/dana-spicer/", "kind": "product", "checked": true}
-]},
-"double-cardan": {"real_world": [
- {"product": "Tom Wood's small diameter 1310 double cardan front driveshaft for Jeep CJ/YJ", "maker": "Tom Wood's Custom Drive Shafts", "use": "1310-series double cardan joints with a centering ball give smooth constant velocity drive at steep front shaft angles.", "url": "https://4xshaft.com/products/small-diameter-1310-double-cardan-shaft", "kind": "product", "checked": true},
- {"product": "Torque King high-angle CV driveshafts for Ram 2500/3500 4x4 (e.g. TKA3130)", "maker": "Torque King", "use": "A double cardan 1410 joint at the transfer case end runs at up to 30 degrees on lifted heavy-duty trucks.", "url": "https://torqueking.com/blog/a-closer-look-at-highperformance-highangle-cv-driveshafts/", "kind": "product", "checked": true}
-]},
-"rzeppa-cv-joint": {"real_world": [
- {"product": "Rzeppa high angle constant velocity joint, 1.25 in, 37.5 degrees (object 1935-614)", "maker": "Universal Power Drives Ltd (Science Museum Group collection)", "use": "A dismantled real Rzeppa joint showing the bell, cage, inner race and six balls that keep the shafts at constant velocity.", "url": "https://collection.sciencemuseumgroup.org.uk/objects/co25100", "kind": "museum", "checked": true},
- {"product": "VW Rabbit front axle outer CV joint", "maker": "Volkswagen (service article by Ralph Birnbaum)", "use": "Shop article on disassembling, inspecting and rebuilding the Rzeppa-style outer joint on a real front-drive car.", "url": "https://automotivetechinfo.com/wp-content/uploads/1988/02/Servicing-Rzeppa-Joints.pdf", "kind": "case-study", "checked": true},
- {"product": "GKN Lobro AC and UF fixed ball joints for car sideshafts", "maker": "GKN Automotive", "use": "Fixed ball joints at the wheel end of front sideshafts allow up to 47 to 50 degrees for steering.", "url": "https://www.gknautomotive.com/globalassets/downloads/aftermarket-download-archive-files/driveshafts-technology/driveshafts_technology_loebro_gb.pdf", "kind": "product", "checked": true, "note": "The brochure calls them fixed ball joints, the Rzeppa-derived type; it does not use the word Rzeppa."}
-]},
-"schmidt-coupling": {"real_world": [
- {"product": "Zero-Max Schmidt offset couplings", "maker": "Zero-Max", "use": "Link offset shafts at constant speed for print registration in printing presses, nip rolls in metal processing and assembly machines.", "url": "https://www.automationworld.com/products/product/21107559/zero-max-inc-schmidt-couplings-connect-offset-shafts-while-ensuring-constant-rotating-speed", "kind": "product", "checked": true},
- {"product": "Schmidt-Kupplung Standard, Power Plus and Offset Plus series", "maker": "Abssac (Schmidt-Kupplung)", "use": "Constant velocity offset couplings driving printing, roll forming, laminating and corrugated paper machine rolls.", "url": "https://eurekamagazine.co.uk/content/technology-spotlights/close-together-far-apart-the-precision-schmidt-kupplung", "kind": "product", "checked": true},
- {"product": "Zero-Max Schmidt offset couplings in printing presses and paper converting", "maker": "Zero-Max (Design World article)", "use": "Compact offset couplings save space between parallel shafts in presses, embossing and pharmaceutical machinery.", "url": "https://www.designworldonline.com/?p=1615", "kind": "product", "checked": true}
-]}
+ "anchor-escapement": {"real_world": [
+  {"product":"English longcase clock movement, Cornish","maker":"Fine Antique Clocks, P A Oxley","use":"The anchor pallets catch and release the escape wheel one tooth per pendulum swing in an antique longcase.","url":"https://www.youtube.com/watch?v=678bSxUyiEw"},
+  {"product":"London longcase clock movement","maker":"Fine Antique Clocks, P A Oxley","use":"The anchor rocks with the pendulum, locking and releasing the escape wheel and receiving a small push each beat.","url":"https://www.youtube.com/watch?v=axV5is5p-4U"},
+  {"product":"Turret clock with anchor escapement and pendulum","maker":"Trevor Murphy","use":"A large tower clock anchor is driven back and forth by the pendulum, metering out the going train.","url":"https://www.youtube.com/watch?v=z_7rE8afFfo"}
+ ]},
+ "lever-escapement": {"real_world": [
+  {"product":"Mechanical wristwatch movement","maker":"Watch Affinity","use":"The pallet fork alternately locks and releases the escape wheel while the balance swings, shown in slow motion.","url":"https://www.youtube.com/watch?v=ZUCVBCFUW5I"},
+  {"product":"Lever platform escapement, running","maker":"Stephen Baguley","use":"A pallet lever on a platform escapement unlocks the escape wheel and impulses the balance each swing.","url":"https://www.youtube.com/watch?v=7LnC1OyLo04"}
+ ]},
+ "verge-escapement": {"real_world": [
+  {"product":"Antique English bracket clock","maker":"Halbe Hageman","use":"The crown wheel pushes alternately on the verge pallets, rocking the balance or pendulum.","url":"https://www.youtube.com/watch?v=qne88OuXegs"},
+  {"product":"Austrian one-day clock movement","maker":"Bill Stoddard","use":"A crown wheel engages two pallets on the verge to release the train one tooth at a time.","url":"https://www.youtube.com/watch?v=S8LOVjIXiKg"},
+  {"product":"Resting-wheel verge clock build","maker":"James Stanley","use":"A homemade weight-driven clock using a verge escapement variant that is shown running.","url":"https://www.youtube.com/watch?v=Rg_UF_32OEQ"}
+ ]},
+ "lead-screw": {"real_world": [
+  {"product":"Monarch engine lathe","maker":"Abom79","use":"The lathe leadscrew drives the carriage through the half nut, with a reverse lever to cut left hand threads.","url":"https://www.youtube.com/watch?v=9Hb-96Z7cRc"},
+  {"product":"Engine lathe with lead screw and half nut lever","maker":"Trev Kongable","use":"Engaging the half nut on the lead screw advances the carriage at a steady rate.","url":"https://www.youtube.com/watch?v=QjFVFCs3Z7g"},
+  {"product":"Lathe leadscrew thread cutting","maker":"LSCAD","use":"The carriage follows the leadscrew through the half nut while a thread is cut.","url":"https://www.youtube.com/watch?v=p_NHCBdpXFo"}
+ ]},
+ "ball-screw": {"real_world": [
+  {"product":"Homebuilt multi-axis CNC machine with ballscrews","maker":"FloweringElbow 4SuperNerds","use":"Motor-turned ballscrews carry the machine axes along their rails.","url":"https://www.youtube.com/watch?v=k47LBPEemvU"}
+ ]},
+ "differential-screw": {"real_world": [
+  {"product":"Machine shop differential screw fine-adjust fixture","maker":"Solid Rock Machine Shop Inc.","use":"Two threads of slightly different pitch move a part by only the pitch difference per turn, giving very fine adjustment.","url":"https://www.youtube.com/watch?v=KeCqpoUoQlA"}
+ ]},
+ "belt-drive": {"real_world": [
+  {"product":"Line-shaft machine shop","maker":"mrpete222","use":"Flat belts carry power from an overhead line shaft down to each machine.","url":"https://www.youtube.com/watch?v=cXDbH5pzagc"},
+  {"product":"Century-old line-shaft machine shop","maker":"Dave Maloney","use":"Leather flat belts from the line shaft drive lathes and other machines.","url":"https://www.youtube.com/watch?v=E-2qJNtFgvs"},
+  {"product":"Line-shaft machine shop at Rough and Tumble","maker":"Shark River Machine","use":"Belts run from line shaft pulleys to the machines in a museum shop.","url":"https://www.youtube.com/watch?v=131Vug8y9_0"}
+ ]},
+ "chain-drive": {"real_world": [
+  {"product":"Lantech chain driven live roller conveyor","maker":"SIGMA Equipment","use":"A roller chain and sprockets turn the conveyor rollers together from a single drive.","url":"https://www.youtube.com/watch?v=HAu7vDjM3mI"}
+ ]},
+ "block-and-tackle": {"real_world": [
+  {"product":"Gin pole with block and tackle lifting logs","maker":"Medieval Trebuchet","use":"A rope reeved through multiple sheaves lets a person lift heavy logs with a small pull.","url":"https://www.youtube.com/watch?v=R3Yk2-hGGFI"}
+ ]},
+ "oldham-coupling": {"real_world": [
+  {"product":"Printrbot Go 3D printer Z lead screw","maker":"John Davis","use":"An Oldham coupler links the motor shaft and lead screw, absorbing offset between them.","url":"https://www.youtube.com/watch?v=08WQxpkgdAk"},
+  {"product":"CraftBot 3D printer Z lead screw","maker":"Craftbot","use":"The coupler's floating disc absorbs a bent lead screw so the Z axis does not wobble.","url":"https://www.youtube.com/watch?v=tmMrsJ1Jmy8"}
+ ]},
+ "universal-joint": {"real_world": [
+  {"product":"Automotive propeller shaft with U-joints (shop demonstration)","use":"Two cross-and-yoke joints at an angle carry torque to the axle, and the working angles set how much the output speed fluctuates.","url":"https://www.youtube.com/watch?v=f1m-Fh5kiRU"}
+ ]},
+ "double-cardan": {"real_world": [
+  {"product":"Ford Bronco / F-150 front driveshaft double Cardan joint","maker":"Ford","use":"Two U-joints joined by a centering yoke let the front driveshaft run at a steering and suspension angle while the output turns at even speed.","url":"https://www.youtube.com/watch?v=rsmH0YPeKhU"},
+  {"product":"Jeep front driveshaft double Cardan joint","maker":"Jeep","use":"The rebuilt joint shows two spiders and a center yoke that split the shaft angle between them so speed fluctuation cancels.","url":"https://www.youtube.com/watch?v=3Bp7E7miYYk"}
+ ]},
+ "rzeppa-cv-joint": {"real_world": [
+  {"product":"Air-cooled VW CV joint","maker":"Volkswagen","use":"The balls, cage and grooved races of a ball-type CV joint are assembled by hand, showing how the balls sit in the bisecting plane.","url":"https://www.youtube.com/watch?v=pmhPYCJWurc"}
+ ]},
+ "schmidt-coupling": {"real_world": [
+  {"product":"Zero-Max Schmidt offset coupling","maker":"Zero-Max","use":"Three discs joined by parallel links carry torque between offset parallel shafts at constant speed, shown on the manufacturer's own hardware.","url":"https://www.youtube.com/watch?v=zVt1tvD7rqk"}
+ ]}
 }

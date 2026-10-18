@@ -21,8 +21,8 @@ export function record(id: string, over: Partial<CatalogRecord> = {}): CatalogRe
     ],
     media: [{ title: "v", url: "https://example.org/v", kind: "video" }],
     real_world: [
-      { product: "p1", use: "u", url: "https://example.org/p1", kind: "product" },
-      { product: "p2", use: "u", url: "https://example.org/p2", kind: "product" },
+      { product: "p1", use: "u", url: "https://www.youtube.com/watch?v=aaaaaaaaaa1" },
+      { product: "p2", use: "u", url: "https://youtu.be/aaaaaaaaaa2" },
     ],
     related: [],
     ...over,

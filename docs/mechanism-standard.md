@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.2
+version: 2.3
 date: 2026-10-18
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -90,12 +90,12 @@ from the catalogue entry with the same id.
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| P1 | The catalogue has a complete record for the id: `name, aka, family, level, summary, motion, ratio, dof, topology, backdrivable, tags, explain {motion, forces, benefits, limits}, build, examples, references, media, real_world`. The folder has `model.ts`, `polish.ts`, `audit.md`. | DATA | `tools/check <id>` prints no `MISSING` |
+| P1 | The catalogue has a complete record for the id: `name, aka, family, level, summary, motion, ratio, dof, topology, backdrivable, tags, explain {motion, forces, benefits, limits}, build, examples, references, media`, and `real_world` (YouTube videos of real footage; may be empty). The folder has `model.ts`, `polish.ts`, `audit.md`. | DATA | `tools/check <id>` prints no `MISSING` |
 | P2 | Facets use the controlled vocabularies of the record spec, exact spelling. | DATA | catalogue validator |
 | P3 | **At a glance:** ratio (kind, class, typical), axis relation, output character, backdrivable, other names, plus family, motion, level, dof, and the drive (motorised or hand operated, section 8). | DATA / SITE | page |
 | P4 | **Tags grouped** into Function, Property and Application, keywords underneath. | DATA | page |
 | P5 | **Explanation:** how it moves, forces, benefits, limits; then where you'll find it: 2 to 4 real-world uses, each with one line. | DATA | page |
-| P6 | **Links:** references (Wikipedia plus at least one hard source) and photos and video (at least one video of the real thing, one photo page). Only URLs that were actually found. | DATA | page |
+| P6 | **Links:** references (Wikipedia plus at least one hard source) and photos and video (at least one video of the real thing, one photo page). In the real world: YouTube videos of real products or machines at work, never animations or renders; none rather than a wrong one. Only URLs that were actually found. | DATA | page |
 | P7 | The page reads the catalogue by id at build time. No prose in `model.ts` or `polish.ts`. | SITE / HAND | lint: no text fields in records |
 | P8 | **Not on the page:** no parts list, no "how it is built" section, no joint sections. | SITE | page |
 | P9 | Explanation text matches what the code does (dwell, ratio, swing, stroke). | HAND | read `explain` against `solve()` and the plot |
@@ -566,6 +566,8 @@ default detail level.
 
 ## Changelog
 
+- **2.3 (2026-10-18).** Real-world examples are YouTube videos of real footage, never product pages, animations or
+  renders, and may be none [P1, P6, DATA].
 - **2.2 (2026-10-18).** Slide rails sit on ground steel pads, screwed through into the base and dowelled at the ends,
   instead of on posts [A6, F1, AUTO].
 - **2.1 (2026-10-18).** Hand fixes from the first four conformance passes promoted to rules and primitives, and one new
