@@ -576,7 +576,7 @@
     {
      "id": "rod",
      "role": "output",
-     "def": "rod rigid with yoke running in guide from x = 95 to 135 mm"
+     "def": "tie bar rigid with the yoke, carrying a crosshead 120 mm from the slot centre in the guide, so the crosshead moves from x = 80 to 160 mm"
     }
    ],
    "joints": [
