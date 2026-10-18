@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.12.2 — 2026-10-18
+
+- Standard 2.4: a linear guide is a few blocks. Each slide is now two rails on one riser each, a bronze gib clamped
+  under the keeper (no separate shim, set screws or lock nuts), a screwed end block with a neoprene pad at each end,
+  a wiper at each end of the slider and one nipple; half to two thirds of the parts it had. The hand-built guides of
+  the rack and pinion and the trammel follow the same layout.
+- The stops and the linear drive grow the base for what they add (posts, tensioner, sensor), and the linear drive
+  lengthens its carriage slot, seats the carriage on the belt and adds the fork sensor, so three polishes lose their
+  hand fixes.
+
+
 ## 0.12.1 — 2026-10-18
 
 - Trammel of Archimedes: one cross-shaped groove plate; the crank and rod turn under it and only the blocks run in the

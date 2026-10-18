@@ -99,7 +99,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | V3 | PASS | AUTO / HAND · belt and pulleys clear of feet and housings; clearance 0 |
 | V4 | PASS | AUTO · flanges, slotted tensioner with an idler |
 | V5 | PASS | AUTO / HAND · linear: belt loop under the base along the travel, carriage through a slot in the base clamped to the slider, tensioner on the far pulley; the slot and the carriage seat are corrected in the polish (see overrides) |
-| V6 | PASS | AUTO / HAND · home flag, fork sensor taking the vane at the raised end, leads to the terminal block, one P-clip; the sensor is added in the polish |
+| V6 | PASS | AUTO / HAND · home flag, fork sensor taking the vane at the motor end of the stroke, leads to the terminal block, one P-clip; all built by the linear drive rule |
 | L1 | PASS | STYLE · lint-style clean |
 | L2 | PASS | HAND · the model and polish carry geometry, roles, marks and materials only |
 | L3 | PASS | HAND · carriage driver, bars link, platform output, rails ground, hardware hw |
@@ -154,10 +154,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 |---|---|---|---|
 | b bars | single plates, a bars crossing over them in single shear at every pin | a front plate over every a bar, a twin of the rear plate, in the model | A9: double shear at every bar pin |
 | platform | layer 4, underside 0.4 mm under the lowered bolt heads | plated 3.5 mm up in the model (`dz`), 1.4 mm over them | A14, K1 |
-| platform length | catalogue 120 mm | 150 mm in the model, catalogue corrected | the base follows the platform; the linear drive's motor sits past the travel and would stand outside a 120 mm platform's base (promotion candidate 1) |
-| base slot for the carriage | travel + 5 mm each end, 5.0 mm short of the carriage at the lowered end | 5.5 mm longer each end in the polish | A15; the carriage reaches 10 mm past its centre (promotion candidate 2) |
-| drive carriage | z from the belt's underside, 0.49 mm into the belt | seated on the belt's top in the polish | A15 (promotion candidate 3) |
-| home flag and sensor | flag only, no fork sensor; sensor lead ending at a point with nothing there | flag shortened to 6 mm and raised to the base underside, fork sensor body at the lead's start taking the vane at the raised end | V6 (promotion candidate 4) |
+| platform length | catalogue 120 mm | 150 mm in the model, catalogue corrected | the base follows the platform; the linear drive's motor sits past the travel and would stand outside a 120 mm platform's base |
 | height scale | none | engraved on the base, index on the platform | F9 |
 
 ## Detail ladder
