@@ -21584,7 +21584,7 @@
       },
       "explain": {
         "motion": "The lever swings back and forth about the wheel axis. On the forward stroke its driving pawl catches the steep face of a tooth and pushes the wheel one tooth; on the return stroke it rides up over the sloped backs of the teeth. A holding pawl on the frame drops into each tooth to stop the wheel running back.",
-        "forces": "Load passes through the pawl tip on the steep tooth face; the face is undercut slightly so the pawl is pulled into engagement under load. The small backward movement before the holding pawl catches is the backlash, at most one tooth pitch.",
+        "forces": "Load passes through the pawl tip on the steep tooth face; the pawl line runs tangent to the root circle, so the load keeps the tip seated in the root. The small backward movement before the holding pawl catches is the backlash, at most one tooth pitch.",
         "benefits": "Simple, robust one-way drive and lock that can hold heavy loads.",
         "limits": "Noisy, motion is in discrete steps, and backlash up to one pitch. Shock loads at engagement wear tooth faces and pawl tips."
       },
