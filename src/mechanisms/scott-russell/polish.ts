@@ -9,8 +9,6 @@ import type { Polish } from "../../assemble/api";
 import { a } from "./model";
 
 export const polish: Polish = (A, H) => {
-  const ctx = A.ctx;
-
   // ---- F7: the straight line holds only when |OM| = |MB| = |MP|, so one length is adjustable: the crank, halfway
   // between O and M. The crank is plated between the rails below and the beam above, with no room over or under it, so
   // the turnbuckle sits in the crank's own plane ----

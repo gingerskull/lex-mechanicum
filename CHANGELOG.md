@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.18.0 — 2026-10-19
+
+- Roberts' linkage, to the current standard: equal rockers and an isosceles coupler whose apex runs along the line
+  through the pivots; the ground length is set by an eccentric bushing at one pivot.
+- The Scott Russell linkage, to the current standard: a crank and a beam pinned at its midpoint, one end on a belt-driven
+  slider; the other end runs exactly at right angles; the crank carries a turnbuckle.
+- Evans' grasshopper, to the current standard: the Scott Russell core with a long swing link in place of the slider,
+  with an eccentric bushing at the swing link's pivot.
+- The belt drive of a linear input moves its idler out along the track when a ground pivot's hardware sits in the way.
+
 ## 0.15.0 — 2026-10-19
 
 - The sheet switch is one button with a sun or moon icon, on the library's bar beside the search and Filters and on a
