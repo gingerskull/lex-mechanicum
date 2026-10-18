@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.12.0 — 2026-10-18
+
+- Twenty-two more mechanisms built to standard 2.3 through the conformance pass: cam and roller follower, Chebyshev,
+  crank and slotted lever, Trammel of Archimedes, compound gear train, Hoekens, intermittent gear, Jansen, locomotive
+  driving gear, Oldham coupling, oscillating cylinder, pantograph, Peaucellier-Lipkin, planetary, rack and pinion,
+  ratchet and pawl, scissor lift, Scotch yoke, toggle clamp, Tusi couple, Watt and Whitworth. Each has its audit sheet,
+  8 visual baselines and a joints table. Hoekens and the pantograph stay open on F7 (no adjuster fits their free
+  pins yet).
+- Catalogue: real-world and media links checked, one dead link replaced; the Scotch yoke rod span, the scissor lift
+  platform length and ratio text, the trammel groove cut-back and a few explanations were corrected to the built model.
+- Fix: two arms swinging on one pivot get their own stop ids; the oscillating drive lever is wider so its wall round
+  the shaft bore meets the minimum.
+
+
 ## 0.11.1 — 2026-10-18
 
 - Licensed: the code under MIT (`LICENSE`), the catalogue, documents and drawings under Creative Commons

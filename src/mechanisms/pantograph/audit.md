@@ -1,5 +1,5 @@
 # Audit: Pantograph (pantograph)
-standard: 2.3 · date: 2026-10-18 · result: pass · detail: full · pass: audit+fix
+standard: 2.3 · date: 2026-10-18 · result: open · detail: full · pass: audit+fix
 
 ## Summary
 PASS 101 · FAIL 1 · N/A 19 · open: FAIL F7
