@@ -3,7 +3,7 @@
 export { models } from "../../../src/mechanisms/models";
 export { loadPackage } from "../../../src/package/loader";
 export { browserFactory } from "../../../src/render/canvas";
-export { defaultView } from "../../../src/render/draft";
+export { defaultView, cardView } from "../../../src/render/draft";
 export type { DrawView } from "../../../src/render/draft";
 export { createSession } from "../../../src/render/session";
 export type { Session } from "../../../src/render/session";

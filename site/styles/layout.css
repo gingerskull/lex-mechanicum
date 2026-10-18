@@ -157,6 +157,21 @@ footer {
   justify-content: space-between;
 }
 @media (max-width: 1000px) {
+  /* the set title block becomes one low strip across the header: four cells in a row (SS2) */
+  header.top .tblock {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    flex: 1 1 100%;
+  }
+  header.top .tblock div {
+    min-width: 0;
+    border-bottom: 0;
+  }
+  header.top .tblock div:nth-child(2n) {
+    border-right: 1px solid var(--line);
+  }
+  header.top .tblock div:last-child {
+    border-right: 0;
+  }
   .dlayout {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -172,8 +187,40 @@ footer {
   .facet .lbl {
     padding-top: 0;
   }
-  .bar .hide-s,
-  .tblock {
+  /* the bar reads as two groups: search and Filters on the first row, the sheet switch alone on the second (SS3) */
+  .bar .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 10px;
+  }
+  .bar .spacer {
     display: none;
+  }
+  .bar .search {
+    grid-column: 1;
+    flex: none;
+  }
+  .bar .fbtn {
+    grid-column: 2;
+    align-self: stretch;
+    justify-content: center;
+  }
+  .bar .lbl {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .bar .seg {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .bar .row > .lbl,
+  .bar .row > .seg {
+    margin-top: 2px;
+  }
+  header.top .tblock b {
+    font-size: 10.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

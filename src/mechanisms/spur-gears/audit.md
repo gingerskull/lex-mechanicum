@@ -1,5 +1,5 @@
 # Audit: Spur gear pair (spur-gears)
-standard: 2.0 · date: 2026-10-18 · result: pass · detail: full · pass: audit+fix
+standard: 2.3 · date: 2026-10-18 · result: pass · detail: full · pass: audit+fix
 
 ## Summary
 PASS 113 · FAIL 0 · N/A 8 · open: none
@@ -19,8 +19,8 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | P6 | PASS | DATA · Wikipedia, KMODDL and an engineering guide; two videos, a photo page, an animation |
 | P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts; lint-style clean |
 | P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · solve(): the gear turns half as fast and the other way, ratio exact; the line of action at 20° as the text says |
-| P10 | PASS | HAND · velocity on the pinion pitch circle, input and output spin, line of action, pressure angle, gear angle plot (slope -0.5) |
+| P9 | PASS | HAND · solve(): the gear turns half as fast and the other way, ratio exact; the pressure angle of 20° as the text says |
+| P10 | PASS | HAND · velocity on the pinion pitch circle, input and output spin, pressure angle, gear angle plot (slope -0.5) |
 | P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
 | K1 | PASS | HAND · centres exact; hubs, spokes, bridge and flange are cut round the model's teeth and pitch circles |
 | K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
@@ -114,7 +114,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | R4 | PASS | AUTO · package built at build time |
 | R5 | PASS | HAND · states only what differs; rules 0.07 s, polish under 1 ms |
 | R6 | PASS | FLAG · browser bench (one run for all four): plan 50.5, 28° 75.6, side 39.3, explode 27.9 ms at full detail; 8 ms reached at dial D; runs on this machine vary by up to half (look at in #14) |
-| R7 | PASS | HAND · model.ts + polish.ts 4.8 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 4.6 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
