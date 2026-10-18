@@ -40,7 +40,8 @@ describe("visual snapshots", () => {
           const base = join(DIR, file);
           if (process.env.UPDATE_SNAPSHOTS || !existsSync(base)) {
             mkdirSync(DIR, { recursive: true });
-            writeFileSync(base, png);
+            // RGB at full compression: Chrome's PNGs are larger than they need to be
+            writeFileSync(base, PNG.sync.write(PNG.sync.read(png), { deflateLevel: 9, colorType: 2, inputHasAlpha: true } as Parameters<typeof PNG.sync.write>[1]));
             return;
           }
           const a = PNG.sync.read(readFileSync(base));

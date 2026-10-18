@@ -52,10 +52,13 @@ Heavy checks run locally; CI runs what takes seconds.
 | Per-mechanism headless checks: kinematics, clearance, clamp, record completeness | pre-push and CI | that mechanism changed; all mechanisms when `src/` outside `src/mechanisms/` changed |
 | Conformance report (standard version per mechanism) | pre-push and CI | always |
 | Site build | CI | `site/`, catalogue or packages changed |
-| Visual snapshots (Playwright, both sheets, four views per mechanism, against our own baselines) | local only, pre-push for changed paths | mechanism, renderer, style or rules changed |
-| Bench, audit screenshots, thumbnails | local, on demand | |
+| Thumbnails: stale ones redrawn in local Chrome; the push stops until `site/thumbs` is committed | pre-push hook | their fingerprint changed (package, model, renderer, style or view) |
+| Thumbnail fingerprints compared with the manifest (no drawing) | CI, in the site build | `site/`, catalogue or packages changed |
+| Visual snapshots (local Chrome, both sheets, four views per mechanism, against our own baselines) | local only | mechanism, renderer, style or rules changed |
+| Browser bench, audit screenshots | local, on demand | |
 
-Snapshot baselines are regenerated once, when the look is final, never to make a run pass.
+Snapshot baselines are regenerated once, when the look is final, never to make a run pass. Everything that draws
+needs Google Chrome installed locally (`tools/chrome.ts`); CI never draws.
 
 ## CI
 

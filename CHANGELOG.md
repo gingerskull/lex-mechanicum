@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.14.0 — 2026-10-18
+
+- The drawings are drawn with WebGL2 in place of Canvas 2D: a full-detail frame takes 1.4–3.6 ms on desktop for
+  every mechanism and view, against 23–62 ms before on the mechanisms compared, with the look held. One GPU context
+  per page is shared by the stage and the cards; a lost context is rebuilt and the drawing comes back. Lines get
+  round joins and caps, hidden line dashes keep their length at any tilt, and silhouettes run down each part's far
+  left and right.
+- Standard 2.6: the pixel ratio cap moves from DL-C to DL-G, the last rung the Auto dial reaches. The Auto dial also
+  steps down when frames miss the display's rate.
+- Library cards draw at dial B, sharp and with wall shading; only the last three hovered cards keep a live drawing,
+  so memory stays flat, and off-screen cards cost no layout or paint.
+- A browser without WebGL2 shows a large still of the drawing with a note; the rest of the page works.
+- Thumbnails are committed as WebP with fingerprints of what they are drawn from; the site build checks them and
+  never draws. Shots, thumbnails, the bench and the visual snapshots draw in local Chrome; the bench is the browser
+  bench, with draw counters.
+
 ## 0.13.1 — 2026-10-18
 
 - Library cards on touch screens: a tap or a scroll that touches a card while its animation plays no longer restarts
