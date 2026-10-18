@@ -58,6 +58,15 @@ export function tooth(card: Card, T: ResolvedTheme): void {
   if (p) {
     ctx.fillStyle = p;
     ctx.fillRect(0, 0, card.w, card.h);
+    // multiply darkens on average (the noise averages mid-grey): dividing by that average again (colour-dodge with its
+    // complement) keeps the sheet's tone, so dropping the grain (DL-A) changes the texture only
+    if (ctx.globalCompositeOperation === "multiply") {
+      const g = Math.round(255 * T.grain * 0.5);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "color-dodge";
+      ctx.fillStyle = paint([g, g, g]);
+      ctx.fillRect(0, 0, card.w, card.h);
+    }
   }
   ctx.restore();
 }

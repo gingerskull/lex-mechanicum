@@ -9,6 +9,9 @@
   scrolling.
 - Scrolling the page with a finger on the drawing no longer pauses it: only a sideways drag (which scrubs) or a tap
   (which plays or pauses) does.
+- On the Drafting sheet the paper no longer turns darker at full detail: the paper grain keeps the sheet's tone, so
+  dropping it (DL-A) changes only the texture.
+- On a phone, the filter panel's headings sit above their chips again, not below them.
 
 ## 0.14.1 — 2026-10-18
 
