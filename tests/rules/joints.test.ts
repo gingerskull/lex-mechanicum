@@ -82,11 +82,14 @@ describe("J4 pin in slot", () => {
 });
 
 describe("J5 slide", () => {
-  it("adds keeper, gib with three adjusters and lock nuts, wipers, nipple and two end stops with bumpers", () => {
+  it("adds a gib clamped under the keeper, wipers, nipple and two end stops with pads, as a few blocks", () => {
     const ctx = contextBefore(j5Model, j5);
     const k = kinds(run(ctx, j5));
-    expect(k).toMatchObject({ plate: 1, shim: 1, gib: 1, setScrew: 3, nut: 3, wiper: 2, stop: 2, bumper: 2, nipple: 1 });
-    expect(only(k)).toEqual(["bumper", "gib", "head", "nipple", "nut", "plate", "setScrew", "shank", "shim", "stop", "wiper"]);
+    // the stop screws are the only screws the slide adds: the keeper's are the rail's fixing screws (A6)
+    expect(k).toEqual({ plate: 1, gib: 1, wiper: 2, stop: 2, bumper: 2, nipple: 1, head: 2, shank: 2 });
+    expect(only(k)).not.toContain("setScrew");
+    expect(only(k)).not.toContain("nut");
+    expect(only(k)).not.toContain("shim");
   });
 });
 

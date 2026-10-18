@@ -39,18 +39,40 @@ describe("feet", () => {
 });
 
 describe("standoffs", () => {
-  it("seats each slide rail on ground pads, screwed into the base at each and dowelled at the ends", () => {
+  it("seats each slide rail on one ground riser, screwed into the base, the reference rail dowelled", () => {
     const ctx = contextBefore(j5Model, standoffs);
     const added = run(ctx, standoffs);
-    const pads = added.filter((s) => s.kind === "standoff");
-    // two rails, 117 mm of straight run each: pads at most 45 mm apart
-    expect(pads.length).toBe(8);
-    for (const p of pads) expect([p.z0, p.z1]).toEqual([ctx.b1, 0]);
-    expect(added.filter((s) => s.headKind === "csk")).toHaveLength(8);
-    expect(added.filter((s) => s.kind === "dowel")).toHaveLength(4);
+    const risers = added.filter((s) => s.kind === "standoff");
+    // nothing passes under the rails: one riser each, along the straight run
+    expect(risers.map((s) => s.id).sort()).toEqual(["raila-seat0", "railb-seat0"]);
+    for (const p of risers) expect([p.z0, p.z1]).toEqual([ctx.b1, 0]);
+    // 119 mm of straight run: a screw 6 mm in from each end, at most 100 mm apart
+    expect(added.filter((s) => s.headKind === "csk")).toHaveLength(6);
+    // rail b is the reference: dowelled; rail a carries the gib, set against the slider, and is screwed only
+    expect(added.filter((s) => s.kind === "dowel").map((s) => s.id).sort()).toEqual(["railb-seat0-dowel", "railb-seat1-dowel"]);
+    expect(ctx.joint("railb-seat")!.serves.F1).toHaveLength(2);
+    expect(ctx.joint("raila-seat")!.serves.F1).toBeUndefined();
     // nothing hangs under the base
     expect(added.filter((s) => s.z1 <= ctx.b0)).toEqual([]);
-    expect(ctx.joint("raila-seat")!.serves.F1).toHaveLength(2);
+  });
+
+  it("screws the gib rail down through keeper and gib, the gib slotted at each screw", () => {
+    const ctx = contextBefore(j5Model, standoffs);
+    run(ctx, standoffs);
+    const keeper = ctx.get("slide-block-keeper")!;
+    const gib = ctx.get("slide-block-gib")!;
+    expect(gib.z1).toBe(keeper.z0);
+    const heads = ctx.solids.filter((s) => /^raila-seat\d-sc$/.test(s.id));
+    expect(heads).toHaveLength(3);
+    for (const h of heads) {
+      expect(h.z1).toBeCloseTo(keeper.z1, 6);
+      // a slot round each screw, longer across the rail than along it
+      const slot = gib.holes.find((o) => o.some(([x, y]) => Math.hypot(x - h.at[0], y - h.at[1]) < 2.3));
+      expect(slot).toBeDefined();
+      const xs = slot!.map((p) => p[0]);
+      const ys = slot!.map((p) => p[1]);
+      expect(Math.max(...ys) - Math.min(...ys)).toBeGreaterThan(Math.max(...xs) - Math.min(...xs) + 0.5);
+    }
   });
 
   it("gives a rail no posts", () => {

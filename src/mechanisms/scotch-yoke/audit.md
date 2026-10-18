@@ -33,7 +33,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | D2 | PASS | HAND · material in the yoke walls round the slot where the pin pushes; bosses on the crank round the shaft and the pin; no windows |
 | D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
 | D4 | PASS | AUTO · feet concentric with the corner arcs |
-| D5 | PASS | AUTO / HAND · rails on ground pads; the tie bar is one plain bar over the yoke tongue and the crosshead, no posts |
+| D5 | PASS | AUTO / HAND · rails on ground risers; the tie bar is one plain bar over the yoke tongue and the crosshead, no posts |
 | D6 | PASS | HAND / STYLE · slide hardware, wear strips and leads read quieter than crank, yoke and crosshead |
 | D7 | PASS | HAND · crank, yoke, bar, rails and base carry only load shape and manufacturing marks |
 | A1 | PASS | AUTO · pO J2, pA J4 (pin in the yoke slot), slide-block J5 |
@@ -41,18 +41,18 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | A3 | PASS | AUTO · 6800-2RS on the Ø10 input; Ø8 stud with a Ø11.7 track roller at A; spacers in every gap |
 | A4 | PASS | AUTO · stepped keyed input shaft with end retainer; ground shoulder bolt with undercut thread |
 | A5 | PASS | AUTO · feather key 3 x 3 on the Ø10 input shaft |
-| A6 | PASS | AUTO · the rails sit on ground steel pads, four each, screwed down through rail and pad and dowelled at the ends |
+| A6 | PASS | AUTO · the rails sit on a 9.5 mm ground steel riser each, three countersunk M3 down through rail and riser, the reference rail dowelled by its end screws (v2.4) |
 | A7 | PASS | AUTO · 8 mm base 2 mm under the crank, counterbored corners, feet, crank pin path engraved, front scale, clearance hole for the input shaft |
 | A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 (tie bar screws and dowels included) |
 | A9 | PASS | HAND · A is single shear by force: the yoke sweeps over the whole crank plane, so no cap, bridge or second crank plate fits above it (it would have to be carried from the input shaft, which cannot pass the yoke). The crank is plated up so the yoke clears it by 1.5 mm; the stud overhang is the yoke thickness plus washers, about 8 mm, not 1.5 mm, because the roller has to sit in the 7 mm slot. The input shaft carries the moment on two bearings. Decision for David: accept this, or add a bridge |
 | A10 | PASS | HAND · crank on layer -1, yoke, crosshead and rails on layer 0, tie bar on layer 1: nothing stacked only to clear |
-| A11 | PASS | HAND · crank pin to crank to keyed input to the housing (screwed and dowelled); roller to the yoke walls to the tie bar to the crosshead to the rails, keeper and gib; rails screwed through their pads into the base and dowelled |
+| A11 | PASS | HAND · crank pin to crank to keyed input to the housing (screwed and dowelled); roller to the yoke walls to the tie bar to the crosshead to the rails, keeper and gib; rails screwed through their risers into the base, the reference rail dowelled |
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · every solid named with catalogue sizes, sets counted |
 | A14 | PASS | HAND · the tie bar and the yoke tongue clear the rails by 2 mm at the far stroke; the yoke head clears the rails' start by 2.5 mm; the lower end stop has no room beside the bar and the yoke and is not built (see F5); clearance 0 |
 | A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
 | A16 | PASS | HAND · a note and a badge on every joint, five build rules |
-| A17 | PASS | HAND · housing and shaft, crank; rail pads and rails, dowels, gib, crosshead, keeper; yoke on the tie bar (screws and dowels); roller stud last through the yoke slot |
+| A17 | PASS | HAND · housing and shaft, crank; rail risers, rails and dowels, gib, crosshead, keeper; yoke on the tie bar (screws and dowels); roller stud last through the yoke slot |
 | E1 | PASS | AUTO · every solid has one explode level; levels -8 to 2.5 |
 | E2 | PASS | AUTO · 43 rigid groups; fired: explode |
 | E3 | PASS | AUTO · fired: explode |
@@ -66,17 +66,17 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | J2 | PASS | AUTO · input: housing with two sealed bearings, sleeve, wave washer, circlips, screwed and dowelled; keyed shaft, pulley hub with two set screws, end retainer, thrust washer, home flag |
 | J3 | N/A | no free moving pin: the one moving pin runs in a slot and is a J4 |
 | J4 | PASS | AUTO · the crank pin runs in the yoke slot: Ø11.7 track roller on a Ø8 shoulder bolt (it stands for the slide block), two hardened wear strips screwed to the slot walls, felt oiler in the slot end |
-| J5 | PASS | AUTO / HAND · rails, keeper, bronze gib with three adjusting screws and lock nuts, felt wipers at both ends, grease nipple, one end stop with a neoprene pad; the lower stop is not built (F5) |
+| J5 | PASS | AUTO / HAND · rails, keeper, bronze gib clamped under the keeper by the rail screws, set on slotted holes, felt wipers at both ends, grease nipple, one end stop with a neoprene pad; the lower stop is not built (F5) |
 | J6 | N/A | no gear mesh |
 | J7 | N/A | no cam |
 | J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension |
-| F1 | PASS | AUTO / HAND · housing dowelled; each rail located by two dowels through its end pads; the tie bar located by a dowel at the yoke end and one at the crosshead |
+| F1 | PASS | AUTO / HAND · housing dowelled; the reference rail located by two dowels by its end screws (the gib on the other takes up the fit); the tie bar located by a dowel at the yoke end and one at the crosshead |
 | F2 | PASS | AUTO · stud head and washer hold the roller; keeper holds the crosshead down; bearings by circlip and flange; shaft end retainer |
 | F3 | PASS | AUTO · feather key at the input |
 | F4 | PASS | AUTO · bronze thrust washer under the crank, wave washer preloading the input; spacers and washer set the roller's end float |
 | F5 | PASS | AUTO / HAND · the crank drives the yoke positively, so the stroke cannot be overrun; the slide gets a hardened end stop with a neoprene pad at the far end. The near end has no room for a stop beside the yoke tongue and the bar (the rule reported it); the crank's own sweep is the limit there. Rule candidate in promotion |
 | F6 | N/A | driven; no rest position to hold |
-| F7 | PASS | AUTO · bronze gib with adjusting screws and lock nuts; belt tension at the motor mount. No exact length ratio to set |
+| F7 | PASS | AUTO · bronze gib clamped under the keeper by the rail screws, set on slotted holes; belt tension at the motor mount. No exact length ratio to set |
 | F8 | PASS | AUTO · felt oilers in the slot, wipers at both ends of the crosshead, grease nipple on the keeper, shielded and sealed bearings |
 | F9 | PASS | HAND · index mark on the yoke edge and a line on the base: with the yoke at its far stroke they line up and the crank points along the guide, so the crank goes back on its key in phase |
 | F10 | PASS | AUTO / HAND · pulley flanges, home flag and fork sensor; no slip clutch: the crank pin cannot be jammed, the slot is its own limit |
@@ -92,7 +92,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | M10 | PASS | AUTO / HAND · steel crank, aluminium yoke, bronze crosshead, hardened ground rails and wear strips, bronze gib |
 | M11 | PASS | AUTO · centre holes and chamfered ends on the shafts |
 | M12 | PASS | HAND · every head reachable (tie bar screws from above, wear strip screws from the top face); bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw, lock nuts on the gib screws |
+| M13 | PASS | AUTO / HAND · threadlocker on every screw; the gib is held by the keeper's clamp, no lock nuts |
 | M14 | PASS | AUTO · hardened wear strips screwed to both slot walls; hardened rails with a bronze gib and crosshead on the slide |
 | V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 |
 | V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
@@ -114,7 +114,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | R4 | PASS | AUTO · package built at build time, 21 KB |
 | R5 | PASS | HAND · states only what differs; no sampling; polish under 1 ms |
 | R6 | PASS | FLAG · Node CPU canvas bench (not the browser one), 2026-10-18, other jobs running: plan 272, 28° 244, side 208, explode 232 ms at full detail; setup 1.3 ms; 8 ms not reached at any dial position in Node (H 36 ms). A browser bench is still to run |
-| R7 | PASS | HAND · model.ts + polish.ts 8.4 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 8.3 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -134,9 +134,9 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | pO | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – turns fully | – driven through the belt | – belt tension at the motor mount (drive) | – sealed bearings | – one input; phase is set at A | – see drive |
 | pA | J4 | – no removable plate on the pin; the stud threads into the crank | head | – no keyed part | Inner-race spacer and washer set the roller's end float | – the slot ends are 1 mm beyond the pin's reach | – driven | – no adjustable length | Felt oiler, oil-soaked wool felt | Index mark on the yoke edge and a line on the base, lined up with the yoke at its far stroke | – none needed |
-| slide-block | J5 | Tie bar dowelled to the yoke tongue and the crosshead (2 x Dowel pin Ø3 h6); rails dowelled to the base | Keeper plate, holds the slider down | – prismatic, no torque | – the keeper takes the lift, the base the weight | End stop block, hardened | – driven | Gib strip 3 x 6 x 136, bronze | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – the crank drives the yoke positively |
-| raila-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib on the other rail adjusts the fit | – static | – static | – static |
-| railb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and pad at each pad | – static | – static | – static | – static | – the gib on this rail adjusts the fit | – static | – static | – static |
+| slide-block | J5 | Tie bar dowelled to the yoke tongue and the crosshead (2 x Dowel pin Ø3 h6); the reference rail dowelled to the base | Keeper plate, holds the slider down | – prismatic, no torque | – the keeper takes the lift, the base the weight | End stop block, hardened | – driven | Gib strip 141 x 7 x 2.3, bronze, slotted, clamped under the keeper | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – the crank drives the yoke positively |
+| raila-seat | post | – not dowelled: the gib on it takes up the fit against the reference rail | – screwed down through keeper, gib, rail and riser | – static | – static | – static | – static | – the gib on this rail adjusts the fit | – static | – static | – static |
+| railb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and riser | – static | – static | – static | – static | – the gib on the other rail adjusts the fit | – static | – static | – static |
 | drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
 
 ## Variants and overrides
@@ -152,14 +152,14 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 6 | 0 | 270.7 |
-| DL-B | 0 | 180 | 256.6 |
+| DL-B | 0 | 162 | 256.6 |
 | DL-C | 0 | 0 | 55.3 |
-| DL-D | 11 | 0 | 49.5 |
+| DL-D | 10 | 0 | 49.5 |
 | DL-E | 12 | 2 | 47.8 |
 | DL-F | 0 | 0 | 37.4 |
 | DL-G | 0 | 0 | 38.9 |
-| DL-H | 21 | 0 | 35.6 |
-| never | 104 | 104 | 255.4 (full) |
+| DL-H | 13 | 0 | 35.6 |
+| never | 88 | 101 | 255.4 (full) |
 
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
@@ -172,5 +172,5 @@ Hand fixes that should become rules or primitives.
   two rigid bodies by a plate. Seen once so far.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.2 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.4 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets, overlays on, looked at (to attach to #38) · bench: Node CPU canvas, DPR 1.5, 2026-10-18; 28° frame 243.9 ms at full detail, 8 ms not reached in Node (flag, R6); browser bench not run

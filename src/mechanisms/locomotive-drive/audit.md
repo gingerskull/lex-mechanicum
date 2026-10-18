@@ -33,7 +33,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | D2 | PASS | rim, hub and four windows between spokes; bosses round the pins; main rod tapered to a larger big end |
 | D3 | PASS | roles told apart by pattern and tone in both sheets |
 | D4 | PASS | feet concentric with the corner arcs |
-| D5 | PASS | guide bars on ground pads; no bridges: the rods sweep over both axles (see A9) |
+| D5 | PASS | guide bars on ground risers; no bridges: the rods sweep over both axles (see A9) |
 | D6 | PASS | drive and slide hardware read quieter than wheels and rods |
 | D7 | PASS | wheels, rods, crosshead and base carry only load shape and manufacturing marks |
 | A1 | PASS | pW J1, pC and pX J3, slide J5 |
@@ -41,7 +41,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | A3 | PASS | 6000-2RS on the Ø10 axles, F688ZZ on the Ø8 crank pins, F686ZZ on the Ø6 wrist pin |
 | A4 | PASS | stepped axles with shoulders, circlip groove and undercut threads |
 | A5 | N/A | no keyed part: the wheels turn on dead axles |
-| A6 | PASS | guide bars on 15 mm ground steel pads, countersunk M3 at each and two dowels |
+| A6 | PASS | guide bars on a 15 mm ground steel riser each, two countersunk M3 each, the reference bar dowelled (v2.4) |
 | A7 | PASS | 8 mm base 2 mm under the wheels, counterbored corners, feet, engraved path, scale, slot for the belt carriage |
 | A8 | PASS | every head has its shank; holes cut by stage 3 |
 | A9 | PASS | see joint table: axles are single shear by necessity (both rods sweep over them); a bridge would stand above the rods with the axle through them. X is single shear with the main rod over the crosshead, shortest overhang. C1: pin held at the wheel and clamped by its head over the main rod |
@@ -52,7 +52,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | A14 | PASS | belt clamp, sensor and lead clear of every sweep; clearance 0 |
 | A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
 | A16 | PASS | a note and a badge on every joint, five build rules |
-| A17 | PASS | axle, bearing, wheel, circlips; rails on pads, crosshead, keeper; coupling rod, then main rod on the crank pin; wrist pin last |
+| A17 | PASS | axle, bearing, wheel, circlips; rails on risers, gib, crosshead, keeper; coupling rod, then main rod on the crank pin; wrist pin last |
 | E1 | PASS | one level per solid |
 | E2 | PASS | screws, bolts, shafts and bought units are groups |
 | E3 | PASS | pins and keeper screws upward, drive screws downward |
@@ -66,7 +66,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | J2 | N/A | no live shaft: the input is the crosshead |
 | J3 | PASS | C1, C2 and X: shoulder bolts, bearings in the rods, inner-race spacers, threadlocker |
 | J4 | N/A | no pin in a slot |
-| J5 | PASS | guide bars, keeper, bronze gib with three adjusting screws, felt wipers, grease nipple, end stops with pads |
+| J5 | PASS | guide bars (one the dowelled reference), a bronze gib clamped under the keeper by the other bar's screws, felt wipers, grease nipple, an end stop block with a pad at each end |
 | J6 | N/A | no gear mesh |
 | J7 | N/A | no cam |
 | J8 | PASS | flanged motor pulley, slotted tensioner arm on the idler, carriage clamped to the belt |
@@ -76,7 +76,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | F4 | PASS | bronze thrust washer under each wheel on the base |
 | F5 | PASS | end stops with neoprene pads just past both ends of the stroke |
 | F6 | N/A | driven; no rest position to hold |
-| F7 | PASS | gib with adjusting screws; belt tension on the slotted arm. The rod lengths are fixed (see promotion candidates) |
+| F7 | PASS | gib set on slotted holes and clamped under the keeper; belt tension on the slotted arm. The rod lengths are fixed (see promotion candidates) |
 | F8 | PASS | felt wipers and grease nipple on the slide; sealed bearings |
 | F9 | PASS | a timing mark on each wheel rim at the crank pin |
 | F10 | PASS | pulley flanges, home flag and fork sensor; no slip clutch: the stops are never touched in running |
@@ -92,7 +92,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | M10 | PASS | cast steel wheels, steel rods, bronze crosshead and gib, hardened rails |
 | M11 | PASS | centre holes and chamfered ends on the axles |
 | M12 | PASS | every head reachable; bearings pressed out past their circlips |
-| M13 | PASS | threadlocker on every screw, lock nuts on the gib screws, nyloc on the axles |
+| M13 | PASS | threadlocker on every screw, nyloc on the axles; the gib is held by the keeper's clamp, no lock nuts |
 | M14 | PASS | hardened rails and bronze gib are the replaceable wear parts |
 | V1 | PASS | pancake outrunner Ø50 x 18 under the base, GT2 16T pulley, belt loop |
 | V2 | PASS | one-piece bracket, flange screws up into the base |
@@ -114,7 +114,7 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | R4 | PASS | package built at build time, 24 KB |
 | R5 | PASS | states only what differs; no sampling; polish about 3 ms |
 | R6 | PASS | Node CPU bench: plan 327, 28° 367, side 222, explode 222 ms at full detail; browser frame times not measured in this session (Node numbers rank views, not devices) |
-| R7 | PASS | HAND · model.ts + polish.ts 10.1 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 10.0 KB |
 | R8 | PASS | pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | default dial full |
@@ -137,8 +137,8 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | pC1 | J3 | none | 2 x Internal circlip DIN 472, Ø16; 2 x Bearing F688ZZ (8x16x5); head | none | none | none | none | none | none | none | none |
 | pC2 | J3 | none | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | none | none | none | none | none | none | none | none |
 | pX | J3 | none | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | none | none | none | none | none | none | none | none |
-| slide-crosshead | J5 | none | Keeper plate, holds the slider down | none | none | 2 x End stop block, hardened | none | Gib strip 3 x 6 x 72, bronze | 2 x wiper; Grease nipple M6 (DIN 71412) | none | none |
-| guidea-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | none | none | none | none | none | none | none | none | none |
+| slide-crosshead | J5 | none | Keeper plate, holds the slider down | none | none | 2 x End stop block, hardened | none | Gib strip 77 x 7 x 2.3, bronze, slotted, clamped under the keeper | 2 x wiper; Grease nipple M6 (DIN 71412) | none | none |
+| guidea-seat | post | – not dowelled: the gib on it takes up the fit | none | none | none | none | none | none | none | none | none |
 | guideb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | none | none | none | none | none | none | none | none | none |
 | drive | drive | none | none | none | none | none | none | Tensioner arm, slotted, 2 x M4 | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
@@ -155,19 +155,19 @@ PASS 113 · FAIL 0 · N/A 8 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 14 | 0 | 242.8 (Node CPU) |
-| DL-B | 0 | 151 | 222.2 |
+| DL-B | 0 | 134 | 222.2 |
 | DL-C | 0 | 0 | 70.5 |
-| DL-D | 25 | 0 | 55.2 |
+| DL-D | 24 | 0 | 55.2 |
 | DL-E | 11 | 2 | 57.5 |
 | DL-F | 0 | 0 | 115.3 |
 | DL-G | 0 | 0 | 101.2 |
-| DL-H | 19 | 0 | 47.5 |
-| never | 103 | 165 | 367.1 (full) |
+| DL-H | 11 | 0 | 47.5 |
+| never | 89 | 162 | 367.1 (full) |
 
 ## Promotion candidates
 - J1 dead axle: when a moving part sweeps over the axle above the top part, the rule builds a bridge above every sweep and runs the axle up through the sweeping parts (clashes). It should finish the axle below the sweep on an external circlip with a sealed bearing, as done here by hand.
 - `P.rails` could take `dz`: here it is set by mapping over the returned parts.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.0 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.1 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets, overlays on, looked at (attached to #29) · bench: Node CPU, DPR 1.5, 2026-10-18; 28° frame 367 ms at full detail, 47 ms at dial H (flag, R6; browser numbers not measured)

@@ -87,7 +87,7 @@ export const polish: Polish = (A, H) => {
   A.rules.push(
     { title: "Rods over the wheels", text: "The coupling rod and the main rod both sweep over the axle ends, so the axles stop below the wheel faces and the rods run clear over them." },
     { title: "Both wheels read the same", text: "A mark on each rim at the crank pin: the coupling rod only fits when both wheels read alike." },
-    { title: "Crosshead low, rod high", text: "The crosshead and its guide bars sit under the main rod, which runs over the keeper plate. The guide bars stand on tall ground pads." },
+    { title: "Crosshead low, rod high", text: "The crosshead and its guide bars sit under the main rod, which runs over the keeper plate. The guide bars stand on tall ground risers." },
     { title: "Windows away from the pin", text: "The wheel windows stop short of the crank pin boss so its tapped hole keeps its edge distance." },
     { title: "Kinematics untouched", text: "Wheel radius 34, crank 17, rod lengths 80 and the guide line are the model's; the hardware is designed round them." },
   );

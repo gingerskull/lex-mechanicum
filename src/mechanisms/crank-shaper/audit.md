@@ -33,7 +33,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | D2 | PASS | HAND · bosses round every pin; the lever is a plain bar with the slot; no windows |
 | D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
 | D4 | PASS | AUTO · fired: base (1 solid), feet (4 solids) |
-| D5 | PASS | AUTO / HAND · rails seated on ground pads; the cap on a single post; one bridge over the lever pivot |
+| D5 | PASS | AUTO / HAND · rails seated on ground risers; the cap on a single post; one bridge over the lever pivot |
 | D6 | PASS | HAND / STYLE · slide hardware, stops and leads read quieter than crank, lever and ram |
 | D7 | PASS | HAND · crank, lever, link, ram, rails and base carry only load shape and manufacturing marks |
 | A1 | PASS | AUTO · pO2 J2, pO3 J1, pA J4, pB J3, pC J3, slide-ram J5; fired: classify (no solids) |
@@ -46,13 +46,13 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | A8 | PASS | AUTO · fired: fasteners (stage 3) |
 | A9 | PASS | HAND · pC a clevis (ram and cap): double shear. pA single shear (the lever sweeps over the crank); pB single shear (a rear plate would sweep through the ram rails); both with a 1.5 mm overhang by plating; pO3 held at both ends by base and bridge |
 | A10 | PASS | HAND · crank, link and ram near the base; lever 1.5 mm over crank and link; cap 1.5 mm over the link |
-| A11 | PASS | HAND · crank pin to crank to keyed input to the housing (screwed and dowelled); lever to its axle to the base and bridge; ram to rails, keeper and gib; rails screwed through pads and dowelled |
+| A11 | PASS | HAND · crank pin to crank to keyed input to the housing (screwed and dowelled); lever to its axle to the base and bridge; ram to rails, keeper and gib; rails screwed through their risers, the reference rail dowelled |
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · every named solid carries catalogue sizes; unnamed items are further items of a counted set |
 | A14 | PASS | HAND · stops and the pivot bridge sit outside the lever swing; clearance 0 over the cycle |
 | A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
 | A16 | PASS | HAND · a note and a badge on every joint, five build rules |
-| A17 | PASS | HAND · housing and shaft, crank; axle, lever on its bearing, bridge; rail pads and rails, dowels, gib, ram, keeper; link on both pins; cap post, cap and screw last |
+| A17 | PASS | HAND · housing and shaft, crank; axle, lever on its bearing, bridge; rail risers, rails and dowels, gib, ram, keeper; link on both pins; cap post, cap and screw last |
 | E1 | PASS | AUTO · every solid has one explode level; levels -8 to 4 |
 | E2 | PASS | AUTO · 58 rigid groups; fired: explode |
 | E3 | PASS | AUTO · fired: explode |
@@ -137,7 +137,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | pA | J4 | – moving joint, no removable bearing plate | head | – plain pin, nothing keyed | – clamped stack, no free axial play | – limited at the lever pivot and the rail ends | – driven, no rest position | – exact by construction | Felt oiler, oil-soaked wool felt | – single keyed phase | – protected at the drive |
 | pB | J3 | – moving joint, no removable bearing plate | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – plain pin, nothing keyed | – clamped stack, no free axial play | – limited at the lever pivot and the rail ends | – driven, no rest position | – exact by construction | – sealed bearings | – single keyed phase | – protected at the drive |
 | pC | J3 | – moving joint, no removable bearing plate | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – plain pin, nothing keyed | – clamped stack, no free axial play | – limited at the lever pivot and the rail ends | – driven, no rest position | – exact by construction | – sealed bearings | – single keyed phase | – protected at the drive |
-| slide-ram | J5 | – moving joint, no removable bearing plate | Keeper plate, holds the slider down | – plain pin, nothing keyed | – clamped stack, no free axial play | 2 x End stop block, hardened | – driven, no rest position | Gib strip 3 x 6 x 196, bronze | 2 x wiper; Grease nipple M6 (DIN 71412) | – single keyed phase | – protected at the drive |
+| slide-ram | J5 | – moving joint, no removable bearing plate | Keeper plate, holds the slider down | – plain pin, nothing keyed | – clamped stack, no free axial play | 2 x End stop block, hardened | – driven, no rest position | Gib strip 201 x 7 x 2.3, bronze, slotted, clamped under the keeper | 2 x wiper; Grease nipple M6 (DIN 71412) | – single keyed phase | – protected at the drive |
 | pO3-bridge-post | post | 2 x spigot | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a |
 | raila-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a |
 | railb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a | – n/a |
@@ -151,18 +151,18 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 12 | 0 | 252.8 |
-| DL-B | 0 | 295 | 207.5 |
+| DL-B | 0 | 265 | 207.5 |
 | DL-C | 0 | 0 | 63.6 |
-| DL-D | 27 | 0 | 59.0 |
+| DL-D | 26 | 0 | 59.0 |
 | DL-E | 12 | 2 | 50.9 |
 | DL-F | 0 | 0 | 46.2 |
 | DL-G | 0 | 0 | 45.7 |
-| DL-H | 26 | 0 | 38.7 |
-| never | 146 | 147 | 38.7 (full 312.2) |
+| DL-H | 18 | 0 | 38.7 |
+| never | 118 | 144 | 38.7 (full 312.2) |
 
 ## Promotion candidates
 None from the polish: it only writes notes. Observation for the rules: the lever slot gets one 80 mm wear strip, on one wall only.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 29.8 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 28.7 KB
 screenshots: dist/s (plan, 28 deg, side, explode at 28 and 70 deg, both sheets) · bench: Node CPU canvas, plan 310.7, 28 deg 298.8, side 231.1, explode 70 deg 242.4 ms; setup 2.1 ms; package 29.8 KB; Node frames are not comparable with the browser targets (flag only)
