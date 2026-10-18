@@ -150,7 +150,7 @@ PASS 116 · FAIL 0 · N/A 5 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 8 | 0 | 40.9 |
-| DL-B | 0 | 228 | 39.4 |
+| DL-B | 0 | 224 | 39.4 |
 | DL-C | 0 | 0 | 17.4 |
 | DL-D | 21 | 0 | 12.7 |
 | DL-E | 12 | 13 | 5.9 |
@@ -166,5 +166,5 @@ Hand fixes that should become rules or primitives.
   segment primitive were promoted in standard 2.1.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.1 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.8 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #11) · bench: browser, DPR 1.5, 2026-10-18; 28° frame 50.3 ms at full detail, 8 ms reached at dial E (flag, R6)

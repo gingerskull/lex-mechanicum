@@ -106,6 +106,10 @@ export function boreChamfers(s: Solid, minR = 1.9, c = 0.5): void {
     const [x0, y0, x1, y1] = bbox(h);
     const r = (x1 - x0) / 2;
     if (r < minR || Math.abs((y1 - y0) / 2 - r) >= 0.05) continue;
+    // a square bounding box is not a round hole: every vertex must lie on the circle (a window symmetric about a diagonal)
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
+    if (h.some((p) => Math.abs(Math.hypot(p[0] - cx, p[1] - cy) - r) > 0.05 * r + 0.05)) continue;
     const pts = circle(r + c, (x0 + x1) / 2, (y0 + y1) / 2, Math.max(28, Math.round(r * 3)));
     const k = ringKey(bbox(pts));
     if (has.has(k)) continue;
