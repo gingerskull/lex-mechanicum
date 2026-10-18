@@ -2330,7 +2330,7 @@
   "ratio": {
    "kind": "Variable",
    "class": "Variable",
-   "typical": "lift per unit slider travel = n w / h, here from about 0.6 (raised) to 8.6 (lowered)"
+   "typical": "lift per unit slider travel = n w / h, here from about 2.0 (raised) to 8.6 (lowered)"
   },
   "dof": 1,
   "topology": {
@@ -2402,7 +2402,7 @@
     {
      "id": "platform",
      "role": "output",
-     "def": "pinned at L3, slotted at R3, 120 mm long; point C 45 mm from L3"
+     "def": "pinned at L3, slotted at R3, 150 mm long; point C 45 mm from L3"
     }
    ],
    "joints": [
