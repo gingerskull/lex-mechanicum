@@ -55,4 +55,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   ravigneaux: async () => (await import("./ravigneaux/model")).default,
   wankel: async () => (await import("./wankel/model")).default,
   "star-wheel": async () => (await import("./star-wheel/model")).default,
+  "flat-faced-cam": async () => (await import("./flat-faced-cam/model")).default,
 };
