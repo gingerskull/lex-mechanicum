@@ -1,0 +1,185 @@
+/* The stage's view modes (SS5), mechanism page only: standard, Wide and full screen. Wide holds above the one-column
+   breakpoint (tokens.size.bpWide, 1000 px) and falls back to standard below it, where its toggle hides. Full screen
+   (data-full on the stage box) fills the screen with the drawing; on a short landscape screen the same controls
+   reflow into a rail beside it, with vertical sliders (top is more). */
+.views {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.views .btn {
+  padding-block: 0;
+  min-height: 32px;
+}
+.views .btn.sq {
+  width: 32px;
+  padding: 0;
+  justify-content: center;
+}
+@media (max-width: 1000px) {
+  #wide {
+    display: none;
+  }
+}
+
+/* Wide: the stage and its controls across the layout, at a glance (two thirds) and the plot side by side below
+   it, the facts in rows of cells */
+@media (min-width: 1001px) {
+  :root[data-view="wide"] .dlayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* full width, as tall as the stage ratio gives but short enough to leave the controls on screen */
+  :root[data-view="wide"] .stagebox {
+    container-type: inline-size;
+  }
+  :root[data-view="wide"] .stage {
+    aspect-ratio: auto;
+    height: min(calc(100cqi / (var(--ratio-stage))), calc(100svh - 150px));
+  }
+  /* at a glance takes two thirds, so its facts run in more columns and the row stays low */
+  :root[data-view="wide"] .side {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+  :root[data-view="wide"] .side .plot {
+    display: flex;
+    flex-direction: column;
+  }
+  :root[data-view="wide"] .plot canvas {
+    flex: 1 1 auto;
+    height: 0;
+    min-height: 160px;
+  }
+  :root[data-view="wide"] .facts {
+    /* a wrapping row, not a grid: each line fills the width with no holes; a short fact never wraps, a long one is
+       given about half its text length as width (--n, its characters), so it runs to about two lines */
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 18px;
+    /* the last row's dashed rule hangs below the list and is clipped; the sides stay open for focus outlines */
+    clip-path: inset(-8px -8px 0 -8px);
+  }
+  :root[data-view="wide"] .facts > div {
+    flex: 1 0 auto;
+    display: block;
+    min-width: 0;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: -1px;
+  }
+  :root[data-view="wide"] .facts > div.long {
+    flex: 1 1 calc(var(--n) * 3.7px);
+    min-width: 200px;
+  }
+  :root[data-view="wide"] .facts dt,
+  :root[data-view="wide"] .facts dd {
+    padding: 0;
+    border: 0;
+  }
+  :root[data-view="wide"] .facts dt {
+    line-height: 1.6;
+  }
+}
+
+/* full screen */
+.stagebox[data-full] {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: auto;
+  padding: max(12px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+}
+.stagebox[data-full] .stage {
+  flex: 1 1 0;
+  min-height: 160px;
+  aspect-ratio: auto;
+}
+.stagebox[data-full] #wide {
+  display: none;
+}
+
+/* full screen on a short landscape screen: the drawing keeps the full height, the controls stand in a rail at its
+   right, four columns: transport on top, the four sliders upright, the overlay chips below */
+@media (orientation: landscape) and (max-height: 500px) {
+  .stagebox[data-full] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) repeat(4, auto);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "stage play speed speed views"
+      "stage scrub tilt explode dial"
+      "stage ovl ovl ovl ovl";
+    gap: 10px;
+    overflow: hidden;
+  }
+  .stagebox[data-full] .stage {
+    grid-area: stage;
+    min-height: 0;
+  }
+  .stagebox[data-full] .controls {
+    display: contents;
+  }
+  .stagebox[data-full] .play {
+    grid-area: play;
+    justify-self: center;
+  }
+  .stagebox[data-full] #speed {
+    grid-area: speed;
+    flex-wrap: nowrap;
+    justify-self: center;
+    align-self: center;
+  }
+  .stagebox[data-full] #speed button {
+    padding-inline: 8px;
+  }
+  .stagebox[data-full] .views {
+    grid-area: views;
+    margin: 0;
+    justify-self: center;
+    align-self: center;
+  }
+  .stagebox[data-full] .scrub {
+    grid-area: scrub;
+  }
+  .stagebox[data-full] .tilt {
+    grid-area: tilt;
+  }
+  .stagebox[data-full] .explode {
+    grid-area: explode;
+  }
+  .stagebox[data-full] .dial {
+    grid-area: dial;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+  }
+  .stagebox[data-full] .scrub,
+  .stagebox[data-full] .sl {
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    min-height: 0;
+  }
+  .stagebox[data-full] .scrub input,
+  .stagebox[data-full] .sl input {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    flex: 1 1 0;
+    min-height: 40px;
+    width: auto;
+  }
+  .stagebox[data-full] .scrub output,
+  .stagebox[data-full] .sl output {
+    min-width: 0;
+    text-align: center;
+  }
+  .stagebox[data-full] .ovl {
+    grid-area: ovl;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-top: 0;
+  }
+}

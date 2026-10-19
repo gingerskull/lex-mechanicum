@@ -20,7 +20,7 @@ import { SHEETS, VERSION } from "../data";
       <div><i>Rev</i><b>{VERSION}</b></div>
     </div>
   </header>
-  <Bar library><Facets /></Bar>
+  <Bar library set={{ name: "Mechanism Library", count: SHEETS.length }}><Facets /></Bar>
   <main class="wrap" id="library">
     <div class="status"><span id="shown">{SHEETS.length} sheets</span><button id="clear" type="button" hidden>Clear filters</button></div>
     <div class="grid" id="grid">

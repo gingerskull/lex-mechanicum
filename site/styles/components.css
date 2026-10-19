@@ -51,7 +51,14 @@
 .search input::placeholder {
   color: var(--faint);
 }
-.search svg {
+/* the clear (x) is the page's own, at the field's right end */
+.search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+.search:has(.qclear:not([hidden])) input {
+  padding-right: 36px;
+}
+.search > svg {
   position: absolute;
   left: 11px;
   top: 50%;
@@ -59,6 +66,29 @@
   width: 15px;
   height: 15px;
   color: var(--muted);
+  pointer-events: none;
+}
+.qclear {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  width: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--size-transition);
+}
+.qclear:hover {
+  color: var(--ink);
+}
+.qclear svg {
+  width: 13px;
+  height: 13px;
 }
 .lbl {
   font: 500 10.5px var(--font-mono);
@@ -545,8 +575,11 @@
 .facts a:hover {
   text-decoration: underline solid var(--accent);
 }
-.facts dt:nth-last-child(2),
-.facts dd:last-child {
+/* each fact is a dt and dd in a div, which takes no box here (Wide lays the divs out as cells, views.css) */
+.facts > div {
+  display: contents;
+}
+.facts > div:last-child > * {
   border-bottom: 0;
 }
 .plot canvas {

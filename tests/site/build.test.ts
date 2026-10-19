@@ -57,6 +57,22 @@ describe("site build", () => {
     expect(all).not.toMatch(/(pins|materials|locking|j\d-[\w-]+)\.[\w-]+\.js/);
   });
 
+  it("gives the library bar a clear (x) on the search and the set's name for its stuck state (SS3)", () => {
+    const html = read("index.html");
+    expect(html).toMatch(/<button[^>]*id="qclear"[^>]*hidden/);
+    expect(html).toMatch(/id="libbar"/);
+    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${Object.keys(mechanisms).length}</span>`));
+  });
+
+  it("gives the stage its view modes: the Wide toggle, full screen and the remembered mode set before paint", () => {
+    const html = read(join("mechanisms", Object.keys(mechanisms)[0]!, "index.html"));
+    expect(html).toMatch(/<button[^>]*id="wide"[^>]*aria-pressed="false"/);
+    expect(html).toMatch(/<button[^>]*id="full"[^>]*aria-pressed="false"/);
+    const pre = html.indexOf('localStorage.getItem("stage-view")');
+    expect(pre).toBeGreaterThan(-1);
+    expect(pre).toBeLessThan(html.indexOf('class="dlayout"'));
+  });
+
   it("shows the version in the footer and no colour literals in the page CSS", () => {
     const html = read("index.html");
     expect(html).toContain(`Version ${JSON.parse(readFileSync("package.json", "utf8")).version}`);
