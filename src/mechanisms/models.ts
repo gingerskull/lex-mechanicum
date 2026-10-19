@@ -57,4 +57,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "star-wheel": async () => (await import("./star-wheel/model")).default,
   "flat-faced-cam": async () => (await import("./flat-faced-cam/model")).default,
   "face-groove-cam": async () => (await import("./face-groove-cam/model")).default,
+  "schmidt-coupling": async () => (await import("./schmidt-coupling/model")).default,
 };
