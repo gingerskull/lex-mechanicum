@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.20.0 — 2026-10-19
+
+- A ground pivot that the links below it sweep over is carried from above: a stub from a bridge on two posts into the
+  topmost part only. A pivot with a part sweeping over its axle gets no bridge, and its bearings are shielded instead
+  of oiled.
+- Hart's inversor added to standard 2.6: five planes, the ground pivot A hung from a bridge, a slotted stud to set AB.
+- Rhombic drive added to standard 2.6: two geared cranks, four rods on two layers, the piston and displacer yokes on
+  rails above the gears.
+- Walschaerts valve gear added to standard 2.6: the expansion link as two curved bars with hardened wear strips, a
+  bronze die block, the trunnion hung from a bridge, the reverse arm on an eccentric bushing.
+
 ## 0.15.0 — 2026-10-19
 
 - The sheet switch is one button with a sun or moon icon, on the library's bar beside the search and Filters and on a

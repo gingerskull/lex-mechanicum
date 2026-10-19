@@ -1,5 +1,6 @@
 // One fixture model per joint type: each rule adds the solids its standard row names, and nothing else.
 import { describe, expect, it } from "vitest";
+import { bbox } from "../../src/core/geom";
 import { SHOULDER_LENGTHS } from "../../src/hardware/tables";
 import { j1 } from "../../src/rules/j1-dead-axle";
 import { j2 } from "../../src/rules/j2-live-shaft";
@@ -8,7 +9,7 @@ import { j4 } from "../../src/rules/j4-slot-roller";
 import { j5 } from "../../src/rules/j5-slide";
 import { j6 } from "../../src/rules/j6-mesh";
 import { j7 } from "../../src/rules/j7-cam";
-import { j1Model, j2Model, j3Model, j4Model, j5Model, j6Model, j7Model } from "../fixtures/models";
+import { hungModel, j1Model, j2Model, j3Model, j4Model, j5Model, j6Model, j7Model } from "../fixtures/models";
 import { contextBefore, kinds, run } from "./helpers";
 
 const only = (k: Record<string, number>) => Object.keys(k).sort();
@@ -111,5 +112,31 @@ describe("J7 cam", () => {
     const k = kinds(run(ctx, j7));
     expect(k).toMatchObject({ spring: 1, washer: 1, plate: 1, setScrew: 1 });
     expect(k.bushing).toBeUndefined();
+  });
+});
+
+describe("J1 hung pivot", () => {
+  it("carries a pivot from a bridge into the top part only when a lower part sweeps over it", () => {
+    const ctx = contextBefore(hungModel, j1);
+    expect(ctx.pinJoint("pO4")!.type).toBe("J1");
+    const added = run(ctx, j1);
+    const lever = ctx.get("lever")!;
+    const bridge = added.find((s) => s.kind === "bridge")!;
+    const stud = ctx.get("pO4-axle")!;
+    // the stud ends just under the lever, nothing of it reaches the layers below
+    expect(stud.z0).toBeGreaterThan(lever.z0 - 2);
+    expect(stud.z0).toBeLessThan(lever.z0);
+    expect(bridge.z0).toBeGreaterThan(lever.z1);
+    expect(added.some((s) => s.kind === "thrustWasher")).toBe(false);
+    expect(kinds(added)).toMatchObject({ bridge: 1, standoff: 2, spigot: 2, circlipExternal: 1, nut: 1 });
+    expect(ctx.joint("pO4")!.badge).toEqual(["single shear", "warn"]);
+    // the base carries no axle hole for it
+    expect(ctx.get("base")!.holes.some((h) => Math.abs(bbox(h)[0] + bbox(h)[2] - 50) < 1 && Math.abs(bbox(h)[1] + bbox(h)[3]) < 1)).toBe(false);
+  });
+
+  it("leaves a pivot with nothing sweeping under it as a dead axle on the base", () => {
+    const ctx = contextBefore(j3Model, j1);
+    run(ctx, j1);
+    expect(ctx.get("pO4-axle")!.z0).toBeLessThan(ctx.b1);
   });
 });

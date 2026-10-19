@@ -4,12 +4,15 @@
 import { bridge } from "../hardware/sub/bridge";
 import { disc, nut, oilSink, plainWasher, spacer, tube } from "../hardware/primitives";
 import { NUTS, SHOULDER_BOLTS, WASHERS, engagement, threadFor } from "../hardware/tables";
+import { buildHungPin, isHung } from "./hung";
 import { boltName, elements, partName, raceD, shoulderBolt, stackSpacers, tappedMark, type Element } from "./pins";
 import type { PinJoint, Rule, RuleContext } from "./types";
 
 const fmt = (v: number) => String(+v.toFixed(1));
 
 export function buildFixedPin(ctx: RuleContext, j: PinJoint): void {
+  // a pivot that links below its lowest part sweep over is carried from above (hung.ts)
+  if (isHung(ctx, j)) return buildHungPin(ctx, j);
   const J = ctx.joint(j.id)!;
   const group = `${j.id}-axle`;
   const at = j.at;
