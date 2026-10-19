@@ -28,5 +28,6 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "oldham-coupling": async () => (await import("./oldham-coupling/model")).default,
   "oscillating-cylinder": async () => (await import("./oscillating-cylinder/model")).default,
   "scotch-yoke": async () => (await import("./scotch-yoke/model")).default,
+  "hart-inversor": async () => (await import("./hart-inversor/model")).default,
   "hoekens-linkage": async () => (await import("./hoekens-linkage/model")).default,
 };
