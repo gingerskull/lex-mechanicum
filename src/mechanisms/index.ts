@@ -58,6 +58,7 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "double-crank": () => import("./double-crank/polish"),
   "double-rocker": () => import("./double-rocker/polish"),
   "internal-gear-pair": () => import("./internal-gear-pair/polish"),
+  "sun-and-planet": () => import("./sun-and-planet/polish"),
 };
 
 export const mechanisms: Record<string, () => Promise<MechanismEntry>> = Object.fromEntries(
