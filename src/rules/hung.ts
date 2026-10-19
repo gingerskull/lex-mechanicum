@@ -2,7 +2,7 @@
 // round a shaft that rises from the base, and no layer order clears it (A9, A10). The pivot is then a stub: a bridge on
 // two spigoted posts, placed outside every sweep and high enough to clear all of them, holds the top of a short shouldered
 // stud, and the stud runs down into the topmost part that turns on it only, so nothing below that part meets it. The
-// pin's cap in the model is declared at that part's layer; the rule finds the case by the sweeps under it.
+// pin's cap in the model is declared at that part's layer, with `top: "hung"`.
 import { circlip, disc, nut, plainWasher, shaft } from "../hardware/primitives";
 import { bridge } from "../hardware/sub/bridge";
 import { NUTS, SHOULDER_BOLTS, WASHERS, circlipExt, threadFor } from "../hardware/tables";
@@ -11,17 +11,9 @@ import type { PinJoint, RuleContext } from "./types";
 
 const fmt = (v: number) => String(+v.toFixed(1));
 
-/**
- * A fixed pin whose lowest turning part sits above model parts that sweep over its centre: nothing from the base can
- * reach it, so it is carried from above.
- */
-export function isHung(ctx: RuleContext, j: PinJoint): boolean {
-  if (!j.fixed || j.live) return false;
-  const moving = j.joined.filter((x) => x.moving);
-  if (!moving.length) return false;
-  const low = Math.min(...j.joined.map((x) => x.z0));
-  if (low < ctx.b1 + 1) return false;
-  return ctx.hits(j.P, j.d / 2 + 0.5, ctx.b1, low - 0.05, () => true);
+/** A fixed pin the model declares hung (`top: "hung"`) with a part turning on it. */
+export function isHung(_ctx: RuleContext, j: PinJoint): boolean {
+  return j.fixed && !j.live && j.pin.top === "hung" && j.joined.some((x) => x.moving);
 }
 
 /** Builds the hung pivot: bearings in the turning parts, circlip under the lowest, sleeves up to the bridge, stud and nut. */

@@ -56,6 +56,12 @@ export interface Part {
   over?: number;
   /** The input shaft cap. */
   accent?: boolean;
+  /**
+   * Ground pins: how the top of the pivot is held when links sweep over it. "hung": carried from a bridge into the
+   * topmost part only, nothing rising from the base (J1, hung); "free": no bridge, the axle stops over its stack
+   * (single shear) because a part sweeps over it above. Unset: the rules' bridge where it fits.
+   */
+  top?: "hung" | "free";
   name?: string;
   /** Links: the modelled pin-to-pin length, checked against the solved points. */
   len?: number;

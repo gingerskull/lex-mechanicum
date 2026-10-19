@@ -55,7 +55,7 @@ export default defineMechanism({
     bar("FD", s, 0, ["F", "D"], "Short bar FD"),
     bar("EF", l, 1, ["E", "F"], "Long bar EF", true),
     { ...bar("CD", l, 2, ["C", "D"], "Long bar CD", true, UP), role: "output" },
-    P.cap("pA", 3, 7, { fixed: [A[0], A[1], 0], span: 0 }),
+    P.cap("pA", 3, 7, { fixed: [A[0], A[1], 0], span: 0, top: "hung" }),
     P.cap("pB", -1, 7, { fixed: [B[0], B[1], 0], accent: true }),
     P.cap("pg", 0, 5.5, { at: "g", span: 1 }),
     P.cap("pE", 1, 5.5, { at: "E", span: 2 }),

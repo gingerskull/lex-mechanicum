@@ -151,7 +151,7 @@ PASS 119 · FAIL 0 · N/A 2 · open: none
 | bull gear | gear on a shaft at O2 | ring gear (Ø52 bore) on a fixed Ø48 hub, in the model | O3 lies 14 mm from O2, inside the gear: a shaft at O2 cannot carry the pivot. The hub carries the pivot stud |
 | O2 | no rule for a ring on a hub | bronze bushing, hub flange, two thrust washers, retainer plate screwed to the hub, oil sinks (polish) | nothing in the rules builds this; see promotion candidates |
 | hub posts | two posts on the outline's far points | two posts at (±15, 11), two dowels | the rule's pair fell on the pivot bore (edge distance) |
-| pO3 | no bridge (the J1 rule skips it when a part sweeps over the axle above its stack), axle head 0.6 mm over the bearing | kept; held in the hub and the base | the rod sweeps over the pivot: a bridge or a tall axle would meet it (clearance 8 mm) |
+| pO3 | dead axle with a bridge on spigoted posts | axle head 1 mm over the bearing, no bridge; held in the hub and the base | the rod sweeps over the pivot: a bridge or a tall axle would meet it (clearance 8 mm) |
 | gears | layer 0, z 0 to 7 | plated 3 mm low (`dz`), z -3 to 4 | the lever tip sweeps over the pinion hub and circlip |
 | ram, rails, rod, cap | layers 0 and 1 | ram and rails layer 2, rod layer 3, cap layer 4 | the lever tip (66 mm) sweeps under the ram's whole left end; the rod's pin B sits above the lever; the rails start 54 mm from O3, the rail risers start past the lever's sweep, found by the rule |
 | pC | wrist pin through ram and rod, single shear | ram cap twinned with the ram in the model, on a post at x 14 | A9: double shear |

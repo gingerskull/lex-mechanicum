@@ -9,7 +9,7 @@ import { j4 } from "../../src/rules/j4-slot-roller";
 import { j5 } from "../../src/rules/j5-slide";
 import { j6 } from "../../src/rules/j6-mesh";
 import { j7 } from "../../src/rules/j7-cam";
-import whitworth from "../../src/mechanisms/whitworth/model";
+import walschaerts from "../../src/mechanisms/walschaerts-valve-gear/model";
 import { hungModel, j1Model, j2Model, j3Model, j4Model, j5Model, j6Model, j7Model } from "../fixtures/models";
 import { contextBefore, kinds, run } from "./helpers";
 
@@ -142,14 +142,20 @@ describe("J1 hung pivot", () => {
   });
 });
 
-describe("J1 under a sweep", () => {
-  it("gives a pivot no bridge when a part sweeps over the axle above its stack, and shields its bearing", () => {
-    const ctx = contextBefore(whitworth, j1);
+describe("J1 free pivot", () => {
+  it("gives a pivot the model declares free no bridge, and shields its bearing", () => {
+    const ctx = contextBefore(walschaerts, j1);
     run(ctx, j1);
-    expect(ctx.get("pO3-bridge")).toBeUndefined();
-    expect(ctx.joint("pO3")!.badge).toEqual(["single shear", "warn"]);
-    const brg = ctx.get("pO3-lever-brg")!;
+    expect(ctx.get("pLr-bridge")).toBeUndefined();
+    expect(ctx.joint("pLr")!.badge).toEqual(["single shear", "warn"]);
+    const brg = ctx.get("pLr-lifting-brg")!;
     expect(brg.closure).toBe("shield");
     expect(brg.name).toMatch(/ZZ/);
+  });
+
+  it("still bridges a pivot that is not declared", () => {
+    const ctx = contextBefore(j3Model, j1);
+    run(ctx, j1);
+    expect(ctx.get("pO4-bridge")).toBeDefined();
   });
 });

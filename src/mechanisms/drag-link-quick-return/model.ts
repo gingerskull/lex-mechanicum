@@ -54,7 +54,7 @@ export default defineMechanism({
     ...P.rails("rail", 120, 290, 20, { layer: 4, name: "Ram rail" }),
     P.cap("pO2", -1, 7, { fixed: [0, 0, 0], accent: true }),
     // O4: the shaft of the follower and the ram arm, in the bridge between them
-    P.cap("pO4", 2, 5.5, { fixed: [d, 0, 0], span: 2 }),
+    P.cap("pO4", 2, 5.5, { fixed: [d, 0, 0], span: 2, top: "hung" }),
     P.cap("pA", 0, 5.5, { at: "A" }),
     P.cap("pB", 1, 5.5, { at: "B" }),
     P.cap("pD", 4, 5.5, { at: "D" }),

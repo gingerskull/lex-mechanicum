@@ -28,9 +28,8 @@ export const polish: Polish = (A, H) => {
     const brg = A.get(`${pid}-wheel${k}-brg`)!;
     const s2 = A.get(`${pid}-axle-s2`)!;
     const zc = brg.z1;
-    // ---- the rods sweep over the axle, so the rules give it no bridge; the washer under the rules' head comes out
-    // and the axle stops at the wheel ----
-    A.drop(new RegExp(`^${pid}-(bridge|sp-top|top$)`));
+    // ---- the rules' bridge, its posts and the sleeve up to it come out; the axle stops at the wheel ----
+    A.drop(new RegExp(`^${pid}-(bridge|sp-top)`));
     A.drop(`${pid}-axle-shim`);
     A.drop(`${pid}-axle-head`);
     A.drop(`${pid}-axle-s2`);

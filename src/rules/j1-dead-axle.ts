@@ -47,9 +47,8 @@ export function buildFixedPin(ctx: RuleContext, j: PinJoint): void {
     J.badge = ["both ends held", "ok"];
   } else {
     const zMin = Math.max(...els.map((e) => e.over)) + 0.5;
-    // a moving part that sweeps over the axle above its stack leaves no room for a bridge's stem: single shear instead
-    const over = ctx.hits(j.P, j.d / 2 + 1, zMin, zMin + 200, () => true);
-    const br = over ? null : bridge(ctx, { id: `${j.id}-bridge`, over: [j.P], zMin, joint: j.id });
+    // a pin the model declares free (a part sweeps over the axle above its stack) gets no bridge: single shear
+    const br = j.pin.top === "free" ? null : bridge(ctx, { id: `${j.id}-bridge`, over: [j.P], zMin, joint: j.id });
     if (br) {
       br.bridge.holes.push(disc(j.d / 2 + 0.01, ...j.P));
       br.bridge.marks.push(...oilSink(j.d / 2, ...j.P));

@@ -159,7 +159,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 | pD, die pin | shoulder bolt with a head over the radius rod | stud on to a bronze die block, circlip | the die runs in the slot between the bars; a head would stand in the slot |
 | expansion link | one plate with a slot | two curved bars, tied by the cover and two end straps on posts | the die passes the trunnion's place, so no plate may cross the slot there |
 | pLt, trunnion | dead axle from the base | hung stud from a bridge into the cover (J1, hung rule) | the die, radius rod and lifting link pass under it |
-| pLr, reverse arm | axle with a bridge over it | no bridge, single shear (J1 rule change in this branch) | the link sweeps over the axle above the lifting link |
+| pLr, reverse arm | axle with a bridge over it | no bridge, single shear: the pin is declared free (`top: "free"`) | the link sweeps over the axle above the lifting link |
 | eccentric rod | layer 3 | plated 3.5 mm up (dz) | the crank pin's head stands to z 32.7 |
 | pLr | fixed axle | eccentric bushing in the base (H.eccentricMount) | F7: the die's place in the slot |
 | wheel | disc | crank web with a balance tail | a disc would hold the return crank pin (K5) |
@@ -181,7 +181,7 @@ PASS 115 · FAIL 0 · N/A 6 · open: none
 Hand fixes that should become rules or primitives.
 
 - Curved slots: the classifier reads a slot from its hole's box, so a curved slot is not seen; here the slot is a gap between two bars and the die, strips and ends are by hand. A curved-slot J4 (arc strips, die block) would make this a rule.
-- The J1 bridge is now skipped when a part sweeps over the axle above its stack (rule change in this branch).
+- Pivots that drop the rules' bridge by hand (Roberts, Whitworth, locomotive drive, Klann, Stephenson six-bar, parallelogram) could declare `top: "free"`, and the hung axles of the antiparallelogram and double crank `top: "hung"`; each needs its polish trimmed, as its own change.
 
 ## Verification
 check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 39.3 KB
