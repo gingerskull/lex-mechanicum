@@ -53,4 +53,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "non-circular-gears": async () => (await import("./non-circular-gears/model")).default,
   "cycloidal-drive": async () => (await import("./cycloidal-drive/model")).default,
   ravigneaux: async () => (await import("./ravigneaux/model")).default,
+  wankel: async () => (await import("./wankel/model")).default,
 };
