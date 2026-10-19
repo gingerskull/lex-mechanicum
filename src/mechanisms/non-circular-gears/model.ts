@@ -40,7 +40,7 @@ export const m = pitch / Math.PI;
 /** Arc length from α = 0, any α. */
 export function arcOf(al: number): number {
   const k = Math.floor(al / TAU);
-  let x = al - k * TAU;
+  const x = al - k * TAU;
   let s: number;
   if (x <= Math.PI) s = interp(x);
   else s = PERIM - interp(TAU - x);

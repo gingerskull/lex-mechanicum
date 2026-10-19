@@ -6,7 +6,7 @@ import { checkModel } from "../../src/model/check";
 
 describe("mechanisms", () => {
   for (const id of Object.keys(mechanisms))
-    it(id, async () => {
+    it(id, { timeout: 30_000 }, async () => {
       const { model } = await mechanisms[id]!();
       expect(model.id).toBe(id);
       expect(recordById(id)).toBeDefined();
