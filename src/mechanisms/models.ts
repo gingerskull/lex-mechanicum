@@ -32,6 +32,8 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "oscillating-cylinder": async () => (await import("./oscillating-cylinder/model")).default,
   "scotch-yoke": async () => (await import("./scotch-yoke/model")).default,
   "hoekens-linkage": async () => (await import("./hoekens-linkage/model")).default,
+  "offset-slider-crank": async () => (await import("./offset-slider-crank/model")).default,
+  "eccentric-sheave": async () => (await import("./eccentric-sheave/model")).default,
   "klann-linkage": async () => (await import("./klann-linkage/model")).default,
   "watt-six-bar": async () => (await import("./watt-six-bar/model")).default,
   "stephenson-six-bar": async () => (await import("./stephenson-six-bar/model")).default,

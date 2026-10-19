@@ -41,6 +41,8 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "oscillating-cylinder": () => import("./oscillating-cylinder/polish"),
   "scotch-yoke": () => import("./scotch-yoke/polish"),
   "hoekens-linkage": () => import("./hoekens-linkage/polish"),
+  "offset-slider-crank": () => import("./offset-slider-crank/polish"),
+  "eccentric-sheave": () => import("./eccentric-sheave/polish"),
   "klann-linkage": () => import("./klann-linkage/polish"),
   "watt-six-bar": () => import("./watt-six-bar/polish"),
   "stephenson-six-bar": () => import("./stephenson-six-bar/polish"),
