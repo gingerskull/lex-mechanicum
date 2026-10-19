@@ -142,3 +142,21 @@ export const clevisModel: MechanismModel = defineMechanism({
     return { pts: { O2: [0, 0], O4: [100, 0], A, B: circleX(A, 120, [100, 0], 80, 1) } };
   },
 });
+
+/**
+ * A hung pivot: a lever on a ground pivot in the top layer, and a crank beneath it whose sweep covers that pivot, so no
+ * shaft can rise from the base to the lever. The lever turns with the crank's phase, nothing joins them.
+ */
+export const hungModel: MechanismModel = defineMechanism({
+  id: "fx-hung",
+  input: { kind: "rotary", part: "crank" },
+  parts: [
+    P.link("crank", 60, { role: "driver", r: [13, 9.5], between: ["O2", "A"] }),
+    P.link("lever", 50, { role: "output", r: [12, 9.5], layer: 2, between: ["O4", "B"] }),
+    P.cap("pO2", -1, 7, { fixed: [0, 0, 0], accent: true }),
+    P.cap("pO4", 2, 7, { fixed: [25, 0, 0], top: "hung" }),
+  ],
+  solve(u) {
+    return { pts: { O2: [0, 0], O4: [25, 0], A: V.at([0, 0], u, 60), B: V.at([25, 0], osc(-60 * D2R, 60 * D2R)(u), 50) } };
+  },
+});

@@ -79,9 +79,10 @@ export const P = {
     });
   },
   /** Flush pivot cap of radius r; span is the number of layers the pin passes through. */
-  cap(id: string, layer: number, r = 5.5, o: Place & { span?: number; accent?: boolean; th?: number; over?: number } = {}): Part {
+  cap(id: string, layer: number, r = 5.5, o: Place & { span?: number; accent?: boolean; th?: number; over?: number; top?: "hung" | "free" } = {}): Part {
     const p = base(id, "pin", layer, S(circle(r, 0, 0, 36)), { span: o.span ?? 1, th: o.th ?? THICK, over: o.over ?? 0.8, ...place(o) });
     if (o.accent) p.accent = true;
+    if (o.top) p.top = o.top;
     return p;
   },
   /** Square-ended slider block centred on its origin, with a ring where its pin sits. */

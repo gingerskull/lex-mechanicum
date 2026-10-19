@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.20.0 — 2026-10-19
+
+- A ground pivot that the links below it sweep over can be carried from above: a pin marked hung in the model gets a
+  stub from a bridge on two posts into the topmost part only. A pin marked free gets no bridge (a part sweeps over its
+  axle), and its bearings are shielded instead of oiled. Unmarked pivots are built as before.
+- Hart's inversor added to standard 2.6: five planes, the ground pivot A hung from a bridge, a slotted stud to set AB.
+- Rhombic drive added to standard 2.6: two geared cranks, four rods on two layers, the piston and displacer yokes on
+  rails above the gears.
+- Drag-link quick-return added to standard 2.6: the output crank split round a bridge, the follower below and the ram
+  arm above on one keyed shaft in the bridge's bearing, the rod over everything.
+- Walschaerts valve gear added to standard 2.6: the expansion link as two curved bars with hardened wear strips, a
+  bronze die block, the trunnion hung from a bridge, the reverse arm on an eccentric bushing.
+
 ## 0.19.0 — 2026-10-19
 
 - Offset slider-crank is built to standard 2.0: a slider-crank whose slide line sits 20 mm off the crank centre, stroke
