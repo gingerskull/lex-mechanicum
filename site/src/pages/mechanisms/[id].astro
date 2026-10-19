@@ -2,6 +2,7 @@
 // One page per registered mechanism (SS5, SS8): crumbs, header, stage, side panels, explanation, links. The catalogue
 // supplies every word; the drawing comes from the package and the model's solve.
 import Sheet from "../../layouts/Sheet.astro";
+import "../../../styles/views.css";
 import Bar from "../../components/Bar.astro";
 import ThemeToggle from "../../components/ThemeToggle.astro";
 import Stage from "../../components/Stage.astro";
@@ -67,12 +68,18 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
       <div class="hrow"><h1>{r.name}</h1><ThemeToggle /></div>
       <p>{r.summary}</p>
     </div>
+    <script is:inline>
+      // the remembered view mode, set before the layout paints (the stage island wires the toggle)
+      try {
+        if (localStorage.getItem("stage-view") === "wide") document.documentElement.dataset.view = "wide";
+      } catch {}
+    </script>
     <div class="dlayout">
       <Stage id={sheet.id} no={sheet.no} title={r.name} />
       <aside class="side">
         <section class="panel">
           <h2>At a glance</h2>
-          <dl class="facts">{facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v.map((x) => (typeof x === "string" ? x : <a href={x[1]}>{x[0]}</a>))}</dd></>))}</dl>
+          <dl class="facts">{facts.map(([k, v]) => (<div><dt>{k}</dt><dd>{v.map((x) => (typeof x === "string" ? x : <a href={x[1]}>{x[0]}</a>))}</dd></div>))}</dl>
         </section>
         {r.build.plot && (
           <section class="panel plot">
