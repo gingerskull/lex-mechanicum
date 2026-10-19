@@ -38,6 +38,7 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "oscillating-cylinder": () => import("./oscillating-cylinder/polish"),
   "scotch-yoke": () => import("./scotch-yoke/polish"),
   "hart-inversor": () => import("./hart-inversor/polish"),
+  "rhombic-drive": () => import("./rhombic-drive/polish"),
   "hoekens-linkage": () => import("./hoekens-linkage/polish"),
 };
 
