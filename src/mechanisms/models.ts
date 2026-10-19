@@ -31,5 +31,6 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "hart-inversor": async () => (await import("./hart-inversor/model")).default,
   "rhombic-drive": async () => (await import("./rhombic-drive/model")).default,
   "walschaerts-valve-gear": async () => (await import("./walschaerts-valve-gear/model")).default,
+  "drag-link-quick-return": async () => (await import("./drag-link-quick-return/model")).default,
   "hoekens-linkage": async () => (await import("./hoekens-linkage/model")).default,
 };

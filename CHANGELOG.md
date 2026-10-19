@@ -8,6 +8,8 @@
 - Hart's inversor added to standard 2.6: five planes, the ground pivot A hung from a bridge, a slotted stud to set AB.
 - Rhombic drive added to standard 2.6: two geared cranks, four rods on two layers, the piston and displacer yokes on
   rails above the gears.
+- Drag-link quick-return added to standard 2.6: the output crank split round a bridge, the follower below and the ram
+  arm above on one keyed shaft in the bridge's bearing, the rod over everything.
 - Walschaerts valve gear added to standard 2.6: the expansion link as two curved bars with hardened wear strips, a
   bronze die block, the trunnion hung from a bridge, the reverse arm on an eccentric bushing.
 

@@ -40,6 +40,7 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "hart-inversor": () => import("./hart-inversor/polish"),
   "rhombic-drive": () => import("./rhombic-drive/polish"),
   "walschaerts-valve-gear": () => import("./walschaerts-valve-gear/polish"),
+  "drag-link-quick-return": () => import("./drag-link-quick-return/polish"),
   "hoekens-linkage": () => import("./hoekens-linkage/polish"),
 };
 
