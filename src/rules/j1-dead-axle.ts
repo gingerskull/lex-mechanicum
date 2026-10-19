@@ -2,7 +2,7 @@
 // inner-race spacers, a bronze thrust washer on the base (F4), a bridge over the top on spigoted posts (F1, A11),
 // the axle threaded into the base or through it to a washer and nyloc (M9), an oil sink over the open bearing (F8).
 import { bridge } from "../hardware/sub/bridge";
-import { disc, nut, oilSink, plainWasher, spacer, tube } from "../hardware/primitives";
+import { bearingName, disc, nut, oilSink, plainWasher, spacer, tube } from "../hardware/primitives";
 import { NUTS, SHOULDER_BOLTS, WASHERS, engagement, threadFor } from "../hardware/tables";
 import { buildHungPin, isHung } from "./hung";
 import { boltName, elements, partName, raceD, shoulderBolt, stackSpacers, tappedMark, type Element } from "./pins";
@@ -47,7 +47,9 @@ export function buildFixedPin(ctx: RuleContext, j: PinJoint): void {
     J.badge = ["both ends held", "ok"];
   } else {
     const zMin = Math.max(...els.map((e) => e.over)) + 0.5;
-    const br = bridge(ctx, { id: `${j.id}-bridge`, over: [j.P], zMin, joint: j.id });
+    // a moving part that sweeps over the axle above its stack leaves no room for a bridge's stem: single shear instead
+    const over = ctx.hits(j.P, j.d / 2 + 1, zMin, zMin + 200, () => true);
+    const br = over ? null : bridge(ctx, { id: `${j.id}-bridge`, over: [j.P], zMin, joint: j.id });
     if (br) {
       br.bridge.holes.push(disc(j.d / 2 + 0.01, ...j.P));
       br.bridge.marks.push(...oilSink(j.d / 2, ...j.P));
@@ -67,7 +69,12 @@ export function buildFixedPin(ctx: RuleContext, j: PinJoint): void {
       ctx.add(spacer(`${j.id}-top`, j.d + 0.2, raceD(ctx, j, j.d + 3.2), { name: "Washer under the head, on the inner race", at, z0: top.z1, z1: zTop, ex: top.ex, joints: [j.id] }));
       J.badge = ["single shear", "warn"];
       // no bridge: shield the bearings instead of oiling them from a sink
-      for (const t of ctx.solids) if (t.joints.includes(j.id) && t.kind === "bearing" && t.closure === "open") t.closure = "shield";
+      for (const t of ctx.solids)
+        if (t.joints.includes(j.id) && t.kind === "bearing" && t.closure === "open") {
+          t.closure = "shield";
+          if (t.name) t.name = bearingName(t.d!, t.D!, "shield", !!ctx.get(`${t.id}-fl`));
+          t.mat = "Bearing steel 100Cr6, steel shields";
+        }
     }
   }
   const name = `${boltName(j.d, zTop - ctx.b1).replace("Shoulder bolt", "Axle, shoulder bolt")}${threaded ? ", threaded into the base" : `, through the base, M${M} nyloc underneath`}`;

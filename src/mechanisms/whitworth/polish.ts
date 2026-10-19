@@ -8,7 +8,6 @@
 // - the cap's post on the ram, on the side the rod never swings to;
 // - notes, badges and build rules (A16).
 import type { Polish } from "../../assemble/api";
-import { bearingName } from "../../hardware/primitives";
 import { locking } from "../../rules/locking";
 import { materials } from "../../rules/materials";
 import { Rbore, Rhub, e } from "./model";
@@ -31,18 +30,7 @@ export const polish: Polish = (A, H) => {
   const cap = A.get("cap")!;
   const exBull = ctx.get("bull")!.ex;
 
-  // ---- pivot O3: no bridge (the rod passes over), the axle's head sits 2 mm over the bearing ----
-  A.drop(/^pO3-bridge/);
-  A.drop("pO3-axle-shim");
-  const brg = A.get("pO3-lever-brg-fl")!;
-  const zHead = brg.z1 + 1;
-  A.set("pO3-sp-top", { z1: zHead, name: "Inner-race spacer 10.2x13.1", kind: "spacer", span: undefined });
-  A.set("pO3-axle-s2", { z1: zHead });
-  const head = A.get("pO3-axle-head")!;
-  const hh = head.z1 - head.z0;
-  A.set("pO3-axle-head", { z0: zHead, z1: zHead + hh });
-  const lb = A.get("pO3-lever-brg")!;
-  for (const id of ["pO3-lever-brg", "pO3-lever-brg-fl"]) A.set(id, { closure: "shield", name: id === "pO3-lever-brg" ? bearingName(lb.d!, lb.D!, "shield", true) : "" });
+  // ---- pivot O3: the rod passes over it, so the rules give it no bridge; the axle is held in the hub and the base ----
   const J3 = A.joint("pO3");
   J3.serves.F1 = ["pO3-axle", "pO3-axle-s2"];
   delete J3.serves.F8;
