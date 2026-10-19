@@ -60,4 +60,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "schmidt-coupling": async () => (await import("./schmidt-coupling/model")).default,
   "sprag-clutch": async () => (await import("./sprag-clutch/model")).default,
   "internal-geneva": async () => (await import("./internal-geneva/model")).default,
+  "anchor-escapement": async () => (await import("./anchor-escapement/model")).default,
 };
