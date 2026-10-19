@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.21.0 — 2026-10-19
+
+- Internal gear pair added to standard 2.6: the ring gear has no hub, so it is carried on its rim by three flanged track rollers
+  on dead axles, a retaining ring over each, and nothing crosses the mesh.
+- Sun and planet gear added: the planet fixed to the connecting rod through a hub sleeve and four screws, the retainer
+  turning on the sun shaft between the sun and a flywheel, a beam that rocks about 24° either side.
+- Non-circular gears added: two elliptical gears of 26 teeth spaced equally along the pitch curve, the driven gear's speed
+  swinging between 0.54 and 1.86 of the input's, four spokes in each.
+- Cycloidal drive added: eleven lobes on twelve ring pins and six output pins in holes 2 mm wider, 11:1 reversing; a cycle is
+  one turn of the output (eleven of the input).
+- Ravigneaux gearset added (first gear, carrier held): three pinion pairs, the long pinion in two halves bolted into one gear,
+  the ring carried on its rim by three rollers.
+- Wankel rotary engine added: the rotor on an eccentric journal turning a third of the shaft's speed round the fixed gear,
+  its apexes tracing the housing's epitrochoid, apex seals as replaceable strips.
+- Star wheel and pin added: the finger pushes the star ahead of it (simulated) and the sprung jumper snaps it into the next
+  detent, ten teeth.
+- Cam with flat-faced follower added: cycloidal rise, dwell, return and dwell, the flat face sliding across the cam, a
+  replaceable hardened track ring.
+- Face groove cam added: the groove cut as a ring and an island screwed on a base disc, a track roller in the groove, no
+  spring.
+- Schmidt coupling added: three discs and six links joining two shafts 50 apart, the middle disc floating, the output pivot hung
+  from a bridge.
+- Sprag clutch added (the driving state): sixteen sprags between the races at their locking tilt, a garter spring, the outer race
+  carried on a spider.
+- The keyed-bore rule no longer takes a moving part's wide round hole for a keyed bore (a ring gear turning round a pin).
+- Internal Geneva drive, desmodromic valve cam, anchor escapement and lever escapement are not yet built: their issues say why.
+
 ## 0.20.0 — 2026-10-19
 
 - A ground pivot that the links below it sweep over can be carried from above: a pin marked hung in the model gets a

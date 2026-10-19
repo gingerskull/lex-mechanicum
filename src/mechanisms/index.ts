@@ -57,6 +57,17 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   antiparallelogram: () => import("./antiparallelogram/polish"),
   "double-crank": () => import("./double-crank/polish"),
   "double-rocker": () => import("./double-rocker/polish"),
+  "internal-gear-pair": () => import("./internal-gear-pair/polish"),
+  "sun-and-planet": () => import("./sun-and-planet/polish"),
+  "non-circular-gears": () => import("./non-circular-gears/polish"),
+  "cycloidal-drive": () => import("./cycloidal-drive/polish"),
+  ravigneaux: () => import("./ravigneaux/polish"),
+  wankel: () => import("./wankel/polish"),
+  "star-wheel": () => import("./star-wheel/polish"),
+  "flat-faced-cam": () => import("./flat-faced-cam/polish"),
+  "face-groove-cam": () => import("./face-groove-cam/polish"),
+  "schmidt-coupling": () => import("./schmidt-coupling/polish"),
+  "sprag-clutch": () => import("./sprag-clutch/polish"),
 };
 
 export const mechanisms: Record<string, () => Promise<MechanismEntry>> = Object.fromEntries(
