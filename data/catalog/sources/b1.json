@@ -1185,7 +1185,7 @@
   "ratio": {
    "kind": "Variable",
    "class": "Variable",
-   "typical": "input swing about 70° gives output swing about 41° with defaults"
+   "typical": "input swing 66° (20° to 86°) gives output swing about 31° with defaults"
   },
   "dof": 1,
   "topology": {
@@ -1628,15 +1628,15 @@
   "in_site": false,
   "family": "Linkage",
   "level": "Intermediate",
-  "summary": "A crossed four-bar with opposite links equal: the two cranks turn in opposite directions at varying speeds, like a pair of elliptical gears.",
+  "summary": "A crossed four-bar with opposite links equal: the two cranks turn the same way at varying speeds, like a pair of elliptical gears.",
   "motion": {
    "input": "Rotary",
    "output": "Rotary",
    "label": "Rotary → Rotary",
    "output_character": [
     "Continuous",
-    "Reversing",
-    "Variable speed"
+    "Variable speed",
+    "Non-uniform"
    ],
    "axes": "Offset parallel",
    "plane": "Planar"
@@ -1644,7 +1644,7 @@
   "ratio": {
    "kind": "Variable",
    "class": "Variable",
-   "typical": "1:1 average, reversed; instantaneous 0.43x to 2.33x with defaults"
+   "typical": "1:1 average; instantaneous 0.43x to 2.33x with defaults"
   },
   "dof": 1,
   "topology": {
@@ -1657,7 +1657,7 @@
   "backdrivable": "Yes",
   "tags": {
    "function": [
-    "Reversing",
+    "Motion conversion",
     "Function generation",
     "Path generation"
    ],
@@ -1681,9 +1681,9 @@
    ]
   },
   "explain": {
-   "motion": "The two long links cross like scissors. With the short link fixed, both long cranks make full turns in opposite directions, and their crossing point stays on an ellipse whose foci are the fixed pivots, exactly like a pair of rolling elliptical gears. The midpoint of the free long link traces a figure-eight.",
+   "motion": "The two long links cross like scissors. With the short link fixed, both long cranks make full turns in the same direction, one speeding up as the other slows, and their crossing point stays on an ellipse whose foci are the fixed pivots, exactly like a pair of rolling elliptical gears.",
    "forces": "Each crank drives the other through the short coupler as push or pull. The speed ratio and torque ratio change continuously and are inverses of each other, so torque rises when the output slows.",
-   "benefits": "An exact, gearless replacement for elliptical gears and a compact way to reverse rotation with a built-in speed variation. A building block for Kempe angle multipliers and Hart's inversor.",
+   "benefits": "An exact, gearless replacement for elliptical gears and a compact way to turn one shaft by another with a built-in speed variation. A building block for Kempe angle multipliers and Hart's inversor.",
    "limits": "Passes through change points where it can flip into a parallelogram, so it needs bracing or a guide. Large speed variation causes heavy inertia loads at speed."
   },
   "build": {
@@ -1772,8 +1772,8 @@
      "note": "ground, short"
     }
    ],
-   "defining_relations": "a = c, b = d, crossed assembly. Crossing point X of the two long links satisfies |O2X| + |O4X| = a, an ellipse with foci O2, O4 and major axis a. Speed ratio ω4/ω2 = -|O2X| / |O4X|, between (a - d)/(a + d) and (a + d)/(a - d).",
-   "range": "input crank 360° continuous; output crank 360° in the opposite sense; speed ratio 0.43 to 2.33",
+   "defining_relations": "a = c, b = d, crossed assembly. Crossing point X of the two long links satisfies |O2X| + |O4X| = a, an ellipse with foci O2, O4 and major axis a. Speed ratio ω4/ω2 = |O2X| / |O4X|, between (a - d)/(a + d) and (a + d)/(a - d).",
+   "range": "input crank 360° continuous; output crank 360° in the same sense; speed ratio 0.43 to 2.33",
    "overlays": [
     "paths",
     "velocity",
