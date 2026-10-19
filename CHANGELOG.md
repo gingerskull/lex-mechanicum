@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.17.0 — 2026-10-19
+
+- Bell crank: an L-shaped lever turning a horizontal pull into a vertical push, on a belt-driven carriage, with a clevis lever and a slide at each rod.
+- Five-bar linkage: the geared one-input version, a 22-tooth and a 28-tooth gear coupling the two cranks, the tip tracing a curve.
+- Stephenson six-bar linkage: a four-bar whose coupler point drives a dyad to an output rocker, belt-driven.
+- Watt six-bar linkage: two four-bars in series on a ternary rocker, the output rocker swinging about 91°.
+- Klann linkage: the walking leg, its foot tracing a flat stance stroke and a lifted return.
+
 ## 0.16.0 — 2026-10-19
 
 - Ackermann steering linkage: built to the standard (2.6), with a drive by its input kind, an audit sheet, both sheets,
