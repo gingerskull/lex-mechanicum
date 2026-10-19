@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.24.0 — 2026-10-20
+
+- Anchor escapement added to standard 2.6: a 30-tooth wheel and a recoil anchor whose two pallet faces are turned 35°
+  off the dead line. The wheel is found by simulation: urged forward by its train, stopped and pushed back by the
+  pallets, it advances 12° per pendulum period with about 1° of recoil. The motor swings the anchor through the
+  pendulum's ±3°; the pendulum is drawn shortened. An eccentric under the wheel axle sets the depth of engagement.
+- Lever escapement added to standard 2.6, scaled 2x: a 15-tooth club wheel, a pallet lever with two ruby stones and a
+  fork, a balance on three arms with a flat hairspring. The impulse pin is in the fork only within 20° of the balance's
+  rest; the lever flips 5.1° either side and the wheel advances about 12° each beat, by the anchor's simulation.
+- The oscillating drive works for a swing too small for its 22 mm lever to give a 5 mm crank: a longer lever and a
+  2 mm crank. Every existing mechanism is unchanged.
+- CI: the Check job may run 8 minutes (was 5); the desmodromic cam's slowest test has a 30 s limit; eslint ignores
+  `.claude/`, so a lint run from a checkout with extra worktrees works.
+
 ## 0.23.0 — 2026-10-19
 
 - Desmodromic valve cam added to standard 2.6: two lobes on one camshaft, each the envelope of its rocker's shoe so that

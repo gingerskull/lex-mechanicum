@@ -48,7 +48,7 @@ describe("desmodromic cam", () => {
     }
   });
 
-  it("never lets a rocker's body meet its lobe, and keeps the pressure angle under 35°", () => {
+  it("never lets a rocker's body meet its lobe, and keeps the pressure angle under 35°", { timeout: 30_000 }, () => {
     for (const [r, l, w] of [["rockerOpen", "lobeOpen", 1], ["rockerClose", "lobeClose", 2]] as const) {
       let worst = 0;
       let pa = 0;

@@ -268,7 +268,11 @@ function oscillating(ctx: RuleContext, kind: MotorKind): string {
   const r = swing(ctx, part);
   if (!j?.below || !r) return "No live oscillating input to drive.";
   const zl = j.below.z0;
-  const rho = 22;
+  // a swing too small for a 22 mm lever to give a 5 mm crank (a pendulum's few degrees) gets a longer lever and a 2 mm crank
+  const half = (r[1] - r[0]) / 2;
+  const small = 22 * Math.sin(half) < 5;
+  const rho = small ? Math.ceil(2 / Math.sin(half)) : 22;
+  const rcMin = small ? 2 : 5;
   // the lever points away from the part; its tip's extremes set the crank and link at their dead centres
   const off = Math.PI;
   const tip = (th: number): Vec2 => [j.P[0] + rho * Math.cos(th + off), j.P[1] + rho * Math.sin(th + off)];
@@ -284,7 +288,7 @@ function oscillating(ctx: RuleContext, kind: MotorKind): string {
       const p: Vec2 = [Tm[0] + D * Math.cos((k / 24) * TAU), Tm[1] + D * Math.sin((k / 24) * TAU)];
       const rc0 = Math.abs(Math.hypot(p[0] - Thi[0], p[1] - Thi[1]) - Math.hypot(p[0] - Tlo[0], p[1] - Tlo[1])) / 2;
       const L0 = (Math.hypot(p[0] - Thi[0], p[1] - Thi[1]) + Math.hypot(p[0] - Tlo[0], p[1] - Tlo[1])) / 2;
-      if (rc0 < 5 || L0 < 2.5 * rc0 || D >= bestD) continue;
+      if (rc0 < rcMin || L0 < 2.5 * rc0 || D >= bestD) continue;
       if (Math.hypot(p[0] - j.P[0], p[1] - j.P[1]) < R + 22) continue;
       if (depth(ctx.get("base")!.outer, [], p) < R + 3) continue;
       if (ctx.clearance(p, R + 1, zl - 40, ctx.b0, (t) => t.isBase === true) < 0) continue;
@@ -303,7 +307,7 @@ function oscillating(ctx: RuleContext, kind: MotorKind): string {
       const dh = Math.hypot(p[0] - Thi[0], p[1] - Thi[1]);
       const dl = Math.hypot(p[0] - Tlo[0], p[1] - Tlo[1]);
       const rc0 = Math.abs(dh - dl) / 2;
-      if (rc0 < 5 || (dh + dl) / 2 < 2.5 * rc0) continue;
+      if (rc0 < rcMin || (dh + dl) / 2 < 2.5 * rc0) continue;
       const s = rc0 + 0.2 * (Math.cos(a) * out[0] + Math.sin(a) * out[1]) / (Math.hypot(...out) || 1);
       if (!best || s > best.s) best = { p, s };
     }
