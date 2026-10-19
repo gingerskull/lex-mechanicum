@@ -57,6 +57,35 @@ header.top {
 .spacer {
   flex: 1;
 }
+/* the library bar's row and filter panel have the header's and the grid's edges: their padding sits outside the
+   layout width */
+.libbar .row,
+.libbar .facets {
+  box-sizing: content-box;
+}
+/* the set's name and count, in once the bar sticks (not on a phone); the search gives way to it */
+.settitle {
+  display: none;
+  flex: 0 0 auto;
+  min-width: 0;
+  margin-right: 10px;
+  font: 700 18px / 1.1 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.settitle span {
+  color: var(--faint);
+  font-weight: 500;
+}
+.libbar.stuck .row {
+  flex-wrap: nowrap;
+}
+.libbar.stuck .settitle {
+  display: block;
+}
 /* a mechanism page's compact bar: its name and the sheet switch, in once the page's heading has scrolled away */
 .pagebar {
   position: fixed;
@@ -246,6 +275,9 @@ footer {
   }
   .bartitle {
     font-size: 16px;
+  }
+  .libbar.stuck .settitle {
+    display: none;
   }
   header.top .tblock b {
     font-size: 10.5px;

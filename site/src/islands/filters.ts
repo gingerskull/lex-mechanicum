@@ -6,6 +6,7 @@ import { readLibrary, saveLibrary, takeReturn } from "../library";
 
 const cards = [...document.querySelectorAll<HTMLAnchorElement>(".card")];
 const q = document.getElementById("q") as HTMLInputElement | null;
+const qclear = document.getElementById("qclear");
 const toggle = document.getElementById("ftoggle");
 const panel = document.getElementById("facets");
 const badge = document.getElementById("fcount");
@@ -40,6 +41,7 @@ function apply() {
   if (clear) clear.hidden = on.length === 0 && words.length === 0;
   if (fclear) fclear.disabled = on.length === 0 && words.length === 0;
   if (empty) empty.hidden = n > 0;
+  if (qclear) qclear.hidden = !q?.value;
   // the URL says what is shown: ?<facet>=<value>... and ?q=<words>
   const p = new URLSearchParams();
   for (const c of on) p.append(c.dataset.f!, c.dataset.v!);
@@ -59,6 +61,27 @@ for (const c of chips)
     apply();
   });
 q?.addEventListener("input", apply);
+// the search's clear (x): empties the field and the results follow, the field keeps the focus
+const clearSearch = () => {
+  if (!q) return;
+  q.value = "";
+  apply();
+  q.focus();
+};
+qclear?.addEventListener("pointerdown", (e) => e.preventDefault());
+qclear?.addEventListener("click", clearSearch);
+q?.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && q.value) {
+    e.preventDefault();
+    clearSearch();
+  }
+});
+
+// once the bar sticks (the header above it has scrolled away), it carries the set's name and count
+const libbar = document.getElementById("libbar");
+const header = document.querySelector("header.top");
+if (libbar && header)
+  new IntersectionObserver(([e]) => libbar.classList.toggle("stuck", !e?.isIntersecting), { rootMargin: "-1px 0px 0px 0px" }).observe(header);
 const clearAll = () => {
   for (const c of chips) c.setAttribute("aria-pressed", "false");
   if (q) q.value = "";

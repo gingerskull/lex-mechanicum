@@ -1,22 +1,29 @@
 ---
-// The sticky bar (SS3). On the library: search, filters and the sheet switch on one row, the filter panel under it. On a
-// mechanism page: the mechanism's name and the sheet switch, shown once the page's own heading has scrolled away.
+// The sticky bar (SS3). On the library: search, filters and the sheet switch on one row, the filter panel under it; once
+// the bar sticks, the set's name and sheet count join the row at its left (not on a phone). On a mechanism page: the
+// mechanism's name and the sheet switch, shown once the page's own heading has scrolled away.
 import ThemeToggle from "./ThemeToggle.astro";
 interface Props {
   library?: boolean;
+  /** The library's name and sheet count, shown in the library bar once it sticks. */
+  set?: { name: string; count: number };
   /** A mechanism page's name: the bar becomes the compact page bar. */
   title?: string;
 }
-const { library = false, title } = Astro.props;
+const { library = false, set, title } = Astro.props;
 ---
-<div class:list={["bar", { pagebar: !!title }]} id={title ? "pagebar" : undefined}>
+<div class:list={["bar", { pagebar: !!title, libbar: library }]} id={title ? "pagebar" : library ? "libbar" : undefined}>
   <div class="wrap row">
     {library && (
       <>
-        <label class="search">
+        {set && <span class="settitle" aria-hidden="true">{set.name} <span>{set.count}</span></span>}
+        <div class="search">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5" /><path d="M11 11l3.5 3.5" /></svg>
-          <input id="q" type="search" placeholder="Search mechanisms" aria-label="Search mechanisms" />
-        </label>
+          <input id="q" type="search" placeholder="Search mechanisms" aria-label="Search mechanisms" autocomplete="off" />
+          <button class="qclear" id="qclear" type="button" aria-label="Clear search" title="Clear search" hidden>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" /></svg>
+          </button>
+        </div>
         <button class="fbtn" id="ftoggle" aria-expanded="false" aria-controls="facets" type="button">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 4h12M4.5 8h7M7 12h2" /></svg>Filters<span class="badge" id="fcount" hidden></span>
         </button>

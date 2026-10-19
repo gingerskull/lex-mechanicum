@@ -57,6 +57,13 @@ describe("site build", () => {
     expect(all).not.toMatch(/(pins|materials|locking|j\d-[\w-]+)\.[\w-]+\.js/);
   });
 
+  it("gives the library bar a clear (x) on the search and the set's name for its stuck state (SS3)", () => {
+    const html = read("index.html");
+    expect(html).toMatch(/<button[^>]*id="qclear"[^>]*hidden/);
+    expect(html).toMatch(/id="libbar"/);
+    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${Object.keys(mechanisms).length}</span>`));
+  });
+
   it("shows the version in the footer and no colour literals in the page CSS", () => {
     const html = read("index.html");
     expect(html).toContain(`Version ${JSON.parse(readFileSync("package.json", "utf8")).version}`);
