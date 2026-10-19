@@ -101,8 +101,9 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
     const w = x1 - x0;
     const h = y1 - y0;
     const centred = Math.hypot((x0 + x1) / 2 - L[0], (y0 + y1) / 2 - L[1]) < 1.6;
-    // a round hole wider than four cap radii is no keyed bore: the cavity of a ring gear turning round the pin
-    if (centred && Math.max(w, h) / Math.min(w, h) < 1.3 && Math.max(w, h) <= 4 * capR) joined.push({ ...base, how: "keyed", bore: Math.max(w, h), hole: hi });
+    // a moving part's round hole wider than four cap radii is no keyed bore: the cavity of a ring gear turning round the pin
+    // (a fixed ring still joins the stack, as it always did)
+    if (centred && Math.max(w, h) / Math.min(w, h) < 1.3 && (p.fixed || Math.max(w, h) <= 4 * capR)) joined.push({ ...base, how: "keyed", bore: Math.max(w, h), hole: hi });
     // a big opening round the pin (ring gear, hub bore) is not a joint
     else if (Math.min(w, h) <= 4 * capR) joined.push({ ...base, how: "slot", slotW: Math.min(w, h), hole: hi, slots: visits(ctx, c, p, capR) });
   }
