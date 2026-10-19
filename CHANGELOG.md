@@ -10,6 +10,26 @@
   with an eccentric bushing at the swing link's pivot.
 - The belt drive of a linear input moves its idler out along the track when a ground pivot's hardware sits in the way.
 
+## 0.17.0 — 2026-10-19
+
+- Bell crank: an L-shaped lever turning a horizontal pull into a vertical push, on a belt-driven carriage, with a clevis lever and a slide at each rod.
+- Five-bar linkage: the geared one-input version, a 22-tooth and a 28-tooth gear coupling the two cranks, the tip tracing a curve.
+- Stephenson six-bar linkage: a four-bar whose coupler point drives a dyad to an output rocker, belt-driven.
+- Watt six-bar linkage: two four-bars in series on a ternary rocker, the output rocker swinging about 91°.
+- Klann linkage: the walking leg, its foot tracing a flat stance stroke and a lifted return.
+
+## 0.16.0 — 2026-10-19
+
+- Ackermann steering linkage: built to the standard (2.6), with a drive by its input kind, an audit sheet, both sheets,
+  every tilt and the explode; the tie rod has a turnbuckle and the wheels' lock is engraved on the base.
+- Parallelogram linkage: built to the standard; the coupler carries the exact-length turnbuckle and the follower's axle
+  clears the coupler that sweeps over it.
+- Antiparallelogram linkage: built to the standard; the follower hangs from a bridge so the long crank passes under it.
+- Double-crank linkage: built to the standard; the output crank hangs from a bridge so the input crank passes under it.
+- Double-rocker linkage: built to the standard, driven 20° to 86° inside its toggle positions.
+- The antiparallelogram's record now says its cranks turn the same way, and the double-rocker's typical line gives the
+  driven swing (66° in, about 31° out).
+
 ## 0.15.0 — 2026-10-19
 
 - The sheet switch is one button with a sun or moon icon, on the library's bar beside the search and Filters and on a
