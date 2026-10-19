@@ -29,4 +29,9 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "oscillating-cylinder": async () => (await import("./oscillating-cylinder/model")).default,
   "scotch-yoke": async () => (await import("./scotch-yoke/model")).default,
   "hoekens-linkage": async () => (await import("./hoekens-linkage/model")).default,
+  "ackermann-steering": async () => (await import("./ackermann-steering/model")).default,
+  "parallelogram-linkage": async () => (await import("./parallelogram-linkage/model")).default,
+  antiparallelogram: async () => (await import("./antiparallelogram/model")).default,
+  "double-crank": async () => (await import("./double-crank/model")).default,
+  "double-rocker": async () => (await import("./double-rocker/model")).default,
 };
