@@ -11,6 +11,8 @@
   rest; the lever flips 5.1° either side and the wheel advances about 12° each beat, by the anchor's simulation.
 - The oscillating drive works for a swing too small for its 22 mm lever to give a 5 mm crank: a longer lever and a
   2 mm crank. Every existing mechanism is unchanged.
+- CI: the Check job may run 8 minutes (was 5); the desmodromic cam's slowest test has a 30 s limit; eslint ignores
+  `.claude/`, so a lint run from a checkout with extra worktrees works.
 
 ## 0.23.0 — 2026-10-19
 
