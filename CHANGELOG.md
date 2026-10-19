@@ -12,6 +12,13 @@
 - The oscillating drive works for a swing too small for its 22 mm lever to give a 5 mm crank: a longer lever and a
   2 mm crank. Every existing mechanism is unchanged.
 
+## 0.23.0 — 2026-10-19
+
+- Desmodromic valve cam added to standard 2.6: two lobes on one camshaft, each the envelope of its rocker's shoe so that
+  the shoe is 0.1 mm from the lobe at every angle (sampled from the outlines in a test); an opening rocker on a hung
+  stud pushing the stem's end, a closing rocker that is a clevis of two plates round the valve pulling a split collar
+  back through hardened nose pads, the valve in two guide strips with a hardened seat; hardened rings and shoe pads.
+
 ## 0.22.0 — 2026-10-19
 
 - Internal Geneva drive added to standard 2.6: four slots opening inward, the crank turning 270° for each 90° step of the

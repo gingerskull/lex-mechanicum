@@ -59,6 +59,7 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "face-groove-cam": async () => (await import("./face-groove-cam/model")).default,
   "schmidt-coupling": async () => (await import("./schmidt-coupling/model")).default,
   "sprag-clutch": async () => (await import("./sprag-clutch/model")).default,
+  "desmodromic-cam": async () => (await import("./desmodromic-cam/model")).default,
   "internal-geneva": async () => (await import("./internal-geneva/model")).default,
   "anchor-escapement": async () => (await import("./anchor-escapement/model")).default,
   "lever-escapement": async () => (await import("./lever-escapement/model")).default,

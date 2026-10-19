@@ -68,6 +68,7 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "face-groove-cam": () => import("./face-groove-cam/polish"),
   "schmidt-coupling": () => import("./schmidt-coupling/polish"),
   "sprag-clutch": () => import("./sprag-clutch/polish"),
+  "desmodromic-cam": () => import("./desmodromic-cam/polish"),
   "internal-geneva": () => import("./internal-geneva/polish"),
   "anchor-escapement": () => import("./anchor-escapement/polish"),
   "lever-escapement": () => import("./lever-escapement/polish"),
