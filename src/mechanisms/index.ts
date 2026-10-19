@@ -32,6 +32,9 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "scissor-lift": () => import("./scissor-lift/polish"),
   "elliptic-trammel": () => import("./elliptic-trammel/polish"),
   "watt-linkage": () => import("./watt-linkage/polish"),
+  "roberts-linkage": () => import("./roberts-linkage/polish"),
+  "scott-russell": () => import("./scott-russell/polish"),
+  "evans-grasshopper": () => import("./evans-grasshopper/polish"),
   "locomotive-drive": () => import("./locomotive-drive/polish"),
   whitworth: () => import("./whitworth/polish"),
   "oldham-coupling": () => import("./oldham-coupling/polish"),
@@ -42,6 +45,18 @@ const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
   "walschaerts-valve-gear": () => import("./walschaerts-valve-gear/polish"),
   "drag-link-quick-return": () => import("./drag-link-quick-return/polish"),
   "hoekens-linkage": () => import("./hoekens-linkage/polish"),
+  "offset-slider-crank": () => import("./offset-slider-crank/polish"),
+  "eccentric-sheave": () => import("./eccentric-sheave/polish"),
+  "klann-linkage": () => import("./klann-linkage/polish"),
+  "watt-six-bar": () => import("./watt-six-bar/polish"),
+  "stephenson-six-bar": () => import("./stephenson-six-bar/polish"),
+  "five-bar": () => import("./five-bar/polish"),
+  "bell-crank": () => import("./bell-crank/polish"),
+  "ackermann-steering": () => import("./ackermann-steering/polish"),
+  "parallelogram-linkage": () => import("./parallelogram-linkage/polish"),
+  antiparallelogram: () => import("./antiparallelogram/polish"),
+  "double-crank": () => import("./double-crank/polish"),
+  "double-rocker": () => import("./double-rocker/polish"),
 };
 
 export const mechanisms: Record<string, () => Promise<MechanismEntry>> = Object.fromEntries(

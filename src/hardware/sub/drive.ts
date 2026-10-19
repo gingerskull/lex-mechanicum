@@ -341,10 +341,12 @@ function linear(ctx: RuleContext, kind: MotorKind): string {
   const sx0 = Math.min(...s.slider.shape.outer.map((p) => p[0]));
   const sx1 = Math.max(...s.slider.shape.outer.map((p) => p[0]));
   const tA = s.range[1] + sx1 + MOTORS[kind].R + 6;
-  const tB = s.range[0] + sx0 - 12;
+  const zp0 = ctx.b0 - 12;
+  let tB = s.range[0] + sx0 - 12;
+  // a ground pivot's axle and nut under the base, near the slider's end of the stroke, would meet the idler: step it out along the axis
+  for (let k = 0; k < 12 && ctx.clearance(line(tB, 0), pm.od / 2, zp0, zp0 + 7.5) < 0.8; k++) tB -= 3;
   const M = line(tA, 0);
   const I = line(tB, 0);
-  const zp0 = ctx.b0 - 12;
   // the base holds the whole loop: the motor bracket at one end, the idler and its tensioner arm (6 mm end radius) at the other
   const E = line(tB - 14, 0);
   const mm = MOTORS[kind].R + 8;
