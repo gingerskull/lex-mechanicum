@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.22.0 — 2026-10-19
+
+- Internal Geneva drive added to standard 2.6: four slots opening inward, the crank turning 270° for each 90° step of the
+  wheel and resting it for 90°. The crank axis lies in the wheel's material, so the wheel is a ring carried on three flanged
+  rollers and the crank hangs above it from a bridge; the wheel is two plates turning as one, the locking plate cut from the
+  crank's sweep so the concave locking arcs come out of the motion, with wear strips and felts in the slots, a hardened
+  locking segment on the crank and a hand knob on the roller stud (hand operated).
+
 ## 0.21.0 — 2026-10-19
 
 - Internal gear pair added to standard 2.6: the ring gear has no hub, so it is carried on its rim by three flanged track rollers
