@@ -545,8 +545,11 @@
 .facts a:hover {
   text-decoration: underline solid var(--accent);
 }
-.facts dt:nth-last-child(2),
-.facts dd:last-child {
+/* each fact is a dt and dd in a div, which takes no box here (Wide lays the divs out as cells, views.css) */
+.facts > div {
+  display: contents;
+}
+.facts > div:last-child > * {
   border-bottom: 0;
 }
 .plot canvas {

@@ -3,6 +3,7 @@
 // frame time one rung at a time with hysteresis, never past G on its own (DL4), and the slider follows it; moving the
 // slider sets the dial by hand and turns Auto off. The title block shows the position. A browser without WebGL2 gets
 // a still drawing (site/thumbs, drawn with the thumbnails) and a one-line note instead; the rest of the page works.
+// The view modes (Wide, full screen) work either way; each canvas follows its own CSS size after a mode change.
 import { autoStep } from "../autodial";
 import { hasWebGL2 } from "../gl";
 import { url } from "../url";
@@ -16,6 +17,57 @@ const CYCLE = 6;
 
 const box = document.querySelector<HTMLElement>(".stagebox");
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+/** Where the standard/Wide choice is remembered; the page's inline script reads it before the layout paints. */
+const VIEW_KEY = "stage-view";
+
+type FsDoc = Document & { webkitFullscreenElement?: Element | null; webkitFullscreenEnabled?: boolean; webkitExitFullscreen?: () => void };
+type FsEl = HTMLElement & { webkitRequestFullscreen?: () => void };
+
+/** Wide (the stage across the layout, the panels below; CSS keeps it to wide screens) and full screen. */
+function views(box: HTMLElement) {
+  const root = document.documentElement;
+  const wide = $<HTMLButtonElement>("wide");
+  const showWide = () => wide.setAttribute("aria-pressed", String(root.dataset.view === "wide"));
+  showWide();
+  wide.addEventListener("click", () => {
+    const on = root.dataset.view !== "wide";
+    if (on) root.dataset.view = "wide";
+    else delete root.dataset.view;
+    showWide();
+    try {
+      localStorage.setItem(VIEW_KEY, on ? "wide" : "standard");
+    } catch {
+      // storage off: the mode holds for this page only
+    }
+  });
+
+  const doc = document as FsDoc;
+  const el = box as FsEl;
+  const full = $<HTMLButtonElement>("full");
+  if (!(doc.fullscreenEnabled || doc.webkitFullscreenEnabled)) {
+    full.hidden = true;
+    return;
+  }
+  const current = () => doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
+  const sync = () => {
+    const on = current() === box;
+    box.toggleAttribute("data-full", on);
+    full.setAttribute("aria-pressed", String(on));
+    full.setAttribute("aria-label", on ? "Leave full screen" : "Full screen");
+    full.title = on ? "Leave full screen (Esc)" : "Full screen";
+    $("fullicon").setAttribute("d", on ? "M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4" : "M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4");
+  };
+  full.addEventListener("click", () => {
+    if (current() === box) {
+      if (doc.exitFullscreen) void doc.exitFullscreen().catch(() => {});
+      else doc.webkitExitFullscreen?.();
+    } else if (el.requestFullscreen) void el.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+    else el.webkitRequestFullscreen?.();
+  });
+  document.addEventListener("fullscreenchange", sync);
+  document.addEventListener("webkitfullscreenchange", sync);
+}
 
 /** Without WebGL2: the still for each sheet in place of the canvas, the controls off, and the plot drawn once. */
 async function still(box: HTMLElement) {
@@ -33,7 +85,7 @@ async function still(box: HTMLElement) {
   note.className = "stagenote";
   note.textContent = "This browser has no WebGL2, so the drawing is a still image and its controls are off.";
   stage.after(note);
-  for (const c of box.querySelectorAll<HTMLButtonElement | HTMLInputElement>("button, input")) c.disabled = true;
+  for (const c of box.querySelectorAll<HTMLButtonElement | HTMLInputElement>("button, input")) if (!c.closest(".views")) c.disabled = true;
   const plotCanvas = document.getElementById("plot") as HTMLCanvasElement | null;
   if (!plotCanvas) return;
   const E = await import("./engine");
@@ -47,6 +99,7 @@ async function still(box: HTMLElement) {
   };
   draw();
   window.addEventListener("themechange", draw);
+  new ResizeObserver(draw).observe(plotCanvas);
 }
 
 async function main(box: HTMLElement) {
@@ -233,13 +286,19 @@ async function main(box: HTMLElement) {
     e.preventDefault();
   });
   window.addEventListener("themechange", () => (dirty = true));
-  new ResizeObserver(() => {
+  // a view mode change, a window resize or a rotation: each canvas takes its new CSS size at the pixel ratio
+  const resized = new ResizeObserver(() => {
     const r = size();
     sess.resize(r.width, r.height, E.pixelRatio());
     plotSize();
     dirty = true;
-  }).observe(canvas);
+  });
+  resized.observe(canvas);
+  if (plotCanvas) resized.observe(plotCanvas);
   requestAnimationFrame(tick);
 }
 
-if (box) void (hasWebGL2() ? main(box) : still(box));
+if (box) {
+  views(box);
+  void (hasWebGL2() ? main(box) : still(box));
+}
