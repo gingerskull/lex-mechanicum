@@ -22,8 +22,8 @@
   }
 }
 
-/* Wide: the stage and its controls across the layout, at a glance and the plot side by side below it, the facts in
-   rows of cells as tall as the plot */
+/* Wide: the stage and its controls across the layout, at a glance (two thirds) and the plot side by side below
+   it, the facts in rows of cells */
 @media (min-width: 1001px) {
   :root[data-view="wide"] .dlayout {
     grid-template-columns: minmax(0, 1fr);
@@ -36,10 +36,9 @@
     aspect-ratio: auto;
     height: min(calc(100cqi / (var(--ratio-stage))), calc(100svh - 150px));
   }
+  /* at a glance takes two thirds, so its facts run in more columns and the row stays low */
   :root[data-view="wide"] .side {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     align-items: stretch;
   }
   :root[data-view="wide"] .side .plot {
@@ -52,17 +51,25 @@
     min-height: 160px;
   }
   :root[data-view="wide"] .facts {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    /* a wrapping row, not a grid: each line fills the width with no holes; a short fact never wraps, a long one is
+       given about half its text length as width (--n, its characters), so it runs to about two lines */
+    display: flex;
+    flex-wrap: wrap;
     column-gap: 18px;
     /* the last row's dashed rule hangs below the list and is clipped; the sides stay open for focus outlines */
     clip-path: inset(-8px -8px 0 -8px);
   }
   :root[data-view="wide"] .facts > div {
+    flex: 1 0 auto;
     display: block;
     min-width: 0;
     padding: 6px 0;
     border-bottom: 1px dashed var(--line);
     margin-bottom: -1px;
+  }
+  :root[data-view="wide"] .facts > div.long {
+    flex: 1 1 calc(var(--n) * 3.7px);
+    min-width: 200px;
   }
   :root[data-view="wide"] .facts dt,
   :root[data-view="wide"] .facts dd {

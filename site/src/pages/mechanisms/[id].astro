@@ -22,6 +22,10 @@ const drive = await driveOf(sheet.id);
 type Part = string | [string, string];
 const facetLink = (key: string, v: string) => url(`/?${key}=${encodeURIComponent(v)}`);
 const searchLink = (v: string) => url(`/?q=${encodeURIComponent(v.toLowerCase())}`);
+// in the Wide facts row (SS9) a fact up to this many characters keeps its width and never wraps; a longer one gets a
+// width from its length, so it runs to about two lines
+const LONG_FACT = 28;
+const textOf = (v: Part[]) => v.map((x) => (typeof x === "string" ? x : x[0])).join("");
 const facts: [string, Part[]][] = [
   ["Family", [[r.family, facetLink("family", r.family)]]],
   ["Motion", [[r.motion.input, facetLink("input", r.motion.input)], " → ", [r.motion.output, facetLink("output", r.motion.output)], ` (${r.motion.output_character.join(", ").toLowerCase()})`]],
@@ -79,7 +83,7 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
       <aside class="side">
         <section class="panel">
           <h2>At a glance</h2>
-          <dl class="facts">{facts.map(([k, v]) => (<div><dt>{k}</dt><dd>{v.map((x) => (typeof x === "string" ? x : <a href={x[1]}>{x[0]}</a>))}</dd></div>))}</dl>
+          <dl class="facts">{facts.map(([k, v]) => (<div class:list={[{ long: textOf(v).length > LONG_FACT }]} style={textOf(v).length > LONG_FACT ? `--n: ${textOf(v).length}` : undefined}><dt>{k}</dt><dd>{v.map((x) => (typeof x === "string" ? x : <a href={x[1]}>{x[0]}</a>))}</dd></div>))}</dl>
         </section>
         {r.build.plot && (
           <section class="panel plot">

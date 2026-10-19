@@ -4,8 +4,9 @@
 
 - Library: the search, Filters and theme row spans the full layout width, the search box has a clear (x) control
   (Escape clears too), and once the bar sticks on scroll it shows the library's name and count (omitted on phones).
+  A mechanism page's compact bar has the same edges as the page.
 - Mechanism page: three view modes for the drawing. Wide (desktop) spans the canvas across the layout with "At a
-  glance" and the graph side by side below it; full screen uses the Fullscreen API, and on a short landscape screen
+  glance" (two thirds, its facts in a low wrapping row) and the graph side by side below it; full screen uses the Fullscreen API, and on a short landscape screen
   its controls move into a rail beside the drawing with vertical sliders. The Wide choice is remembered.
 
 ## 0.24.0 — 2026-10-20

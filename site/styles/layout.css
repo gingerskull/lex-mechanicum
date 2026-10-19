@@ -57,10 +57,11 @@ header.top {
 .spacer {
   flex: 1;
 }
-/* the library bar's row and filter panel have the header's and the grid's edges: their padding sits outside the
-   layout width */
+/* the library bar's row and filter panel, and a mechanism page's compact bar, have the header's and the grid's
+   edges: their padding sits outside the layout width */
 .libbar .row,
-.libbar .facets {
+.libbar .facets,
+.pagebar .row {
   box-sizing: content-box;
 }
 /* the set's name and count, in once the bar sticks (not on a phone); the search gives way to it */
