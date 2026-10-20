@@ -3,7 +3,7 @@
 // apart for the bench (decode is timed by the caller).
 import type { Shape2 } from "../package/format2";
 import { edgesOfExtrude, edgesOfMesh, type EdgeSet } from "./edges";
-import { tessellate } from "./tessellate";
+import { capTime, tessellate } from "./tessellate";
 import type { MeshData } from "./types";
 
 /** The triangles of a shape: tessellated from its profile, or the mesh it ships. */
@@ -20,15 +20,16 @@ export function edgesOfShape(s: Shape2, mesh: MeshData): EdgeSet {
 export interface PreparedShapes {
   meshes: MeshData[];
   edges: EdgeSet[];
-  /** Milliseconds spent turning shapes into triangles and finding their edges. */
-  ms: { tessellate: number; edges: number };
+  /** Milliseconds spent turning shapes into triangles (`caps`: of that, triangulating caps) and finding their edges. */
+  ms: { tessellate: number; edges: number; caps: number };
 }
 
 export function prepareShapes(shapes: readonly Shape2[]): PreparedShapes {
+  capTime.ms = 0;
   const t0 = performance.now();
   const meshes = shapes.map(meshOfShape);
   const t1 = performance.now();
   const edges = shapes.map((s, i) => edgesOfShape(s, meshes[i]!));
   const t2 = performance.now();
-  return { meshes, edges, ms: { tessellate: t1 - t0, edges: t2 - t1 } };
+  return { meshes, edges, ms: { tessellate: t1 - t0, edges: t2 - t1, caps: capTime.ms } };
 }

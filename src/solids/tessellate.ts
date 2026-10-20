@@ -116,7 +116,9 @@ function extrudeLayers(p: Profile, op: Extrude): Layers {
         pts[o++] = op.h * t;
       }
   }
-  return { rings: rings.map((r) => r.length), K, closed: false, pts, start: flat2(rings), end: flat2(rings) };
+  // one array for both caps, so the layered mesh triangulates the cap once and reuses it
+  const xy = flat2(rings);
+  return { rings: rings.map((r) => r.length), K, closed: false, pts, start: xy, end: xy };
 }
 
 /** The rotation-minimising frames (x, y, tangent) at each path point, seeded so profile y lies toward world z. */
@@ -184,7 +186,8 @@ function sweepLayers(p: Profile, op: Sweep): Layers {
         pts[o++] = q[2] + x[2] * uu + y[2] * vv;
       }
   }
-  return { rings: rings.map((r) => r.length), K: m, closed, pts, start: closed ? [] : flat2(rings), end: closed ? [] : flat2(rings) };
+  const xy = closed ? [] : flat2(rings);
+  return { rings: rings.map((r) => r.length), K: m, closed, pts, start: xy, end: xy };
 }
 
 function loftLayers(op: Loft): Layers {
@@ -218,8 +221,20 @@ const layersOf = (p: Profile, op: Op): Layers => {
   throw new Error("revolve has no layers");
 };
 
+/** Milliseconds spent triangulating caps since the last reset: the bench splits tessellation with it. */
+export const capTime = { ms: 0 };
+
 /** Triangles of a flat cap given its flat ring coordinates, as indices into the cap's points; counter-clockwise in xy. */
 function capTriangles(xy: number[], rings: number[]): number[] {
+  const t0 = performance.now();
+  try {
+    return capTrianglesRaw(xy, rings);
+  } finally {
+    capTime.ms += performance.now() - t0;
+  }
+}
+
+function capTrianglesRaw(xy: number[], rings: number[]): number[] {
   const holes: number[] = [];
   let o = 0;
   for (let i = 0; i < rings.length - 1; i++) holes.push((o += rings[i]!));
