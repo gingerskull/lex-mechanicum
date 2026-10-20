@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.12
+version: 2.13
 date: 2026-10-20
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -187,7 +187,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `drive` | V1, V2, V3, V5, V6, F10 |
 | `j8-belt` | J8, V4 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
-| `j13-compliant` | J13, F1, F2, F5 |
+| `j13-compliant` | J13, A6, F1, F2, F5 |
 | `j2-straddle` | A9, J2 |
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
@@ -257,7 +257,7 @@ every line of its row exists or is marked N/A with a reason in the audit.
 | J9 | **Crossed-axis mesh** (bevel, hypoid, worm, crossed helical; declared in `meshes`) | Each gear keyed on its shaft (J2 or J10) and located on it (F2); a shim pack at its back face sets its mounting distance, and so the backlash and the contact pattern (F7); a bronze thrust washer wherever the mesh pushes along a shaft: toward a bevel or hypoid gear's back face (away from the apex), both ways on a worm and on crossed helical gears (F4), the shaft's own spacer under the gear stopping at it; timing marks at the mesh (F9). Pitch cones, the back-cone teeth (Tredgold), lead and lead angle from `src/core/spatial.ts`. |
 | J10 | **Shaft in plan** (a fixed pin on an x or y axis) | Two pillow blocks on the base past either end of what the shaft carries, or both behind it where something sweeps past its far end, far apart (A9): a cast housing on the shaft's axis on a foot plate, two screws down into the base and two dowels (F1, A11). Live: a sealed bearing in each block, located in the nearer by two shaft collars against its inner race, floating in the other (F2, F4); keyed parts as J2 (A5, F3). Dead: the shaft clamped in both blocks by set screws, every part on its own bearing (F2). A part overhung on a live shaft's free end is held there by a washer and a countersunk screw into the shaft end (F2). The base drops under the shaft until its blocks fit, and grows under a block that stands past it (base growth). A hand-turned input takes a handwheel on the free shaft end, a motor-driven one its pulley (V5). |
 | J12 | **Flexible member** (extends J8; declared in `flexible`) | Timing belt (recorded as J8): HTD timing pulleys (`P.pulley`), the centre distance for a whole number of teeth; its back a fixed band round the pitch path, on no posts; its teeth conveyed round the pulleys by the solved travel (D9); flanges on the small pulley (F10); a flat flanged idler on the belt's back takes up the stretch (F7, F10); dry (no F8). Chain: ISO 606 sprockets (`P.sprocket`); rollers and inner and outer link plates conveyed round the sprockets by the solved travel (D9) on a path exactly a whole number of pitches long; the centre distance for a whole number of links; an idler sprocket of a whole number of teeth outside the chain, its pitch circle on the rollers' line and its seats phased to them, turning at one tooth per pitch of travel, takes up the stretch (F7); greased (F8). Chain and belt: the idler on the slack span near the small wheel, on a sealed bearing on a stud through an arm slotted across the span and clamped on two posts (F7). Rope: its spans stretched between the sheaves (D9), its wraps fixed arcs in the sheaves' grooves (`P.ropeSpan`, `P.ropeWrap`); the dead end on a becket with a thimble, its pin in a post screwed to the base (F1, F2, A11); the hook on a swivel (F3); becket and hook at their own sheaves' heights; a guard over each sheave whose centre stands still keeps the rope in its groove (F2); the note counts the parts that carry the load. CVT (`{ form: "cvt", pairs: [{ fixed, sliding, spring? }], belt }`): per shaft a fixed sheave half on the live shaft and a sliding half posed by a frame that slides along it; each sliding half on a feather key sized from the shaft (DIN 6885), or on the shaft's D-flat to Ø8, its shaft's spacers cut short of its travel and the shaft run on past it (F3); where the pair asks, a compression spring round the shaft from the half's back to a seat collar fixed on the shaft, its length following the half (F6, F2); the belt runs in the grooves by design. |
-| J13 | **Compliant joint** (declared in `compliant`) | The neck drawn rigid, its bend and stress zone by the model's `bend` overlay; a hardened stop pin just past each end of the swing so the neck never leaves its elastic range (F5); the blank's ground block clamped to the base under a plate, two screws and two dowels (F1, F2). |
+| J13 | **Compliant joint** (declared in `compliant`) | The neck drawn rigid, its bend and stress zone by the model's `bend` overlay; the neck one piece with its block and its lever (no clash, no overlap between them); a hardened stop pin each side so the neck never leaves its elastic range (F5): on the lever's edge at 70 % of its reach, a fifth of the half swing past each end, or, for a body that moves without turning (a shuttle guided between necks), at each end of its solved travel, past its end face by a fifth of the half travel; the blank's ground block on a ground seat plate of its own outline, never on posts, and nothing through a neck (A6); clamped to the base under a plate, two screws and two dowels reamed through block, clamp plate and seat (F1, F2); the blank one material (M10). |
 | J11 | **Screw** (lead or ball; declared in `screws`) | The screw on its shaft in plan (J10: one end located, one floating, F2, F4); its thread drawn by its helix at the lead; the nut a block on the carriage: a flanged bronze nut, or a preloaded ball nut with its ball return and a wiper at each end (F8); the flange screwed to the carriage; anti-rotation from the carriage's slide (J5) or a key in a guide slot (F3). |
 
 ---
@@ -397,7 +397,7 @@ definition, as long as they are readable.
 | V2 | **One solid bracket:** top flange against the base, floor for the motor, full-height window for the belt; flange screws go up into the base from inside; nothing shows on top of the base. A motor beside a shaft in plan stands on one angle bracket instead: an upright its face screws to and a foot screwed to the base top, both slotted for the belt's tension. | AUTO | side view |
 | V3 | Belt and pulleys clear of feet, housings and base hardware; where the belt passes under a post, its lower screw becomes a flush countersunk screw. | AUTO (rule) / HAND (motor position) | `tools/clearance` |
 | V4 | Drive detail: pulley flanges, set screws or clamp hub, belt tension slot, idler where needed (J8). | AUTO | screenshot |
-| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
+| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. A compliant joint's lever (J13) has no shaft: a pin pressed into its tip runs down through an arc slot in the base to the link, the rocker's pivot the joint's centre, the motor on the line of the tip's chord. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
 | V6 | **Sensing and cabling:** home flag on the input and a fork sensor on the bracket or a post; motor and sensor leads to a terminal block on the base edge, one cable clip under the base (on the base top for a motor beside a shaft in plan). | AUTO | underside view |
 
 ---
@@ -606,6 +606,14 @@ Start here, then run the full ten-function audit.
 - Declare each neck in `compliant` (J13): the neck rigid, the lever's swing as its range; the model gives the `bend`
   overlay of each neck (centre, direction, length, width, angle).
 - F5 stops just past the swing; the blank clamped and dowelled to the base (F1, F2).
+- The blank is one part in one material: block, necks and levers (J13 names it; a polish names another alloy or a
+  plastic). Its block stands on a seat plate, so the lever moves clear of the base.
+- A fixed-guided beam is a deforming outline from the solved state (the cubic clamped at both ends), its pseudo-rigid
+  chord kept in `solve()`; a fixed part that bends is swept, not ground. One J13 per anchor, none at the shuttle (the
+  same beam); the stops bank the shuttle, not the beam.
+- A motor drives a snap-through mechanism through a spring (the roller between two preloaded springs in a window of
+  the output), so the output snaps ahead of the input where the beams' force falls faster than the spring's rate,
+  near the force peak; the shuttle's balance against the spring is solved, the snap a short transfer.
 
 **Screws** (lead screw, ball screw, screw jack)
 - Declare the screw in `screws` (J11): the screw on a shaft in plan (J10) with one end located and one floating; the
@@ -641,6 +649,15 @@ default detail level.
 
 ## Changelog
 
+- **2.13 (2026-10-20).** Hand fixes of the first compliant passes (flexure hinge, bistable) promoted to rules. J13 seats
+  the clamped block on a ground plate of its own outline and the standoffs rule posts no compliant block or neck
+  [J13, A6, AUTO]; the clamp dowels are reamed through block, clamp plate and seat [J13, F1, AUTO]; the stop pins stand
+  on the lever's edge a fifth of the half swing past each end, and bank a body that moves without turning at the ends
+  of its solved travel [J13, F5, AUTO]. A neck is one piece with its block and its lever in the clearance and the model
+  check [A15, K5, AUTO]; a fixed part that stretches or deforms is swept, not ground [A14, A15, AUTO]. An oscillating
+  input on a compliant joint's lever is driven by a pin in its tip, down through an arc slot in the base [V5, F2,
+  AUTO]. The blank takes one material [M10, AUTO]. The compliant playbook gains the blank, the guided beam and the
+  spring drive of a snap-through mechanism.
 - **2.12 (2026-10-20).** The engine for the belt CVT, and the chain drive's hand fixes promoted. Posed solids honour
   `taper` (boxed, sliced and drawn to the far end) and slide along their own axis with their frame; a posed solid may
   `reach` a point that stays, so a spring keeps its seat as the part it presses moves [D8, L6, AUTO]. Deforming

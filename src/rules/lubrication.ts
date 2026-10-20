@@ -14,9 +14,10 @@ export const lubrication: Rule = {
       if (t.kind === "bushing") {
         const host = ctx.get(t.body);
         if (!host) continue;
-        // an oil hole from the top face to the bushing, with a small sink round it
+        // an oil hole from the top face to the bushing, with a small sink round it; a bushing carried by its own motion
+        // (a drive link's) is not in its body's part, and is oil-impregnated
         const r = (t.D ?? 8) / 2 + 1.2;
-        host.marks.push({ kind: "oilSink", pts: circle(0.8, t.at[0] + r, t.at[1], 12) }, { kind: "oilSink", pts: circle(1.4, t.at[0] + r, t.at[1], 14) });
+        if (!t.motion) host.marks.push({ kind: "oilSink", pts: circle(0.8, t.at[0] + r, t.at[1], 12) }, { kind: "oilSink", pts: circle(1.4, t.at[0] + r, t.at[1], 14) });
         for (const j of t.joints) (ctx.joint(j)?.serves ?? {}).F8 = [...(ctx.joint(j)?.serves.F8 ?? []), t.id];
       }
       if (t.kind === "bearing" && t.closure === "open") {

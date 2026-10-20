@@ -1,7 +1,8 @@
 // H.drive (V1 to V6): the prime mover by input kind. rotary: a brushless pancake motor under the base in a one-piece
 // bracket, GT2 belt 32:16 to the input pulley; an input on a shaft in plan (J10) has the motor beside the shaft on an
 // angle bracket instead, belted in the plane across the shaft to a pulley on its free end. oscillating: the motor turns a short crank, a link swings a lever on the
-// input shaft through exactly the modelled range. linear: a belt loop under the base along the stroke, a carriage
+// input shaft through exactly the modelled range; a compliant joint's lever (J13) has no shaft, so a pin pressed into
+// its tip runs down through an arc slot in the base to the link. linear: a belt loop under the base along the stroke, a carriage
 // clamped to the input slider through a slot in the base, a tensioner on the far pulley. manual: a handle on the input
 // and stops at the ends of its range, no motor. Every motorised build has a home flag, a fork sensor, leads to a
 // terminal block on the base edge and a cable clip.
@@ -12,7 +13,7 @@ import { poseOf } from "../../model/pose";
 import { heights } from "../../parts";
 import { inPlane, type PinJoint, type RuleContext, type SlideJoint } from "../../rules/types";
 import type { Part } from "../../model/types";
-import { cableClip, disc, flag, hullOf, lead, plate, screw, setScrew, shaft, spacer, standoff, terminalBlock, tube } from "../primitives";
+import { bushing, cableClip, circlip, disc, dowel, flag, hullOf, lead, plate, screw, setScrew, shaft, spacer, standoff, terminalBlock, tube } from "../primitives";
 import { solid, marks, type Motion, type Solid } from "../solid";
 import { MOTORS, PULLEYS, BELT, SENSOR, innerRingD } from "../tables";
 import { housingBearing } from "./housing";
@@ -104,7 +105,8 @@ function motorUnit(ctx: RuleContext, M: Vec2, toward: Vec2, zp0: number, kind: M
   face.forEach((p, k) => ctx.add(screw(`drive-face-sc${k}`, "button", 3, 6, { ...G, group: undefined, at: [M[0] + p[0], M[1] + p[1], 0], face: zf1, dir: -1, name: k ? "" : undefined, qty: k ? 0 : 2 })));
   // the motor: stator flange on the floor, bell and magnets turning, stator and windings faint inside
   const MO = { at, joints: ["drive"], ex: -8, group: "drive-motor", role: "ground" as const };
-  const turn = spin ? { body: spin.body, motion: spin.motion } : {};
+  // a motor turning with an oscillating drive's crank is placed by the crank's motion, not by its own pose
+  const turn = spin ? { body: spin.body, motion: spin.motion, ...(spin.motion.type === "crank" ? { at: [0, 0, 0] as Pose } : {}) } : {};
   const zm = zf0;
   if (kind === "pancake") {
     ctx.add(solid("drive-motor", { ...MO, kind: "motor", name: m.name, mat: "Aluminium flange, steel bell", outer: disc(RO - 3), holes: [disc(2.1)], marks: marks("boss", circle(RO - 6, 0, 0, 64), ...face.map((p) => circle(1.6, ...p, 14))), z0: zm - 3, z1: zm, chamfer: 0.8 }));
@@ -132,7 +134,7 @@ interface Run {
  * lead is routed as a cable is laid: an arc round a housing it must clear (the way that keeps it away from the motor),
  * runs parallel to the base edges, and a last run square to the block into its own clamp.
  */
-function cabling(ctx: RuleContext, runs: Run[], motor: Vec2): void {
+function cabling(ctx: RuleContext, runs: Run[], motor: Vec2, clearOf = false): void {
   const base = ctx.get("base")!;
   const xs = base.outer.map((p) => p[0]);
   const ys = base.outer.map((p) => p[1]);
@@ -149,6 +151,14 @@ function cabling(ctx: RuleContext, runs: Run[], motor: Vec2): void {
   const [T, rot, n] = cand[0]!;
   const along: Vec2 = [Math.cos(rot), Math.sin(rot)];
   const z0 = ctx.b0 - 8;
+  if (clearOf) {
+    // a block that would sit under the motor bracket slides along the edge toward the base's middle until it is clear
+    const sign = Math.sign(((x0 + x1) / 2 - T[0]) * along[0] + ((y0 + y1) / 2 - T[1]) * along[1]) || 1;
+    for (let k = 0; k < 40 && ctx.clearance(T, 11, z0, ctx.b0, (t) => t.isBase === true) < 0.5; k++) {
+      T[0] += 2 * sign * along[0];
+      T[1] += 2 * sign * along[1];
+    }
+  }
   const G = { joints: ["drive"], ex: -2 };
   ctx.add(terminalBlock("drive-terminal", 4, { ...G, at: [T[0], T[1], rot], z0, z1: ctx.b0 }));
   ctx.add(screw("drive-terminal-sc", "button", 3, 14, { ...G, at: [T[0], T[1], 0], face: z0, dir: 1, name: "Button head M3 x 14, terminal block to base" }));
@@ -408,10 +418,100 @@ function rotaryInPlan(ctx: RuleContext, kind: MotorKind, j: PinJoint): string {
   return `${kind === "pancake" ? "Brushless pancake motor Ø50 x 18" : "Brushed DC motor Ø36"} beside the input's shaft in plan on a one-piece angle bracket, its axis along ${axis}; GT2 belt ${TIN}:${TM} over ${fmt(c)} mm in the plane across the shaft to the input pulley on its free end, past the outer block. Tension by the slots in the bracket's foot and upright; home flag on the located collar read by a fork sensor on a post; leads over the base to a terminal block on its edge.`;
 }
 
+/** An arc slot about c of radius rho from angle a0 to a1 (a0 < a1), half width w, with round ends. */
+function arcSlot(c: Vec2, rho: number, a0: number, a1: number, w: number): Vec2[] {
+  const at = (o: Vec2, r: number, t: number): Vec2 => [o[0] + r * Math.cos(t), o[1] + r * Math.sin(t)];
+  const n = Math.max(4, Math.ceil((a1 - a0) / (Math.PI / 90)));
+  const pts: Vec2[] = [];
+  for (let i = 0; i <= n; i++) pts.push(at(c, rho + w, a0 + ((a1 - a0) * i) / n));
+  for (let i = 1; i < 12; i++) pts.push(at(at(c, rho, a1), w, a1 + (Math.PI * i) / 12));
+  for (let i = n; i >= 0; i--) pts.push(at(c, rho - w, a0 + ((a1 - a0) * i) / n));
+  for (let i = 1; i < 12; i++) pts.push(at(at(c, rho, a0), w, a0 + Math.PI + (Math.PI * i) / 12));
+  return pts;
+}
+
+/**
+ * An oscillating input that is a compliant joint's lever (J13), which has no shaft: the rocker's pivot is the joint's
+ * `at`. A pin pressed into the lever's tip runs down through an arc slot in the base to the link; under the base the
+ * motor, beside the tip on the line of its chord, turns a crank whose throw is half the chord, so the link swings the
+ * lever through exactly its modelled range (dead centres at the ends of the swing). Circlips hold the link on both pins.
+ */
+function oscillatingCompliant(ctx: RuleContext, kind: MotorKind, part: Part, r: [number, number]): string {
+  const P = poseOf(part, ctx.s0)!;
+  const pivot: Vec2 = [P[0], P[1]];
+  const ps = ctx.solidOf[part.id]!;
+  // the tip: the lever's hole farthest from the pivot, else a Ø4 hole 7 mm in from its reach
+  const reach = Math.max(...part.shape.outer.map((q) => Math.hypot(q[0], q[1])));
+  const holes = part.shape.holes.map((h) => {
+    const c = h.reduce((a, q): Vec2 => [a[0] + q[0] / h.length, a[1] + q[1] / h.length], [0, 0]);
+    return { c, d: 2 * Math.max(...h.map((q) => Math.hypot(q[0] - c[0], q[1] - c[1]))) };
+  });
+  const far = holes.sort((a, b) => Math.hypot(b.c[0], b.c[1]) - Math.hypot(a.c[0], a.c[1]))[0];
+  let tipL: Vec2;
+  let d: number;
+  if (far && Math.hypot(far.c[0], far.c[1]) > 0.5 * reach) {
+    tipL = far.c;
+    d = Math.round(far.d * 2) / 2;
+  } else {
+    const o = part.shape.outer.reduce((a, q) => (Math.hypot(q[0], q[1]) > Math.hypot(a[0], a[1]) ? q : a));
+    tipL = [(o[0] * (reach - 7)) / reach, (o[1] * (reach - 7)) / reach];
+    d = 4;
+    ps.holes.push(circle(d / 2, tipL[0], tipL[1], 24));
+  }
+  const rho = Math.hypot(tipL[0], tipL[1]);
+  const off = Math.atan2(tipL[1], tipL[0]);
+  const tip = (th: number): Vec2 => [pivot[0] + rho * Math.cos(th + off), pivot[1] + rho * Math.sin(th + off)];
+  const Tlo = tip(r[0]);
+  const Thi = tip(r[1]);
+  const chord = Math.hypot(Thi[0] - Tlo[0], Thi[1] - Tlo[1]);
+  const u: Vec2 = [(Thi[0] - Tlo[0]) / chord, (Thi[1] - Tlo[1]) / chord];
+  const Tm: Vec2 = [(Tlo[0] + Thi[0]) / 2, (Tlo[1] + Thi[1]) / 2];
+  const zl = ctx.b0 - 4;
+  const R = MOTORS[kind].R;
+  // the motor on the chord's line, its bracket clear of the pin: either side, one under the base first
+  const D = Math.max(R + 5, 1.25 * chord);
+  const cand = [-1, 1].map((s): Vec2 => [Tm[0] + s * D * u[0], Tm[1] + s * D * u[1]]);
+  const clear = cand.filter((p) => ctx.clearance(p, R + 1, zl - 40, ctx.b0, (t) => t.isBase === true) >= 0);
+  const M = clear.find((p) => depth(ctx.get("base")!.outer, [], p) >= R + 3) ?? clear[0] ?? cand[0]!;
+  const m = R + 8;
+  growBase(ctx, [M[0] - m, M[1] - m, M[0] + m, M[1] + m]);
+  const dHi = Math.hypot(M[0] - Thi[0], M[1] - Thi[1]);
+  const dLo = Math.hypot(M[0] - Tlo[0], M[1] - Tlo[1]);
+  const L = (dHi + dLo) / 2;
+  const rc = Math.abs(dHi - dLo) / 2;
+  const motion = (type: "crank" | "link"): Motion => ({ type, motor: M, r: rc, L, pivot, rho, off });
+  const unit = motorUnit(ctx, M, Tm, zl - 18, kind, { body: part.id, motion: motion("crank") }, zl - 5.5);
+  ctx.get("drive-floor")!.name = `Motor bracket Ø${2 * R}, one piece, link window`;
+  const joints = ["drive", ...ps.joints];
+  const G = { body: part.id, joints: ["drive"], ex: -5 };
+  const crank = { ...G, at: [0, 0, 0] as Pose, motion: motion("crank") };
+  const link = { ...G, at: [0, 0, 0] as Pose, motion: motion("link") };
+  const onLever = { body: part.id, at: [tipL[0], tipL[1], 0] as Pose, ex: ps.ex };
+  ctx.add(
+    dowel("drive-pin", d, { ...onLever, z0: zl - 5.5, z1: ps.z1, joints, accent: true, name: `Drive pin Ø${d}, hardened, pressed into the lever's tip` }),
+    circlip("drive-pin-cl", d, { ...onLever, z0: zl - 5.4, joints: ["drive"] }),
+    solid("drive-link", { ...link, kind: "part", role: "link", name: `Drive link, ${fmt(L)} mm`, mat: "Steel C45", outer: roundedPoly([[0, 0], [L, 0]], 6), holes: [disc(3.5), circle(3.5, L, 0, 28)], z0: zl - 5, z1: zl - 0.5 }),
+    bushing("drive-link-b0", d, 7, { ...link, z0: zl - 5, z1: zl - 0.5 }),
+    bushing("drive-link-b1", d, 7, { ...link, at: [L, 0, 0], z0: zl - 5, z1: zl - 0.5, name: "" }),
+    solid("drive-crank", { ...crank, kind: "part", role: "driver", name: `Drive crank, ${fmt(rc)} mm throw, on the motor shaft`, mat: "Steel C45", outer: roundedPoly([[0, 0], [rc, 0]], 6), holes: [disc(2.05)], z0: zl - 10, z1: zl - 5.5 }),
+    dowel("drive-crank-pin", d, { ...crank, at: [rc, 0, 0], z0: zl - 9, z1: zl + 0.5, name: `Crank pin Ø${d}, hardened, pressed into the crank` }),
+    circlip("drive-crank-pin-cl", d, { ...crank, at: [rc, 0, 0], z0: zl - 0.4 }),
+    flag("drive-flag", 2, 10, Math.PI, { ...crank, z0: zl - 14, z1: zl - 13 }),
+  );
+  sensor(ctx, "drive-sensor", { axis: M, a: 0, rIn: 4, rOut: 12, zv: zl - 14, t: 1, joint: "drive", ex: -6 });
+  // the pin's arc slot in the base
+  ctx.get("base")!.holes.push(arcSlot(pivot, rho, Math.min(r[0], r[1]) + off, Math.max(r[0], r[1]) + off, d / 2 + 1));
+  cabling(ctx, [{ from: unit.leadFrom }, { from: [M[0] + 18, M[1]] }], M, true);
+  const deg = String(+(((r[1] - r[0]) * 180) / Math.PI).toFixed(1));
+  return `${kind === "pancake" ? "Brushless pancake motor Ø50 x 18" : "Brushed DC motor Ø36"} under the base in a one-piece bracket. It turns a ${fmt(rc)} mm crank; a ${fmt(L)} mm link takes the drive pin pressed into the lever's tip, ${fmt(rho)} mm from the neck, through an arc slot in the base, and swings the lever through exactly the modelled ${deg}° (dead centres at the ends of the swing). Home flag on the crank read by a fork sensor; leads to a terminal block on the base edge.`;
+}
+
 function oscillating(ctx: RuleContext, kind: MotorKind): string {
   const j = inputJoint(ctx);
   const part = ctx.parts[ctx.model.input.part]!;
   const r = swing(ctx, part);
+  // a compliant joint's lever has no shaft: it is driven by a pin at its tip
+  if (!j && r && ctx.model.compliant?.some((c) => c.lever === part.id)) return oscillatingCompliant(ctx, kind, part, r);
   if (!j?.below || !r) return "No live oscillating input to drive.";
   const zl = j.below.z0;
   // a swing too small for a 22 mm lever to give a 5 mm crank (a pendulum's few degrees) gets a longer lever and a 2 mm crank
@@ -598,6 +698,8 @@ export function drive(ctx: RuleContext, spec: DriveSpec = {}): Solid[] {
   const flagId = added.find((s) => s.kind === "flag")?.id;
   if (flagId) serves.F10 = [flagId, ...added.filter((s) => s.kind === "sensor").map((s) => s.id)];
   if (k === "manual") serves.F5 = added.filter((s) => s.kind === "bumper").map((s) => s.id);
+  const clips = added.filter((s) => s.kind === "circlipExternal" || s.kind === "circlipInternal").map((s) => s.id);
+  if (k === "oscillating" && clips.length) serves.F2 = clips;
   ctx.joints.push({ id: "drive", type: "drive", at: [0, 0], title: k === "manual" ? "Drive · hand operated" : "Drive · motor", note, badge: [k === "manual" ? "hand operated" : "motorised", "ok"], serves });
   return added;
 }

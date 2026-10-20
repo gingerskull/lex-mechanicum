@@ -17,8 +17,13 @@ export function bodyPose(parts: PartIndex, body: string, s: Solved): Pose | null
   return p ? poseOf(p, s) : null;
 }
 
-/** True when the body never moves relative to ground (a posed part fixed in its frame moves with the frame). */
-export const isGround = (parts: PartIndex, body: string): boolean => body === "ground" || (!!parts[body]?.fixed && parts[body]!.axis !== "p");
+/** True when the body never moves relative to ground: a posed part fixed in its frame moves with the frame, and a fixed
+ * part that stretches or deforms is not ground. */
+export const isGround = (parts: PartIndex, body: string): boolean => {
+  if (body === "ground") return true;
+  const p = parts[body];
+  return !!p?.fixed && p.axis !== "p" && !p.stretch && !p.deform;
+};
 
 /** The phase direction of the input at u: +1 when the input angle grows. */
 function direction(model: MechanismModel, parts: PartIndex, body: string, u: number): 1 | -1 {
