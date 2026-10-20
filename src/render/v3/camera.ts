@@ -21,7 +21,7 @@ export type NamedView = (typeof NAMED_VIEWS)[number];
 export interface Orient {
   /** Degrees about z. */
   yaw: number;
-  /** Degrees from plan (0) to side elevation (90); negative looks from below. */
+  /** Degrees from plan (0) to side elevation (90); past 90 the orbit goes over the top, and 180 looks up from beneath. */
   tilt: number;
   /** An auxiliary view: the direction from the drawing toward the viewer (any length); yaw and tilt are then derived. */
   aux?: Vec3;
