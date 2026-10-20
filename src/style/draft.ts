@@ -112,6 +112,7 @@ export const DRAFT = {
     wallShade: {
       shade: 0.045, // 0..1 ink alpha
       steps: 5, // count of facing buckets
+      light: [0.75, -0.25] as const, // screen direction the light comes from (x right, y down), the wall facing it is lightest
       outer: { from: 0.4, span: 0.9 }, // factors, outer walls
       hole: { from: 1.2, span: 1 }, // factors, walls inside holes (darker)
     },
@@ -151,6 +152,42 @@ export const DRAFT = {
     doubleAlpha: 0.3, // 0..1
   },
 
+  // Depth peeling (SD1, SD3): the renderer peels the nearest surfaces of each pixel, front to back.
+  peel: {
+    layers: 4, // count, depth layers peeled at full detail (at most 4)
+    layersLow: 2, // count, layers once rung C is dropped (the deep layers go with the wall shading)
+    edgeEps: 0.05, // mm, an edge is covered only by a surface nearer than its depth less this
+    ownEps: 0.3, // mm, extra margin for the faces of the edge's own solid (added to ownPx / s)
+    ownPx: 2.5, // px, margin for the faces of the edge's own solid, as a screen distance
+  },
+
+  // The camera (SD11): a turntable about z. A view is [yaw, tilt] in degrees: yaw turns the drawing about z, tilt is the
+  // angle from plan (0) to side elevation (90).
+  camera: {
+    pad: 28, // px, margin round the drawing when a view is fitted to the sheet
+    snap: 4, // degrees, a view this close to a named view is that view (title block, orbit snapping)
+    views: { PLAN: [0, 0], FRONT: [0, 90], SIDE: [90, 90], ISOMETRIC: [45, 54.7356], DIMETRIC: [20.7, 70.5288] } as Record<string, readonly [number, number]>, // [yaw, tilt] degrees
+    auxMinCos: 0.02, // an AUX view down an axis that stands this close to vertical turns the drawing's up to y
+  },
+
+  // Section views (SD19): the cut faces are paper hatched at 45 degrees, with a bold outline.
+  section: {
+    hatch: { pitch: 7, width: 1.2, alpha: 0.45 }, // px between lines, px, 0..1 ink
+    outline: { width: 1.6, alpha: 1 }, // px, 0..1: the bold outline of a cut face
+  },
+
+  // Detail views (SD20): a magnified window, framed and lettered.
+  detailView: {
+    frame: { width: 1, alpha: 0.7, dash: [6, 3] as const }, // px, 0..1, px: the window's frame in the main view
+    minScale: 1.5, // factor, the least magnification a detail view is drawn at
+  },
+
+  // Ghost paths, phantom positions, ticks, explode trails (SD21, SD23, SD24, SD12).
+  ghost: { alpha: 0.4, dash: [3, 3] as const, width: 1 }, // factor on path.alpha, px, px
+  phantom: { dash: [4, 3] as const, width: 0.8, alpha: 0.85 }, // px, px, factor on the hidden lines' alpha
+  tick: { half: 3.5, width: 1, alpha: 0.8 }, // px half length of the cross mark, px, 0..1 ink
+  trail: { width: 0.7, alpha: 0.55, dash: [2, 3] as const }, // px, 0..1, px: explode trail lines
+
   // Traced paths and the comet (SD7), accent.
   path: {
     color: "accent" as ColorName,
@@ -173,6 +210,8 @@ export const DRAFT = {
     alpha: 0.5, // 0..1
     overshoot: 6, // px past the head
     maxTilt: 60, // degrees, hidden at and above this tilt
+    endOnDeg: 8, // degrees, an axis this close to the view direction is drawn as a centre cross (3D renderer)
+    cross: 6, // px, half length of the centre cross seen end-on (3D renderer)
     minScale: 0.8, // px per mm, hidden when the drawing is smaller than this
   },
 
@@ -221,6 +260,7 @@ export const DRAFT = {
     planTilt: 8, // degrees, VIEW reads PLAN at or below this
     elevationTilt: 80, // degrees, VIEW reads ELEVATION at or above this; also the side view of the detail ladder
     defaultTilt: 28, // degrees, the view when none is given
+    stamp: { text: "3D", width: 0.8, alpha: 0.85 }, // the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha
   },
 
   // Overlays (SD14): colours by token name, never changing the drawing beneath.
