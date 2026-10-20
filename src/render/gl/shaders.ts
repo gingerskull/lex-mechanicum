@@ -46,6 +46,13 @@ vec4 chunkT(int c, int k) { int t = c * 3 + k; return texelFetch(uChunks, ivec2(
 vec4 sliceT(int s, int k) { int t = s * 2 + k; return texelFetch(uSlices, ivec2(t % ${SROW}, t / ${SROW}), 0); }
 float dashT(int i) { return texelFetch(uDash, ivec2(i % ${SROW}, i / ${SROW}), 0).r; }
 vec2 proj(vec2 w, float z) { return vec2(uOx + uS * w.x, uOy - uS * (w.y * uCt + z * uSt)); }
+// the slice's axis (0 z, 1 x, 2 y; src/core/axis.ts): a point (p, q) of the solid's plane at a along the axis
+int axis;
+vec2 projA(vec2 w, float a) {
+  if (axis == 1) return vec2(uOx + uS * a, uOy - uS * (w.x * uCt + w.y * uSt));
+  if (axis == 2) return vec2(uOx + uS * w.x, uOy - uS * (a * uCt + w.y * uSt));
+  return proj(w, a);
+}
 
 vec4 pose;
 vec2 world(vec2 l) { return pose.xy + vec2(pose.z * l.x - pose.w * l.y, pose.w * l.x + pose.z * l.y); }
@@ -122,15 +129,17 @@ void main() {
   }
   pose = sliceT(sl, 0);
   vec4 s1 = sliceT(sl, 1);
+  // the far end (z0) and the near end (top) of the slice along its axis; for z and x the top, for y the low y
   float z0 = s1.x;
   float top = s1.y;
+  axis = int(s1.w + 0.5);
   float fa = s1.z;
-  vec2 d = vec2(0.0, uS * (top - z0) * uSt);
+  vec2 d = axis == 1 ? vec2(uS * (z0 - top), 0.0) : axis == 2 ? vec2(0.0, uS * (top - z0) * uCt) : vec2(0.0, uS * (top - z0) * uSt);
   if (mode == ${MODE.wall} || mode == ${MODE.wallErase} || mode == ${MODE.holeWall}) {
     bool hole = t0.y >= 0.0;
     float sg = hole ? t0.x : -t0.x;
-    vec2 A = proj(world(t1.xy), top);
-    vec2 B = proj(world(t1.zw), top);
+    vec2 A = projA(world(t1.xy), top);
+    vec2 B = projA(world(t1.zw), top);
     vec2 n;
     if (!faces(A, B, sg, d, n)) { cull(); return; }
     float i = bucket(n);
@@ -145,7 +154,7 @@ void main() {
       vColor = vec4(uInk * s + uPaper * wa * (1.0 - s), s + wa * (1.0 - s));
     }
     // the quad's points in the top plane, in local mm, for clipping hole walls to their hole
-    float D = (top - z0) * uSt / max(uCt, 1e-3);
+    float D = axis == 2 ? (top - z0) * uCt / max(uSt, 1e-3) : (top - z0) * uSt / max(uCt, 1e-3);
     vec2 lift = D * vec2(pose.w, pose.z);
     vec2 P; vec2 L;
     if (v == 0 || v == 3) { P = A; L = t1.xy; }
@@ -165,7 +174,7 @@ void main() {
       vPat = vec2(c2.y, 0.0);
       vColor = vec4(0.0);
     }
-    out2(proj(world(L), top), op);
+    out2(projA(world(L), top), op);
     return;
   }
   if (mode == ${MODE.line}) {
@@ -177,14 +186,14 @@ void main() {
     }
     vColor = lineColour(c1.w * fa, c2.x);
     vec2 off = c2.zw;
-    segment(proj(world(t1.xy), c1.y) + off, proj(world(t1.zw), c1.y) + off, c1.z, phase, v, op);
+    segment(projA(world(t1.xy), c1.y) + off, projA(world(t1.zw), c1.y) + off, c1.z, phase, v, op);
     return;
   }
   if (mode == ${MODE.silhouette}) {
     float sg = -t0.x;
-    vec2 Pp = proj(world(t1.xy), top);
-    vec2 Pc = proj(world(t1.zw), top);
-    vec2 Pn = proj(world(t2.xy), top);
+    vec2 Pp = projA(world(t1.xy), top);
+    vec2 Pc = projA(world(t1.zw), top);
+    vec2 Pn = projA(world(t2.xy), top);
     vec2 n;
     bool a = faces(Pp, Pc, sg, d, n);
     bool b = faces(Pc, Pn, sg, d, n);
@@ -195,8 +204,8 @@ void main() {
   }
   if (mode == ${MODE.bottom}) {
     float sg = -t0.x;
-    vec2 A = proj(world(t1.xy), top);
-    vec2 B = proj(world(t1.zw), top);
+    vec2 A = projA(world(t1.xy), top);
+    vec2 B = projA(world(t1.zw), top);
     vec2 n;
     if (!faces(A, B, sg, d, n)) { cull(); return; }
     vColor = lineColour(c1.z * fa, 0.0);

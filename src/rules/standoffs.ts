@@ -19,7 +19,8 @@ export const standoffs: Rule = {
     // rail id -> its slide; rail b is the reference, rail a carries the gib and keeper
     const rails = new Map(ctx.info.flatMap((j) => (j.kind === "slide" ? j.rails.map((r, k) => [r.id, { j, ref: k === 1 }] as const) : [])));
     for (const p of ctx.model.parts) {
-      if (!p.fixed || p.role === "pin" || p.role === "trace") continue;
+      // a fixed part on an x or y axis is carried by its own mount (J10), not on posts
+      if (!p.fixed || p.role === "pin" || p.role === "trace" || p.axis) continue;
       const q = ctx.solidOf[p.id]!;
       const onSlide = rails.get(p.id);
       if (onSlide) {

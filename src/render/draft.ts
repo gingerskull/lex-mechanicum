@@ -15,7 +15,7 @@ import { drawSolids, gpuReady } from "./gl";
 import { drawOverlays, type OverlayFlags } from "./overlays";
 import { projector, type Projector } from "./projector";
 import { dimensions, paper, sheetFrame, tooth, type SheetInfo } from "./sheet";
-import { slices } from "./slices";
+import { depthOrder, slices } from "./slices";
 import type { Session } from "./session";
 import { worldSolids, type World } from "./world";
 import { LAYER } from "../parts";
@@ -68,8 +68,10 @@ function zRange(sess: Session, explode: number): [number, number] {
   let z0 = Infinity;
   let z1 = -Infinity;
   for (const p of sess.prepared) {
-    z0 = Math.min(z0, p.s.z0 + gap * p.s.ex);
-    z1 = Math.max(z1, p.s.z1 + gap * p.s.ex);
+    // an x or y solid's z0..z1 run along its axis: its world z is within the package's z bounds
+    const [a, b] = p.axis === "z" ? [p.s.z0, p.s.z1] : [sess.pkg.bounds.z0, sess.pkg.bounds.z1];
+    z0 = Math.min(z0, a + gap * p.s.ex);
+    z1 = Math.max(z1, b + gap * p.s.ex);
   }
   return [z0, z1];
 }
@@ -94,8 +96,10 @@ export function drawFrame(sess: Session, u: number, view: DrawView): { s: Solved
   main.lineCap = "round";
   paper(card, T, sess.cache.paper);
   const W = worldSolids(sess.prepared, sess.model, sess.parts, s, u, e, (p) => (view.base || !p.base) && LD.solid(p.s.detail));
-  const list = slices(W, sess.cache.slices).sort(
+  const list = depthOrder(
+    slices(W, sess.cache.slices),
     (a, b) => a.top - b.top || (a.w.p.inset ? 0 : 1) - (b.w.p.inset ? 0 : 1) || Pr.key(...a.w.c) - Pr.key(...b.w.c) || a.z0 - b.z0,
+    Pr,
   );
   const ink = T.ink;
   const SK = DRAFT.sketch;

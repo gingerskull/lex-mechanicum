@@ -78,7 +78,8 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
   const capR = Math.max(...c.shape.outer.map((q) => Math.hypot(q[0], q[1])));
   const joined: Joined[] = [];
   for (const p of ctx.model.parts) {
-    if (p.role === "pin" || p.role === "trace") continue;
+    // a part on another axis lies in another plane: J9 to J11 join those (src/core/axis.ts)
+    if (p.role === "pin" || p.role === "trace" || (p.axis ?? "z") !== (c.axis ?? "z")) continue;
     const [z0, z1] = heights(p);
     if (!(z1 > zlo + 0.1 && z0 < zhi - 0.1)) continue;
     const q = poseOf(p, ctx.s0);
@@ -152,7 +153,7 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
 
 function slides(ctx: RuleContext): SlideJoint[] {
   const out: SlideJoint[] = [];
-  const rails = ctx.model.parts.filter((p) => p.fixed && p.role === "ground" && /a$/.test(p.id));
+  const rails = ctx.model.parts.filter((p) => p.fixed && !p.axis && p.role === "ground" && /a$/.test(p.id));
   for (const a of rails) {
     const b = ctx.model.parts.find((p) => p.id === a.id.slice(0, -1) + "b" && p.fixed);
     if (!b || Math.abs(a.fixed![2] - b.fixed![2]) > 1e-6) continue;
@@ -161,7 +162,7 @@ function slides(ctx: RuleContext): SlideJoint[] {
     const [bx0, , bx1] = bbox(a.shape.outer);
     const yA = toLocal(b.fixed!, [a.fixed![0], a.fixed![1]])[1];
     const slider = ctx.model.parts.find((p) => {
-      if (p.fixed || p.role === "pin" || p.role === "trace") return false;
+      if (p.fixed || p.axis || p.role === "pin" || p.role === "trace") return false;
       const q = poseOf(p, ctx.s0);
       if (!q || Math.abs(Math.sin(q[2] - ang)) > 1e-6) return false;
       const l = toLocal(b.fixed!, [q[0], q[1]]);
@@ -193,7 +194,7 @@ function meshes(ctx: RuleContext): MeshJoint[] {
     for (let j = i + 1; j < geared.length; j++) {
       const a = geared[i]!;
       const b = geared[j]!;
-      if (a.m !== b.m || Math.abs(heights(a)[0] - heights(b)[0]) > 0.1) continue;
+      if (a.m !== b.m || (a.axis ?? "z") !== (b.axis ?? "z") || Math.abs(heights(a)[0] - heights(b)[0]) > 0.1) continue;
       const m = a.m!;
       const A = at(a);
       const B = at(b);

@@ -20,7 +20,7 @@ function probe(ctx: RuleContext, head: Solid, z0: number, z1: number): { clash: 
   const parts = indexParts(ctx.model);
   const key = (t: Solid) => (t.motion ? `m:${JSON.stringify(t.motion)}:${t.body}` : isGround(parts, t.body) ? "ground" : t.body);
   const hk = key(head);
-  const others = ctx.solids.filter((t) => t !== head && !t.faint && t.role !== "trace" && key(t) !== hk && (!head.group || t.group !== head.group) && t.z1 > z0 + 0.05);
+  const others = ctx.solids.filter((t) => t !== head && !t.axis && !t.faint && t.role !== "trace" && key(t) !== hk && (!head.group || t.group !== head.group) && t.z1 > z0 + 0.05);
   let clash = 0;
   let gap = Infinity;
   let over = "";

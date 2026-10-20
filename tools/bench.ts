@@ -6,7 +6,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { mechanisms } from "../src/mechanisms";
-import { buildPackage } from "../src/package/build";
+import { buildFrom, buildPackage } from "../src/package/build";
 import { encode } from "../src/package/format";
 import type { Dial } from "../src/render/detail";
 import { prepare } from "../src/render/world";
@@ -27,7 +27,7 @@ const med = (v: number[]) => [...v].sort((a, b) => a - b)[Math.floor(v.length / 
 
 /** The solids and marks each rung drops, and the package size: data, no drawing. */
 async function inventory(id: string): Promise<Pick<BenchRow, "packageKB" | "rungs">> {
-  const { pkg } = await buildPackage(id);
+  const { pkg } = id.startsWith("fx-") ? buildFrom(id, (await import("../tests/fixtures/scenes")).scenes[id]!) : await buildPackage(id);
   const rungs: BenchRow["rungs"] = {};
   for (const p of prepare(pkg)) {
     (rungs[p.s.detail] ??= { solids: 0, marks: 0 }).solids++;
@@ -37,7 +37,7 @@ async function inventory(id: string): Promise<Pick<BenchRow, "packageKB" | "rung
 }
 
 export async function benchAll(ids: string[], o: { runs: number; dpr: number; frames: number }): Promise<{ gpu: string; rows: BenchRow[] }> {
-  const chrome = await openChrome();
+  const chrome = await openChrome({ fixtures: ids.some((id) => id.startsWith("fx-")) });
   const dials: Dial[] = ["full", ...DETAIL.map((r) => r.id)];
   const rows: BenchRow[] = [];
   try {

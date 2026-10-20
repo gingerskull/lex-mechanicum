@@ -19,7 +19,9 @@ export function rigid(ctx: RuleContext, a: Solid, b: Solid): boolean {
 }
 
 export function fasteners(ctx: RuleContext): void {
+  // stage 3 works on the plan axis: a solid on an x or y axis (src/core/axis.ts) is left to its own rule
   const S = ctx.solids;
+  const flat = (t: Solid) => !t.axis;
   const W = new Map<Solid, Vec2 | null>();
   const at = (t: Solid): Vec2 | null => {
     if (!W.has(t)) {
@@ -41,13 +43,13 @@ export function fasteners(ctx: RuleContext): void {
   ctx.rule = "fasteners";
 
   // 1. a shank for every head that has none
-  for (const h of S.filter((t) => t.kind === "head")) {
+  for (const h of S.filter((t) => flat(t) && t.kind === "head")) {
     const grp = h.group ?? h.id;
     if (S.some((t) => t !== h && t.group === grp && (t.kind === "shank" || t.kind === "shaft"))) continue;
     const P = at(h);
     if (!P) continue;
     const d = h.thread ?? 5;
-    const cand = S.filter((t) => t !== h && isPlate(t) && rigid(ctx, t, h) && (() => { const l = local(t, P); return !!l && inside(t.outer, l); })());
+    const cand = S.filter((t) => t !== h && flat(t) && isPlate(t) && rigid(ctx, t, h) && (() => { const l = local(t, P); return !!l && inside(t.outer, l); })());
     const below = cand.find((t) => Math.abs(t.z1 - h.z0) < 0.4);
     const above = cand.find((t) => Math.abs(t.z0 - h.z1) < 0.4);
     const T = below ?? above;
@@ -74,7 +76,7 @@ export function fasteners(ctx: RuleContext): void {
   }
 
   // 2. two screws meeting in a short standoff each stop short of its middle
-  const shanks = S.filter((t) => t.kind === "shank" && at(t));
+  const shanks = S.filter((t) => flat(t) && t.kind === "shank" && at(t));
   for (let i = 0; i < shanks.length; i++)
     for (let k = i + 1; k < shanks.length; k++) {
       const a = shanks[i]!;
@@ -92,7 +94,7 @@ export function fasteners(ctx: RuleContext): void {
     }
 
   // 3. holes where shanks pass: clearance through, tapped where they end, a mark where the tapped hole is blind
-  for (const sh of S.filter((t) => t.kind === "shank")) {
+  for (const sh of S.filter((t) => flat(t) && t.kind === "shank")) {
     const P = at(sh);
     if (!P) continue;
     const r = (sh.d ?? 3) / 2;
@@ -100,7 +102,7 @@ export function fasteners(ctx: RuleContext): void {
     const headUp = h ? h.z0 + h.z1 > sh.z0 + sh.z1 : true;
     const far = headUp ? sh.z0 : sh.z1;
     for (const t of S) {
-      if (t === sh || t.group === sh.group || !isPlate(t) || !rigid(ctx, t, sh)) continue;
+      if (t === sh || t.group === sh.group || !flat(t) || !isPlate(t) || !rigid(ctx, t, sh)) continue;
       if (Math.min(t.z1, sh.z1) - Math.max(t.z0, sh.z0) < 0.3 || !inMaterial(t, P, r)) continue;
       const l = local(t, P)!;
       const endsInside = far > t.z0 + 0.2 && far < t.z1 - 0.2;
@@ -115,10 +117,10 @@ export function fasteners(ctx: RuleContext): void {
   }
 
   // 4. countersinks for countersunk heads (M4)
-  for (const h of S.filter((t) => t.kind === "head" && t.headKind === "csk")) {
+  for (const h of S.filter((t) => flat(t) && t.kind === "head" && t.headKind === "csk")) {
     const P = at(h);
     if (!P) continue;
-    const T = S.find((t) => t !== h && isPlate(t) && rigid(ctx, t, h) && Math.abs(t.z1 - h.z1) < 0.3 && local(t, P) && inside(t.outer, local(t, P)!));
+    const T = S.find((t) => t !== h && flat(t) && isPlate(t) && rigid(ctx, t, h) && Math.abs(t.z1 - h.z1) < 0.3 && local(t, P) && inside(t.outer, local(t, P)!));
     if (!T) continue;
     const l = local(T, P)!;
     T.marks.push({ kind: "chamfer", pts: circle((h.D ?? 6) / 2 + 0.2, l[0], l[1], 28) });

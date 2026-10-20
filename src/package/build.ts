@@ -2,7 +2,7 @@
 // envelope of every solid and pack it. The renderer and the site read the result; nothing here ships.
 import { planCorners } from "../core/axis";
 import { TAU, xf } from "../core/geom";
-import { assemble, type Assembly } from "../assemble";
+import { assemble, type Assembly, type Polish } from "../assemble";
 import { indexParts, solidBox, solidPose } from "../assemble/pose";
 import { parseHeader, readAudit } from "../audit/sheet";
 import { mechanisms } from "../mechanisms";
@@ -72,7 +72,11 @@ export interface Built {
 export async function buildPackage(id: string, opts: { polish?: boolean } = {}): Promise<Built> {
   const load = mechanisms[id];
   if (!load) throw new Error(`unknown mechanism "${id}"; registered: ${Object.keys(mechanisms).join(", ")}`);
-  const { model, polish } = await load();
+  return buildFrom(id, await load(), opts);
+}
+
+/** Assembles and packs a model with its polish (a registered mechanism, or a fixture scene of the drawing tools). */
+export function buildFrom(id: string, { model, polish }: { model: MechanismModel; polish?: Polish }, opts: { polish?: boolean } = {}): Built {
   const sampled = sample(model);
   const assembly = assemble(model, sampled, polish && opts.polish !== false ? { polish } : {});
   const audit = readAudit(id);

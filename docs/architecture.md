@@ -51,7 +51,8 @@ site/                            Astro: layout, pages (library, one page per mec
                                  (theme, filters, card, stage, engine), CSS on the generated tokens.css
 tools/                           command-line tools (below)
 site/thumbs/                     the committed card thumbnails and stage stills (WebP) and their fingerprint manifest
-tests/                           unit and fixture tests, per-mechanism checks, site build test, visual snapshots
+tests/                           unit and fixture tests, per-mechanism checks, site build test, visual snapshots;
+                                 fixture scenes (tests/fixtures/scenes.ts, ids "fx-...") that `shot` and `bench` draw
 ```
 
 ## From model to page
@@ -85,7 +86,10 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    position). The paper and construction lines go on the 2D canvas; the solids are planned on the CPU as slice and
    chunk tables and drawn on the GPU in one instanced call per target (the frame and the lines layer), each chunk's op
    number written as depth so a fill or stroke covers a pixel once and the paint order holds; the result is
-   composited onto the canvas, and centrelines, dimensions, traces, sheet and overlays are drawn over it. Every
+   composited onto the canvas, and centrelines, dimensions, traces, sheet and overlays are drawn over it. A solid on an
+   x or y axis is drawn by the same items: its slice row carries the axis, the shaders map its plane to the screen
+   (a y face by one affine, as a z face; an x face is edge-on) and sweep its walls along the projected axis; a y solid
+   shows its low-y end, the end nearer the viewer. Every
    session on a page shares one WebGL2 context; a lost context is rebuilt and the drawing redrawn. Thumbnails, the
    stage, the screenshot tool and the visual tests all use this one renderer.
 5. **Site.** Astro builds one static page per registered mechanism: the drawing stage, controls, at-a-glance facts,
@@ -128,7 +132,9 @@ none. The pre-push hook redraws what is stale; the site build only compares.
 - Kinematics are exact and never altered by hardware, style or detail (standard K1).
 - Every look value is global in `src/style`; no colour, weight or font anywhere else (standard L1, style SA).
 - Rules are modules with fixture tests; the standard's AUTO table is generated from the registry.
-- Depth order is kept by slicing every solid at every overlapping z boundary and painting far to near.
+- Depth order is kept by slicing every solid at every overlapping z boundary and painting far to near. A solid on an
+  x or y axis is cut along its own axis where another solid's box meets it, and ordered among the z slices by the
+  plane that separates their boxes (`depthOrder`); a frame without one is ordered exactly as before.
 - Nothing draws in Node: drawing is WebGL2, in the browser or in local Chrome.
 - The detail ladder is one data table (`src/style/detail.ts`) ordered by what a viewer notices; the mechanism is
   always packaged at full detail.

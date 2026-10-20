@@ -2,6 +2,7 @@
 // (pose, z range and fade per slice) and two chunk tables, one per target: the frame (paper, shade, hidden lines) and the
 // lines layer (full lines, erased where later surfaces cover them). A chunk is a range of items drawn in one mode; its
 // op number, written as depth, keeps the paint order of the drafting frame (style Part IV, paint order SD).
+import { toWorld } from "../../core/axis";
 import { TAU, area, type Vec2 } from "../../core/geom";
 import { DRAFT, type RoleSurface, type SurfaceKey } from "../../style/draft";
 import { FORM } from "../../style/form";
@@ -110,6 +111,27 @@ function phases(items: Items, r: Range, pose: [number, number, number], Pr: Proj
   }
 }
 
+/** phases() for a solid on an x or y axis: an edge of its plane is (0, x ct + y st) on screen for x, (x, y st) for y. */
+function phasesOut(items: Items, r: Range, pose: [number, number, number], Pr: Projector, out: number[], axis: "x" | "y"): void {
+  const D = items.data;
+  const c = Math.cos(pose[2]);
+  const s = Math.sin(pose[2]);
+  let cum = 0;
+  for (let i = r[0]; i < r[0] + r[1]; i++) {
+    const o = i * ITEM;
+    if (D[o + 2] === 0) cum = 0;
+    out.push(cum);
+    const dx = D[o + 6]! - D[o + 4]!;
+    const dy = D[o + 7]! - D[o + 5]!;
+    const rx = c * dx - s * dy;
+    const ry = s * dx + c * dy;
+    cum += Pr.s * (axis === "x" ? Math.abs(rx * Pr.ct + ry * Pr.st) : Math.hypot(rx, ry * Pr.st));
+  }
+}
+
+/** The slice's axis code in the slice table (0 z, 1 x, 2 y), as the shaders read it. */
+const AXIS_CODE = { x: 1, y: 2 } as const;
+
 export function planFrame(f: PlanInput): FramePlan {
   const { list, T, LD, cardK, Pr, items, dynStart } = f;
   const SK = DRAFT.sketch;
@@ -143,10 +165,18 @@ export function planFrame(f: PlanInput): FramePlan {
       let lo = 0;
       let hi = 0;
       const P = w.outer;
-      for (let i = 1; i < P.length; i++) {
-        if (P[i]![0] < P[lo]![0]) lo = i;
-        if (P[i]![0] > P[hi]![0]) hi = i;
-      }
+      if (w.axis === "x") {
+        // the walls of an x solid run across the screen: its silhouettes are at the outline's lowest and highest point
+        const k = (q: Vec2) => q[0] * Pr.ct + q[1] * Pr.st;
+        for (let i = 1; i < P.length; i++) {
+          if (k(P[i]!) < k(P[lo]!)) lo = i;
+          if (k(P[i]!) > k(P[hi]!)) hi = i;
+        }
+      } else
+        for (let i = 1; i < P.length; i++) {
+          if (P[i]![0] < P[lo]![0]) lo = i;
+          if (P[i]![0] > P[hi]![0]) hi = i;
+        }
       e = [lo, hi];
       extremes.set(w, e);
     }
@@ -161,19 +191,27 @@ export function planFrame(f: PlanInput): FramePlan {
     const p = w.p;
     const it = items.solids.get(p)!;
     const fa = p.faint ? 0.5 : 1;
-    slices.set([w.pose[0], w.pose[1], Math.cos(w.pose[2]), Math.sin(w.pose[2]), Sl.z0, Sl.top, fa, 0], si * 8);
+    // the slice's far end (z0) and near end (top) along its axis: a y solid is seen from its low-y end
+    const ax = w.axis;
+    const top = ax === "y" ? Sl.z0 : Sl.top;
+    const z0 = ax === "y" ? Sl.top : Sl.z0;
+    slices.set([w.pose[0], w.pose[1], Math.cos(w.pose[2]), Math.sin(w.pose[2]), z0, top, fa, ax ? AXIS_CODE[ax] : 0], si * 8);
+    // a point of the solid's plane at `a` along its axis, on screen
+    const P3 = (q: Vec2, a: number): Vec2 => (ax ? Pr.P(...toWorld(ax, q, a)) : Pr.P(q[0], q[1], a));
     const isBase = p.base;
     const isPlate = PLATE.has(p.s.kind) && p.s.role !== "trace";
     const R: RoleSurface = (isBase ? DRAFT.role.base : DRAFT.role[p.s.role as SurfaceKey]) ?? DRAFT.role.link;
     const see = p.seeThrough ? F.seeThrough : null;
     const { face: faceA, occ, wallOcc } = cover({ base: isBase, plate: isPlate, see: !!see, top: Sl.isTop });
-    const d: Vec2 = [0, Pr.s * (Sl.top - Sl.z0) * Pr.st];
+    // the walls' sweep on screen, from the near end to the far end
+    const d: Vec2 = ax === "x" ? [Pr.s * (z0 - top), 0] : ax === "y" ? [0, Pr.s * (top - z0) * Pr.ct] : [0, Pr.s * (Sl.top - Sl.z0) * Pr.st];
     // pen: the full line on the lines layer; the frame gets it thin and dashed, a hidden line where it is covered
     const line = (r: Range, z: number, width: number, alpha: number, withHidden: boolean, at = op) => {
       cl.push(r, si, MODE.line, at, [z, width, alpha, 0, 0, 0, 0]);
       if (withHidden && hidden && r[1]) {
         const at0 = dash.length;
-        phases(items, r, w.pose, Pr, dash);
+        if (ax) phasesOut(items, r, w.pose, Pr, dash, ax);
+        else phases(items, r, w.pose, Pr, dash);
         cm.push(r, si, MODE.line, at, [z, width * L.hidden.width, alpha * L.hidden.alpha, 0, 1 + at0, 0, 0]);
       }
     };
@@ -182,9 +220,10 @@ export function planFrame(f: PlanInput): FramePlan {
     cm.push(it.outer, si, MODE.wall, op, [wallA, shade ? 1 : 0, WS.outer.from, WS.outer.span]);
     cl.push(it.outer, si, MODE.wallErase, op, [Math.max(0, Math.min(1, wallOcc))]);
     op++;
-    if (shade && it.holes[1]) cm.push(it.holes, si, MODE.holeWall, op++, [0, 0, WS.hole.from, WS.hole.span]);
+    // (a hole in an x solid is edge-on: its walls are inside the solid)
+    if (shade && it.holes[1] && ax !== "x") cm.push(it.holes, si, MODE.holeWall, op++, [0, 0, WS.hole.from, WS.hole.span]);
     // 2. the plate's bottom outline before its own top face, so its back edge turns hidden behind it
-    if (Sl.isBottom && isPlate) line(it.outer, Sl.z0, L.plateBottom, L.bottomAlpha, true, op++);
+    if (Sl.isBottom && isPlate) line(it.outer, z0, L.plateBottom, L.bottomAlpha, true, op++);
     // 3. the slice's top face: paper, tint and role pattern; the lines layer erased
     let patA = 0;
     let patK = 0;
@@ -204,8 +243,8 @@ export function planFrame(f: PlanInput): FramePlan {
       if (hi - lo > 0.05) {
         const P = w.outer;
         const n = P.length;
-        const top = P.map((q) => Pr.P(q[0], q[1], Sl.top));
-        const vis = wallsOf(top, d, area(top) > 0 ? 1 : -1, WS.steps).vis;
+        const cap = P.map((q) => P3(q, top));
+        const vis = wallsOf(cap, d, area(cap) > 0 ? 1 : -1, WS.steps).vis;
         const pitch = Math.max(FORM.thread.pitch(p.s.thr[0]), FORM.thread.minPitchPx / Pr.s);
         const pairs: [Vec2, Vec2][] = [];
         for (let z = lo; z < hi; z += pitch)
@@ -214,7 +253,7 @@ export function planFrame(f: PlanInput): FramePlan {
             const za = z + (pitch * i) / n;
             const zb = z + (pitch * (i + 1)) / n;
             if (zb > hi) break;
-            pairs.push([Pr.P(P[i]![0], P[i]![1], za), Pr.P(P[(i + 1) % n]![0], P[(i + 1) % n]![1], zb)]);
+            pairs.push([P3(P[i]!, za), P3(P[(i + 1) % n]!, zb)]);
           }
         cl.push(segs(pairs), si, MODE.screen, op++, [L.thread, L.threadAlpha * fa, 0, 0]);
       }
@@ -224,7 +263,7 @@ export function planFrame(f: PlanInput): FramePlan {
     if (Sl.isTop || LD.effect("innerSilhouettes")) {
       cl.push(it.verts, si, MODE.silhouette, op, [L.silhouette, L.silhouetteAlpha]);
       const pairs: [Vec2, Vec2][] = extreme(w).map((i) => {
-        const q = Pr.P(w.outer[i]![0], w.outer[i]![1], Sl.top);
+        const q = P3(w.outer[i]!, top);
         return [q, [q[0] + d[0], q[1] + d[1]]];
       });
       cl.push(segs(pairs), si, MODE.screen, op, [L.silhouette, L.silhouetteAlpha * fa, 0, 0]);
@@ -232,20 +271,20 @@ export function planFrame(f: PlanInput): FramePlan {
     }
     if (Sl.isTop) {
       if (it.chamfer[1] && Pr.s > L.chamferMinScale && LD.mark("chamfer"))
-        cl.push(it.chamfer, si, MODE.line, op++, [Sl.top, L.chamfer, L.chamferAlpha * (isBase ? L.baseChamferGain : 1), 0, 0, 0, 0]);
+        cl.push(it.chamfer, si, MODE.line, op++, [top, L.chamfer, L.chamferAlpha * (isBase ? L.baseChamferGain : 1), 0, 0, 0, 0]);
       const shown = it.marks.filter((m) => LD.mark(m.kind));
       if (shown.length) {
-        for (const m of shown) cl.push(m.range, si, MODE.line, op, [Sl.top, L.marks, L.marksAlpha * (isBase ? L.baseMarksGain : 1), 0, 0, 0, 0]);
+        for (const m of shown) cl.push(m.range, si, MODE.line, op, [top, L.marks, L.marksAlpha * (isBase ? L.baseMarksGain : 1), 0, 0, 0, 0]);
         op++;
       }
       const width = isBase ? L.baseTop * cardK.base : isPlate ? L.plateTop * cardK.plate : L.otherTop;
-      line(it.outer, Sl.top, width, 1, true, op);
-      line(it.holes, Sl.top, width, 1, true, op);
+      line(it.outer, top, width, 1, true, op);
+      line(it.holes, top, width, 1, true, op);
       op++;
       // a second, offset pencil pass round the base plate: the one loose line on the sheet
       if (isBase && SK.doubleAlpha > 0) {
         const o = SK.doubleOffset;
-        cl.push(it.outer, si, MODE.line, op++, [Sl.top, SK.width, SK.doubleAlpha, 0, 0, o, o * SK.doubleOffsetY]);
+        cl.push(it.outer, si, MODE.line, op++, [top, SK.width, SK.doubleAlpha, 0, 0, o, o * SK.doubleOffsetY]);
       }
       if (p.accent || p.headTop) {
         let a0 = Infinity;
@@ -253,7 +292,7 @@ export function planFrame(f: PlanInput): FramePlan {
         let a1 = -Infinity;
         let b1 = -Infinity;
         for (const q of w.outer) {
-          const [x, y] = Pr.P(q[0], q[1], Sl.top);
+          const [x, y] = P3(q, top);
           if (x < a0) a0 = x;
           if (x > a1) a1 = x;
           if (y < b0) b0 = y;
@@ -273,7 +312,7 @@ export function planFrame(f: PlanInput): FramePlan {
           op++;
         }
         if (p.headTop) {
-          const q = Pr.P(w.c[0], w.c[1], Sl.top);
+          const q = ax ? P3([w.pose[0], w.pose[1]], top) : Pr.P(w.c[0], w.c[1], Sl.top);
           heads.push([q[0], q[1], (a1 - a0) / 2, (b1 - b0) / 2]);
         }
       }
