@@ -1,8 +1,8 @@
 # Mechanism standard
 
 ```
-version: 2.6
-date: 2026-10-18
+version: 2.7
+date: 2026-10-20
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
 
@@ -136,6 +136,7 @@ forms, reused everywhere.
 | D4 | Consistent radii: base-plate corners from the form style; feet and corner standoffs concentric with the corner arcs. | AUTO | screenshot |
 | D5 | **Solid, designed mounts** over scattered standoffs: one bracket, bridge or post pair, shaped as a part. | HAND (shape) / AUTO (`H.bridge`) | review |
 | D6 | **Nothing cosmetic distracts.** Supporting elements read quieter than the mechanism but stay clearly visible. | HAND + STYLE | screenshots |
+| D8 | **Axis.** A part lies on the base plane (axis z, the default) or stands out of it on an x or y axis of the base: a shaft in plan, a disc on edge, a bevel pinion, a worm, a screw. Such a part declares `axis` and `along` (where it starts along the axis); its outline, its pose and the solved points that place it lie in the plane normal to the axis, and its extent along the axis takes the place of the z range. Joints between parts on different axes are only those that allow it (J9, J11), declared in the model (`meshes`, `screws`). Solid modifiers give the forms along the axis: `taper` (a bevel gear's frustum, a cone) and `helix` (a helical gear's teeth, a screw's thread, at its lead). | AUTO (z by default; `tools/check` reports `AXIS`) / HAND (where a mechanism needs an axis) | `tools/check` |
 | D7 | **The big parts stay plain.** Bars, plates, wheels, brackets and the base carry only load-driven shape (D2) and manufacturing evidence (section 7). All richness is in what makes the mechanism move and hold: shafts, bearings, clips, spacers, keys, screws, nuts, springs, stops, adjusters, oilers, marks, sensors. | HAND | review |
 
 ---
@@ -153,8 +154,8 @@ feet, lubrication, timing marks, materials and the drive.
 
 | Id | Rule | Tier |
 |---|---|---|
-| A1 | Every joint is classified by type (J1 to J8) from the model: fixed or moving pin, keyed or bored part, slot (closed, or open at the rim), slide, mesh, cam contact, belt. Slots are found over the whole cycle, and over as many cycles as an indexing part takes to come round, so an intermittent contact is seen whatever the assembly phase. The canonical build of that type is generated in full. | AUTO |
-| A2 | A fixed pin that drives (the accent input, or a fixed pin with a keyed part) is a **live shaft** (J2); any other fixed pin is a **dead axle** (J1); a moving pin is a **shoulder bolt** joint (J3); a pin in a slot carries a **track roller** (J4); rails carry a **slide** (J5); meshing gears get **mesh hardware** (J6); a cam gets its **follower train** (J7). | AUTO |
+| A1 | Every joint is classified by type (J1 to J11) from the model: fixed or moving pin, keyed or bored part, slot (closed, or open at the rim), slide, mesh, cam contact, belt, a pin on an x or y axis, a declared crossed-axis mesh or screw. Slots are found over the whole cycle, and over as many cycles as an indexing part takes to come round, so an intermittent contact is seen whatever the assembly phase. The canonical build of that type is generated in full. | AUTO |
+| A2 | A fixed pin that drives (the accent input, or a fixed pin with a keyed part) is a **live shaft** (J2); any other fixed pin is a **dead axle** (J1); a moving pin is a **shoulder bolt** joint (J3); a pin in a slot carries a **track roller** (J4); rails carry a **slide** (J5); meshing gears get **mesh hardware** (J6); a cam gets its **follower train** (J7). A fixed pin on an x or y axis is a **shaft in plan** (J10), live or dead; a moving one is built in its own plane like any J3 or J4; a declared crossed-axis mesh gets **J9** and a declared screw **J11**. | AUTO |
 | A3 | **Catalogue sizing:** bore = largest catalogue bore every boss on the joint can take; each part gets the largest bearing its boss fits with a 1.2 mm wall, else a bronze bushing; gaps get inner-race spacers. | AUTO |
 | A4 | **Shafts are stepped profiles** (`H.shaft`): shoulders at every seat, circlip grooves, set-screw flats, thread with undercut, chamfered ends, wrench flats where tightened without a head, centre holes on turned ends. | AUTO |
 | A5 | **Keys by shaft size:** D-flat to Ø8; feather key and keyway above Ø8; taper pin on cross-pinned small parts. Every keyed part gets the matching bore. | AUTO |
@@ -172,6 +173,9 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `base` | A7, D4, M4 |
 | `j6-mesh` | J6, F7 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
+| `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
+| `j9-crossed-mesh` | J9, F4, F7, F9 |
+| `j11-screw` | J11, F3, F8 |
 | `j3-moving-pin` | J3, A12, M3 |
 | `j4-slot-roller` | J4, M14 |
 | `j5-slide` | J5, F5, F7 |
@@ -247,6 +251,9 @@ every line of its row exists or is marked N/A with a reason in the audit.
 | J6 | **Gear mesh** | Hubs with key or D-flat and set screw (F3); eccentric bushing with flange, arc slots and clamp screws on one shaft for backlash (F7); timing marks at the mesh (F9); thrust washers and retaining rings on each shaft (F2, F4). |
 | J7 | **Cam contact** | Roller follower on a stud; return spring with seat, guide and preload screw, or form closure (F6); follower guide bushing with circlip (F2); anti-rotation key on flat followers (F3); felt oiler on the track (F8); zero line (F9); hardened cam (M10). |
 | J8 | **Belt** | Flanged small pulley (F10); slotted mount for tension (F7); idler on a slotted arm where the wrap is short; belt guard only if see-through. |
+| J9 | **Crossed-axis mesh** (bevel, hypoid, worm, crossed helical; declared in `meshes`) | Each gear keyed on its shaft (J2 or J10) and located on it (F2); a shim pack at its back face sets its mounting distance, and so the backlash and the contact pattern (F7); a bronze thrust washer wherever the mesh pushes along a shaft: toward a bevel or hypoid gear's back face (away from the apex), both ways on a worm and on crossed helical gears (F4); timing marks at the mesh (F9). Pitch cones, the back-cone teeth (Tredgold), lead and lead angle from `src/core/spatial.ts`. |
+| J10 | **Shaft in plan** (a fixed pin on an x or y axis) | Two pillow blocks on the base past either end of what the shaft carries, or both behind it where something sweeps past its far end, far apart (A9): a cast housing on the shaft's axis on a foot plate, two screws down into the base and two dowels (F1, A11). Live: a sealed bearing in each block, located in the nearer by two shaft collars against its inner race, floating in the other (F2, F4); keyed parts as J2 (A5, F3). Dead: the shaft clamped in both blocks by set screws, every part on its own bearing (F2). The base drops under the shaft until its blocks fit (base growth). A hand-turned input takes a handwheel on the free shaft end (V5). |
+| J11 | **Screw** (lead or ball; declared in `screws`) | The screw on its shaft in plan (J10: one end located, one floating, F2, F4); its thread drawn by its helix at the lead; the nut a block on the carriage: a flanged bronze nut, or a preloaded ball nut with its ball return and a wiper at each end (F8); the flange screwed to the carriage; anti-rotation from the carriage's slide (J5) or a key in a guide slot (F3). |
 
 ---
 
@@ -402,7 +409,7 @@ The look is the blueprint / drafting scheme: dark Blueprint and light Drafting s
 | L3 | **Roles carry the look.** Each role has its own surface: driver fine stipple, link sparse dots, output hatching, ground soft dashes, base a faint dot grid, bearings cross-hatch, hardware plain. Every solid's `role` must be right. | HAND |
 | L4 | **One accent colour** for the input shaft ring, the traced path and the forces. `accent: true` goes on the input only. | HAND (flag) / STYLE |
 | L5 | **Transparency stays.** Surfaces are semi-transparent and a covered edge becomes a dashed hidden line, so screws in holes, bearings in bores and shanks through plates show. Model them as real solids with real holes, never as a mark on a top face. A static solid that hides a working zone (the pitch point of a mesh, the run of a slot roller) is drawn see-through, so the zone stays in view. | AUTO (stage 3, see-through) / HAND |
-| L6 | **Correct depth order** at every tilt: solids sliced at every overlapping z boundary; nothing paints in front of what it sits behind. | AUTO |
+| L6 | **Correct depth order** at every tilt: solids sliced at every overlapping z boundary; a solid on an x or y axis cut along its own axis where another solid's box meets it and placed by the plane between their boxes; nothing paints in front of what it sits behind. | AUTO |
 | L7 | **View:** tilt from 0° (true plan) to 88° (side elevation), no sideways shear. Pseudo-2D only. | STYLE |
 | L8 | **Drawing conventions the mechanism feeds:** chain centrelines through every joint head and base-plate dimensions are automatic. Engraved scales, index marks and match marks are `marks` and draw as fine ink lines. Fill patterns never get finer than the on-screen floor; a detail under about 1 mm becomes one mark or nothing. | AUTO / HAND |
 
@@ -458,7 +465,7 @@ performance and perception tests later.
 
 | Id | Check | Pass |
 |---|---|---|
-| Q1 | `tools/check <id>` | no `MISSING`, `NaN`, `LINK LEN`, `POSE JUMP`, `INTERFERE`, `OVERLAP`, `WARN`, clamp or edge-distance fault; periodicity none |
+| Q1 | `tools/check <id>` | no `MISSING`, `NaN`, `LINK LEN`, `POSE JUMP`, `INTERFERE`, `OVERLAP`, `WARN`, `AXIS`, clamp or edge-distance fault; periodicity none |
 | Q2 | `tools/clearance <id>` | 0 clashes over the full cycle |
 | Q3 | `tools/package <id>` and the site build | package written, page builds |
 | Q4 | `tools/shot <id>`: plan, 28°, side, full explode at 28° and 70°, both sheets, overlays on | nothing clips, details readable, nothing distracts, E1 to E9 hold |
@@ -548,6 +555,27 @@ Start here, then run the full ten-function audit.
 **Couplings** (Oldham, universal joints)
 - Each shaft in its own J2 cartridge; F8 lubrication of sliding tongues; F3 clamp hubs on shaft ends.
 
+**Spatial gears** (bevel, hypoid, worm, helical, herringbone, crossed helical)
+- The geometry from `src/core/spatial.ts`: bevel pitch cones from the tooth counts and shaft angle, the gear a toothed
+  frustum (`taper` = the inner end's scale) with Tredgold back-cone teeth; a worm's lead and lead angle, its wheel at
+  the lead angle; a helical gear's transverse profile turned by its `helix`.
+- Declare every crossed mesh in `meshes` (J9), the worm first. A gear on an x or y axis turns on a shaft in plan
+  (J10); a bevel pinion overhangs its wheel, so its blocks stand behind it.
+- F7 by the shim packs (mounting distance); F4 where the mesh pushes; F9 marks at the mesh; herringbone: one shaft
+  located, the other free to float so the halves share the load.
+
+**Shaft couplings** (universal joint, double Cardan, Rzeppa, flexible couplings)
+- Each shaft on its own support (J2 or J10); the cross of a universal joint in needle cups held by circlips
+  (`H.crossBearings`, F2), a grease nipple on the cross (F8); clamp hubs or keyed yokes on the shaft ends (F3).
+- A member that tilts as it turns (the cross, a cage, a swash plate) waits for posed axes; its build follows the
+  decision on it.
+
+**Screws** (lead screw, ball screw, screw jack)
+- Declare the screw in `screws` (J11): the screw on a shaft in plan (J10) with one end located and one floating; the
+  thread drawn by its helix at the lead (`src/core/spatial.ts`: lead, lead angle, self-locking).
+- The nut on a carriage that slides (J5), so the slide holds it from turning; a ball nut's return and wipers (F8); end
+  stops just past the travel (F5).
+
 **Curve generators** (Tusi couple, elliptic trammel)
 - Trammel: F7 adjustable slider pins at the model's lengths; J5 on the slots. Tusi: F9 marks for the planet's phase.
 
@@ -564,7 +592,9 @@ blocks) with `seatRail` and `railLayout` (A6: the rail's riser, or pads clear of
 `H.eccentric` (J6 backlash), `H.eccentricMount` (F7 at a ground pivot), `H.turnbuckle` (F7 on a moving link: the
 link in two halves joined in its own plane by left and right hand studs, a flat body and jam nuts), `H.stops` (F5 from
 the solved range), `H.dragPack` (F6, sized to the face it bears on), `H.lockingSegment` (M14), `H.outputCoupling` (a
-keyed flange on a straddle-mounted output), `H.followerTrain` (J7), `H.drive` (V1 to V6 by input kind), `H.sensor` (V6).
+keyed flange on a straddle-mounted output), `H.followerTrain` (J7), `H.drive` (V1 to V6 by input kind), `H.sensor` (V6), `H.pillowBlock` (J10: a bearing block
+for a shaft in plan, a housing on its axis on a foot plate, screwed and dowelled), `H.crossBearings` (the four needle
+cups and circlips of a universal joint's cross).
 
 Every primitive has real catalogue sizes, a default material, a default locking method where threaded, and a
 default detail level.
@@ -573,6 +603,12 @@ default detail level.
 
 ## Changelog
 
+- **2.7 (2026-10-20).** Spatial mechanisms. A part may stand out of the plan plane on an x or y axis, with solid forms
+  along it (taper, helix); every existing part is on z and meets it unchanged [D8, AUTO]. Joint classification covers
+  pins on x or y axes and declared crossed meshes and screws [A1, A2, AUTO]. New joint rows: crossed-axis mesh,
+  shaft in plan with its pillow blocks and the base growth under it, screw [J9 to J11, AUTO]. Depth order across
+  axes [L6, AUTO]. The model check reports `AXIS` [Q1, AUTO]. Playbooks for spatial gears, shaft couplings and
+  screws; `H.pillowBlock` and `H.crossBearings` in Appendix B.
 - **2.6 (2026-10-18).** The device pixel ratio cap moves from DL-C to DL-G: a soft drawing is seen at once, and on the
   GPU renderer a frame's cost hardly follows its pixel count (browser bench, DL5), so it goes last of the effects
   [DL-C, DL-G, AUTO].

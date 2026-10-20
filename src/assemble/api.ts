@@ -8,7 +8,8 @@ import { bridge } from "../hardware/sub/bridge";
 import { drive } from "../hardware/sub/drive";
 import { followerTrain } from "../hardware/sub/followerTrain";
 import { housing } from "../hardware/sub/housing";
-import { dragPack, eccentricMount, lockingSegment, outputCoupling, sensor, turnbuckle } from "../hardware/sub/misc";
+import { crossBearings, dragPack, eccentricMount, lockingSegment, outputCoupling, sensor, turnbuckle } from "../hardware/sub/misc";
+import { pillowBlock } from "../hardware/sub/pillow";
 import { slide } from "../hardware/sub/slide";
 import { stops } from "../hardware/sub/stops";
 import type { MechanismModel, Solved } from "../model/types";
@@ -66,6 +67,8 @@ export const HP = {
   followerTrain: (a: Ctx, j: Parameters<typeof followerTrain>[1]) => followerTrain(ctxOf(a), j),
   drive: (a: Ctx, o?: Parameters<typeof drive>[1]) => drive(ctxOf(a), o),
   sensor: (a: Ctx, id: string, o: Parameters<typeof sensor>[2]) => sensor(ctxOf(a), id, o),
+  pillowBlock: (a: Ctx, id: string, o: Parameters<typeof pillowBlock>[2]) => pillowBlock(ctxOf(a), id, o),
+  crossBearings: (a: Ctx, id: string, o: Parameters<typeof crossBearings>[2]) => crossBearings(ctxOf(a), id, o),
 };
 export type PolishHardware = typeof HP;
 

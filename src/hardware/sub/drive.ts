@@ -9,7 +9,8 @@ import { growBase } from "../../rules/base";
 import { depth, toWorld } from "../../core/poly";
 import { poseOf } from "../../model/pose";
 import { heights } from "../../parts";
-import type { PinJoint, RuleContext, SlideJoint } from "../../rules/types";
+import { inPlane, type PinJoint, type RuleContext, type SlideJoint } from "../../rules/types";
+import type { Part } from "../../model/types";
 import { cableClip, disc, flag, hullOf, lead, plate, screw, setScrew, shaft, spacer, terminalBlock, tube } from "../primitives";
 import { solid, marks, type Motion, type Solid } from "../solid";
 import { MOTORS, PULLEYS, BELT, innerRingD } from "../tables";
@@ -219,7 +220,11 @@ function inputJoint(ctx: RuleContext): PinJoint | undefined {
 
 function rotary(ctx: RuleContext, kind: MotorKind): string {
   const j = inputJoint(ctx);
-  if (!j?.below) return "No live input shaft to drive: the input part needs a fixed pivot with the accent cap.";
+  if (!j?.below) {
+    const pin = ctx.info.find((x): x is PinJoint => x.kind === "pin" && x.type === "J10" && x.joined.some((y) => y.part.id === ctx.model.input.part));
+    if (pin) return "The input turns on a shaft in plan (J10): the belt drive turns a z shaft, so drive the input through a crossed mesh (J9) from one, or by hand.";
+    return "No live input shaft to drive: the input part needs a fixed pivot with the accent cap.";
+  }
   const zp0 = j.below.z0;
   const pin = PULLEYS[TIN];
   const pm = PULLEYS[TM];
@@ -383,6 +388,12 @@ function linear(ctx: RuleContext, kind: MotorKind): string {
 
 function manual(ctx: RuleContext): string {
   const part = ctx.parts[ctx.model.input.part]!;
+  // an input on an x or y axis takes its knob on its own face, in its plane (src/core/axis.ts)
+  if (part.axis === "x" || part.axis === "y") {
+    let note = "";
+    inPlane(ctx, part, () => (note = knobOnFace(ctx, part)));
+    return note;
+  }
   const ps = ctx.solidOf[part.id]!;
   const reach = Math.max(...part.shape.outer.map(([x, y]) => Math.hypot(x, y)));
   const G = { body: part.id, joints: ["drive"], ex: ps.ex + 1 };
@@ -409,6 +420,31 @@ function manual(ctx: RuleContext): string {
     note += ids.length ? " Stops at both ends of its swing." : "";
   }
   return note;
+}
+
+/**
+ * A hand-turned input on an x or y axis: a handwheel keyed on its shaft in plan's free end, past the floating block,
+ * with a knob on its outer face (a block stands right beside the part, so its own face has no room for a knob).
+ */
+function knobOnFace(ctx: RuleContext, part: Part): string {
+  const j = ctx.info.find((k): k is PinJoint => k.kind === "pin" && k.type === "J10" && k.driven.some((x) => x.part.id === part.id));
+  const ps = ctx.solidOf[part.id]!;
+  if (!j) return "Hand operated, but the input has no shaft in plan to carry a handwheel.";
+  if (!j.below) return "Hand operated, but the input's shaft in plan has no free end for a handwheel.";
+  const [e0, e1] = [j.below.z0, j.below.z1];
+  // the wheel clears the base under the shaft
+  const R = Math.max(j.d / 2 + 4, Math.min(Math.max(14, j.d + 8), j.P[1] - ctx.b1 - 2));
+  const out = e0 > ctx.solidOf[part.id]!.z0;
+  const end = out ? e0 + 8 : e1 - 8;
+  const G = { body: j.body, at: j.at, joints: ["drive", j.id], ex: ps.ex + 1 };
+  const fmtR = String(+(2 * R).toFixed(1));
+  ctx.add(solid("drive-wheel", { ...G, kind: "part", role: "driver", name: `Handwheel Ø${fmtR}, keyed on the shaft end`, mat: "Aluminium 6061-T6, anodised", outer: disc(R), holes: [disc(j.d / 2 + 0.01)], z0: out ? end - 6 : end, z1: out ? end : end + 6 }));
+  // the knob on the wheel's outer face, at the rim
+  const k: [number, number, number] = [j.at[0] + Math.max(0.7 * R, R - 6), j.at[1], 0];
+  const [k0, k1] = out ? [end, end + 12] : [end - 12, end];
+  ctx.add(solid("drive-handle", { ...G, at: k, kind: "part", role: "driver", name: "Handle knob Ø10, on a shoulder screw", mat: "Phenolic, black", outer: disc(5), z0: out ? k0 + 2 : k0, z1: out ? k1 : k1 - 2 }));
+  ctx.add(tube("drive-handle-sleeve", 4, 6, { ...G, at: k, name: "Handle shoulder screw M4", z0: out ? k0 : k1 - 2, z1: out ? k0 + 2 : k1 }));
+  return "Hand operated: a handwheel with a knob on the input's shaft in plan.";
 }
 
 export function drive(ctx: RuleContext, spec: DriveSpec = {}): Solid[] {

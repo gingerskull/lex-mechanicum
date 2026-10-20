@@ -11,7 +11,7 @@ export type FindingType = "MISSING" | "NaN" | "LINK_LEN" | "POSE_JUMP" | "INTERF
  * The joint types that may join two parts of different axes (a crossed-axis mesh, a screw). A declared joint between
  * parts of different axes whose type is not listed is an AXIS finding.
  */
-export const MIXED_AXIS_JOINTS: readonly string[] = [];
+export const MIXED_AXIS_JOINTS: readonly string[] = ["J9", "J11"];
 
 const axisOf = (p: Part) => p.axis ?? "z";
 
@@ -184,6 +184,19 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
   // a joint type that allows it
   for (const p of model.parts) if (isOut(p.axis) && p.along === undefined) add("AXIS", `axis ${p.axis} needs \`along\`, the start of the part along its axis`, p.id);
   const byId = Object.fromEntries(model.parts.map((p) => [p.id, p]));
+  for (const m of model.meshes ?? []) {
+    const a = byId[m.a];
+    const b = byId[m.b];
+    if (!a || !b) add("MISSING", `crossed mesh ${m.a} / ${m.b}: no such part`);
+    else if (axisOf(a) === axisOf(b)) add("AXIS", `${m.form} mesh ${m.a} / ${m.b}: both on axis ${axisOf(a)}; a mesh on one axis is read from the parts (J6)`, m.a);
+    else if (a.m === undefined || b.m === undefined) add("AXIS", `${m.form} mesh ${m.a} / ${m.b}: a gear needs its module m`, m.a);
+  }
+  for (const s of model.screws ?? []) {
+    const a = byId[s.screw];
+    if (!a || !byId[s.nut]) add("MISSING", `screw ${s.screw} / ${s.nut}: no such part`);
+    else if (!isOut(a.axis)) add("AXIS", `screw ${s.screw}: a screw lies on an x or y axis`, s.screw);
+    if (!(Math.abs(s.lead) > 0)) add("AXIS", `screw ${s.screw}: lead ${s.lead}`, s.screw);
+  }
   for (const c of model.cams ?? []) {
     const a = byId[c.cam];
     const b = byId[c.follower];

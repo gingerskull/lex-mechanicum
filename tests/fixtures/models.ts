@@ -4,6 +4,8 @@ import { V, circleX, osc } from "../../src/core/vec";
 import { defineMechanism } from "../../src/model/define";
 import type { MechanismModel } from "../../src/model/types";
 import { P } from "../../src/parts";
+import { bevel, bevelOutline, pitchCones } from "../../src/core/spatial";
+import { circle } from "../../src/core/geom";
 
 /** J1: an arm 8 mm thick turning on a plain fixed pin (no accent, nothing keyed): a dead axle. */
 export const j1Model: MechanismModel = defineMechanism({
@@ -174,4 +176,58 @@ export const axisModel: MechanismModel = defineMechanism({
     P.disc("plate", 25, { fixed: [0, 60, 0], role: "ground" }),
   ],
   solve: (u) => ({ pts: { S: [0, 30], W: [60, 30] }, a: u }),
+});
+
+/** J10: a wheel keyed to a shaft in plan along x (centre y 0, z 30), turning with the input phase. */
+export const j10Model: MechanismModel = defineMechanism({
+  id: "fx-j10",
+  input: { kind: "manual", part: "wheel" },
+  parts: [
+    P.disc("wheel", 22, { axis: "x", along: -4, thick: 8, layer: 2, at: "S", spin: (s) => s.a as number, holes: [circle(4, 0, 0, 24)] }),
+    P.cap("pS", 0, 7, { axis: "x", along: -25, span: 4, fixed: [0, 30, 0] }),
+  ],
+  solve: (u) => ({ pts: { S: [0, 30] }, a: u }),
+});
+
+/** J10 dead: the same wheel turning on a clamped shaft in plan (its plain outline is bored by the build). */
+export const j10DeadModel: MechanismModel = defineMechanism({
+  ...j10Model,
+  id: "fx-j10-dead",
+  parts: [{ ...j10Model.parts[0]!, shape: { outer: j10Model.parts[0]!.shape.outer, holes: [] } }, j10Model.parts[1]!],
+});
+
+/**
+ * J9: the catalogue's bevel pair, the wheel keyed on a live z shaft (J2, the accent input) and the pinion keyed on a
+ * shaft in plan along x (J10), the cones' apex over the wheel's centre.
+ */
+const [bd1, bd2] = pitchCones(16, 32);
+const bp = bevel(16, 4, bd1, 20);
+const bg = bevel(32, 4, bd2, 20);
+export const j9Model: MechanismModel = defineMechanism({
+  id: "fx-j9",
+  input: { kind: "rotary", part: "gear" },
+  parts: [
+    { ...P.custom("gear", bevelOutline(32, 4, bd2), { role: "output", layer: 1, at: "G", spin: (s) => s.a as number, holes: [circle(5, 0, 0, 24)] }), thick: bg.axial, taper: bg.inner, m: 4, z: 32 },
+    P.cap("pG", 0, 7, { fixed: [0, 0, 0], accent: true, span: 2 }),
+    { ...P.custom("pinion", bevelOutline(16, 4, bd1), { role: "driver", layer: 3, at: "Q", spin: (s) => -2 * (s.a as number), holes: [circle(5, 0, 0, 24)], axis: "x", along: -bp.apex }), thick: bp.axial, taper: bp.inner, m: 4, z: 16 },
+    P.cap("pQ", 0, 7, { axis: "x", along: -bp.apex - 6, span: 3, fixed: [0, 10 + bg.apex, 0] }),
+  ],
+  meshes: [{ a: "pinion", b: "gear", form: "bevel" }],
+  solve: (u) => ({ pts: { G: [0, 0], Q: [0, 10 + bg.apex] }, a: u }),
+});
+
+/** J11: a lead screw along x (Tr12x3, centre y 0, z 30) driving a carriage, keyed to its shaft in plan. */
+export const j11Model: MechanismModel = defineMechanism({
+  id: "fx-j11",
+  input: { kind: "manual", part: "screw" },
+  parts: [
+    P.disc("screw", 6, { axis: "x", along: -60, thick: 120, layer: 2, at: "S", spin: (s) => s.a as number, holes: [circle(4, 0, 0, 24)], marks: [] }),
+    P.cap("pS", 0, 7, { axis: "x", along: -62, span: 12, fixed: [0, 30, 0] }),
+    P.slider("carriage", 40, 50, { layer: 4, at: "N" }),
+  ],
+  screws: [{ screw: "screw", nut: "carriage", lead: 3, form: "lead" }],
+  solve(u) {
+    const a = osc(-2 * TAU, 2 * TAU)(u);
+    return { pts: { S: [0, 30], N: [(3 * a) / TAU - 10, 0] }, a };
+  },
 });

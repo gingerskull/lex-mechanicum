@@ -12,6 +12,9 @@ import { j5 } from "./j5-slide";
 import { j6 } from "./j6-mesh";
 import { j7 } from "./j7-cam";
 import { j8 } from "./j8-belt";
+import { j9 } from "./j9-crossed-mesh";
+import { j10 } from "./j10-shaft-in-plan";
+import { j11 } from "./j11-screw";
 import { locking } from "./locking";
 import { lubrication } from "./lubrication";
 import { materials } from "./materials";
@@ -22,11 +25,13 @@ import type { Rule, RuleContext } from "./types";
 
 /**
  * Order matters: the mesh rule asks J2 for hubs and an eccentric before the shafts are built; the bridges (J1) are
- * placed after every moving pin's hardware exists; the drive after every housing; the straddle bridges over live gear
+ * placed after every moving pin's hardware exists; shafts in plan (J10) after the live shafts, then the crossed meshes
+ * (J9) that shim the gears on both kinds and the screws (J11) on their shafts in plan; the drive after every housing;
+ * the straddle bridges over live gear
  * shafts after the drive, whose motor they keep clear of; the feet after everything that hangs under the base;
  * lubrication, timing, locking and materials last, over everything.
  */
-export const rules: Rule[] = [classify, base, j6, j2, j3, j4, j5, j7, j1, stops, standoffs, drive, j8, j2Straddle, feet, lubrication, timingMarks, locking, materials];
+export const rules: Rule[] = [classify, base, j6, j2, j10, j9, j11, j3, j4, j5, j7, j1, stops, standoffs, drive, j8, j2Straddle, feet, lubrication, timingMarks, locking, materials];
 
 /** Stages and code outside the rule list that serve AUTO requirements. */
 export const PROVIDERS: { id: string; ids: string[] }[] = [

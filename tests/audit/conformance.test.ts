@@ -78,3 +78,16 @@ describe("conformance", () => {
     expect(conformance().failing).toEqual([]);
   });
 });
+
+describe("standard 2.7", () => {
+  const std = readStandard();
+  it("is the current version and brings no HAND change, so audits at 2.6 stay current", () => {
+    const e = changelog(std)[0]!;
+    expect(e.version).toBe("2.7");
+    expect(e.changes.flatMap((c) => c.ids)).toEqual(expect.arrayContaining(["D8", "J9", "J10", "J11", "L6", "Q1"]));
+    expect(e.changes.every((c) => !c.tiers.includes("HAND"))).toBe(true);
+    const r = evaluate(std, { old: sheet("2.6"), now: sheet("2.7") });
+    expect(r.mechanisms.map((m) => [m.id, m.status])).toEqual([["old", "current"], ["now", "current"]]);
+    expect(r.failing).toEqual([]);
+  });
+});

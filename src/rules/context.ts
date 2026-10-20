@@ -8,6 +8,8 @@ import { poseOf } from "../model/pose";
 import { sample, type Sampled } from "../model/sample";
 import type { MechanismModel, Part } from "../model/types";
 import { FORM } from "../style/form";
+import { pillowRise } from "../hardware/sub/pillow";
+import { BORES } from "../hardware/tables";
 import { indexParts, isGround, solidBox, solidPose } from "../assemble/pose";
 import type { RuleContext } from "./types";
 
@@ -33,7 +35,10 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
     const q = poseOf(p, s0);
     return q ? Math.min(...xf(p.shape.outer, q).map((v) => v[1])) : Infinity;
   };
-  const b1 = Math.min(...plates.map(lowest)) - 2;
+  // J10's base growth rule: a shaft in plan stands high enough over the base for its pillow blocks
+  const shaftsInPlan = model.parts.filter((p) => p.role === "pin" && p.fixed && isOut(p.axis));
+  const capR = (p: Part) => Math.max(...p.shape.outer.map((q) => Math.hypot(q[0], q[1])));
+  const b1 = Math.min(...plates.map(lowest), ...shaftsInPlan.map((p) => p.fixed![1] - pillowRise(BORES.find((d) => d <= Math.max(8, Math.round(capR(p) * 1.45))) ?? 8))) - 2;
   const solids: Solid[] = [];
   const solidOf: Record<string, Solid> = {};
   for (const p of plates) {
@@ -103,6 +108,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       const flat = list.flat();
       for (const s of flat) {
         if (ctx.get(s.id)) throw new Error(`duplicate solid id ${s.id}`);
+        if (ctx.axis && !s.axis) s.axis = ctx.axis;
         solids.push(s);
         (ctx.fired[ctx.rule] ??= []).push(s.id);
       }

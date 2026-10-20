@@ -29,10 +29,11 @@ src/parts/                       the part family: link (stadium or tapered), pla
                                  a clevis twin; heights()
 src/model/                       the MechanismModel contract, defineMechanism, poseOf, sample, basePlate, checkModel
 src/hardware/                    tables (bearings, screws, circlips, keys, pulleys, springs, motors) as data; the
-                                 Solid type; primitives H.*; subassemblies in sub/ (housing, bridge, slide and its rail seat, stops,
+                                 Solid type; primitives H.*; subassemblies in sub/ (housing, pillow block, bridge, slide and its rail seat, stops,
                                  eccentric mount, turnbuckle, drag pack, locking segment, output coupling, follower train, sensor,
-                                 drive by input kind)
-src/rules/                       context, classify (slots closed and open, over the cycle), one module per rule, the
+                                 drive by input kind, a universal joint's cross bearings)
+src/rules/                       context, classify (slots closed and open, over the cycle; pins on x or y axes; declared
+                                 crossed meshes and screws), one module per rule (J1 to J11), the
                                  registry and autoTable(); stage 3 fasteners; the headroom and see-through stages; the
                                  rigid explode pass
 src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> headroom -> see-through ->

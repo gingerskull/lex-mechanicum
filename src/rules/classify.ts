@@ -1,6 +1,7 @@
 // A1, A2: reads the model once and classifies every joint by type. Pins: which parts each joins, in what order up the
 // stack, bored, keyed or slotted; slides: rails and the block between them; meshes: gear pairs at their centre
 // distance; cams: declared by the model.
+import { toWorld } from "../core/axis";
 import { TAU, bbox, wrap, type Vec2 } from "../core/geom";
 import { edgeDist, holeSlot, inside, notchAt, toLocal, type Slot } from "../core/poly";
 import { BORES, bearingFor } from "../hardware/tables";
@@ -147,7 +148,8 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
   }
   const body = live ? (anchor?.part.id ?? "ground") : fixed ? "ground" : (anchor?.part.id ?? c.id);
   const at: [number, number, number] = body === "ground" ? [P[0], P[1], 0] : anchor ? [anchor.L[0], anchor.L[1], 0] : [0, 0, 0];
-  const type = live ? "J2" : slots.length ? "J4" : fixed ? "J1" : "J3";
+  // a fixed pin on an x or y axis is a shaft in plan (J10), live or dead; a moving one is built in its plane
+  const type = fixed && (c.axis === "x" || c.axis === "y") ? "J10" : live ? "J2" : slots.length ? "J4" : fixed ? "J1" : "J3";
   return { kind: "pin", id: c.id, type, pin: c, P, fixed, live, joined, driven, anchor, d, body, at };
 }
 
@@ -245,24 +247,45 @@ export const classify: Rule = {
       const follower = ctx.parts[k.follower];
       if (cam && follower) info.push({ kind: "cam", id: `cam-${cam.id}`, type: "J7", cam, follower });
     }
+    for (const m of ctx.model.meshes ?? []) {
+      const a = ctx.parts[m.a];
+      const b = ctx.parts[m.b];
+      if (a && b) info.push({ kind: "crossMesh", id: `mesh-${a.id}-${b.id}`, type: "J9", a, b, form: m.form });
+    }
+    for (const s of ctx.model.screws ?? []) {
+      const screw = ctx.parts[s.screw];
+      const nut = ctx.parts[s.nut];
+      if (screw && nut) info.push({ kind: "screw", id: `screw-${screw.id}`, type: "J11", screw, nut, lead: s.lead, form: s.form });
+    }
     ctx.info = info;
+    // the plan point of a part or a pin, wherever its axis lies
+    const plan = (p: Part, q: Vec2): Vec2 => {
+      if (p.axis !== "x" && p.axis !== "y") return q;
+      const [w0, w1] = heights(p);
+      const w = toWorld(p.axis, q, (w0 + w1) / 2);
+      return [w[0], w[1]];
+    };
+    const posOf = (p: Part): Vec2 => {
+      const q = poseOf(p, ctx.s0);
+      return q ? plan(p, [q[0], q[1]]) : [0, 0];
+    };
     for (const j of info) {
       const at: Vec2 =
-        j.kind === "pin" ? j.P : j.kind === "mesh" ? j.at : (() => {
-          const q = poseOf(j.kind === "slide" ? j.slider : j.cam, ctx.s0);
-          return q ? [q[0], q[1]] : [0, 0];
-        })();
+        j.kind === "pin" ? plan(j.pin, j.P) : j.kind === "mesh" ? j.at : posOf(j.kind === "slide" ? j.slider : j.kind === "cam" ? j.cam : j.kind === "crossMesh" ? j.b : j.nut);
       const title =
         j.kind === "pin"
-          ? `${pinLabel(j.pin)} · ${j.live ? (j.pin.accent ? "Input" : "Shaft") : j.fixed ? "Pivot" : j.type === "J4" ? "Roller" : "Pin"}`
+          ? `${pinLabel(j.pin)} · ${j.live ? (j.pin.accent ? "Input" : "Shaft") : j.type === "J10" ? "Shaft" : j.fixed ? "Pivot" : j.type === "J4" ? "Roller" : "Pin"}`
           : j.kind === "slide"
             ? `Slide · ${ctx.solidOf[j.slider.id]?.name ?? j.slider.id}`
-            : j.kind === "mesh"
+            : j.kind === "mesh" || j.kind === "crossMesh"
               ? `Mesh · ${j.a.id} and ${j.b.id}`
-              : `Cam · ${j.cam.id}`;
+              : j.kind === "screw"
+                ? `Screw · ${j.screw.id}`
+                : `Cam · ${j.cam.id}`;
       ctx.joints.push({ id: j.id, type: j.type, at, title, note: "", serves: {}, ...(j.kind === "pin" ? { d: j.d } : {}) });
-      for (const p of j.kind === "pin" ? j.joined.map((x) => x.part) : j.kind === "slide" ? [...j.rails, j.slider] : j.kind === "mesh" ? [j.a, j.b] : [j.cam, j.follower])
-        ctx.solidOf[p.id]?.joints.push(j.id);
+      const members =
+        j.kind === "pin" ? j.joined.map((x) => x.part) : j.kind === "slide" ? [...j.rails, j.slider] : j.kind === "mesh" || j.kind === "crossMesh" ? [j.a, j.b] : j.kind === "screw" ? [j.screw, j.nut] : [j.cam, j.follower];
+      for (const p of members) ctx.solidOf[p.id]?.joints.push(j.id);
     }
   },
 };

@@ -27,7 +27,8 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
   const S = assembly.solids.filter((t) => !t.faint && t.role !== "trace");
   const motionKey = (t: Solid) => (t.motion ? `m:${JSON.stringify(t.motion)}:${t.body}` : isGround(parts, t.body) ? "ground" : t.body);
   const keys = S.map(motionKey);
-  const contact = new Set((model.cams ?? []).flatMap((c) => [`${c.cam}|${c.follower}`, `${c.follower}|${c.cam}`]));
+  // cam contacts and crossed meshes touch by design (their teeth are drawn whole)
+  const contact = new Set([...(model.cams ?? []).map((c) => [c.cam, c.follower]), ...(model.meshes ?? []).map((m) => [m.a, m.b])].flatMap(([a, b]) => [`${a}|${b}`, `${b}|${a}`]));
   const pairs: [number, number][] = [];
   for (let i = 0; i < S.length; i++)
     for (let k = i + 1; k < S.length; k++) {

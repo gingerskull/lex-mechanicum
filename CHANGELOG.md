@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.29.0 — 2026-10-20
+
+- Rules for spatial joints and standard 2.7:
+  - **J10, shaft in plan:** a fixed pin on an x or y axis runs in two pillow blocks (`H.pillowBlock`), each a cast housing
+    on the shaft's axis on a foot screwed and dowelled to the base. A live shaft has a bearing in each block, located
+    in the nearer by collars and floating in the other; a dead one is clamped, with every part on its own bearing.
+    Where something sweeps past the shaft's far end, both blocks stand behind the part. The base drops under the
+    shaft until the blocks fit, and a hand-turned input gets a handwheel on the free end.
+  - **J9, crossed-axis mesh:** declared in the model's `meshes`; shims set each gear's mounting distance, thrust
+    washers go where the mesh pushes, and timing marks are added at the mesh.
+  - **J11, screw:** declared in `screws`; the thread is drawn at its lead, with a bronze or ball nut on the carriage
+    (ball return, wipers) and anti-rotation from its slide or a key.
+  - `H.crossBearings` for a universal joint's needle cups.
+  - Joints in the plane of a pin on an x or y axis (J3, J4) build there.
+  - The model check accepts J9 and J11 between axes and reports a crossed mesh on one axis.
+- Standard 2.7: D8 (axis), J9 to J11, A1, A2, L6, Q1; playbooks for spatial gears, shaft couplings and screws. Every
+  change is AUTO, so every mechanism stays current at its audited version.
+
 ## 0.28.0 — 2026-10-20
 
 - Engine: two solid modifiers. `taper` scales a solid's outline toward its far end (a bevel gear, a cone);
