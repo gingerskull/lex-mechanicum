@@ -55,12 +55,15 @@ function serve(js: string): Promise<{ server: Server; port: number }> {
     const m = /^\/packages\/([a-z0-9-]+)\.mx2$/.exec(p);
     if (m) {
       const id = m[1]!;
-      if (!packages.has(id)) packages.set(id, buildPackage2(id).then((b) => encode2(b.pkg)));
+      // fixture scenes (tests/fixtures/scene3.ts) are packed like mechanisms
+      const built = () => (id.startsWith("fx3-") ? import("../tests/fixtures/scene3").then((m) => encode2(m.pkg3(m.fixtures3[id]!).pkg)) : buildPackage2(id).then((b) => encode2(b.pkg)));
+      if (!packages.has(id)) packages.set(id, built());
       packages.get(id)!.then((b) => send("application/octet-stream", b), (e: unknown) => fail(500, e));
       return;
     }
     const meta = /^\/meta\/([a-z0-9-]+)\.json$/.exec(p);
     if (meta) {
+      if (meta[1]!.startsWith("fx3-")) return send("application/json", JSON.stringify({ name: "Fixture", teaching: null, kin: null } satisfies Meta));
       const rec = recordById(meta[1]!) as unknown as { name?: string; kin?: Meta["kin"]; teaching?: Meta["teaching"] } | undefined;
       if (!rec) return fail(404);
       return send("application/json", JSON.stringify({ name: rec.name ?? meta[1]!, teaching: rec.teaching ?? null, kin: rec.kin ?? null } satisfies Meta));

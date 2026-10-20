@@ -28,6 +28,8 @@ export interface Fx {
   ex?: number;
   fr?: Frame;
   detail?: RungId;
+  /** A round hole through a rectangle: cx, cy, r. */
+  hole?: [number, number, number];
 }
 
 const rect = ([x0, y0, x1, y1]: [number, number, number, number]): Vec2[] => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
@@ -37,7 +39,7 @@ export function pkg3(solids: Fx[]): { pkg: Package2; meshes: ReturnType<typeof p
   const shapes: Shape2[] = [];
   const packed: PackedSolid3[] = solids.map((s, i) => {
     const ring = s.rect ? rect(s.rect) : circle(s.disc![2], s.disc![0], s.disc![1], 48);
-    shapes.push({ profile: { outer: ring, holes: [] }, op: extrudeOp(s.z1 - s.z0) });
+    shapes.push({ profile: { outer: ring, holes: s.hole ? [circle(s.hole[2], s.hole[0], s.hole[1], 48).reverse()] : [] }, op: extrudeOp(s.z1 - s.z0) });
     return { id: s.id, name: "", kind: s.kind ?? "part", role: s.role ?? "link", body: s.body, fr: s.fr ?? atPose(0, 0, s.z0), shape: i, ex: s.ex ?? 0, detail: s.detail ?? "never", flags: s.flags ?? 0 };
   });
   const all = solids.flatMap((s) => (s.rect ? [[s.rect[0], s.rect[1]], [s.rect[2], s.rect[3]]] : [[s.disc![0] - s.disc![2], s.disc![1] - s.disc![2]], [s.disc![0] + s.disc![2], s.disc![1] + s.disc![2]]]));
@@ -68,3 +70,23 @@ export function scene3(solids: Fx[], o: { poser?: Poser; teaching?: Teaching | n
   const poser = o.poser ?? { period: Math.PI * 2, place: () => mat4(IDENTITY), point: () => null, span: () => null };
   return { pkg, meshes, edges, poser, teaching: o.teaching ?? null, info: { title: "Fixture", no: "FX-1" } };
 }
+
+/**
+ * Overlapping translucent boxes in plan at three depths (and the same scene with every solid on a rung the dial drops, for
+ * the paper behind them): the drawn check compares the peeled composite with a ray-cast of their top faces.
+ */
+export const DEPTH: Fx[] = [
+  { id: "a", body: "g", rect: [0, 0, 60, 60], z0: 0, z1: 4, role: "hw", kind: "plate" },
+  { id: "b", body: "g", rect: [30, 0, 90, 60], z0: 6, z1: 10, role: "trace", kind: "standoff" },
+  { id: "c", body: "g", rect: [15, 30, 75, 90], z0: 12, z1: 16, role: "hw", kind: "plate" },
+];
+
+/** A block with a bore and a cross hole, for the section views. */
+export const BLOCK: Fx[] = [
+  { id: "block", body: "g", rect: [0, 0, 80, 50], z0: 0, z1: 30, role: "ground", kind: "housing", hole: [40, 25, 10] },
+  { id: "pin", body: "g", disc: [40, 25, 6], z0: 4, z1: 36, role: "driver", kind: "shaft" },
+];
+
+const hidden = (xs: Fx[]): Fx[] => xs.map((s) => ({ ...s, kind: "nipple", detail: "E" }));
+
+export const fixtures3: Record<string, Fx[]> = { "fx3-depth": DEPTH, "fx3-depth-bg": hidden(DEPTH), "fx3-depth-swap": DEPTH.map((s) => (s.id === "a" ? { ...s, z0: 18, z1: 22 } : s)), "fx3-block": BLOCK };
