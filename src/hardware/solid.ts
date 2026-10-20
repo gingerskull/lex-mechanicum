@@ -41,6 +41,14 @@ export interface Solid {
    * is z, as every solid on the base plane. A solid on a part's body has that part's axis.
    */
   axis?: "x" | "y";
+  /**
+   * Solid modifiers (src/core/spatial.ts): `taper`, the outline's scale at the far end (z1) about the solid's origin,
+   * so the solid is a frustum (a bevel gear, a cone); `helix`, a lead in mm per turn (+ right hand, - left), so the
+   * outline turns 2π (w - z0) / lead along the axis (a helical gear), or, where that would wind more than a quarter
+   * turn, the walls carry thread marks at that lead (a screw, a worm).
+   */
+  taper?: number;
+  helix?: number;
   outer: Vec2[];
   holes: Vec2[][];
   marks: Mark[];

@@ -44,6 +44,8 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       role: p.role,
       body: p.id,
       ...onAxis(p),
+      ...(p.taper !== undefined ? { taper: p.taper } : {}),
+      ...(p.helix !== undefined ? { helix: p.helix } : {}),
       z0,
       z1,
       outer: p.shape.outer.slice(),

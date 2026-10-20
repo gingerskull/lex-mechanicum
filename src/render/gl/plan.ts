@@ -10,7 +10,7 @@ import type { theme } from "../../style/theme";
 import type { Ladder } from "../detail";
 import type { Projector } from "../projector";
 import { wallsOf, type Slice } from "../slices";
-import type { World } from "../world";
+import { pointAt, poseAt, type World } from "../world";
 import { ITEM_TEXELS, type Items, type Range } from "./geometry";
 import { MODE, OPS, PER_ROW } from "./shaders";
 
@@ -182,7 +182,7 @@ export function planFrame(f: PlanInput): FramePlan {
     }
     return e;
   };
-  const slices = new Float32Array(Math.max(1, list.length) * 8);
+  const slices = new Float32Array(Math.max(1, list.length) * 12);
   const cm = new Chunks();
   const cl = new Chunks();
   let op = 1;
@@ -195,7 +195,17 @@ export function planFrame(f: PlanInput): FramePlan {
     const ax = w.axis;
     const top = ax === "y" ? Sl.z0 : Sl.top;
     const z0 = ax === "y" ? Sl.top : Sl.z0;
-    slices.set([w.pose[0], w.pose[1], Math.cos(w.pose[2]), Math.sin(w.pose[2]), z0, top, fa, ax ? AXIS_CODE[ax] : 0], si * 8);
+    const code = ax ? AXIS_CODE[ax] : 0;
+    if (p.mods) {
+      // a tapered or helical solid: the pose of its outline at the near end, then at the far end (code + 4)
+      const capP = poseAt(p, w.pose, top);
+      const backP = poseAt(p, w.pose, z0);
+      slices.set([...capP, z0, top, fa, code + 4, ...backP], si * 12);
+    } else {
+      const c = Math.cos(w.pose[2]);
+      const s = Math.sin(w.pose[2]);
+      slices.set([w.pose[0], w.pose[1], c, s, z0, top, fa, code, w.pose[0], w.pose[1], c, s], si * 12);
+    }
     // a point of the solid's plane at `a` along its axis, on screen
     const P3 = (q: Vec2, a: number): Vec2 => (ax ? Pr.P(...toWorld(ax, q, a)) : Pr.P(q[0], q[1], a));
     const isBase = p.base;
@@ -236,23 +246,28 @@ export function planFrame(f: PlanInput): FramePlan {
     cm.push(it.tris, si, MODE.face, op, [faceA, Sl.isTop ? (R.tint ?? 0) : 0, patA, patK, uv]);
     if (occ > 0) cl.push(it.tris, si, MODE.faceErase, op, [Math.max(0, Math.min(1, occ))]);
     op++;
-    // threads on shanks and shafts (DL-B): screen-space segments on the visible walls
-    if (w.thr && p.s.thr && FORM.thread.show && LD.mark("thread")) {
-      const lo = Math.max(w.thr[0], Sl.z0);
-      const hi = Math.min(w.thr[1], Sl.top);
+    // threads on shanks and shafts (DL-B): screen-space segments on the visible walls; a screw or worm (a helix that
+    // winds) carries its own lead along its whole length
+    const lead = p.threadLead;
+    const thr: [number, number] | null = w.thr && p.s.thr ? w.thr : lead ? (w.along ?? [w.z0, w.z1]) : null;
+    if (thr && FORM.thread.show && LD.mark("thread")) {
+      const lo = Math.max(thr[0], Sl.z0);
+      const hi = Math.min(thr[1], Sl.top);
       if (hi - lo > 0.05) {
         const P = w.outer;
         const n = P.length;
         const cap = P.map((q) => P3(q, top));
         const vis = wallsOf(cap, d, area(cap) > 0 ? 1 : -1, WS.steps).vis;
-        const pitch = Math.max(FORM.thread.pitch(p.s.thr[0]), FORM.thread.minPitchPx / Pr.s);
+        const pitch = Math.max(lead ? Math.abs(lead) : FORM.thread.pitch(p.s.thr![0]), FORM.thread.minPitchPx / Pr.s);
+        // a left-hand helix climbs the other way round the outline
+        const turn = (i: number) => (lead && lead < 0 ? n - i : i);
         const pairs: [Vec2, Vec2][] = [];
         for (let z = lo; z < hi; z += pitch)
           for (let i = 0; i < n; i++) {
             if (!vis[i]) continue;
-            const za = z + (pitch * i) / n;
-            const zb = z + (pitch * (i + 1)) / n;
-            if (zb > hi) break;
+            const za = z + (pitch * turn(i)) / n;
+            const zb = z + (pitch * turn(i + 1)) / n;
+            if (Math.max(za, zb) > hi) break;
             pairs.push([P3(P[i]!, za), P3(P[(i + 1) % n]!, zb)]);
           }
         cl.push(segs(pairs), si, MODE.screen, op++, [L.thread, L.threadAlpha * fa, 0, 0]);
@@ -263,6 +278,7 @@ export function planFrame(f: PlanInput): FramePlan {
     if (Sl.isTop || LD.effect("innerSilhouettes")) {
       cl.push(it.verts, si, MODE.silhouette, op, [L.silhouette, L.silhouetteAlpha]);
       const pairs: [Vec2, Vec2][] = extreme(w).map((i) => {
+        if (p.mods) return [P3(pointAt(poseAt(p, w.pose, top), p.outer[i]!), top), P3(pointAt(poseAt(p, w.pose, z0), p.outer[i]!), z0)];
         const q = P3(w.outer[i]!, top);
         return [q, [q[0] + d[0], q[1] + d[1]]];
       });

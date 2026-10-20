@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.28.0 — 2026-10-20
+
+- Engine: two solid modifiers. `taper` scales a solid's outline toward its far end (a bevel gear, a cone);
+  `helix` gives it a lead, turning its outline along the axis (a helical gear) or, where that would wind more than
+  a quarter turn, drawing thread marks at the lead (a screw, a worm). The package carries both; the slice row holds the
+  outline's pose at each end.
+- Geometry in `src/core/spatial.ts`: bevel pitch cones and Tredgold back-cone teeth, worm and wheel, helical and
+  crossed helical gears, screw lead and trapezoidal and metric threads, each checked against the catalogue's specs.
+- Fixture scenes: the catalogue's bevel pair (16:32, module 4) and worm drive (module 3, 30:1).
+
 ## 0.27.0 — 2026-10-20
 
 - Renderer: solids on an x or y axis are drawn with the z solids, at every tilt and explode. A y face is mapped to

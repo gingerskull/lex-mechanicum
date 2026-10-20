@@ -2,7 +2,7 @@
 // Local geometry is unpacked once per session (Prepared); a frame only transforms it. A solid on an x or y axis
 // (src/core/axis.ts) is posed in its own plane; the explode lifts it along the base z like every other solid.
 import { boxOf, toWorld, type Axis, type Vec3 } from "../core/axis";
-import { offsetPoly, type Pose, type Vec2 } from "../core/geom";
+import { TAU, offsetPoly, type Pose, type Vec2 } from "../core/geom";
 import { solidPose, type PartIndex } from "../assemble/pose";
 import type { MechanismModel, Solved } from "../model/types";
 import { axisOfPacked, ringsOf, hasFlag, type Package, type PackedSolid } from "../package/format";
@@ -12,6 +12,10 @@ import { FORM } from "../style/form";
 export interface Prepared {
   s: PackedSolid;
   axis: Axis;
+  /** A tapered solid, or a helical one whose outline turns along it (src/core/spatial.ts): its ends differ. */
+  mods: boolean;
+  /** A helical solid that winds too far to turn its outline (a screw, a worm): its lead, drawn as thread marks. */
+  threadLead: number | null;
   outer: Vec2[];
   holes: Vec2[][];
   marks: { kind: MarkKind; pts: Vec2[] }[];
@@ -58,6 +62,26 @@ function edgeBreak(s: PackedSolid, outer: Vec2[], holes: Vec2[][]): Vec2[][] | n
   ];
 }
 
+/** A helical solid whose outline turns at most a quarter turn along it is drawn turning (a helical gear's teeth). */
+const twisted = (s: PackedSolid): boolean => s.helix !== undefined && Math.abs((TAU * (s.z1 - s.z0)) / s.helix) <= Math.PI / 2;
+
+/** The scale and turn of a solid's outline at w along its axis (1 and 0 for a solid with no modifier). */
+export function modAt(p: Prepared, w: number): [number, number] {
+  if (!p.mods) return [1, 0];
+  const s = p.s;
+  const t = (w - s.z0) / (s.z1 - s.z0 || 1);
+  return [1 + ((s.taper ?? 1) - 1) * t, s.helix !== undefined && twisted(s) ? (TAU * (w - s.z0)) / s.helix : 0];
+}
+
+/** The pose of a solid's outline at w along its axis: its pose with the outline scaled and turned there. */
+export function poseAt(p: Prepared, pose: Pose, w: number): [number, number, number, number] {
+  const [k, a] = modAt(p, w);
+  return [pose[0], pose[1], Math.cos(pose[2] + a) * k, Math.sin(pose[2] + a) * k];
+}
+
+/** A local point at w along the axis, posed in the solid's plane. */
+export const pointAt = (P: [number, number, number, number], [x, y]: Vec2): Vec2 => [P[0] + P[2] * x - P[3] * y, P[1] + P[3] * x + P[2] * y];
+
 export function prepare(pkg: Package): Prepared[] {
   return pkg.solids.map((s) => {
     const r = ringsOf(s);
@@ -70,6 +94,8 @@ export function prepare(pkg: Package): Prepared[] {
       marks: r.marks.map((m) => ({ kind: m.kind, pts: toVec(m.pts) })),
       edges: edgeBreak(s, outer, holes),
       axis: axisOfPacked(s),
+      mods: s.taper !== undefined || twisted(s),
+      threadLead: s.helix !== undefined && !twisted(s) ? s.helix : null,
       base: hasFlag(s, "isBase"),
       inset: hasFlag(s, "inset"),
       accent: hasFlag(s, "accent"),
@@ -112,6 +138,12 @@ const xf = (pts: Vec2[], [x, y, a]: Pose): Vec2[] => {
 
 export const worldPts = xf;
 
+/** The far end's outline of a tapered or helical solid, posed. */
+const far = (p: Prepared, pose: Pose): Vec2[] => {
+  const P = poseAt(p, pose, p.s.z1);
+  return p.outer.map((q) => pointAt(P, q));
+};
+
 export function worldSolids(
   prepared: Prepared[],
   model: MechanismModel,
@@ -132,7 +164,8 @@ export function worldSolids(
       // the plane's v is up: the explode lifts the pose in the plane, not the extent along the axis
       const lifted: Pose = [pose[0], pose[1] + dz, pose[2]];
       const outer = xf(p.outer, lifted);
-      const B = boxOf(p.axis, outer, p.s.z0, p.s.z1);
+      // a tapered or helical solid's far outline differs: the box holds both ends
+      const B = boxOf(p.axis, p.mods ? [...outer, ...far(p, lifted)] : outer, p.s.z0, p.s.z1);
       const c = toWorld(p.axis, [lifted[0], lifted[1]], (p.s.z0 + p.s.z1) / 2);
       out.push({ p, axis: p.axis, pose: lifted, z0: B[2], z1: B[5], thr: p.s.thr ? [p.s.thr[1], p.s.thr[2]] : null, outer, holes: p.holes.map((h) => xf(h, lifted)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
       continue;
@@ -147,7 +180,7 @@ export function worldSolids(
       outer,
       holes: p.holes.map((h) => xf(h, pose)),
       c: [pose[0], pose[1]],
-      bb: bounds(outer),
+      bb: bounds(p.mods ? [...outer, ...far(p, pose)] : outer),
     });
   }
   return out;

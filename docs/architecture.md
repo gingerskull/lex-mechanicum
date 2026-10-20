@@ -22,7 +22,8 @@ src/style/                       tokens (palettes, type, sizes), form (geometry-
                                  knobs), detail (the detail ladder), kinds (solid kinds, roles, mark kinds, effects),
                                  theme (rgb resolution, font strings). One source per value; tokens.css is generated.
 src/core/                        geometry, vectors, involute gears and meshing, polygon queries (poly.ts), the
-                                 out-of-plane axis (axis.ts: plane mapping, world boxes)
+                                 out-of-plane axis (axis.ts: plane mapping, world boxes), bevel, worm, helical and
+                                 screw geometry (spatial.ts)
 src/parts/                       the part family: link (stadium or tapered), plate, cap, slider, rails, slotLink, gear,
                                  ringGear, rack, disc, custom, tracer; every part may carry a plating offset (dz) and
                                  a clevis twin; heights()
@@ -89,7 +90,11 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    composited onto the canvas, and centrelines, dimensions, traces, sheet and overlays are drawn over it. A solid on an
    x or y axis is drawn by the same items: its slice row carries the axis, the shaders map its plane to the screen
    (a y face by one affine, as a z face; an x face is edge-on) and sweep its walls along the projected axis; a y solid
-   shows its low-y end, the end nearer the viewer. Every
+   shows its low-y end, the end nearer the viewer. Two solid modifiers change a solid along its axis: `taper` scales
+   its outline toward the far end (a bevel gear's toothed frustum, a cone) and `helix` turns it by its lead (a
+   helical gear); the slice row then carries the outline's pose at both ends and the walls run between them. A helix
+   that would wind more than a quarter turn (a screw, a worm) keeps its outline and carries thread marks at its lead
+   instead. Every
    session on a page shares one WebGL2 context; a lost context is rebuilt and the drawing redrawn. Thumbnails, the
    stage, the screenshot tool and the visual tests all use this one renderer.
 5. **Site.** Astro builds one static page per registered mechanism: the drawing stage, controls, at-a-glance facts,

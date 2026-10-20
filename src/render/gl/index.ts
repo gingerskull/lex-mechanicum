@@ -113,7 +113,7 @@ export function drawSolids(f: SolidsPass): { own: GpuSession; heads: Heads } {
   }
 
   // the frame's tables: slices, chunks, dash phases, and the screen-space items after the static ones
-  g.slices.write(plan.slices, list.length * 8);
+  g.slices.write(plan.slices, list.length * 12);
   g.chunks[0].write(plan.frame.data, plan.frame.n * 12);
   g.chunks[1].write(plan.lines.data, plan.lines.n * 12);
   g.dash.write(plan.dash, plan.dash.length);

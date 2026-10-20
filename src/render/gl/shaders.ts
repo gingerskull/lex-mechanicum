@@ -10,7 +10,7 @@ export const MODE = { wall: 1, wallErase: 2, holeWall: 3, face: 4, faceErase: 5,
 /** Item and chunk tables: three texels per entry, 341 entries per 1023-texel row. */
 export const ROW = 1023;
 export const PER_ROW = 341;
-/** Slice table: two texels per slice, 512 per row. Hole table: one texel per hole. Dash table: one float per texel. */
+/** Slice table: three texels per slice. Hole table: one texel per hole. Dash table: one float per texel. */
 export const SROW = 1024;
 export const OPS = 1048576;
 
@@ -43,7 +43,7 @@ flat out vec2 vPat;
 
 vec4 itemT(int i, int k) { int t = i * 3 + k; return texelFetch(uItems, ivec2(t % ${ROW}, t / ${ROW}), 0); }
 vec4 chunkT(int c, int k) { int t = c * 3 + k; return texelFetch(uChunks, ivec2(t % ${ROW}, t / ${ROW}), 0); }
-vec4 sliceT(int s, int k) { int t = s * 2 + k; return texelFetch(uSlices, ivec2(t % ${SROW}, t / ${SROW}), 0); }
+vec4 sliceT(int s, int k) { int t = s * 3 + k; return texelFetch(uSlices, ivec2(t % ${SROW}, t / ${SROW}), 0); }
 float dashT(int i) { return texelFetch(uDash, ivec2(i % ${SROW}, i / ${SROW}), 0).r; }
 vec2 proj(vec2 w, float z) { return vec2(uOx + uS * w.x, uOy - uS * (w.y * uCt + z * uSt)); }
 // the slice's axis (0 z, 1 x, 2 y; src/core/axis.ts): a point (p, q) of the solid's plane at a along the axis
@@ -56,6 +56,10 @@ vec2 projA(vec2 w, float a) {
 
 vec4 pose;
 vec2 world(vec2 l) { return pose.xy + vec2(pose.z * l.x - pose.w * l.y, pose.w * l.x + pose.z * l.y); }
+// a tapered or helical slice (mods): the pose of its far end, its outline scaled and turned there (src/core/spatial.ts)
+bool mods;
+vec4 poseB;
+vec2 worldB(vec2 l) { return poseB.xy + vec2(poseB.z * l.x - poseB.w * l.y, poseB.w * l.x + poseB.z * l.y); }
 float depthOf(float op) { return op / ${OPS}.0 * 2.0 - 1.0; }
 void out2(vec2 p, float op) { gl_Position = vec4(p.x / uSize.x * 2.0 - 1.0, 1.0 - p.y / uSize.y * 2.0, depthOf(op), 1.0); }
 void cull() { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); }
@@ -132,7 +136,10 @@ void main() {
   // the far end (z0) and the near end (top) of the slice along its axis; for z and x the top, for y the low y
   float z0 = s1.x;
   float top = s1.y;
-  axis = int(s1.w + 0.5);
+  int code = int(s1.w + 0.5);
+  axis = code & 3;
+  mods = code >= 4;
+  poseB = mods ? sliceT(sl, 2) : pose;
   float fa = s1.z;
   vec2 d = axis == 1 ? vec2(uS * (z0 - top), 0.0) : axis == 2 ? vec2(0.0, uS * (top - z0) * uCt) : vec2(0.0, uS * (top - z0) * uSt);
   if (mode == ${MODE.wall} || mode == ${MODE.wallErase} || mode == ${MODE.holeWall}) {
@@ -140,8 +147,11 @@ void main() {
     float sg = hole ? t0.x : -t0.x;
     vec2 A = projA(world(t1.xy), top);
     vec2 B = projA(world(t1.zw), top);
+    // a tapered or helical wall runs to its edge at the far end, not to the edge moved by d
+    vec2 A2 = mods ? projA(worldB(t1.xy), z0) : A + d;
+    vec2 B2 = mods ? projA(worldB(t1.zw), z0) : B + d;
     vec2 n;
-    if (!faces(A, B, sg, d, n)) { cull(); return; }
+    if (!faces(A, B, sg, mods ? 0.5 * (A2 - A + B2 - B) : d, n)) { cull(); return; }
     float i = bucket(n);
     if (mode == ${MODE.wallErase}) vColor = vec4(0.0, 0.0, 0.0, c1.y * fa);
     else if (mode == ${MODE.holeWall}) {
@@ -159,8 +169,8 @@ void main() {
     vec2 P; vec2 L;
     if (v == 0 || v == 3) { P = A; L = t1.xy; }
     else if (v == 1) { P = B; L = t1.zw; }
-    else if (v == 2 || v == 4) { P = B + d; L = t1.zw - lift; }
-    else { P = A + d; L = t1.xy - lift; }
+    else if (v == 2 || v == 4) { P = B2; L = t1.zw - lift; }
+    else { P = A2; L = t1.xy - lift; }
     vLocal = L;
     out2(P, op);
     return;
@@ -186,7 +196,9 @@ void main() {
     }
     vColor = lineColour(c1.w * fa, c2.x);
     vec2 off = c2.zw;
-    segment(projA(world(t1.xy), c1.y) + off, projA(world(t1.zw), c1.y) + off, c1.z, phase, v, op);
+    // a line at the far end of a tapered or helical slice is on its far outline
+    bool atFar = mods && abs(c1.y - z0) < 1e-4;
+    segment(projA(atFar ? worldB(t1.xy) : world(t1.xy), c1.y) + off, projA(atFar ? worldB(t1.zw) : world(t1.zw), c1.y) + off, c1.z, phase, v, op);
     return;
   }
   if (mode == ${MODE.silhouette}) {
@@ -195,21 +207,26 @@ void main() {
     vec2 Pc = projA(world(t1.zw), top);
     vec2 Pn = projA(world(t2.xy), top);
     vec2 n;
-    bool a = faces(Pp, Pc, sg, d, n);
-    bool b = faces(Pc, Pn, sg, d, n);
+    vec2 Pc2 = mods ? projA(worldB(t1.zw), z0) : Pc + d;
+    vec2 da = mods ? 0.5 * (projA(worldB(t1.xy), z0) - Pp + Pc2 - Pc) : d;
+    vec2 db = mods ? 0.5 * (Pc2 - Pc + projA(worldB(t2.xy), z0) - Pn) : d;
+    bool a = faces(Pp, Pc, sg, da, n);
+    bool b = faces(Pc, Pn, sg, db, n);
     if (a == b) { cull(); return; }
     vColor = lineColour(c1.z * fa, 0.0);
-    segment(Pc, Pc + d, c1.y, 0.0, v, op);
+    segment(Pc, Pc2, c1.y, 0.0, v, op);
     return;
   }
   if (mode == ${MODE.bottom}) {
     float sg = -t0.x;
     vec2 A = projA(world(t1.xy), top);
     vec2 B = projA(world(t1.zw), top);
+    vec2 A2 = mods ? projA(worldB(t1.xy), z0) : A + d;
+    vec2 B2 = mods ? projA(worldB(t1.zw), z0) : B + d;
     vec2 n;
-    if (!faces(A, B, sg, d, n)) { cull(); return; }
+    if (!faces(A, B, sg, mods ? 0.5 * (A2 - A + B2 - B) : d, n)) { cull(); return; }
     vColor = lineColour(c1.z * fa, 0.0);
-    segment(A + d, B + d, c1.y, 0.0, v, op);
+    segment(A2, B2, c1.y, 0.0, v, op);
     return;
   }
   cull();
