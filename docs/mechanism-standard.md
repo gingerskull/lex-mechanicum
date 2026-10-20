@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.13
+version: 2.14
 date: 2026-10-20
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -569,6 +569,10 @@ Start here, then run the full ten-function audit.
   input on that shaft is driven by a motor beside it (V1).
 - F7 by the shim packs (mounting distance); F4 where the mesh pushes; F9 marks at the mesh; herringbone: one shaft
   located, the other free to float so the halves share the load.
+- Worm: the worm between its two blocks, never overhung; the located block takes its thrust both ways (F4); the wheel's
+  shim sets its mid-plane on the worm's axis (F7). A bronze wheel on hub and arms, a case-hardened ground worm (M2,
+  M10), oiled for the sliding contact (F8). Where the lead angle is below the friction angle the note says it is
+  self-locking, never a substitute for a brake.
 
 **Shaft couplings** (universal joint, double Cardan, Rzeppa, flexible couplings)
 - Each shaft on its own support (J2 or J10); the cross of a universal joint in needle cups held by circlips
@@ -649,6 +653,11 @@ default detail level.
 
 ## Changelog
 
+- **2.14 (2026-10-20).** A shaft in plan's far block stands past the parts unless a moving part's sweep outline meets
+  the block's area in plan (the housing's, or the foot's for a sweep that reaches down to it), so a worm runs between
+  its two blocks and a bevel pinion stays overhung [J10, A9, AUTO]. Clearance between a z solid and one on an x or y
+  axis tests the z solid's posed outline against the other's plan footprint where their boxes meet, never deeper than
+  the box test [A15, Q2, AUTO]. The spatial gears playbook gains the worm.
 - **2.13 (2026-10-20).** Hand fixes of the first compliant passes (flexure hinge, bistable) promoted to rules. J13 seats
   the clamped block on a ground plate of its own outline and the standoffs rule posts no compliant block or neck
   [J13, A6, AUTO]; the clamp dowels are reamed through block, clamp plate and seat [J13, F1, AUTO]; the stop pins stand

@@ -4,10 +4,10 @@ import { V, circleX, osc } from "../../src/core/vec";
 import { defineMechanism } from "../../src/model/define";
 import type { MechanismModel, Solved } from "../../src/model/types";
 import { P } from "../../src/parts";
-import { bevel, bevelOutline, pitchCones } from "../../src/core/spatial";
+import { bevel, bevelOutline, pitchCones, worm } from "../../src/core/spatial";
 import { beltLength, beltPath, beltRing, centresFor, htd, radiusFor } from "../../src/core/flex";
 import { sprocketR } from "../../src/rules/j12-flexible";
-import { circle } from "../../src/core/geom";
+import { circle, gearOutline } from "../../src/core/geom";
 
 /** J1: an arm 8 mm thick turning on a plain fixed pin (no accent, nothing keyed): a dead axle. */
 export const j1Model: MechanismModel = defineMechanism({
@@ -216,6 +216,26 @@ export const j9Model: MechanismModel = defineMechanism({
   ],
   meshes: [{ a: "pinion", b: "gear", form: "bevel" }],
   solve: (u) => ({ pts: { G: [0, 0], Q: [0, 10 + bg.apex] }, a: u }),
+});
+
+/**
+ * J9 worm: a worm (module 3, one start, q 10, six leads long) on a live shaft in plan along x (J10, the accent input),
+ * in front of its 30-tooth wheel (face 20) on a z shaft, its axis at the wheel's mid-plane. The wheel's teeth pass
+ * beside both ends of the worm, inside the blocks' strip along the shaft but clear of the blocks.
+ */
+const fw = worm(3, 1, 30, 10);
+const FWL = 6 * fw.lead;
+export const j9WormModel: MechanismModel = defineMechanism({
+  id: "fx-j9-worm",
+  input: { kind: "rotary", part: "worm" },
+  parts: [
+    { ...P.custom("wheel", gearOutline(30, 3), { role: "output", layer: 1, at: "G", spin: (s) => -(s.a as number) / 30, holes: [circle(7.2, 0, 0, 36)], helix: fw.wheelLead }), thick: 20, m: 3, z: 30 },
+    { ...P.disc("worm", fw.d1 / 2 + 3, { role: "driver", layer: 3, at: "W", spin: (s) => s.a as number, holes: [circle(6, 0, 0, 36)], axis: "x", along: -FWL / 2, thick: FWL, helix: fw.lead, marks: [] }), m: 3, z: 1 },
+    P.cap("pG", 0, 7, { fixed: [0, 0, 0], span: 3 }),
+    P.cap("pW", 0, 7, { axis: "x", along: -FWL / 2 - 1, span: 5, fixed: [-fw.a, 20, 0], accent: true }),
+  ],
+  meshes: [{ a: "worm", b: "wheel", form: "worm" }],
+  solve: (u) => ({ pts: { G: [0, 0], W: [-fw.a, 20] }, a: u }),
 });
 
 /** J11: a lead screw along x (Tr12x3, centre y 0, z 30) driving a carriage, keyed to its shaft in plan. */

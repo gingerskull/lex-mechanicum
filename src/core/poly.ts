@@ -95,6 +95,22 @@ export function region(outer: Vec2[], holes: Vec2[][]): Region {
 }
 
 /**
+ * An axis-aligned rectangle as a region, its edges sampled at most `step` apart, so the vertex test of `overlap` sees
+ * it cross another outline even where neither has a corner inside the other (a plan footprint, a block's area).
+ */
+export function boxRegion(x0: number, y0: number, x1: number, y1: number, step = 1): Region {
+  const outer: Vec2[] = [];
+  const corners: Vec2[] = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  for (let i = 0; i < 4; i++) {
+    const a = corners[i]!;
+    const b = corners[(i + 1) % 4]!;
+    const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / step));
+    for (let k = 0; k < n; k++) outer.push([a[0] + ((b[0] - a[0]) * k) / n, a[1] + ((b[1] - a[1]) * k) / n]);
+  }
+  return { outer, holes: [], box: [x0, y0, x1, y1] };
+}
+
+/**
  * How far two regions interpenetrate: the largest depth of a vertex of one inside the material of the other, 0 when
  * they only touch or are apart. Outlines are dense polygons, so vertex depth is a good measure.
  */

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.36.0 — 2026-10-20
+
+- Worm drive added to standard 2.14: module 3, single start, 30:1, the worm on a shaft in plan between two pillow
+  blocks in front of a bronze wheel on hub and arms; the located block takes the worm's thrust both ways, a felt
+  oiler feeds the thread, the self-locking note says it is no brake.
+- Helical gear pair added to standard 2.14: 17 to 34 teeth, normal module 3, 20° helix of opposite hands, on straddled
+  z shafts; the axial thrust taken by opposed angular-contact bearings and thrust washers under circlips.
+- Rules (standard 2.14): a shaft in plan's far pillow block stands past the parts unless a moving part's sweep outline
+  meets its area, so a worm runs between two blocks; clearance between a part on z and one on an x or y axis tests the
+  z outline against the other's footprint in plan where their boxes meet.
+
 ## 0.35.0 — 2026-10-20
 
 - Flexure hinge added to standard 2.13: a circular-notch hinge cut in one 7075 blank, ±2° drawn true with the bend
