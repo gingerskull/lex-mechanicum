@@ -218,8 +218,8 @@ export function markdown(r: Report): string {
   const d = r.device;
   L.push(`## Bench, package v2`, ``, `${String(d.userAgent)}`, `GPU ${String(d.gpu)}, ${String(d.cores)} cores, ${String(d.memoryGB)} GB, screen ${String(d.screen)}, DPR ${String(d.dpr)}`, `Stage ${r.opts.w} x ${r.opts.h} CSS px at DPR ${r.opts.dpr}; ${r.opts.runs} runs, ${r.opts.frames} frames per view; medians. v2 frames are drawn by the stand-in renderer (a floor).`, ``);
   L.push(`Setup, ms. GPU is buffers, sizing and the first frame on the page's shared context; the context and both shader programs were made once, in ${r.contextMs} ms.`, ``);
-  L.push(`Setup, ms (decode / tessellate / edges / GPU / total):`, ``, `| Mechanism | v1 KB | v2 KB | solids | shapes | triangles | edges | decode | tessellate (caps) | edges | GPU | total | worker wall |`, `|---|---|---|---|---|---|---|---|---|---|---|---|---|`);
-  for (const x of r.rows) L.push(`| ${x.id} | ${x.kb.v1} | ${x.kb.v2} | ${x.solids} | ${x.shapes} | ${x.triangles} | ${x.edges} | ${x.setup.decode} | ${x.setup.tessellate} (${x.setup.caps}) | ${x.setup.edges} | ${x.setup.gpu} | ${x.setup.total} | ${x.worker?.wall ?? ""} |`);
+  L.push(`Setup, ms (decode / tessellate / edges / GPU / total):`, ``, `| Mechanism | v1 KB | v2 KB | solids | shapes | triangles | edges | decode | tessellate (caps) | edges | GPU | total | worker wall | via worker (wall + GPU) |`, `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`);
+  for (const x of r.rows) L.push(`| ${x.id} | ${x.kb.v1} | ${x.kb.v2} | ${x.solids} | ${x.shapes} | ${x.triangles} | ${x.edges} | ${x.setup.decode} | ${x.setup.tessellate} (${x.setup.caps}) | ${x.setup.edges} | ${x.setup.gpu} | ${x.setup.total} | ${x.worker?.wall ?? ""} | ${x.worker ? r2(x.worker.wall + x.setup.gpu) : ""} |`);
   const vs = VIEWS.map(([k]) => k);
   L.push(``, `Frames per view, ms (paced / gpu wait / script):`, ``, `| Mechanism | ${vs.join(" | ")} |`, `|---|${vs.map(() => "---").join("|")}|`);
   for (const x of r.rows) L.push(`| ${x.id} | ${vs.map((k) => `${x.views[k]?.paced} / ${x.views[k]?.gpu} / ${x.views[k]?.cpu}`).join(" | ")} |`);

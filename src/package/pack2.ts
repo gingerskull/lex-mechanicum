@@ -7,7 +7,7 @@ import type { Joint } from "../rules/types";
 import { rounded } from "../solids/frame";
 import { checkMesh } from "../solids/check";
 import { quantise } from "../solids/quantise";
-import { cleanRing, dropCollinear, tessellate } from "../solids/tessellate";
+import { capOf, cleanRing, dropCollinear, orient, tessellate } from "../solids/tessellate";
 import { isPlain, type MeshData, type Op, type Profile, type Solid3, type Vec3 } from "../solids/types";
 import { gridFor, type PackageBounds } from "./format";
 import { FLAG3, type Flag3, type PackedSolid3, type Package2, type Shape2 } from "./format2";
@@ -86,9 +86,11 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     let shape: Shape2;
     let key: string;
     if (plain(s)) {
-      const profile = chosen.get(s)!;
+      // oriented here so the cap's indices refer to the rings as stored
+      const profile = s.op.op === "revolve" || s.op.op === "loft" ? chosen.get(s)! : orient(chosen.get(s)!);
       const op = snapOp(s.op);
-      shape = { profile, marks, op };
+      const cap = capOf(profile, op);
+      shape = { profile, marks, op, ...(cap ? { cap } : {}) };
       key = JSON.stringify([op, profile, marks]);
     } else {
       const mesh = quantise(meshOf(s));

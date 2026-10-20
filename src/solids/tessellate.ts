@@ -253,12 +253,12 @@ function capTrianglesRaw(xy: number[], rings: number[]): number[] {
   return tri;
 }
 
-function layeredMesh(L: Layers): MeshData {
+function layeredMesh(L: Layers, cap?: ArrayLike<number>): MeshData {
   const N = L.rings.reduce((a, b) => a + b, 0);
   const wallLayers = L.closed ? L.K : L.K - 1;
   const nWall = wallLayers * N * 2;
-  const startTri = L.closed ? [] : capTriangles(L.start, L.rings);
-  const endTri = L.closed ? [] : L.end === L.start ? startTri : capTriangles(L.end, L.rings);
+  const startTri: ArrayLike<number> = L.closed ? [] : cap ?? capTriangles(L.start, L.rings);
+  const endTri: ArrayLike<number> = L.closed ? [] : cap || L.end === L.start ? startTri : capTriangles(L.end, L.rings);
   const tri = new Uint32Array((nWall + (startTri.length + endTri.length) / 3) * 3);
   const tag = new Uint8Array(tri.length / 3);
   let o = 0;
@@ -370,10 +370,21 @@ function revolveMesh(p: Profile, op: Extract<Op, { op: "revolve" }>): MeshData {
 }
 
 /** The mesh of a profile under an operation (extrude, revolve, sweep or loft). */
-export function tessellate(profile: Profile, op: Op): MeshData {
+export function tessellate(profile: Profile, op: Op, cap?: ArrayLike<number>): MeshData {
   if (op.op === "revolve") return revolveMesh(orient(profile), op);
   if (op.op === "loft") return layeredMesh(layersOf(profile, op));
-  return layeredMesh(layersOf(orient(profile), op));
+  return layeredMesh(layersOf(orient(profile), op), cap);
+}
+
+/**
+ * The triangulation of an extrusion's or an open sweep's cap, as indices into its rings (outer, then holes) counter-
+ * clockwise: what a package ships so the browser need not triangulate (a phone spends most of its tessellation there).
+ * The profile must already be `orient`ed. Null for the other operations, whose ends differ.
+ */
+export function capOf(profile: Profile, op: Op): Uint32Array | null {
+  if (op.op !== "extrude" && !(op.op === "sweep" && !op.closed)) return null;
+  const rings = [profile.outer, ...profile.holes];
+  return Uint32Array.from(capTriangles(flat2(rings), rings.map((r) => r.length)));
 }
 
 /**

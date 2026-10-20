@@ -7,7 +7,7 @@ import { capTime, tessellate } from "./tessellate";
 import type { MeshData } from "./types";
 
 /** The triangles of a shape: tessellated from its profile, or the mesh it ships. */
-export const meshOfShape = (s: Shape2): MeshData => s.mesh ?? tessellate(s.profile!, s.op!);
+export const meshOfShape = (s: Shape2): MeshData => s.mesh ?? tessellate(s.profile!, s.op!, s.cap);
 
 /** The drafting edges of a shape, straight from the profile where it is a plain extrusion, else from the mesh. */
 export function edgesOfShape(s: Shape2, mesh: MeshData): EdgeSet {
