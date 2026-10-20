@@ -7,7 +7,7 @@ import { overlap, region, type Region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, shapeAt, solidBox, solidPose } from "./pose";
+import { indexParts, isGround, planeKey, shapeAt, solidBox, solidPose } from "./pose";
 
 export interface Clash {
   a: string;
@@ -37,7 +37,7 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
       const b = S[k]!;
       if (a.group && a.group === b.group) continue;
       if (a.allow?.includes(b.id) || b.allow?.includes(a.id) || contact.has(`${a.id}|${b.id}`)) continue;
-      if (a.axis === b.axis && Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0) <= 0.05) continue;
+      if (planeKey(a) === planeKey(b) && Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0) <= 0.05) continue;
       pairs.push([i, k]);
     }
   const worst = new Map<string, Clash>();
@@ -53,11 +53,11 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
       const a = S[i]!;
       const b = S[k]!;
       let d: number;
-      if (a.axis !== b.axis) {
+      if (planeKey(a) !== planeKey(b)) {
         const qa = poses[i];
         const qb = poses[k];
         if (!qa || !qb) continue;
-        d = boxOverlap(solidBox(a, qa), solidBox(b, qb));
+        d = boxOverlap(solidBox(a, qa, s), solidBox(b, qb, s));
       } else {
         const ra = regs[i];
         const rb = regs[k];

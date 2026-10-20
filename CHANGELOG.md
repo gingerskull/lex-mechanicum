@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.31.0 — 2026-10-20
+
+- Engine: posed axes. A member whose axis is none of x, y, z (a universal joint's cross, a swash plate) is posed every
+  phase by a frame from the solved state: its outline lies in that frame's plane, it is boxed in it for the checks and
+  the base, the renderer draws it through one affine per slice, and the depth order places it by its world box.
+- Standard 2.9: D8 and L6 cover posed axes; the shaft couplings playbook poses the cross. AUTO.
+- Fixture scene: a universal joint at 30°, drawn over a full turn.
+
 ## 0.30.0 — 2026-10-20
 
 - Engine: members that change shape over the cycle.

@@ -48,9 +48,13 @@ float dashT(int i) { return texelFetch(uDash, ivec2(i % ${SROW}, i / ${SROW}), 0
 vec2 proj(vec2 w, float z) { return vec2(uOx + uS * w.x, uOy - uS * (w.y * uCt + z * uSt)); }
 // the slice's axis (0 z, 1 x, 2 y; src/core/axis.ts): a point (p, q) of the solid's plane at a along the axis
 int axis;
+// a posed slice (axis 3): its local (x, y) to screen (pM) and its axis on screen and offset (pT), one affine
+vec4 pM;
+vec4 pT;
 vec2 projA(vec2 w, float a) {
   if (axis == 1) return vec2(uOx + uS * a, uOy - uS * (w.x * uCt + w.y * uSt));
   if (axis == 2) return vec2(uOx + uS * w.x, uOy - uS * (a * uCt + w.y * uSt));
+  if (axis == 3) return vec2(pM.x * w.x + pM.y * w.y + pT.x * a + pT.z, pM.z * w.x + pM.w * w.y + pT.y * a + pT.w);
   return proj(w, a);
 }
 
@@ -140,8 +144,15 @@ void main() {
   axis = code & 3;
   mods = code >= 4;
   poseB = mods ? sliceT(sl, 2) : pose;
+  if (axis == 3) {
+    // the slice row holds the affine itself: the item points go in as they are
+    pM = pose;
+    pT = sliceT(sl, 2);
+    pose = vec4(0.0, 0.0, 1.0, 0.0);
+    poseB = pose;
+  }
   float fa = s1.z;
-  vec2 d = axis == 1 ? vec2(uS * (z0 - top), 0.0) : axis == 2 ? vec2(0.0, uS * (top - z0) * uCt) : vec2(0.0, uS * (top - z0) * uSt);
+  vec2 d = axis == 3 ? pT.xy * (z0 - top) : axis == 1 ? vec2(uS * (z0 - top), 0.0) : axis == 2 ? vec2(0.0, uS * (top - z0) * uCt) : vec2(0.0, uS * (top - z0) * uSt);
   if (mode == ${MODE.wall} || mode == ${MODE.wallErase} || mode == ${MODE.holeWall}) {
     bool hole = t0.y >= 0.0;
     float sg = hole ? t0.x : -t0.x;

@@ -1,7 +1,7 @@
 // World solids of one frame: every packed solid posed at u, its z range moved by the explode, its outlines in world mm.
 // Local geometry is unpacked once per session (Prepared); a frame only transforms it. A solid on an x or y axis
 // (src/core/axis.ts) is posed in its own plane; the explode lifts it along the base z like every other solid.
-import { boxOf, toWorld, type Axis, type Vec3 } from "../core/axis";
+import { boxOf, frameBox, framePoint, toWorld, type Axis, type Frame3, type Vec3 } from "../core/axis";
 import { TAU, offsetPoly, type Pose, type Vec2 } from "../core/geom";
 import { shapeAt, solidPose, type PartIndex } from "../assemble/pose";
 import type { MechanismModel, Solved } from "../model/types";
@@ -11,7 +11,8 @@ import { FORM } from "../style/form";
 
 export interface Prepared {
   s: PackedSolid;
-  axis: Axis;
+  /** z, x, y, or "p" for a solid posed by a solved frame (src/core/axis.ts). */
+  axis: Axis | "p";
   /** A tapered solid, or a helical one whose outline turns along it (src/core/spatial.ts): its ends differ. */
   mods: boolean;
   /** A helical solid that winds too far to turn its outline (a screw, a worm): its lead, drawn as thread marks. */
@@ -112,8 +113,10 @@ export function prepare(pkg: Package): Prepared[] {
 
 export interface World {
   p: Prepared;
-  /** Set for an x or y solid (its prepared axis), unset for z. */
-  axis?: "x" | "y";
+  /** Set for an x, y or posed solid (its prepared axis), unset for z. */
+  axis?: "x" | "y" | "p";
+  /** A posed solid: its frame in this frame, lifted by the explode (src/core/axis.ts). */
+  frame?: Frame3;
   /** Pose in the solid's plane; for an x or y solid lifted by the explode. */
   pose: Pose;
   /** Exploded z range: of the extrusion for a z solid, of the world box for an x or y solid. */
@@ -134,7 +137,8 @@ export interface World {
 }
 
 /** The world points of an outline posed in a solid's plane, at `w` along its axis. */
-export const outline3 = (w: Pick<World, "p" | "outer">, at: number): Vec3[] => w.outer.map((q) => toWorld(w.p.axis, q, at));
+export const outline3 = (w: Pick<World, "p" | "outer" | "frame">, at: number): Vec3[] =>
+  w.outer.map((q) => (w.frame ? framePoint(w.frame, q, at) : toWorld(w.p.axis as Axis, q, at)));
 
 const xf = (pts: Vec2[], [x, y, a]: Pose): Vec2[] => {
   const c = Math.cos(a);
@@ -166,6 +170,17 @@ export function worldSolids(
     const pose = solidPose(model, parts, p.s, s, u);
     if (!pose) continue;
     const dz = gap * p.s.ex;
+    if (p.axis === "p") {
+      // a posed solid: its plane from the solved frame, lifted by the explode along the base z
+      const f = p.s.frame ? s.frames?.[p.s.frame] : undefined;
+      if (!f) continue;
+      const frame: Frame3 = { o: [f.o[0], f.o[1], f.o[2] + dz], u: f.u, v: f.v };
+      const outer = xf(p.outer, pose);
+      const B = frameBox(frame, outer, p.s.z0, p.s.z1);
+      const c = framePoint(frame, [pose[0], pose[1]], (p.s.z0 + p.s.z1) / 2);
+      out.push({ p, axis: "p", frame, pose, z0: B[2], z1: B[5], thr: null, outer, holes: p.holes.map((h) => xf(h, pose)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
+      continue;
+    }
     if (p.axis !== "z") {
       // the plane's v is up: the explode lifts the pose in the plane, not the extent along the axis
       const lifted: Pose = [pose[0], pose[1] + dz, pose[2]];

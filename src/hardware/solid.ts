@@ -45,7 +45,9 @@ export interface Solid {
    * Axis x or y: the outline lies in the plane normal to that axis and `at` is a pose in it (src/core/axis.ts); unset
    * is z, as every solid on the base plane. A solid on a part's body has that part's axis.
    */
-  axis?: "x" | "y";
+  axis?: "x" | "y" | "p";
+  /** Axis "p": the key of the solved frame the solid's plane is posed by (src/core/axis.ts, Frame3). */
+  frame?: string;
   /**
    * Solid modifiers (src/core/spatial.ts): `taper`, the outline's scale at the far end (z1) about the solid's origin,
    * so the solid is a frustum (a bevel gear, a cone); `helix`, a lead in mm per turn (+ right hand, - left), so the
@@ -131,7 +133,8 @@ export function solid(id: string, o: SolidInit): Solid {
 }
 
 /** The axis of a solid as a spread: `{ axis }` for an x or y solid, nothing for a z solid (so z solids stay unchanged). */
-export const onAxis = (t: { axis?: Axis | undefined }): { axis?: "x" | "y" } => (t.axis === "x" || t.axis === "y" ? { axis: t.axis } : {});
+export const onAxis = (t: { axis?: Axis | "p" | undefined; frame?: string | undefined }): { axis?: "x" | "y" | "p"; frame?: string } =>
+  t.axis === "x" || t.axis === "y" ? { axis: t.axis } : t.axis === "p" && t.frame ? { axis: "p", frame: t.frame } : {};
 
 /** Marks of one kind from point lists. */
 export const marks = (kind: MarkKind, ...lists: Vec2[][]): Mark[] => lists.map((pts) => ({ kind, pts }));

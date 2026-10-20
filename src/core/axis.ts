@@ -16,7 +16,7 @@ export type Vec3 = [number, number, number];
 export type Box3 = [number, number, number, number, number, number];
 
 /** True for an axis other than z: the part or solid stands out of the plan plane. */
-export const isOut = (axis: Axis | undefined): axis is "x" | "y" => axis === "x" || axis === "y";
+export const isOut = (axis: Axis | "p" | undefined): axis is "x" | "y" => axis === "x" || axis === "y";
 
 /** World point of a point (p, q) in the plane of `axis` at `w` along it. */
 export function toWorld(axis: Axis | undefined, [p, q]: Vec2, w: number): Vec3 {
@@ -48,6 +48,42 @@ export function boxOf(axis: Axis | undefined, P: Vec2[], w0: number, w1: number)
 /** How far two boxes overlap: the smallest overlap over the three directions, mm (≤ 0 when they are apart). */
 export function boxOverlap(a: Box3, b: Box3): number {
   return Math.min(Math.min(a[3], b[3]) - Math.max(a[0], b[0]), Math.min(a[4], b[4]) - Math.max(a[1], b[1]), Math.min(a[5], b[5]) - Math.max(a[2], b[2]));
+}
+
+/**
+ * A posed axis: a frame read from the solved state, for a member whose axis is none of x, y, z (a universal
+ * joint's cross, a swash plate). Its plane is spanned by u and v (unit, orthogonal) through the origin o; its axis is
+ * u x v. A point (p, q) of the plane at w along the axis is o + p u + q v + w (u x v).
+ */
+export interface Frame3 {
+  o: Vec3;
+  u: Vec3;
+  v: Vec3;
+}
+
+export const cross3 = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+
+/** A posed frame's axis, u x v. */
+export const frameAxis = (f: Frame3): Vec3 => cross3(f.u, f.v);
+
+/** The world point of (p, q) at w along a posed frame's axis. */
+export function framePoint(f: Frame3, [p, q]: Vec2, w: number): Vec3 {
+  const W = frameAxis(f);
+  return [f.o[0] + p * f.u[0] + q * f.v[0] + w * W[0], f.o[1] + p * f.u[1] + q * f.v[1] + w * W[1], f.o[2] + p * f.u[2] + q * f.v[2] + w * W[2]];
+}
+
+/** The world box of an outline in a posed frame's plane, from w0 to w1 along its axis. */
+export function frameBox(f: Frame3, P: Vec2[], w0: number, w1: number): Box3 {
+  const B: Box3 = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+  for (const q of P)
+    for (const w of [w0, w1]) {
+      const X = framePoint(f, q, w);
+      for (let k = 0; k < 3; k++) {
+        B[k] = Math.min(B[k]!, X[k]!);
+        B[k + 3] = Math.max(B[k + 3]!, X[k]!);
+      }
+    }
+  return B;
 }
 
 /** The plan (x, y) corners of a box, for envelopes and base sizing. */

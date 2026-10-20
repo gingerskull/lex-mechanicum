@@ -11,6 +11,7 @@ import { planFrame, type Chunks } from "../../src/render/gl/plan";
 import { MODE, PER_ROW, ROW } from "../../src/render/gl/shaders";
 import { projector } from "../../src/render/projector";
 import { boxOfSliceable, depthOrder, separate, slices, type Slice, type Sliceable } from "../../src/render/slices";
+import { frameAxis, frameBox, framePoint } from "../../src/core/axis";
 import { modAt, prepare, worldSolids, type Prepared, type World } from "../../src/render/world";
 import { theme } from "../../src/style/theme";
 import { scenes } from "../fixtures/scenes";
@@ -170,5 +171,37 @@ describe("cone and helix forms", () => {
     const [k, a] = modAt(wheel, wheel.s.z1);
     expect(k).toBe(1);
     expect(a).toBeCloseTo((2 * Math.PI * (wheel.s.z1 - wheel.s.z0)) / wheel.s.helix!, 9);
+  });
+});
+
+describe("posed axes", () => {
+  it("maps a point of a posed frame's plane to the world and boxes an outline in it", () => {
+    const f = { o: [1, 2, 3] as [number, number, number], u: [0, 1, 0] as [number, number, number], v: [0, 0, 1] as [number, number, number] };
+    expect(frameAxis(f)).toEqual([1, 0, 0]);
+    expect(framePoint(f, [2, 3], 4)).toEqual([5, 4, 6]);
+    expect(frameBox(f, [[-1, -1], [1, 1]], 0, 2)).toEqual([1, 1, 2, 3, 3, 4]);
+  });
+
+  it("writes a posed slice's affine (code 3) so its near end maps where the frame says", () => {
+    const b = buildFrom("fx-ujoint", scenes["fx-ujoint"]!);
+    expect(b.pkg.solids.find((s) => s.id === "cross")!.frame).toBe("cross");
+    const P = prepare(b.pkg);
+    const u = 0.9;
+    const s = b.model.solve(u);
+    const W = worldSolids(P, b.model, indexParts(b.model), s, u, 0, () => true);
+    const Pr = projector({ tilt: 28 }, { w: 1200, h: 800 }, b.pkg.bounds, [b.pkg.bounds.z0, b.pkg.bounds.z1], 40);
+    const list = depthOrder(slices(W), (a, c) => a.top - c.top || a.z0 - c.z0, Pr);
+    const items = buildItems(P);
+    const out = planFrame({ list, T: theme("dark"), LD: ladder("full", { tilt: 28, explode: 0 }), cardK: { plate: 1, base: 1 }, Pr, items, dynStart: Math.ceil(items.data.length / (4 * ROW)) * PER_ROW });
+    const i = list.findIndex((Sl) => Sl.w.p.s.id === "cross");
+    const r = Array.from(out.slices.subarray(i * 12, i * 12 + 12));
+    expect(r[7]).toBe(3);
+    // a local point (p, q) of the cross at `top` along its axis, through the row's affine and through the frame
+    const [p, q, a] = [5, -2, r[5]!];
+    const screen = [r[0]! * p + r[1]! * q + r[8]! * a + r[10]!, r[2]! * p + r[3]! * q + r[9]! * a + r[11]!];
+    const X = framePoint(s.frames!.cross!, [p, q], a);
+    const ref = Pr.P(X[0], X[1], X[2]);
+    expect(screen[0]).toBeCloseTo(ref[0], 3);
+    expect(screen[1]).toBeCloseTo(ref[1], 3);
   });
 });

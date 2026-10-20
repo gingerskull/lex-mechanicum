@@ -20,9 +20,10 @@ export interface Place {
   off?: number;
   spin?(s: Solved): number;
   name?: string;
-  /** The part's axis (src/core/axis.ts) and, for x or y, where it starts along it. */
-  axis?: Axis;
+  /** The part's axis (src/core/axis.ts) and, for x, y or p, where it starts along it; a posed part's frame key. */
+  axis?: Axis | "p";
   along?: number;
+  frame?: string;
   /** Solid modifiers: far-end scale and helix lead (src/model/types.ts). */
   taper?: number;
   helix?: number;
@@ -53,6 +54,7 @@ const place = (o: Place): Place => {
   if (o.name !== undefined) c.name = o.name;
   if (o.axis !== undefined && o.axis !== "z") c.axis = o.axis;
   if (o.along !== undefined) c.along = o.along;
+  if (o.frame !== undefined) c.frame = o.frame;
   if (o.taper !== undefined) c.taper = o.taper;
   if (o.helix !== undefined) c.helix = o.helix;
   if (o.stretch) c.stretch = true;
@@ -192,7 +194,7 @@ export const layerZ = (p: Part): number => p.layer * LAYER;
 /** z range of a part (its range along its axis), mm, plating included. A pin runs from its layer through `span` layers plus its cap and overhang. */
 export function heights(p: Part): [number, number] {
   // a part on an x or y axis: its extent along that axis, from `along`
-  if (p.axis === "x" || p.axis === "y") {
+  if (p.axis === "x" || p.axis === "y" || p.axis === "p") {
     const w0 = (p.along ?? 0) + (p.dz ?? 0);
     return [w0, p.role === "pin" ? w0 + (p.span ?? 1) * LAYER + (p.th ?? THICK) + (p.over ?? 0.8) : w0 + p.thick];
   }
