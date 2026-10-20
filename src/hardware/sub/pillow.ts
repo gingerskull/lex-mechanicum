@@ -36,10 +36,15 @@ export interface PillowResult {
   seat: [number, number];
 }
 
-const FOOT = 8;
+/** The foot plate's thickness, mm. */
+export const FOOT = 8;
 
-/** The boss radius of a block for a shaft of Ø d. */
-const bossR = (d: number, live: boolean): number => (live ? housingBearing(d).D / 2 + 5 : d / 2 + 6);
+/** The boss radius of a block for a shaft of Ø d: the housing's half-width across the shaft. */
+export const bossR = (d: number, live: boolean): number => (live ? housingBearing(d).D / 2 + 5 : d / 2 + 6);
+
+/** The foot plate's half-width across the shaft, and how far it stands past the block along it, mm. */
+export const footHalf = (d: number, live: boolean): number => bossR(d, live) + 9;
+export const FOOT_PAST = 2;
 
 /**
  * How far a shaft in plan's centre must stand over the base top for its blocks: the foot, and the boss's lower part
@@ -61,11 +66,11 @@ export function pillowBlock(ctx: RuleContext, id: string, s: PillowSpec): Pillow
   // plan coordinates: along the axis, and across it (the plane's u)
   const plan = (along: number, across: number): Vec2 => (s.axis === "x" ? [along, across] : [across, along]);
   const wm = s.w0 + L / 2;
-  const half = Rb + 9;
-  const foot = plate(`${id}-foot`, [plan(s.w0 - 2, p - half), plan(s.w0 + L + 2, p - half), plan(s.w0 + L + 2, p + half), plan(s.w0 - 2, p + half)], {
+  const half = footHalf(s.d, s.live);
+  const foot = plate(`${id}-foot`, [plan(s.w0 - FOOT_PAST, p - half), plan(s.w0 + L + FOOT_PAST, p - half), plan(s.w0 + L + FOOT_PAST, p + half), plan(s.w0 - FOOT_PAST, p + half)], {
     kind: "housing",
     role: "ground",
-    name: s.first ? `Pillow block foot ${2 * half} x ${L + 4} x ${FOOT}, screwed and dowelled to the base` : "",
+    name: s.first ? `Pillow block foot ${2 * half} x ${L + 2 * FOOT_PAST} x ${FOOT}, screwed and dowelled to the base` : "",
     z0: ctx.b1,
     z1: top,
     ex: s.ex,

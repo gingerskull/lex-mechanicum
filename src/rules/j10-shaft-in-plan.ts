@@ -7,9 +7,9 @@
 // motor-driven input keeps a free end past the blocks for its handwheel or pulley. The blocks lift with the shaft in
 // the explode.
 import { bbox, dBore } from "../core/geom";
-import { depth } from "../core/poly";
+import { boxRegion, depth, overlap, type Region } from "../core/poly";
 import { collar, disc, key, setScrew, shaft, screw, washer } from "../hardware/primitives";
-import { pillowBlock, pillowWidth } from "../hardware/sub/pillow";
+import { bossR, FOOT, FOOT_PAST, footHalf, pillowBlock, pillowWidth } from "../hardware/sub/pillow";
 import { keyFor } from "../hardware/tables";
 import { heights } from "../parts";
 import { growBase } from "./base";
@@ -40,7 +40,7 @@ export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
   // the parts, far apart (A9: the shortest overhang, two bearings far apart)
   const wA = a0 - GAP - (live ? COLLAR : 0) - L;
   const after = a1 + GAP;
-  const overhung = blocked(ctx, axis, j.P, after, after + L, d);
+  const overhung = blocked(ctx, axis, j.P, after, after + L, d, live);
   const wB = overhung ? wA - Math.max(20, 2 * d) - L : after;
   const A = pillowBlock(ctx, `${j.id}-blkA`, { axis, P: j.P, w0: wA, d, live, located: true, ex, first: true });
   const B = pillowBlock(ctx, `${j.id}-blkB`, { axis, P: j.P, w0: wB, d, live, located: false, ex, first: false });
@@ -133,13 +133,21 @@ export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
   J.badge = ["two blocks", "ok"];
 }
 
-/** Whether a block from w0 to w1 along the axis would stand in the sweep of a moving part. */
-function blocked(ctx: RuleContext, axis: "x" | "y", P: [number, number], w0: number, w1: number, d: number): boolean {
-  const half = d / 2 + 20;
-  const [u0, u1] = [P[0] - half, P[0] + half];
-  const box = axis === "x" ? [w0, u0, w1, u1] : [u0, w0, u1, w1];
-  const z1 = P[1] + d / 2 + 10;
-  return ctx.sweeps().some((sw) => sw.z1 > ctx.b1 + 0.05 && sw.z0 < z1 && sw.regions.some((g) => g.box[0] < box[2]! && g.box[2] > box[0]! && g.box[1] < box[3]! && g.box[3] > box[1]!));
+/**
+ * Whether a block from w0 to w1 along the axis would stand in the sweep of a moving part: each sweep's outline (a plan
+ * footprint for a part on an x or y axis) against the block's area in plan, the housing's for a sweep that passes over
+ * the foot, the foot's for one that reaches down to it, over the block's height.
+ */
+function blocked(ctx: RuleContext, axis: "x" | "y", P: [number, number], w0: number, w1: number, d: number, live: boolean): boolean {
+  const area = (half: number, past: number): Region => {
+    const [a0, a1, u0, u1] = [w0 - past, w1 + past, P[0] - half, P[0] + half];
+    return axis === "x" ? boxRegion(a0, u0, a1, u1) : boxRegion(u0, a0, u1, a1);
+  };
+  const housing = area(bossR(d, live), 0);
+  const foot = area(footHalf(d, live), FOOT_PAST);
+  const top = ctx.b1 + FOOT;
+  const z1 = P[1] + bossR(d, live);
+  return ctx.sweeps().some((sw) => sw.z1 > ctx.b1 + 0.05 && sw.z0 < z1 && sw.regions.some((g) => overlap(g, sw.z0 < top ? foot : housing) > 0));
 }
 
 export const j10: Rule = {

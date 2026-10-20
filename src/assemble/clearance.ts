@@ -2,14 +2,16 @@
 // tested for interpenetration of their outlines at n phases. Pairs that are one body, one group, or allowed by
 // design are skipped. Two solids on different axes (src/core/axis.ts) are tested by their world boxes, except a posed
 // solid whose frame's axis stands along the base z (a sheave half or a belt sliding up a z shaft): it is tested with
-// the z solids by its outline in plan, as they are.
-import { boxOverlap, frameAxis, framePoint } from "../core/axis";
-import { TAU, xf } from "../core/geom";
-import { overlap, region, type Region } from "../core/poly";
+// the z solids by its outline in plan, as they are. Where a z solid and one on an x or y axis have boxes that meet, the
+// z solid's posed outline is then tested against the other's plan footprint (its box seen from above, as the rule
+// context sees it), so a wheel beside a pillow block clears it by its teeth, not by its square box.
+import { boxOverlap, frameAxis, framePoint, isOut, type Box3 } from "../core/axis";
+import { TAU, xf, type Pose, type Vec2 } from "../core/geom";
+import { boxRegion, overlap, region, type Region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
-import type { MechanismModel } from "../model/types";
+import type { MechanismModel, Solved } from "../model/types";
 import type { Assembly } from "./index";
-import { extentAt, indexParts, isGround, planeKey, ringsAt, solidBox, solidPose } from "./pose";
+import { extentAt, indexParts, isGround, type PartIndex, planeKey, ringsAt, solidBox, solidPose } from "./pose";
 
 export interface Clash {
   a: string;
@@ -22,6 +24,16 @@ export interface Clash {
 
 /** Penetration below this is touching, not clashing (polygon discretisation of circles). */
 export const CLASH_TOL = 0.1;
+
+/** A z solid's posed outline at a phase, at its widest where it tapers out toward its top (its holes kept narrow). */
+function planOf(parts: PartIndex, t: Solid, q: Pose, s: Solved): Region {
+  const k = Math.max(1, t.taper ?? 1);
+  const { outer: P, holes } = ringsAt(parts, t, s);
+  return region(xf(k === 1 ? P : P.map(([x, y]): Vec2 => [x * k, y * k]), q), holes.map((h) => xf(h, q)));
+}
+
+/** The plan footprint of a box. */
+const footprint = (b: Box3): Region => boxRegion(b[0], b[1], b[3], b[4]);
 
 export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Clash[] {
   const parts = indexParts(model);
@@ -85,7 +97,14 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
         const qa = poses[i];
         const qb = poses[k];
         if (!qa || !qb) continue;
-        d = boxOverlap(solidBox(a, qa, s, parts), solidBox(b, qb, s, parts));
+        const ba = solidBox(a, qa, s, parts);
+        const bb = solidBox(b, qb, s, parts);
+        d = boxOverlap(ba, bb);
+        // a z solid against one on an x or y axis: their heights meet, so the plan decides (never deeper than the box)
+        if (d > CLASH_TOL && !a.axis !== !b.axis) {
+          const [z, o, q, bo] = !a.axis ? [a, b, qa, bb] : [b, a, qb, ba];
+          if (isOut(o.axis)) d = Math.min(d, overlap(planOf(parts, z, q, s), footprint(bo)));
+        }
       } else {
         const ra = regs[i];
         const rb = regs[k];
