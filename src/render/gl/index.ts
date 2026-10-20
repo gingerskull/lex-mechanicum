@@ -11,7 +11,7 @@ import type { Prepared, World } from "../world";
 import { gpu, patterns, Table, targets, type Gpu } from "./context";
 import { ITEM_TEXELS, buildItems, refreshItems, type Items } from "./geometry";
 import { planFrame, type Heads } from "./plan";
-import { PER_ROW, ROW, SROW } from "./shaders";
+import { PER_ROW, ROW, SLICE, SROW } from "./shaders";
 
 export { gpuReady, onRestored, loseContext } from "./context";
 export type { Heads } from "./plan";
@@ -130,7 +130,7 @@ export function drawSolids(f: SolidsPass): { own: GpuSession; heads: Heads } {
   }
 
   // the frame's tables: slices, chunks, dash phases, and the screen-space items after the static ones
-  g.slices.write(plan.slices, list.length * 12);
+  g.slices.write(plan.slices, list.length * SLICE);
   g.chunks[0].write(plan.frame.data, plan.frame.n * 12);
   g.chunks[1].write(plan.lines.data, plan.lines.n * 12);
   g.dash.write(plan.dash, plan.dash.length);

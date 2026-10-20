@@ -10,8 +10,9 @@ export const MODE = { wall: 1, wallErase: 2, holeWall: 3, face: 4, faceErase: 5,
 /** Item and chunk tables: three texels per entry, 341 entries per 1023-texel row. */
 export const ROW = 1023;
 export const PER_ROW = 341;
-/** Slice table: three texels per slice. Hole table: one texel per hole. Dash table: one float per texel. */
+/** Slice table: four texels per slice (SLICE floats). Hole table: one texel per hole. Dash table: one float per texel. */
 export const SROW = 1024;
+export const SLICE = 16;
 export const OPS = 1048576;
 
 const f = (x: number) => (Number.isInteger(x) ? `${x}.0` : String(x));
@@ -43,12 +44,13 @@ flat out vec2 vPat;
 
 vec4 itemT(int i, int k) { int t = i * 3 + k; return texelFetch(uItems, ivec2(t % ${ROW}, t / ${ROW}), 0); }
 vec4 chunkT(int c, int k) { int t = c * 3 + k; return texelFetch(uChunks, ivec2(t % ${ROW}, t / ${ROW}), 0); }
-vec4 sliceT(int s, int k) { int t = s * 3 + k; return texelFetch(uSlices, ivec2(t % ${SROW}, t / ${SROW}), 0); }
+vec4 sliceT(int s, int k) { int t = s * 4 + k; return texelFetch(uSlices, ivec2(t % ${SROW}, t / ${SROW}), 0); }
 float dashT(int i) { return texelFetch(uDash, ivec2(i % ${SROW}, i / ${SROW}), 0).r; }
 vec2 proj(vec2 w, float z) { return vec2(uOx + uS * w.x, uOy - uS * (w.y * uCt + z * uSt)); }
 // the slice's axis (0 z, 1 x, 2 y; src/core/axis.ts): a point (p, q) of the solid's plane at a along the axis
 int axis;
-// a posed slice (axis 3): its local (x, y) to screen (pM) and its axis on screen and offset (pT), one affine
+// a posed slice (axis 3): its local (x, y) to screen (pM) and its axis on screen and offset (pT), one affine; a tapered
+// one's far end is its outline scaled (and turned) relative to the near end (poseB)
 vec4 pM;
 vec4 pT;
 vec2 projA(vec2 w, float a) {
@@ -149,7 +151,7 @@ void main() {
     pM = pose;
     pT = sliceT(sl, 2);
     pose = vec4(0.0, 0.0, 1.0, 0.0);
-    poseB = pose;
+    poseB = mods ? sliceT(sl, 3) : pose;
   }
   float fa = s1.z;
   vec2 d = axis == 3 ? pT.xy * (z0 - top) : axis == 1 ? vec2(uS * (z0 - top), 0.0) : axis == 2 ? vec2(0.0, uS * (top - z0) * uCt) : vec2(0.0, uS * (top - z0) * uSt);

@@ -1,10 +1,10 @@
 // World pose of a solid at a solved phase: its body's pose composed with its local pose, or the solid's own motion
 // (belt-driven pulleys, the oscillating drive's crank and link). Shared by assembly, checks, packaging and renderer.
-import { boxOf, frameBox, type Box3 } from "../core/axis";
+import { boxOf, frameAxis, frameBox, type Box3, type Frame3 } from "../core/axis";
 import { xf, xfPose, type Pose, type Vec2 } from "../core/geom";
 import { circleX } from "../core/vec";
 import type { Solid } from "../hardware/solid";
-import { poseOf } from "../model/pose";
+import { deformRings, poseOf } from "../model/pose";
 import type { MechanismModel, Part, Solved } from "../model/types";
 
 export type PartIndex = Record<string, Part>;
@@ -17,8 +17,8 @@ export function bodyPose(parts: PartIndex, body: string, s: Solved): Pose | null
   return p ? poseOf(p, s) : null;
 }
 
-/** True when the body never moves relative to ground. */
-export const isGround = (parts: PartIndex, body: string): boolean => body === "ground" || !!parts[body]?.fixed;
+/** True when the body never moves relative to ground (a posed part fixed in its frame moves with the frame). */
+export const isGround = (parts: PartIndex, body: string): boolean => body === "ground" || (!!parts[body]?.fixed && parts[body]!.axis !== "p");
 
 /** The phase direction of the input at u: +1 when the input angle grows. */
 function direction(model: MechanismModel, parts: PartIndex, body: string, u: number): 1 | -1 {
@@ -46,21 +46,40 @@ export function alongPath(path: Vec2[], s: number): Pose {
 }
 
 /**
- * A solid's local outline at a solved phase: its outline, stretched along x to the distance of its two points, or its
- * part's deforming outline (src/model/types.ts).
+ * A solid's local rings at a solved phase: its outline, stretched along x to the distance of its two points, or its
+ * part's deforming outline (src/model/types.ts); a deforming part that gives its holes replaces the solid's first
+ * holes with them (the rules may have cut more, which stay).
  */
-export function shapeAt(parts: PartIndex, t: Pick<Solid, "outer" | "stretch" | "deform" | "body">, s: Solved): Vec2[] {
+export function ringsAt(parts: PartIndex, t: Pick<Solid, "outer" | "holes" | "stretch" | "deform" | "body">, s: Solved): { outer: Vec2[]; holes: Vec2[][] } {
   if (t.stretch) {
     const a = s.pts[t.stretch[0]];
     const b = s.pts[t.stretch[1]];
     const L = a && b ? Math.hypot(b[0] - a[0], b[1] - a[1]) : 1;
-    return t.outer.map(([x, y]): Vec2 => [x * L, y]);
+    return { outer: t.outer.map(([x, y]): Vec2 => [x * L, y]), holes: t.holes };
   }
   if (t.deform) {
     const f = parts[t.body]?.deform;
-    if (f) return f(s);
+    if (f) {
+      const r = deformRings(f(s));
+      return { outer: r.outer, holes: r.holes ? [...r.holes, ...t.holes.slice(r.holes.length)] : t.holes };
+    }
   }
-  return t.outer;
+  return t;
+}
+
+/** A solid's local outline at a solved phase (ringsAt's outer ring). */
+export const shapeAt = (parts: PartIndex, t: Pick<Solid, "outer" | "stretch" | "deform" | "body">, s: Solved): Vec2[] =>
+  ringsAt(parts, { ...t, holes: [] }, s).outer;
+
+/**
+ * A solid's extent along its axis at a solved phase: z0..z1, or for a posed solid that reaches a world point
+ * (`reach`), that end moved to where the point lies along the frame's axis.
+ */
+export function extentAt(t: Pick<Solid, "z0" | "z1" | "reach">, f?: Frame3): [number, number] {
+  if (!t.reach || !f) return [t.z0, t.z1];
+  const W = frameAxis(f);
+  const w = (t.reach.to[0] - f.o[0]) * W[0] + (t.reach.to[1] - f.o[1]) * W[1] + (t.reach.to[2] - f.o[2]) * W[2];
+  return t.reach.end === 1 ? [t.z0, w] : [w, t.z1];
 }
 
 export function solidPose(model: MechanismModel, parts: PartIndex, t: Pick<Solid, "body" | "at" | "motion">, s: Solved, u: number): Pose | null {
@@ -89,15 +108,24 @@ export function solidPose(model: MechanismModel, parts: PartIndex, t: Pick<Solid
 
 /**
  * The world box of a solid at a pose (its outline posed in its plane, over its extent along its axis); a solid that
- * widens toward its far end (taper above 1) is boxed at its widest.
+ * widens toward its far end (taper above 1) is boxed at its widest. With `parts`, a stretched or deforming solid is
+ * boxed at its outline of the phase.
  */
-export const solidBox = (t: Pick<Solid, "axis" | "outer" | "z0" | "z1" | "taper" | "frame">, q: Pose, s?: Solved): Box3 => {
+export const solidBox = (
+  t: Pick<Solid, "axis" | "outer" | "z0" | "z1" | "taper" | "frame" | "reach" | "stretch" | "deform" | "body">,
+  q: Pose,
+  s?: Solved,
+  parts?: PartIndex,
+): Box3 => {
   const k = Math.max(1, t.taper ?? 1);
-  const P = xf(k === 1 ? t.outer : t.outer.map(([x, y]): Vec2 => [x * k, y * k]), q);
+  const O = parts && s && (t.stretch || t.deform) ? shapeAt(parts, t, s) : t.outer;
+  const P = xf(k === 1 ? O : O.map(([x, y]): Vec2 => [x * k, y * k]), q);
   if (t.axis === "p") {
     // a posed solid is boxed in its frame at the phase (a far box when the frame is not solved)
     const f = t.frame ? s?.frames?.[t.frame] : undefined;
-    return f ? frameBox(f, P, t.z0, t.z1) : [1e9, 1e9, 1e9, 1e9, 1e9, 1e9];
+    if (!f) return [1e9, 1e9, 1e9, 1e9, 1e9, 1e9];
+    const [w0, w1] = extentAt(t, f);
+    return frameBox(f, P, w0, w1);
   }
   return boxOf(t.axis, P, t.z0, t.z1);
 };

@@ -133,7 +133,7 @@ function evidence(inp: AuditInput, reqs: Requirement[]): Record<string, Row> {
   }
   set("K7", `input ${inp.model.input.kind} on ${inp.model.input.part}`);
   // A
-  const pinTypes = a.joints.filter((j) => /^J\d$/.test(j.type)).map((j) => `${j.id} ${j.type}`);
+  const pinTypes = a.joints.filter((j) => /^J\d+$/.test(j.type)).map((j) => `${j.id} ${j.type}`);
   set("A1", `${pinTypes.join(", ") || "no joints"}; ${out.A1?.evidence ?? ""}`.replace(/; $/, ""));
   set("A2", pinTypes.join(", ") || "no joints");
   const solids = a.solids;

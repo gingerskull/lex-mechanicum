@@ -7,6 +7,12 @@ function forPart(ctx: RuleContext, t: Solid): string {
   const p = ctx.parts[t.body];
   if (!p) return "Aluminium 6061-T6, anodised";
   if (ctx.model.cams?.some((c) => c.cam === p.id)) return "Steel 16MnCr5, case-hardened";
+  // a timing belt's back and its pulleys (J12)
+  for (const f of ctx.model.flexible ?? []) {
+    if (f.form !== "belt") continue;
+    if (f.band === p.id) return "Neoprene, glass-fibre cords";
+    if (f.over.includes(p.id)) return "Aluminium 6061-T6, anodised";
+  }
   if (p.z !== undefined || p.m !== undefined) return "Steel C45, teeth induction-hardened";
   if (p.fixed && p.role === "ground") return "Steel C45, hardened and ground";
   if (p.len !== undefined) return "Steel C45, black oxide";

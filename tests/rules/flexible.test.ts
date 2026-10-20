@@ -74,7 +74,7 @@ describe("stretched, conveyed and deforming members", () => {
     const items = buildItems(P);
     const W = worldSolids(P, deformModel, indexParts(deformModel), deformModel.solve(1), 1, 0, () => true);
     const w = W.find((x) => x.p === p)!;
-    expect(w.local).toHaveLength(120);
+    expect(w.local!.outer).toHaveLength(120);
     const before = items.data.slice();
     const [lo, hi] = refreshItems(items, p, w.local!);
     const it = items.solids.get(p)!;
@@ -82,7 +82,7 @@ describe("stretched, conveyed and deforming members", () => {
     // only the solid's own items change, and its first edge now starts at the deformed outline's first point
     for (let i = 0; i < items.data.length; i++) if (i < lo * ITEM_TEXELS * 4 || i >= (hi + 1) * ITEM_TEXELS * 4) expect(items.data[i]).toBe(before[i]);
     const o = it.outer[0] * ITEM_TEXELS * 4;
-    expect(items.data[o + 4]).toBeCloseTo(w.local![0]![0], 4);
+    expect(items.data[o + 4]).toBeCloseTo(w.local!.outer[0]![0], 4);
   });
 
   it("assembles each fixture with no clash and no clamp fault, and the model check accepts the declarations", () => {

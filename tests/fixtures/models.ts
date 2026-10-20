@@ -2,10 +2,10 @@
 import { D2R, TAU, type Vec2 } from "../../src/core/geom";
 import { V, circleX, osc } from "../../src/core/vec";
 import { defineMechanism } from "../../src/model/define";
-import type { MechanismModel } from "../../src/model/types";
+import type { MechanismModel, Solved } from "../../src/model/types";
 import { P } from "../../src/parts";
 import { bevel, bevelOutline, pitchCones } from "../../src/core/spatial";
-import { centresFor } from "../../src/core/flex";
+import { beltLength, beltPath, beltRing, centresFor, htd, radiusFor } from "../../src/core/flex";
 import { sprocketR } from "../../src/rules/j12-flexible";
 import { circle } from "../../src/core/geom";
 
@@ -234,7 +234,7 @@ export const j11Model: MechanismModel = defineMechanism({
   },
 });
 
-/** J12 chain: the catalogue's chain drive, 15T and 30T sprockets at 12.7 pitch, the centres set for 62 links. */
+/** J12 chain: the catalogue's chain drive, 15T and 30T ISO 606 sprockets at 12.7 pitch, the centres set for 62 links. */
 const CH = { p: 12.7, z1: 15, z2: 30 };
 const chR1 = sprocketR(CH.z1, CH.p);
 const chR2 = sprocketR(CH.z2, CH.p);
@@ -243,13 +243,14 @@ export const chainModel: MechanismModel = defineMechanism({
   id: "fx-chain",
   input: { kind: "rotary", part: "s1" },
   parts: [
-    P.gear("s1", CH.z1, CH.p / Math.PI, { role: "driver", at: "O1", spin: (s) => s.a as number }),
-    P.gear("s2", CH.z2, CH.p / Math.PI, { role: "output", at: "O2", spin: (s) => (s.a as number) * (CH.z1 / CH.z2) }),
+    P.sprocket("s1", CH.z1, CH.p, 8.5, { role: "driver", at: "O1", spin: (s) => s.a as number, holes: [circle(6, 0, 0, 36)] }),
+    P.sprocket("s2", CH.z2, CH.p, 8.5, { role: "output", at: "O2", spin: (s) => (s.a as number) * (CH.z1 / CH.z2), holes: [circle(7.2, 0, 0, 36)] }),
     P.cap("pO1", -1, 7, { fixed: [0, 0, 0], accent: true }),
     P.cap("pO2", -1, 7, { fixed: [chC, 0, 0] }),
   ],
   flexible: [{ form: "chain", over: ["s1", "s2"], travel: "t", pitch: CH.p, roller: 8.5 }],
-  solve: (u) => ({ pts: { O1: [0, 0], O2: [chC, 0] }, a: u, t: u * chR1 }),
+  // one pitch of chain per tooth: the travel is the driver's angle times z1·p / 2π (the mean chain speed)
+  solve: (u) => ({ pts: { O1: [0, 0], O2: [chC, 0] }, a: u, t: (u * CH.z1 * CH.p) / TAU }),
 });
 
 /** J12 rope: a rope over two fixed sheaves, a load block on one end rising as the other end is hauled down. */
@@ -389,4 +390,102 @@ export const stretchModel: MechanismModel = defineMechanism({
     P.cap("pX", 2, 1.5, { fixed: [42, 0, 0] }),
   ],
   solve: () => ({ pts: { S0: [0, 0], S1: [50, 0] } }),
+});
+
+/**
+ * J12 timing belt: HTD 5M, 36 and 18 grooves, the centres set for 90 teeth; the large pulley declared first and the small
+ * one driving, so the slack span is the upper one and the small pulley the second (the belt drive has them the other
+ * way round). The band is a fixed part round the pitch path, its teeth carried round by the travel t.
+ */
+const BT = { p: 5, z1: 36, z2: 18 };
+const btR1 = (BT.p * BT.z1) / TAU;
+const btR2 = (BT.p * BT.z2) / TAU;
+const btC = centresFor(btR1, btR2, 90 * BT.p);
+const btBand = (off: number): Vec2[] => beltPath([0, 0], btR1 + off, [btC, 0], btR2 + off, Math.PI / 96);
+export const beltModel: MechanismModel = defineMechanism({
+  id: "fx-belt",
+  input: { kind: "rotary", part: "small" },
+  parts: [
+    P.pulley("big", BT.z1, BT.p, { role: "output", at: "O1", spin: (s) => s.b as number, holes: [circle(7.2, 0, 0, 36)] }),
+    P.pulley("small", BT.z2, BT.p, { role: "driver", at: "O2", spin: (s) => s.a as number, holes: [circle(6, 0, 0, 36)] }),
+    P.custom("band", btBand(htd(BT.p).hs - htd(BT.p).ht - htd(BT.p).pld), { role: "link", dz: 0.6, thick: 5.8, fixed: [0, 0, 0], holes: [btBand(-htd(BT.p).pld + 0.05)] }),
+    P.cap("pO1", -1, 7, { fixed: [0, 0, 0] }),
+    P.cap("pO2", -1, 7, { fixed: [btC, 0, 0], accent: true }),
+  ],
+  flexible: [{ form: "belt", over: ["big", "small"], travel: "t", pitch: BT.p, band: "band" }],
+  solve: (u) => ({ pts: { O1: [0, 0], O2: [btC, 0] }, a: u, b: (u * btR2) / btR1, t: u * btR2 }),
+});
+
+/**
+ * J12 CVT: two live z shafts 110 apart, each with a fixed sheave half (a frustum, `taper`) and a sliding half posed by
+ * a frame that slides along the shaft (axis "p"), set diagonally: the input's fixed half above its sliding half, the
+ * output's below. The V-belt is a deforming band (its outer and inner edges both change, a hole) on a frame that moves
+ * with the belt plane. The input's wrap radius is swept over the cycle while it turns twice; the output's is solved from
+ * the constant belt length (radiusFor) and its angle integrated (with a linear trim to a whole number of turns, so
+ * the cycle closes). The output half is sprung; the input half is set by the cycle.
+ */
+export const CVT = { C: 110, R: 40, k: 0.35, t: 6, w: 10, h: 6, n: 24 };
+const cvtL = beltLength(25, 25, CVT.C);
+const cvtR1 = (u: number) => 25 + 7 * Math.sin(u);
+const cvtR2 = (u: number) => radiusFor(cvtR1(u), CVT.C, cvtL);
+/** The axial gap between the halves' faces where the belt runs at radius r. */
+const cvtGap = (r: number) => CVT.w - (2 * CVT.t * (r - CVT.k * CVT.R)) / (CVT.R * (1 - CVT.k));
+// the fixed halves' faces: the output's up at z 6, the input's down at the mean belt plane plus its mean gap
+const CVT_N = 720;
+const cvtB: number[] = [0];
+let cvtG = 0;
+for (let i = 0; i < CVT_N; i++) {
+  const u = ((i + 0.5) / CVT_N) * TAU;
+  cvtB.push(cvtB[i]! + (2 * (TAU / CVT_N) * cvtR1(u)) / cvtR2(u));
+  cvtG += (cvtGap(cvtR1(u)) + cvtGap(cvtR2(u))) / 2 / CVT_N;
+}
+const cvtTrim = (Math.round(cvtB[CVT_N]! / TAU) * TAU - cvtB[CVT_N]!) / TAU;
+const cvtOut = (u: number) => {
+  const x = ((((u % TAU) + TAU) % TAU) / TAU) * CVT_N;
+  const i = Math.min(CVT_N - 1, Math.floor(x));
+  return cvtB[i]! + (cvtB[i + 1]! - cvtB[i]!) * (x - i) + cvtTrim * (((u % TAU) + TAU) % TAU) + Math.round(cvtB[CVT_N]! / TAU) * TAU * Math.floor(u / TAU);
+};
+const zOutFace = 6;
+const zInFace = zOutFace + cvtG;
+const cvtBand = (r1: number, r2: number) => ({
+  outer: beltRing([0, 0], r1 + CVT.h / 2, [CVT.C, 0], r2 + CVT.h / 2, CVT.n),
+  holes: [beltRing([0, 0], r1 - CVT.h / 2, [CVT.C, 0], r2 - CVT.h / 2, CVT.n)],
+});
+const half = (id: string, r: number, o: Parameters<typeof P.disc>[2], taper: number) => ({ ...P.disc(id, r, { ...o, thick: CVT.t, holes: [circle(6, 0, 0, 36)], marks: [] }), taper });
+export const cvtModel: MechanismModel = defineMechanism({
+  id: "fx-cvt",
+  input: { kind: "rotary", part: "inFixed" },
+  parts: [
+    // the input's fixed half: its narrow face down (it widens toward z1, taper 1 / k)
+    half("inFixed", CVT.k * CVT.R, { role: "driver", layer: 1, dz: zInFace - 10, at: "O1", spin: (s) => s.a as number }, 1 / CVT.k),
+    half("inSlide", CVT.R, { role: "driver", axis: "p", frame: "inSlide", along: 0, layer: 0, fixed: [0, 0, 0] }, CVT.k),
+    half("outFixed", CVT.R, { role: "output", layer: 0, dz: 0, at: "O2", spin: (s) => s.b as number }, CVT.k),
+    half("outSlide", CVT.k * CVT.R, { role: "output", axis: "p", frame: "outSlide", along: 0, layer: 1, fixed: [0, 0, 0] }, 1 / CVT.k),
+    { ...P.custom("vbelt", cvtBand(25, 25).outer, { role: "link", axis: "p", frame: "belt", along: -4, thick: 8, layer: 1, fixed: [0, 0, 0], holes: cvtBand(25, 25).holes }), deform: (s: Solved) => cvtBand(s.r1 as number, s.r2 as number) },
+    P.cap("pO1", -1, 7, { fixed: [0, 0, 0], accent: true, span: 3 }),
+    P.cap("pO2", -1, 7, { fixed: [CVT.C, 0, 0] }),
+  ],
+  flexible: [{ form: "cvt", pairs: [{ fixed: "inFixed", sliding: "inSlide" }, { fixed: "outFixed", sliding: "outSlide", spring: true }], belt: "vbelt" }],
+  solve(u) {
+    const r1 = cvtR1(u);
+    const r2 = cvtR2(u);
+    const g1 = cvtGap(r1);
+    const g2 = cvtGap(r2);
+    const a = 2 * u;
+    const b = cvtOut(u);
+    // the input's sliding half below its fixed one (its back at z0), the output's above (its face at z0)
+    const fr = (o: [number, number, number], ang: number) => ({ o, u: [Math.cos(ang), Math.sin(ang), 0] as [number, number, number], v: [-Math.sin(ang), Math.cos(ang), 0] as [number, number, number] });
+    return {
+      pts: { O1: [0, 0], O2: [CVT.C, 0] },
+      a,
+      b,
+      r1,
+      r2,
+      frames: {
+        inSlide: fr([0, 0, zInFace - g1 - CVT.t], a),
+        outSlide: fr([CVT.C, 0, zOutFace + g2], b),
+        belt: fr([0, 0, (zInFace - g1 / 2 + zOutFace + g2 / 2) / 2], 0),
+      },
+    };
+  },
 });

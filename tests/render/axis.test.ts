@@ -92,7 +92,7 @@ describe("the frame plan across axes", () => {
     const dynStart = Math.ceil(s.items.data.length / (4 * ROW)) * PER_ROW;
     return { list, out: planFrame({ list, T: theme("dark"), LD, cardK: { plate: 1, base: 1 }, Pr, items: s.items, dynStart }) };
   };
-  const row = (o: Float32Array, i: number) => Array.from(o.subarray(i * 12, i * 12 + 12));
+  const row = (o: Float32Array, i: number) => Array.from(o.subarray(i * 16, i * 16 + 12));
   const chunks = (c: Chunks) => Array.from({ length: c.n }, (_, i) => Array.from(c.data.subarray(i * ITEM, (i + 1) * ITEM)));
 
   it("writes the axis code, the far and the near end of each slice: a y slice is seen from its low-y end", () => {
@@ -144,11 +144,11 @@ describe("cone and helix forms", () => {
     const items = buildItems(P);
     const out = planFrame({ list, T: theme("dark"), LD: ladder("full", { tilt: 28, explode: 0 }), cardK: { plate: 1, base: 1 }, Pr, items, dynStart: Math.ceil(items.data.length / (4 * ROW)) * PER_ROW });
     list.forEach((Sl, i) => {
-      const r = Array.from(out.slices.subarray(i * 12, i * 12 + 12));
+      const r = Array.from(out.slices.subarray(i * 16, i * 16 + 12));
       const p = Sl.w.p;
       if (!p.mods) {
         expect(r[7]! < 4).toBe(true);
-        expect(r.slice(8)).toEqual(r.slice(0, 4));
+        expect(r.slice(8, 12)).toEqual(r.slice(0, 4));
         return;
       }
       expect(r[7]).toBe((Sl.w.axis === "x" ? 1 : 0) + 4);
@@ -194,7 +194,7 @@ describe("posed axes", () => {
     const items = buildItems(P);
     const out = planFrame({ list, T: theme("dark"), LD: ladder("full", { tilt: 28, explode: 0 }), cardK: { plate: 1, base: 1 }, Pr, items, dynStart: Math.ceil(items.data.length / (4 * ROW)) * PER_ROW });
     const i = list.findIndex((Sl) => Sl.w.p.s.id === "cross");
-    const r = Array.from(out.slices.subarray(i * 12, i * 12 + 12));
+    const r = Array.from(out.slices.subarray(i * 16, i * 16 + 12));
     expect(r[7]).toBe(3);
     // a local point (p, q) of the cross at `top` along its axis, through the row's affine and through the frame
     const [p, q, a] = [5, -2, r[5]!];

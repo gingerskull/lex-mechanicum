@@ -53,6 +53,8 @@ export interface PackedSolid {
   stretch?: [string, string];
   /** A posed solid's frame key: its axis is "p" (src/core/axis.ts, Frame3). */
   frame?: string;
+  /** A posed solid whose end reaches a world point each frame (src/hardware/solid.ts). */
+  reach?: { to: [number, number, number]; end: 0 | 1 };
   /** FLAG bits: inset, accent, faint, isBase, headTop, seeThrough, and the axis (axisX, axisY; neither is z). */
   flags: number;
   /** x, y pairs, body-local mm: the outer outline, then each hole, then each mark. */
@@ -210,6 +212,7 @@ export function pack(a: PackInput, sampled: Sampled): Package {
     if (s.helix !== undefined) p.helix = s.helix;
     if (s.stretch) p.stretch = [s.stretch[0], s.stretch[1]];
     if (s.axis === "p" && s.frame) p.frame = s.frame;
+    if (s.axis === "p" && s.reach) p.reach = { to: [s.reach.to[0], s.reach.to[1], s.reach.to[2]], end: s.reach.end };
     return p;
   });
   const traces: Record<string, Float32Array> = {};

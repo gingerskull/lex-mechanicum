@@ -35,11 +35,12 @@ export interface Items {
 }
 
 /**
- * Rewrites a stretched or deforming solid's items (outline edges, top-face triangles, outline vertices) for its outline
- * of this frame, in place: the point count never changes, so the item ranges hold. Returns the first and last item
+ * Rewrites a stretched or deforming solid's items (outline and hole edges, top-face triangles, outline vertices) for its
+ * rings of this frame, in place: the point counts never change, so the item ranges hold. Returns the first and last item
  * written.
  */
-export function refreshItems(items: Items, p: Prepared, outer: Vec2[]): [number, number] {
+export function refreshItems(items: Items, p: Prepared, rings: { outer: Vec2[]; holes: Vec2[][] }): [number, number] {
+  const { outer, holes } = rings;
   const it = items.solids.get(p)!;
   const D = items.data;
   const n = outer.length;
@@ -65,7 +66,21 @@ export function refreshItems(items: Items, p: Prepared, outer: Vec2[]): [number,
     put(it.outer[0] + i, s, -1, cum, cum + L, a, b);
     cum += L;
   }
-  const pts = [...outer, ...p.holes.flat()];
+  // the holes' edges, each keeping its hole id (the hole table points at them)
+  let h0 = it.holes[0];
+  for (const h of holes) {
+    const sh = area(h) > 0 ? 1 : -1;
+    let c = 0;
+    for (let i = 0; i < h.length; i++) {
+      const a = h[i]!;
+      const b = h[(i + 1) % h.length]!;
+      const L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      put(h0 + i, sh, D[(h0 + i) * ITEM_TEXELS * 4 + 1]!, c, c + L, a, b);
+      c += L;
+    }
+    h0 += h.length;
+  }
+  const pts = [...outer, ...holes.flat()];
   const tri = it.tri ?? [];
   for (let k = 0; k < tri.length; k += 3) put(it.tris[0] + k / 3, 0, 0, 0, 0, pts[tri[k]!]!, pts[tri[k + 1]!]!, pts[tri[k + 2]!]!);
   for (let i = 0; i < n; i++) put(it.verts[0] + i, s, 0, 0, 0, outer[(i - 1 + n) % n]!, outer[i]!, outer[(i + 1) % n]!);

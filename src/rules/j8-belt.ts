@@ -2,11 +2,24 @@
 // slotted arm when the wrap on the small pulley is short.
 import { bbox, roundedPoly, type Vec2 } from "../core/geom";
 import { disc } from "../hardware/primitives";
-import { solid } from "../hardware/solid";
+import { solid, type Solid } from "../hardware/solid";
 import { PULLEYS } from "../hardware/tables";
-import type { Rule } from "./types";
+import type { Joint, Rule, RuleContext } from "./types";
 
 const SLOT = 2.5;
+/** A belt flange's thickness, mm. */
+export const FLANGE_T = 0.8;
+
+/**
+ * Flanges of Ø fd either side of a pulley, turning with it, so the belt cannot walk off (F10): `${id}-fl0` under it and
+ * `${id}-fl1` over it, in the pulley's group.
+ */
+export function flanges(ctx: RuleContext, pulley: Solid, fd: number, J?: Joint, name = "Pulley flanges"): void {
+  const fl = { body: pulley.body, at: pulley.at, ...(pulley.motion ? { motion: pulley.motion } : {}), ...(pulley.axis ? { axis: pulley.axis } : {}), joints: pulley.joints, ex: pulley.ex, kind: "pulley" as const, role: pulley.role, mat: "Steel, zinc plated", group: pulley.id };
+  ctx.add(solid(`${pulley.id}-fl0`, { ...fl, name, qty: 2, outer: disc(fd / 2), holes: pulley.holes, z0: pulley.z0 - FLANGE_T, z1: pulley.z0 }));
+  ctx.add(solid(`${pulley.id}-fl1`, { ...fl, name: "", outer: disc(fd / 2), holes: pulley.holes, z0: pulley.z1, z1: pulley.z1 + FLANGE_T }));
+  if (J) (J.serves.F10 ??= []).push(`${pulley.id}-fl0`);
+}
 
 export const j8: Rule = {
   id: "j8-belt",
@@ -28,11 +41,7 @@ export const j8: Rule = {
       // flanges either side of the small pulley so the belt cannot walk off
       const [x0, , x1] = bbox(small.outer);
       const r = (x1 - x0) / 2;
-      const fl = { body: small.body, at: small.at, ...(small.motion ? { motion: small.motion } : {}), ...(small.axis ? { axis: small.axis } : {}), joints: small.joints, ex: small.ex, kind: "pulley" as const, role: small.role, mat: "Steel, zinc plated", group: small.id };
-      const fd = r < 6 ? PULLEYS[16].fd : PULLEYS[32].fd;
-      ctx.add(solid(`${small.id}-fl0`, { ...fl, name: "Pulley flanges", qty: 2, outer: disc(fd / 2), holes: small.holes, z0: small.z0 - 0.8, z1: small.z0 }));
-      ctx.add(solid(`${small.id}-fl1`, { ...fl, name: "", outer: disc(fd / 2), holes: small.holes, z0: small.z1, z1: small.z1 + 0.8 }));
-      if (J) (J.serves.F10 ??= []).push(`${small.id}-fl0`);
+      flanges(ctx, small, r < 6 ? PULLEYS[16].fd : PULLEYS[32].fd, J);
       // tension: the mount's screw holes become slots along the belt, the motor slides and is clamped
       const mount = b.mount ? ctx.get(b.mount) : undefined;
       const c = Math.hypot(pb[0] - pa[0], pb[1] - pa[1]) || 1;

@@ -7,7 +7,7 @@ import { edgeDist, overlap, region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, planeKey, shapeAt, solidBox, solidPose } from "./pose";
+import { indexParts, isGround, planeKey, ringsAt, solidBox, solidPose } from "./pose";
 
 const maxR = (t: Solid, cx: number, cy: number, q: [number, number, number]) =>
   Math.max(...xf(t.outer, q).map(([x, y]) => Math.hypot(x - cx, y - cy)));
@@ -38,13 +38,15 @@ export function clampCheck(model: MechanismModel, assembly: Assembly, n = 12): s
         const qr = pose.get(r);
         const qg = pose.get(g);
         if (planeKey(r) !== planeKey(g)) {
-          if (qr && qg && boxesTouch(solidBox(r, qr, s), solidBox(g, qg, s))) out.add(`${r.id} (turning) touches the ground face of ${g.id}`);
+          if (qr && qg && boxesTouch(solidBox(r, qr, s, parts), solidBox(g, qg, s, parts))) out.add(`${r.id} (turning) touches the ground face of ${g.id}`);
           continue;
         }
         if (Math.abs(r.z1 - g.z0) > 0.05 && Math.abs(g.z1 - r.z0) > 0.05) continue;
         if (!qr || !qg) continue;
-        const ra = region(xf(shapeAt(parts, r, s), qr), r.holes.map((h) => xf(h, qr)));
-        const rb = region(xf(shapeAt(parts, g, s), qg), g.holes.map((h) => xf(h, qg)));
+        const Rr = ringsAt(parts, r, s);
+        const Rg = ringsAt(parts, g, s);
+        const ra = region(xf(Rr.outer, qr), Rr.holes.map((h) => xf(h, qr)));
+        const rb = region(xf(Rg.outer, qg), Rg.holes.map((h) => xf(h, qg)));
         // touching faces overlap in plan when a vertex of one lies inside the other's material
         if (overlap(ra, rb) <= 0.05) continue;
         const brg = r.kind === "bearing" ? r : g.kind === "bearing" ? g : null;

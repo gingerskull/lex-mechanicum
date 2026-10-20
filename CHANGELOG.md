@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.34.0 — 2026-10-20
+
+- Belt drive added to standard 2.11: an HTD 8M timing belt, 24 to 48 grooves, 2:1, its teeth carried round the
+  pulleys, a flanged idler on the slack span on a slotted arm, both shafts straddle mounted.
+- Friction wheel drive added to standard 2.11: a rubber-tyred wheel on a hex sleeve across a ground steel disc, shifted
+  along its shaft by a fork on a slide to set the ratio from 3 to -1, the disc pressed on the wheel by disc springs.
+- Chain drive added to standard 2.12: an ISO 08B roller chain, 15 to 30 teeth on ISO 606 sprockets, 62 links, its
+  rollers and link plates carried round, a toothed idler on the slack span, greased.
+- Rules (standard 2.11): a timing belt declared as a flexible member, the idler shared by chain and belt, a bridge over
+  each live shaft joined by a chain, belt or CVT, the timing pulley part `P.pulley`; the audit lists J10 to J13 among
+  the joints.
+- Engine (standard 2.12): posed solids honour their taper and their deforming outline, deforming outlines carry holes,
+  a posed solid can reach a fixed point (a spring keeping its seat); the CVT rule names its fixed and sliding halves,
+  sizes its keys from the shaft and springs only the halves that ask; `P.sprocket`, the chain conveyed on a path a
+  whole number of pitches long, the idler a toothed sprocket on the rollers' line.
+
 ## 0.33.0 — 2026-10-20
 
 - Rules: the hand fixes of the two spatial-engine pilots promoted (standard 2.10, AUTO).

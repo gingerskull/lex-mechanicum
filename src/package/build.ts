@@ -24,7 +24,7 @@ export function envelope(model: MechanismModel, a: Assembly, n = 72): { minX: nu
       const q = solidPose(model, parts, t, s, u);
       if (!q) continue;
       // a solid on an x or y axis covers its box's plan footprint
-      for (const [x, y] of t.axis ? planCorners(solidBox(t, q, s)) : xf(shapeAt(parts, t, s), q)) {
+      for (const [x, y] of t.axis ? planCorners(solidBox(t, q, s, parts)) : xf(shapeAt(parts, t, s), q)) {
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
         if (y < minY) minY = y;
@@ -53,7 +53,7 @@ export function zSweep(model: MechanismModel, a: Assembly, n = 72): [number, num
     for (const t of out) {
       const q = solidPose(model, parts, t, s, u);
       if (!q) continue;
-      const b = solidBox(t, q, s);
+      const b = solidBox(t, q, s, parts);
       z0 = Math.min(z0, b[2]);
       z1 = Math.max(z1, b[5]);
     }

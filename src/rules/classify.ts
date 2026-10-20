@@ -5,6 +5,7 @@ import { toWorld } from "../core/axis";
 import { TAU, bbox, wrap, type Vec2 } from "../core/geom";
 import { edgeDist, holeSlot, inside, notchAt, toLocal, type Slot } from "../core/poly";
 import { BORES, bearingFor } from "../hardware/tables";
+import { membersOf, wheelsOf } from "../model/flex";
 import { partShape, poseOf } from "../model/pose";
 import type { Part } from "../model/types";
 import { heights } from "../parts";
@@ -280,7 +281,7 @@ export const classify: Rule = {
           : j.kind === "mesh"
             ? j.at
             : j.kind === "flex"
-              ? posOf(ctx.parts[j.spec.over[0]!]!)
+              ? posOf(ctx.parts[wheelsOf(j.spec)[0]!]!)
               : j.kind === "compliant"
                 ? (ctx.s0.pts[j.spec.at] ?? [0, 0])
                 : posOf(j.kind === "slide" ? j.slider : j.kind === "cam" ? j.cam : j.kind === "crossMesh" ? j.b : j.nut);
@@ -294,11 +295,13 @@ export const classify: Rule = {
               : j.kind === "screw"
                 ? `Screw · ${j.screw.id}`
                 : j.kind === "flex"
-                  ? `${j.spec.form === "chain" ? "Chain" : j.spec.form === "rope" ? "Rope" : "CVT belt"} · ${j.spec.over.join(" and ")}`
+                  ? `${{ chain: "Chain", rope: "Rope", belt: "Belt", cvt: "CVT belt" }[j.spec.form]} · ${wheelsOf(j.spec).join(" and ")}`
                   : j.kind === "compliant"
                     ? `Flexure · ${j.spec.neck}`
                     : `Cam · ${j.cam.id}`;
-      ctx.joints.push({ id: j.id, type: j.type, at, title, note: "", serves: {}, ...(j.kind === "pin" ? { d: j.d } : {}) });
+      // a timing belt is a belt (J8) whose build J12 makes
+      const type = j.kind === "flex" && j.spec.form === "belt" ? "J8" : j.type;
+      ctx.joints.push({ id: j.id, type, at, title, note: "", serves: {}, ...(j.kind === "pin" ? { d: j.d } : {}) });
       const members =
         j.kind === "pin"
           ? j.joined.map((x) => x.part)
@@ -309,7 +312,7 @@ export const classify: Rule = {
               : j.kind === "screw"
                 ? [j.screw, j.nut]
                 : j.kind === "flex"
-                  ? j.spec.over.map((id) => ctx.parts[id]!).filter(Boolean)
+                  ? (j.spec.form === "cvt" ? membersOf(j.spec) : [...j.spec.over, ...(j.spec.form === "belt" ? [j.spec.band] : [])]).map((id) => ctx.parts[id]!).filter(Boolean)
                   : j.kind === "compliant"
                     ? [j.spec.neck, j.spec.ground, j.spec.lever].map((id) => ctx.parts[id]!).filter(Boolean)
                     : [j.cam, j.follower];
