@@ -1,0 +1,3350 @@
+{
+  "non-circular-gears": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              170,
+              110
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                40,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "gear1",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 20,
+            "module": 3.737,
+            "face": 12,
+            "bore": 12,
+            "pitch": {
+              "curve": "ellipse",
+              "a": 40,
+              "e": 0.5,
+              "pivot": "focus"
+            }
+          },
+          "at": {
+            "joint": "F1"
+          }
+        },
+        {
+          "id": "gear2",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "z": 20,
+            "module": 3.737,
+            "face": 12,
+            "bore": 12,
+            "pitch": {
+              "curve": "ellipse",
+              "a": 40,
+              "e": 0.5,
+              "pivot": "focus"
+            },
+            "phase": "half a pitch, a tooth of one meets a gap of the other on the line of centres"
+          },
+          "at": {
+            "joint": "F2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "F1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear1",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "F2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear2",
+          "at": [
+            80,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "gear1",
+          "b": "gear2",
+          "at": [
+            60,
+            0,
+            0
+          ],
+          "z1": 20,
+          "z2": 20,
+          "pitch": "ellipse",
+          "note": "the contact stays on the line of centres F1-F2, r1 + r2 = 2a"
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 40,
+          "unit": "mm",
+          "min": 30,
+          "max": 50,
+          "note": "semi-major axis; the foci are 2a apart"
+        },
+        {
+          "id": "e",
+          "value": 0.5,
+          "unit": "ratio",
+          "min": 0.2,
+          "max": 0.6,
+          "note": "eccentricity of both pitch ellipses"
+        },
+        {
+          "id": "cd",
+          "value": 80,
+          "unit": "mm",
+          "min": 60,
+          "max": 100,
+          "note": "centre distance = 2a, focus to focus"
+        },
+        {
+          "id": "face",
+          "value": 12,
+          "unit": "mm",
+          "min": 8,
+          "max": 20,
+          "note": "face width"
+        },
+        {
+          "id": "alpha",
+          "value": 20,
+          "unit": "°",
+          "min": 14.5,
+          "max": 25,
+          "note": "pressure angle of the generating rack"
+        }
+      ],
+      "design": [
+        {
+          "id": "z",
+          "options": [
+            16,
+            20,
+            26
+          ],
+          "value": 20,
+          "note": "teeth on each gear, spaced equally by arc length; module = perimeter / (pi z)"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "F1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "ellipse-mesh",
+          "joints": [
+            "F2",
+            "M"
+          ],
+          "in": {
+            "a": "gear1",
+            "b": "gear2",
+            "za": "z",
+            "zb": "z",
+            "semi": "a",
+            "ecc": "e"
+          },
+          "opts": {
+            "pitch": "ellipse about a focus",
+            "relation": "tan(th2/2) = -((1+e)/(1-e)) tan(th1/2)"
+          },
+          "out": [
+            "gear2-turn",
+            "contact"
+          ]
+        }
+      ],
+      "points": [
+        {
+          "id": "T1",
+          "body": "gear1",
+          "local": [
+            18,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "T2",
+          "body": "gear2",
+          "local": [
+            18,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "gear2-angle",
+          "of": "gear2",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "gear2",
+          "kind": "speed-ratio",
+          "unit": ""
+        },
+        {
+          "id": "contact",
+          "of": "M",
+          "kind": "position",
+          "unit": "mm"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and issue #215: e from 0.3 to 0.5, so the ellipses read as ellipses and the speed swings from a third to three times the input; 20 coarser teeth instead of 26; the speed-ratio plot the record promises beside the output angle. Equal-time ticks on a point of each gear show steady input against uneven output, and the line of centres with r1 and r2 dimensioned shows why: the contact slides along it and the ratio is r1/r2."
+      },
+      "principle": [
+        {
+          "body": "gear1"
+        },
+        {
+          "body": "gear2"
+        },
+        {
+          "point": "M"
+        }
+      ],
+      "traces": [
+        {
+          "id": "driven-mark",
+          "point": "T2",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "driver-mark",
+          "point": "T1",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "centres",
+          "kind": "line",
+          "from": "F1",
+          "to": "F2",
+          "label": "LINE OF CENTRES"
+        },
+        {
+          "id": "r1",
+          "kind": "dimension",
+          "from": "F1",
+          "to": "M",
+          "label": "r1"
+        },
+        {
+          "id": "r2",
+          "kind": "dimension",
+          "from": "M",
+          "to": "F2",
+          "label": "r2"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "eccentricity",
+          "kind": "param",
+          "param": "e"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "speed-ratio",
+          "label": "SPEED RATIO"
+        },
+        {
+          "x": "input",
+          "y": "gear2-angle",
+          "label": "OUTPUT ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "the contact point runs 40 mm each way along the line of centres",
+          "output": "contact",
+          "stat": "range",
+          "value": 40,
+          "tol": 0.1
+        },
+        {
+          "text": "from a third of the input speed to three times it (opposite sense)",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": -3,
+          "tol": 0.01
+        },
+        {
+          "text": "from a third of the input speed to three times it (opposite sense)",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": -0.3333,
+          "tol": 0.005
+        },
+        {
+          "text": "in the 120° of input around the meeting of the long radius with the short one it turns 240°",
+          "output": "gear2-angle",
+          "stat": "at",
+          "at": 60,
+          "value": -120,
+          "tol": 0.2
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "Two identical elliptical gears each turn about one focus, with the foci 80 mm apart (the major axis length). The contact point always lies on the line of centres and runs 40 mm each way along it, so the two radii to it trade length while their sum stays the same, and the speed ratio is their quotient. As the driver turns steadily, the driven gear turns the other way, speeding up and slowing down once per turn, from a third of the input speed to three times it: in the 120° of input around the meeting of the long radius with the short one it turns 240°.",
+      "ratio.typical": "ratio swings between (1-e)/(1+e) and (1+e)/(1-e) each turn; 1/3 to 3 at e = 0.5",
+      "build.range": "input 360° continuous; output 360° per input turn, the other way, speed varying from 1/3 to 3 times the input",
+      "build.notes": "Mesh with the long radius of one gear against the short radius of the other. Solve contact with r1 + r2 = cd. Space teeth equally by arc length along the pitch curve, not by angle: 20 teeth on a perimeter of 234.8 mm, module about 3.74. Any tooth count works for identical ellipses because both gears complete a turn together. At e = 0.5 the pitch curve's normal tilts up to 30° from the radius, so the teeth must be generated by rolling the two pitch curves (conjugate), not set as rack teeth on the normal."
+    }
+  },
+  "cycloidal-drive": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "disc",
+            "radius": 72,
+            "thickness": 6,
+            "pins": {
+              "count": 10,
+              "radius": 5,
+              "circle": 50
+            },
+            "cover": "ring over the pin tops"
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                -12
+              ]
+            }
+          }
+        },
+        {
+          "id": "eccentric",
+          "role": "driver",
+          "shape": {
+            "type": "disc",
+            "radius": 12,
+            "thickness": 10,
+            "offset": 4,
+            "shaft": 12,
+            "note": "cam on the input shaft, its centre e off the axis; the disc runs on it on needle rollers"
+          },
+          "at": {
+            "joint": "O_in"
+          }
+        },
+        {
+          "id": "disc",
+          "role": "gear",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 10,
+            "profile": {
+              "curve": "curtate epitrochoid offset by the pin radius",
+              "lobes": 9,
+              "N": 10,
+              "R": 50,
+              "Rr": 5,
+              "e": 4
+            },
+            "bore": 14,
+            "holes": {
+              "count": 6,
+              "radius": 8,
+              "circle": 27,
+              "start": 30
+            }
+          },
+          "at": {
+            "joint": "E"
+          }
+        },
+        {
+          "id": "flange",
+          "role": "output",
+          "shape": {
+            "type": "disc",
+            "radius": 40,
+            "thickness": 6,
+            "pins": {
+              "count": 6,
+              "radius": 4,
+              "circle": 27,
+              "start": 30
+            }
+          },
+          "at": {
+            "joint": "O_out"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O_in",
+          "type": "revolute",
+          "a": "ground",
+          "b": "eccentric",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "E",
+          "type": "revolute",
+          "a": "eccentric",
+          "b": "disc",
+          "at": [
+            4,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O_out",
+          "type": "revolute",
+          "a": "ground",
+          "b": "flange",
+          "at": [
+            0,
+            0,
+            -8
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "RP",
+          "type": "rolling",
+          "a": "disc",
+          "b": "ground",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "note": "the disc's lobes on the ring pins; kinematically its rolling circle (radius e n) inside the pins' (radius e N), touching on the line O-E"
+        },
+        {
+          "id": "OP",
+          "type": "pin-in-slot",
+          "a": "flange",
+          "b": "disc",
+          "at": [
+            23.383,
+            13.5,
+            0
+          ],
+          "slot": {
+            "body": "disc",
+            "path": "circle",
+            "radius": 8
+          },
+          "note": "output pin in its hole; the hole radius exceeds the pin's by e, one of six alike"
+        }
+      ],
+      "params": [
+        {
+          "id": "R",
+          "value": 50,
+          "unit": "mm",
+          "min": 40,
+          "max": 60,
+          "note": "ring pin circle radius"
+        },
+        {
+          "id": "Rr",
+          "value": 5,
+          "unit": "mm",
+          "min": 3,
+          "max": 8,
+          "note": "ring pin radius; below the trochoid's smallest convex radius of curvature (12.8 mm at e 4)"
+        },
+        {
+          "id": "e",
+          "value": 4,
+          "unit": "mm",
+          "min": 2,
+          "max": 4.8,
+          "note": "eccentricity, below R/N = 5; eN/R = 0.8, lobes 2e = 8 mm deep"
+        },
+        {
+          "id": "Ro",
+          "value": 27,
+          "unit": "mm",
+          "min": 24,
+          "max": 30,
+          "note": "output pin circle radius"
+        },
+        {
+          "id": "ro",
+          "value": 4,
+          "unit": "mm",
+          "min": 3,
+          "max": 6,
+          "note": "output pin radius; disc hole radius = ro + e"
+        }
+      ],
+      "design": [
+        {
+          "id": "N",
+          "options": [
+            10,
+            12
+          ],
+          "value": 10,
+          "note": "ring pins; the disc has N - 1 lobes"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O_in",
+          "kind": "rotary",
+          "range": [
+            0,
+            3240
+          ],
+          "default": 0,
+          "note": "one cycle is one output turn, 9 input turns: the disc, flange and pins are then back exactly"
+        }
+      ],
+      "solve": [
+        {
+          "block": "willis",
+          "id": "wobble",
+          "joints": [
+            "E",
+            "RP"
+          ],
+          "in": {
+            "carrier": "eccentric",
+            "planet": "disc",
+            "ring": "ground",
+            "zr": "N",
+            "e": "e"
+          },
+          "opts": {
+            "zp": "N - 1",
+            "note": "ring fixed: disc turns -1/(N-1) of the input; its centre E rides at e on the input angle"
+          },
+          "out": [
+            "disc-angle"
+          ]
+        },
+        {
+          "block": "dyad",
+          "id": "output-pin",
+          "joints": [
+            "O_out",
+            "OP"
+          ],
+          "in": {
+            "a": "O_out",
+            "b": "H0",
+            "ra": "Ro",
+            "rb": "e"
+          },
+          "opts": {
+            "root": "the parallelogram O, E, H0, pin: the flange turns exactly with the disc"
+          },
+          "out": [
+            "flange-angle"
+          ]
+        }
+      ],
+      "points": [
+        {
+          "id": "D",
+          "body": "disc",
+          "local": [
+            36,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "H0",
+          "body": "disc",
+          "local": [
+            23.383,
+            13.5,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "flange-angle",
+          "of": "flange",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "flange",
+          "kind": "speed-ratio",
+          "unit": ""
+        },
+        {
+          "id": "disc-path",
+          "of": "D",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail."
+      },
+      "principle": [
+        {
+          "body": "disc"
+        },
+        {
+          "body": "eccentric"
+        },
+        {
+          "body": "flange"
+        },
+        {
+          "point": "D"
+        },
+        {
+          "point": "OP"
+        }
+      ],
+      "traces": [
+        {
+          "id": "disc-point",
+          "point": "D",
+          "ticks": {
+            "every": 360
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "crank",
+          "kind": "line",
+          "from": "O_in",
+          "to": "E",
+          "label": "ECCENTRIC O-E"
+        },
+        {
+          "id": "pin-circle",
+          "kind": "circle",
+          "center": "O_in",
+          "radius": 40,
+          "label": "ROLLING CIRCLE eN"
+        },
+        {
+          "id": "disc-circle",
+          "kind": "circle",
+          "center": "E",
+          "radius": 36,
+          "label": "DISC ROLLING CIRCLE en"
+        },
+        {
+          "id": "pitch-line",
+          "kind": "line",
+          "from": "E",
+          "to": "RP",
+          "label": "TO THE PITCH POINT"
+        }
+      ],
+      "view": "VIEW 30 70",
+      "views": [
+        {
+          "id": "B",
+          "kind": "detail",
+          "center": [
+            23.383,
+            13.5,
+            0
+          ],
+          "scale": 2.5,
+          "highlight": [
+            "OP",
+            "disc.holes",
+            "flange.pins"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "eccentricity",
+          "kind": "param",
+          "param": "e"
+        },
+        {
+          "id": "pins",
+          "kind": "design",
+          "design": "N"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "flange-angle",
+        "label": "OUTPUT ANGLE"
+      },
+      "claims": [
+        {
+          "text": "it rolls backwards by one lobe, 40°, for every input turn",
+          "output": "flange-angle",
+          "stat": "at",
+          "at": 360,
+          "value": -40,
+          "tol": 0.05
+        },
+        {
+          "text": "the output turns once, backwards, per 9 input turns (9:1)",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.1111,
+          "tol": 0.0005
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "The input shaft carries an eccentric that makes the cycloidal disc wobble around inside a ring of 10 fixed pins. Because the disc has 9 lobes, one fewer than the pins, it rolls backwards by one lobe, 40°, for every input turn, so the output turns once, backwards, per 9 input turns (9:1). Pins on the output flange run in holes in the disc whose radius exceeds the pin's by the eccentricity: each hole circles its pin, so the wobble is left behind and only the slow turn reaches the flange.",
+      "ratio.typical": "about 9:1 to 100:1 per stage; ratio = n / (N - n); default 9:1",
+      "build.ground": "housing with N = 10 ring pins of radius 5 on a circle of radius R = 50, under a cover ring",
+      "build.range": "input 360° continuous; output 40° per input turn, opposite sense; one output turn per 9 input turns",
+      "build.defining_relations": "ratio i = n/(N - n) = 9, output opposite to input; disc profile (t from 0 to 2 pi): x = R cos t - Rr cos(t + psi) - e cos(N t), y = -R sin t + Rr sin(t + psi) + e sin(N t), psi = atan2(sin((1-N)t), R/(e N) - cos((1-N)t)); e < R/N, here eN/R = 0.8 and the lobes are 2e = 8 mm deep; the disc's rolling circle (radius e n = 36) rolls inside the pins' (radius e N = 40), touching on the line O-E; disc angle = -th_in/n relative to ground, disc centre at e on input angle; output angle = disc angle (the pins and holes form parallelograms O, E, hole, pin).",
+      "build.notes": "N = 10, n = 9, R = 50, pin radius 5, e = 4: no undercut (the trochoid's smallest convex radius of curvature is 12.8 mm) and no pin interference over the cycle. Six output pins of radius 4 on radius 27 (at 30° + 60° k) in holes of radius 8; the disc's bore 14 on needle rollers over a Ø24 cam on a Ø12 shaft. Trace a point on the disc's rolling circle (radius 36): it draws ten cusps per output turn, one at each pin. One disc is drawn so its lobes read; a real unit balances it with a second disc 180° out of phase. The disc sits on top of the pins, the output flange underneath.",
+      "topology.notes": "ground with 10 ring pins, eccentric input shaft, cycloidal disc, output flange with pins; higher pairs: disc lobes on ring pins (rolling, all ten counted as one), output pins in disc holes (pin-in-hole, all six counted as one)"
+    }
+  },
+  "bevel-gears": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              200,
+              160
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                -20,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "pinion",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 16,
+            "module": 4,
+            "face": 20,
+            "bore": 12,
+            "cone": 26.57,
+            "teeth": "straight bevel, Tredgold back-cone"
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "gear",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "z": 32,
+            "module": 4,
+            "face": 20,
+            "bore": 14.4,
+            "cone": 63.43,
+            "teeth": "straight bevel, Tredgold back-cone",
+            "phase": "half a tooth, a pinion tooth in a gear gap at the mesh"
+          },
+          "at": {
+            "joint": "O2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "pinion",
+          "at": [
+            -64,
+            0,
+            52
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear",
+          "at": [
+            0,
+            0,
+            20
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "pinion",
+          "b": "gear",
+          "at": [
+            -64,
+            0,
+            20
+          ],
+          "z1": 16,
+          "z2": 32,
+          "crossed": 90,
+          "cone": [
+            26.57,
+            63.43
+          ],
+          "note": "outer pitch point; both pitch cones share the apex P"
+        }
+      ],
+      "params": [
+        {
+          "id": "m",
+          "value": 4,
+          "unit": "mm",
+          "min": 2,
+          "max": 6,
+          "note": "outer transverse module"
+        },
+        {
+          "id": "b",
+          "value": 20,
+          "unit": "mm",
+          "min": 10,
+          "max": 24,
+          "note": "face width, at most Re/3"
+        },
+        {
+          "id": "Sigma",
+          "value": 90,
+          "unit": "°",
+          "min": 45,
+          "max": 135,
+          "note": "shaft angle"
+        },
+        {
+          "id": "alpha",
+          "value": 20,
+          "unit": "°",
+          "min": 14.5,
+          "max": 25,
+          "note": "pressure angle"
+        }
+      ],
+      "design": [
+        {
+          "id": "pair",
+          "options": [
+            "16/32",
+            "16/16"
+          ],
+          "value": "16/32",
+          "note": "tooth counts; 16/16 is the mitre pair, both cones 45°"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "mesh",
+          "joints": [
+            "O2",
+            "M"
+          ],
+          "in": {
+            "a": "pinion",
+            "b": "gear",
+            "pair": "pair",
+            "sigma": "Sigma"
+          },
+          "opts": {
+            "form": "bevel",
+            "cones": "tan(delta1) = sin(Sigma) / (z2/z1 + cos(Sigma))"
+          },
+          "out": "gear-turn"
+        }
+      ],
+      "points": [
+        {
+          "id": "P",
+          "body": "ground",
+          "local": [
+            0,
+            0,
+            52
+          ]
+        },
+        {
+          "id": "Q1",
+          "body": "ground",
+          "local": [
+            -64,
+            0,
+            84
+          ]
+        },
+        {
+          "id": "Q2",
+          "body": "ground",
+          "local": [
+            64,
+            0,
+            20
+          ]
+        },
+        {
+          "id": "Tp",
+          "body": "pinion",
+          "local": [
+            0,
+            0,
+            -32
+          ]
+        },
+        {
+          "id": "Tg",
+          "body": "gear",
+          "local": [
+            -64,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "gear-angle",
+          "of": "gear",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "gear",
+          "kind": "speed-ratio",
+          "unit": ""
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio."
+      },
+      "principle": [
+        {
+          "body": "pinion"
+        },
+        {
+          "body": "gear"
+        },
+        {
+          "point": "P"
+        },
+        {
+          "point": "M"
+        }
+      ],
+      "traces": [
+        {
+          "id": "gear-pitch-point",
+          "point": "Tg",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true
+        },
+        {
+          "id": "pinion-pitch-point",
+          "point": "Tp",
+          "ticks": {
+            "every": 30
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "pinion-axis",
+          "kind": "axis-line",
+          "at": "O1",
+          "label": "PINION AXIS"
+        },
+        {
+          "id": "gear-axis",
+          "kind": "axis-line",
+          "at": "O2",
+          "label": "GEAR AXIS"
+        },
+        {
+          "id": "common-cone-line",
+          "kind": "line",
+          "from": "P",
+          "to": "M",
+          "label": "COMMON CONE LINE"
+        },
+        {
+          "id": "pinion-cone",
+          "kind": "line",
+          "from": "P",
+          "to": "Q1",
+          "label": "PINION PITCH CONE"
+        },
+        {
+          "id": "gear-cone",
+          "kind": "line",
+          "from": "P",
+          "to": "Q2",
+          "label": "GEAR PITCH CONE"
+        },
+        {
+          "id": "delta1",
+          "kind": "arc",
+          "center": "P",
+          "from": "O1",
+          "to": "M",
+          "label": "PINION CONE ANGLE"
+        },
+        {
+          "id": "delta2",
+          "kind": "arc",
+          "center": "P",
+          "from": "O2",
+          "to": "M",
+          "label": "GEAR CONE ANGLE"
+        }
+      ],
+      "view": "FRONT",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "pair",
+          "kind": "design",
+          "design": "pair"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "gear-angle",
+        "label": "GEAR ANGLE"
+      },
+      "claims": [
+        {
+          "text": "the 16-tooth pinion turns the 32-tooth gear at half speed",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.5,
+          "tol": 0.0005
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "build.notes": "Draw both cones from the common apex P, on the gear's axis above its centre at the pinion's axis height. The default view is the front elevation, where the pitch cones show as triangles meeting at P. Sense of rotation depends on viewing side; both shafts are axially loaded away from P."
+    }
+  },
+  "helical-gears": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              190,
+              120
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                40.705,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "pinion",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 17,
+            "module": 3,
+            "face": 30,
+            "bore": 10,
+            "helix": 20,
+            "hand": "right",
+            "modules": "normal"
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "gear",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "z": 34,
+            "module": 3,
+            "face": 30,
+            "bore": 12,
+            "helix": 20,
+            "hand": "left",
+            "modules": "normal",
+            "phase": "half a tooth"
+          },
+          "at": {
+            "joint": "O2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "pinion",
+          "at": [
+            0,
+            0,
+            10
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear",
+          "at": [
+            81.41,
+            0,
+            10
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "pinion",
+          "b": "gear",
+          "at": [
+            27.137,
+            0,
+            25
+          ],
+          "z1": 17,
+          "z2": 34,
+          "hand": [
+            "right",
+            "left"
+          ],
+          "helix": 20
+        }
+      ],
+      "params": [
+        {
+          "id": "mn",
+          "value": 3,
+          "unit": "mm",
+          "min": 2,
+          "max": 4,
+          "note": "normal module; transverse module mn / cos(beta) = 3.193"
+        },
+        {
+          "id": "beta",
+          "value": 20,
+          "unit": "°",
+          "min": 10,
+          "max": 35,
+          "note": "helix angle, opposite hands; sets the twist across the face and the axial thrust, not the ratio"
+        },
+        {
+          "id": "b",
+          "value": 30,
+          "unit": "mm",
+          "min": 20,
+          "max": 40,
+          "note": "face width"
+        },
+        {
+          "id": "alpha_n",
+          "value": 20,
+          "unit": "°",
+          "min": 14.5,
+          "max": 25,
+          "note": "normal pressure angle"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "mesh",
+          "joints": [
+            "O2",
+            "M"
+          ],
+          "in": {
+            "a": "pinion",
+            "b": "gear",
+            "za": 17,
+            "zb": 34,
+            "mn": "mn",
+            "beta": "beta"
+          },
+          "opts": {
+            "form": "parallel helical",
+            "centres": "mn (z1 + z2) / (2 cos beta)"
+          },
+          "out": "gear-turn"
+        }
+      ],
+      "points": [
+        {
+          "id": "Hb",
+          "body": "pinion",
+          "local": [
+            27.137,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Ht",
+          "body": "pinion",
+          "local": [
+            24.969,
+            10.627,
+            30
+          ]
+        },
+        {
+          "id": "Gb",
+          "body": "gear",
+          "local": [
+            -54.042,
+            -5.008,
+            0
+          ]
+        },
+        {
+          "id": "Gt",
+          "body": "gear",
+          "local": [
+            -53.952,
+            5.893,
+            30
+          ]
+        },
+        {
+          "id": "Mb",
+          "body": "ground",
+          "local": [
+            27.137,
+            0,
+            18
+          ]
+        },
+        {
+          "id": "Mt",
+          "body": "ground",
+          "local": [
+            27.137,
+            0,
+            48
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "gear-angle",
+          "of": "gear",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "gear",
+          "kind": "speed-ratio",
+          "unit": ""
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review of the 0.36.0 build (six phases, ratio -0.5 exact, centre distance 81.41, overlap ratio 1.09, thrust tan 20° = 0.36 of the tangential force): the numbers are right, but in plan a helical pair is a spur pair, so the twist, the gradual engagement and the thrust cannot be seen. Decided: open in isometric so the face shows; the pitch line at the mesh and one tooth's helix on each gear (the pinion's twists 23.1° across the 30 mm face, the gear's 11.5°) as construction lines, so a tooth is seen crossing the pitch line from one end of the face to the other; the two ends of the pinion's helix traced with ticks every 15°, the bottom end reaching the mesh first. The helix angle is a control: it changes the twist and the thrust, never the ratio."
+      },
+      "principle": [
+        {
+          "body": "pinion"
+        },
+        {
+          "body": "gear"
+        },
+        {
+          "point": "Hb"
+        },
+        {
+          "point": "Ht"
+        }
+      ],
+      "traces": [
+        {
+          "id": "helix-bottom",
+          "point": "Hb",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "helix-top",
+          "point": "Ht",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "pitch-line",
+          "kind": "line",
+          "from": "Mb",
+          "to": "Mt",
+          "label": "PITCH LINE"
+        },
+        {
+          "id": "pinion-helix",
+          "kind": "line",
+          "from": "Hb",
+          "to": "Ht",
+          "label": "PINION TOOTH, RIGHT HAND"
+        },
+        {
+          "id": "gear-helix",
+          "kind": "line",
+          "from": "Gb",
+          "to": "Gt",
+          "label": "GEAR TOOTH, LEFT HAND"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "helix",
+          "kind": "param",
+          "param": "beta"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "gear-angle",
+        "label": "GEAR ANGLE"
+      },
+      "claims": [
+        {
+          "text": "the 17-tooth pinion drives the 34-tooth gear at half speed in the opposite direction",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.5,
+          "tol": 0.0005
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "build.notes": "Draw the slanted teeth in 3D and open in isometric: the pitch line at the mesh and one tooth's helix line on each gear show the tooth crossing it from one end of the face to the other. An axial thrust arrow on each shaft, in opposite directions. Hands must be opposite for parallel shafts."
+    }
+  },
+  "herringbone-gears": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              240,
+              160
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                51.962,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "pinion",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 20,
+            "module": 3,
+            "face": 60,
+            "bore": 12,
+            "helix": 30,
+            "hand": [
+              "right",
+              "left"
+            ],
+            "halves": {
+              "width": 25,
+              "gap": 10
+            },
+            "modules": "normal"
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "gear",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "z": 40,
+            "module": 3,
+            "face": 60,
+            "bore": 16,
+            "helix": 30,
+            "hand": [
+              "left",
+              "right"
+            ],
+            "halves": {
+              "width": 25,
+              "gap": 10
+            },
+            "modules": "normal",
+            "phase": "half a tooth"
+          },
+          "at": {
+            "joint": "O2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "cylindrical",
+          "a": "ground",
+          "b": "pinion",
+          "at": [
+            0,
+            0,
+            10
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "limits": [
+            -2,
+            2
+          ],
+          "note": "the pinion floats axially; the two halves' opposite thrusts centre it"
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear",
+          "at": [
+            103.923,
+            0,
+            10
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "note": "the gear is located axially"
+        },
+        {
+          "id": "MR",
+          "type": "gear-mesh",
+          "a": "pinion",
+          "b": "gear",
+          "at": [
+            34.641,
+            0,
+            22.5
+          ],
+          "z1": 20,
+          "z2": 40,
+          "hand": [
+            "right",
+            "left"
+          ],
+          "helix": 30,
+          "note": "lower half"
+        },
+        {
+          "id": "ML",
+          "type": "gear-mesh",
+          "a": "pinion",
+          "b": "gear",
+          "at": [
+            34.641,
+            0,
+            57.5
+          ],
+          "z1": 20,
+          "z2": 40,
+          "hand": [
+            "left",
+            "right"
+          ],
+          "helix": 30,
+          "note": "upper half"
+        }
+      ],
+      "params": [
+        {
+          "id": "mn",
+          "value": 3,
+          "unit": "mm",
+          "min": 2,
+          "max": 4,
+          "note": "normal module; transverse module 3.464"
+        },
+        {
+          "id": "beta",
+          "value": 30,
+          "unit": "°",
+          "min": 20,
+          "max": 45,
+          "note": "helix angle of each half"
+        },
+        {
+          "id": "b_half",
+          "value": 25,
+          "unit": "mm",
+          "min": 15,
+          "max": 35,
+          "note": "face width of each half"
+        },
+        {
+          "id": "gap",
+          "value": 10,
+          "unit": "mm",
+          "min": 0,
+          "max": 15,
+          "note": "central relief groove; 0 is the staggered Wuest form"
+        },
+        {
+          "id": "alpha_n",
+          "value": 20,
+          "unit": "°",
+          "min": 14.5,
+          "max": 25,
+          "note": "normal pressure angle"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "mesh",
+          "joints": [
+            "O2",
+            "MR",
+            "ML"
+          ],
+          "in": {
+            "a": "pinion",
+            "b": "gear",
+            "za": 20,
+            "zb": 40,
+            "mn": "mn",
+            "beta": "beta"
+          },
+          "opts": {
+            "form": "double helical",
+            "float": "the pinion's slide on O1 is set by the two meshes: their thrusts are equal and opposite, so it stays at 0"
+          },
+          "out": [
+            "gear-turn",
+            "pinion-slide"
+          ]
+        }
+      ],
+      "points": [
+        {
+          "id": "Va",
+          "body": "pinion",
+          "local": [
+            34.641,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Vb",
+          "body": "pinion",
+          "local": [
+            31.677,
+            14.02,
+            25
+          ]
+        },
+        {
+          "id": "Vc",
+          "body": "pinion",
+          "local": [
+            31.677,
+            14.02,
+            35
+          ]
+        },
+        {
+          "id": "Vd",
+          "body": "pinion",
+          "local": [
+            34.641,
+            0,
+            60
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "gear-angle",
+          "of": "gear",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "gear",
+          "kind": "speed-ratio",
+          "unit": ""
+        },
+        {
+          "id": "pinion-float",
+          "of": "O1",
+          "kind": "position",
+          "unit": "mm"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Review against the record (unbuilt): the record's plan reads, a V of teeth with two opposed thrust arrows cancelling. Decided: open in isometric so the V shows; one tooth's two helix lines on the pinion (each half twists 23.9° over its 25 mm) as construction lines meeting across the groove; the pinion on a cylindrical joint, free to slide, held centred by the two half-meshes of opposite hand (a single helical would push it to one side), the gear located. The two thrust arrows per shaft are drawn equal and opposite. The helix angle is a control: at any angle the thrusts still cancel."
+      },
+      "principle": [
+        {
+          "body": "pinion"
+        },
+        {
+          "body": "gear"
+        }
+      ],
+      "traces": [],
+      "overlays": [
+        {
+          "id": "right-hand-half",
+          "kind": "line",
+          "from": "Va",
+          "to": "Vb",
+          "label": "RIGHT-HAND HALF"
+        },
+        {
+          "id": "left-hand-half",
+          "kind": "line",
+          "from": "Vc",
+          "to": "Vd",
+          "label": "LEFT-HAND HALF"
+        },
+        {
+          "id": "float",
+          "kind": "axis-line",
+          "at": "O1",
+          "label": "PINION FREE TO FLOAT"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "helix",
+          "kind": "param",
+          "param": "beta"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "gear-angle",
+        "label": "GEAR ANGLE"
+      },
+      "claims": [
+        {
+          "text": "end-on it behaves like a spur pair: the 20-tooth pinion turns the 40-tooth gear at half speed, the other way",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.5,
+          "tol": 0.0005
+        },
+        {
+          "text": "the axial thrusts cancel, so the floating pinion stays centred",
+          "output": "pinion-float",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.revolute": 1,
+      "topology.higher_pairs": 2,
+      "topology.notes": "ground, pinion, gear; the gear's shaft on a revolute and located, the pinion on a cylindrical joint, free to float axially; one helical mesh per half, of opposite hands, whose equal and opposite axial forces centre the pinion",
+      "build.notes": "Draw the V teeth in 3D, apexes pointing the same way on both gears in the mesh, and open in isometric. Two opposed axial arrows on each shaft cancel. The pinion floats on its shaft (cylindrical joint) and the V centres it. Optional Wuest (staggered, no gap) variant: gap = 0."
+    }
+  },
+  "worm-drive": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              150,
+              160
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                -20,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "worm",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "form": "worm",
+            "z": 1,
+            "module": 3,
+            "pitchDiameter": 30,
+            "face": 56.55,
+            "helix": 5.71,
+            "hand": "right",
+            "bore": 12
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "wheel",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "form": "worm wheel",
+            "z": 30,
+            "module": 3,
+            "face": 20,
+            "helix": 5.71,
+            "hand": "right",
+            "throat": true,
+            "bore": 14.4
+          },
+          "at": {
+            "joint": "O2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "worm",
+          "at": [
+            0,
+            -60,
+            20
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wheel",
+          "at": [
+            0,
+            0,
+            20
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "worm",
+          "b": "wheel",
+          "at": [
+            0,
+            -45,
+            20
+          ],
+          "z1": 1,
+          "z2": 30,
+          "crossed": 90,
+          "form": "worm",
+          "note": "the wheel's mid-plane on the worm's axis"
+        }
+      ],
+      "params": [
+        {
+          "id": "m",
+          "value": 3,
+          "unit": "mm",
+          "min": 2,
+          "max": 4,
+          "note": "axial module of the worm = transverse module of the wheel"
+        },
+        {
+          "id": "q",
+          "value": 10,
+          "unit": "factor",
+          "min": 8,
+          "max": 20,
+          "note": "diameter factor, d1 = q m = 30; lead angle atan(z1/q) = 5.71°"
+        },
+        {
+          "id": "face",
+          "value": 20,
+          "unit": "mm",
+          "min": 14,
+          "max": 26,
+          "note": "wheel face width"
+        },
+        {
+          "id": "worm_length",
+          "value": 56.55,
+          "unit": "mm",
+          "min": 40,
+          "max": 80,
+          "note": "six leads"
+        },
+        {
+          "id": "alpha",
+          "value": 20,
+          "unit": "°",
+          "min": 14.5,
+          "max": 25,
+          "note": "pressure angle"
+        },
+        {
+          "id": "mu",
+          "value": 0.06,
+          "unit": "coefficient",
+          "min": 0.02,
+          "max": 0.15,
+          "note": "running friction, steel on bronze; friction angle 3.65°"
+        },
+        {
+          "id": "mu_s",
+          "value": 0.12,
+          "unit": "coefficient",
+          "min": 0.05,
+          "max": 0.2,
+          "note": "friction at rest; friction angle 7.28° > lead angle 5.71°, so it is self-locking"
+        }
+      ],
+      "design": [
+        {
+          "id": "starts",
+          "options": [
+            1,
+            2
+          ],
+          "value": 1,
+          "note": "worm starts; ratio = wheel teeth / starts (30:1 or 15:1); two starts give a lead angle of 11.3° and no lock"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "mesh",
+          "joints": [
+            "O2",
+            "M"
+          ],
+          "in": {
+            "a": "worm",
+            "b": "wheel",
+            "za": "starts",
+            "zb": 30,
+            "m": "m",
+            "q": "q"
+          },
+          "opts": {
+            "form": "worm",
+            "hand": "right"
+          },
+          "out": "wheel-turn"
+        }
+      ],
+      "points": [
+        {
+          "id": "Tw",
+          "body": "wheel",
+          "local": [
+            0,
+            -45,
+            0
+          ]
+        },
+        {
+          "id": "Tm",
+          "body": "worm",
+          "local": [
+            0,
+            15,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "wheel-angle",
+          "of": "wheel",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "wheel",
+          "kind": "speed-ratio",
+          "unit": ""
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review of the 0.36.0 build (six phases, wheel 12° per worm turn, ratio 1/30 exact, lead angle 5.71°, centre distance 60): the motion is right, but the text's self-locking did not follow from its own numbers (lead angle 5.71° is above the 3.65° friction angle of mu 0.06); it holds at rest, where mu is about 0.12 (7.28°), and the text now says so and why the lock fails under vibration. Decided (issue #215): open in the auxiliary view down the worm's axis, where the worm is end-on, the wheel's axis a line 60 mm away and the throated rim wraps the worm, so the crossing without meeting reads; a section on the wheel's mid-plane, where the thread works on the teeth like a rack; a pitch point traced on the worm (seen whole in the default view) and one on the wheel, ticked every 90° of worm, so one worm turn moves the wheel one tooth. A design control gives two starts: 15:1 and no lock."
+      },
+      "principle": [
+        {
+          "body": "worm"
+        },
+        {
+          "body": "wheel"
+        },
+        {
+          "point": "M"
+        }
+      ],
+      "traces": [
+        {
+          "id": "worm-pitch-point",
+          "point": "Tm",
+          "ticks": {
+            "every": 90
+          },
+          "comet": true
+        },
+        {
+          "id": "wheel-pitch-point",
+          "point": "Tw",
+          "ticks": {
+            "every": 90
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "worm-axis",
+          "kind": "axis-line",
+          "at": "O1",
+          "label": "WORM AXIS"
+        },
+        {
+          "id": "wheel-axis",
+          "kind": "axis-line",
+          "at": "O2",
+          "label": "WHEEL AXIS"
+        },
+        {
+          "id": "centre-distance",
+          "kind": "dimension",
+          "from": "O1",
+          "to": "O2",
+          "label": "CENTRE DISTANCE, AXES CROSS WITHOUT MEETING"
+        }
+      ],
+      "view": "AUX O1",
+      "views": [
+        {
+          "id": "A-A",
+          "kind": "section",
+          "plane": {
+            "origin": [
+              0,
+              0,
+              20
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          "highlight": [
+            "worm.thread",
+            "wheel.teeth",
+            "M"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "starts",
+          "kind": "design",
+          "design": "starts"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "wheel-angle",
+        "label": "WHEEL ANGLE"
+      },
+      "claims": [
+        {
+          "text": "each worm turn advances the wheel by one tooth, so a 30-tooth wheel turns once per 30 worm turns",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.03333,
+          "tol": 0.0001
+        },
+        {
+          "text": "each worm turn advances the wheel by one tooth (12°)",
+          "output": "wheel-angle",
+          "stat": "at",
+          "at": 360,
+          "value": -12,
+          "tol": 0.05
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.forces": "Contact is mostly sliding along the thread, so friction is high and efficiency falls from about 90% at low ratios to under 50% at high ratios. The drive locks when the lead angle is below the friction angle: here the lead angle is 5.7°, and at rest steel on bronze has a friction coefficient of about 0.12 (friction angle about 7.3°), so the wheel cannot turn the worm. Running, the coefficient falls to about 0.06 (3.7°), which is why the lock is not reliable under vibration.",
+      "build.defining_relations": "ratio i = z2/z1 = 30; lead L = z1 pi m; tan(gamma) = z1/q; a = m(q+z2)/2; efficiency (worm driving) = (cos an - mu tan g)/(cos an + mu cot g) approx tan g / tan(g + phi); self-locking (the wheel cannot drive) when gamma < phi, phi = atan(mu / cos alpha): at rest mu about 0.12 gives phi 7.28° > gamma 5.71°, so it locks; running mu 0.06 gives 3.65°, below gamma.",
+      "build.notes": "Show the worm thread as a helix advancing one axial pitch per turn while the wheel turns one tooth. The default view is the auxiliary view down the worm's axis; a section on the wheel's mid-plane shows the thread profile moving like a rack. Show a lock icon if the wheel is driven."
+    }
+  },
+  "crossed-helical-gears": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              160,
+              200
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                -30,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "gear1",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 12,
+            "module": 3,
+            "modules": "normal",
+            "face": 30,
+            "helix": 45,
+            "hand": "right",
+            "bore": 10
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "gear2",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "z": 24,
+            "module": 3,
+            "modules": "normal",
+            "face": 20,
+            "helix": 45,
+            "hand": "right",
+            "bore": 12
+          },
+          "at": {
+            "joint": "O2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear1",
+          "at": [
+            0,
+            -76.368,
+            45
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear2",
+          "at": [
+            0,
+            0,
+            45
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "gear1",
+          "b": "gear2",
+          "at": [
+            0,
+            -50.912,
+            45
+          ],
+          "z1": 12,
+          "z2": 24,
+          "crossed": 90,
+          "hand": [
+            "right",
+            "right"
+          ],
+          "helix": [
+            45,
+            45
+          ],
+          "note": "point contact; the teeth of both lie along the same line there"
+        }
+      ],
+      "params": [
+        {
+          "id": "mn",
+          "value": 3,
+          "unit": "mm",
+          "min": 2,
+          "max": 4,
+          "note": "normal module, the same on both"
+        },
+        {
+          "id": "beta1",
+          "value": 45,
+          "unit": "°",
+          "min": 30,
+          "max": 60,
+          "note": "helix angle of gear 1; gear 2's is Sigma - beta1, both right hand; d = z mn / cos(beta), centre distance (d1 + d2)/2 follows"
+        },
+        {
+          "id": "Sigma",
+          "value": 90,
+          "unit": "°",
+          "min": 90,
+          "max": 90,
+          "note": "shaft angle = beta1 + beta2"
+        },
+        {
+          "id": "alpha_n",
+          "value": 20,
+          "unit": "°",
+          "min": 14.5,
+          "max": 25,
+          "note": "normal pressure angle, the same on both"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "mesh",
+          "joints": [
+            "O2",
+            "M"
+          ],
+          "in": {
+            "a": "gear1",
+            "b": "gear2",
+            "za": 12,
+            "zb": 24,
+            "mn": "mn",
+            "beta1": "beta1",
+            "sigma": "Sigma"
+          },
+          "opts": {
+            "form": "crossed helical",
+            "ratio": "z1/z2, whatever the helix split"
+          },
+          "out": "gear2-turn"
+        }
+      ],
+      "points": [
+        {
+          "id": "T1",
+          "body": "gear1",
+          "local": [
+            0,
+            25.456,
+            0
+          ]
+        },
+        {
+          "id": "T2",
+          "body": "gear2",
+          "local": [
+            0,
+            -50.912,
+            0
+          ]
+        },
+        {
+          "id": "Ka",
+          "body": "ground",
+          "local": [
+            -14,
+            -50.912,
+            31
+          ]
+        },
+        {
+          "id": "Kb",
+          "body": "ground",
+          "local": [
+            14,
+            -50.912,
+            59
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "gear2-angle",
+          "of": "gear2",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "gear2",
+          "kind": "speed-ratio",
+          "unit": ""
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review against the record (unbuilt): ratio z2/z1 = 2, centre distance 76.37 and the 45° + 45° split check out. The record's lesson that the ratio is set by tooth counts, not diameters, needs a way to see it. Decided: gear 2 on a vertical axis, gear 1 on a crossing axis in front of it, the same layout as the worm drive; open in isometric; both axis lines and the centre distance between them on their common perpendicular; the shared tooth direction at the contact as a construction line. The helix angle of gear 1 is a control (30° to 60°, gear 2 takes the rest of 90°): the diameters and centre distance change, the ratio does not. A pitch point traced on gear 2, ticked every 30° of input, with ghosts at 30° and 60°: three circles of different size, each with twelve ticks over half a turn."
+      },
+      "principle": [
+        {
+          "body": "gear1"
+        },
+        {
+          "body": "gear2"
+        },
+        {
+          "point": "M"
+        }
+      ],
+      "traces": [
+        {
+          "id": "gear2-pitch-point",
+          "point": "T2",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true,
+          "ghosts": [
+            {
+              "control": "beta1",
+              "value": 30
+            },
+            {
+              "control": "beta1",
+              "value": 60
+            }
+          ]
+        },
+        {
+          "id": "gear1-pitch-point",
+          "point": "T1",
+          "ticks": {
+            "every": 30
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "axis1",
+          "kind": "axis-line",
+          "at": "O1",
+          "label": "GEAR 1 AXIS"
+        },
+        {
+          "id": "axis2",
+          "kind": "axis-line",
+          "at": "O2",
+          "label": "GEAR 2 AXIS"
+        },
+        {
+          "id": "centre-distance",
+          "kind": "dimension",
+          "from": "O1",
+          "to": "O2",
+          "label": "CENTRE DISTANCE"
+        },
+        {
+          "id": "tooth-line",
+          "kind": "line",
+          "from": "Ka",
+          "to": "Kb",
+          "label": "TEETH IN LINE AT THE CONTACT"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "helix-split",
+          "kind": "param",
+          "param": "beta1"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "gear2-angle",
+        "label": "GEAR 2 ANGLE"
+      },
+      "claims": [
+        {
+          "text": "gear 1 (12 teeth) turns gear 2 (24 teeth) at half speed",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.5,
+          "tol": 0.0005
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "Two ordinary helical gears of the same hand are mounted on shafts crossing at 90° at a set distance, without meeting. With 45° helix angles the teeth line up at the contact and gear 1 (12 teeth) turns gear 2 (24 teeth) at half speed. Changing how the shaft angle is split between the two helix angles changes both diameters and the centre distance, but not the ratio: that is set by the tooth counts alone.",
+      "build.ground": "frame with gear 2 on a vertical axis and gear 1 on a horizontal axis crossing in front of it, the axes a = 76.37 apart on their common perpendicular",
+      "build.notes": "Draw both gears as short helical cylinders with axes at 90°, gear 1 in front of gear 2 as in the worm drive; teeth at 45° line up at the contact point. Unequal helix angles (e.g. 30° + 60°) change diameters but not the tooth ratio: a control, with ghost traces."
+    }
+  },
+  "harmonic-drive": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "ringGear",
+            "z": 32,
+            "module": 2,
+            "face": 12,
+            "addendum": 0.8,
+            "rim": 46,
+            "note": "the rigid circular spline, fixed in the housing"
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "wave_gen",
+          "role": "driver",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 10,
+            "profile": {
+              "ellipse": [
+                28.5,
+                24.5
+              ],
+              "note": "outer race of the thin wave-generator bearing; the elliptical cam inside it 3 mm smaller"
+            },
+            "bore": 10
+          },
+          "at": {
+            "joint": "Ow"
+          }
+        },
+        {
+          "id": "flexspline",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "z": 30,
+            "module": 2,
+            "face": 12,
+            "addendum": 0.8,
+            "bore": 26.5,
+            "flexible": true,
+            "cup": {
+              "length": 30,
+              "wall": 0.8
+            },
+            "note": "thin toothed cup; its rim takes the wave generator's shape"
+          },
+          "at": {
+            "joint": "Of"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "Ow",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wave_gen",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Of",
+          "type": "revolute",
+          "a": "ground",
+          "b": "flexspline",
+          "at": [
+            0,
+            0,
+            -30
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "note": "the cup's bottom, on the output bearing"
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "flexspline",
+          "b": "ground",
+          "at": [
+            32,
+            0,
+            0
+          ],
+          "z1": 30,
+          "z2": 32,
+          "internal": true,
+          "zones": 2,
+          "note": "engaged at both ends of the wave generator's long axis"
+        }
+      ],
+      "params": [
+        {
+          "id": "m",
+          "value": 2,
+          "unit": "mm",
+          "min": 0.5,
+          "max": 2.5,
+          "note": "module; m = 60 / Zf keeps the flexspline's pitch radius at 30"
+        },
+        {
+          "id": "w0",
+          "value": 2,
+          "unit": "mm",
+          "min": 0.5,
+          "max": 2.5,
+          "note": "radial deflection at the long axis = m (Zc - Zf)/2"
+        },
+        {
+          "id": "ha",
+          "value": 0.8,
+          "unit": "coefficient",
+          "min": 0.6,
+          "max": 1,
+          "note": "addendum coefficient; short teeth so the tips clear at the short axis"
+        },
+        {
+          "id": "face",
+          "value": 12,
+          "unit": "mm",
+          "min": 8,
+          "max": 20,
+          "note": "tooth face width"
+        }
+      ],
+      "design": [
+        {
+          "id": "Zf",
+          "options": [
+            30,
+            100
+          ],
+          "value": 30,
+          "note": "flexspline teeth; the circular spline has Zf + 2"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "Ow",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "flexure",
+          "id": "wave",
+          "in": {
+            "generator": "wave_gen",
+            "body": "flexspline",
+            "w0": "w0"
+          },
+          "opts": {
+            "lobes": 2,
+            "shape": "w(phi) = w0 cos 2(phi - th_in), radial, on the flexspline's rim; points on the flexspline are given undeformed and moved by it"
+          },
+          "out": "flex-shape"
+        },
+        {
+          "block": "willis",
+          "id": "train",
+          "joints": [
+            "Of",
+            "M"
+          ],
+          "in": {
+            "carrier": "wave_gen",
+            "planet": "flexspline",
+            "ring": "ground",
+            "zp": "Zf",
+            "shape": "flex-shape"
+          },
+          "opts": {
+            "zr": "Zf + 2",
+            "note": "ring fixed: flexspline turns -(Zc - Zf)/Zf of the input"
+          },
+          "out": "flexspline-turn"
+        }
+      ],
+      "points": [
+        {
+          "id": "Mk",
+          "body": "flexspline",
+          "local": [
+            30,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Wa",
+          "body": "wave_gen",
+          "local": [
+            28.5,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Wb",
+          "body": "wave_gen",
+          "local": [
+            -28.5,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "flexspline-angle",
+          "of": "flexspline",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "flexspline",
+          "kind": "speed-ratio",
+          "unit": ""
+        },
+        {
+          "id": "mark-path",
+          "of": "Mk",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option."
+      },
+      "principle": [
+        {
+          "body": "wave_gen"
+        },
+        {
+          "body": "flexspline"
+        },
+        {
+          "body": "ground"
+        },
+        {
+          "point": "Mk"
+        }
+      ],
+      "traces": [
+        {
+          "id": "flexspline-mark",
+          "point": "Mk",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "long-axis",
+          "kind": "line",
+          "from": "Wa",
+          "to": "Wb",
+          "label": "LONG AXIS: TEETH ENGAGED AT BOTH ENDS"
+        },
+        {
+          "id": "rest-circle",
+          "kind": "circle",
+          "center": "Ow",
+          "radius": 30,
+          "label": "FLEXSPLINE PITCH CIRCLE AT REST"
+        },
+        {
+          "id": "rigid-circle",
+          "kind": "circle",
+          "center": "Ow",
+          "radius": 32,
+          "label": "RIGID SPLINE PITCH CIRCLE"
+        },
+        {
+          "id": "bend",
+          "kind": "bend",
+          "point": "Mk",
+          "label": "FLEXSPLINE BENT INTO AN OVAL"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "teeth",
+          "kind": "design",
+          "design": "Zf"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "flexspline-angle",
+        "label": "FLEXSPLINE ANGLE"
+      },
+      "claims": [
+        {
+          "text": "each wave generator turn shifts the flexspline back by two teeth, 24°",
+          "output": "flexspline-angle",
+          "stat": "at",
+          "at": 360,
+          "value": -24,
+          "tol": 0.05
+        },
+        {
+          "text": "the flexspline turns once, backwards, per 15 input turns (15:1)",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.06667,
+          "tol": 0.0001
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "An elliptical cam with a thin ball bearing (the wave generator) spins inside a flexible cup with 30 external teeth (the flexspline), bending it into an oval so its teeth engage a rigid 32-tooth ring at the two ends of the long axis and stand clear at the ends of the short one. Each wave generator turn shifts the flexspline back by two teeth relative to the ring, 24°, so the flexspline turns once, backwards, per 15 input turns (15:1). With the finer 100 and 102 teeth of the other tooth set the reduction is 50:1, but the bend is then too small to see.",
+      "ratio.typical": "30:1 to 160:1 per stage; ratio = Zf / (Zc - Zf); drawn with coarse teeth at 30/2 = 15:1, and 100/2 = 50:1 as the alternative tooth set",
+      "build.range": "wave generator 360° continuous; flexspline 24° per input turn, opposite sense (7.2° with 100/102 teeth)",
+      "build.defining_relations": "circular spline fixed: i = -Zf/(Zc - Zf) = -15 at Zf 30, Zc 32 (-50 at 100/102; output reverses); flexspline fixed, circular spline output: i = Zc/(Zc - Zf) = 16 (same sense); Zc - Zf = 2 (two lobes); radial deflection w0 = m (Zc - Zf)/2 = 2 mm at m 2, so the flexspline's pitch curve (radius 30 at rest) reaches the rigid spline's (radius 32) at the long axis; with addendum 0.8 m the tips clear by 0.8 mm at the short axis.",
+      "build.notes": "Teeth are tiny at the real module, so the drawing uses Zf = 30, Zc = 32, m = 2 (15:1) with the true deflection for that module, 2 mm; 100/102 is a design option. Draw the flexspline teeth on a curve that follows the rotating oval; an index mark on the flexspline shows the slow backward rotation.",
+      "topology.notes": "ground with circular spline, wave generator, flexspline (compliant); one multi-tooth mesh at two zones. The wave generator bearing sets the flexspline's shape, not its angle, so it is not counted as a rigid pair in the mobility (the flexure block carries it)."
+    }
+  },
+  "hypoid-gears": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              280,
+              240
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                -30,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "pinion",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 10,
+            "module": 4.878,
+            "face": 30,
+            "bore": 16,
+            "spiral": 50,
+            "hand": "left",
+            "teeth": "hypoid, curved, lofted along the face",
+            "pitchDiameter": 65.7
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "ring",
+          "role": "output",
+          "shape": {
+            "type": "gear",
+            "z": 41,
+            "module": 4.878,
+            "face": 30,
+            "bore": 40,
+            "spiral": 30,
+            "hand": "right",
+            "cone": 76.3,
+            "teeth": "hypoid, curved, lofted along the face",
+            "pitchDiameter": 200
+          },
+          "at": {
+            "joint": "O2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "pinion",
+          "at": [
+            -81.687,
+            -25,
+            51.626
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "ring",
+          "at": [
+            0,
+            0,
+            20
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "pinion",
+          "b": "ring",
+          "at": [
+            -81.687,
+            -25,
+            23.554
+          ],
+          "z1": 10,
+          "z2": 41,
+          "crossed": 90,
+          "offset": 25,
+          "spiral": [
+            50,
+            30
+          ],
+          "note": "mean contact point; the axes pass E apart"
+        }
+      ],
+      "params": [
+        {
+          "id": "E",
+          "value": 25,
+          "unit": "mm",
+          "min": 0,
+          "max": 40,
+          "note": "hypoid offset, the shortest distance between the axes; 0 is a spiral bevel pair"
+        },
+        {
+          "id": "beta2",
+          "value": 30,
+          "unit": "°",
+          "min": 20,
+          "max": 40,
+          "note": "ring gear mean spiral angle"
+        },
+        {
+          "id": "beta1",
+          "value": 50,
+          "unit": "°",
+          "min": 30,
+          "max": 60,
+          "note": "pinion mean spiral angle, about beta2 + eps, sin(eps) about E / gear pitch radius; equals beta2 at E = 0"
+        },
+        {
+          "id": "b",
+          "value": 30,
+          "unit": "mm",
+          "min": 20,
+          "max": 40,
+          "note": "face width"
+        },
+        {
+          "id": "alpha",
+          "value": 20,
+          "unit": "°",
+          "min": 14.5,
+          "max": 25,
+          "note": "mean pressure angle"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "mesh",
+          "joints": [
+            "O2",
+            "M"
+          ],
+          "in": {
+            "a": "pinion",
+            "b": "ring",
+            "za": 10,
+            "zb": 41,
+            "offset": "E",
+            "beta1": "beta1",
+            "beta2": "beta2"
+          },
+          "opts": {
+            "form": "hypoid",
+            "ratio": "z2/z1, set by the tooth counts"
+          },
+          "out": "ring-turn"
+        }
+      ],
+      "points": [
+        {
+          "id": "Tp",
+          "body": "pinion",
+          "local": [
+            0,
+            0,
+            -28.072
+          ]
+        },
+        {
+          "id": "Tg",
+          "body": "ring",
+          "local": [
+            -81.687,
+            -25,
+            3.554
+          ]
+        },
+        {
+          "id": "Cg",
+          "body": "ground",
+          "local": [
+            0,
+            0,
+            51.626
+          ]
+        },
+        {
+          "id": "Cp",
+          "body": "ground",
+          "local": [
+            0,
+            -25,
+            51.626
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "ring-angle",
+          "of": "ring",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "ring",
+          "kind": "speed-ratio",
+          "unit": ""
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review against the record (unbuilt): ratio 41/10 = 4.1 and 87.8° per pinion turn check out; the pinion's pitch diameter by the record's relation is 65.7 mm against 48.8 mm for a spiral bevel pinion of the same ratio. The offset, the one thing that makes it a hypoid, needs to be seen and compared. Decided: the ring gear on a vertical axis like the bevel pair, the pinion on a horizontal axis passing E beside it; open in plan, where both axis lines and the offset E between them (a dimension on their common perpendicular) read with the ring face-on. The offset is a control from 0 (a spiral bevel pair) to 40; the pinion's pitch point is traced, ticked every 30°, with a ghost at E = 0, so the larger, offset pinion is seen against the bevel one. Teeth by a loft generator."
+      },
+      "principle": [
+        {
+          "body": "pinion"
+        },
+        {
+          "body": "ring"
+        },
+        {
+          "point": "M"
+        }
+      ],
+      "traces": [
+        {
+          "id": "pinion-pitch-point",
+          "point": "Tp",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true,
+          "ghosts": [
+            {
+              "control": "E",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "id": "ring-pitch-point",
+          "point": "Tg",
+          "ticks": {
+            "every": 30
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "pinion-axis",
+          "kind": "axis-line",
+          "at": "O1",
+          "label": "PINION AXIS"
+        },
+        {
+          "id": "ring-axis",
+          "kind": "axis-line",
+          "at": "O2",
+          "label": "RING GEAR AXIS"
+        },
+        {
+          "id": "offset",
+          "kind": "dimension",
+          "from": "Cg",
+          "to": "Cp",
+          "label": "OFFSET E"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "offset",
+          "kind": "param",
+          "param": "E"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "ring-angle",
+        "label": "RING GEAR ANGLE"
+      },
+      "claims": [
+        {
+          "text": "the 10-tooth pinion drives a 41-tooth ring gear (4.1:1)",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": -0.2439,
+          "tol": 0.0005
+        },
+        {
+          "text": "ring gear 87.8° per pinion turn",
+          "output": "ring-angle",
+          "stat": "at",
+          "at": 360,
+          "value": -87.8,
+          "tol": 0.05
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "The 10-tooth pinion drives a 41-tooth ring gear through 90° (4.1:1), but its axis passes 25 mm to one side of the ring gear's axis, so the two shafts cross without meeting. To mesh at that offset the pinion has a larger spiral angle than the gear, which makes it larger and stronger than a spiral bevel pinion of the same ratio, here about a third larger across.",
+      "build.ground": "housing with the ring gear's axis vertical through the origin and the pinion's axis horizontal along x, passing E = 25 to one side of it",
+      "build.range": "pinion 360° continuous; ring gear 87.8° per pinion turn",
+      "build.notes": "Draw the pinion on a horizontal axis offset E beside the ring gear's centre, the ring gear on a vertical axis as in the bevel pair. Curved teeth by a loft along the face. Show the offset E as a dimension between the axes, on their common perpendicular, and make E a control (0 is a spiral bevel pair)."
+    }
+  }
+}

@@ -1,0 +1,5224 @@
+{
+  "oldham-coupling": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              220,
+              170
+            ],
+            "thickness": 8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                14,
+                0,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "id": "hub-in",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "disc",
+            "radius": 68,
+            "thickness": 12,
+            "bore": 10,
+            "slot": {
+              "along": "x",
+              "length": 106,
+              "width": 18,
+              "depth": 6
+            }
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "disc",
+          "role": "link",
+          "shape": {
+            "type": "disc",
+            "radius": 50,
+            "thickness": 6,
+            "tongues": [
+              {
+                "face": "input",
+                "along": "x",
+                "length": 48,
+                "width": 16,
+                "height": 6
+              },
+              {
+                "face": "output",
+                "along": "y",
+                "length": 48,
+                "width": 16,
+                "height": 6
+              }
+            ]
+          },
+          "at": {
+            "joint": "T1"
+          }
+        },
+        {
+          "id": "hub-out",
+          "role": "output",
+          "shape": {
+            "type": "disc",
+            "radius": 68,
+            "thickness": 12,
+            "bore": 10,
+            "slot": {
+              "along": "y",
+              "length": 106,
+              "width": 18,
+              "depth": 6
+            }
+          },
+          "at": {
+            "joint": "O2"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "hub-in",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "T1",
+          "type": "prismatic",
+          "a": "hub-in",
+          "b": "disc",
+          "at": [
+            21,
+            12.12,
+            15.5
+          ],
+          "axis": [
+            0.866,
+            0.5,
+            0
+          ],
+          "limits": [
+            -28,
+            28
+          ],
+          "note": "input tongue in the input slot; slide measured from O1 along the slot"
+        },
+        {
+          "id": "T2",
+          "type": "prismatic",
+          "a": "disc",
+          "b": "hub-out",
+          "at": [
+            21,
+            12.12,
+            15.5
+          ],
+          "axis": [
+            -0.5,
+            0.866,
+            0
+          ],
+          "limits": [
+            -28,
+            28
+          ],
+          "note": "output tongue in the output slot, square to T1; slide measured from O2"
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "hub-out",
+          "at": [
+            28,
+            0,
+            31
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "e",
+          "value": 28,
+          "unit": "mm",
+          "min": 0,
+          "max": 40,
+          "note": "shaft offset O1 to O2"
+        },
+        {
+          "id": "R",
+          "value": 68,
+          "unit": "mm",
+          "min": 55,
+          "max": 90,
+          "note": "hub radius"
+        },
+        {
+          "id": "Rm",
+          "value": 50,
+          "unit": "mm",
+          "min": 40,
+          "max": 60,
+          "note": "floating disc radius"
+        },
+        {
+          "id": "ws",
+          "value": 18,
+          "unit": "mm",
+          "min": 12,
+          "max": 24,
+          "note": "slot width"
+        },
+        {
+          "id": "wr",
+          "value": 16,
+          "unit": "mm",
+          "min": 10,
+          "max": 22,
+          "note": "tongue width, 1 mm clear each side"
+        },
+        {
+          "id": "Lt",
+          "value": 48,
+          "unit": "mm",
+          "min": 30,
+          "max": 60,
+          "note": "tongue length; slot half-length e + Lt/2 + 1 = 53"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 30
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "disc-centre",
+          "joints": [
+            "T1",
+            "T2",
+            "O2"
+          ],
+          "in": {
+            "a": "orbit-centre",
+            "ra": "e",
+            "b": "O1",
+            "dir": "hub-in"
+          },
+          "opts": {
+            "ra_scale": 0.5,
+            "construction": "C lies on the input slot line through O1 and on the circle of diameter O1 O2 (it sees O1 and O2 at a right angle)",
+            "root": "the root other than O1",
+            "angles": "disc and output hub keep the input angle: two prismatic pairs at right angles on one rigid disc"
+          },
+          "out": [
+            "disc",
+            "hub-out"
+          ]
+        }
+      ],
+      "points": [
+        {
+          "id": "C",
+          "body": "disc",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "orbit-centre",
+          "body": "ground",
+          "local": [
+            0,
+            0,
+            25.5
+          ]
+        },
+        {
+          "id": "in-mark",
+          "body": "hub-in",
+          "local": [
+            60,
+            0,
+            12
+          ]
+        },
+        {
+          "id": "out-mark",
+          "body": "hub-out",
+          "local": [
+            60,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "hub-in",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "output-angle",
+          "of": "hub-out",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "hub-out",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "orbit-angle",
+          "of": "C",
+          "kind": "angle",
+          "unit": "deg",
+          "note": "angle of C about the orbit centre"
+        },
+        {
+          "id": "disc-centre-path",
+          "of": "C",
+          "kind": "path"
+        },
+        {
+          "id": "tongue-in-slide",
+          "of": "T1",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "tongue-out-slide",
+          "of": "T2",
+          "kind": "position",
+          "unit": "mm"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "rethink",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and #217. The output hub covered the floating disc and both tongues, the whole principle. It is drawn see-through so the disc, both tongues and both slots show at once; a slotted yoke hub only if that still reads badly. The disc centre C is traced and its orbit drawn as a full circle of diameter e = 28 mm midway between the shafts; ticks every 15 degrees of input land 30 degrees apart on it, so C goes round twice per shaft turn. A right-angle arc at C shows why: C always sees O1 and O2 at 90 degrees."
+      },
+      "principle": [
+        {
+          "body": "hub-in"
+        },
+        {
+          "body": "disc"
+        },
+        {
+          "body": "hub-out"
+        },
+        {
+          "point": "C"
+        }
+      ],
+      "traces": [
+        {
+          "id": "disc-centre",
+          "point": "C",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "orbit",
+          "kind": "circle",
+          "center": "orbit-centre",
+          "radius": "e/2",
+          "label": "DISC CENTRE ORBIT, DIAMETER e"
+        },
+        {
+          "id": "offset",
+          "kind": "dimension",
+          "from": "O1",
+          "to": "O2",
+          "label": "OFFSET e"
+        },
+        {
+          "id": "right-angle",
+          "kind": "arc",
+          "center": "C",
+          "from": "O1",
+          "to": "O2",
+          "label": "90° AT C"
+        },
+        {
+          "id": "input-slot",
+          "kind": "line",
+          "from": "O1",
+          "to": "C",
+          "label": "INPUT SLOT LINE"
+        },
+        {
+          "id": "output-slot",
+          "kind": "line",
+          "from": "O2",
+          "to": "C",
+          "label": "OUTPUT SLOT LINE"
+        }
+      ],
+      "view": "PLAN",
+      "views": [],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "orbit-angle",
+          "label": "DISC CENTRE ANGLE ON ITS ORBIT"
+        },
+        {
+          "x": "input",
+          "y": "output-angle",
+          "label": "OUTPUT ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "the output turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the output turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the disc centre goes round its circle twice per turn",
+          "output": "orbit-angle",
+          "stat": "ratio",
+          "value": 2,
+          "tol": 0.001
+        },
+        {
+          "text": "the disc centre runs on a circle of diameter e = 28 mm",
+          "output": "disc-centre-path",
+          "stat": "range",
+          "value": 28,
+          "tol": 0.1
+        },
+        {
+          "text": "each tongue strokes ±28 mm in its slot",
+          "output": "tongue-in-slide",
+          "stat": "range",
+          "value": 56,
+          "tol": 0.1
+        },
+        {
+          "text": "each tongue strokes ±28 mm in its slot",
+          "output": "tongue-out-slide",
+          "stat": "range",
+          "value": 56,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "build.notes": "e = 28, R = 68, Rm = 50, ws = 18, wr = 16, Lt = 48. Slot half-length e + Lt/2 + 1 = 53, so the tongue ends clear the slot ends by 1 mm. Draw the input slot as a groove (not a hole) since the shaft is behind the hub. The disc keeps the input angle; it only translates relative to the hub frames. At e = 0 it reduces to a rigid coupling."
+    }
+  },
+  "schmidt-coupling": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              240,
+              220
+            ],
+            "thickness": 8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                25,
+                25,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "id": "disc-in",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "disc",
+            "radius": 53,
+            "thickness": 6,
+            "ring": {
+              "inner": 30
+            },
+            "pins": {
+              "count": 3,
+              "radius": 44
+            },
+            "indexMark": {
+              "at": [
+                0,
+                48
+              ]
+            }
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "link-a1",
+          "role": "link",
+          "set": "A",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "PA1"
+          }
+        },
+        {
+          "id": "link-a2",
+          "role": "link",
+          "set": "A",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "PA2"
+          }
+        },
+        {
+          "id": "link-a3",
+          "role": "link",
+          "set": "A",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "PA3"
+          }
+        },
+        {
+          "id": "disc-mid",
+          "role": "link",
+          "shape": {
+            "type": "disc",
+            "radius": 53,
+            "thickness": 6,
+            "ring": {
+              "inner": 30
+            },
+            "pins": {
+              "count": 6,
+              "radius": 44
+            },
+            "indexMark": {
+              "at": [
+                0,
+                48
+              ]
+            }
+          },
+          "at": {
+            "joint": "QA1"
+          }
+        },
+        {
+          "id": "link-b1",
+          "role": "link",
+          "set": "B",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "QB1"
+          }
+        },
+        {
+          "id": "link-b2",
+          "role": "link",
+          "set": "B",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "QB2"
+          }
+        },
+        {
+          "id": "link-b3",
+          "role": "link",
+          "set": "B",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "QB3"
+          }
+        },
+        {
+          "id": "disc-out",
+          "role": "output",
+          "shape": {
+            "type": "disc",
+            "radius": 53,
+            "thickness": 6,
+            "ring": {
+              "inner": 30
+            },
+            "pins": {
+              "count": 3,
+              "radius": 44
+            },
+            "indexMark": {
+              "at": [
+                0,
+                48
+              ]
+            }
+          },
+          "at": {
+            "joint": "O3"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "disc-in",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PA1",
+          "type": "revolute",
+          "a": "disc-in",
+          "b": "link-a1",
+          "at": [
+            44,
+            0,
+            6
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PA2",
+          "type": "revolute",
+          "a": "disc-in",
+          "b": "link-a2",
+          "at": [
+            -22,
+            38.11,
+            6
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PA3",
+          "type": "revolute",
+          "a": "disc-in",
+          "b": "link-a3",
+          "at": [
+            -22,
+            -38.11,
+            6
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "QA1",
+          "type": "revolute",
+          "a": "link-a1",
+          "b": "disc-mid",
+          "at": [
+            69,
+            54.54,
+            12
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "QA2",
+          "type": "revolute",
+          "a": "link-a2",
+          "b": "disc-mid",
+          "at": [
+            3,
+            92.65,
+            12
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "QA3",
+          "type": "revolute",
+          "a": "link-a3",
+          "b": "disc-mid",
+          "at": [
+            3,
+            16.44,
+            12
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "QB1",
+          "type": "revolute",
+          "a": "disc-mid",
+          "b": "link-b1",
+          "at": [
+            47,
+            92.65,
+            18
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "QB2",
+          "type": "revolute",
+          "a": "disc-mid",
+          "b": "link-b2",
+          "at": [
+            -19,
+            54.54,
+            18
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "QB3",
+          "type": "revolute",
+          "a": "disc-mid",
+          "b": "link-b3",
+          "at": [
+            47,
+            16.44,
+            18
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PB1",
+          "type": "revolute",
+          "a": "link-b1",
+          "b": "disc-out",
+          "at": [
+            72,
+            38.11,
+            24
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PB2",
+          "type": "revolute",
+          "a": "link-b2",
+          "b": "disc-out",
+          "at": [
+            6,
+            0,
+            24
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PB3",
+          "type": "revolute",
+          "a": "link-b3",
+          "b": "disc-out",
+          "at": [
+            72,
+            -38.11,
+            24
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O3",
+          "type": "revolute",
+          "a": "ground",
+          "b": "disc-out",
+          "at": [
+            50,
+            0,
+            30
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "e",
+          "value": 50,
+          "unit": "mm",
+          "min": 20,
+          "max": 100,
+          "note": "shaft offset O1 to O3 (0 < e < 2L; collinear links at 2L)"
+        },
+        {
+          "id": "L",
+          "value": 60,
+          "unit": "mm",
+          "min": 50,
+          "max": 80,
+          "note": "link length, both sets"
+        },
+        {
+          "id": "r",
+          "value": 44,
+          "unit": "mm",
+          "min": 36,
+          "max": 50,
+          "note": "pin pitch radius on every disc (44, not 40, so the eyes of a set clear each other at the ends of their sweep)"
+        },
+        {
+          "id": "disc-r",
+          "value": 53,
+          "unit": "mm",
+          "min": 48,
+          "max": 60,
+          "note": "disc radius"
+        }
+      ],
+      "design": [
+        {
+          "id": "middle-side",
+          "options": [
+            "above",
+            "below"
+          ],
+          "value": "above"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "middle-centre",
+          "in": {
+            "a": "O1",
+            "b": "O3",
+            "ra": "L",
+            "rb": "L"
+          },
+          "branch": "above",
+          "out": "C",
+          "opts": {
+            "note": "the middle disc centre: |C - O1| = |C - O3| = L, fixed in space for a given offset"
+          }
+        },
+        {
+          "block": "dyad",
+          "id": "set-a",
+          "joints": [
+            "PA1",
+            "QA1",
+            "PA2",
+            "QA2",
+            "PA3",
+            "QA3"
+          ],
+          "in": {
+            "a": "PA1",
+            "b": "C",
+            "ra": "L",
+            "rb": "r"
+          },
+          "out": [
+            "QA1",
+            "disc-mid"
+          ],
+          "opts": {
+            "root": "parallelogram O1 PA1 QA1 C",
+            "redundant": "links A2 and A3 are the same parallelogram turned 120 and 240 degrees; they close identically"
+          }
+        },
+        {
+          "block": "dyad",
+          "id": "set-b",
+          "joints": [
+            "QB1",
+            "PB1",
+            "QB2",
+            "PB2",
+            "QB3",
+            "PB3",
+            "O3"
+          ],
+          "in": {
+            "a": "QB1",
+            "b": "O3",
+            "ra": "L",
+            "rb": "r"
+          },
+          "out": [
+            "PB1",
+            "disc-out"
+          ],
+          "opts": {
+            "root": "parallelogram C QB1 PB1 O3",
+            "redundant": "links B2 and B3 close identically"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "mid-centre",
+          "body": "disc-mid",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "link-a-mid",
+          "body": "link-a1",
+          "local": [
+            30,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "mark-in",
+          "body": "disc-in",
+          "local": [
+            0,
+            48,
+            0
+          ]
+        },
+        {
+          "id": "mark-mid",
+          "body": "disc-mid",
+          "local": [
+            0,
+            48,
+            0
+          ]
+        },
+        {
+          "id": "mark-out",
+          "body": "disc-out",
+          "local": [
+            0,
+            48,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "disc-in",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "middle-angle",
+          "of": "disc-mid",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "output-angle",
+          "of": "disc-out",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "disc-out",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "link-a-angle",
+          "of": "link-a1",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "link-b-angle",
+          "of": "link-b1",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "middle-centre-height",
+          "of": "mid-centre",
+          "kind": "position",
+          "unit": "mm",
+          "note": "distance of C from the shaft line O1 O3"
+        },
+        {
+          "id": "link-midpoint-path",
+          "of": "link-a-mid",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "rethink",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and #217. Three opaque discs overlapped and the output disc hid link set B, so neither point showed: the parallel links of each set, and all three discs keeping one orientation. The discs become see-through rings with one bold index mark each, so three parallel marks turn together. The two link sets are told apart by role pattern and stacking, not colour, and drawn on top. The midpoint of link A1 is traced: it draws a circle of radius r = 44 mm while the link never turns. The offset e is a control (20 to 100 mm) with ghost traces at 30 and 90 mm; the middle disc centre moves along the bisector of O1 O3 and the output stays in phase."
+      },
+      "principle": [
+        {
+          "body": "disc-in"
+        },
+        {
+          "body": "disc-mid"
+        },
+        {
+          "body": "disc-out"
+        },
+        {
+          "body": "link-a1"
+        },
+        {
+          "body": "link-a2"
+        },
+        {
+          "body": "link-a3"
+        },
+        {
+          "body": "link-b1"
+        },
+        {
+          "body": "link-b2"
+        },
+        {
+          "body": "link-b3"
+        },
+        {
+          "point": "mark-in"
+        },
+        {
+          "point": "mark-mid"
+        },
+        {
+          "point": "mark-out"
+        },
+        {
+          "point": "link-a-mid"
+        }
+      ],
+      "traces": [
+        {
+          "id": "link-midpoint",
+          "point": "link-a-mid",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true,
+          "ghosts": [
+            {
+              "control": "offset",
+              "value": 30
+            },
+            {
+              "control": "offset",
+              "value": 90
+            }
+          ]
+        }
+      ],
+      "overlays": [
+        {
+          "id": "set-a-direction",
+          "kind": "line",
+          "from": "O1",
+          "to": "mid-centre",
+          "label": "EVERY LINK A IS PARALLEL TO THIS"
+        },
+        {
+          "id": "set-b-direction",
+          "kind": "line",
+          "from": "mid-centre",
+          "to": "O3",
+          "label": "EVERY LINK B IS PARALLEL TO THIS"
+        },
+        {
+          "id": "offset",
+          "kind": "dimension",
+          "from": "O1",
+          "to": "O3",
+          "label": "OFFSET e"
+        }
+      ],
+      "view": "PLAN",
+      "views": [],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "offset",
+          "kind": "param",
+          "param": "e"
+        },
+        {
+          "id": "middle-side",
+          "kind": "design",
+          "design": "middle-side"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "output-angle",
+          "label": "OUTPUT ANGLE"
+        },
+        {
+          "x": "input",
+          "y": "link-a-angle",
+          "label": "LINK A ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "the output turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the output turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the links themselves do not rotate",
+          "output": "link-a-angle",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        },
+        {
+          "text": "the links themselves do not rotate",
+          "output": "link-b-angle",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        },
+        {
+          "text": "the middle disc spins about a fixed point, 54.5 mm off the shaft line at e = 50 mm",
+          "output": "middle-centre-height",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        },
+        {
+          "text": "the middle disc spins about a fixed point, 54.5 mm off the shaft line at e = 50 mm",
+          "output": "middle-centre-height",
+          "stat": "mean",
+          "value": 54.54,
+          "tol": 0.05
+        },
+        {
+          "text": "every point of a link circles with radius r = 44 mm",
+          "output": "link-midpoint-path",
+          "stat": "range",
+          "value": 88,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "build.range": "input 360° continuous; output 360° in phase; the middle disc spins about the fixed point C, 54.5 mm off the shaft line at e = 50; every link translates without turning, each of its points circling with radius r = 44",
+      "build.notes": "Pins on r = 44, not 40, so the three eyes of a set clear each other at the ends of their sweep. Offset the B pins by 60° on the middle disc so the links do not collide. The offset e is a control (20 to 100 mm): C moves along the perpendicular bisector of O1 O3 while the output stays in phase. Near e = 0 the middle disc is undetermined; at e = 2L the links are collinear (singular)."
+    }
+  },
+  "universal-joint": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              320,
+              200
+            ],
+            "thickness": 8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                30,
+                -4
+              ]
+            }
+          }
+        },
+        {
+          "id": "yoke-in",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "shaft",
+            "diameter": 16,
+            "length": 120,
+            "yoke": {
+              "radius": 30,
+              "arm": 8
+            }
+          },
+          "at": {
+            "joint": "B1"
+          },
+          "frame": "local x along the input shaft toward the cross"
+        },
+        {
+          "id": "cross",
+          "role": "link",
+          "shape": {
+            "type": "cross",
+            "arm": 30,
+            "diameter": 10
+          },
+          "at": {
+            "joint": "C1"
+          }
+        },
+        {
+          "id": "yoke-out",
+          "role": "output",
+          "shape": {
+            "type": "shaft",
+            "diameter": 16,
+            "length": 120,
+            "yoke": {
+              "radius": 30,
+              "arm": 8
+            }
+          },
+          "at": {
+            "joint": "B2"
+          },
+          "frame": "local x along the output shaft away from the cross"
+        }
+      ],
+      "joints": [
+        {
+          "id": "B1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "yoke-in",
+          "at": [
+            -60,
+            0,
+            80
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "C1",
+          "type": "revolute",
+          "a": "yoke-in",
+          "b": "cross",
+          "at": [
+            0,
+            0,
+            80
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "C2",
+          "type": "revolute",
+          "a": "cross",
+          "b": "yoke-out",
+          "at": [
+            0,
+            0,
+            80
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "yoke-out",
+          "at": [
+            51.96,
+            30,
+            80
+          ],
+          "axis": [
+            0.866,
+            0.5,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "beta",
+          "value": 30,
+          "unit": "deg",
+          "min": 0,
+          "max": 45,
+          "note": "shaft angle (bend) between the two shafts"
+        },
+        {
+          "id": "r",
+          "value": 30,
+          "unit": "mm",
+          "min": 20,
+          "max": 40,
+          "note": "yoke and cross arm radius"
+        },
+        {
+          "id": "Ls",
+          "value": 120,
+          "unit": "mm",
+          "min": 80,
+          "max": 160,
+          "note": "shaft stub length drawn"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "B1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "hooke",
+          "id": "joint",
+          "joints": [
+            "C1",
+            "C2",
+            "B2"
+          ],
+          "in": {
+            "input": "input",
+            "beta": "beta"
+          },
+          "out": [
+            "cross",
+            "yoke-out"
+          ],
+          "opts": {
+            "zero": "input yoke arm in the plane of the two shafts",
+            "relation": "tan(theta2) = tan(theta1) / cos(beta), atan2 branch"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "centre",
+          "body": "cross",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "in-tip",
+          "body": "yoke-in",
+          "local": [
+            60,
+            30,
+            0
+          ]
+        },
+        {
+          "id": "out-tip",
+          "body": "yoke-out",
+          "local": [
+            -60,
+            0,
+            30
+          ]
+        },
+        {
+          "id": "in-ext",
+          "body": "yoke-in",
+          "local": [
+            120,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "yoke-in",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "output-angle",
+          "of": "yoke-out",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "yoke-out",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "angle-error",
+          "of": "yoke-out",
+          "kind": "angle",
+          "unit": "deg",
+          "note": "output angle minus input angle"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Review against the record (not in the 2026-10-19 review). The record's plan reads: a bend of 30 degrees makes the speed swing of 0.866 to 1.155 large enough to see. Decided: the bend angle is a control (0 to 45 degrees); the output yoke arm end is traced with ticks every 15 degrees of input, so its uneven spacing shows the speed-up and slow-down twice per turn, next to the even ticks of the input arm end; both shaft axes and the bend arc are drawn; the plot shows the speed ratio and the lead and lag."
+      },
+      "principle": [
+        {
+          "body": "yoke-in"
+        },
+        {
+          "body": "cross"
+        },
+        {
+          "body": "yoke-out"
+        },
+        {
+          "point": "centre"
+        }
+      ],
+      "traces": [
+        {
+          "id": "output-arm",
+          "point": "out-tip",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "input-arm",
+          "point": "in-tip",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "input-axis",
+          "kind": "axis-line",
+          "at": "B1",
+          "label": "INPUT AXIS"
+        },
+        {
+          "id": "output-axis",
+          "kind": "axis-line",
+          "at": "B2",
+          "label": "OUTPUT AXIS"
+        },
+        {
+          "id": "bend",
+          "kind": "arc",
+          "center": "centre",
+          "from": "in-ext",
+          "to": "B2",
+          "label": "SHAFT ANGLE β"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "views": [],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "bend",
+          "kind": "param",
+          "param": "beta"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "speed-ratio",
+          "label": "OUTPUT SPEED RATIO"
+        },
+        {
+          "x": "input",
+          "y": "angle-error",
+          "label": "OUTPUT LEAD AND LAG"
+        }
+      ],
+      "claims": [
+        {
+          "text": "at 30° the output speed varies by about ±15%",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 0.866,
+          "tol": 0.001
+        },
+        {
+          "text": "at 30° the output speed varies by about ±15%",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1.155,
+          "tol": 0.001
+        },
+        {
+          "text": "over a full turn both shafts turn 360°",
+          "output": "output-angle",
+          "stat": "range",
+          "value": 360,
+          "tol": 0.01
+        },
+        {
+          "text": "the output runs ahead and then behind, twice per revolution, by up to 4.1° at 30°",
+          "output": "angle-error",
+          "stat": "max",
+          "value": 4.12,
+          "tol": 0.05
+        },
+        {
+          "text": "the output runs ahead and then behind, twice per revolution, by up to 4.1° at 30°",
+          "output": "angle-error",
+          "stat": "min",
+          "value": -4.12,
+          "tol": 0.05
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.notes": "ground, input yoke, cross (spider), output yoke; a spherical 4R chain with all four axes meeting at the cross centre. Overconstrained in the joint count: Kutzbach gives -2 because it ignores that the four axes are concurrent; the true mobility is 1, solved in closed form by the Hooke block."
+    }
+  },
+  "double-cardan": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              300,
+              160
+            ],
+            "thickness": 8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                20,
+                -4
+              ]
+            }
+          }
+        },
+        {
+          "id": "yoke-in",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "shaft",
+            "diameter": 16,
+            "length": 100,
+            "yoke": {
+              "radius": 30,
+              "arm": 8
+            }
+          },
+          "at": {
+            "joint": "B1"
+          },
+          "frame": "local x along the input shaft toward cross 1"
+        },
+        {
+          "id": "cross-1",
+          "role": "link",
+          "shape": {
+            "type": "cross",
+            "arm": 30,
+            "diameter": 10
+          },
+          "at": {
+            "joint": "C1a"
+          }
+        },
+        {
+          "id": "centre",
+          "role": "link",
+          "shape": {
+            "type": "shaft",
+            "diameter": 20,
+            "length": 60,
+            "yoke": {
+              "radius": 30,
+              "arm": 8,
+              "ends": 2
+            }
+          },
+          "at": {
+            "joint": "C1b"
+          },
+          "frame": "local x along the centre yoke from cross 1 to cross 2"
+        },
+        {
+          "id": "cross-2",
+          "role": "link",
+          "shape": {
+            "type": "cross",
+            "arm": 30,
+            "diameter": 10
+          },
+          "at": {
+            "joint": "C2a"
+          }
+        },
+        {
+          "id": "yoke-out",
+          "role": "output",
+          "shape": {
+            "type": "shaft",
+            "diameter": 16,
+            "length": 100,
+            "yoke": {
+              "radius": 30,
+              "arm": 8
+            }
+          },
+          "at": {
+            "joint": "B2"
+          },
+          "frame": "local x along the output shaft away from cross 2"
+        }
+      ],
+      "joints": [
+        {
+          "id": "B1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "yoke-in",
+          "at": [
+            -86.38,
+            20.52,
+            80
+          ],
+          "axis": [
+            0.9397,
+            -0.342,
+            0
+          ]
+        },
+        {
+          "id": "C1a",
+          "type": "revolute",
+          "a": "yoke-in",
+          "b": "cross-1",
+          "at": [
+            -30,
+            0,
+            80
+          ],
+          "axis": [
+            0.342,
+            0.9397,
+            0
+          ]
+        },
+        {
+          "id": "C1b",
+          "type": "revolute",
+          "a": "cross-1",
+          "b": "centre",
+          "at": [
+            -30,
+            0,
+            80
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C2a",
+          "type": "revolute",
+          "a": "centre",
+          "b": "cross-2",
+          "at": [
+            30,
+            0,
+            80
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C2b",
+          "type": "revolute",
+          "a": "cross-2",
+          "b": "yoke-out",
+          "at": [
+            30,
+            0,
+            80
+          ],
+          "axis": [
+            -0.342,
+            0.9397,
+            0
+          ]
+        },
+        {
+          "id": "B2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "yoke-out",
+          "at": [
+            86.38,
+            20.52,
+            80
+          ],
+          "axis": [
+            0.9397,
+            0.342,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "beta",
+          "value": 20,
+          "unit": "deg",
+          "min": 0,
+          "max": 30,
+          "note": "angle at each joint, kept equal by the centring ball (total bend 2 beta)"
+        },
+        {
+          "id": "phase",
+          "value": 0,
+          "unit": "deg",
+          "min": 0,
+          "max": 90,
+          "note": "angle between the centre yoke's two forks; 0 = in phase"
+        },
+        {
+          "id": "r",
+          "value": 30,
+          "unit": "mm",
+          "min": 20,
+          "max": 40,
+          "note": "yoke and cross arm radius"
+        },
+        {
+          "id": "Lc",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 90,
+          "note": "centre yoke length, cross 1 to cross 2"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "B1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "hooke",
+          "id": "joint-1",
+          "joints": [
+            "C1a",
+            "C1b"
+          ],
+          "in": {
+            "input": "input",
+            "beta": "beta"
+          },
+          "out": [
+            "cross-1",
+            "centre"
+          ],
+          "opts": {
+            "zero": "input yoke arm in the plane of the shafts"
+          }
+        },
+        {
+          "block": "hooke",
+          "id": "joint-2",
+          "joints": [
+            "C2a",
+            "C2b",
+            "B2"
+          ],
+          "in": {
+            "input": "centre",
+            "beta": "beta",
+            "phase": "phase"
+          },
+          "out": [
+            "cross-2",
+            "yoke-out"
+          ],
+          "opts": {
+            "reversed": true,
+            "relation": "tan(theta3 - phase) = tan(theta2 - phase) cos(beta)"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "in-tip",
+          "body": "yoke-in",
+          "local": [
+            60,
+            30,
+            0
+          ]
+        },
+        {
+          "id": "centre-tip",
+          "body": "centre",
+          "local": [
+            30,
+            0,
+            30
+          ]
+        },
+        {
+          "id": "out-tip",
+          "body": "yoke-out",
+          "local": [
+            -60,
+            30,
+            0
+          ]
+        },
+        {
+          "id": "in-ext",
+          "body": "yoke-in",
+          "local": [
+            90,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "centre-ext",
+          "body": "centre",
+          "local": [
+            90,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "yoke-in",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "centre-angle",
+          "of": "centre",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "output-angle",
+          "of": "yoke-out",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "centre-speed-ratio",
+          "of": "centre",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "yoke-out",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "centre-lag",
+          "of": "centre",
+          "kind": "angle",
+          "unit": "deg",
+          "note": "centre yoke angle minus input angle"
+        },
+        {
+          "id": "output-lag",
+          "of": "yoke-out",
+          "kind": "angle",
+          "unit": "deg",
+          "note": "output angle minus input angle"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review against the record (not in the 2026-10-19 review). At 15 degrees per joint the centre yoke's wobble (speed ratio 0.966 to 1.035) is too small to see next to the flat output, so the default angle per joint is 20 degrees (total 40): the centre yoke's speed ratio runs 0.940 to 1.064 and it leads and lags by 1.8 degrees, while the output stays exactly in phase. The phase between the centre yoke's forks is a control (0 to 90 degrees): at 90 the two fluctuations add instead of cancelling. The centre yoke arm end is traced with ticks every 15 degrees of input (uneven), the output arm end likewise (even); the plot shows both speed ratios."
+      },
+      "principle": [
+        {
+          "body": "yoke-in"
+        },
+        {
+          "body": "cross-1"
+        },
+        {
+          "body": "centre"
+        },
+        {
+          "body": "cross-2"
+        },
+        {
+          "body": "yoke-out"
+        }
+      ],
+      "traces": [
+        {
+          "id": "centre-arm",
+          "point": "centre-tip",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "output-arm",
+          "point": "out-tip",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "input-axis",
+          "kind": "axis-line",
+          "at": "B1",
+          "label": "INPUT AXIS"
+        },
+        {
+          "id": "output-axis",
+          "kind": "axis-line",
+          "at": "B2",
+          "label": "OUTPUT AXIS"
+        },
+        {
+          "id": "centre-axis",
+          "kind": "line",
+          "from": "C1b",
+          "to": "C2a",
+          "label": "CENTRE YOKE"
+        },
+        {
+          "id": "angle-1",
+          "kind": "arc",
+          "center": "C1b",
+          "from": "in-ext",
+          "to": "C2a",
+          "label": "β"
+        },
+        {
+          "id": "angle-2",
+          "kind": "arc",
+          "center": "C2a",
+          "from": "centre-ext",
+          "to": "B2",
+          "label": "β"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "views": [],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "phase",
+          "kind": "param",
+          "param": "phase"
+        },
+        {
+          "id": "bend",
+          "kind": "param",
+          "param": "beta"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "centre-speed-ratio",
+          "label": "CENTRE YOKE SPEED RATIO"
+        },
+        {
+          "x": "input",
+          "y": "speed-ratio",
+          "label": "OUTPUT SPEED RATIO"
+        }
+      ],
+      "claims": [
+        {
+          "text": "the output turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the output turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the output stays exactly in phase",
+          "output": "output-lag",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        },
+        {
+          "text": "centre yoke leads and lags by up to about 1.8° at beta = 20°",
+          "output": "centre-lag",
+          "stat": "max",
+          "value": 1.78,
+          "tol": 0.03
+        },
+        {
+          "text": "the centre yoke still accelerates twice per turn",
+          "output": "centre-speed-ratio",
+          "stat": "min",
+          "value": 0.94,
+          "tol": 0.002
+        },
+        {
+          "text": "the centre yoke still accelerates twice per turn",
+          "output": "centre-speed-ratio",
+          "stat": "max",
+          "value": 1.064,
+          "tol": 0.002
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.notes": "ground, input yoke, cross 1, centre yoke, cross 2, output yoke; 2 shaft bearings plus 2 cross bearings per joint. Overconstrained in the joint count: Kutzbach gives 0 because it ignores that the axes at each cross meet at its centre (two spherical chains); the true mobility is 1, solved in closed form by two Hooke blocks. A ball-and-socket centring device (spherical pair, not counted) keeps the two joint angles equal.",
+      "build.ground": "input and output bearings whose axes meet on the perpendicular bisector of the centre yoke, Lc/2 tan(beta) off it, total angle 2 beta",
+      "build.range": "input 360° continuous; output 360° exactly in phase; centre yoke leads and lags by up to about 1.8° at beta = 20° (speed ratio 0.940 to 1.064)",
+      "build.notes": "A phase control (0° to 90°) turns the centre yoke's second fork: at 90° the two fluctuations add instead of cancelling and the output speed ratio swings 0.883 to 1.133 at beta = 20°. Keep the centre yoke on the bisector of the total angle. Reuse the single universal-joint solver twice, the second reversed."
+    }
+  },
+  "rzeppa-cv-joint": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              300,
+              180
+            ],
+            "thickness": 8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                20,
+                -4
+              ]
+            }
+          }
+        },
+        {
+          "id": "inner",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "spherical band of radius 24, 30 mm wide, with 6 meridian grooves for 16 mm balls, on a 20 mm shaft 100 mm long",
+            "grooves": 6,
+            "sphere": 24
+          },
+          "at": {
+            "joint": "B1"
+          },
+          "frame": "local x along the input shaft toward J"
+        },
+        {
+          "id": "outer",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "bell with an inner sphere of radius 33 and 6 meridian grooves, on a 24 mm shaft 100 mm long",
+            "grooves": 6,
+            "sphere": 33
+          },
+          "at": {
+            "joint": "B2"
+          },
+          "frame": "local x along the output shaft away from J"
+        },
+        {
+          "id": "cage",
+          "role": "link",
+          "shape": {
+            "type": "cage",
+            "inner": 24.5,
+            "outer": 32.5,
+            "width": 22,
+            "windows": 6,
+            "window": [
+              17,
+              16
+            ]
+          },
+          "at": {
+            "joint": "F1"
+          },
+          "frame": "local x along the cage axis (the bisecting plane's normal), local y in the plane of the shafts"
+        },
+        {
+          "id": "ball-1",
+          "role": "link",
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "sphere of diameter 16",
+            "diameter": 16
+          },
+          "at": {
+            "joint": "W1"
+          }
+        },
+        {
+          "id": "ball-2",
+          "role": "link",
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "sphere of diameter 16",
+            "diameter": 16
+          },
+          "at": {
+            "joint": "W2"
+          }
+        },
+        {
+          "id": "ball-3",
+          "role": "link",
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "sphere of diameter 16",
+            "diameter": 16
+          },
+          "at": {
+            "joint": "W3"
+          }
+        },
+        {
+          "id": "ball-4",
+          "role": "link",
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "sphere of diameter 16",
+            "diameter": 16
+          },
+          "at": {
+            "joint": "W4"
+          }
+        },
+        {
+          "id": "ball-5",
+          "role": "link",
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "sphere of diameter 16",
+            "diameter": 16
+          },
+          "at": {
+            "joint": "W5"
+          }
+        },
+        {
+          "id": "ball-6",
+          "role": "link",
+          "shape": {
+            "type": "custom",
+            "op": "revolve",
+            "profile": "sphere of diameter 16",
+            "diameter": 16
+          },
+          "at": {
+            "joint": "W6"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "B1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "inner",
+          "at": [
+            -60,
+            0,
+            80
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "B2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "outer",
+          "at": [
+            51.96,
+            30,
+            80
+          ],
+          "axis": [
+            0.866,
+            0.5,
+            0
+          ]
+        },
+        {
+          "id": "F1",
+          "type": "spherical",
+          "a": "inner",
+          "b": "cage",
+          "at": [
+            0,
+            0,
+            80
+          ],
+          "note": "cage inner sphere on the inner race, concentric at J"
+        },
+        {
+          "id": "F2",
+          "type": "spherical",
+          "a": "cage",
+          "b": "outer",
+          "at": [
+            0,
+            0,
+            80
+          ],
+          "note": "cage outer sphere in the bell, concentric at J"
+        },
+        {
+          "id": "W1",
+          "type": "pin-in-slot",
+          "a": "ball-1",
+          "b": "cage",
+          "at": [
+            -6.47,
+            24.15,
+            80
+          ],
+          "slot": {
+            "body": "cage",
+            "path": "window 1: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
+          }
+        },
+        {
+          "id": "W2",
+          "type": "pin-in-slot",
+          "a": "ball-2",
+          "b": "cage",
+          "at": [
+            -3.32,
+            12.39,
+            58.54
+          ],
+          "slot": {
+            "body": "cage",
+            "path": "window 2: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
+          }
+        },
+        {
+          "id": "W3",
+          "type": "pin-in-slot",
+          "a": "ball-3",
+          "b": "cage",
+          "at": [
+            3.32,
+            -12.39,
+            58.54
+          ],
+          "slot": {
+            "body": "cage",
+            "path": "window 3: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
+          }
+        },
+        {
+          "id": "W4",
+          "type": "pin-in-slot",
+          "a": "ball-4",
+          "b": "cage",
+          "at": [
+            6.47,
+            -24.15,
+            80
+          ],
+          "slot": {
+            "body": "cage",
+            "path": "window 4: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
+          }
+        },
+        {
+          "id": "W5",
+          "type": "pin-in-slot",
+          "a": "ball-5",
+          "b": "cage",
+          "at": [
+            3.32,
+            -12.39,
+            101.46
+          ],
+          "slot": {
+            "body": "cage",
+            "path": "window 5: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
+          }
+        },
+        {
+          "id": "W6",
+          "type": "pin-in-slot",
+          "a": "ball-6",
+          "b": "cage",
+          "at": [
+            -3.32,
+            12.39,
+            101.46
+          ],
+          "slot": {
+            "body": "cage",
+            "path": "window 6: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
+          }
+        },
+        {
+          "id": "G1",
+          "type": "pin-in-slot",
+          "a": "ball-1",
+          "b": "inner",
+          "at": [
+            -6.47,
+            24.15,
+            80
+          ],
+          "slot": {
+            "body": "inner",
+            "path": "groove 1, centre offset 3 mm toward the input side of J"
+          }
+        },
+        {
+          "id": "G2",
+          "type": "pin-in-slot",
+          "a": "ball-2",
+          "b": "inner",
+          "at": [
+            -3.32,
+            12.39,
+            58.54
+          ],
+          "slot": {
+            "body": "inner",
+            "path": "groove 2, centre offset 3 mm toward the input side of J"
+          }
+        },
+        {
+          "id": "G3",
+          "type": "pin-in-slot",
+          "a": "ball-3",
+          "b": "inner",
+          "at": [
+            3.32,
+            -12.39,
+            58.54
+          ],
+          "slot": {
+            "body": "inner",
+            "path": "groove 3, centre offset 3 mm toward the input side of J"
+          }
+        },
+        {
+          "id": "G4",
+          "type": "pin-in-slot",
+          "a": "ball-4",
+          "b": "inner",
+          "at": [
+            6.47,
+            -24.15,
+            80
+          ],
+          "slot": {
+            "body": "inner",
+            "path": "groove 4, centre offset 3 mm toward the input side of J"
+          }
+        },
+        {
+          "id": "G5",
+          "type": "pin-in-slot",
+          "a": "ball-5",
+          "b": "inner",
+          "at": [
+            3.32,
+            -12.39,
+            101.46
+          ],
+          "slot": {
+            "body": "inner",
+            "path": "groove 5, centre offset 3 mm toward the input side of J"
+          }
+        },
+        {
+          "id": "G6",
+          "type": "pin-in-slot",
+          "a": "ball-6",
+          "b": "inner",
+          "at": [
+            -3.32,
+            12.39,
+            101.46
+          ],
+          "slot": {
+            "body": "inner",
+            "path": "groove 6, centre offset 3 mm toward the input side of J"
+          }
+        },
+        {
+          "id": "H1",
+          "type": "pin-in-slot",
+          "a": "ball-1",
+          "b": "outer",
+          "at": [
+            -6.47,
+            24.15,
+            80
+          ],
+          "slot": {
+            "body": "outer",
+            "path": "groove 1, centre offset 3 mm toward the output side of J"
+          }
+        },
+        {
+          "id": "H2",
+          "type": "pin-in-slot",
+          "a": "ball-2",
+          "b": "outer",
+          "at": [
+            -3.32,
+            12.39,
+            58.54
+          ],
+          "slot": {
+            "body": "outer",
+            "path": "groove 2, centre offset 3 mm toward the output side of J"
+          }
+        },
+        {
+          "id": "H3",
+          "type": "pin-in-slot",
+          "a": "ball-3",
+          "b": "outer",
+          "at": [
+            3.32,
+            -12.39,
+            58.54
+          ],
+          "slot": {
+            "body": "outer",
+            "path": "groove 3, centre offset 3 mm toward the output side of J"
+          }
+        },
+        {
+          "id": "H4",
+          "type": "pin-in-slot",
+          "a": "ball-4",
+          "b": "outer",
+          "at": [
+            6.47,
+            -24.15,
+            80
+          ],
+          "slot": {
+            "body": "outer",
+            "path": "groove 4, centre offset 3 mm toward the output side of J"
+          }
+        },
+        {
+          "id": "H5",
+          "type": "pin-in-slot",
+          "a": "ball-5",
+          "b": "outer",
+          "at": [
+            3.32,
+            -12.39,
+            101.46
+          ],
+          "slot": {
+            "body": "outer",
+            "path": "groove 5, centre offset 3 mm toward the output side of J"
+          }
+        },
+        {
+          "id": "H6",
+          "type": "pin-in-slot",
+          "a": "ball-6",
+          "b": "outer",
+          "at": [
+            -3.32,
+            12.39,
+            101.46
+          ],
+          "slot": {
+            "body": "outer",
+            "path": "groove 6, centre offset 3 mm toward the output side of J"
+          }
+        }
+      ],
+      "params": [
+        {
+          "id": "beta",
+          "value": 30,
+          "unit": "deg",
+          "min": 0,
+          "max": 45,
+          "note": "joint angle between the two shafts"
+        },
+        {
+          "id": "Rp",
+          "value": 25,
+          "unit": "mm",
+          "min": 20,
+          "max": 32,
+          "note": "ball pitch circle radius"
+        },
+        {
+          "id": "db",
+          "value": 16,
+          "unit": "mm",
+          "min": 12,
+          "max": 20,
+          "note": "ball diameter"
+        },
+        {
+          "id": "off",
+          "value": 3,
+          "unit": "mm",
+          "min": 1,
+          "max": 6,
+          "note": "groove centre offset either side of J, which steers the balls into the bisecting plane"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "B1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "homokinetic",
+          "id": "cv",
+          "joints": [
+            "B2",
+            "F1",
+            "F2",
+            "W1",
+            "W2",
+            "W3",
+            "W4",
+            "W5",
+            "W6",
+            "G1",
+            "G2",
+            "G3",
+            "G4",
+            "G5",
+            "G6",
+            "H1",
+            "H2",
+            "H3",
+            "H4",
+            "H5",
+            "H6"
+          ],
+          "in": {
+            "input": "input",
+            "beta": "beta",
+            "Rp": "Rp"
+          },
+          "out": [
+            "outer",
+            "cage",
+            "ball-1",
+            "ball-2",
+            "ball-3",
+            "ball-4",
+            "ball-5",
+            "ball-6"
+          ],
+          "opts": {
+            "balls": 6,
+            "phase0": 90,
+            "relation": "cage in the plane through J whose normal bisects the shaft axes; ball k at the intersection of that plane with inner groove k (meridian angle theta + 90 + 60k about the input axis), radius Rp from J; output angle = input angle"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "joint-centre",
+          "body": "cage",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "cage-normal",
+          "body": "cage",
+          "local": [
+            45,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "bisector-tip",
+          "body": "cage",
+          "local": [
+            0,
+            45,
+            0
+          ]
+        },
+        {
+          "id": "in-ext",
+          "body": "inner",
+          "local": [
+            105,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "out-ext",
+          "body": "outer",
+          "local": [
+            -15,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "ball-1-centre",
+          "body": "ball-1",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "inner",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "output-angle",
+          "of": "outer",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "outer",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "cage-tilt",
+          "of": "cage",
+          "kind": "angle",
+          "unit": "deg",
+          "note": "tilt of the cage axis from the input axis"
+        },
+        {
+          "id": "ball-axial",
+          "of": "ball-1-centre",
+          "kind": "position",
+          "unit": "mm",
+          "note": "ball 1 centre along the input axis, from J, in the inner race"
+        },
+        {
+          "id": "ball-path",
+          "of": "ball-1-centre",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 45 degrees); the plot shows output minus input (flat) and the ball's run along its groove."
+      },
+      "principle": [
+        {
+          "body": "inner"
+        },
+        {
+          "body": "outer"
+        },
+        {
+          "body": "cage"
+        },
+        {
+          "body": "ball-1"
+        },
+        {
+          "body": "ball-2"
+        },
+        {
+          "body": "ball-3"
+        },
+        {
+          "body": "ball-4"
+        },
+        {
+          "body": "ball-5"
+        },
+        {
+          "body": "ball-6"
+        },
+        {
+          "point": "ball-1-centre"
+        }
+      ],
+      "traces": [
+        {
+          "id": "ball",
+          "point": "ball-1-centre",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "input-axis",
+          "kind": "axis-line",
+          "at": "B1",
+          "label": "INPUT AXIS"
+        },
+        {
+          "id": "output-axis",
+          "kind": "axis-line",
+          "at": "B2",
+          "label": "OUTPUT AXIS"
+        },
+        {
+          "id": "bisecting-plane",
+          "kind": "line",
+          "from": "joint-centre",
+          "to": "bisector-tip",
+          "label": "BISECTING PLANE"
+        },
+        {
+          "id": "shaft-angle",
+          "kind": "arc",
+          "center": "joint-centre",
+          "from": "in-ext",
+          "to": "out-ext",
+          "label": "SHAFT ANGLE β"
+        },
+        {
+          "id": "half-angle",
+          "kind": "arc",
+          "center": "joint-centre",
+          "from": "in-ext",
+          "to": "cage-normal",
+          "label": "β/2"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "views": [
+        {
+          "id": "cage-section",
+          "kind": "section",
+          "plane": {
+            "origin": [
+              0,
+              0,
+              80
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          "highlight": [
+            "cage",
+            "ball-1",
+            "ball-4",
+            "inner.grooves",
+            "outer.grooves"
+          ],
+          "note": "the plane of the two shafts; at the default pose balls 1 and 4 lie in it"
+        }
+      ],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "bend",
+          "kind": "param",
+          "param": "beta"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "speed-ratio",
+          "label": "OUTPUT SPEED RATIO"
+        },
+        {
+          "x": "input",
+          "y": "ball-axial",
+          "label": "BALL RUN ALONG ITS GROOVE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "the two shafts turn at exactly the same speed",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the two shafts turn at exactly the same speed",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001
+        },
+        {
+          "text": "the cage tilts by beta/2 = 15° at beta = 30°",
+          "output": "cage-tilt",
+          "stat": "mean",
+          "value": 15,
+          "tol": 0.01
+        },
+        {
+          "text": "each ball runs ±6.5 mm along its groove per turn",
+          "output": "ball-axial",
+          "stat": "range",
+          "value": 12.94,
+          "tol": 0.05
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.notes": "ground, inner race with shaft, outer race (bell) with shaft, cage, 6 balls; each ball contacts an inner groove, an outer groove and a cage window (18 higher pairs); cage to races are spherical sliding fits. The joint count (Kutzbach, 20) is not the mobility: each ball contact is counted as a point contact, while the groove holds the ball centre on a line, and each ball's spin is an idle freedom; the six balls with the two spherical fits overconstrain the cage. The true mobility is 1, solved in closed form by the homokinetic block.",
+      "build.defining_relations": "Balls lie in the homokinetic plane through J whose normal bisects the two shaft axes (tilted beta/2 from each); omega_out = omega_in; ball k sits on a circle of radius Rp in that plane where it meets inner groove k (near angle theta + 60k; it shifts a little round its window at an angle); each ball runs along its inner groove by ±Rp sin(beta/2) per turn.",
+      "build.range": "input 360° continuous; output 360° in phase; cage tilts by beta/2 = 15° at beta = 30°; each ball runs ±6.5 mm along its inner groove per turn"
+    }
+  },
+  "swash-plate": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "profile": "cylinder block of radius 60, 50 long along x, with 5 bores of 12 mm on pitch radius 40",
+            "length": 50
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                45,
+                0,
+                70
+              ]
+            }
+          }
+        },
+        {
+          "id": "shaft",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "shaft",
+            "diameter": 14,
+            "length": 180,
+            "plate": {
+              "radius": 58,
+              "thickness": 8,
+              "tilt": "gamma",
+              "at": 0
+            }
+          },
+          "at": {
+            "joint": "S"
+          },
+          "frame": "local x along the shaft, origin at the plate centre"
+        },
+        {
+          "id": "piston-1",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 40,
+            "width": 12,
+            "shoe": {
+              "radius": 9
+            }
+          },
+          "at": {
+            "joint": "K1"
+          }
+        },
+        {
+          "id": "piston-2",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 40,
+            "width": 12,
+            "shoe": {
+              "radius": 9
+            }
+          },
+          "at": {
+            "joint": "K2"
+          }
+        },
+        {
+          "id": "piston-3",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 40,
+            "width": 12,
+            "shoe": {
+              "radius": 9
+            }
+          },
+          "at": {
+            "joint": "K3"
+          }
+        },
+        {
+          "id": "piston-4",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 40,
+            "width": 12,
+            "shoe": {
+              "radius": 9
+            }
+          },
+          "at": {
+            "joint": "K4"
+          }
+        },
+        {
+          "id": "piston-5",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 40,
+            "width": 12,
+            "shoe": {
+              "radius": 9
+            }
+          },
+          "at": {
+            "joint": "K5"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "S",
+          "type": "revolute",
+          "a": "ground",
+          "b": "shaft",
+          "at": [
+            0,
+            0,
+            70
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "P1",
+          "type": "prismatic",
+          "a": "piston-1",
+          "b": "ground",
+          "at": [
+            9.28,
+            40,
+            70
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            -13,
+            13
+          ],
+          "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+        },
+        {
+          "id": "P2",
+          "type": "prismatic",
+          "a": "piston-2",
+          "b": "ground",
+          "at": [
+            16.69,
+            12.36,
+            108.04
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            -13,
+            13
+          ],
+          "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+        },
+        {
+          "id": "P3",
+          "type": "prismatic",
+          "a": "piston-3",
+          "b": "ground",
+          "at": [
+            28.67,
+            -32.36,
+            93.51
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            -13,
+            13
+          ],
+          "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+        },
+        {
+          "id": "P4",
+          "type": "prismatic",
+          "a": "piston-4",
+          "b": "ground",
+          "at": [
+            28.67,
+            -32.36,
+            46.49
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            -13,
+            13
+          ],
+          "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+        },
+        {
+          "id": "P5",
+          "type": "prismatic",
+          "a": "piston-5",
+          "b": "ground",
+          "at": [
+            16.69,
+            12.36,
+            31.96
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            -13,
+            13
+          ],
+          "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+        },
+        {
+          "id": "K1",
+          "type": "cam-contact",
+          "a": "piston-1",
+          "b": "shaft",
+          "at": [
+            -10.72,
+            40,
+            70
+          ],
+          "follower": "flat",
+          "note": "slipper on the plate face"
+        },
+        {
+          "id": "K2",
+          "type": "cam-contact",
+          "a": "piston-2",
+          "b": "shaft",
+          "at": [
+            -3.31,
+            12.36,
+            108.04
+          ],
+          "follower": "flat",
+          "note": "slipper on the plate face"
+        },
+        {
+          "id": "K3",
+          "type": "cam-contact",
+          "a": "piston-3",
+          "b": "shaft",
+          "at": [
+            8.67,
+            -32.36,
+            93.51
+          ],
+          "follower": "flat",
+          "note": "slipper on the plate face"
+        },
+        {
+          "id": "K4",
+          "type": "cam-contact",
+          "a": "piston-4",
+          "b": "shaft",
+          "at": [
+            8.67,
+            -32.36,
+            46.49
+          ],
+          "follower": "flat",
+          "note": "slipper on the plate face"
+        },
+        {
+          "id": "K5",
+          "type": "cam-contact",
+          "a": "piston-5",
+          "b": "shaft",
+          "at": [
+            -3.31,
+            12.36,
+            31.96
+          ],
+          "follower": "flat",
+          "note": "slipper on the plate face"
+        }
+      ],
+      "params": [
+        {
+          "id": "R",
+          "value": 40,
+          "unit": "mm",
+          "min": 30,
+          "max": 50,
+          "note": "piston pitch radius"
+        },
+        {
+          "id": "gamma",
+          "value": 15,
+          "unit": "deg",
+          "min": 0,
+          "max": 18,
+          "note": "swash angle"
+        },
+        {
+          "id": "dp",
+          "value": 12,
+          "unit": "mm",
+          "min": 8,
+          "max": 16,
+          "note": "piston bore"
+        },
+        {
+          "id": "plate-r",
+          "value": 58,
+          "unit": "mm",
+          "min": 50,
+          "max": 70,
+          "note": "plate radius"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "S",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "piston-1",
+          "joints": [
+            "P1",
+            "K1"
+          ],
+          "in": {
+            "slide": "P1",
+            "plane": "shaft",
+            "r": "R",
+            "gamma": "gamma",
+            "phase": 0
+          },
+          "out": "piston-1",
+          "opts": {
+            "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
+            "law": "x = -R tan(gamma) cos(theta - phase)"
+          }
+        },
+        {
+          "block": "slider-dyad",
+          "id": "piston-2",
+          "joints": [
+            "P2",
+            "K2"
+          ],
+          "in": {
+            "slide": "P2",
+            "plane": "shaft",
+            "r": "R",
+            "gamma": "gamma",
+            "phase": 72
+          },
+          "out": "piston-2",
+          "opts": {
+            "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
+            "law": "x = -R tan(gamma) cos(theta - phase)"
+          }
+        },
+        {
+          "block": "slider-dyad",
+          "id": "piston-3",
+          "joints": [
+            "P3",
+            "K3"
+          ],
+          "in": {
+            "slide": "P3",
+            "plane": "shaft",
+            "r": "R",
+            "gamma": "gamma",
+            "phase": 144
+          },
+          "out": "piston-3",
+          "opts": {
+            "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
+            "law": "x = -R tan(gamma) cos(theta - phase)"
+          }
+        },
+        {
+          "block": "slider-dyad",
+          "id": "piston-4",
+          "joints": [
+            "P4",
+            "K4"
+          ],
+          "in": {
+            "slide": "P4",
+            "plane": "shaft",
+            "r": "R",
+            "gamma": "gamma",
+            "phase": 216
+          },
+          "out": "piston-4",
+          "opts": {
+            "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
+            "law": "x = -R tan(gamma) cos(theta - phase)"
+          }
+        },
+        {
+          "block": "slider-dyad",
+          "id": "piston-5",
+          "joints": [
+            "P5",
+            "K5"
+          ],
+          "in": {
+            "slide": "P5",
+            "plane": "shaft",
+            "r": "R",
+            "gamma": "gamma",
+            "phase": 288
+          },
+          "out": "piston-5",
+          "opts": {
+            "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
+            "law": "x = -R tan(gamma) cos(theta - phase)"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "head-1",
+          "body": "piston-1",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "head-2",
+          "body": "piston-2",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "head-3",
+          "body": "piston-3",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "head-4",
+          "body": "piston-4",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "head-5",
+          "body": "piston-5",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "plate-centre",
+          "body": "shaft",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "plate-perp",
+          "body": "shaft",
+          "local": [
+            0,
+            58,
+            0
+          ]
+        },
+        {
+          "id": "plate-rim",
+          "body": "shaft",
+          "local": [
+            -15.01,
+            56.02,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "piston-1-x",
+          "of": "head-1",
+          "kind": "position",
+          "unit": "mm",
+          "note": "along the shaft axis"
+        },
+        {
+          "id": "piston-2-x",
+          "of": "head-2",
+          "kind": "position",
+          "unit": "mm",
+          "note": "along the shaft axis"
+        },
+        {
+          "id": "piston-3-x",
+          "of": "head-3",
+          "kind": "position",
+          "unit": "mm",
+          "note": "along the shaft axis"
+        },
+        {
+          "id": "piston-4-x",
+          "of": "head-4",
+          "kind": "position",
+          "unit": "mm",
+          "note": "along the shaft axis"
+        },
+        {
+          "id": "piston-5-x",
+          "of": "head-5",
+          "kind": "position",
+          "unit": "mm",
+          "note": "along the shaft axis"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Review against the record (not in the 2026-10-19 review). A 15 degree plate on a 40 mm pitch radius gives a 21.4 mm stroke, large enough to read. Decided: the swash angle is a control (0 to 18 degrees) with a ghost trace at 8 degrees; piston 1's head is traced with ticks every 15 degrees of shaft angle, bunched at the stroke ends, which shows the simple harmonic motion; the swash angle is drawn as an arc between the plate and the plane square to the shaft; a section through the shaft axis and piston 1 shows the plate face and the slipper; the plot shows all five pistons, 72 degrees apart."
+      },
+      "principle": [
+        {
+          "body": "shaft"
+        },
+        {
+          "body": "piston-1"
+        },
+        {
+          "body": "piston-2"
+        },
+        {
+          "body": "piston-3"
+        },
+        {
+          "body": "piston-4"
+        },
+        {
+          "body": "piston-5"
+        },
+        {
+          "point": "head-1"
+        }
+      ],
+      "traces": [
+        {
+          "id": "piston-1",
+          "point": "head-1",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true,
+          "ghosts": [
+            {
+              "control": "tilt",
+              "value": 8
+            }
+          ]
+        }
+      ],
+      "overlays": [
+        {
+          "id": "shaft-axis",
+          "kind": "axis-line",
+          "at": "S",
+          "label": "SHAFT AXIS"
+        },
+        {
+          "id": "swash-angle",
+          "kind": "arc",
+          "center": "plate-centre",
+          "from": "plate-perp",
+          "to": "plate-rim",
+          "label": "SWASH ANGLE γ"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "views": [
+        {
+          "id": "A-A",
+          "kind": "section",
+          "plane": {
+            "origin": [
+              0,
+              0,
+              70
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          "highlight": [
+            "piston-1",
+            "shaft.plate",
+            "K1"
+          ],
+          "note": "through the shaft axis and piston 1"
+        }
+      ],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "tilt",
+          "kind": "param",
+          "param": "gamma"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "piston-1-x",
+          "label": "PISTON 1 POSITION"
+        },
+        {
+          "x": "input",
+          "y": "piston-2-x",
+          "label": "PISTON 2 POSITION"
+        },
+        {
+          "x": "input",
+          "y": "piston-3-x",
+          "label": "PISTON 3 POSITION"
+        },
+        {
+          "x": "input",
+          "y": "piston-4-x",
+          "label": "PISTON 4 POSITION"
+        },
+        {
+          "x": "input",
+          "y": "piston-5-x",
+          "label": "PISTON 5 POSITION"
+        }
+      ],
+      "claims": [
+        {
+          "text": "stroke = 2 R tan(gamma) = 21.4 mm",
+          "output": "piston-1-x",
+          "stat": "range",
+          "value": 21.44,
+          "tol": 0.05
+        },
+        {
+          "text": "the pistons are phased evenly round the circle",
+          "output": "piston-2-x",
+          "stat": "phase",
+          "value": 72,
+          "tol": 0.5
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "sarrus-linkage": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              80,
+              80
+            ],
+            "thickness": 6
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                -3
+              ]
+            }
+          }
+        },
+        {
+          "id": "l1a",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ],
+            "width": 40
+          },
+          "at": {
+            "joint": "H1"
+          }
+        },
+        {
+          "id": "l1b",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ],
+            "width": 40
+          },
+          "at": {
+            "joint": "K1"
+          }
+        },
+        {
+          "id": "l2a",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ],
+            "width": 40
+          },
+          "at": {
+            "joint": "H2"
+          }
+        },
+        {
+          "id": "l2b",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ],
+            "width": 40
+          },
+          "at": {
+            "joint": "K2"
+          }
+        },
+        {
+          "id": "top",
+          "role": "output",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              80,
+              80
+            ],
+            "thickness": 6
+          },
+          "at": {
+            "joint": "T1"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "H1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "l1a",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "K1",
+          "type": "revolute",
+          "a": "l1a",
+          "b": "l1b",
+          "at": [
+            78.57,
+            0,
+            45.96
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "T1",
+          "type": "revolute",
+          "a": "l1b",
+          "b": "top",
+          "at": [
+            40,
+            0,
+            91.93
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "H2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "l2a",
+          "at": [
+            0,
+            40,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "K2",
+          "type": "revolute",
+          "a": "l2a",
+          "b": "l2b",
+          "at": [
+            0,
+            78.57,
+            45.96
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "T2",
+          "type": "revolute",
+          "a": "l2b",
+          "b": "top",
+          "at": [
+            0,
+            40,
+            91.93
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "L",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 80,
+          "note": "length of every limb link"
+        },
+        {
+          "id": "w",
+          "value": 80,
+          "unit": "mm",
+          "min": 60,
+          "max": 100,
+          "note": "plate side"
+        }
+      ],
+      "design": [
+        {
+          "id": "knees",
+          "options": [
+            "outward",
+            "inward"
+          ],
+          "value": "outward"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "H1",
+          "kind": "oscillating",
+          "range": [
+            10,
+            80
+          ],
+          "default": 40,
+          "lo": 10,
+          "hi": 80,
+          "note": "lower link of limb 1, angle from vertical"
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "limb-1",
+          "joints": [
+            "K1",
+            "T1"
+          ],
+          "in": {
+            "a": "K1",
+            "ra": "L",
+            "slide": "H1",
+            "dir": [
+              0,
+              0,
+              1
+            ]
+          },
+          "out": [
+            "T1",
+            "top"
+          ],
+          "opts": {
+            "plane": "xz, the plane of limb 1",
+            "root": "top hinge above the knee",
+            "slide": "the top plate's vertical translation, which limb 2 enforces"
+          }
+        },
+        {
+          "block": "dyad",
+          "id": "limb-2",
+          "joints": [
+            "H2",
+            "K2",
+            "T2"
+          ],
+          "in": {
+            "a": "H2",
+            "b": "T2",
+            "ra": "L",
+            "rb": "L"
+          },
+          "branch": "outward",
+          "out": [
+            "K2",
+            "l2a",
+            "l2b"
+          ],
+          "opts": {
+            "plane": "yz, the plane of limb 2, at 90 degrees to limb 1"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "top-centre",
+          "body": "top",
+          "local": [
+            -40,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "base-centre",
+          "body": "ground",
+          "local": [
+            0,
+            0,
+            3
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "l1a",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "plate-height",
+          "of": "top-centre",
+          "kind": "position",
+          "unit": "mm",
+          "note": "height above the base"
+        },
+        {
+          "id": "plate-drift",
+          "of": "top-centre",
+          "kind": "position",
+          "unit": "mm",
+          "note": "horizontal distance from the line through the base centre"
+        },
+        {
+          "id": "plate-tilt",
+          "of": "top",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "knee-path",
+          "of": "K1",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Review against the record (not in the 2026-10-19 review). The record's proportions read well: links of 60 mm folding from 10 to 80 degrees move the top plate 97.3 mm along an exact vertical line. Built as two orthogonal planar dyads, limb 1 in one vertical plane and limb 2 in the plane at 90 degrees. Decided: trace the top plate centre (a straight line) with ticks every 5 degrees of input, which bunch near the top where it moves slowly, and both knees; draw both limbs' hinge axes so the right angle between the two planes shows, and the straight line itself."
+      },
+      "principle": [
+        {
+          "body": "l1a"
+        },
+        {
+          "body": "l1b"
+        },
+        {
+          "body": "l2a"
+        },
+        {
+          "body": "l2b"
+        },
+        {
+          "body": "top"
+        },
+        {
+          "point": "top-centre"
+        }
+      ],
+      "traces": [
+        {
+          "id": "plate-centre",
+          "point": "top-centre",
+          "ticks": {
+            "every": 5
+          },
+          "comet": true
+        },
+        {
+          "id": "knee-1",
+          "point": "K1"
+        },
+        {
+          "id": "knee-2",
+          "point": "K2"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "straight-line",
+          "kind": "line",
+          "from": "base-centre",
+          "to": "top-centre",
+          "label": "EXACT STRAIGHT LINE"
+        },
+        {
+          "id": "limb-1-axes",
+          "kind": "axis-line",
+          "at": "H1",
+          "label": "LIMB 1 HINGE AXES"
+        },
+        {
+          "id": "limb-2-axes",
+          "kind": "axis-line",
+          "at": "H2",
+          "label": "LIMB 2 HINGE AXES, AT 90°"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "views": [],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "plate-height",
+        "label": "TOP PLATE HEIGHT"
+      },
+      "claims": [
+        {
+          "text": "plate height 118.2 mm down to 20.8 mm, stroke about 97 mm",
+          "output": "plate-height",
+          "stat": "max",
+          "value": 118.18,
+          "tol": 0.05
+        },
+        {
+          "text": "plate height 118.2 mm down to 20.8 mm, stroke about 97 mm",
+          "output": "plate-height",
+          "stat": "min",
+          "value": 20.84,
+          "tol": 0.05
+        },
+        {
+          "text": "plate height 118.2 mm down to 20.8 mm, stroke about 97 mm",
+          "output": "plate-height",
+          "stat": "range",
+          "value": 97.34,
+          "tol": 0.05
+        },
+        {
+          "text": "the top plate rises along an exact line",
+          "output": "plate-drift",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.001
+        },
+        {
+          "text": "the plates stay parallel with no rotation",
+          "output": "plate-tilt",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.001
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "bennett-linkage": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "twist": 30,
+            "boss": [
+              10,
+              10
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                110
+              ]
+            }
+          },
+          "frame": "Denavit-Hartenberg frame at hinge A: z along axis A, x along the common normal to B"
+        },
+        {
+          "id": "l2",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "twist": 56.44,
+            "boss": [
+              10,
+              10
+            ]
+          },
+          "at": {
+            "joint": "B"
+          },
+          "frame": "z along axis B, x along the common normal to C"
+        },
+        {
+          "id": "l3",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "twist": 30,
+            "boss": [
+              10,
+              10
+            ]
+          },
+          "at": {
+            "joint": "C"
+          },
+          "frame": "z along axis C, x along the common normal to D"
+        },
+        {
+          "id": "l4",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "twist": 56.44,
+            "boss": [
+              10,
+              10
+            ]
+          },
+          "at": {
+            "joint": "D"
+          },
+          "frame": "z along axis D, x along the common normal to A"
+        }
+      ],
+      "joints": [
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "ground",
+          "b": "l4",
+          "at": [
+            0,
+            0,
+            110
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "ground",
+          "b": "l2",
+          "at": [
+            60,
+            0,
+            110
+          ],
+          "axis": [
+            0,
+            -0.5,
+            0.866
+          ]
+        },
+        {
+          "id": "C",
+          "type": "revolute",
+          "a": "l2",
+          "b": "l3",
+          "at": [
+            60,
+            86.6,
+            160
+          ],
+          "axis": [
+            0.8333,
+            -0.2764,
+            0.4787
+          ]
+        },
+        {
+          "id": "D",
+          "type": "revolute",
+          "a": "l3",
+          "b": "l4",
+          "at": [
+            79.93,
+            60.09,
+            110
+          ],
+          "axis": [
+            0.5008,
+            -0.6661,
+            0.5528
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 80,
+          "note": "length of links 1 and 3 (common normal)"
+        },
+        {
+          "id": "b",
+          "value": 100,
+          "unit": "mm",
+          "min": 80,
+          "max": 120,
+          "note": "length of links 2 and 4"
+        },
+        {
+          "id": "alpha",
+          "value": 30,
+          "unit": "deg",
+          "min": 20,
+          "max": 40,
+          "note": "twist of links 1 and 3"
+        },
+        {
+          "id": "beta",
+          "value": 56.44,
+          "unit": "deg",
+          "min": 40,
+          "max": 70,
+          "note": "twist of links 2 and 4, from a/sin(alpha) = b/sin(beta)"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "B",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 90
+        }
+      ],
+      "solve": [
+        {
+          "block": "bennett",
+          "id": "loop",
+          "joints": [
+            "A",
+            "C",
+            "D"
+          ],
+          "in": {
+            "input": "input",
+            "a": "a",
+            "b": "b",
+            "alpha": "alpha",
+            "beta": "beta"
+          },
+          "out": [
+            "l3",
+            "l4"
+          ],
+          "opts": {
+            "relation": "tan(thA/2) tan(thB/2) = sin((beta + alpha)/2) / sin((beta - alpha)/2); thC = -thA; thD = -thB",
+            "frames": "Denavit-Hartenberg, all offsets zero"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "coupler-mid",
+          "body": "l3",
+          "local": [
+            30,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "B",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "output-angle",
+          "of": "A",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "opposite-angle",
+          "of": "C",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "A",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "coupler-path",
+          "of": "coupler-mid",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Review against the record (not in the 2026-10-19 review). The principle is that four hinges with skew axes still close and move with one freedom. Decided: all four hinge axes drawn as axis lines, so their skew shows; the midpoint of the link opposite the ground is traced, a closed space curve, with ticks every 15 degrees of input; the plot shows output against input and the speed ratio, which runs from 0.33 to 2.99 times input speed, in the opposite sense. Solved in closed form by the Bennett block."
+      },
+      "principle": [
+        {
+          "body": "ground"
+        },
+        {
+          "body": "l2"
+        },
+        {
+          "body": "l3"
+        },
+        {
+          "body": "l4"
+        },
+        {
+          "point": "coupler-mid"
+        }
+      ],
+      "traces": [
+        {
+          "id": "coupler",
+          "point": "coupler-mid",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "axis-A",
+          "kind": "axis-line",
+          "at": "A",
+          "label": "HINGE AXIS A"
+        },
+        {
+          "id": "axis-B",
+          "kind": "axis-line",
+          "at": "B",
+          "label": "HINGE AXIS B"
+        },
+        {
+          "id": "axis-C",
+          "kind": "axis-line",
+          "at": "C",
+          "label": "HINGE AXIS C"
+        },
+        {
+          "id": "axis-D",
+          "kind": "axis-line",
+          "at": "D",
+          "label": "HINGE AXIS D"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "views": [],
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "output-angle",
+          "label": "OUTPUT HINGE ANGLE"
+        },
+        {
+          "x": "input",
+          "y": "speed-ratio",
+          "label": "OUTPUT SPEED RATIO"
+        }
+      ],
+      "claims": [
+        {
+          "text": "output hinge turns 360° in the opposite sense",
+          "output": "output-angle",
+          "stat": "range",
+          "value": 360,
+          "tol": 0.5
+        },
+        {
+          "text": "opposite hinges turn equal and opposite",
+          "output": "opposite-angle",
+          "stat": "range",
+          "value": 360,
+          "tol": 0.5
+        },
+        {
+          "text": "speed ratio from 0.33 to 2.99 times input speed, in the opposite sense",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": -2.994,
+          "tol": 0.005
+        },
+        {
+          "text": "speed ratio from 0.33 to 2.99 times input speed, in the opposite sense",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": -0.334,
+          "tol": 0.005
+        },
+        {
+          "text": "at input 90° the output hinge stands at 143.1°",
+          "output": "output-angle",
+          "stat": "at",
+          "value": 143.1,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.notes": "spatial 4R, overconstrained: Kutzbach gives -2, but the Bennett conditions (opposite links equal in length and twist, a/sin(alpha) = b/sin(beta), all offsets zero) give mobility 1. Solved in closed form by the Bennett block, never by a numeric loop.",
+      "build.range": "input hinge 360° continuous; output hinge turns 360° in the opposite sense, non-uniformly: its speed runs from 0.33 to 2.99 times input speed"
+    }
+  },
+  "centrifugal-governor": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              200,
+              120
+            ],
+            "thickness": 8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                -4
+              ]
+            }
+          }
+        },
+        {
+          "id": "spindle",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "shaft",
+            "diameter": 16,
+            "length": 230
+          },
+          "at": {
+            "joint": "S"
+          }
+        },
+        {
+          "id": "arm-l",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              8,
+              7
+            ],
+            "ball": {
+              "diameter": 36
+            }
+          },
+          "at": {
+            "joint": "PL"
+          }
+        },
+        {
+          "id": "arm-r",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              8,
+              7
+            ],
+            "ball": {
+              "diameter": 36
+            }
+          },
+          "at": {
+            "joint": "PR"
+          }
+        },
+        {
+          "id": "link-l",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              7,
+              6
+            ]
+          },
+          "at": {
+            "joint": "ML"
+          }
+        },
+        {
+          "id": "link-r",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              7,
+              6
+            ]
+          },
+          "at": {
+            "joint": "MR"
+          }
+        },
+        {
+          "id": "sleeve",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 24,
+            "width": 28,
+            "bore": 16
+          },
+          "at": {
+            "joint": "Sl"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "S",
+          "type": "revolute",
+          "a": "ground",
+          "b": "spindle",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PL",
+          "type": "revolute",
+          "a": "spindle",
+          "b": "arm-l",
+          "at": [
+            0,
+            0,
+            200
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "PR",
+          "type": "revolute",
+          "a": "spindle",
+          "b": "arm-r",
+          "at": [
+            0,
+            0,
+            200
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "ML",
+          "type": "revolute",
+          "a": "arm-l",
+          "b": "link-l",
+          "at": [
+            -30,
+            0,
+            148.04
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "MR",
+          "type": "revolute",
+          "a": "arm-r",
+          "b": "link-r",
+          "at": [
+            30,
+            0,
+            148.04
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "QL",
+          "type": "revolute",
+          "a": "link-l",
+          "b": "sleeve",
+          "at": [
+            0,
+            0,
+            96.08
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "QR",
+          "type": "revolute",
+          "a": "link-r",
+          "b": "sleeve",
+          "at": [
+            0,
+            0,
+            96.08
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "Sl",
+          "type": "prismatic",
+          "a": "sleeve",
+          "b": "spindle",
+          "at": [
+            0,
+            0,
+            96.08
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "limits": [
+            87.24,
+            140
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "L",
+          "value": 100,
+          "unit": "mm",
+          "min": 80,
+          "max": 120,
+          "note": "arm length, pivot to ball centre"
+        },
+        {
+          "id": "p",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 80,
+          "note": "link pin distance along the arm"
+        },
+        {
+          "id": "q",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 80,
+          "note": "link length"
+        },
+        {
+          "id": "m",
+          "value": 0.5,
+          "unit": "kg",
+          "min": 0.2,
+          "max": 2,
+          "note": "each ball (does not enter the balance with the sleeve load neglected)"
+        },
+        {
+          "id": "Hp",
+          "value": 200,
+          "unit": "mm",
+          "min": 150,
+          "max": 250,
+          "note": "arm pivot height on the spindle"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "spin",
+          "joint": "S",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        },
+        {
+          "id": "speed",
+          "joint": "PL",
+          "kind": "manual",
+          "range": [
+            97.6,
+            133.8
+          ],
+          "default": 101.6,
+          "unit": "rpm",
+          "sets": "arm angle phi = acos(g / (L omega^2)), g = 9810 mm/s^2: the conical pendulum balance, sleeve load neglected; phi 20° to 60° over this range"
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "sleeve",
+          "joints": [
+            "ML",
+            "QL",
+            "Sl"
+          ],
+          "in": {
+            "a": "ML",
+            "ra": "q",
+            "slide": "PL",
+            "dir": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "out": [
+            "QL",
+            "sleeve",
+            "link-l"
+          ],
+          "opts": {
+            "root": "sleeve below the link pin"
+          }
+        },
+        {
+          "block": "dyad",
+          "id": "right-side",
+          "joints": [
+            "PR",
+            "MR",
+            "QR"
+          ],
+          "in": {
+            "a": "PR",
+            "b": "QR",
+            "ra": "p",
+            "rb": "q"
+          },
+          "out": [
+            "MR",
+            "arm-r",
+            "link-r"
+          ],
+          "opts": {
+            "root": "mirror of the left arm"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "ball-r",
+          "body": "arm-r",
+          "local": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "ball-l",
+          "body": "arm-l",
+          "local": [
+            100,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "sleeve-point",
+          "body": "sleeve",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "arm-angle",
+          "of": "arm-r",
+          "kind": "angle",
+          "unit": "deg",
+          "note": "from the vertical"
+        },
+        {
+          "id": "sleeve-height",
+          "of": "sleeve-point",
+          "kind": "position",
+          "unit": "mm",
+          "note": "height above the base"
+        },
+        {
+          "id": "ball-height",
+          "of": "ball-r",
+          "kind": "position",
+          "unit": "mm",
+          "note": "below the arm pivot"
+        },
+        {
+          "id": "ball-path",
+          "of": "ball-r",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Review against the record (not in the 2026-10-19 review). The principle is the conical pendulum: the faster the spin, the higher and wider the balls run, and the links lift the sleeve. The speed is the control (97.6 to 133.8 rpm, default 101.6); the arm angle follows from the balance h = g / omega^2, never sweeping by itself. A ball centre is traced, a horizontal circle, with ghost circles at both ends of the speed range, low and narrow against high and wide. The pendulum height h from the pivot down to the ball is dimensioned. The plot shows arm angle and sleeve height against speed. View near front elevation, slightly from above, so the circles read as flat ellipses and heights read true."
+      },
+      "principle": [
+        {
+          "body": "arm-l"
+        },
+        {
+          "body": "arm-r"
+        },
+        {
+          "body": "link-l"
+        },
+        {
+          "body": "link-r"
+        },
+        {
+          "body": "sleeve"
+        },
+        {
+          "point": "ball-r"
+        },
+        {
+          "point": "ball-l"
+        }
+      ],
+      "traces": [
+        {
+          "id": "ball",
+          "point": "ball-r",
+          "comet": true,
+          "ghosts": [
+            {
+              "control": "speed",
+              "value": 97.6
+            },
+            {
+              "control": "speed",
+              "value": 133.8
+            }
+          ]
+        }
+      ],
+      "overlays": [
+        {
+          "id": "spin-axis",
+          "kind": "axis-line",
+          "at": "S",
+          "label": "SPIN AXIS"
+        },
+        {
+          "id": "pendulum-height",
+          "kind": "dimension",
+          "from": "PR",
+          "to": "ball-r",
+          "measure": "vertical",
+          "label": "h = g / ω²"
+        },
+        {
+          "id": "sleeve-drop",
+          "kind": "dimension",
+          "from": "PL",
+          "to": "sleeve-point",
+          "measure": "vertical",
+          "label": "SLEEVE BELOW PIVOT"
+        }
+      ],
+      "view": "VIEW 0 15",
+      "views": [],
+      "controls": [
+        {
+          "id": "spin",
+          "kind": "driver",
+          "driver": "spin"
+        },
+        {
+          "id": "speed",
+          "kind": "driver",
+          "driver": "speed"
+        }
+      ],
+      "plot": [
+        {
+          "x": "speed",
+          "y": "arm-angle",
+          "label": "ARM ANGLE"
+        },
+        {
+          "x": "speed",
+          "y": "sleeve-height",
+          "label": "SLEEVE HEIGHT"
+        }
+      ],
+      "claims": [
+        {
+          "text": "arm angle 20° to 60° over about 98 to 134 rpm",
+          "output": "arm-angle",
+          "stat": "min",
+          "value": 20,
+          "tol": 0.2,
+          "over": "speed"
+        },
+        {
+          "text": "arm angle 20° to 60° over about 98 to 134 rpm",
+          "output": "arm-angle",
+          "stat": "max",
+          "value": 60,
+          "tol": 0.2,
+          "over": "speed"
+        },
+        {
+          "text": "sleeve travels 52.8 mm",
+          "output": "sleeve-height",
+          "stat": "range",
+          "value": 52.8,
+          "tol": 0.2,
+          "over": "speed"
+        },
+        {
+          "text": "at the default speed the arms stand at 30°",
+          "output": "arm-angle",
+          "stat": "at",
+          "value": 30,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    }
+  }
+}
