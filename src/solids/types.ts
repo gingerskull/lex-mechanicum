@@ -123,6 +123,11 @@ export interface Solid3 {
   /** A posed part whose end reaches a world point each frame. */
   reach?: { to: Vec3; end: 0 | 1 };
   flags: { inset?: boolean; accent?: boolean; faint?: boolean; isBase?: boolean; headTop?: boolean; seeThrough?: boolean };
+  /**
+   * Lifted 2.5D solids only (src/solids/lift.ts): the plane convention of the body's 2D pose when the part's axis is
+   * x, y or posed (src/core/axis.ts). A solid the new builders make has none; its frame says everything.
+   */
+  legacyAxis?: "x" | "y" | "p";
   /** Sizes of round parts and free text for the audit. */
   d?: number;
   D?: number;
