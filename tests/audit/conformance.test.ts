@@ -91,3 +91,51 @@ describe("standard 2.7", () => {
     expect(r.failing).toEqual([]);
   });
 });
+
+describe("conformance across the two engines (S6)", () => {
+  const SPLIT = `# Mechanism standard
+
+\`\`\`
+version: 3.1
+\`\`\`
+
+| Id | Requirement | Tier |
+|---|---|---|
+| K7 | **Input kind declared** | HAND |
+
+## Changelog
+
+- **3.1 (2026-11-01).** Section 9a [R7, HAND].
+- **3.0 (2026-10-20).** True 3D parts [K8, T1, AUTO + HAND].
+- **2.0 (2026-10-17).** Input kind [K7, V5, HAND].
+`;
+  const v3sheet = (version: string, teaching = "teaching: keep · decisions in the record") => `# Audit: Fixture (fx)
+standard: ${version} · date: 2026-10-21 · result: pass · detail: full · pass: build
+${teaching}
+
+## Requirements
+| Id | Status | Evidence / action |
+|---|---|---|
+| K7 | PASS | rotary |
+`;
+
+  it("keeps a 2.5D audit current across the 3.0 HAND changes", () => {
+    // behind only the 2.5D engine's own change (2.0); K8, T1 and R7 bind at the rebuild
+    const behind = evaluate(SPLIT, { fx: sheet("1.0") });
+    expect(behind.mechanisms[0]).toMatchObject({ engine: "2.5D", status: "behind", behind: ["K7", "V5"] });
+    const current = evaluate(SPLIT, { fx: sheet("2.0") });
+    expect(current.mechanisms[0]).toMatchObject({ engine: "2.5D", status: "current", hand: [] });
+    expect(current.failing).toEqual([]);
+  });
+
+  it("holds a 3.0 audit to the HAND changes after it, and to the teaching line", () => {
+    const behind = evaluate(SPLIT, { fx: v3sheet("3.0") });
+    expect(behind.mechanisms[0]).toMatchObject({ engine: "v3", status: "behind", behind: ["R7"] });
+    const current = evaluate(SPLIT, { fx: v3sheet("3.1") });
+    expect(current.mechanisms[0]).toMatchObject({ engine: "v3", status: "current" });
+    const none = evaluate(SPLIT, { fx: v3sheet("3.1", "") });
+    expect(none.mechanisms[0]).toMatchObject({ engine: "v3", status: "no teaching" });
+    expect(none.failing).toEqual(["fx"]);
+    expect(evaluate(SPLIT, { fx: v3sheet("3.1", "teaching: ? · decisions in the record") }).failing).toEqual(["fx"]);
+  });
+});

@@ -15,12 +15,19 @@ describe("generated doc tables", () => {
 });
 
 describe("audit template", () => {
-  it("has the sections the generator writes, in the same order", async () => {
-    const std = readFileSync(STANDARD, "utf8");
-    const tpl = std.slice(std.indexOf("## 11. Audit sheet template"));
-    const block = tpl.slice(tpl.indexOf("```markdown"), tpl.indexOf("```\n", tpl.indexOf("```markdown") + 3));
-    const heads = (t: string) => [...t.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
+  const std = readFileSync(STANDARD, "utf8");
+  const tpl = std.slice(std.indexOf("## 11. Audit sheet template"));
+  const block = tpl.slice(tpl.indexOf("```markdown"), tpl.indexOf("```\n", tpl.indexOf("```markdown") + 3));
+  const heads = (t: string) => [...t.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
+
+  it("has the sections a 2.5D sheet writes, in the same order, plus the 3.0 Supports section", () => {
     const sheet = readFileSync(new URL("../../src/mechanisms/four-bar/audit.md", import.meta.url), "utf8");
-    expect(heads(block)).toEqual(heads(sheet));
+    expect(heads(block).filter((h) => h !== "Supports")).toEqual(heads(sheet));
+  });
+
+  it("has the `teaching:` line under the header and the kit, block, support and stack columns (S2, A20, A21)", () => {
+    const lines = block.split("\n");
+    expect(lines.findIndex((l) => l.startsWith("teaching:"))).toBe(lines.findIndex((l) => l.startsWith("standard:")) + 1);
+    expect(block).toMatch(/\| Joint \| Kit \| Block \| Support \| Stack \| F1 locate/);
   });
 });

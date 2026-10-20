@@ -33,8 +33,12 @@ import {
 export const FUNCTIONS = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"] as const;
 const FN_TITLES = ["locate", "retain", "torque", "thrust", "limit", "hold", "adjust", "lube", "timing", "protect"];
 
-/** Rows whose status a tool decides outright: always regenerated, never kept from an earlier sheet. */
-export const TOOL_DECIDED = new Set(["P1", "K2", "A12", "A15", "M6", "R7", "Q1", "Q2"]);
+/**
+ * Rows whose status a tool decides outright: always regenerated, never kept from an earlier sheet (standard 11). K5 is
+ * retired in 3.0 and has no row; K1, K11, T9 and D11 are decided from the record v3 and its solids, and read `N/A` on a
+ * 2.5D sheet (K1 there is the model check's link error).
+ */
+export const TOOL_DECIDED = new Set(["P1", "K1", "K2", "K11", "T9", "D11", "A12", "A15", "M6", "R7", "Q1", "Q2"]);
 
 /** Everything the sheet is written from. */
 export interface AuditInput {
@@ -61,8 +65,8 @@ interface Row {
   evidence: string;
 }
 
-const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : /(s|sh|ch)$/.test(w) ? "es" : "s"}`;
-const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
+export const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : /(s|sh|ch)$/.test(w) ? "es" : "s"}`;
+export const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
 
 /** P1's record fields (standard 2); `real_world` may be empty (standard 2.3). */
 const RECORD_FIELDS = ["name", "aka", "family", "level", "summary", "motion", "ratio", "dof", "topology", "backdrivable", "tags", "explain", "build", "examples", "references", "media"];
@@ -78,7 +82,7 @@ function recordMissing(id: string): string[] | null {
 }
 
 /** Describes the solids serving one function at one joint: named items with their count. */
-export function describeServers(ids: string[], byId: Map<string, Solid>): string {
+export function describeServers(ids: string[], byId: Map<string, Pick<Solid, "name" | "kind">>): string {
   const groups: { label: string; kind: string; n: number }[] = [];
   for (const id of ids) {
     const s = byId.get(id);
@@ -122,14 +126,11 @@ function evidence(inp: AuditInput, reqs: Requirement[]): Record<string, Row> {
     set("P1", `${rec}; ${files.length ? `missing ${files.join(", ")}` : "model.ts, polish.ts, audit.md present"}`, ok ? "PASS" : "FAIL");
   }
   // K
-  set("K1", `check: max link error ${inp.check.maxLinkErr.toExponential(1)} mm${findings(["LINK_LEN"]).length ? `; ${fmt(findings(["LINK_LEN"]))}` : ""}`);
+  set("K1", `check: max link error ${inp.check.maxLinkErr.toExponential(1)} mm${findings(["LINK_LEN"]).length ? `; ${fmt(findings(["LINK_LEN"]))}` : ""}`, findings(["LINK_LEN"]).length ? "FAIL" : "PASS");
+  for (const id of ["K11", "T9", "D11"]) set(id, "2.5D engine: decided from the record v3 at the rebuild (S6)", "N/A");
   {
     const f = findings(["NaN", "POSE_JUMP", "PERIODICITY", "MISSING"]);
     set("K2", f.length ? `check: ${fmt(f)}` : `check: finite, continuous, periodic over ${inp.check.n} samples`, f.length ? "FAIL" : "PASS");
-  }
-  {
-    const f = findings(["INTERFERE", "OVERLAP", "WARN", "AXIS"]);
-    set("K5", f.length ? `check: ${fmt(f)}` : "check: no INTERFERE, OVERLAP or WARN");
   }
   set("K7", `input ${inp.model.input.kind} on ${inp.model.input.part}`);
   // A
