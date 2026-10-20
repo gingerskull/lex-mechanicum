@@ -184,6 +184,7 @@ function rope(ctx: RuleContext, j: FlexJoint & { spec: { form: "rope" } }): void
       const P = ctx.s0.pts[k];
       if (!P) return false;
       if (lq && Math.hypot(P[0] - lq[0], P[1] - lq[1]) < 0.5) return true;
+      if (hook && Math.hypot(P[0] - hook[0], P[1] - hook[1]) < 0.5) return true;
       return moves.some((s) => {
         const { c, R } = rim(ctx, s)!;
         return Math.hypot(P[0] - c[0], P[1] - c[1]) <= R + 0.5;

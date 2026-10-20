@@ -196,6 +196,8 @@ export const P = {
    */
   ropeWrap(id: string, r: number, a0: number, a1: number, o: PartOpts & { rope?: number } = {}): Part {
     const rr = (o.rope ?? 3.2) / 2;
+    // counter-clockwise: a wrap across angle 0 runs on past 2π
+    while (a1 <= a0) a1 += 2 * Math.PI;
     return P.custom(id, [...arcPts(0, 0, r + rr, a0, a1, Math.PI / 36), ...arcPts(0, 0, r - rr, a1, a0, Math.PI / 36)], { ...o, thick: 2 * rr });
   },
   /** The traced point marker. */

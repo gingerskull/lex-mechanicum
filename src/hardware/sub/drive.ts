@@ -309,10 +309,11 @@ function rotaryInPlan(ctx: RuleContext, kind: MotorKind, j: PinJoint): string {
   const ex = ps.ex;
   // the motor beside the shaft, on the side where its bracket is clear
   const C = R + 45;
-  const sign = [1, -1].find((k) => !ctx.hits(plan(at(23 + m.H / 2), uc + k * C), R + 5, b1, vc + R + 5, (t) => t.isBase === true)) ?? 1;
   // level with the shaft, or as high as the motor needs to clear the bracket's foot and its screw heads
   const FOOT = 5;
-  const M: Vec2 = [uc + sign * C, Math.max(vc, b1 + FOOT + R + 5)];
+  const vm = Math.max(vc, b1 + FOOT + R + 5);
+  const sign = [1, -1].find((k) => !ctx.hits(plan(at(23 + m.H / 2), uc + k * C), R + 5, b1, vm + R + 5, (t) => t.isBase === true)) ?? 1;
+  const M: Vec2 = [uc + sign * C, vm];
   const turn = { body: j.body, motion: { type: "geared" as const, around: M, ratio: TIN / TM } };
   // input pulley and its hub with two set screws at 90° on the shaft's free end (F3)
   const G = { body: j.body, at: j.at, joints: ["drive", j.id], ex };
