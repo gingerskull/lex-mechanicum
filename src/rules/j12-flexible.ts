@@ -2,14 +2,16 @@
 // - Chain: its rollers and link plates are carried round the two sprockets by the solved travel (a conveyed placement:
 //   each a small rigid solid on the fixed path, nothing deforms); an idler sprocket on a slotted arm on the slack span
 //   takes up the stretch (F7); the chain is greased (F8).
-// - Rope: its spans are stretched parts of the model; a becket dead-ends it with a thimble (F1, F2), the hook hangs on
-//   a swivel so the load can turn (F3), and a guard over each fixed sheave keeps the rope in its groove (F2).
+// - Rope: its spans are stretched parts of the model, its wraps fixed arcs over the sheaves (P.ropeSpan, P.ropeWrap),
+//   touching their sheaves and the spans they join by design; a becket on a post dead-ends it with a thimble (F1, F2),
+//   the hook hangs on a swivel so the load can turn (F3), each at its own sheave's height, and a guard over each sheave
+//   whose centre stands still keeps the rope in its groove (F2). The note counts the parts that carry the load.
 // - CVT: each sliding sheave half is keyed to its shaft so it slides but cannot turn on it (F3), and a spring presses
 //   it on the belt (F6).
 import { beltPath, pathLength } from "../core/flex";
-import { arcPts, circle, roundedPoly, type Vec2 } from "../core/geom";
+import { TAU, arcPts, circle, roundedPoly, type Vec2 } from "../core/geom";
 import { toLocal } from "../core/poly";
-import { disc, dowel, key, plate, screw, spring } from "../hardware/primitives";
+import { disc, dowel, key, plate, screw, spring, standoff } from "../hardware/primitives";
 import { solid } from "../hardware/solid";
 import { poseOf } from "../model/pose";
 import type { FlexJoint, Rule, RuleContext } from "./types";
@@ -73,40 +75,100 @@ function chain(ctx: RuleContext, j: FlexJoint & { spec: { form: "chain" } }): vo
   J.badge = ["chain tensioned", "ok"];
 }
 
+/** Whether a part's centre stands still over the cycle (a sheave on a fixed pin, whether or not it is a fixed part). */
+function still(ctx: RuleContext, id: string): boolean {
+  const p = ctx.parts[id];
+  if (!p) return false;
+  if (p.fixed) return true;
+  const q0 = poseOf(p, ctx.s0);
+  if (!q0) return false;
+  for (let i = 0; i < 24; i++) {
+    const q = poseOf(p, ctx.model.solve((i / 24) * TAU));
+    if (!q || Math.hypot(q[0] - q0[0], q[1] - q0[1]) > 1e-6) return false;
+  }
+  return true;
+}
+
+/** The world centre and rim radius of a sheave at the assembly phase. */
+function rim(ctx: RuleContext, id: string): { c: Vec2; R: number } | null {
+  const p = ctx.parts[id];
+  const q = p ? poseOf(p, ctx.s0) : null;
+  return p && q ? { c: [q[0], q[1]], R: Math.max(...p.shape.outer.map(([x, y]) => Math.hypot(x, y))) } : null;
+}
+
 function rope(ctx: RuleContext, j: FlexJoint & { spec: { form: "rope" } }): void {
   const J = ctx.joint(j.id)!;
   const f = j.spec;
   const dead = f.dead ? ctx.s0.pts[f.dead] : undefined;
   const hook = f.hook ? ctx.s0.pts[f.hook] : undefined;
   const ex = Math.max(0, ...f.over.map((id) => ctx.solidOf[id]?.ex ?? 0));
-  const ref = ctx.solidOf[f.over[0]!]!;
-  const [z0, z1] = [ref.z0, ref.z1];
+  const sheaves = f.over.filter((id) => ctx.solidOf[id] && rim(ctx, id));
+  const zOf = (id: string): [number, number] => [ctx.solidOf[id]!.z0, ctx.solidOf[id]!.z1];
+  // a point's own sheave: the one whose rim is nearest it, among those at the height of the rope part ending there
+  const own = (pt: string | undefined, among: string[]): string | undefined => {
+    const P = pt ? ctx.s0.pts[pt] : undefined;
+    if (!P || !among.length) return among[0];
+    const sp = f.spans.map((id) => ctx.parts[id]).find((p) => p?.between?.includes(pt!));
+    const zs = sp ? ctx.solidOf[sp.id] : undefined;
+    const meets = (id: string) => !zs || Math.min(zs.z1, zOf(id)[1]) - Math.max(zs.z0, zOf(id)[0]) > 0;
+    const d = (id: string) => {
+      const r = rim(ctx, id)!;
+      return Math.abs(Math.hypot(P[0] - r.c[0], P[1] - r.c[1]) - r.R);
+    };
+    return [...among].sort((a, b) => Number(meets(b)) - Number(meets(a)) || d(a) - d(b))[0];
+  };
+  const fixed = sheaves.filter((id) => still(ctx, id));
+  const moves = sheaves.filter((id) => !fixed.includes(id));
   if (dead) {
-    // the becket: a plate on the upper block holding a thimble the rope's dead end is spliced round (F1, F2)
+    // the becket: a plate holding a thimble the rope's dead end is spliced round (F1, F2), its pin threaded into the top
+    // of a post screwed up from under the base (A11)
+    const span = f.spans.map((id) => ctx.parts[id]).find((p) => p?.between?.includes(f.dead!));
+    const far = span?.between?.find((k) => k !== f.dead);
+    const [z0, z1] = zOf(own(far, sheaves) ?? sheaves[0]!);
     ctx.add(plate(`${j.id}-becket`, roundedPoly([[dead[0], dead[1] + 6], [dead[0], dead[1] + 16]], 6), { body: "ground", joints: [j.id], ex, kind: "bracket", name: "Becket with a thimble, the rope's dead end spliced round it", z0: z0 - 2, z1: z1 + 2, holes: [circle(3, dead[0], dead[1] + 11, 20)], mat: "Steel, galvanised" }));
-    ctx.add(dowel(`${j.id}-becket-pin`, 6, { body: "ground", at: [dead[0], dead[1] + 11, 0], z0: z0 - 4, z1: z1 + 4, ex, joints: [j.id], name: "Becket pin Ø6, split-pinned" }));
+    const at: [number, number, number] = [dead[0], dead[1] + 11, 0];
+    const pin = dowel(`${j.id}-becket-pin`, 6, { body: "ground", at, z0: z0 - 4, z1: z1 + 4, ex, joints: [j.id], name: "Becket pin Ø6, split-pinned" });
+    ctx.add(pin);
+    if (pin.z0 - ctx.b1 > 1) {
+      ctx.add(standoff(`${j.id}-becket-post`, { body: "ground", at, z0: ctx.b1, z1: pin.z0, ex: pin.ex - 0.5, joints: [j.id], name: `Becket post Ø10 x ${fmt(pin.z0 - ctx.b1)}, the becket pin threaded into its top` }));
+      ctx.add(screw(`${j.id}-becket-post-bot`, "button", 5, ctx.b1 - ctx.b0 + 8, { body: "ground", at, face: ctx.b0, dir: 1, ex: -1.5, joints: [j.id], lock: "threadlocker, medium strength (Loctite 243)" }));
+    }
     (J.serves.F1 ??= []).push(`${j.id}-becket`);
     (J.serves.F2 ??= []).push(`${j.id}-becket-pin`);
   }
-  // the hook on a swivel on the moving block: the load turns without twisting the rope (F3)
+  // the hook on a swivel on the moving block, at its own sheave's height: the load turns without twisting the rope (F3)
   const moving = (f.load ? [ctx.parts[f.load]] : f.over.map((id) => ctx.parts[id])).find((p) => p && !p.fixed);
   if (hook && moving) {
     const q = poseOf(moving, ctx.s0)!;
     const l = toLocal(q, hook);
     const body = moving.id;
+    const near = moves.length ? moves : sheaves;
+    const [z0, z1] = zOf([...near].sort((a, b) => Math.hypot(hook[0] - rim(ctx, a)!.c[0], hook[1] - rim(ctx, a)!.c[1]) - Math.hypot(hook[0] - rim(ctx, b)!.c[0], hook[1] - rim(ctx, b)!.c[1]))[0] ?? f.over[0]!);
     ctx.add(solid(`${j.id}-swivel`, { body, at: [l[0], l[1], 0], kind: "collar", role: "hw", name: "Hook swivel on a thrust bearing", outer: disc(7), holes: [disc(3)], z0: z0 - 1, z1: z1 + 1, ex: ctx.solidOf[body]!.ex, joints: [j.id], mat: "Steel, forged" }));
     ctx.add(solid(`${j.id}-hook`, { body, at: [l[0], l[1] - 10, 0], kind: "part", role: "output", name: "Load hook with a safety latch", outer: [...arcPts(0, -6, 8, 0, Math.PI, Math.PI / 10), ...arcPts(0, -6, 4, Math.PI, 0, Math.PI / 8)], z0, z1, ex: ctx.solidOf[body]!.ex, joints: [j.id], mat: "Steel, forged" }));
     (J.serves.F3 ??= []).push(`${j.id}-swivel`);
   }
-  // a guard over each fixed sheave's rim keeps the rope in the groove when it goes slack (F2)
-  for (const id of f.over) {
-    const p = ctx.parts[id];
-    if (!p?.fixed) continue;
-    const R = Math.max(...p.shape.outer.map(([x, y]) => Math.hypot(x, y)));
-    const [x, y] = p.fixed;
+  // a guard over each sheave whose centre stands still keeps the rope in the groove when it goes slack (F2)
+  fixed.forEach((id, k) => {
+    const { c, R } = rim(ctx, id)!;
+    const [x, y] = c;
+    const [z0, z1] = zOf(id);
     const band = [...arcPts(x, y, R + 4, Math.PI * 0.15, Math.PI * 0.85, Math.PI / 24), ...arcPts(x, y, R + 2, Math.PI * 0.85, Math.PI * 0.15, Math.PI / 24)];
-    ctx.add(solid(`${j.id}-${id}-guard`, { body: "ground", kind: "stop", role: "hw", name: "Rope guard over the sheave", outer: band, z0: z0 - 1, z1: z1 + 1, ex: ctx.solidOf[id]!.ex, joints: [j.id], mat: "Steel S235" }));
+    ctx.add(solid(`${j.id}-${id}-guard`, { body: "ground", kind: "stop", role: "hw", name: k ? "" : "Rope guard over the sheave, steel strip", qty: k ? 0 : fixed.length, outer: band, z0: z0 - 1, z1: z1 + 1, ex: ctx.solidOf[id]!.ex, joints: [j.id], mat: "Steel S235" }));
     (J.serves.F2 ??= []).push(`${j.id}-${id}-guard`);
+  });
+  // each wrap lies in its sheave's groove and meets the spans at their tangent points, by design
+  for (const id of f.wraps ?? []) {
+    const w = ctx.parts[id];
+    const ws = ctx.solidOf[id];
+    const q = w ? poseOf(w, ctx.s0) : null;
+    if (!w || !ws || !q) continue;
+    const r = w.shape.outer.map(([x, y]) => Math.hypot(x, y));
+    const [r0, r1] = [Math.min(...r) - 0.5, Math.max(...r) + 0.5];
+    const on = (P: Vec2 | undefined) => !!P && Math.hypot(P[0] - q[0], P[1] - q[1]) >= r0 && Math.hypot(P[0] - q[0], P[1] - q[1]) <= r1;
+    const grooves = sheaves.filter((s) => Math.hypot(rim(ctx, s)!.c[0] - q[0], rim(ctx, s)!.c[1] - q[1]) < 0.01);
+    const joins = f.spans.filter((s) => ctx.parts[s]?.between?.some((k) => on(ctx.s0.pts[k])));
+    ws.allow = [...(ws.allow ?? []), ...grooves, ...joins];
   }
   // the rope lies in the sheaves' grooves and through the becket and swivel by design
   const touch = ctx.solids.filter((t) => t.joints.includes(j.id) || f.over.includes(t.body)).map((t) => t.id);
@@ -114,7 +176,25 @@ function rope(ctx: RuleContext, j: FlexJoint & { spec: { form: "rope" } }): void
     const sp = ctx.solidOf[id];
     if (sp) sp.allow = [...(sp.allow ?? []), ...f.over, ...touch];
   }
-  J.note = `Rope reeved over ${f.over.length} sheaves in ${f.spans.length} parts: its spans stretch between the sheaves; dead-ended on a becket with a thimble, the hook on a swivel, a guard over each fixed sheave.`;
+  // the parts that carry the load: spans with an end on a moving sheave's rim, or on the load itself
+  const load = f.load ? ctx.parts[f.load] : undefined;
+  const lq = load ? poseOf(load, ctx.s0) : null;
+  const carries = f.spans.filter((id) =>
+    (ctx.parts[id]?.between ?? []).some((k) => {
+      const P = ctx.s0.pts[k];
+      if (!P) return false;
+      if (lq && Math.hypot(P[0] - lq[0], P[1] - lq[1]) < 0.5) return true;
+      if (hook && Math.hypot(P[0] - hook[0], P[1] - hook[1]) < 0.5) return true;
+      return moves.some((s) => {
+        const { c, R } = rim(ctx, s)!;
+        return Math.hypot(P[0] - c[0], P[1] - c[1]) <= R + 0.5;
+      });
+    }),
+  ).length;
+  const n = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight"][carries] ?? String(carries);
+  const parts = carries > 1 ? `${n} parts carry the load, so the fall moves ${n} times as far as the load` : `${n} part carries the load`;
+  const held = [dead && "dead-ended on a becket with a thimble on a post", hook && moving && "the hook on a swivel", fixed.length && "a guard over each sheave whose centre stands still"].filter(Boolean);
+  J.note = `Rope reeved over ${f.over.length} sheaves, ${f.spans.length} straight parts: ${parts}. Its spans stretch between their tangent points${f.wraps?.length ? ", its wraps lie in the grooves" : ""}${held.length ? `; ${held.join(", ")}` : ""}.`;
   J.badge = ["rope reeved", "ok"];
 }
 
@@ -137,7 +217,7 @@ function cvt(ctx: RuleContext, j: FlexJoint & { spec: { form: "cvt" } }): void {
 export const j12: Rule = {
   id: "j12-flexible",
   tier: "AUTO",
-  ids: ["J12", "F2", "F3", "F6", "F7", "F8"],
+  ids: ["J12", "A11", "F2", "F3", "F6", "F7", "F8"],
   applies: (ctx) => ctx.info.some((j) => j.type === "J12"),
   apply(ctx) {
     for (const j of ctx.info) {

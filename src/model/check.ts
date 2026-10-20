@@ -2,7 +2,7 @@
 // axes of parts standing out of the plan plane (src/core/axis.ts).
 import { boxOf, isOut, planCorners } from "../core/axis";
 import { TAU, xf } from "../core/geom";
-import { partBox, poseOf } from "./pose";
+import { partBox, partShape, poseOf } from "./pose";
 import type { MechanismModel, Part, Pose, Solved, Vec2 } from "./types";
 
 export type FindingType = "MISSING" | "NaN" | "LINK_LEN" | "POSE_JUMP" | "INTERFERE" | "OVERLAP" | "WARN" | "PERIODICITY" | "AXIS";
@@ -201,7 +201,7 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     if (!(Math.abs(s.lead) > 0)) add("AXIS", `screw ${s.screw}: lead ${s.lead}`, s.screw);
   }
   for (const f of model.flexible ?? []) {
-    for (const id of [...f.over, ...(f.form === "rope" ? [...f.spans, ...(f.load ? [f.load] : [])] : [])]) if (!byId[id]) add("MISSING", `flexible ${f.form}: no part ${id}`);
+    for (const id of [...f.over, ...(f.form === "rope" ? [...f.spans, ...(f.wraps ?? []), ...(f.load ? [f.load] : [])] : [])]) if (!byId[id]) add("MISSING", `flexible ${f.form}: no part ${id}`);
     if (f.form === "rope") for (const k of [f.dead, f.hook]) if (k && !s0.pts[k]) add("MISSING", `rope: no solved point ${k}`);
     if (f.form === "chain" && typeof s0[f.travel] !== "number") add("MISSING", `chain: the solved travel "${f.travel}" is not a number in solve(u)`);
   }
@@ -237,7 +237,7 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
         const loc = toLocal(pp, bp);
         l0 ??= loc;
         if (Math.hypot(loc[0] - l0[0], loc[1] - l0[1]) > 1e-4) attached = false;
-        const O = xf(b.shape.outer, bp);
+        const O = xf(partShape(b, s), bp);
         const q: Vec2 = [pp[0], pp[1]];
         if (inPoly(q, O) || polyD(q, O) < pr) {
           inside = true;
@@ -257,7 +257,7 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     }
   }
 
-  // OVERLAP: same-layer bodies, vertex inside the other outline (and not in one of its holes) by more than the tolerance
+  // OVERLAP: same-layer bodies (a stretched or deforming part at its solved outline), vertex inside the other outline (and not in one of its holes) by more than the tolerance
   for (let i = 0; i < bodies.length; i++)
     for (let j = i + 1; j < bodies.length; j++) {
       const A = bodies[i]!;
@@ -269,8 +269,8 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
         const pa = poseOf(A, S[k]!);
         const pb = poseOf(B, S[k]!);
         if (!pa || !pb) continue;
-        const OA = xf(A.shape.outer, pa);
-        const OB = xf(B.shape.outer, pb);
+        const OA = xf(partShape(A, S[k]!), pa);
+        const OB = xf(partShape(B, S[k]!), pb);
         const test = (X: Vec2[], Y: Vec2[], Yh: Vec2[][]) => X.some((q) => inPoly(q, Y) && polyD(q, Y) > OVERLAP_TOL && !Yh.some((h) => inPoly(q, h)));
         if (test(OA, OB, B.shape.holes.map((h) => xf(h, pb))) || test(OB, OA, A.shape.holes.map((h) => xf(h, pa)))) {
           hit++;
@@ -291,7 +291,7 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
       if (!pp) continue;
       const w0 = (p.along ?? 0) + (p.dz ?? 0);
       const pb = p.axis === "p" ? partBox(p, S[k]!) : null;
-      for (const [x, y] of pb ? planCorners(pb) : isOut(p.axis) ? planCorners(boxOf(p.axis, xf(p.shape.outer, pp), w0, w0 + p.thick)) : xf(p.shape.outer, pp)) {
+      for (const [x, y] of pb ? planCorners(pb) : isOut(p.axis) ? planCorners(boxOf(p.axis, xf(partShape(p, S[k]!), pp), w0, w0 + p.thick)) : xf(partShape(p, S[k]!), pp)) {
         x0 = Math.min(x0, x);
         x1 = Math.max(x1, x);
         y0 = Math.min(y0, y);

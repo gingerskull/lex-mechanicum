@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.9
+version: 2.10
 date: 2026-10-20
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -186,7 +186,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `standoffs` | A6 |
 | `drive` | V1, V2, V3, V5, V6, F10 |
 | `j8-belt` | J8, V4 |
-| `j12-flexible` | J12, F2, F3, F6, F7, F8 |
+| `j12-flexible` | J12, A11, F2, F3, F6, F7, F8 |
 | `j13-compliant` | J13, F1, F2, F5 |
 | `j2-straddle` | A9, J2 |
 | `feet` | A7, D4 |
@@ -247,16 +247,16 @@ every line of its row exists or is marked N/A with a reason in the audit.
 | Id | Joint kind | Canonical build |
 |---|---|---|
 | J1 | **Ground revolute, dead axle** | Shouldered axle (A4); a bearing in every turning part; inner-race spacers; circlip or retainer plate on both sides of each bearing (F2); thrust washer against the base (F4); bridge over the top on spigoted posts, dowelled (F1); axle through the base to a washer and nyloc, or threaded with an undercut where the base is thick enough (M9); oil sink on the bridge over an open bearing (F8). |
-| J2 | **Ground revolute, live shaft** | Housing cartridge behind the base: two bearings, spacer sleeve, wave-washer preload, circlips, shield or seal (F2, F4); housing screwed and dowelled to the base (F1, A11); keyed shaft (A5) with pulley on a hub with two set screws at 90° or a clamp hub (F3); end retainer on the shaft end (F2); thrust washer under the first part (F4); home flag on the pulley or shaft (F10); clearance hole in the base (A7). A gear shaft with nothing sweeping over it is straddle mounted: a bridge over the shafts of the mesh, a floating flanged bearing in it per shaft, the backlash eccentric at the top as well as the bottom (A9, F7). |
+| J2 | **Ground revolute, live shaft** | Housing cartridge behind the base: two bearings, spacer sleeve, wave-washer preload, circlips, shield or seal (F2, F4); housing screwed and dowelled to the base (F1, A11); keyed shaft (A5) with pulley on a hub with two set screws at 90° or a clamp hub (F3); end retainer on the shaft end (F2); thrust washer under the first part (F4); home flag on the pulley or shaft (F10); clearance hole in the base (A7). A gear shaft with nothing sweeping over it is straddle mounted, in a parallel mesh or a crossed one (J9): a bridge over the shafts of the mesh, its box clear of the swept box of any part on an axis in plan, a floating flanged bearing in it per shaft, the backlash eccentric at the top as well as the bottom (A9, F7). |
 | J3 | **Moving revolute** (pin between links) | Shoulder bolt threaded into the lowest part, bearing in every other part, inner-race spacers, threadlocker or nyloc (M13), clevis where the sweeps allow (A9), bore chamfers (M3). |
 | J4 | **Pin in slot** | Track roller on a stud; hardened wear strips screwed into the walls of every slot the roller runs in (M14); felt oiler per slot, in the relieved end where the roller leaves room (F8); relief at the slot ends. |
 | J5 | **Prismatic slide** | A few blocks. One rail is the plain reference, dowelled (F1); on the other a bronze gib bears on the slider's side and a keeper plate over it laps the slider (F2); the gib is slotted, set across against the slider and clamped by the keeper's screws, which are the rail's own fixing screws, down through keeper, gib, rail and riser (F7, A6, M13). A felt wiper at each end of the slider, a grease nipple on the keeper (F8); one end stop block with a neoprene pad just past each end of the travel (F5). No separate shim, gib adjusting screws or lock nuts. |
 | J6 | **Gear mesh** | Hubs with key or D-flat and set screw (F3); eccentric bushing with flange, arc slots and clamp screws on one shaft for backlash (F7); timing marks at the mesh (F9); thrust washers and retaining rings on each shaft (F2, F4). |
 | J7 | **Cam contact** | Roller follower on a stud; return spring with seat, guide and preload screw, or form closure (F6); follower guide bushing with circlip (F2); anti-rotation key on flat followers (F3); felt oiler on the track (F8); zero line (F9); hardened cam (M10). |
 | J8 | **Belt** | Flanged small pulley (F10); slotted mount for tension (F7); idler on a slotted arm where the wrap is short; belt guard only if see-through. |
-| J9 | **Crossed-axis mesh** (bevel, hypoid, worm, crossed helical; declared in `meshes`) | Each gear keyed on its shaft (J2 or J10) and located on it (F2); a shim pack at its back face sets its mounting distance, and so the backlash and the contact pattern (F7); a bronze thrust washer wherever the mesh pushes along a shaft: toward a bevel or hypoid gear's back face (away from the apex), both ways on a worm and on crossed helical gears (F4); timing marks at the mesh (F9). Pitch cones, the back-cone teeth (Tredgold), lead and lead angle from `src/core/spatial.ts`. |
-| J10 | **Shaft in plan** (a fixed pin on an x or y axis) | Two pillow blocks on the base past either end of what the shaft carries, or both behind it where something sweeps past its far end, far apart (A9): a cast housing on the shaft's axis on a foot plate, two screws down into the base and two dowels (F1, A11). Live: a sealed bearing in each block, located in the nearer by two shaft collars against its inner race, floating in the other (F2, F4); keyed parts as J2 (A5, F3). Dead: the shaft clamped in both blocks by set screws, every part on its own bearing (F2). The base drops under the shaft until its blocks fit (base growth). A hand-turned input takes a handwheel on the free shaft end (V5). |
-| J12 | **Flexible member** (extends J8; declared in `flexible`) | Chain: rollers and inner and outer link plates conveyed round the sprockets by the solved travel (D9); the centre distance for a whole number of links; an idler sprocket on a slotted arm on the slack span takes up the stretch (F7); greased (F8). Rope: its spans stretched between the sheaves (D9); the dead end on a becket with a thimble (F1, F2); the hook on a swivel (F3); a guard over each fixed sheave keeps the rope in its groove (F2). CVT: each sliding sheave half keyed to its shaft (F3) and pressed on the belt by a spring (F6). |
+| J9 | **Crossed-axis mesh** (bevel, hypoid, worm, crossed helical; declared in `meshes`) | Each gear keyed on its shaft (J2 or J10) and located on it (F2); a shim pack at its back face sets its mounting distance, and so the backlash and the contact pattern (F7); a bronze thrust washer wherever the mesh pushes along a shaft: toward a bevel or hypoid gear's back face (away from the apex), both ways on a worm and on crossed helical gears (F4), the shaft's own spacer under the gear stopping at it; timing marks at the mesh (F9). Pitch cones, the back-cone teeth (Tredgold), lead and lead angle from `src/core/spatial.ts`. |
+| J10 | **Shaft in plan** (a fixed pin on an x or y axis) | Two pillow blocks on the base past either end of what the shaft carries, or both behind it where something sweeps past its far end, far apart (A9): a cast housing on the shaft's axis on a foot plate, two screws down into the base and two dowels (F1, A11). Live: a sealed bearing in each block, located in the nearer by two shaft collars against its inner race, floating in the other (F2, F4); keyed parts as J2 (A5, F3). Dead: the shaft clamped in both blocks by set screws, every part on its own bearing (F2). A part overhung on a live shaft's free end is held there by a washer and a countersunk screw into the shaft end (F2). The base drops under the shaft until its blocks fit, and grows under a block that stands past it (base growth). A hand-turned input takes a handwheel on the free shaft end, a motor-driven one its pulley (V5). |
+| J12 | **Flexible member** (extends J8; declared in `flexible`) | Chain: rollers and inner and outer link plates conveyed round the sprockets by the solved travel (D9); the centre distance for a whole number of links; an idler sprocket on a slotted arm on the slack span takes up the stretch (F7); greased (F8). Rope: its spans stretched between the sheaves (D9), its wraps fixed arcs in the sheaves' grooves (`P.ropeSpan`, `P.ropeWrap`); the dead end on a becket with a thimble, its pin in a post screwed to the base (F1, F2, A11); the hook on a swivel (F3); becket and hook at their own sheaves' heights; a guard over each sheave whose centre stands still keeps the rope in its groove (F2); the note counts the parts that carry the load. CVT: each sliding sheave half keyed to its shaft (F3) and pressed on the belt by a spring (F6). |
 | J13 | **Compliant joint** (declared in `compliant`) | The neck drawn rigid, its bend and stress zone by the model's `bend` overlay; a hardened stop pin just past each end of the swing so the neck never leaves its elastic range (F5); the blank's ground block clamped to the base under a plate, two screws and two dowels (F1, F2). |
 | J11 | **Screw** (lead or ball; declared in `screws`) | The screw on its shaft in plan (J10: one end located, one floating, F2, F4); its thread drawn by its helix at the lead; the nut a block on the carriage: a flanged bronze nut, or a preloaded ball nut with its ball return and a wiper at each end (F8); the flange screwed to the carriage; anti-rotation from the carriage's slide (J5) or a key in a guide slot (F3). |
 
@@ -393,12 +393,12 @@ definition, as long as they are readable.
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| V1 | **Standard prime mover:** brushless pancake outrunner Ø50 x 18 under the base, faint internals turning at belt ratio, GT2 belt, default 32:16. Brushed Ø36 DC motor as the alternative setting. Every mechanism with a rotary, oscillating or linear input is motorised. | AUTO (`H.drive`) | screenshot |
-| V2 | **One solid bracket:** top flange against the base, floor for the motor, full-height window for the belt; flange screws go up into the base from inside; nothing shows on top of the base. | AUTO | side view |
+| V1 | **Standard prime mover:** brushless pancake outrunner Ø50 x 18 under the base, faint internals turning at belt ratio, GT2 belt, default 32:16. An input on a shaft in plan (J10) has the motor beside the shaft on a one-piece angle bracket, belted in the plane across the shaft to a pulley on its free end. Brushed Ø36 DC motor as the alternative setting. Every mechanism with a rotary, oscillating or linear input is motorised. | AUTO (`H.drive`) | screenshot |
+| V2 | **One solid bracket:** top flange against the base, floor for the motor, full-height window for the belt; flange screws go up into the base from inside; nothing shows on top of the base. A motor beside a shaft in plan stands on one angle bracket instead: an upright its face screws to and a foot screwed to the base top, both slotted for the belt's tension. | AUTO | side view |
 | V3 | Belt and pulleys clear of feet, housings and base hardware; where the belt passes under a post, its lower screw becomes a flush countersunk screw. | AUTO (rule) / HAND (motor position) | `tools/clearance` |
 | V4 | Drive detail: pulley flanges, set screws or clamp hub, belt tension slot, idler where needed (J8). | AUTO | screenshot |
 | V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
-| V6 | **Sensing and cabling:** home flag on the input and a fork sensor on the bracket or a post; motor and sensor leads to a terminal block on the base edge, one cable clip under the base. | AUTO | underside view |
+| V6 | **Sensing and cabling:** home flag on the input and a fork sensor on the bracket or a post; motor and sensor leads to a terminal block on the base edge, one cable clip under the base (on the base top for a motor beside a shaft in plan). | AUTO | underside view |
 
 ---
 
@@ -565,7 +565,8 @@ Start here, then run the full ten-function audit.
   frustum (`taper` = the inner end's scale) with Tredgold back-cone teeth; a worm's lead and lead angle, its wheel at
   the lead angle; a helical gear's transverse profile turned by its `helix`.
 - Declare every crossed mesh in `meshes` (J9), the worm first. A gear on an x or y axis turns on a shaft in plan
-  (J10); a bevel pinion overhangs its wheel, so its blocks stand behind it.
+  (J10); a bevel pinion overhangs its wheel, so its blocks stand behind it and it is held on the shaft end. A rotary
+  input on that shaft is driven by a motor beside it (V1).
 - F7 by the shim packs (mounting distance); F4 where the mesh pushes; F9 marks at the mesh; herringbone: one shaft
   located, the other free to float so the halves share the load.
 
@@ -578,9 +579,10 @@ Start here, then run the full ten-function audit.
 **Flexible drives** (chain, rope and tackle, CVT, harmonic drive)
 - Declare the member in `flexible` (J12). A chain: sprocket pitch radius p / (2 sin(π/z)); choose the centre distance
   for a whole number of links (`centresFor` in `src/core/flex.ts`); the travel is the driving sprocket's angle times its
-  pitch radius. A rope: each span a stretched part (`stretch`, outline at unit length) between solved tangent points;
-  the hook on the load block. A flexspline or a belt's wrap that bends: `deform`, the same point count every frame.
-- F7 by the idler or the slotted mount; F8 grease on a chain; F2 guards on fixed sheaves.
+  pitch radius. A rope: each span a stretched part (`P.ropeSpan`, outline at unit length) between solved tangent points;
+  each wrap a fixed arc at its sheave's centre (`P.ropeWrap`, declared in `wraps`); the hook on the load block. A
+  flexspline or a belt's wrap that bends: `deform`, the same point count every frame.
+- F7 by the idler or the slotted mount; F8 grease on a chain; F2 guards over the sheaves whose centres stand still.
 
 **Compliant mechanisms** (flexure hinge, compliant gripper, bistable)
 - Declare each neck in `compliant` (J13): the neck rigid, the lever's swing as its range; the model gives the `bend`
@@ -609,8 +611,9 @@ blocks) with `seatRail` and `railLayout` (A6: the rail's riser, or pads clear of
 `H.eccentric` (J6 backlash), `H.eccentricMount` (F7 at a ground pivot), `H.turnbuckle` (F7 on a moving link: the
 link in two halves joined in its own plane by left and right hand studs, a flat body and jam nuts), `H.stops` (F5 from
 the solved range), `H.dragPack` (F6, sized to the face it bears on), `H.lockingSegment` (M14), `H.outputCoupling` (a
-keyed flange on a straddle-mounted output), `H.followerTrain` (J7), `H.drive` (V1 to V6 by input kind), `H.sensor` (V6), `H.pillowBlock` (J10: a bearing block
-for a shaft in plan, a housing on its axis on a foot plate, screwed and dowelled), `H.crossBearings` (the four needle
+keyed flange on a straddle-mounted output), `H.followerTrain` (J7), `H.drive` (V1 to V6 by input kind, a rotary input
+on a shaft in plan included), `H.sensor` (V6), `H.pillowBlock` (J10: a bearing block for a shaft in plan, a housing on
+its axis on a foot plate, screwed and dowelled), `H.crossBearings` (the four needle
 cups and circlips of a universal joint's cross).
 
 Every primitive has real catalogue sizes, a default material, a default locking method where threaded, and a
@@ -620,6 +623,15 @@ default detail level.
 
 ## Changelog
 
+- **2.10 (2026-10-20).** Hand fixes of the spatial-engine pilots promoted to rules. A rotary input on a shaft in plan
+  is motorised: the motor beside the shaft on an angle bracket, belted across it to a pulley on its free end, home flag
+  and sensor, leads to the terminal block [V1, V2, V4, V6, AUTO]. The base grows under a pillow block that stands past
+  it; a part overhung on a live shaft's free end is held by a washer and a countersunk screw [J10, F2, AUTO]. Live gear
+  shafts in a crossed mesh are straddle mounted, the bridge kept clear of parts on axes in plan; the J2 spacer under a
+  gear's back face stops at its J9 thrust washer [A9, J2, J9, F4, AUTO]. Ropes: a guard over every sheave whose centre
+  stands still, becket and hook at their own sheaves' heights, the becket on a post, the parts carrying the load
+  counted, the rope primitives `P.ropeSpan` and `P.ropeWrap` [J12, F2, A11, AUTO]. The model check and classify read
+  stretched and deforming parts at their solved outline [K5, A1, AUTO].
 - **2.9 (2026-10-20).** Posed axes: a member whose axis is none of x, y, z is posed each phase by a solved frame, drawn
   by one affine per face and ordered by its box [D8, L6, AUTO]. The shaft couplings playbook poses the universal
   joint's cross and yokes.

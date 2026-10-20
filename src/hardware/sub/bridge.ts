@@ -1,7 +1,8 @@
 // H.bridge (D5, F1, A11): a bridge over one or more pivots on two spigoted Ø10 posts, placed where nothing moving ever
-// passes, high enough to clear every sweep under its footprint. One post's spigot sits in a round hole, the other in a
-// slot toward it, so the bridge goes back square after a rebuild.
-import { TAU, circle, roundedPoly, type Vec2 } from "../../core/geom";
+// passes, high enough to clear every sweep under its footprint, and with its box clear of the swept box of any part
+// turning on an axis in plan. One post's spigot sits in a round hole, the other in a slot toward it, so the bridge goes
+// back square after a rebuild.
+import { TAU, bbox, circle, roundedPoly, type Vec2 } from "../../core/geom";
 import { depth, inside, overlap, region } from "../../core/poly";
 import type { RuleContext } from "../../rules/types";
 import { disc, hullOf, screw, spigot, standoff, plate } from "../primitives";
@@ -106,6 +107,18 @@ export function bridge(ctx: RuleContext, o: BridgeSpec): BridgeResult | null {
       cands.push({ p, r, a });
     }
   const clear = (x: (typeof cands)[0]) => (x.ok ??= !ctx.hits(x.p, R + POST_MARGIN, ctx.b1, ctx.b1 + 80, (t) => t.isBase === true));
+  // a part on an x, y or posed axis is tested against the bridge by world boxes (A15): the box round the bosses and
+  // posts must stay off its swept box wherever their heights meet, or the bridge would sit in it
+  const outs = ctx
+    .sweeps()
+    .filter((sw) => (sw.part.axis === "x" || sw.part.axis === "y" || sw.part.axis === "p") && sw.regions.length && sw.z1 > o.zMin - 0.8 && sw.z0 < o.zMin + THICK + 0.8)
+    .map((sw) => bbox(sw.regions.flatMap((g): Vec2[] => [[g.box[0], g.box[1]], [g.box[2], g.box[3]]])));
+  const boxFree = (A: (typeof cands)[0], B: (typeof cands)[0]) => {
+    if (!outs.length) return true;
+    const r = R + 1.5;
+    const [x0, y0, x1, y1] = bbox([...o.over.flatMap(([x, y]): Vec2[] => [[x - rB, y - rB], [x + rB, y + rB]]), ...[A.p, B.p].flatMap(([x, y]): Vec2[] => [[x - r, y - r], [x + r, y + r]])]);
+    return outs.every((b) => b[0] >= x1 + 0.8 || b[2] <= x0 - 0.8 || b[1] >= y1 + 0.8 || b[3] <= y0 - 0.8);
+  };
   let best: [typeof cands[0], typeof cands[0]] | null = null;
   let cost = Infinity;
   for (let i = 0; i < cands.length && 2 * cands[i]!.r < cost; i++) {
@@ -115,7 +128,7 @@ export function bridge(ctx: RuleContext, o: BridgeSpec): BridgeResult | null {
       const sep = Math.abs(Math.atan2(Math.sin(A.a - B.a), Math.cos(A.a - B.a))) * (180 / Math.PI);
       if (sep < 50 || sep > 160 || Math.hypot(A.p[0] - B.p[0], A.p[1] - B.p[1]) < 20) continue;
       const k = A.r + B.r + 0.3 * Math.abs(sep - 100);
-      if (k < cost && clear(A) && clear(B)) {
+      if (k < cost && boxFree(A, B) && clear(A) && clear(B)) {
         cost = k;
         best = [A, B];
       }

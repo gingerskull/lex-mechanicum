@@ -28,7 +28,7 @@ export const j8: Rule = {
       // flanges either side of the small pulley so the belt cannot walk off
       const [x0, , x1] = bbox(small.outer);
       const r = (x1 - x0) / 2;
-      const fl = { body: small.body, at: small.at, ...(small.motion ? { motion: small.motion } : {}), joints: small.joints, ex: small.ex, kind: "pulley" as const, role: small.role, mat: "Steel, zinc plated", group: small.id };
+      const fl = { body: small.body, at: small.at, ...(small.motion ? { motion: small.motion } : {}), ...(small.axis ? { axis: small.axis } : {}), joints: small.joints, ex: small.ex, kind: "pulley" as const, role: small.role, mat: "Steel, zinc plated", group: small.id };
       const fd = r < 6 ? PULLEYS[16].fd : PULLEYS[32].fd;
       ctx.add(solid(`${small.id}-fl0`, { ...fl, name: "Pulley flanges", qty: 2, outer: disc(fd / 2), holes: small.holes, z0: small.z0 - 0.8, z1: small.z0 }));
       ctx.add(solid(`${small.id}-fl1`, { ...fl, name: "", outer: disc(fd / 2), holes: small.holes, z0: small.z1, z1: small.z1 + 0.8 }));

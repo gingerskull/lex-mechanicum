@@ -1,7 +1,7 @@
 // The part family. Every mechanism is built only from these elements (standard K3): stadium links with a ring at each
 // boss, flush pivot caps, square-ended sliders on twin stadium rails, stadium slots, involute gears with a D-bore,
 // discs, custom outlines and the tracer.
-import { capsule, circle, dBore, gearOutline, ring, roundRect, roundedPoly, slot, taper, D2R, xfPose } from "../core/geom";
+import { arcPts, capsule, circle, dBore, gearOutline, ring, roundRect, roundedPoly, slot, taper, D2R, xfPose } from "../core/geom";
 import type { Axis, Part, Pose, Role, Shape, Solved, Vec2 } from "../model/types";
 
 /** Layer pitch and default plate thickness, mm. */
@@ -181,6 +181,24 @@ export const P = {
       marks: o.marks ?? [],
       ...place(o),
     });
+  },
+  /**
+   * A straight rope part (J12, D9): its outline at unit length along x, stretched between two solved points (the
+   * tangent points it runs between), of the rope's Ø `rope`.
+   */
+  ropeSpan(id: string, a: string, b: string, o: PartOpts & { rope?: number } = {}): Part {
+    const rr = (o.rope ?? 3.2) / 2;
+    return P.custom(id, [[0, -rr], [1, -rr], [1, rr], [0, rr]], { ...o, thick: 2 * rr, between: [a, b], stretch: true });
+  },
+  /**
+   * A rope's wrap over a sheave (J12): an arc band of the rope's Ø `rope` on the pitch radius r, from angle a0 to a1
+   * counter-clockwise. Place it at the sheave's centre, without a spin: it stays put while the sheave turns under it.
+   */
+  ropeWrap(id: string, r: number, a0: number, a1: number, o: PartOpts & { rope?: number } = {}): Part {
+    const rr = (o.rope ?? 3.2) / 2;
+    // counter-clockwise: a wrap across angle 0 runs on past 2π
+    while (a1 <= a0) a1 += 2 * Math.PI;
+    return P.custom(id, [...arcPts(0, 0, r + rr, a0, a1, Math.PI / 36), ...arcPts(0, 0, r - rr, a1, a0, Math.PI / 36)], { ...o, thick: 2 * rr });
   },
   /** The traced point marker. */
   tracer(id: string, layer: number, o: Place & { r?: number; thick?: number } = {}): Part {
