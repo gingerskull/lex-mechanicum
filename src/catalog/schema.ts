@@ -1,5 +1,6 @@
 // Catalogue record type and controlled vocabularies. The source of truth for both is data/catalog/record-spec.md;
 // a change there is made here in the same commit.
+import type { Kin, Teaching } from "./kin";
 
 export const VOCABULARIES = {
   family: [
@@ -97,6 +98,8 @@ export interface BuildSpec {
 }
 
 export interface CatalogRecord {
+  /** 2 until the cut-over, 3 after; v3 requires `kin` and `teaching` and rejects the retired `build` fields. */
+  record_version?: 2 | 3;
   id: string;
   name: string;
   aka?: string[];
@@ -125,6 +128,10 @@ export interface CatalogRecord {
   };
   explain: { motion: string; forces: string; benefits: string; limits: string };
   build: BuildSpec;
+  /** Record v3: the kinematic model. Present on every record; required at record_version 3. */
+  kin?: Kin;
+  /** Record v3: what makes the drawing teach. */
+  teaching?: Teaching;
   examples?: { use: string; detail: string }[];
   references: Link<ReferenceKind>[];
   media: Link<MediaKind>[];

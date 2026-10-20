@@ -1,14 +1,16 @@
+import { validateKinTeaching, validateRetired } from "./validate-kin";
 import { VOCABULARIES, type CatalogRecord, type Vocabularies, type Waivable } from "./schema";
 
 const URL_OK = /^https?:\/\//;
 const YOUTUBE = /^https:\/\/(www\.youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)[\w-]{11}/;
 
 /** Checks merged records against record-spec.md. Each problem is one line, `<id>: <what>`; none means valid. */
-export function validate(records: CatalogRecord[]): string[] {
+export function validate(records: CatalogRecord[], opts: { asVersion?: 2 | 3 } = {}): string[] {
   const problems: string[] = [];
 
   for (const r of records) {
     const say = (what: string) => problems.push(`${r.id}: ${what}`);
+    const v3 = (opts.asVersion ?? r.record_version) === 3;
     const vocab = (field: string, list: keyof Vocabularies, value: unknown, many = false) => {
       const allowed: readonly string[] = VOCABULARIES[list];
       if (value === undefined) return say(`${field} missing`);
@@ -36,6 +38,8 @@ export function validate(records: CatalogRecord[]): string[] {
     const refs = (r.references ?? []).length;
     if (!waived("references") && refs < 2) say(`${refs} references, at least 2 needed`);
     for (const x of [...(r.references ?? []), ...(r.media ?? [])]) if (!URL_OK.test(x.url ?? "")) say(`bad url ${String(x.url)}`);
+    problems.push(...validateKinTeaching(r, { required: v3 }));
+    if (v3 && opts.asVersion === undefined) problems.push(...validateRetired(r));
     for (const x of r.real_world ?? []) if (!YOUTUBE.test(x.url ?? "")) say(`real-world example not a YouTube video: ${String(x.url)}`);
   }
 

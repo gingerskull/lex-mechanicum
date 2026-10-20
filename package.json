@@ -10,6 +10,7 @@
   },
   "scripts": {
     "catalog": "tsx tools/catalog.ts",
+    "kin-check": "tsx tools/kin-check.ts",
     "tokens": "tsx tools/tokens-css.ts",
     "prebuild": "npm run tokens && tsx tools/site-assets.ts",
     "package": "tsx tools/package.ts",

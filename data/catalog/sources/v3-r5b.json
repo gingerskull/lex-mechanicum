@@ -1,0 +1,3337 @@
+{
+ "intermittent-gear": {
+  "kin": {
+   "bodies": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "shape": {
+      "type": "plate",
+      "rect": [
+       150,
+       70
+      ],
+      "center": [
+       40,
+       0,
+       -8
+      ]
+     },
+     "at": {
+      "frame": {
+       "origin": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "id": "driver",
+     "role": "driver",
+     "shape": {
+      "type": "gear",
+      "z": 20,
+      "module": 4,
+      "face": 10,
+      "bore": 8,
+      "cut": {
+       "teeth": 5,
+       "centredAt": 180,
+       "note": "5 consecutive teeth of the 20 spacings, centred on local 180 degrees"
+      },
+      "lockRim": {
+       "radius": 39,
+       "note": "the untoothed 270 degrees are a plain convex rim between the root (35) and pitch (40) circles, relieved at its ends"
+      },
+      "endTeeth": {
+       "entryTip": 42.8,
+       "exitTip": 43.5,
+       "note": "the first and last teeth shortened so they clear the stopped gear"
+      }
+     },
+     "at": {
+      "joint": "O1"
+     }
+    },
+    {
+     "id": "driven",
+     "role": "output",
+     "shape": {
+      "type": "gear",
+      "z": 20,
+      "module": 4,
+      "face": 10,
+      "bore": 8,
+      "lockArcs": {
+       "count": 4,
+       "every": 5,
+       "radius": 39.5,
+       "about": "the driver axis at rest",
+       "note": "each arc cut across the tips of the two teeth that flank a locking gap; at rest a locking gap faces the driver (local 180 degrees)"
+      }
+     },
+     "at": {
+      "joint": "O2"
+     }
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "a": "ground",
+     "b": "driver",
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "a": "ground",
+     "b": "driven",
+     "at": [
+      80,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "M",
+     "type": "gear-mesh",
+     "a": "driver",
+     "b": "driven",
+     "at": [
+      40,
+      0,
+      0
+     ],
+     "z": [
+      20,
+      20
+     ]
+    },
+    {
+     "id": "L",
+     "type": "cam-contact",
+     "a": "driver",
+     "b": "driven",
+     "at": [
+      39,
+      0,
+      0
+     ],
+     "follower": "flat",
+     "note": "the locking rim in a locking arc"
+    }
+   ],
+   "params": [
+    {
+     "id": "m",
+     "value": 4,
+     "unit": "mm",
+     "min": 3,
+     "max": 5,
+     "note": "module"
+    },
+    {
+     "id": "cd",
+     "value": 80,
+     "unit": "mm",
+     "min": 60,
+     "max": 100,
+     "note": "centre distance m (z1 + z2) / 2"
+    },
+    {
+     "id": "RL",
+     "value": 39,
+     "unit": "mm",
+     "min": 36.5,
+     "max": 39.5,
+     "note": "driver locking rim radius"
+    },
+    {
+     "id": "RC",
+     "value": 39.5,
+     "unit": "mm",
+     "min": 37,
+     "max": 40,
+     "note": "driven locking arc radius about the driver axis at rest (RL plus 0.5 running clearance)"
+    }
+   ],
+   "design": [],
+   "drivers": [
+    {
+     "id": "input",
+     "joint": "O1",
+     "kind": "rotary",
+     "range": [
+      0,
+      360
+     ],
+     "default": 0
+    }
+   ],
+   "solve": [
+    {
+     "block": "gear-mesh",
+     "id": "mesh",
+     "joints": [
+      "O2",
+      "M",
+      "L"
+     ],
+     "in": {
+      "a": "driver",
+      "b": "driven",
+      "m": "m",
+      "cd": "cd",
+      "rim": "RL",
+      "arc": "RC"
+     },
+     "opts": {
+      "z1": 20,
+      "z2": 20,
+      "cut": 5,
+      "window": [
+       135,
+       225
+      ],
+      "outside": "held by the locking rim"
+     },
+     "out": "driven-turn"
+    }
+   ],
+   "points": [
+    {
+     "id": "K",
+     "body": "driven",
+     "local": [
+      -30,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "Tp",
+     "body": "driver",
+     "local": [
+      -40,
+      0,
+      0
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "id": "driven-angle",
+     "of": "driven",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "mesh-ratio",
+     "of": "driven",
+     "kind": "speed-ratio"
+    },
+    {
+     "id": "mark-path",
+     "of": "K",
+     "kind": "path"
+    }
+   ],
+   "fallback": null
+  },
+  "teaching": {
+   "review": {
+    "verdict": "rethink",
+    "date": "2026-10-20",
+    "note": "Applies the 2026-10-19 review and issue #216: the single-plane form, so the teeth and the lock read in one plan view. The driver's untoothed rim is a convex locking arc of radius 39 that sits 3 mm deep in a locking gap of the driven gear, whose two flanking tooth tips are cut to a concave arc of radius 39.5 about the driver axis. A mark on the driven gear is traced with equal-time ticks, so stop and go reads; the bridge goes off the mesh."
+   },
+   "principle": [
+    {
+     "body": "driver"
+    },
+    {
+     "body": "driven"
+    },
+    {
+     "point": "K"
+    }
+   ],
+   "traces": [
+    {
+     "id": "driven-mark",
+     "point": "K",
+     "ticks": {
+      "every": 10
+     },
+     "comet": true
+    },
+    {
+     "id": "driver-teeth",
+     "point": "Tp"
+    }
+   ],
+   "overlays": [
+    {
+     "id": "centres",
+     "kind": "line",
+     "from": "O1",
+     "to": "O2",
+     "label": "LINE OF CENTRES"
+    },
+    {
+     "id": "rim",
+     "kind": "circle",
+     "center": "O1",
+     "radius": 39,
+     "label": "LOCKING RIM"
+    },
+    {
+     "id": "pitch-driven",
+     "kind": "circle",
+     "center": "O2",
+     "radius": 40,
+     "label": "PITCH CIRCLE"
+    }
+   ],
+   "view": "PLAN",
+   "controls": [
+    {
+     "id": "driver",
+     "kind": "driver",
+     "driver": "input"
+    }
+   ],
+   "plot": {
+    "x": "input",
+    "y": "driven-angle",
+    "label": "DRIVEN ANGLE"
+   },
+   "claims": [
+    {
+     "text": "5 of 20 teeth advance the driven gear 90° per driver turn",
+     "output": "driven-angle",
+     "stat": "range",
+     "value": 90,
+     "tol": 0.1
+    },
+    {
+     "text": "it rests for the other 270°",
+     "output": "driven-angle",
+     "stat": "dwell",
+     "value": 270,
+     "tol": 0.5
+    },
+    {
+     "text": "in mesh it turns at the gear ratio, 1:1 the other way",
+     "output": "mesh-ratio",
+     "stat": "min",
+     "value": -1,
+     "tol": 0.01
+    }
+   ],
+   "exceptions": []
+  },
+  "edit": {
+   "explain.motion": "The driver has teeth on only part of its rim; the rest of its rim is a plain convex locking arc. While the teeth are in mesh, the driven gear turns at the normal gear ratio, the other way. When they have passed, the locking arc slides in a concave arc cut across the tips of two driven teeth and holds the driven gear still. Teeth and lock work in one plane. Here 5 of 20 teeth advance the driven gear 90° per driver turn, and it rests for the other 270°.",
+   "topology.notes": "ground, driver with 5 teeth and a convex locking rim, driven gear with 4 concave locking arcs, all in one plane; the gear mesh and the locking contact alternate. The mobility counted from kin is 0 because both contacts are declared; only one acts at a time, so the true mobility is 1.",
+   "build.defining_relations": "Index angle per driver turn = 360° x nT/z2 = 90°. Driver moves the output for 360° x nT/z1 = 90°, dwell 270°. Number of stops per driven turn = z2/nT = 4 (must be an integer). Centre distance cd = m(z1+z2)/2 = 80. Locking: the driver's rim radius RL = 39 lies between its root (35) and pitch (40) circles; at rest it reaches 3 mm inside the driven tip circle (cd - RL = 41 against 44), into a locking gap whose two flanking tooth tips are cut to RC = RL + 0.5 about the driver axis.",
+   "build.notes": "Single-plane form: teeth and lock in one plane, so plan view shows both. The 4 locking gaps of the driven gear are 5 teeth apart; the 8 teeth that flank them have their tips cut concave. The driver's end teeth are shortened (tips 42.8 and 43.5) so they clear the stopped gear, and the ends of its locking rim are relieved. Driven turns opposite to driver."
+  }
+ },
+ "star-wheel": {
+  "kin": {
+   "bodies": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "shape": {
+      "type": "plate",
+      "rect": [
+       90,
+       70
+      ],
+      "center": [
+       16,
+       8,
+       -8
+      ]
+     },
+     "at": {
+      "frame": {
+       "origin": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "id": "driver",
+     "role": "driver",
+     "shape": {
+      "type": "disc",
+      "radius": 15,
+      "thickness": 6,
+      "pin": {
+       "radius": 1.5,
+       "at": [
+        -12,
+        0
+       ]
+      }
+     },
+     "at": {
+      "joint": "O1"
+     }
+    },
+    {
+     "id": "star",
+     "role": "output",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 6,
+      "profile": {
+       "kind": "star",
+       "teeth": 10,
+       "tip": 20,
+       "root": 11.5,
+       "phase": 102.91,
+       "note": "straight flanks from each tip to the roots half a pitch either side"
+      }
+     },
+     "at": {
+      "joint": "O2"
+     }
+    },
+    {
+     "id": "jumper",
+     "role": "pawl",
+     "shape": {
+      "type": "link",
+      "length": 22,
+      "boss": [
+       7,
+       5
+      ],
+      "roller": {
+       "radius": 2.8
+      }
+     },
+     "at": {
+      "joint": "J"
+     }
+    }
+   ],
+   "joints": [
+    {
+     "id": "O1",
+     "type": "revolute",
+     "a": "ground",
+     "b": "driver",
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "O2",
+     "type": "revolute",
+     "a": "ground",
+     "b": "star",
+     "at": [
+      28,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "J",
+     "type": "revolute",
+     "a": "ground",
+     "b": "jumper",
+     "at": [
+      36.7,
+      27.8,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ],
+     "limits": [
+      -158.03,
+      -140.02
+     ]
+    },
+    {
+     "id": "Fc",
+     "type": "cam-contact",
+     "a": "driver",
+     "b": "star",
+     "at": "F",
+     "follower": "roller"
+    },
+    {
+     "id": "Kc",
+     "type": "cam-contact",
+     "a": "jumper",
+     "b": "star",
+     "at": "RJ",
+     "follower": "roller"
+    }
+   ],
+   "params": [
+    {
+     "id": "c",
+     "value": 28,
+     "unit": "mm",
+     "min": 26,
+     "max": 30,
+     "note": "centre distance driver to star"
+    },
+    {
+     "id": "rf",
+     "value": 12,
+     "unit": "mm",
+     "min": 10,
+     "max": 14,
+     "note": "finger radius"
+    },
+    {
+     "id": "rTip",
+     "value": 20,
+     "unit": "mm",
+     "min": 18,
+     "max": 22,
+     "note": "star tip radius"
+    },
+    {
+     "id": "rRoot",
+     "value": 11.5,
+     "unit": "mm",
+     "min": 10,
+     "max": 14,
+     "note": "star root radius (deep enough that the tooth behind clears the finger during the snap)"
+    },
+    {
+     "id": "play",
+     "value": 0.4,
+     "unit": "mm",
+     "min": 0.2,
+     "max": 0.6,
+     "note": "running clearance of the Ø3 finger in the gap"
+    },
+    {
+     "id": "Lj",
+     "value": 22,
+     "unit": "mm",
+     "min": 18,
+     "max": 26,
+     "note": "jumper arm, pivot to roller"
+    },
+    {
+     "id": "rRoller",
+     "value": 2.8,
+     "unit": "mm",
+     "min": 2,
+     "max": 3.5,
+     "note": "jumper roller radius"
+    },
+    {
+     "id": "snap",
+     "value": 8,
+     "unit": "deg",
+     "min": 5,
+     "max": 8,
+     "note": "driver angle over which the jumper snaps the star from the crest to the next gap"
+    }
+   ],
+   "design": [],
+   "drivers": [
+    {
+     "id": "input",
+     "joint": "O1",
+     "kind": "rotary",
+     "range": [
+      0,
+      360
+     ],
+     "default": 0
+    }
+   ],
+   "solve": [
+    {
+     "block": "cam",
+     "id": "index",
+     "joints": [
+      "O2",
+      "Fc"
+     ],
+     "in": {
+      "cam": "driver",
+      "follower": "star",
+      "pin": "F",
+      "c": "c",
+      "rf": "rf",
+      "tip": "rTip",
+      "root": "rRoot",
+      "play": "play",
+      "snap": "snap"
+     },
+     "opts": {
+      "law": "finger push to the crest, then snap",
+      "crest": 18,
+      "step": 36,
+      "snapLaw": "cycloidal, never behind the finger"
+     },
+     "out": "psi"
+    },
+    {
+     "block": "cam",
+     "id": "detent",
+     "joints": [
+      "J",
+      "Kc"
+     ],
+     "in": {
+      "cam": "star",
+      "angle": "psi",
+      "follower": "jumper",
+      "pivot": "J",
+      "arm": "Lj",
+      "roller": "rRoller"
+     },
+     "opts": {
+      "follower": "oscillating roller, held on the star by its spring"
+     },
+     "out": "jumper-arm"
+    }
+   ],
+   "points": [
+    {
+     "id": "F",
+     "body": "driver",
+     "local": [
+      -12,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "T",
+     "body": "star",
+     "local": [
+      -19.92,
+      1.77,
+      0
+     ]
+    },
+    {
+     "id": "RJ",
+     "body": "jumper",
+     "local": [
+      22,
+      0,
+      0
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "id": "star-angle",
+     "of": "star",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "finger-reach",
+     "of": "star",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "jumper-angle",
+     "of": "jumper",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "tip-path",
+     "of": "T",
+     "kind": "path"
+    },
+    {
+     "id": "finger-path",
+     "of": "F",
+     "kind": "path"
+    }
+   ],
+   "fallback": null
+  },
+  "teaching": {
+   "review": {
+    "verdict": "tweak",
+    "date": "2026-10-20",
+    "note": "Applies the 2026-10-19 review and issue #216. The finger pushes the star only to the jumper's crest, half a pitch (18°); there the jumper takes over and snaps the star into the next gap over 8° of driver, and a time map slows playback through the snap. The jumper pivot moves to (36.7, 27.8) so its crest falls at 18°, and the star's roots go to radius 11.5 so the tooth behind clears the finger during the snap. The finger's own reach is 22.7° (the review measured 22.8° on the old star; the old exported 36° was wrong). A tooth tip is traced with equal-time ticks so the slow push and the fast snap read."
+   },
+   "principle": [
+    {
+     "body": "driver"
+    },
+    {
+     "body": "star"
+    },
+    {
+     "body": "jumper"
+    },
+    {
+     "point": "F"
+    },
+    {
+     "point": "RJ"
+    }
+   ],
+   "traces": [
+    {
+     "id": "tooth-tip",
+     "point": "T",
+     "ticks": {
+      "every": 2
+     },
+     "comet": true
+    },
+    {
+     "id": "finger",
+     "point": "F"
+    }
+   ],
+   "overlays": [
+    {
+     "id": "finger-circle",
+     "kind": "circle",
+     "center": "O1",
+     "through": "F",
+     "label": "FINGER CIRCLE"
+    },
+    {
+     "id": "tip-circle",
+     "kind": "circle",
+     "center": "O2",
+     "radius": 20,
+     "label": "TIP CIRCLE"
+    },
+    {
+     "id": "crest",
+     "kind": "line",
+     "from": "O2",
+     "to": "RJ",
+     "label": "JUMPER LINE: A TIP ON IT IS THE CREST"
+    }
+   ],
+   "view": "PLAN",
+   "controls": [
+    {
+     "id": "driver",
+     "kind": "driver",
+     "driver": "input"
+    }
+   ],
+   "timeMap": {
+    "feature": "the jumper's snap",
+    "slow": 4,
+    "span": [
+     194,
+     206
+    ]
+   },
+   "plot": {
+    "x": "input",
+    "y": "star-angle",
+    "label": "STAR ANGLE"
+   },
+   "claims": [
+    {
+     "text": "the star steps 36° per driver turn",
+     "output": "star-angle",
+     "stat": "range",
+     "value": 36,
+     "tol": 0.1
+    },
+    {
+     "text": "at the crest, 18° into the step, the jumper takes over",
+     "output": "star-angle",
+     "stat": "at",
+     "at": 195.85,
+     "value": 18,
+     "tol": 0.2
+    },
+    {
+     "text": "and snaps the star into the next gap over 8° of driver",
+     "output": "star-angle",
+     "stat": "at",
+     "at": 203.85,
+     "value": 36,
+     "tol": 0.1
+    },
+    {
+     "text": "the finger alone would carry the star 22.7°, past the crest",
+     "output": "finger-reach",
+     "stat": "max",
+     "value": 22.72,
+     "tol": 0.15
+    },
+    {
+     "text": "the jumper's arm lifts 18.0° as it rides over the tooth",
+     "output": "jumper-angle",
+     "stat": "range",
+     "value": 18,
+     "tol": 0.2
+    },
+    {
+     "text": "between steps the jumper holds the star still, 325.6° of each turn",
+     "output": "star-angle",
+     "stat": "dwell",
+     "value": 325.6,
+     "tol": 0.5
+    }
+   ],
+   "exceptions": []
+  },
+  "edit": {
+   "explain.motion": "A driver turns continuously and once per turn its finger enters a gap of the star wheel and pushes one tooth. A spring-loaded jumper rides up the flank of the next tooth. At the crest, 18° into the step, the jumper takes over: it snaps the star on into the next gap, 36° in all, over 8° of driver, while the finger turns out of the gap. Between steps the jumper holds the star still.",
+   "build.ground": "plate with driver axis O1 at (0,0), star axis O2 at (28,0) and jumper pivot J at (36.7,27.8)",
+   "build.defining_relations": "Index per driver turn = 360°/N = 36°. Finger path circle (radius rf about O1) must reach inside the star tip circle: c - rf < r_tip, overlap 4 mm here. The finger must carry the star past the jumper's crest, half a pitch (180°/N = 18°); this finger could carry it 22.7°. The jumper takes over at the crest; for its crest to fall at half a pitch its arm runs nearly at right angles to the radius through the roller. Jumper rest position at a gap bisector.",
+   "build.range": "driver 360° continuous; star steps 36° once per driver turn: the finger pushes it from driver 169.5° to 195.9° (to the crest, 18°) and the jumper snaps it the rest of the way by 203.9°; it rests for the other 325.6°",
+   "build.notes": "Two phases: the finger pushes the star to the jumper's crest (18°), then the jumper snaps it into the next detent over 8° of driver; a time map slows playback through the snap. The star's roots are at radius 11.5 (deeper than the old 13 to 14) and the Ø3 finger runs with 0.4 mm clearance, so the tooth behind the finger clears it during the snap. The leaf spring lies inside the base. Star turns opposite to driver."
+  }
+ },
+ "ratchet-pawl": {
+  "kin": {
+   "bodies": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "shape": {
+      "type": "plate",
+      "rect": [
+       180,
+       200
+      ],
+      "center": [
+       10,
+       30,
+       -10
+      ]
+     },
+     "at": {
+      "frame": {
+       "origin": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "id": "wheel",
+     "role": "output",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 8,
+      "profile": {
+       "kind": "sawtooth",
+       "teeth": 12,
+       "root": 50,
+       "tip": 62,
+       "faceSpan": 3,
+       "backSpan": 27,
+       "note": "steep face over 3 degrees of wheel angle, back slope over the other 27"
+      }
+     },
+     "at": {
+      "joint": "OW"
+     }
+    },
+    {
+     "id": "lever",
+     "role": "driver",
+     "shape": {
+      "type": "link",
+      "length": 128,
+      "boss": [
+       12,
+       8
+      ],
+      "plates": 2
+     },
+     "at": {
+      "joint": "OL"
+     }
+    },
+    {
+     "id": "pawl",
+     "role": "pawl",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 8,
+      "profile": {
+       "kind": "pawl",
+       "length": 56,
+       "boss": 9,
+       "bevel": 32,
+       "note": "solid beak: a round boss, a full arm bowed outside the tip circle, a finger whose front edge lies along the steep face"
+      }
+     },
+     "at": {
+      "joint": "D"
+     }
+    },
+    {
+     "id": "holdPawl",
+     "role": "pawl",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 8,
+      "profile": {
+       "kind": "pawl",
+       "length": 56,
+       "boss": 9,
+       "bevel": 32
+      }
+     },
+     "at": {
+      "joint": "H"
+     }
+    }
+   ],
+   "joints": [
+    {
+     "id": "OW",
+     "type": "revolute",
+     "a": "ground",
+     "b": "wheel",
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "OL",
+     "type": "revolute",
+     "a": "ground",
+     "b": "lever",
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ],
+     "limits": [
+      62,
+      98
+     ]
+    },
+    {
+     "id": "D",
+     "type": "revolute",
+     "a": "lever",
+     "b": "pawl",
+     "at": [
+      35.24,
+      66.28,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "H",
+     "type": "revolute",
+     "a": "ground",
+     "b": "holdPawl",
+     "at": [
+      63.66,
+      -39.78,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "T1",
+     "type": "cam-contact",
+     "a": "pawl",
+     "b": "wheel",
+     "at": "TD",
+     "follower": "knife"
+    },
+    {
+     "id": "T2",
+     "type": "cam-contact",
+     "a": "holdPawl",
+     "b": "wheel",
+     "at": "TH",
+     "follower": "knife"
+    }
+   ],
+   "params": [
+    {
+     "id": "rRoot",
+     "value": 50,
+     "unit": "mm",
+     "min": 40,
+     "max": 60,
+     "note": "root radius"
+    },
+    {
+     "id": "rTip",
+     "value": 62,
+     "unit": "mm",
+     "min": 52,
+     "max": 72,
+     "note": "tip radius"
+    },
+    {
+     "id": "Lp",
+     "value": 56,
+     "unit": "mm",
+     "min": 45,
+     "max": 65,
+     "note": "pawl, pivot to tip"
+    },
+    {
+     "id": "Rp",
+     "value": 75.07,
+     "unit": "mm",
+     "min": 60,
+     "max": 90,
+     "note": "pawl pivot radius, hypot(root, Lp), so the pawl line is tangent to the root circle at engagement"
+    },
+    {
+     "id": "Lh",
+     "value": 128,
+     "unit": "mm",
+     "min": 100,
+     "max": 150,
+     "note": "lever length"
+    }
+   ],
+   "design": [],
+   "drivers": [
+    {
+     "id": "input",
+     "joint": "OL",
+     "kind": "oscillating",
+     "range": [
+      62,
+      98
+     ],
+     "lo": 62,
+     "hi": 98,
+     "default": 62
+    }
+   ],
+   "solve": [
+    {
+     "block": "cam",
+     "id": "index",
+     "joints": [
+      "OW",
+      "T1"
+     ],
+     "in": {
+      "cam": "wheel",
+      "lever": "lever",
+      "pawl": "pawl",
+      "root": "rRoot",
+      "tip": "rTip",
+      "Lp": "Lp",
+      "Rp": "Rp"
+     },
+     "opts": {
+      "law": "push one pitch on the forward stroke after 6 degrees of lost motion, hold on the return",
+      "teeth": 12
+     },
+     "out": "wheel-turn"
+    },
+    {
+     "block": "cam",
+     "id": "drive-pawl",
+     "joints": [
+      "D"
+     ],
+     "in": {
+      "cam": "wheel",
+      "angle": "wheel-turn",
+      "follower": "pawl",
+      "pivot": "D",
+      "length": "Lp"
+     },
+     "opts": {
+      "follower": "oscillating knife on a moving pivot, sprung onto the wheel"
+     },
+     "out": "pawl-angle"
+    },
+    {
+     "block": "cam",
+     "id": "hold-pawl",
+     "joints": [
+      "H",
+      "T2"
+     ],
+     "in": {
+      "cam": "wheel",
+      "angle": "wheel-turn",
+      "follower": "holdPawl",
+      "pivot": "H",
+      "length": "Lp"
+     },
+     "opts": {
+      "follower": "oscillating knife, sprung onto the wheel"
+     },
+     "out": "hold-angle"
+    }
+   ],
+   "points": [
+    {
+     "id": "E",
+     "body": "lever",
+     "local": [
+      128,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "TD",
+     "body": "pawl",
+     "local": [
+      56,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "TH",
+     "body": "holdPawl",
+     "local": [
+      56,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "E0",
+     "body": "ground",
+     "local": [
+      60.09,
+      113.02,
+      0
+     ]
+    },
+    {
+     "id": "E1",
+     "body": "ground",
+     "local": [
+      -17.81,
+      126.75,
+      0
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "id": "wheel-angle",
+     "of": "wheel",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "lever-angle",
+     "of": "lever",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "tip-path",
+     "of": "TD",
+     "kind": "path"
+    }
+   ],
+   "fallback": null
+  },
+  "teaching": {
+   "review": {
+    "verdict": "keep",
+    "date": "2026-10-20",
+    "note": "Applies the 2026-10-19 review (keep): lever, both pawls and the sawtooth wheel read in plan, the wheel steps one tooth per stroke and stays on the return while the holding pawl clicks over the teeth. Solider pawl shapes are a build matter. The root circle and the pawl line, tangent to it at engagement, are drawn as construction."
+   },
+   "principle": [
+    {
+     "body": "wheel"
+    },
+    {
+     "body": "lever"
+    },
+    {
+     "body": "pawl"
+    },
+    {
+     "body": "holdPawl"
+    },
+    {
+     "point": "TD"
+    },
+    {
+     "point": "TH"
+    }
+   ],
+   "traces": [
+    {
+     "id": "pawl-tip",
+     "point": "TD",
+     "comet": true
+    }
+   ],
+   "overlays": [
+    {
+     "id": "root",
+     "kind": "circle",
+     "center": "OW",
+     "radius": 50,
+     "label": "ROOT CIRCLE"
+    },
+    {
+     "id": "pawl-line",
+     "kind": "line",
+     "from": "D",
+     "to": "TD",
+     "label": "PAWL LINE"
+    },
+    {
+     "id": "stroke",
+     "kind": "arc",
+     "center": "OW",
+     "from": "E0",
+     "to": "E1",
+     "label": "STROKE"
+    }
+   ],
+   "view": "PLAN",
+   "controls": [
+    {
+     "id": "lever",
+     "kind": "driver",
+     "driver": "input"
+    }
+   ],
+   "plot": {
+    "x": "input",
+    "y": "wheel-angle",
+    "label": "WHEEL ANGLE"
+   },
+   "claims": [
+    {
+     "text": "one tooth (30°, 12 teeth) per lever stroke of 36°",
+     "output": "wheel-angle",
+     "stat": "range",
+     "value": 30,
+     "tol": 0.1
+    },
+    {
+     "text": "one tooth (30°, 12 teeth) per lever stroke of 36°",
+     "output": "lever-angle",
+     "stat": "range",
+     "value": 36,
+     "tol": 0.1
+    },
+    {
+     "text": "the wheel rests on the return stroke and through the first 6° of lost motion",
+     "output": "wheel-angle",
+     "stat": "dwell",
+     "value": 228.2,
+     "tol": 0.5
+    }
+   ],
+   "exceptions": []
+  },
+  "edit": {
+   "topology.notes": "ground, lever, ratchet wheel, driving pawl, holding pawl; pawl tips contact wheel teeth; springs keep pawls engaged (pawl angles follow the wheel). The mobility counted from kin is 2: the wheel's angle is fixed only by one-sided contacts (the driving pawl pushes it, the holding pawl stops it running back), which a count of joints does not see; the true mobility is 1."
+  }
+ },
+ "sprag-clutch": {
+  "kin": {
+   "bodies": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "shape": {
+      "type": "plate",
+      "rect": [
+       140,
+       140
+      ],
+      "center": [
+       0,
+       0,
+       -10
+      ]
+     },
+     "at": {
+      "frame": {
+       "origin": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "id": "inner",
+     "role": "driver",
+     "shape": {
+      "type": "disc",
+      "radius": 30,
+      "thickness": 12,
+      "bore": 10
+     },
+     "at": {
+      "joint": "Oi"
+     }
+    },
+    {
+     "id": "outer",
+     "role": "output",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 12,
+      "profile": {
+       "kind": "ring",
+       "bore": 44,
+       "outside": 56,
+       "spider": {
+        "hub": 17,
+        "arms": 3,
+        "note": "carries the race on the shaft; drawn see-through or moved off the sprags"
+       }
+      }
+     },
+     "at": {
+      "joint": "Oo"
+     }
+    },
+    {
+     "id": "sprags",
+     "role": "link",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 12,
+      "pattern": {
+       "count": 8,
+       "about": [
+        0,
+        0,
+        0
+       ]
+      },
+      "profile": {
+       "kind": "figure-eight",
+       "innerArc": {
+        "centre": [
+         36,
+         0
+        ],
+        "radius": 6
+       },
+       "outerArc": {
+        "centre": [
+         37.99,
+         0.84
+        ],
+        "radius": 6
+       },
+       "lobe": 8,
+       "waist": 5,
+       "note": "two contact arcs on a waisted body; the garter spring sits in the waist"
+      }
+     },
+     "at": {
+      "joint": "Oo"
+     }
+    }
+   ],
+   "joints": [
+    {
+     "id": "Oi",
+     "type": "revolute",
+     "a": "ground",
+     "b": "inner",
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "Oo",
+     "type": "revolute",
+     "a": "ground",
+     "b": "outer",
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "Ci",
+     "type": "rolling",
+     "a": "inner",
+     "b": "sprags",
+     "at": [
+      30,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "Co",
+     "type": "rolling",
+     "a": "sprags",
+     "b": "outer",
+     "at": [
+      43.99,
+      0.98,
+      0
+     ]
+    }
+   ],
+   "params": [
+    {
+     "id": "ri",
+     "value": 30,
+     "unit": "mm",
+     "min": 25,
+     "max": 35,
+     "note": "inner race radius"
+    },
+    {
+     "id": "ro",
+     "value": 44,
+     "unit": "mm",
+     "min": 39,
+     "max": 49,
+     "note": "outer race bore radius (gap 14)"
+    },
+    {
+     "id": "rho",
+     "value": 6,
+     "unit": "mm",
+     "min": 4,
+     "max": 7,
+     "note": "radius of each sprag contact arc"
+    },
+    {
+     "id": "e",
+     "value": 2.16,
+     "unit": "mm",
+     "min": 1,
+     "max": 4,
+     "note": "distance between the two arc centres; sets the tilt and the grip angle"
+    },
+    {
+     "id": "mu",
+     "value": 0.1,
+     "unit": "-",
+     "min": 0.05,
+     "max": 0.15,
+     "note": "race friction coefficient (oil)"
+    },
+    {
+     "id": "n",
+     "value": 8,
+     "unit": "sprags",
+     "min": 6,
+     "max": 12,
+     "note": "sprag count"
+    }
+   ],
+   "design": [],
+   "drivers": [
+    {
+     "id": "input",
+     "joint": "Oi",
+     "kind": "oscillating",
+     "range": [
+      0,
+      90
+     ],
+     "lo": 0,
+     "hi": 90,
+     "default": 0
+    }
+   ],
+   "solve": [
+    {
+     "block": "cam",
+     "id": "clutch",
+     "joints": [
+      "Oo",
+      "Ci",
+      "Co"
+     ],
+     "in": {
+      "inner": "inner",
+      "outer": "outer",
+      "sprags": "sprags",
+      "ri": "ri",
+      "ro": "ro",
+      "rho": "rho",
+      "e": "e",
+      "mu": "mu"
+     },
+     "opts": {
+      "law": "one-way: the outer race follows the inner while it turns counter-clockwise (lock), and stays while it turns back (overrun)",
+      "sprags": "carried with the outer race, at the tilt the gap fixes"
+     },
+     "out": [
+      "outer-turn",
+      "sprag-turn"
+     ]
+    }
+   ],
+   "points": [
+    {
+     "id": "P1",
+     "body": "sprags",
+     "local": [
+      30,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "P2",
+     "body": "sprags",
+     "local": [
+      43.99,
+      0.98,
+      0
+     ]
+    },
+    {
+     "id": "Pr",
+     "body": "sprags",
+     "local": [
+      44,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "Mi",
+     "body": "inner",
+     "local": [
+      0,
+      24,
+      0
+     ]
+    },
+    {
+     "id": "Mo",
+     "body": "outer",
+     "local": [
+      0,
+      50,
+      0
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "id": "inner-angle",
+     "of": "inner",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "outer-angle",
+     "of": "outer",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "inner-speed",
+     "of": "inner",
+     "kind": "speed-ratio"
+    },
+    {
+     "id": "outer-speed",
+     "of": "outer",
+     "kind": "speed-ratio"
+    },
+    {
+     "id": "lock-ratio",
+     "of": "outer",
+     "kind": "speed-ratio"
+    },
+    {
+     "id": "grip-angle",
+     "of": "P1",
+     "kind": "angle",
+     "unit": "deg"
+    }
+   ],
+   "fallback": null
+  },
+  "teaching": {
+   "review": {
+    "verdict": "rethink",
+    "date": "2026-10-20",
+    "note": "Applies the 2026-10-19 review and issue #216. Fewer, larger sprags: 8 figure-of-eight sprags in a 14 mm gap between races of radius 30 and 44. Each sprag's contact arcs (radius 6, centres 2.16 apart) give a grip angle of 4.0° at the inner race and 2.7° at the outer, below the friction angle of 5.7° for mu = 0.1, so it locks by the text's own rule. Lock and overrun are timed phases: the inner race turns 90° forward with the outer race locked to it, then turns back while the outer race stays and the sprags slide on the inner race. The spider goes see-through or is moved; a detail view shows one sector with the line of thrust and the grip angle; the plot is outer speed against inner speed."
+   },
+   "principle": [
+    {
+     "body": "inner"
+    },
+    {
+     "body": "outer"
+    },
+    {
+     "body": "sprags"
+    },
+    {
+     "point": "P1"
+    },
+    {
+     "point": "P2"
+    }
+   ],
+   "traces": [
+    {
+     "id": "inner-mark",
+     "point": "Mi",
+     "ticks": {
+      "every": 15
+     },
+     "comet": true
+    },
+    {
+     "id": "outer-mark",
+     "point": "Mo",
+     "ticks": {
+      "every": 15
+     }
+    }
+   ],
+   "overlays": [
+    {
+     "id": "thrust",
+     "kind": "line",
+     "from": "P1",
+     "to": "P2",
+     "label": "LINE OF THRUST"
+    },
+    {
+     "id": "radial",
+     "kind": "axis-line",
+     "from": "Oi",
+     "to": "Pr",
+     "label": "RADIUS"
+    },
+    {
+     "id": "grip",
+     "kind": "arc",
+     "center": "P1",
+     "from": "Pr",
+     "to": "P2",
+     "label": "GRIP ANGLE"
+    }
+   ],
+   "view": "PLAN",
+   "views": [
+    {
+     "id": "sector",
+     "kind": "detail",
+     "center": [
+      37,
+      0,
+      0
+     ],
+     "scale": 3,
+     "highlight": [
+      "sprags",
+      "P1",
+      "P2"
+     ]
+    }
+   ],
+   "controls": [
+    {
+     "id": "inner-race",
+     "kind": "driver",
+     "driver": "input"
+    }
+   ],
+   "plot": [
+    {
+     "x": "inner-speed",
+     "y": "outer-speed",
+     "label": "OUTER SPEED AGAINST INNER SPEED"
+    },
+    {
+     "x": "input",
+     "y": "outer-angle",
+     "label": "OUTER RACE ANGLE"
+    }
+   ],
+   "claims": [
+    {
+     "text": "here the inner race turns 90° counter-clockwise and back each cycle",
+     "output": "inner-angle",
+     "stat": "range",
+     "value": 90,
+     "tol": 0.1
+    },
+    {
+     "text": "the outer race steps 90° each cycle",
+     "output": "outer-angle",
+     "stat": "range",
+     "value": 90,
+     "tol": 0.1
+    },
+    {
+     "text": "the outer race turns with the inner, 1:1",
+     "output": "lock-ratio",
+     "stat": "max",
+     "value": 1,
+     "tol": 0.001
+    },
+    {
+     "text": "the outer race stays while the inner race turns back",
+     "output": "outer-angle",
+     "stat": "dwell",
+     "value": 180,
+     "tol": 0.5
+    },
+    {
+     "text": "here the grip angle is 4.0° at the inner race",
+     "output": "grip-angle",
+     "stat": "mean",
+     "value": 4,
+     "tol": 0.05
+    }
+   ],
+   "exceptions": []
+  },
+  "edit": {
+   "explain.motion": "Each sprag is a short strut whose diagonal is slightly longer than the gap between the races, tipped toward the drive by a light garter spring. Here the inner race turns 90° counter-clockwise and back each cycle. Turning counter-clockwise, friction stands the sprags up until they wedge across the gap, and the outer race turns with the inner, 1:1. Turning back, the sprags lean and slide on the inner race while the outer race stays: it overruns. So the outer race steps 90° each cycle.",
+   "explain.forces": "Torque goes through all the sprags in compression across the gap, so capacity is high for the size. A sprag locks when its grip angle, between the line of thrust and the radius at the contact, is below the friction angle: tan(grip angle) < mu. Here the grip angle is 4.0° at the inner race, below the friction angle for mu = 0.1.",
+   "topology.notes": "ground, inner race, outer race, and 8 sprags that move as one set (in practice 12 to 30 sprags in a cage with a garter spring); two friction contacts per sprag. The mobility counted from kin is 3: the sprags' place round the races counts as free, while the garter spring and friction carry them with the outer race. The record's 2 are the two races.",
+   "build.defining_relations": "Lock condition: tan(grip angle) < mu (5.7° for mu = 0.1). Gap g = ro - ri = 14. Each sprag's contact arcs, radius rho = 6, are centred at radius ri + rho = 36 and ro - rho = 38, e = 2.16 apart; that fixes its tilt and gives a grip angle of 4.0° at the inner race and 2.7° at the outer (ri sin of the inner angle = ro sin of the outer). The diagonal between the contacts is 14.02 against the gap of 14. Driving: w_outer = w_inner while the inner race turns counter-clockwise; otherwise the outer race is free.",
+   "build.range": "inner race 90° forward then 90° back each cycle; the outer race follows 1:1 on the forward half and stays on the return (overrun), stepping 90° per cycle",
+   "build.notes": "8 large sprags so lock and overrun read, and a detail view of one sector. The drive cycle is timed: the inner race forward (lock), then back (overrun). The tilt change between lock and overrun is a fraction of a degree and is not drawn; the viewer sees the sprags carried with both races, then sliding on the inner one, with marks on both races."
+  }
+ },
+ "lever-escapement": {
+  "kin": {
+   "bodies": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "shape": {
+      "type": "plate",
+      "rect": [
+       120,
+       200
+      ],
+      "bankingPins": 2,
+      "center": [
+       0,
+       60,
+       -10
+      ]
+     },
+     "at": {
+      "frame": {
+       "origin": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "id": "wheel",
+     "role": "output",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 4,
+      "profile": {
+       "kind": "club-teeth",
+       "teeth": 15,
+       "tip": 40,
+       "root": 33,
+       "tooth": [
+        [
+         31.88,
+         -8.54
+        ],
+        [
+         39.98,
+         -1.4
+        ],
+        [
+         38.99,
+         1.02
+        ],
+        [
+         32.99,
+         -0.58
+        ]
+       ],
+       "note": "tooth polygon in the wheel frame, tip at angle 0"
+      }
+     },
+     "at": {
+      "joint": "W"
+     }
+    },
+    {
+     "id": "lever",
+     "role": "pawl",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 4,
+      "profile": {
+       "kind": "pallet-lever",
+       "fork": {
+        "at": 60,
+        "slot": 4.3,
+        "horns": true
+       },
+       "stones": {
+        "entry": [
+         [
+          20.37,
+          -14.25
+         ],
+         [
+          25.17,
+          -11.86
+         ],
+         [
+          22.73,
+          -10.19
+         ],
+         [
+          17.93,
+          -12.58
+         ]
+        ],
+        "exit": [
+         [
+          -21.27,
+          -6.47
+         ],
+         [
+          -16.47,
+          -8.86
+         ],
+         [
+          -19.13,
+          -10.16
+         ],
+         [
+          -23.93,
+          -7.77
+         ]
+        ]
+       },
+       "note": "lever frame: origin on L, y toward B; stones in the wheel's plane"
+      }
+     },
+     "at": {
+      "joint": "L"
+     }
+    },
+    {
+     "id": "balance",
+     "role": "driver",
+     "shape": {
+      "type": "disc",
+      "radius": 50,
+      "rim": 3,
+      "thickness": 3,
+      "roller": {
+       "radius": 20
+      },
+      "pin": {
+       "radius": 2,
+       "at": [
+        0,
+        -16
+       ]
+      },
+      "note": "a thin rim on arms so the fork and pin show"
+     },
+     "at": {
+      "joint": "B"
+     }
+    }
+   ],
+   "joints": [
+    {
+     "id": "W",
+     "type": "revolute",
+     "a": "ground",
+     "b": "wheel",
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "L",
+     "type": "revolute",
+     "a": "ground",
+     "b": "lever",
+     "at": [
+      0,
+      46.19,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ],
+     "limits": [
+      -5.13,
+      5.13
+     ]
+    },
+    {
+     "id": "B",
+     "type": "revolute",
+     "a": "ground",
+     "b": "balance",
+     "at": [
+      0,
+      122.19,
+      0
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ]
+    },
+    {
+     "id": "pallet",
+     "type": "cam-contact",
+     "a": "wheel",
+     "b": "lever",
+     "at": [
+      22.7,
+      34.29,
+      0
+     ],
+     "follower": "flat"
+    },
+    {
+     "id": "fork",
+     "type": "pin-in-slot",
+     "a": "balance",
+     "b": "lever",
+     "at": "IP",
+     "slot": "lever.fork"
+    }
+   ],
+   "params": [
+    {
+     "id": "rw",
+     "value": 40,
+     "unit": "mm",
+     "min": 30,
+     "max": 50,
+     "note": "escape wheel tip radius (bench scale)"
+    },
+    {
+     "id": "dWL",
+     "value": 46.19,
+     "unit": "mm",
+     "min": 40,
+     "max": 55,
+     "note": "wheel to lever pivot, rw / cos 30° (stones 2.5 teeth apart on tangents)"
+    },
+    {
+     "id": "lf",
+     "value": 60,
+     "unit": "mm",
+     "min": 45,
+     "max": 75,
+     "note": "lever pivot to fork"
+    },
+    {
+     "id": "rr",
+     "value": 16,
+     "unit": "mm",
+     "min": 10,
+     "max": 20,
+     "note": "roller radius to the impulse pin"
+    },
+    {
+     "id": "win",
+     "value": 20,
+     "unit": "deg",
+     "min": 15,
+     "max": 30,
+     "note": "balance half-angle for which the pin is in the fork"
+    },
+    {
+     "id": "amp",
+     "value": 270,
+     "unit": "deg",
+     "min": 200,
+     "max": 300,
+     "note": "balance semi-amplitude"
+    }
+   ],
+   "design": [],
+   "drivers": [
+    {
+     "id": "input",
+     "joint": "B",
+     "kind": "oscillating",
+     "range": [
+      -270,
+      270
+     ],
+     "lo": -270,
+     "hi": 270,
+     "default": 0
+    }
+   ],
+   "solve": [
+    {
+     "block": "escapement",
+     "id": "escape",
+     "joints": [
+      "W",
+      "L",
+      "pallet",
+      "fork"
+     ],
+     "in": {
+      "wheel": "wheel",
+      "pallets": "lever",
+      "pivot": "L",
+      "balance": "balance",
+      "pin": "IP",
+      "rr": "rr",
+      "lf": "lf",
+      "win": "win"
+     },
+     "opts": {
+      "kind": "lever",
+      "lever": "follows the pin in the fork while |balance| < win, else rests on its banking (5.13 degrees)",
+      "wheel": "urged forward by the train, held by a stone's locking face, released and driven across the impulse faces, then dropping onto the other stone"
+     },
+     "out": [
+      "lever-turn",
+      "wheel-turn"
+     ]
+    }
+   ],
+   "points": [
+    {
+     "id": "IP",
+     "body": "balance",
+     "local": [
+      0,
+      -16,
+      0
+     ]
+    },
+    {
+     "id": "FK",
+     "body": "lever",
+     "local": [
+      0,
+      60,
+      0
+     ]
+    },
+    {
+     "id": "F1",
+     "body": "ground",
+     "local": [
+      -5.36,
+      105.95,
+      0
+     ]
+    },
+    {
+     "id": "F2",
+     "body": "ground",
+     "local": [
+      5.36,
+      105.95,
+      0
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "id": "balance-angle",
+     "of": "balance",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "lever-angle",
+     "of": "lever",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "wheel-angle",
+     "of": "wheel",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "pin-path",
+     "of": "IP",
+     "kind": "path"
+    }
+   ],
+   "fallback": null
+  },
+  "teaching": {
+   "review": {
+    "verdict": "tweak",
+    "date": "2026-10-20",
+    "note": "Applies the 2026-10-19 review and issue #216. The true ±270° balance swing stays; a time map slows playback 3 times while the balance is within 35° of its centre, so unlock, impulse and drop, about 8% of the cycle, take about a quarter of the playback. Stones, horns, fork and pin are kept clear of hardware (see-through or moved) and the balance is a thin rim. The text now says unlock, impulse, drop: on one beat 4.6° of the 11.8° step is a drop after the lever has banked."
+   },
+   "principle": [
+    {
+     "body": "wheel"
+    },
+    {
+     "body": "lever"
+    },
+    {
+     "body": "balance"
+    },
+    {
+     "point": "IP"
+    },
+    {
+     "point": "FK"
+    }
+   ],
+   "traces": [
+    {
+     "id": "impulse-pin",
+     "point": "IP",
+     "ticks": {
+      "every": 10
+     },
+     "comet": true
+    }
+   ],
+   "overlays": [
+    {
+     "id": "centres",
+     "kind": "line",
+     "from": "W",
+     "to": "B",
+     "label": "LINE OF CENTRES"
+    },
+    {
+     "id": "lift",
+     "kind": "arc",
+     "center": "L",
+     "from": "F1",
+     "to": "F2",
+     "label": "LIFT"
+    }
+   ],
+   "view": "PLAN",
+   "views": [
+    {
+     "id": "stones",
+     "kind": "detail",
+     "center": [
+      0,
+      34,
+      0
+     ],
+     "scale": 2.5,
+     "highlight": [
+      "lever.stones",
+      "wheel"
+     ]
+    }
+   ],
+   "controls": [
+    {
+     "id": "balance",
+     "kind": "driver",
+     "driver": "input"
+    }
+   ],
+   "timeMap": {
+    "feature": "unlock, impulse and drop near the balance's centre (span in balance degrees, both beats)",
+    "slow": 3,
+    "span": [
+     -35,
+     35
+    ]
+   },
+   "plot": [
+    {
+     "x": "input",
+     "y": "wheel-angle",
+     "label": "ESCAPE WHEEL ANGLE"
+    },
+    {
+     "x": "input",
+     "y": "lever-angle",
+     "label": "LEVER ANGLE"
+    }
+   ],
+   "claims": [
+    {
+     "text": "the balance swings freely, ±270° here",
+     "output": "balance-angle",
+     "stat": "range",
+     "value": 540,
+     "tol": 0.5
+    },
+    {
+     "text": "flips the lever 10.3° from one banking pin to the other",
+     "output": "lever-angle",
+     "stat": "range",
+     "value": 10.26,
+     "tol": 0.1
+    },
+    {
+     "text": "the wheel advances 12° per beat, 24° per balance period",
+     "output": "wheel-angle",
+     "stat": "at",
+     "at": 360,
+     "value": 24,
+     "tol": 0.1
+    }
+   ],
+   "exceptions": []
+  },
+  "edit": {
+   "explain.motion": "The balance wheel swings freely under its hairspring, ±270° here. Near the middle of each swing the impulse pin on the balance roller enters the lever fork and flips the lever 10.3° from one banking pin to the other. Each beat then goes unlock, impulse, drop. Unlock: the pin turns the lever and lifts one pallet stone off the tooth it holds. Impulse: the tooth slides across the stone's impulse face and pushes the lever, and the fork pushes the pin. Drop: the wheel runs free until the other stone locks the next tooth. The wheel advances 12° per beat. Then the lever rests against its banking pin while the balance completes its free arc.",
+   "build.range": "balance ±270° continuous oscillation; lever flips ±5.1° once per beat; escape wheel steps about 12° per beat (24° per balance period), part of it a drop after the lever has banked",
+   "build.notes": "Drive by time: the balance angle is a sine, ±270°. The lever is coupled only while the impulse pin is inside the fork (|balance| below 20°); the rest of the time it rests on a banking pin. The wheel moves in three steps each beat: unlock, impulse, drop, the drop partly after the lever has banked. A time map slows playback near the balance's centre so the engagement reads. Scaled up a lot for visibility (wheel radius 40)."
+  }
+ },
+ "verge-escapement": {
+  "kin": {
+   "bodies": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "shape": {
+      "type": "plate",
+      "rect": [
+       200,
+       120
+      ],
+      "posts": "a frame holding the wheel arbor and the verge bearings",
+      "center": [
+       0,
+       0,
+       -5
+      ]
+     },
+     "at": {
+      "frame": {
+       "origin": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "id": "crownWheel",
+     "role": "driver",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "profile": {
+       "kind": "crown",
+       "teeth": 15,
+       "radius": 40,
+       "rim": 5,
+       "toothHeight": 8,
+       "back": 12,
+       "note": "saw teeth on the rim pointing along the axis toward the verge (-y); the steep face leads"
+      }
+     },
+     "at": {
+      "joint": "C"
+     }
+    },
+    {
+     "id": "verge",
+     "role": "output",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "profile": {
+       "kind": "verge",
+       "staff": {
+        "diameter": 4,
+        "from": -50,
+        "to": 80
+       },
+       "upperPallet": {
+        "at": 40,
+        "length": 12,
+        "height": 10,
+        "thickness": 1.5,
+        "angle": 47.5
+       },
+       "lowerPallet": {
+        "at": -40,
+        "length": 12,
+        "height": 10,
+        "thickness": 1.5,
+        "angle": -47.5
+       },
+       "foliot": {
+        "at": 80,
+        "length": 160,
+        "weights": 60
+       },
+       "note": "pallet angles from the +y direction toward +x, at foliot angle 0; the two pallets are 95 degrees apart"
+      }
+     },
+     "at": {
+      "joint": "V"
+     }
+    }
+   ],
+   "joints": [
+    {
+     "id": "C",
+     "type": "revolute",
+     "a": "ground",
+     "b": "crownWheel",
+     "at": [
+      0,
+      0,
+      70
+     ],
+     "axis": [
+      0,
+      1,
+      0
+     ]
+    },
+    {
+     "id": "V",
+     "type": "revolute",
+     "a": "ground",
+     "b": "verge",
+     "at": [
+      0,
+      -14,
+      70
+     ],
+     "axis": [
+      0,
+      0,
+      1
+     ],
+     "limits": [
+      -45,
+      45
+     ]
+    },
+    {
+     "id": "P",
+     "type": "cam-contact",
+     "a": "crownWheel",
+     "b": "verge",
+     "at": [
+      8.85,
+      -5.89,
+      110
+     ],
+     "follower": "flat"
+    }
+   ],
+   "params": [
+    {
+     "id": "N",
+     "value": 15,
+     "unit": "teeth",
+     "min": 11,
+     "max": 21,
+     "note": "crown teeth, odd"
+    },
+    {
+     "id": "R",
+     "value": 40,
+     "unit": "mm",
+     "min": 30,
+     "max": 50,
+     "note": "crown radius"
+    },
+    {
+     "id": "h",
+     "value": 8,
+     "unit": "mm",
+     "min": 6,
+     "max": 10,
+     "note": "tooth height along the axis"
+    },
+    {
+     "id": "reach",
+     "value": 6,
+     "unit": "mm",
+     "min": 4,
+     "max": 7,
+     "note": "how far the pallets reach past the tooth tips (verge axis 6 in front of the tips, pallets 12 long)"
+    },
+    {
+     "id": "lp",
+     "value": 12,
+     "unit": "mm",
+     "min": 10,
+     "max": 14,
+     "note": "pallet length"
+    },
+    {
+     "id": "pal",
+     "value": 95,
+     "unit": "deg",
+     "min": 90,
+     "max": 105,
+     "note": "angle between the pallets"
+    },
+    {
+     "id": "amp",
+     "value": 45,
+     "unit": "deg",
+     "min": 40,
+     "max": 50,
+     "note": "foliot semi-amplitude"
+    },
+    {
+     "id": "Lf",
+     "value": 160,
+     "unit": "mm",
+     "min": 120,
+     "max": 200,
+     "note": "foliot bar length"
+    },
+    {
+     "id": "rw",
+     "value": 60,
+     "unit": "mm",
+     "min": 30,
+     "max": 75,
+     "note": "regulating weight radius"
+    }
+   ],
+   "design": [],
+   "drivers": [
+    {
+     "id": "input",
+     "joint": "V",
+     "kind": "oscillating",
+     "range": [
+      -45,
+      45
+     ],
+     "lo": -45,
+     "hi": 45,
+     "default": 0
+    }
+   ],
+   "solve": [
+    {
+     "block": "escapement",
+     "id": "escape",
+     "joints": [
+      "C",
+      "P"
+     ],
+     "in": {
+      "wheel": "crownWheel",
+      "pallets": "verge",
+      "pivot": "V",
+      "teeth": "N",
+      "radius": "R",
+      "reach": "reach",
+      "lp": "lp",
+      "pal": "pal"
+     },
+     "opts": {
+      "kind": "verge",
+      "pallets": "the upper pallet on the top teeth, the lower on the bottom teeth, which move the other way",
+      "wheel": "urged forward by its train, stopped or pushed back by the pallets (instant drop)"
+     },
+     "out": "wheel-turn"
+    }
+   ],
+   "points": [
+    {
+     "id": "PU",
+     "body": "verge",
+     "local": [
+      8.85,
+      8.11,
+      40
+     ]
+    },
+    {
+     "id": "PL",
+     "body": "verge",
+     "local": [
+      -8.85,
+      8.11,
+      -40
+     ]
+    },
+    {
+     "id": "W1",
+     "body": "verge",
+     "local": [
+      60,
+      0,
+      80
+     ]
+    },
+    {
+     "id": "TT",
+     "body": "crownWheel",
+     "local": [
+      0,
+      -8,
+      40
+     ]
+    },
+    {
+     "id": "VT",
+     "body": "ground",
+     "local": [
+      0,
+      -14,
+      150
+     ]
+    },
+    {
+     "id": "CB",
+     "body": "ground",
+     "local": [
+      0,
+      40,
+      70
+     ]
+    },
+    {
+     "id": "S1",
+     "body": "ground",
+     "local": [
+      56.57,
+      42.57,
+      150
+     ]
+    },
+    {
+     "id": "S2",
+     "body": "ground",
+     "local": [
+      56.57,
+      -70.57,
+      150
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "id": "foliot-angle",
+     "of": "verge",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "wheel-angle",
+     "of": "crownWheel",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "recoil",
+     "of": "crownWheel",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "weight-path",
+     "of": "W1",
+     "kind": "path"
+    }
+   ],
+   "fallback": null
+  },
+  "teaching": {
+   "review": {
+    "verdict": "tweak",
+    "date": "2026-10-20",
+    "note": "New review against the record (unbuilt). The record's picture works: the wheel face toward the viewer and the verge vertical in front of it. Decided: an isometric default view so both pallet planes and the crown teeth read; two section views through the pallet planes, where a top tooth and a bottom tooth cross the verge in opposite directions; the foliot swing set to ±45°, inside the record's 80° to 100°; the verge axis 6 mm in front of the tooth tips. The recoil is the lesson and is large here: about 5.6° every beat, so the wheel visibly runs back. The verge axis meets the wheel axis, so the axes are perpendicular intersecting. Traced: a foliot weight and a tooth tip."
+   },
+   "principle": [
+    {
+     "body": "crownWheel"
+    },
+    {
+     "body": "verge"
+    },
+    {
+     "point": "PU"
+    },
+    {
+     "point": "PL"
+    },
+    {
+     "point": "TT"
+    }
+   ],
+   "traces": [
+    {
+     "id": "foliot-weight",
+     "point": "W1",
+     "ticks": {
+      "every": 15
+     },
+     "comet": true
+    },
+    {
+     "id": "tooth-tip",
+     "point": "TT"
+    }
+   ],
+   "overlays": [
+    {
+     "id": "verge-axis",
+     "kind": "axis-line",
+     "from": "V",
+     "to": "VT",
+     "label": "VERGE AXIS"
+    },
+    {
+     "id": "wheel-axis",
+     "kind": "axis-line",
+     "from": "C",
+     "to": "CB",
+     "label": "WHEEL AXIS"
+    },
+    {
+     "id": "swing",
+     "kind": "arc",
+     "center": "VT",
+     "from": "S1",
+     "to": "S2",
+     "label": "SWING"
+    }
+   ],
+   "view": "ISOMETRIC",
+   "views": [
+    {
+     "id": "U-U",
+     "kind": "section",
+     "plane": {
+      "origin": [
+       0,
+       0,
+       110
+      ],
+      "normal": [
+       0,
+       0,
+       1
+      ]
+     },
+     "highlight": [
+      "verge.upperPallet",
+      "crownWheel",
+      "PU"
+     ]
+    },
+    {
+     "id": "L-L",
+     "kind": "section",
+     "plane": {
+      "origin": [
+       0,
+       0,
+       30
+      ],
+      "normal": [
+       0,
+       0,
+       1
+      ]
+     },
+     "highlight": [
+      "verge.lowerPallet",
+      "crownWheel",
+      "PL"
+     ]
+    }
+   ],
+   "controls": [
+    {
+     "id": "foliot",
+     "kind": "driver",
+     "driver": "input"
+    }
+   ],
+   "plot": [
+    {
+     "x": "input",
+     "y": "foliot-angle",
+     "label": "FOLIOT ANGLE"
+    },
+    {
+     "x": "input",
+     "y": "wheel-angle",
+     "label": "CROWN WHEEL ANGLE"
+    }
+   ],
+   "claims": [
+    {
+     "text": "the foliot swings ±45°",
+     "output": "foliot-angle",
+     "stat": "range",
+     "value": 90,
+     "tol": 0.1
+    },
+    {
+     "text": "the wheel advances one tooth, 24°, per full swing",
+     "output": "wheel-angle",
+     "stat": "at",
+     "at": 360,
+     "value": 24,
+     "tol": 0.1
+    },
+    {
+     "text": "12° per beat",
+     "output": "wheel-angle",
+     "stat": "at",
+     "at": 180,
+     "value": 12,
+     "tol": 0.2
+    },
+    {
+     "text": "pushes the wheel back about 5.6° (the recoil)",
+     "output": "recoil",
+     "stat": "min",
+     "value": 5.6,
+     "tol": 0.3
+    },
+    {
+     "text": "pushes the wheel back about 5.6° (the recoil)",
+     "output": "recoil",
+     "stat": "max",
+     "value": 5.65,
+     "tol": 0.3
+    }
+   ],
+   "exceptions": []
+  },
+  "edit": {
+   "explain.motion": "The crown wheel has saw teeth on its rim, pointing along its axis, and an odd tooth count, 15 here, so a tooth at the top faces a gap at the bottom. The verge is a vertical staff across the wheel face carrying two flag pallets set 95° apart, one at the top of the wheel and one at the bottom, where the teeth move in opposite directions. A top tooth pushes the upper pallet round until it slips off; by then the lower pallet has swung into the path of a bottom tooth, which stops the verge and drives it back. The foliot, a bar with two weights, swings ±45° and the wheel advances one tooth, 24°, per full swing, 12° per beat. After each tooth lands, the foliot's inertia carries the pallet on and pushes the wheel back about 5.6° (the recoil).",
+   "motion.axes": "Perpendicular intersecting",
+   "build.ground": "frame holding the crown wheel arbor horizontal at (0, 0, 70) along y and the verge vertical on the line x = 0, y = -14, 6 mm in front of the tooth tips; the two axes meet",
+   "build.range": "crown wheel advances 24° per foliot cycle, 12° per beat, with a recoil of about 5.6° each beat; foliot swings ±45°",
+   "build.notes": "Spatial: the default view is isometric, the wheel face toward the viewer and the verge vertical in front of it, with section views through the two pallet planes, where a top tooth and a bottom tooth cross the verge in opposite directions. Driven by time: the foliot angle is a sine, ±45°, and the escapement block finds the wheel, urged forward and stopped or pushed back by the pallets. The pallets reach 6 mm past the 8 mm tooth tips."
+  }
+ },
+ "anchor-escapement": {
+  "kin": {
+   "bodies": [
+    {
+     "id": "ground",
+     "role": "ground",
+     "shape": {
+      "type": "plate",
+      "rect": [
+       160,
+       80
+      ],
+      "upright": {
+       "height": 250,
+       "note": "a vertical frame plate behind the wheel carrying E and A"
+      },
+      "center": [
+       0,
+       20,
+       0
+      ]
+     },
+     "at": {
+      "frame": {
+       "origin": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "id": "wheel",
+     "role": "output",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 4,
+      "profile": {
+       "kind": "pointed-teeth",
+       "teeth": 30,
+       "tip": 50,
+       "root": 39.4,
+       "back": 8,
+       "undercut": 1,
+       "note": "pointed teeth, the back slope 8 degrees behind the tip, the face undercut 1 degree"
+      }
+     },
+     "at": {
+      "joint": "E"
+     }
+    },
+    {
+     "id": "anchor",
+     "role": "driver",
+     "shape": {
+      "type": "custom",
+      "op": "extrude",
+      "thickness": 4,
+      "profile": {
+       "kind": "anchor",
+       "pallets": {
+        "entry": [
+         [
+          38,
+          0,
+          -40.02
+         ],
+         [
+          44.77,
+          0,
+          -36.14
+         ],
+         [
+          43.22,
+          0,
+          -34.18
+         ],
+         [
+          36.46,
+          0,
+          -38.06
+         ]
+        ],
+        "exit": [
+         [
+          -28.67,
+          0,
+          -22.76
+         ],
+         [
+          -21.91,
+          0,
+          -26.65
+         ],
+         [
+          -24.1,
+          0,
+          -27.85
+         ],
+         [
+          -30.87,
+          0,
+          -23.97
+         ]
+        ]
+       },
+       "pendulum": {
+        "rod": 200,
+        "bob": 18,
+        "offset": [
+         0,
+         15
+        ],
+        "note": "rod and bob keyed to the anchor arbor, hanging down behind the wheel"
+       },
+       "note": "anchor frame: origin on A, x right, z up; pallets in the wheel's plane"
+      }
+     },
+     "at": {
+      "joint": "A"
+     }
+    }
+   ],
+   "joints": [
+    {
+     "id": "E",
+     "type": "revolute",
+     "a": "ground",
+     "b": "wheel",
+     "at": [
+      0,
+      0,
+      160
+     ],
+     "axis": [
+      0,
+      -1,
+      0
+     ]
+    },
+    {
+     "id": "A",
+     "type": "revolute",
+     "a": "ground",
+     "b": "anchor",
+     "at": [
+      0,
+      0,
+      230.71
+     ],
+     "axis": [
+      0,
+      -1,
+      0
+     ],
+     "limits": [
+      -7,
+      7
+     ]
+    },
+    {
+     "id": "P",
+     "type": "cam-contact",
+     "a": "wheel",
+     "b": "anchor",
+     "at": [
+      41.39,
+      0,
+      192.63
+     ],
+     "follower": "flat"
+    }
+   ],
+   "params": [
+    {
+     "id": "N",
+     "value": 30,
+     "unit": "teeth",
+     "min": 20,
+     "max": 40,
+     "note": "escape wheel teeth"
+    },
+    {
+     "id": "r",
+     "value": 50,
+     "unit": "mm",
+     "min": 40,
+     "max": 60,
+     "note": "tip radius"
+    },
+    {
+     "id": "rRoot",
+     "value": 39.4,
+     "unit": "mm",
+     "min": 36,
+     "max": 46,
+     "note": "root radius (deep teeth so the pallets can go in at ±7°)"
+    },
+    {
+     "id": "d",
+     "value": 70.71,
+     "unit": "mm",
+     "min": 60,
+     "max": 80,
+     "note": "wheel to anchor arbor, r / cos 45°"
+    },
+    {
+     "id": "amp",
+     "value": 7,
+     "unit": "deg",
+     "min": 6,
+     "max": 8,
+     "note": "pendulum semi-amplitude (exaggerated for teaching)"
+    },
+    {
+     "id": "gamma",
+     "value": 15.15,
+     "unit": "deg",
+     "min": 15,
+     "max": 45,
+     "note": "pallet face turned off the line that would hold the wheel dead; sets lift and recoil"
+    },
+    {
+     "id": "Lshow",
+     "value": 200,
+     "unit": "mm",
+     "min": 150,
+     "max": 220,
+     "note": "shown pendulum, arbor to bob centre (stands for the 994 mm seconds pendulum)"
+    }
+   ],
+   "design": [],
+   "drivers": [
+    {
+     "id": "input",
+     "joint": "A",
+     "kind": "oscillating",
+     "range": [
+      -7,
+      7
+     ],
+     "lo": -7,
+     "hi": 7,
+     "default": 0
+    }
+   ],
+   "solve": [
+    {
+     "block": "escapement",
+     "id": "escape",
+     "joints": [
+      "E",
+      "P"
+     ],
+     "in": {
+      "wheel": "wheel",
+      "pallets": "anchor",
+      "pivot": "A",
+      "teeth": "N",
+      "tip": "r",
+      "root": "rRoot"
+     },
+     "opts": {
+      "kind": "anchor (recoil)",
+      "wheel": "urged forward by the train, stopped by a pallet, pushed back where a pallet moves into a tooth (instant drop)"
+     },
+     "out": "wheel-turn"
+    }
+   ],
+   "points": [
+    {
+     "id": "B",
+     "body": "anchor",
+     "local": [
+      0,
+      15,
+      -200
+     ]
+    },
+    {
+     "id": "P1c",
+     "body": "anchor",
+     "local": [
+      41.39,
+      0,
+      -38.08
+     ]
+    },
+    {
+     "id": "P2c",
+     "body": "anchor",
+     "local": [
+      -25.29,
+      0,
+      -24.7
+     ]
+    },
+    {
+     "id": "TT",
+     "body": "wheel",
+     "local": [
+      0,
+      0,
+      50
+     ]
+    },
+    {
+     "id": "S1",
+     "body": "ground",
+     "local": [
+      24.37,
+      15,
+      32.2
+     ]
+    },
+    {
+     "id": "S2",
+     "body": "ground",
+     "local": [
+      -24.37,
+      15,
+      32.2
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "id": "anchor-angle",
+     "of": "anchor",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "wheel-angle",
+     "of": "wheel",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "recoil",
+     "of": "wheel",
+     "kind": "angle",
+     "unit": "deg"
+    },
+    {
+     "id": "bob-path",
+     "of": "B",
+     "kind": "path"
+    }
+   ],
+   "fallback": null
+  },
+  "teaching": {
+   "review": {
+    "verdict": "tweak",
+    "date": "2026-10-20",
+    "note": "Applies the 2026-10-19 review and issue #216. The pendulum hangs down past the wheel in a vertical plane and the default view is the front elevation. The swing is ±7° (from ±3°), so the pallets travel several mm; the pallets are re-fitted on the 30-tooth wheel (deeper teeth, root 39.4, faces turned 15.15°) so each beat releases half a tooth and the recoil is 1.8° on one pallet and 2° on the other, at least 1.5° on both. Ticks fall 181.9° and 178.1° of the period apart. The pallets sit at 38.25° and 118.8° about the wheel centre, so both drops fall at mid-swing (in beat). The bob is traced; the line of centres and the arbor-to-pallet lines are drawn as construction."
+   },
+   "principle": [
+    {
+     "body": "wheel"
+    },
+    {
+     "body": "anchor"
+    },
+    {
+     "point": "P1c"
+    },
+    {
+     "point": "P2c"
+    },
+    {
+     "point": "B"
+    }
+   ],
+   "traces": [
+    {
+     "id": "bob",
+     "point": "B",
+     "ticks": {
+      "every": 15
+     },
+     "comet": true
+    },
+    {
+     "id": "tooth-tip",
+     "point": "TT"
+    }
+   ],
+   "overlays": [
+    {
+     "id": "centres",
+     "kind": "line",
+     "from": "E",
+     "to": "A",
+     "label": "LINE OF CENTRES"
+    },
+    {
+     "id": "arm-entry",
+     "kind": "line",
+     "from": "A",
+     "to": "P1c",
+     "label": "ENTRY PALLET"
+    },
+    {
+     "id": "arm-exit",
+     "kind": "line",
+     "from": "A",
+     "to": "P2c",
+     "label": "EXIT PALLET"
+    },
+    {
+     "id": "tip-circle",
+     "kind": "circle",
+     "center": "E",
+     "radius": 50,
+     "label": "TIP CIRCLE"
+    },
+    {
+     "id": "swing",
+     "kind": "arc",
+     "center": "A",
+     "from": "S1",
+     "to": "S2",
+     "label": "SWING"
+    }
+   ],
+   "view": "FRONT",
+   "controls": [
+    {
+     "id": "pendulum",
+     "kind": "driver",
+     "driver": "input"
+    }
+   ],
+   "plot": [
+    {
+     "x": "input",
+     "y": "wheel-angle",
+     "label": "ESCAPE WHEEL ANGLE"
+    },
+    {
+     "x": "input",
+     "y": "anchor-angle",
+     "label": "PENDULUM ANGLE"
+    }
+   ],
+   "claims": [
+    {
+     "text": "the pendulum swings ±7° here",
+     "output": "anchor-angle",
+     "stat": "range",
+     "value": 14,
+     "tol": 0.05
+    },
+    {
+     "text": "each swing releases half a tooth, 6°",
+     "output": "wheel-angle",
+     "stat": "at",
+     "at": 180,
+     "value": 6.04,
+     "tol": 0.25
+    },
+    {
+     "text": "the wheel advances one tooth, 12°, per full period",
+     "output": "wheel-angle",
+     "stat": "at",
+     "at": 360,
+     "value": 12,
+     "tol": 0.05
+    },
+    {
+     "text": "pushing the wheel back about 1.9° on each pallet",
+     "output": "recoil",
+     "stat": "min",
+     "value": 1.8,
+     "tol": 0.2
+    },
+    {
+     "text": "pushing the wheel back about 1.9° on each pallet",
+     "output": "recoil",
+     "stat": "max",
+     "value": 2,
+     "tol": 0.2
+    }
+   ],
+   "exceptions": []
+  },
+  "edit": {
+   "explain.motion": "The train turns the escape wheel, but one of the two pallets of the anchor always blocks a tooth. The pendulum hangs below the anchor and swings ±7° here; as it swings, the anchor rocks on its arbor and lifts one pallet clear, and the wheel jumps forward until a tooth drops onto the other pallet. Each swing releases half a tooth, 6°, so the wheel advances one tooth, 12°, per full period. In the recoil form the pallet keeps moving into the wheel after the tooth has landed, pushing the wheel back about 1.9° on each pallet as the pendulum completes its swing.",
+   "build.range": "pendulum ±7° (simple harmonic; exaggerated from the usual ±3° so the pallets travel several mm); anchor follows the pendulum; escape wheel steps 6° per beat with a recoil of 1.8° and 2° on the two pallets",
+   "build.defining_relations": "Pendulum period T = 2 pi sqrt(L/g), T = 2 s for L = 994 mm; wheel advances 360/N = 12° per period (one tooth per two beats); d = r / cos(45°) = 70.71 (the tangent layout); the pallet faces are centred at 38.25° and 118.8° about E, so both beats release at mid-swing and step 6° each; the faces turned 15.15° off the line that would hold the wheel dead give the lift and the recoil; lift smaller than the amplitude, so each pallet locks, recoils, then gives impulse.",
+   "build.notes": "Front elevation: the escapement in a vertical plane, the pendulum hanging down from A past the wheel (behind it), shown 200 mm long for the 994 mm rod. Animate on time: phi = amp sin(2 pi t / T), ±7°. The wheel is found by the escapement block (instant drop): locked except near mid-swing, then a drop, then the recoil as the pallet goes in. Teeth deepened to root 39.4 so the pallets can go in at the larger swing."
+  }
+ }
+}
