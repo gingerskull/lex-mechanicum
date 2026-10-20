@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { chromium } from "playwright-core";
 import { recordById } from "../../src/catalog";
-import { buildPackage2 } from "../../src/package/build2";
+import { buildAnyPackage } from "../../src/package/any";
 import { encode } from "../../src/package/format";
 import { encode2 } from "../../src/package/format2";
 import { FONT_FILES } from "../tokens-css";
@@ -46,9 +46,10 @@ export async function buildPage(out: string, ids: string[]): Promise<string> {
   });
   for (const f of FONT_FILES) copyFileSync(join(dirname(require.resolve(`@fontsource/${f.slug}/package.json`)), "files", `${f.slug}-latin-${f.weight}-normal.woff2`), join(out, "fonts", f.file));
   for (const id of ids) {
-    const b = await buildPackage2(id);
+    const b = await buildAnyPackage(id);
     writeFileSync(join(out, "packages", `${id}.mx2`), await encode2(b.pkg));
-    writeFileSync(join(out, "packages", `${id}.mxp`), await encode(b.built.pkg));
+    // a mechanism rebuilt on engine v3 has no 2.5D package to set beside it
+    if (b.v1) writeFileSync(join(out, "packages", `${id}.mxp`), await encode(b.v1));
     const rec = recordById(id) as unknown as { name?: string; kin?: unknown; teaching?: unknown } | undefined;
     writeFileSync(join(out, "meta", `${id}.json`), JSON.stringify({ name: rec?.name ?? id, teaching: rec?.teaching ?? null, kin: rec?.kin ?? null }));
   }

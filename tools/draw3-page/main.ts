@@ -1,6 +1,7 @@
 // The drawing page of the 3D renderer: tools/chrome3.ts loads it in local Chrome and calls the functions it puts on
 // window (shot, bench, lose). Packages (v2) and the records' teaching and kin blocks come from the page's server; every
 // drawing on the page shares one GPU context, as on the site.
+import { compose, differ } from "../page-image";
 import type { Kin, Teaching } from "../../src/catalog/kin";
 import { Kinematics } from "../../src/kin/compose";
 import type { Controls, Kin as KinLib } from "../../src/kin/types";
@@ -225,7 +226,7 @@ async function seeThrough(id: string, o: Draw3Options): Promise<string[]> {
   return out;
 }
 
-const api = { shot, lose, bench, gpu, seeThrough };
+const api = { shot, lose, bench, gpu, seeThrough, differ, compose };
 export type Draw3Page = typeof api;
 Object.assign(window, { draw3: api });
 void Promise.all([...document.fonts].map((f) => f.load())).then(

@@ -6,7 +6,7 @@ import { edgeDist } from "../core/poly";
 import type { Mat4 } from "../solids/frame";
 import { manifold, meshOf } from "../solids/manifold";
 import type { Solid3, Vec3 } from "../solids/types";
-import { boxOfMesh, matClose, obbMeet, obbOf, type Box, type Placer, withScale } from "./clash3";
+import { localBox, matClose, obbMeet, obbOf, type Box, type Placer, withScale } from "./clash3";
 
 type Wasm = Awaited<ReturnType<typeof manifold>>;
 type Mf = InstanceType<Wasm["Manifold"]>;
@@ -39,15 +39,16 @@ function radial(pts: Vec3[], m: Mat4): number {
 }
 
 /**
- * The face contact of a posed solid with a posed ground solid: they do not interpenetrate, but the first nudged by a
- * probe along its own axis overlaps it by a patch of more than `MIN_PATCH`. Returns the patch's points
+ * The face contact of a posed solid with a posed ground solid: they do not interpenetrate (that is A15's finding, and a
+ * fit by design is not a face contact), but the first nudged by a probe along its own axis overlaps it by a patch of more
+ * than `MIN_PATCH`. Returns the patch's points
  * (for the bearing-race test), or null when they do not touch face to face.
  */
 function patchOf(A: Mf, B: Mf, ma: Mat4): Vec3[] | null {
   const now = A.intersect(B);
   const deep = now.volume();
   now.delete();
-  if (deep > MIN_PATCH * TOUCH) return null; // interpenetrating: A15's finding, not a face contact
+  if (deep > MIN_PATCH * TOUCH) return null;
   // only faces across the turning part's own axis clamp it: a slide's side against its gib is the designed sliding face
   {
     const u = axisOf(ma, 2);
@@ -78,30 +79,32 @@ export async function clampCheck3(solids: Solid3[], placer: Placer, n = 12): Pro
   // a stretched member (a belt) changes length, not place: it is as fixed as its seat
   const rigid: Mat4[][] = phases.map((u) => S.map((s) => placer.place(s, u)));
   const moving = S.map((_, i) => rigid.some((row) => !matClose(row[i]!, rigid[0]![i]!)));
-  const local: Box[] = [];
-  const base: (Mf | null)[] = S.map((s, i) => {
+  const local: (Box | null)[] = S.map((s) => localBox(M, s));
+  const base: (Mf | null | undefined)[] = S.map((_, i) => (local[i] ? undefined : null));
+  const baseOf = (i: number): Mf | null => {
+    if (base[i] !== undefined) return base[i]!;
     try {
-      const m = meshOf(M, s);
-      local[i] = boxOfMesh(m.pos);
-      return M.Manifold.ofMesh(new M.Mesh({ numProp: 3, vertProperties: m.pos, triVerts: m.tri }));
+      const m = meshOf(M, S[i]!);
+      base[i] = M.Manifold.ofMesh(new M.Mesh({ numProp: 3, vertProperties: m.pos, triVerts: m.tri }));
     } catch {
-      local[i] = [0, 0, 0, 0, 0, 0];
-      return null;
+      base[i] = null;
     }
-  });
+    return base[i]!;
+  };
   const out = new Set<string>();
   for (let p = 0; p < n; p++) {
-    const obb = S.map((_, i) => obbOf(local[i]!, mats[p]![i]!));
+    const obb = S.map((_, i) => (local[i] ? obbOf(local[i]!, mats[p]![i]!) : null));
     for (let r = 0; r < S.length; r++) {
       const R = S[r]!;
-      if (!moving[r] || SLIDING.has(R.kind) || !base[r]) continue;
+      if (!moving[r] || SLIDING.has(R.kind) || !local[r]) continue;
       for (let g = 0; g < S.length; g++) {
         const G = S[g]!;
-        if (moving[g] || SLIDING.has(G.kind) || !base[g]) continue;
+        if (moving[g] || SLIDING.has(G.kind) || !local[g]) continue;
         const key = `${R.id} (turning) touches the ground face of ${G.id}`;
         if (out.has(key) || !obbMeet(obb[r]!, obb[g]!, -TOUCH)) continue;
-        const A = base[r]!.transform(mats[p]![r]!);
-        const B = base[g]!.transform(mats[p]![g]!);
+        if (!baseOf(r) || !baseOf(g)) continue;
+        const A = baseOf(r)!.transform(mats[p]![r]!);
+        const B = baseOf(g)!.transform(mats[p]![g]!);
         const patch = patchOf(A, B, mats[p]![r]!);
         A.delete();
         B.delete();

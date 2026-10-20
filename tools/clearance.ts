@@ -1,4 +1,4 @@
-// npx tsx tools/clearance.ts <id | all> [--2d | --3d | --v3 | --both] [--ci | --full] [--no-cache] [--inject <solid>,<dz>]
+// npx tsx tools/clearance.ts <id | all | changed> [--2d | --3d | --v3 | --both] [--ci | --full] [--no-cache] [--inject <solid>,<dz>]
 // A15, A12 and M6 over the full cycle (standard Q2). Two engines live side by side until the cut-over:
 //   --2d   the 2.5D mechanism's own check on its outlines (default for a mechanism audited below 3.0);
 //   --3d   the same mechanism's solids lifted to 3D and tested with Manifold, penetration depth against 0.1 mm,
@@ -7,7 +7,11 @@
 //   --both the 2.5D check and the lifted 3D check.
 // --ci samples 8 phases and skips the `allow` audit; --full (the default) samples 72. Results are cached on the solids
 // and poses (dist/cache/checks3); --no-cache recomputes. --inject moves one solid along its local z by dz mm, to see a
-// clash found. Exits non-zero on a clash, clamp or edge-distance fault.
+// clash found. Exits non-zero on a clash, clamp or edge-distance fault, or (full profile) an unnecessary `allow`.
+// `changed` is the pre-push selection (the workflow's check table): the mechanisms whose folder changed since the branch's
+// upstream, and every mechanism when code outside src/mechanisms changed; a 2.5D mechanism gets its own cheap check, one
+// rebuilt on engine v3 the full 72-phase 3D check, which the CI profile only samples.
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { assemble } from "../src/assemble";
 import type { Polish } from "../src/assemble/api";
@@ -67,13 +71,40 @@ export async function report3(id: string, src: CheckSource, o: { profile: "ci" |
   return { lines, clashes: clashes.length, faults: r.clamp.length + r.edges.length + (r.profile === "full" ? unnecessary.length : 0) };
 }
 
+/** The mechanisms a push changes: see the header. */
+export function changedIds(base?: string): string[] {
+  const git = (...a: string[]) => execFileSync("git", a, { encoding: "utf8" }).trim();
+  let ref = base;
+  if (!ref) {
+    for (const r of ["@{upstream}", "origin/main"]) {
+      try {
+        ref = git("merge-base", "HEAD", r);
+        break;
+      } catch {
+        // no such ref
+      }
+    }
+  }
+  if (!ref) return allIds();
+  const files = git("diff", "--name-only", ref).split("\n").filter(Boolean);
+  const ids = new Set<string>();
+  for (const f of files) {
+    const m = /^src\/mechanisms\/([a-z0-9-]+)\//.exec(f);
+    if (m) ids.add(m[1]!);
+    else if (/^(src|tools)\//.test(f) || f === "package.json") return allIds();
+    else if (f.startsWith("data/catalog/")) allIds().filter((id) => engineOf(id) === "v3").forEach((id) => ids.add(id));
+  }
+  return [...ids].filter(isKnown);
+}
+
 async function main() {
   const flags = new Set(process.argv.slice(2).filter((a) => a.startsWith("--")));
   const inj = process.argv.indexOf("--inject");
   const inject = inj > 0 ? ((): [string, number] => { const [a, b] = process.argv[inj + 1]!.split(","); return [a!, Number(b)]; })() : undefined;
   const args = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && all[i - 1] !== "--inject");
   const arg = args[0] ?? "all";
-  const ids = arg === "all" ? allIds() : [arg];
+  const ids = arg === "all" ? allIds() : arg === "changed" ? changedIds() : [arg];
+  if (arg === "changed" && !ids.length) console.log("clearance: no mechanism changed");
   const profile = flags.has("--ci") ? "ci" : "full";
   let bad = 0;
   for (const id of ids) {

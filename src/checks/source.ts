@@ -7,7 +7,8 @@ import type { Assembly as Assembly2 } from "../assemble";
 import { buildAssembly, type Assembly as Assembly3, type Polish } from "../builder";
 import { makePoseSource } from "../builder/poses";
 import { xfMat } from "../builder/sweeps";
-import { buildPackage, type Built } from "../package/build";
+import { buildPackage } from "../package/build";
+import type { MechanismModel } from "../model/types";
 import { planeMatrix } from "../render/v3/poser";
 import { IDENTITY, mat4, type Mat4 } from "../solids/frame";
 import { liftAll } from "../solids/lift";
@@ -25,8 +26,8 @@ export interface CheckSource {
   placer: Placer;
   /** Body pairs that touch by design. */
   contact: [string, string][];
-  /** Poses of every body at a phase (the builder's kin), for the solid checks that need none this is unused. */
-  built?: Built;
+  /** The 2.5D build a lifted source came from. */
+  v1?: { model: MechanismModel; assembly: Assembly2 };
   assembly3?: Assembly3;
   kin?: Kin;
 }
@@ -39,8 +40,7 @@ const mul = (a: Mat4, b: Mat4): Mat4 => {
 };
 
 /** A registered 2.5D mechanism's lifted solids and a placer that poses them with today's model. */
-export function legacySource(built: Built): CheckSource {
-  const { model, assembly } = built;
+export function legacySource(id: string, model: MechanismModel, assembly: Assembly2): CheckSource {
   const parts = indexParts(model);
   const v1 = new Map(assembly.solids.map((s) => [s.id, s]));
   const solids = liftAll(assembly.solids);
@@ -84,11 +84,12 @@ export function legacySource(built: Built): CheckSource {
     ...(model.meshes ?? []).map((m): [string, string] => [m.a, m.b]),
     ...(model.compliant ?? []).flatMap((c): [string, string][] => [[c.neck, c.lever], [c.neck, c.ground]]),
   ];
-  return { id: built.pkg.id, engine: "2.5D lifted", solids, placer, contact, built };
+  return { id, engine: "2.5D lifted", solids, placer, contact, v1: { model, assembly } };
 }
 
 export async function legacySourceOf(id: string, opts: { polish?: boolean } = {}): Promise<CheckSource> {
-  return legacySource(await buildPackage(id, opts));
+  const b = await buildPackage(id, opts);
+  return legacySource(id, b.model, b.assembly);
 }
 
 /** Joint types whose two bodies touch by design (teeth, a cam's flank, a belt on its pulley, a thread). */

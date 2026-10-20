@@ -2,11 +2,12 @@
 // Manifold at sampled phases, after a world-box filter, and judged by penetration depth (2 x volume / area of the
 // intersection) against the clash tolerance, so a shaft in its own faceted bore is not a clash. A hand `allow` names
 // a pair and is reported unnecessary when the pair does not overlap at any phase. Build time, Node only.
-import { type Mat4, mat4 } from "../solids/frame";
+import type { Mat4 } from "../solids/frame";
 import { manifold, meshOf } from "../solids/manifold";
-import type { Solid3 } from "../solids/types";
+import { tessellate } from "../solids/tessellate";
+import { isPlain, type Solid3 } from "../solids/types";
 
-type Wasm = Awaited<ReturnType<typeof manifold>>;
+export type Wasm = Awaited<ReturnType<typeof manifold>>;
 type Mf = InstanceType<Wasm["Manifold"]>;
 
 /** Penetration below this is touching, not clashing (faceting sag is 0.025 mm, `FACET_TOL`), mm. */
@@ -80,6 +81,23 @@ export const boxOfMesh = (pos: Float32Array): Box => {
 };
 
 /** The world box of a local box under a column-major matrix. */
+/**
+ * The box of a solid in its own frame, without a boolean where it can be avoided: a plain solid is its outline's sweep
+ * (holes lie inside it), anything else is meshed. Null when the solid cannot be meshed (the SOLID check's finding).
+ */
+export function localBox(M: Wasm, s: Solid3): Box | null {
+  try {
+    if (isPlain(s)) return boxOfMesh(tessellate({ outer: s.profile.outer, holes: [] }, s.op).pos);
+  } catch {
+    // fall through to Manifold
+  }
+  try {
+    return boxOfMesh(meshOf(M, s).pos);
+  } catch {
+    return null;
+  }
+}
+
 export function worldBox(b: Box, m: Mat4): Box {
   const out: Box = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
   for (let i = 0; i < 8; i++) {
@@ -150,6 +168,50 @@ export function obbMeet(A: Obb, B: Obb, tol: number): boolean {
   return true;
 }
 
+/** The inverse of a rigid column-major matrix (orthonormal columns). */
+export function rigidInverse(m: Mat4): Mat4 {
+  const r = [m[0]!, m[4]!, m[8]!, m[1]!, m[5]!, m[9]!, m[2]!, m[6]!, m[10]!];
+  const t = [-(r[0]! * m[12]! + r[1]! * m[13]! + r[2]! * m[14]!), -(r[3]! * m[12]! + r[4]! * m[13]! + r[5]! * m[14]!), -(r[6]! * m[12]! + r[7]! * m[13]! + r[8]! * m[14]!)];
+  return [r[0]!, r[3]!, r[6]!, 0, r[1]!, r[4]!, r[7]!, 0, r[2]!, r[5]!, r[8]!, 0, t[0]!, t[1]!, t[2]!, 1];
+}
+
+export function matMul(a: Mat4, b: Mat4): Mat4 {
+  const o = new Array<number>(16).fill(0);
+  for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) o[c * 4 + r]! += a[k * 4 + r]! * b[c * 4 + k]!;
+  return o as Mat4;
+}
+
+/** True when the matrix is a turn about the z axis through the origin and nothing else. */
+export function isTurnAboutZ(d: Mat4, eps = 1e-6): boolean {
+  return Math.abs(d[2]!) < eps && Math.abs(d[6]!) < eps && Math.abs(d[8]!) < eps && Math.abs(d[9]!) < eps && Math.abs(d[10]! - 1) < eps && Math.abs(d[12]!) < eps && Math.abs(d[13]!) < eps && Math.abs(d[14]!) < eps;
+}
+
+/**
+ * A solid that a turn about its own z axis leaves as it is (to within its facets): a revolution, or a plain extrusion of
+ * regular polygons centred on the axis (a shaft, a washer, a bearing, a disc). The check reuses a pair's result when the
+ * pair's relative pose changes by such a turn only.
+ */
+export function axisymmetric(s: Solid3): boolean {
+  if (!isPlain(s) || s.stretch || s.deform) return false;
+  if (s.op.op === "revolve") return true;
+  if (s.op.op !== "extrude" || s.op.twist) return false;
+  const rings = [s.profile.outer, ...s.profile.holes];
+  return rings.every((r) => {
+    const n = r.length;
+    if (n < 12) return false;
+    const R = Math.hypot(r[0]![0], r[0]![1]);
+    if (R < 1e-6) return false;
+    for (let i = 0; i < n; i++) {
+      const a = r[i]!;
+      if (Math.abs(Math.hypot(a[0], a[1]) - R) > 1e-3 * R) return false;
+      const b = r[(i + 1) % n]!;
+      const turn = Math.atan2(a[0] * b[1] - a[1] * b[0], a[0] * b[0] + a[1] * b[1]);
+      if (Math.abs(Math.abs(turn) - (2 * Math.PI) / n) > 1e-3) return false;
+    }
+    return true;
+  });
+}
+
 export const matClose = (a: Mat4, b: Mat4): boolean => {
   for (let i = 0; i < 16; i++) if (Math.abs(a[i]! - b[i]!) > 1e-7) return false;
   return true;
@@ -157,20 +219,8 @@ export const matClose = (a: Mat4, b: Mat4): boolean => {
 
 /** The relative matrix inverse(A) * B of two rigid transforms is constant over the phases: they move as one. */
 function sameMotion(mats: Mat4[][], i: number, j: number): boolean {
-  // compare A_p^-1 B_p with A_0^-1 B_0 through A_0 A_p^-1 B_p = B_0 (rigid, so a product test needs no inverse of B)
-  const inv = (m: Mat4): Mat4 => {
-    // rigid inverse of a column-major matrix with orthonormal columns (any scale along x is applied separately)
-    const r = [m[0]!, m[4]!, m[8]!, m[1]!, m[5]!, m[9]!, m[2]!, m[6]!, m[10]!];
-    const t = [-(r[0]! * m[12]! + r[1]! * m[13]! + r[2]! * m[14]!), -(r[3]! * m[12]! + r[4]! * m[13]! + r[5]! * m[14]!), -(r[6]! * m[12]! + r[7]! * m[13]! + r[8]! * m[14]!)];
-    return [r[0]!, r[3]!, r[6]!, 0, r[1]!, r[4]!, r[7]!, 0, r[2]!, r[5]!, r[8]!, 0, t[0]!, t[1]!, t[2]!, 1];
-  };
-  const mul = (a: Mat4, b: Mat4): Mat4 => {
-    const o = new Array<number>(16).fill(0);
-    for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) for (let k = 0; k < 4; k++) o[c * 4 + r]! += a[k * 4 + r]! * b[c * 4 + k]!;
-    return o as Mat4;
-  };
-  const rel0 = mul(inv(mats[0]![i]!), mats[0]![j]!);
-  for (let p = 1; p < mats.length; p++) if (!matClose(mul(inv(mats[p]![i]!), mats[p]![j]!), rel0)) return false;
+  const rel0 = matMul(rigidInverse(mats[0]![i]!), mats[0]![j]!);
+  for (let p = 1; p < mats.length; p++) if (!matClose(matMul(rigidInverse(mats[p]![i]!), mats[p]![j]!), rel0)) return false;
   return true;
 }
 
@@ -186,19 +236,20 @@ export async function clearance3(solids: ClashSolid[], placer: Placer, opts: Cla
   const tol = opts.tol ?? CLASH_TOL;
   const M = await manifold();
   const S = solids.filter((s) => !s.flags.faint && s.role !== "trace" && !opts.skip?.(s));
-  const base: (Mf | null)[] = [];
-  const local: Box[] = [];
-  for (const s of S) {
+  // the local boxes are cheap; a solid's Manifold is made when a pair first needs it
+  const local: (Box | null)[] = S.map((s) => localBox(M, s));
+  const base: (Mf | null | undefined)[] = S.map((_, i) => (local[i] ? undefined : null));
+  const baseOf = (i: number): Mf | null => {
+    if (base[i] !== undefined) return base[i]!;
     try {
-      const m = meshOf(M, s);
-      base.push(M.Manifold.ofMesh(new M.Mesh({ numProp: 3, vertProperties: m.pos, triVerts: m.tri })));
-      local.push(boxOfMesh(m.pos));
+      const m = meshOf(M, S[i]!);
+      base[i] = M.Manifold.ofMesh(new M.Mesh({ numProp: 3, vertProperties: m.pos, triVerts: m.tri }));
     } catch {
       // a solid Manifold would not mesh is the SOLID check's finding, not a clash
-      base.push(null);
-      local.push([0, 0, 0, 0, 0, 0]);
+      base[i] = null;
     }
-  }
+    return base[i]!;
+  };
   const phases = Array.from({ length: N }, (_, i) => (i / N) * Math.PI * 2);
   const rigid: Mat4[][] = phases.map((u) => S.map((s) => placer.place(s, u)));
   const mats: Mat4[][] = phases.map((u, p) => S.map((s, i) => withScale(rigid[p]![i]!, placer.stretch?.(s, u) ?? 1)));
@@ -227,7 +278,7 @@ export async function clearance3(solids: ClashSolid[], placer: Placer, opts: Cla
     for (let k = i + 1; k < S.length; k++) {
       const a = S[i]!;
       const b = S[k]!;
-      if (!base[i] || !base[k]) continue;
+      if (!local[i] || !local[k]) continue;
       const allowed = !!(a.allow?.includes(b.id) || b.allow?.includes(a.id));
       if (allowed && opts.allowCheck === false) continue;
       if (allowed) allowPairs.set(`${i}|${k}`, { a: a.id, b: b.id, why: (a.allow?.includes(b.id) ? a.why : b.why) || a.why || b.why || "", depth: 0 });
@@ -238,11 +289,14 @@ export async function clearance3(solids: ClashSolid[], placer: Placer, opts: Cla
       pairs.push([i, k, moves]);
     }
 
+  // pairs where one solid is a body of revolution: the result is reused when the relative pose only turns about its axis
+  const sym = S.map(axisymmetric);
+  const seen = new Map<string, Mat4[]>();
   const worst = new Map<string, Clash3>();
   let boxHits = 0;
   let inter = 0;
   for (let p = 0; p < N; p++) {
-    const wb = S.map((_, i) => (base[i] ? worldBox(local[i]!, mats[p]![i]!) : null));
+    const wb = S.map((_, i) => (local[i] ? worldBox(local[i]!, mats[p]![i]!) : null));
     const ob = new Map<number, Obb>();
     const obb = (i: number): Obb => {
       let o = ob.get(i);
@@ -253,7 +307,7 @@ export async function clearance3(solids: ClashSolid[], placer: Placer, opts: Cla
     const at = (i: number): Mf => {
       let m = posed.get(i);
       if (!m) {
-        m = base[i]!.transform(mats[p]![i]!);
+        m = baseOf(i)!.transform(mats[p]![i]!);
         posed.set(i, m);
       }
       return m;
@@ -264,7 +318,17 @@ export async function clearance3(solids: ClashSolid[], placer: Placer, opts: Cla
       const al = allowPairs.get(`${i}|${k}`);
       // a hand exemption already shown necessary is not tested again
       if (al && al.depth > tol) continue;
+      if ((sym[i] || sym[k]) && !S[i]!.stretch && !S[k]!.stretch) {
+        // T is the pose of k in the frame of i; a turn of i about its axis (left) or of k about its axis (right) is no change
+        const T = matMul(rigidInverse(rigid[p]![i]!), rigid[p]![k]!);
+        const key = `${i}|${k}`;
+        const list = seen.get(key) ?? [];
+        if (list.some((q) => (sym[i] && isTurnAboutZ(matMul(T, rigidInverse(q)))) || (sym[k] && isTurnAboutZ(matMul(rigidInverse(q), T))))) continue;
+        list.push(T);
+        seen.set(key, list);
+      }
       boxHits++;
+      if (!baseOf(i) || !baseOf(k)) continue;
       const x = at(i).intersect(at(k));
       inter++;
       const vol = x.volume();

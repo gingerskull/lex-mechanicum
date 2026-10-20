@@ -9,10 +9,14 @@
 // given), ready to publish and open on a phone; `--v2 [id ...]` builds it, opens it in local Chrome and runs it, printing
 // the page's report (setup split into decode, tessellate, edges and GPU, frame time per view and dial position, today's
 // renderer beside it) and writing dist/bench/report-v2.md and report-v2.json.
+//
+// A mechanism rebuilt on engine v3 has no 2.5D renderer to set beside it, so naming one (or --v3) runs the v2 page with
+// today's renderer left out: setup split into decode, tessellate, edges and GPU, and frame time paced and with a GPU wait,
+// against the targets of R6 (8 ms desktop frame, 20 ms setup), reported as flags, never as failures.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { mechanisms } from "../src/mechanisms";
+import { allIds, engineOf } from "../src/checks/engine";
 import { buildFrom, buildPackage } from "../src/package/build";
 import { encode } from "../src/package/format";
 import type { Dial } from "../src/render/detail";
@@ -91,7 +95,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     return i > 0 ? process.argv[i + 1]! : d;
   };
   const flag = (k: string) => process.argv.includes(`--${k}`);
-  if (flag("page") || flag("v2")) {
+  const named = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && !new Set(["--out", "--runs", "--dpr", "--frames", "--w", "--h"]).has(all[i - 1] ?? ""));
+  const has3 = flag("v3") || named.some((id) => engineOf(id) === "v3");
+  if (flag("page") || flag("v2") || has3) {
     const num = (k: string, d: number) => Number(arg(k, String(d)));
     const val = new Set(["--out", "--runs", "--dpr", "--frames", "--w", "--h"]);
     const given = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && !val.has(all[i - 1] ?? ""));
@@ -102,7 +108,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
       console.log(`bench page for ${ids.join(", ")} built in ${out}; publish that folder and open index.html on the phone`);
     } else {
       const dir = await buildPage(join(root, "dist", "bench-page"), ids);
-      const o = { ids, runs: num("runs", 3), frames: num("frames", 40), w: num("w", W), h: num("h", H), dpr: num("dpr", 1.5), today: true, worker: true };
+      const o = { ids, runs: num("runs", 3), frames: num("frames", 40), w: num("w", W), h: num("h", H), dpr: num("dpr", 1.5), today: !ids.some((id) => engineOf(id) === "v3"), worker: true };
       const { gpu, md, json } = await runPage(dir, o);
       mkdirSync("dist/bench", { recursive: true });
       writeFileSync("dist/bench/report-v2.json", JSON.stringify(json, null, 2));
@@ -115,7 +121,7 @@ ${md}`);
   const opts = { runs: Number(arg("runs", "3")), dpr: Number(arg("dpr", "1.5")), frames: Number(arg("frames", "40")) };
   const flags = new Set(["--runs", "--dpr", "--frames"]);
   const ids = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && !flags.has(all[i - 1] ?? ""));
-  const { gpu, rows } = await benchAll(ids.length ? ids : Object.keys(mechanisms), opts);
+  const { gpu, rows } = await benchAll(ids.length ? ids : allIds().filter((id) => engineOf(id) !== "v3"), opts);
   mkdirSync("dist/bench", { recursive: true });
   writeFileSync("dist/bench/report.json", JSON.stringify({ gpu, ...opts, rows }, null, 2));
   writeFileSync("dist/bench/report.md", report(gpu, rows, opts));

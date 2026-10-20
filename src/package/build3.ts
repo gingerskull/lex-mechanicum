@@ -65,20 +65,19 @@ export async function buildPackage3(rec: Pick<CatalogRecord, "id"> & { kin?: unk
   });
   for (let i = 0; i < PHASES; i++) {
     const u = (i / PHASES) * Math.PI * 2;
-    let bodies: Map<string, ReturnType<typeof xf.id>> | null = null;
-    let pose: ReturnType<typeof src.K.pose> | null = null;
+    let pose: ReturnType<typeof src.K.pose>;
     try {
       pose = src.K.pose(u);
-      bodies = pose.bodies;
     } catch {
       continue;
     }
+    const bodies = pose.bodies;
     for (const id of want) {
       const p = pose.points.get(id);
       if (p) (points.get(id) ?? points.set(id, []).get(id)!).push([p[0], p[1]]);
     }
     assembly.solids.forEach((s, k) => {
-      const X = s.body === "ground" ? xf.id() : (bodies!.get(s.body) ?? xf.id());
+      const X = s.body === "ground" ? xf.id() : (bodies.get(s.body) ?? xf.id());
       const M4 = mulM(xfMat(X), mat4(s.frame));
       for (const q of local[k]!) grow(M4[0]! * q[0] + M4[4]! * q[1] + M4[8]! * q[2] + M4[12]!, M4[1]! * q[0] + M4[5]! * q[1] + M4[9]! * q[2] + M4[13]!, M4[2]! * q[0] + M4[6]! * q[1] + M4[10]! * q[2] + M4[14]!);
     });

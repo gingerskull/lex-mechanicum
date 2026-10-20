@@ -25,11 +25,12 @@ export function plate(id: string, body: string, [x0, y0, x1, y1]: [number, numbe
   };
 }
 
-/** A round pin of radius r from z0 to z1, centred at (x, y). */
+/** A round pin of radius r from z0 to z1 on the axis through (x, y): the profile is centred on the frame, as the builder makes round parts. */
 export function pin(id: string, body: string, x: number, y: number, r: number, z0: number, z1: number, extra: Partial<Solid3> = {}): Solid3 {
   const n = 48;
-  const ring = Array.from({ length: n }, (_, i): [number, number] => [x + r * Math.cos((2 * Math.PI * i) / n), y + r * Math.sin((2 * Math.PI * i) / n)]);
-  return { ...plate(id, body, [0, 0, 1, 1], z0, z1, extra), profile: { outer: ring, holes: [] } };
+  const ring = Array.from({ length: n }, (_, i): [number, number] => [r * Math.cos((2 * Math.PI * i) / n), r * Math.sin((2 * Math.PI * i) / n)]);
+  const s = plate(id, body, [0, 0, 1, 1], z0, z1, extra);
+  return { ...s, frame: atPose(x, y, z0), profile: { outer: ring, holes: [] } };
 }
 
 /** Bodies named in `moving` slide along -x by `travel` mm and back over the cycle; every other body stays. */

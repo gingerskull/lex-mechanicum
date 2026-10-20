@@ -10,7 +10,7 @@ import { build } from "esbuild";
 import { chromium, type Browser, type Page } from "playwright-core";
 import { recordById } from "../src/catalog";
 import { ghostTeaching } from "../tests/fixtures/ghost3";
-import { buildPackage2 } from "../src/package/build2";
+import { buildAnyPackage } from "../src/package/any";
 import { encode2 } from "../src/package/format2";
 import type { Bench3, Draw3Options, Draw3Page, ImageOut, Meta } from "./draw3-page/main";
 import { FONT_FILES } from "./tokens-css";
@@ -57,7 +57,7 @@ function serve(js: string): Promise<{ server: Server; port: number }> {
     if (m) {
       const id = m[1]!;
       // fixture scenes (tests/fixtures/scene3.ts) are packed like mechanisms
-      const built = () => (id.startsWith("fx3-") ? import("../tests/fixtures/scene3").then((m) => encode2(m.pkg3(m.fixtures3[id]!).pkg)) : buildPackage2(id).then((b) => encode2(b.pkg)));
+      const built = () => (id.startsWith("fx3-") ? import("../tests/fixtures/scene3").then((m) => encode2(m.pkg3(m.fixtures3[id]!).pkg)) : buildAnyPackage(id).then((b) => encode2(b.pkg)));
       if (!packages.has(id)) packages.set(id, built());
       packages.get(id)!.then((b) => send("application/octet-stream", b), (e: unknown) => fail(500, e));
       return;
@@ -80,12 +80,18 @@ export interface Chrome3 {
   shot(id: string, o: Draw3Options, out?: ImageOut): Promise<Buffer>;
   lose(id: string, o: Draw3Options): Promise<Buffer>;
   bench(id: string, o: { w: number; h: number; dpr: number; frames: number; views: Record<string, Partial<Draw3Options>> }): Promise<Bench3>;
+  /** Pixels of two images that differ by more than `tolerance` (0..1) in a channel; Infinity when the sizes differ. */
+  differ(a: Buffer, b: Buffer, tolerance?: number): Promise<number>;
+  /** Lays images out on a sheet: one row per row, labels above, each cell scaled to w x h. Returns a PNG. */
+  compose(g: { w: number; h: number; pad: number; columns: string[]; rows: { label: string; cells: (Buffer | null)[] }[] }): Promise<Buffer>;
   /** Ids of the solids drawn see-through in the view (T10). */
   seeThrough(id: string, o: Draw3Options): Promise<string[]>;
   close(): Promise<void>;
 }
 
 const fromUrl = (u: string) => Buffer.from(u.slice(u.indexOf(",") + 1), "base64");
+const typeOf = (b: Buffer) => (b.subarray(8, 12).toString("latin1") === "WEBP" ? "image/webp" : "image/png");
+const dataUrl = (b: Buffer, type = "image/png") => `data:${type};base64,${b.toString("base64")}`;
 
 /** Opens the 3D drawing page in local Chrome. Close it when done. */
 export async function openChrome3(): Promise<Chrome3> {
@@ -113,6 +119,11 @@ export async function openChrome3(): Promise<Chrome3> {
     shot: async (id, o, out = {}) => fromUrl(await page.evaluate(([i, oo, x]) => (window as unknown as W).draw3.shot(i, oo, x), [id, o, out] as const)),
     lose: async (id, o) => fromUrl(await page.evaluate(([i, oo]) => (window as unknown as W).draw3.lose(i, oo), [id, o] as const)),
     bench: (id, o) => page.evaluate(([i, oo]) => (window as unknown as W).draw3.bench(i, oo), [id, o] as const),
+    differ: (a, b, tolerance = 0.1) => page.evaluate(([x, y, t]) => (window as unknown as W).draw3.differ(x, y, t), [dataUrl(a, typeOf(a)), dataUrl(b, typeOf(b)), tolerance] as const),
+    compose: async (g) => {
+      const rows = g.rows.map((r) => ({ label: r.label, cells: r.cells.map((c) => (c ? dataUrl(c) : null)) }));
+      return fromUrl(await page.evaluate((gg) => (window as unknown as W).draw3.compose(gg), { ...g, rows }));
+    },
     seeThrough: (id, o) => page.evaluate(([i, oo]) => (window as unknown as W).draw3.seeThrough(i, oo), [id, o] as const),
     close: async () => {
       await browser.close();
