@@ -95,7 +95,7 @@ export function pillowBlock(ctx: RuleContext, id: string, s: PillowSpec): Pillow
   let seat: [number, number] = [s.w0, s.w0 + L];
   if (b) {
     seat = [wm - b.B / 2, wm + b.B / 2];
-    ctx.add(bearing(`${id}-brg`, b, { axis: s.axis, at: [p, q, 0], z0: seat[0], z1: seat[1], closure: "seal", ex: s.ex, joints: [id], name: s.first ? undefined : "", seat: s.located ? "circlip each side" : "floating" }));
+    ctx.add(bearing(`${id}-brg`, b, { axis: s.axis, at: [p, q, 0], z0: seat[0], z1: seat[1], closure: "seal", ex: s.ex, joints: [id], ...(s.first ? {} : { name: "" }), seat: s.located ? "circlip each side" : "floating" }));
     if (s.located) {
       const c = circlipInt(b.D);
       for (const [k, z] of [[0, seat[0] - c.s], [1, seat[1]]] as const)

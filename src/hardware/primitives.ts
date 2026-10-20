@@ -2,7 +2,7 @@
 // where threaded and the detail rung of their kind. Each returns finished solids; callers place them.
 import { TAU, arcPts, bbox, circle, dBore, polar, roundedPoly, type Vec2 } from "../core/geom";
 import { FORM } from "../style/form";
-import { solid, marks, type Mark, type Solid } from "./solid";
+import { solid, marks, onAxis, type Mark, type Solid } from "./solid";
 import {
   BEARINGS, FLANGE, HEADS, NIPPLES, NUTS, SCREW_STANDARD, SENSOR, SPRINGS, STANDOFF, WASHERS, circlipExt, circlipInt,
   standardLength, type Bearing, type HeadKind,
@@ -424,6 +424,8 @@ export function screw(
     ex: rest.ex ?? 0,
     group: id,
     ...(rest.lock ? { lock: rest.lock } : {}),
+    // a screw on an x, y or posed axis has its shank on that axis too
+    ...onAxis(rest),
   });
   return [h, sh];
 }
