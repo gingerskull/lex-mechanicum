@@ -89,4 +89,6 @@ export const BLOCK: Fx[] = [
 
 const hidden = (xs: Fx[]): Fx[] => xs.map((s) => ({ ...s, kind: "nipple", detail: "E" }));
 
-export const fixtures3: Record<string, Fx[]> = { "fx3-depth": DEPTH, "fx3-depth-bg": hidden(DEPTH), "fx3-depth-swap": DEPTH.map((s) => (s.id === "a" ? { ...s, z0: 18, z1: 22 } : s)), "fx3-block": BLOCK };
+import { GHOST } from "./ghost3";
+
+export const fixtures3: Record<string, Fx[]> = { "fx3-ghost": GHOST, "fx3-depth": DEPTH, "fx3-depth-bg": hidden(DEPTH), "fx3-depth-swap": DEPTH.map((s) => (s.id === "a" ? { ...s, z0: 18, z1: 22 } : s)), "fx3-block": BLOCK };

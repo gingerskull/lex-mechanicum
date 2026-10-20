@@ -333,6 +333,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.fill.seeThrough.opacity` | 0.5 |  |
 | `draft.fill.wallShade.shade` | 0.045 | 0..1 ink alpha |
 | `draft.fill.wallShade.steps` | 5 | count of facing buckets |
+| `draft.fill.wallShade.light` | [0.75, -0.25] | screen direction the light comes from (x right, y down), the wall facing it is lightest |
 | `draft.fill.wallShade.outer.from` | 0.4 | factors, outer walls |
 | `draft.fill.wallShade.outer.span` | 0.9 | factors, outer walls |
 | `draft.fill.wallShade.hole.from` | 1.2 | factors, walls inside holes (darker) |
@@ -378,6 +379,40 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.sketch.doubleOffset` | 0.7 | px, second pencil pass offset (x; y is -0.6 of it) |
 | `draft.sketch.doubleOffsetY` | -0.6 | factor on doubleOffset for the y shift |
 | `draft.sketch.doubleAlpha` | 0.3 | 0..1 |
+| `draft.peel.layers` | 4 | count, depth layers peeled at full detail (at most 4) |
+| `draft.peel.layersLow` | 2 | count, layers once rung C is dropped (the deep layers go with the wall shading) |
+| `draft.peel.edgeEps` | 0.05 | mm, an edge is covered only by a surface nearer than its depth less this |
+| `draft.peel.ownEps` | 0.3 | mm, extra margin for the faces of the edge's own solid (added to ownPx / s) |
+| `draft.peel.ownPx` | 2.5 | px, margin for the faces of the edge's own solid, as a screen distance |
+| `draft.camera.pad` | 28 | px, margin round the drawing when a view is fitted to the sheet |
+| `draft.camera.snap` | 4 | degrees, a view this close to a named view is that view (title block, orbit snapping) |
+| `draft.camera.views.PLAN` | [0, 0] | [yaw, tilt] degrees |
+| `draft.camera.views.FRONT` | [0, 90] | [yaw, tilt] degrees |
+| `draft.camera.views.SIDE` | [90, 90] | [yaw, tilt] degrees |
+| `draft.camera.views.ISOMETRIC` | [45, 54.7356] | [yaw, tilt] degrees |
+| `draft.camera.views.DIMETRIC` | [20.7, 70.5288] | [yaw, tilt] degrees |
+| `draft.camera.auxMinCos` | 0.02 | an AUX view down an axis that stands this close to vertical turns the drawing's up to y |
+| `draft.section.hatch.pitch` | 7 | px between lines, px, 0..1 ink |
+| `draft.section.hatch.width` | 1.2 | px between lines, px, 0..1 ink |
+| `draft.section.hatch.alpha` | 0.45 | px between lines, px, 0..1 ink |
+| `draft.section.outline.width` | 1.6 | px, 0..1: the bold outline of a cut face |
+| `draft.section.outline.alpha` | 1 | px, 0..1: the bold outline of a cut face |
+| `draft.detailView.frame.width` | 1 | px, 0..1, px: the window's frame in the main view |
+| `draft.detailView.frame.alpha` | 0.7 | px, 0..1, px: the window's frame in the main view |
+| `draft.detailView.frame.dash` | [6, 3] | px, 0..1, px: the window's frame in the main view |
+| `draft.detailView.minScale` | 1.5 | factor, the least magnification a detail view is drawn at |
+| `draft.ghost.alpha` | 0.4 | factor on path.alpha, px, px |
+| `draft.ghost.dash` | [3, 3] | factor on path.alpha, px, px |
+| `draft.ghost.width` | 1 | factor on path.alpha, px, px |
+| `draft.phantom.dash` | [4, 3] | px, px, factor on the hidden lines' alpha |
+| `draft.phantom.width` | 0.8 | px, px, factor on the hidden lines' alpha |
+| `draft.phantom.alpha` | 0.85 | px, px, factor on the hidden lines' alpha |
+| `draft.tick.half` | 3.5 | px half length of the cross mark, px, 0..1 ink |
+| `draft.tick.width` | 1 | px half length of the cross mark, px, 0..1 ink |
+| `draft.tick.alpha` | 0.8 | px half length of the cross mark, px, 0..1 ink |
+| `draft.trail.width` | 0.7 | px, 0..1, px: explode trail lines |
+| `draft.trail.alpha` | 0.55 | px, 0..1, px: explode trail lines |
+| `draft.trail.dash` | [2, 3] | px, 0..1, px: explode trail lines |
 | `draft.path.color` | `accent` |  |
 | `draft.path.dash` | [1.5, 3.5] | px |
 | `draft.path.width` | 1 | px |
@@ -394,6 +429,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.centre.alpha` | 0.5 | 0..1 |
 | `draft.centre.overshoot` | 6 | px past the head |
 | `draft.centre.maxTilt` | 60 | degrees, hidden at and above this tilt |
+| `draft.centre.endOnDeg` | 8 | degrees, an axis this close to the view direction is drawn as a centre cross (3D renderer) |
+| `draft.centre.cross` | 6 | px, half length of the centre cross seen end-on (3D renderer) |
 | `draft.centre.minScale` | 0.8 | px per mm, hidden when the drawing is smaller than this |
 | `draft.dims.offset` | 18 | px, dimension line distance from the plate |
 | `draft.dims.gap` | 3 | px, gap between the plate and an extension line |
@@ -437,6 +474,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.sheet.planTilt` | 8 | degrees, VIEW reads PLAN at or below this |
 | `draft.sheet.elevationTilt` | 80 | degrees, VIEW reads ELEVATION at or above this; also the side view of the detail ladder |
 | `draft.sheet.defaultTilt` | 28 | degrees, the view when none is given |
+| `draft.sheet.stamp.text` | `3D` | the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha |
+| `draft.sheet.stamp.width` | 0.8 | the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha |
+| `draft.sheet.stamp.alpha` | 0.85 | the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha |
 | `draft.overlays.forces.color` | `accent` |  |
 | `draft.overlays.forces.alpha` | 1 |  |
 | `draft.overlays.forcesWarn.color` | `warn` |  |
@@ -566,7 +606,7 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 |---|---|---|---|
 | A | Paper grain, bearing balls and cages, motor internals | kinds: bearingBalls, bearingCage, motorInternal; effects: grain |  |
 | B | Manufacturing marks | marks: chamfer, boreEntry, headFlute, hexSocket, knurl, keyway, thread | atSide: skip |
-| C | Wall shading, inner-slice silhouettes | effects: wallShade, innerSilhouettes |  |
+| C | Wall shading, inner-slice silhouettes, deep depth layers | effects: wallShade, innerSilhouettes, deepLayers |  |
 | D | Stack hardware inside a joint | kinds: spacer, washer, thrustWasher, waveWasher, sleeve, shim, circlipInternal | whenExplode: draw |
 | E | Service and sensing parts, timing marks | kinds: nipple, felt, wiper, flag, sensor, terminalBlock, cableClip, lead; marks: oilSink, timing |  |
 | F | Role surface patterns | effects: rolePatterns |  |

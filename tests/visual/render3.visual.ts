@@ -99,6 +99,42 @@ describe("depth (SQ10)", () => {
   });
 });
 
+describe("teaching layers", () => {
+  const base = { view: "PLAN", card: false, u: 1 };
+  const diff = (a: PNG, b: PNG) => {
+    let n = 0;
+    for (let i = 0; i < a.data.length; i += 4) if (Math.abs(a.data[i]! - b.data[i]!) + Math.abs(a.data[i + 1]! - b.data[i + 1]!) + Math.abs(a.data[i + 2]! - b.data[i + 2]!) > 30) n++;
+    return n;
+  };
+  const off = { traces: false, ghosts: false, ticks: false, construction: false, trails: false, forces: false, velocity: false, angles: false };
+
+  it("draws traces, ghosts, ticks, construction overlays, force, velocity and angle overlays, each by its own switch", async () => {
+    const none = await shot("fx3-ghost", { ...base, over: { show: off } });
+    for (const k of Object.keys(off) as (keyof typeof off)[]) {
+      if (k === "trails") continue; // nothing is exploded
+      // ticks sit on a trace: they are judged against the traces alone
+      const ref = k === "ticks" ? await shot("fx3-ghost", { ...base, over: { show: { ...off, traces: true } } }) : none;
+      const one = await shot("fx3-ghost", { ...base, over: { show: { ...off, [k]: true, ...(k === "ticks" ? { traces: true } : {}) } } });
+      expect(diff(ref, one), k).toBeGreaterThan(20);
+    }
+  });
+
+  it("draws the phantoms and the highlight only when asked, and at every dial position (DL6)", async () => {
+    const a = await shot("fx3-ghost", base);
+    const b = await shot("fx3-ghost", { ...base, over: { phantoms: ["rocker"], highlight: ["T"] } });
+    expect(diff(a, b)).toBeGreaterThan(100);
+    // at the last dial position the teaching layers are still there: the same view without them differs
+    const g = await shot("fx3-ghost", { ...base, detail: "H" });
+    const g0 = await shot("fx3-ghost", { ...base, detail: "H", over: { show: off } });
+    expect(diff(g, g0)).toBeGreaterThan(1000);
+  });
+
+  it("makes the plate over the rocker see-through, and keeps the cycle's other solids opaque", async () => {
+    const ids = await chrome.seeThrough("fx3-ghost", { w: W, h: H, dpr: 1, u: 0, view: "PLAN" });
+    expect([...ids].sort()).toEqual(["plate", "post"]);
+  });
+});
+
 describe("views (SQ11)", () => {
   const VIEWS = ["PLAN", "FRONT", "SIDE", "ISOMETRIC", "DIMETRIC", "VIEW 30 40"];
   for (const theme of ["dark", "light"] as const)

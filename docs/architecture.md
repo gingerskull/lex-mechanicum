@@ -43,6 +43,12 @@ src/package/                     the package format (pack, encode, decode), the 
 src/audit/                       the audit generator and the conformance report
 src/render/                      canvas factory, projector, world solids, slices, session, the drafting frame,
                                  detail dial, pattern tiles, sheet frame and title block, overlays, plot
+src/render/v3/                   the 3D drafting renderer (E7), beside the 2.5D one until cut-over: camera (turntable and AUX bases, named
+                                 views, fit), views (record view strings, sections, details), scene (solid table: poses, explode, paper
+                                 and role styles), bake (triangles and edges for the GPU), visibility (principle see-through), shaders and
+                                 gpu (depth peeling, composite, analytic edges; one shared context), annotate (traces, ghosts, phantoms,
+                                 overlays, centrelines, dimensions, trails, highlights), sheet, poser (kin and today's model adapters),
+                                 session (one canvas, redraw only on change)
 src/render/gl/                   the solids on the GPU: geometry (items, once per session), plan (a frame as slice
                                  and chunk tables, pure, unit-tested in Node), shaders, the page's one shared context
 src/mechanisms/<id>/model.ts     kinematics only
@@ -127,6 +133,7 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 | `conformance` (`npm run conformance`) | audited standard version per mechanism (Q7), part of `npm run check` |
 | `shot <id> [options]` (`npm run shot`) | one frame to a PNG (Q4) |
 | `thumbs [id ...] [--all] [--hook]` (`npm run thumbs`) | redraws the stale thumbnails and stills in `site/thumbs` and their manifest |
+| `shot3 <id> [--view ...]`, `pilots3`, `bench3 [id ...]` | the 3D renderer in local Chrome (`tools/chrome3.ts`): one frame to a PNG in any named view, section, detail or explode; the acceptance shot set of the pilots and the teaching layers; frame times per view and dial position |
 | `bench [id ...]` (`npm run bench`) | the browser bench: frame times per view and dial position, draw counters, package size, rung counts (Q5, DL5) |
 | `bench --page` (`npm run bench:page`), `bench --v2` | the package v2 bench: `--page` builds a static page (`dist/bench-page`) to publish and open on a phone, `--v2` runs it in local Chrome; setup split into decode, tessellate, edges and GPU, frames per view and dial position (R6, R10) |
 | `compare [--shots --ref dir] [--cards] [--lose]` | the renderer's look against reference images, card drawings per dial position, the lost-context check |

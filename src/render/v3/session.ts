@@ -240,7 +240,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       const c = Array.isArray(det.centre) ? det.centre : scene.poser.point(u, det.centre);
       if (c) win = { centre: c, scale: Math.max(det.scale, DRAFT.detailView.minScale) };
     }
-    return fit(B, card.w, card.h, box, win ? { window: win } : {});
+    // the dimension lines of the detail stage run along the bottom and the right of the drawing: keep room for them
+    const room = view.sheet && view.dims && !view.card ? DRAFT.dims.offset + DRAFT.dims.ext + DRAFT.dims.labelH / 2 : 0;
+    return fit(B, card.w, card.h, box, { ...(win ? { window: win } : {}), ...(room ? { inset: { right: room, bottom: room } } : {}) });
   }
 
   /** Outlines the windows of detail views in this view (SD20). */

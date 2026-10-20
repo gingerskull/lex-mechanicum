@@ -8,6 +8,7 @@ import { models } from "../../src/mechanisms/models";
 import type { MechanismModel } from "../../src/model/types";
 import { browserFactory } from "../../src/render/canvas";
 import type { Dial } from "../../src/render/detail";
+import { ghostItems, ghostPoser } from "../../tests/fixtures/ghost3";
 import { gpu3, loseContext } from "../../src/render/v3/gpu";
 import { hybridPoser, kinPoser, legacyPoser, staticPoser, type Poser } from "../../src/render/v3/poser";
 import type { Scene } from "../../src/render/v3/scene";
@@ -61,7 +62,8 @@ const cache = new Map<string, Promise<Loaded>>();
 
 const bytes = async (url: string) => new Uint8Array(await (await fetch(`${url}?v=${stamp()}`)).arrayBuffer());
 
-function poserFor(l: { meta: Meta; model: MechanismModel | null; z: number }, controls?: Controls): Poser {
+function poserFor(l: { meta: Meta; model: MechanismModel | null; z: number; id?: string }, controls?: Controls): Poser {
+  if (l.id === "fx3-ghost") return ghostPoser;
   const legacy: Poser = l.model ? legacyPoser(l.model, l.z) : staticPoser;
   return l.meta.kin ? hybridPoser(legacy, kinPoser(new Kinematics(l.meta.kin as unknown as KinLib), controls)) : legacy;
 }
@@ -77,7 +79,7 @@ async function load(id: string): Promise<Loaded> {
     const model = models[id] ? await models[id]!() : null;
     const axes: Record<string, Vec3> = {};
     for (const j of meta.kin?.joints ?? []) if (Array.isArray(j.axis) && j.axis.length >= 3) axes[j.id] = [j.axis[0] as number, j.axis[1] as number, j.axis[2] as number];
-    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, model, z: s.pkg.bounds.z1 }), teaching: meta.teaching, axes, info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
+    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, model, z: s.pkg.bounds.z1, id }), teaching: meta.teaching, axes, ...(id === "fx3-ghost" ? { items: ghostItems } : {}), info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
     return { scene, meta, model, setupMs };
   })();
   cache.set(id, p);
@@ -113,7 +115,7 @@ async function session(id: string, o: Draw3Options): Promise<{ sess: Session3; s
   const b0 = performance.now();
   const sess = createSession3(canvas, l.scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
   const bakeMs = performance.now() - b0;
-  if (o.controls) sess.setPoser(poserFor({ meta: l.meta, model: l.model, z: l.scene.pkg.bounds.z1 }, o.controls));
+  if (o.controls) sess.setPoser(poserFor({ meta: l.meta, model: l.model, z: l.scene.pkg.bounds.z1, id }, o.controls));
   return { sess, scene: sess.scene, setupMs: l.setupMs, bakeMs };
 }
 

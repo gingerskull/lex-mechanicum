@@ -25,6 +25,8 @@ try {
   await save("oscillating-cylinder-section-light", "oscillating-cylinder", { view: "port-face", theme: "light", sectionShift: [0, 0, 14.2] });
   await save("watt-linkage-ghost", "watt-linkage", { view: "PLAN" });
   await save("walschaerts-ghost", "walschaerts-valve-gear", { view: "PLAN" });
+  await save("fixture-ghost-phantom", "fx3-ghost", { view: "PLAN", w: 1000, h: 650, over: { phantoms: ["rocker"], highlight: ["T"] } });
+  await save("fixture-ghost-phantom-light", "fx3-ghost", { view: "ISOMETRIC", theme: "light", w: 1000, h: 650, over: { phantoms: ["rocker"] } });
   await save("four-bar-explode", "four-bar", { view: "ISOMETRIC", explode: 1 });
   await save("bevel-gears-explode", "bevel-gears", { view: "ISOMETRIC", explode: 1 });
   await save("four-bar-side", "four-bar", { view: "SIDE" });
