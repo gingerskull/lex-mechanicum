@@ -111,6 +111,8 @@ export interface Solid3 {
   joints: string[];
   detail: RungId;
   group?: string;
+  /** Solids this one overlaps by design (a rope through a sheave, a shank in its tapped hole); `why` gives the reason (A15). */
+  allow?: string[];
   mat?: string;
   motion?: Motion;
   closure?: "open" | "shield" | "seal";

@@ -41,6 +41,8 @@ export function liftSolid(s: Solid): Solid3 {
     },
   };
   if (s.group !== undefined) out.group = s.group;
+  if (s.allow?.length) out.allow = s.allow;
+  if (s.why !== undefined) out.why = s.why;
   if (s.mat !== undefined) out.mat = s.mat;
   if (s.motion) out.motion = s.motion;
   if (s.closure) out.closure = s.closure;
