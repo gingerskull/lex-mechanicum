@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.35.0 — 2026-10-20
+
+- Flexure hinge added to standard 2.13: a circular-notch hinge cut in one 7075 blank, ±2° drawn true with the bend
+  overlay, stop pins just past the swing, the block seated, clamped and dowelled, driven by a crank and link through a
+  pin in the lever's tip.
+- Bistable compliant mechanism added to standard 2.13: a von Mises truss cut in one acetal blank, two beams bent as
+  fixed-guided curves, the shuttle snapping between ±7 mm; the pusher drives it through two preloaded springs, so it
+  snaps near the force peak, at 97 % of it.
+- Rules (standard 2.13): a compliant block on a seat plate of its own outline with dowels reamed through block, clamp
+  plate and seat; stops placed by the swing or, for a guided body, at its travel ends; the neck one piece with its
+  block and lever in the checks; a fixed part that bends is swept, not ground; an oscillating input on a compliant
+  lever driven through a pin in its tip; the blank one material.
+- Tests: unit tests time out at 30 s, as the rule fixtures need on the CI runner.
+
 ## 0.34.0 — 2026-10-20
 
 - Belt drive added to standard 2.11: an HTD 8M timing belt, 24 to 48 grooves, 2:1, its teeth carried round the
