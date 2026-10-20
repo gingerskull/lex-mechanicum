@@ -25,7 +25,9 @@ function boxesTouch(a: Box3, b: Box3): boolean {
 export function clampCheck(model: MechanismModel, assembly: Assembly, n = 12): string[] {
   const parts = indexParts(model);
   const S = assembly.solids.filter((t) => !t.faint);
-  const moving = (t: Solid) => !!t.motion || !isGround(parts, t.body);
+  // a fixed part that bends (a flexspline, a flexure neck) never turns: its seat is not a rotating stack's; a posed part
+  // fixed in its frame moves with the frame
+  const moving = (t: Solid) => !!t.motion || !(isGround(parts, t.body) || (parts[t.body]?.fixed && parts[t.body]!.axis !== "p"));
   const out = new Set<string>();
   for (let step = 0; step < n; step++) {
     const u = (step / n) * TAU;

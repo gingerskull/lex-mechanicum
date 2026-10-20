@@ -1,6 +1,7 @@
 // A6: fixed plates floating above the base sit on Ø10 standoffs, screwed from both sides, spigoted when the plate
 // holds a bearing (F1). A slide rail sits on a ground steel riser instead (pads where something passes under it),
-// screwed down into the base; the reference rail is dowelled (F1), as a rail is on a machine (`seatRail`).
+// screwed down into the base; the reference rail is dowelled (F1), as a rail is on a machine (`seatRail`). A compliant
+// blank's ground block and its neck stand on no posts: J13 seats and clamps the block, and nothing goes through a neck.
 import { xf, type Vec2 } from "../core/geom";
 import { edgeDist, inside, toLocal } from "../core/poly";
 import { disc, screw, spigot, standoff } from "../hardware/primitives";
@@ -20,9 +21,10 @@ export const standoffs: Rule = {
     const rails = new Map(ctx.info.flatMap((j) => (j.kind === "slide" ? j.rails.map((r, k) => [r.id, { j, ref: k === 1 }] as const) : [])));
     // a timing belt's band rides its pulleys (J12): no plate, no posts
     const bands = new Set((ctx.model.flexible ?? []).flatMap((f) => (f.form === "belt" ? [f.band] : [])));
+    const blank = new Set((ctx.model.compliant ?? []).flatMap((c) => [c.ground, c.neck]));
     for (const p of ctx.model.parts) {
       // a fixed part on an x or y axis is carried by its own mount (J10), not on posts
-      if (!p.fixed || p.role === "pin" || p.role === "trace" || p.axis || bands.has(p.id)) continue;
+      if (!p.fixed || p.role === "pin" || p.role === "trace" || p.axis || bands.has(p.id) || blank.has(p.id)) continue;
       const q = ctx.solidOf[p.id]!;
       const onSlide = rails.get(p.id);
       if (onSlide) {

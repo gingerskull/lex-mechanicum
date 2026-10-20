@@ -278,12 +278,14 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     }
   }
 
-  // OVERLAP: same-layer bodies (a stretched or deforming part at its solved outline), vertex inside the other outline (and not in one of its holes) by more than the tolerance
+  // OVERLAP: same-layer bodies (a stretched or deforming part at its solved outline), vertex inside the other outline (and not in one of its holes) by more than the tolerance;
+  // a compliant neck is one piece with its block and its lever
+  const onePiece = new Set((model.compliant ?? []).flatMap((c) => [`${c.neck}|${c.lever}`, `${c.lever}|${c.neck}`, `${c.neck}|${c.ground}`, `${c.ground}|${c.neck}`]));
   for (let i = 0; i < bodies.length; i++)
     for (let j = i + 1; j < bodies.length; j++) {
       const A = bodies[i]!;
       const B = bodies[j]!;
-      if (A.layer !== B.layer || axisOf(A) !== axisOf(B)) continue;
+      if (A.layer !== B.layer || axisOf(A) !== axisOf(B) || onePiece.has(`${A.id}|${B.id}`)) continue;
       let hit = 0;
       let first = -1;
       for (let k = 0; k <= n; k += 3) {

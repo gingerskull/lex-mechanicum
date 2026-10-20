@@ -489,3 +489,51 @@ export const cvtModel: MechanismModel = defineMechanism({
     };
   },
 });
+
+/**
+ * J13 driven (V5): the notch flexure of fx-flexure, ±2° on a tapered lever with a Ø4 bore at its tip, 60 mm from the
+ * neck, its block standing 2 mm over the base: the oscillating drive through a pin in the tip.
+ */
+const FD = 2 * D2R;
+export const flexureDriveModel: MechanismModel = defineMechanism({
+  id: "fx-flexure-drive",
+  input: { kind: "oscillating", part: "lever" },
+  parts: [
+    P.custom("block", [[-40, -20], [-6, -20], [-6, 20], [-40, 20]], { role: "ground", fixed: [0, 0, 0] }),
+    P.custom("neck", [[-6, -1], [6, -1], [6, 1], [-6, 1]], { role: "link", fixed: [0, 0, 0] }),
+    P.custom("lever", [[6, -8], [60, -6], [66, 0], [60, 6], [6, 8]], { role: "driver", at: "N", spin: (s) => s.b as number, holes: [circle(2, 60, 0, 24)] }),
+  ],
+  compliant: [{ neck: "neck", ground: "block", lever: "lever", at: "N", range: [-FD, FD] }],
+  solve: (u) => ({ pts: { N: [0, 0] }, b: osc(-FD, FD)(u) }),
+  angles: (s) => [{ type: "bend", c: [0, 0], a: 0, L: 12, w: 2, bend: s.b as number, key: "neck" }],
+});
+
+/**
+ * J13 guided: a shuttle carried by two necks (4 mm deep) between two ground blocks, moving ±5 mm along y without turning; the necks
+ * fixed and bending (deforming outlines), so they are swept, not ground.
+ */
+const neckAt = (s: -1 | 1, y: number): Vec2[] => [
+  [s * 10, y - 1],
+  [s * 40, -1],
+  [s * 40, 1],
+  [s * 10, y + 1],
+];
+export const guidedModel: MechanismModel = defineMechanism({
+  id: "fx-guided",
+  input: { kind: "manual", part: "shuttle" },
+  parts: [
+    P.custom("blockL", [[-70, -15], [-40, -15], [-40, 15], [-70, 15]], { role: "ground", fixed: [0, 0, 0] }),
+    P.custom("blockR", [[40, -15], [70, -15], [70, 15], [40, 15]], { role: "ground", fixed: [0, 0, 0] }),
+    { ...P.custom("neckL", neckAt(-1, 0), { role: "link", fixed: [0, 0, 0], thick: 4 }), deform: (s: { [k: string]: unknown }) => neckAt(-1, s.y as number) },
+    { ...P.custom("neckR", neckAt(1, 0), { role: "link", fixed: [0, 0, 0], thick: 4 }), deform: (s: { [k: string]: unknown }) => neckAt(1, s.y as number) },
+    P.custom("shuttle", [[-10, -12], [10, -12], [10, 12], [-10, 12]], { role: "output", at: "S" }),
+  ],
+  compliant: [
+    { neck: "neckL", ground: "blockL", lever: "shuttle", at: "AL", range: [-0.1, 0.1] },
+    { neck: "neckR", ground: "blockR", lever: "shuttle", at: "AR", range: [Math.PI - 0.1, Math.PI + 0.1] },
+  ],
+  solve(u) {
+    const y = 5 * Math.cos(u);
+    return { pts: { S: [0, y], AL: [-40, 0], AR: [40, 0] }, y };
+  },
+});

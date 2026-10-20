@@ -142,7 +142,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
     sweeps() {
       if (sweepCache) return sweepCache;
       sweepCache = model.parts
-        .filter((p) => p.role !== "pin" && (!p.fixed || p.axis === "p"))
+        .filter((p) => p.role !== "pin" && !isGround(parts, p.id))
         .map((part: Part) => {
           let [z0, z1] = heights(part);
           const regions: Region[] = [];
