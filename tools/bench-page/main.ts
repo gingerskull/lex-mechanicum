@@ -68,7 +68,9 @@ interface Hosts {
 const med = (v: number[]) => [...v].sort((a, b) => a - b)[Math.floor(v.length / 2)] ?? 0;
 const r2 = (x: number) => Math.round(x * 100) / 100;
 const frame = () => new Promise<number>((r) => requestAnimationFrame(r));
-const bytes = async (url: string) => new Uint8Array(await (await fetch(url)).arrayBuffer());
+/** The page's build stamp: scripts and packages are fetched with it so a phone never reuses an older build. */
+const stamp = () => document.body.dataset.v ?? "";
+const bytes = async (url: string) => new Uint8Array(await (await fetch(`${url}?v=${stamp()}`)).arrayBuffer());
 
 const VIEWS: [string, { tilt: number; explode: number }][] = [["plan", { tilt: 0, explode: 0 }], ["28", { tilt: 28, explode: 0 }], ["side", { tilt: 88, explode: 0 }], ["explode", { tilt: 70, explode: 1 }]];
 
@@ -152,7 +154,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     const gpu = performance.now() - g0;
     setups.push({ decode: s.ms.decode, tessellate: s.ms.tessellate, caps: s.ms.caps, edges: s.ms.edges, gpu, total: s.ms.decode + s.ms.tessellate + s.ms.edges + gpu });
     if (o.worker && typeof Worker !== "undefined") {
-      const w = new Worker(`setup-worker.js?v=${document.body.dataset.v ?? ""}`, { type: "module" });
+      const w = new Worker(`setup-worker.js?v=${stamp()}`, { type: "module" });
       workers.push((await setupInWorker(w, blob2)).wall);
       w.terminate();
     }
@@ -186,7 +188,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
 
 async function todays(id: string, o: Opts, host: HTMLElement, log: (s: string) => void): Promise<NonNullable<Row["today"]>> {
   log(`${id}: today's renderer`);
-  const [m, pkg] = await Promise.all([models[id]!(), loadPackage(`packages/${id}.mxp`)]);
+  const [m, pkg] = await Promise.all([models[id]!(), loadPackage(`packages/${id}.mxp?v=${stamp()}`)]);
   const setup: number[] = [];
   const views: Record<string, number[]> = {};
   const cpus: Record<string, number[]> = {};
