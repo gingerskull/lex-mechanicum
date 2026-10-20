@@ -31,7 +31,7 @@ function arg(name: string): string | undefined {
 
 async function main() {
   const id = process.argv[2];
-  if (!id || !mechanisms[id]) {
+  if (!id || (!mechanisms[id] && !id.startsWith("fx-"))) {
     console.error(`usage: tools/shot.ts <id> [options] [out.png]; ids: ${Object.keys(mechanisms).join(", ")}`);
     process.exitCode = 1;
     return;
@@ -46,7 +46,7 @@ async function main() {
   };
   const last = process.argv[process.argv.length - 1]!;
   const out = last.endsWith(".png") ? last : join("dist", "shots", `${id}-${view.theme}-t${view.tilt}-e${view.explode}.png`);
-  const chrome = await openChrome();
+  const chrome = await openChrome({ fixtures: id.startsWith("fx-") });
   try {
     const png = await chrome.shot(id, stageShot(id, { view, u: Number(arg("u") ?? 1.1), w: Number(arg("w") ?? 1393), h: Number(arg("h") ?? 870), dpr: Number(arg("dpr") ?? 1.5) }));
     mkdirSync(dirname(out), { recursive: true });

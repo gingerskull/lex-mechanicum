@@ -27,7 +27,13 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
   // explode levels follow the layer grid: a plated part keeps its layer's level
   const levels = [...new Set(plates.map(layerZ))].sort((a, b) => a - b);
   const exOf = (z: number) => Math.max(0, levels.findIndex((l) => l >= z - 1e-6));
-  const b1 = Math.min(...plates.map((p) => heights(p)[0])) - 2;
+  // the base sits under the lowest part: for a part on an x or y axis, the lowest world z of its outline
+  const lowest = (p: Part) => {
+    if (!isOut(p.axis)) return heights(p)[0];
+    const q = poseOf(p, s0);
+    return q ? Math.min(...xf(p.shape.outer, q).map((v) => v[1])) : Infinity;
+  };
+  const b1 = Math.min(...plates.map(lowest)) - 2;
   const solids: Solid[] = [];
   const solidOf: Record<string, Solid> = {};
   for (const p of plates) {

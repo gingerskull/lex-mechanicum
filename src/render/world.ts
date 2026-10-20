@@ -82,6 +82,9 @@ export function prepare(pkg: Package): Prepared[] {
 
 export interface World {
   p: Prepared;
+  /** Set for an x or y solid (its prepared axis), unset for z. */
+  axis?: "x" | "y";
+  /** Pose in the solid's plane; for an x or y solid lifted by the explode. */
   pose: Pose;
   /** Exploded z range: of the extrusion for a z solid, of the world box for an x or y solid. */
   z0: number;
@@ -126,12 +129,12 @@ export function worldSolids(
     if (!pose) continue;
     const dz = gap * p.s.ex;
     if (p.axis !== "z") {
-      // the plane's v is up: the explode lifts the posed outline, not the extent along the axis
-      const lift = (P: Vec2[]) => xf(P, pose).map(([a, b]): Vec2 => [a, b + dz]);
-      const outer = lift(p.outer);
+      // the plane's v is up: the explode lifts the pose in the plane, not the extent along the axis
+      const lifted: Pose = [pose[0], pose[1] + dz, pose[2]];
+      const outer = xf(p.outer, lifted);
       const B = boxOf(p.axis, outer, p.s.z0, p.s.z1);
-      const c = toWorld(p.axis, [pose[0], pose[1] + dz], p.s.z0);
-      out.push({ p, pose, z0: B[2], z1: B[5], thr: p.s.thr ? [p.s.thr[1], p.s.thr[2]] : null, outer, holes: p.holes.map(lift), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
+      const c = toWorld(p.axis, [lifted[0], lifted[1]], (p.s.z0 + p.s.z1) / 2);
+      out.push({ p, axis: p.axis, pose: lifted, z0: B[2], z1: B[5], thr: p.s.thr ? [p.s.thr[1], p.s.thr[2]] : null, outer, holes: p.holes.map((h) => xf(h, lifted)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
       continue;
     }
     const outer = xf(p.outer, pose);

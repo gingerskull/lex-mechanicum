@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { chromium, type Browser, type Page } from "playwright-core";
-import { buildPackage } from "../src/package/build";
+import { buildFrom, buildPackage } from "../src/package/build";
 import { encode } from "../src/package/format";
 import type { Dial } from "../src/render/detail";
 import type { BenchResult, DrawOptions, DrawPage, ImageOut } from "./draw-page/main";
@@ -33,8 +33,8 @@ const html = () => {
   return `<!doctype html><meta charset="utf-8"><title>loading</title><link rel="icon" href="data:,"><style>${faces}</style><body style="margin:0;background:#888"><script type="module" src="./main.js"></script>\n`;
 };
 
-async function bundle(): Promise<string> {
-  const r = await build({ entryPoints: [join(root, "tools/draw-page/main.ts")], bundle: true, format: "esm", platform: "browser", target: "es2022", write: false, logLevel: "warning" });
+async function bundle(fixtures = false): Promise<string> {
+  const r = await build({ entryPoints: [join(root, fixtures ? "tools/draw-page/fixtures.ts" : "tools/draw-page/main.ts")], bundle: true, format: "esm", platform: "browser", target: "es2022", write: false, logLevel: "warning" });
   return r.outputFiles[0]!.text;
 }
 
@@ -58,7 +58,9 @@ function serve(js: string): Promise<{ server: Server; port: number }> {
     const m = /^\/packages\/([a-z0-9-]+)\.mxp$/.exec(p);
     if (m) {
       const id = m[1]!;
-      if (!packages.has(id)) packages.set(id, buildPackage(id).then((b) => encode(b.pkg)));
+      // fixture scenes (tests/fixtures/scenes.ts) are packed like mechanisms
+      const built = () => (id.startsWith("fx-") ? import("../tests/fixtures/scenes").then(({ scenes }) => buildFrom(id, scenes[id]!)) : buildPackage(id));
+      if (!packages.has(id)) packages.set(id, built().then((b) => encode(b.pkg)));
       packages.get(id)!.then((b) => send("application/octet-stream", b), (e: unknown) => fail(500, e));
       return;
     }
@@ -87,9 +89,9 @@ const dataUrl = (b: Buffer, type = "image/png") => `data:${type};base64,${b.toSt
 const typeOf = (b: Buffer) => (b.subarray(8, 12).toString("latin1") === "WEBP" ? "image/webp" : "image/png");
 const fromUrl = (u: string) => Buffer.from(u.slice(u.indexOf(",") + 1), "base64");
 
-/** Opens the drawing page in local Chrome. Close it when done. */
-export async function openChrome(): Promise<Chrome> {
-  const { server, port } = await serve(await bundle());
+/** Opens the drawing page in local Chrome (`fixtures`: with the fixture scenes, ids "fx-..."). Close it when done. */
+export async function openChrome(o: { fixtures?: boolean } = {}): Promise<Chrome> {
+  const { server, port } = await serve(await bundle(o.fixtures));
   let browser: Browser;
   try {
     browser = await chromium.launch({ channel: "chrome", headless: true, args: ARGS });

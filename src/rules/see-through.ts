@@ -75,7 +75,7 @@ function cover(ctx: RuleContext, t: Solid, z: Zone): number {
 
 /** Solids that can hide a zone: static, above it, not the base plate and not a part of the mechanism. */
 const hiders = (ctx: RuleContext, z: Zone) =>
-  ctx.solids.filter((t) => !t.isBase && t.kind !== "part" && !t.motion && isGround(ctx.parts, t.body) && t.z0 >= z.top - 0.05);
+  ctx.solids.filter((t) => !t.isBase && !t.axis && t.kind !== "part" && !t.motion && isGround(ctx.parts, t.body) && t.z0 >= z.top - 0.05);
 
 /** How much of each zone is hidden, counting see-through solids as hiding nothing. */
 export function hiddenShare(ctx: RuleContext): { joint: string; hidden: number }[] {

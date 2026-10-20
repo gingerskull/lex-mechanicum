@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.27.0 — 2026-10-20
+
+- Renderer: solids on an x or y axis are drawn with the z solids, at every tilt and explode. A y face is mapped to
+  the screen by one affine and an x face is edge-on; walls sweep along the projected axis; outlines, hidden lines,
+  silhouettes, threads and dashes follow the axis. Depth order: such a solid is cut along its own axis where another
+  solid's box meets it, and placed among the z slices by the plane that separates their boxes; a drawing without
+  one is ordered exactly as before. The rules leave parts on another axis to their own joints (pins, meshes, slides,
+  posts, stage 3 fasteners, headroom, see-through), and the base sits under the lowest point of such a part.
+- Tools: fixture scenes (`tests/fixtures/scenes.ts`) draw with `tools/shot` and `tools/bench` like mechanisms: a shaft
+  in plan in two pillow blocks with a wheel and a gear, along y and along x.
+
 ## 0.26.0 — 2026-10-20
 
 - Engine: a part and its solids may stand out of the plan plane on an x or y axis (a shaft in plan, a disc on edge),
