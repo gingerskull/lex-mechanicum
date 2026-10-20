@@ -110,14 +110,15 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const Y = pN.bodies.get(b) ?? X;
       const body = k.kin.bodies.find((q) => q.id === b);
       const n = body?.symmetry ?? (typeof body?.shape?.z === "number" ? (body.shape.z as number) : undefined);
-      const ax = [...setup.joints.values()].find((r) => r.joint.a === b || r.joint.b === b)?.axis;
+      const jr = [...setup.joints.values()].find((r) => r.joint.a === b || r.joint.b === b);
+      const ax = jr?.axis;
       if (n && ax) {
         // rotation about the axis may differ by a whole number of symmetry steps; nothing else may differ
         const rel = xf.mul(Y, xf.inv(X));
         const ang = xf.angleAbout(rel, ax);
         const step = TAU / n;
         const off = Math.abs(ang - Math.round(ang / step) * step);
-        const R = xf.rotAbout([0, 0, 0], ax, Math.round(ang / step) * step);
+        const R = xf.rotAbout(jr!.at, ax, Math.round(ang / step) * step);
         const resid = xf.mul(xf.inv(R), rel);
         periodicity = Math.max(periodicity, off, v3.len(v3.perp(resid.t, ax)), v3.len(v3.perp(m3.log(resid.R), ax)));
       } else periodicity = Math.max(periodicity, poseDiff(X, Y));

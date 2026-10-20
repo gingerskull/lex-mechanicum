@@ -16,7 +16,7 @@ export interface ResolvedJoint {
   axis2?: Vec3;
   pinA?: Vec3;
   pinB?: Vec3;
-  slot?: { from: Vec3; to: Vec3 };
+  slot?: { from: Vec3; to: Vec3; repeat?: number; center?: Vec3 };
   ca?: Vec3;
   cb?: Vec3;
   num: (v: unknown) => number;
@@ -99,9 +99,16 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
     case "pin-in-slot": {
       if (!wrapped(j, driverValue) || !r.slot) break;
       const pin = xf.apply(Xa, r.at);
-      const f = xf.apply(Xb, r.slot.from);
-      const d = v3.unit(xf.dir(Xb, v3.sub(r.slot.to, r.slot.from)));
-      push(v3.perp(v3.sub(pin, f), d));
+      let best: Vec3 | null = null;
+      const n = r.slot.repeat ?? 1;
+      for (let k = 0; k < n; k++) {
+        const turn = r.slot.center ? xf.rotAbout(r.slot.center, r.axis, (k * 2 * Math.PI) / n) : xf.id();
+        const from = xf.apply(Xb, xf.apply(turn, r.slot.from));
+        const dir = v3.unit(xf.dir(Xb, xf.dir(turn, v3.sub(r.slot.to, r.slot.from))));
+        const miss = v3.perp(v3.sub(pin, from), dir);
+        if (!best || v3.len(miss) < v3.len(best)) best = miss;
+      }
+      push(best!);
       break;
     }
     case "cam-contact": {
@@ -209,7 +216,7 @@ export function resolveJoint(j: KinJoint, num: (v: unknown) => number, vec: (v: 
     axis2: j.axis2 ? unit(vec(j.axis2)) : undefined,
     pinA: j.pinA ? unit(vec(j.pinA)) : undefined,
     pinB: j.pinB ? unit(vec(j.pinB)) : undefined,
-    slot: j.slot ? { from: vec(j.slot.from), to: vec(j.slot.to) } : undefined,
+    slot: j.slot ? { from: vec(j.slot.from), to: vec(j.slot.to), repeat: j.slot.repeat, center: j.slot.center ? vec(j.slot.center) : undefined } : undefined,
     ca: j.ca ? vec(j.ca) : undefined,
     cb: j.cb ? vec(j.cb) : undefined,
     num,

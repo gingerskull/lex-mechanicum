@@ -232,7 +232,7 @@ export class Kinematics {
     const unknownSet = new Set(fb.loops.flat());
     const dist = (a: Record<string, number>, b: Record<string, number>) => Math.max(0, ...Object.keys(a).map((k) => Math.abs((a[k] ?? 0) - (b[k] ?? 0))));
     const step = 3; // degrees (or mm) between continuation steps
-    let warm = s.fbWarm;
+    const warm = s.fbWarm;
     if (!warm || dist(warm.vals, vals) > step) {
       // continue from the reference pose along a straight path in driver space
       const v0 = this.defaultValues(s);

@@ -238,7 +238,6 @@ const gearMesh: BlockFn = (c, s) => {
   const jid = str(i.joint, "gear-mesh.joint");
   const j = c.joint(jid);
   const dA = c.delta("in", c.rad(i.input));
-  const centre = c.jointAt(jid);
   const axisB = j.axis2 ? v3.unit(c.vec(j.axis2)) : c.jointAxis(jid);
   let X: Xf;
   let dB = 0;

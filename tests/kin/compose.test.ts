@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Kinematics, TAU, verifyK1, v3, xf, type K1Report } from "../../src/kin";
-import { antiparallelogram, bennett, crankRocker, homokineticJoint, parallelogram, sliderCrank, toggleClamp, universalJoint } from "./fixtures";
+import { antiparallelogram, bennett, crankRocker, fourBar, homokineticJoint, parallelogram, sliderCrank, toggleClamp, universalJoint } from "./fixtures";
 
 const D = Math.PI / 180;
 
@@ -68,9 +68,9 @@ describe("composition from a kin block's joint graph", () => {
     expect(r.ok, report(r)).toBe(true);
     const x0 = k.pose(0).outputs["slider-x"] as number;
     const xHalf = k.pose(Math.PI).outputs["slider-x"] as number;
-    // crank 30, rod 90, offset 10: stroke is 2 × 30 within a small correction
-    expect(Math.abs(x0 - xHalf)).toBeGreaterThan(55);
-    expect(Math.abs(x0 - xHalf)).toBeLessThan(61);
+    // the selector's default is the long crank (35): the stroke is 2 × 35 within a small correction for the offset
+    expect(Math.abs(x0 - xHalf)).toBeGreaterThan(65);
+    expect(Math.abs(x0 - xHalf)).toBeLessThan(71);
   });
 });
 
@@ -138,5 +138,45 @@ describe("branches and toggles", () => {
     const dp = jaw(th + eps) - jaw(th);
     expect(dm * dp).toBeGreaterThan(0); // same sign both sides: an extremum
     expect(Math.abs(jaw(th + 1e-4) - jaw(th - 1e-4))).toBeLessThan(1e-6);
+  });
+});
+
+describe("K1 catches what is wrong", () => {
+  it("a link length that disagrees with the joint geometry leaves a residual", () => {
+    const kin = crankRocker();
+    kin.params = kin.params!.map((p) => (p.id === "c" ? { ...p, value: 82 } : p));
+    const r = verifyK1(new Kinematics(kin));
+    expect(r.ok).toBe(false);
+    expect(r.maxResidual).toBeGreaterThan(0.1);
+  });
+
+  it("a Bennett linkage that breaks the condition does not close", () => {
+    const kin = bennett();
+    kin.solve = kin.solve.map((s) => ({ ...s, in: { ...s.in, b: 70 } }));
+    const r = verifyK1(new Kinematics(kin));
+    expect(r.ok).toBe(false);
+    expect(r.maxResidual).toBeGreaterThan(1e-3);
+  });
+
+  it("a wrong declared branch no longer reproduces the reference geometry", () => {
+    const kin = crankRocker();
+    kin.design = [{ id: "branch", options: ["left", "right"], value: "right" }];
+    const r = verifyK1(new Kinematics(kin));
+    expect(r.referenceAgreement).toBeGreaterThan(1);
+    expect(r.ok).toBe(false);
+  });
+
+  it("a universal joint whose cross arms are not perpendicular is caught", () => {
+    const kin = universalJoint(30);
+    kin.joints = kin.joints.map((j) => (j.id === "U" ? { ...j, pinB: [0, 0.3, -1] } : j));
+    const r = verifyK1(new Kinematics(kin));
+    expect(r.ok).toBe(false);
+  });
+
+  it("links that cannot reach are a failure at the samples where they cannot", () => {
+    const kin = fourBar({ d: 100, a: 30, b: 70, c: 80 });
+    kin.params = kin.params!.map((p) => (p.id === "b" ? { ...p, value: 10 } : p));
+    const r = verifyK1(new Kinematics(kin));
+    expect(r.ok).toBe(false);
   });
 });

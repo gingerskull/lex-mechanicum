@@ -2,6 +2,8 @@
 // (E2) produces them from records. Geometry is given in the reference configuration (the drivers' defaults).
 import { bennettB, bennettFrames, dyadRRR, type Kin, type Vec3, v3 } from "../../src/kin";
 
+export { sliderCrank, crankRockerNumeric, gearPair, rackPinion, planetary, camFollower, leadScrew, geneva, fiveBar, sarrus, escapement, flexureHinge, beltDrive } from "./fixtures2";
+
 const D = Math.PI / 180;
 
 const rot = (p: Vec3, deg: number): Vec3 => [p[0] * Math.cos(deg * D) - p[1] * Math.sin(deg * D), p[0] * Math.sin(deg * D) + p[1] * Math.cos(deg * D), p[2]];
@@ -166,44 +168,6 @@ export function bennett(s: BennettSpec = { a: 60, alphaDeg: 40, betaDeg: 70, the
         in: { a: "a", alpha: "alpha", beta: "beta", theta0: s.theta0Deg, input: "input", joints: ["J1", "J2", "J3", "J4"], bodies: ["crank", "coupler", "rocker"] },
       },
     ],
-    fallback: null,
-  };
-}
-
-/** Slider-crank: crank 30, rod 90, slider on the x axis (offset 10). */
-export function sliderCrank(): Kin {
-  const th0 = 0;
-  const e = 10;
-  const A: Vec3 = [30, 0, 0];
-  const C: Vec3 = [Math.sqrt(90 * 90 - (e - 0) ** 2) + 30 * 0, e, 0];
-  // the rod closes: |C - A| = 90 with C on y = e, far root
-  const x = A[0] + Math.sqrt(90 * 90 - (e - A[1]) ** 2);
-  C[0] = x;
-  return {
-    bodies: [
-      { id: "ground", role: "ground" },
-      { id: "crank", role: "driver", at: { joint: "O" } },
-      { id: "rod", role: "link" },
-      { id: "slider", role: "slider" },
-    ],
-    joints: [
-      { id: "O", type: "revolute", a: "ground", b: "crank", at: [0, 0, 0], axis: [0, 0, 1] },
-      { id: "A", type: "revolute", a: "crank", b: "rod", at: A, axis: [0, 0, 1] },
-      { id: "C", type: "revolute", a: "rod", b: "slider", at: C, axis: [0, 0, 1] },
-      { id: "P", type: "prismatic", a: "slider", b: "ground", at: C, axis: [1, 0, 0] },
-    ],
-    params: [
-      { id: "r", value: 30 },
-      { id: "l", value: 90 },
-    ],
-    design: [{ id: "closure", options: ["far", "near"], value: "far" }],
-    drivers: [{ id: "input", joint: "O", kind: "rotary", range: [0, 360], default: th0 }],
-    solve: [{ block: "slider-dyad", id: "rod", in: { kind: "rrp", a: "A", r: "l", p: [0, e, 0], d: [1, 0, 0] }, branch: "closure", out: { p: "C", s: "slider-x" } }],
-    points: [
-      { id: "A", body: "crank", local: [30, 0, 0] },
-      { id: "C", body: "rod", local: [C[0], C[1], C[2]] },
-    ],
-    outputs: [{ id: "slider-x", of: "slider", kind: "position", unit: "mm" }],
     fallback: null,
   };
 }
