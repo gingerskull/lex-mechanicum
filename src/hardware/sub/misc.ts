@@ -3,7 +3,7 @@
 import { TAU, arcPts, circle, dBore, polar, type Vec2 } from "../../core/geom";
 import { clipHalfPlane, edgeDist, inside, toWorld } from "../../core/poly";
 import type { RuleContext } from "../../rules/types";
-import { boltCircle, disc, eccentric, key as keyPart, plate, screw, sensor as fork, shaft, spacer, thrustWasher, waveWasher, wearStrip } from "../primitives";
+import { boltCircle, circlip, disc, eccentric, key as keyPart, plate, screw, sensor as fork, shaft, spacer, thrustWasher, waveWasher, wearStrip } from "../primitives";
 import { onAxis, solid, type Solid } from "../solid";
 import { JAM_NUTS, NUTS, SENSOR, innerRingD, keyFor, standardLength } from "../tables";
 
@@ -292,5 +292,32 @@ export function sensor(ctx: RuleContext, id: string, o: { axis: Vec2; a: number;
     fork(`${id}-arm1`, { ...G, name: "", outer: box(o.rIn, o.rOut, h / 2), z0: hi, z1: hi + 1.2 }),
   ];
   ctx.add(out);
+  return out;
+}
+
+/**
+ * H.crossBearings: the four needle-bearing cups on a universal joint's cross, each held in its yoke ear by an
+ * external circlip (F2), for a cross whose arms lie along x and y at height zc (a tilted cross waits for posed axes).
+ * Each cup is a solid on its arm's axis from `r - L` to `r` along the arm, and its circlip just outside it.
+ */
+export function crossBearings(ctx: RuleContext, id: string, o: { at: Vec2; zc: number; r: number; d: number; body?: string; ex: number; joint: string }): Solid[] {
+  const D = o.d + 6;
+  const L = Math.max(8, o.d);
+  const out: Solid[] = [];
+  const arms: ["x" | "y", 1 | -1][] = [["x", 1], ["x", -1], ["y", 1], ["y", -1]];
+  arms.forEach(([axis, s], k) => {
+    // the arm's own coordinates: along it, and the cup's centre in the plane normal to it (across, up)
+    const c0 = axis === "x" ? o.at[0] : o.at[1];
+    const across = axis === "x" ? o.at[1] : o.at[0];
+    const a = c0 + s * o.r;
+    const [w0, w1] = s > 0 ? [a - L, a] : [a, a + L];
+    const G = { axis, body: o.body ?? "ground", at: [across, o.zc, 0] as [number, number, number], ex: o.ex, joints: [o.joint] };
+    out.push(solid(`${id}-cup${k}`, { ...G, name: k ? "" : `Needle bearing cup Ø${D} x ${L} on a Ø${o.d} trunnion`, qty: k ? 0 : 4, kind: "bearing", role: "bearing", outer: disc(D / 2), holes: [disc(o.d / 2)], z0: w0, z1: w1, d: o.d, D, mat: "Bearing steel 100Cr6, needles in a drawn cup", why: "the cross's trunnion turns in it" }));
+    const [c0w, c1w] = s > 0 ? [a, a + 1] : [a - 1, a];
+    out.push(circlip(`${id}-cl${k}`, D, { ...G, z0: c0w, z1: c1w, name: k ? "" : `External circlip on the cup, Ø${D}`, qty: k ? 0 : 4 }));
+  });
+  ctx.add(out);
+  const J = ctx.joint(o.joint);
+  if (J) (J.serves.F2 ??= []).push(...out.filter((t) => t.kind !== "bearing").map((t) => t.id));
   return out;
 }

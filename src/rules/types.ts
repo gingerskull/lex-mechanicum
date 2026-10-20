@@ -8,7 +8,7 @@ import type { MechanismModel, Part, Solved } from "../model/types";
 import type { Form } from "../style/form";
 import type { PartIndex } from "../assemble/pose";
 
-export type JointType = "J1" | "J2" | "J3" | "J4" | "J5" | "J6" | "J7" | "J8";
+export type JointType = "J1" | "J2" | "J3" | "J4" | "J5" | "J6" | "J7" | "J8" | "J9" | "J10" | "J11";
 
 /** A slot a pin runs in over the cycle, with the range of the pin centre along it (from the closed end's centre). */
 export interface SlotVisit extends Slot {
@@ -39,7 +39,8 @@ export interface Joined {
 export interface PinJoint {
   kind: "pin";
   id: string;
-  type: "J1" | "J2" | "J3" | "J4";
+  /** J10: a fixed pin on an x or y axis, a shaft in plan (src/core/axis.ts). */
+  type: "J1" | "J2" | "J3" | "J4" | "J10";
   pin: Part;
   /** World centre at the assembly phase. */
   P: Vec2;
@@ -99,7 +100,28 @@ export interface CamJoint {
   follower: Part;
 }
 
-export type JointInfo = PinJoint | SlideJoint | MeshJoint | CamJoint;
+/** J9: a crossed-axis mesh declared by the model (MechanismModel.meshes). */
+export interface CrossMeshJoint {
+  kind: "crossMesh";
+  id: string;
+  type: "J9";
+  a: Part;
+  b: Part;
+  form: "bevel" | "hypoid" | "worm" | "crossed";
+}
+
+/** J11: a screw joint declared by the model (MechanismModel.screws). */
+export interface ScrewJoint {
+  kind: "screw";
+  id: string;
+  type: "J11";
+  screw: Part;
+  nut: Part;
+  lead: number;
+  form: "lead" | "ball";
+}
+
+export type JointInfo = PinJoint | SlideJoint | MeshJoint | CamJoint | CrossMeshJoint | ScrewJoint;
 
 /** The engineering record of a joint (A16): read by the audit, never shown on the page (P8). */
 export interface Joint {
@@ -164,6 +186,24 @@ export interface RuleContext {
   /** Record which rule added what (the audit reads it). */
   fired: Record<string, string[]>;
   rule: string;
+  /**
+   * The plane a joint is being built in: while set (a pin on an x or y axis), add() gives every solid without an axis
+   * this one, so the in-plane builders (J3, J4) serve any axis.
+   */
+  axis?: "x" | "y";
+}
+
+/** Builds a joint in its pin's plane: solids added meanwhile take the pin's axis (x or y), none for z. */
+export function inPlane(ctx: RuleContext, pin: Part, build: () => void): void {
+  const a = pin.axis === "x" || pin.axis === "y" ? pin.axis : undefined;
+  if (!a) return build();
+  const was = ctx.axis;
+  ctx.axis = a;
+  try {
+    build();
+  } finally {
+    ctx.axis = was;
+  }
 }
 
 export interface Rule {

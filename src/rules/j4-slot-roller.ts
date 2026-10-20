@@ -2,7 +2,7 @@
 // (F8), relief at the slot ends. A moving stud is a shoulder bolt (as J3); a fixed one is an axle (as J1).
 import { buildFixedPin } from "./j1-dead-axle";
 import { buildMovingPin } from "./j3-moving-pin";
-import type { Rule } from "./types";
+import { inPlane, type Rule } from "./types";
 
 export const j4: Rule = {
   id: "j4-slot-roller",
@@ -10,6 +10,6 @@ export const j4: Rule = {
   ids: ["J4", "M14"],
   applies: (ctx) => ctx.info.some((j) => j.type === "J4"),
   apply(ctx) {
-    for (const j of ctx.info) if (j.kind === "pin" && j.type === "J4") (j.fixed ? buildFixedPin : buildMovingPin)(ctx, j);
+    for (const j of ctx.info) if (j.kind === "pin" && j.type === "J4") inPlane(ctx, j.pin, () => (j.fixed ? buildFixedPin : buildMovingPin)(ctx, j));
   },
 };

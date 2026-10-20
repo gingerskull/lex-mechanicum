@@ -119,6 +119,13 @@ export interface MechanismModel {
   plot?: Plot;
   /** Cam contacts (J7): the cam part and the follower it drives. Other joints are read from the parts. */
   cams?: { cam: string; follower: string }[];
+  /**
+   * Crossed-axis meshes (J9): two gear parts on different axes (src/core/axis.ts) that mesh: a bevel or hypoid pair, a
+   * worm and its wheel, crossed helical gears. Parallel meshes are read from the parts (J6).
+   */
+  meshes?: { a: string; b: string; form: "bevel" | "hypoid" | "worm" | "crossed" }[];
+  /** Screw joints (J11): the screw part (on an x or y axis), the nut part it drives along that axis, the lead and the kind. */
+  screws?: { screw: string; nut: string; lead: number; form: "lead" | "ball" }[];
   /** Detail ladder rung of the whole mechanism; "never" is never dropped. */
   detail?: RungId;
 }

@@ -3,7 +3,7 @@
 import { boreChamfers, disc, spacer } from "../hardware/primitives";
 import { SHOULDER_BOLTS, threadFor } from "../hardware/tables";
 import { boltName, elements, partName, raceD, shoulderBolt, stackSpacers, tappedMark } from "./pins";
-import type { PinJoint, Rule, RuleContext } from "./types";
+import { inPlane, type PinJoint, type Rule, type RuleContext } from "./types";
 
 /** Builds a pin whose bolt rides a moving part (J3, and J4 with a slot). */
 export function buildMovingPin(ctx: RuleContext, j: PinJoint): void {
@@ -46,6 +46,6 @@ export const j3: Rule = {
   ids: ["J3", "A12", "M3"],
   applies: (ctx) => ctx.info.some((j) => j.type === "J3"),
   apply(ctx) {
-    for (const j of ctx.info) if (j.kind === "pin" && j.type === "J3") buildMovingPin(ctx, j);
+    for (const j of ctx.info) if (j.kind === "pin" && j.type === "J3") inPlane(ctx, j.pin, () => buildMovingPin(ctx, j));
   },
 };
