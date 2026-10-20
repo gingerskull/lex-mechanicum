@@ -1,5 +1,7 @@
 // The built site (npm run build, then npm run test:site): a page for every registered mechanism, no engine on the
-// library page until hover, and the mechanism page's JavaScript under 96 KB gzipped (80 until 0.21: every model is in the page's closure, about 0.3 KB each, and the 89 catalogue entries end near 92 KB), package excluded (R8, SS8).
+// library page until hover, and the JavaScript a mechanism page loads under 96 KB gzipped: its scripts, everything they
+// import (the engine included), and its own model, package excluded (R8, SS8). Other mechanisms' model chunks are
+// imported dynamically and never fetched by that page, so they are not counted; each stays under 4 KB instead.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
@@ -10,14 +12,20 @@ const OUT = join("dist", "site");
 const read = (f: string) => readFileSync(join(OUT, f), "utf8");
 const scripts = (html: string) => [...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map((m) => m[1]!);
 
-/** A module and every chunk it imports statically or dynamically, by file name. */
-function closure(file: string, seen = new Set<string>()): Set<string> {
+/** A module and every chunk it imports statically or dynamically, by file name; `skip` leaves chunks out. */
+function closure(file: string, seen = new Set<string>(), skip: (f: string) => boolean = () => false): Set<string> {
   if (seen.has(file)) return seen;
   seen.add(file);
   const src = read(file);
-  for (const m of src.matchAll(/(?:import|from)\s*\(?\s*["'`](\.{1,2}\/[^"'`]+\.js)["'`]/g)) closure(join("_astro", m[1]!.replace(/^\.\//, "")).split("\\").join("/"), seen);
+  for (const m of src.matchAll(/(?:import|from)\s*\(?\s*["'`](\.{1,2}\/[^"'`]+\.js)["'`]/g)) {
+    const f = join("_astro", m[1]!.replace(/^\.\//, "")).split("\\").join("/");
+    if (!skip(f)) closure(f, seen, skip);
+  }
   return seen;
 }
+
+/** A mechanism's model chunks: every lazily loaded model module. */
+const isModel = (f: string) => /(^|\/)model\.[\w-]+\.js$/.test(f);
 
 describe("site build", () => {
   it("has the library and a page for every registered mechanism", () => {
@@ -39,10 +47,18 @@ describe("site build", () => {
     expect(html).not.toMatch(/engine\.[\w-]+\.js/);
   });
 
-  it("keeps the mechanism page under 96 KB of gzipped JavaScript", () => {
+  it("keeps the JavaScript a mechanism page loads under 96 KB gzipped, and every model chunk under 4 KB", () => {
+    const models = new Set<string>();
+    for (const id of Object.keys(mechanisms)) for (const src of scripts(read(join("mechanisms", id, "index.html")))) for (const f of closure(src.replace(/^\//, ""))) if (isModel(f)) models.add(f);
+    for (const f of models) expect(gzipSync(read(f)).byteLength, f).toBeLessThan(4 * 1024);
     for (const id of Object.keys(mechanisms)) {
       const files = new Set<string>();
-      for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files);
+      for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files, isModel);
+      // the page's own model: the model chunk that defines its id
+      const q = "[\"'`]";
+      const own = [...models].filter((f) => new RegExp(`id:\\s*${q}${id}${q}`).test(read(f)));
+      expect(own.length, `${id}: its model chunk`).toBeGreaterThan(0);
+      for (const f of own) closure(f, files);
       const gz = [...files].reduce((n, f) => n + gzipSync(read(f)).byteLength, 0);
       expect(gz, `${id}: ${[...files].join(", ")}`).toBeLessThan(96 * 1024);
     }

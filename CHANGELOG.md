@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.32.0 — 2026-10-20
+
+- Bevel gear pair added to standard 2.9, the first pilot of the spatial engine: the catalogue's 16:32 pair at module 4,
+  Tredgold back-cone teeth on tapered gears. The wheel is on a straddled live shaft on the base. The pinion is on a
+  shaft in plan in two pillow blocks behind it. Shims set the mounting distance and thrust washers sit where the mesh
+  pushes. The pinion is driven by a motor beside its shaft, belted to its free end, built by hand until a rule drives a
+  shaft in plan.
+- Block and tackle added to standard 2.9, the first pilot of flexible members: two sheaves on each block, four parts of
+  rope stretched between the sheaves, giving 4:1. The lower block runs on a slide, the fall is hauled by the linear
+  belt drive, each sheave turns by the rope paid past it, and the rope has a becket, a swivel hook and guards.
+- Renderer: an x or posed solid keeps its silhouettes on every slice at a reduced detail dial (they are its outline).
+  `H.screw` puts a screw's shank on the screw's axis.
+
 ## 0.31.0 — 2026-10-20
 
 - Engine: posed axes. A member whose axis is none of x, y, z (a universal joint's cross, a swash plate) is posed every
