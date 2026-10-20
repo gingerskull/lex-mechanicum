@@ -12,24 +12,29 @@
 //   touching their sheaves and the spans they join by design; a becket on a post dead-ends it with a thimble (F1, F2),
 //   the hook hangs on a swivel so the load can turn (F3), each at its own sheave's height, and a guard over each sheave
 //   whose centre stands still keeps the rope in its groove (F2). The note counts the parts that carry the load.
-// - CVT: each sliding sheave half is keyed to its shaft so it slides but cannot turn on it (F3), and a spring presses
-//   it on the belt (F6).
-import { beltLength, beltPath, beltTooth, htd, pathLength } from "../core/flex";
-import { TAU, arcPts, circle, roundedPoly, type Vec2 } from "../core/geom";
-import { toLocal } from "../core/poly";
-import { bearing, circlip, disc, dowel, hullOf, key, nut, plainWasher, plate, screw, shaft, spacer, spring, standoff } from "../hardware/primitives";
-import { solid, type Solid } from "../hardware/solid";
-import { BEARINGS } from "../hardware/tables";
+// - CVT: per shaft a fixed half and a sliding half (posed by a frame that slides along the shaft): each sliding half
+//   slides on a feather key sized from the shaft so it cannot turn on it (F3); where the spec asks, a spring round the
+//   shaft from a seat collar fixed on it presses the half on the belt (F6), its length following the half.
+import { beltLength, beltPath, beltTooth, chainPath, htd, sprocketOutline, sprocketR } from "../core/flex";
+import { TAU, arcPts, circle, dBore, roundedPoly, type Vec2 } from "../core/geom";
+import { inside, toLocal } from "../core/poly";
+import { framePoint } from "../core/axis";
+import { bearing, circlip, collar, disc, dowel, hullOf, key, nut, plainWasher, plate, screw, shaft, spacer, spring, standoff } from "../hardware/primitives";
+import { onAxis, solid, type Solid } from "../hardware/solid";
+import { BEARINGS, circlipExt, keyFor } from "../hardware/tables";
 import { poseOf } from "../model/pose";
+import { alongPath } from "../assemble/pose";
 import { FLANGE_T, flanges } from "./j8-belt";
-import type { FlexJoint, Joint, Rule, RuleContext } from "./types";
+import type { Solved } from "../model/types";
+import type { FlexJoint, Joint, PinJoint, Rule, RuleContext } from "./types";
 
 const fmt = (v: number) => String(+v.toFixed(1));
 /** Link plate thickness and the gap the idler leaves over the chain, mm. */
 const PLATE = 1.2;
+/** The chain idler sprocket's teeth: odd, so its wear spreads over the even chain. */
+const IDLER_TEETH = 9;
 
-/** Pitch radius of a sprocket of z teeth at chain pitch p. */
-export const sprocketR = (z: number, p: number): number => p / (2 * Math.sin(Math.PI / z));
+export { sprocketR };
 
 /** The tensioner arm: its thickness and gap over what it clears, its posts along and outward of the idler, the slot. */
 const ARM = { t: 5, gap: 0.7, along: 26, out: 6, slot: 4 };
@@ -45,7 +50,21 @@ const FLANGE_RISE = 2.5;
 function idler(
   ctx: RuleContext,
   j: FlexJoint & { spec: { over: [string, string]; travel: string } },
-  o: { r: [number, number]; ri: number; back: number; z: [number, number]; top: number; ex: number; outer: Vec2[]; name: string; mat: string; flanged?: boolean },
+  o: {
+    r: [number, number];
+    ri: number;
+    back: number;
+    z: [number, number];
+    top: number;
+    ex: number;
+    outer: Vec2[];
+    name: string;
+    mat: string;
+    flanged?: boolean;
+    /** Its turn per turn of the first wheel (default -r1 / ri), and its angle at the assembly phase given its centre. */
+    ratio?: number;
+    phase?: (ci: Vec2) => number;
+  },
 ): Solid | null {
   const J = ctx.joint(j.id)!;
   const [a, b] = j.spec.over.map((id) => ctx.parts[id]!);
@@ -81,7 +100,8 @@ function idler(
   const id = `${j.id}-idler`;
   const G = { joints: [j.id], ex: o.ex };
   // it turns with the loop, geared to the first wheel
-  const turn = { body: a!.id, motion: { type: "geared" as const, around: ci, ratio: -r1 / o.ri } };
+  const ratio = o.ratio ?? -r1 / o.ri;
+  const turn = { body: a!.id, motion: { type: "geared" as const, around: ci, ratio }, ...(o.phase ? { at: [0, 0, o.phase(ci) - qa[2] * ratio] as [number, number, number] } : {}) };
   const brg = BEARINGS.find((x) => x.name === "6800")!;
   const [z0, z1] = o.z;
   const idl = solid(id, { ...G, ...turn, kind: "pulley", role: "link", name: o.name, outer: o.outer, holes: [disc(brg.D / 2)], z0, z1, mat: o.mat });
@@ -168,9 +188,12 @@ function chain(ctx: RuleContext, j: FlexJoint & { spec: { form: "chain" } }): vo
   }
   const r1 = sprocketR(a!.z, f.pitch);
   const r2 = sprocketR(b!.z, f.pitch);
-  const path = beltPath([qa[0], qa[1]], r1, [qb[0], qb[1]], r2);
-  const L = pathLength(path);
+  const c1: Vec2 = [qa[0], qa[1]];
+  const c2: Vec2 = [qb[0], qb[1]];
+  // the chain is a whole number of links; it is conveyed on a path exactly that long, so no roller creeps a lap
+  const L = beltLength(r1, r2, Math.hypot(c2[0] - c1[0], c2[1] - c1[1]));
   const N = Math.round(L / f.pitch);
+  const { path, off } = chainPath(c1, r1, c2, r2, N, f.pitch);
   const s = ctx.solidOf[a!.id]!;
   const [z0, z1] = [s.z0, s.z1];
   const allow = [a!.id, b!.id];
@@ -185,11 +208,19 @@ function chain(ctx: RuleContext, j: FlexJoint & { spec: { form: "chain" } }): vo
     for (const [side, w0] of [["t", z1 + k * PLATE], ["b", z0 - (k + 1) * PLATE]] as const)
       ctx.add(solid(`${j.id}-p${i}${side}`, { ...G, kind: "plate", role: "hw", name: "", qty: 0, motion: conv((i + 0.5) * f.pitch), outer: link, holes: [], z0: w0, z1: w0 + PLATE, mat: "Steel, through hardened", chamfer: 0 }));
   }
-  // the idler sprocket on the slack span, outside the chain; its teeth take the rollers by design
-  const ri = Math.max(14, r1 * 0.6);
-  const idl = idler(ctx, j, { r: [r1, r2], ri, back: f.roller / 2 - 1.5, z: [z0, z1], top: z1 + 2 * PLATE, ex: s.ex, outer: circle(ri, 0, 0, 48), name: `Idler sprocket Ø${fmt(2 * ri)} on a sealed bearing`, mat: "Steel C45" });
+  // the idler: a sprocket of a whole number of teeth outside the chain, its pitch circle on the rollers' line, a seat
+  // on the roller nearest it at the assembly phase, turning one tooth per pitch of travel (the first wheel's z / its z)
+  const zi = IDLER_TEETH;
+  const ri = sprocketR(zi, f.pitch);
+  const t0 = ctx.s0[f.travel];
+  const rollers = Array.from({ length: N }, (_, i) => alongPath(path, (typeof t0 === "number" ? t0 : 0) + i * f.pitch));
+  const phase = (ci: Vec2): number => {
+    const X = rollers.reduce((p, q) => (Math.hypot(q[0] - ci[0], q[1] - ci[1]) < Math.hypot(p[0] - ci[0], p[1] - ci[1]) ? q : p));
+    return Math.atan2(X[1] - ci[1], X[0] - ci[0]);
+  };
+  const idl = idler(ctx, j, { r: [r1, r2], ri, back: 0, z: [z0, z1], top: z1 + 2 * PLATE, ex: s.ex, outer: sprocketOutline(zi, f.pitch, f.roller), name: `Idler sprocket, ${zi} teeth, ISO 606, on a sealed bearing`, mat: "Steel C45", ratio: -a!.z / zi, phase });
   if (idl) allow.push(idl.id);
-  J.note = `Roller chain, ${fmt(f.pitch)} pitch, ${N} links (${fmt(L)} mm of path${Math.abs(L - N * f.pitch) > 0.5 ? `: ${fmt(L - N * f.pitch)} mm off a whole number of links, taken up by the idler` : ""}) over the ${a!.id} and the ${b!.id}: rollers and link plates carried round, an idler sprocket on the slack span on an arm slotted across it and clamped on two posts (F7), greased (F8).`;
+  J.note = `Roller chain, ${fmt(f.pitch)} pitch, ${N} links over the ${a!.z}-tooth ${a!.id} and the ${b!.z}-tooth ${b!.id}${Math.abs(L - N * f.pitch) > 0.5 ? ` (${fmt(L)} mm on the pitch circles: ${fmt(L - N * f.pitch)} mm off a whole number of links, taken up by the idler)` : ""}: rollers and link plates carried round on a path exactly ${N} pitches long${Math.abs(off) > 0.05 ? `, ${fmt(off)} mm off the pitch circles` : ""}; a ${zi}-tooth idler sprocket on the slack span, its pitch circle on the rollers' line and its seats on them, on an arm slotted across the span and clamped on two posts (F7), greased (F8).`;
   J.badge = ["chain tensioned", "ok"];
 }
 
@@ -316,19 +347,156 @@ function rope(ctx: RuleContext, j: FlexJoint & { spec: { form: "rope" } }): void
   J.badge = ["rope reeved", "ok"];
 }
 
+/** A CVT spring's wire per mm of shaft Ø, its shortest length over the cycle, and the seat collar's width, mm. */
+const CVT_SPRING = { wirePerD: 0.14, minLen: 8, seat: 6 };
+
+/**
+ * A live z shaft runs on up to `z` where a sliding half's travel or its spring seat stands past its top: a segment of
+ * the shaft added on, the flush end screw over the fixed half giving way to a circlip on the shaft's new end.
+ */
+function runOn(ctx: RuleContext, j: PinJoint, ax: "x" | "y" | "z", z: number, keyway?: [number, number]): void {
+  if (ax !== "z") return;
+  const segs = ctx.solids.filter((t) => t.group === `${j.id}-shaft` && t.kind === "shaft");
+  if (!segs.length) return;
+  const top = segs.reduce((p, q) => (q.z1 > p.z1 ? q : p));
+  if (top.z1 >= z) return;
+  const J = ctx.joint(j.id)!;
+  const end = ctx.get(`${j.id}-end`);
+  if (end) {
+    ctx.drop(new RegExp(`^${j.id}-end(-|$)`));
+    J.serves.F2 = (J.serves.F2 ?? []).filter((id) => id !== `${j.id}-end`);
+  }
+  top.marks = top.marks.filter((mk) => mk.kind !== "chamfer" && mk.kind !== "boreEntry");
+  ctx.add(shaft(`${j.id}-shaft-cvt`, { d: j.d, z0: top.z1, z1: z, ...(keyway ? { keyway } : {}) }, { body: j.body, at: top.at, ex: top.ex, joints: [j.id], group: `${j.id}-shaft`, name: "" }));
+  const c = circlipExt(j.d);
+  ctx.add(circlip(`${j.id}-cl-cvt`, j.d, { body: j.body, at: j.at, z0: z - 1 - c.s, z1: z - 1, ex: top.ex, joints: [j.id], group: `${j.id}-shaft` }));
+  (J.serves.F2 ??= []).push(`${j.id}-cl-cvt`);
+  J.note += " The shaft runs on past the sliding sheave half's travel, a circlip on its end.";
+}
+
+/** A world point's coordinate along a base axis. */
+const alongOf = (axis: "x" | "y" | "z", X: [number, number, number]): number => X[axis === "x" ? 0 : axis === "y" ? 1 : 2];
+
+/**
+ * CVT (J12): per shaft, a fixed sheave half on the live shaft and a sliding half posed by a frame that slides along it.
+ * Each sliding half carries a feather key, sized from the shaft (DIN 6885), in a keyway running the length of its travel
+ * along the shaft, so it slides but cannot turn (F3). Where the spec asks, a compression spring round the shaft presses
+ * it on the belt (F6): from its back face to a seat collar fixed on the shaft past the end of its travel, its length
+ * following the half each frame (`reach`). The other half is the controlled freedom: the mechanism's polish sets it.
+ */
 function cvt(ctx: RuleContext, j: FlexJoint & { spec: { form: "cvt" } }): void {
   const J = ctx.joint(j.id)!;
-  for (const id of j.spec.over) {
-    const host = ctx.solidOf[id];
-    if (!host) continue;
-    const G = { body: id, joints: [j.id], ex: host.ex };
-    const k = key(`${j.id}-${id}-key`, 4, host.z1 - host.z0, { ...G, outer: [[5, -2], [9, -2], [9, 2], [5, 2]], z0: host.z0, z1: host.z1, name: "Sliding key: the sheave half slides on the shaft, never turns on it" });
-    ctx.add(k);
-    ctx.add(spring(`${j.id}-${id}-spring`, "compression", { ...G, D: 18, wire: 1.6, z0: host.z1, z1: host.z1 + 12, name: "Compression spring pressing the sheave half on the belt" }));
-    (J.serves.F3 ??= []).push(k.id);
-    (J.serves.F6 ??= []).push(`${j.id}-${id}-spring`);
+  const sprung: string[] = [];
+  for (const pr of j.spec.pairs) {
+    const fixed = ctx.parts[pr.fixed];
+    const sl = ctx.parts[pr.sliding];
+    const host = ctx.solidOf[pr.sliding];
+    const fHost = ctx.solidOf[pr.fixed];
+    const shaftJ = ctx.info.find((x): x is PinJoint => x.kind === "pin" && x.live && x.driven.some((d) => d.part.id === pr.fixed));
+    if (!fixed || !sl || !host || !fHost || !shaftJ || sl.axis !== "p" || !sl.frame || fixed.axis === "p") {
+      J.note += ` ${pr.sliding}: no sliding half on a frame beside a fixed half on a live shaft, so no key or spring.`;
+      continue;
+    }
+    const d = shaftJ.d;
+    // the shaft's segments, and the one the straddle runs on up later
+    const shaftIds = [...ctx.solids.filter((t) => t.group === `${shaftJ.id}-shaft`).map((t) => t.id), `${shaftJ.id}-shaft-up`, `${shaftJ.id}-shaft-cvt`];
+    // the half rides the shaft by design (its bore on the shaft, the key in the shaft's keyway)
+    (host.allow ??= []).push(...shaftIds);
+    const G = { body: pr.sliding, axis: "p" as const, frame: sl.frame, joints: [j.id], ex: host.ex, allow: shaftIds };
+    // the half's ends along the shaft's axis, world mm, at a phase
+    const ax = fixed.axis ?? "z";
+    const endAt = (s: Solved, w: number): [number, number, number] | null => {
+      const f = s.frames?.[sl.frame!];
+      const q = poseOf(sl, s);
+      return f && q ? framePoint(f, [q[0], q[1]], w) : null;
+    };
+    const phases = Array.from({ length: 72 }, (_, i) => ctx.model.solve((i / 72) * TAU));
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (const s of phases)
+      for (const w of [host.z0, host.z1]) {
+        const X = endAt(s, w);
+        if (X) [lo, hi] = [Math.min(lo, alongOf(ax, X)), Math.max(hi, alongOf(ax, X))];
+      }
+    // the shaft's spacers give way to the half's travel: each keeps its part clear of it, or goes
+    for (const t of ctx.solids.filter((x) => x.kind === "spacer" && x.joints.includes(shaftJ.id) && (x.axis ?? "z") === ax && x.z1 > lo - 0.5 && x.z0 < hi + 0.5)) {
+      if (t.z0 < lo) t.z1 = lo - 0.5;
+      else t.z0 = hi + 0.5;
+      if (t.z1 - t.z0 < 1) ctx.drop(new RegExp(`^${t.id}$`));
+      else J.note += ` The ${t.name ? t.name.charAt(0).toLowerCase() + t.name.slice(1) : "spacer"} is cut short of the sliding half's travel.`;
+    }
+    // the feather key in the hub (A5, F3): its section in the bore at the shaft's surface, the hub's length; to Ø8 the
+    // half's D-bore slides on the shaft's flat
+    const k = keyFor(d);
+    // the bore cut to the shaft (the model's bore round the centre only places it), a sliding fit
+    const bore = k ? disc(d / 2 + 0.03) : dBore(d / 2 + 0.05);
+    const hb = host.holes.findIndex((h) => inside(h, [0, 0]));
+    if (hb >= 0) host.holes[hb] = bore;
+    else host.holes.push(bore);
+    if (!k) (J.serves.F3 ??= []).push(host.id);
+    const kk = !k ? null : key(`${j.id}-${pr.sliding}-key`, k.b, host.z1 - host.z0, {
+      ...G,
+      at: [0, 0, 0],
+      outer: [[d / 2 - k.t1, -k.b / 2], [d / 2 - k.t1 + k.h, -k.b / 2], [d / 2 - k.t1 + k.h, k.b / 2], [d / 2 - k.t1, k.b / 2]],
+      z0: host.z0,
+      z1: host.z1,
+      name: `Feather key ${k.b} x ${k.h} x ${+(host.z1 - host.z0).toFixed(1)} (DIN 6885) in the hub, sliding in a keyway along the shaft`,
+    });
+    if (kk) {
+      ctx.add(kk);
+      (J.serves.F3 ??= []).push(kk.id);
+    }
+    if (!pr.spring) {
+      runOn(ctx, shaftJ, ax, hi + 1, k ? [lo, hi] : undefined);
+      continue;
+    }
+    // the back face: the end of the half farther from the fixed half, along the shaft's axis
+    const mid = (fHost.z0 + fHost.z1) / 2;
+    const P0 = endAt(ctx.s0, host.z0);
+    const P1 = endAt(ctx.s0, host.z1);
+    if (!P0 || !P1) continue;
+    const end: 0 | 1 = Math.abs(alongOf(ax, P1) - mid) > Math.abs(alongOf(ax, P0) - mid) ? 1 : 0;
+    const dir = Math.sign(alongOf(ax, end ? P1 : P0) - alongOf(ax, end ? P0 : P1)) || 1;
+    // the seat stands the spring's shortest length past the back face's farthest reach over the cycle
+    let reach = -Infinity;
+    for (const s of phases) {
+      const X = endAt(s, end ? host.z1 : host.z0);
+      if (X) reach = Math.max(reach, dir * alongOf(ax, X));
+    }
+    const seat = dir * reach + dir * CVT_SPRING.minLen;
+    const wire = Math.max(1, Math.round(d * CVT_SPRING.wirePerD * 10) / 10);
+    const D = d + 2 + 2 * wire;
+    const L = shaftJ.driven.find((x) => x.part.id === pr.fixed)!.L;
+    const sid = `${j.id}-${pr.sliding}-seat`;
+    const [s0, s1] = dir > 0 ? [seat, seat + CVT_SPRING.seat] : [seat - CVT_SPRING.seat, seat];
+    ctx.add(collar(sid, d, D + 6, { body: pr.fixed, ...onAxis(fixed), at: [L[0], L[1], 0], z0: s0, z1: s1, ex: fHost.ex, joints: [j.id, shaftJ.id], name: `Spring seat collar Ø${d} x Ø${D + 6} x ${CVT_SPRING.seat}, set screw, fixed on the shaft` }));
+    // the seat's face toward the half, on the shaft's axis, in world mm
+    const B0 = end ? P1 : P0;
+    const to: [number, number, number] = [B0[0], B0[1], B0[2]];
+    to[ax === "x" ? 0 : ax === "y" ? 1 : 2] = seat;
+    const len0 = Math.abs(seat - alongOf(ax, B0));
+    const spr = spring(`${j.id}-${pr.sliding}-spring`, "compression", {
+      ...G,
+      at: [0, 0, 0],
+      D,
+      wire,
+      z0: end ? host.z1 : host.z0 - len0,
+      z1: end ? host.z1 + len0 : host.z0,
+      reach: { to, end: end ? 1 : 0 },
+      name: `Compression spring Ø${+D.toFixed(1)}, wire ${wire}, round the shaft: presses the sheave half on the belt`,
+      allow: [...shaftIds, sid],
+    });
+    ctx.add(spr);
+    (J.serves.F6 ??= []).push(spr.id);
+    (J.serves.F2 ??= []).push(sid);
+    runOn(ctx, shaftJ, ax, Math.max(hi + 1, s1 + 1), k ? [lo, hi] : undefined);
+    sprung.push(pr.sliding);
   }
-  J.note = "CVT belt between sheave pairs: each sliding half keyed to its shaft and pressed on the belt by a spring.";
+  // the belt runs in the grooves of both halves on each shaft by design
+  const belt = ctx.solidOf[j.spec.belt];
+  if (belt) (belt.allow ??= []).push(...j.spec.pairs.flatMap((p) => [p.fixed, p.sliding]));
+  const free = j.spec.pairs.filter((p) => !p.spring).map((p) => p.sliding);
+  J.note = `CVT belt between ${j.spec.pairs.length} sheave pairs: each sliding half keyed to its shaft, sliding on a feather key along it (F3)${sprung.length ? `; ${sprung.join(" and ")} pressed on the belt by a spring round the shaft from a seat collar fixed on it (F6)` : ""}${free.length ? `; ${free.join(" and ")} set by the mechanism's control` : ""}.${J.note}`;
   J.badge = ["sheaves keyed and sprung", "ok"];
 }
 

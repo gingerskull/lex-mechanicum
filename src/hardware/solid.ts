@@ -58,8 +58,14 @@ export interface Solid {
   helix?: number;
   /** A stretched member: the two solved points its unit-length outline spans (src/model/types.ts, Part.stretch). */
   stretch?: [string, string];
-  /** A deforming member: its outline comes from its part's `deform(s)` each frame. */
+  /** A deforming member: its outline (and its holes, where the part gives them) from its part's `deform(s)` each frame. */
   deform?: boolean;
+  /**
+   * Axis "p": one end along the frame's axis (`end` 0 for z0, 1 for z1) reaches the world point `to` each frame, so
+   * the solid's length along its axis follows the frame: a spring between a part that slides with the frame and a
+   * seat that stays (src/assemble/pose.ts extentAt).
+   */
+  reach?: { to: [number, number, number]; end: 0 | 1 };
   outer: Vec2[];
   holes: Vec2[][];
   marks: Mark[];

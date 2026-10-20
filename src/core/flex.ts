@@ -97,3 +97,84 @@ export function pathLength(P: Vec2[]): number {
   for (let i = 0; i < P.length; i++) L += Math.hypot(P[(i + 1) % P.length]![0] - P[i]![0], P[(i + 1) % P.length]![1] - P[i]![1]);
   return L;
 }
+
+/** The radius on wheel 2 for which the open-belt path at centre distance C is exactly `L` long, wheel 1 at r1 (a CVT). */
+export function radiusFor(r1: number, C: number, L: number): number {
+  let lo = Math.max(1e-6, r1 - C + 1e-6);
+  let hi = r1 + C - 1e-6;
+  for (let i = 0; i < 100; i++) {
+    const m = (lo + hi) / 2;
+    if (beltLength(r1, m, C) < L) lo = m;
+    else hi = m;
+  }
+  return (lo + hi) / 2;
+}
+
+/**
+ * beltPath with a fixed point count: n points on each wheel's arc, whatever the radii (a deforming band's rings keep
+ * their point counts every frame).
+ */
+export function beltRing(c1: Vec2, r1: number, c2: Vec2, r2: number, n: number): Vec2[] {
+  const a = Math.atan2(c2[1] - c1[1], c2[0] - c1[0]);
+  const b = Math.asin((r2 - r1) / Math.hypot(c2[0] - c1[0], c2[1] - c1[1]));
+  const arc = (c: Vec2, r: number, t0: number, t1: number): Vec2[] => Array.from({ length: n }, (_, i) => polar(r, t0 + ((t1 - t0) * i) / (n - 1), c[0], c[1]));
+  return [...arc(c1, r1, a + Math.PI / 2 + b, a + TAU - Math.PI / 2 - b), ...arc(c2, r2, a - Math.PI / 2 - b, a + Math.PI / 2 + b)];
+}
+
+/** Pitch radius of a sprocket of z teeth at chain pitch p: the pitch polygon's circumradius. */
+export const sprocketR = (z: number, p: number): number => p / (2 * Math.sin(Math.PI / z));
+
+/** ISO 606 roller seat radius for rollers of Ø d1, mm. */
+export const sprocketSeat = (d1: number): number => 0.505 * d1 + 0.069 * Math.cbrt(d1);
+
+/**
+ * An ISO 606 sprocket of z teeth at chain pitch p for rollers of Ø d1: a roller seat centred on each vertex of the pitch
+ * polygon (the first at angle a0), its seating angle 140° - 90°/z, convex flanks of the mean standard radius tangent to
+ * it, the tip circle midway between the standard's limits, a land left on each tip.
+ */
+export function sprocketOutline(z: number, p: number, d1: number, a0 = 0): Vec2[] {
+  const R = sprocketR(z, p);
+  const seat = sprocketSeat(d1);
+  const al = ((140 - 90 / z) * Math.PI) / 180;
+  const re = (0.12 * d1 * (z + 2) + 0.008 * d1 * (z * z + 180)) / 2;
+  const Ra = (2 * R + p * (1 - 1.6 / z) - d1 + (2 * R + 1.25 * p - d1)) / 4;
+  // one tooth gap in its own frame (the vertex on +x): the seat, then the flank on the +y side out to the tip circle
+  const E: Vec2 = [R - seat * Math.cos(al / 2), seat * Math.sin(al / 2)];
+  const cf: Vec2 = [E[0] + (re * (R - E[0])) / seat, E[1] + (re * (0 - E[1])) / seat];
+  const flank: Vec2[] = [];
+  for (let ps = Math.PI - al / 2; ps > Math.PI - al / 2 - Math.PI / 2; ps -= 0.01) {
+    const q = polar(re, ps, cf[0], cf[1]);
+    flank.push(q);
+    if (Math.hypot(q[0], q[1]) >= Ra) break;
+  }
+  // the tip half-angle the flank reaches, held short of the half pitch so the tip keeps a land
+  const tipA = Math.min(Math.atan2(flank[flank.length - 1]![1], flank[flank.length - 1]![0]), Math.PI / z - 0.02);
+  const half = flank.filter(([x, y]) => Math.atan2(y, x) < tipA);
+  const gap: Vec2[] = [...half.map(([x, y]): Vec2 => [x, -y]).reverse(), ...arcPts(R, 0, seat, Math.PI + al / 2, Math.PI - al / 2, Math.PI / 24), ...half];
+  const out: Vec2[] = [];
+  for (let k = 0; k < z; k++) {
+    const a = a0 + (k * TAU) / z;
+    const rot = ([x, y]: Vec2): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)];
+    out.push(...gap.map(rot));
+    out.push(...arcPts(0, 0, Ra, a + tipA, a + TAU / z - tipA, Math.PI / 90).slice(1, -1));
+  }
+  return out;
+}
+
+/**
+ * The closed path a chain of N pitches p is conveyed on round two sprockets (beltPath): its wrap arcs set a hair off the
+ * pitch circles (the same offset on both) so the polyline is exactly N p long, and the rollers come back to the same
+ * place every circuit. Returns the path and the offset, mm.
+ */
+export function chainPath(c1: Vec2, r1: number, c2: Vec2, r2: number, N: number, p: number, step = Math.PI / 24): { path: Vec2[]; off: number } {
+  const L = N * p;
+  let lo = -Math.min(r1, r2) / 2;
+  let hi = Math.min(r1, r2) / 2;
+  for (let i = 0; i < 80; i++) {
+    const m = (lo + hi) / 2;
+    if (pathLength(beltPath(c1, r1 + m, c2, r2 + m, step)) < L) lo = m;
+    else hi = m;
+  }
+  const off = (lo + hi) / 2;
+  return { path: beltPath(c1, r1 + off, c2, r2 + off, step), off };
+}

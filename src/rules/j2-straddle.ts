@@ -12,6 +12,7 @@ import { bridge } from "../hardware/sub/bridge";
 import { housingBearing } from "../hardware/sub/housing";
 import { FLANGE, circlipExt, circlipInt } from "../hardware/tables";
 import { circleClearance } from "../core/poly";
+import { wheelsOf } from "../model/flex";
 import type { PinJoint, Rule, RuleContext } from "./types";
 
 /** Eccentricity of the top bushing: the same as the one under the housing. */
@@ -36,8 +37,9 @@ function meshShafts(ctx: RuleContext): { group: PinJoint[]; carried: Carried }[]
   const out: { group: PinJoint[]; carried: Carried }[] = groups.map((group) => ({ group, carried: { what: "gear" } }));
   for (const f of ctx.info) {
     if (f.kind !== "flex" || f.spec.form === "rope") continue;
-    const carried = f.spec.form === "chain" ? { what: "sprocket", by: "chain" } : { what: "pulley", by: "belt" };
-    for (const id of f.spec.over) {
+    // a CVT's shafts carry their fixed sheave halves (the sliding halves ride them)
+    const carried = f.spec.form === "chain" ? { what: "sprocket", by: "chain" } : f.spec.form === "cvt" ? { what: "sheave", by: "belt" } : { what: "pulley", by: "belt" };
+    for (const id of wheelsOf(f.spec)) {
       const j = live.find((x) => x.driven.some((d) => d.part.id === id));
       if (j && !out.some((o) => o.group.includes(j))) out.push({ group: [j], carried });
     }

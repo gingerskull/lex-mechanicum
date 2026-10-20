@@ -3,7 +3,7 @@
 // (src/core/axis.ts) is posed in its own plane; the explode lifts it along the base z like every other solid.
 import { boxOf, frameBox, framePoint, toWorld, type Axis, type Frame3, type Vec3 } from "../core/axis";
 import { TAU, offsetPoly, type Pose, type Vec2 } from "../core/geom";
-import { shapeAt, solidPose, type PartIndex } from "../assemble/pose";
+import { extentAt, ringsAt, solidPose, type PartIndex } from "../assemble/pose";
 import type { MechanismModel, Solved } from "../model/types";
 import { axisOfPacked, ringsOf, hasFlag, type Package, type PackedSolid } from "../package/format";
 import type { MarkKind } from "../style/kinds";
@@ -132,8 +132,8 @@ export interface World {
   bb: [number, number, number, number];
   /** An x or y solid: its extent along its axis, world mm. */
   along?: [number, number];
-  /** A stretched or deforming member: its local outline in this frame (its items are refreshed from it). */
-  local?: Vec2[];
+  /** A stretched or deforming member: its local rings in this frame (its items are refreshed from them). */
+  local?: { outer: Vec2[]; holes: Vec2[][] };
 }
 
 /** The world points of an outline posed in a solid's plane, at `w` along its axis. */
@@ -148,10 +148,10 @@ const xf = (pts: Vec2[], [x, y, a]: Pose): Vec2[] => {
 
 export const worldPts = xf;
 
-/** The far end's outline of a tapered or helical solid, posed. */
-const far = (p: Prepared, pose: Pose): Vec2[] => {
+/** The far end's outline of a tapered or helical solid, posed (its outline of the frame for a member that changes shape). */
+const far = (p: Prepared, pose: Pose, outer: Vec2[] = p.outer): Vec2[] => {
   const P = poseAt(p, pose, p.s.z1);
-  return p.outer.map((q) => pointAt(P, q));
+  return outer.map((q) => pointAt(P, q));
 };
 
 export function worldSolids(
@@ -170,30 +170,34 @@ export function worldSolids(
     const pose = solidPose(model, parts, p.s, s, u);
     if (!pose) continue;
     const dz = gap * p.s.ex;
+    // a stretched or deforming member takes its rings of this frame, whatever its axis
+    const local = p.dyn ? ringsAt(parts, { outer: p.outer, holes: p.holes, stretch: p.s.stretch, deform: p.dyn === "deform", body: p.s.body }, s) : null;
+    const L = local ?? p;
     if (p.axis === "p") {
-      // a posed solid: its plane from the solved frame, lifted by the explode along the base z
+      // a posed solid: its plane from the solved frame, lifted by the explode along the base z; its extent along the
+      // frame's axis from the solved frame (a solid that reaches a seat keeps its length under the explode)
       const f = p.s.frame ? s.frames?.[p.s.frame] : undefined;
       if (!f) continue;
       const frame: Frame3 = { o: [f.o[0], f.o[1], f.o[2] + dz], u: f.u, v: f.v };
-      const outer = xf(p.outer, pose);
-      const B = frameBox(frame, outer, p.s.z0, p.s.z1);
-      const c = framePoint(frame, [pose[0], pose[1]], (p.s.z0 + p.s.z1) / 2);
-      out.push({ p, axis: "p", frame, pose, z0: B[2], z1: B[5], thr: null, outer, holes: p.holes.map((h) => xf(h, pose)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
+      const along = extentAt(p.s, f);
+      const outer = xf(L.outer, pose);
+      // a tapered solid's far outline differs: the box holds both ends
+      const B = frameBox(frame, p.mods ? [...outer, ...far(p, pose, L.outer)] : outer, along[0], along[1]);
+      const c = framePoint(frame, [pose[0], pose[1]], (along[0] + along[1]) / 2);
+      out.push({ ...(local ? { local } : {}), p, axis: "p", frame, pose, z0: B[2], z1: B[5], thr: null, outer, holes: L.holes.map((h) => xf(h, pose)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along });
       continue;
     }
     if (p.axis !== "z") {
       // the plane's v is up: the explode lifts the pose in the plane, not the extent along the axis
       const lifted: Pose = [pose[0], pose[1] + dz, pose[2]];
-      const outer = xf(p.outer, lifted);
+      const outer = xf(L.outer, lifted);
       // a tapered or helical solid's far outline differs: the box holds both ends
-      const B = boxOf(p.axis, p.mods ? [...outer, ...far(p, lifted)] : outer, p.s.z0, p.s.z1);
+      const B = boxOf(p.axis, p.mods ? [...outer, ...far(p, lifted, L.outer)] : outer, p.s.z0, p.s.z1);
       const c = toWorld(p.axis, [lifted[0], lifted[1]], (p.s.z0 + p.s.z1) / 2);
-      out.push({ p, axis: p.axis, pose: lifted, z0: B[2], z1: B[5], thr: p.s.thr ? [p.s.thr[1], p.s.thr[2]] : null, outer, holes: p.holes.map((h) => xf(h, lifted)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
+      out.push({ ...(local ? { local } : {}), p, axis: p.axis, pose: lifted, z0: B[2], z1: B[5], thr: p.s.thr ? [p.s.thr[1], p.s.thr[2]] : null, outer, holes: L.holes.map((h) => xf(h, lifted)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
       continue;
     }
-    // a stretched or deforming member takes its outline of this frame
-    const local = p.dyn ? shapeAt(parts, { outer: p.outer, stretch: p.s.stretch, deform: p.dyn === "deform", body: p.s.body }, s) : null;
-    const outer = xf(local ?? p.outer, pose);
+    const outer = xf(L.outer, pose);
     out.push({
       ...(local ? { local } : {}),
       p,
@@ -202,9 +206,9 @@ export function worldSolids(
       z1: p.s.z1 + dz,
       thr: p.s.thr ? [p.s.thr[1] + dz, p.s.thr[2] + dz] : null,
       outer,
-      holes: p.holes.map((h) => xf(h, pose)),
+      holes: L.holes.map((h) => xf(h, pose)),
       c: [pose[0], pose[1]],
-      bb: bounds(p.mods ? [...outer, ...far(p, pose)] : outer),
+      bb: bounds(p.mods ? [...outer, ...far(p, pose, L.outer)] : outer),
     });
   }
   return out;

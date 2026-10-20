@@ -1,6 +1,6 @@
 import { boxOf, frameBox, type Box3 } from "../core/axis";
 import { xf } from "../core/geom";
-import type { MechanismModel, Part, Pose, Solved, Vec2 } from "./types";
+import type { MechanismModel, Part, Pose, Shape, Solved, Vec2 } from "./types";
 
 /**
  * A part's pose from, in order: its fixed pose, an explicit solved pose, the segment between two named points (the
@@ -23,20 +23,29 @@ export function poseOf(p: Part, s: Solved): Pose | null {
   return null;
 }
 
+/** A deforming outline as rings: a part's `deform(s)` may return the outer ring alone or the outer ring and its holes. */
+export const deformRings = (d: Vec2[] | Shape): { outer: Vec2[]; holes?: Vec2[][] } => (Array.isArray(d) ? { outer: d } : d);
+
 /**
- * A part's outline at a solved phase: its shape, stretched along x to the distance of its two points (`stretch`), or
- * from `deform(s)`.
+ * A part's rings at a solved phase: its shape, stretched along x to the distance of its two points (`stretch`), or
+ * from `deform(s)` (its holes too where it gives them, else the shape's).
  */
-export function partShape(p: Part, s: Solved): Vec2[] {
-  if (p.deform) return p.deform(s);
+export function partRings(p: Part, s: Solved): Shape {
+  if (p.deform) {
+    const r = deformRings(p.deform(s));
+    return { outer: r.outer, holes: r.holes ?? p.shape.holes };
+  }
   if (p.stretch && p.between) {
     const a = s.pts[p.between[0]];
     const b = s.pts[p.between[1]];
     const L = a && b ? Math.hypot(b[0] - a[0], b[1] - a[1]) : 1;
-    return p.shape.outer.map(([x, y]): Vec2 => [x * L, y]);
+    return { outer: p.shape.outer.map(([x, y]): Vec2 => [x * L, y]), holes: p.shape.holes };
   }
-  return p.shape.outer;
+  return p.shape;
 }
+
+/** A part's outline at a solved phase (partRings' outer ring). */
+export const partShape = (p: Part, s: Solved): Vec2[] => partRings(p, s).outer;
 
 /**
  * The world box of a part at a solved phase: its outline over its z range, or over its extent along an x, y or posed

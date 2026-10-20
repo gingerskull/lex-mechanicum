@@ -4,7 +4,7 @@ import { TAU, xf, type Vec2 } from "../core/geom";
 import { circleClearance, region, type Region } from "../core/poly";
 import { marks, onAxis, solid, type Solid } from "../hardware/solid";
 import { heights, layerZ } from "../parts";
-import { partBox, partShape, poseOf } from "../model/pose";
+import { partBox, partRings, partShape, poseOf } from "../model/pose";
 import { sample, type Sampled } from "../model/sample";
 import type { MechanismModel, Part } from "../model/types";
 import { FORM } from "../style/form";
@@ -13,7 +13,7 @@ import { BORES } from "../hardware/tables";
 
 /** Room a chain's lower link plates take under its sprockets, mm (two plates and a gap). */
 const CHAIN_UNDER = 3;
-import { indexParts, isGround, shapeAt, solidBox, solidPose } from "../assemble/pose";
+import { indexParts, isGround, ringsAt, solidBox, solidPose } from "../assemble/pose";
 import type { RuleContext } from "./types";
 
 /** Phase at which the build is laid out: away from the singular positions of u = 0. */
@@ -34,7 +34,8 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
   const exOf = (z: number) => Math.max(0, levels.findIndex((l) => l >= z - 1e-6));
   // the base sits under the lowest part: for a part on an x or y axis, the lowest world z of its outline
   const lowest = (p: Part) => {
-    if (p.axis === "p") return partBox(p, s0)?.[2] ?? Infinity;
+    // a posed part may slide with its frame: its lowest over the cycle
+    if (p.axis === "p") return Math.min(...Array.from({ length: 36 }, (_, i) => partBox(p, i ? model.solve((i / 36) * TAU) : s0)?.[2] ?? Infinity));
     if (!isOut(p.axis)) return heights(p)[0];
     const q = poseOf(p, s0);
     return q ? Math.min(...xf(p.shape.outer, q).map((v) => v[1])) : Infinity;
@@ -85,11 +86,14 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       const pose = solidPose(model, parts, t, s, u);
       if (!pose) continue;
       if (t.axis) {
-        const b = solidBox(t, pose, s);
+        const b = solidBox(t, pose, s, parts);
         regions.push(region(planCorners(b), []));
         z[0] = Math.min(z[0], b[2]);
         z[1] = Math.max(z[1], b[5]);
-      } else regions.push(region(xf(shapeAt(parts, t, s), pose), t.holes.map((h) => xf(h, pose))));
+      } else {
+        const r = ringsAt(parts, t, s);
+        regions.push(region(xf(r.outer, pose), r.holes.map((h) => xf(h, pose))));
+      }
     }
     const out = { n: t.outer.length + t.holes.length, regions, z };
     solidCache.set(t, out);
@@ -138,7 +142,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
     sweeps() {
       if (sweepCache) return sweepCache;
       sweepCache = model.parts
-        .filter((p) => p.role !== "pin" && !p.fixed)
+        .filter((p) => p.role !== "pin" && (!p.fixed || p.axis === "p"))
         .map((part: Part) => {
           let [z0, z1] = heights(part);
           const regions: Region[] = [];
@@ -151,12 +155,15 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
             const pose = poseOf(part, s);
             if (!pose) continue;
             if (out) {
-              const b = part.axis === "p" ? partBox(part, s) : boxOf(part.axis as "x" | "y", xf(part.shape.outer, pose), w0, w1);
+              const b = part.axis === "p" ? partBox(part, s) : boxOf(part.axis as "x" | "y", xf(partShape(part, s), pose), w0, w1);
               if (!b) continue;
               regions.push(region(planCorners(b), []));
               z0 = Math.min(z0, b[2]);
               z1 = Math.max(z1, b[5]);
-            } else regions.push(region(xf(partShape(part, s), pose), part.shape.holes.map((h) => xf(h, pose))));
+            } else {
+              const r = partRings(part, s);
+              regions.push(region(xf(r.outer, pose), r.holes.map((h) => xf(h, pose))));
+            }
           }
           return { part, z0, z1, regions };
         });

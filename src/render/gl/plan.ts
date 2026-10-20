@@ -12,7 +12,7 @@ import type { Projector } from "../projector";
 import { wallsOf, type Slice } from "../slices";
 import { pointAt, poseAt, type World } from "../world";
 import { ITEM_TEXELS, type Items, type Range } from "./geometry";
-import { MODE, OPS, PER_ROW } from "./shaders";
+import { MODE, OPS, PER_ROW, SLICE } from "./shaders";
 
 const PLATE = new Set(["part", "plate", "bracket", "bridge", "housing", "base"]);
 const L = DRAFT.lines;
@@ -79,7 +79,10 @@ export interface PlanInput {
 }
 
 export interface FramePlan {
-  /** Two texels per slice: (x, y, cos a, sin a), (z0, top, fade, 0). */
+  /**
+   * SLICE floats per slice: (x, y, cos a, sin a), (z0, top, fade, axis code), the far end's pose, and for a posed
+   * tapered slice the far end's scale and turn relative to the near end (0, 0, cos, sin).
+   */
   slices: Float32Array;
   frame: Chunks;
   lines: Chunks;
@@ -186,11 +189,14 @@ export function planFrame(f: PlanInput): FramePlan {
       let lo = 0;
       let hi = 0;
       const P = w.outer;
-      if (w.axis === "p" && w.frame) {
-        // a posed solid: across its walls' sweep on screen
-        const W = lin(Pr, frameAxis(w.frame));
-        const U = lin(Pr, w.frame.u);
-        const V = lin(Pr, w.frame.v);
+      const Wp = w.axis === "p" && w.frame ? lin(Pr, frameAxis(w.frame)) : null;
+      if (Wp && Math.hypot(Wp[0], Wp[1]) > 1e-6 * Pr.s) {
+        // a posed solid: across its walls' sweep on screen (seen along its axis, as a z solid in plan: far left and
+        // right)
+        const W = Wp;
+        const f = w.frame!;
+        const U = lin(Pr, f.u);
+        const V = lin(Pr, f.v);
         const k = (q: Vec2) => (U[0] * q[0] + V[0] * q[1]) * W[1] - (U[1] * q[0] + V[1] * q[1]) * W[0];
         for (let i = 1; i < P.length; i++) {
           if (k(P[i]!) < k(P[lo]!)) lo = i;
@@ -199,6 +205,15 @@ export function planFrame(f: PlanInput): FramePlan {
       } else if (w.axis === "x") {
         // the walls of an x solid run across the screen: its silhouettes are at the outline's lowest and highest point
         const k = (q: Vec2) => q[0] * Pr.ct + q[1] * Pr.st;
+        for (let i = 1; i < P.length; i++) {
+          if (k(P[i]!) < k(P[lo]!)) lo = i;
+          if (k(P[i]!) > k(P[hi]!)) hi = i;
+        }
+      } else if (Wp) {
+        // a posed solid seen along its axis: far left and right on screen
+        const U = lin(Pr, w.frame!.u);
+        const V = lin(Pr, w.frame!.v);
+        const k = (q: Vec2) => U[0] * q[0] + V[0] * q[1];
         for (let i = 1; i < P.length; i++) {
           if (k(P[i]!) < k(P[lo]!)) lo = i;
           if (k(P[i]!) > k(P[hi]!)) hi = i;
@@ -213,7 +228,7 @@ export function planFrame(f: PlanInput): FramePlan {
     }
     return e;
   };
-  const slices = new Float32Array(Math.max(1, list.length) * 12);
+  const slices = new Float32Array(Math.max(1, list.length) * SLICE);
   const cm = new Chunks();
   const cl = new Chunks();
   let op = 1;
@@ -237,21 +252,28 @@ export function planFrame(f: PlanInput): FramePlan {
     const Wd = fw ? lin(Pr, fw) : null;
     const P0 = f ? Pr.P(f.o[0], f.o[1], f.o[2]) : null;
     if (f) {
-      const c = Math.cos(w.pose[2]);
-      const s = Math.sin(w.pose[2]);
+      // the outline's pose at the near end (scaled and turned there for a tapered solid), as one affine to the screen
+      const N = poseAt(p, w.pose, top);
+      const [c, s] = [N[2], N[3]];
       const cx: Vec2 = [c * U![0] + s * V![0], c * U![1] + s * V![1]];
       const cy: Vec2 = [-s * U![0] + c * V![0], -s * U![1] + c * V![1]];
       const off: Vec2 = [P0![0] + w.pose[0] * U![0] + w.pose[1] * V![0], P0![1] + w.pose[0] * U![1] + w.pose[1] * V![1]];
-      slices.set([cx[0], cy[0], cx[1], cy[1], z0, top, fa, code, Wd![0], Wd![1], off[0], off[1]], si * 12);
+      slices.set([cx[0], cy[0], cx[1], cy[1], z0, top, fa, code + (p.mods ? 4 : 0), Wd![0], Wd![1], off[0], off[1]], si * SLICE);
+      if (p.mods) {
+        // the far end relative to the near: the ratio of the two ends' scale-and-turn (a complex division)
+        const B = poseAt(p, w.pose, z0);
+        const n2 = c * c + s * s || 1;
+        slices.set([0, 0, (B[2] * c + B[3] * s) / n2, (B[3] * c - B[2] * s) / n2], si * SLICE + 12);
+      }
     } else if (p.mods) {
       // a tapered or helical solid: the pose of its outline at the near end, then at the far end (code + 4)
       const capP = poseAt(p, w.pose, top);
       const backP = poseAt(p, w.pose, z0);
-      slices.set([...capP, z0, top, fa, code + 4, ...backP], si * 12);
+      slices.set([...capP, z0, top, fa, code + 4, ...backP], si * SLICE);
     } else {
       const c = Math.cos(w.pose[2]);
       const s = Math.sin(w.pose[2]);
-      slices.set([w.pose[0], w.pose[1], c, s, z0, top, fa, code, w.pose[0], w.pose[1], c, s], si * 12);
+      slices.set([w.pose[0], w.pose[1], c, s, z0, top, fa, code, w.pose[0], w.pose[1], c, s], si * SLICE);
     }
     // a point of the solid's plane at `a` along its axis, on screen
     const P3 = (q: Vec2, a: number): Vec2 =>
@@ -328,7 +350,8 @@ export function planFrame(f: PlanInput): FramePlan {
     if (Sl.isTop || LD.effect("innerSilhouettes") || ax === "x" || ax === "p") {
       cl.push(it.verts, si, MODE.silhouette, op, [L.silhouette, L.silhouetteAlpha]);
       const pairs: [Vec2, Vec2][] = extreme(w).map((i) => {
-        if (p.mods) return [P3(pointAt(poseAt(p, w.pose, top), p.outer[i]!), top), P3(pointAt(poseAt(p, w.pose, z0), p.outer[i]!), z0)];
+        const q0 = (w.local?.outer ?? p.outer)[i]!;
+        if (p.mods) return [P3(pointAt(poseAt(p, w.pose, top), q0), top), P3(pointAt(poseAt(p, w.pose, z0), q0), z0)];
         const q = P3(w.outer[i]!, top);
         return [q, [q[0] + d[0], q[1] + d[1]]];
       });

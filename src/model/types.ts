@@ -60,10 +60,12 @@ export interface Part {
   /**
    * Members that change shape over the cycle (cheapest first): `stretch`, a part placed `between` two solved points
    * whose outline is given at unit length along x and stretched to their distance (a rope span, a spring); `deform`,
-   * the outline from the solved state each frame, always with the same point count (a flexspline, a belt's wrap).
+   * the outline from the solved state each frame, always with the same point count (a flexspline, a belt's wrap); it
+   * may return its holes too (`{ outer, holes }`, a band whose inner and outer edges both change), each ring with the
+   * point count of the part's shape.
    */
   stretch?: boolean;
-  deform?(s: Solved): Vec2[];
+  deform?(s: Solved): Vec2[] | Shape;
   /**
    * Plating offset from the layer grid, mm (K1: heights may change, centres may not): a part plated low over a pin
    * shortens the pin's overhang (A9). The explode level stays the layer's.
@@ -150,14 +152,16 @@ export interface MechanismModel {
    * mm, at `pitch`), a rope over sheaves (its spans are stretched parts, `spans`; its wraps over the sheaves, `wraps`,
    * fixed arcs, P.ropeWrap), a toothed timing belt over two timing pulleys (P.pulley, tooth counts `z`; the belt's
    * back is the fixed part `band` round the pitch path, its teeth carried round by the solved travel `travel`, mm, at
-   * `pitch`, HTD), or a CVT belt between sheave pairs. A chain's and a belt's path starts at the first wheel's tangent
+   * `pitch`, HTD), or a CVT belt between sheave pairs: per shaft its `fixed` half (on the shaft, turning with it) and its
+   * `sliding` half (posed by a frame that slides along the shaft, axis "p"), sprung on the belt where `spring` is set,
+   * and the belt (`belt`, a deforming part). A chain's and a belt's path starts at the first wheel's tangent
    * point on the span that runs onto it and goes counter-clockwise; the travel grows with the input.
    */
   flexible?: (
     | { form: "chain"; over: [string, string]; travel: string; pitch: number; roller: number }
     | { form: "rope"; over: string[]; spans: string[]; wraps?: string[]; dead?: string; hook?: string; load?: string }
     | { form: "belt"; over: [string, string]; travel: string; pitch: number; band: string }
-    | { form: "cvt"; over: string[] }
+    | { form: "cvt"; pairs: { fixed: string; sliding: string; spring?: boolean }[]; belt: string }
   )[];
   /** Compliant joints (J13): a flexure neck joining a lever to the ground block it is cut from, its swing range. */
   compliant?: { neck: string; ground: string; lever: string; at: string; range: [number, number] }[];

@@ -1,13 +1,15 @@
 // A15: zero clashes over the full cycle. Every pair of solids that move relative to each other and share a z range is
 // tested for interpenetration of their outlines at n phases. Pairs that are one body, one group, or allowed by
-// design are skipped. Two solids on different axes (src/core/axis.ts) are tested by their world boxes.
-import { boxOverlap } from "../core/axis";
+// design are skipped. Two solids on different axes (src/core/axis.ts) are tested by their world boxes, except a posed
+// solid whose frame's axis stands along the base z (a sheave half or a belt sliding up a z shaft): it is tested with
+// the z solids by its outline in plan, as they are.
+import { boxOverlap, frameAxis, framePoint } from "../core/axis";
 import { TAU, xf } from "../core/geom";
 import { overlap, region, type Region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, planeKey, shapeAt, solidBox, solidPose } from "./pose";
+import { extentAt, indexParts, isGround, planeKey, ringsAt, solidBox, solidPose } from "./pose";
 
 export interface Clash {
   a: string;
@@ -47,17 +49,40 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
     const poses = S.map((t) => solidPose(model, parts, t, s, u));
     const regs: (Region | null)[] = S.map((t, i) => {
       const q = poses[i];
-      return q ? region(xf(shapeAt(parts, t, s), q), t.holes.map((h) => xf(h, q))) : null;
+      if (!q) return null;
+      const r = ringsAt(parts, t, s);
+      return region(xf(r.outer, q), r.holes.map((h) => xf(h, q)));
+    });
+    // z solids and posed solids standing along z: their outline in plan and their z range
+    const flats = S.map((t, i): { r: Region; z: [number, number] } | null => {
+      if (!t.axis) return regs[i] ? { r: regs[i]!, z: [t.z0, t.z1] } : null;
+      const f = t.axis === "p" && t.frame ? s.frames?.[t.frame] : undefined;
+      const q = poses[i];
+      if (!f || !q || Math.abs(frameAxis(f)[2]) < 1 - 1e-9) return null;
+      const [w0, w1] = extentAt(t, f);
+      const plan = (P: typeof t.outer) => xf(P, q).map((p): [number, number] => {
+        const X = framePoint(f, p, 0);
+        return [X[0], X[1]];
+      });
+      const r = ringsAt(parts, t, s);
+      const za = framePoint(f, [q[0], q[1]], w0)[2];
+      const zb = framePoint(f, [q[0], q[1]], w1)[2];
+      return { r: region(plan(r.outer), r.holes.map(plan)), z: [Math.min(za, zb), Math.max(za, zb)] };
     });
     for (const [i, k] of pairs) {
       const a = S[i]!;
       const b = S[k]!;
       let d: number;
-      if (planeKey(a) !== planeKey(b)) {
+      const fa = flats[i];
+      const fb = flats[k];
+      if (planeKey(a) !== planeKey(b) && fa && fb) {
+        if (Math.min(fa.z[1], fb.z[1]) - Math.max(fa.z[0], fb.z[0]) <= 0.05) continue;
+        d = overlap(fa.r, fb.r);
+      } else if (planeKey(a) !== planeKey(b)) {
         const qa = poses[i];
         const qb = poses[k];
         if (!qa || !qb) continue;
-        d = boxOverlap(solidBox(a, qa, s), solidBox(b, qb, s));
+        d = boxOverlap(solidBox(a, qa, s, parts), solidBox(b, qb, s, parts));
       } else {
         const ra = regs[i];
         const rb = regs[k];

@@ -50,7 +50,7 @@ export function rigidExplode(ctx: RuleContext): void {
       const q = ctx.world(t);
       if (!q || !P) return false;
       if (!t.axis) return Math.min(t.z1, z1) - Math.max(t.z0, z0) > 0.3 && inside(t.outer, toLocal(q, P));
-      const b = solidBox(t, q, ctx.s0);
+      const b = solidBox(t, q, ctx.s0, ctx.parts);
       return Math.min(b[5], z1) - Math.max(b[2], z0) > 0.3 && P[0] > b[0] && P[0] < b[3] && P[1] > b[1] && P[1] < b[4];
     };
     const passed = P ? S.filter((t) => t.group !== g && !["head", "shank", "nut", "washer"].includes(t.kind) && passes(t)) : [];

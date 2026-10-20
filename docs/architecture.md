@@ -66,7 +66,7 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    tags and links come from the catalogue record with the same id.
    A member whose axis is none of x, y, z (a universal joint's cross, a swash plate) declares `axis: "p"` and a
    `frame`: the model's `solve(u)` returns that frame (an origin and two unit directions) and the part's plane follows
-   it every phase.
+   it every phase. A frame that moves along its own axis slides the part along it (a CVT's sheave half).
    A part may declare an **axis** (`axis: "x" | "y"`, z by default) with its start along it (`along`): it then stands
    out of the plan plane, a shaft in plan or a disc on edge. Its outline, its pose and the solved points that place it
    lie in the plane normal to the axis (`src/core/axis.ts`: for x the plane's (u, v) is world (y, z), for y it is
@@ -96,11 +96,14 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    x or y axis is drawn by the same items: its slice row carries the axis, the shaders map its plane to the screen
    (a y face by one affine, as a z face; an x face is edge-on) and sweep its walls along the projected axis; a y solid
    shows its low-y end, the end nearer the viewer; a posed solid's slice row carries its own local-to-screen affine. A
-   member that changes shape is a stretched or deforming solid whose
-   outline is made again each frame (its items rewritten in the GPU buffer in place, the point count fixed), or a
-   small rigid solid carried along a closed path (a `convey` motion). Two solid modifiers change a solid along its axis: `taper` scales
+   member that changes shape is a stretched or deforming solid, on any axis, whose
+   outline (and, for a deforming part that gives them, its holes) is made again each frame (its edge, hole-edge,
+   triangle and vertex items rewritten in the GPU buffer in place, the point count of each ring fixed), or a
+   small rigid solid carried along a closed path (a `convey` motion). A posed solid whose end `reach`es a point that
+   stays (a spring on its seat) takes its extent along the frame's axis from the frame each phase. Two solid modifiers change a solid along its axis: `taper` scales
    its outline toward the far end (a bevel gear's toothed frustum, a cone) and `helix` turns it by its lead (a
-   helical gear); the slice row then carries the outline's pose at both ends and the walls run between them. A helix
+   helical gear); the slice row then carries the outline's pose at both ends and the walls run between them (a posed slice: its near
+   end's affine and the far end's scale and turn relative to it, in a fourth texel). A helix
    that would wind more than a quarter turn (a screw, a worm) keeps its outline and carries thread marks at its lead
    instead. Every
    session on a page shares one WebGL2 context; a lost context is rebuilt and the drawing redrawn. Thumbnails, the
