@@ -152,7 +152,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     const gpu = performance.now() - g0;
     setups.push({ decode: s.ms.decode, tessellate: s.ms.tessellate, caps: s.ms.caps, edges: s.ms.edges, gpu, total: s.ms.decode + s.ms.tessellate + s.ms.edges + gpu });
     if (o.worker && typeof Worker !== "undefined") {
-      const w = new Worker("setup-worker.js", { type: "module" });
+      const w = new Worker(`setup-worker.js?v=${document.body.dataset.v ?? ""}`, { type: "module" });
       workers.push((await setupInWorker(w, blob2)).wall);
       w.terminate();
     }

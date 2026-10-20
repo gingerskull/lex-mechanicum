@@ -18,12 +18,12 @@ const require = createRequire(import.meta.url);
 /** The pilots the phone page offers when no ids are given. */
 export const PAGE_IDS = ["four-bar", "spur-gears", "bevel-gears"];
 
-const html = (ids: string[]) => {
+const html = (ids: string[], v: number) => {
   const faces = FONT_FILES.map((f) => `@font-face{font-family:"${f.family}";font-weight:${f.weight};font-style:normal;src:url("fonts/${f.file}") format("woff2")}`).join("");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>loading</title><link rel="icon" href="data:,"><style>${faces}
 body{font:15px/1.4 system-ui,sans-serif;margin:12px;max-width:1400px}fieldset{border:1px solid #888;margin:8px 0}label{margin-right:12px;white-space:nowrap}
 button{font:inherit;padding:8px 16px}pre{white-space:pre-wrap;word-break:break-word;font:12px/1.35 ui-monospace,monospace;background:#8881;padding:8px;overflow-x:auto}</style></head>
-<body data-ids="${ids.join(",")}"><div id="app"></div><script type="module" src="./main.js"></script></body></html>
+<body data-ids="${ids.join(",")}" data-v="${v}"><div id="app"></div><script type="module" src="./main.js?v=${v}"></script></body></html>
 `;
 };
 
@@ -48,7 +48,7 @@ export async function buildPage(out: string, ids: string[]): Promise<string> {
     writeFileSync(join(out, "packages", `${id}.mx2`), await encode2(b.pkg));
     writeFileSync(join(out, "packages", `${id}.mxp`), await encode(b.built.pkg));
   }
-  writeFileSync(join(out, "index.html"), html(ids));
+  writeFileSync(join(out, "index.html"), html(ids, Date.now()));
   return out;
 }
 
