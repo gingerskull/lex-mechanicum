@@ -1,11 +1,11 @@
 // The model contract: what a mechanism's model.ts provides. Kinematics only; no prose and no style.
-import type { Axis } from "../core/axis";
+import type { Axis, Frame3 } from "../core/axis";
 import type { Pose, Vec2 } from "../core/geom";
 import type { RungId } from "../style/detail";
 import type { Role } from "../style/kinds";
 
 // Role and the rung ids are the detail ladder's vocabulary (src/style); the model shares them, never redefines them.
-export type { Axis, Pose, Role, RungId, Vec2 };
+export type { Axis, Frame3, Pose, Role, RungId, Vec2 };
 
 export type InputKind = "rotary" | "oscillating" | "linear" | "manual";
 
@@ -18,6 +18,8 @@ export interface Shape {
 export interface Solved {
   pts: Record<string, Vec2>;
   poses?: Record<string, Pose>;
+  /** Posed frames of members whose axis is none of x, y, z (Part.axis "p", src/core/axis.ts). */
+  frames?: Record<string, Frame3>;
   [k: string]: unknown;
 }
 
@@ -39,9 +41,14 @@ export interface Part {
    * a part standing out of the plan plane (a shaft in plan, a disc on edge). Its outline, its pose and the solved points
    * it is placed by lie in the plane normal to the axis.
    */
-  axis?: Axis;
-  /** Axis x or y: where the part's extent along its axis starts, world mm (its z0 for a z part). Required then. */
+  axis?: Axis | "p";
+  /** Axis x, y or p: where the part's extent along its axis starts, world mm (its z0 for a z part). Required then. */
   along?: number;
+  /**
+   * Axis "p", a posed axis: the key of the solved frame (`solve(u).frames`) whose plane the outline lies in. The part's
+   * pose (fixed, at, between) is then a pose within that plane.
+   */
+  frame?: string;
   /**
    * Solid modifiers (src/core/spatial.ts): `taper`, the outline's scale at the far end (z1) about the solid's origin,
    * so the solid is a frustum (a bevel gear, a cone); `helix`, a lead in mm per turn (+ right hand, - left), so the

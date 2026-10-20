@@ -6,7 +6,7 @@ import { bevel, bevelOutline, pitchCones, worm } from "../../src/core/spatial";
 import { defineMechanism } from "../../src/model/define";
 import type { MechanismModel } from "../../src/model/types";
 import { P } from "../../src/parts";
-import { chainModel, deformModel, flexureModel, ropeModel } from "./models";
+import { chainModel, deformModel, flexureModel, ropeModel, ujointModel } from "./models";
 
 export interface Scene {
   model: MechanismModel;
@@ -109,5 +109,5 @@ function wormPair(): Scene {
 export const scenes: Record<string, Scene> = Object.fromEntries([shaftInPlan("y"), shaftInPlan("x"), bevelPair(), wormPair()].map((s) => [s.model.id, s]));
 
 /** Flexible members (#168): the chain on two sprockets and the rope over two sheaves of the rule fixtures. */
-export const flexScenes: Scene[] = [chainModel, ropeModel, flexureModel, deformModel].map((model) => ({ model, polish() {} }));
+export const flexScenes: Scene[] = [chainModel, ropeModel, flexureModel, deformModel, ujointModel].map((model) => ({ model, polish() {} }));
 for (const s of flexScenes) scenes[s.model.id] = s;

@@ -64,6 +64,9 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    the cycle phase u in 0..2π. Heights belong to the model too: a part plated off its layer (`dz`), a clevis plate
    twinned with its partner (`twin`), tapered links sized to their bosses. It holds no prose and no style; name, text,
    tags and links come from the catalogue record with the same id.
+   A member whose axis is none of x, y, z (a universal joint's cross, a swash plate) declares `axis: "p"` and a
+   `frame`: the model's `solve(u)` returns that frame (an origin and two unit directions) and the part's plane follows
+   it every phase.
    A part may declare an **axis** (`axis: "x" | "y"`, z by default) with its start along it (`along`): it then stands
    out of the plan plane, a shaft in plan or a disc on edge. Its outline, its pose and the solved points that place it
    lie in the plane normal to the axis (`src/core/axis.ts`: for x the plane's (u, v) is world (y, z), for y it is
@@ -92,7 +95,8 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    composited onto the canvas, and centrelines, dimensions, traces, sheet and overlays are drawn over it. A solid on an
    x or y axis is drawn by the same items: its slice row carries the axis, the shaders map its plane to the screen
    (a y face by one affine, as a z face; an x face is edge-on) and sweep its walls along the projected axis; a y solid
-   shows its low-y end, the end nearer the viewer. A member that changes shape is a stretched or deforming solid whose
+   shows its low-y end, the end nearer the viewer; a posed solid's slice row carries its own local-to-screen affine. A
+   member that changes shape is a stretched or deforming solid whose
    outline is made again each frame (its items rewritten in the GPU buffer in place, the point count fixed), or a
    small rigid solid carried along a closed path (a `convey` motion). Two solid modifiers change a solid along its axis: `taper` scales
    its outline toward the far end (a bevel gear's toothed frustum, a cone) and `helix` turns it by its lead (a

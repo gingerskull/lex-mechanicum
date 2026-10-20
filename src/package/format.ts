@@ -51,6 +51,8 @@ export interface PackedSolid {
   helix?: number;
   /** A stretched member's two solved points (src/hardware/solid.ts). */
   stretch?: [string, string];
+  /** A posed solid's frame key: its axis is "p" (src/core/axis.ts, Frame3). */
+  frame?: string;
   /** FLAG bits: inset, accent, faint, isBase, headTop, seeThrough, and the axis (axisX, axisY; neither is z). */
   flags: number;
   /** x, y pairs, body-local mm: the outer outline, then each hole, then each mark. */
@@ -112,7 +114,7 @@ export function ringsOf(s: PackedSolid): { outer: Float32Array; holes: Float32Ar
 export const hasFlag = (s: PackedSolid, f: FlagName): boolean => (s.flags & FLAG[f]) !== 0;
 
 /** The axis of a packed solid: "z" unless an axis flag is set. */
-export const axisOfPacked = (s: PackedSolid): "z" | "x" | "y" => (hasFlag(s, "axisX") ? "x" : hasFlag(s, "axisY") ? "y" : "z");
+export const axisOfPacked = (s: PackedSolid): "z" | "x" | "y" | "p" => (s.frame ? "p" : hasFlag(s, "axisX") ? "x" : hasFlag(s, "axisY") ? "y" : "z");
 
 const INT16 = 32767;
 /** Finest grid: 1/256 mm. A larger mechanism gets a coarser grid so its farthest point still fits in int16. */
@@ -207,6 +209,7 @@ export function pack(a: PackInput, sampled: Sampled): Package {
     if (s.taper !== undefined) p.taper = s.taper;
     if (s.helix !== undefined) p.helix = s.helix;
     if (s.stretch) p.stretch = [s.stretch[0], s.stretch[1]];
+    if (s.axis === "p" && s.frame) p.frame = s.frame;
     return p;
   });
   const traces: Record<string, Float32Array> = {};

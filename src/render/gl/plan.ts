@@ -2,7 +2,7 @@
 // (pose, z range and fade per slice) and two chunk tables, one per target: the frame (paper, shade, hidden lines) and the
 // lines layer (full lines, erased where later surfaces cover them). A chunk is a range of items drawn in one mode; its
 // op number, written as depth, keeps the paint order of the drafting frame (style Part IV, paint order SD).
-import { toWorld } from "../../core/axis";
+import { frameAxis, toWorld } from "../../core/axis";
 import { TAU, area, type Vec2 } from "../../core/geom";
 import { DRAFT, type RoleSurface, type SurfaceKey } from "../../style/draft";
 import { FORM } from "../../style/form";
@@ -129,8 +129,29 @@ function phasesOut(items: Items, r: Range, pose: [number, number, number], Pr: P
   }
 }
 
-/** The slice's axis code in the slice table (0 z, 1 x, 2 y), as the shaders read it. */
-const AXIS_CODE = { x: 1, y: 2 } as const;
+/** phases() for a posed solid: an edge (dx, dy) of its plane is dx U + dy V on screen. */
+function phasesPosed(items: Items, r: Range, pose: [number, number, number], U: Vec2, V: Vec2, out: number[]): void {
+  const D = items.data;
+  const c = Math.cos(pose[2]);
+  const s = Math.sin(pose[2]);
+  let cum = 0;
+  for (let i = r[0]; i < r[0] + r[1]; i++) {
+    const o = i * ITEM;
+    if (D[o + 2] === 0) cum = 0;
+    out.push(cum);
+    const dx = D[o + 6]! - D[o + 4]!;
+    const dy = D[o + 7]! - D[o + 5]!;
+    const rx = c * dx - s * dy;
+    const ry = s * dx + c * dy;
+    cum += Math.hypot(rx * U[0] + ry * V[0], rx * U[1] + ry * V[1]);
+  }
+}
+
+/** The slice's axis code in the slice table (0 z, 1 x, 2 y, 3 posed), as the shaders read it. */
+const AXIS_CODE = { x: 1, y: 2, p: 3 } as const;
+
+/** A world direction (X, Y, Z) as a screen displacement per mm (the projector's linear part). */
+const lin = (Pr: Projector, [X, Y, Z]: [number, number, number]): Vec2 => [Pr.s * X, -Pr.s * (Y * Pr.ct + Z * Pr.st)];
 
 export function planFrame(f: PlanInput): FramePlan {
   const { list, T, LD, cardK, Pr, items, dynStart } = f;
@@ -165,7 +186,17 @@ export function planFrame(f: PlanInput): FramePlan {
       let lo = 0;
       let hi = 0;
       const P = w.outer;
-      if (w.axis === "x") {
+      if (w.axis === "p" && w.frame) {
+        // a posed solid: across its walls' sweep on screen
+        const W = lin(Pr, frameAxis(w.frame));
+        const U = lin(Pr, w.frame.u);
+        const V = lin(Pr, w.frame.v);
+        const k = (q: Vec2) => (U[0] * q[0] + V[0] * q[1]) * W[1] - (U[1] * q[0] + V[1] * q[1]) * W[0];
+        for (let i = 1; i < P.length; i++) {
+          if (k(P[i]!) < k(P[lo]!)) lo = i;
+          if (k(P[i]!) > k(P[hi]!)) hi = i;
+        }
+      } else if (w.axis === "x") {
         // the walls of an x solid run across the screen: its silhouettes are at the outline's lowest and highest point
         const k = (q: Vec2) => q[0] * Pr.ct + q[1] * Pr.st;
         for (let i = 1; i < P.length; i++) {
@@ -193,10 +224,26 @@ export function planFrame(f: PlanInput): FramePlan {
     const fa = p.faint ? 0.5 : 1;
     // the slice's far end (z0) and near end (top) along its axis: a y solid is seen from its low-y end
     const ax = w.axis;
-    const top = ax === "y" ? Sl.z0 : Sl.top;
-    const z0 = ax === "y" ? Sl.top : Sl.z0;
+    // a posed solid is seen from the end its axis points the viewer's way (toward -y and +z)
+    const f = ax === "p" ? w.frame! : null;
+    const fw = f ? frameAxis(f) : null;
+    const nearHigh = fw ? -fw[1] * Pr.st + fw[2] * Pr.ct >= 0 : ax !== "y";
+    const top = nearHigh ? Sl.top : Sl.z0;
+    const z0 = nearHigh ? Sl.z0 : Sl.top;
     const code = ax ? AXIS_CODE[ax] : 0;
-    if (p.mods) {
+    // a posed solid's local (x, y) and its axis on screen: one affine per slice
+    const U = f ? lin(Pr, f.u) : null;
+    const V = f ? lin(Pr, f.v) : null;
+    const Wd = fw ? lin(Pr, fw) : null;
+    const P0 = f ? Pr.P(f.o[0], f.o[1], f.o[2]) : null;
+    if (f) {
+      const c = Math.cos(w.pose[2]);
+      const s = Math.sin(w.pose[2]);
+      const cx: Vec2 = [c * U![0] + s * V![0], c * U![1] + s * V![1]];
+      const cy: Vec2 = [-s * U![0] + c * V![0], -s * U![1] + c * V![1]];
+      const off: Vec2 = [P0![0] + w.pose[0] * U![0] + w.pose[1] * V![0], P0![1] + w.pose[0] * U![1] + w.pose[1] * V![1]];
+      slices.set([cx[0], cy[0], cx[1], cy[1], z0, top, fa, code, Wd![0], Wd![1], off[0], off[1]], si * 12);
+    } else if (p.mods) {
       // a tapered or helical solid: the pose of its outline at the near end, then at the far end (code + 4)
       const capP = poseAt(p, w.pose, top);
       const backP = poseAt(p, w.pose, z0);
@@ -207,20 +254,22 @@ export function planFrame(f: PlanInput): FramePlan {
       slices.set([w.pose[0], w.pose[1], c, s, z0, top, fa, code, w.pose[0], w.pose[1], c, s], si * 12);
     }
     // a point of the solid's plane at `a` along its axis, on screen
-    const P3 = (q: Vec2, a: number): Vec2 => (ax ? Pr.P(...toWorld(ax, q, a)) : Pr.P(q[0], q[1], a));
+    const P3 = (q: Vec2, a: number): Vec2 =>
+      f ? [P0![0] + q[0] * U![0] + q[1] * V![0] + a * Wd![0], P0![1] + q[0] * U![1] + q[1] * V![1] + a * Wd![1]] : ax ? Pr.P(...toWorld(ax as "x" | "y", q, a)) : Pr.P(q[0], q[1], a);
     const isBase = p.base;
     const isPlate = PLATE.has(p.s.kind) && p.s.role !== "trace";
     const R: RoleSurface = (isBase ? DRAFT.role.base : DRAFT.role[p.s.role as SurfaceKey]) ?? DRAFT.role.link;
     const see = p.seeThrough ? F.seeThrough : null;
     const { face: faceA, occ, wallOcc } = cover({ base: isBase, plate: isPlate, see: !!see, top: Sl.isTop });
     // the walls' sweep on screen, from the near end to the far end
-    const d: Vec2 = ax === "x" ? [Pr.s * (z0 - top), 0] : ax === "y" ? [0, Pr.s * (top - z0) * Pr.ct] : [0, Pr.s * (Sl.top - Sl.z0) * Pr.st];
+    const d: Vec2 = Wd ? [Wd[0] * (z0 - top), Wd[1] * (z0 - top)] : ax === "x" ? [Pr.s * (z0 - top), 0] : ax === "y" ? [0, Pr.s * (top - z0) * Pr.ct] : [0, Pr.s * (Sl.top - Sl.z0) * Pr.st];
     // pen: the full line on the lines layer; the frame gets it thin and dashed, a hidden line where it is covered
     const line = (r: Range, z: number, width: number, alpha: number, withHidden: boolean, at = op) => {
       cl.push(r, si, MODE.line, at, [z, width, alpha, 0, 0, 0, 0]);
       if (withHidden && hidden && r[1]) {
         const at0 = dash.length;
-        if (ax) phasesOut(items, r, w.pose, Pr, dash, ax);
+        if (f) phasesPosed(items, r, w.pose, U!, V!, dash);
+        else if (ax) phasesOut(items, r, w.pose, Pr, dash, ax as "x" | "y");
         else phases(items, r, w.pose, Pr, dash);
         cm.push(r, si, MODE.line, at, [z, width * L.hidden.width, alpha * L.hidden.alpha, 0, 1 + at0, 0, 0]);
       }
@@ -231,7 +280,7 @@ export function planFrame(f: PlanInput): FramePlan {
     cl.push(it.outer, si, MODE.wallErase, op, [Math.max(0, Math.min(1, wallOcc))]);
     op++;
     // (a hole in an x solid is edge-on: its walls are inside the solid)
-    if (shade && it.holes[1] && ax !== "x") cm.push(it.holes, si, MODE.holeWall, op++, [0, 0, WS.hole.from, WS.hole.span]);
+    if (shade && it.holes[1] && ax !== "x" && ax !== "p") cm.push(it.holes, si, MODE.holeWall, op++, [0, 0, WS.hole.from, WS.hole.span]);
     // 2. the plate's bottom outline before its own top face, so its back edge turns hidden behind it
     if (Sl.isBottom && isPlate) line(it.outer, z0, L.plateBottom, L.bottomAlpha, true, op++);
     // 3. the slice's top face: paper, tint and role pattern; the lines layer erased

@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.8
+version: 2.9
 date: 2026-10-20
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -136,7 +136,7 @@ forms, reused everywhere.
 | D4 | Consistent radii: base-plate corners from the form style; feet and corner standoffs concentric with the corner arcs. | AUTO | screenshot |
 | D5 | **Solid, designed mounts** over scattered standoffs: one bracket, bridge or post pair, shaped as a part. | HAND (shape) / AUTO (`H.bridge`) | review |
 | D6 | **Nothing cosmetic distracts.** Supporting elements read quieter than the mechanism but stay clearly visible. | HAND + STYLE | screenshots |
-| D8 | **Axis.** A part lies on the base plane (axis z, the default) or stands out of it on an x or y axis of the base: a shaft in plan, a disc on edge, a bevel pinion, a worm, a screw. Such a part declares `axis` and `along` (where it starts along the axis); its outline, its pose and the solved points that place it lie in the plane normal to the axis, and its extent along the axis takes the place of the z range. Joints between parts on different axes are only those that allow it (J9, J11), declared in the model (`meshes`, `screws`). Solid modifiers give the forms along the axis: `taper` (a bevel gear's frustum, a cone) and `helix` (a helical gear's teeth, a screw's thread, at its lead). | AUTO (z by default; `tools/check` reports `AXIS`) / HAND (where a mechanism needs an axis) | `tools/check` |
+| D8 | **Axis.** A part lies on the base plane (axis z, the default) or stands out of it on an x or y axis of the base: a shaft in plan, a disc on edge, a bevel pinion, a worm, a screw. Such a part declares `axis` and `along` (where it starts along the axis); its outline, its pose and the solved points that place it lie in the plane normal to the axis, and its extent along the axis takes the place of the z range. Joints between parts on different axes are only those that allow it (J9, J11), declared in the model (`meshes`, `screws`). A member whose axis is none of these, and may tilt as it turns (a universal joint's cross, a swash plate, a Rzeppa cage, a governor's arms, a Bennett link), declares axis `p` and a `frame`: its plane is posed each phase by the solved frame of that name (`solve(u).frames`: an origin and two unit directions). Solid modifiers give the forms along the axis: `taper` (a bevel gear's frustum, a cone) and `helix` (a helical gear's teeth, a screw's thread, at its lead). | AUTO (z by default; `tools/check` reports `AXIS`) / HAND (where a mechanism needs an axis) | `tools/check` |
 | D9 | **Members that change shape**, cheapest first: a **stretched** part between two solved points, its outline given at unit length (a rope span, a spring); **conveyed** small rigid solids carried along a fixed closed path by a solved travel (chain rollers and links, belt teeth); a **deforming** outline from the solved state each frame, always with the same point count (a flexspline, a CVT belt's wrap), for a few solids only. A flexure is drawn rigid; its bend and stress zone are a `bend` overlay. | AUTO (the placements; the bench counts deforming solids) / HAND (which a mechanism needs) | screenshot, bench |
 | D7 | **The big parts stay plain.** Bars, plates, wheels, brackets and the base carry only load-driven shape (D2) and manufacturing evidence (section 7). All richness is in what makes the mechanism move and hold: shafts, bearings, clips, spacers, keys, screws, nuts, springs, stops, adjusters, oilers, marks, sensors. | HAND | review |
 
@@ -414,7 +414,7 @@ The look is the blueprint / drafting scheme: dark Blueprint and light Drafting s
 | L3 | **Roles carry the look.** Each role has its own surface: driver fine stipple, link sparse dots, output hatching, ground soft dashes, base a faint dot grid, bearings cross-hatch, hardware plain. Every solid's `role` must be right. | HAND |
 | L4 | **One accent colour** for the input shaft ring, the traced path and the forces. `accent: true` goes on the input only. | HAND (flag) / STYLE |
 | L5 | **Transparency stays.** Surfaces are semi-transparent and a covered edge becomes a dashed hidden line, so screws in holes, bearings in bores and shanks through plates show. Model them as real solids with real holes, never as a mark on a top face. A static solid that hides a working zone (the pitch point of a mesh, the run of a slot roller) is drawn see-through, so the zone stays in view. | AUTO (stage 3, see-through) / HAND |
-| L6 | **Correct depth order** at every tilt: solids sliced at every overlapping z boundary; a solid on an x or y axis cut along its own axis where another solid's box meets it and placed by the plane between their boxes; nothing paints in front of what it sits behind. | AUTO |
+| L6 | **Correct depth order** at every tilt: solids sliced at every overlapping z boundary; a solid on an x or y axis cut along its own axis where another solid's box meets it and placed by the plane between their boxes; a posed solid kept whole and placed by its box; nothing paints in front of what it sits behind. | AUTO |
 | L7 | **View:** tilt from 0° (true plan) to 88° (side elevation), no sideways shear. Pseudo-2D only. | STYLE |
 | L8 | **Drawing conventions the mechanism feeds:** chain centrelines through every joint head and base-plate dimensions are automatic. Engraved scales, index marks and match marks are `marks` and draw as fine ink lines. Fill patterns never get finer than the on-screen floor; a detail under about 1 mm becomes one mark or nothing. | AUTO / HAND |
 
@@ -572,8 +572,8 @@ Start here, then run the full ten-function audit.
 **Shaft couplings** (universal joint, double Cardan, Rzeppa, flexible couplings)
 - Each shaft on its own support (J2 or J10); the cross of a universal joint in needle cups held by circlips
   (`H.crossBearings`, F2), a grease nipple on the cross (F8); clamp hubs or keyed yokes on the shaft ends (F3).
-- A member that tilts as it turns (the cross, a cage, a swash plate) waits for posed axes; its build follows the
-  decision on it.
+- A member that tilts as it turns (the cross, a cage, a swash plate) is posed by a solved frame (axis `p`): the cross's
+  arms along the two yokes' pins, a yoke's axis along its shaft.
 
 **Flexible drives** (chain, rope and tackle, CVT, harmonic drive)
 - Declare the member in `flexible` (J12). A chain: sprocket pitch radius p / (2 sin(π/z)); choose the centre distance
@@ -620,6 +620,9 @@ default detail level.
 
 ## Changelog
 
+- **2.9 (2026-10-20).** Posed axes: a member whose axis is none of x, y, z is posed each phase by a solved frame, drawn
+  by one affine per face and ordered by its box [D8, L6, AUTO]. The shaft couplings playbook poses the universal
+  joint's cross and yokes.
 - **2.8 (2026-10-20).** Members that change shape over the cycle: stretched, conveyed and deforming, and the bend
   overlay for flexures; every existing part keeps its shape [D9, AUTO]. Flexible members (chain, rope, CVT) and compliant
   joints, declared in the model [A2, J12 to J13, AUTO]. Playbooks for flexible drives and compliant mechanisms.

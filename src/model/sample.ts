@@ -1,6 +1,6 @@
-import { boxOf, isOut, planCorners } from "../core/axis";
+import { isOut, planCorners } from "../core/axis";
 import { TAU, bbox, circle, ring, roundRect, xf } from "../core/geom";
-import { partShape, poseOf, velocity } from "./pose";
+import { partBox, partShape, poseOf, velocity } from "./pose";
 import type { MechanismModel, Part, Vec2 } from "./types";
 
 export interface Bounds {
@@ -51,9 +51,9 @@ export function sample(model: MechanismModel, n = 360): Sampled {
         const pose = poseOf(p, s);
         if (!pose) continue;
         // a part on an x or y axis covers its box's plan footprint, from `along` over its thickness
-        if (isOut(p.axis)) {
-          const w0 = (p.along ?? 0) + (p.dz ?? 0);
-          for (const q of planCorners(boxOf(p.axis, xf(partShape(p, s), pose), w0, w0 + p.thick))) grow(q);
+        if (isOut(p.axis) || p.axis === "p") {
+          const b = partBox(p, s);
+          if (b) for (const q of planCorners(b)) grow(q);
         } else for (const q of xf(partShape(p, s), pose)) grow(q);
       }
     for (const k of model.vel ?? []) {

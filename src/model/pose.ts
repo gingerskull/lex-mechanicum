@@ -1,3 +1,5 @@
+import { boxOf, frameBox, type Box3 } from "../core/axis";
+import { xf } from "../core/geom";
 import type { MechanismModel, Part, Pose, Solved, Vec2 } from "./types";
 
 /**
@@ -34,6 +36,23 @@ export function partShape(p: Part, s: Solved): Vec2[] {
     return p.shape.outer.map(([x, y]): Vec2 => [x * L, y]);
   }
   return p.shape.outer;
+}
+
+/**
+ * The world box of a part at a solved phase: its outline over its z range, or over its extent along an x, y or posed
+ * axis. Null when the part has no pose or its frame is not solved.
+ */
+export function partBox(p: Part, s: Solved): Box3 | null {
+  const q = poseOf(p, s);
+  if (!q) return null;
+  const P = xf(partShape(p, s), q);
+  const w0 = p.axis === "x" || p.axis === "y" || p.axis === "p" ? (p.along ?? 0) + (p.dz ?? 0) : p.layer * 10 + (p.dz ?? 0);
+  const w1 = w0 + p.thick;
+  if (p.axis === "p") {
+    const f = p.frame ? s.frames?.[p.frame] : undefined;
+    return f ? frameBox(f, P, w0, w1) : null;
+  }
+  return boxOf(p.axis === "x" || p.axis === "y" ? p.axis : "z", P, w0, w1);
 }
 
 /** Velocity of a solved point per radian of cycle phase, by central difference. */

@@ -2,7 +2,7 @@
 // axes of parts standing out of the plan plane (src/core/axis.ts).
 import { boxOf, isOut, planCorners } from "../core/axis";
 import { TAU, xf } from "../core/geom";
-import { poseOf } from "./pose";
+import { partBox, poseOf } from "./pose";
 import type { MechanismModel, Part, Pose, Solved, Vec2 } from "./types";
 
 export type FindingType = "MISSING" | "NaN" | "LINK_LEN" | "POSE_JUMP" | "INTERFERE" | "OVERLAP" | "WARN" | "PERIODICITY" | "AXIS";
@@ -13,7 +13,8 @@ export type FindingType = "MISSING" | "NaN" | "LINK_LEN" | "POSE_JUMP" | "INTERF
  */
 export const MIXED_AXIS_JOINTS: readonly string[] = ["J9", "J11"];
 
-const axisOf = (p: Part) => p.axis ?? "z";
+// a part's plane: its axis, a posed part's by its frame
+const axisOf = (p: Part) => (p.axis === "p" ? `p:${p.frame ?? ""}` : (p.axis ?? "z"));
 
 export interface Finding {
   type: FindingType;
@@ -182,7 +183,9 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
 
   // AXIS: a part on an x or y axis is placed along it by `along`; a cam contact between parts of different axes must be
   // a joint type that allows it
-  for (const p of model.parts) if (isOut(p.axis) && p.along === undefined) add("AXIS", `axis ${p.axis} needs \`along\`, the start of the part along its axis`, p.id);
+  for (const p of model.parts) if ((isOut(p.axis) || p.axis === "p") && p.along === undefined) add("AXIS", `axis ${p.axis} needs \`along\`, the start of the part along its axis`, p.id);
+  for (const p of model.parts)
+    if (p.axis === "p" && (!p.frame || !s0.frames?.[p.frame])) add("AXIS", `a posed part needs a frame solved in solve(u).frames (frame "${p.frame ?? ""}")`, p.id);
   const byId = Object.fromEntries(model.parts.map((p) => [p.id, p]));
   for (const m of model.meshes ?? []) {
     const a = byId[m.a];
@@ -287,7 +290,8 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
       const pp = poseOf(p, S[k]!);
       if (!pp) continue;
       const w0 = (p.along ?? 0) + (p.dz ?? 0);
-      for (const [x, y] of isOut(p.axis) ? planCorners(boxOf(p.axis, xf(p.shape.outer, pp), w0, w0 + p.thick)) : xf(p.shape.outer, pp)) {
+      const pb = p.axis === "p" ? partBox(p, S[k]!) : null;
+      for (const [x, y] of pb ? planCorners(pb) : isOut(p.axis) ? planCorners(boxOf(p.axis, xf(p.shape.outer, pp), w0, w0 + p.thick)) : xf(p.shape.outer, pp)) {
         x0 = Math.min(x0, x);
         x1 = Math.max(x1, x);
         y0 = Math.min(y0, y);

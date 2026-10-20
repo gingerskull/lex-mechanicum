@@ -1,6 +1,6 @@
 // World pose of a solid at a solved phase: its body's pose composed with its local pose, or the solid's own motion
 // (belt-driven pulleys, the oscillating drive's crank and link). Shared by assembly, checks, packaging and renderer.
-import { boxOf, type Box3 } from "../core/axis";
+import { boxOf, frameBox, type Box3 } from "../core/axis";
 import { xf, xfPose, type Pose, type Vec2 } from "../core/geom";
 import { circleX } from "../core/vec";
 import type { Solid } from "../hardware/solid";
@@ -91,7 +91,16 @@ export function solidPose(model: MechanismModel, parts: PartIndex, t: Pick<Solid
  * The world box of a solid at a pose (its outline posed in its plane, over its extent along its axis); a solid that
  * widens toward its far end (taper above 1) is boxed at its widest.
  */
-export const solidBox = (t: Pick<Solid, "axis" | "outer" | "z0" | "z1" | "taper">, q: Pose): Box3 => {
+export const solidBox = (t: Pick<Solid, "axis" | "outer" | "z0" | "z1" | "taper" | "frame">, q: Pose, s?: Solved): Box3 => {
   const k = Math.max(1, t.taper ?? 1);
-  return boxOf(t.axis, xf(k === 1 ? t.outer : t.outer.map(([x, y]): Vec2 => [x * k, y * k]), q), t.z0, t.z1);
+  const P = xf(k === 1 ? t.outer : t.outer.map(([x, y]): Vec2 => [x * k, y * k]), q);
+  if (t.axis === "p") {
+    // a posed solid is boxed in its frame at the phase (a far box when the frame is not solved)
+    const f = t.frame ? s?.frames?.[t.frame] : undefined;
+    return f ? frameBox(f, P, t.z0, t.z1) : [1e9, 1e9, 1e9, 1e9, 1e9, 1e9];
+  }
+  return boxOf(t.axis, P, t.z0, t.z1);
 };
+
+/** The axis a solid's outline lies normal to, for comparing two solids' planes (a posed one by its frame). */
+export const planeKey = (t: Pick<Solid, "axis" | "frame">): string => (t.axis === "p" ? `p:${t.frame}` : (t.axis ?? "z"));

@@ -81,10 +81,9 @@ describe("conformance", () => {
 
 describe("standard 2.7", () => {
   const std = readStandard();
-  it("brings no HAND change, nor does 2.8, so audits at 2.6 stay current", () => {
+  it("brings no HAND change, nor do 2.8 and 2.9, so audits at 2.6 stay current", () => {
     const e = changelog(std).find((x) => x.version === "2.7")!;
-    expect(changelog(std)[0]!.version).toBe("2.8");
-    expect(changelog(std)[0]!.changes.every((c) => !c.tiers.includes("HAND"))).toBe(true);
+    for (const v of ["2.8", "2.9"]) expect(changelog(std).find((x) => x.version === v)!.changes.every((c) => !c.tiers.includes("HAND"))).toBe(true);
     expect(e.changes.flatMap((c) => c.ids)).toEqual(expect.arrayContaining(["D8", "J9", "J10", "J11", "L6", "Q1"]));
     expect(e.changes.every((c) => !c.tiers.includes("HAND"))).toBe(true);
     const r = evaluate(std, { old: sheet("2.6"), now: sheet("2.7") });

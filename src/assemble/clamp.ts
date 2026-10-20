@@ -7,7 +7,7 @@ import { edgeDist, overlap, region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, shapeAt, solidBox, solidPose } from "./pose";
+import { indexParts, isGround, planeKey, shapeAt, solidBox, solidPose } from "./pose";
 
 const maxR = (t: Solid, cx: number, cy: number, q: [number, number, number]) =>
   Math.max(...xf(t.outer, q).map(([x, y]) => Math.hypot(x - cx, y - cy)));
@@ -37,8 +37,8 @@ export function clampCheck(model: MechanismModel, assembly: Assembly, n = 12): s
         if (moving(g) || g.kind === "thrustWasher") continue;
         const qr = pose.get(r);
         const qg = pose.get(g);
-        if (r.axis !== g.axis) {
-          if (qr && qg && boxesTouch(solidBox(r, qr), solidBox(g, qg))) out.add(`${r.id} (turning) touches the ground face of ${g.id}`);
+        if (planeKey(r) !== planeKey(g)) {
+          if (qr && qg && boxesTouch(solidBox(r, qr, s), solidBox(g, qg, s))) out.add(`${r.id} (turning) touches the ground face of ${g.id}`);
           continue;
         }
         if (Math.abs(r.z1 - g.z0) > 0.05 && Math.abs(g.z1 - r.z0) > 0.05) continue;

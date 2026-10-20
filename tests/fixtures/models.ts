@@ -309,3 +309,41 @@ export const deformModel: MechanismModel = defineMechanism({
   ],
   solve: (u) => ({ pts: { O: [0, 0] }, a: u }),
 });
+
+/**
+ * Posed axes (#169): a universal joint at 30°. The input shaft and its yoke turn on x; the output shaft lies in plan at
+ * 30° to it. The cross and the output yoke are posed by solved frames: the cross's arms along the input yoke's pins
+ * (a) and the output yoke's pins (b = s2 x a), the output yoke's axis along the output shaft.
+ */
+const UJ = { beta: 30 * D2R, zc: 40, r: 14 };
+const s2: [number, number, number] = [Math.cos(UJ.beta), Math.sin(UJ.beta), 0];
+const norm = (v: [number, number, number]): [number, number, number] => {
+  const l = Math.hypot(...v) || 1;
+  return [v[0] / l, v[1] / l, v[2] / l];
+};
+const ears = (r: number): Vec2[][] => [[[r - 3, -5], [r + 3, -5], [r + 3, 5], [r - 3, 5]], [[-r - 3, -5], [-r + 3, -5], [-r + 3, 5], [-r - 3, 5]]];
+const plus = (r: number, w: number): Vec2[] => [
+  [-r, -w], [-w, -w], [-w, -r], [w, -r], [w, -w], [r, -w], [r, w], [w, w], [w, r], [-w, r], [-w, w], [-r, w],
+];
+export const ujointModel: MechanismModel = defineMechanism({
+  id: "fx-ujoint",
+  input: { kind: "manual", part: "shaft1" },
+  parts: [
+    P.disc("shaft1", 6, { axis: "x", along: -90, thick: 72, layer: 2, at: "S", spin: (s) => s.a as number, role: "driver", marks: [] }),
+    P.disc("hub1", 10, { axis: "x", along: -24, thick: 6, layer: 3, at: "S", spin: (s) => s.a as number, role: "driver" }),
+    P.custom("ears1a", ears(UJ.r)[0]!, { axis: "x", along: -18, thick: 22, layer: 3, at: "S", spin: (s) => s.a as number, role: "driver" }),
+    P.custom("ears1b", ears(UJ.r)[1]!, { axis: "x", along: -18, thick: 22, layer: 3, at: "S", spin: (s) => s.a as number, role: "driver" }),
+    P.custom("cross", plus(UJ.r + 2, 3), { axis: "p", frame: "cross", along: -3, thick: 6, layer: 3, fixed: [0, 0, 0], role: "link" }),
+    P.custom("ears2a", ears(UJ.r)[0]!, { axis: "p", frame: "yoke2", along: -4, thick: 22, layer: 3, fixed: [0, 0, 0], role: "output" }),
+    P.custom("ears2b", ears(UJ.r)[1]!, { axis: "p", frame: "yoke2", along: -4, thick: 22, layer: 3, fixed: [0, 0, 0], role: "output" }),
+    P.disc("hub2", 10, { axis: "p", frame: "yoke2", along: 18, thick: 6, layer: 3, fixed: [0, 0, 0], role: "output" }),
+    P.disc("shaft2", 6, { axis: "p", frame: "yoke2", along: 24, thick: 66, layer: 2, fixed: [0, 0, 0], role: "output", marks: [] }),
+  ],
+  solve(u) {
+    const a: [number, number, number] = [0, Math.cos(u), Math.sin(u)];
+    const b = norm([s2[1] * a[2] - s2[2] * a[1], s2[2] * a[0] - s2[0] * a[2], s2[0] * a[1] - s2[1] * a[0]]);
+    const o: [number, number, number] = [0, 0, UJ.zc];
+    const v2: [number, number, number] = [s2[1] * b[2] - s2[2] * b[1], s2[2] * b[0] - s2[0] * b[2], s2[0] * b[1] - s2[1] * b[0]];
+    return { pts: { S: [0, UJ.zc] }, a: u, frames: { cross: { o, u: a, v: b }, yoke2: { o, u: b, v: v2 } } };
+  },
+});

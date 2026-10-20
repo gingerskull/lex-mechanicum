@@ -4,7 +4,7 @@ import { TAU, xf, type Vec2 } from "../core/geom";
 import { circleClearance, region, type Region } from "../core/poly";
 import { marks, onAxis, solid, type Solid } from "../hardware/solid";
 import { heights, layerZ } from "../parts";
-import { partShape, poseOf } from "../model/pose";
+import { partBox, partShape, poseOf } from "../model/pose";
 import { sample, type Sampled } from "../model/sample";
 import type { MechanismModel, Part } from "../model/types";
 import { FORM } from "../style/form";
@@ -34,6 +34,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
   const exOf = (z: number) => Math.max(0, levels.findIndex((l) => l >= z - 1e-6));
   // the base sits under the lowest part: for a part on an x or y axis, the lowest world z of its outline
   const lowest = (p: Part) => {
+    if (p.axis === "p") return partBox(p, s0)?.[2] ?? Infinity;
     if (!isOut(p.axis)) return heights(p)[0];
     const q = poseOf(p, s0);
     return q ? Math.min(...xf(p.shape.outer, q).map((v) => v[1])) : Infinity;
@@ -84,7 +85,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       const pose = solidPose(model, parts, t, s, u);
       if (!pose) continue;
       if (t.axis) {
-        const b = solidBox(t, pose);
+        const b = solidBox(t, pose, s);
         regions.push(region(planCorners(b), []));
         z[0] = Math.min(z[0], b[2]);
         z[1] = Math.max(z[1], b[5]);
@@ -142,7 +143,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
           let [z0, z1] = heights(part);
           const regions: Region[] = [];
           // a part on an x or y axis sweeps its box: the plan footprint, over the box's z range
-          const out = isOut(part.axis);
+          const out = isOut(part.axis) || part.axis === "p";
           const [w0, w1] = [z0, z1];
           if (out) [z0, z1] = [Infinity, -Infinity];
           for (let i = 0; i < SWEEP_STEPS; i++) {
@@ -150,7 +151,8 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
             const pose = poseOf(part, s);
             if (!pose) continue;
             if (out) {
-              const b = boxOf(part.axis, xf(part.shape.outer, pose), w0, w1);
+              const b = part.axis === "p" ? partBox(part, s) : boxOf(part.axis as "x" | "y", xf(part.shape.outer, pose), w0, w1);
+              if (!b) continue;
               regions.push(region(planCorners(b), []));
               z0 = Math.min(z0, b[2]);
               z1 = Math.max(z1, b[5]);

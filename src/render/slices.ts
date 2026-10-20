@@ -16,8 +16,8 @@ export interface Sliceable {
   z1: number;
   /** Plan box. */
   bb: [number, number, number, number];
-  /** An x or y solid, and its extent along that axis. */
-  axis?: "z" | "x" | "y";
+  /** An x, y or posed ("p") solid, and its extent along that axis. A posed solid is never cut. */
+  axis?: "z" | "x" | "y" | "p";
   along?: [number, number];
 }
 
@@ -100,14 +100,14 @@ export function wallsOf(P: Vec2[], d: Vec2, sg: number, steps = 5): { vis: boole
   return { vis, buckets };
 }
 
-const isOutW = (w: Sliceable): boolean => w.axis === "x" || w.axis === "y";
+const isOutW = (w: Sliceable): boolean => w.axis === "x" || w.axis === "y" || w.axis === "p";
 /** Two boxes meet when they overlap by more than this in every direction, mm. */
 const MEET = 0.05;
 
 /** The world box of a solid, or of its slice from `a` to `b` along its axis. */
 export function boxOfSliceable(w: Sliceable, a?: number, b?: number): Box3 {
   const B: Box3 = [w.bb[0], w.bb[1], w.z0, w.bb[2], w.bb[3], w.z1];
-  if (a === undefined || b === undefined) return B;
+  if (a === undefined || b === undefined || w.axis === "p") return B;
   const k = w.axis === "x" ? 0 : w.axis === "y" ? 1 : 2;
   B[k] = a;
   B[k + 3] = b;
@@ -140,8 +140,9 @@ function mixedSlices<T extends Sliceable>(W: T[], cache?: { last?: SliceCache })
     cuts = W.map((w, i) => {
       const [lo, hi] = range(w);
       const set = new Set([lo, hi]);
+      // a posed solid's axis runs along no base axis: it stays whole and is ordered by its box
       const a = k3(w);
-      for (const k of pairs[i]!) for (const v of [boxes[k]![a]!, boxes[k]![a + 3]!]) if (v > lo + 1e-6 && v < hi - 1e-6) set.add(v);
+      if (w.axis !== "p") for (const k of pairs[i]!) for (const v of [boxes[k]![a]!, boxes[k]![a + 3]!]) if (v > lo + 1e-6 && v < hi - 1e-6) set.add(v);
       return [...set].sort((x, y) => x - y);
     });
     if (cache) cache.last = { key: sig, cuts };
