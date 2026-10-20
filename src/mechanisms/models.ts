@@ -71,4 +71,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "flexure-hinge": async () => (await import("./flexure-hinge/model")).default,
   "bistable-compliant": async () => (await import("./bistable-compliant/model")).default,
   "worm-drive": async () => (await import("./worm-drive/model")).default,
+  "helical-gears": async () => (await import("./helical-gears/model")).default,
 };
