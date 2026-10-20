@@ -24,6 +24,7 @@
     "shot": "tsx tools/shot.ts",
     "thumbs": "tsx tools/thumbs.ts",
     "bench": "tsx tools/bench.ts",
+    "bench:page": "tsx tools/bench.ts --page",
     "test:visual": "vitest run --config vitest.visual.config.ts",
     "build": "astro build --root site",
     "dev": "npm run prebuild && astro dev --root site",

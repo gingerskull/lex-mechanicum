@@ -122,11 +122,13 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 | `check <id>` | kinematic checks of a model (standard Q1) |
 | `clearance <id \| all>` | assembles and reports clashes, clamp faults and hole walls (Q2) |
 | `package [id ...]` (`npm run package`) | writes `dist/packages/<id>.mxp` (Q3) |
+| `package --v2 [id ...]` | writes package v2 (`.mx2`) from the lifted v3 solids: Manifold meshes and checks every solid (SOLID), prints size against v1 and shapes per kind |
 | `audit <id>` (`npm run audit`) | writes or regenerates `src/mechanisms/<id>/audit.md` (Q6) |
 | `conformance` (`npm run conformance`) | audited standard version per mechanism (Q7), part of `npm run check` |
 | `shot <id> [options]` (`npm run shot`) | one frame to a PNG (Q4) |
 | `thumbs [id ...] [--all] [--hook]` (`npm run thumbs`) | redraws the stale thumbnails and stills in `site/thumbs` and their manifest |
 | `bench [id ...]` (`npm run bench`) | the browser bench: frame times per view and dial position, draw counters, package size, rung counts (Q5, DL5) |
+| `bench --page` (`npm run bench:page`), `bench --v2` | the package v2 bench: `--page` builds a static page (`dist/bench-page`) to publish and open on a phone, `--v2` runs it in local Chrome; setup split into decode, tessellate, edges and GPU, frames per view and dial position (R6, R10) |
 | `compare [--shots --ref dir] [--cards] [--lose]` | the renderer's look against reference images, card drawings per dial position, the lost-context check |
 | `tokens-css` (`npm run tokens`) | writes `site/styles/tokens.css` and its `@font-face` rules |
 | `site-assets` (in `prebuild`) | fonts and packages into `site/public`; checks the thumbnails' fingerprints and copies them (never draws) |
