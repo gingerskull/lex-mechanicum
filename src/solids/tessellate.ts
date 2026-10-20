@@ -47,6 +47,29 @@ export function cleanRing(r: readonly Vec2[]): Vec2[] {
   return out;
 }
 
+/**
+ * A ring without the points that lie exactly on the line between their neighbours. The triangulation of a cap leaves such
+ * a point out, which would open the mesh there; on a package's grid they are exact, so they can be dropped for good.
+ */
+export function dropCollinear(r: readonly Vec2[]): Vec2[] {
+  let out = r.slice();
+  for (let again = true; again && out.length > 3; ) {
+    again = false;
+    const keep: Vec2[] = [];
+    for (let i = 0; i < out.length; i++) {
+      const a = out[(i + out.length - 1) % out.length]!;
+      const p = out[i]!;
+      const b = out[(i + 1) % out.length]!;
+      const cross = (p[0] - a[0]) * (b[1] - p[1]) - (p[1] - a[1]) * (b[0] - p[0]);
+      const ahead = (p[0] - a[0]) * (b[0] - p[0]) + (p[1] - a[1]) * (b[1] - p[1]) > 0;
+      if (cross === 0 && ahead && keep.length + (out.length - i - 1) > 2) again = true;
+      else keep.push(p);
+    }
+    out = keep;
+  }
+  return out;
+}
+
 /** The profile with clean rings, the outer counter-clockwise and the holes clockwise . */
 export function orient(p: Profile): Profile {
   const fix = (r: readonly Vec2[], ccw: boolean): Vec2[] => {

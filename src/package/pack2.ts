@@ -5,9 +5,10 @@ import type { Vec2 } from "../core/geom";
 import type { Sampled } from "../model/sample";
 import type { Joint } from "../rules/types";
 import { rounded } from "../solids/frame";
+import { checkMesh } from "../solids/check";
 import { quantise } from "../solids/quantise";
-import { cleanRing } from "../solids/tessellate";
-import { isPlain, type MeshData, type Op, type Solid3, type Vec3 } from "../solids/types";
+import { cleanRing, dropCollinear, tessellate } from "../solids/tessellate";
+import { isPlain, type MeshData, type Op, type Profile, type Solid3, type Vec3 } from "../solids/types";
 import { gridFor, type PackageBounds } from "./format";
 import { FLAG3, type Flag3, type PackedSolid3, type Package2, type Shape2 } from "./format2";
 
@@ -28,20 +29,18 @@ const FIELD_FLAGS = ["inset", "accent", "faint", "isBase", "headTop", "seeThroug
 const coords = (op: Op): number[] => (op.op === "sweep" ? op.path.flat() : op.op === "loft" ? op.sections.flatMap((s) => [s.outer, ...s.holes].flat(2)) : []);
 
 /** Reduces v3 solids to a package. Coordinates are snapped to the package grid; meshes are quantised to 1/64 mm. */
-export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => MeshData, o: { allMesh?: boolean } = {}): Package2 {
-  const plain = (s: Solid3) => isPlain(s) && !o.allMesh;
+export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => MeshData, o: { allMesh?: boolean; fixProfile?: (p: Profile) => Profile | null } = {}): Package2 {
+  const candidate = (s: Solid3) => isPlain(s) && !o.allMesh;
+  const raw = (s: Solid3): Profile => ({ outer: cleanRing(s.profile.outer), holes: s.profile.holes.map(cleanRing) });
   let max = 0;
   const see = (xs: Iterable<number>) => {
     for (const x of xs) max = Math.max(max, Math.abs(x));
   };
   for (const s of a.solids) {
-    if (!plain(s)) {
-      for (const m of s.marks) see(m.pts.flat());
-      continue;
-    }
+    for (const m of s.marks) see(m.pts.flat());
+    if (!candidate(s)) continue;
     see(s.profile.outer.flat());
     for (const h of s.profile.holes) see(h.flat());
-    for (const m of s.marks) see(m.pts.flat());
     see(coords(s.op));
   }
   const traceRaw: Record<string, number[]> = {};
@@ -49,11 +48,36 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
   const grid = gridFor(max);
   const snap = (x: number) => Math.round(x * grid) / grid + 0;
   const snap2 = (r: readonly Vec2[]): Vec2[] => r.map(([x, y]): Vec2 => [snap(x), snap(y)]);
+  // snapped and without points on a straight run: a stretched or deforming member keeps every point (its count is fixed)
+  const snapP = (p: Profile, keepAll = false): Profile => {
+    const ring = (r: readonly Vec2[]) => (keepAll ? snap2(r) : dropCollinear(snap2(r)));
+    return { outer: ring(p.outer), holes: p.holes.map(ring) };
+  };
   const snapOp = (op: Op): Op => {
     if (op.op === "sweep") return { ...op, path: op.path.map((p): Vec3 => [snap(p[0]), snap(p[1]), snap(p[2])]) };
     if (op.op === "loft") return { op: "loft", sections: op.sections.map((s) => ({ z: snap(s.z), outer: snap2(s.outer), holes: s.holes.map(snap2) })) };
     return op;
   };
+
+  // The profile that ships, as the browser will triangulate it: a profile whose holes overlap each other or the rim has
+  // them united by Manifold at build time; one that still does not triangulate into a closed solid is a boolean result
+  // and ships as a mesh. A stretched or deforming member must stay a profile whatever it is.
+  const sound = (p: Profile, op: Op) => checkMesh(tessellate(p, op), { thin: false }).ok;
+  const chosen = new Map<Solid3, Profile | null>();
+  for (const s of a.solids) {
+    if (!candidate(s)) continue;
+    const keepAll = !!(s.stretch || s.deform);
+    const snapped = snapP(raw(s), keepAll);
+    const op = snapOp(s.op);
+    let pick: Profile | null = sound(snapped, op) ? snapped : null;
+    if (!pick && o.fixProfile && s.profile.holes.length && (s.op.op === "extrude" || s.op.op === "sweep")) {
+      const fixed = o.fixProfile(raw(s));
+      const f = fixed && snapP(fixed, keepAll);
+      if (f && sound(f, op)) pick = f;
+    }
+    chosen.set(s, pick ?? (s.stretch || s.deform ? snapped : null));
+  }
+  const plain = (s: Solid3) => !!chosen.get(s);
 
   const shapes: Shape2[] = [];
   const index = new Map<string, number>();
@@ -62,14 +86,22 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     let shape: Shape2;
     let key: string;
     if (plain(s)) {
-      const profile = { outer: snap2(cleanRing(s.profile.outer)), holes: s.profile.holes.map((h) => snap2(cleanRing(h))) };
+      const profile = chosen.get(s)!;
       const op = snapOp(s.op);
       shape = { profile, marks, op };
       key = JSON.stringify([op, profile, marks]);
     } else {
       const mesh = quantise(meshOf(s));
-      shape = { mesh, marks };
-      key = JSON.stringify([marks, Array.from(mesh.pos), Array.from(mesh.tri), Array.from(mesh.tag)]);
+      if (mesh.tag.length || !isPlain(s)) {
+        shape = { mesh, marks };
+        key = JSON.stringify([marks, Array.from(mesh.pos), Array.from(mesh.tri), Array.from(mesh.tag)]);
+      } else {
+        // Manifold made nothing of it (a solid with no volume, which SOLID reports): keep its profile so nothing vanishes
+        const profile = snapP(raw(s), true);
+        const op = snapOp(s.op);
+        shape = { profile, marks, op };
+        key = JSON.stringify([op, profile, marks]);
+      }
     }
     const hit = index.get(key);
     if (hit !== undefined) return hit;

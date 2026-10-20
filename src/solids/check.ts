@@ -15,24 +15,37 @@ export interface SolidReport {
 /** Thinnest a solid may be, as volume per surface area times 3 (a sheet is zero), mm. */
 const MIN_THICKNESS = 0.05;
 
-export function checkMesh(m: MeshData): SolidReport {
+/** `thin: false` skips the sheet test (a stretched member's unit-length profile is a sheet until it is stretched). */
+export function checkMesh(m: MeshData, o: { thin?: boolean } = {}): SolidReport {
   const issues: string[] = [];
   const nt = m.tag.length;
   if (!nt) return { ok: false, issues: ["no triangles"], volume: 0, triangles: 0, holeWalls: 0 };
   const nv = m.pos.length / 3;
+  // vertices at the same position are one (two rings that touch each share a point); edges are matched by position
+  const canon = new Uint32Array(nv);
+  const at = new Map<string, number>();
+  for (let v = 0; v < nv; v++) {
+    const k = `${m.pos[3 * v]},${m.pos[3 * v + 1]},${m.pos[3 * v + 2]}`;
+    const j = at.get(k);
+    if (j === undefined) at.set(k, v);
+    canon[v] = j ?? v;
+  }
   // every directed edge once, and its reverse once: closed, consistently wound, no T-junction shared by three faces
   const seen = new Map<number, number>();
   let bad = 0;
   let degenerate = 0;
   let area = 0;
   for (let t = 0; t < nt; t++) {
-    const a = m.tri[3 * t]!;
-    const b = m.tri[3 * t + 1]!;
-    const c = m.tri[3 * t + 2]!;
-    if (a >= nv || b >= nv || c >= nv) {
+    const a0 = m.tri[3 * t]!;
+    const b0 = m.tri[3 * t + 1]!;
+    const c0 = m.tri[3 * t + 2]!;
+    if (a0 >= nv || b0 >= nv || c0 >= nv) {
       issues.push(`triangle ${t} indexes a missing vertex`);
       break;
     }
+    const a = canon[a0]!;
+    const b = canon[b0]!;
+    const c = canon[c0]!;
     if (a === b || b === c || a === c) degenerate++;
     for (const [u, v] of [[a, b], [b, c], [c, a]] as const) {
       const k = u * nv + v;
@@ -52,7 +65,7 @@ export function checkMesh(m: MeshData): SolidReport {
   if (bad) issues.push(`${bad} edges are open, doubled or wound the wrong way (not a closed manifold)`);
   const vol = volume(m);
   if (!(vol > 0)) issues.push(`volume ${vol.toFixed(3)} mm³ is not positive`);
-  else if ((3 * vol) / area < MIN_THICKNESS) issues.push(`thickness ${((3 * vol) / area).toFixed(3)} mm: a sheet`);
+  else if (o.thin !== false && (3 * vol) / area < MIN_THICKNESS) issues.push(`thickness ${((3 * vol) / area).toFixed(3)} mm: a sheet`);
   let holeWalls = 0;
   for (let t = 0; t < nt; t++) {
     const g = m.tag[t]!;

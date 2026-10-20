@@ -201,3 +201,39 @@ export function meshOf(M: Wasm, s: Pick<Solid3, "id" | "profile" | "op" | "featu
     for (const m of live) m.delete();
   }
 }
+
+/**
+ * A profile whose holes overlap each other or the rim (a window and the bores at its corners) made into one outer ring
+ * and clean, disjoint hole rings: the holes are united and cut from the outline. Null when the result is not a single
+ * piece (a hole that cuts the part in two), which can only ship as a mesh.
+ */
+export function cleanProfile(M: Wasm, p: Profile): Profile | null {
+  const live: { delete(): void }[] = [];
+  try {
+    const o = orient(p);
+    const outer = new M.CrossSection([o.outer], "NonZero");
+    live.push(outer);
+    if (!o.holes.length) return o;
+    const holes = new M.CrossSection(o.holes.map((h) => h.slice().reverse()), "NonZero");
+    live.push(holes);
+    const res = outer.subtract(holes);
+    live.push(res);
+    const polys = res.toPolygons() as Vec2[][];
+    const rings = polys.map((r) => ({ r, a: signedArea(r) }));
+    const outers = rings.filter((x) => x.a > 0);
+    if (outers.length !== 1) return null;
+    return { outer: outers[0]!.r, holes: rings.filter((x) => x.a < 0).map((x) => x.r) };
+  } finally {
+    for (const m of live) m.delete();
+  }
+}
+
+function signedArea(r: readonly Vec2[]): number {
+  let s = 0;
+  for (let i = 0; i < r.length; i++) {
+    const a = r[i]!;
+    const b = r[(i + 1) % r.length]!;
+    s += a[0] * b[1] - b[0] * a[1];
+  }
+  return s / 2;
+}

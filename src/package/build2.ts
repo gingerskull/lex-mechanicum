@@ -2,7 +2,7 @@
 // builders make solids natively), every solid meshed by Manifold and checked (D11), and the shapes packed.
 import { checkMesh, type SolidReport } from "../solids/check";
 import { liftAll } from "../solids/lift";
-import { manifold, meshOf } from "../solids/manifold";
+import { cleanProfile, manifold, meshOf } from "../solids/manifold";
 import { quantise } from "../solids/quantise";
 import type { Solid3 } from "../solids/types";
 import { buildPackage, type Built } from "./build";
@@ -27,9 +27,15 @@ export async function buildPackage2(id: string, opts: { polish?: boolean; allMes
   const M = await manifold();
   const reports: Built2["reports"] = [];
   const failed: Built2["failed"] = [];
+  const rest = built.model.solve(0);
   for (const s of solids) {
     try {
-      reports.push({ id: s.id, report: checkMesh(quantise(meshOf(M, s))) });
+      // a stretched member is a unit-length profile; it is checked at the length it has at the start of the cycle
+      const a = s.stretch ? rest.pts[s.stretch[0]] : undefined;
+      const b = s.stretch ? rest.pts[s.stretch[1]] : undefined;
+      const L = a && b ? Math.hypot(b[0] - a[0], b[1] - a[1]) : 1;
+      const sized: Solid3 = s.stretch ? { ...s, profile: { outer: s.profile.outer.map(([x, y]): [number, number] => [x * L, y]), holes: s.profile.holes } } : s;
+      reports.push({ id: s.id, report: checkMesh(quantise(meshOf(M, sized))) });
     } catch (e) {
       failed.push({ id: s.id, error: String(e) });
     }
@@ -38,7 +44,7 @@ export async function buildPackage2(id: string, opts: { polish?: boolean; allMes
     { id, standard: built.pkg.standard, result: built.pkg.result, solids, joints: built.pkg.joints, levels: built.pkg.levels, b0: built.pkg.b0, b1: built.pkg.b1, bounds: built.pkg.bounds },
     built.sampled,
     (s) => meshOf(M, s),
-    opts.allMesh ? { allMesh: true } : {},
+    { ...(opts.allMesh ? { allMesh: true } : {}), fixProfile: (p) => cleanProfile(M, p) },
   );
   return { built, solids, pkg, reports, failed };
 }
