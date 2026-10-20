@@ -81,6 +81,14 @@ export function snapped(o: Orient): Orient {
 
 /** The title block's VIEW cell for a pose (SD10): a named view, "AUX ⟂ joint" given the joint's name, or "VIEW az/el". */
 export function viewLabel(o: Orient, auxName?: string): string {
+  if (o.aux && !auxName) {
+    // an auxiliary view straight down a world axis is the plan, front or side view
+    const e = unit(o.aux);
+    for (const n of NAMED_VIEWS) {
+      const b = basisOf(...(DRAFT.camera.views[n]! as [number, number]));
+      if (n !== "ISOMETRIC" && n !== "DIMETRIC" && dot(e, b.eye) > 0.9999) return n;
+    }
+  }
   if (o.aux) return `AUX ⟂ ${(auxName ?? "AXIS").toUpperCase()}`;
   const n = snapName(o);
   if (n) return n;

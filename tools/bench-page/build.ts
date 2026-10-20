@@ -7,6 +7,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { chromium } from "playwright-core";
+import { recordById } from "../../src/catalog";
 import { buildPackage2 } from "../../src/package/build2";
 import { encode } from "../../src/package/format";
 import { encode2 } from "../../src/package/format2";
@@ -31,6 +32,7 @@ button{font:inherit;padding:8px 16px}pre{white-space:pre-wrap;word-break:break-w
 export async function buildPage(out: string, ids: string[]): Promise<string> {
   mkdirSync(join(out, "packages"), { recursive: true });
   mkdirSync(join(out, "fonts"), { recursive: true });
+  mkdirSync(join(out, "meta"), { recursive: true });
   await build({
     entryPoints: { main: join(root, "tools/bench-page/main.ts"), "setup-worker": join(root, "src/solids/edges-worker.ts") },
     bundle: true,
@@ -47,6 +49,8 @@ export async function buildPage(out: string, ids: string[]): Promise<string> {
     const b = await buildPackage2(id);
     writeFileSync(join(out, "packages", `${id}.mx2`), await encode2(b.pkg));
     writeFileSync(join(out, "packages", `${id}.mxp`), await encode(b.built.pkg));
+    const rec = recordById(id) as unknown as { name?: string; kin?: unknown; teaching?: unknown } | undefined;
+    writeFileSync(join(out, "meta", `${id}.json`), JSON.stringify({ name: rec?.name ?? id, teaching: rec?.teaching ?? null, kin: rec?.kin ?? null }));
   }
   writeFileSync(join(out, "index.html"), html(ids, Date.now()));
   return out;
@@ -54,7 +58,7 @@ export async function buildPage(out: string, ids: string[]): Promise<string> {
 
 /** Runs the page in local Chrome on the real GPU; returns the GPU's name, the report as Markdown, and the raw report. */
 export async function runPage(dir: string, o: Record<string, unknown>): Promise<{ gpu: string; md: string; json: unknown }> {
-  const types: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".woff2": "font/woff2" };
+  const types: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".woff2": "font/woff2", ".json": "application/json" };
   const server = createServer((q, r) => {
     const u = decodeURIComponent(new URL(q.url ?? "/", "http://x").pathname);
     const p = u === "/" ? "/index.html" : u;

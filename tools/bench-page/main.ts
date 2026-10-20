@@ -8,8 +8,8 @@
 //              frame costs when the display's rate is not the limit), and the median script time of the draw call.
 //   today      the same views through today's renderer (package v1), when asked.
 //
-// The v2 frames are drawn by a stand-in (tools/bench-page/standin.ts) until the 3D renderer exists: a floor for its
-// cost, not its cost. Everything is a median of the runs.
+// The v2 frames are drawn by the 3D renderer (src/render/v3) on today's model's poses (the lifted pilots) with the record's
+// teaching layers. Everything is a median of the runs.
 import { models } from "../../src/mechanisms/models";
 import { loadPackage } from "../../src/package/loader";
 import { browserFactory } from "../../src/render/canvas";
@@ -18,7 +18,19 @@ import { defaultView, type DrawView } from "../../src/render/draft";
 import { createSession } from "../../src/render/session";
 import { setupInWorker, setupInline } from "../../src/solids/setup";
 import { DETAIL } from "../../src/style/detail";
-import { createGpu, StandIn, type Gpu, type StandInView } from "./standin";
+import { Kinematics } from "../../src/kin/compose";
+import type { Kin as KinLib } from "../../src/kin/types";
+import { gpu3 } from "../../src/render/v3/gpu";
+import { hybridPoser, kinPoser, legacyPoser } from "../../src/render/v3/poser";
+import { createSession3, recordDrawView, type DrawView3 } from "../../src/render/v3/session";
+import type { Meta } from "../draw3-page/main";
+
+/** What a bench view asks of the renderer: the tilt from plan, the explode and the dial. */
+interface StandInView {
+  tilt: number;
+  explode: number;
+  detail: Dial;
+}
 
 export interface Opts {
   ids: string[];
@@ -59,6 +71,9 @@ export interface Report {
   opts: Opts;
   rows: Row[];
 }
+
+/** The page's one context cost (shader compile and link), ms. */
+let shared: { ms: number } | null = null;
 
 interface Hosts {
   gpu: HTMLElement;
@@ -121,22 +136,11 @@ function canvasIn(host: HTMLElement): HTMLCanvasElement {
   return c;
 }
 
-/** The page's one context, and what making it cost (the once-per-page share of the GPU stage). */
-let shared: { gpu: Gpu; ms: number } | null = null;
-function gpuFor(host: HTMLElement): { gpu: Gpu; ms: number } {
-  if (!shared) {
-    const t0 = performance.now();
-    const gpu = createGpu(canvasIn(host));
-    gpu.gl.finish();
-    shared = { gpu, ms: performance.now() - t0 };
-  }
-  return shared;
-}
-
 async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): Promise<Row> {
   const model = await models[id]!();
   const blob2 = await bytes(`packages/${id}.mx2`);
   const blob1 = await bytes(`packages/${id}.mxp`);
+  const meta = (await (await fetch(`meta/${id}.json?v=${stamp()}`)).json()) as Meta;
   const dials: Dial[] = ["full", ...DETAIL.map((r) => r.id)];
   const setups: Row["setup"][] = [];
   const workers: number[] = [];
@@ -147,11 +151,17 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     log(`${id}: run ${run + 1} of ${o.runs}, setup`);
     const s = await setupInline(blob2.slice());
     const g0 = performance.now();
-    const stand = new StandIn(gpuFor(host.gpu).gpu, s.pkg, s.meshes, s.edges, model);
-    stand.resize(o.w, o.h, o.dpr);
+    const canvas = canvasIn(host.gpu);
+    const legacy = legacyPoser(model, s.pkg.bounds.z1);
+    const poser = meta.kin ? hybridPoser(legacy, kinPoser(new Kinematics(meta.kin as unknown as KinLib))) : legacy;
+    const scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser, teaching: meta.teaching, info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
+    const sess = createSession3(canvas, scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
+    const viewOf = (v: StandInView): DrawView3 => recordDrawView(scene, { state: { orient: { yaw: 0, tilt: v.tilt }, explode: v.explode }, detail: v.detail });
+    const stand = { draw: (u: number, v: StandInView) => sess.draw(u, viewOf(v)), finish: () => sess.finish(), dispose: () => sess.dispose(), counters: { draws: 0, instances: 0 } };
     stand.draw(1, { tilt: 28, explode: 0, detail: "full" });
     stand.finish();
     const gpu = performance.now() - g0;
+    shared = { ms: gpu3(sess.card).buildMs };
     setups.push({ decode: s.ms.decode, tessellate: s.ms.tessellate, caps: s.ms.caps, edges: s.ms.edges, gpu, total: s.ms.decode + s.ms.tessellate + s.ms.edges + gpu });
     if (o.worker && typeof Worker !== "undefined") {
       const w = new Worker(`setup-worker.js?v=${stamp()}`, { type: "module" });
@@ -162,7 +172,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     for (const [k, v] of VIEWS) (views[k] ??= []).push(await timeFrames((u) => stand.draw(u, { ...v, detail: "full" }), () => stand.finish(), o.frames));
     for (const d of dials) (dial[d] ??= []).push(await timeFrames((u) => stand.draw(u, { tilt: 28, explode: 0, detail: d } satisfies StandInView), () => stand.finish(), Math.max(10, o.frames >> 1)));
     stand.draw(1, { tilt: 28, explode: 0, detail: "full" });
-    counts = { solids: s.pkg.solids.length, shapes: s.meshes.length, triangles: s.meshes.reduce((n, m) => n + m.tag.length, 0), edges: s.edges.reduce((n, e) => n + e.n, 0), draws: stand.counters.draws, instances: stand.counters.instances };
+    counts = { solids: s.pkg.solids.length, shapes: s.meshes.length, triangles: s.meshes.reduce((n, m) => n + m.tag.length, 0), edges: s.edges.reduce((n, e) => n + e.n, 0), draws: sess.stats?.draws ?? 0, instances: 0 };
     stand.dispose();
   }
   const pick = (m: Record<string, Timing[]>): Record<string, Timing> =>
@@ -218,7 +228,7 @@ async function todays(id: string, o: Opts, host: HTMLElement, log: (s: string) =
 export function markdown(r: Report): string {
   const L: string[] = [];
   const d = r.device;
-  L.push(`## Bench, package v2`, ``, `${String(d.userAgent)}`, `GPU ${String(d.gpu)}, ${String(d.cores)} cores, ${String(d.memoryGB)} GB, screen ${String(d.screen)}, DPR ${String(d.dpr)}`, `Stage ${r.opts.w} x ${r.opts.h} CSS px at DPR ${r.opts.dpr}; ${r.opts.runs} runs, ${r.opts.frames} frames per view; medians. v2 frames are drawn by the stand-in renderer (a floor).`, ``);
+  L.push(`## Bench, package v2`, ``, `${String(d.userAgent)}`, `GPU ${String(d.gpu)}, ${String(d.cores)} cores, ${String(d.memoryGB)} GB, screen ${String(d.screen)}, DPR ${String(d.dpr)}`, `Stage ${r.opts.w} x ${r.opts.h} CSS px at DPR ${r.opts.dpr}; ${r.opts.runs} runs, ${r.opts.frames} frames per view; medians. v2 frames are drawn by the 3D renderer.`, ``);
   L.push(`Setup, ms. GPU is buffers, sizing and the first frame on the page's shared context; the context and both shader programs were made once, in ${r.contextMs} ms.`, ``);
   L.push(`Setup, ms (decode / tessellate / edges / GPU / total):`, ``, `| Mechanism | v1 KB | v2 KB | solids | shapes | triangles | edges | decode | tessellate (caps) | edges | GPU | total | worker wall | via worker (wall + GPU) |`, `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`);
   for (const x of r.rows) L.push(`| ${x.id} | ${x.kb.v1} | ${x.kb.v2} | ${x.solids} | ${x.shapes} | ${x.triangles} | ${x.edges} | ${x.setup.decode} | ${x.setup.tessellate} (${x.setup.caps}) | ${x.setup.edges} | ${x.setup.gpu} | ${x.setup.total} | ${x.worker?.wall ?? ""} | ${x.worker ? r2(x.worker.wall + x.setup.gpu) : ""} |`);

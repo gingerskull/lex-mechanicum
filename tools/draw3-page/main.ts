@@ -8,7 +8,7 @@ import { models } from "../../src/mechanisms/models";
 import type { MechanismModel } from "../../src/model/types";
 import { browserFactory } from "../../src/render/canvas";
 import type { Dial } from "../../src/render/detail";
-import { loseContext } from "../../src/render/v3/gpu";
+import { gpu3, loseContext } from "../../src/render/v3/gpu";
 import { hybridPoser, kinPoser, legacyPoser, staticPoser, type Poser } from "../../src/render/v3/poser";
 import type { Scene } from "../../src/render/v3/scene";
 import { createSession3, recordDrawView, type DrawView3, type Session3 } from "../../src/render/v3/session";
@@ -37,6 +37,10 @@ export interface Draw3Options {
   detail?: Dial;
   /** Settings of the record's controls for this drawing. */
   controls?: Controls;
+  /** A detail window on a named point or a world point: the drawing magnified about it. */
+  zoom?: { centre: string | Vec3; scale: number; name?: string };
+  /** Moves a record section's cut plane (the lifted pilots' z differs from the record's frame until the new builders place solids by the record). */
+  sectionShift?: Vec3;
   over?: Partial<DrawView3>;
 }
 
@@ -93,10 +97,12 @@ function viewOf(scene: Scene, o: Draw3Options): DrawView3 {
       if (p) state = { orient: p.orient, ...(p.auxName ? { auxName: p.auxName } : {}), explode: 0 };
     }
   }
-  return { ...base, state: { ...state, explode: o.explode ?? state.explode } };
+  if (state.section && o.sectionShift) state = { ...state, section: { ...state.section, origin: [state.section.origin[0] + o.sectionShift[0], state.section.origin[1] + o.sectionShift[1], state.section.origin[2] + o.sectionShift[2]] } };
+  const detail = o.zoom ? { name: o.zoom.name ?? "DETAIL Z", centre: o.zoom.centre, scale: o.zoom.scale, highlight: [] } : state.detail;
+  return { ...base, state: { ...state, ...(detail ? { detail } : {}), explode: o.explode ?? state.explode } };
 }
 
-async function session(id: string, o: Draw3Options): Promise<{ sess: Session3; scene: Scene; setupMs: number }> {
+async function session(id: string, o: Draw3Options): Promise<{ sess: Session3; scene: Scene; setupMs: number; bakeMs: number }> {
   const l = await load(id);
   const canvas = document.createElement("canvas");
   canvas.id = "stage";
@@ -104,9 +110,11 @@ async function session(id: string, o: Draw3Options): Promise<{ sess: Session3; s
   canvas.style.height = `${o.h}px`;
   canvas.style.display = "block";
   document.body.replaceChildren(canvas);
+  const b0 = performance.now();
   const sess = createSession3(canvas, l.scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
+  const bakeMs = performance.now() - b0;
   if (o.controls) sess.setPoser(poserFor({ meta: l.meta, model: l.model, z: l.scene.pkg.bounds.z1 }, o.controls));
-  return { sess, scene: sess.scene, setupMs: l.setupMs };
+  return { sess, scene: sess.scene, setupMs: l.setupMs, bakeMs };
 }
 
 /** Draws one frame and returns it as a data URL. */
@@ -144,8 +152,12 @@ const r2 = (x: number) => Math.round(x * 100) / 100;
 
 export interface Bench3 {
   id: string;
+  /** Decode, tessellate and edges (the worker's share), then the session's bake into GPU arrays, then the first frame (program build on a cold page, buffers, first peel). */
   setupMs: number;
+  bakeMs: number;
   firstFrameMs: number;
+  /** Shader compile and link, once per page; 0 when the page already had its context. */
+  contextMs: number;
   tris: number;
   edges: number;
   layers: number;
@@ -157,11 +169,12 @@ export interface Bench3 {
 /** Frame times per view: the mean interval of paced frames, draw plus a read-back (the GPU's cost), and the script time. */
 async function bench(id: string, o: { w: number; h: number; dpr: number; frames: number; views: Record<string, Partial<Draw3Options>> }): Promise<Bench3> {
   const base: Draw3Options = { w: o.w, h: o.h, dpr: o.dpr, u: 1 };
-  const { sess, scene, setupMs } = await session(id, base);
+  const { sess, scene, setupMs, bakeMs } = await session(id, base);
   const t0 = performance.now();
   sess.draw(1, viewOf(scene, base));
   sess.finish();
   const firstFrameMs = performance.now() - t0;
+  const contextMs = gpu3(sess.card).buildMs;
   const views: Bench3["views"] = {};
   for (const [name, spec] of Object.entries(o.views)) {
     const v = viewOf(scene, { ...base, ...spec });
@@ -189,7 +202,7 @@ async function bench(id: string, o: { w: number; h: number; dpr: number; frames:
     views[name] = { paced: r2(paced), gpu: r2((performance.now() - g0) / o.frames), cpu: r2(med(cpu)) };
   }
   const st = sess.stats;
-  const out: Bench3 = { id, setupMs: r2(setupMs), firstFrameMs: r2(firstFrameMs), tris: st?.tris ?? 0, edges: st?.edges ?? 0, layers: st?.layers ?? 0, draws: st?.draws ?? 0, see: sess.see.reduce((a, b) => a + b, 0), views };
+  const out: Bench3 = { id, setupMs: r2(setupMs), bakeMs: r2(bakeMs), firstFrameMs: r2(firstFrameMs), contextMs: r2(contextMs), tris: st?.tris ?? 0, edges: st?.edges ?? 0, layers: st?.layers ?? 0, draws: st?.draws ?? 0, see: sess.see.reduce((a, b) => a + b, 0), views };
   sess.dispose();
   return out;
 }

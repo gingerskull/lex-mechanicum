@@ -4,7 +4,7 @@
 // dimensions, paper tooth, teaching traces and overlays, the sheet, and the force, velocity and angle overlays.
 import { DRAFT } from "../../style/draft";
 import { MARK_KINDS } from "../../style/kinds";
-import { theme, type ResolvedTheme } from "../../style/theme";
+import { rgba as paint, theme, type ResolvedTheme } from "../../style/theme";
 import type { ThemeKey } from "../../style/tokens";
 import { makeCard, sizeCard, type CanvasFactory, type CanvasLike, type Card } from "../canvas";
 import { ladder, type Dial } from "../detail";
@@ -13,11 +13,10 @@ import { baseSketch, basePencil, centrelines, dimensions, highlights, newCache, 
 import { basisOfOrient, fit, snapName, viewLabel, type Box, type Camera } from "./camera";
 import { Geometry, gpu3, gpuReady, onRestored, type Stats3 } from "./gpu";
 import type { Poser } from "./poser";
-import { place, rows, runtime, ST, worldBox, type Runtime, type Scene } from "./scene";
+import { place, rows, runtime, worldBox, type Runtime, type Scene } from "./scene";
 import { sheetFrame } from "./sheet";
 import { defaultView as recordView, type DetailSpec, type ViewState } from "./views";
 import { seeThrough } from "./visibility";
-import { FORM } from "../../style/form";
 
 export interface DrawView3 {
   state: ViewState;
@@ -252,7 +251,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     ctx.save();
     ctx.setLineDash([...D.dash]);
     ctx.lineWidth = D.width;
-    ctx.strokeStyle = `rgba(${A.T.ink[0]},${A.T.ink[1]},${A.T.ink[2]},${D.alpha})`;
+    ctx.strokeStyle = paint(A.T.ink, D.alpha);
     for (const sp of specs) {
       const c = Array.isArray(sp.centre) ? sp.centre : scene.poser.point(A.u, sp.centre);
       if (!c) continue;
@@ -264,8 +263,6 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     ctx.restore();
   }
 
-  void ST;
-  void FORM;
   return sess;
 }
 

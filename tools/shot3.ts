@@ -41,6 +41,7 @@ async function main() {
         dpr: Number(arg("dpr") ?? 1.5),
         explode: Number(arg("explode") ?? 0),
         detail: (arg("detail") ?? "full") as Dial,
+        ...(arg("zoom") ? { zoom: { centre: arg("zoom")!, scale: Number(arg("scale") ?? 4) } } : {}),
         ...(process.argv.includes("--card") ? { card: true } : {}),
       }),
     );
