@@ -201,9 +201,10 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     if (!(Math.abs(s.lead) > 0)) add("AXIS", `screw ${s.screw}: lead ${s.lead}`, s.screw);
   }
   for (const f of model.flexible ?? []) {
-    for (const id of [...f.over, ...(f.form === "rope" ? [...f.spans, ...(f.wraps ?? []), ...(f.load ? [f.load] : [])] : [])]) if (!byId[id]) add("MISSING", `flexible ${f.form}: no part ${id}`);
+    for (const id of [...f.over, ...(f.form === "rope" ? [...f.spans, ...(f.wraps ?? []), ...(f.load ? [f.load] : [])] : f.form === "belt" ? [f.band] : [])]) if (!byId[id]) add("MISSING", `flexible ${f.form}: no part ${id}`);
     if (f.form === "rope") for (const k of [f.dead, f.hook]) if (k && !s0.pts[k]) add("MISSING", `rope: no solved point ${k}`);
-    if (f.form === "chain" && typeof s0[f.travel] !== "number") add("MISSING", `chain: the solved travel "${f.travel}" is not a number in solve(u)`);
+    if ((f.form === "chain" || f.form === "belt") && typeof s0[f.travel] !== "number") add("MISSING", `${f.form}: the solved travel "${f.travel}" is not a number in solve(u)`);
+    if (f.form === "belt") for (const id of f.over) if (byId[id] && byId[id]!.z === undefined) add("MISSING", `belt: pulley ${id} has no tooth count (P.pulley)`);
   }
   for (const c of model.compliant ?? []) for (const id of [c.neck, c.ground, c.lever]) if (!byId[id]) add("MISSING", `compliant joint: no part ${id}`);
   for (const c of model.cams ?? []) {

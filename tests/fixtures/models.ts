@@ -5,7 +5,7 @@ import { defineMechanism } from "../../src/model/define";
 import type { MechanismModel } from "../../src/model/types";
 import { P } from "../../src/parts";
 import { bevel, bevelOutline, pitchCones } from "../../src/core/spatial";
-import { centresFor } from "../../src/core/flex";
+import { beltPath, centresFor, htd } from "../../src/core/flex";
 import { sprocketR } from "../../src/rules/j12-flexible";
 import { circle } from "../../src/core/geom";
 
@@ -389,4 +389,28 @@ export const stretchModel: MechanismModel = defineMechanism({
     P.cap("pX", 2, 1.5, { fixed: [42, 0, 0] }),
   ],
   solve: () => ({ pts: { S0: [0, 0], S1: [50, 0] } }),
+});
+
+/**
+ * J12 timing belt: HTD 5M, 36 and 18 grooves, the centres set for 90 teeth; the large pulley declared first and the small
+ * one driving, so the slack span is the upper one and the small pulley the second (the belt drive has them the other
+ * way round). The band is a fixed part round the pitch path, its teeth carried round by the travel t.
+ */
+const BT = { p: 5, z1: 36, z2: 18 };
+const btR1 = (BT.p * BT.z1) / TAU;
+const btR2 = (BT.p * BT.z2) / TAU;
+const btC = centresFor(btR1, btR2, 90 * BT.p);
+const btBand = (off: number): Vec2[] => beltPath([0, 0], btR1 + off, [btC, 0], btR2 + off, Math.PI / 96);
+export const beltModel: MechanismModel = defineMechanism({
+  id: "fx-belt",
+  input: { kind: "rotary", part: "small" },
+  parts: [
+    P.pulley("big", BT.z1, BT.p, { role: "output", at: "O1", spin: (s) => s.b as number, holes: [circle(7.2, 0, 0, 36)] }),
+    P.pulley("small", BT.z2, BT.p, { role: "driver", at: "O2", spin: (s) => s.a as number, holes: [circle(6, 0, 0, 36)] }),
+    P.custom("band", btBand(htd(BT.p).hs - htd(BT.p).ht - htd(BT.p).pld), { role: "link", dz: 0.6, thick: 5.8, fixed: [0, 0, 0], holes: [btBand(-htd(BT.p).pld + 0.05)] }),
+    P.cap("pO1", -1, 7, { fixed: [0, 0, 0] }),
+    P.cap("pO2", -1, 7, { fixed: [btC, 0, 0], accent: true }),
+  ],
+  flexible: [{ form: "belt", over: ["big", "small"], travel: "t", pitch: BT.p, band: "band" }],
+  solve: (u) => ({ pts: { O1: [0, 0], O2: [btC, 0] }, a: u, b: (u * btR2) / btR1, t: u * btR2 }),
 });

@@ -61,3 +61,15 @@ describe("generateAudit on four-bar without polish", () => {
     expect(section(again, "Promotion candidates")).toBe("- stop bumpers on every rocker");
   }, 60_000);
 });
+
+describe("generateAudit lists every joint type in A1 and A2", () => {
+  it("J9 to J13 included, not only J1 to J8", async () => {
+    const fresh = await generateAudit("block-and-tackle", { ...opts, existing: null, polish: true });
+    const rows = rowsOf(fresh, "Requirements");
+    expect(rows.get("A2")![2]).toMatch(/flex-rope-0 J12/);
+    expect(rows.get("A1")![2]).toMatch(/flex-rope-0 J12/);
+    const bevel = rowsOf(await generateAudit("bevel-gears", { ...opts, existing: null, polish: true }), "Requirements");
+    expect(bevel.get("A2")![2]).toMatch(/pQ J10/);
+    expect(bevel.get("A2")![2]).toMatch(/mesh-pinion-gear J9/);
+  }, 120_000);
+});

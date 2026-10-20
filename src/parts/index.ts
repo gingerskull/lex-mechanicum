@@ -2,6 +2,7 @@
 // boss, flush pivot caps, square-ended sliders on twin stadium rails, stadium slots, involute gears with a D-bore,
 // discs, custom outlines and the tracer.
 import { arcPts, capsule, circle, dBore, gearOutline, ring, roundRect, roundedPoly, slot, taper, D2R, xfPose } from "../core/geom";
+import { pulleyOutline } from "../core/flex";
 import type { Axis, Part, Pose, Role, Shape, Solved, Vec2 } from "../model/types";
 
 /** Layer pitch and default plate thickness, mm. */
@@ -199,6 +200,20 @@ export const P = {
     // counter-clockwise: a wrap across angle 0 runs on past 2π
     while (a1 <= a0) a1 += 2 * Math.PI;
     return P.custom(id, [...arcPts(0, 0, r + rr, a0, a1, Math.PI / 36), ...arcPts(0, 0, r - rr, a1, a0, Math.PI / 36)], { ...o, thick: 2 * rr });
+  },
+  /**
+   * A timing pulley (J8, J12 belt): z round-bottomed HTD grooves at belt pitch p on the pitch circle less the pitch line
+   * differential, a groove at angle a0 (phase it to the belt path's teeth), an engraved ring 7 mm inside the pitch
+   * circle. Its tooth count is `z`; it has no module, so no mesh is read from it.
+   */
+  pulley(id: string, z: number, p: number, o: PartOpts & { a0?: number } = {}): Part {
+    const rp = (p * z) / (2 * Math.PI);
+    return base(id, o.role ?? "driver", o.layer ?? 0, S(pulleyOutline(z, p, o.a0 ?? 0), o.holes ?? []), {
+      thick: o.thick ?? 7,
+      marks: o.marks ?? [circle(rp - 7, 0, 0, Math.max(48, Math.round(z * 1.5)))],
+      ...place(o),
+      z,
+    });
   },
   /** The traced point marker. */
   tracer(id: string, layer: number, o: Place & { r?: number; thick?: number } = {}): Part {

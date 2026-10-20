@@ -1,6 +1,8 @@
-// A9 for live gear shafts: straddle mounting. A live shaft that carries a gear in a mesh, with nothing sweeping over
-// its top, runs on up into a bridge on spigoted posts: a floating flanged bearing per shaft, an internal circlip under
-// it, the housing pair below still locating. Shafts of meshing gears share one bridge. Where the mesh asked for
+// A9 for live gear and wheel shafts: straddle mounting. A live shaft that carries a gear in a mesh, or a pulley or
+// sprocket of a flexible member (J12), with nothing sweeping over its top, runs on up into a bridge on spigoted posts: a
+// floating flanged bearing per shaft, an internal circlip under it, the housing pair below still locating. Shafts of
+// meshing gears share one bridge; shafts joined by a belt or chain have one each, since one bridge over both would span
+// the loop. Where the mesh asked for
 // backlash (J6, F7), the top bearing sits in an eccentric bushing turned with the one under the housing, so the shaft
 // stays upright when the backlash is set. A flush end screw on the top part gives way to a circlip, the shaft passing.
 import { circle } from "../core/geom";
@@ -15,8 +17,11 @@ import type { PinJoint, Rule, RuleContext } from "./types";
 /** Eccentricity of the top bushing: the same as the one under the housing. */
 const ECC = 0.3;
 
-/** Live shafts that carry a gear in a mesh, by mesh. */
-function meshShafts(ctx: RuleContext): PinJoint[][] {
+/** What a straddled shaft carries and what pulls it sideways, for its note: a gear (no member), a pulley or a sprocket. */
+type Carried = { what: string; by?: string };
+
+/** Live shafts that carry a gear in a mesh, by mesh; then each live shaft that carries a wheel of a chain, belt or CVT. */
+function meshShafts(ctx: RuleContext): { group: PinJoint[]; carried: Carried }[] {
   const live = ctx.info.filter((j): j is PinJoint => j.kind === "pin" && j.type === "J2");
   const groups: PinJoint[][] = [];
   for (const m of ctx.info) {
@@ -28,7 +33,16 @@ function meshShafts(ctx: RuleContext): PinJoint[][] {
     if (!hit) groups.push(g);
     else for (const j of g) if (!hit.includes(j)) hit.push(j);
   }
-  return groups;
+  const out: { group: PinJoint[]; carried: Carried }[] = groups.map((group) => ({ group, carried: { what: "gear" } }));
+  for (const f of ctx.info) {
+    if (f.kind !== "flex" || f.spec.form === "rope") continue;
+    const carried = f.spec.form === "chain" ? { what: "sprocket", by: "chain" } : { what: "pulley", by: "belt" };
+    for (const id of f.spec.over) {
+      const j = live.find((x) => x.driven.some((d) => d.part.id === id));
+      if (j && !out.some((o) => o.group.includes(j))) out.push({ group: [j], carried });
+    }
+  }
+  return out;
 }
 
 /** Nothing moving passes over the shaft's top: no sweep above the top driven part covers its axis. */
@@ -41,14 +55,16 @@ function clearAbove(ctx: RuleContext, j: PinJoint): boolean {
   return true;
 }
 
-export function straddle(ctx: RuleContext, group: PinJoint[]): void {
+export function straddle(ctx: RuleContext, group: PinJoint[], carried: Carried = { what: "gear" }): void {
   const stackTop = (j: PinJoint) => Math.max(...ctx.solids.filter((t) => t.joints.includes(j.id) && t.z0 >= ctx.b1 && t.kind !== "bridge").map((t) => t.z1));
   // the flush end screw on a top part gives way to a circlip: the shaft runs on through it
   for (const j of group) {
     const end = ctx.get(`${j.id}-end`);
     if (!end) continue;
     ctx.drop(new RegExp(`^${j.id}-end(-|$)`));
-    const zt = end.z1 + 0.5;
+    // over a flanged pulley's top flange, the circlip sits on the flange
+    const fl = ctx.solids.filter((t) => t.kind === "pulley" && t.group === end.body && t.z0 >= end.z1 - 1e-6);
+    const zt = fl.length ? Math.max(end.z1 + 0.5, ...fl.map((t) => t.z1)) : end.z1 + 0.5;
     const c = circlipExt(j.d);
     ctx.add(circlip(`${j.id}-cl-top`, j.d, { body: j.body, at: j.at, z0: zt, z1: zt + c.s, ex: end.ex, joints: [j.id], group: `${j.id}-shaft` }));
     const F2 = ctx.joint(j.id)!.serves.F2 ?? [];
@@ -64,7 +80,7 @@ export function straddle(ctx: RuleContext, group: PinJoint[]): void {
   }
   for (const j of group.slice(1)) br.bridge.joints.push(j.id);
   br.bridge.name = `Bridge over the ${group.length > 1 ? "shafts" : "shaft"}, on two spigoted posts`;
-  br.bridge.why = "carries the top of each live shaft in a floating bearing, so the gears are not overhung (A9)";
+  br.bridge.why = `carries the top of each live shaft in a floating bearing, so the ${carried.what}s are not overhung (A9)`;
   const Zb = br.z1;
   for (const j of group) {
     const J = ctx.joint(j.id)!;
@@ -103,7 +119,7 @@ export function straddle(ctx: RuleContext, group: PinJoint[]): void {
     ctx.add(shaft(`${j.id}-shaft-up`, { d: j.d, z0: top.z1, z1: seat }, { body: j.body, at: top.at, ex: top.ex, joints: [j.id], group: `${j.id}-shaft`, name: "" }));
     // above the bearing flange and any bushing screw heads the shaft end is free, for a coupling (H.outputCoupling)
     j.top = { seat, free: seat + Math.max(F.w, j.eccentric ? headHeight("button", 3) : 0) + 0.6, bearing: b };
-    J.note += ` Straddle mounted: the shaft runs on up into a floating ${b.name} bearing in the bridge${j.eccentric ? ", in an eccentric bushing turned with the one under the housing so the shaft stays upright when the backlash is set" : ""}, so the gear is carried on both sides.`;
+    J.note += ` Straddle mounted: the shaft runs on up into a floating ${b.name} bearing in the bridge${j.eccentric ? ", in an eccentric bushing turned with the one under the housing so the shaft stays upright when the backlash is set" : ""}, so the ${carried.by ? `${carried.what}, pulled sideways by the ${carried.by},` : carried.what} is carried on both sides.`;
     J.badge = ["straddle mounted", "ok"];
   }
   for (const m of ctx.info)
@@ -115,11 +131,11 @@ export const j2Straddle: Rule = {
   id: "j2-straddle",
   tier: "AUTO",
   ids: ["A9", "J2"],
-  applies: (ctx) => ctx.info.some((j) => j.kind === "mesh" || j.kind === "crossMesh"),
+  applies: (ctx) => ctx.info.some((j) => j.kind === "mesh" || j.kind === "crossMesh" || (j.kind === "flex" && j.spec.form !== "rope")),
   apply(ctx) {
-    for (const g of meshShafts(ctx)) {
-      const clear = g.filter((j) => clearAbove(ctx, j));
-      if (clear.length) straddle(ctx, clear);
+    for (const { group, carried } of meshShafts(ctx)) {
+      const clear = group.filter((j) => clearAbove(ctx, j));
+      if (clear.length) straddle(ctx, clear, carried);
     }
   },
 };

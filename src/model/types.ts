@@ -148,11 +148,15 @@ export interface MechanismModel {
   /**
    * Flexible members (J12): a roller chain over two sprockets (its links carried round by the solved travel `travel`,
    * mm, at `pitch`), a rope over sheaves (its spans are stretched parts, `spans`; its wraps over the sheaves, `wraps`,
-   * fixed arcs, P.ropeWrap), or a CVT belt between sheave pairs.
+   * fixed arcs, P.ropeWrap), a toothed timing belt over two timing pulleys (P.pulley, tooth counts `z`; the belt's
+   * back is the fixed part `band` round the pitch path, its teeth carried round by the solved travel `travel`, mm, at
+   * `pitch`, HTD), or a CVT belt between sheave pairs. A chain's and a belt's path starts at the first wheel's tangent
+   * point on the span that runs onto it and goes counter-clockwise; the travel grows with the input.
    */
   flexible?: (
     | { form: "chain"; over: [string, string]; travel: string; pitch: number; roller: number }
     | { form: "rope"; over: string[]; spans: string[]; wraps?: string[]; dead?: string; hook?: string; load?: string }
+    | { form: "belt"; over: [string, string]; travel: string; pitch: number; band: string }
     | { form: "cvt"; over: string[] }
   )[];
   /** Compliant joints (J13): a flexure neck joining a lever to the ground block it is cut from, its swing range. */

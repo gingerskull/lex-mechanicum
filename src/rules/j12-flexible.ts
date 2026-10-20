@@ -1,20 +1,28 @@
-// J12: a flexible member the model declares (MechanismModel.flexible), extending J8 to chains, ropes and CVT belts.
+// J12: a flexible member the model declares (MechanismModel.flexible), extending J8 to timing belts, chains, ropes and
+// CVT belts.
+// - Timing belt (recorded as J8): its back is the model's fixed band round the pitch path, never a plate on posts; its
+//   teeth are carried round the two pulleys by the solved travel (a conveyed placement, D9); the small pulley is
+//   flanged (J8, F10); it runs dry (no F8).
 // - Chain: its rollers and link plates are carried round the two sprockets by the solved travel (a conveyed placement:
-//   each a small rigid solid on the fixed path, nothing deforms); an idler sprocket on a slotted arm on the slack span
-//   takes up the stretch (F7); the chain is greased (F8).
+//   each a small rigid solid on the fixed path, nothing deforms); greased (F8).
+// - Both: the centres are fixed by the shafts, so an idler on the slack span near the small wheel, outside the loop,
+//   takes up the stretch: on a sealed bearing on a stud through an arm slotted across the span and clamped on two posts
+//   (F7); a belt's idler is a flat flanged pulley on the belt's back, a chain's a sprocket.
 // - Rope: its spans are stretched parts of the model, its wraps fixed arcs over the sheaves (P.ropeSpan, P.ropeWrap),
 //   touching their sheaves and the spans they join by design; a becket on a post dead-ends it with a thimble (F1, F2),
 //   the hook hangs on a swivel so the load can turn (F3), each at its own sheave's height, and a guard over each sheave
 //   whose centre stands still keeps the rope in its groove (F2). The note counts the parts that carry the load.
 // - CVT: each sliding sheave half is keyed to its shaft so it slides but cannot turn on it (F3), and a spring presses
 //   it on the belt (F6).
-import { beltPath, pathLength } from "../core/flex";
+import { beltLength, beltPath, beltTooth, htd, pathLength } from "../core/flex";
 import { TAU, arcPts, circle, roundedPoly, type Vec2 } from "../core/geom";
 import { toLocal } from "../core/poly";
-import { disc, dowel, key, plate, screw, spring, standoff } from "../hardware/primitives";
-import { solid } from "../hardware/solid";
+import { bearing, circlip, disc, dowel, hullOf, key, nut, plainWasher, plate, screw, shaft, spacer, spring, standoff } from "../hardware/primitives";
+import { solid, type Solid } from "../hardware/solid";
+import { BEARINGS } from "../hardware/tables";
 import { poseOf } from "../model/pose";
-import type { FlexJoint, Rule, RuleContext } from "./types";
+import { FLANGE_T, flanges } from "./j8-belt";
+import type { FlexJoint, Joint, Rule, RuleContext } from "./types";
 
 const fmt = (v: number) => String(+v.toFixed(1));
 /** Link plate thickness and the gap the idler leaves over the chain, mm. */
@@ -22,6 +30,131 @@ const PLATE = 1.2;
 
 /** Pitch radius of a sprocket of z teeth at chain pitch p. */
 export const sprocketR = (z: number, p: number): number => p / (2 * Math.sin(Math.PI / z));
+
+/** The tensioner arm: its thickness and gap over what it clears, its posts along and outward of the idler, the slot. */
+const ARM = { t: 5, gap: 0.7, along: 26, out: 6, slot: 4 };
+/** A flat idler's and a timing belt's small pulley's flanges stand this far past the belt's back, mm. */
+const FLANGE_RISE = 2.5;
+
+/**
+ * The idler of a chain or belt (F7): on the slack span (the one leaving the driving wheel as the travel grows), near the
+ * small wheel, outside the loop, touching the member's back (`back` out from the pitch line); turning with the loop on
+ * a sealed bearing on a stud, the stud through an arm above it that is slotted across the span on two posts and clamped
+ * there by two screws. Returns the idler, or null when the wheels have no pose.
+ */
+function idler(
+  ctx: RuleContext,
+  j: FlexJoint & { spec: { over: [string, string]; travel: string } },
+  o: { r: [number, number]; ri: number; back: number; z: [number, number]; top: number; ex: number; outer: Vec2[]; name: string; mat: string; flanged?: boolean },
+): Solid | null {
+  const J = ctx.joint(j.id)!;
+  const [a, b] = j.spec.over.map((id) => ctx.parts[id]!);
+  const qa = poseOf(a!, ctx.s0);
+  const qb = poseOf(b!, ctx.s0);
+  if (!qa || !qb) return null;
+  const c1: Vec2 = [qa[0], qa[1]];
+  const c2: Vec2 = [qb[0], qb[1]];
+  const [r1, r2] = o.r;
+  const C = Math.hypot(c2[0] - c1[0], c2[1] - c1[1]);
+  const ang = Math.atan2(c2[1] - c1[1], c2[0] - c1[0]);
+  const beta = Math.asin((r2 - r1) / C);
+  const tangent = (c: Vec2, r: number, s: number): Vec2 => [c[0] + r * Math.cos(ang + s * (Math.PI / 2 + beta)), c[1] + r * Math.sin(ang + s * (Math.PI / 2 + beta))];
+  // the path runs along the lower span from wheel 1 to wheel 2: that span leaves wheel 1 as the travel grows, and is
+  // slack when wheel 1 drives
+  const lower: [Vec2, Vec2] = [tangent(c1, r1, -1), tangent(c2, r2, -1)];
+  const upper: [Vec2, Vec2] = [tangent(c1, r1, 1), tangent(c2, r2, 1)];
+  const drives1 = ctx.model.input.part !== b!.id;
+  const t0 = ctx.model.solve(0)[j.spec.travel];
+  const t1 = ctx.model.solve(0.01)[j.spec.travel];
+  const grows = typeof t0 !== "number" || typeof t1 !== "number" || t1 >= t0;
+  const slack = drives1 === grows ? lower : upper;
+  // from the small wheel's end
+  const [S1, S2] = r1 <= r2 ? slack : [slack[1], slack[0]];
+  const L = Math.hypot(S2[0] - S1[0], S2[1] - S1[1]);
+  const t: Vec2 = [(S2[0] - S1[0]) / L, (S2[1] - S1[1]) / L];
+  // outward: away from the middle of the two centres
+  const mid: Vec2 = [(c1[0] + c2[0]) / 2, (c1[1] + c2[1]) / 2];
+  const sgn = (S1[0] - mid[0]) * t[1] - (S1[1] - mid[1]) * t[0] >= 0 ? 1 : -1;
+  const n: Vec2 = [sgn * t[1], -sgn * t[0]];
+  const off = (p: Vec2, u: number, v: number): Vec2 => [p[0] + t[0] * u + n[0] * v, p[1] + t[1] * u + n[1] * v];
+  const ci = off(S1, 0.3 * L, o.back + o.ri);
+  const id = `${j.id}-idler`;
+  const G = { joints: [j.id], ex: o.ex };
+  // it turns with the loop, geared to the first wheel
+  const turn = { body: a!.id, motion: { type: "geared" as const, around: ci, ratio: -r1 / o.ri } };
+  const brg = BEARINGS.find((x) => x.name === "6800")!;
+  const [z0, z1] = o.z;
+  const idl = solid(id, { ...G, ...turn, kind: "pulley", role: "link", name: o.name, outer: o.outer, holes: [disc(brg.D / 2)], z0, z1, mat: o.mat });
+  ctx.add(idl);
+  if (o.flanged) flanges(ctx, idl, 2 * (o.ri + FLANGE_RISE), J, "Idler flanges");
+  const A0 = Math.max(o.top, o.flanged ? z1 + FLANGE_T : z1) + ARM.gap;
+  const A1 = A0 + ARM.t;
+  const at: [number, number, number] = [ci[0], ci[1], 0];
+  // E4: the arm comes off first with the stud and what rides it; the idler and its bearing stay in the loop's plane
+  const UP = { joints: [j.id], ex: o.ex + 1 };
+  const zb = (z0 + z1 - brg.B) / 2;
+  ctx.add(bearing(`${id}-brg`, brg, { ...G, at, z0: zb, z1: zb + brg.B, closure: "seal", name: `Bearing ${brg.name}-2RS (${brg.d}x${brg.D}x${brg.B}), pressed into the idler, retaining compound` }));
+  ctx.add(circlip(`${id}-cl`, brg.d, { ...UP, at, z0: zb - 1 }));
+  ctx.add(spacer(`${id}-sp`, brg.d, brg.d + 4, { ...UP, at, z0: zb + brg.B, z1: A0, name: `Inner-race spacer ${brg.d}x${brg.d + 4}, idler to arm` }));
+  ctx.add(shaft(`${id}-stud`, { d: brg.d, z0: zb - 1.2, z1: A1 + 1.5, grooves: [zb - 1], thread: { M: 8, z0: A0, z1: A1 + 1.5 } }, { ...UP, at, name: `Idler stud Ø${brg.d}, M8 end through the arm` }));
+  ctx.add(plainWasher(`${id}-wa`, 8, { ...UP, at, z0: A1 }));
+  ctx.add(nut(`${id}-nut`, 8, { ...UP, at, z0: A1 + 1.6 }));
+  // the arm: a boss over the idler and an ear each side, slotted across the span at its posts
+  const posts = [off(ci, -ARM.along, ARM.out), off(ci, ARM.along, ARM.out)];
+  const slot = (p: Vec2) => roundedPoly([[p[0] - n[0] * ARM.slot, p[1] - n[1] * ARM.slot], [p[0] + n[0] * ARM.slot, p[1] + n[1] * ARM.slot]], 2.75);
+  const arm = plate(`${j.id}-arm`, hullOf([[ci[0], ci[1], 10], ...posts.map((p): [number, number, number] => [p[0], p[1], 7.5])]), { ...UP, kind: "bracket", name: "Tensioner arm, steel, slotted across the span for the take-up", holes: [disc(4.2, ci[0], ci[1]), ...posts.map(slot)], z0: A0, z1: A1, mat: "Steel S235, zinc plated" });
+  ctx.add(arm);
+  posts.forEach((p, k) => {
+    const pat: [number, number, number] = [p[0], p[1], 0];
+    const pid = `${j.id}-arm-post${k}`;
+    ctx.add(standoff(pid, { ...G, at: pat, z0: ctx.b1, z1: A0, name: k ? "" : `Standoff Ø10 x ${fmt(A0 - ctx.b1)}, M5, the tensioner arm's posts`, qty: k ? 0 : 2 }));
+    ctx.add(plainWasher(`${pid}-wa`, 5, { ...UP, at: pat, z0: A1 }));
+    ctx.add(screw(`${pid}-top`, "socket", 5, 12, { ...G, at: pat, face: A1 + 1, dir: -1, ex: o.ex + 1.5, name: k ? "" : "Socket head M5 x 12, clamps the arm in its slot", qty: k ? 0 : 2 }));
+    ctx.add(screw(`${pid}-bot`, "button", 5, ctx.b1 - ctx.b0 + 6, { ...G, at: pat, face: ctx.b0, dir: 1, ex: -1.5, lock: "threadlocker, medium strength (Loctite 243)" }));
+  });
+  (J.serves.F7 ??= []).push(arm.id, id);
+  (J.serves.F2 ??= []).push(`${id}-cl`, `${id}-nut`);
+  return idl;
+}
+
+function belt(ctx: RuleContext, j: FlexJoint & { spec: { form: "belt" } }): void {
+  const J: Joint = ctx.joint(j.id)!;
+  const f = j.spec;
+  const [a, b] = f.over.map((id) => ctx.parts[id]!);
+  const qa = poseOf(a!, ctx.s0);
+  const qb = poseOf(b!, ctx.s0);
+  const band = ctx.solidOf[f.band];
+  if (!qa || !qb || a!.z === undefined || b!.z === undefined || !band) {
+    J.note = "Timing belt: both pulleys need a pose and a tooth count (P.pulley), and the band a part.";
+    return;
+  }
+  const P = htd(f.pitch);
+  const r1 = (f.pitch * a!.z) / TAU;
+  const r2 = (f.pitch * b!.z) / TAU;
+  const path = beltPath([qa[0], qa[1]], r1, [qb[0], qb[1]], r2, Math.PI / 96);
+  const L = beltLength(r1, r2, Math.hypot(qb[0] - qa[0], qb[1] - qa[1]));
+  const N = Math.round(L / f.pitch);
+  // D9: the teeth carried round the pitch path; they run the belt's full width, the band standing 0.1 mm in at each
+  // face (the model), so a tooth is never level with the band it is moulded to and draws as its own edge
+  const T = beltTooth(f.pitch);
+  for (let i = 0; i < N; i++)
+    ctx.add(solid(`${j.id}-t${i}`, { kind: "belt", role: "link", name: i ? "" : `Belt teeth, HTD ${f.pitch}M, ${N}`, qty: i ? 0 : N, motion: { type: "convey", path, key: f.travel, offset: i * f.pitch }, outer: T, z0: band.z0 - 0.1, z1: band.z1 + 0.1, ex: band.ex, joints: [j.id], allow: [band.id, a!.id, b!.id], mat: "Neoprene, glass-fibre cords" }));
+  // J8, F10: flanges on the small pulley; the thrust washer under it gives way to the lower one
+  const back = P.hs - P.ht - P.pld;
+  const [small, rs] = r1 <= r2 ? [a!, r1] : [b!, r2];
+  const ss = ctx.solidOf[small.id]!;
+  flanges(ctx, ss, 2 * (rs + back + FLANGE_RISE), J);
+  const pin = ctx.info.find((i) => i.kind === "pin" && i.driven.some((x) => x.part.id === small.id));
+  if (pin)
+    for (const t of ctx.solids)
+      if (t.joints.includes(pin.id) && t.body === ss.body && t.z1 > ss.z0 - FLANGE_T + 1e-6 && t.z1 <= ss.z0 + 1e-6 && t.z0 < ss.z0 - FLANGE_T) t.z1 = ss.z0 - FLANGE_T;
+  // F7: the idler on the belt's back
+  const ri = Math.max(14, rs * 0.45);
+  idler(ctx, j, { r: [r1, r2], ri, back, z: [ss.z0, ss.z1], top: ss.z1, ex: band.ex, outer: disc(ri), name: `Idler pulley Ø${fmt(2 * ri)}, flat, on the belt's back`, mat: "Aluminium 6061-T6, hard anodised", flanged: true });
+  const off = L - N * f.pitch;
+  J.note = `HTD ${f.pitch}M timing belt, ${N} teeth, ${fmt(N * f.pitch)} mm pitch length, over the ${a!.z}-groove ${a!.id} and the ${b!.z}-groove ${b!.id} pulley${Math.abs(off) > 0.5 ? ` (${fmt(L)} mm of path: ${fmt(off)} mm off a whole number of teeth, taken up by the idler)` : ": the centre distance is set for a whole number of teeth"}; the teeth are carried round in the grooves by the belt's travel, so the ratio is exact. Flanged small pulley (F10). The centres are fixed, so a flat flanged idler on the belt's back, on the slack span near the small pulley, takes up the stretch: its arm slides ±${ARM.slot} mm across the span on two posts and is clamped by two M5 screws (F7); it also lays more belt on the small pulley. No lubrication: a dry belt (F8 none).`;
+  J.badge = ["belt tensioned", "ok"];
+}
 
 function chain(ctx: RuleContext, j: FlexJoint & { spec: { form: "chain" } }): void {
   const J = ctx.joint(j.id)!;
@@ -52,26 +185,11 @@ function chain(ctx: RuleContext, j: FlexJoint & { spec: { form: "chain" } }): vo
     for (const [side, w0] of [["t", z1 + k * PLATE], ["b", z0 - (k + 1) * PLATE]] as const)
       ctx.add(solid(`${j.id}-p${i}${side}`, { ...G, kind: "plate", role: "hw", name: "", qty: 0, motion: conv((i + 0.5) * f.pitch), outer: link, holes: [], z0: w0, z1: w0 + PLATE, mat: "Steel, through hardened", chamfer: 0 }));
   }
-  // the idler on the slack span, outside the chain, on an arm slotted for the take-up (F7)
-  const ia = path[Math.floor(path.length - 1)]!;
-  const ib = path[0]!;
-  const mid: Vec2 = [(ia[0] + ib[0]) / 2, (ia[1] + ib[1]) / 2];
-  const t: Vec2 = [ib[0] - ia[0], ib[1] - ia[1]];
-  const tl = Math.hypot(t[0], t[1]) || 1;
-  // outward normal of a counter-clockwise path
-  const n: Vec2 = [t[1] / tl, -t[0] / tl];
+  // the idler sprocket on the slack span, outside the chain; its teeth take the rollers by design
   const ri = Math.max(14, r1 * 0.6);
-  const ci: Vec2 = [mid[0] + n[0] * (ri + f.roller / 2 - 1.5), mid[1] + n[1] * (ri + f.roller / 2 - 1.5)];
-  // it turns with the chain (geared to the driving sprocket); the rollers run on its teeth by design
-  allow.push(`${j.id}-idler`);
-  ctx.add(solid(`${j.id}-idler`, { ...G, body: a!.id, motion: { type: "geared", around: ci, ratio: -r1 / ri }, kind: "pulley", role: "hw", name: `Idler sprocket Ø${fmt(2 * ri)} on a sealed bearing`, outer: circle(ri, 0, 0, 48), holes: [circle(4, 0, 0, 24)], z0, z1, mat: "Steel C45" }));
-  const pv: Vec2 = [ci[0] + (t[0] / tl) * 40, ci[1] + (t[1] / tl) * 40];
-  const armZ: [number, number] = [z0 - 2 * PLATE - 4, z0 - 2 * PLATE - 1];
-  const arm = plate(`${j.id}-arm`, roundedPoly([ci, pv], 7), { ...G, kind: "bracket", name: "Tensioner arm, slotted at its pivot for the take-up", holes: [roundedPoly([[pv[0] - 3 * (t[0] / tl), pv[1] - 3 * (t[1] / tl)], [pv[0] + 3 * (t[0] / tl), pv[1] + 3 * (t[1] / tl)]], 2.6)], z0: armZ[0], z1: armZ[1], mat: "Steel S235, zinc plated" });
-  ctx.add(arm);
-  ctx.add(screw(`${j.id}-arm-sc`, "socket", 5, 12, { ...G, at: [pv[0], pv[1], 0], face: armZ[1], dir: -1, ex: s.ex + 1, name: "Socket head M5, clamps the tensioner arm in its slot" }));
-  (J.serves.F7 ??= []).push(arm.id, `${j.id}-idler`);
-  J.note = `Roller chain, ${fmt(f.pitch)} pitch, ${N} links (${fmt(L)} mm of path${Math.abs(L - N * f.pitch) > 0.5 ? `: ${fmt(L - N * f.pitch)} mm off a whole number of links, taken up by the idler` : ""}) over the ${a!.id} and the ${b!.id}: rollers and link plates carried round, an idler sprocket on a slotted arm on the slack span (F7), greased (F8).`;
+  const idl = idler(ctx, j, { r: [r1, r2], ri, back: f.roller / 2 - 1.5, z: [z0, z1], top: z1 + 2 * PLATE, ex: s.ex, outer: circle(ri, 0, 0, 48), name: `Idler sprocket Ø${fmt(2 * ri)} on a sealed bearing`, mat: "Steel C45" });
+  if (idl) allow.push(idl.id);
+  J.note = `Roller chain, ${fmt(f.pitch)} pitch, ${N} links (${fmt(L)} mm of path${Math.abs(L - N * f.pitch) > 0.5 ? `: ${fmt(L - N * f.pitch)} mm off a whole number of links, taken up by the idler` : ""}) over the ${a!.id} and the ${b!.id}: rollers and link plates carried round, an idler sprocket on the slack span on an arm slotted across it and clamped on two posts (F7), greased (F8).`;
   J.badge = ["chain tensioned", "ok"];
 }
 
@@ -217,12 +335,13 @@ function cvt(ctx: RuleContext, j: FlexJoint & { spec: { form: "cvt" } }): void {
 export const j12: Rule = {
   id: "j12-flexible",
   tier: "AUTO",
-  ids: ["J12", "A11", "F2", "F3", "F6", "F7", "F8"],
+  ids: ["J12", "J8", "A11", "F2", "F3", "F6", "F7", "F8", "F10"],
   applies: (ctx) => ctx.info.some((j) => j.type === "J12"),
   apply(ctx) {
     for (const j of ctx.info) {
       if (j.kind !== "flex") continue;
       if (j.spec.form === "chain") chain(ctx, j as FlexJoint & { spec: { form: "chain" } });
+      else if (j.spec.form === "belt") belt(ctx, j as FlexJoint & { spec: { form: "belt" } });
       else if (j.spec.form === "rope") rope(ctx, j as FlexJoint & { spec: { form: "rope" } });
       else cvt(ctx, j as FlexJoint & { spec: { form: "cvt" } });
     }
