@@ -1,0 +1,569 @@
+// The shared parts of every assembly, ported to 3D frames (A6, A7, A22, M10, M13 and the rest of 5.1): rocker stops and the
+// swing scale, standoffs under fixed plates, rubber feet, the drive, lubrication and timing marks, locking, materials,
+// the stage-3 fasteners, headroom, the see-through stage and the explode.
+import { TAU, circle, roundRect, type Vec2 } from "../../core/geom";
+import { H } from "../../hardware/primitives";
+import { MOTORS, PULLEYS, STANDOFF } from "../../hardware/tables";
+import { cleanProfile } from "../../solids/manifold";
+import type { Solid3 } from "../../solids/types";
+import { type Vec3, v3, wrapPi, xf } from "../../kin/math";
+import type { BuildCtx } from "../ctx";
+import { LEVER_WALL, MIN_GAP, PITCH } from "../constants";
+import { canon, fromPlane, parallel, place, planeCoords, type Frame } from "../frames";
+import { pointDist } from "../planar";
+import { clearance } from "../router";
+import { projectAlong } from "../view";
+import { worldManifold, worldPoints } from "../sweeps";
+import { lowestZ } from "./core";
+import type { Rule } from "./types";
+
+const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
+const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
+
+// ---------------------------------------------------------------------------------------------------- stops (A22, F5)
+
+/** Angular range of a body about a site's axis over the cycle, radians, from the poses. */
+export function swingOf(ctx: BuildCtx, body: string, axis: Vec3): { lo: number; hi: number; range: number } {
+  let prev = 0;
+  let acc = 0;
+  let lo = 0;
+  let hi = 0;
+  ctx.sampled.us.forEach((_, i) => {
+    const a = xf.angleAbout(ctx.xfOf(body, i), axis);
+    if (i === 0) {
+      acc = a;
+      prev = a;
+    } else {
+      acc += wrapPi(a - prev);
+      prev = a;
+    }
+    if (i === 0) lo = hi = acc;
+    lo = Math.min(lo, acc);
+    hi = Math.max(hi, acc);
+  });
+  return { lo, hi, range: hi - lo };
+}
+
+export const stops: Rule = {
+  id: "stops",
+  tier: "AUTO",
+  ids: ["F5", "A22"],
+  fixture: "four-bar",
+  applies: (ctx) => ctx.sites.some((s) => s.fixed),
+  apply(ctx) {
+    for (const s of ctx.sites.filter((q) => q.fixed && !q.inPlan)) {
+      for (const b of s.bodies) {
+        const g = ctx.geoms.get(b);
+        const ext = ctx.extent(b);
+        if (!g || !ext) continue;
+        const sw = swingOf(ctx, b, s.axis);
+        // only a part that swings (a rocker, a lever) gets stops; a crank turns past them
+        if (sw.range > TAU * 0.75 || sw.range < 0.02) continue;
+        const pivot = planeCoords(ext.frame, s.at).uv;
+        const pts = g.profile.outer.map((q) => planeCoords(ext.frame, fromPlane(g.frame, q, 0)).uv);
+        const reach = Math.max(...pts.map((p) => Math.hypot(p[0] - pivot[0], p[1] - pivot[1])));
+        // the direction of the lever, from the pivot to its farthest point
+        const tip = pts.reduce((q, p) => (Math.hypot(p[0] - pivot[0], p[1] - pivot[1]) > Math.hypot(q[0] - pivot[0], q[1] - pivot[1]) ? p : q), pts[0]!);
+        const dir = Math.atan2(tip[1] - pivot[1], tip[0] - pivot[0]);
+        // half width of the lever at a radius, from the outline across its own direction
+        const halfWidth = (rad: number): number => {
+          const near = pts.filter((p) => Math.abs(Math.hypot(p[0] - pivot[0], p[1] - pivot[1]) - rad) < 0.12 * reach);
+          return near.length ? Math.max(...near.map((p) => Math.abs(-(p[0] - pivot[0]) * Math.sin(dir) + (p[1] - pivot[1]) * Math.cos(dir)))) : 8;
+        };
+        const over = Math.max(0.05, 0.2 * (sw.range / 2));
+        const r = 3;
+        const placed: string[] = [];
+        const others = ctx.sweeps.moving().filter((m) => m !== b);
+        for (const [k, th, side] of [[0, sw.hi + over, 1], [1, sw.lo - over, -1]] as const) {
+          // the pin stands beside the lever's edge at the end of the swing, a clearance off it: at 70 % of the reach, else
+          // nearer or farther where something else is in the way
+          for (const [f, grow] of [[0.7, 1], [0.55, 1], [0.85, 1], [0.4, 1], [0.95, 1], [0.7, 1.7], [0.55, 1.7], [0.85, 1.7], [0.7, 2.6], [0.4, 2.6]] as const) {
+            const rs = f * reach;
+            const ang = dir + (th - (side > 0 ? sw.hi : sw.lo)) * grow + (side > 0 ? sw.hi : sw.lo);
+            const lat = side * (halfWidth(rs) + r + MIN_GAP);
+            const c: Vec2 = [pivot[0] + rs * Math.cos(ang) - lat * Math.sin(ang), pivot[1] + rs * Math.sin(ang) + lat * Math.cos(ang)];
+            const w = fromPlane(ext.frame, c, 0);
+            const pin = place(UPF, H.stop(`${s.id}-${b}-stop${k}`, circle(r, w[0], w[1], 20), { name: k ? "" : "Stop pin Ø6, hardened, on the lever's edge", qty: k ? 0 : 2, z0: ctx.base!.top, z1: ext.frame.o[2] + ext.w1 + 1, joints: [s.id] }));
+            // the pin is judged against the other moving parts; the lever itself is meant to meet it
+            const m = worldManifold(ctx.M, pin[0]!);
+            const g2 = ctx.sweeps.gap(m, others, MIN_GAP + 1);
+            m.delete();
+            if (g2 < MIN_GAP) continue;
+            ctx.add(pin);
+            ctx.add(place(UPF, H.screw(`${s.id}-${b}-stop${k}-sc`, "button", 4, 12, { at: [w[0], w[1], 0], face: ctx.base!.bottom, dir: 1, name: "", qty: 0, joints: [s.id] })));
+            placed.push(pin[0]!.id);
+            (ctx.fired.stops ??= []).push(pin[0]!.id);
+            break;
+          }
+        }
+        // the swing scale engraved on the base at the lever's edge (F5, F9)
+        const ticks: [number, number][][] = [];
+        const n = Math.floor((sw.range * 180) / Math.PI / 5);
+        for (let q = 0; q <= n; q++) {
+          const a = dir + sw.lo + (q * 5 * Math.PI) / 180;
+          ticks.push([polar(pivot, reach * 0.92, a), polar(pivot, reach * 0.92 + (q % 2 ? 2.2 : 3.6), a)]);
+        }
+        for (const t of ticks) ctx.baseMarks.push({ kind: "scale", pts: t });
+        ctx.note({ id: `${s.id}-${b}-stops`, kit: "stops", at: s.at, title: `Stops · ${b}`, note: `${b} swings ${((sw.range * 180) / Math.PI).toFixed(1)}°; hardened stop pins at 70 % of its reach, a fifth of the half swing past each end; swing scale engraved on the base.`, serves: { F5: placed }, badge: placed.length ? ["stopped both ends", "ok"] : ["no stop fits", "warn"] });
+        if (!placed.length) ctx.issues.push(`${b}: no place for a stop pin clears the other parts`);
+      }
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------- standoffs (A6)
+
+/** A body no joint reaches: a fixed plate that has to stand on the base (A6). */
+const isFixedPlate = (ctx: BuildCtx, id: string): boolean => id !== "ground" && ctx.parts.has(id) && !ctx.kin.joints.some((j) => j.a === id || j.b === id);
+
+/** True when a point lies in the sweep of the plate's own body (the post is under the plate it holds). */
+const insideOwn = (body: string, ctx: BuildCtx, p: Vec2): boolean => {
+  void body;
+  void ctx;
+  void p;
+  return false;
+};
+
+export const standoffs: Rule = {
+  id: "standoffs",
+  tier: "AUTO",
+  ids: ["A6"],
+  fixture: "kin:fixedPlate",
+  applies: (ctx) => ctx.kin.bodies.some((b) => isFixedPlate(ctx, b.id)),
+  apply() {},
+  after(ctx) {
+    const base = ctx.base!;
+    for (const b of ctx.kin.bodies) {
+      if (!isFixedPlate(ctx, b.id)) continue;
+      const part = ctx.parts.get(b.id)!;
+      const ext = ctx.extent(b.id);
+      if (!ext || part.body === "ground") continue;
+      const pts = part.profile.outer.map((q) => planeCoords(UPF, fromPlane(part.frame, q, 0)).uv);
+      const c: Vec2 = [pts.reduce((a, p) => a + p[0], 0) / pts.length, pts.reduce((a, p) => a + p[1], 0) / pts.length];
+      const far = [...pts].sort((p, q) => Math.hypot(q[0] - c[0], q[1] - c[1]) - Math.hypot(p[0] - c[0], p[1] - c[1]));
+      const z1 = part.frame.o[2];
+      if (z1 - base.top < 1) continue;
+      // two posts under the plate, far apart, each standing clear of every moving part and of the supports already built
+      const swept = ctx.sweeps.planPolys();
+      const fixed = ctx.solids.filter((q) => ["standoff", "bridge", "housing", "bracket", "foot", "stop"].includes(q.kind) && q.body === "ground" && !q.flags.isBase).map((q) => ctx.sweeps.staticPolys(q));
+      const free = (p: Vec2): boolean => swept.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + MIN_GAP || insideOwn(part.body, ctx, p)) && fixed.every((f) => f.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + 1));
+      const cands = far.flatMap((p) => [0.18, 0.3, 0.45].map((k): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k])).filter(free);
+      const a = cands[0];
+      const bFar = a ? cands.find((p) => Math.hypot(p[0] - a[0], p[1] - a[1]) > 30) : undefined;
+      if (!a || !bFar) {
+        ctx.issues.push(`${b.id}: no place for two posts under the plate clears the sweeps`);
+        continue;
+      }
+      [a, bFar].forEach((inset, k) => {
+        const at: [number, number, number] = [inset[0], inset[1], 0];
+        (ctx.fired.standoffs ??= []).push(`${b.id}-post${k}`);
+        ctx.add(place(UPF, H.standoff(`${b.id}-post${k}`, { at, z0: base.top, z1, joints: [b.id], ...(k ? { name: "", qty: 0 } : { name: `Standoff Ø${STANDOFF.D} x ${+(z1 - base.top).toFixed(1)}, M${STANDOFF.M}`, qty: 2 }) })));
+        ctx.add(place(UPF, H.screw(`${b.id}-post${k}-top`, "button", STANDOFF.M, 6 + 1.5 * STANDOFF.M, { at, face: z1 + (part.op.op === "extrude" ? part.op.h : 6), dir: -1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
+        ctx.add(place(UPF, H.screw(`${b.id}-post${k}-bot`, "button", STANDOFF.M, base.top - base.bottom + 1.5 * STANDOFF.M, { at, face: base.bottom, dir: 1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
+      });
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------- the drive (V1 to V6, F10)
+
+export const drive: Rule = {
+  id: "drive",
+  tier: "AUTO",
+  ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
+  fixture: "four-bar",
+  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary"),
+  apply(ctx) {
+    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
+    const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
+    if (!site || !ctx.base) return;
+    const st = ctx.stacks.get(site.id)!;
+    const bb = ctx.base.bottom;
+    const S: Vec2 = [site.at[0], site.at[1]];
+    const pz = bb - 28;
+    if (st.w0 + (ctx.stacks.get(site.id) ? 0 : 0) > pz - 2 - 0) {
+      // the shaft does not reach the belt plane (no housing): the drive is not built
+      ctx.issues.push(`drive: the live shaft ${site.id} does not reach below the base`);
+    }
+    const others = ctx.sites.filter((q) => q !== site && q.fixed).map((q) => [q.at[0], q.at[1]] as Vec2);
+    const C = 46;
+    let M: Vec2 | null = null;
+    let best = -1;
+    for (let k = 0; k < 12; k++) {
+      const a = (k / 12) * TAU;
+      const m = polar(S, C, a);
+      const clear = Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999);
+      if (clear > best) {
+        best = clear;
+        M = m;
+      }
+    }
+    if (!M) return;
+    const mot = MOTORS.pancake;
+    const mTop = bb - 3;
+    const mBot = mTop - mot.H;
+    const g: Pick<Solid3, "joints"> = { joints: ["drive"] };
+    void g;
+    const j = ["drive"];
+    ctx.add(place(UPF, H.solid("drive-motor", { name: mot.name, kind: "motor", role: "hw", mat: "Aluminium housing, neodymium rotor", outer: circle(mot.R, M[0], M[1], 48), z0: mBot, z1: mTop, joints: j })));
+    ctx.add(place(UPF, H.solid("drive-motor-core", { name: "", kind: "motorInternal", role: "hw", outer: circle(mot.R - 4, M[0], M[1], 36), z0: mBot + 3, z1: mTop - 3, faint: true, inset: true, joints: j })));
+    ctx.add(place(UPF, H.plate("drive-flange", roundRect(M[0] - 29, M[1] - 29, M[0] + 29, M[1] + 29, 4), { name: "Motor flange, screwed up into the base", kind: "bracket", z0: mTop, z1: bb, holes: [circle(mot.R - 2, M[0], M[1], 36).reverse()], joints: j })));
+    [[-22, -22], [22, -22], [22, 22], [-22, 22]].forEach(([dx, dy], k) =>
+      ctx.add(place(UPF, H.screw(`drive-fl${k}`, "socket", 3, 3 + 4.5, { at: [M![0] + dx!, M![1] + dy!, 0], face: mTop, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 4 }), joints: j }))),
+    );
+    ctx.add(place(UPF, H.shaft("drive-shaft", { d: mot.shaft, z0: mBot - 14, z1: mBot }, { name: `Motor shaft Ø${mot.shaft}`, at: [M[0], M[1], 0], joints: j })));
+    // the pulleys, one on the motor shaft and one on the input shaft's free end, in one plane
+    const small = PULLEYS[16];
+    const big = PULLEYS[32];
+    const pulley = (id: string, c: Vec2, p: (typeof PULLEYS)[16]) => {
+      ctx.add(place(UPF, H.solid(id, { name: `GT2 timing pulley ${p.T}T`, kind: "pulley", role: "hw", mat: "Aluminium 6061-T6", outer: circle(p.od / 2, c[0], c[1], 36), holes: [circle(2, c[0], c[1], 12)], z0: pz - 3, z1: pz + 3, joints: j })));
+      ctx.add(place(UPF, H.solid(`${id}-fl0`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: [circle(2, c[0], c[1], 12)], z0: pz - 4, z1: pz - 3, joints: j })));
+      ctx.add(place(UPF, H.solid(`${id}-fl1`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: [circle(2, c[0], c[1], 12)], z0: pz + 3, z1: pz + 4, joints: j })));
+    };
+    pulley("drive-pulley-motor", M, small);
+    pulley("drive-pulley-shaft", S, big);
+    const rb = small.pd / 2;
+    const rB = big.pd / 2;
+    const ring = H.hullOf([[M[0], M[1], rb + 0.7], [S[0], S[1], rB + 0.7]]);
+    const inner = H.hullOf([[M[0], M[1], rb - 0.7], [S[0], S[1], rB - 0.7]]);
+    ctx.add(place(UPF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: pz - 3, z1: pz + 3, joints: j })));
+    // the home flag on the big pulley and a fork sensor on a post under the base (V6, F10)
+    const dir = Math.atan2(M[1] - S[1], M[0] - S[0]) + Math.PI / 2;
+    const flagR0 = rB + 0.2;
+    ctx.add(place(UPF, H.flag("drive-flag", flagR0, flagR0 + 6, dir, { at: [S[0], S[1], 0], z0: pz + 4, z1: pz + 5, joints: j })));
+    const sc = polar(S, flagR0 + 6 - 4, dir);
+    ctx.add(place(UPF, H.sensor("drive-sensor", { at: [sc[0], sc[1], 0], z0: pz + 1, z1: pz + 9, joints: j })));
+    ctx.add(place(UPF, H.standoff("drive-sensor-post", { at: [sc[0], sc[1] + 6, 0], z0: pz + 9, z1: bb, name: "Standoff Ø10 under the base, carries the sensor", joints: j })));
+    const tb = polar(M, 36, dir);
+    ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
+    ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));
+    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: "Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+    void LEVER_WALL;
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------- feet (A7)
+
+export const feet: Rule = {
+  id: "feet",
+  tier: "AUTO",
+  ids: ["A7", "D4"],
+  fixture: "four-bar",
+  applies: () => true,
+  apply() {},
+  after(ctx) {
+    const base = ctx.base;
+    if (!base || !base.outline.length) return;
+    const xs = base.outline.map((p) => p[0]);
+    const ys = base.outline.map((p) => p[1]);
+    const x0 = Math.min(...xs);
+    const x1 = Math.max(...xs);
+    const y0 = Math.min(...ys);
+    const y1 = Math.max(...ys);
+    const lowest = lowestZ(ctx, base.bottom);
+    const h = Math.max(6, isFinite(lowest) ? base.bottom - lowest + 3 : 6);
+    const inset = 8;
+    [[x0 + inset, y0 + inset], [x1 - inset, y0 + inset], [x1 - inset, y1 - inset], [x0 + inset, y1 - inset]].forEach(([x, y], k) =>
+      ctx.add(
+        place(UPF, H.solid(`foot${k}`, { name: k ? "" : `Rubber foot Ø16 x ${Math.round(h)}, M4 stud`, qty: k ? 0 : 4, kind: "foot", role: "ground", mat: "Neoprene, 60 Shore A", outer: circle(8, x!, y!, 28), z0: base.bottom - h, z1: base.bottom, joints: [] })),
+      ),
+    );
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------- lubrication and marks
+
+export const lubrication: Rule = {
+  id: "lubrication",
+  tier: "AUTO",
+  ids: ["F8"],
+  fixture: "four-bar",
+  applies: () => true,
+  apply() {},
+  after(ctx) {
+    // an oil sink on every bridge over an open bearing
+    for (const b of ctx.solids.filter((s) => s.kind === "bridge")) {
+      const site = ctx.sites.find((s) => `${s.id}-bridge` === b.id);
+      if (!site) continue;
+      const uv = planeCoords(b.frame, site.at).uv;
+      b.marks.push({ kind: "oilSink", pts: circle(3.2, uv[0], uv[1], 24) });
+      (ctx.fired.lubrication ??= []).push(b.id);
+    }
+  },
+};
+
+export const timingMarks: Rule = {
+  id: "timing-marks",
+  tier: "AUTO",
+  ids: ["F9"],
+  fixture: "four-bar",
+  applies: (ctx) => ctx.kin.drivers.length > 0,
+  apply() {},
+  after(ctx) {
+    for (const d of ctx.kin.drivers) {
+      const site = ctx.sites.find((s) => s.joints.includes(d.joint ?? ""));
+      if (!site) continue;
+      for (const b of site.bodies) {
+        const part = ctx.parts.get(b);
+        const g = ctx.geoms.get(b);
+        if (!part || !g) continue;
+        const reach = Math.max(...g.profile.outer.map((p) => Math.hypot(p[0], p[1])));
+        part.marks.push({ kind: "index", pts: [[3, 0], [Math.min(reach - 1, 9), 0]] });
+        // the zero on the base, beside the pivot, so a turn can be counted
+        const w = fromPlane(g.frame, [reach + 5, 0], 0);
+        const w2 = fromPlane(g.frame, [reach + 9, 0], 0);
+        ctx.baseMarks.push({ kind: "index", pts: [[w[0], w[1]], [w2[0], w2[1]]] });
+        (ctx.fired["timing-marks"] ??= []).push(b);
+      }
+    }
+  },
+};
+
+export const locking: Rule = {
+  id: "locking",
+  tier: "AUTO",
+  ids: ["M13"],
+  fixture: "four-bar",
+  applies: () => true,
+  apply() {},
+  after(ctx) {
+    for (const s of ctx.solids) {
+      if (!(s.kind === "shank" || s.thread) || s.why) continue;
+      s.why = s.id.endsWith("-lock") ? "nyloc" : "locked with threadlocker (Loctite 243)";
+      (ctx.fired.locking ??= []).push(s.id);
+    }
+  },
+};
+
+const BY_KIND: Partial<Record<Solid3["kind"], string>> = {
+  base: "Aluminium 6061-T6, bead-blasted and anodised",
+  plate: "Aluminium 6061-T6, anodised",
+  bracket: "Aluminium 6061, bead-blasted",
+  housing: "Aluminium 6061-T6, anodised",
+  bridge: "Aluminium 6061-T6, anodised",
+  standoff: "Stainless steel A2",
+  spacer: "Steel, hardened",
+  washer: "Steel, hardened",
+  sleeve: "Steel",
+  shim: "Steel shim stock",
+};
+
+export const materials: Rule = {
+  id: "materials",
+  tier: "AUTO",
+  ids: ["M10"],
+  fixture: "four-bar",
+  applies: () => true,
+  apply() {},
+  after(ctx) {
+    const gearish = new Set(["gear", "ringGear", "pulley", "sprocket", "rack", "cam"]);
+    for (const s of ctx.solids) {
+      if (s.mat) continue;
+      if (s.kind === "part") {
+        const shape = String(ctx.kin.bodies.find((b) => b.id === s.body)?.shape?.type);
+        s.mat = gearish.has(shape) ? "Steel C45, teeth induction-hardened" : s.role === "link" || s.role === "driver" || s.role === "output" ? "Steel C45, black oxide" : "Aluminium 6061-T6, anodised";
+      } else s.mat = BY_KIND[s.kind] ?? "Steel";
+      (ctx.fired.materials ??= []).push(s.id);
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------- stage 3: fasteners (A8)
+
+export const fasteners: Rule = {
+  id: "fasteners",
+  tier: "AUTO",
+  ids: ["A8", "M4"],
+  fixture: "four-bar",
+  applies: () => true,
+  apply() {},
+  after(ctx) {
+    // every shank, dowel and axle that passes a fixed plate gets a clearance hole through it; one that ends in a plate
+    // is tapped there and leaves it whole
+    const plates = ctx.solids.filter((p) => p.body === "ground" && ["base", "plate", "bridge", "bracket", "housing", "foot"].includes(p.kind) && p.op.op === "extrude" && !ctx.parts.has(p.id));
+    for (const s of ctx.solids) {
+      if (!(s.kind === "shank" || s.kind === "dowel" || s.kind === "shaft") || s.op.op !== "extrude" || s.body !== "ground" && s.kind !== "shank") continue;
+      const r = (s.d ?? 0) / 2;
+      if (!r) continue;
+      const z = canon(s.frame.z);
+      const h = s.op.h;
+      for (const p of plates) {
+        if (!parallel(p.frame.z, z) || p.id === s.id || (p.group && p.group === s.group)) continue;
+        const dz = v3.dot(v3.sub(p.frame.o, s.frame.o), z);
+        const p0 = dz;
+        const p1 = dz + (p.op.op === "extrude" ? p.op.h : 0);
+        const lo = 0;
+        const hi = h;
+        if (hi <= p0 + 0.05 || lo >= p1 - 0.05) continue;
+        const uv = planeCoords(p.frame, s.frame.o).uv;
+        if (!insidePlate(p, uv)) continue;
+        // through: the shank spans the plate end to end; blind: it ends inside (tapped, no hole)
+        const through = lo <= p0 + 0.05 && hi >= p1 - 0.05;
+        if (!through) continue;
+        const rr = r + (s.kind === "dowel" ? 0.02 : 0.3);
+        if (p.profile.holes.some((hh) => ringHas(hh, uv, rr))) continue;
+        p.profile.holes.push(circle(rr, uv[0], uv[1], Math.max(16, Math.round(rr * 6))).reverse());
+        (ctx.fired.fasteners ??= []).push(`${s.id}->${p.id}`);
+      }
+    }
+    // a hole that overlaps another is merged into one clean ring so the plate stays a single piece
+    for (const p of plates) {
+      if (p.profile.holes.length < 2) continue;
+      const c = cleanProfile(ctx.M, p.profile);
+      if (c) p.profile = c;
+    }
+  },
+};
+
+const insidePlate = (p: Solid3, uv: Vec2): boolean => {
+  const pts = p.profile.outer;
+  let c = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const a = pts[i]!;
+    const b = pts[j]!;
+    if (a[1] > uv[1] !== b[1] > uv[1] && uv[0] < ((b[0] - a[0]) * (uv[1] - a[1])) / (b[1] - a[1]) + a[0]) c = !c;
+  }
+  return c;
+};
+
+const ringHas = (ring: Vec2[], c: Vec2, r: number): boolean => ring.every((p) => Math.hypot(p[0] - c[0], p[1] - c[1]) < r * 1.8) && Math.abs(Math.hypot(ring[0]![0] - c[0], ring[0]![1] - c[1]) - r) < r * 0.5;
+
+// ---------------------------------------------------------------------------------------------------- headroom (A13)
+
+export const headroom: Rule = {
+  id: "headroom",
+  tier: "AUTO",
+  ids: ["A13"],
+  fixture: "four-bar",
+  applies: (ctx) => ctx.sites.some((s) => !s.fixed),
+  apply() {},
+  after(ctx) {
+    // a bolt head under a plate that passes over it needs headroom; the placer opened the gap, this checks it held. The
+    // head rides its part, so it is judged with the other parts at the same phase, in plan, where their heights meet.
+    for (const s of ctx.sites.filter((q) => !q.fixed)) {
+      const head = ctx.get(`${s.id}-bolt-head`);
+      if (!head || head.op.op !== "extrude") continue;
+      const r = (head.D ?? 12) / 2;
+      const w0 = head.frame.o[2];
+      const w1 = w0 + head.op.h;
+      const carrier = head.body;
+      let worst = Infinity;
+      let who = "";
+      for (const b of ctx.sweeps.moving()) {
+        if (s.bodies.includes(b)) continue;
+        const e = ctx.extent(b);
+        const g = ctx.geoms.get(b);
+        if (!e || !g) continue;
+        const z0 = e.frame.o[2] + e.w0;
+        const z1 = e.frame.o[2] + e.w1;
+        if (z1 <= w0 - 0.01 || z0 >= w1 + MIN_GAP) continue;
+        ctx.sampled.us.forEach((_, i) => {
+          const c = planeCoords(e.frame, xf.apply(ctx.xfOf(carrier, i), s.at)).uv;
+          const ring = g.profile.outer.map((q) => planeCoords(e.frame, xf.apply(ctx.xfOf(b, i), fromPlane(g.frame, q, 0))).uv);
+          const d = pointDist(ring, c[0], c[1]) - r;
+          if (d < worst) {
+            worst = d;
+            who = b;
+          }
+        });
+      }
+      if (worst < MIN_GAP - 0.5) ctx.issues.push(`headroom: the head of ${head.id} is ${worst.toFixed(2)} mm from ${who}, which passes over it`);
+      else (ctx.fired.headroom ??= []).push(head.id);
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------- see-through (L5, T10)
+
+export const seeThrough: Rule = {
+  id: "see-through",
+  tier: "AUTO",
+  ids: ["L5", "T10", "T11", "T12"],
+  fixture: "kin:fourBarHung",
+  applies: (ctx) => ctx.principle.size > 0,
+  apply() {},
+  after(ctx) {
+    const dir = ctx.viewDir();
+    const principle = [...ctx.principle].map((b) => ({ b, sweep: ctx.sweeps.of(b) })).filter((p): p is { b: string; sweep: NonNullable<typeof p.sweep> } => !!p.sweep);
+    if (!principle.length) return;
+    const proj = principle.map((p) => ({ b: p.b, cs: p.sweep.project(dir), c: centroidDepth(ctx, p.b, dir) }));
+    for (const s of ctx.solids) {
+      if (ctx.principle.has(s.body) || s.flags.isBase || s.kind === "foot") continue;
+      if (ctx.parts.get(s.body)?.id === s.id) continue;
+      const m = worldManifold(ctx.M, s);
+      const sp = projectAlong(m, dir);
+      const sd = v3.dot(centroid(worldPoints(ctx.M, s)), dir);
+      const hit: string[] = [];
+      for (const p of proj) {
+        // it covers the principle part when it is nearer the viewer and their outlines meet
+        if (sd >= p.c) continue;
+        const x = sp.intersect(p.cs);
+        if (x.area() > 0.5) hit.push(p.b);
+        x.delete();
+      }
+      sp.delete();
+      m.delete();
+      if (hit.length) {
+        s.flags.seeThrough = true;
+        ctx.covers.set(s.id, [...new Set([...(ctx.covers.get(s.id) ?? []), ...hit])]);
+        (ctx.fired["see-through"] ??= []).push(s.id);
+      }
+    }
+    proj.forEach((p) => p.cs.delete());
+  },
+};
+
+const centroid = (pts: Vec3[]): Vec3 => {
+  const s = pts.reduce((a, p) => v3.add(a, p), [0, 0, 0] as Vec3);
+  return v3.mul(s, 1 / Math.max(1, pts.length));
+};
+
+function centroidDepth(ctx: BuildCtx, body: string, dir: Vec3): number {
+  const p = ctx.parts.get(body);
+  return p ? v3.dot(centroid(worldPoints(ctx.M, p)), dir) : 0;
+}
+
+// ---------------------------------------------------------------------------------------------------- explode (E1 to E10)
+
+export const explode: Rule = {
+  id: "explode",
+  tier: "AUTO",
+  ids: ["E1", "E2", "E3", "E5", "E6", "E7", "E8", "E10"],
+  fixture: "four-bar",
+  applies: () => true,
+  apply() {},
+  after(ctx) {
+    // every solid is one rigid body; its level is its centre's place along its own axis, in pitches, so a spacer or a
+    // washer sits midway between the parts it separates and a stack of one axis moves in its own direction
+    const level = new Map<string, number>();
+    const unit = (s: Solid3): string => s.group ?? s.id;
+    const sum = new Map<string, { n: number; v: number }>();
+    for (const s of ctx.solids) {
+      if (s.flags.isBase) continue;
+      const z = canon(s.frame.z);
+      const h = s.op.op === "extrude" ? s.op.h : 0;
+      const c = v3.add(s.frame.o, v3.mul(s.frame.z, h / 2));
+      const v = v3.dot(c, z) / PITCH;
+      const u = sum.get(unit(s)) ?? { n: 0, v: 0 };
+      u.n++;
+      u.v += v;
+      sum.set(unit(s), u);
+    }
+    for (const [u, a] of sum) level.set(u, Math.round((a.v / a.n) * 2) / 2);
+    for (const s of ctx.solids) {
+      if (s.flags.isBase) {
+        s.ex = -2;
+        continue;
+      }
+      s.ex = level.get(unit(s)) ?? 0;
+      s.exAxis = canon(s.frame.z);
+    }
+    // a bridge and its screws come off before the parts they clamp (E4)
+    const top = Math.max(0, ...[...level.values()]);
+    for (const s of ctx.solids.filter((q) => q.kind === "bridge")) s.ex = top + 1;
+    (ctx.fired.explode ??= []).push(`${ctx.solids.length} solids`);
+  },
+};
+
+void clearance;
+void pointDist;

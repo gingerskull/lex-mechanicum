@@ -265,35 +265,49 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | Rule or stage | Serves |
 |---|---|
 | `classify` | A1, A2, A3 |
+| `placement` | A10, A18 |
 | `base` | A7, D4, M4 |
-| `j6-mesh` | J6, F7 |
+| `j6-mesh` | J6, F7, F9 |
+| `j9-crossed-mesh` | J9, F4, F7, F9 |
+| `j3-moving-pin` | J3, A12, M3 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
-| `j9-crossed-mesh` | J9, F4, F7, F9 |
-| `j11-screw` | J11, F3, F8 |
-| `j3-moving-pin` | J3, A12, M3 |
 | `j4-slot-roller` | J4, M14 |
-| `j5-slide` | J5, F5, F7 |
+| `pin-lobe` | J4, M14 |
+| `groove-cam` | J7, M14 |
+| `j5-slide` | J5, F5, F7, A6 |
 | `j7-cam` | J7, F6 |
-| `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
-| `stops` | F5 |
-| `standoffs` | A6 |
-| `drive` | V1, V2, V3, V5, V6, F10 |
+| `pallet-contact` | J7, F6, M14 |
+| `fork-pin` | J4, F2 |
+| `pawl-tooth` | J7, F6, F5 |
+| `tongue-slot` | J5, F8, M14 |
+| `ring-hub` | J3, F2 |
+| `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
+| `strap-sheave` | J12, F1, F2, A11 |
+| `j11-screw` | J11, F3, F8 |
 | `j13-compliant` | J13, A6, F1, F2, F5 |
-| `j2-straddle` | A9, J2 |
+| `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
+| `stops` | F5, A22 |
+| `drive` | V1, V2, V3, V5, V6, F10 |
+| `adjustable-length` | F7, A22 |
+| `cable-clip` | A22, V6 |
+| `standoffs` | A6 |
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
 | `timing-marks` | F9 |
 | `locking` | M13 |
 | `materials` | M10 |
-| `fasteners (stage 3)` | A8, M4 |
+| `fasteners` | A8, M4 |
 | `headroom` | A13 |
-| `see-through` | L5 |
-| `explode` | E1, E2, E3, E5, E6, E7, E8 |
+| `see-through` | L5, T10, T11, T12 |
+| `explode` | E1, E2, E3, E5, E6, E7, E8, E10 |
+| `axial stack builder` | A20, A12, A3, A4, A5 |
+| `support router` | A14, A19, T11, T12 |
+| `placement solver` | A10, A18, A9 |
 | `hardware primitives` | A13, M1, M3, M5, M11, R3 |
-| `checks (clearance, clamp, edge distance)` | A12, A15, M6 |
+| `checks (clearance, clamp, edge distance)` | A15, M6 |
 <!-- auto-table:end -->
 
 ### 5.2 Stage 2: hand polish (HAND, mandatory for every mechanism)

@@ -37,6 +37,12 @@ src/rules/                       context, classify (slots closed and open, over 
                                  (J1 to J13), the
                                  registry and autoTable(); stage 3 fasteners; the headroom and see-through stages; the
                                  rigid explode pass
+src/builder/                     engine v3's hardware builder, beside the 2.5D engine until the cut-over: poses (the record's
+                                 composition, else the numeric solver), the placement solver (slabs per family of parallel
+                                 planes), sites and kits (one per joint type: block, hardware rule, explode axis, see-through
+                                 zone, rungs), the axial stack builder with its support selector, the support router against
+                                 swept volumes (Manifold hulls of sampled poses, least gap), the shared parts, the polish API
+                                 v3 and the rules registry that the standard's AUTO table is generated from
 src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> headroom -> see-through ->
                                  explode; the polish API; solid poses; clearance, clamp and edge-distance checks
 src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)
