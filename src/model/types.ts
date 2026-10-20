@@ -1,10 +1,11 @@
 // The model contract: what a mechanism's model.ts provides. Kinematics only; no prose and no style.
+import type { Axis } from "../core/axis";
 import type { Pose, Vec2 } from "../core/geom";
 import type { RungId } from "../style/detail";
 import type { Role } from "../style/kinds";
 
 // Role and the rung ids are the detail ladder's vocabulary (src/style); the model shares them, never redefines them.
-export type { Pose, Role, RungId, Vec2 };
+export type { Axis, Pose, Role, RungId, Vec2 };
 
 export type InputKind = "rotary" | "oscillating" | "linear" | "manual";
 
@@ -28,8 +29,19 @@ export interface Solved {
 export interface Part {
   id: string;
   role: Role;
-  /** Integer layer, LAYER mm apart; z0 = layer · LAYER + dz. */
+  /**
+   * Integer layer, LAYER mm apart; z0 = layer · LAYER + dz. For a part whose axis is x or y it is only the part's
+   * explode level: its plane is placed by `along`.
+   */
   layer: number;
+  /**
+   * The axis the part turns about and is extruded along (src/core/axis.ts): z of the base (the default), or x or y for
+   * a part standing out of the plan plane (a shaft in plan, a disc on edge). Its outline, its pose and the solved points
+   * it is placed by lie in the plane normal to the axis.
+   */
+  axis?: Axis;
+  /** Axis x or y: where the part's extent along its axis starts, world mm (its z0 for a z part). Required then. */
+  along?: number;
   /**
    * Plating offset from the layer grid, mm (K1: heights may change, centres may not): a part plated low over a pin
    * shortens the pin's overhang (A9). The explode level stays the layer's.

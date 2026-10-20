@@ -1,5 +1,6 @@
 // The unit of a built assembly: an extruded outline in body-local millimetres with a z range, riding on a body the
 // solver poses. Every solid carries its kind, role, material and detail rung (standard DL1, M10, A13).
+import type { Axis } from "../core/axis";
 import type { Pose, Vec2 } from "../core/geom";
 import { rungOf, type RungId } from "../style/detail";
 import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
@@ -32,8 +33,14 @@ export interface Solid {
   body: string;
   /** Pose on the body, body-local mm and radians. */
   at: Pose;
+  /** Extent along the solid's axis: z for a z solid, x or y for a solid on an x or y axis. */
   z0: number;
   z1: number;
+  /**
+   * Axis x or y: the outline lies in the plane normal to that axis and `at` is a pose in it (src/core/axis.ts); unset
+   * is z, as every solid on the base plane. A solid on a part's body has that part's axis.
+   */
+  axis?: "x" | "y";
   outer: Vec2[];
   holes: Vec2[][];
   marks: Mark[];
@@ -105,6 +112,9 @@ export function solid(id: string, o: SolidInit): Solid {
   if (o.detail === undefined) s.detail = rungOf({ kind: s.kind, role: s.role }).id;
   return s;
 }
+
+/** The axis of a solid as a spread: `{ axis }` for an x or y solid, nothing for a z solid (so z solids stay unchanged). */
+export const onAxis = (t: { axis?: Axis | undefined }): { axis?: "x" | "y" } => (t.axis === "x" || t.axis === "y" ? { axis: t.axis } : {});
 
 /** Marks of one kind from point lists. */
 export const marks = (kind: MarkKind, ...lists: Vec2[][]): Mark[] => lists.map((pts) => ({ kind, pts }));

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.26.0 — 2026-10-20
+
+- Engine: a part and its solids may stand out of the plan plane on an x or y axis (a shaft in plan, a disc on edge),
+  placed along it by `along`; the solver's points are read in the part's own plane. The model check asks an x or y
+  part for its place along the axis and refuses a joint between parts of different axes that no joint type allows
+  yet. The explode lifts them along the base z as a whole; the clearance, clamp and rule-context tests compare solids
+  on different axes by their world boxes; the package carries the axis as flag bits and the renderer's world solids
+  turn their outlines into world coordinates. Every existing package is byte-identical.
+
 ## 0.25.0 — 2026-10-20
 
 - Library: the search, Filters and theme row spans the full layout width, the search box has a clear (x) control

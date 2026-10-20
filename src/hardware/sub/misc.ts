@@ -4,7 +4,7 @@ import { TAU, arcPts, circle, dBore, polar, type Vec2 } from "../../core/geom";
 import { clipHalfPlane, edgeDist, inside, toWorld } from "../../core/poly";
 import type { RuleContext } from "../../rules/types";
 import { boltCircle, disc, eccentric, key as keyPart, plate, screw, sensor as fork, shaft, spacer, thrustWasher, waveWasher, wearStrip } from "../primitives";
-import { solid, type Solid } from "../solid";
+import { onAxis, solid, type Solid } from "../solid";
 import { JAM_NUTS, NUTS, SENSOR, innerRingD, keyFor, standardLength } from "../tables";
 
 const fmt = (v: number) => String(+v.toFixed(1));
@@ -67,12 +67,12 @@ export function lockingSegment(ctx: RuleContext, host: Solid, o: { r: number; de
   host.outer = [...arcPts(0, 0, o.r, a0, s0, 0.05), ...arcPts(0, 0, ri, s0, s1), ...arcPts(0, 0, o.r, s1, a1, 0.05), ...rest];
   const n = o.screws ?? 4;
   const M = o.M ?? 3;
-  const G = { body: host.body, z0: host.z0, z1: host.z1, ex: host.ex, joints: [o.joint] };
+  const G = { body: host.body, ...onAxis(host), z0: host.z0, z1: host.z1, ex: host.ex, joints: [o.joint] };
   const seg = wearStrip(`${host.id}-seg`, [...arcPts(0, 0, o.r, s0, s1), ...arcPts(0, 0, ri, s1, s0)], { ...G, name: `Locking segment, hardened, ${n} x M${M} csk`, role: host.role });
   const out: Solid[] = [seg];
   for (let i = 0; i < n; i++) {
     const p = polar(ri, s0 + ((s1 - s0) * (i + 0.5)) / n);
-    out.push(...screw(`${host.id}-seg-sc${i}`, "csk", M, 2 * M, { body: host.body, at: [p[0], p[1], 0], face: host.z1, dir: -1, ex: host.ex, joints: [o.joint], name: i ? "" : undefined, qty: i ? 0 : n }));
+    out.push(...screw(`${host.id}-seg-sc${i}`, "csk", M, 2 * M, { body: host.body, ...onAxis(host), at: [p[0], p[1], 0], face: host.z1, dir: -1, ex: host.ex, joints: [o.joint], name: i ? "" : undefined, qty: i ? 0 : n }));
   }
   ctx.add(out);
   return out;
@@ -207,7 +207,7 @@ export function turnbuckle(
   host.marks = host.marks.filter((k) => !across(k.pts) && !onFar(k.pts));
   if (!host.joints.includes(jid)) host.joints.push(jid);
 
-  const G = { role: "hw" as const, body: host.body, at: host.at, ex: host.ex, joints: [jid] };
+  const G = { role: "hw" as const, body: host.body, ...onAxis(host), at: host.at, ex: host.ex, joints: [jid] };
   const body = solid(`${host.id}-tb-body`, {
     ...G,
     kind: "collar",

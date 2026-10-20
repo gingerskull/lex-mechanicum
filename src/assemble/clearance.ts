@@ -1,12 +1,13 @@
 // A15: zero clashes over the full cycle. Every pair of solids that move relative to each other and share a z range is
 // tested for interpenetration of their outlines at n phases. Pairs that are one body, one group, or allowed by
-// design are skipped.
+// design are skipped. Two solids on different axes (src/core/axis.ts) are tested by their world boxes.
+import { boxOverlap } from "../core/axis";
 import { TAU, xf } from "../core/geom";
 import { overlap, region, type Region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, solidPose } from "./pose";
+import { indexParts, isGround, solidBox, solidPose } from "./pose";
 
 export interface Clash {
   a: string;
@@ -35,22 +36,33 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
       const b = S[k]!;
       if (a.group && a.group === b.group) continue;
       if (a.allow?.includes(b.id) || b.allow?.includes(a.id) || contact.has(`${a.id}|${b.id}`)) continue;
-      if (Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0) <= 0.05) continue;
+      if (a.axis === b.axis && Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0) <= 0.05) continue;
       pairs.push([i, k]);
     }
   const worst = new Map<string, Clash>();
   for (let step = 0; step < n; step++) {
     const u = (step / n) * TAU;
     const s = model.solve(u);
-    const regs: (Region | null)[] = S.map((t) => {
-      const q = solidPose(model, parts, t, s, u);
+    const poses = S.map((t) => solidPose(model, parts, t, s, u));
+    const regs: (Region | null)[] = S.map((t, i) => {
+      const q = poses[i];
       return q ? region(xf(t.outer, q), t.holes.map((h) => xf(h, q))) : null;
     });
     for (const [i, k] of pairs) {
-      const ra = regs[i];
-      const rb = regs[k];
-      if (!ra || !rb) continue;
-      const d = overlap(ra, rb);
+      const a = S[i]!;
+      const b = S[k]!;
+      let d: number;
+      if (a.axis !== b.axis) {
+        const qa = poses[i];
+        const qb = poses[k];
+        if (!qa || !qb) continue;
+        d = boxOverlap(solidBox(a, qa), solidBox(b, qb));
+      } else {
+        const ra = regs[i];
+        const rb = regs[k];
+        if (!ra || !rb) continue;
+        d = overlap(ra, rb);
+      }
       if (d <= CLASH_TOL) continue;
       const key = `${S[i]!.id}|${S[k]!.id}`;
       const w = worst.get(key);

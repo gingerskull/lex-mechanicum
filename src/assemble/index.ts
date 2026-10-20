@@ -59,6 +59,8 @@ export function assembleWith(model: MechanismModel, opts: AssembleOptions = {}):
   let zmin = Infinity;
   let zmax = -Infinity;
   for (const s of ctx.solids) {
+    // an x or y solid's z0..z1 run along its axis, not up
+    if (s.axis) continue;
     zmin = Math.min(zmin, s.z0);
     zmax = Math.max(zmax, s.z1);
   }

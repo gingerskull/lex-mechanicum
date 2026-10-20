@@ -160,3 +160,18 @@ export const hungModel: MechanismModel = defineMechanism({
     return { pts: { O2: [0, 0], O4: [25, 0], A: V.at([0, 0], u, 60), B: V.at([25, 0], osc(-60 * D2R, 60 * D2R)(u), 50) } };
   },
 });
+
+/**
+ * Axes out of the plan plane (src/core/axis.ts): a shaft in plan along x (its section in the y-z plane, centre y 0,
+ * z 30), a wheel standing on edge normal to y (centre x 60, z 30) and a plate lying on the base plane beside them.
+ */
+export const axisModel: MechanismModel = defineMechanism({
+  id: "fx-axis",
+  input: { kind: "rotary", part: "shaft" },
+  parts: [
+    P.disc("shaft", 5, { axis: "x", along: -40, thick: 80, layer: 2, at: "S", spin: (s) => s.a as number, marks: [] }),
+    P.disc("wheel", 20, { axis: "y", along: 40, thick: 6, layer: 2, at: "W", spin: (s) => s.a as number, role: "output" }),
+    P.disc("plate", 25, { fixed: [0, 60, 0], role: "ground" }),
+  ],
+  solve: (u) => ({ pts: { S: [0, 30], W: [60, 30] }, a: u }),
+});

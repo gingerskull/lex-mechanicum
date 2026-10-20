@@ -1,9 +1,19 @@
-// Headless kinematic checks (standard K1, K2, K5): rigidity, continuity, periodicity, pin joins, interference.
+// Headless kinematic checks (standard K1, K2, K5): rigidity, continuity, periodicity, pin joins, interference, and the
+// axes of parts standing out of the plan plane (src/core/axis.ts).
+import { boxOf, isOut, planCorners } from "../core/axis";
 import { TAU, xf } from "../core/geom";
 import { poseOf } from "./pose";
 import type { MechanismModel, Part, Pose, Solved, Vec2 } from "./types";
 
-export type FindingType = "MISSING" | "NaN" | "LINK_LEN" | "POSE_JUMP" | "INTERFERE" | "OVERLAP" | "WARN" | "PERIODICITY";
+export type FindingType = "MISSING" | "NaN" | "LINK_LEN" | "POSE_JUMP" | "INTERFERE" | "OVERLAP" | "WARN" | "PERIODICITY" | "AXIS";
+
+/**
+ * The joint types that may join two parts of different axes (a crossed-axis mesh, a screw). A declared joint between
+ * parts of different axes whose type is not listed is an AXIS finding.
+ */
+export const MIXED_AXIS_JOINTS: readonly string[] = [];
+
+const axisOf = (p: Part) => p.axis ?? "z";
 
 export interface Finding {
   type: FindingType;
@@ -170,6 +180,17 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     if (mx > JUMP) add("POSE_JUMP", `step ${mx.toFixed(2)} between samples`, p.id);
   }
 
+  // AXIS: a part on an x or y axis is placed along it by `along`; a cam contact between parts of different axes must be
+  // a joint type that allows it
+  for (const p of model.parts) if (isOut(p.axis) && p.along === undefined) add("AXIS", `axis ${p.axis} needs \`along\`, the start of the part along its axis`, p.id);
+  const byId = Object.fromEntries(model.parts.map((p) => [p.id, p]));
+  for (const c of model.cams ?? []) {
+    const a = byId[c.cam];
+    const b = byId[c.follower];
+    if (a && b && axisOf(a) !== axisOf(b) && !MIXED_AXIS_JOINTS.includes("J7"))
+      add("AXIS", `cam contact ${c.cam} (axis ${axisOf(a)}) and ${c.follower} (axis ${axisOf(b)}): J7 does not join parts of different axes`, c.cam);
+  }
+
   // pins: which bodies carry the pin centre at a constant local point (joins), which it passes through (INTERFERE)
   const pins = model.parts.filter((p) => p.role === "pin" || p.role === "trace");
   const bodies = model.parts.filter((p) => p.role !== "pin" && p.role !== "trace");
@@ -180,6 +201,8 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     const lo = pin.layer;
     const hi = pin.role === "pin" ? pin.layer + (pin.span ?? 1) : pin.layer;
     for (const b of bodies) {
+      // a pin and a body on different axes lie in different planes: their points are not comparable
+      if (axisOf(b) !== axisOf(pin)) continue;
       let attached = true;
       let l0: Vec2 | null = null;
       let inside = false;
@@ -217,7 +240,7 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     for (let j = i + 1; j < bodies.length; j++) {
       const A = bodies[i]!;
       const B = bodies[j]!;
-      if (A.layer !== B.layer) continue;
+      if (A.layer !== B.layer || axisOf(A) !== axisOf(B)) continue;
       let hit = 0;
       let first = -1;
       for (let k = 0; k <= n; k += 3) {
@@ -244,7 +267,8 @@ export function checkModel(model: MechanismModel, n = 720): CheckReport {
     for (const p of model.parts) {
       const pp = poseOf(p, S[k]!);
       if (!pp) continue;
-      for (const [x, y] of xf(p.shape.outer, pp)) {
+      const w0 = (p.along ?? 0) + (p.dz ?? 0);
+      for (const [x, y] of isOut(p.axis) ? planCorners(boxOf(p.axis, xf(p.shape.outer, pp), w0, w0 + p.thick)) : xf(p.shape.outer, pp)) {
         x0 = Math.min(x0, x);
         x1 = Math.max(x1, x);
         y0 = Math.min(y0, y);

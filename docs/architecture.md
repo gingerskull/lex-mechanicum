@@ -21,7 +21,8 @@ src/catalog/                     record schema and vocabularies, merge, validato
 src/style/                       tokens (palettes, type, sizes), form (geometry-affecting values), draft (renderer
                                  knobs), detail (the detail ladder), kinds (solid kinds, roles, mark kinds, effects),
                                  theme (rgb resolution, font strings). One source per value; tokens.css is generated.
-src/core/                        geometry, vectors, involute gears and meshing, polygon queries (poly.ts)
+src/core/                        geometry, vectors, involute gears and meshing, polygon queries (poly.ts), the
+                                 out-of-plane axis (axis.ts: plane mapping, world boxes)
 src/parts/                       the part family: link (stadium or tapered), plate, cap, slider, rails, slotLink, gear,
                                  ringGear, rack, disc, custom, tracer; every part may carry a plating offset (dz) and
                                  a clevis twin; heights()
@@ -59,15 +60,25 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    the cycle phase u in 0..2π. Heights belong to the model too: a part plated off its layer (`dz`), a clevis plate
    twinned with its partner (`twin`), tapered links sized to their bosses. It holds no prose and no style; name, text,
    tags and links come from the catalogue record with the same id.
+   A part may declare an **axis** (`axis: "x" | "y"`, z by default) with its start along it (`along`): it then stands
+   out of the plan plane, a shaft in plan or a disc on edge. Its outline, its pose and the solved points that place it
+   lie in the plane normal to the axis (`src/core/axis.ts`: for x the plane's (u, v) is world (y, z), for y it is
+   (x, z); v is always up), and its extent along the axis takes the place of the z range. The solver still returns
+   2D points; each part reads them in its own plane. Its `layer` is then only its explode level.
 2. **Assemble.** `assemble(model)` runs the rules (every joint built from its type, then base, standoffs, feet,
    lubrication, timing marks, materials, drive, straddle bridges over live gear shafts), then the mechanism's
    `polish(A, H)` (only what differs), then stage 3 fasteners, then the headroom stage (a shoulder bolt head lifted on
    a shim that would meet a solid gets a shoulder ground to length), then the see-through stage (a static solid that
    hides a working zone, such as the pitch point of a mesh, is marked to be drawn see-through), then the rigid explode
    pass. The result is a list of solids: extruded outlines in body-local millimetres with z ranges, explode levels,
-   detail rungs, roles, materials and joint membership.
+   detail rungs, roles, materials and joint membership. A solid carries its part's axis: its z0..z1 then run along
+   that axis. The explode lifts every level along the base z, whatever the axis, so a shaft in plan rises as a whole
+   (a fastener on an x or y axis stays with its level). The clearance, clamp and rule-context tests compare two
+   solids on different axes by their world boxes.
 3. **Package.** At build time, `tools/package` assembles every mechanism and writes a compact package (typed arrays)
-   with the solids, traced paths, bounds, plot data and joint notes. The rules engine, the hardware library and the
+   with the solids, traced paths, bounds, plot data and joint notes. A solid's axis is two flag bits (none for z, so
+   a mechanism with no out-of-plane part packs exactly as before); the bounds' z range includes the world z swept by
+   the x and y solids. The rules engine, the hardware library and the
    polishes never reach the browser.
 4. **Render.** The renderer loads a package and the mechanism's `solve`, keeps a per-canvas session (paper tile,
    slice cuts, its geometry on the GPU) and draws a frame for a given u and view (tilt, explode, overlays, detail

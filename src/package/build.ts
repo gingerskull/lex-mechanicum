@@ -1,8 +1,9 @@
 // Build-time packaging (Node only): assemble a registered mechanism with its polish, sample it, measure the swept
 // envelope of every solid and pack it. The renderer and the site read the result; nothing here ships.
+import { planCorners } from "../core/axis";
 import { TAU, xf } from "../core/geom";
 import { assemble, type Assembly } from "../assemble";
-import { indexParts, solidPose } from "../assemble/pose";
+import { indexParts, solidBox, solidPose } from "../assemble/pose";
 import { parseHeader, readAudit } from "../audit/sheet";
 import { mechanisms } from "../mechanisms";
 import { sample, type Sampled } from "../model/sample";
@@ -22,7 +23,8 @@ export function envelope(model: MechanismModel, a: Assembly, n = 72): { minX: nu
     for (const t of a.solids) {
       const q = solidPose(model, parts, t, s, u);
       if (!q) continue;
-      for (const [x, y] of xf(t.outer, q)) {
+      // a solid on an x or y axis covers its box's plan footprint
+      for (const [x, y] of t.axis ? planCorners(solidBox(t, q)) : xf(t.outer, q)) {
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
         if (y < minY) minY = y;
@@ -31,6 +33,32 @@ export function envelope(model: MechanismModel, a: Assembly, n = 72): { minX: nu
     }
   }
   return { minX, minY, maxX, maxY };
+}
+
+/** World z range swept by the solids on an x or y axis over the cycle, or null when there are none. */
+export function zSweep(model: MechanismModel, a: Assembly, n = 72): [number, number] | null {
+  const out = a.solids.filter((t) => t.axis);
+  if (!out.length) return null;
+  const parts = indexParts(model);
+  let z0 = Infinity;
+  let z1 = -Infinity;
+  for (const t of a.solids)
+    if (!t.axis) {
+      z0 = Math.min(z0, t.z0);
+      z1 = Math.max(z1, t.z1);
+    }
+  for (let i = 0; i < n; i++) {
+    const u = (i / n) * TAU;
+    const s = model.solve(u);
+    for (const t of out) {
+      const q = solidPose(model, parts, t, s, u);
+      if (!q) continue;
+      const b = solidBox(t, q);
+      z0 = Math.min(z0, b[2]);
+      z1 = Math.max(z1, b[5]);
+    }
+  }
+  return [z0, z1];
 }
 
 export interface Built {
@@ -49,6 +77,6 @@ export async function buildPackage(id: string, opts: { polish?: boolean } = {}):
   const assembly = assemble(model, sampled, polish && opts.polish !== false ? { polish } : {});
   const audit = readAudit(id);
   const header = audit ? parseHeader(audit) : null;
-  const pkg = pack({ id, standard: header?.standard || "none", result: header?.result || "none", ...assembly, envelope: envelope(model, assembly) }, sampled);
+  const pkg = pack({ id, standard: header?.standard || "none", result: header?.result || "none", ...assembly, envelope: envelope(model, assembly), zOut: zSweep(model, assembly) }, sampled);
   return { model, assembly, sampled, pkg };
 }
