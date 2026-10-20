@@ -3,7 +3,14 @@
 // draw counters of one frame, the package size and the solids and marks on each rung. Frames are drawn back to back
 // on animation frames with the frame-rate cap off, so each frame's GPU work is paid before the next (what the stage
 // gets); the median of the runs. Writes dist/bench/report.md and report.json.
+//
+// Package v2 (standard R6, R10): `--page [--out dir] [id ...]` builds the bench page as a static folder (default
+// dist/bench-page: index.html, the scripts, the fonts and the v1 and v2 packages of the ids; the pilots when none is
+// given), ready to publish and open on a phone; `--v2 [id ...]` builds it, opens it in local Chrome and runs it, printing
+// the page's report (setup split into decode, tessellate, edges and GPU, frame time per view and dial position, today's
+// renderer beside it) and writing dist/bench/report-v2.md and report-v2.json.
 import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { mechanisms } from "../src/mechanisms";
 import { buildFrom, buildPackage } from "../src/package/build";
@@ -11,6 +18,7 @@ import { encode } from "../src/package/format";
 import type { Dial } from "../src/render/detail";
 import { prepare } from "../src/render/world";
 import { DETAIL, rungOf } from "../src/style/detail";
+import { buildPage, PAGE_IDS, runPage } from "./bench-page/build";
 import { openChrome, type BenchResult } from "./chrome";
 
 const W = 1393;
@@ -82,6 +90,28 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     const i = process.argv.indexOf(`--${k}`);
     return i > 0 ? process.argv[i + 1]! : d;
   };
+  const flag = (k: string) => process.argv.includes(`--${k}`);
+  if (flag("page") || flag("v2")) {
+    const num = (k: string, d: number) => Number(arg(k, String(d)));
+    const val = new Set(["--out", "--runs", "--dpr", "--frames", "--w", "--h"]);
+    const given = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && !val.has(all[i - 1] ?? ""));
+    const ids = given.length ? given : PAGE_IDS;
+    const root = fileURLToPath(new URL("..", import.meta.url));
+    if (flag("page")) {
+      const out = await buildPage(arg("out", join(root, "dist", "bench-page")), ids);
+      console.log(`bench page for ${ids.join(", ")} built in ${out}; publish that folder and open index.html on the phone`);
+    } else {
+      const dir = await buildPage(join(root, "dist", "bench-page"), ids);
+      const o = { ids, runs: num("runs", 3), frames: num("frames", 40), w: num("w", W), h: num("h", H), dpr: num("dpr", 1.5), today: true, worker: true };
+      const { gpu, md, json } = await runPage(dir, o);
+      mkdirSync("dist/bench", { recursive: true });
+      writeFileSync("dist/bench/report-v2.json", JSON.stringify(json, null, 2));
+      writeFileSync("dist/bench/report-v2.md", md);
+      console.log(`${gpu}
+${md}`);
+    }
+    process.exit(0);
+  }
   const opts = { runs: Number(arg("runs", "3")), dpr: Number(arg("dpr", "1.5")), frames: Number(arg("frames", "40")) };
   const flags = new Set(["--runs", "--dpr", "--frames"]);
   const ids = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && !flags.has(all[i - 1] ?? ""));
