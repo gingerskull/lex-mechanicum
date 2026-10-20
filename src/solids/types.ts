@@ -106,6 +106,8 @@ export interface Solid3 {
   marks: Mark[];
   /** Explode level (E1) and joint membership. */
   ex: number;
+  /** The axis the part moves along when exploded (E10): its stack's joint axis; absent for the base z. */
+  exAxis?: Vec3;
   joints: string[];
   detail: RungId;
   group?: string;

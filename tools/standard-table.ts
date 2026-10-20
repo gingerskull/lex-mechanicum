@@ -3,7 +3,7 @@
 // differs. Part of npm run check through tests/docs/tables.test.ts.
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { autoTable } from "../src/rules/registry";
+import { autoTable } from "../src/builder/registry";
 import { replaceBlock, table, writeOrCheck } from "./doc-tables";
 
 export const STANDARD = fileURLToPath(new URL("../docs/mechanism-standard.md", import.meta.url));
