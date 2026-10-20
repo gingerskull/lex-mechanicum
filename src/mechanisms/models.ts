@@ -68,4 +68,5 @@ export const models: Record<string, () => Promise<MechanismModel>> = {
   "belt-drive": async () => (await import("./belt-drive/model")).default,
   "friction-wheel-drive": async () => (await import("./friction-wheel-drive/model")).default,
   "chain-drive": async () => (await import("./chain-drive/model")).default,
+  "flexure-hinge": async () => (await import("./flexure-hinge/model")).default,
 };
