@@ -46,6 +46,9 @@ export interface PackedSolid {
   chamfer?: number;
   /** Thread: nominal M size and the z range of the drawn thread. */
   thr?: [number, number, number];
+  /** Solid modifiers: far-end scale and helix lead (src/hardware/solid.ts). */
+  taper?: number;
+  helix?: number;
   /** FLAG bits: inset, accent, faint, isBase, headTop, seeThrough, and the axis (axisX, axisY; neither is z). */
   flags: number;
   /** x, y pairs, body-local mm: the outer outline, then each hole, then each mark. */
@@ -198,6 +201,8 @@ export function pack(a: PackInput, sampled: Sampled): Package {
     if (s.headKind) p.headKind = s.headKind;
     if (s.chamfer !== undefined) p.chamfer = s.chamfer;
     if (s.thread !== undefined && s.threadZ) p.thr = [s.thread, s.threadZ[0], s.threadZ[1]];
+    if (s.taper !== undefined) p.taper = s.taper;
+    if (s.helix !== undefined) p.helix = s.helix;
     return p;
   });
   const traces: Record<string, Float32Array> = {};

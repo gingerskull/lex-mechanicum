@@ -43,6 +43,14 @@ export interface Part {
   /** Axis x or y: where the part's extent along its axis starts, world mm (its z0 for a z part). Required then. */
   along?: number;
   /**
+   * Solid modifiers (src/core/spatial.ts): `taper`, the outline's scale at the far end (z1) about the solid's origin,
+   * so the solid is a frustum (a bevel gear, a cone); `helix`, a lead in mm per turn (+ right hand, - left), so the
+   * outline turns 2π (w - z0) / lead along the axis (a helical gear), or, where that would wind more than a quarter
+   * turn, the walls carry thread marks at that lead (a screw, a worm).
+   */
+  taper?: number;
+  helix?: number;
+  /**
    * Plating offset from the layer grid, mm (K1: heights may change, centres may not): a part plated low over a pin
    * shortens the pin's overhang (A9). The explode level stays the layer's.
    */

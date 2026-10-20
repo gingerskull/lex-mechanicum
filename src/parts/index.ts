@@ -23,6 +23,9 @@ export interface Place {
   /** The part's axis (src/core/axis.ts) and, for x or y, where it starts along it. */
   axis?: Axis;
   along?: number;
+  /** Solid modifiers: far-end scale and helix lead (src/model/types.ts). */
+  taper?: number;
+  helix?: number;
 }
 
 export interface PartOpts extends Place {
@@ -47,6 +50,8 @@ const place = (o: Place): Place => {
   if (o.name !== undefined) c.name = o.name;
   if (o.axis !== undefined && o.axis !== "z") c.axis = o.axis;
   if (o.along !== undefined) c.along = o.along;
+  if (o.taper !== undefined) c.taper = o.taper;
+  if (o.helix !== undefined) c.helix = o.helix;
   return c;
 };
 

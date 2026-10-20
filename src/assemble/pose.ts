@@ -47,5 +47,11 @@ export function solidPose(model: MechanismModel, parts: PartIndex, t: Pick<Solid
   return xfPose(P, t.at);
 }
 
-/** The world box of a solid at a pose (its outline posed in its plane, over its extent along its axis). */
-export const solidBox = (t: Pick<Solid, "axis" | "outer" | "z0" | "z1">, q: Pose): Box3 => boxOf(t.axis, xf(t.outer, q), t.z0, t.z1);
+/**
+ * The world box of a solid at a pose (its outline posed in its plane, over its extent along its axis); a solid that
+ * widens toward its far end (taper above 1) is boxed at its widest.
+ */
+export const solidBox = (t: Pick<Solid, "axis" | "outer" | "z0" | "z1" | "taper">, q: Pose): Box3 => {
+  const k = Math.max(1, t.taper ?? 1);
+  return boxOf(t.axis, xf(k === 1 ? t.outer : t.outer.map(([x, y]): Vec2 => [x * k, y * k]), q), t.z0, t.z1);
+};

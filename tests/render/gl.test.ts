@@ -123,7 +123,7 @@ describe("the frame plan", () => {
 
   it("writes one slice row per slice and points every chunk at a slice", () => {
     const { list, out } = plan(28);
-    expect(out.slices.length).toBe(list.length * 8);
+    expect(out.slices.length).toBe(list.length * 12);
     for (const k of [...chunks(out.frame), ...chunks(out.lines)]) expect(k[2]).toBeLessThan(list.length);
   });
 

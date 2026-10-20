@@ -4,14 +4,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { indexParts } from "../../src/assemble/pose";
 import type { MechanismModel } from "../../src/model/types";
 import { buildFrom } from "../../src/package/build";
-import type { Package } from "../../src/package/format";
+import { decode, encode, type Package } from "../../src/package/format";
 import { ladder } from "../../src/render/detail";
 import { buildItems, ITEM_TEXELS, type Items } from "../../src/render/gl/geometry";
 import { planFrame, type Chunks } from "../../src/render/gl/plan";
 import { MODE, PER_ROW, ROW } from "../../src/render/gl/shaders";
 import { projector } from "../../src/render/projector";
 import { boxOfSliceable, depthOrder, separate, slices, type Slice, type Sliceable } from "../../src/render/slices";
-import { prepare, worldSolids, type Prepared, type World } from "../../src/render/world";
+import { modAt, prepare, worldSolids, type Prepared, type World } from "../../src/render/world";
 import { theme } from "../../src/style/theme";
 import { scenes } from "../fixtures/scenes";
 
@@ -91,7 +91,7 @@ describe("the frame plan across axes", () => {
     const dynStart = Math.ceil(s.items.data.length / (4 * ROW)) * PER_ROW;
     return { list, out: planFrame({ list, T: theme("dark"), LD, cardK: { plate: 1, base: 1 }, Pr, items: s.items, dynStart }) };
   };
-  const row = (o: Float32Array, i: number) => Array.from(o.subarray(i * 8, i * 8 + 8));
+  const row = (o: Float32Array, i: number) => Array.from(o.subarray(i * 12, i * 12 + 12));
   const chunks = (c: Chunks) => Array.from({ length: c.n }, (_, i) => Array.from(c.data.subarray(i * ITEM, (i + 1) * ITEM)));
 
   it("writes the axis code, the far and the near end of each slice: a y slice is seen from its low-y end", () => {
@@ -126,5 +126,49 @@ describe("the frame plan across axes", () => {
           for (let i = 1; i < ops.length; i++) expect(ops[i]).toBeGreaterThanOrEqual(ops[i - 1]!);
         }
       }
+  });
+});
+
+describe("cone and helix forms", () => {
+  it("packs taper and helix, and writes a modified slice's near and far poses with the code + 4", async () => {
+    const b = buildFrom("fx-bevel-pair", scenes["fx-bevel-pair"]!);
+    const pin = b.pkg.solids.find((s) => s.id === "pinion")!;
+    expect(pin.taper).toBeCloseTo((71.554 - 20) / 71.554, 4);
+    const back = await decode(await encode(b.pkg));
+    expect(back.solids.find((s) => s.id === "pinion")!.taper).toBe(pin.taper);
+    const P = prepare(b.pkg);
+    const W = worldSolids(P, b.model, indexParts(b.model), b.model.solve(1), 1, 0, () => true);
+    const Pr = projector({ tilt: 28 }, { w: 1200, h: 800 }, b.pkg.bounds, [b.pkg.bounds.z0, b.pkg.bounds.z1], 40);
+    const list = depthOrder(slices(W), (a, c) => a.top - c.top || a.z0 - c.z0, Pr);
+    const items = buildItems(P);
+    const out = planFrame({ list, T: theme("dark"), LD: ladder("full", { tilt: 28, explode: 0 }), cardK: { plate: 1, base: 1 }, Pr, items, dynStart: Math.ceil(items.data.length / (4 * ROW)) * PER_ROW });
+    list.forEach((Sl, i) => {
+      const r = Array.from(out.slices.subarray(i * 12, i * 12 + 12));
+      const p = Sl.w.p;
+      if (!p.mods) {
+        expect(r[7]! < 4).toBe(true);
+        expect(r.slice(8)).toEqual(r.slice(0, 4));
+        return;
+      }
+      expect(r[7]).toBe((Sl.w.axis === "x" ? 1 : 0) + 4);
+      // the outline's scale at each end: 1 at z0, the taper at z1, linear between
+      const k = (w: number) => 1 + ((p.s.taper ?? 1) - 1) * ((w - p.s.z0) / (p.s.z1 - p.s.z0));
+      expect(Math.hypot(r[2]!, r[3]!)).toBeCloseTo(k(r[5]!), 5);
+      expect(Math.hypot(r[10]!, r[11]!)).toBeCloseTo(k(r[4]!), 5);
+    });
+  });
+
+  it("turns a helical gear's outline along it and draws a worm's lead as thread marks", () => {
+    const b = buildFrom("fx-worm-pair", scenes["fx-worm-pair"]!);
+    const P = prepare(b.pkg);
+    const wheel = P.find((p) => p.s.id === "wheel")!;
+    const wormP = P.find((p) => p.s.id === "worm")!;
+    expect(wheel.mods).toBe(true);
+    expect(wheel.threadLead).toBeNull();
+    expect(wormP.mods).toBe(false);
+    expect(wormP.threadLead).toBeCloseTo(3 * Math.PI, 9);
+    const [k, a] = modAt(wheel, wheel.s.z1);
+    expect(k).toBe(1);
+    expect(a).toBeCloseTo((2 * Math.PI * (wheel.s.z1 - wheel.s.z0)) / wheel.s.helix!, 9);
   });
 });
