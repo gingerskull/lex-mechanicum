@@ -21,7 +21,12 @@ export interface Mark {
 export type Motion =
   | { type: "geared"; around: Vec2; ratio: number }
   | { type: "rolling"; around: Vec2; axis: Vec2; r: number }
-  | { type: "crank" | "link"; motor: Vec2; r: number; L: number; pivot: Vec2; rho: number; off: number };
+  | { type: "crank" | "link"; motor: Vec2; r: number; L: number; pivot: Vec2; rho: number; off: number }
+  /**
+   * convey: carried along a fixed closed path (world mm on the body's plane) by the solved travel `s[key]` (mm along
+   * it) plus `offset`, turned to the path's direction: a chain link, a belt tooth.
+   */
+  | { type: "convey"; path: Vec2[]; key: string; offset: number };
 
 export interface Solid {
   id: string;
@@ -49,6 +54,10 @@ export interface Solid {
    */
   taper?: number;
   helix?: number;
+  /** A stretched member: the two solved points its unit-length outline spans (src/model/types.ts, Part.stretch). */
+  stretch?: [string, string];
+  /** A deforming member: its outline comes from its part's `deform(s)` each frame. */
+  deform?: boolean;
   outer: Vec2[];
   holes: Vec2[][];
   marks: Mark[];

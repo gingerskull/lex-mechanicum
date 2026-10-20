@@ -15,6 +15,8 @@ import { j8 } from "./j8-belt";
 import { j9 } from "./j9-crossed-mesh";
 import { j10 } from "./j10-shaft-in-plan";
 import { j11 } from "./j11-screw";
+import { j12 } from "./j12-flexible";
+import { j13 } from "./j13-compliant";
 import { locking } from "./locking";
 import { lubrication } from "./lubrication";
 import { materials } from "./materials";
@@ -31,7 +33,7 @@ import type { Rule, RuleContext } from "./types";
  * shafts after the drive, whose motor they keep clear of; the feet after everything that hangs under the base;
  * lubrication, timing, locking and materials last, over everything.
  */
-export const rules: Rule[] = [classify, base, j6, j2, j10, j9, j11, j3, j4, j5, j7, j1, stops, standoffs, drive, j8, j2Straddle, feet, lubrication, timingMarks, locking, materials];
+export const rules: Rule[] = [classify, base, j6, j2, j10, j9, j11, j3, j4, j5, j7, j1, stops, standoffs, drive, j8, j12, j13, j2Straddle, feet, lubrication, timingMarks, locking, materials];
 
 /** Stages and code outside the rule list that serve AUTO requirements. */
 export const PROVIDERS: { id: string; ids: string[] }[] = [

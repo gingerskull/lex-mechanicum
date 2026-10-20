@@ -7,7 +7,7 @@ import { overlap, region, type Region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, solidBox, solidPose } from "./pose";
+import { indexParts, isGround, shapeAt, solidBox, solidPose } from "./pose";
 
 export interface Clash {
   a: string;
@@ -47,7 +47,7 @@ export function clearance(model: MechanismModel, assembly: Assembly, n = 72): Cl
     const poses = S.map((t) => solidPose(model, parts, t, s, u));
     const regs: (Region | null)[] = S.map((t, i) => {
       const q = poses[i];
-      return q ? region(xf(t.outer, q), t.holes.map((h) => xf(h, q))) : null;
+      return q ? region(xf(shapeAt(parts, t, s), q), t.holes.map((h) => xf(h, q))) : null;
     });
     for (const [i, k] of pairs) {
       const a = S[i]!;

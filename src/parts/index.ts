@@ -26,6 +26,9 @@ export interface Place {
   /** Solid modifiers: far-end scale and helix lead (src/model/types.ts). */
   taper?: number;
   helix?: number;
+  /** A stretched member (outline at unit length along x) or a deforming one (src/model/types.ts). */
+  stretch?: boolean;
+  deform?(s: Solved): Vec2[];
 }
 
 export interface PartOpts extends Place {
@@ -52,6 +55,8 @@ const place = (o: Place): Place => {
   if (o.along !== undefined) c.along = o.along;
   if (o.taper !== undefined) c.taper = o.taper;
   if (o.helix !== undefined) c.helix = o.helix;
+  if (o.stretch) c.stretch = true;
+  if (o.deform) c.deform = o.deform;
   return c;
 };
 

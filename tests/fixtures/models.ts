@@ -5,6 +5,8 @@ import { defineMechanism } from "../../src/model/define";
 import type { MechanismModel } from "../../src/model/types";
 import { P } from "../../src/parts";
 import { bevel, bevelOutline, pitchCones } from "../../src/core/spatial";
+import { centresFor } from "../../src/core/flex";
+import { sprocketR } from "../../src/rules/j12-flexible";
 import { circle } from "../../src/core/geom";
 
 /** J1: an arm 8 mm thick turning on a plain fixed pin (no accent, nothing keyed): a dead axle. */
@@ -230,4 +232,80 @@ export const j11Model: MechanismModel = defineMechanism({
     const a = osc(-2 * TAU, 2 * TAU)(u);
     return { pts: { S: [0, 30], N: [(3 * a) / TAU - 10, 0] }, a };
   },
+});
+
+/** J12 chain: the catalogue's chain drive, 15T and 30T sprockets at 12.7 pitch, the centres set for 62 links. */
+const CH = { p: 12.7, z1: 15, z2: 30 };
+const chR1 = sprocketR(CH.z1, CH.p);
+const chR2 = sprocketR(CH.z2, CH.p);
+const chC = centresFor(chR1, chR2, 62 * CH.p);
+export const chainModel: MechanismModel = defineMechanism({
+  id: "fx-chain",
+  input: { kind: "rotary", part: "s1" },
+  parts: [
+    P.gear("s1", CH.z1, CH.p / Math.PI, { role: "driver", at: "O1", spin: (s) => s.a as number }),
+    P.gear("s2", CH.z2, CH.p / Math.PI, { role: "output", at: "O2", spin: (s) => (s.a as number) * (CH.z1 / CH.z2) }),
+    P.cap("pO1", -1, 7, { fixed: [0, 0, 0], accent: true }),
+    P.cap("pO2", -1, 7, { fixed: [chC, 0, 0] }),
+  ],
+  flexible: [{ form: "chain", over: ["s1", "s2"], travel: "t", pitch: CH.p, roller: 8.5 }],
+  solve: (u) => ({ pts: { O1: [0, 0], O2: [chC, 0] }, a: u, t: u * chR1 }),
+});
+
+/** J12 rope: a rope over two fixed sheaves, a load block on one end rising as the other end is hauled down. */
+const RS = 25;
+const ropeSpan = (id: string, a: string, b: string): ReturnType<typeof P.custom> =>
+  P.custom(id, [[0, -1.6], [1, -1.6], [1, 1.6], [0, 1.6]], { role: "link", layer: 2, dz: -8, thick: 3.2, between: [a, b], stretch: true });
+export const ropeModel: MechanismModel = defineMechanism({
+  id: "fx-rope",
+  input: { kind: "manual", part: "load" },
+  parts: [
+    P.disc("u1", RS, { role: "ground", layer: 1, fixed: [-40, 0, 0] }),
+    P.disc("u2", RS, { role: "ground", layer: 1, fixed: [40, 0, 0] }),
+    ropeSpan("spanA", "A0", "A"),
+    ropeSpan("spanM", "M0", "M1"),
+    ropeSpan("spanB", "B0", "B"),
+    P.custom("load", [[-14, -24], [14, -24], [14, 0], [-14, 0]], { role: "output", layer: 1, at: "A" }),
+  ],
+  flexible: [{ form: "rope", over: ["u1", "u2"], spans: ["spanA", "spanM", "spanB"], hook: "A", load: "load" }],
+  solve(u) {
+    const ya = 60 + 50 * (0.5 - 0.5 * Math.cos(u));
+    return { pts: { A0: [-40 - RS, 0], A: [-40 - RS, -ya], M0: [-40, RS], M1: [40, RS], B0: [40 + RS, 0], B: [40 + RS, -170 + ya] } };
+  },
+});
+
+/** J13: a notch flexure, a lever rocking ±3° on a neck cut from its ground block. */
+const FX = 3 * D2R;
+export const flexureModel: MechanismModel = defineMechanism({
+  id: "fx-flexure",
+  input: { kind: "manual", part: "lever" },
+  parts: [
+    P.custom("block", [[-40, -20], [-6, -20], [-6, 20], [-40, 20]], { role: "ground", fixed: [0, 0, 0] }),
+    P.custom("neck", [[-6, -2], [6, -2], [6, 2], [-6, 2]], { role: "link", fixed: [0, 0, 0] }),
+    P.custom("lever", [[6, -6], [70, -6], [70, 6], [6, 6]], { role: "driver", at: "N", spin: (s) => s.b as number }),
+  ],
+  compliant: [{ neck: "neck", ground: "block", lever: "lever", at: "N", range: [-FX, FX] }],
+  solve: (u) => ({ pts: { N: [0, 0] }, b: osc(-FX, FX)(u) }),
+  angles: (s) => [{ type: "bend", c: [0, 0], a: 0, L: 12, w: 4, bend: s.b as number, key: "neck" }],
+});
+
+/**
+ * A deforming outline: a flexspline-like ring pushed into an ellipse whose major axis turns with the input (a wave
+ * generator), 120 points every frame.
+ */
+const flexRing = (a: number): Vec2[] =>
+  Array.from({ length: 120 }, (_, i) => {
+    const t = (i / 120) * TAU;
+    const r = 40 + 1.5 * Math.cos(2 * (t - a));
+    return [r * Math.cos(t), r * Math.sin(t)];
+  });
+export const deformModel: MechanismModel = defineMechanism({
+  id: "fx-deform",
+  input: { kind: "rotary", part: "wave" },
+  parts: [
+    { ...P.custom("flexspline", flexRing(0), { role: "output", fixed: [0, 0, 0], holes: [circle(34, 0, 0, 72)] }), deform: (s: { [k: string]: unknown }) => flexRing(s.a as number) },
+    P.custom("wave", Array.from({ length: 48 }, (_, i): Vec2 => [30 * Math.cos((i / 48) * TAU), 26 * Math.sin((i / 48) * TAU)]), { role: "driver", layer: 1, at: "O", spin: (s) => s.a as number, holes: [circle(5, 0, 0, 24)] }),
+    P.cap("pO", -1, 7, { fixed: [0, 0, 0], accent: true, span: 2 }),
+  ],
+  solve: (u) => ({ pts: { O: [0, 0] }, a: u }),
 });

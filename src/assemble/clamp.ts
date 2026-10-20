@@ -7,7 +7,7 @@ import { edgeDist, overlap, region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, solidBox, solidPose } from "./pose";
+import { indexParts, isGround, shapeAt, solidBox, solidPose } from "./pose";
 
 const maxR = (t: Solid, cx: number, cy: number, q: [number, number, number]) =>
   Math.max(...xf(t.outer, q).map(([x, y]) => Math.hypot(x - cx, y - cy)));
@@ -43,8 +43,8 @@ export function clampCheck(model: MechanismModel, assembly: Assembly, n = 12): s
         }
         if (Math.abs(r.z1 - g.z0) > 0.05 && Math.abs(g.z1 - r.z0) > 0.05) continue;
         if (!qr || !qg) continue;
-        const ra = region(xf(r.outer, qr), r.holes.map((h) => xf(h, qr)));
-        const rb = region(xf(g.outer, qg), g.holes.map((h) => xf(h, qg)));
+        const ra = region(xf(shapeAt(parts, r, s), qr), r.holes.map((h) => xf(h, qr)));
+        const rb = region(xf(shapeAt(parts, g, s), qg), g.holes.map((h) => xf(h, qg)));
         // touching faces overlap in plan when a vertex of one lies inside the other's material
         if (overlap(ra, rb) <= 0.05) continue;
         const brg = r.kind === "bearing" ? r : g.kind === "bearing" ? g : null;

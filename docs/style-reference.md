@@ -443,6 +443,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.angleGuide.dash` | [3, 3] | px, 0..1, px, factor on radius |
 | `draft.overlays.angleGuide.reach` | 1.5 | px, 0..1, px, factor on radius |
 | `draft.overlays.angleArc` | 1.8 | px |
+| `draft.overlays.bend.width` | 1.4 | px, 0..1, count: a flexure's bent centreline and stress zone ticks |
+| `draft.overlays.bend.zoneAlpha` | 0.35 | px, 0..1, count: a flexure's bent centreline and stress zone ticks |
+| `draft.overlays.bend.ticks` | 5 | px, 0..1, count: a flexure's bent centreline and stress zone ticks |
 | `draft.overlays.line.width` | 1 | px, 0..1, px |
 | `draft.overlays.line.alpha` | 0.6 | px, 0..1, px |
 | `draft.overlays.line.dash` | [4, 4] | px, 0..1, px |

@@ -65,11 +65,11 @@ export function report(gpu: string, rows: BenchRow[], o: { runs: number; dpr: nu
   const dials = Object.keys(rows[0]?.dial ?? {});
   L.push(``, `Frame at 28° by dial position (ms):`, ``, `| Mechanism | ${dials.join(" | ")} |`, `|---|${dials.map(() => "---").join("|")}|`);
   for (const r of rows) L.push(`| ${r.id} | ${dials.map((d) => r.dial[d]).join(" | ")} |`);
-  L.push(``, `Draw counters at 28°, full detail (one frame):`, ``, `| Mechanism | solids | slices | 2D fills | 2D strokes | GL draws | GL chunks | GL instances |`, `|---|---|---|---|---|---|---|---|`);
+  L.push(``, `Draw counters at 28°, full detail (one frame):`, ``, `| Mechanism | solids | slices | 2D fills | 2D strokes | GL draws | GL chunks | GL instances | deforming (items) |`, `|---|---|---|---|---|---|---|---|---|`);
   for (const r of rows) {
     const c = r.counters["28"]!;
     const n = (k: string) => c[k] ?? 0;
-    L.push(`| ${r.id} | ${n("solids")} | ${n("slices")} | ${n("fill")} | ${n("stroke")} | ${n("glDraws")} | ${n("glChunks")} | ${n("glInstances")} |`);
+    L.push(`| ${r.id} | ${n("solids")} | ${n("slices")} | ${n("fill")} | ${n("stroke")} | ${n("glDraws")} | ${n("glChunks")} | ${n("glInstances")} | ${n("glDyn")} (${n("glDynItems")}) |`);
   }
   const rs = [...DETAIL.map((r) => r.id), "never"];
   L.push(``, `Solids and marks per rung:`, ``, `| Mechanism | ${rs.join(" | ")} |`, `|---|${rs.map(() => "---").join("|")}|`);

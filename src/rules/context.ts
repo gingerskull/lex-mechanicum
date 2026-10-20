@@ -4,13 +4,16 @@ import { TAU, xf, type Vec2 } from "../core/geom";
 import { circleClearance, region, type Region } from "../core/poly";
 import { marks, onAxis, solid, type Solid } from "../hardware/solid";
 import { heights, layerZ } from "../parts";
-import { poseOf } from "../model/pose";
+import { partShape, poseOf } from "../model/pose";
 import { sample, type Sampled } from "../model/sample";
 import type { MechanismModel, Part } from "../model/types";
 import { FORM } from "../style/form";
 import { pillowRise } from "../hardware/sub/pillow";
 import { BORES } from "../hardware/tables";
-import { indexParts, isGround, solidBox, solidPose } from "../assemble/pose";
+
+/** Room a chain's lower link plates take under its sprockets, mm (two plates and a gap). */
+const CHAIN_UNDER = 3;
+import { indexParts, isGround, shapeAt, solidBox, solidPose } from "../assemble/pose";
 import type { RuleContext } from "./types";
 
 /** Phase at which the build is laid out: away from the singular positions of u = 0. */
@@ -38,7 +41,9 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
   // J10's base growth rule: a shaft in plan stands high enough over the base for its pillow blocks
   const shaftsInPlan = model.parts.filter((p) => p.role === "pin" && p.fixed && isOut(p.axis));
   const capR = (p: Part) => Math.max(...p.shape.outer.map((q) => Math.hypot(q[0], q[1])));
-  const b1 = Math.min(...plates.map(lowest), ...shaftsInPlan.map((p) => p.fixed![1] - pillowRise(BORES.find((d) => d <= Math.max(8, Math.round(capR(p) * 1.45))) ?? 8))) - 2;
+  // J12's: a chain's lower link plates pass under its sprockets
+  const chained = (model.flexible ?? []).flatMap((f) => (f.form === "chain" ? f.over : [])).map((id) => parts[id]).filter((p): p is Part => !!p);
+  const b1 = Math.min(...plates.map(lowest), ...shaftsInPlan.map((p) => p.fixed![1] - pillowRise(BORES.find((d) => d <= Math.max(8, Math.round(capR(p) * 1.45))) ?? 8)), ...chained.map((p) => heights(p)[0] - CHAIN_UNDER)) - 2;
   const solids: Solid[] = [];
   const solidOf: Record<string, Solid> = {};
   for (const p of plates) {
@@ -51,6 +56,8 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       ...onAxis(p),
       ...(p.taper !== undefined ? { taper: p.taper } : {}),
       ...(p.helix !== undefined ? { helix: p.helix } : {}),
+      ...(p.stretch && p.between ? { stretch: [p.between[0], p.between[1]] as [string, string] } : {}),
+      ...(p.deform ? { deform: true } : {}),
       z0,
       z1,
       outer: p.shape.outer.slice(),
@@ -73,14 +80,15 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
     const z: [number, number] = t.axis ? [Infinity, -Infinity] : [t.z0, t.z1];
     for (let i = 0; i < steps; i++) {
       const u = steps === 1 ? U0 : (i / steps) * TAU;
-      const pose = solidPose(model, parts, t, steps === 1 ? s0 : model.solve(u), u);
+      const s = steps === 1 ? s0 : model.solve(u);
+      const pose = solidPose(model, parts, t, s, u);
       if (!pose) continue;
       if (t.axis) {
         const b = solidBox(t, pose);
         regions.push(region(planCorners(b), []));
         z[0] = Math.min(z[0], b[2]);
         z[1] = Math.max(z[1], b[5]);
-      } else regions.push(region(xf(t.outer, pose), t.holes.map((h) => xf(h, pose))));
+      } else regions.push(region(xf(shapeAt(parts, t, s), pose), t.holes.map((h) => xf(h, pose))));
     }
     const out = { n: t.outer.length + t.holes.length, regions, z };
     solidCache.set(t, out);
@@ -138,14 +146,15 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
           const [w0, w1] = [z0, z1];
           if (out) [z0, z1] = [Infinity, -Infinity];
           for (let i = 0; i < SWEEP_STEPS; i++) {
-            const pose = poseOf(part, model.solve((i / SWEEP_STEPS) * TAU));
+            const s = model.solve((i / SWEEP_STEPS) * TAU);
+            const pose = poseOf(part, s);
             if (!pose) continue;
             if (out) {
               const b = boxOf(part.axis, xf(part.shape.outer, pose), w0, w1);
               regions.push(region(planCorners(b), []));
               z0 = Math.min(z0, b[2]);
               z1 = Math.max(z1, b[5]);
-            } else regions.push(region(xf(part.shape.outer, pose), part.shape.holes.map((h) => xf(h, pose))));
+            } else regions.push(region(xf(partShape(part, s), pose), part.shape.holes.map((h) => xf(h, pose))));
           }
           return { part, z0, z1, regions };
         });

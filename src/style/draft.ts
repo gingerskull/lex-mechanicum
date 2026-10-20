@@ -242,6 +242,7 @@ export const DRAFT = {
     spinR: 24, // mm, default spin arc radius
     angleGuide: { width: 1, alpha: 0.55, dash: [3, 3] as const, reach: 1.5 }, // px, 0..1, px, factor on radius
     angleArc: 1.8, // px
+    bend: { width: 1.4, zoneAlpha: 0.35, ticks: 5 }, // px, 0..1, count: a flexure's bent centreline and stress zone ticks
     line: { width: 1, alpha: 0.6, dash: [4, 4] as const }, // px, 0..1, px
     dimWidth: 1, // px
     velocityLen: 34, // px, arrow length at the point's peak speed

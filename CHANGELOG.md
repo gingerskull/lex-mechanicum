@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.30.0 — 2026-10-20
+
+- Engine: members that change shape over the cycle.
+  - A part between two solved points can be stretched along its length (rope spans, springs).
+  - Small solids can be carried along a closed path by a solved travel (chain rollers and links).
+  - A few solids can take their outline from the solved state each frame (a flexspline). Their GPU items are rewritten
+    in place, and the bench counts them.
+  - A flexure's bend and stress zone are drawn as an overlay.
+- Rules:
+  - J12, flexible members: a chain carried round its sprockets with an idler on a slotted arm; a rope with becket,
+    swivel and sheave guards; CVT sheaves keyed and sprung.
+  - J13, compliant joints: stop pins past the swing, the blank clamped and dowelled.
+- Standard 2.8: D9, J12, J13 and their playbooks, all AUTO.
+- Fixture scenes: a chain on two sprockets, a rope over two sheaves, a flexure, and a deforming ring.
+
 ## 0.29.0 — 2026-10-20
 
 - Rules for spatial joints and standard 2.7:

@@ -84,7 +84,7 @@ async function frameMs(sess: Session, draw: (u: number) => void, frames: number)
   resetCounts();
   draw(0.9);
   const st = sess.stats;
-  const c: Record<string, number> = { ...counts, solids: sess.drawn, slices: st?.slices ?? 0, glDraws: st?.draws ?? 0, glInstances: st?.instances ?? 0, glChunks: st?.chunks ?? 0 };
+  const c: Record<string, number> = { ...counts, solids: sess.drawn, slices: st?.slices ?? 0, glDraws: st?.draws ?? 0, glInstances: st?.instances ?? 0, glChunks: st?.chunks ?? 0, glDyn: st?.dyn ?? 0, glDynItems: st?.dynItems ?? 0 };
   countDraws(false);
   const cpu: number[] = [];
   await frame();

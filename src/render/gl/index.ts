@@ -9,7 +9,7 @@ import type { Projector } from "../projector";
 import type { Slice } from "../slices";
 import type { Prepared, World } from "../world";
 import { gpu, patterns, Table, targets, type Gpu } from "./context";
-import { buildItems, type Items } from "./geometry";
+import { ITEM_TEXELS, buildItems, refreshItems, type Items } from "./geometry";
 import { planFrame, type Heads } from "./plan";
 import { PER_ROW, ROW, SROW } from "./shaders";
 
@@ -27,6 +27,9 @@ export interface GpuStats {
   chunks: number;
   items: number;
   samples: number;
+  /** Members whose outline was rewritten on the GPU this frame (stretched or deforming), and their items. */
+  dyn: number;
+  dynItems: number;
   /**
    * How long the GPU had been on the previous frame and was still not done when this one started, ms (0 when it was
    * done): the honest sign of a GPU-bound drawing, whatever the display's rate or the page's scrolling does.
@@ -68,7 +71,7 @@ function own(f: SolidsPass, g: Gpu | null): GpuSession {
   let o = f.own;
   if (!o) {
     const items = buildItems(f.prepared);
-    o = { items, gen: 0, itemsTex: null, staticRows: Math.max(1, Math.ceil(items.data.length / (4 * ROW))), holesTex: null, stats: { slices: 0, draws: 0, instances: 0, chunks: 0, items: items.count, samples: 0, gpuLagMs: 0 }, fence: null, fenceAt: 0 };
+    o = { items, gen: 0, itemsTex: null, staticRows: Math.max(1, Math.ceil(items.data.length / (4 * ROW))), holesTex: null, stats: { slices: 0, draws: 0, instances: 0, chunks: 0, items: items.count, samples: 0, dyn: 0, dynItems: 0, gpuLagMs: 0 }, fence: null, fenceAt: 0 };
   }
   if (g && o.gen !== g.gen) {
     // a new context: the old textures (and fence) went with the old one
@@ -100,8 +103,22 @@ export function drawSolids(f: SolidsPass): { own: GpuSession; heads: Heads } {
   const { card, T, LD, cardK, Pr, main, list } = f;
   const g = gpu(card);
   const o = own(f, g.lost ? null : g);
+  // stretched and deforming members: their items rewritten for this frame's outline, in place
+  let lo = Infinity;
+  let hi = -Infinity;
+  let dyn = 0;
+  const seen = new Set<Prepared>();
+  for (const Sl of list) {
+    const w = Sl.w;
+    if (!w.local || seen.has(w.p)) continue;
+    seen.add(w.p);
+    const [a, b] = refreshItems(o.items, w.p, w.local);
+    lo = Math.min(lo, a);
+    hi = Math.max(hi, b);
+    dyn++;
+  }
   const plan = planFrame({ list, T, LD, cardK, Pr, items: o.items, dynStart: o.staticRows * PER_ROW });
-  o.stats = { slices: list.length, draws: 0, instances: 0, chunks: plan.frame.n + plan.lines.n, items: o.items.count, samples: g.samples, gpuLagMs: 0 };
+  o.stats = { slices: list.length, draws: 0, instances: 0, chunks: plan.frame.n + plan.lines.n, items: o.items.count, samples: g.samples, dyn, dynItems: dyn ? hi - lo + 1 : 0, gpuLagMs: 0 };
   // a lost context draws nothing until it is back; onRestored listeners redraw then
   if (g.lost || g.gl.isContextLost() || !o.itemsTex || !o.holesTex) return { own: o, heads: plan.heads };
   const gl = g.gl;
@@ -117,6 +134,14 @@ export function drawSolids(f: SolidsPass): { own: GpuSession; heads: Heads } {
   g.chunks[0].write(plan.frame.data, plan.frame.n * 12);
   g.chunks[1].write(plan.lines.data, plan.lines.n * 12);
   g.dash.write(plan.dash, plan.dash.length);
+  if (dyn) {
+    // the rows holding the rewritten items
+    const per = ROW * 4;
+    const r0 = Math.floor((lo * ITEM_TEXELS * 4) / per);
+    const r1 = Math.floor(((hi + 1) * ITEM_TEXELS * 4 - 1) / per);
+    const src = o.items.data.subarray(r0 * per, Math.min(o.items.data.length, (r1 + 1) * per));
+    o.itemsTex.write(src, src.length, r0);
+  }
   if (plan.dyn.length && o.itemsTex.write(plan.dyn, plan.dyn.length, o.staticRows)) {
     o.itemsTex.write(o.items.data, o.items.data.length);
     o.itemsTex.write(plan.dyn, plan.dyn.length, o.staticRows);

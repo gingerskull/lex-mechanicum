@@ -23,6 +23,7 @@ export function labelOf(it: OverlayItem): string | null {
   if (!it.key) return null;
   if (it.type === "angle") return it.value === undefined ? it.key : `${it.key} ${Math.round(it.value)}°`;
   if (it.type === "axial") return `${it.key}: push / pull`;
+  if (it.type === "bend") return `${it.key} ${(Math.abs(it.bend) * 180 / Math.PI).toFixed(1)}°`;
   return it.key;
 }
 
@@ -135,6 +136,44 @@ function drawItem(ctx: CanvasRenderingContext2D, Pr: Projector, it: Item, col: s
     ctx.stroke();
     const mid = t0 + dt / 2;
     if (text) label(text, c[0] + Math.cos(mid) * (r + 34), c[1] + Math.sin(mid) * (r + 16), col);
+  } else if (it.type === "bend") {
+    // the neck's centreline bent at a constant curvature through `bend` over its length, from its root
+    const B = O.bend;
+    const u: Vec2 = [Math.cos(it.a), Math.sin(it.a)];
+    const n: Vec2 = [-u[1], u[0]];
+    const root: Vec2 = [it.c[0] - (u[0] * it.L) / 2, it.c[1] - (u[1] * it.L) / 2];
+    const N = 16;
+    const k = it.bend / (it.L || 1);
+    const at = (t: number): Vec2 => {
+      const s = t * it.L;
+      const x = Math.abs(k) < 1e-9 ? s : Math.sin(k * s) / k;
+      const y = Math.abs(k) < 1e-9 ? 0 : (1 - Math.cos(k * s)) / k;
+      return [root[0] + u[0] * x + n[0] * y, root[1] + u[1] * x + n[1] * y];
+    };
+    ctx.lineWidth = B.width;
+    ctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const q = P(at(i / N));
+      if (i) ctx.lineTo(q[0], q[1]);
+      else ctx.moveTo(q[0], q[1]);
+    }
+    ctx.stroke();
+    // the stress zone: ticks across the neck on the side in tension and the side in compression
+    ctx.globalAlpha = B.zoneAlpha;
+    ctx.beginPath();
+    for (let i = 1; i < B.ticks + 1; i++) {
+      const t = i / (B.ticks + 1);
+      for (const side of [-1, 1]) {
+        const a = P([it.c[0] + u[0] * (t - 0.5) * it.L + n[0] * side * (it.w / 2), it.c[1] + u[1] * (t - 0.5) * it.L + n[1] * side * (it.w / 2)]);
+        const b = P([it.c[0] + u[0] * (t - 0.5) * it.L + n[0] * side * (it.w / 2 + 2), it.c[1] + u[1] * (t - 0.5) * it.L + n[1] * side * (it.w / 2 + 2)]);
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(b[0], b[1]);
+      }
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    const e = P(at(1));
+    if (text) label(text, e[0] + 18, e[1] - 14, col);
   } else if (it.type === "spin") {
     const c = P(it.c);
     const r = (it.r || O.spinR) * s;
