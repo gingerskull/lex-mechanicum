@@ -1,9 +1,9 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 2.4
-date: 2026-10-18
-supersedes: 1.0 (the hand-off style reference of 2026-10-16)
+version: 3.0
+date: 2026-10-20
+supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
 The master reference for how the library **looks**: the mechanism drawings and the site around them. Parts I to V
@@ -11,6 +11,13 @@ are the rules and the architecture; Part VI holds the reference values the style
 checks. What a mechanism **is** (parts, assembly, detail, roles, accent flag, detail ladder) is in
 `docs/mechanism-standard.md`; its section 9 holds the few look rules a mechanism build depends on. This document owns
 everything else about the look.
+
+Version 3.0 restates the drawing for true 3D parts: a depth-buffer renderer, a free orthographic camera with named views,
+and section, detail and exploded views. The look stays the drafting look, judged by eye (SQ2). The requirement ids that
+encoded the 2.5D scheme (SP10, SD1 to SD4, SD6, SD8, SD10 to SD12, SD17, SF10) are restated under their own ids; new
+entries are SD19 to SD27, SS13 and SQ10 to SQ12. Part VI is generated from `src/style`; the knobs the new entries
+need (peel depth, edge angle, section hatch, overlay and ghost-trace looks, view names) land there with the renderer
+step and the tables regenerate with them.
 
 Where this document and the code disagree on a **rule**, the document wins and the code is the bug. Where they
 disagree on a **value**, the style files win (values are meant to be tuned) and Part VI is updated.
@@ -45,9 +52,10 @@ where it means something.
 | SP6 | **Two sheets, one drawing.** Blueprint (dark) and Drafting (light) share every weight, pattern, size and rule. Only colours differ. A change that works on one sheet only is not finished. |
 | SP7 | **Minimal, monochrome industrial design** carries from the parts to the page: square corners, hairline rules, technical lettering, no ornament, generous space. |
 | SP8 | **Every look value is a global parameter**, named in the style files, applied to every mechanism and page at once. Nothing is styled per mechanism; no stray literal in drawing or page code. |
-| SP9 | **Correct depth, always.** Nothing paints in front of what it sits behind, at any tilt or explode. An effect that breaks depth order is wrong whatever it looks like. |
-| SP10 | **Pseudo-2D only.** Top view to side elevation by tilt, no sideways shear, no free 3D orbit. |
+| SP9 | **Correct depth, always.** Nothing paints in front of what it sits behind, at any camera, section or explode. An effect that breaks depth order is wrong whatever it looks like. |
+| SP10 | **Orthographic only, freely oriented.** A turntable orbit about the mechanism that snaps to named views; parallel lines stay parallel; no perspective. |
 | SP11 | **Richness is drawn, not styled.** Mechanical detail comes from real solids (the standard, section 6); the style never adds detail of its own and never hides what the build has, except through the detail ladder (SD18). |
+| SP12 | **The principle always reads.** What carries the lesson is never hidden by hardware: a covering static solid is drawn see-through first, supports are moved out of the way second, and posts and plates are never removed (standard T10 to T12). Teaching content (traces, construction overlays, ghost paths, views) is drawn by the same drafting conventions as the rest and never as decoration (SP5). |
 
 ---
 
@@ -112,7 +120,7 @@ site/styles/*.css        base, layout, components: var(--…) and color-mix() of
 
 | Id | Rule |
 |---|---|
-| SF10 | **One line hierarchy** for the whole drawing, thick to thin: plate top outline → base outline → other top outlines → plate bottom outline and silhouettes → hidden lines → centrelines, dimensions, marks, chamfers, threads. The page reuses the idea: `--line-2` for frames, `--line` for internal rules, dashed for secondary separators. |
+| SF10 | **One line hierarchy** for the whole drawing, thick to thin: outlines of the plate faces nearest the viewer → base outline → outlines of other nearest faces → back outlines of plates and silhouettes → hidden lines → centrelines, dimensions, marks, chamfers, threads, construction overlays. The page reuses the idea: `--line-2` for frames, `--line` for internal rules, dashed for secondary separators. |
 | SF11 | **Spacing has a floor.** Any pattern, thread or repeated mark is drawn at its real size or at the px floor, whichever is coarser, so nothing turns to grey mush on thumbnails. A detail under about 1 mm on screen becomes one mark or nothing. |
 | SF12 | **The grid** is the drafting sheet: a 12 px minor square with every 5th line major, centred on the drawing. The page background uses the same pitch, derived from one token. |
 
@@ -126,42 +134,53 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 
 1. **Paper:** radial gradient paper → paper edge, then the grid (cached per theme and size).
 2. **Construction lines** of the base plate (loose touch, SD9), under everything.
-3. **Solids, slice by slice**, sorted by slice top, then inset parts first, then depth along the view ray, then
-   bottom z. For each slice: side walls (paper fill, then a light ink shade stepped by wall facing; walls inside
-   holes darker); plate bottom outline before its own top face; top face paper fill at the surface's opacity, on
-   the top slice the role tint and pattern; threads on visible shank walls; silhouettes down the walls on every
-   slice; on the top slice chamfer lines, marks, the bold top outline, the base's second pencil pass, the accent
-   ring, joint-head positions; bottom edges of non-plates.
-4. **Lines layer composited** over the frame (SD3).
-5. **Chain centrelines** through joint heads (tilt < 60°).
-6. **Dimensions** of the base plate (detail stage only).
-7. **Paper tooth** over the drawing.
-8. **Traced paths** and comet, joint highlight callout.
-9. **Sheet frame**, zone marks, title block (detail stage only), including the detail dial position.
-10. **Overlays:** forces, velocity, angles, labels.
+3. **Solids, by depth:** up to four surface layers are peeled from the camera and composited front to back; each layer
+   is paper at its surface's opacity, with the role tint and pattern on faces within the set angle of the view, and
+   walls shaded in steps by facing (walls inside holes darker).
+4. **Edges:** bold and solid where nothing covers them, thin and dashed through the papers in front, plus the bold line
+   at what the occluders let through (SD3); chamfers, threads and engraving as fine lines; the accent ring round the
+   input shaft.
+5. **Section cut faces** (SD19) hatched at 45° with their cut outlines, when a section view is on.
+6. **Centrelines** along each joint axis (SD6).
+7. **Dimensions** of the base plate in the named view (detail stage only).
+8. **Paper tooth** over the drawing.
+9. **Traces:** ghost paths, teaching traces with ticks, the comet, phantom positions, construction overlays, explode
+   trail lines, the joint highlight callout (SD12, SD21 to SD24).
+10. **Sheet frame**, zone marks, title block (detail stage only), with the view name and the detail dial position, and
+    the 3D stamp during the transition (SS13).
+11. **Overlays:** forces, velocity, angles, labels.
 
 ## Requirements
 
 | Id | Requirement |
 |---|---|
-| SD1 | **Depth order is sacred.** Solids are sliced at every overlapping z boundary and painted far to near; a new effect is inserted into this order, never layered over the finished frame unless it is an annotation (steps 5 to 10). |
-| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a tenth of the lines under it through. A solid the build marks see-through (it hides a working zone, standard L5) covers once, at its top face, at half opacity (its paper and its occlusion halved), so the zone reads through it. |
-| SD3 | **Hidden lines by construction.** Every edge is drawn twice: bold and solid on a separate lines layer, and thin and dashed on the frame. Each later surface erases the lines layer where it covers, by its occlusion value. An edge seen directly is bold; the same edge seen through a part is dashed. Fine detail (chamfers, threads, engraving) lives only on the lines layer, so it disappears behind parts instead of turning into dashes. The dashed copy is drawn only for edges that can be covered (the renderer tests against occluder bounds). |
-| SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's pose (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns only on top faces, never on walls. |
+| SD1 | **Depth order is sacred.** The depth buffer decides what is in front; there is no slicing and no painter's order, and no effect uses a depth bias. A new effect is inserted into the peeled composite or drawn as an annotation (steps 5 to 11), never layered over the finished frame in a way that reorders what it covers. |
+| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a tenth of the lines under it through. A solid drawn see-through (it covers a working zone or a principle part, standard L5 and T10) takes half the paper and half the occlusion on every face in view, so what lies behind reads through it. |
+| SD3 | **Visible and hidden edges by depth.** Every edge is classified by what covers it in the depth layers. An edge seen directly is bold and solid; the same edge seen through a part is thin and dashed, with the bold line at what the occluders let through (fractional occlusion, each occluder at its opacity). Fine detail (chamfers, threads, engraving) lives only in the visible class, so it disappears behind parts instead of turning into dashes. Edges are the cap outlines, the creases and the smooth-surface silhouettes of each solid, shipped or extracted once at setup. |
+| SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's own coordinates (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns go on the cap and primary faces within a set angle of the view, never on walls or faces turned edge-on. |
 | SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout. A second accent use needs a reason written here. |
-| SD6 | **Chain centrelines** (long dash, short dash) through every joint head, overshooting a little; hidden above 60° tilt and when the drawing is too small to read them. |
+| SD6 | **Centrelines along joint axes** (long dash, short dash) through every joint head and along its axis, overshooting a little; hidden for an axis within a set angle of the view direction (it would foreshorten to a point) and when the drawing is too small to read them. |
 | SD7 | **Traced paths** are a fine dotted accent line at the trace height; the first path gets the comet (tapering trail, open circle at the current point). The base plate keeps the path engraved as a mark (that is form, not overlay). |
-| SD8 | **Dimensions:** overall base-plate width and depth in mm, with extension lines, gaps and filled arrowheads, labels on a paper knock-out. Detail stage only, when the base is shown and the view is not near edge-on. Depth is labelled true size even when foreshortened. |
+| SD8 | **Dimensions:** overall base-plate width and depth in mm, with extension lines, gaps and filled arrowheads, labels on a paper knock-out. Detail stage only, in the named views where the base reads true (PLAN, FRONT, SIDE) and when it is not near edge-on. A dimension is labelled true size even when foreshortened. |
 | SD9 | **Loose touches, the complete list:** (a) construction lines along the base plate's straight edges, running past the rounded corners; (b) a second, slightly offset pencil pass round the base outline. Nothing else is loose; a third needs a decision issue. |
-| SD10 | **Sheet frame on the detail stage:** double border, zone ticks with numbers across and letters down, a title block bottom right (TITLE, DWG number, SCALE computed from the projection, VIEW: PLAN ≤ 8°, ELEVATION ≥ 80°, else TILT n°, SHEET n/N, DETAIL FULL or the rung). Thumbnails get no frame, no title block, no dimensions. |
-| SD11 | **View:** tilt 0° (true orthographic plan) to 88° (side elevation), no sideways shear, parallel lines stay parallel. Patterns foreshorten with tilt and switch off near edge-on. |
-| SD12 | **Explode is a view state, not a style.** It uses form's rigid explode; the drawing rules apply unchanged to exploded parts. |
+| SD10 | **Sheet frame on the detail stage:** double border, zone ticks with numbers across and letters down, a title block bottom right (TITLE, DWG number, SCALE computed from the projection, VIEW, SHEET n/N, DETAIL FULL or the rung). The view names are PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ joint (an auxiliary view down a joint axis, named with the joint) and VIEW az/el for any other orientation (azimuth and elevation in degrees). A section or detail view adds its name (SECTION A-A, DETAIL B). Thumbnails get no frame, no title block, no dimensions. |
+| SD11 | **Camera:** orthographic, a turntable orbit (yaw and tilt) that snaps to the named views of SD10; parallel lines stay parallel; patterns foreshorten with the angle and switch off near edge-on. The default view is the mechanism's own (standard T7). |
+| SD12 | **Explode is a view state, not a style.** Parts move along their stack's joint axis by the rigid explode of the form style, each with a thin trail line to its assembled position; the drawing rules apply unchanged to exploded parts. |
 | SD13 | **Supporting hardware reads quieter.** Motor internals are faint; hardware has no pattern; the base is the faintest surface. Brackets and tall parts still get full outlines and silhouettes. |
 | SD14 | **Overlays use the sheet's colours:** forces in accent (warn when out of range), velocity in `vel`, angles in ink, labels in mono on a paper panel with an ink hairline. Overlays never change the drawing beneath. |
 | SD15 | **Output plot** (detail side panel) is drawn on the sheet: ink grid dashed, curve in ink, current point in accent, mono labels. |
 | SD16 | **Thumbnails and the detail stage share one renderer and one style.** The only differences are the annotation set (SD8, SD10), scale-dependent switches (SF11, SD6) and the card rules: a card (thumbnail and hover animation) draws at detail dial A-B (`card.detail`), sharp at full pixel ratio with wall shading, and its two bold outlines, `lines.plateTop` and `lines.baseTop`, are scaled by `card.plateTopFactor` and `card.baseTopFactor`. Never a second thumbnail style. Thumbnails are drawn to images by the same renderer and committed; they are redrawn when what they are drawn from changes. |
-| SD17 | **Performance is part of the style.** Paper and pattern tiles are cached per theme and size; a session's geometry is uploaded to the GPU once and a frame sends only its slice and chunk tables, drawn in one instanced call per target; slicing is recomputed only when the view's z arrangement changes; nothing draws unless u, view or theme changed; no per-frame blur. A new effect that costs per-frame passes is measured with the browser bench before it lands. |
-| SD18 | **The detail ladder** (standard 9b) is the only way the drawing drops anything. Render effects sit in the ladder at the rung their noticeability earns: paper grain in the first rung, wall shading and inner-slice silhouettes and the DPR cap in the third, role patterns in the sixth, hidden lines in the seventh. The order is data in `src/style/detail.ts`. |
+| SD17 | **Performance is part of the style.** Paper and pattern tiles are cached per theme and size; one GPU context serves a page and a session's geometry is uploaded once; a frame sends the pose and draws in a few instanced calls per target; nothing draws unless u, view or theme changed; no per-frame blur. A new effect that costs per-frame passes is measured with the browser bench before it lands; setup is measured split into decode, tessellate, edges and GPU (standard R6, R10). |
+| SD18 | **The detail ladder** (standard 9b) is the only way the drawing drops anything. Render effects sit in the ladder at the rung their noticeability earns: paper grain in the first rung, wall shading and silhouettes on the layers behind the nearest and the DPR cap in the third, role patterns in the sixth, hidden lines in the seventh. The order is data in `src/style/detail.ts`. |
+| SD19 | **Section views.** The record names a cut plane; solids on the near side are removed, the cut faces are hatched at 45° in ink with the cut outlines drawn bold, and what lies behind shows as in any other view. Cut faces never show through translucent plates: a section draws the cut outline and hatching of the cut solids only. |
+| SD20 | **Detail views.** A magnified window of the drawing, framed and lettered (DETAIL B), drawn by the same renderer at a larger scale with its own line weights floor (SF11); the dial position applies as in the main view. |
+| SD21 | **Phantom positions.** A part at an extreme position is shown as a thin, dashed outline in ink at the alpha of the hidden lines, with no fill, so the range of motion reads without a second copy of the part. |
+| SD22 | **Construction overlays** (dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, a workspace outline, a chord, a crank line) are drafting construction: fine dashed ink lines with mono labels on a paper panel, their points named in the record. They never change the drawing beneath. |
+| SD23 | **Ghost traces.** The path of a setting that is not selected (a Walschaerts die at +1, 0 and -1; the full lemniscate of a Watt linkage) is a fine dashed accent line at a fraction of the trace alpha, drawn under the selected trace. |
+| SD24 | **Teaching traces and ticks.** A teaching trace follows SD7; equal-time ticks are small ink cross-marks along it at equal steps of the input, so uneven speed reads as uneven spacing. |
+| SD25 | **Same-role parts told apart by pattern variant or an index mark**, never by hue (a Schmidt coupling's two link sets): a role has a small set of registered pattern variants, and one bold index mark on a disc is a `mark`. |
+| SD26 | **Highlights.** The part a view or a setting makes the point of (the open port, the loaded rocker, the load-carrying groove wall) is drawn with the accent ring or the highlight callout (SD5), the one accent use added by the teaching block. |
+| SD27 | **Time map.** Playback slows near a declared feature; the drawing and the plot do not change, only the rate at which u advances; the scrubber shows the true input. |
 
 ---
 
@@ -177,7 +196,7 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS2 | **Header:** kicker (mono, accent), large condensed uppercase title, short intro, and a set title block (mono grid of label/value cells). Search field and the Filters button in the same row. Below 1000 px the title block is one low strip across the header, its four cells in a row with dividers, shown at every width. |
 | SS3 | **Sticky bar:** on the library, search, the Filters button and the sheet switch on one row, the switch at the right, the row on the same left and right edges as the header and the card grid; translucent paper with blur, hairline top and bottom. The search has a clear (x) at its right end while it holds text (Escape does the same); it empties the field and keeps the focus there. Once the bar sticks, the set's name and sheet count join the row at its left (not on a phone, where the row stays search, Filters and switch). Filters hidden behind the button; facets open as chip rows in a scrollable panel with a "Clear all filters" button. The library keeps its filters and search in its address (`?<facet>=<value>`, `?q=<words>`), so a page can link to a filtered set. A mechanism page has no bar at the top: its sheet switch sits at the right of its name, and once the name scrolls away a compact bar slides in with the name (one line, cut with an ellipsis) and the switch. "Back to library" returns to the library as it was left, showing the card of the mechanism the visitor is on; Previous and Next step through what the library shows. |
 | SS4 | **Controls:** segmented buttons and chips are square, hairline, mono uppercase; pressed = ink fill with paper text. Tags are dashed outlines, solid on hover. The play button is the one round control (accent outline, fills on hover). Range inputs use `accent-color` (accent for the scrubber, ink for view sliders). |
-| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number, title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, the view modes, tilt, explode, detail pin) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
+| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number, title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, the view modes, the orbit and the named views, explode, detail pin, the section and detail views the record declares, and the mechanism's own controls) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
 | SS6 | **Panels:** paper fill, hairline frame, a mono uppercase header strip with a rule under it; fact lists as label/value rows with dashed separators. |
 | SS7 | **Theme switch** is one square button with an icon of the sheet it switches to (a sun on Blueprint, a moon on Drafting), remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
 | SS8 | **Real pages:** one static page per mechanism at `/mechanisms/<id>/`, prev and next from the catalogue order, the library at `/`. The engine loads only on the mechanism page or on card hover. |
@@ -185,6 +204,7 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. |
 | SS11 | **Motion on the page is minimal:** short colour and border transitions (≤ .2 s). The only continuous motion is the mechanisms themselves. |
 | SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer. |
+| SS13 | **Transition stamp.** While both engines are on main, a page or card drawn by the v3 engine carries a visible 3D stamp: in the title block of its stage and on its library card. It leaves with the old engine at cut-over. |
 
 ---
 
@@ -586,19 +606,31 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 | Id | Check | Pass |
 |---|---|---|
 | SQ1 | Literal scan: a colour (`#…`, `rgb(`) or a font family string outside `src/style` and the generated CSS | No hits in renderer, site code, component CSS or records (pattern tiles may build `rgba()` strings from token values) |
-| SQ2 | Look match | The four mechanisms, side by side with the hand-off proposal at plan, 28° and side view in both sheets, read as the same style and overall look to the eye. Not pixel for pixel. |
+| SQ2 | Look match | The four pilots, side by side with the hand-off proposal at plan, an isometric view and side view in both sheets, read as the same style and overall look to the eye. Not pixel for pixel. |
 | SQ3 | One-knob test | Changing `tokens.themes.dark.accent` changes the input ring, paths, forces, play button, kicker, sheet numbers and focus ring together, and nothing else. Changing `draft.lines.plateTop` changes every mechanism. |
 | SQ4 | Theme switch | Every visible card and the stage redraw in the new theme with no stale cached paper, patterns or thumbnails. |
 | SQ5 | Headless | Checks, clearance, packaging and audit generation run in Node (style must not need the DOM); the bench, shots and snapshots draw in local Chrome. |
 | SQ6 | Records clean | No style values in `src/mechanisms` (standard L1). |
 | SQ7 | Phone width | 375 px wide: no horizontal scroll, 16 px gutters, stage 4:3, controls wrap. |
 | SQ8 | Contrast | Body and secondary text pass SF5 on both sheets. |
-| SQ9 | Snapshots | Visual snapshots of every mechanism at four views in both sheets match our own baselines; baselines are regenerated once, when the look is final. |
+| SQ9 | Snapshots | Visual snapshots of every mechanism at its default view and three more in both sheets match our own baselines; baselines are regenerated once, when the look is final. |
+| SQ10 | Depth | A renderer test: with the principle parts selected, no depth bias or draw-order trick is in use; the peeled composite equals a reference ray-cast on a fixture scene of overlapping translucent solids. |
+| SQ11 | Views | Every named view, every section and detail view the records declare, and full explode render without clipping, on both sheets; the default view of each mechanism is the one its record names. |
+| SQ12 | Phone | The bench page for a measured build reports setup (decode, tessellate, edges, GPU) and frame times per view on a mid-range phone; targets are flags, not gates (standard R10). |
 
 ---
 
 ## Changelog
 
+- **3.0 (2026-10-20).** Restated for true 3D parts, a depth-buffer renderer and a free orthographic camera. SP10, SD1,
+  SD11 and the view names of SD10 (turntable orbit snapping to PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ joint,
+  VIEW az/el) [SP10, SD10, SD11, STYLE]. The depth buffer replaces slicing: SD1, SD3 (visible and hidden edges by depth,
+  fractional occlusion kept), SD4 (patterns on faces within a set angle of the view), SD2 (see-through on every face in
+  view), SF10 [SD1 to SD4, SF10, STYLE]. Centrelines along joint axes, dimensions in named views, explode along each
+  axis with trail lines, performance as a GPU-first rule [SD6, SD8, SD12, SD17, STYLE]. New: the principle always reads
+  (SP12), section views, detail views, phantom positions, construction overlays, ghost traces, teaching traces and
+  ticks, pattern variants, highlights, the time map [SP12, SD19 to SD27, STYLE], the transition stamp [SS13, SITE], and
+  the depth, view and phone checks [SQ10 to SQ12, STYLE].
 - **2.4 (2026-10-19).** The sheet switch is one icon button (SS7); the library's bar is one row on a phone, a
   mechanism page shows the switch beside its name and a compact name bar once scrolled, and the library is returned
   to as it was left (SS3).

@@ -1,9 +1,18 @@
-# Mechanism catalogue: record spec for research workers
+# Mechanism catalogue: record spec
+
+```
+record spec: v3 (record_version 3)
+date: 2026-10-20
+supersedes: v2 (records with a hand-written model, joints inferred from outlines)
+```
 
 You are researching a batch of mechanical mechanisms for an online mechanism library (a site that animates each
-mechanism in 2D/pseudo-3D in one house style). Each mechanism becomes one JSON record. The records must later be
-enough to BUILD the mechanism in the app: kinematic geometry, members, joints, ground/input/output, parameters
-with sensible default values, motion range, and which overlays make sense.
+mechanism as true 3D parts, drawn in one house style). Each mechanism becomes one JSON record. In v3 the record is
+enough to BUILD the mechanism with no hand-written model: its structured `kin` block (bodies, joints with 3D axes,
+drivers, parameters and ranges, the named points and outputs) and its `teaching` block (the principle parts, traces,
+construction overlays, default view, controls, time map) are described under "Record v3" below. The prose fields stay
+prose. Research workers fill the prose, the facets and the links; the kin and teaching blocks are written with the
+mechanism's build pass against the mechanism standard 3.0.
 
 Existing site code (read-only reference, do not edit): mechanism-site/src/mechanisms/*.js
 If a mechanism in your batch is marked IN-SITE, read its file there and reuse its geometry/dimensions where possible
@@ -18,6 +27,7 @@ Use plain prose in text fields (no em-dashes; use commas or "to"). Units: mm, de
 
 ```json
 {
+  "record_version": 3,
   "id": "kebab-case, must equal the id given to you",
   "name": "Display name",
   "aka": ["other names people search for"],
@@ -54,18 +64,13 @@ Use plain prose in text fields (no em-dashes; use commas or "to"). Units: mm, de
     "limits": "1 to 2 sentences: drawbacks, failure modes, when not to use it."
   },
   "build": {
-    "ground": "what is fixed",
-    "input": "member id and how it is driven (e.g. 'crank, continuous rotation about O2' or 'rocker oscillating ±30°')",
-    "output": "member id and what is read off (e.g. 'slider position x', 'coupler point P path')",
-    "members": [ { "id": "crank", "role": "driver|link|output|ground|slider|gear|cam|follower|pawl|spring|belt", "def": "geometry in words+numbers: 'O2→A, length a'" } ],
-    "joints": [ { "id": "A", "type": "revolute|prismatic|pin-in-slot|gear mesh|cam contact|rolling|belt|screw|spherical|universal", "between": ["crank", "coupler"] } ],
-    "params": [ { "name": "a", "value": 40, "unit": "mm", "note": "crank length" } ],
+    "ground": "what is fixed, one line",
     "defining_relations": "the equations / constraints that make it work (e.g. Grashof s+l<=p+q; Hoekens ratios 1:2.5:2.5:2; Geneva c = r/sin(pi/n)); gear ratio formulas; cam law",
     "range": "motion range of input and output with default params (e.g. 'crank 360° continuous; rocker swings 41°')",
-    "overlays": ["subset of: paths, velocity, forces, angles, plot"],
-    "plot": "what output-vs-input plot to show, e.g. 'slider position vs crank angle'",
     "notes": "anything tricky for an animator: branch choice, singular positions, dwell, toggle, tooth counts that mesh"
   },
+  "kin": { "...": "the kinematic model, see Record v3" },
+  "teaching": { "...": "what makes the drawing teach, see Record v3" },
   "examples": [ { "use": "short real-world use", "detail": "where/how, 1 sentence" } ],
   "references": [ { "title": "...", "url": "https://...", "kind": "ONE of wikipedia|textbook|kmoddl|paper|standard|patent|museum|engineering-guide|calculator" } ],
   "media": [ { "title": "...", "url": "https://...", "kind": "ONE of video|photos|animation|interactive" } ],
@@ -73,11 +78,123 @@ Use plain prose in text fields (no em-dashes; use commas or "to"). Units: mm, de
 }
 ```
 
+`build.members`, `build.joints`, `build.input`, `build.output`, `build.params`, `build.overlays` and `build.plot` of v2 are
+retired: they are the `kin` and `teaching` blocks. Records at `record_version` 2 stay valid until the 2.5D engine is
+removed at cut-over.
+
 Counts: examples 2 to 4 real-world uses (industry or practical). references 2 to 5 (prefer Wikipedia + one hard
 source: KMODDL/Cornell, university course page, textbook page, paper, standard (ISO/AGMA/DIN), patent, or a
 manufacturer engineering guide). media 2 to 4: at least one VIDEO of the real thing in use or a real build, and at
 least one page with PHOTOS of a real one (Wikimedia Commons category, museum page, manufacturer page). Animations
 (e.g. Wikimedia gif pages, 507movements, Purdue, firgelliauto) are welcome but do not replace the real-use video.
+
+## Record v3: the `kin` and `teaching` blocks
+
+Record v3 (`"record_version": 3`) adds two blocks to the record and retires two fields. The catalogue is what the app
+builds from: the `kin` block is the kinematic model (it replaces the hand-written `model.ts`), and the `teaching` block
+holds what makes the drawing teach (it replaces the polish's overlays and the review's notes). The mechanism standard
+(3.0) says what each field must achieve (K, T and P rows); this section says what the fields are.
+
+**Units and frame.** Millimetres and degrees. The base plate lies in the xy plane, z up; angles about an axis follow the
+right-hand rule; an angle in the plane is counter-clockwise from +x seen from +z. Every position is `[x, y, z]` (z may
+be omitted in a planar mechanism and is then 0). A **body frame** is an origin and an orientation (`"rot": [rx, ry, rz]`
+in degrees, applied x then y then z, default none); points and axes given "in a body" are in its frame.
+
+**What changed from v2.**
+- `build.members` and `build.joints` are **retired**: bodies and joints live in `kin`, and nothing infers a joint from
+  outlines any more. The validator rejects both in a v3 record.
+- `build.input`, `output`, `ground`, `params`, `range`, `overlays` and `plot` are replaced by `kin` (drivers, outputs,
+  params, ranges) and `teaching` (overlays, plot, traces). What stays in `build` is prose for a human reader:
+  `defining_relations`, `notes` and a one-line `ground`.
+- `explain`, `summary`, `examples`, `real_world`, `references`, `media` and the facets are unchanged.
+
+### `kin`
+
+```json
+"kin": {
+  "bodies":  [ { "id": "crank", "role": "driver", "shape": { "type": "link", "length": 40, "boss": [9, 7] },
+                 "at": { "joint": "O2" } } ],
+  "joints":  [ { "id": "O2", "type": "revolute", "a": "ground", "b": "crank",
+                 "at": [0, 0, 0], "axis": [0, 0, 1] } ],
+  "params":  [ { "id": "a", "value": 40, "unit": "mm", "min": 20, "max": 70, "note": "crank length" } ],
+  "design":  [ { "id": "branch", "options": ["elbow-up", "elbow-down"], "value": "elbow-up" } ],
+  "drivers": [ { "id": "input", "joint": "O2", "kind": "rotary", "range": [0, 360], "default": 0 } ],
+  "solve":   [ { "block": "dyad", "id": "coupler", "in": { "a": "A", "b": "O4", "ra": "b", "rb": "c" },
+                 "branch": "elbow-up", "out": "B" } ],
+  "points":  [ { "id": "A", "body": "crank", "local": [40, 0, 0] } ],
+  "outputs": [ { "id": "rocker-angle", "of": "rocker", "kind": "angle", "unit": "deg" } ],
+  "fallback": null
+}
+```
+
+| Field | Content |
+|---|---|
+| `bodies` | Every rigid member: `id`, `role` (`ground`, `driver`, `link`, `output`, `slider`, `gear`, `cam`, `follower`, `pawl`, `spring`, `belt`, `frame`), a typed `shape`, and where it sits (`at`: a joint or point it is pinned to, or a fixed `frame`). `ground` is always present. |
+| `shape` types | `link` (length, boss radii), `plate` (outline points or `rect`), `slotLink` (length, slot length, slot width), `slider` (length, width), `gear` (`z` teeth, `module`, `face`, `bore`; `helix`, `cone` half-angle, `hand` for helical, bevel and worm), `rack`, `ringGear`, `cam` (base radius, `law` reference), `disc` (radius, thickness), `shaft` (diameter, length), `sprocket` (`z`, ISO 606 pitch), `pulley` (`z`, HTD pitch, or diameter), `rope`, `cage`, `cross`, `tracer`, `custom` (a profile and an operation: `extrude`, `revolve`, `sweep`, `loft`). |
+| `joints` | Declared, with a 3D origin and axis: `id`, `type`, `a`, `b` (bodies), `at` (point or position), `axis`, `limits` `[lo, hi]` where it has them. **Types:** `revolute`, `prismatic`, `cylindrical`, `screw` (`lead`, `hand`, `ball`), `pin-in-slot` (the slot's body and path), `gear-mesh` (`ratio` or the two bodies' tooth counts; `crossed` axes angle, `offset` for hypoid), `cam-contact` (follower kind: roller, flat, knife), `belt` (a `flexible` member: `belt`, `chain`, `rope`, `cvt`), `rolling`, `spherical`, `universal`, `planar`, `flexure` (neck, width, length, thickness). Every joint belongs to exactly one block of `solve`, or to `fallback`. |
+| `params` | Named dimensions: `id`, `value`, `unit`, `min`, `max` (the **ranges** used by controls and by the validator), `note`. |
+| `design` | Discrete **design choices** that change the build but not the motion law: tooth counts, which arrangement, which side a part is on. `options` and the chosen `value`. |
+| `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params. |
+| `solve` | The composition: a list of block instances in solve order. A **block** is one of `dyad`, `slider-dyad`, `gear-mesh`, `willis`, `hooke`, `homokinetic`, `bennett`, `cam`, `screw`, `convey`, `flexure`, `escapement`; `in` names the bodies, points and params it reads; `out` names the points and angles it produces; `branch` names the design choice that picks its root. Block inputs and outputs are the only names later blocks may read. |
+| `points` | Named points: a body and a local position. Every point a trace, overlay, dimension or plot uses is here (standard K12). |
+| `outputs` | Quantities read off: `id`, `of` (a body or point), `kind` (`angle`, `position`, `speed-ratio`, `path`), `unit`. Plots and claims read these. |
+| `fallback` | `null`, or `{ "numeric": true, "loops": [...] }` when a loop does not decompose into blocks. The audit names it; K1 verifies it. |
+
+The **generic loop-closure solver** is not in the record: it runs at build time on `bodies` and `joints` and its
+residual is the K1 check. The blocks' closed forms drive the animation (K1).
+
+### `teaching`
+
+```json
+"teaching": {
+  "review": { "verdict": "keep", "date": "2026-10-20", "note": "..." },
+  "principle": [ { "body": "coupler" }, { "point": "P" } ],
+  "traces":   [ { "id": "p-path", "point": "P", "ticks": { "every": 15 }, "ghosts": [ { "control": "die", "value": 1 } ] } ],
+  "overlays": [ { "id": "dead-centre", "kind": "line", "from": "O", "to": "A", "label": "DEAD CENTRE" } ],
+  "view":     "ISOMETRIC",
+  "views":    [ { "id": "A-A", "kind": "section", "plane": { "origin": [0, 0, 0], "normal": [0, 1, 0] }, "highlight": ["port"] } ],
+  "controls": [ { "id": "offset", "kind": "param", "param": "e" } ],
+  "timeMap":  { "feature": "engagement", "slow": 3, "span": [160, 200] },
+  "plot":     { "x": "input", "y": "rocker-angle", "label": "ROCKER ANGLE" },
+  "claims":   [ { "text": "the rocker swings 41 degrees", "output": "rocker-angle", "stat": "range", "value": 41, "tol": 0.5 } ],
+  "exceptions": []
+}
+```
+
+| Field | Content |
+|---|---|
+| `review` | The teaching review's verdict (`keep`, `tweak`, `rethink`), the date, and a note on what was decided (standard T2). The audit's `teaching:` line repeats the verdict. |
+| `principle` | The bodies and points that carry the principle (T3). They are drawn on top and whole; the visibility rule (T10 to T12) protects them. |
+| `traces` | Teaching traces: a named `point`, optional `ticks` (every n degrees of input, equal time), `ghosts` for settings not selected (`control` and `value`), and `comet: true` on the first. A trace can be a point on a moving body (a point on a planet). |
+| `overlays` | Construction overlays: `kind` is `line` (through two named points), `arc`, `circle`, `chord`, `dimension` (a moment arm, a length), `axis-line`, `workspace` (an outline traced by a named point over a range) or `bend` (a flexure's state). Each names its points and a short mechanics-only `label`. |
+| `view` | The default named view (T7): `PLAN`, `FRONT`, `SIDE`, `ISOMETRIC`, `DIMETRIC`, `AUX <joint-id>`, or `VIEW az el` in degrees. |
+| `views` | Section and detail views (T8): `kind` `section` (a cut `plane` of origin and normal) or `detail` (a window `center` and `scale`); `highlight` names bodies or points to draw with the highlight. |
+| `controls` | The controls the page shows (T14): `kind` `driver`, `param`, `design` or `selector`, and the id it maps to. A mechanism's controls are only these. |
+| `timeMap` | A playback rate near a feature (T13): the `span` of input degrees and the `slow` factor. It never changes `solve`. |
+| `plot` | What the side panel plots: `x`, `y` (output ids) and a label; several settings may be listed for a family of curves. |
+| `claims` | Every number the explanation states, with the `output` and `stat` (`range`, `max`, `min`, `mean`, `ratio`, `phase`, `dwell`, `at`) it comes from, the stated `value` and a tolerance (standard T9). `text` is the sentence it supports. |
+| `exceptions` | The rare individual cases where a different construction is used instead of seeing through or moving a support (T12), each with its reason; the decision is made in the mechanism's issue. |
+
+Teaching strings (labels, trace names, captions) state the mechanism, never its use (T15). Real-world context belongs
+in `examples` and `real_world`.
+
+### What stays prose
+
+`summary`, `explain` (motion, forces, benefits, limits), `examples`, `build.defining_relations` and `build.notes` stay
+prose. Anything a number in that prose depends on is a `teaching.claims` entry. Anything that the drawing needs
+(a trace, an overlay, a view, a control) is structured, never prose.
+
+### Validation (the catalogue validator)
+
+- Every `a` and `b` of a joint is a body; every `in` of a block is a body, point, param or an earlier `out`; every
+  point named by a trace, overlay, view highlight, plot or claim exists; every control maps to a driver, a param or a
+  design choice; every `value` is within its `min` and `max`.
+- The mobility counted from `bodies` and `joints` equals `dof` (K11). A mechanism with an overconstrained loop says so
+  in `topology.notes`.
+- `build.members` and `build.joints` are rejected; a `kin` block and a `teaching` block are required of every record at
+  `record_version` 3; the old fields are accepted at version 2 until the cut-over removes the 2.5D engine.
+- The vocabularies of the facets are unchanged. The new vocabularies are the joint types, block names, shape types,
+  overlay kinds and view names above.
 
 ## LINKS MUST BE REAL
 
