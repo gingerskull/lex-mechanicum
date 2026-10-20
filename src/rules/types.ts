@@ -8,7 +8,7 @@ import type { MechanismModel, Part, Solved } from "../model/types";
 import type { Form } from "../style/form";
 import type { PartIndex } from "../assemble/pose";
 
-export type JointType = "J1" | "J2" | "J3" | "J4" | "J5" | "J6" | "J7" | "J8" | "J9" | "J10" | "J11";
+export type JointType = "J1" | "J2" | "J3" | "J4" | "J5" | "J6" | "J7" | "J8" | "J9" | "J10" | "J11" | "J12" | "J13";
 
 /** A slot a pin runs in over the cycle, with the range of the pin centre along it (from the closed end's centre). */
 export interface SlotVisit extends Slot {
@@ -121,7 +121,23 @@ export interface ScrewJoint {
   form: "lead" | "ball";
 }
 
-export type JointInfo = PinJoint | SlideJoint | MeshJoint | CamJoint | CrossMeshJoint | ScrewJoint;
+/** J12: a flexible member the model declares (MechanismModel.flexible). */
+export interface FlexJoint {
+  kind: "flex";
+  id: string;
+  type: "J12";
+  spec: NonNullable<MechanismModel["flexible"]>[number];
+}
+
+/** J13: a compliant joint the model declares (MechanismModel.compliant). */
+export interface CompliantJoint {
+  kind: "compliant";
+  id: string;
+  type: "J13";
+  spec: NonNullable<MechanismModel["compliant"]>[number];
+}
+
+export type JointInfo = PinJoint | SlideJoint | MeshJoint | CamJoint | CrossMeshJoint | ScrewJoint | FlexJoint | CompliantJoint;
 
 /** The engineering record of a joint (A16): read by the audit, never shown on the page (P8). */
 export interface Joint {

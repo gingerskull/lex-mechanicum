@@ -33,7 +33,8 @@ src/hardware/                    tables (bearings, screws, circlips, keys, pulle
                                  eccentric mount, turnbuckle, drag pack, locking segment, output coupling, follower train, sensor,
                                  drive by input kind, a universal joint's cross bearings)
 src/rules/                       context, classify (slots closed and open, over the cycle; pins on x or y axes; declared
-                                 crossed meshes and screws), one module per rule (J1 to J11), the
+                                 crossed meshes, screws, flexible members and compliant joints), one module per rule
+                                 (J1 to J13), the
                                  registry and autoTable(); stage 3 fasteners; the headroom and see-through stages; the
                                  rigid explode pass
 src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> headroom -> see-through ->
@@ -91,7 +92,9 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    composited onto the canvas, and centrelines, dimensions, traces, sheet and overlays are drawn over it. A solid on an
    x or y axis is drawn by the same items: its slice row carries the axis, the shaders map its plane to the screen
    (a y face by one affine, as a z face; an x face is edge-on) and sweep its walls along the projected axis; a y solid
-   shows its low-y end, the end nearer the viewer. Two solid modifiers change a solid along its axis: `taper` scales
+   shows its low-y end, the end nearer the viewer. A member that changes shape is a stretched or deforming solid whose
+   outline is made again each frame (its items rewritten in the GPU buffer in place, the point count fixed), or a
+   small rigid solid carried along a closed path (a `convey` motion). Two solid modifiers change a solid along its axis: `taper` scales
    its outline toward the far end (a bevel gear's toothed frustum, a cone) and `helix` turns it by its lead (a
    helical gear); the slice row then carries the outline's pose at both ends and the walls run between them. A helix
    that would wind more than a quarter turn (a screw, a worm) keeps its outline and carries thread marks at its lead

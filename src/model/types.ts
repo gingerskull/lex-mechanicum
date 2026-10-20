@@ -51,6 +51,13 @@ export interface Part {
   taper?: number;
   helix?: number;
   /**
+   * Members that change shape over the cycle (cheapest first): `stretch`, a part placed `between` two solved points
+   * whose outline is given at unit length along x and stretched to their distance (a rope span, a spring); `deform`,
+   * the outline from the solved state each frame, always with the same point count (a flexspline, a belt's wrap).
+   */
+  stretch?: boolean;
+  deform?(s: Solved): Vec2[];
+  /**
    * Plating offset from the layer grid, mm (K1: heights may change, centres may not): a part plated low over a pin
    * shortens the pin's overhang (A9). The explode level stays the layer's.
    */
@@ -94,7 +101,12 @@ export interface Part {
 export type OverlayItem =
   | { type: "axial"; a: Vec2; b: Vec2; key?: string; z?: number }
   | { type: "spin"; c: Vec2; r: number; dir?: 1 | -1; key?: string; z?: number }
-  | { type: "angle"; c: Vec2; a: Vec2; b: Vec2; r: number; key?: string; value?: number; warn?: boolean; z?: number };
+  | { type: "angle"; c: Vec2; a: Vec2; b: Vec2; r: number; key?: string; value?: number; warn?: boolean; z?: number }
+  /**
+   * A flexure's bend (the neck is drawn rigid): the neck's centre `c`, its direction `a` (radians), length `L` and
+   * width `w`, mm, and the angle it is bent through (radians). Drawn as the bent centreline over the stress zone.
+   */
+  | { type: "bend"; c: Vec2; a: number; L: number; w: number; bend: number; key?: string; z?: number };
 
 export interface Plot {
   label: string;
@@ -126,6 +138,17 @@ export interface MechanismModel {
   meshes?: { a: string; b: string; form: "bevel" | "hypoid" | "worm" | "crossed" }[];
   /** Screw joints (J11): the screw part (on an x or y axis), the nut part it drives along that axis, the lead and the kind. */
   screws?: { screw: string; nut: string; lead: number; form: "lead" | "ball" }[];
+  /**
+   * Flexible members (J12): a roller chain over two sprockets (its links carried round by the solved travel `travel`,
+   * mm, at `pitch`), a rope over sheaves (its spans are stretched parts, `spans`), or a CVT belt between sheave pairs.
+   */
+  flexible?: (
+    | { form: "chain"; over: [string, string]; travel: string; pitch: number; roller: number }
+    | { form: "rope"; over: string[]; spans: string[]; dead?: string; hook?: string; load?: string }
+    | { form: "cvt"; over: string[] }
+  )[];
+  /** Compliant joints (J13): a flexure neck joining a lever to the ground block it is cut from, its swing range. */
+  compliant?: { neck: string; ground: string; lever: string; at: string; range: [number, number] }[];
   /** Detail ladder rung of the whole mechanism; "never" is never dropped. */
   detail?: RungId;
 }

@@ -27,12 +27,52 @@ function direction(model: MechanismModel, parts: PartIndex, body: string, u: num
   return a && b && b[2] < a[2] ? -1 : 1;
 }
 
+/** Point and direction at arc length `s` along a closed path. */
+export function alongPath(path: Vec2[], s: number): Pose {
+  let L = 0;
+  for (let i = 0; i < path.length; i++) L += Math.hypot(path[(i + 1) % path.length]![0] - path[i]![0], path[(i + 1) % path.length]![1] - path[i]![1]);
+  let r = ((s % L) + L) % L;
+  for (let i = 0; i < path.length; i++) {
+    const a = path[i]!;
+    const b = path[(i + 1) % path.length]!;
+    const l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (r <= l || i === path.length - 1) {
+      const t = l ? Math.min(1, r / l) : 0;
+      return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, Math.atan2(b[1] - a[1], b[0] - a[0])];
+    }
+    r -= l;
+  }
+  return [path[0]![0], path[0]![1], 0];
+}
+
+/**
+ * A solid's local outline at a solved phase: its outline, stretched along x to the distance of its two points, or its
+ * part's deforming outline (src/model/types.ts).
+ */
+export function shapeAt(parts: PartIndex, t: Pick<Solid, "outer" | "stretch" | "deform" | "body">, s: Solved): Vec2[] {
+  if (t.stretch) {
+    const a = s.pts[t.stretch[0]];
+    const b = s.pts[t.stretch[1]];
+    const L = a && b ? Math.hypot(b[0] - a[0], b[1] - a[1]) : 1;
+    return t.outer.map(([x, y]): Vec2 => [x * L, y]);
+  }
+  if (t.deform) {
+    const f = parts[t.body]?.deform;
+    if (f) return f(s);
+  }
+  return t.outer;
+}
+
 export function solidPose(model: MechanismModel, parts: PartIndex, t: Pick<Solid, "body" | "at" | "motion">, s: Solved, u: number): Pose | null {
   const B = bodyPose(parts, t.body, s);
   if (!B) return null;
   const m = t.motion;
   if (!m) return xfPose(B, t.at);
   if (m.type === "geared") return [m.around[0], m.around[1], B[2] * m.ratio + t.at[2]];
+  if (m.type === "convey") {
+    const v = s[m.key];
+    return xfPose(alongPath(m.path, (typeof v === "number" ? v : 0) + m.offset), t.at);
+  }
   if (m.type === "rolling") {
     const travel = B[0] * m.axis[0] + B[1] * m.axis[1];
     return [m.around[0], m.around[1], -travel / m.r + t.at[2]];

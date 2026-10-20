@@ -257,6 +257,8 @@ export const classify: Rule = {
       const nut = ctx.parts[s.nut];
       if (screw && nut) info.push({ kind: "screw", id: `screw-${screw.id}`, type: "J11", screw, nut, lead: s.lead, form: s.form });
     }
+    (ctx.model.flexible ?? []).forEach((f, k) => info.push({ kind: "flex", id: `flex-${f.form}-${k}`, type: "J12", spec: f }));
+    for (const c of ctx.model.compliant ?? []) info.push({ kind: "compliant", id: `flexure-${c.neck}`, type: "J13", spec: c });
     ctx.info = info;
     // the plan point of a part or a pin, wherever its axis lies
     const plan = (p: Part, q: Vec2): Vec2 => {
@@ -271,7 +273,15 @@ export const classify: Rule = {
     };
     for (const j of info) {
       const at: Vec2 =
-        j.kind === "pin" ? plan(j.pin, j.P) : j.kind === "mesh" ? j.at : posOf(j.kind === "slide" ? j.slider : j.kind === "cam" ? j.cam : j.kind === "crossMesh" ? j.b : j.nut);
+        j.kind === "pin"
+          ? plan(j.pin, j.P)
+          : j.kind === "mesh"
+            ? j.at
+            : j.kind === "flex"
+              ? posOf(ctx.parts[j.spec.over[0]!]!)
+              : j.kind === "compliant"
+                ? (ctx.s0.pts[j.spec.at] ?? [0, 0])
+                : posOf(j.kind === "slide" ? j.slider : j.kind === "cam" ? j.cam : j.kind === "crossMesh" ? j.b : j.nut);
       const title =
         j.kind === "pin"
           ? `${pinLabel(j.pin)} · ${j.live ? (j.pin.accent ? "Input" : "Shaft") : j.type === "J10" ? "Shaft" : j.fixed ? "Pivot" : j.type === "J4" ? "Roller" : "Pin"}`
@@ -281,10 +291,26 @@ export const classify: Rule = {
               ? `Mesh · ${j.a.id} and ${j.b.id}`
               : j.kind === "screw"
                 ? `Screw · ${j.screw.id}`
-                : `Cam · ${j.cam.id}`;
+                : j.kind === "flex"
+                  ? `${j.spec.form === "chain" ? "Chain" : j.spec.form === "rope" ? "Rope" : "CVT belt"} · ${j.spec.over.join(" and ")}`
+                  : j.kind === "compliant"
+                    ? `Flexure · ${j.spec.neck}`
+                    : `Cam · ${j.cam.id}`;
       ctx.joints.push({ id: j.id, type: j.type, at, title, note: "", serves: {}, ...(j.kind === "pin" ? { d: j.d } : {}) });
       const members =
-        j.kind === "pin" ? j.joined.map((x) => x.part) : j.kind === "slide" ? [...j.rails, j.slider] : j.kind === "mesh" || j.kind === "crossMesh" ? [j.a, j.b] : j.kind === "screw" ? [j.screw, j.nut] : [j.cam, j.follower];
+        j.kind === "pin"
+          ? j.joined.map((x) => x.part)
+          : j.kind === "slide"
+            ? [...j.rails, j.slider]
+            : j.kind === "mesh" || j.kind === "crossMesh"
+              ? [j.a, j.b]
+              : j.kind === "screw"
+                ? [j.screw, j.nut]
+                : j.kind === "flex"
+                  ? j.spec.over.map((id) => ctx.parts[id]!).filter(Boolean)
+                  : j.kind === "compliant"
+                    ? [j.spec.neck, j.spec.ground, j.spec.lever].map((id) => ctx.parts[id]!).filter(Boolean)
+                    : [j.cam, j.follower];
       for (const p of members) ctx.solidOf[p.id]?.joints.push(j.id);
     }
   },

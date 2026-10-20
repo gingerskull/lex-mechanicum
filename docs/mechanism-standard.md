@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 2.7
+version: 2.8
 date: 2026-10-20
 supersedes: 1.0 (the hand-off standard of 2026-10-16)
 ```
@@ -137,6 +137,7 @@ forms, reused everywhere.
 | D5 | **Solid, designed mounts** over scattered standoffs: one bracket, bridge or post pair, shaped as a part. | HAND (shape) / AUTO (`H.bridge`) | review |
 | D6 | **Nothing cosmetic distracts.** Supporting elements read quieter than the mechanism but stay clearly visible. | HAND + STYLE | screenshots |
 | D8 | **Axis.** A part lies on the base plane (axis z, the default) or stands out of it on an x or y axis of the base: a shaft in plan, a disc on edge, a bevel pinion, a worm, a screw. Such a part declares `axis` and `along` (where it starts along the axis); its outline, its pose and the solved points that place it lie in the plane normal to the axis, and its extent along the axis takes the place of the z range. Joints between parts on different axes are only those that allow it (J9, J11), declared in the model (`meshes`, `screws`). Solid modifiers give the forms along the axis: `taper` (a bevel gear's frustum, a cone) and `helix` (a helical gear's teeth, a screw's thread, at its lead). | AUTO (z by default; `tools/check` reports `AXIS`) / HAND (where a mechanism needs an axis) | `tools/check` |
+| D9 | **Members that change shape**, cheapest first: a **stretched** part between two solved points, its outline given at unit length (a rope span, a spring); **conveyed** small rigid solids carried along a fixed closed path by a solved travel (chain rollers and links, belt teeth); a **deforming** outline from the solved state each frame, always with the same point count (a flexspline, a CVT belt's wrap), for a few solids only. A flexure is drawn rigid; its bend and stress zone are a `bend` overlay. | AUTO (the placements; the bench counts deforming solids) / HAND (which a mechanism needs) | screenshot, bench |
 | D7 | **The big parts stay plain.** Bars, plates, wheels, brackets and the base carry only load-driven shape (D2) and manufacturing evidence (section 7). All richness is in what makes the mechanism move and hold: shafts, bearings, clips, spacers, keys, screws, nuts, springs, stops, adjusters, oilers, marks, sensors. | HAND | review |
 
 ---
@@ -155,7 +156,7 @@ feet, lubrication, timing marks, materials and the drive.
 | Id | Rule | Tier |
 |---|---|---|
 | A1 | Every joint is classified by type (J1 to J11) from the model: fixed or moving pin, keyed or bored part, slot (closed, or open at the rim), slide, mesh, cam contact, belt, a pin on an x or y axis, a declared crossed-axis mesh or screw. Slots are found over the whole cycle, and over as many cycles as an indexing part takes to come round, so an intermittent contact is seen whatever the assembly phase. The canonical build of that type is generated in full. | AUTO |
-| A2 | A fixed pin that drives (the accent input, or a fixed pin with a keyed part) is a **live shaft** (J2); any other fixed pin is a **dead axle** (J1); a moving pin is a **shoulder bolt** joint (J3); a pin in a slot carries a **track roller** (J4); rails carry a **slide** (J5); meshing gears get **mesh hardware** (J6); a cam gets its **follower train** (J7). A fixed pin on an x or y axis is a **shaft in plan** (J10), live or dead; a moving one is built in its own plane like any J3 or J4; a declared crossed-axis mesh gets **J9** and a declared screw **J11**. | AUTO |
+| A2 | A fixed pin that drives (the accent input, or a fixed pin with a keyed part) is a **live shaft** (J2); any other fixed pin is a **dead axle** (J1); a moving pin is a **shoulder bolt** joint (J3); a pin in a slot carries a **track roller** (J4); rails carry a **slide** (J5); meshing gears get **mesh hardware** (J6); a cam gets its **follower train** (J7); a declared flexible member gets **J12** and a compliant joint **J13**. A fixed pin on an x or y axis is a **shaft in plan** (J10), live or dead; a moving one is built in its own plane like any J3 or J4; a declared crossed-axis mesh gets **J9** and a declared screw **J11**. | AUTO |
 | A3 | **Catalogue sizing:** bore = largest catalogue bore every boss on the joint can take; each part gets the largest bearing its boss fits with a 1.2 mm wall, else a bronze bushing; gaps get inner-race spacers. | AUTO |
 | A4 | **Shafts are stepped profiles** (`H.shaft`): shoulders at every seat, circlip grooves, set-screw flats, thread with undercut, chamfered ends, wrench flats where tightened without a head, centre holes on turned ends. | AUTO |
 | A5 | **Keys by shaft size:** D-flat to Ø8; feather key and keyway above Ø8; taper pin on cross-pinned small parts. Every keyed part gets the matching bore. | AUTO |
@@ -185,6 +186,8 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `standoffs` | A6 |
 | `drive` | V1, V2, V3, V5, V6, F10 |
 | `j8-belt` | J8, V4 |
+| `j12-flexible` | J12, F2, F3, F6, F7, F8 |
+| `j13-compliant` | J13, F1, F2, F5 |
 | `j2-straddle` | A9, J2 |
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
@@ -253,6 +256,8 @@ every line of its row exists or is marked N/A with a reason in the audit.
 | J8 | **Belt** | Flanged small pulley (F10); slotted mount for tension (F7); idler on a slotted arm where the wrap is short; belt guard only if see-through. |
 | J9 | **Crossed-axis mesh** (bevel, hypoid, worm, crossed helical; declared in `meshes`) | Each gear keyed on its shaft (J2 or J10) and located on it (F2); a shim pack at its back face sets its mounting distance, and so the backlash and the contact pattern (F7); a bronze thrust washer wherever the mesh pushes along a shaft: toward a bevel or hypoid gear's back face (away from the apex), both ways on a worm and on crossed helical gears (F4); timing marks at the mesh (F9). Pitch cones, the back-cone teeth (Tredgold), lead and lead angle from `src/core/spatial.ts`. |
 | J10 | **Shaft in plan** (a fixed pin on an x or y axis) | Two pillow blocks on the base past either end of what the shaft carries, or both behind it where something sweeps past its far end, far apart (A9): a cast housing on the shaft's axis on a foot plate, two screws down into the base and two dowels (F1, A11). Live: a sealed bearing in each block, located in the nearer by two shaft collars against its inner race, floating in the other (F2, F4); keyed parts as J2 (A5, F3). Dead: the shaft clamped in both blocks by set screws, every part on its own bearing (F2). The base drops under the shaft until its blocks fit (base growth). A hand-turned input takes a handwheel on the free shaft end (V5). |
+| J12 | **Flexible member** (extends J8; declared in `flexible`) | Chain: rollers and inner and outer link plates conveyed round the sprockets by the solved travel (D9); the centre distance for a whole number of links; an idler sprocket on a slotted arm on the slack span takes up the stretch (F7); greased (F8). Rope: its spans stretched between the sheaves (D9); the dead end on a becket with a thimble (F1, F2); the hook on a swivel (F3); a guard over each fixed sheave keeps the rope in its groove (F2). CVT: each sliding sheave half keyed to its shaft (F3) and pressed on the belt by a spring (F6). |
+| J13 | **Compliant joint** (declared in `compliant`) | The neck drawn rigid, its bend and stress zone by the model's `bend` overlay; a hardened stop pin just past each end of the swing so the neck never leaves its elastic range (F5); the blank's ground block clamped to the base under a plate, two screws and two dowels (F1, F2). |
 | J11 | **Screw** (lead or ball; declared in `screws`) | The screw on its shaft in plan (J10: one end located, one floating, F2, F4); its thread drawn by its helix at the lead; the nut a block on the carriage: a flanged bronze nut, or a preloaded ball nut with its ball return and a wiper at each end (F8); the flange screwed to the carriage; anti-rotation from the carriage's slide (J5) or a key in a guide slot (F3). |
 
 ---
@@ -570,6 +575,18 @@ Start here, then run the full ten-function audit.
 - A member that tilts as it turns (the cross, a cage, a swash plate) waits for posed axes; its build follows the
   decision on it.
 
+**Flexible drives** (chain, rope and tackle, CVT, harmonic drive)
+- Declare the member in `flexible` (J12). A chain: sprocket pitch radius p / (2 sin(π/z)); choose the centre distance
+  for a whole number of links (`centresFor` in `src/core/flex.ts`); the travel is the driving sprocket's angle times its
+  pitch radius. A rope: each span a stretched part (`stretch`, outline at unit length) between solved tangent points;
+  the hook on the load block. A flexspline or a belt's wrap that bends: `deform`, the same point count every frame.
+- F7 by the idler or the slotted mount; F8 grease on a chain; F2 guards on fixed sheaves.
+
+**Compliant mechanisms** (flexure hinge, compliant gripper, bistable)
+- Declare each neck in `compliant` (J13): the neck rigid, the lever's swing as its range; the model gives the `bend`
+  overlay of each neck (centre, direction, length, width, angle).
+- F5 stops just past the swing; the blank clamped and dowelled to the base (F1, F2).
+
 **Screws** (lead screw, ball screw, screw jack)
 - Declare the screw in `screws` (J11): the screw on a shaft in plan (J10) with one end located and one floating; the
   thread drawn by its helix at the lead (`src/core/spatial.ts`: lead, lead angle, self-locking).
@@ -603,6 +620,9 @@ default detail level.
 
 ## Changelog
 
+- **2.8 (2026-10-20).** Members that change shape over the cycle: stretched, conveyed and deforming, and the bend
+  overlay for flexures; every existing part keeps its shape [D9, AUTO]. Flexible members (chain, rope, CVT) and compliant
+  joints, declared in the model [A2, J12 to J13, AUTO]. Playbooks for flexible drives and compliant mechanisms.
 - **2.7 (2026-10-20).** Spatial mechanisms. A part may stand out of the plan plane on an x or y axis, with solid forms
   along it (taper, helix); every existing part is on z and meets it unchanged [D8, AUTO]. Joint classification covers
   pins on x or y axes and declared crossed meshes and screws [A1, A2, AUTO]. New joint rows: crossed-axis mesh,

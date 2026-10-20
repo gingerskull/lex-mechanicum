@@ -17,7 +17,7 @@ import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 export const FORMAT = 1;
 
 /** Bits of `PackedSolid.flags`. */
-export const FLAG = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32, axisX: 64, axisY: 128 } as const;
+export const FLAG = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32, axisX: 64, axisY: 128, deform: 256 } as const;
 export type FlagName = keyof typeof FLAG;
 /** The flags read from a solid's own fields of the same name (the axis bits come from `axis`). */
 const FIELD_FLAGS = ["inset", "accent", "faint", "isBase", "headTop", "seeThrough"] as const;
@@ -49,6 +49,8 @@ export interface PackedSolid {
   /** Solid modifiers: far-end scale and helix lead (src/hardware/solid.ts). */
   taper?: number;
   helix?: number;
+  /** A stretched member's two solved points (src/hardware/solid.ts). */
+  stretch?: [string, string];
   /** FLAG bits: inset, accent, faint, isBase, headTop, seeThrough, and the axis (axisX, axisY; neither is z). */
   flags: number;
   /** x, y pairs, body-local mm: the outer outline, then each hole, then each mark. */
@@ -177,6 +179,7 @@ export function pack(a: PackInput, sampled: Sampled): Package {
     for (const f of FIELD_FLAGS) if (s[f]) flags |= FLAG[f];
     if (s.axis === "x") flags |= FLAG.axisX;
     if (s.axis === "y") flags |= FLAG.axisY;
+    if (s.deform) flags |= FLAG.deform;
     const p: PackedSolid = {
       id: s.id,
       name: s.name,
@@ -203,6 +206,7 @@ export function pack(a: PackInput, sampled: Sampled): Package {
     if (s.thread !== undefined && s.threadZ) p.thr = [s.thread, s.threadZ[0], s.threadZ[1]];
     if (s.taper !== undefined) p.taper = s.taper;
     if (s.helix !== undefined) p.helix = s.helix;
+    if (s.stretch) p.stretch = [s.stretch[0], s.stretch[1]];
     return p;
   });
   const traces: Record<string, Float32Array> = {};

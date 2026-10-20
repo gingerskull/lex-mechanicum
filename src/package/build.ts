@@ -3,7 +3,7 @@
 import { planCorners } from "../core/axis";
 import { TAU, xf } from "../core/geom";
 import { assemble, type Assembly, type Polish } from "../assemble";
-import { indexParts, solidBox, solidPose } from "../assemble/pose";
+import { indexParts, shapeAt, solidBox, solidPose } from "../assemble/pose";
 import { parseHeader, readAudit } from "../audit/sheet";
 import { mechanisms } from "../mechanisms";
 import { sample, type Sampled } from "../model/sample";
@@ -24,7 +24,7 @@ export function envelope(model: MechanismModel, a: Assembly, n = 72): { minX: nu
       const q = solidPose(model, parts, t, s, u);
       if (!q) continue;
       // a solid on an x or y axis covers its box's plan footprint
-      for (const [x, y] of t.axis ? planCorners(solidBox(t, q)) : xf(t.outer, q)) {
+      for (const [x, y] of t.axis ? planCorners(solidBox(t, q)) : xf(shapeAt(parts, t, s), q)) {
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
         if (y < minY) minY = y;

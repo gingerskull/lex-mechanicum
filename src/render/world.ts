@@ -3,7 +3,7 @@
 // (src/core/axis.ts) is posed in its own plane; the explode lifts it along the base z like every other solid.
 import { boxOf, toWorld, type Axis, type Vec3 } from "../core/axis";
 import { TAU, offsetPoly, type Pose, type Vec2 } from "../core/geom";
-import { solidPose, type PartIndex } from "../assemble/pose";
+import { shapeAt, solidPose, type PartIndex } from "../assemble/pose";
 import type { MechanismModel, Solved } from "../model/types";
 import { axisOfPacked, ringsOf, hasFlag, type Package, type PackedSolid } from "../package/format";
 import type { MarkKind } from "../style/kinds";
@@ -16,6 +16,8 @@ export interface Prepared {
   mods: boolean;
   /** A helical solid that winds too far to turn its outline (a screw, a worm): its lead, drawn as thread marks. */
   threadLead: number | null;
+  /** A member whose outline changes over the cycle: stretched between two points, or deforming (src/model/types.ts). */
+  dyn: "stretch" | "deform" | null;
   outer: Vec2[];
   holes: Vec2[][];
   marks: { kind: MarkKind; pts: Vec2[] }[];
@@ -92,10 +94,12 @@ export function prepare(pkg: Package): Prepared[] {
       outer,
       holes,
       marks: r.marks.map((m) => ({ kind: m.kind, pts: toVec(m.pts) })),
-      edges: edgeBreak(s, outer, holes),
+      // a member that changes shape draws no edge break: its outline is new each frame
+      edges: s.stretch || hasFlag(s, "deform") ? null : edgeBreak(s, outer, holes),
       axis: axisOfPacked(s),
       mods: s.taper !== undefined || twisted(s),
       threadLead: s.helix !== undefined && !twisted(s) ? s.helix : null,
+      dyn: s.stretch ? "stretch" : hasFlag(s, "deform") ? "deform" : null,
       base: hasFlag(s, "isBase"),
       inset: hasFlag(s, "inset"),
       accent: hasFlag(s, "accent"),
@@ -125,6 +129,8 @@ export interface World {
   bb: [number, number, number, number];
   /** An x or y solid: its extent along its axis, world mm. */
   along?: [number, number];
+  /** A stretched or deforming member: its local outline in this frame (its items are refreshed from it). */
+  local?: Vec2[];
 }
 
 /** The world points of an outline posed in a solid's plane, at `w` along its axis. */
@@ -170,8 +176,11 @@ export function worldSolids(
       out.push({ p, axis: p.axis, pose: lifted, z0: B[2], z1: B[5], thr: p.s.thr ? [p.s.thr[1], p.s.thr[2]] : null, outer, holes: p.holes.map((h) => xf(h, lifted)), c: [c[0], c[1]], bb: [B[0], B[1], B[3], B[4]], along: [p.s.z0, p.s.z1] });
       continue;
     }
-    const outer = xf(p.outer, pose);
+    // a stretched or deforming member takes its outline of this frame
+    const local = p.dyn ? shapeAt(parts, { outer: p.outer, stretch: p.s.stretch, deform: p.dyn === "deform", body: p.s.body }, s) : null;
+    const outer = xf(local ?? p.outer, pose);
     out.push({
+      ...(local ? { local } : {}),
       p,
       pose,
       z0: p.s.z0 + dz,

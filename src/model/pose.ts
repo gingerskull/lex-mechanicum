@@ -21,6 +21,21 @@ export function poseOf(p: Part, s: Solved): Pose | null {
   return null;
 }
 
+/**
+ * A part's outline at a solved phase: its shape, stretched along x to the distance of its two points (`stretch`), or
+ * from `deform(s)`.
+ */
+export function partShape(p: Part, s: Solved): Vec2[] {
+  if (p.deform) return p.deform(s);
+  if (p.stretch && p.between) {
+    const a = s.pts[p.between[0]];
+    const b = s.pts[p.between[1]];
+    const L = a && b ? Math.hypot(b[0] - a[0], b[1] - a[1]) : 1;
+    return p.shape.outer.map(([x, y]): Vec2 => [x * L, y]);
+  }
+  return p.shape.outer;
+}
+
 /** Velocity of a solved point per radian of cycle phase, by central difference. */
 export function velocity(model: MechanismModel, u: number, point: string, du = 1e-3): Vec2 {
   const a = model.solve(u - du).pts[point];

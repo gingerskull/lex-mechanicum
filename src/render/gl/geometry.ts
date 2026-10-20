@@ -21,6 +21,8 @@ export interface SolidItems {
   verts: Range;
   chamfer: Range;
   marks: { kind: MarkKind; closed: boolean; range: Range }[];
+  /** A stretched or deforming solid: its top face's triangle indices, kept to refresh its items each frame. */
+  tri?: number[];
 }
 
 export interface Items {
@@ -30,6 +32,44 @@ export interface Items {
   solids: Map<Prepared, SolidItems>;
   /** Per hole id: first edge item and edge count (for clipping hole walls to the hole). */
   holes: Float32Array;
+}
+
+/**
+ * Rewrites a stretched or deforming solid's items (outline edges, top-face triangles, outline vertices) for its outline
+ * of this frame, in place: the point count never changes, so the item ranges hold. Returns the first and last item
+ * written.
+ */
+export function refreshItems(items: Items, p: Prepared, outer: Vec2[]): [number, number] {
+  const it = items.solids.get(p)!;
+  const D = items.data;
+  const n = outer.length;
+  const put = (i: number, aux0: number, aux1: number, cumA: number, cumB: number, a: Vec2, b: Vec2, c: Vec2 = [0, 0]) => {
+    const o = i * ITEM_TEXELS * 4;
+    D[o] = aux0;
+    D[o + 1] = aux1;
+    D[o + 2] = cumA;
+    D[o + 3] = cumB;
+    D[o + 4] = a[0];
+    D[o + 5] = a[1];
+    D[o + 6] = b[0];
+    D[o + 7] = b[1];
+    D[o + 8] = c[0];
+    D[o + 9] = c[1];
+  };
+  const s = area(outer) > 0 ? 1 : -1;
+  let cum = 0;
+  for (let i = 0; i < n; i++) {
+    const a = outer[i]!;
+    const b = outer[(i + 1) % n]!;
+    const L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    put(it.outer[0] + i, s, -1, cum, cum + L, a, b);
+    cum += L;
+  }
+  const pts = [...outer, ...p.holes.flat()];
+  const tri = it.tri ?? [];
+  for (let k = 0; k < tri.length; k += 3) put(it.tris[0] + k / 3, 0, 0, 0, 0, pts[tri[k]!]!, pts[tri[k + 1]!]!, pts[tri[k + 2]!]!);
+  for (let i = 0; i < n; i++) put(it.verts[0] + i, s, 0, 0, 0, outer[(i - 1 + n) % n]!, outer[i]!, outer[(i + 1) % n]!);
+  return [it.outer[0], it.verts[0] + it.verts[1] - 1];
 }
 
 export function buildItems(prepared: Prepared[]): Items {
@@ -92,7 +132,7 @@ export function buildItems(prepared: Prepared[]): Items {
       ring(m.pts, -1, closed);
       marks.push({ kind: m.kind, closed, range: [m0, n - m0] });
     }
-    solids.set(p, { outer, holes: holesR, tris, verts, chamfer, marks });
+    solids.set(p, { outer, holes: holesR, tris, verts, chamfer, marks, ...(p.dyn ? { tri: Array.from(tri) } : {}) });
   }
   return { data: new Float32Array(out), count: n, solids, holes: new Float32Array(holes) };
 }
