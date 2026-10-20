@@ -2,7 +2,7 @@
 // boss, flush pivot caps, square-ended sliders on twin stadium rails, stadium slots, involute gears with a D-bore,
 // discs, custom outlines and the tracer.
 import { capsule, circle, dBore, gearOutline, ring, roundRect, roundedPoly, slot, taper, D2R, xfPose } from "../core/geom";
-import type { Part, Pose, Role, Shape, Solved, Vec2 } from "../model/types";
+import type { Axis, Part, Pose, Role, Shape, Solved, Vec2 } from "../model/types";
 
 /** Layer pitch and default plate thickness, mm. */
 export const LAYER = 10;
@@ -20,6 +20,9 @@ export interface Place {
   off?: number;
   spin?(s: Solved): number;
   name?: string;
+  /** The part's axis (src/core/axis.ts) and, for x or y, where it starts along it. */
+  axis?: Axis;
+  along?: number;
 }
 
 export interface PartOpts extends Place {
@@ -42,6 +45,8 @@ const place = (o: Place): Place => {
   if (o.off !== undefined) c.off = o.off;
   if (o.spin !== undefined) c.spin = o.spin;
   if (o.name !== undefined) c.name = o.name;
+  if (o.axis !== undefined && o.axis !== "z") c.axis = o.axis;
+  if (o.along !== undefined) c.along = o.along;
   return c;
 };
 
@@ -174,8 +179,13 @@ export const P = {
 /** z of a part's layer on the grid, before plating: its explode level. */
 export const layerZ = (p: Part): number => p.layer * LAYER;
 
-/** z range of a part, mm, plating included. A pin runs from its layer through `span` layers plus its cap and overhang. */
+/** z range of a part (its range along its axis), mm, plating included. A pin runs from its layer through `span` layers plus its cap and overhang. */
 export function heights(p: Part): [number, number] {
+  // a part on an x or y axis: its extent along that axis, from `along`
+  if (p.axis === "x" || p.axis === "y") {
+    const w0 = (p.along ?? 0) + (p.dz ?? 0);
+    return [w0, p.role === "pin" ? w0 + (p.span ?? 1) * LAYER + (p.th ?? THICK) + (p.over ?? 0.8) : w0 + p.thick];
+  }
   const z0 = p.layer * LAYER + (p.dz ?? 0);
   if (p.role === "pin") return [z0, (p.layer + (p.span ?? 1)) * LAYER + (p.th ?? THICK) + (p.over ?? 0.8)];
   return [z0, z0 + p.thick];

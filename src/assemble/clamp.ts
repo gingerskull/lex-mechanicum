@@ -1,14 +1,26 @@
 // A12: a rotating stack never touches a ground face, so tightening never squeezes a moving part. Contact through a
-// bearing's inner race is allowed, and a thrust washer is the designed sliding face (F4). M6: hole walls.
+// bearing's inner race is allowed, and a thrust washer is the designed sliding face (F4). Solids on different axes
+// (src/core/axis.ts) touch when their world boxes share a face over an area. M6: hole walls.
 import { TAU, bbox, xf } from "../core/geom";
+import type { Box3 } from "../core/axis";
 import { edgeDist, overlap, region } from "../core/poly";
 import type { Solid } from "../hardware/solid";
 import type { MechanismModel } from "../model/types";
 import type { Assembly } from "./index";
-import { indexParts, isGround, solidPose } from "./pose";
+import { indexParts, isGround, solidBox, solidPose } from "./pose";
 
 const maxR = (t: Solid, cx: number, cy: number, q: [number, number, number]) =>
   Math.max(...xf(t.outer, q).map(([x, y]) => Math.hypot(x - cx, y - cy)));
+
+/** Two boxes meet face to face: one direction where a face of one lies on a face of the other, overlap in the other two. */
+function boxesTouch(a: Box3, b: Box3): boolean {
+  for (let k = 0; k < 3; k++) {
+    if (Math.abs(a[k + 3]! - b[k]!) > 0.05 && Math.abs(b[k + 3]! - a[k]!) > 0.05) continue;
+    const o = [0, 1, 2].filter((j) => j !== k).map((j) => Math.min(a[j + 3]!, b[j + 3]!) - Math.max(a[j]!, b[j]!));
+    if (o.every((v) => v > 0.05)) return true;
+  }
+  return false;
+}
 
 export function clampCheck(model: MechanismModel, assembly: Assembly, n = 12): string[] {
   const parts = indexParts(model);
@@ -23,9 +35,13 @@ export function clampCheck(model: MechanismModel, assembly: Assembly, n = 12): s
       if (!moving(r) || r.kind === "thrustWasher") continue;
       for (const g of S) {
         if (moving(g) || g.kind === "thrustWasher") continue;
-        if (Math.abs(r.z1 - g.z0) > 0.05 && Math.abs(g.z1 - r.z0) > 0.05) continue;
         const qr = pose.get(r);
         const qg = pose.get(g);
+        if (r.axis !== g.axis) {
+          if (qr && qg && boxesTouch(solidBox(r, qr), solidBox(g, qg))) out.add(`${r.id} (turning) touches the ground face of ${g.id}`);
+          continue;
+        }
+        if (Math.abs(r.z1 - g.z0) > 0.05 && Math.abs(g.z1 - r.z0) > 0.05) continue;
         if (!qr || !qg) continue;
         const ra = region(xf(r.outer, qr), r.holes.map((h) => xf(h, qr)));
         const rb = region(xf(g.outer, qg), g.holes.map((h) => xf(h, qg)));

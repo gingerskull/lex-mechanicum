@@ -1,8 +1,11 @@
 // The rigid explode pass (standard 5a). Every solid ends with one level (E1). A screw is one body with its washer and
 // leaves along its axis to the head side, half a level clear of the last part it passes (E2, E3); a nut goes the
 // other way. Pressed parts were given their seat's level by the rules (E5); bought units are groups (E6); loose
-// spacers sit midway between what they separate (E7); a shaft keeps its builder's level (E8).
+// spacers sit midway between what they separate (E7); a shaft keeps its builder's level (E8). Levels lift along the
+// base z for every axis: a shaft in plan (axis x or y) and everything on it rise as a whole, and a fastener whose axis
+// is x or y stays with its level like a bought unit.
 import { inside, toLocal } from "../core/poly";
+import { solidBox } from "../assemble/pose";
 import type { Solid } from "../hardware/solid";
 import { rigid } from "./fasteners";
 import type { RuleContext } from "./types";
@@ -31,7 +34,7 @@ export function rigidExplode(ctx: RuleContext): void {
 
   for (const [g, members] of groups) {
     const head = members.find((t) => t.kind === "head");
-    if (!head) {
+    if (!head || head.axis) {
       // a bought unit or a shaft: one level, the first member's
       const L = members.reduce((m, t) => Math.min(m, lvl(t)), Infinity);
       for (const t of members) set(t, Number.isFinite(L) ? L : 0);
@@ -41,20 +44,24 @@ export function rigidExplode(ctx: RuleContext): void {
     const z1 = Math.max(...members.map((t) => t.z1));
     const up = head.z0 + head.z1 > z0 + z1;
     const P = axisOf(head);
-    const passed = P
-      ? S.filter((t) => t.group !== g && !["head", "shank", "nut", "washer"].includes(t.kind) && Math.min(t.z1, z1) - Math.max(t.z0, z0) > 0.3 && (() => {
-          const q = ctx.world(t);
-          return !!q && inside(t.outer, toLocal(q, P));
-        })())
-      : [];
+    // what the screw passes: a z solid whose outline holds the axis over the shank's z range, or an x or y solid whose
+    // world box does
+    const passes = (t: Solid) => {
+      const q = ctx.world(t);
+      if (!q || !P) return false;
+      if (!t.axis) return Math.min(t.z1, z1) - Math.max(t.z0, z0) > 0.3 && inside(t.outer, toLocal(q, P));
+      const b = solidBox(t, q);
+      return Math.min(b[5], z1) - Math.max(b[2], z0) > 0.3 && P[0] > b[0] && P[0] < b[3] && P[1] > b[1] && P[1] < b[4];
+    };
+    const passed = P ? S.filter((t) => t.group !== g && !["head", "shank", "nut", "washer"].includes(t.kind) && passes(t)) : [];
     const levels = passed.map((t) => (t.span ? (up ? Math.max(...t.span) : Math.min(...t.span)) : t.ex));
     const L = up ? Math.max(head.ex, ...levels.map((v) => v + clear)) : Math.min(head.ex, ...levels.map((v) => v - clear));
     for (const t of members) set(t, L);
     // the washer under the head goes with it
-    for (const t of S) if (!done.has(t) && t.kind === "washer" && sameAxis(t, head) && rigid(ctx, t, head) && Math.min(Math.abs(t.z1 - head.z0), Math.abs(t.z0 - head.z1)) < 0.3) set(t, L);
+    for (const t of S) if (!done.has(t) && !t.axis && t.kind === "washer" && sameAxis(t, head) && rigid(ctx, t, head) && Math.min(Math.abs(t.z1 - head.z0), Math.abs(t.z0 - head.z1)) < 0.3) set(t, L);
     // a nut on the far end leaves the other way
     for (const n of S) {
-      if (done.has(n) || n.kind !== "nut" || !sameAxis(n, head) || !rigid(ctx, n, head)) continue;
+      if (done.has(n) || n.axis || n.kind !== "nut" || !sameAxis(n, head) || !rigid(ctx, n, head)) continue;
       if (Math.min(n.z1, z1) - Math.max(n.z0, z0) < -0.3) continue;
       const nl = up ? Math.min(n.ex, ...levels.map((v) => v - 2 * clear)) : Math.max(n.ex, ...levels.map((v) => v + 2 * clear));
       for (const t of n.group ? (groups.get(n.group) ?? [n]) : [n]) set(t, nl);

@@ -1,6 +1,7 @@
 // World pose of a solid at a solved phase: its body's pose composed with its local pose, or the solid's own motion
 // (belt-driven pulleys, the oscillating drive's crank and link). Shared by assembly, checks, packaging and renderer.
-import { xfPose, type Pose, type Vec2 } from "../core/geom";
+import { boxOf, type Box3 } from "../core/axis";
+import { xf, xfPose, type Pose, type Vec2 } from "../core/geom";
 import { circleX } from "../core/vec";
 import type { Solid } from "../hardware/solid";
 import { poseOf } from "../model/pose";
@@ -45,3 +46,6 @@ export function solidPose(model: MechanismModel, parts: PartIndex, t: Pick<Solid
     m.type === "crank" ? [m.motor[0], m.motor[1], Math.atan2(C[1] - m.motor[1], C[0] - m.motor[0])] : [C[0], C[1], Math.atan2(T[1] - C[1], T[0] - C[0])];
   return xfPose(P, t.at);
 }
+
+/** The world box of a solid at a pose (its outline posed in its plane, over its extent along its axis). */
+export const solidBox = (t: Pick<Solid, "axis" | "outer" | "z0" | "z1">, q: Pose): Box3 => boxOf(t.axis, xf(t.outer, q), t.z0, t.z1);

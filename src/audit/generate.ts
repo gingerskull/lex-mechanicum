@@ -128,7 +128,7 @@ function evidence(inp: AuditInput, reqs: Requirement[]): Record<string, Row> {
     set("K2", f.length ? `check: ${fmt(f)}` : `check: finite, continuous, periodic over ${inp.check.n} samples`, f.length ? "FAIL" : "PASS");
   }
   {
-    const f = findings(["INTERFERE", "OVERLAP", "WARN"]);
+    const f = findings(["INTERFERE", "OVERLAP", "WARN", "AXIS"]);
     set("K5", f.length ? `check: ${fmt(f)}` : "check: no INTERFERE, OVERLAP or WARN");
   }
   set("K7", `input ${inp.model.input.kind} on ${inp.model.input.part}`);

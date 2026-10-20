@@ -1,13 +1,14 @@
 // Builds the rule context from a model: the model parts as solids, the base plane, the explode levels, the sweeps.
+import { boxOf, isOut, planCorners } from "../core/axis";
 import { TAU, xf, type Vec2 } from "../core/geom";
 import { circleClearance, region, type Region } from "../core/poly";
-import { marks, solid, type Solid } from "../hardware/solid";
+import { marks, onAxis, solid, type Solid } from "../hardware/solid";
 import { heights, layerZ } from "../parts";
 import { poseOf } from "../model/pose";
 import { sample, type Sampled } from "../model/sample";
 import type { MechanismModel, Part } from "../model/types";
 import { FORM } from "../style/form";
-import { indexParts, isGround, solidPose } from "../assemble/pose";
+import { indexParts, isGround, solidBox, solidPose } from "../assemble/pose";
 import type { RuleContext } from "./types";
 
 /** Phase at which the build is laid out: away from the singular positions of u = 0. */
@@ -36,6 +37,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       kind: "part",
       role: p.role,
       body: p.id,
+      ...onAxis(p),
       z0,
       z1,
       outer: p.shape.outer.slice(),
@@ -48,20 +50,31 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
   }
 
   let sweepCache: ReturnType<RuleContext["sweeps"]> | null = null;
-  const solidCache = new Map<Solid, { n: number; regions: Region[] }>();
-  const sweptSolid = (t: Solid): Region[] => {
+  // a solid on an x or y axis is seen by these plan tests as its box: the plan footprint over the box's z range
+  const solidCache = new Map<Solid, { n: number; regions: Region[]; z: [number, number] }>();
+  const sweptOf = (t: Solid) => {
     const c = solidCache.get(t);
-    if (c && c.n === t.outer.length + t.holes.length) return c.regions;
+    if (c && c.n === t.outer.length + t.holes.length) return c;
     const steps = isGround(parts, t.body) && !t.motion ? 1 : SOLID_STEPS;
     const regions: Region[] = [];
+    const z: [number, number] = t.axis ? [Infinity, -Infinity] : [t.z0, t.z1];
     for (let i = 0; i < steps; i++) {
       const u = steps === 1 ? U0 : (i / steps) * TAU;
       const pose = solidPose(model, parts, t, steps === 1 ? s0 : model.solve(u), u);
-      if (pose) regions.push(region(xf(t.outer, pose), t.holes.map((h) => xf(h, pose))));
+      if (!pose) continue;
+      if (t.axis) {
+        const b = solidBox(t, pose);
+        regions.push(region(planCorners(b), []));
+        z[0] = Math.min(z[0], b[2]);
+        z[1] = Math.max(z[1], b[5]);
+      } else regions.push(region(xf(t.outer, pose), t.holes.map((h) => xf(h, pose))));
     }
-    solidCache.set(t, { n: t.outer.length + t.holes.length, regions });
-    return regions;
+    const out = { n: t.outer.length + t.holes.length, regions, z };
+    solidCache.set(t, out);
+    return out;
   };
+  const sweptSolid = (t: Solid): Region[] => sweptOf(t).regions;
+  const zOf = (t: Solid): [number, number] => (t.axis ? sweptOf(t).z : [t.z0, t.z1]);
 
   const ctx: RuleContext = {
     model,
@@ -104,11 +117,21 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       sweepCache = model.parts
         .filter((p) => p.role !== "pin" && !p.fixed)
         .map((part: Part) => {
-          const [z0, z1] = heights(part);
+          let [z0, z1] = heights(part);
           const regions: Region[] = [];
+          // a part on an x or y axis sweeps its box: the plan footprint, over the box's z range
+          const out = isOut(part.axis);
+          const [w0, w1] = [z0, z1];
+          if (out) [z0, z1] = [Infinity, -Infinity];
           for (let i = 0; i < SWEEP_STEPS; i++) {
             const pose = poseOf(part, model.solve((i / SWEEP_STEPS) * TAU));
-            if (pose) regions.push(region(xf(part.shape.outer, pose), part.shape.holes.map((h) => xf(h, pose))));
+            if (!pose) continue;
+            if (out) {
+              const b = boxOf(part.axis, xf(part.shape.outer, pose), w0, w1);
+              regions.push(region(planCorners(b), []));
+              z0 = Math.min(z0, b[2]);
+              z1 = Math.max(z1, b[5]);
+            } else regions.push(region(xf(part.shape.outer, pose), part.shape.holes.map((h) => xf(h, pose))));
           }
           return { part, z0, z1, regions };
         });
@@ -123,7 +146,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
       }
       for (const t of solids) {
         // moving model parts are covered by their sweeps above
-        if ((solidOf[t.id] === t && !isGround(parts, t.body)) || !zHit(t.z0, t.z1) || ignore?.(t)) continue;
+        if ((solidOf[t.id] === t && !isGround(parts, t.body)) || !zHit(...zOf(t)) || ignore?.(t)) continue;
         for (const g of sweptSolid(t)) m = Math.min(m, circleClearance(c, r, g));
       }
       return m;
@@ -137,7 +160,7 @@ export function createContext(model: MechanismModel, sampled: Sampled = sample(m
         for (const g of sw.regions) if (near(g) && circleClearance(c, r, g) < 0) return true;
       }
       for (const t of solids) {
-        if ((solidOf[t.id] === t && !isGround(parts, t.body)) || !zHit(t.z0, t.z1) || ignore?.(t)) continue;
+        if ((solidOf[t.id] === t && !isGround(parts, t.body)) || !zHit(...zOf(t)) || ignore?.(t)) continue;
         for (const g of sweptSolid(t)) if (near(g) && circleClearance(c, r, g) < 0) return true;
       }
       return false;

@@ -17,8 +17,10 @@ import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 export const FORMAT = 1;
 
 /** Bits of `PackedSolid.flags`. */
-export const FLAG = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32 } as const;
+export const FLAG = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32, axisX: 64, axisY: 128 } as const;
 export type FlagName = keyof typeof FLAG;
+/** The flags read from a solid's own fields of the same name (the axis bits come from `axis`). */
+const FIELD_FLAGS = ["inset", "accent", "faint", "isBase", "headTop", "seeThrough"] as const;
 
 export interface PackedSolid {
   id: string;
@@ -44,7 +46,7 @@ export interface PackedSolid {
   chamfer?: number;
   /** Thread: nominal M size and the z range of the drawn thread. */
   thr?: [number, number, number];
-  /** FLAG bits: inset, accent, faint, isBase, headTop, seeThrough. */
+  /** FLAG bits: inset, accent, faint, isBase, headTop, seeThrough, and the axis (axisX, axisY; neither is z). */
   flags: number;
   /** x, y pairs, body-local mm: the outer outline, then each hole, then each mark. */
   pts: Float32Array;
@@ -61,7 +63,7 @@ export interface PackageBounds {
   minY: number;
   maxX: number;
   maxY: number;
-  /** z range of all solids, assembled. */
+  /** z range of all solids, assembled (an x or y solid's world z over the cycle). */
   z0: number;
   z1: number;
 }
@@ -104,6 +106,9 @@ export function ringsOf(s: PackedSolid): { outer: Float32Array; holes: Float32Ar
 
 export const hasFlag = (s: PackedSolid, f: FlagName): boolean => (s.flags & FLAG[f]) !== 0;
 
+/** The axis of a packed solid: "z" unless an axis flag is set. */
+export const axisOfPacked = (s: PackedSolid): "z" | "x" | "y" => (hasFlag(s, "axisX") ? "x" : hasFlag(s, "axisY") ? "y" : "z");
+
 const INT16 = 32767;
 /** Finest grid: 1/256 mm. A larger mechanism gets a coarser grid so its farthest point still fits in int16. */
 const MAX_GRID = 256;
@@ -132,6 +137,8 @@ export interface PackInput {
   b1: number;
   /** The 2D envelope of the drawing; the packager computes it from the solids' sweeps. */
   envelope: { minX: number; minY: number; maxX: number; maxY: number };
+  /** World z range swept by the solids on an x or y axis, when there are any. */
+  zOut?: [number, number] | null;
 }
 
 /** Reduces an assembly to its package. Coordinates are snapped to the package grid. */
@@ -153,11 +160,20 @@ export function pack(a: PackInput, sampled: Sampled): Package {
 
   let z0 = Infinity;
   let z1 = -Infinity;
+  if (a.zOut) {
+    z0 = a.zOut[0];
+    z1 = a.zOut[1];
+  }
   const solids = a.solids.map((s, i): PackedSolid => {
-    z0 = Math.min(z0, s.z0);
-    z1 = Math.max(z1, s.z1);
+    // an x or y solid's z0..z1 run along its axis; its world z is in zOut
+    if (!s.axis) {
+      z0 = Math.min(z0, s.z0);
+      z1 = Math.max(z1, s.z1);
+    }
     let flags = 0;
-    for (const f of Object.keys(FLAG) as FlagName[]) if (s[f]) flags |= FLAG[f];
+    for (const f of FIELD_FLAGS) if (s[f]) flags |= FLAG[f];
+    if (s.axis === "x") flags |= FLAG.axisX;
+    if (s.axis === "y") flags |= FLAG.axisY;
     const p: PackedSolid = {
       id: s.id,
       name: s.name,
