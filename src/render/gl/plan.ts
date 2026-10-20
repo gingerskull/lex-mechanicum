@@ -324,7 +324,8 @@ export function planFrame(f: PlanInput): FramePlan {
     }
     // 4. silhouettes down the walls, where the walls turn away and at the outline's far left and right; on inner
     // slices only while DL-C is drawn
-    if (Sl.isTop || LD.effect("innerSilhouettes")) {
+    // an x or posed solid is seen by its walls only: its silhouettes are its outline, kept on every slice
+    if (Sl.isTop || LD.effect("innerSilhouettes") || ax === "x" || ax === "p") {
       cl.push(it.verts, si, MODE.silhouette, op, [L.silhouette, L.silhouetteAlpha]);
       const pairs: [Vec2, Vec2][] = extreme(w).map((i) => {
         if (p.mods) return [P3(pointAt(poseAt(p, w.pose, top), p.outer[i]!), top), P3(pointAt(poseAt(p, w.pose, z0), p.outer[i]!), z0)];
