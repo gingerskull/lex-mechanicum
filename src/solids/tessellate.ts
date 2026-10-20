@@ -116,7 +116,9 @@ function extrudeLayers(p: Profile, op: Extrude): Layers {
         pts[o++] = op.h * t;
       }
   }
-  return { rings: rings.map((r) => r.length), K, closed: false, pts, start: flat2(rings), end: flat2(rings) };
+  // one array for both caps, so the layered mesh triangulates the cap once and reuses it
+  const xy = flat2(rings);
+  return { rings: rings.map((r) => r.length), K, closed: false, pts, start: xy, end: xy };
 }
 
 /** The rotation-minimising frames (x, y, tangent) at each path point, seeded so profile y lies toward world z. */
@@ -184,7 +186,8 @@ function sweepLayers(p: Profile, op: Sweep): Layers {
         pts[o++] = q[2] + x[2] * uu + y[2] * vv;
       }
   }
-  return { rings: rings.map((r) => r.length), K: m, closed, pts, start: closed ? [] : flat2(rings), end: closed ? [] : flat2(rings) };
+  const xy = closed ? [] : flat2(rings);
+  return { rings: rings.map((r) => r.length), K: m, closed, pts, start: xy, end: xy };
 }
 
 function loftLayers(op: Loft): Layers {
@@ -218,8 +221,20 @@ const layersOf = (p: Profile, op: Op): Layers => {
   throw new Error("revolve has no layers");
 };
 
+/** Milliseconds spent triangulating caps since the last reset: the bench splits tessellation with it. */
+export const capTime = { ms: 0 };
+
 /** Triangles of a flat cap given its flat ring coordinates, as indices into the cap's points; counter-clockwise in xy. */
 function capTriangles(xy: number[], rings: number[]): number[] {
+  const t0 = performance.now();
+  try {
+    return capTrianglesRaw(xy, rings);
+  } finally {
+    capTime.ms += performance.now() - t0;
+  }
+}
+
+function capTrianglesRaw(xy: number[], rings: number[]): number[] {
   const holes: number[] = [];
   let o = 0;
   for (let i = 0; i < rings.length - 1; i++) holes.push((o += rings[i]!));
@@ -238,12 +253,12 @@ function capTriangles(xy: number[], rings: number[]): number[] {
   return tri;
 }
 
-function layeredMesh(L: Layers): MeshData {
+function layeredMesh(L: Layers, cap?: ArrayLike<number>): MeshData {
   const N = L.rings.reduce((a, b) => a + b, 0);
   const wallLayers = L.closed ? L.K : L.K - 1;
   const nWall = wallLayers * N * 2;
-  const startTri = L.closed ? [] : capTriangles(L.start, L.rings);
-  const endTri = L.closed ? [] : L.end === L.start ? startTri : capTriangles(L.end, L.rings);
+  const startTri: ArrayLike<number> = L.closed ? [] : cap ?? capTriangles(L.start, L.rings);
+  const endTri: ArrayLike<number> = L.closed ? [] : cap || L.end === L.start ? startTri : capTriangles(L.end, L.rings);
   const tri = new Uint32Array((nWall + (startTri.length + endTri.length) / 3) * 3);
   const tag = new Uint8Array(tri.length / 3);
   let o = 0;
@@ -355,10 +370,21 @@ function revolveMesh(p: Profile, op: Extract<Op, { op: "revolve" }>): MeshData {
 }
 
 /** The mesh of a profile under an operation (extrude, revolve, sweep or loft). */
-export function tessellate(profile: Profile, op: Op): MeshData {
+export function tessellate(profile: Profile, op: Op, cap?: ArrayLike<number>): MeshData {
   if (op.op === "revolve") return revolveMesh(orient(profile), op);
   if (op.op === "loft") return layeredMesh(layersOf(profile, op));
-  return layeredMesh(layersOf(orient(profile), op));
+  return layeredMesh(layersOf(orient(profile), op), cap);
+}
+
+/**
+ * The triangulation of an extrusion's or an open sweep's cap, as indices into its rings (outer, then holes) counter-
+ * clockwise: what a package ships so the browser need not triangulate (a phone spends most of its tessellation there).
+ * The profile must already be `orient`ed. Null for the other operations, whose ends differ.
+ */
+export function capOf(profile: Profile, op: Op): Uint32Array | null {
+  if (op.op !== "extrude" && !(op.op === "sweep" && !op.closed)) return null;
+  const rings = [profile.outer, ...profile.holes];
+  return Uint32Array.from(capTriangles(flat2(rings), rings.map((r) => r.length)));
 }
 
 /**

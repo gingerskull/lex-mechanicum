@@ -44,7 +44,7 @@ interface Row {
   shapes: number;
   triangles: number;
   edges: number;
-  setup: { decode: number; tessellate: number; edges: number; gpu: number; total: number };
+  setup: { decode: number; tessellate: number; caps: number; edges: number; gpu: number; total: number };
   worker?: { wall: number };
   views: Record<string, Timing>;
   dial: Record<string, Timing>;
@@ -68,7 +68,9 @@ interface Hosts {
 const med = (v: number[]) => [...v].sort((a, b) => a - b)[Math.floor(v.length / 2)] ?? 0;
 const r2 = (x: number) => Math.round(x * 100) / 100;
 const frame = () => new Promise<number>((r) => requestAnimationFrame(r));
-const bytes = async (url: string) => new Uint8Array(await (await fetch(url)).arrayBuffer());
+/** The page's build stamp: scripts and packages are fetched with it so a phone never reuses an older build. */
+const stamp = () => document.body.dataset.v ?? "";
+const bytes = async (url: string) => new Uint8Array(await (await fetch(`${url}?v=${stamp()}`)).arrayBuffer());
 
 const VIEWS: [string, { tilt: number; explode: number }][] = [["plan", { tilt: 0, explode: 0 }], ["28", { tilt: 28, explode: 0 }], ["side", { tilt: 88, explode: 0 }], ["explode", { tilt: 70, explode: 1 }]];
 
@@ -150,9 +152,9 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     stand.draw(1, { tilt: 28, explode: 0, detail: "full" });
     stand.finish();
     const gpu = performance.now() - g0;
-    setups.push({ decode: s.ms.decode, tessellate: s.ms.tessellate, edges: s.ms.edges, gpu, total: s.ms.decode + s.ms.tessellate + s.ms.edges + gpu });
+    setups.push({ decode: s.ms.decode, tessellate: s.ms.tessellate, caps: s.ms.caps, edges: s.ms.edges, gpu, total: s.ms.decode + s.ms.tessellate + s.ms.edges + gpu });
     if (o.worker && typeof Worker !== "undefined") {
-      const w = new Worker("setup-worker.js", { type: "module" });
+      const w = new Worker(`setup-worker.js?v=${stamp()}`, { type: "module" });
       workers.push((await setupInWorker(w, blob2)).wall);
       w.terminate();
     }
@@ -173,7 +175,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     shapes: counts.shapes,
     triangles: counts.triangles,
     edges: counts.edges,
-    setup: { decode: field("decode"), tessellate: field("tessellate"), edges: field("edges"), gpu: field("gpu"), total: field("total") },
+    setup: { decode: field("decode"), tessellate: field("tessellate"), caps: field("caps"), edges: field("edges"), gpu: field("gpu"), total: field("total") },
     views: pick(views),
     dial: pick(dial),
     draws: counts.draws,
@@ -186,7 +188,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
 
 async function todays(id: string, o: Opts, host: HTMLElement, log: (s: string) => void): Promise<NonNullable<Row["today"]>> {
   log(`${id}: today's renderer`);
-  const [m, pkg] = await Promise.all([models[id]!(), loadPackage(`packages/${id}.mxp`)]);
+  const [m, pkg] = await Promise.all([models[id]!(), loadPackage(`packages/${id}.mxp?v=${stamp()}`)]);
   const setup: number[] = [];
   const views: Record<string, number[]> = {};
   const cpus: Record<string, number[]> = {};
@@ -218,8 +220,8 @@ export function markdown(r: Report): string {
   const d = r.device;
   L.push(`## Bench, package v2`, ``, `${String(d.userAgent)}`, `GPU ${String(d.gpu)}, ${String(d.cores)} cores, ${String(d.memoryGB)} GB, screen ${String(d.screen)}, DPR ${String(d.dpr)}`, `Stage ${r.opts.w} x ${r.opts.h} CSS px at DPR ${r.opts.dpr}; ${r.opts.runs} runs, ${r.opts.frames} frames per view; medians. v2 frames are drawn by the stand-in renderer (a floor).`, ``);
   L.push(`Setup, ms. GPU is buffers, sizing and the first frame on the page's shared context; the context and both shader programs were made once, in ${r.contextMs} ms.`, ``);
-  L.push(`Setup, ms (decode / tessellate / edges / GPU / total):`, ``, `| Mechanism | v1 KB | v2 KB | solids | shapes | triangles | edges | decode | tessellate | edges | GPU | total | worker wall |`, `|---|---|---|---|---|---|---|---|---|---|---|---|---|`);
-  for (const x of r.rows) L.push(`| ${x.id} | ${x.kb.v1} | ${x.kb.v2} | ${x.solids} | ${x.shapes} | ${x.triangles} | ${x.edges} | ${x.setup.decode} | ${x.setup.tessellate} | ${x.setup.edges} | ${x.setup.gpu} | ${x.setup.total} | ${x.worker?.wall ?? ""} |`);
+  L.push(`Setup, ms (decode / tessellate / edges / GPU / total):`, ``, `| Mechanism | v1 KB | v2 KB | solids | shapes | triangles | edges | decode | tessellate (caps) | edges | GPU | total | worker wall | via worker (wall + GPU) |`, `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`);
+  for (const x of r.rows) L.push(`| ${x.id} | ${x.kb.v1} | ${x.kb.v2} | ${x.solids} | ${x.shapes} | ${x.triangles} | ${x.edges} | ${x.setup.decode} | ${x.setup.tessellate} (${x.setup.caps}) | ${x.setup.edges} | ${x.setup.gpu} | ${x.setup.total} | ${x.worker?.wall ?? ""} | ${x.worker ? r2(x.worker.wall + x.setup.gpu) : ""} |`);
   const vs = VIEWS.map(([k]) => k);
   L.push(``, `Frames per view, ms (paced / gpu wait / script):`, ``, `| Mechanism | ${vs.join(" | ")} |`, `|---|${vs.map(() => "---").join("|")}|`);
   for (const x of r.rows) L.push(`| ${x.id} | ${vs.map((k) => `${x.views[k]?.paced} / ${x.views[k]?.gpu} / ${x.views[k]?.cpu}`).join(" | ")} |`);

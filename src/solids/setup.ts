@@ -13,7 +13,7 @@ export interface Setup {
   meshes: MeshData[];
   edges: EdgeSet[];
   /** Milliseconds per stage, measured where the stage ran. */
-  ms: { decode: number; tessellate: number; edges: number };
+  ms: { decode: number; tessellate: number; edges: number; caps: number };
 }
 
 /** Decodes a blob and prepares every shape on this thread. */
@@ -22,7 +22,7 @@ export async function setupInline(blob: Uint8Array): Promise<Setup> {
   const pkg = await decode2(blob);
   const t1 = performance.now();
   const p = prepareShapes(pkg.shapes);
-  return { pkg, meshes: p.meshes, edges: p.edges, ms: { decode: t1 - t0, tessellate: p.ms.tessellate, edges: p.ms.edges } };
+  return { pkg, meshes: p.meshes, edges: p.edges, ms: { decode: t1 - t0, tessellate: p.ms.tessellate, edges: p.ms.edges, caps: p.ms.caps } };
 }
 
 /** Everything the worker sends back, and the buffers to transfer. */

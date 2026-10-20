@@ -40,6 +40,7 @@ const same = (a: Package2, b: Package2) => {
     expect(t.op).toEqual(s.op);
     expect(t.profile).toEqual(s.profile);
     expect(t.marks).toEqual(s.marks);
+    expect(Array.from(t.cap ?? [])).toEqual(Array.from(s.cap ?? []));
     if (s.mesh) {
       expect(Array.from(t.mesh!.pos)).toEqual(Array.from(s.mesh.pos));
       expect(Array.from(t.mesh!.tri)).toEqual(Array.from(s.mesh.tri));

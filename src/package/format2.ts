@@ -30,6 +30,8 @@ export interface Shape2 {
   /** Marks on the top face, in profile coordinates. */
   marks?: { kind: MarkKind; pts: Vec2[] }[];
   op?: Op;
+  /** Triangulation of the cap of an extrusion or open sweep: indices into the profile's rings (outer, then holes). */
+  cap?: Uint32Array;
   mesh?: MeshData;
 }
 
@@ -96,6 +98,8 @@ interface HeaderShape {
   outer?: number;
   holes?: number[];
   marks?: { kind: MarkKind; n: number }[];
+  /** Number of cap indices. */
+  nc?: number;
   nv?: number;
   nt?: number;
 }
@@ -121,6 +125,7 @@ function headerOf(s: Shape2): HeaderShape {
     outer: s.profile!.outer.length,
     holes: s.profile!.holes.map((h) => h.length),
     marks: (s.marks ?? []).map((m) => ({ kind: m.kind, n: m.pts.length })),
+    ...(s.cap ? { nc: s.cap.length } : {}),
   };
 }
 
@@ -132,20 +137,25 @@ function encodeBody(p: Package2): Uint8Array {
   const hLen = pad4(json.length);
   const profileRings = shapes.flatMap(ringsOfShape);
   const nGeom = profileRings.reduce((n, r) => n + 2 * r.length, 0) + Object.values(traces).reduce((n, t) => n + t.length, 0);
+  const caps = shapes.filter((s) => s.cap).map((s) => s.cap!);
+  const nCap = caps.reduce((n, c) => n + c.length, 0);
   const meshes = shapes.filter((s) => s.mesh).map((s) => s.mesh!);
   const nPos = meshes.reduce((n, m) => n + m.pos.length, 0);
   const nIdx = meshes.reduce((n, m) => n + m.tri.length, 0);
   const nTag = meshes.reduce((n, m) => n + m.tag.length, 0);
   const geomBytes = pad4(nGeom * 2);
+  const capBytes = pad4(nCap * 2);
   const posBytes = pad4(nPos * 2);
   const tagBytes = pad4(nTag);
-  const buf = new Uint8Array(4 + hLen + geomBytes + posBytes + nIdx * 4 + tagBytes + (plot?.length ?? 0) * 4);
+  const buf = new Uint8Array(4 + hLen + geomBytes + capBytes + posBytes + nIdx * 4 + tagBytes + (plot?.length ?? 0) * 4);
   new DataView(buf.buffer).setUint32(0, hLen, true);
   buf.set(json, 4);
   buf.fill(0x20, 4 + json.length, 4 + hLen);
   let at = 4 + hLen;
   const geom = new Int16Array(buf.buffer, at, nGeom);
   at += geomBytes;
+  const capIdx = new Int16Array(buf.buffer, at, nCap);
+  at += capBytes;
   const pos = new Int16Array(buf.buffer, at, nPos);
   at += posBytes;
   const idx = new Int32Array(buf.buffer, at, nIdx);
@@ -168,6 +178,14 @@ function encodeBody(p: Package2): Uint8Array {
   };
   for (const r of profileRings) put(r.flat());
   for (const t of Object.values(traces)) put(t);
+  let co = 0;
+  for (const c of caps) {
+    let last = 0;
+    for (let i = 0; i < c.length; i++) {
+      capIdx[co++] = c[i]! - last;
+      last = c[i]!;
+    }
+  }
   let po = 0;
   let io = 0;
   let to = 0;
@@ -234,6 +252,7 @@ export function decodeBody2(bytes: Uint8Array): Package2 {
     return ring + h.marks!.reduce((a, m) => a + m.n, 0) + extra;
   };
   const nGeom = hs.reduce((n, h) => n + 2 * pointsOf(h), 0) + tLens.reduce((n, [, l]) => n + l, 0);
+  const nCap = hs.reduce((n, h) => n + (h.nc ?? 0), 0);
   const meshHs = hs.filter((h) => h.k === 1);
   const nPos = meshHs.reduce((n, h) => n + h.nv! * 3, 0);
   const nIdx = meshHs.reduce((n, h) => n + h.nt! * 3, 0);
@@ -241,6 +260,8 @@ export function decodeBody2(bytes: Uint8Array): Package2 {
   let at = bytes.byteOffset + 4 + hLen;
   const geom = new Int16Array(bytes.buffer, at, nGeom);
   at += pad4(nGeom * 2);
+  const capIdx = new Int16Array(bytes.buffer, at, nCap);
+  at += pad4(nCap * 2);
   const pos = new Int16Array(bytes.buffer, at, nPos);
   at += pad4(nPos * 2);
   const idx = new Int32Array(bytes.buffer, at, nIdx);
@@ -261,6 +282,7 @@ export function decodeBody2(bytes: Uint8Array): Package2 {
     }
     return out;
   };
+  let co = 0;
   let po = 0;
   let io = 0;
   let to = 0;
@@ -302,7 +324,18 @@ export function decodeBody2(bytes: Uint8Array): Package2 {
       for (let i = 1; i < zs.length; i++) sections.push({ z: zs[i]!, outer: ring(h.outer!), holes: h.holes!.map(ring) });
       op = { op: "loft", sections };
     }
-    return { profile: { outer, holes }, marks, op };
+    const out: Shape2 = { profile: { outer, holes }, marks, op };
+    if (h.nc) {
+      const cap = new Uint32Array(h.nc);
+      let last = 0;
+      for (let i = 0; i < h.nc; i++) {
+        last += capIdx[co + i]!;
+        cap[i] = last;
+      }
+      co += h.nc;
+      out.cap = cap;
+    }
+    return out;
   });
   const traces: Record<string, Float32Array> = {};
   for (const [k, l] of tLens) {
