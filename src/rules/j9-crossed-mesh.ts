@@ -61,6 +61,9 @@ function member(ctx: RuleContext, m: CrossMeshJoint, gid: string, both: boolean)
       });
       ctx.add(tw);
       (J.serves.F4 ??= []).push(tw.id);
+      // a spacer of the shaft's own stack (J2 under the first part) that ran up to the back face stops at the washer
+      for (const t of ctx.solids)
+        if (t.kind === "spacer" && t.joints.includes(pj.id) && !t.joints.includes(m.id) && t.z1 > tw.z0 + 0.01 && t.z0 < tw.z0 - 0.3 && t.z1 <= Math.max(face, back) + 0.01) t.z1 = tw.z0;
     }
     // a timing mark on the gear's face at tooth 0 (F9)
     const r = Math.max(...host.outer.map(([a, b]) => Math.hypot(a, b)));

@@ -5,7 +5,7 @@ import { toWorld } from "../core/axis";
 import { TAU, bbox, wrap, type Vec2 } from "../core/geom";
 import { edgeDist, holeSlot, inside, notchAt, toLocal, type Slot } from "../core/poly";
 import { BORES, bearingFor } from "../hardware/tables";
-import { poseOf } from "../model/pose";
+import { partShape, poseOf } from "../model/pose";
 import type { Part } from "../model/types";
 import { heights } from "../parts";
 import type { Joined, JointInfo, MeshJoint, PinJoint, Rule, RuleContext, SlideJoint, SlotVisit } from "./types";
@@ -58,8 +58,8 @@ function visits(ctx: RuleContext, pin: Part, part: Part, capR: number): SlotVisi
     if (hi >= 0) {
       sl = holeSlot(part.shape.holes[hi]!, hi);
       if (sl && 2 * sl.w > 4 * capR) sl = null;
-    } else if (!inside(part.shape.outer, L)) {
-      sl = notchAt(part.shape.outer, L, 2 * capR);
+    } else if (!inside(partShape(part, s), L)) {
+      sl = notchAt(partShape(part, s), L, 2 * capR);
       if (sl && sl.w < 0.75 * capR) sl = null;
     }
     if (!sl) continue;
@@ -86,13 +86,15 @@ function pinJoint(ctx: RuleContext, c: Part): PinJoint | null {
     const q = poseOf(p, ctx.s0);
     if (!q) continue;
     const L = toLocal(q, P);
-    if (!inside(p.shape.outer, L)) {
+    // a stretched or deforming part at its outline at the assembly phase
+    const outer = partShape(p, ctx.s0);
+    if (!inside(outer, L)) {
       // an open slot, a notch in the outline (a Geneva wheel), the pin in it at some phase of the cycle
       const slots = visits(ctx, c, p, capR);
       if (slots.length) joined.push({ part: p, L, R: 0, z0, z1, moving: !p.fixed, how: "slot", slotW: 2 * Math.min(...slots.map((v) => v.w)), slots });
       continue;
     }
-    const R = edgeDist(p.shape.outer, L);
+    const R = edgeDist(outer, L);
     const hi = p.shape.holes.findIndex((h) => inside(h, L));
     const base = { part: p, L, R, z0, z1, moving: !p.fixed };
     if (hi < 0) {

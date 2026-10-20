@@ -1,5 +1,5 @@
 # Audit: Bevel gear pair (bevel-gears)
-standard: 2.9 · date: 2026-10-20 · result: pass · detail: full · pass: build
+standard: 2.10 · date: 2026-10-20 · result: pass · detail: full · pass: build
 
 ## Summary
 PASS 114 · FAIL 0 · N/A 14 · open: none
@@ -7,7 +7,7 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.9 and its changelog |
+| S1 | PASS | DATA · the standard carries version 2.10 and its changelog |
 | S2 | PASS | HAND · header with standard, date, result, detail, pass |
 | S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
 | S4 | PASS | SITE · #107 holds only this mechanism's decisions and open items |
@@ -44,9 +44,9 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | A4 | PASS | AUTO · stepped keyed shafts, chamfered ends, circlip grooves |
 | A5 | PASS | AUTO · feather keys 4 x 4 on Ø12 and 3 x 3 on Ø10 |
 | A6 | N/A | no floating fixed plate besides the bridge, which stands on spigoted Ø10 standoffs |
-| A7 | PASS | AUTO · 8 mm base, counterbored corners, feet, front scale, clearance hole for the gear shaft; the base grown by hand under the outer block and the drive (see promotion candidates) |
+| A7 | PASS | AUTO · 8 mm base, counterbored corners, feet, front scale, clearance hole for the gear shaft; the base grows under the outer block (J10) and the drive (V2) |
 | A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 |
-| A9 | PASS | HAND · the pinion overhangs the gear, so both blocks stand behind it 36 mm apart (J10); the gear shaft straddle mounted: housing pair below, floating bearing in the bridge above (straddle called from the polish, the J2 rule runs it for parallel meshes only) |
+| A9 | PASS | AUTO / HAND · the pinion overhangs the gear, so both blocks stand behind it 36 mm apart (J10); the gear shaft straddle mounted: housing pair below, floating bearing in the bridge above, its box clear of the pinion (J2 straddle) |
 | A10 | PASS | HAND · the gear alone on its plane; the pinion stands out of it on its own axis; the bridge above the gear |
 | A11 | PASS | HAND · gear to keyed shaft to housing (screwed, dowelled) and bridge (screwed, spigoted); pinion to keyed shaft to two blocks (screwed, dowelled); motor to bracket to base |
 | A12 | PASS | AUTO · clamp check clean |
@@ -71,16 +71,16 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | J5 | N/A | no slide |
 | J6 | N/A | no parallel mesh |
 | J7 | N/A | no cam |
-| J8 | PASS | HAND · flanged motor pulley, bracket slotted for tension (AUTO-TODO: the belt is built in the polish, see V) |
+| J8 | PASS | AUTO · motor pulley flanged, the bracket's upright slotted for tension |
 | J9 | PASS | AUTO · each gear keyed on its shaft; a shim pack at each back face sets the mounting distance (F7); a bronze thrust washer behind each, where the mesh pushes away from the apex (F4); timing marks on tooth 0 of each gear (F9) |
 | J10 | PASS | AUTO · two pillow blocks behind the overhung pinion, sealed bearings, located in the nearer by two collars, floating in the other; screwed and dowelled foot plates |
 | J12 | N/A | no flexible member |
 | J13 | N/A | no compliant joint |
 | J11 | N/A | no screw |
 | F1 | PASS | AUTO · housing, blocks dowelled; bridge spigoted |
-| F2 | PASS | AUTO / HAND · bearings on circlips; collars on the pinion shaft; the pinion held by an end washer and a countersunk M4 (hand: J10 has no end retainer for a part at the shaft's free end) |
+| F2 | PASS | AUTO · bearings on circlips; collars on the pinion shaft; the pinion held by an end washer and a countersunk M4 into the shaft end (J10) |
 | F3 | PASS | AUTO · feather keys in both gears; the input pulley on a hub with two set screws |
-| F4 | PASS | AUTO / HAND · bronze thrust washers behind both gears (J9); wave washer preloading the housing pair; collars locating the pinion shaft |
+| F4 | PASS | AUTO · bronze thrust washers behind both gears (J9), the gear's J2 spacer stopping at its washer; wave washer preloading the housing pair; collars locating the pinion shaft |
 | F5 | N/A | both shafts turn fully, nothing to over-travel |
 | F6 | N/A | driven through the mesh; no rest position to hold |
 | F7 | PASS | AUTO / HAND · shim packs at both back faces set the mounting distance and the backlash; belt tension by the bracket's slots |
@@ -101,12 +101,12 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | M12 | PASS | HAND · every head reachable; bearings pressed out past their circlips |
 | M13 | PASS | AUTO / HAND · 41 threaded, 0 without a locking method |
 | M14 | N/A | no sliding wear surface besides the teeth, which are hardened |
-| V1 | PASS | HAND · AUTO-TODO: brushless pancake motor Ø50 x 18, GT2 32:16, built in the polish beside the pinion's shaft (axis x): the drive rule turns a z shaft only and refuses an input on a shaft in plan |
-| V2 | PASS | HAND · AUTO-TODO: one angle bracket, a foot on the base and an upright the motor screws to; beside the base top, not under it, since the motor's axis lies in plan |
+| V1 | PASS | AUTO · brushless pancake motor Ø50 x 18, GT2 32:16, beside the pinion's shaft (axis x), its bell turning at the belt ratio (H.drive, rotary input on a shaft in plan) |
+| V2 | PASS | AUTO · one angle bracket, a foot on the base and an upright the motor screws to; beside the shaft on the base top, not under it, since the motor's axis lies in plan |
 | V3 | PASS | HAND · belt and pulleys clear of the blocks, the bracket and the base; clearance 0 |
-| V4 | PASS | HAND · AUTO-TODO: motor pulley flanged both sides, the input pulley on a hub with two set screws at 90°, slots in the bracket's foot and upright for tension |
+| V4 | PASS | AUTO · motor pulley flanged both sides, the input pulley on a hub with two set screws at 90°, slots in the bracket's foot and upright for tension |
 | V5 | PASS | HAND · rotary: belt to the input pulley on the pinion's free shaft end, the catalogue's input kept |
-| V6 | PASS | HAND · AUTO-TODO: home flag on the located collar, fork sensor on a post between the blocks, leads to a terminal block on the base edge, one P-clip |
+| V6 | PASS | AUTO · home flag on the located collar, fork sensor on a post between the blocks, leads to a terminal block on the base edge, one P-clip |
 | L1 | PASS | STYLE · lint-style clean |
 | L2 | PASS | HAND · the polish carries geometry, roles, marks and materials only |
 | L3 | PASS | HAND · pinion and pulleys driver, gear output, blocks, bridge and bracket ground, hardware hw |
@@ -115,13 +115,13 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode across the x and z solids |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · timing marks are marks |
-| R1 | PASS | HAND · straddle, spokes, standoff, flag, sensor, terminal block, clip and leads from the rules and H.*; the drive's motor, bracket and belt are drawn in the polish because H.drive has no shaft-in-plan case (promotion candidate) |
+| R1 | PASS | HAND · bridge, drive, end retainer and base growth from the rules; the polish adds only the spokes (H.spokes) and the notes |
 | R2 | PASS | HAND · threads M3, M4, M5; shafts Ø10 and 12; bearings 6800 and 6801; GT2 16T and 32T |
 | R3 | PASS | AUTO · housing, pillow blocks and bridge from their subassemblies |
 | R4 | PASS | AUTO · package 20 KB |
 | R5 | PASS | HAND · states only what differs; no sampling in the polish; polish under 50 ms |
 | R6 | PASS | FLAG · browser bench: plan 2.4, 28° 2.77, side 2.3, explode 2.84 ms at full detail, setup 7.8 ms; under the 8 ms target |
-| R7 | PASS | HAND · model.ts + polish.ts 16.8 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 5.9 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing up or down |
 | DL2 | PASS | HAND · default dial full |
@@ -140,19 +140,14 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | pG | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 3 x Internal circlip DIN 472, Ø21; Shaft collar 12x22, set screw; External circlip DIN 471, Ø12; Bearing F6801ZZ (12x21x5), floating | Feather key 4 x 4 x 8.9 (DIN 6885) | Wave washer 16.5x20.8, spring steel; Thrust washer 12.2x18, bronze | – turns fully | – driven through the mesh | – mounting distance by the shim pack (mesh) | – sealed and shielded bearings | – see mesh | – none needed |
-| pQ | J10 | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Shaft collar Ø10 x Ø20 x 6, set screw M3; 2 x Pillow block, bored for a 6800-2RS; End washer Ø16 x 2, steel; Countersunk M4 x 10 (ISO 10642), into the shaft end | Feather key 3 x 3 x 17.9 (DIN 6885) | 2 x Shaft collar Ø10 x Ø20 x 6, set screw M3 | – turns fully | – driven through the belt | – mounting distance by the shim pack (mesh) | – sealed bearings | – see mesh | – see drive |
+| pQ | J10 | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Shaft collar Ø10 x Ø20 x 6, set screw M3; End washer Ø16 x 2, steel; Countersunk M4 x 10 (ISO 10642), into the shaft end; 2 x Pillow block, bored for a 6800-2RS | Feather key 3 x 3 x 17.9 (DIN 6885) | 2 x Shaft collar Ø10 x Ø20 x 6, set screw M3 | – turns fully | – driven through the belt | – mounting distance by the shim pack (mesh) | – sealed bearings | – see mesh | – see drive |
 | mesh-pinion-gear | J9 | – the shafts locate the gears | – end washer (pQ), circlip over the gear (pG) | – keys (pG, pQ) | Thrust washer 10.2x20, bronze; Thrust washer 12.2x22, bronze | – continuous rotation | – driven | Shim pack Ø10.2 x Ø18, 0.5 mm, sets the pinion's mounting distance; Shim pack Ø12.2 x Ø20, 0.5 mm, sets the gear's mounting distance | Open teeth, greased at assembly | Bevel pinion, 16 teeth; Bevel gear, 32 teeth | – none needed |
-| drive | drive | – bracket screwed to the base | – pulley hub set screws | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | Motor bracket, one-piece angle, slotted for belt tension | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap; 2 x Pulley flanges Ø14, both sides |
+| drive | drive | – bracket screwed to the base | – pulley hub set screws | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | Motor bracket, one-piece angle, slotted for belt tension | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
 | pG-bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – spigot in a slot takes the hole tolerance | – static | – static | – static |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| pG | no bridge (the J2 straddle runs for J6 meshes only) | straddle called from the polish; a keep-out over the pinion's side while the bridge is placed | A9: the sweeps allow double shear; the bridge search does not see the pinion's sweep |
-| pG-tw-sp | J2 spacer from the thrust washer up to the gear | stops at the J9 thrust washer | the J2 and J9 stacks both sit under the gear's back face |
-| pQ | shaft ends 1 mm past the pinion, no end retainer | shaft flush, end washer and countersunk M4 | F2: the pinion held toward the apex |
-| drive | refused: input on a shaft in plan | motor beside on an angle bracket, belt across the shaft to its free end (AUTO-TODO) | keeps the catalogue's input (K7) |
-| base | sized to the model | grown under the outer block and the drive; feet rerun | the outer block stood off the base |
 | gear | solid web | hub and six arms (H.spokes) | M2 |
 
 ## Detail ladder
@@ -171,13 +166,8 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 ## Promotion candidates
 Hand fixes that should become rules or primitives.
 
-- Drive for an input on a shaft in plan (V1 to V6): `H.drive` rotary refuses it (`src/hardware/sub/drive.ts`, `rotary`). Built here by hand: motor on an angle bracket beside the shaft, axis along x, belt in the plane across the shaft, flanges, tension slots, flag on the located collar, sensor on a post.
-- The J10 blocks can stand past the model's footprint (both behind an overhung part) and the base does not grow under them (`src/rules/j10-shaft-in-plan.ts`, `buildShaftInPlan`); `growBase` and the feet are rerun in the polish.
-- The J2 straddle runs only for parallel meshes (`src/rules/j2-straddle.ts`, `applies`: kind "mesh"); a gear in a crossed mesh needs it too. The bridge search ignores the sweep of a part on an x or y axis (`src/hardware/sub/bridge.ts`, the loop skips model parts and sweeps() does not cover the pinion), hence the keep-out.
-- J2 and J9 both stack under a gear's back face: the J2 spacer runs through the J9 thrust washer and shim (`src/rules/j9-crossed-mesh.ts`, `member`).
-- J10 gives a part at the shaft's free end no end retainer (F2).
-- `H.screw` drops the axis on the shank (`src/hardware/primitives.ts`, `screw`: the shank takes body, at and joints only); a screw on an x axis gets its shank on z.
+- None: the drive, the base growth, the straddle bridge, the spacer at the thrust washer and the end retainer are rules since standard 2.10.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.0 KB
+check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.1 KB
 screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (dist/shots) · bench: browser, DPR 1.5, 2026-10-20; 28° frame 2.77 ms at full detail, under target

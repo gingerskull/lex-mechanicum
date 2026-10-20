@@ -1,5 +1,5 @@
 # Audit: Block and tackle (block-and-tackle)
-standard: 2.9 · date: 2026-10-20 · result: pass · detail: full · pass: build
+standard: 2.10 · date: 2026-10-20 · result: pass · detail: full · pass: build
 
 ## Summary
 PASS 114 · FAIL 0 · N/A 14 · open: none
@@ -7,7 +7,7 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.9 and its changelog |
+| S1 | PASS | DATA · the standard carries version 2.10 and its changelog |
 | S2 | PASS | HAND · header with standard, date, result, detail, pass |
 | S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
 | S4 | PASS | SITE · #136 holds only this mechanism's decisions and open items |
@@ -24,7 +24,7 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
 | K1 | PASS | HAND · check: max link error 0.0e+0 mm; tangent points, rope lengths and sheave angles are solved; the polish changes outlines (spokes) and hardware only |
 | K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · custom (block, rope parts and wraps), plate (top cheek), rails, disc (sheaves), slider (carriage), caps; stretched rope parts placed between solved points |
+| K3 | PASS | HAND · custom (block), rope parts and wraps (P.ropeSpan, P.ropeWrap), plate (top cheek), rails, disc (sheaves), slider (carriage), caps; stretched rope parts placed between solved points |
 | K4 | PASS | HAND · roles: driver (carriage), output (block and its cheek), link (sheaves and rope), ground (guide bars and track), pin; accent on the carriage pin pF only, the input of a linear mechanism |
 | K5 | PASS | HAND · check clean: block and guide layer 0, sheaves A layer 1, sheaves B layer 3, top cheek layer 4, carriage and track layer 3 plated 7 mm down; the rope on layers 2 and 5 plated into its planes (z 12, 22 and 32) so no rope part shares a layer with a sheave; ground pivot layer -1, radius 7, moving pins 5.5 |
 | K6 | PASS | DATA · sheaves 60 mm and n = 4 as the catalogue; the 400 mm block spacing is scaled to 120 to 95 mm and the fall stroke to 99.8 mm for the bench; the lower pin is 8 mm right of the upper so the fall clears the lower sheaves (a fleet of 3.8° to 4.8°); both said in a code comment |
@@ -74,11 +74,11 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | J8 | PASS | AUTO · flanged motor pulley, idler on a slotted tensioner arm |
 | J9 | N/A | no crossed-axis mesh |
 | J10 | N/A | no shaft in plan |
-| J12 | PASS | AUTO / HAND · rope: parts stretched between tangent points, dead end on a becket with a thimble, hook on a swivel; the guards over the upper sheaves are added in the polish (AUTO-TODO: the rule places them only over sheaves that are fixed parts) |
+| J12 | PASS | AUTO · rope: parts stretched between tangent points, the wraps in the grooves, dead end on a becket with a thimble on its post, hook on a swivel, a guard over each upper sheave (their centres stand still); four parts carry the load (the note) |
 | J13 | N/A | no compliant joint |
 | J11 | N/A | no screw |
 | F1 | PASS | AUTO · bridge on spigots; both reference rails dowelled; the becket located by its pin in the post |
-| F2 | PASS | AUTO / HAND · every bearing held by a flange and an internal circlip; heads on the inner races; keepers hold the block and the carriage down; the becket pin split-pinned; a guard over each upper sheave (polish) |
+| F2 | PASS | AUTO · every bearing held by a flange and an internal circlip; heads on the inner races; keepers hold the block and the carriage down; the becket pin split-pinned; a guard over each upper sheave |
 | F3 | PASS | AUTO · the hook turns on its swivel, so the rope never twists; no keyed part |
 | F4 | PASS | AUTO · bronze thrust washer under sheave A on the upper axle; the moving pins clamp their bearings through inner-race spacers |
 | F5 | PASS | AUTO · end stops with neoprene pads just past both ends of the block's and the carriage's travel; the sheaves need none, the rope turns them |
@@ -99,7 +99,7 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | M10 | PASS | AUTO / HAND · materials named on every solid |
 | M11 | PASS | AUTO · centre holes and chamfered ends on the shafts |
 | M12 | PASS | HAND · every head reachable from above or below; bearings pressed out past their circlips; the becket post screw from under the base |
-| M13 | PASS | AUTO / HAND · threadlocker or nyloc on every threaded part; the becket post screw threadlocked (polish) |
+| M13 | PASS | AUTO · threadlocker or nyloc on every threaded part; the becket post screw threadlocked |
 | M14 | PASS | AUTO · hardened rails and a bronze gib on each slide |
 | V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 16T pulleys |
 | V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
@@ -115,13 +115,13 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | L6 | PASS | AUTO · depth order right at plan, 28°, side and explode: the three rope heights on the left side stay apart |
 | L7 | PASS | STYLE · tilt 0° to 88°, no shear |
 | L8 | PASS | AUTO / HAND · engraved path, scale and the sheaves' groove lines are marks |
-| R1 | PASS | HAND · the polish uses H.standoff, H.screw and H.spokes; the guard repeats the rope rule's band (AUTO-TODO, listed below) |
+| R1 | PASS | HAND · rope parts and wraps from P.ropeSpan and P.ropeWrap, becket post and guards from the rope rule; the polish uses H.spokes only |
 | R2 | PASS | HAND · threads M3, M4, M5, M6, M8; joints Ø8, 10; bearings F688ZZ (8x16x5), F6800 (10x19x5) |
 | R3 | PASS | AUTO · slides, bridge and drive from their subassemblies |
 | R4 | PASS | AUTO · package 23.9 KB |
 | R5 | PASS | HAND · states only what differs; no sampling; rules about 0.8 s, polish 1 ms |
 | R6 | PASS | FLAG · browser bench, DPR 1.5: plan 2.41, 28° 3.15, side 2.48, explode 70° 2.93 ms; setup 12.5 ms; under every target |
-| R7 | PASS | HAND · model.ts + polish.ts 14.0 KB |
+| R7 | PASS | HAND · model.ts + polish.ts 11.6 KB |
 | R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
 | DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
 | DL2 | PASS | HAND · default dial full |
@@ -156,12 +156,10 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| upper sheave guards | none: the rope rule guards only sheaves that are fixed parts | a guard over each upper sheave in the polish | J12, F2: these sheaves turn on a fixed pin (AUTO-TODO) |
-| becket | a ground plate with its pin, standing free | the pin threaded into a Ø10 post screwed up from under the base | A11: the dead end's load reaches the base |
 | sheaves | plain discs | five spokes round the bearing hub | M2: they reverse every stroke; the spokes show them turn |
 | lower block | single cheek, the sheaves in single shear | a top cheek as the bottom cheek's clevis twin, and a distance bolt below the sheaves, in the model | A9 |
 | carriage and track | layer 3 | plated 7 mm down in the model | the fall runs over the end stop's screw head and takes the carriage pin above the carriage |
-| rope contacts | wraps clash with their sheaves and the straight parts | allowed in the polish; the fall's eye allowed round the carriage pin | the rope lies in the grooves and meets itself at the tangent points by design |
+| fall's eye | clashes with the carriage pin's hardware | allowed in the polish | the eye is spliced round a thimble on the pin |
 | block spacing | catalogue 400 mm | 120 to 95 mm in the model | K6: bench size |
 
 ## Detail ladder
@@ -178,11 +176,8 @@ PASS 114 · FAIL 0 · N/A 14 · open: none
 | never | 125 | 96 | 3.14 (full) |
 
 ## Promotion candidates
-- J12 rope guards: `src/rules/j12-flexible.ts` guards only sheaves that are fixed parts. A sheave that turns on a fixed pin (every real upper block) gets none; the polish adds the same band. The rule should guard every sheave whose centre does not move.
-- Rope wraps over the sheaves: each pass builds the same fixed arcs and allows them against their sheaves and the parts they meet. A rope helper could make the wraps from the reeving and set those contacts.
 - Flexible drives, rope: a reeving with the dead end on the upper block and the fall from an upper sheave puts three rope lines on one side. Two sheaves per pin give two planes; the part that changes plane is drawn between them, and the lower block is set off the upper pin so the fall runs past the lower sheaves.
 - Flexible drives, rope: sheave angles follow the rope paid past each sheave over its pitch radius (no slip); the fall follows the rope length, so the ratio stays exact with a fleet.
-- The model check's same-layer OVERLAP test (`src/model/check.ts`, line 272) reads the unit outline of a stretched part, so it sees only a 1 mm stub at its first point; the rope parts were put on their own layers to keep that stub clear.
 
 ## Verification
 check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.9 KB

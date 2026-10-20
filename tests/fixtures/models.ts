@@ -347,3 +347,46 @@ export const ujointModel: MechanismModel = defineMechanism({
     return { pts: { S: [0, UJ.zc] }, a: u, frames: { cross: { o, u: a, v: b }, yoke2: { o, u: b, v: v2 } } };
   },
 });
+
+/** J10 driven: the J10 wheel's shaft turned by a motor (its free end past the far block). */
+export const j10RotaryModel: MechanismModel = defineMechanism({ ...j10Model, id: "fx-j10-rotary", input: { kind: "rotary", part: "wheel" } });
+
+/** J9 driven from the pinion: its shaft in plan overhangs the wheel, so the motor belts to the free end behind the blocks. */
+export const j9DriveModel: MechanismModel = defineMechanism({ ...j9Model, id: "fx-j9-drive", input: { kind: "rotary", part: "pinion" } });
+
+/**
+ * J12 rope with a dead end: sheave u1 posed at a point that stands still (not a fixed part) on layer 1 with a wrap over
+ * it, sheave u2 fixed on layer 3, the rope dead-ended under u2 on a becket and the load hanging from u1's side.
+ */
+const rbSpan = (id: string, a: string, b: string, layer: number) => P.ropeSpan(id, a, b, { layer, dz: -8 });
+export const ropeBecketModel: MechanismModel = defineMechanism({
+  id: "fx-rope-becket",
+  input: { kind: "manual", part: "load" },
+  parts: [
+    P.disc("u1", RS, { role: "link", layer: 1, at: "U1", spin: (s) => s.t as number }),
+    P.disc("u2", RS, { role: "ground", layer: 3, fixed: [40, 0, 0] }),
+    rbSpan("spanA", "A0", "A", 2),
+    rbSpan("spanM", "M0", "M1", 2),
+    rbSpan("spanB", "B0", "B", 4),
+    P.ropeWrap("w1", RS, Math.PI / 2, Math.PI, { layer: 2, dz: -8, at: "U1" }),
+    P.custom("load", [[-14, -24], [14, -24], [14, 0], [-14, 0]], { role: "output", layer: 1, at: "A" }),
+    P.cap("pU1", 0, 6, { fixed: [-40, 0, 0], span: 2 }),
+  ],
+  flexible: [{ form: "rope", over: ["u2", "u1"], spans: ["spanA", "spanM", "spanB"], wraps: ["w1"], dead: "B", hook: "A", load: "load" }],
+  solve(u) {
+    const ya = 60 + 50 * (0.5 - 0.5 * Math.cos(u));
+    return { pts: { U1: [-40, 0], A0: [-40 - RS, 0], A: [-40 - RS, -ya], M0: [-40, RS], M1: [40, RS], B0: [40 + RS, 0], B: [40 + RS, -100] }, t: ya / RS };
+  },
+});
+
+/** A rope span stretched between two points 50 mm apart, across a plate on its layer, and a pin through its far end. */
+export const stretchModel: MechanismModel = defineMechanism({
+  id: "fx-stretch",
+  input: { kind: "manual", part: "span" },
+  parts: [
+    P.ropeSpan("span", "S0", "S1", { layer: 2, rope: 6 }),
+    P.custom("plate", [[20, -2], [30, -2], [30, 2], [20, 2]], { role: "ground", layer: 2, fixed: [0, 0, 0] }),
+    P.cap("pX", 2, 1.5, { fixed: [42, 0, 0] }),
+  ],
+  solve: () => ({ pts: { S0: [0, 0], S1: [50, 0] } }),
+});

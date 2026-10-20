@@ -2,12 +2,17 @@
 // base past either end of what it carries (H.pillowBlock): a live shaft turns in a sealed bearing in each, located in
 // the first block by two collars against its inner race and floating in the second, so it can grow (F2, F4); a dead
 // shaft is clamped in both and every part turns on it in its own bearing (F2). Parts keyed to a live shaft take a
-// D-flat to Ø8 and a feather key above (A5, F3). The blocks lift with the shaft in the explode.
-import { dBore } from "../core/geom";
-import { collar, disc, key, setScrew, shaft } from "../hardware/primitives";
+// D-flat to Ø8 and a feather key above (A5, F3); a part overhung on the shaft's free end is held there by a washer and
+// a countersunk screw into the shaft end (F2). The base grows under a block that stands past it. A hand-turned or
+// motor-driven input keeps a free end past the blocks for its handwheel or pulley. The blocks lift with the shaft in
+// the explode.
+import { bbox, dBore } from "../core/geom";
+import { depth } from "../core/poly";
+import { collar, disc, key, setScrew, shaft, screw, washer } from "../hardware/primitives";
 import { pillowBlock, pillowWidth } from "../hardware/sub/pillow";
 import { keyFor } from "../hardware/tables";
 import { heights } from "../parts";
+import { growBase } from "./base";
 import { partName, seatBearing } from "./pins";
 import { inPlane, type PinJoint, type Rule, type RuleContext } from "./types";
 
@@ -15,6 +20,11 @@ const fmt = (v: number) => String(+v.toFixed(1));
 /** Clearance between what the shaft carries and a block, and the collar's width, mm. */
 const GAP = 3;
 const COLLAR = 6;
+/** The free end past the outer block: a handwheel's run, or a pulley and its hub's, mm. */
+const END: Record<string, number> = { manual: 12, rotary: 14 };
+/** The end retainer: washer thickness, and the base's margin round a block foot it grows under, mm. */
+const END_W = 2;
+const MARGIN = 8;
 
 export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
   const axis = j.pin.axis as "x" | "y";
@@ -34,9 +44,19 @@ export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
   const wB = overhung ? wA - Math.max(20, 2 * d) - L : after;
   const A = pillowBlock(ctx, `${j.id}-blkA`, { axis, P: j.P, w0: wA, d, live, located: true, ex, first: true });
   const B = pillowBlock(ctx, `${j.id}-blkB`, { axis, P: j.P, w0: wB, d, live, located: false, ex, first: false });
-  // a hand-turned input takes a handwheel on the shaft's free end (the drive rule fits it there)
-  const input = ctx.model.input.kind === "manual" && j.driven.some((x) => x.part.id === ctx.model.input.part);
-  if (input) j.below = overhung ? { z0: B.w[0] - 14, z1: B.w[0] - 2 } : { z0: B.w[1] + 2, z1: B.w[1] + 14 };
+  // the base under a block that stands past it
+  for (const b of [A, B]) {
+    if (b.foot.outer.every((p) => depth(ctx.get("base")!.outer, [], p) >= 2)) continue;
+    const [x0, y0, x1, y1] = bbox(b.foot.outer);
+    growBase(ctx, [x0 - MARGIN, y0 - MARGIN, x1 + MARGIN, y1 + MARGIN]);
+  }
+  // a hand-turned input takes a handwheel on the shaft's free end, a motor-driven one its pulley (the drive rule fits
+  // them there)
+  const run = END[ctx.model.input.kind];
+  const input = run !== undefined && j.driven.some((x) => x.part.id === ctx.model.input.part);
+  if (input) j.below = overhung ? { z0: B.w[0] - 2 - run, z1: B.w[0] - 2 } : { z0: B.w[1] + 2, z1: B.w[1] + 2 + run };
+  // an overhung part keyed on the shaft's free end: held there by a washer and a countersunk screw (F2)
+  const tip = overhung && live ? j.driven.find((x) => x.z1 >= a1 - 0.01) : undefined;
   for (const b of [A, B]) {
     for (const t of ctx.solids.filter((s) => s.joints.includes(b.housing.id))) t.joints.push(j.id);
     (J.serves.F1 ??= []).push(`${b.housing.id}-dw0`, `${b.housing.id}-dw1`);
@@ -44,7 +64,8 @@ export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
   const group = `${j.id}-shaft`;
   const [w0, w1] = heights(j.pin);
   const z0 = Math.min(overhung ? B.w[0] - 2 : wA - (live ? COLLAR + 1 : 2), w0, j.below?.z0 ?? Infinity);
-  const z1 = Math.max(overhung ? a1 + 1 : B.w[1] + 2, w1, j.below?.z1 ?? -Infinity);
+  // a retained end stops flush with the part it holds
+  const z1 = tip ? a1 : Math.max(overhung ? a1 + 1 : B.w[1] + 2, w1, j.below?.z1 ?? -Infinity);
   const k = live ? keyFor(d) : null;
   const driven = live ? j.driven : [];
   ctx.add(
@@ -59,6 +80,7 @@ export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
     }),
   );
   const notes: string[] = [];
+  let end = "";
   inPlane(ctx, j.pin, () => {
     if (live) {
       // keyed parts (A5, F3): the bore cut to the shaft, a key above Ø8
@@ -89,6 +111,16 @@ export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
         (J.serves.F2 ??= []).push(id);
         (J.serves.F4 ??= []).push(id);
       }
+      if (tip) {
+        const host = ctx.solidOf[tip.part.id]!;
+        const M = d >= 14 ? 5 : d >= 10 ? 4 : 3;
+        const E = { body: tip.part.id, at: [tip.L[0], tip.L[1], 0] as [number, number, number], ex: host.ex, joints: [j.id] };
+        const w = `${j.id}-end-w`;
+        ctx.add(washer(w, M + 0.3, d + 6, { ...E, name: `End washer Ø${d + 6} x ${END_W}, steel`, z0: a1, z1: a1 + END_W, inset: false }));
+        ctx.add(screw(`${j.id}-end`, "csk", M, 10, { ...E, face: a1 + END_W, dir: -1, name: `Countersunk M${M} x 10 (ISO 10642), into the shaft end`, lock: "threadlocker, medium (Loctite 243)" }));
+        (J.serves.F2 ??= []).push(w, `${j.id}-end`);
+        end = ` On the free end, a washer and a countersunk M${M} into the shaft end hold the ${partName(ctx, tip)}.`;
+      }
       notes.push(`turns in sealed ${A.bearing?.name ?? ""} bearings in two pillow blocks ${fmt(Math.abs(B.seat[0] - A.seat[1]))} mm apart${overhung ? ", both behind the part" : ""}, located in the nearer by two collars, floating in the other`);
     } else {
       // every part turns on the clamped shaft in its own bearing (F2)
@@ -97,7 +129,7 @@ export function buildShaftInPlan(ctx: RuleContext, j: PinJoint): void {
     }
   });
   for (const id of [A.housing.id, B.housing.id]) (J.serves.F2 ??= []).push(id);
-  J.note = `Shaft in plan along ${axis}, Ø${d}, ${notes.join("; ")}${driven.length ? `; keyed to the ${driven.map((x) => partName(ctx, x)).join(" and ")}` : ""}.`;
+  J.note = `Shaft in plan along ${axis}, Ø${d}, ${notes.join("; ")}${driven.length ? `; keyed to the ${driven.map((x) => partName(ctx, x)).join(" and ")}` : ""}.${end}`;
   J.badge = ["two blocks", "ok"];
 }
 

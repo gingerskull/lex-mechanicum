@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.33.0 — 2026-10-20
+
+- Rules: the hand fixes of the two spatial-engine pilots promoted (standard 2.10, AUTO).
+  - A rotary input on a shaft in plan is motorised: a motor beside the shaft on an angle bracket, belted across it to
+    a pulley on its free end, with a home flag, a fork sensor and leads to the terminal block.
+  - J10 grows the base under a pillow block that stands past it, and holds a part overhung on a live shaft's free end
+    by a washer and a countersunk screw.
+  - Live gear shafts in a crossed mesh are straddle mounted; the bridge keeps its box clear of parts on axes in plan.
+    The J2 spacer under a gear's back face stops at the J9 thrust washer.
+  - Ropes: a guard over every sheave whose centre stands still, the becket and the hook at their own sheaves' heights,
+    the becket on a post, the parts that carry the load counted in the note; `P.ropeSpan` and `P.ropeWrap`, the wraps
+    allowed against their sheaves and spans.
+  - The model check and classify read stretched parts at their solved outline.
+- Bevel gear pair and block and tackle: their polishes keep only what is particular to them (spokes, notes, the fall's
+  eye). The tackle builds as before. The bevel pair's base no longer grows on the side away from the drive, its motor
+  pulley, bell and flanges turn, and the slots and motor screws follow the under-base drive.
+
 ## 0.32.0 — 2026-10-20
 
 - Bevel gear pair added to standard 2.9, the first pilot of the spatial engine: the catalogue's 16:32 pair at module 4,

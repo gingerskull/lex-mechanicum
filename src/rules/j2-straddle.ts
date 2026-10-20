@@ -20,7 +20,8 @@ function meshShafts(ctx: RuleContext): PinJoint[][] {
   const live = ctx.info.filter((j): j is PinJoint => j.kind === "pin" && j.type === "J2");
   const groups: PinJoint[][] = [];
   for (const m of ctx.info) {
-    if (m.kind !== "mesh" || m.form === "rack") continue;
+    // a gear in a parallel mesh, or in a crossed one (J9): its shaft is straddled whatever the other gear's axis
+    if (!((m.kind === "mesh" && m.form !== "rack") || m.kind === "crossMesh")) continue;
     const g = [m.a, m.b].map((p) => live.find((j) => j.driven.some((x) => x.part.id === p.id))).filter((j): j is PinJoint => !!j);
     if (!g.length) continue;
     const hit = groups.find((h) => h.some((j) => g.includes(j)));
@@ -114,7 +115,7 @@ export const j2Straddle: Rule = {
   id: "j2-straddle",
   tier: "AUTO",
   ids: ["A9", "J2"],
-  applies: (ctx) => ctx.info.some((j) => j.kind === "mesh"),
+  applies: (ctx) => ctx.info.some((j) => j.kind === "mesh" || j.kind === "crossMesh"),
   apply(ctx) {
     for (const g of meshShafts(ctx)) {
       const clear = g.filter((j) => clearAbove(ctx, j));

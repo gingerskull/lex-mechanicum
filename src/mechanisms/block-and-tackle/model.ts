@@ -13,7 +13,7 @@
 // so the fall clears the lower sheaves by 4.8 mm as it runs past them (a fleet of 3.8° to 4.8° on the four parts).
 // The input oscillates: the fall is hauled in and paid out over the cycle. The model runs on the block spacing and
 // derives the fall from the rope length, so the ratio is exact for the slight fleet (about 4.0).
-import { arcPts, circle, roundRect, type Vec2 } from "../../core/geom";
+import { circle, roundRect, type Vec2 } from "../../core/geom";
 import { osc } from "../../core/vec";
 import { defineMechanism } from "../../model/define";
 import type { Part, Solved } from "../../model/types";
@@ -55,12 +55,11 @@ const C_ROPE = ropeIn(D_MAX) - F_TOP;
 export const PULL = ropeIn(D_MAX) - ropeIn(D_MIN);
 
 /** A straight rope part: outline at unit length along x, stretched between two solved points (D9). */
-const span = (id: string, a: string, b: string, layer: number, dz: number, name: string): Part =>
-  P.custom(id, [[0, -RR], [1, -RR], [1, RR], [0, RR]], { role: "link", layer, dz, thick: 2 * RR, between: [a, b], stretch: true, name });
+const span = (id: string, a: string, b: string, layer: number, dz: number, name: string): Part => P.ropeSpan(id, a, b, { role: "link", layer, dz, rope: 2 * RR, name });
 
 /** The rope's wrap over a sheave, a fixed arc on the block (the sheave turns under it), a0 to a1 counter-clockwise. */
 const wrap = (id: string, a0: number, a1: number, layer: number, dz: number, place: { at: string }, name: string): Part =>
-  P.custom(id, [...arcPts(0, 0, RP + RR, a0, a1, Math.PI / 36), ...arcPts(0, 0, RP - RR, a1, a0, Math.PI / 36)], { role: "link", layer, dz, thick: 2 * RR, ...place, name });
+  P.ropeWrap(id, RP, a0, a1, { role: "link", layer, dz, rope: 2 * RR, ...place, name });
 
 const sheave = (id: string, layer: number, at: string, k: string, name: string): Part =>
   P.disc(id, RS, { role: "link", layer, at, spin: (s) => s[k] as number, marks: [circle(RP - RR, 0, 0, 72)], name });
@@ -105,7 +104,7 @@ export default defineMechanism({
     P.cap("pK", 0, 5.5, { at: "K", span: 4 }),
     P.cap("pF", 3, 5.5, { at: "F", span: 1, dz: CAR_DZ, accent: true }),
   ],
-  flexible: [{ form: "rope", over: ["UA", "UB", "LA", "LB"], spans: ["r1", "r2", "r3", "r4", "fall"], dead: "D0", hook: "Hk", load: "block" }],
+  flexible: [{ form: "rope", over: ["UA", "UB", "LA", "LB"], spans: ["r1", "r2", "r3", "r4", "fall"], wraps: ["wUA", "wUB", "wLA", "wLB"], dead: "D0", hook: "Hk", load: "block" }],
   solve(u): Solved {
     const D = spacing(u);
     const l = Math.hypot(DX, D);
