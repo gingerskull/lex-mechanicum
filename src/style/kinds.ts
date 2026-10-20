@@ -48,5 +48,6 @@ export const EFFECTS = [
   "fullDpr", // device pixel ratio above 1
   "rolePatterns", // role surface patterns
   "hiddenLines", // dashed copies of covered edges
+  "deepLayers", // depth layers beyond the nearest two
 ] as const;
 export type Effect = (typeof EFFECTS)[number];
