@@ -9,8 +9,8 @@
 //                          or end (`feature`);
 //   dwell                  the longest span of the cycle, degrees, in which the output stays within `band` (default
 //                          one thousandth of its range).
-// `over: "speed"` style claims over another driver, and outputs the library does not compute, are reported as
-// uncheckable, never as a mismatch.
+// A claim `over` a driver (a speed control) takes its statistic over that driver's range instead of the cycle. Outputs
+// the library does not compute are reported as uncheckable, never as a mismatch.
 import type { Kinematics } from "../kin/compose";
 import type { Pose } from "../kin/types";
 
@@ -86,9 +86,7 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   const o = outputs.find((q) => q.id === claim.output);
   if (!o) return `no output ${claim.output}`;
   const drv = K.kin.drivers.find((d) => (claim.over ? d.id === claim.over : d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"));
-  if (!drv) return "no primary driver";
-  if (claim.over && claim.over !== drv.id) return `claim over ${claim.over}`;
-  if (claim.over) return `claim over ${claim.over} sweeps a control, not the cycle`;
+  if (!drv) return claim.over ? `claim over ${claim.over}: no such driver` : "no primary driver";
   const n = poses.length;
   const u = poses.map((_, i) => (i / n) * 360);
   const x = poses.map((p) => p.values[drv.id] ?? NaN);
@@ -214,8 +212,26 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
     return claims.map((claim) => ({ claim, status: "uncheckable", why: `does not solve: ${(e as Error).message}` }));
   }
   const rotary = K.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual")?.kind === "rotary";
+  // a claim `over` a driver sweeps that driver across its range with the cycle at its start (a speed control)
+  const swept = new Map<string, Pose[] | string>();
+  const sweep = (id: string): Pose[] | string => {
+    const d = K.kin.drivers.find((q) => q.id === id);
+    const r = d?.range ?? (d?.lo !== undefined && d?.hi !== undefined ? [d.lo, d.hi] : undefined);
+    if (!d || !r) return `claim over ${id}: no driver with a range`;
+    try {
+      return Array.from({ length: n }, (_, i) => K.poseAt({ [id]: r[0] + ((r[1] - r[0]) * i) / (n - 1) }));
+    } catch (e) {
+      return `does not solve over ${id}: ${(e as Error).message}`;
+    }
+  };
   return claims.map((claim): ClaimResult => {
-    const S = seriesOf(K, claim, outputs, poses);
+    let P: Pose[] | string = poses;
+    if (claim.over) {
+      if (!swept.has(claim.over)) swept.set(claim.over, sweep(claim.over));
+      P = swept.get(claim.over)!;
+      if (typeof P === "string") return { claim, status: "uncheckable", why: P };
+    }
+    const S = seriesOf(K, claim, outputs, P);
     if (typeof S === "string") return { claim, status: "uncheckable", why: S };
     const v = evaluate(S, claim, rotary);
     if (typeof v === "string") return { claim, status: "uncheckable", why: v };

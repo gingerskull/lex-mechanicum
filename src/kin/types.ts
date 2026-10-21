@@ -10,6 +10,9 @@ export interface Frame {
   /** The record spec's name for `o`. */
   origin?: Vec;
   rot?: Vec; // degrees, x then y then z
+  /** Instead of rot: the frame's z axis and a direction its x is made square to (either may hold expressions). */
+  z?: Vec;
+  x?: Vec;
 }
 
 export interface KinBody {
@@ -134,6 +137,8 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
+  /** A position read as one number: its component along this world direction, or along this joint's axis. */
+  along?: Vec | string;
 }
 
 export interface Kin {

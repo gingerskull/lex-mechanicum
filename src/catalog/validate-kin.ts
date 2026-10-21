@@ -118,7 +118,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
       if (!Array.isArray(d.options) || d.options.length < 2) say(`driver ${d.id}: a selector needs named options`);
       continue;
     }
-    if (d.joint === undefined || !joints.has(d.joint)) say(`driver ${d.id}: joint "${String(d.joint)}" is not a joint`);
+    // a manual driver with no joint moves nothing itself: a block reads its value (a governor's speed)
+    if (d.kind === "manual" && d.joint === undefined) {
+      // nothing to drive
+    } else if (d.joint === undefined || !joints.has(d.joint)) say(`driver ${d.id}: joint "${String(d.joint)}" is not a joint`);
     else driverJoints.add(d.joint);
     if (!(Array.isArray(d.range) && d.range.length === 2 && d.range.every(isNum) && d.range[0] < d.range[1])) say(`driver ${d.id}: range must be [lo, hi]`);
     else if (isNum(d.default) && (d.default < d.range[0] || d.default > d.range[1])) say(`driver ${d.id}: default ${d.default} outside its range`);
@@ -141,6 +144,11 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
     if (key === "kind" || key === "mode" || key === "form") return;
+    // an expression over known names ("90 - input"): every name in it known
+    if (isStr(v) && !known.has(v) && /[-+*/^() ]/.test(v)) {
+      const names = (v.match(/[A-Za-z_][A-Za-z0-9_-]*/g) ?? []).filter((n) => !["sin", "cos", "tan", "sqrt", "abs", "asin", "acos", "atan"].includes(n));
+      if (names.every((n) => known.has(n))) return;
+    }
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   for (const s of kin.solve) {
@@ -170,9 +178,16 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (!bodies.has(p.body)) say(`point ${p.id}: body "${String(p.body)}" is not a body`);
     if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every(isNum))) say(`point ${p.id}: local must be [x, y, z]`);
   }
+  // values a solve step writes (its `out` names), which an output may read: a centre yoke's turn
+  const values = new Set<string>();
+  for (const st of kin.solve as { out?: unknown }[]) {
+    const out = st.out;
+    if (typeof out === "string") values.add(out);
+    else if (out && typeof out === "object" && !Array.isArray(out)) for (const v of Object.values(out)) if (typeof v === "string") values.add(v);
+  }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);
-    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point or joint`);
+    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !values.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or block value`);
   }
 
   // mobility (K11)

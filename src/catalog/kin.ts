@@ -17,6 +17,8 @@ export const KIN_VOCAB = {
   block: [
     "dyad", "slider-dyad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
     "flexure", "escapement",
+    // couplings and spatial linkages (R6)
+    "sarrus", "cross-slide", "parallel-cranks", "plane-slide", "rzeppa", "conical-pendulum",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

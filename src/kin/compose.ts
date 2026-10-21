@@ -3,7 +3,7 @@
 import { type BlockCtx, KinError } from "./ctx";
 import { evalExpr } from "./expr";
 import { BLOCKS } from "./registry";
-import { D2R, R2D, TAU, type Vec3, fitXf, m3, v3, wrapPi, xf, type Xf } from "./math";
+import { D2R, R2D, TAU, type Mat3, type Vec3, fitXf, m3, v3, wrapPi, xf, type Xf } from "./math";
 import { solveNumeric } from "./numeric";
 import { resolveJoint, type ResolvedJoint } from "./residual";
 import type { Controls, Kin, KinBody, KinDriver, KinJoint, Pose, SolveStep } from "./types";
@@ -524,6 +524,7 @@ class Run implements BlockCtx {
         const ref: Vec3[] = [];
         const now: Vec3[] = [];
         let hint: Vec3 | undefined;
+        let carried: [Vec3, Vec3] | undefined;
         let slide = false;
         // a prismatic partner already posed: the body keeps the partner's turn (a piston in a swinging cylinder)
         let guide: Xf | undefined;
@@ -544,11 +545,13 @@ class Run implements BlockCtx {
           if (j.type === "revolute" && !hint) hint = r.axis;
           if (!point.has(j.type)) continue;
           const other = j.a === b.id ? j.b : j.a;
+          // a hinge to a posed body: its axis as that body carries it now
+          if (j.type === "revolute" && !carried && this.xfs.has(other)) carried = [r.axis, xf.dir(this.xfs.get(other)!, r.axis)];
           if (this.pts.has(j.id)) add(r.at, this.pts.get(j.id)!);
           else if (this.xfs.has(other)) add(r.at, xf.apply(this.xfs.get(other)!, r.at));
         }
         let X: Xf | null = null;
-        if (ref.length >= 2) X = fitXf(ref, now, hint);
+        if (ref.length >= 2) X = fitXf(ref, now, carried ? undefined : hint) ?? (carried ? fitAxis(ref, now, carried) : null);
         else if (ref.length === 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
         else if (ref.length === 1 && slide) X = xf.trans(v3.sub(now[0]!, ref[0]!));
         if (X) {
@@ -589,7 +592,12 @@ class Run implements BlockCtx {
     }
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
+      let v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
+      // a position read along a direction (a world vector, or a joint's axis): a height, a slide along a bore
+      if (o.along !== undefined && Array.isArray(v)) {
+        const dir = typeof o.along === "string" ? this.s.joints.get(o.along)?.axis : v3.unit(this.vec(o.along));
+        v = dir ? v3.dot(v, dir) : undefined;
+      }
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {
@@ -621,6 +629,7 @@ class Run implements BlockCtx {
     if (kind === "path" || (kind === "position" && points.has(of))) return points.get(of);
     if (kind === "angle") {
       if (of in this.vals) return this.vals[of];
+      if (!this.k._bodies.has(of) && this.s.joints.has(of)) return this.hingeAngle(of, points);
       const axis = this.bodyAxis(of);
       const X = this.xfs.get(of);
       if (X && axis) return xf.angleAbout(X, axis) * R2D;
@@ -635,6 +644,36 @@ class Run implements BlockCtx {
     return undefined;
   }
 
+  /**
+   * A revolute joint's angle, degrees: the turn about its axis from the direction body a arrives along (from a's other
+   * joint to this one) to the direction body b leaves along (from this joint to b's other joint): a loop's
+   * Denavit-Hartenberg joint angle when the joints are listed round the loop. A body with no other joint off the axis
+   * leaves only the relative turn of b against a since the reference.
+   */
+  private hingeAngle(id: string, points: Map<string, Vec3>): number | undefined {
+    const r = this.s.joints.get(id)!;
+    const j = r.joint;
+    const Xa = this.xfs.get(j.a);
+    const Xb = this.xfs.get(j.b);
+    if (!Xa || !Xb) return undefined;
+    const axis = xf.dir(Xa, r.axis);
+    const at = xf.apply(Xa, r.at);
+    const other = (body: string): Vec3 | undefined => {
+      for (const q of this.s.joints.values()) {
+        if (q.joint.id === id || (q.joint.a !== body && q.joint.b !== body)) continue;
+        const p = points.get(q.joint.id);
+        if (p && v3.len(v3.perp(v3.sub(p, at), axis)) > 1e-6) return p;
+      }
+      return undefined;
+    };
+    const pa = other(j.a);
+    const pb = other(j.b);
+    if (!pa || !pb) return xf.angleAbout(xf.mul(xf.inv(Xa), Xb), r.axis) * R2D;
+    const da = v3.perp(v3.sub(at, pa), axis);
+    const db = v3.perp(v3.sub(pb, at), axis);
+    return Math.atan2(v3.dot(axis, v3.cross(da, db)), v3.dot(da, db)) * R2D;
+  }
+
   private bodyAxis(body: string, type?: string): Vec3 | undefined {
     // a body's own axis is that of its joint to the ground, where it has one (a yoke turns on its shaft, not its pin)
     for (const r of this.s.joints.values()) {
@@ -647,11 +686,34 @@ class Run implements BlockCtx {
   }
 }
 
-/** A frame object of the record, if the body has one (`o` or `origin`, and `rot`); a prose `frame` string is not one. */
-function frameObj(f: unknown): { o?: unknown; rot?: unknown } | undefined {
+/**
+ * The rigid motion carrying two points and a hinge axis (reference and now): the line through the points and the axis
+ * fix it, where two points alone leave a turn about their line. Null when the axis runs along the line.
+ */
+function fitAxis(ref: Vec3[], now: Vec3[], [a0, a1]: [Vec3, Vec3]): Xf | null {
+  const frame = (d: Vec3, a: Vec3): Mat3 | null => {
+    const e1 = v3.unit(d);
+    const n = v3.cross(e1, a);
+    if (v3.len(n) < 1e-9) return null;
+    const e3 = v3.unit(n);
+    const e2 = v3.cross(e3, e1);
+    return [e1[0], e2[0], e3[0], e1[1], e2[1], e3[1], e1[2], e2[2], e3[2]];
+  };
+  const Fr = frame(v3.sub(ref[1]!, ref[0]!), a0);
+  const Fn = frame(v3.sub(now[1]!, now[0]!), a1);
+  if (!Fr || !Fn) return null;
+  const R = m3.mul(Fn, m3.T(Fr));
+  return { R, t: v3.sub(now[0]!, m3.mulV(R, ref[0]!)) };
+}
+
+/**
+ * A frame object of the record, if the body has one (`o` or `origin`, and `rot`, or the directions `z` and `x`); a prose
+ * `frame` string is not one.
+ */
+function frameObj(f: unknown): { o?: unknown; rot?: unknown; x?: unknown; z?: unknown } | undefined {
   if (!f || typeof f !== "object") return undefined;
-  const g = f as { o?: unknown; origin?: unknown; rot?: unknown };
-  return { o: g.o ?? g.origin, rot: g.rot };
+  const g = f as { o?: unknown; origin?: unknown; rot?: unknown; x?: unknown; z?: unknown };
+  return { o: g.o ?? g.origin, rot: g.rot, x: g.x, z: g.z };
 }
 
 /**
@@ -666,6 +728,13 @@ export function bodyFrameOf(b: KinBody, list: KinJoint[], joints: Map<string, Re
   // the ground is the world: its `frame` only places the plate its shape draws
   if (b.id === "ground") return xf.id();
   const f = frameObj(b.frame) ?? frameObj(b.at?.frame);
+  if (f && f.z !== undefined) {
+    const z = v3.unit(vec(f.z));
+    const h = f.x !== undefined ? vec(f.x) : Math.abs(z[2]) > 0.9 ? ([1, 0, 0] as Vec3) : ([0, 0, 1] as Vec3);
+    const x = v3.unit(v3.perp(h, z));
+    const y = v3.cross(z, x);
+    return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: f.o !== undefined ? vec(f.o) : [0, 0, 0] };
+  }
   if (f && (f.o !== undefined || f.rot !== undefined)) return { R: m3.eulerDeg(f.rot !== undefined ? vec(f.rot) : [0, 0, 0]), t: f.o !== undefined ? vec(f.o) : [0, 0, 0] };
   const at = b.at?.joint ? joints.get(b.at.joint) : undefined;
   if (!at) return xf.id();

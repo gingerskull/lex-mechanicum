@@ -1742,7 +1742,23 @@
           "at": {
             "joint": "B1"
           },
-          "frame": "local x along the input shaft toward cross 1"
+          "frame": {
+            "o": [
+              "-Lc/2-Ls*cos(beta)",
+              "Ls*sin(beta)",
+              "H"
+            ],
+            "z": [
+              "cos(beta)",
+              "-sin(beta)",
+              0
+            ],
+            "x": [
+              0,
+              0,
+              1
+            ]
+          }
         },
         {
           "id": "cross-1",
@@ -1754,6 +1770,23 @@
           },
           "at": {
             "joint": "C1a"
+          },
+          "frame": {
+            "o": [
+              "-Lc/2",
+              0,
+              "H"
+            ],
+            "z": [
+              "sin(beta)",
+              "cos(beta)",
+              0
+            ],
+            "x": [
+              0,
+              0,
+              1
+            ]
           }
         },
         {
@@ -1762,17 +1795,59 @@
           "shape": {
             "type": "shaft",
             "diameter": 20,
-            "length": 60,
+            "length": 100,
             "yoke": {
               "radius": 30,
-              "arm": 8,
-              "ends": 2
+              "arm": 8
             }
           },
-          "at": {
-            "joint": "C1b"
+          "frame": {
+            "o": [
+              0,
+              0,
+              "H"
+            ],
+            "z": [
+              1,
+              0,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "centre-fork",
+          "role": "link",
+          "shape": {
+            "type": "shaft",
+            "diameter": 20,
+            "length": 100,
+            "yoke": {
+              "radius": 30,
+              "arm": 8
+            }
           },
-          "frame": "local x along the centre yoke from cross 1 to cross 2"
+          "frame": {
+            "o": [
+              0,
+              0,
+              "H"
+            ],
+            "z": [
+              1,
+              0,
+              0
+            ],
+            "x": [
+              0,
+              "-sin(phase)",
+              "cos(phase)"
+            ]
+          }
         },
         {
           "id": "cross-2",
@@ -1784,6 +1859,23 @@
           },
           "at": {
             "joint": "C2a"
+          },
+          "frame": {
+            "o": [
+              "Lc/2",
+              0,
+              "H"
+            ],
+            "z": [
+              0,
+              "-sin(phase)",
+              "cos(phase)"
+            ],
+            "x": [
+              "-cos(phase)*sin(beta)",
+              "cos(phase)*cos(beta)",
+              "sin(phase)*cos(beta)"
+            ]
           }
         },
         {
@@ -1801,7 +1893,23 @@
           "at": {
             "joint": "B2"
           },
-          "frame": "local x along the output shaft away from cross 2"
+          "frame": {
+            "o": [
+              "Lc/2+Ls*cos(beta)",
+              "Ls*sin(beta)",
+              "H"
+            ],
+            "z": [
+              "cos(beta)",
+              "sin(beta)",
+              0
+            ],
+            "x": [
+              "-cos(phase)*sin(beta)",
+              "cos(phase)*cos(beta)",
+              "sin(phase)*cos(beta)"
+            ]
+          }
         }
       ],
       "joints": [
@@ -1811,13 +1919,13 @@
           "a": "ground",
           "b": "yoke-in",
           "at": [
-            -86.38,
-            20.52,
-            80
+            "-Lc/2-Ls*cos(beta)",
+            "Ls*sin(beta)",
+            "H"
           ],
           "axis": [
-            0.9397,
-            -0.342,
+            "cos(beta)",
+            "-sin(beta)",
             0
           ]
         },
@@ -1827,13 +1935,13 @@
           "a": "yoke-in",
           "b": "cross-1",
           "at": [
-            -30,
+            "-Lc/2",
             0,
-            80
+            "H"
           ],
           "axis": [
-            0.342,
-            0.9397,
+            "sin(beta)",
+            "cos(beta)",
             0
           ]
         },
@@ -1843,9 +1951,9 @@
           "a": "cross-1",
           "b": "centre",
           "at": [
-            -30,
+            "-Lc/2",
             0,
-            80
+            "H"
           ],
           "axis": [
             0,
@@ -1856,17 +1964,17 @@
         {
           "id": "C2a",
           "type": "revolute",
-          "a": "centre",
+          "a": "centre-fork",
           "b": "cross-2",
           "at": [
-            30,
+            "Lc/2",
             0,
-            80
+            "H"
           ],
           "axis": [
             0,
-            0,
-            1
+            "-sin(phase)",
+            "cos(phase)"
           ]
         },
         {
@@ -1875,14 +1983,14 @@
           "a": "cross-2",
           "b": "yoke-out",
           "at": [
-            30,
+            "Lc/2",
             0,
-            80
+            "H"
           ],
           "axis": [
-            -0.342,
-            0.9397,
-            0
+            "-cos(phase)*sin(beta)",
+            "cos(phase)*cos(beta)",
+            "sin(phase)*cos(beta)"
           ]
         },
         {
@@ -1891,13 +1999,13 @@
           "a": "ground",
           "b": "yoke-out",
           "at": [
-            86.38,
-            20.52,
-            80
+            "Lc/2+Ls*cos(beta)",
+            "Ls*sin(beta)",
+            "H"
           ],
           "axis": [
-            0.9397,
-            0.342,
+            "cos(beta)",
+            "sin(beta)",
             0
           ]
         }
@@ -1929,11 +2037,27 @@
         },
         {
           "id": "Lc",
+          "value": 110,
+          "unit": "mm",
+          "min": 100,
+          "max": 140,
+          "note": "centre yoke length, cross 1 to cross 2 (the two forks back to back)"
+        },
+        {
+          "id": "Ls",
           "value": 60,
           "unit": "mm",
-          "min": 40,
+          "min": 50,
           "max": 90,
-          "note": "centre yoke length, cross 1 to cross 2"
+          "note": "cross centre to the shaft's reference point (B1, B2)"
+        },
+        {
+          "id": "H",
+          "value": 60,
+          "unit": "mm",
+          "min": 50,
+          "max": 90,
+          "note": "shaft axis height above the base"
         }
       ],
       "design": [],
@@ -1959,14 +2083,29 @@
           ],
           "in": {
             "input": "input",
-            "beta": "beta"
+            "cross": "cross-1",
+            "joints": {
+              "in": "B1",
+              "a": "C1a",
+              "b": "C1b"
+            },
+            "shafts": {
+              "out": {
+                "body": "centre",
+                "axis": [
+                  1,
+                  0,
+                  0
+                ]
+              }
+            }
           },
-          "out": [
-            "cross-1",
-            "centre"
-          ],
+          "out": {
+            "delta": "centre-turn"
+          },
           "opts": {
-            "zero": "input yoke arm in the plane of the shafts"
+            "zero": "input yoke pin square to the plane of the shafts",
+            "relation": "tan(theta2) = tan(theta1) / cos(beta)"
           }
         },
         {
@@ -1978,17 +2117,29 @@
             "B2"
           ],
           "in": {
-            "input": "centre",
-            "beta": "beta",
-            "phase": "phase"
+            "input": "centre-turn",
+            "cross": "cross-2",
+            "joints": {
+              "out": "B2",
+              "a": "C2a",
+              "b": "C2b"
+            },
+            "shafts": {
+              "in": {
+                "body": "centre-fork",
+                "axis": [
+                  1,
+                  0,
+                  0
+                ]
+              }
+            }
           },
-          "out": [
-            "cross-2",
-            "yoke-out"
-          ],
+          "out": {
+            "delta": "out-turn"
+          },
           "opts": {
-            "reversed": true,
-            "relation": "tan(theta3 - phase) = tan(theta2 - phase) cos(beta)"
+            "relation": "the same law from the centre yoke's second fork, turned by the phase"
           }
         }
       ],
@@ -1997,9 +2148,9 @@
           "id": "in-tip",
           "body": "yoke-in",
           "local": [
-            60,
-            30,
-            0
+            0,
+            -30,
+            60
           ]
         },
         {
@@ -2008,34 +2159,34 @@
           "local": [
             30,
             0,
-            30
+            -55
           ]
         },
         {
           "id": "out-tip",
           "body": "yoke-out",
           "local": [
-            -60,
             30,
-            0
+            0,
+            -60
           ]
         },
         {
           "id": "in-ext",
           "body": "yoke-in",
           "local": [
-            90,
             0,
-            0
+            0,
+            100
           ]
         },
         {
           "id": "centre-ext",
           "body": "centre",
           "local": [
-            90,
             0,
-            0
+            0,
+            95
           ]
         }
       ],
@@ -2048,7 +2199,7 @@
         },
         {
           "id": "centre-angle",
-          "of": "centre",
+          "of": "centre-turn",
           "kind": "angle",
           "unit": "deg"
         },
@@ -2060,7 +2211,7 @@
         },
         {
           "id": "centre-speed-ratio",
-          "of": "centre",
+          "of": "centre-turn",
           "kind": "speed-ratio"
         },
         {
@@ -2070,17 +2221,17 @@
         },
         {
           "id": "centre-lag",
-          "of": "centre",
+          "of": "centre-turn",
           "kind": "angle",
           "unit": "deg",
-          "note": "centre yoke angle minus input angle"
+          "minus": "input-angle"
         },
         {
           "id": "output-lag",
           "of": "yoke-out",
           "kind": "angle",
           "unit": "deg",
-          "note": "output angle minus input angle"
+          "minus": "input-angle"
         }
       ],
       "fallback": null
@@ -2100,6 +2251,9 @@
         },
         {
           "body": "centre"
+        },
+        {
+          "body": "centre-fork"
         },
         {
           "body": "cross-2"
@@ -3907,6 +4061,23 @@
           },
           "at": {
             "joint": "T1"
+          },
+          "frame": {
+            "o": [
+              0,
+              0,
+              "2*L*cos(40)"
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
           }
         }
       ],
@@ -3917,7 +4088,7 @@
           "a": "ground",
           "b": "l1a",
           "at": [
-            40,
+            "w/2",
             0,
             0
           ],
@@ -3933,9 +4104,9 @@
           "a": "l1a",
           "b": "l1b",
           "at": [
-            78.57,
+            "w/2+L*sin(40)",
             0,
-            45.96
+            "L*cos(40)"
           ],
           "axis": [
             0,
@@ -3949,9 +4120,9 @@
           "a": "l1b",
           "b": "top",
           "at": [
-            40,
+            "w/2",
             0,
-            91.93
+            "2*L*cos(40)"
           ],
           "axis": [
             0,
@@ -3966,7 +4137,7 @@
           "b": "l2a",
           "at": [
             0,
-            40,
+            "w/2",
             0
           ],
           "axis": [
@@ -3982,8 +4153,8 @@
           "b": "l2b",
           "at": [
             0,
-            78.57,
-            45.96
+            "w/2+L*sin(40)",
+            "L*cos(40)"
           ],
           "axis": [
             1,
@@ -3998,8 +4169,8 @@
           "b": "top",
           "at": [
             0,
-            40,
-            91.93
+            "w/2",
+            "2*L*cos(40)"
           ],
           "axis": [
             1,
@@ -4053,54 +4224,41 @@
       ],
       "solve": [
         {
-          "block": "slider-dyad",
-          "id": "limb-1",
+          "block": "sarrus",
+          "id": "limbs",
           "joints": [
             "K1",
-            "T1"
-          ],
-          "in": {
-            "a": "K1",
-            "ra": "L",
-            "slide": "H1",
-            "dir": [
-              0,
-              0,
-              1
-            ]
-          },
-          "out": [
             "T1",
-            "top"
-          ],
-          "opts": {
-            "plane": "xz, the plane of limb 1",
-            "root": "top hinge above the knee",
-            "slide": "the top plate's vertical translation, which limb 2 enforces"
-          }
-        },
-        {
-          "block": "dyad",
-          "id": "limb-2",
-          "joints": [
             "H2",
             "K2",
             "T2"
           ],
           "in": {
-            "a": "H2",
-            "b": "T2",
-            "ra": "L",
-            "rb": "L"
+            "l1": "L",
+            "l2": "L",
+            "input": "90 - input",
+            "theta0": 50,
+            "top": "top",
+            "legs": [
+              {
+                "lower": "l1a",
+                "upper": "l1b",
+                "base": "H1",
+                "knee": "K1"
+              },
+              {
+                "lower": "l2a",
+                "upper": "l2b",
+                "base": "H2",
+                "knee": "K2"
+              }
+            ]
           },
-          "branch": "outward",
-          "out": [
-            "K2",
-            "l2a",
-            "l2b"
-          ],
+          "out": {
+            "lift": "lift"
+          },
           "opts": {
-            "plane": "yz, the plane of limb 2, at 90 degrees to limb 1"
+            "relation": "each limb folds in its own vertical plane, the two planes at 90 degrees: upper link angle equals lower link angle, so the top hinge stays over the base hinge and the plate rises along a straight line, height 2 L sin(90 - input)"
           }
         }
       ],
@@ -4109,7 +4267,7 @@
           "id": "top-centre",
           "body": "top",
           "local": [
-            -40,
+            0,
             0,
             0
           ]
@@ -4120,7 +4278,7 @@
           "local": [
             0,
             0,
-            3
+            0
           ]
         }
       ],
@@ -4136,14 +4294,24 @@
           "of": "top-centre",
           "kind": "position",
           "unit": "mm",
-          "note": "height above the base"
+          "note": "height above the base",
+          "along": [
+            0,
+            0,
+            1
+          ]
         },
         {
           "id": "plate-drift",
           "of": "top-centre",
           "kind": "position",
           "unit": "mm",
-          "note": "horizontal distance from the line through the base centre"
+          "note": "horizontal distance of the plate centre from the vertical through the base centre, along limb 1's plane",
+          "along": [
+            1,
+            0,
+            0
+          ]
         },
         {
           "id": "plate-tilt",
@@ -4361,8 +4529,8 @@
         {
           "id": "A",
           "type": "revolute",
-          "a": "ground",
-          "b": "l4",
+          "a": "l4",
+          "b": "ground",
           "at": [
             0,
             0,
@@ -4387,7 +4555,7 @@
           "axis": [
             0,
             -0.5,
-            0.866
+            0.8660254037844
           ]
         },
         {
@@ -4397,13 +4565,13 @@
           "b": "l3",
           "at": [
             60,
-            86.6,
+            86.6025403784439,
             160
           ],
           "axis": [
-            0.8333,
-            -0.2764,
-            0.4787
+            0.8333333333333,
+            -0.2763853991963,
+            0.4787135538782
           ]
         },
         {
@@ -4412,14 +4580,14 @@
           "a": "l3",
           "b": "l4",
           "at": [
-            79.93,
-            60.09,
+            79.9304623717929,
+            60.0926050777581,
             110
           ],
           "axis": [
-            0.5008,
-            -0.6661,
-            0.5528
+            0.5007717089813,
+            -0.6660871864316,
+            0.5527707983926
           ]
         }
       ],
@@ -4450,7 +4618,7 @@
         },
         {
           "id": "beta",
-          "value": 56.44,
+          "value": 56.4427,
           "unit": "deg",
           "min": 40,
           "max": 70,
@@ -4475,16 +4643,23 @@
           "block": "bennett",
           "id": "loop",
           "joints": [
-            "A",
             "C",
-            "D"
+            "D",
+            "A"
           ],
           "in": {
             "input": "input",
-            "a": "a",
-            "b": "b",
-            "alpha": "alpha",
-            "beta": "beta"
+            "joints": [
+              "B",
+              "C",
+              "D",
+              "A"
+            ],
+            "bodies": [
+              "l2",
+              "l3",
+              "l4"
+            ]
           },
           "out": [
             "l3",
@@ -4805,7 +4980,7 @@
           "at": [
             0,
             0,
-            200
+            "Hp"
           ],
           "axis": [
             0,
@@ -4821,7 +4996,7 @@
           "at": [
             0,
             0,
-            200
+            "Hp"
           ],
           "axis": [
             0,
@@ -4835,9 +5010,9 @@
           "a": "arm-l",
           "b": "link-l",
           "at": [
-            -30,
+            "-p*sin(30)",
             0,
-            148.04
+            "Hp-p*cos(30)"
           ],
           "axis": [
             0,
@@ -4851,9 +5026,9 @@
           "a": "arm-r",
           "b": "link-r",
           "at": [
-            30,
+            "p*sin(30)",
             0,
-            148.04
+            "Hp-p*cos(30)"
           ],
           "axis": [
             0,
@@ -4869,7 +5044,7 @@
           "at": [
             0,
             0,
-            96.08
+            "Hp-p*cos(30)-sqrt(q^2-(p*sin(30))^2)"
           ],
           "axis": [
             0,
@@ -4885,7 +5060,7 @@
           "at": [
             0,
             0,
-            96.08
+            "Hp-p*cos(30)-sqrt(q^2-(p*sin(30))^2)"
           ],
           "axis": [
             0,
@@ -4901,7 +5076,7 @@
           "at": [
             0,
             0,
-            96.08
+            "Hp-p*cos(30)-sqrt(q^2-(p*sin(30))^2)"
           ],
           "axis": [
             0,
@@ -4970,66 +5145,74 @@
         },
         {
           "id": "speed",
-          "joint": "PL",
           "kind": "manual",
           "range": [
-            97.6,
-            133.8
+            97.57,
+            133.76
           ],
-          "default": 101.6,
+          "default": 101.63,
           "unit": "rpm",
-          "sets": "arm angle phi = acos(g / (L omega^2)), g = 9810 mm/s^2: the conical pendulum balance, sleeve load neglected; phi 20° to 60° over this range"
+          "sets": "arm angle phi = acos(g / (L omega^2)), g = 9810 mm/s^2: the conical pendulum balance, sleeve load neglected; 20° at 97.57 rpm, 30° at 101.63, 60° at 133.76"
         }
       ],
       "solve": [
+        {
+          "block": "conical-pendulum",
+          "id": "balance",
+          "joints": [
+            "PL",
+            "PR"
+          ],
+          "in": {
+            "speed": "speed",
+            "l": "L",
+            "spindle": "spindle",
+            "arms": [
+              {
+                "body": "arm-l",
+                "joint": "PL",
+                "down": "S",
+                "tip": "ML"
+              },
+              {
+                "body": "arm-r",
+                "joint": "PR",
+                "down": "S",
+                "tip": "MR"
+              }
+            ]
+          },
+          "out": {
+            "angle": "balance-angle"
+          },
+          "opts": {
+            "relation": "cos(phi) = g / (L omega^2): the arms stand where the spin balances the balls' weight (dynamics, sleeve load neglected); the arms ride the spindle's turn"
+          }
+        },
         {
           "block": "slider-dyad",
           "id": "sleeve",
           "joints": [
             "ML",
             "QL",
-            "Sl"
+            "Sl",
+            "MR",
+            "QR"
           ],
           "in": {
+            "kind": "rrp",
             "a": "ML",
-            "ra": "q",
-            "slide": "PL",
-            "dir": [
+            "r": "q",
+            "p": "S",
+            "d": [
               0,
               0,
               -1
             ]
           },
-          "out": [
-            "QL",
-            "sleeve",
-            "link-l"
-          ],
+          "out": "QL",
           "opts": {
-            "root": "sleeve below the link pin"
-          }
-        },
-        {
-          "block": "dyad",
-          "id": "right-side",
-          "joints": [
-            "PR",
-            "MR",
-            "QR"
-          ],
-          "in": {
-            "a": "PR",
-            "b": "QR",
-            "ra": "p",
-            "rb": "q"
-          },
-          "out": [
-            "MR",
-            "arm-r",
-            "link-r"
-          ],
-          "opts": {
-            "root": "mirror of the left arm"
+            "root": "sleeve below the link pin; the right link and the sleeve follow from their joints"
           }
         }
       ],
@@ -5065,24 +5248,36 @@
       "outputs": [
         {
           "id": "arm-angle",
-          "of": "arm-r",
+          "of": "PR",
           "kind": "angle",
           "unit": "deg",
-          "note": "from the vertical"
+          "note": "from the vertical",
+          "from": "S",
+          "to": "ball-r"
         },
         {
           "id": "sleeve-height",
           "of": "sleeve-point",
           "kind": "position",
           "unit": "mm",
-          "note": "height above the base"
+          "note": "height above the base",
+          "along": [
+            0,
+            0,
+            1
+          ]
         },
         {
           "id": "ball-height",
           "of": "ball-r",
           "kind": "position",
           "unit": "mm",
-          "note": "below the arm pivot"
+          "note": "height above the base",
+          "along": [
+            0,
+            0,
+            1
+          ]
         },
         {
           "id": "ball-path",
