@@ -140,6 +140,15 @@ const sampleAt = (path: Float32Array, f: number): Vec3 | null => {
   return [path[k * 3]!, path[k * 3 + 1]!, path[k * 3 + 2]!];
 };
 
+/** A projected path whose last sample is far from its first (more than four times its mean step): it does not close. */
+const isOpen = (pts: [number, number][]): boolean => {
+  const n = pts.length;
+  if (n < 3) return true;
+  let sum = 0;
+  for (let k = 1; k < n; k++) sum += Math.hypot(pts[k]![0] - pts[k - 1]![0], pts[k]![1] - pts[k - 1]![1]);
+  return Math.hypot(pts[0]![0] - pts[n - 1]![0], pts[0]![1] - pts[n - 1]![1]) > (4 * sum) / (n - 1) + 1;
+};
+
 const pathPts = (A: Ann, path: Float32Array): [number, number][] => {
   const out: [number, number][] = [];
   for (let k = 0; k < path.length; k += 3) out.push(P(A, [path[k]!, path[k + 1]!, path[k + 2]!]));
@@ -412,7 +421,9 @@ export function traces(A: Ann, f: TraceFlags): void {
       ctx.setLineDash([...SP.dash]);
       ctx.lineWidth = SP.width;
       ctx.strokeStyle = paint(T[SP.color], SP.alpha * (i ? SP.otherGain : 1));
-      stroke(ctx, pts, true);
+      // a path that does not close over a cycle (an indexing wheel's mark moves on a step each turn) is drawn open
+      const open = isOpen(pts);
+      stroke(ctx, pts, !open);
       ctx.setLineDash([]);
       if (f.ticks && tr.ticks?.every) {
         const n = Math.max(1, Math.floor(360 / tr.ticks.every));
@@ -435,6 +446,7 @@ export function traces(A: Ann, f: TraceFlags): void {
         const idx = Math.round(((((u % TAU) + TAU) % TAU) / TAU) * N);
         const L = Math.min(SP.cometSamples, N >> 1);
         for (let k = 0; k < L; k++) {
+          if (open && idx - k - 1 < 0) break;
           const a = pts[(idx - k - 1 + 10 * N) % N]!;
           const b = pts[(idx - k + 10 * N) % N]!;
           ctx.beginPath();

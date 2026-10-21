@@ -111,6 +111,9 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     eccentric: ctx.eccentric.has(site.id),
     baseTopWorld: ctx.base?.top ?? 0,
   };
+  // a support the record asks for on one of the site's joints (a crank held from above, past what turns under it)
+  const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: SupportKind } | undefined)?.support).find(Boolean);
+  if (asked) spec.support = asked;
   const r = axialStack(ctx, spec);
   ctx.add(r.solids);
   ctx.stacks.set(site.id, r);

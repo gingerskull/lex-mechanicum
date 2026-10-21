@@ -27,6 +27,28 @@ export function genevaAngle(n: number, phi: number): number {
   return turns * (TAU / n) + genevaIndex(n, local).angle;
 }
 
+/**
+ * Internal Geneva wheel with n slots, crank radius a = c sin(π/n) on a centre c from the wheel's. The crank angle φ is
+ * measured from the line of centres with the pin farthest from the wheel centre at φ = 0. The pin drives while it is
+ * past the slots' mouths, |φ| < π/2 + π/n (270° of crank for four slots); the wheel turns the same way as the crank,
+ * tan β = sin φ / (k + cos φ) with k = c / a, and is held between.
+ */
+export function genevaInternalIndex(n: number, phi: number): { angle: number; engaged: boolean; ratio: number } {
+  const half = Math.PI / 2 + Math.PI / n;
+  const p = ((phi + Math.PI) % TAU + TAU) % TAU - Math.PI;
+  const k = 1 / Math.sin(Math.PI / n);
+  if (Math.abs(p) >= half) return { angle: p < 0 ? 0 : TAU / n, engaged: false, ratio: 0 };
+  const beta = Math.atan2(Math.sin(p), k + Math.cos(p));
+  const dbeta = (1 + k * Math.cos(p)) / (1 + k * k + 2 * k * Math.cos(p));
+  return { angle: beta + Math.PI / n, engaged: true, ratio: dbeta };
+}
+
+/** Total wheel angle of an internal Geneva for a continuously turning crank (see genevaInternalIndex). */
+export function genevaInternalAngle(n: number, phi: number): number {
+  const turns = Math.round(phi / TAU);
+  return turns * (TAU / n) + genevaInternalIndex(n, phi - turns * TAU).angle;
+}
+
 /** Crank angle at which the pin enters the slot (and leaves it): ±(π/2 − π/n). */
 export const genevaEngagement = (n: number): number => Math.PI / 2 - Math.PI / n;
 

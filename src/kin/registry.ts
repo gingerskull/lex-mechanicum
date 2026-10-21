@@ -9,7 +9,7 @@ import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from 
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
 import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
-import { genevaAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
+import { genevaAngle, genevaInternalAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
   const o = step.out;
@@ -531,8 +531,9 @@ const escapementBlock: BlockFn = (c, s) => {
 
 /**
  * indexer (Geneva and star wheel). in: n (slots or teeth), input (the crank angle, deg, measured from the line of
- * centres with the pin nearest the wheel at 0), phi0 (its reference value), wheel (body), center, axis, sense (+1 or −1,
- * default −1: an external Geneva turns against its crank).
+ * centres with the pin nearest the wheel at 0; for an internal Geneva, `internal: true`, farthest from it), phi0 (its
+ * reference value), wheel (body), center, axis, sense (+1 or −1; default −1 for an external Geneva, which turns against
+ * its crank, +1 for an internal one).
  * out {angle}: the wheel's angle (deg).
  */
 const indexer: BlockFn = (c, s) => {
@@ -540,8 +541,11 @@ const indexer: BlockFn = (c, s) => {
   const n = c.num(i.n);
   const phi0 = c.num(i.phi0 ?? 0) * D2R;
   const phi = phi0 + c.delta("in", c.rad(i.input));
-  const sense = i.sense !== undefined ? c.num(i.sense) : -1; // an external Geneva turns against its crank
-  const d = sense * (genevaAngle(n, phi) - genevaAngle(n, phi0));
+  // an external Geneva turns against its crank, an internal one with it
+  const internal = i.internal === true;
+  const sense = i.sense !== undefined ? c.num(i.sense) : internal ? 1 : -1;
+  const law = internal ? genevaInternalAngle : genevaAngle;
+  const d = sense * (law(n, phi) - law(n, phi0));
   if (typeof i.wheel === "string") spin(c, i.wheel, c.vec(i.center), v3.unit(c.vec(i.axis ?? [0, 0, 1])), d);
   outVal(c, s, d * R2D, "angle");
 };

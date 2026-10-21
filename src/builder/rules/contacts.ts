@@ -86,6 +86,8 @@ function rollerInSlot(ctx: BuildCtx, c: Contact, L: Local, what: string): Return
   const carrier = bodyOf(ctx, c.a);
   L.add(H.shaft(`${id}-stud`, { d, z0: lo, z1: hi }, { body: carrier, name: `Stud Ø${d} x ${+(hi - lo).toFixed(1)}, pressed into the pin carrier` }));
   L.add(H.roller(`${id}-roller`, d, D, { body: carrier, z0: zc - rw / 2, z1: zc + rw / 2 }));
+  // a wheel that carries its own slots (a Geneva wheel, cut from the record's numbers) needs only the roller and its stud
+  if (String(ctx.geoms.get(c.b)?.shape.type ?? "").startsWith("geneva")) return { serves: {}, note: `${titleOf(id)}: ${what}; Ø${D} track roller on a Ø${d} stud pressed into the crank, running in the wheel's own slots.` };
   const sw = (D + 0.4) / 2 + 1.5;
   const relief = 4;
   const x0 = c.run[0] - relief;

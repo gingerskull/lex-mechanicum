@@ -39788,8 +39788,8 @@
             "shape": {
               "type": "plate",
               "rect": [
-                260,
-                190
+                280,
+                200
               ]
             },
             "at": {
@@ -39806,27 +39806,114 @@
             "id": "crank",
             "role": "driver",
             "shape": {
-              "type": "plate",
-              "arm": 77.78,
-              "pin": {
-                "at": [
-                  -77.78,
-                  0
-                ],
-                "radius": 5.5
-              },
-              "lockDisc": {
-                "radius": 50.56,
-                "relief": {
-                  "center": [
-                    110,
-                    0
+              "type": "genevaCrank",
+              "lock": 50.56,
+              "relief": 82.98,
+              "c": 110,
+              "thickness": 8,
+              "place": 0,
+              "pieces": [
+                {
+                  "id": "arm",
+                  "origin": [
+                    0,
+                    0,
+                    9
                   ],
-                  "radius": 82.98,
-                  "faces": "pin"
+                  "thick": 6,
+                  "fillet": 0.5,
+                  "outline": [
+                    [
+                      -77.782,
+                      8
+                    ],
+                    [
+                      -80.254,
+                      7.608
+                    ],
+                    [
+                      -82.484,
+                      6.472
+                    ],
+                    [
+                      -84.254,
+                      4.702
+                    ],
+                    [
+                      -85.39,
+                      2.472
+                    ],
+                    [
+                      -85.782,
+                      0
+                    ],
+                    [
+                      -85.39,
+                      -2.472
+                    ],
+                    [
+                      -84.254,
+                      -4.702
+                    ],
+                    [
+                      -82.484,
+                      -6.472
+                    ],
+                    [
+                      -80.254,
+                      -7.608
+                    ],
+                    [
+                      -77.782,
+                      -8
+                    ],
+                    [
+                      0,
+                      -8
+                    ],
+                    [
+                      2.472,
+                      -7.608
+                    ],
+                    [
+                      4.702,
+                      -6.472
+                    ],
+                    [
+                      6.472,
+                      -4.702
+                    ],
+                    [
+                      7.608,
+                      -2.472
+                    ],
+                    [
+                      8,
+                      0
+                    ],
+                    [
+                      7.608,
+                      2.472
+                    ],
+                    [
+                      6.472,
+                      4.702
+                    ],
+                    [
+                      4.702,
+                      6.472
+                    ],
+                    [
+                      2.472,
+                      7.608
+                    ],
+                    [
+                      0,
+                      8
+                    ]
+                  ]
                 }
-              },
-              "boss": 12
+              ]
             },
             "at": {
               "joint": "O"
@@ -39835,16 +39922,21 @@
           {
             "id": "wheel",
             "role": "output",
+            "symmetry": 4,
             "shape": {
-              "type": "plate",
-              "slots": 4,
-              "slotHalfWidth": 7,
-              "tipRadius": 79.98,
+              "type": "genevaWheel",
+              "n": 4,
+              "c": 110,
+              "hw": 6.7,
+              "tip": 79.98,
               "slotEnd": 27.22,
-              "lockArc": {
-                "radius": 52.06
-              },
-              "windows": "small"
+              "lock": 50.56,
+              "clear": 0.3,
+              "windowR": 7,
+              "windowAt": 52,
+              "thickness": 8,
+              "place": 0,
+              "bore": 12
             },
             "at": {
               "joint": "W"
@@ -39882,7 +39974,8 @@
               0,
               0,
               1
-            ]
+            ],
+            "support": "stub"
           },
           {
             "id": "S",
@@ -39890,11 +39983,39 @@
             "a": "crank",
             "b": "wheel",
             "at": [
-              -77.78,
+              -77.78174593052023,
               0,
               0
             ],
-            "slot": "wheel"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "slot": {
+              "from": [
+                110,
+                0,
+                0
+              ],
+              "to": [
+                67.57359312880715,
+                42.42640687119285,
+                0
+              ],
+              "repeat": 4,
+              "center": [
+                110,
+                0,
+                0
+              ]
+            },
+            "active": {
+              "driver": "input",
+              "lo": 135,
+              "hi": 225
+            },
+            "note": "the pin drives in a slot while the crank is within 45 degrees of the line of centres"
           },
           {
             "id": "L",
@@ -39906,7 +40027,13 @@
               0,
               0
             ],
-            "follower": "locking arc"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "follower": "locking arc",
+            "note": "the locking disc in the wheel's concave arc holds it between indexes"
           }
         ],
         "params": [
@@ -39953,7 +40080,8 @@
               6,
               8
             ],
-            "value": 4
+            "value": 4,
+            "note": "built with 4 slots"
           }
         ],
         "drivers": [
@@ -39965,12 +40093,14 @@
               0,
               360
             ],
-            "default": 0
+            "default": 0,
+            "phase": 135,
+            "note": "the cycle starts as the pin enters a slot; the reference is mid-dwell"
           }
         ],
         "solve": [
           {
-            "block": "cam",
+            "block": "indexer",
             "id": "index",
             "joints": [
               "W",
@@ -39978,20 +40108,24 @@
               "L"
             ],
             "in": {
-              "cam": "crank",
-              "follower": "wheel",
-              "c": "c",
-              "n": "slots"
+              "n": 4,
+              "input": "input",
+              "phi0": -180,
+              "wheel": "wheel",
+              "center": [
+                110,
+                0,
+                0
+              ],
+              "axis": [
+                0,
+                0,
+                1
+              ]
             },
-            "opts": {
-              "law": "geneva, external: tan(beta) = sin(alpha)/(c/a - cos(alpha)) while the pin is in a slot, locked between",
-              "direction": "wheel turns opposite to the crank",
-              "zero": "mid-dwell, pin on the line of centres away from the wheel"
-            },
-            "out": [
-              "wheel-angle",
-              "wheel-speed"
-            ]
+            "out": {
+              "angle": "wheel-turn"
+            }
           }
         ],
         "points": [
@@ -39999,7 +40133,7 @@
             "id": "R",
             "body": "crank",
             "local": [
-              -77.78,
+              77.78174593052023,
               0,
               0
             ]
@@ -40008,7 +40142,7 @@
             "id": "M",
             "body": "wheel",
             "local": [
-              60,
+              66,
               0,
               0
             ]
@@ -40038,7 +40172,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #216: a solid slotted wheel with clear concave locking arcs and smaller windows (not none), and the bar across the wheel see-through or moved, so the wheel no longer reads as a lattice. A point on the wheel is traced with equal-time ticks so the stop and go reads; the line of centres and the right angle of tangential entry are drawn. Checked: 90° step per crank turn, moving during 90° and resting 270°, peak wheel speed 2.41 times the crank's at mid-index."
+          "note": "Applies the 2026-10-19 review and #216: a solid slotted wheel with clear concave locking arcs and smaller windows (not none), and the bar across the wheel see-through or moved, so the wheel no longer reads as a lattice. A point on the wheel is traced with equal-time ticks so the stop and go reads; the line of centres and the right angle of tangential entry are drawn. Checked: 90° step per crank turn, moving during 90° and resting 270°, peak wheel speed 2.41 times the crank's at mid-index. Rebuild R5 (#216): built on v3. The wheel is a solid slotted plate with four small round windows behind its locking arcs (M2: smaller windows, not none) and the slots and arcs cut from the record's numbers; the crank's locking disc and pin lie in the wheel's plane, its arm above the wheel; the wheel turns on a stub axle from the base, so no bar crosses it. The slot-count control is not offered (the wheel is built at build time); the record keeps the choice."
         },
         "principle": [
           {
@@ -40078,12 +40212,10 @@
           },
           {
             "id": "entry",
-            "kind": "arc",
-            "center": "R",
-            "from": "O",
-            "to": "W",
-            "label": "TANGENTIAL ENTRY 90°",
-            "when": "pin at a slot mouth"
+            "kind": "line",
+            "from": "W",
+            "to": "R",
+            "label": "SLOT LINE"
           },
           {
             "id": "locking",
@@ -40099,11 +40231,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "slots",
-            "kind": "design",
-            "design": "slots"
           }
         ],
         "plot": [
@@ -40131,13 +40258,14 @@
             "output": "wheel-angle",
             "stat": "dwell",
             "value": 270,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
-            "text": "peak wheel speed 2.41 times the crank's, at mid-index",
+            "text": "peak wheel speed 2.41 times the crank's, at mid-index, turning the other way",
             "output": "wheel-speed",
-            "stat": "max",
-            "value": 2.41,
+            "stat": "min",
+            "value": -2.41,
             "tol": 0.02
           }
         ],

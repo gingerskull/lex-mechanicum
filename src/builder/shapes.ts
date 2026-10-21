@@ -13,6 +13,7 @@ import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 import { barrelGroove, camLawOf, flatCam, rollerCam } from "./cams";
+import { genevaCrank, genevaWheel } from "./indexers";
 
 export interface BodyGeom {
   id: string;
@@ -60,7 +61,7 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean; features?: import("../solids/types").Feature[] } {
   const g = outlineOf0(shape, role, pins);
   // holes the record names on a disc or a plate ([x, y, r] in the body's frame): a port face's ports
   if (Array.isArray(shape.holes) && (shape.type === "disc" || shape.type === "plate"))
@@ -68,7 +69,7 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
   return g;
 }
 
-function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
+function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean; features?: import("../solids/types").Feature[] } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -135,6 +136,11 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const d = num(shape.diameter, 8);
       return { profile: { outer: circle(d / 2, 0, 0, 24), holes: [] }, thick: num(shape.length, 40), approx: false };
     }
+    case "genevaWheel":
+    case "genevaCrank": {
+      const part = type === "genevaWheel" ? genevaWheel(shape) : genevaCrank(shape);
+      return { profile: part.profile, thick: part.thick, approx: false, features: part.features };
+    }
     case "rack": {
       const L = num(shape.length, 120);
       const h = num(shape.height, 20);
@@ -178,7 +184,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const fixed = !js.length && !!F;
     // `place`: the part starts that far along its frame's z, where the joints put it (a roller down in a groove), not on a slab
     const placed = typeof shape.place === "number" ? { exact: { offset: shape.place } } : g.exact || fixed ? { exact: { offset: 0 } } : {};
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...placed };
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.features ? { features: g.features } : {}), ...placed };
     const built = universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? geom;
     out.set(b.id, withPieces(b, built));
   }
