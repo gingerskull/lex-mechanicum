@@ -86,7 +86,10 @@ export function controlFor(t: Teaching | null, id: string, value: unknown): Cont
     case "param": return { params: { [key("param")]: num } };
     case "design": return { design: { [key("design")]: String(value) } };
     case "selector": return { select: { [key("selector")]: String(value) } };
-    default: return { drivers: { [key("driver")]: num } };
+    case "driver": return { drivers: { [key("driver")]: num } };
+    // a ghost of a design choice the page does not offer as a control (one that would change the built parts): the
+    // choice by its id, so its path is still drawn
+    default: return typeof value === "string" && !Number.isFinite(num) ? { design: { [id]: value } } : { drivers: { [key("driver")]: num } };
   }
 }
 

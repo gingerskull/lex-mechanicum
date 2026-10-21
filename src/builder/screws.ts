@@ -37,7 +37,9 @@ function coreProfile(spans: { z0: number; z1: number; r: number }[]): Profile {
       pts.push([a.r, a.z1 - c], [a.r - c, a.z1], [0, a.z1]);
       break;
     }
-    pts.push([a.r, a.z1], [b.r, b.z0]);
+    // a plain shank between two threads at the smaller core, stepped at each thread's end
+    const m = Math.min(a.r, b.r);
+    pts.push([a.r, a.z1], [m, a.z1], [m, b.z0], [b.r, b.z0]);
   }
   return { outer: pts, holes: [] };
 }
@@ -166,15 +168,7 @@ function buildNut(ctx: BuildCtx, screwF: Frame, n: Nut, out: Solid3[], serves: R
     L.add(H.solid(`${id}-wiper${k}`, { name: k ? "" : `Felt wiper ring ${t.major} x ${Dn - 2}, at each end of the nut`, kind: "wiper", role: "hw", mat: "Felt, oil soaked", outer: circle(Dn / 2 - 1, 0, 0, 40), holes: [circle(t.major / 2, 0, 0, 40)], z0: a, z1: b, body: id, ...(k ? { qty: 0 } : { qty: 2 }) }));
   serve("F8", `${id}-wiper0`);
   out.push(...L.out());
-  // the nut's ridge in the screw's groove: the screw's helix shifted to the nut's start, in the screw's frame
-  const r = nutRidge(t);
-  const zs = w0 + z0;
-  const lead = t.lead;
-  const s = t.hand === "left" ? -1 : 1;
-  // the screw's ridge centre at angle a lies at z = from + s a lead / 2π; the nut's ridge at that plus the shift
-  const phase = s * ((2 * Math.PI * (zs - t.from - r.shift)) / lead);
-  const sw = helixSweep({ r: r.rootR, lead, z0: zs, z1: w0 + z1, hand: t.hand, phase }, r.pts.map(([u, v]): [number, number] => [-u, v]));
-  out.push({ ...place(screwF, H.solid(`${id}-nut-thread`, { name: "", kind: "bushing", role: "hw", mat: ball ? "Steel 100Cr6" : "Bronze CuSn12", outer: [[0, 0], [1, 0], [0, 1]], z0: 0, z1: 1, body: id, joints: [n.joint] }))[0]!, profile: sw.profile, op: sw.op, frame: { ...screwF } });
+  out.push(nutThread(screwF, t, w0 + z0, w0 + z1, id, `${id}-nut-thread`, n.joint));
   // the grease nipple on the carriage's top, feeding the nut (F8)
   const top = n.Ht / 2;
   const Lt = new Local({ o: v3.add(A.o, v3.mul(A.x, top)), x: A.z, z: A.x }, { joints: [n.joint] });
@@ -182,6 +176,62 @@ function buildNut(ctx: BuildCtx, screwF: Frame, n: Nut, out: Solid3[], serves: R
   out.push(...Lt.out());
   serve("F8", `${id}-nip`);
   return name;
+}
+
+/** A nut's ridge in the screw's groove over [za, zb] of the screw's frame: the screw's helix shifted to it, on `body`. */
+function nutThread(screwF: Frame, t: ThreadSpec, za: number, zb: number, body: string, sid: string, joint: string): Solid3 {
+  const r = nutRidge(t);
+  const s = t.hand === "left" ? -1 : 1;
+  // the screw's ridge centre at path angle a lies at z = from + s a lead / 2π; the nut's ridge at that plus the shift
+  const phase = s * ((2 * Math.PI * (za - t.from - r.shift)) / t.lead);
+  const sw = helixSweep({ r: r.rootR, lead: t.lead, z0: za, z1: zb, hand: t.hand, phase }, r.pts.map(([u, v]): [number, number] => [-u, v]));
+  const ball = t.form === "ball";
+  const base = place(screwF, H.solid(sid, { name: "", kind: "bushing", role: "hw", mat: ball ? "Steel 100Cr6" : "Bronze CuSn12", outer: [[0, 0], [1, 0], [0, 1]], z0: 0, z1: 1, body, joints: [joint] }))[0]!;
+  return { ...base, profile: sw.profile, op: sw.op, frame: { ...screwF } };
+}
+
+/**
+ * A screw that runs in a nut fixed to the ground (a differential screw's first thread): a pedestal block on the base,
+ * screwed and dowelled to it (F1), a flanged bronze nut screwed into it (F3), its ridge in the screw's groove, a felt
+ * wiper each end and a grease nipple on top (F8).
+ */
+function buildFixedNut(ctx: BuildCtx, screwF: Frame, t: ThreadSpec, w0: number, L: number, joint: string, baseTop: number, out: Solid3[], serves: Record<string, string[]>): void {
+  const serve = (f: string, ...ids: string[]) => ((serves[f] ??= []).push(...ids));
+  const id = `${joint}-nut`;
+  const A = axisFrame(screwF, w0);
+  const Dn = Math.round(t.major + 8);
+  const W = Dn + 16;
+  const above = W / 2;
+  const below = v3.dot(v3.sub(A.o, [A.o[0], A.o[1], baseTop]), UP);
+  const lat = v3.cross(A.z, A.x);
+  void lat;
+  const P = new Local(A, { joints: [joint] });
+  // the pedestal: from the base up past the axis, across the screw, bored for the nut
+  P.add(H.plate(`${id}-block`, roundRect(-below, -W / 2, above, W / 2, 2), { body: "ground", kind: "housing", role: "ground", name: `Nut block ${W} x ${L}, screwed and dowelled to the base`, z0: -L / 2, z1: L / 2, holes: [circle(Dn / 2 + 0.05, 0, 0, 48).reverse()], mat: "Cast iron EN-GJL-250" }));
+  const fl = { D: Dn + 10, t: 4 };
+  P.add(H.solid(`${id}-bronze`, { name: `Flanged bronze nut Tr${t.major}x${t.pitch}, ${t.hand} hand, fixed`, kind: "bushing", role: "hw", mat: "Bronze CuSn12", outer: circle(Dn / 2, 0, 0, 48), holes: [circle(t.major / 2 + 0.15, 0, 0, 48)], z0: -L / 2, z1: L / 2, body: "ground" }));
+  P.add(H.solid(`${id}-flange`, { name: "", kind: "bushing", role: "hw", mat: "Bronze CuSn12", outer: circle(fl.D / 2, 0, 0, 48), holes: [circle(t.major / 2 + 0.15, 0, 0, 48)], z0: -L / 2 - fl.t, z1: -L / 2, body: "ground", group: `${id}-bronze` }));
+  const pcd = (Dn / 2 + fl.D / 2) / 2;
+  for (let k = 0; k < 4; k++) {
+    const a = Math.PI / 4 + (k * Math.PI) / 2;
+    P.add(H.screw(`${id}-fsc${k}`, "socket", 3, fl.t + 8, { body: "ground", at: [pcd * Math.cos(a), pcd * Math.sin(a), 0], face: -L / 2 - fl.t, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 4 }) }));
+  }
+  for (const [k, a, b] of [[0, -L / 2 - fl.t - 2, -L / 2 - fl.t], [1, L / 2, L / 2 + 2]] as const)
+    P.add(H.solid(`${id}-wiper${k}`, { name: k ? "" : `Felt wiper ring ${t.major} x ${Dn - 2}, at each end of the nut`, kind: "wiper", role: "hw", mat: "Felt, oil soaked", outer: circle(Dn / 2 - 1, 0, 0, 40), holes: [circle(t.major / 2, 0, 0, 40)], z0: a, z1: b, body: "ground", ...(k ? { qty: 0 } : { qty: 2 }) }));
+  out.push(...P.out());
+  out.push(nutThread(screwF, t, w0 - L / 2, w0 + L / 2, "ground", `${id}-thread`, joint));
+  // screws down into the base and two dowels (F1); a grease nipple on top (F8)
+  const S = new Local({ o: [A.o[0], A.o[1], baseTop], x: A.z, z: UP }, { joints: [joint] });
+  for (const [k, u] of [[0, -W / 2 + 4], [1, W / 2 - 4]] as const) {
+    S.add(H.screw(`${id}-sc${k}`, "socket", 4, 14, { body: "ground", at: [0, u, 0], face: -8, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    S.add(H.dowel(`${id}-dw${k}`, 4, { body: "ground", at: [k ? L / 2 - 4 : -L / 2 + 4, u, 0], z0: -6, z1: 6, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø4 x 12 h6, nut block to base", qty: 2 }) }));
+  }
+  const Lt = new Local({ o: v3.add(A.o, v3.mul(A.x, above)), x: A.z, z: A.x }, { joints: [joint] });
+  Lt.add(H.nipple(`${id}-nip`, { body: "ground", at: [0, 0, 0], z0: 0, z1: 9 }));
+  out.push(...S.out(), ...Lt.out());
+  serve("F1", `${id}-dw0`);
+  serve("F3", `${id}-bronze`, `${id}-fsc0`);
+  serve("F8", `${id}-wiper0`, `${id}-nip`);
 }
 
 /**
@@ -346,6 +396,39 @@ function buildScrew(ctx: BuildCtx, sb: string): void {
       d: journal,
       serves,
     });
+  }
+  // a screw that runs in a nut of the ground's (a differential screw): the fixed nut on its pedestal, and a knurled knob
+  // on the free end, since the screw advances through its nut and a belt could not follow it (V5)
+  const fixed = ctx.kin.joints.filter((j) => j.type === "screw" && j.a === "ground" && j.b === sb);
+  for (const j of fixed) {
+    const w = v3.dot(v3.sub(ctx.S.joints.get(j.id)!.at, F.o), F.z);
+    const gsh = (ctx.kin.bodies.find((b) => b.id === "ground")?.shape ?? {}) as Record<string, unknown>;
+    const L = num((gsh.nut as Record<string, unknown> | undefined)?.length, 30);
+    const fs: Record<string, string[]> = {};
+    buildFixedNut(ctx, F, threadAt(T, w), w, L, j.id, baseTop, out, fs);
+    ctx.note({ id: j.id, kit: "J11", at: ctx.S.joints.get(j.id)!.at, title: `J11 · ${titleOf(j.id)}`, note: `${titleOf(j.id)}: the screw runs in a flanged bronze nut fixed in a pedestal block screwed and dowelled to the base (F1, F3), so each turn advances the screw itself by its lead; a felt wiper at each end and a grease nipple (F8).`, badge: ["screw carried by the fixed nut", "ok"], serves: fs });
+  }
+  const knob = (body.shape as Record<string, unknown>).knob as Record<string, unknown> | undefined;
+  if (fixed.length && knob) {
+    const D = num(knob.diameter, 30);
+    const at = num(knob.at, T[0]!.from - 15);
+    const t0 = T[0]!;
+    const K = new Local(F, { joints: fixed.map((j) => j.id) });
+    const jd = Math.round(t0.minor - 2);
+    K.add(H.shaft(`${sb}-journal0`, { d: jd, z0: at - 2, z1: t0.from }, { body: sb, name: `Screw end Ø${jd}, the knob pinned on it` }));
+    const kn: Vec2[] = [];
+    const N = 36;
+    for (let k = 0; k < N; k++) {
+      const a = (2 * Math.PI * k) / N;
+      const r = D / 2 - (k % 2 ? 0.8 : 0);
+      kn.push([r * Math.cos(a), r * Math.sin(a)]);
+    }
+    K.add(H.solid(`${sb}-knob`, { name: `Knurled knob Ø${D} x 14, taper-pinned to the screw, index line on its face`, kind: "part", role: "driver", mat: "Aluminium 6061-T6, knurled", outer: kn, holes: [circle(jd / 2 + 0.02, 0, 0, 32)], z0: at - 14, z1: at, body: sb, marks: [{ kind: "index", pts: [[D / 2 - 6, 0], [D / 2 - 1.5, 0]] }] }));
+    K.add(H.dowel(`${sb}-knob-pin`, 3, { body: sb, at: [0, 0, 0], z0: at - 9, z1: at - 5, name: "Taper pin Ø3, knob to screw" }));
+    const ks = K.out();
+    // the knob's own solid turns about the screw's axis: its frame starts at the screw's
+    for (const q of ks) if (q.id === `${sb}-knob`) q.flags.accent = true;
+    out.push(...ks);
   }
   void support;
   ctx.add(out);

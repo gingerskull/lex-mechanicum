@@ -615,7 +615,7 @@ class Run implements BlockCtx {
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);
-      if (r && (r.joint.type === "prismatic" || r.joint.type === "cylindrical")) {
+      if (r && (r.joint.type === "prismatic" || r.joint.type === "cylindrical" || r.joint.type === "screw")) {
         const Xa = this.xfs.get(r.joint.a) ?? xf.id();
         const Xb = this.xfs.get(r.joint.b) ?? xf.id();
         return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));

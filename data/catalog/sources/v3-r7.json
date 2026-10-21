@@ -2803,7 +2803,7 @@
    "review": {
     "verdict": "tweak",
     "date": "2026-10-20",
-    "note": "Unbuilt; reviewed against the record. The relation is exact and linear (3 mm per turn), but the record's 200 mm stroke takes 66.7 turns, and a screw turning one way cannot repeat its cycle. Decided: the screw turns 10 turns out and back, so the nut travels 30 mm, one lead per turn, with a tick on the nut's path at each turn; a mark on the handwheel to count turns; the guide that keeps the nut from turning is part of the lesson and stays in view; a section through the nut on the screw axis shows the loaded thread flank, the inclined plane of the text. Tr12x3 is kept: lead angle 5.2° against a friction angle of 8.5°, so it is self-locking."
+    "note": "Unbuilt; reviewed against the record. The relation is exact and linear (3 mm per turn), but the record's 200 mm stroke takes 66.7 turns, and a screw turning one way cannot repeat its cycle. Decided: the screw turns 10 turns out and back, so the nut travels 30 mm, one lead per turn, with a tick on the nut's path at each turn; a mark on the handwheel to count turns; the guide that keeps the nut from turning is part of the lesson and stays in view; a section through the nut on the screw axis shows the loaded thread flank, the inclined plane of the text. Tr12x3 is kept: lead angle 5.2° against a friction angle of 8.5°, so it is self-locking. Rebuild (R7): the input is a reversing belt drive to the screw's end; the nut's ticks count the turns, so the handwheel mark is not kept."
    },
    "principle": [
     {
@@ -3295,27 +3295,18 @@
       "type": "plate",
       "rect": [
        300,
-       70
+       90
       ],
       "nut": {
-       "at": [
-        15,
-        0,
-        40
-       ],
        "length": 30,
        "thread": "Tr24x5"
       },
-      "rail": {
-       "side": -1,
-       "offset": 24
-      },
-      "note": "frame carrying the fixed nut and a guide rail for the moving nut"
+      "note": "base with the fixed nut's pedestal and the guide rail for the moving nut's flag"
      },
      "at": {
       "frame": {
        "origin": [
-        100,
+        80,
         0,
         0
        ]
@@ -3328,28 +3319,29 @@
      "shape": {
       "type": "shaft",
       "diameter": 24,
-      "length": 250,
       "threads": [
        {
         "form": "Tr",
         "major": 24,
+        "minor": 18.5,
         "pitch": 5,
         "hand": "right",
-        "from": -65,
-        "to": 15
+        "from": -45,
+        "to": 25
        },
        {
         "form": "Tr",
         "major": 20,
+        "minor": 15.5,
         "pitch": 4,
         "hand": "right",
-        "from": 50,
-        "to": 160
+        "from": 60,
+        "to": 150
        }
       ],
       "knob": {
-       "diameter": 30,
-       "at": -80
+       "diameter": 40,
+       "at": -62
       }
      },
      "at": {
@@ -3360,14 +3352,13 @@
      "id": "nut",
      "role": "output",
      "shape": {
-      "type": "slider",
-      "length": 25,
-      "width": 30,
-      "height": 30,
-      "bore": "Tr20x4",
+      "type": "nut",
+      "length": 26,
+      "width": 40,
+      "height": 40,
       "flag": {
        "side": -1,
-       "to": "guide rail"
+       "gap": 16
       }
      },
      "at": {
@@ -3401,7 +3392,7 @@
      "a": "screw",
      "b": "nut",
      "at": [
-      120,
+      135,
       0,
       40
      ],
@@ -3412,7 +3403,6 @@
      ],
      "lead": 4,
      "hand": "right",
-     "handFrom": "hands",
      "ball": false
     },
     {
@@ -3421,7 +3411,7 @@
      "a": "ground",
      "b": "nut",
      "at": [
-      120,
+      135,
       0,
       40
      ],
@@ -3432,7 +3422,7 @@
      ],
      "limits": [
       0,
-      90
+      10
      ]
     }
    ],
@@ -3495,19 +3485,13 @@
       "guide"
      ],
      "in": {
-      "screw": "screw",
+      "joint": "moving-thread",
+      "input": "knob",
       "nut": "nut",
-      "p1": "p1",
-      "p2": "p2",
-      "hands": "hands",
-      "turn": "knob"
+      "hand": "hands"
      },
-     "out": [
-      "x-screw",
-      "x-nut"
-     ],
-     "opts": {
-      "relation": "x_screw = p1 turn / 360; x_nut = (p1 - p2) turn / 360 with the same hands, (p1 + p2) turn / 360 with opposite hands"
+     "out": {
+      "advance": "nut-advance"
      }
     }
    ],
@@ -3516,40 +3500,40 @@
      "id": "screw-end",
      "body": "screw",
      "local": [
-      165,
       0,
-      0
+      0,
+      150
      ]
     },
     {
      "id": "nut-mark",
      "body": "nut",
      "local": [
+      20,
       0,
-      0,
-      15
+      0
      ]
     },
     {
-     "id": "knob-mark",
-     "body": "screw",
+     "id": "nut-centre",
+     "body": "nut",
      "local": [
-      -80,
       0,
-      15
+      0,
+      0
      ]
     }
    ],
    "outputs": [
     {
      "id": "screw-x",
-     "of": "screw-end",
+     "of": "fixed-thread",
      "kind": "position",
      "unit": "mm"
     },
     {
      "id": "nut-x",
-     "of": "nut-mark",
+     "of": "guide",
      "kind": "position",
      "unit": "mm"
     },
@@ -3566,7 +3550,7 @@
    "review": {
     "verdict": "tweak",
     "date": "2026-10-20",
-    "note": "Unbuilt; reviewed against the record. With 1.0 and 0.8 mm pitches the nut moves 0.2 mm per turn: nothing would show, and the record's own note asked to exaggerate the drawing, which K1 forbids. Decided: real coarse threads of 5 and 4 mm (Tr24x5 in the fixed nut, Tr20x4 for the moving nut), the same 5:1 as the fine pair, so over 10 turns out and back the screw advances 50 mm and the nut 10 mm, both at true size; ticks once per turn on the screw's end and on the nut so 5 mm against 1 mm per turn reads; a same or opposite hand switch with the opposite-hand nut path (9 mm per turn) as a ghost; a section through both nuts shows the two pitches engaged."
+    "note": "Unbuilt; reviewed against the record. With 1.0 and 0.8 mm pitches the nut moves 0.2 mm per turn: nothing would show, and the record's own note asked to exaggerate the drawing, which K1 forbids. Decided: real coarse threads of 5 and 4 mm (Tr24x5 in the fixed nut, Tr20x4 for the moving nut), the same 5:1 as the fine pair, so over 10 turns out and back the screw advances 50 mm and the nut 10 mm, both at true size; ticks once per turn on the screw's end and on the nut so 5 mm against 1 mm per turn reads; a same or opposite hand switch with the opposite-hand nut path (9 mm per turn) as a ghost; a section through both nuts shows the two pitches engaged. Rebuild (R7): the hand switch is not offered as a control, because the threads are built right hand and a control cannot change built parts; the opposite-hand nut path stays as a ghost. The screw advances through its fixed nut, so it is turned by a knob on its end, not belted."
    },
    "principle": [
     {
@@ -3580,9 +3564,6 @@
     },
     {
      "point": "nut-mark"
-    },
-    {
-     "point": "knob-mark"
     }
    ],
    "traces": [
@@ -3623,19 +3604,19 @@
      "kind": "section",
      "plane": {
       "origin": [
-       70,
+       75,
        0,
        40
       ],
       "normal": [
        0,
-       1,
+       -1,
        0
       ]
      },
      "highlight": [
-      "fixed-thread",
-      "moving-thread"
+      "screw",
+      "nut"
      ]
     }
    ],
@@ -3644,11 +3625,6 @@
      "id": "knob",
      "kind": "driver",
      "driver": "knob"
-    },
-    {
-     "id": "hands",
-     "kind": "design",
-     "design": "hands"
     }
    ],
    "plot": [
