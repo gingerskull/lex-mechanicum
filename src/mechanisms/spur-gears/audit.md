@@ -55,8 +55,8 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
-| D1 | PASS | HAND · involute teeth, module 4, 20 deg pressure angle; the gear webbed with spokes |
-| D2 | PASS | HAND · material where the teeth carry; webs and bosses on the large gears |
+| D1 | PASS | HAND · involute teeth, module 4, 20 deg pressure angle; plain discs |
+| D2 | PASS | HAND · material where the teeth carry; plain gear discs on keyed hubs |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
 | D5 | PASS | AUTO / HAND · one bridge over each gear on two posts; motor bracket |
