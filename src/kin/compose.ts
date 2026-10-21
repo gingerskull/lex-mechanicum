@@ -628,6 +628,8 @@ class Run implements BlockCtx {
         // a joint between two bodies that were both solved still resolves above; anything else is skipped
       }
     }
+    // construction points a block made (a crossing of two lines) that no body carries
+    for (const [id, p] of this.pts) if (!points.has(id)) points.set(id, p);
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
       const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points, o.axis);

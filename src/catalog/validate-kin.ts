@@ -148,6 +148,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isStr(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
+  // what the blocks produce: a construction point (a crossing of two lines) may be traced and read like a named point
+  const made = new Set<string>();
   for (const s of kin.solve) {
     const by = s.id;
     if (!KIN_VOCAB.block.includes(s.block as never) && !/^new:[a-z][a-z0-9-]*$/.test(String(s.block))) {
@@ -158,7 +160,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     // a name, a list of names, or the block's keyed outputs ({ angle: "gear-turn" }, as src/kin/registry reads them)
     const outs = typeof s.out === "string" ? [s.out] : isObj(s.out) && !Array.isArray(s.out) ? Object.values(s.out) : arr(s.out);
     if (!outs.length || !outs.every(isStr)) say(`solve ${by}: out must name what the block produces`);
-    for (const o of outs as string[]) known.add(o);
+    for (const o of outs as string[]) {
+      known.add(o);
+      made.add(o);
+    }
     if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch)) say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);
     for (const j of arr(s.joints) as string[]) claim(j, `solve ${by}`);
   }
@@ -178,7 +183,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);
     // an angle output may read a driver's own value (absolute, in the driver's units)
-    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !(o.kind === "angle" && drivers.has(o.of))) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or (for an angle) driver`);
+    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !made.has(o.of) && !(o.kind === "angle" && drivers.has(o.of))) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or (for an angle) driver`);
   }
 
   // mobility (K11)
@@ -200,7 +205,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   }
 
   const pointish = (name: string, v: unknown, where: string) => {
-    if (!isStr(v) || !(points.has(v) || joints.has(v) || bodies.has(v))) say(`${where}: ${name} "${String(v)}" is not a named point, joint or body`);
+    if (!isStr(v) || !(points.has(v) || joints.has(v) || bodies.has(v) || made.has(v))) say(`${where}: ${name} "${String(v)}" is not a named point, joint or body`);
   };
 
   if (!Array.isArray(t.principle) || !t.principle.length) say("teaching.principle must list the principle bodies and points (T3)");

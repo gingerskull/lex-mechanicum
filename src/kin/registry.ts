@@ -498,6 +498,35 @@ const lerp: BlockFn = (c, s) => {
   outPoint(c, s, v3.add(a, v3.mul(v3.sub(c.vec(i.b), a), c.num(i.t))));
 };
 
+/**
+ * line-crossing. in: a1, a2 (two points of one line), b1, b2 (of the other), n (plane normal, default +z), sum
+ * (optional). out: where the lines cross in that plane (the crossing of an antiparallelogram's bars, an instant
+ * centre). Where the lines run together (an antiparallelogram's change points) the crossing is the limit: the point
+ * on the line a1→a2 whose distances to a1 and b1 add up to `sum` (the ellipse with foci a1 and b1); without `sum`
+ * parallel lines do not cross and the block fails there.
+ */
+const lineCrossing: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const n = v3.unit(i.n ? c.vec(i.n) : [0, 0, 1]);
+  const p = c.vec(i.a1);
+  const d = v3.perp(v3.sub(c.vec(i.a2), p), n);
+  const q = c.vec(i.b1);
+  const e = v3.perp(v3.sub(c.vec(i.b2), q), n);
+  const den = v3.dot(v3.cross(d, e), n);
+  if (Math.abs(den) > 1e-6 * v3.len(d) * v3.len(e)) {
+    const t = v3.dot(v3.cross(v3.sub(q, p), e), n) / den;
+    outPoint(c, s, v3.add(p, v3.mul(d, t)));
+    return;
+  }
+  if (i.sum === undefined) throw new KinError(`line-crossing ${s.id}: the lines are parallel`);
+  // on the ray p + rho u: rho + |p + rho u - q| = L gives rho = (L^2 - |q - p|^2) / (2 (L - u.(q - p)))
+  const L = c.num(i.sum);
+  const u = v3.unit(d);
+  const w = v3.perp(v3.sub(q, p), n);
+  const rho = (L * L - v3.dot(w, w)) / (2 * (L - v3.dot(u, w)));
+  outPoint(c, s, v3.add(p, v3.mul(u, rho)));
+};
+
 void sideOf;
 void angleFrom;
 
@@ -518,4 +547,5 @@ export const BLOCKS: Record<string, BlockFn> = {
   escapement: escapementBlock,
   indexer,
   lerp,
+  "line-crossing": lineCrossing,
 };

@@ -775,17 +775,6 @@
           "at": {
             "joint": "O4"
           }
-        },
-        {
-          "id": "tracer",
-          "role": "slider",
-          "shape": {
-            "type": "tracer",
-            "radius": 6
-          },
-          "at": {
-            "joint": "X"
-          }
         }
       ],
       "joints": [
@@ -811,8 +800,8 @@
           "a": "crank",
           "b": "coupler",
           "at": [
-            50,
-            86.6,
+            50.000000000000014,
+            86.60254037844386,
             0
           ],
           "axis": [
@@ -827,8 +816,8 @@
           "a": "coupler",
           "b": "follower",
           "at": [
-            11.05,
-            95.72,
+            11.052631578947384,
+            95.71859726038531,
             0
           ],
           "axis": [
@@ -852,35 +841,6 @@
             0,
             1
           ]
-        },
-        {
-          "id": "X-slide",
-          "type": "prismatic",
-          "a": "crank",
-          "b": "tracer",
-          "at": [
-            26.25,
-            45.47,
-            0
-          ],
-          "axis": [
-            0.5,
-            0.866,
-            0
-          ]
-        },
-        {
-          "id": "X",
-          "type": "pin-in-slot",
-          "a": "tracer",
-          "b": "follower",
-          "at": [
-            26.25,
-            45.47,
-            0
-          ],
-          "slot": "follower",
-          "path": "line O4 to B"
         }
       ],
       "params": [
@@ -921,8 +881,8 @@
         {
           "id": "assembly",
           "options": [
-            "crossed",
-            "parallel"
+            "parallel",
+            "crossed"
           ],
           "value": "crossed"
         }
@@ -957,31 +917,21 @@
           "branch": "crossed",
           "out": "B",
           "opts": {
-            "keep": "crossed",
-            "change-points": [
-              0,
-              180
-            ],
-            "note": "the side of the circle intersection flips at the change points; the crossed assembly is kept"
+            "note": "the crossed closure, held through the change points at 0 and 180 degrees by the branch table"
           }
         },
         {
-          "block": "new:line-crossing",
+          "block": "line-crossing",
           "id": "crossing",
-          "joints": [
-            "X-slide",
-            "X"
-          ],
+          "joints": [],
           "in": {
             "a1": "O2",
             "a2": "A",
             "b1": "O4",
-            "b2": "B"
+            "b2": "B",
+            "sum": "a"
           },
-          "out": "X",
-          "opts": {
-            "closed": "rho = (a^2 - d^2) / (2 (a - d cos u)) along O2A"
-          }
+          "out": "X"
         }
       ],
       "points": [],
@@ -1062,11 +1012,6 @@
           "id": "crank",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "assembly",
-          "kind": "design",
-          "design": "assembly"
         }
       ],
       "plot": [

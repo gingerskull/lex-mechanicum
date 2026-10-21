@@ -8,6 +8,9 @@ import { hasFlag3 } from "../../package/format2";
 import { EF, EDGE, EFLAG } from "../../solids/edges";
 import { mat4 } from "../../solids/frame";
 import type { Vec3 } from "../../solids/types";
+import { xf } from "../../kin/math";
+const xfApply = xf.apply;
+const xfInv = xf.inv;
 import { DRAFT } from "../../style/draft";
 import { FORM } from "../../style/form";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
@@ -735,6 +738,20 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const pt = typeof o.point === "string" ? o.point : "";
       const poser = A.rt.scene.poser;
       const pts: Vec3[] = [];
+      // the point's path seen from a moving body, carried by that body now: the centrode that rolls on the fixed one
+      if (typeof o.frame === "string" && poser.bodyAt) {
+        const now = poser.bodyAt(A.u, o.frame);
+        if (!now) return;
+        const n = 180;
+        for (let k = 0; k <= n; k++) {
+          const u = (k / n) * poser.period;
+          const p = poser.point(u, pt), X = poser.bodyAt(u, o.frame);
+          if (p && X) pts.push(xfApply(now, xfApply(xfInv(X), p)));
+        }
+        poly(pts, true);
+        if (pts[0]) tag(pts[Math.floor(n / 4)]!, 0, -12);
+        return;
+      }
       const sweeps = poser.sweep ? poser.sweep(pt, Array.isArray(o.range) ? (o.range as [number, number]) : undefined, Array.isArray(o.branches) ? (o.branches as string[]) : undefined) : null;
       if (sweeps) for (const line of sweeps) { poly(line); if (line.length) pts.push(line[Math.floor(line.length / 2)]!); }
       else {
