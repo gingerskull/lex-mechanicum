@@ -764,7 +764,7 @@
         "review": {
           "verdict": "rethink",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: a wheel on each knuckle, dashed wheel-axis lines and the rear-axle line that meet near one point, the turning centre. The wheelbase is shortened from 250 to 200 mm and the arms lengthened from 30 to 45 mm. The left knuckle keeps its range of -30 to +40 degrees; to reach -30 the arms are angled 18.5 degrees inward, a little less than the 20.6 degrees that aims them at the rear axle centre, and the outer wheel stays within 2 degrees of the ideal over the whole range. A shorter wheelbase would put the centre nearer but cannot reach -30 degrees with a good trapezoid."
+          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: a wheel on each knuckle, dashed wheel-axis lines and the rear-axle line that meet near one point, the turning centre. The wheelbase is shortened from 250 to 200 mm and the arms lengthened from 30 to 45 mm. The left knuckle keeps its range of -30 to +40 degrees; to reach -30 the arms are angled 18.5 degrees inward, a little less than the 20.6 degrees that aims them at the rear axle centre, and the outer wheel stays within 2 degrees of the ideal over the whole range. A shorter wheelbase would put the centre nearer but cannot reach -30 degrees with a good trapezoid. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): rethink, as decided. A wheel stands on each knuckle on a stub axle in an upright tube (stub 24 mm, width 18, so the wheel clears its tube); the wheel axis lines are carried to the rear axle line and the turning centre is marked where they meet, about 38 mm behind that line at full lock because the outer wheel turns 1.5 degrees more than ideal. The base holds the rear axle line and both full-lock centres. The tie rod closes on the right side of the dyad, which the record had reversed."
         },
         "principle": [
           {
@@ -1509,7 +1509,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: the two moment arms are drawn as dimensions perpendicular to each rod's line of action, so the arm ratio 60 : 40 reads as the force ratio 1.5 and the travel ratio 0.67."
+          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: the two moment arms are drawn as dimensions perpendicular to each rod's line of action, so the arm ratio 60 : 40 reads as the force ratio 1.5 and the travel ratio 0.67. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The moment arms are drawn square to each rod's line. The record had the lever outline in the wrong frame (its x runs toward A) and asked the output slide for B before any block made it: B now comes from a second dyad on the lever's rigid triangle, and the displacement ratio is a slope of output against input (0.667)."
         },
         "principle": [
           {
@@ -3381,7 +3381,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep): the stylus is moved round a five-lobed flower and the pen draws it at twice the size. The line O, T, E is drawn as construction so the collinearity that makes the copy exact reads at every pose."
+          "note": "Applies the 2026-10-19 review (keep): the stylus is moved round a five-lobed flower and the pen draws it at twice the size. The line O, T, E is drawn as construction so the collinearity that makes the copy exact reads at every pose. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The target-path block moves the stylus round the flower and the dyads close the rhombus; the pen draws the flower at exactly twice the size, with O, T and E in line. The stylus is the cycle, so it is not a slider."
         },
         "principle": [
           {
@@ -3995,7 +3995,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: both coupler ends are traced, so two equal circles side by side show the coupler translating without turning. The parallel branch is held through the change points at 0 and 180 degrees."
+          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: both coupler ends are traced, so two equal circles side by side show the coupler translating without turning. The parallel branch is held through the change points at 0 and 180 degrees. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The joint positions are exact (they were rounded, K1 1e-3), and the assembly control is dropped: the parts are built for the parallel closure, which is held through both change points; the assembly stays a design choice."
         },
         "principle": [
           {
@@ -4966,7 +4966,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decision: the ground bridge is moved or drawn see-through so it no longer reads as a scissor bar of the wrong length (engine). The platform point traces a straight vertical line; the span w and one stage height h are dimensioned, so h = sqrt(L^2 - w^2) and the lift ratio 3w / h read off the drawing."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decision: the ground bridge is moved or drawn see-through so it no longer reads as a scissor bar of the wrong length (engine). The platform point traces a straight vertical line; the span w and one stage height h are dimensioned, so h = sqrt(L^2 - w^2) and the lift ratio 3w / h read off the drawing. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. Each stage's far pins come from the lerp block (2M - R), the platform turns by its slot through R3, and C runs straight up and down. The ground bridge is routed off the bars and drawn see-through, so it no longer reads as a scissor bar."
         },
         "principle": [
           {
@@ -7462,7 +7462,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: the crossing point X traces the fixed ellipse (foci O2 and O4), and the equal ellipse carried by the coupler (foci A and B) is drawn as a ghost rolling on it at X, which shows the coupler's motion as one ellipse rolling on another. The bridge over O4 must not read as a third arm (engine)."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: the crossing point X traces the fixed ellipse (foci O2 and O4), and the equal ellipse carried by the coupler (foci A and B) is drawn as a ghost rolling on it at X, which shows the coupler's motion as one ellipse rolling on another. The bridge over O4 must not read as a third arm (engine). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. The crossing X is a construction point made by the line-crossing block (at the change points its limit on the ellipse), so there is no tracer part and no slot in the output crank; the equal ellipse is drawn as a ghost carried by the coupler and touches the fixed one at X. The bridge over O4 is routed off the bowtie, with its posts outside both crank circles, and drawn see-through. The assembly control is dropped (parts built for the crossed closure)."
         },
         "principle": [
           {
@@ -8889,7 +8889,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: B is traced with equal-time ticks every 15 degrees of input, which bunch to 7.7 degrees and spread to 30.8 degrees of output turn, so the 0.51 to 2.07 speed swing shows against A's evenly ticked circle. The bridge over O4 becomes see-through or is moved (engine)."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: B is traced with equal-time ticks every 15 degrees of input, which bunch to 7.7 degrees and spread to 30.8 degrees of output turn, so the 0.51 to 2.07 speed swing shows against A's evenly ticked circle. The bridge over O4 becomes see-through or is moved (engine). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. The equal-time ticks bunch and spread on B against the even ticks on A. Both cranks sweep over the other's pivot, so one pivot must be carried from above: the bridge over O4 is drawn see-through. The transmission angle is now a three-point angle, and the joint positions are exact."
         },
         "principle": [
           {
@@ -9488,7 +9488,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions. Re-proportioned to a 100, b 60, c 80, d 100 and driven from the output's toggle (24.2 degrees, coupler in line with the input rocker) to 1.9 degrees inside the input's toggle (88.9 degrees, coupler in line with the output rocker): both rockers now move one way per stroke and the output's extremes fall at the ends of the input stroke, with no double wobble. Both toggles are marked; B is traced. The old text's 146.2 degrees was never reached (the old output peaked at 136.3 degrees)."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions. Re-proportioned to a 100, b 60, c 80, d 100 and driven from the output's toggle (24.2 degrees, coupler in line with the input rocker) to 1.9 degrees inside the input's toggle (88.9 degrees, coupler in line with the output rocker): both rockers now move one way per stroke and the output's extremes fall at the ends of the input stroke, with no double wobble. Both toggles are marked; B is traced. The old text's 146.2 degrees was never reached (the old output peaked at 136.3 degrees). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. Both rockers move one way per stroke; the two toggles are drawn at their poses. Joint positions exact; the input and output angles are read as absolute angles (the input from its driver, the output from the line O4 to B)."
         },
         "principle": [
           {
@@ -10223,7 +10223,7 @@
         "review": {
           "verdict": "rethink",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: the gear pair is gone and both cranks are driven. The cycle runs the tip round a 50 mm square target by inverse kinematics, so each crank visibly moves on its own (64.5 degrees each, out of phase) and the straight sides show that neither crank alone could draw them. The outline of the reachable workspace is drawn as construction, and the plot of one crank against the other is a closed loop, the signature of two inputs."
+          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: the gear pair is gone and both cranks are driven. The cycle runs the tip round a 50 mm square target by inverse kinematics, so each crank visibly moves on its own (64.5 degrees each, out of phase) and the straight sides show that neither crank alone could draw them. The outline of the reachable workspace is drawn as construction, and the plot of one crank against the other is a closed loop, the signature of two inputs. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): rethink, as decided. No gears: the target-path block runs the tip round the rounded square and the five-bar block's inverse kinematics turns each crank on its own; the reachable workspace is outlined over both cranks' ranges. The cranks are set by the cycle, so they are not sliders; the target size is the control."
         },
         "principle": [
           {
@@ -12515,7 +12515,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and the issue's decision to add a workpiece block at the pad, which the plunger meets at the toggle (engine hardware). The plunger is traced with equal-time ticks every 5 degrees of handle, which bunch near the dead-centre line: the plunger almost stops while the handle still turns, which is the force gain."
+          "note": "Applies the 2026-10-19 review (keep) and the issue's decision to add a workpiece block at the pad, which the plunger meets at the toggle (engine hardware). The plunger is traced with equal-time ticks every 5 degrees of handle, which bunch near the dead-centre line: the plunger almost stops while the handle still turns, which is the force gain. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep, with the workpiece block. The handle is an oscillating hand lever over -70 to +3 degrees (a manual driver never moves in the cycle). The plunger carries an adjustable spindle with a pad that meets the workpiece at dead centre; the slide's front end stop is dropped because the linkage limits the travel there (polish exception)."
         },
         "principle": [
           {
