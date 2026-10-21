@@ -171,7 +171,8 @@ const j5 = contactRule({
     const sb = bodyOf(ctx, slider);
     // the wipers ride the slider, which is built where it stands in the reference configuration
     for (const [k, x] of [[0, e[0] - 3], [1, e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [(x0 + x1) / 2, ky, 0], z0: w0 + rh + 3, z1: w0 + rh + 3 + 9 }));
+    // the nipple stands at the keeper's end, past the slider's travel, out of the way of parts that sweep over the slide
+    L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [x0 + 14, ky, 0], z0: w0 + rh + 3, z1: w0 + rh + 3 + 9 }));
     // one end stop block with a neoprene pad just past each end of the travel (F5)
     for (const [k, x, s] of [[0, x0 + 1, 1], [1, x1 - 1, -1]] as const) {
       const sx = x - s * 4;

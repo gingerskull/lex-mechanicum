@@ -4565,7 +4565,7 @@
             "b": "b0",
             "at": [
               32.5,
-              31.12,
+              31.12474899497183,
               0
             ],
             "axis": [
@@ -4581,7 +4581,7 @@
             "b": "a1",
             "at": [
               0,
-              62.25,
+              62.24949798994366,
               0
             ],
             "axis": [
@@ -4597,7 +4597,7 @@
             "b": "b1",
             "at": [
               65,
-              62.25,
+              62.24949798994366,
               0
             ],
             "axis": [
@@ -4613,7 +4613,7 @@
             "b": "b1",
             "at": [
               32.5,
-              93.37,
+              93.37424698491549,
               0
             ],
             "axis": [
@@ -4629,7 +4629,7 @@
             "b": "a2",
             "at": [
               0,
-              124.5,
+              124.49899597988733,
               0
             ],
             "axis": [
@@ -4645,7 +4645,7 @@
             "b": "b2",
             "at": [
               65,
-              124.5,
+              124.49899597988733,
               0
             ],
             "axis": [
@@ -4661,7 +4661,7 @@
             "b": "b2",
             "at": [
               32.5,
-              155.62,
+              155.62374497485916,
               0
             ],
             "axis": [
@@ -4677,7 +4677,7 @@
             "b": "platform",
             "at": [
               0,
-              186.75,
+              186.74849396983097,
               0
             ],
             "axis": [
@@ -4693,11 +4693,26 @@
             "b": "platform",
             "at": [
               65,
-              186.75,
+              186.74849396983097,
               0
             ],
-            "slot": "platform",
-            "path": "along the platform, 48.5 to 86.5 from L3"
+            "slot": {
+              "from": [
+                48.5,
+                186.74849396983097,
+                0
+              ],
+              "to": [
+                86.5,
+                186.74849396983097,
+                0
+              ]
+            },
+            "axis": [
+              0,
+              0,
+              1
+            ]
           }
         ],
         "params": [
@@ -4772,17 +4787,38 @@
               "rb": "m"
             },
             "branch": "up",
-            "out": "M0",
-            "opts": {
-              "then": "L1 = 2 M0 - R0, R1 = 2 M0 - L0"
-            }
+            "out": "M0"
+          },
+          {
+            "block": "lerp",
+            "id": "far-left-0",
+            "joints": [
+              "L1"
+            ],
+            "in": {
+              "a": "R0",
+              "b": "M0",
+              "t": 2
+            },
+            "out": "L1"
+          },
+          {
+            "block": "lerp",
+            "id": "far-right-0",
+            "joints": [
+              "R1"
+            ],
+            "in": {
+              "a": "L0",
+              "b": "M0",
+              "t": 2
+            },
+            "out": "R1"
           },
           {
             "block": "dyad",
             "id": "stage-1",
             "joints": [
-              "L1",
-              "R1",
               "M1"
             ],
             "in": {
@@ -4792,17 +4828,38 @@
               "rb": "m"
             },
             "branch": "up",
-            "out": "M1",
-            "opts": {
-              "then": "L2 = 2 M1 - R1, R2 = 2 M1 - L1"
-            }
+            "out": "M1"
+          },
+          {
+            "block": "lerp",
+            "id": "far-left-1",
+            "joints": [
+              "L2"
+            ],
+            "in": {
+              "a": "R1",
+              "b": "M1",
+              "t": 2
+            },
+            "out": "L2"
+          },
+          {
+            "block": "lerp",
+            "id": "far-right-1",
+            "joints": [
+              "R2"
+            ],
+            "in": {
+              "a": "L1",
+              "b": "M1",
+              "t": 2
+            },
+            "out": "R2"
           },
           {
             "block": "dyad",
             "id": "stage-2",
             "joints": [
-              "L2",
-              "R2",
               "M2"
             ],
             "in": {
@@ -4812,25 +4869,46 @@
               "rb": "m"
             },
             "branch": "up",
-            "out": "M2",
-            "opts": {
-              "then": "L3 = 2 M2 - R2, R3 = 2 M2 - L2"
-            }
+            "out": "M2"
+          },
+          {
+            "block": "lerp",
+            "id": "far-left-2",
+            "joints": [
+              "L3"
+            ],
+            "in": {
+              "a": "R2",
+              "b": "M2",
+              "t": 2
+            },
+            "out": "L3"
+          },
+          {
+            "block": "lerp",
+            "id": "far-right-2",
+            "joints": [],
+            "in": {
+              "a": "L2",
+              "b": "M2",
+              "t": 2
+            },
+            "out": "R3"
           },
           {
             "block": "slider-dyad",
             "id": "platform-slot",
             "joints": [
-              "L3",
               "R3"
             ],
             "in": {
+              "kind": "rpr",
               "a": "L3",
-              "b": "R3"
+              "p": "R3",
+              "body": "platform"
             },
-            "out": "platform-angle",
-            "opts": {
-              "inversion": "slotted link: the platform turns about L3 so its slot passes through R3"
+            "out": {
+              "angle": "platform-slot-angle"
             }
           }
         ],
@@ -4850,13 +4928,18 @@
             "id": "platform-height",
             "of": "L3",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "lift-ratio",
             "of": "L3",
             "kind": "speed-ratio",
-            "over": "carriage"
+            "over": "R0"
           },
           {
             "id": "carriage-position",

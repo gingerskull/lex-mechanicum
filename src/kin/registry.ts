@@ -488,6 +488,16 @@ const indexer: BlockFn = (c, s) => {
   outVal(c, s, d * R2D, "angle");
 };
 
+/**
+ * lerp. in: a, b (points), t (a number): out = a + t (b − a), a point on the line through two others (a scissor bar's
+ * far pin, 2 M − R, from its near pin and its middle pin).
+ */
+const lerp: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const a = c.vec(i.a);
+  outPoint(c, s, v3.add(a, v3.mul(v3.sub(c.vec(i.b), a), c.num(i.t))));
+};
+
 void sideOf;
 void angleFrom;
 
@@ -507,4 +517,5 @@ export const BLOCKS: Record<string, BlockFn> = {
   flexure: flexureBlock,
   escapement: escapementBlock,
   indexer,
+  lerp,
 };
