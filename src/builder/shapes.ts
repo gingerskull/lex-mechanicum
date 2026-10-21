@@ -26,6 +26,13 @@ export interface BodyGeom {
   shape: Record<string, unknown>;
   /** A bevel gear's toothed frustum: the scale of its inner end, toward the apex along +z (D8). */
   scaleTop?: number;
+  /**
+   * The body stands where its joints put it, not on a slab of the placement solver (a bevel gear on its cone, a
+   * universal joint's yoke and cross on their centre); its own part starts `offset` along the frame's z.
+   */
+  exact?: { offset: number };
+  /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
+  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number }[];
 }
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -46,7 +53,7 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -90,7 +97,7 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
       if (typeof shape.cone === "number") {
         // a straight bevel gear: Tredgold's back-cone teeth at the outer end, tapering toward the apex over the face
         const bv = bevel(z, m, shape.cone * D2R, num(shape.face, 0) || undefined);
-        return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner };
+        return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
       }
       return { profile: { outer: gearOutline(z, m), holes: [hole(bore / 2)] }, thick: num(shape.face, 10), approx: false };
     }
@@ -149,7 +156,8 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const pins = js.map((j) => ({ joint: j.joint.id, ...(({ uv, w }) => ({ uv, w }))(planeCoords(frame, j.at)) }));
     const shape = (b.shape ?? {}) as Record<string, unknown>;
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
-    out.set(b.id, { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}) });
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact ? { exact: { offset: 0 } } : {}) };
+    out.set(b.id, universal(kin, S, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -176,6 +184,83 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
       turned.add(id);
     });
   }
+}
+
+/**
+ * A universal joint's yoke (a `shaft` shape with a `yoke`) or cross (a `cross` shape), from the joints at the cross
+ * centre. The yoke is a hub keyed on its live shaft (the shaft is the stack's, J10), a bar across the shaft and two
+ * arms reaching to the cross's pin ends, each bored for a needle cup; the cross is two trunnions on a centre block.
+ * Both stand where the joints put them.
+ */
+function universal(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const sh = g.shape;
+  const isYoke = String(sh.type) === "shaft" && typeof sh.yoke === "object" && sh.yoke !== null;
+  const isCross = String(sh.type) === "cross";
+  if (!isYoke && !isCross) return null;
+  const crossOf = (j: { a: string; b: string }) => [j.a, j.b].find((x) => String(kin.bodies.find((q) => q.id === x)?.shape?.type) === "cross");
+  const F = g.frame;
+  const o = F.o;
+  const z = F.z;
+  const y = v3.cross(z, F.x);
+  const along = (s: number): Vec3 => v3.add(o, v3.mul(z, s));
+  const pinsOf = kin.joints.filter((j) => (j.a === b.id || j.b === b.id) && j.type === "revolute" && (isCross || crossOf(j))).map((j) => S.joints.get(j.id)!);
+  if (!pinsOf.length) return null;
+  const centre = pinsOf[0]!.at;
+  if (isCross) {
+    const r = num(sh.arm, 30);
+    const d = num(sh.diameter, 10);
+    const pB = pinsOf.find((q) => Math.abs(v3.dot(v3.unit(q.axis), z)) < 0.5)?.axis ?? F.x;
+    const zB = v3.unit(pB);
+    const block = d / 2 + 3;
+    return {
+      ...g,
+      profile: { outer: circle(d / 2, 0, 0, 32), holes: [] },
+      thick: 2 * r,
+      approx: false,
+      exact: { offset: v3.dot(v3.sub(centre, o), z) - r },
+      pieces: [
+        { id: `${b.id}-b`, name: "", frame: { o: v3.sub(centre, v3.mul(zB, r)), x: z, z: zB }, profile: { outer: circle(d / 2, 0, 0, 32), holes: [] }, h: 2 * r },
+        { id: `${b.id}-block`, name: "", frame: { o: v3.sub(centre, v3.mul(z, block)), x: F.x, z }, profile: { outer: roundRect(-block, -block, block, block, 2), holes: [] }, h: 2 * block },
+      ],
+    };
+  }
+  // a yoke: s runs along the shaft (the frame's z), the centre at s = sc; the pin across it, q the third direction
+  const yk = sh.yoke as Record<string, unknown>;
+  const R = num(yk.radius, 30);
+  const a = num(yk.arm, 8);
+  const cupD = num(sh.cup, 14);
+  const rb = cupD / 2 + 3;
+  const sc = v3.dot(v3.sub(centre, o), z);
+  const sg = Math.sign(sc) || 1;
+  const p = v3.unit(pinsOf[0]!.axis);
+  const q = v3.cross(z, p);
+  const sFace = sc - sg * (R + rb + 4);
+  const sBar = sFace - sg * 8;
+  const hub = 14;
+  const rh = num(sh.diameter, 16) / 2 + 3;
+  const lo = (s0: number, s1: number) => Math.min(s0, s1);
+  // the bar: across the shaft, the arms' length apart, in the plane of the pin
+  const half = R + a / 2;
+  const bar: Vec2[] = roundRect(-half, -rb, half, rb, 3);
+  const arm = (k: 1 | -1) => {
+    const base = v3.add(o, v3.mul(p, k * R - a / 2));
+    const ax = v3.mul(z, 1);
+    const prof: Profile = { outer: roundedPoly([[sBar + sg * 2, 0], [sc, 0]], rb), holes: [circle(cupD / 2 + 0.05, sc, 0, 32).reverse()] };
+    return { id: `${b.id}-arm${k > 0 ? 0 : 1}`, name: "", frame: { o: base, x: ax, z: p }, profile: prof, h: a };
+  };
+  return {
+    ...g,
+    profile: { outer: circle(rh, 0, 0, 36), holes: [] },
+    thick: hub,
+    approx: false,
+    exact: { offset: lo(sBar, sBar - sg * hub) },
+    pieces: [
+      { id: `${b.id}-bar`, name: "", frame: { o: along(lo(sFace, sBar)), x: p, z }, profile: { outer: bar.map(([u, w]): Vec2 => [u, w]), holes: [] }, h: 8 },
+      arm(1),
+      arm(-1),
+    ],
+  };
+  void q;
 }
 
 const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);

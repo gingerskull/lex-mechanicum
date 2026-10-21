@@ -99,6 +99,8 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   // ---- the members: a bearing in each turning part, a key and hub on each keyed one
   // a bevel gear (its teeth taper toward +w, the apex) is keyed in its own bore, its shim pack at its back face (J9)
   const isBevel = (m: Member) => ctx.geoms.get(m.body)?.scaleTop !== undefined;
+  // a part with a hub of its own (a yoke) is keyed in its own bore and takes no clamp hub
+  const ownHub = (m: Member) => !!ctx.geoms.get(m.body)?.exact && !isBevel(m);
   const seats: Seat[] = members.map((m, i) => {
     const b = fit.bearing[i] ?? null;
     if (m.keyed && !moving) return { m, b: null, z0: m.w0 - (isBevel(m) ? (m.shim ?? 0) : 0), z1: m.w1 };
@@ -169,6 +171,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const hubH = 8;
     const hubD = d + 10;
     const sh = s.m.shim ?? 0;
+    if (ownHub(s.m)) return;
     if (isBevel(s.m)) {
       if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm at the back face, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: s.m.w0 - sh, z1: s.m.w0, body: s.m.body, inset: true }));
       return;
@@ -183,7 +186,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   });
 
   const lastSeat = seats[seats.length - 1]!;
-  const hubbed = keyedSeats.filter((s) => !isBevel(s.m));
+  const hubbed = keyedSeats.filter((s) => !isBevel(s.m) && !ownHub(s.m));
   const hubTop = hubbed.length && !endHeld ? Math.max(...hubbed.map((s) => s.m.w1 + (s.m.shim ?? 0) + 8)) : -Infinity;
   const zTop = Math.max(lastSeat.b || !lastSeat.m.keyed ? lastSeat.z1 : lastSeat.m.w1, hubTop, moving ? lastSeat.m.w1 : -Infinity);
   const first = members[0]!;

@@ -125,6 +125,7 @@ const angleFrom = (d: Vec3, a: Vec3, e0: Vec3): number => Math.atan2(v3.dot(a, v
  */
 const hooke: BlockFn = (c, s) => {
   const i = s.in ?? {};
+  if (i.cross !== undefined) return hookeCross(c, s);
   const jid = str(i.joint, "hooke.joint");
   const j = c.joint(jid);
   const a1 = c.jointAxis(jid);
@@ -143,6 +144,50 @@ const hooke: BlockFn = (c, s) => {
   spin(c, bodies[1]!, centre, a2, d2);
   outVal(c, s, d2 * R2D, "delta");
 };
+
+/** The columns x, y, z of a rotation matrix (row-major Mat3). */
+const cols = (x: Vec3, y: Vec3, z: Vec3) => [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]] as import("./math").Mat3;
+
+/**
+ * hooke, with the cross as a body of its own (a Cardan joint as built: two yokes, a cross and four revolutes).
+ * in: input (the input shaft's angle, deg, as a value name), cross (body), joints { in, out, a, b }: the input shaft's
+ * ground revolute, the output shaft's, the input yoke's pin into the cross and the output yoke's (their axes the cross
+ * arms, all four meeting at the cross centre). The output follows tan θ2 = tan θ1 / cos β, and the cross turns so its
+ * arms stay on both yokes' pins.
+ */
+function hookeCross(c: BlockCtx, s: SolveStep): void {
+  const i = s.in ?? {};
+  const J = (i.joints ?? {}) as Record<string, unknown>;
+  const jIn = str(J.in, "hooke.joints.in");
+  const jOut = str(J.out, "hooke.joints.out");
+  const jA = str(J.a, "hooke.joints.a");
+  const jB = str(J.b, "hooke.joints.b");
+  const a1 = c.jointAxis(jIn);
+  const a2 = c.jointAxis(jOut);
+  const pinA = c.jointAxis(jA);
+  const pinB = c.jointAxis(jB);
+  const centre = c.jointAt(jA);
+  const np = v3.unit(v3.cross(a1, a2));
+  const p1 = v3.cross(np, a1);
+  const beta = Math.acos(Math.max(-1, Math.min(1, v3.dot(a1, a2))));
+  const psi0 = Math.atan2(v3.dot(pinA, np), v3.dot(pinA, p1));
+  const d1 = c.delta("in", c.rad(i.input));
+  const d2 = beta < 1e-9 ? d1 : hookeAngle(psi0 + d1, beta) - hookeAngle(psi0, beta);
+  const bIn = c.joint(jIn);
+  const bOut = c.joint(jOut);
+  const shaftIn = bIn.a === "ground" ? bIn.b : bIn.a;
+  const shaftOut = bOut.a === "ground" ? bOut.b : bOut.a;
+  const X1 = xf.rotAbout(centre, a1, d1);
+  const X2 = xf.rotAbout(centre, a2, d2);
+  c.setXf(shaftIn, X1);
+  c.setXf(shaftOut, X2);
+  // the cross: its arms carried by the two yokes' pins
+  const qA = xf.dir(X1, pinA);
+  const qB = xf.dir(X2, pinB);
+  const R = m3.mul(cols(qA, qB, v3.cross(qA, qB)), m3.T(cols(pinA, pinB, v3.cross(pinA, pinB))));
+  c.setXf(str(i.cross, "hooke.cross"), { R, t: v3.sub(centre, m3.mulV(R, centre)) });
+  outVal(c, s, d2 * R2D, "delta");
+}
 
 /**
  * homokinetic. in: joint (a `universal` joint with homokinetic true), input (deg), bodies [in, out].

@@ -149,7 +149,8 @@ const geomList = (g: BlockGeom): Solid3[] => [g.foot, g.ped, g.boss];
  */
 export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: number; live: boolean; lo: number; hi: number; baseTop: number; joints: string[] }): PillowOut {
   const W = pillowWidth(o.d, o.live);
-  const gap = 3;
+  // a live shaft's locating block carries a 4 mm collar on each face: the gap to the parts leaves room for it
+  const gap = o.live ? 8 : 3;
   const tryAt = (wb: number): boolean => {
     const g = blockGeom(ctx, { id: `${o.id}-t`, f: o.frame, d: o.d, live: o.live, wb, baseTop: o.baseTop, first: false });
     const c = clearance(ctx, geomList(g));

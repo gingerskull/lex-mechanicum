@@ -226,11 +226,11 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   const hi = Math.max(8, Mc[0] - 29, Mc[0] + 29);
   const vTop = Math.max(vm + 29, mouth + SENSOR.l + 2);
   ctx.add(place(PF, H.plate("drive-bracket", roundRect(lo, -h + foot, hi, vTop, 3), { name: "Motor bracket, one piece: an upright on a foot, slotted for the belt's tension", kind: "bracket", role: "ground", z0: w0, z1: w1, holes: [circle(mot.R - 8, Mc[0], Mc[1], 36).reverse()], mat: "Aluminium 6061-T6, anodised", joints: j })));
-  // the foot's frame: x outward along the shaft, z up, so y = up x out = -lat and a point u across lies at y = -u
+  // the foot's frame: x outward along the shaft, z up, so y = z x x = up x out = lat and a point u across lies at y = u
   const FF: Frame = { o: [S[0], S[1], ctx.base.top], x: out, z: up };
-  ctx.add(place(FF, H.plate("drive-bracket-foot", roundRect(w0, -hi, w1 + mot.H + 6, -lo, 3), { name: "", kind: "bracket", role: "ground", z0: 0, z1: foot, mat: "Aluminium 6061-T6, anodised", joints: j, group: "drive-bracket" })));
+  ctx.add(place(FF, H.plate("drive-bracket-foot", roundRect(w0, lo, w1 + mot.H + 6, hi, 3), { name: "", kind: "bracket", role: "ground", z0: 0, z1: foot, mat: "Aluminium 6061-T6, anodised", joints: j, group: "drive-bracket" })));
   for (const [k, u] of [[0, Mc[0] - sg * 20], [1, Mc[0] + sg * 20]] as const)
-    ctx.add(place(FF, H.screw(`drive-ft${k}`, "socket", 4, foot + 8, { at: [w1 + mot.H + 1, -u, 0], face: foot, dir: -1, ...(k ? { name: "", qty: 0 } : { qty: 2 }), joints: j })));
+    ctx.add(place(FF, H.screw(`drive-ft${k}`, "socket", 4, foot + 8, { at: [w1 + mot.H + 1, u, 0], face: foot, dir: -1, ...(k ? { name: "", qty: 0 } : { qty: 2 }), joints: j })));
   ctx.add(place(PF, H.solid("drive-motor", { name: mot.name, kind: "motor", role: "hw", mat: "Aluminium housing, neodymium rotor", outer: circle(mot.R, Mc[0], Mc[1], 48), z0: w1, z1: w1 + mot.H, joints: j })));
   ctx.add(place(PF, H.solid("drive-motor-core", { name: "", kind: "motorInternal", role: "hw", outer: circle(mot.R - 4, Mc[0], Mc[1], 36), z0: w1 + 3, z1: w1 + mot.H - 3, faint: true, inset: true, joints: j })));
   ctx.add(place(PF, H.shaft("drive-shaft", { d: mot.shaft, z0: -4, z1: w1 }, { name: `Motor shaft Ø${mot.shaft}`, at: [Mc[0], Mc[1], 0], joints: j })));
@@ -248,9 +248,9 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   ctx.add(place(PF, H.solid("drive-sensor-jaw", { ...fork, name: "", outer: box(mouth, mouth + SENSOR.l), z0: gap1, z1: w0 })));
   ctx.add(place(PF, H.solid("drive-sensor-back", { ...fork, name: "", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: gap0, z1: gap1 })));
   // terminals and a lead on the base top, past the motor
-  const tb: [number, number, number] = [w1 + mot.H + 14, -Mc[0], 0];
+  const tb: [number, number, number] = [w1 + mot.H + 14, Mc[0], 0];
   ctx.add(place(FF, H.terminalBlock("drive-terminals", 4, { at: tb, z0: 0, z1: 6, joints: j })));
-  ctx.add(place(FF, H.lead("drive-lead", [[w1 + mot.H, -Mc[0]], [w1 + mot.H + 6, -Mc[0] - sg * 4], [tb[0], tb[1]]], { z0: 0, z1: 1, joints: j })));
+  ctx.add(place(FF, H.lead("drive-lead", [[w1 + mot.H, Mc[0]], [w1 + mot.H + 6, Mc[0] + sg * 4], [tb[0], tb[1]]], { z0: 0, z1: 1, joints: j })));
   ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
 }
 

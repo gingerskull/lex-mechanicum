@@ -61,7 +61,7 @@ function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
     slabOf[b] = s;
     const r = ctx.extent(b);
     // a bevel gear stands where its cone says, so its points are drawn where the kinematics put them
-    if (!r || ctx.geoms.get(b)?.scaleTop !== undefined) continue;
+    if (!r || ctx.geoms.get(b)?.exact) continue;
     const n = r.frame.z;
     const o = r.frame.o;
     lifts[b] = [n[0], n[1], n[2], n[0] * o[0] + n[1] * o[1] + n[2] * o[2] + r.w1];

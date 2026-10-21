@@ -1344,8 +1344,7 @@
           },
           "at": {
             "joint": "B1"
-          },
-          "frame": "local x along the input shaft toward the cross"
+          }
         },
         {
           "id": "cross",
@@ -1373,8 +1372,7 @@
           },
           "at": {
             "joint": "B2"
-          },
-          "frame": "local x along the output shaft away from the cross"
+          }
         }
       ],
       "joints": [
@@ -1386,7 +1384,7 @@
           "at": [
             -60,
             0,
-            80
+            55
           ],
           "axis": [
             1,
@@ -1402,7 +1400,7 @@
           "at": [
             0,
             0,
-            80
+            55
           ],
           "axis": [
             0,
@@ -1418,7 +1416,7 @@
           "at": [
             0,
             0,
-            80
+            55
           ],
           "axis": [
             0,
@@ -1432,13 +1430,13 @@
           "a": "ground",
           "b": "yoke-out",
           "at": [
-            51.96,
-            30,
-            80
+            "60*cos(beta)",
+            "60*sin(beta)",
+            55
           ],
           "axis": [
-            0.866,
-            0.5,
+            "cos(beta)",
+            "sin(beta)",
             0
           ]
         }
@@ -1493,14 +1491,19 @@
           ],
           "in": {
             "input": "input",
-            "beta": "beta"
+            "cross": "cross",
+            "joints": {
+              "in": "B1",
+              "out": "B2",
+              "a": "C1",
+              "b": "C2"
+            }
           },
-          "out": [
-            "cross",
-            "yoke-out"
-          ],
+          "out": {
+            "delta": "out-turn"
+          },
           "opts": {
-            "zero": "input yoke arm in the plane of the two shafts",
+            "zero": "input yoke pin C1 across the plane of the two shafts",
             "relation": "tan(theta2) = tan(theta1) / cos(beta), atan2 branch"
           }
         }
@@ -1519,27 +1522,27 @@
           "id": "in-tip",
           "body": "yoke-in",
           "local": [
-            60,
-            30,
-            0
+            0,
+            -30,
+            60
           ]
         },
         {
           "id": "out-tip",
           "body": "yoke-out",
           "local": [
-            -60,
+            30,
             0,
-            30
+            -60
           ]
         },
         {
           "id": "in-ext",
           "body": "yoke-in",
           "local": [
-            120,
             0,
-            0
+            0,
+            120
           ]
         }
       ],
@@ -1566,7 +1569,7 @@
           "of": "yoke-out",
           "kind": "angle",
           "unit": "deg",
-          "note": "output angle minus input angle"
+          "minus": "input-angle"
         }
       ],
       "fallback": null
@@ -1676,7 +1679,7 @@
           "output": "output-angle",
           "stat": "range",
           "value": 360,
-          "tol": 0.01
+          "tol": 1
         },
         {
           "text": "the output runs ahead and then behind, twice per revolution, by up to 4.1° at 30°",

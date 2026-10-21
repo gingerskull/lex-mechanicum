@@ -89,7 +89,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     for (const end of ["a", "b"] as const) if (!bodies.has(j[end])) say(`joint ${j.id}: ${end} "${String(j[end])}" is not a body`);
     if (j.at === undefined) say(`joint ${j.id}: no origin (at)`);
     const needsAxis = !["spherical", "planar", "gear-mesh", "cam-contact", "belt", "rolling", "pin-in-slot"].includes(j.type);
-    if (needsAxis && !(Array.isArray(j.axis) && j.axis.length === 3 && j.axis.every(isNum))) say(`joint ${j.id}: axis must be [x, y, z]`);
+    // a component may be a parameter expression ("cos(beta)"), as a position's may (src/kin/expr.ts)
+    if (needsAxis && !(Array.isArray(j.axis) && j.axis.length === 3 && j.axis.every((x) => isNum(x) || isStr(x)))) say(`joint ${j.id}: axis must be [x, y, z]`);
     if (j.type === "belt" && !KIN_VOCAB.flexible.includes(j.flexible as never)) say(`joint ${j.id}: belt joint needs flexible in ${KIN_VOCAB.flexible.join("/")}`);
     if (j.limits !== undefined && !(Array.isArray(j.limits) && j.limits.length === 2 && j.limits.every(isNum) && j.limits[0] <= j.limits[1])) say(`joint ${j.id}: limits must be [lo, hi]`);
   }
@@ -134,6 +135,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   };
   const resolveIn = (v: unknown, by: string, key: string) => {
     if (Array.isArray(v)) return v.forEach((x) => resolveIn(x, by, key));
+    if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
     if (isNum(v) || typeof v === "boolean") return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };

@@ -583,6 +583,11 @@ class Run implements BlockCtx {
       const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
       if (v !== undefined) outputs[o.id] = v;
     }
+    for (const o of this.k.kin.outputs ?? []) {
+      const a = outputs[o.id];
+      const m = o.minus ? outputs[o.minus] : undefined;
+      if (typeof a === "number" && typeof m === "number") outputs[o.id] = wrapPi((a - m) * D2R) * R2D;
+    }
     return { u: this.u, bodies: this.xfs, points, values: this.vals, outputs, fallback: this.flagged ? this.fallbackBlocks : [] };
   }
 
@@ -613,6 +618,10 @@ class Run implements BlockCtx {
   }
 
   private bodyAxis(body: string, type?: string): Vec3 | undefined {
+    // a body's own axis is that of its joint to the ground, where it has one (a yoke turns on its shaft, not its pin)
+    for (const r of this.s.joints.values()) {
+      if ((r.joint.a === body || r.joint.b === body) && (r.joint.a === "ground" || r.joint.b === "ground") && (type ? r.joint.type === type : r.joint.type !== "gear-mesh")) return r.axis;
+    }
     for (const r of this.s.joints.values()) {
       if ((r.joint.a === body || r.joint.b === body) && (type ? r.joint.type === type : r.joint.type !== "gear-mesh")) return r.axis;
     }

@@ -52,11 +52,12 @@ export const placement: Rule = {
       const slab = ctx.extent(id);
       if (!slab) continue;
       const fam = slab.frame;
-      // a bevel gear sits on its pitch cone: its outer pitch circle at its joint, wherever a slab would put it
-      const o = g.scaleTop !== undefined ? g.frame.o : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      // a body that stands where its joints put it (a bevel gear on its pitch cone, a yoke and a cross on their centre)
+      // is placed there, wherever a slab would put it
+      const o = g.exact ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact.offset)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
       const body = ctx.kin.bodies.find((b) => b.id === id)!;
       const role = BODY_ROLE[body.role] ?? "link";
-      const frame = { o, x: g.frame.x, z: fam.z };
+      const frame = { o, x: g.frame.x, z: g.exact ? g.frame.z : fam.z };
       const marks = g.pins.map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
       const part: Solid3 = {
         id,
@@ -75,6 +76,8 @@ export const placement: Rule = {
       };
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
+      for (const pc of g.pieces ?? [])
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);

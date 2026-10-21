@@ -11,7 +11,7 @@ import { axialStack, type StackResult, type StackSpec, type SupportKind } from "
 import { UP, type Site } from "../sites";
 import type { Rule } from "./types";
 
-const KEYED = new Set(["gear", "ringGear", "pulley", "sprocket", "cam", "disc", "rack"]);
+const KEYED = new Set(["gear", "ringGear", "pulley", "sprocket", "cam", "disc", "rack", "shaft"]);
 
 /** The frame of a site's stack: on the axis at the origin plane of the family its bodies are stacked in. */
 export function siteFrame(ctx: BuildCtx, site: Site): Frame | null {

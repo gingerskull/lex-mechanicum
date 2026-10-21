@@ -132,6 +132,8 @@ export interface KinOutput {
   /** An angle at the point `of` between the rays to the points `from` and `to` (0 to 180 degrees): a transmission angle. */
   from?: string;
   to?: string;
+  /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
+  minus?: string;
 }
 
 export interface Kin {

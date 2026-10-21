@@ -11,6 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
+  "cross-pin",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -46,7 +47,7 @@ export interface Site {
 /** The base normal. */
 export const UP: Vec3 = [0, 0, 1];
 
-const KEYED = new Set(["gear", "ringGear", "pulley", "sprocket", "cam", "disc", "rack"]);
+const KEYED = new Set(["gear", "ringGear", "pulley", "sprocket", "cam", "disc", "rack", "shaft"]);
 const REVOLUTE_LIKE = new Set(["revolute", "cylindrical", "spherical"]);
 const text = (v: unknown): string => (typeof v === "string" ? v : v && typeof v === "object" ? JSON.stringify(v) : "");
 
@@ -64,6 +65,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
     case "spherical":
     case "universal": {
       const ground = j.a === "ground" || j.b === "ground";
+      // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
+      if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
       return parallel(axis, UP) ? "J1" : "J10";
     }
