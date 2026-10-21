@@ -160,7 +160,9 @@ export const standoffs: Rule = {
       const clear3d = (p: Vec2): boolean => clearance(ctx, place(UPF, H.standoff("probe", { at: [p[0], p[1], 0], z0: base.top, z1 }))) >= MIN_GAP;
       const inPlan = (p: Vec2): boolean => swept.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + MIN_GAP || insideOwn(part.body, ctx, p));
       const free = (p: Vec2): boolean => (inPlan(p) || clear3d(p)) && fixed.every((f) => f.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + 1));
-      const cands = far.flatMap((p) => [0.18, 0.3, 0.45].map((k): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k])).filter(free);
+      // (last, nearer the edge: a ring's posts stand under its rim, outside what turns inside it)
+      const at = (k: number) => (p: Vec2): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k];
+      const cands = [...far.flatMap((p) => [0.18, 0.3, 0.45].map((k) => at(k)(p))), ...far.map(at(0.09))].filter(free);
       const a = cands[0];
       const bFar = a ? cands.find((p) => Math.hypot(p[0] - a[0], p[1] - a[1]) > 30) : undefined;
       if (!a || !bFar) {
