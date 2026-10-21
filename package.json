@@ -30,7 +30,8 @@
     "build": "astro build --root site",
     "dev": "npm run prebuild && astro dev --root site",
     "preview": "astro preview --root site",
-    "test:site": "vitest run --config vitest.site.config.ts"
+    "test:site": "vitest run --config vitest.site.config.ts",
+    "test:e2e": "tsx tools/site-e2e.ts"
   },
   "repository": {
     "type": "git",

@@ -6,7 +6,8 @@ import "../../../styles/views.css";
 import Bar from "../../components/Bar.astro";
 import ThemeToggle from "../../components/ThemeToggle.astro";
 import Stage from "../../components/Stage.astro";
-import { SHEETS, driveOf, type Sheet as SheetInfo } from "../../data";
+import Stage3 from "../../components/Stage3.astro";
+import { SHEETS, controlsOf, driveOf, is3, viewButtons, type Sheet as SheetInfo } from "../../data";
 import { url } from "../../url";
 
 export function getStaticPaths() {
@@ -18,6 +19,7 @@ const i = SHEETS.indexOf(sheet);
 const prev = SHEETS[(i - 1 + SHEETS.length) % SHEETS.length]!;
 const next = SHEETS[(i + 1) % SHEETS.length]!;
 const drive = await driveOf(sheet.id);
+const v3 = is3(sheet.id);
 // a fact's value: plain text, or [text, href] for a value the library filters by
 type Part = string | [string, string];
 const facetLink = (key: string, v: string) => url(`/?${key}=${encodeURIComponent(v)}`);
@@ -68,7 +70,7 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
       )}
     </nav>
     <div class="dhead">
-      <div class="meta"><b>{sheet.no}</b> · {r.family} · {r.motion.label}</div>
+      <div class="meta"><b>{sheet.no}</b> · {r.family} · {r.motion.label}{v3 && <span class="stamp3d" title="Drawn by the new 3D engine">3D</span>}</div>
       <div class="hrow"><h1>{r.name}</h1><ThemeToggle /></div>
       <p>{r.summary}</p>
     </div>
@@ -79,7 +81,7 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
       } catch {}
     </script>
     <div class="dlayout">
-      <Stage id={sheet.id} no={sheet.no} title={r.name} />
+      {v3 ? <Stage3 id={sheet.id} no={sheet.no} title={r.name} controls={controlsOf(r)} views={viewButtons(r)} timeMap={Boolean((r as any).teaching?.timeMap)} /> : <Stage id={sheet.id} no={sheet.no} title={r.name} />}
       <aside class="side">
         <section class="panel">
           <h2>At a glance</h2>
@@ -120,7 +122,6 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
     </div>
   </main>
   <script>
-    import "../../islands/stage";
     import "../../islands/sheetnav";
   </script>
 </Sheet>

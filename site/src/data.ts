@@ -2,7 +2,10 @@
 // catalogue records, the drive and the facets. Nothing here ships to the browser.
 import pkg from "../../package.json";
 import { loadCatalog, recordById, type CatalogRecord } from "../../src/catalog";
+import type { Kin, Teaching } from "../../src/catalog/kin";
+import { allIds } from "../../src/checks/engine";
 import { mechanisms } from "../../src/mechanisms";
+import { drawnBy3 } from "./drawn";
 
 export const VERSION = pkg.version;
 
@@ -12,17 +15,19 @@ export interface Sheet {
   rec: CatalogRecord;
 }
 
-/** Registered mechanisms in catalogue order (family, level, name), numbered MX-01, MX-02 ... */
+/** Registered mechanisms in catalogue order (family, level, name), numbered MX-01, MX-02 ...: the 2.5D registry and the mechanisms rebuilt on engine v3. */
+const KNOWN = new Set(allIds());
 export const SHEETS: Sheet[] = loadCatalog()
-  .mechanisms.filter((r) => r.id in mechanisms)
+  .mechanisms.filter((r) => KNOWN.has(r.id))
   .map((rec, i) => ({ id: rec.id, no: `MX-${String(i + 1).padStart(2, "0")}`, rec }));
 
 export const sheetOf = (id: string) => SHEETS.find((s) => s.id === id)!;
 
 /** The drive line of the at-a-glance facts (P3, V5), from the model's input kind. */
 export async function driveOf(id: string): Promise<string> {
-  const { model } = await mechanisms[id]!();
-  const k = model.input.kind;
+  // a mechanism on engine v3 has no 2.5D model: its record's first driver says
+  const kin = (recordById(id) as { kin?: Kin } | undefined)?.kin;
+  const k = mechanisms[id] ? (await mechanisms[id]!()).model.input.kind : (kin?.drivers[0]?.kind === "oscillating" ? "oscillating" : kin?.drivers[0]?.kind === "linear" ? "linear" : kin?.drivers[0]?.kind === "manual" ? "manual" : "rotary");
   if (k === "manual") return "Hand operated";
   return `Motorised: brushless pancake motor, ${k === "rotary" ? "GT2 belt 32:16 to the input" : k === "oscillating" ? "crank and link swinging the input" : "belt carriage on the input slide"}`;
 }
@@ -38,3 +43,64 @@ export const FACETS: { key: string; label: string; of: (r: CatalogRecord) => str
 ];
 
 export const recordOf = (id: string) => recordById(id)!;
+
+/** True when the stage and the card of a sheet are drawn by the v3 engine (and carry the 3D stamp). */
+export const is3 = (id: string): boolean => drawnBy3(id);
+
+/** One control of a v3 stage, from the record's `teaching.controls` (T14): a slider or a choice, and where its value goes. */
+export interface StageControl {
+  id: string;
+  label: string;
+  title?: string;
+  /** Which part of the kinematics' controls the value is for. */
+  target: "params" | "design" | "select" | "drivers";
+  key: string;
+  type: "range" | "choice";
+  min?: number;
+  max?: number;
+  step?: number;
+  value: number | string;
+  unit?: string;
+  options?: { value: string; label: string }[];
+}
+
+/** A step that gives about a hundred stops over a range, a round number. */
+function stepOf(lo: number, hi: number): number {
+  const raw = (hi - lo) / 100;
+  const p = 10 ** Math.floor(Math.log10(raw || 1));
+  return [1, 2, 5, 10].map((k) => k * p).find((k) => k >= raw) ?? raw;
+}
+
+/** The sliders and choices of a record: its parameters, design choices, selectors and manual drivers. The cycle driver is the scrubber. */
+export function controlsOf(rec: CatalogRecord): StageControl[] {
+  const r = rec as unknown as { kin?: Kin; teaching?: Teaching };
+  const kin = r.kin;
+  const out: StageControl[] = [];
+  if (!kin || !r.teaching) return out;
+  for (const c of r.teaching.controls) {
+    const label = String(c.id).replace(/[-_]/g, " ");
+    if (c.kind === "param") {
+      const p = kin.params.find((x) => x.id === c.param);
+      if (p) out.push({ id: c.id, label, title: p.note, target: "params", key: p.id, type: "range", min: p.min, max: p.max, step: stepOf(p.min, p.max), value: p.value, unit: p.unit });
+    } else if (c.kind === "design") {
+      const d = kin.design.find((x) => x.id === c.design);
+      if (d) out.push({ id: c.id, label, target: "design", key: d.id, type: "choice", value: String(d.value), options: d.options.map((o) => ({ value: String(o), label: String(o) })) });
+    } else if (c.kind === "selector") {
+      const d = kin.drivers.find((x) => x.id === c.selector);
+      const ids = (d?.options ?? []).map((o) => (typeof o === "string" ? o : String((o as { id?: unknown }).id ?? ""))).filter(Boolean);
+      if (d && ids.length) out.push({ id: c.id, label, target: "select", key: d.id, type: "choice", value: String(d.default ?? ids[0]), options: ids.map((o) => ({ value: o, label: o })) });
+    } else if (c.kind === "driver") {
+      const d = kin.drivers.find((x) => x.id === c.driver);
+      // the first rotary, oscillating or linear driver is the cycle (the scrubber); another driver, held by hand, is a slider
+      const cycle = kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating" || x.kind === "linear");
+      if (d && d !== cycle && d.range) out.push({ id: c.id, label, target: "drivers", key: d.id, type: "range", min: d.range[0], max: d.range[1], step: stepOf(d.range[0], d.range[1]), value: Number(d.default ?? d.range[0]), unit: d.kind === "linear" ? "mm" : "°" });
+    }
+  }
+  return out;
+}
+
+/** The section and detail views a record declares (buttons on the stage). */
+export function viewButtons(rec: CatalogRecord): { id: string; kind: "section" | "detail" }[] {
+  const t = (rec as unknown as { teaching?: Teaching }).teaching;
+  return (t?.views ?? []).filter((v) => v.kind === "section" || v.kind === "detail").map((v) => ({ id: v.id, kind: v.kind as "section" | "detail" }));
+}

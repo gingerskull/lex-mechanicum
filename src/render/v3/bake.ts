@@ -6,6 +6,7 @@
 import type { Package2, Shape2 } from "../../package/format2";
 import { EF, type EdgeSet } from "../../solids/edges";
 import type { MeshData } from "../../solids/types";
+import { DRAFT } from "../../style/draft";
 import { MARK_KINDS } from "../../style/kinds";
 
 /** Floats per vertex: position (3), normal (3), solid index, tag. */
@@ -94,6 +95,9 @@ export interface BakeOptions {
   /** Radius of the ring as a factor on the head's extent (draft.lines.accentRing.radius). */
   ringRadius: number;
 }
+
+/** What the bake reads from the style. */
+export const BAKE: BakeOptions = { ringSegments: DRAFT.lines.accentRing.segments, ringRadius: DRAFT.lines.accentRing.radius };
 
 /** Everything the GPU draws, from the package's solids and the prepared shapes. */
 export function bake(pkg: Package2, meshes: readonly MeshData[], edges: readonly EdgeSet[], shapes: readonly Pick<Shape2, "marks">[], o: BakeOptions): Baked {

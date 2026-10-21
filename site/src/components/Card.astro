@@ -1,16 +1,18 @@
 ---
-// A library card (SS1): the pre-rendered drawing for each sheet, animated live on hover by the card island.
-import { FACETS, type Sheet } from "../data";
+// A library card (SS1): the pre-rendered drawing for each sheet, animated live on hover by the card island. A card drawn by
+// the v3 engine carries the 3D stamp beside its sheet number (SS13).
+import { FACETS, is3, type Sheet } from "../data";
 import { url } from "../url";
 interface Props {
   sheet: Sheet;
 }
 const { sheet } = Astro.props;
 const r = sheet.rec;
+const v3 = is3(sheet.id);
 const data = Object.fromEntries(FACETS.map((f) => [`data-${f.key}`, f.of(r).join("|")]));
 const text = [r.name, ...(r.aka ?? []), r.summary, r.family, r.motion.label, ...r.tags.function, ...r.tags.property, ...r.tags.application, ...(r.tags.keywords ?? [])].join(" ").toLowerCase();
 ---
-<a class="card" href={url(`/mechanisms/${sheet.id}/`)} data-id={sheet.id} data-text={text} {...data}>
+<a class="card" href={url(`/mechanisms/${sheet.id}/`)} data-id={sheet.id} data-engine={v3 ? "v3" : undefined} data-text={text} {...data}>
   <div class="thumb">
     <img class="t-dark" src={url(`/thumbs/${sheet.id}-dark.webp`)} alt={`${r.name}, drawing`} width="320" height="240" loading="lazy" decoding="async" />
     <img class="t-light" src={url(`/thumbs/${sheet.id}-light.webp`)} alt="" width="320" height="240" loading="lazy" decoding="async" />
@@ -18,7 +20,7 @@ const text = [r.name, ...(r.aka ?? []), r.summary, r.family, r.motion.label, ...
   </div>
   <div class="body">
     <h2>{r.name}</h2>
-    <span class="no">{sheet.no}</span>
+    <span class="no">{sheet.no}{v3 && <span class="stamp3d" title="Drawn by the new 3D engine">3D</span>}</span>
     <span class="meta">{r.family} · {r.motion.label} · {r.level}</span>
     <p class="sum">{r.summary}</p>
     <div class="tags">{r.tags.function.map((t) => <span class="tag">{t}</span>)}</div>
