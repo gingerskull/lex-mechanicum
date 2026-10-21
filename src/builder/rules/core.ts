@@ -144,6 +144,8 @@ export const base: Rule = {
       if (!["standoff", "bridge", "housing", "plate", "foot", "bracket", "motor", "pulley", "belt", "sensor", "terminalBlock", "stop"].includes(s.kind)) continue;
       for (const p of worldPoints(ctx.M, s)) if (p[2] <= bs.top + 2) grow(p);
     }
+    // the points the teaching names on the ground (a rear axle line, a turning centre) lie on the base
+    for (const p of ctx.kin.points ?? []) if (p.body === "ground") grow(p.local.map(Number));
     for (const h of ctx.baseHoles) {
       grow([h.at[0] - h.r, h.at[1] - h.r]);
       grow([h.at[0] + h.r, h.at[1] + h.r]);

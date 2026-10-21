@@ -558,6 +558,34 @@ export function overlays(A: Ann): void {
   ctx.restore();
 }
 
+/** The two points of a line overlay drawn through two named points (`from` and `through`, or `from` and `to`). */
+function lineOf(A: Ann, ov: Ov | undefined): [Vec3, Vec3] | null {
+  if (!ov) return null;
+  const o = ov as Record<string, unknown>;
+  if (o.from === undefined || (o.through === undefined && o.to === undefined)) return null;
+  const a = pointOf(A, o.from), b = pointOf(A, o.through ?? o.to);
+  return a && b && len(sub(b, a)) > 1e-6 ? [a, b] : null;
+}
+
+/** Where two lines cross in the plan plane (at the first line's height); null when they are near parallel. */
+function crossing(l: [Vec3, Vec3], m: [Vec3, Vec3]): Vec3 | null {
+  const d1 = sub(l[1], l[0]), d2 = sub(m[1], m[0]);
+  const den = d1[0] * d2[1] - d1[1] * d2[0];
+  if (Math.abs(den) < 1e-9 * len(d1) * len(d2)) return null;
+  const w = sub(m[0], l[0]);
+  const t = (w[0] * d2[1] - w[1] * d2[0]) / den;
+  return add(l[0], mul(d1, t));
+}
+
+/** The point where the lines a `meet` overlay names cross (the first two of them), if they do. */
+function meetOf(A: Ann, names: unknown): Vec3 | null {
+  if (!Array.isArray(names) || names.length < 2) return null;
+  const all = A.rt.scene.teaching?.overlays ?? [];
+  const l = lineOf(A, all.find((q) => q.id === names[0]));
+  const m = lineOf(A, all.find((q) => q.id === names[1]));
+  return l && m ? crossing(l, m) : null;
+}
+
 function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
   const { ctx } = A;
   const text = typeof ov.label === "string" ? ov.label : "";
@@ -611,7 +639,8 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       return;
     }
     case "circle": {
-      const c = pointOf(A, o.center);
+      // a circle at a named point, or where the lines it names meet (a turning centre)
+      const c = o.meet !== undefined ? meetOf(A, o.meet) : pointOf(A, o.center);
       const r = typeof o.radius === "number" ? o.radius : null;
       if (!c || r === null) return;
       poly(arcPts(c, [1, 0, 0], [0, 0, 1], r, 0, TAU), true);
@@ -661,6 +690,27 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       return;
     }
     case "axis-line": {
+      // a line from one named point through another (a wheel's axis), carried on to where it meets the line named by
+      // `extend`, or to the meeting point of a circle overlay that names it
+      const ln = lineOf(A, ov);
+      if (ln) {
+        const [p, q] = ln;
+        const d = sub(q, p);
+        const all = A.rt.scene.teaching?.overlays ?? [];
+        const ends: number[] = [0, 1];
+        const reach = (x: Vec3 | null) => {
+          if (x && len(sub(x, p)) < 50 * len(d)) ends.push(dot(sub(x, p), d) / dot(d, d));
+        };
+        if (typeof o.extend === "string") reach(crossing(ln, lineOf(A, all.find((m) => m.id === o.extend)) ?? ln));
+        for (const m of all) {
+          const mm = m as Record<string, unknown>;
+          if (Array.isArray(mm.meet) && mm.meet.includes(ov.id)) reach(meetOf(A, mm.meet));
+        }
+        const lo = Math.min(...ends) - 0.1, hi = Math.max(...ends) + 0.1;
+        poly([add(p, mul(d, lo)), add(p, mul(d, hi))]);
+        tag(add(p, mul(d, hi)), 0, -12);
+        return;
+      }
       const c = pointOf(A, o.at);
       if (!c) return;
       const ax = Array.isArray(o.axis) ? (o.axis as Vec3) : (A.rt.scene.axes?.[typeof o.at === "string" ? o.at : ""] ?? [0, 0, 1]);

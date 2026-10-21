@@ -354,7 +354,7 @@
           "paths"
         ],
         "plot": "outer wheel angle vs inner wheel angle, with the ideal Ackermann curve",
-        "notes": "Tie rod behind the axle: PR = circleX(PL, t, KR, r, -1). A wheel on each knuckle, 22 mm outboard of the kingpin. Draw both wheel axis lines and the rear-axle line dashed: they meet near one point, the turning centre, which lies on the plate at full lock (about 300 mm to the side)."
+        "notes": "Tie rod behind the axle: PR = circleX(KR, r, PL, t, +1). A wheel on each knuckle, on a stub axle 24 mm outboard of the kingpin, carried by an upright tube round the kingpin. Draw both wheel axis lines and the rear-axle line dashed: they meet near one point, the turning centre, which lies on the plate at full lock (about 300 mm to the side)."
       },
       "examples": [
         {
@@ -454,8 +454,8 @@
               ],
               "wheel": {
                 "diameter": 70,
-                "width": 22,
-                "stub": 22
+                "width": 18,
+                "stub": 24
               }
             },
             "at": {
@@ -474,8 +474,8 @@
               ],
               "wheel": {
                 "diameter": 70,
-                "width": 22,
-                "stub": 22
+                "width": 18,
+                "stub": 24
               }
             },
             "at": {
@@ -487,7 +487,7 @@
             "role": "link",
             "shape": {
               "type": "link",
-              "length": 121.44,
+              "length": 121.44258092354171,
               "boss": [
                 9.5,
                 9.5
@@ -541,8 +541,8 @@
             "a": "knuckle-left",
             "b": "tie-rod",
             "at": [
-              -60.72,
-              -42.67,
+              -60.721290461770856,
+              -42.67456448427897,
               0
             ],
             "axis": [
@@ -557,8 +557,8 @@
             "a": "tie-rod",
             "b": "knuckle-right",
             "at": [
-              60.72,
-              -42.67,
+              60.721290461770856,
+              -42.67456448427897,
               0
             ],
             "axis": [
@@ -603,7 +603,7 @@
           },
           {
             "id": "t",
-            "value": 121.44,
+            "value": 121.44258092354171,
             "unit": "mm",
             "min": 100,
             "max": 140,
@@ -611,7 +611,7 @@
           },
           {
             "id": "stub",
-            "value": 22,
+            "value": 24,
             "unit": "mm",
             "min": 15,
             "max": 30,
@@ -652,10 +652,10 @@
               "KR"
             ],
             "in": {
-              "a": "PL",
-              "b": "KR",
-              "ra": "t",
-              "rb": "r"
+              "a": "KR",
+              "b": "PL",
+              "ra": "r",
+              "rb": "t"
             },
             "branch": "behind",
             "out": "PR"
@@ -666,8 +666,8 @@
             "id": "WL",
             "body": "knuckle-left",
             "local": [
-              -6.98,
-              -20.86,
+              -7.61531175372221,
+              -22.759767724948784,
               0
             ]
           },
@@ -675,8 +675,8 @@
             "id": "WR",
             "body": "knuckle-right",
             "local": [
-              -6.98,
-              20.86,
+              -7.615311753722213,
+              22.759767724948784,
               0
             ]
           },
@@ -704,6 +704,42 @@
             "local": [
               0,
               -224.15,
+              0
+            ]
+          },
+          {
+            "id": "rear-far-left",
+            "body": "ground",
+            "local": [
+              -379,
+              -200,
+              0
+            ]
+          },
+          {
+            "id": "rear-far-right",
+            "body": "ground",
+            "local": [
+              329.1,
+              -200,
+              0
+            ]
+          },
+          {
+            "id": "centre-left-lock",
+            "body": "ground",
+            "local": [
+              -359,
+              -238.3,
+              0
+            ]
+          },
+          {
+            "id": "centre-right-lock",
+            "body": "ground",
+            "local": [
+              309.1,
+              -221.8,
               0
             ]
           }
@@ -780,8 +816,8 @@
           {
             "id": "rear-axle",
             "kind": "axis-line",
-            "from": "rear-left",
-            "through": "rear-right",
+            "from": "rear-far-left",
+            "through": "rear-far-right",
             "dashed": true,
             "label": "REAR AXLE LINE"
           },

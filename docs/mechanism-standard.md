@@ -267,6 +267,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `classify` | A1, A2, A3 |
 | `placement` | A10, A18 |
 | `base` | A7, D4, M4 |
+| `wheels` | D1, F2 |
 | `j6-mesh` | J6, F7, F9 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
 | `j3-moving-pin` | J3, A12, M3 |

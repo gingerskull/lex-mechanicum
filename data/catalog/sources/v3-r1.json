@@ -4357,8 +4357,8 @@
             ],
             "wheel": {
               "diameter": 70,
-              "width": 22,
-              "stub": 22
+              "width": 18,
+              "stub": 24
             }
           },
           "at": {
@@ -4377,8 +4377,8 @@
             ],
             "wheel": {
               "diameter": 70,
-              "width": 22,
-              "stub": 22
+              "width": 18,
+              "stub": 24
             }
           },
           "at": {
@@ -4390,7 +4390,7 @@
           "role": "link",
           "shape": {
             "type": "link",
-            "length": 121.44,
+            "length": 121.44258092354171,
             "boss": [
               9.5,
               9.5
@@ -4444,8 +4444,8 @@
           "a": "knuckle-left",
           "b": "tie-rod",
           "at": [
-            -60.72,
-            -42.67,
+            -60.721290461770856,
+            -42.67456448427897,
             0
           ],
           "axis": [
@@ -4460,8 +4460,8 @@
           "a": "tie-rod",
           "b": "knuckle-right",
           "at": [
-            60.72,
-            -42.67,
+            60.721290461770856,
+            -42.67456448427897,
             0
           ],
           "axis": [
@@ -4506,7 +4506,7 @@
         },
         {
           "id": "t",
-          "value": 121.44,
+          "value": 121.44258092354171,
           "unit": "mm",
           "min": 100,
           "max": 140,
@@ -4514,7 +4514,7 @@
         },
         {
           "id": "stub",
-          "value": 22,
+          "value": 24,
           "unit": "mm",
           "min": 15,
           "max": 30,
@@ -4555,10 +4555,10 @@
             "KR"
           ],
           "in": {
-            "a": "PL",
-            "b": "KR",
-            "ra": "t",
-            "rb": "r"
+            "a": "KR",
+            "b": "PL",
+            "ra": "r",
+            "rb": "t"
           },
           "branch": "behind",
           "out": "PR"
@@ -4569,8 +4569,8 @@
           "id": "WL",
           "body": "knuckle-left",
           "local": [
-            -6.98,
-            -20.86,
+            -7.61531175372221,
+            -22.759767724948784,
             0
           ]
         },
@@ -4578,8 +4578,8 @@
           "id": "WR",
           "body": "knuckle-right",
           "local": [
-            -6.98,
-            20.86,
+            -7.615311753722213,
+            22.759767724948784,
             0
           ]
         },
@@ -4607,6 +4607,42 @@
           "local": [
             0,
             -224.15,
+            0
+          ]
+        },
+        {
+          "id": "rear-far-left",
+          "body": "ground",
+          "local": [
+            -379.0,
+            -200,
+            0
+          ]
+        },
+        {
+          "id": "rear-far-right",
+          "body": "ground",
+          "local": [
+            329.1,
+            -200,
+            0
+          ]
+        },
+        {
+          "id": "centre-left-lock",
+          "body": "ground",
+          "local": [
+            -359.0,
+            -238.3,
+            0
+          ]
+        },
+        {
+          "id": "centre-right-lock",
+          "body": "ground",
+          "local": [
+            309.1,
+            -221.8,
             0
           ]
         }
@@ -4683,8 +4719,8 @@
         {
           "id": "rear-axle",
           "kind": "axis-line",
-          "from": "rear-left",
-          "through": "rear-right",
+          "from": "rear-far-left",
+          "through": "rear-far-right",
           "dashed": true,
           "label": "REAR AXLE LINE"
         },
@@ -4781,7 +4817,7 @@
       "build.ground": "front axle beam with kingpins KL (-75,0) and KR (75,0); rear axle line at y = -200",
       "build.defining_relations": "Ideal Ackermann: cot(delta_outer) - cot(delta_inner) = w / L = 0.75. Arms angled inward by beta = 18.5°, a little less than atan((w/2)/L) = 20.6°, which would aim them at the rear axle centre, so the tie rod still reaches the -30° lock. Tie rod t = w - 2 r sin(beta) = 121.4 mm.",
       "build.range": "left knuckle -30° to +40° (right turn to left turn); right knuckle -43.5° to +28.8°. Outer wheel 9.3°, 17.3°, 23.9°, 28.8° at inner 10°, 20°, 30°, 40° (ideal 8.9°, 16.0°, 21.9°, 27.3°)",
-      "build.notes": "Tie rod behind the axle: PR = circleX(PL, t, KR, r, -1). A wheel on each knuckle, 22 mm outboard of the kingpin. Draw both wheel axis lines and the rear-axle line dashed: they meet near one point, the turning centre, which lies on the plate at full lock (about 300 mm to the side).",
+      "build.notes": "Tie rod behind the axle: PR = circleX(KR, r, PL, t, +1). A wheel on each knuckle, on a stub axle 24 mm outboard of the kingpin, carried by an upright tube round the kingpin. Draw both wheel axis lines and the rear-axle line dashed: they meet near one point, the turning centre, which lies on the plate at full lock (about 300 mm to the side).",
       "topology.notes": "four-bar: axle beam (ground), left knuckle with its wheel, tie rod, right knuckle with its wheel; count includes ground"
     }
   }
