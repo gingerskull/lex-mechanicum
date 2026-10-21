@@ -42,7 +42,10 @@ src/builder/                     engine v3's hardware builder, beside the 2.5D e
                                  planes), sites and kits (one per joint type: block, hardware rule, explode axis, see-through
                                  zone, rungs), the axial stack builder with its support selector, the support router against
                                  swept volumes (Manifold hulls of sampled poses, least gap), the shared parts, the polish API
-                                 v3 and the rules registry that the standard's AUTO table is generated from
+                                 v3 and the rules registry that the standard's AUTO table is generated from. Bodies a joint
+                                 fixes in space (a bevel gear on its cone, a universal joint's yokes and cross, a swinging
+                                 cylinder and its piston, a fixed port face) are placed where the joints put them, not on a
+                                 slab; their kits are cross-pin, trunnion and piston-bore beside J1 to J13
 src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> headroom -> see-through ->
                                  explode; the polish API; solid poses; clearance, clamp and edge-distance checks
 src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)
@@ -65,7 +68,9 @@ src/render/v3/                   the 3D drafting renderer (E7), beside the 2.5D 
 src/render/gl/                   the solids on the GPU: geometry (items, once per session), plan (a frame as slice
                                  and chunk tables, pure, unit-tested in Node), shaders, the page's one shared context
 src/mechanisms/<id>/model.ts     kinematics only
-src/mechanisms/<id>/polish.ts    overrides and additions to the generated assembly
+src/mechanisms/<id>/polish.ts    overrides and additions to the generated assembly (2.5D)
+src/mechanisms/<id>/polish3.ts   engine v3: the true exceptions to the builder (polish API v3), registered in
+                                 src/mechanisms/v3.ts; a mechanism with none has no file
 src/mechanisms/<id>/audit.md     conformance record
 src/mechanisms/models.ts         id -> lazy import of the model: all the browser loads
 src/mechanisms/index.ts          registry: the models plus a lazy import of each polish, for Node
