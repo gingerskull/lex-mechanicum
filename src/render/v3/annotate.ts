@@ -600,7 +600,8 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       arrowHead(ctx, q, p, O.arrowDim);
       arrowHead(ctx, p, q, O.arrowDim);
       ctx.restore();
-      if (text) label(`${text} ${len(sub(b, a)).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
+      const m = typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
+      if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
       return;
     }
     case "circle": {

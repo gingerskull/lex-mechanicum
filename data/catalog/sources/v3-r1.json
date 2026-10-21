@@ -455,8 +455,8 @@
           "a": "crank",
           "b": "coupler",
           "at": [
-            20,
-            34.64,
+            "a*cos(60)",
+            "a*sin(60)",
             0
           ],
           "axis": [
@@ -471,8 +471,8 @@
           "a": "coupler",
           "b": "follower",
           "at": [
-            120,
-            34.64,
+            "a*cos(60)+b",
+            "a*sin(60)",
             0
           ],
           "axis": [
@@ -487,7 +487,7 @@
           "a": "ground",
           "b": "follower",
           "at": [
-            100,
+            "d",
             0,
             0
           ],
@@ -675,11 +675,6 @@
           "id": "crank",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "assembly",
-          "kind": "design",
-          "design": "assembly"
         }
       ],
       "plot": {
@@ -1226,7 +1221,7 @@
           "b": "follower",
           "at": [
             36.25,
-            -89.92,
+            -89.92184106211349,
             0
           ],
           "axis": [
@@ -1344,7 +1339,9 @@
           "id": "transmission-angle",
           "of": "B",
           "kind": "angle",
-          "unit": "deg"
+          "unit": "deg",
+          "from": "A",
+          "to": "O4"
         }
       ],
       "fallback": null

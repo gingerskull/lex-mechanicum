@@ -35,6 +35,8 @@ export interface Poser {
   point(u: number, id: string, ctl?: Controls): Vec3 | null;
   /** The distance of its two points at phase u (mm). */
   span(u: number, a: string, b: string): number | null;
+  /** The true distance of two kinematic points at phase u (mm), before any is lifted onto a part's top face: what a dimension reads. */
+  measure?(u: number, a: string, b: string): number | null;
   /**
    * The path of a named point over a range of the input (degrees or mm; the whole input range when omitted), one polyline
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
@@ -152,6 +154,12 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       const P = pose(u);
       const A = lifted(P, a);
       const B = lifted(P, b);
+      return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
+    },
+    measure: (u, a, b) => {
+      const P = pose(u);
+      const A = P.points.get(a);
+      const B = P.points.get(b);
       return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
     },
   };
