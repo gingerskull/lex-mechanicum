@@ -2,7 +2,7 @@
 // stage's browser tests against it, in local Chrome. Local only; CI never draws. `--skip-build` reuses dist/site.
 import { spawnSync } from "node:child_process";
 
-const env = { ...process.env, SITE_V3: "four-bar,bevel-gears,oscillating-cylinder" };
+const env = { ...process.env, SITE_V3: "four-bar,bevel-gears,oscillating-cylinder,universal-joint" };
 const run = (cmd: string, args: string[]) => spawnSync(cmd, args, { stdio: "inherit", env, shell: true }).status ?? 1;
 
 if (!process.argv.includes("--skip-build") && run("npm", ["run", "build"]) !== 0) process.exit(1);

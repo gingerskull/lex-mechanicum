@@ -61,7 +61,7 @@ export async function load3(E: Engine, id: string, f: ReturnType<typeof fetchAll
   const model = meta.lifted && E.models[id] ? await E.models[id]!() : null;
   const axes: Record<string, [number, number, number]> = {};
   for (const j of meta.kin?.joints ?? []) if (Array.isArray(j.axis) && j.axis.length >= 3) axes[j.id] = [j.axis[0]!, j.axis[1]!, j.axis[2]!];
-  const poser = poserFor(E, { kinematics, model, z: s.pkg.bounds.z1 });
+  const poser = poserFor(E, { kinematics, model, z: s.pkg.bounds.z1, lifts: s.pkg.lifts });
   const scene: import("../../../src/render/v3/scene").Scene = {
     pkg: s.pkg,
     meshes: s.meshes,
@@ -76,7 +76,7 @@ export async function load3(E: Engine, id: string, f: ReturnType<typeof fetchAll
 }
 
 /** The poser of the loaded mechanism at the given control settings. */
-export function poserFor(E: Engine, l: Pick<Loaded, "kinematics" | "model"> & { z: number }, controls?: import("../../../src/kin/types").Controls) {
+export function poserFor(E: Engine, l: Pick<Loaded, "kinematics" | "model"> & { z: number; lifts?: Record<string, [number, number, number, number]> }, controls?: import("../../../src/kin/types").Controls) {
   const legacy = l.model ? E.legacyPoser(l.model, l.z) : E.staticPoser;
-  return l.kinematics ? (l.model ? E.hybridPoser(legacy, E.kinPoser(l.kinematics, controls)) : E.kinPoser(l.kinematics, controls)) : legacy;
+  return l.kinematics ? (l.model ? E.hybridPoser(legacy, E.kinPoser(l.kinematics, controls)) : E.kinPoser(l.kinematics, controls, l.lifts)) : legacy;
 }

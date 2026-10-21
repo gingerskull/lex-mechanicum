@@ -4,7 +4,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export const ROOT = join(import.meta.dirname, "..", "..");
+// the repository: two folders up from this file, or, where a bundler has moved the code (the site build), the working
+// directory the build runs in
+const here = join(import.meta.dirname, "..", "..");
+export const ROOT = existsSync(join(here, "docs", "mechanism-standard.md")) ? here : process.cwd();
 export const STANDARD_PATH = join(ROOT, "docs", "mechanism-standard.md");
 export const auditPath = (id: string): string => join(ROOT, "src", "mechanisms", id, "audit.md");
 

@@ -54,7 +54,8 @@ export function fourBar(s: FourBarSpec): Kin {
     ],
     solve: [{ block: "dyad", id: "coupler", in: { a: "A", b: "O4", ra: "c", rb: "b" }, branch: "branch", out: "B" }],
     points: [
-      { id: "A", body: "crank", local: [A[0], A[1], A[2]] },
+      // a body's x runs from its `at` joint toward its next joint (src/kin: bodyFrameOf), so A lies on the crank's x
+      { id: "A", body: "crank", local: [s.a, 0, 0] },
       { id: "B", body: "coupler", local: [B[0], B[1], B[2]] },
     ],
     outputs: [{ id: "rocker-angle", of: "rocker", kind: "angle", unit: "deg" }],

@@ -9,12 +9,12 @@ const rec = (id: string) => recordById(id)!;
 
 describe("the stage's controls from a record", () => {
   it("gives a design choice its options and its default", () => {
-    const c = controlsOf(rec("four-bar"));
+    const c = controlsOf(rec("drag-link-quick-return"));
     const a = c.find((x) => x.key === "branch")!;
     expect(a.type).toBe("choice");
     expect(a.target).toBe("design");
-    expect(a.options!.map((o) => o.value)).toEqual(["elbow-up", "elbow-down"]);
-    expect(a.value).toBe("elbow-up");
+    expect(a.options!.map((o) => o.value)).toEqual(["open", "crossed"]);
+    expect(a.value).toBe("open");
   });
 
   it("leaves the cycle's own driver to the scrubber", () => {
@@ -52,10 +52,12 @@ describe("which mechanisms the site draws with the v3 engine", () => {
 
   it("draws none by default, the listed ones on request, and all with 'all'", () => {
     delete process.env.SITE_V3;
-    expect(drawnBy3("four-bar")).toBe(false);
-    process.env.SITE_V3 = "four-bar, bevel-gears";
+    // a mechanism audited at 3.0 (the pilots) is always drawn by v3; the others only on request
     expect(drawnBy3("four-bar")).toBe(true);
-    expect(drawnBy3("bevel-gears")).toBe(true);
+    expect(drawnBy3("slider-crank")).toBe(false);
+    process.env.SITE_V3 = "slider-crank, scotch-yoke";
+    expect(drawnBy3("slider-crank")).toBe(true);
+    expect(drawnBy3("scotch-yoke")).toBe(true);
     expect(drawnBy3("spur-gears")).toBe(false);
     process.env.SITE_V3 = "all";
     expect(drawnBy3("spur-gears")).toBe(true);

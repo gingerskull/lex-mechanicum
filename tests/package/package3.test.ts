@@ -8,7 +8,7 @@ import { decode2, encode2 } from "../../src/package/format2";
 
 describe("package v2 from either engine", () => {
   it("a 2.5D mechanism gives both its v1 package and its v2 package", async () => {
-    const b = await buildAnyPackage("four-bar");
+    const b = await buildAnyPackage("slider-crank");
     expect(b.engine).toBe("2.5D");
     expect(b.v1).not.toBeNull();
     expect(b.pkg.solids.length).toBe(b.v1!.solids.length);

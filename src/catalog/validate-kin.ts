@@ -21,7 +21,9 @@ const FREEDOM: Record<"Planar" | "Spatial", Record<string, number>> = {
 /** Mobility from bodies and joints (Gruebler / Kutzbach): 3 (planar) or 6 (spatial) per free body minus what each joint removes. */
 export function mobility(kin: Kin, plane: "Planar" | "Spatial"): number | undefined {
   const per = plane === "Planar" ? 3 : 6;
-  let m = per * (kin.bodies.length - 1);
+  // a body no joint reaches is fixed where it stands (a port face, a fixed plate): it is part of the ground
+  const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
+  let m = per * (kin.bodies.filter((b) => b.id !== "ground" && joined.has(b.id)).length);
   for (const j of kin.joints) {
     const f = FREEDOM[plane][j.type];
     if (f === undefined) return undefined;
@@ -89,7 +91,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     for (const end of ["a", "b"] as const) if (!bodies.has(j[end])) say(`joint ${j.id}: ${end} "${String(j[end])}" is not a body`);
     if (j.at === undefined) say(`joint ${j.id}: no origin (at)`);
     const needsAxis = !["spherical", "planar", "gear-mesh", "cam-contact", "belt", "rolling", "pin-in-slot"].includes(j.type);
-    if (needsAxis && !(Array.isArray(j.axis) && j.axis.length === 3 && j.axis.every(isNum))) say(`joint ${j.id}: axis must be [x, y, z]`);
+    // a component may be a parameter expression ("cos(beta)"), as a position's may (src/kin/expr.ts)
+    if (needsAxis && !(Array.isArray(j.axis) && j.axis.length === 3 && j.axis.every((x) => isNum(x) || isStr(x)))) say(`joint ${j.id}: axis must be [x, y, z]`);
     if (j.type === "belt" && !KIN_VOCAB.flexible.includes(j.flexible as never)) say(`joint ${j.id}: belt joint needs flexible in ${KIN_VOCAB.flexible.join("/")}`);
     if (j.limits !== undefined && !(Array.isArray(j.limits) && j.limits.length === 2 && j.limits.every(isNum) && j.limits[0] <= j.limits[1])) say(`joint ${j.id}: limits must be [lo, hi]`);
   }
@@ -134,7 +137,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   };
   const resolveIn = (v: unknown, by: string, key: string) => {
     if (Array.isArray(v)) return v.forEach((x) => resolveIn(x, by, key));
+    if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
     if (isNum(v) || typeof v === "boolean") return;
+    // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
+    if (key === "kind" || key === "mode" || key === "form") return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   for (const s of kin.solve) {
@@ -144,7 +150,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     }
     if (!isObj(s.in)) say(`solve ${by}: in must be an object`);
     else for (const [k, v] of Object.entries(s.in)) resolveIn(v, by, k);
-    const outs = typeof s.out === "string" ? [s.out] : arr(s.out);
+    // a name, a list of names, or the block's keyed outputs ({ angle: "gear-turn" }, as src/kin/registry reads them)
+    const outs = typeof s.out === "string" ? [s.out] : isObj(s.out) && !Array.isArray(s.out) ? Object.values(s.out) : arr(s.out);
     if (!outs.length || !outs.every(isStr)) say(`solve ${by}: out must name what the block produces`);
     for (const o of outs as string[]) known.add(o);
     if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch)) say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);

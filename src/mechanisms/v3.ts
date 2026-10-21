@@ -3,4 +3,6 @@
 // later (src/checks/engine.ts); its polish, if it has one, is registered here by the pass that rebuilds it.
 import type { Polish } from "../builder";
 
-export const polishes3: Record<string, () => Promise<{ polish: Polish }>> = {};
+export const polishes3: Record<string, () => Promise<{ polish: Polish }>> = {
+  "four-bar": () => import("./four-bar/polish3"),
+};

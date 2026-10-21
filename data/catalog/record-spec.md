@@ -143,6 +143,40 @@ in degrees, applied x then y then z, default none); points and axes given "in a 
 The **generic loop-closure solver** is not in the record: it runs at build time on `bodies` and `joints` and its
 residual is the K1 check. The blocks' closed forms drive the animation (K1).
 
+**Body frames.** A point's `local` position and a body's `shape` are given in the body's own frame, which the kinematics
+and the hardware builder read the same way (`bodyFrameOf` in `src/kin/compose.ts`):
+- a `frame` object (`origin` or `o`, and `rot`) wins;
+- otherwise the origin is the body's `at` joint, z is that joint's axis (its sign fixed so its largest component is
+  positive) and x points toward the first other joint of the body that lies off that axis, so a link's x runs along it
+  and a coupler's from its first joint to its second; a body with no such joint (a shaft, a cross) keeps the world x, or
+  on an axis in plan the world z, made square to its axis;
+- the `ground`'s frame is always the world: its `frame` only places the plate its shape draws, and its points are world
+  positions;
+- a body no joint reaches stands at its own `frame`, fixed (a port face, a fixed plate): it is part of the ground in the
+  mobility count.
+
+**Positions and axes** may be parameter expressions (`["60*cos(beta)", "60*sin(beta)", 55]`), so a `param` control moves
+the geometry; the drawing carries every built solid from its built frame to the new one.
+
+**Outputs.** An `angle` of a body is its turn about its joint to the ground (else its first joint). An `angle` with `from`
+and `to` points is the angle at `of` between the rays to them (a transmission angle); one with `minus` is that output less
+another angle output, wrapped to ±180° (a lead or lag). A `position` of a prismatic joint is its slide. A `speed-ratio`
+of a body is read from its angle output.
+
+**Shapes the builder places where the joints put them** (not on a slab): a bevel `gear` (with `cone`, its pitch cone
+half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a universal joint's yoke) and a `cross`
+({ arm, diameter }); a `cylinder` that swings on a trunnion ({ bore, wall, span, face, pad, port, rod, axis }) and its
+`piston` ({ length, rod, eye, head, axis }). A `disc` or `plate` may carry `holes` ([x, y, r] in its frame).
+
+**Blocks in their record forms.** `gear-mesh` reads a `gear-mesh` joint (`za`, `zb` or `ratio`, `crossed`, `axis2` the
+second gear's axis, `cb` its centre). `hooke` reads either a `universal` joint or, with the cross as a body,
+`{ input, cross, joints: { in, out, a, b } }`: the two shafts' ground revolutes and the two yoke pins into the cross.
+`slider-dyad` with `kind: "rpr"` is the swinging block: `a` the slotted body's pivot, `p` the pin, `body` the slotted body;
+a body joined to it by a prismatic joint keeps its turn. A block's `out` may be keyed (`{ "angle": "gear-turn" }`).
+
+**Claims.** A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
+open while the swing is in a range); with a number it is the longest stretch the output holds within that much.
+
 ### `teaching`
 
 ```json

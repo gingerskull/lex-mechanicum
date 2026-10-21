@@ -1,7 +1,7 @@
 // Frames for the 3D hardware builder (standard A18 to A22). Everything is built in the coordinates of the reference
 // configuration (every body at the identity, src/kin: Kinematics.referencePose), where a stack along a joint axis is a
-// stack along that axis, whatever its direction. `toBody` turns the finished frames into the body-local ones a Solid3
-// carries; the kinematic pose of a body (an Xf) then moves a part by its body.
+// stack along that axis, whatever its direction. The finished solids keep these frames: the kinematic pose of a body (an
+// Xf from the reference configuration to now) moves a part by its body.
 import type { Vec2 } from "../core/geom";
 import type { Solid } from "../hardware/solid";
 import { apply, compose, cross, dot, norm } from "../solids/frame";

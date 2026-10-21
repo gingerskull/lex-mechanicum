@@ -109,6 +109,7 @@ export async function buildPackage3(rec: Pick<CatalogRecord, "id"> & { kin?: unk
       b0,
       b1,
       bounds: { minX: x0, minY: y0, maxX: x1, maxY: y1, z0, z1 },
+      lifts: assembly.lifts,
     },
     sampled,
     (s) => meshOf(M, s),

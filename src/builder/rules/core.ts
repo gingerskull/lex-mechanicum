@@ -10,11 +10,12 @@ import { BASE_GAP, BASE_T } from "../constants";
 import { fromPlane, place, planeCoords } from "../frames";
 import { titleOf } from "../lib";
 import { edgeDist } from "../planar";
+import { inside } from "../../core/poly";
 import { worldPoints } from "../sweeps";
 import { v3, xf } from "../../kin/math";
 import type { Rule } from "./types";
 
-const BODY_ROLE: Record<string, Solid3["role"]> = { driver: "driver", output: "output" };
+const BODY_ROLE: Record<string, Solid3["role"]> = { driver: "driver", output: "output", frame: "ground" };
 
 export const classify: Rule = {
   id: "classify",
@@ -50,13 +51,16 @@ export const placement: Rule = {
   apply(ctx) {
     for (const [id, g] of ctx.geoms) {
       const slab = ctx.extent(id);
-      if (!slab) continue;
-      const fam = slab.frame;
-      const o = fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      if (!slab && !g.exact) continue;
+      const fam = slab?.frame ?? g.frame;
+      // a body that stands where its joints put it (a bevel gear on its pitch cone, a yoke and a cross on their centre)
+      // is placed there, wherever a slab would put it
+      const o = g.exact || !slab ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact?.offset ?? 0)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
       const body = ctx.kin.bodies.find((b) => b.id === id)!;
       const role = BODY_ROLE[body.role] ?? "link";
-      const frame = { o, x: g.frame.x, z: fam.z };
-      const marks = g.pins.map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
+      const frame = { o, x: g.frame.x, z: g.exact ? g.frame.z : fam.z };
+      // a boss ring round each pin the part carries (a joint off the part, a slide's line, has none)
+      const marks = g.pins.filter((p) => inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
       const part: Solid3 = {
         id,
         name: titleOf(id),
@@ -65,7 +69,7 @@ export const placement: Rule = {
         body: id,
         frame,
         profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: extrudeOp(g.thick),
+        op: extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),
@@ -74,6 +78,8 @@ export const placement: Rule = {
       };
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
+      for (const pc of g.pieces ?? [])
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);

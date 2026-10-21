@@ -11,11 +11,11 @@ afterAll(() => rmSync(out, { recursive: true, force: true }));
 
 describe("bench page", () => {
   it("builds the page, the scripts and the packages of the ids", async () => {
-    await buildPage(out, ["four-bar"]);
-    for (const f of ["index.html", "main.js", "setup-worker.js", "packages/four-bar.mx2", "packages/four-bar.mxp"]) expect(existsSync(join(out, f)), f).toBe(true);
-    expect(readFileSync(join(out, "index.html"), "utf8")).toContain('data-ids="four-bar"');
-    const pkg = await decode2(new Uint8Array(readFileSync(join(out, "packages/four-bar.mx2"))));
-    expect(pkg.id).toBe("four-bar");
-    expect(pkg.solids.length).toBeGreaterThan(100);
+    await buildPage(out, ["slider-crank"]);
+    for (const f of ["index.html", "main.js", "setup-worker.js", "packages/slider-crank.mx2", "packages/slider-crank.mxp"]) expect(existsSync(join(out, f)), f).toBe(true);
+    expect(readFileSync(join(out, "index.html"), "utf8")).toContain('data-ids="slider-crank"');
+    const pkg = await decode2(new Uint8Array(readFileSync(join(out, "packages/slider-crank.mx2"))));
+    expect(pkg.id).toBe("slider-crank");
+    expect(pkg.solids.length).toBeGreaterThan(50);
   }, 60_000);
 });

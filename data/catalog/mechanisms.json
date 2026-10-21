@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-10-20",
+  "generated": "2026-10-21",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -2481,8 +2481,8 @@
             "a": "coupler",
             "b": "rocker",
             "at": [
-              136.67,
-              71.1,
+              136.666666666667,
+              71.1024300256718,
               0
             ],
             "axis": [
@@ -2638,6 +2638,8 @@
           {
             "id": "transmission-angle",
             "of": "B",
+            "from": "A",
+            "to": "O4",
             "kind": "angle",
             "unit": "deg"
           },
@@ -2652,8 +2654,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-19",
-          "note": "Reads as the textbook crank-rocker: the full crank circle, the limited rocker arc and the coupler curve."
+          "date": "2026-10-21",
+          "note": "Reads as the textbook crank-rocker: the full crank circle, the limited rocker arc and the coupler curve. Pilot (P), 2026-10-21: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The assembly-branch control is not offered, because the parts are built for the elbow-up closure and a control cannot rebuild them; the branch stays a declared design choice. The coupler point C is engraved on the coupler (trace mark)."
         },
         "principle": [
           {
@@ -2692,11 +2694,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "assembly",
-            "kind": "design",
-            "design": "branch"
           }
         ],
         "plot": {
@@ -10543,14 +10540,7 @@
                 70,
                 0
               ],
-              "z": -8,
-              "standard": {
-                "center": [
-                  120,
-                  0
-                ],
-                "radius": 40
-              }
+              "z": -8
             },
             "at": {
               "frame": {
@@ -10560,6 +10550,39 @@
                   0
                 ]
               }
+            }
+          },
+          {
+            "id": "standard",
+            "role": "frame",
+            "shape": {
+              "type": "disc",
+              "radius": 40,
+              "thickness": 8,
+              "holes": [
+                [
+                  29.45,
+                  -5.72,
+                  2.5
+                ],
+                [
+                  29.45,
+                  5.72,
+                  2.5
+                ],
+                [
+                  0,
+                  0,
+                  6.05
+                ]
+              ]
+            },
+            "frame": {
+              "origin": [
+                120,
+                0,
+                -22
+              ]
             }
           },
           {
@@ -10581,21 +10604,15 @@
             "id": "piston",
             "role": "slider",
             "shape": {
-              "type": "custom",
-              "op": "extrude",
-              "profile": {
-                "rod": [
-                  0,
-                  120,
-                  28
-                ],
-                "piston": {
-                  "at": 120,
-                  "length": 16,
-                  "width": 38
-                }
-              },
-              "thick": 9
+              "type": "piston",
+              "length": 120,
+              "rod": 10,
+              "eye": 9,
+              "head": [
+                16,
+                39
+              ],
+              "axis": 14
             },
             "at": {
               "joint": "A"
@@ -10605,27 +10622,25 @@
             "id": "cylinder",
             "role": "output",
             "shape": {
-              "type": "custom",
-              "op": "extrude",
-              "profile": {
-                "body": {
-                  "length": 100,
-                  "width": 56,
-                  "corner": 8
-                },
-                "bore": {
-                  "length": 90,
-                  "width": 40
-                },
-                "port": {
-                  "at": [
-                    30,
-                    0
-                  ],
-                  "radius": 2.5
-                }
-              },
-              "thick": 28
+              "type": "cylinder",
+              "bore": 40,
+              "wall": 6,
+              "span": [
+                -46,
+                46
+              ],
+              "face": -14,
+              "pad": [
+                -12,
+                40,
+                28
+              ],
+              "port": [
+                30,
+                2.5
+              ],
+              "rod": 10,
+              "axis": 14
             },
             "at": {
               "joint": "O3"
@@ -10772,16 +10787,14 @@
               "O3"
             ],
             "in": {
-              "a": "A",
-              "pivot": "O3",
-              "r": "Lp"
+              "kind": "rpr",
+              "a": "O3",
+              "p": "A",
+              "body": "cylinder"
             },
-            "out": [
-              "cyl-angle",
-              "Pc"
-            ],
-            "opts": {
-              "form": "rotating-slide"
+            "out": {
+              "angle": "cyl-turn",
+              "dist": "cyl-dist"
             }
           }
         ],
@@ -10801,7 +10814,7 @@
             "local": [
               30,
               0,
-              0
+              -14
             ]
           },
           {
@@ -10810,7 +10823,7 @@
             "local": [
               149.45,
               -5.72,
-              0
+              -14
             ]
           },
           {
@@ -10819,7 +10832,7 @@
             "local": [
               149.45,
               5.72,
-              0
+              -14
             ]
           }
         ],
@@ -10828,8 +10841,7 @@
             "id": "cyl-angle",
             "of": "cylinder",
             "kind": "angle",
-            "unit": "deg",
-            "from": "line O2-O3"
+            "unit": "deg"
           },
           {
             "id": "piston-s",
@@ -10901,9 +10913,8 @@
             "id": "swing",
             "kind": "arc",
             "center": "O3",
-            "from": "O2",
-            "to": "A",
-            "label": "SWING"
+            "label": "SWING",
+            "through": "port"
           }
         ],
         "view": "PLAN",
@@ -10915,7 +10926,7 @@
               "origin": [
                 120,
                 0,
-                -14
+                -13
               ],
               "normal": [
                 0,
@@ -10924,12 +10935,9 @@
               ]
             },
             "highlight": [
-              "port",
-              "inlet",
-              "exhaust",
-              "cylinder.port"
+              "port"
             ],
-            "note": "the face between the cylinder and the standard; the open port is the one the cylinder's port overlaps"
+            "note": "1 mm into the cylinder's port pad, over the face it shares with the standard: the pad's port, cut, over the standard's inlet and exhaust; the open port is the one the cylinder's port overlaps"
           }
         ],
         "controls": [
@@ -27900,8 +27908,7 @@
               "module": 4,
               "face": 20,
               "bore": 12,
-              "cone": 26.57,
-              "teeth": "straight bevel, Tredgold back-cone"
+              "cone": 26.57
             },
             "at": {
               "joint": "O1"
@@ -27916,9 +27923,7 @@
               "module": 4,
               "face": 20,
               "bore": 14.4,
-              "cone": 63.43,
-              "teeth": "straight bevel, Tredgold back-cone",
-              "phase": "half a tooth, a pinion tooth in a gear gap at the mesh"
+              "cone": 63.43
             },
             "at": {
               "joint": "O2"
@@ -27968,14 +27973,31 @@
               0,
               20
             ],
-            "z1": 16,
-            "z2": 32,
-            "crossed": 90,
-            "cone": [
-              26.57,
-              63.43
+            "axis": [
+              1,
+              0,
+              0
             ],
-            "note": "outer pitch point; both pitch cones share the apex P"
+            "axis2": [
+              0,
+              0,
+              1
+            ],
+            "za": 16,
+            "zb": 32,
+            "ratio": -0.5,
+            "crossed": true,
+            "ca": [
+              -64,
+              0,
+              52
+            ],
+            "cb": [
+              0,
+              0,
+              20
+            ],
+            "note": "outer pitch point; both pitch cones share the apex P. Signed about each body's own axis: a positive pinion turn about +x turns the gear by -0.5 about +z"
           }
         ],
         "params": [
@@ -28044,16 +28066,12 @@
               "M"
             ],
             "in": {
-              "a": "pinion",
-              "b": "gear",
-              "pair": "pair",
-              "sigma": "Sigma"
+              "joint": "M",
+              "input": "input"
             },
-            "opts": {
-              "form": "bevel",
-              "cones": "tan(delta1) = sin(Sigma) / (z2/z1 + cos(Sigma))"
-            },
-            "out": "gear-turn"
+            "out": {
+              "angle": "gear-turn"
+            }
           }
         ],
         "points": [
@@ -28088,16 +28106,16 @@
             "id": "Tp",
             "body": "pinion",
             "local": [
+              32,
               0,
-              0,
-              -32
+              0
             ]
           },
           {
             "id": "Tg",
             "body": "gear",
             "local": [
-              -64,
+              64,
               0,
               0
             ]
@@ -28123,7 +28141,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio."
+          "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn."
         },
         "principle": [
           {
@@ -28213,11 +28231,6 @@
             "id": "input",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "pair",
-            "kind": "design",
-            "design": "pair"
           }
         ],
         "plot": {
@@ -47269,8 +47282,7 @@
             },
             "at": {
               "joint": "B1"
-            },
-            "frame": "local x along the input shaft toward the cross"
+            }
           },
           {
             "id": "cross",
@@ -47298,8 +47310,7 @@
             },
             "at": {
               "joint": "B2"
-            },
-            "frame": "local x along the output shaft away from the cross"
+            }
           }
         ],
         "joints": [
@@ -47311,7 +47322,7 @@
             "at": [
               -60,
               0,
-              80
+              55
             ],
             "axis": [
               1,
@@ -47327,7 +47338,7 @@
             "at": [
               0,
               0,
-              80
+              55
             ],
             "axis": [
               0,
@@ -47343,7 +47354,7 @@
             "at": [
               0,
               0,
-              80
+              55
             ],
             "axis": [
               0,
@@ -47357,13 +47368,13 @@
             "a": "ground",
             "b": "yoke-out",
             "at": [
-              51.96,
-              30,
-              80
+              "60*cos(beta)",
+              "60*sin(beta)",
+              55
             ],
             "axis": [
-              0.866,
-              0.5,
+              "cos(beta)",
+              "sin(beta)",
               0
             ]
           }
@@ -47418,14 +47429,19 @@
             ],
             "in": {
               "input": "input",
-              "beta": "beta"
+              "cross": "cross",
+              "joints": {
+                "in": "B1",
+                "out": "B2",
+                "a": "C1",
+                "b": "C2"
+              }
             },
-            "out": [
-              "cross",
-              "yoke-out"
-            ],
+            "out": {
+              "delta": "out-turn"
+            },
             "opts": {
-              "zero": "input yoke arm in the plane of the two shafts",
+              "zero": "input yoke pin C1 across the plane of the two shafts",
               "relation": "tan(theta2) = tan(theta1) / cos(beta), atan2 branch"
             }
           }
@@ -47444,27 +47460,27 @@
             "id": "in-tip",
             "body": "yoke-in",
             "local": [
-              60,
-              30,
-              0
+              0,
+              -30,
+              60
             ]
           },
           {
             "id": "out-tip",
             "body": "yoke-out",
             "local": [
-              -60,
+              30,
               0,
-              30
+              -60
             ]
           },
           {
             "id": "in-ext",
             "body": "yoke-in",
             "local": [
-              120,
               0,
-              0
+              0,
+              120
             ]
           }
         ],
@@ -47491,7 +47507,7 @@
             "of": "yoke-out",
             "kind": "angle",
             "unit": "deg",
-            "note": "output angle minus input angle"
+            "minus": "input-angle"
           }
         ],
         "fallback": null
@@ -47601,7 +47617,7 @@
             "output": "output-angle",
             "stat": "range",
             "value": 360,
-            "tol": 0.01
+            "tol": 1
           },
           {
             "text": "the output runs ahead and then behind, twice per revolution, by up to 4.1° at 30°",

@@ -12,7 +12,7 @@ type Wasm = Awaited<ReturnType<typeof manifold>>;
 type Mf = InstanceType<Wasm["Manifold"]>;
 
 /** Designed sliding faces: a thrust washer, a slide's wear strip (F4). */
-const SLIDING = new Set(["thrustWasher", "wearStrip"]);
+const SLIDING = new Set(["thrustWasher", "wearStrip", "belt"]);
 
 /** How far a face may lie from another and still touch, mm. */
 const TOUCH = 0.05;
@@ -100,6 +100,8 @@ export async function clampCheck3(solids: Solid3[], placer: Placer, n = 12): Pro
       for (let g = 0; g < S.length; g++) {
         const G = S[g]!;
         if (moving[g] || SLIDING.has(G.kind) || !local[g]) continue;
+        // a face the design slides on (a port face on its standard) is no clamp
+        if (R.slides?.includes(G.id) || G.slides?.includes(R.id)) continue;
         const key = `${R.id} (turning) touches the ground face of ${G.id}`;
         if (out.has(key) || !obbMeet(obb[r]!, obb[g]!, -TOUCH)) continue;
         if (!baseOf(r) || !baseOf(g)) continue;

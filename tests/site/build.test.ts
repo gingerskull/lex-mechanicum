@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { mechanisms } from "../../src/mechanisms";
+import { allIds } from "../../src/checks/engine";
 
 const OUT = join("dist", "site");
 const read = (f: string) => readFileSync(join(OUT, f), "utf8");
@@ -35,9 +36,10 @@ const pages = (): string[] => readdirSync(join(OUT, "mechanisms"));
 describe("site build", () => {
   it("has the library and a page for every registered mechanism", () => {
     expect(existsSync(join(OUT, "index.html"))).toBe(true);
-    for (const id of Object.keys(mechanisms)) {
+    for (const id of allIds()) {
       expect(existsSync(join(OUT, "mechanisms", id, "index.html")), id).toBe(true);
-      expect(existsSync(join(OUT, "packages", `${id}.mxp`)), id).toBe(true);
+      // a mechanism on the v3 engine ships package v2 only
+      expect(existsSync(join(OUT, "packages", `${id}.mxp`)) || existsSync(join(OUT, "packages", `${id}.mx2`)), id).toBe(true);
       expect(existsSync(join(OUT, "thumbs", `${id}-dark.webp`)), id).toBe(true);
     }
   });
@@ -91,7 +93,7 @@ describe("site build", () => {
     const html = read("index.html");
     expect(html).toMatch(/<button[^>]*id="qclear"[^>]*hidden/);
     expect(html).toMatch(/id="libbar"/);
-    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${Object.keys(mechanisms).length}</span>`));
+    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${allIds().length}</span>`));
   });
 
   it("gives the stage its view modes: the Wide toggle, full screen and the remembered mode set before paint", () => {

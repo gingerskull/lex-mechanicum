@@ -3,14 +3,18 @@ import { mkdtempSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { allIds, engineOf, isKnown } from "../../src/checks/engine";
+import { allIds, auditedStandard, engineOf, isKnown, V3_STANDARD } from "../../src/checks/engine";
+import { compareVersions } from "../../src/audit/sheet";
 import { cacheKey, check3d, PROFILES } from "../../src/checks/run";
 import { mechanisms } from "../../src/mechanisms";
 import { pin, plate, slidingPlacer } from "../fixtures/clash3";
 
 describe("engineOf", () => {
   it("puts every registered mechanism on the 2.5D engine until its audit is at 3.0 or later (S6)", () => {
-    for (const id of Object.keys(mechanisms)) expect(engineOf(id)).toBe("2.5D");
+    for (const id of Object.keys(mechanisms)) {
+      const v = auditedStandard(id);
+      expect(engineOf(id), id).toBe(v && compareVersions(v, V3_STANDARD) >= 0 ? "v3" : "2.5D");
+    }
     expect(allIds()).toEqual(expect.arrayContaining(Object.keys(mechanisms)));
     expect(isKnown("four-bar")).toBe(true);
     expect(isKnown("no-such-mechanism")).toBe(false);

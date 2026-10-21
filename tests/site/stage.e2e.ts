@@ -10,7 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const OUT = join("dist", "site");
 const TYPES: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".woff2": "font/woff2" };
-const V3 = ["four-bar", "bevel-gears", "oscillating-cylinder"];
+const V3 = ["four-bar", "bevel-gears", "oscillating-cylinder", "universal-joint"];
 const V1 = "slider-crank";
 
 let server: Server;
@@ -191,14 +191,15 @@ describe("the v3 stage on a desktop", () => {
 
   it("changes the drawing with the record's own controls", async () => {
     const ctx = await desktop();
-    const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
+    // the universal joint's bend: a param control that moves the output shaft and its blocks
+    const { page, errors } = await open(ctx, "/mechanisms/universal-joint/");
     await ready(page);
     await pause(page);
     const a = await stageShot(page);
-    const group = page.locator('.seg[data-ctl="assembly"]');
-    await group.locator("button[aria-pressed=false]").first().click();
+    const bend = page.locator('input[data-ctl="bend"]');
+    await bend.fill("40");
+    await bend.dispatchEvent("input");
     await page.waitForTimeout(400);
-    expect(await group.locator("button[aria-pressed=true]").count()).toBe(1);
     expect(differs(a, await stageShot(page))).toBe(true);
     expect(await page.locator("#stage-err").isHidden()).toBe(true);
     expect(errors).toEqual([]);

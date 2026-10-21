@@ -214,7 +214,7 @@ export function bridgeSolids(ctx: BuildCtx, o: { id: string; over: Vec2; route: 
     const at: [number, number, number] = [p[0], p[1], 0];
     const nm = k ? "" : `Standoff Ø${STANDOFF.D} x ${+(r.bottom - o.baseTop).toFixed(1)}, M${STANDOFF.M}, Ø${STANDOFF.spigotD} h7 spigot`;
     out.push(...place(up, H.standoff(`${o.id}-post${k}`, { ...(k ? { name: "" } : { name: nm }), qty: k ? 0 : 2, at, z0: o.baseTop, z1: r.bottom, joints: j })));
-    out.push(...place(up, H.spigot(`${o.id}-post${k}-spigot`, { at, z0: r.bottom, z1: r.bottom + 3, joints: j, allow: [o.id] })));
+    out.push(...place(up, H.spigot(`${o.id}-post${k}-spigot`, { at, z0: r.bottom, z1: r.bottom + 3, joints: j })));
     out.push(...place(up, H.screw(`${o.id}-post${k}-top`, "button", STANDOFF.M, BEAM_T + 1.5 * STANDOFF.M, { at, face: r.top, dir: -1, joints: j, ...(k ? { name: "" } : {}) })));
     out.push(...place(up, H.screw(`${o.id}-post${k}-bot`, "button", STANDOFF.M, o.baseTop - o.baseBottom + 1.5 * STANDOFF.M, { at, face: o.baseBottom, dir: 1, joints: j, ...(k ? { name: "" } : {}) })));
   });

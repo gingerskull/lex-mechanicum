@@ -851,8 +851,7 @@
             "module": 4,
             "face": 20,
             "bore": 12,
-            "cone": 26.57,
-            "teeth": "straight bevel, Tredgold back-cone"
+            "cone": 26.57
           },
           "at": {
             "joint": "O1"
@@ -867,9 +866,7 @@
             "module": 4,
             "face": 20,
             "bore": 14.4,
-            "cone": 63.43,
-            "teeth": "straight bevel, Tredgold back-cone",
-            "phase": "half a tooth, a pinion tooth in a gear gap at the mesh"
+            "cone": 63.43
           },
           "at": {
             "joint": "O2"
@@ -919,14 +916,31 @@
             0,
             20
           ],
-          "z1": 16,
-          "z2": 32,
-          "crossed": 90,
-          "cone": [
-            26.57,
-            63.43
+          "axis": [
+            1,
+            0,
+            0
           ],
-          "note": "outer pitch point; both pitch cones share the apex P"
+          "axis2": [
+            0,
+            0,
+            1
+          ],
+          "za": 16,
+          "zb": 32,
+          "ratio": -0.5,
+          "crossed": true,
+          "ca": [
+            -64,
+            0,
+            52
+          ],
+          "cb": [
+            0,
+            0,
+            20
+          ],
+          "note": "outer pitch point; both pitch cones share the apex P. Signed about each body's own axis: a positive pinion turn about +x turns the gear by -0.5 about +z"
         }
       ],
       "params": [
@@ -995,16 +1009,12 @@
             "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "gear",
-            "pair": "pair",
-            "sigma": "Sigma"
+            "joint": "M",
+            "input": "input"
           },
-          "opts": {
-            "form": "bevel",
-            "cones": "tan(delta1) = sin(Sigma) / (z2/z1 + cos(Sigma))"
-          },
-          "out": "gear-turn"
+          "out": {
+            "angle": "gear-turn"
+          }
         }
       ],
       "points": [
@@ -1039,16 +1049,16 @@
           "id": "Tp",
           "body": "pinion",
           "local": [
+            32,
             0,
-            0,
-            -32
+            0
           ]
         },
         {
           "id": "Tg",
           "body": "gear",
           "local": [
-            -64,
+            64,
             0,
             0
           ]
@@ -1074,7 +1084,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio."
+        "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn."
       },
       "principle": [
         {
@@ -1164,11 +1174,6 @@
           "id": "input",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "pair",
-          "kind": "design",
-          "design": "pair"
         }
       ],
       "plot": {

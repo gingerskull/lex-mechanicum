@@ -44,11 +44,20 @@ export function worldPoints(M: Wasm, s: Solid3): Vec3[] {
 
 /** The pose a fraction t of the way from A to B: the turn between them taken in proportion, the shift linearly. */
 export function between(A: Xf, B: Xf, t: number): Xf {
-  const rel = m3.mul(m3.T(A.R), B.R);
-  const w = m3.log(rel);
+  // the screw motion from A to B (rotation about a fixed line and a slide along it), taken a fraction t: a part that
+  // turns about a pivot stays on its arc between the samples
+  const Rd = m3.mul(B.R, m3.T(A.R));
+  const td = v3.sub(B.t, m3.mulV(Rd, A.t));
+  const w = m3.log(Rd);
   const ang = v3.len(w);
-  const R = ang < 1e-12 ? A.R : m3.mul(A.R, m3.axisAngle(w, ang * t));
-  return { R, t: v3.lerp(A.t, B.t, t) };
+  if (ang < 1e-9) return { R: A.R, t: v3.lerp(A.t, B.t, t) };
+  const n = v3.mul(w, 1 / ang);
+  const a = v3.mul(n, v3.dot(td, n));
+  const p = v3.sub(td, a);
+  const c = v3.mul(v3.add(p, v3.mul(v3.cross(n, p), 1 / Math.tan(ang / 2))), 0.5);
+  const Rt = m3.axisAngle(n, ang * t);
+  const tt = v3.add(v3.sub(c, m3.mulV(Rt, c)), v3.mul(a, t));
+  return { R: m3.mul(Rt, A.R), t: v3.add(m3.mulV(Rt, A.t), tt) };
 }
 
 /** The matrix of a rigid transform, column-major. */
@@ -124,6 +133,30 @@ export class Swept {
   }
 }
 
+/** Groups of points from solids whose boxes touch (within 0.5 mm); a shaft stays a group of its own. */
+function clusters(items: { shaft: boolean; pts: Vec3[] }[]): Vec3[][] {
+  const xs = items.filter((q) => q.pts.length >= 4);
+  const box = xs.map((q) => {
+    const b = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+    for (const p of q.pts) for (let k = 0; k < 3; k++) {
+      b[k] = Math.min(b[k]!, p[k]!);
+      b[k + 3] = Math.max(b[k + 3]!, p[k]!);
+    }
+    return b;
+  });
+  const up = xs.map((_, i) => i);
+  const find = (i: number): number => (up[i] === i ? i : (up[i] = find(up[i]!)));
+  const touch = (a: number[], b: number[]) => [0, 1, 2].every((k) => a[k]! <= b[k + 3]! + 0.5 && b[k]! <= a[k + 3]! + 0.5);
+  for (let i = 0; i < xs.length; i++)
+    for (let j = i + 1; j < xs.length; j++) if (!xs[i]!.shaft && !xs[j]!.shaft && touch(box[i]!, box[j]!)) up[find(i)] = find(j);
+  const out = new Map<number, Vec3[]>();
+  xs.forEach((q, i) => {
+    const r = find(i);
+    (out.get(r) ?? out.set(r, []).get(r)!).push(...q.pts);
+  });
+  return [...out.values()];
+}
+
 export class Sweeps {
   private cache = new Map<string, { key: string; volume: Swept }>();
   private own: { delete(): void }[] = [];
@@ -190,9 +223,11 @@ export class Sweeps {
     if (hit && hit.key === key) return hit.volume;
     hit?.volume.delete();
     const M = this.ctx.M;
-    // the vertices of everything the body carries, in world reference coordinates
-    const pts: Vec3[] = [];
-    for (const sol of solids) for (const v of worldPoints(M, sol)) pts.push(v);
+    // the vertices of everything the body carries, in world reference coordinates, in clusters of solids that touch: a
+    // shaft the body turns is hulled on its own, and a clip over a bridge apart from a hub under it, so the hull of a body
+    // never fills a fixed plate its parts pass through or straddle
+    const each = clusters(solids.map((sol) => ({ shaft: sol.kind === "shaft", pts: worldPoints(M, sol) })));
+    const pts: Vec3[] = each.flat();
     const n = this.ctx.sampled.us.length;
     const step = n > 200 ? 2 : 1;
     // the farthest points of the body stand for it when judging how far it moves between two samples
@@ -211,9 +246,11 @@ export class Sweeps {
       const sub = Math.min(24, Math.floor(move / SWEEP_STEP));
       for (let k = 1; k <= sub; k++) refined.push(between(A, B, k / (sub + 1)));
     }
-    const poses: Vec3[][] = refined.map((X) => pts.map((p) => xf.apply(X, p)));
     const hulls: Mf[] = [];
-    for (let i = 0; i < poses.length; i++) hulls.push(M.Manifold.hull([...poses[i]!, ...poses[(i + 1) % poses.length]!]));
+    for (const q of each) {
+      const poses: Vec3[][] = refined.map((X) => q.map((p) => xf.apply(X, p)));
+      for (let i = 0; i < poses.length; i++) hulls.push(M.Manifold.hull([...poses[i]!, ...poses[(i + 1) % poses.length]!]));
+    }
     const volume = new Swept(M, hulls);
     this.cache.set(body, { key, volume });
     return volume;

@@ -285,6 +285,8 @@ export async function clearance3(solids: ClashSolid[], placer: Placer, opts: Cla
       const moves = movesRel(i, k);
       if (!moves && !allowed) continue;
       if (a.group && a.group === b.group && !allowed) continue;
+      // a belt runs on its pulleys by design (its teeth in their grooves)
+      if (((a.kind === "belt" && b.kind === "pulley") || (a.kind === "pulley" && b.kind === "belt")) && !allowed) continue;
       if (contact.has(`${a.body}|${b.body}`) && !allowed) continue;
       pairs.push([i, k, moves]);
     }

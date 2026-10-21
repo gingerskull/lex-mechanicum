@@ -196,7 +196,7 @@ async function main(box: HTMLElement) {
   sess.onRestored = () => (dirty = true);
   const applyControls = () => {
     ctlDirty = false;
-    sess.setPoser(poserFor(E, { kinematics: L.kinematics, model: L.model, z: zTop }, ctl as never));
+    sess.setPoser(poserFor(E, { kinematics: L.kinematics, model: L.model, z: zTop, lifts: L.scene.pkg.lifts }, ctl as never));
     dirty = true;
   };
   let note = 0;

@@ -84,8 +84,10 @@ function uniforms(gl: WebGL2RenderingContext, p: WebGLProgram): U {
   const u: U = {};
   const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS) as number;
   for (let i = 0; i < n; i++) {
-    const name = gl.getActiveUniform(p, i)!.name.replace(/\[0\]$/, "");
-    u[name] = gl.getUniformLocation(p, name.includes("uMark") ? `${name}[0]` : name);
+    // an array's location is its first element's; a plain uniform keeps its own name
+    const full = gl.getActiveUniform(p, i)!.name;
+    const name = full.replace(/\[0\]$/, "");
+    u[name] = gl.getUniformLocation(p, full);
   }
   return u;
 }
