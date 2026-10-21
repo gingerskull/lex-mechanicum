@@ -3,7 +3,7 @@
 // the stage-3 fasteners, headroom, the see-through stage and the explode.
 import { TAU, circle, roundRect, type Vec2 } from "../../core/geom";
 import { H } from "../../hardware/primitives";
-import { MOTORS, PULLEYS, STANDOFF } from "../../hardware/tables";
+import { MOTORS, PULLEYS, SENSOR, STANDOFF } from "../../hardware/tables";
 import { cleanProfile } from "../../solids/manifold";
 import type { Solid3 } from "../../solids/types";
 import { type Vec3, v3, wrapPi, xf } from "../../kin/math";
@@ -215,13 +215,16 @@ export const drive: Rule = {
     // the pulleys, one on the motor shaft and one on the input shaft's free end, in one plane
     const small = PULLEYS[16];
     const big = PULLEYS[32];
-    const pulley = (id: string, c: Vec2, p: (typeof PULLEYS)[16]) => {
-      ctx.add(place(UPF, H.solid(id, { name: `GT2 timing pulley ${p.T}T`, kind: "pulley", role: "hw", mat: "Aluminium 6061-T6", outer: circle(p.od / 2, c[0], c[1], 36), holes: [circle(2, c[0], c[1], 12)], z0: pz - 3, z1: pz + 3, joints: j })));
-      ctx.add(place(UPF, H.solid(`${id}-fl0`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: [circle(2, c[0], c[1], 12)], z0: pz - 4, z1: pz - 3, joints: j })));
-      ctx.add(place(UPF, H.solid(`${id}-fl1`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: [circle(2, c[0], c[1], 12)], z0: pz + 3, z1: pz + 4, joints: j })));
+    // the shaft's pulley and its flag turn with the input shaft, bored to it
+    const shaftBody = ctx.get(`${site.id}-axle`)?.body ?? "ground";
+    const pulley = (id: string, c: Vec2, p: (typeof PULLEYS)[16], bore: number, body: string) => {
+      const hole = () => [circle(bore / 2 + 0.05, c[0], c[1], 24).reverse()];
+      ctx.add(place(UPF, H.solid(id, { name: `GT2 timing pulley ${p.T}T`, kind: "pulley", role: "hw", mat: "Aluminium 6061-T6", outer: circle(p.od / 2, c[0], c[1], 36), holes: hole(), z0: pz - 3, z1: pz + 3, joints: j, body })));
+      ctx.add(place(UPF, H.solid(`${id}-fl0`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: hole(), z0: pz - 4, z1: pz - 3, joints: j, body })));
+      ctx.add(place(UPF, H.solid(`${id}-fl1`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: hole(), z0: pz + 3, z1: pz + 4, joints: j, body })));
     };
-    pulley("drive-pulley-motor", M, small);
-    pulley("drive-pulley-shaft", S, big);
+    pulley("drive-pulley-motor", M, small, mot.shaft, "ground");
+    pulley("drive-pulley-shaft", S, big, st.d, shaftBody);
     const rb = small.pd / 2;
     const rB = big.pd / 2;
     const ring = H.hullOf([[M[0], M[1], rb + 0.7], [S[0], S[1], rB + 0.7]]);
@@ -229,11 +232,24 @@ export const drive: Rule = {
     ctx.add(place(UPF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: pz - 3, z1: pz + 3, joints: j })));
     // the home flag on the big pulley and a fork sensor on a post under the base (V6, F10)
     const dir = Math.atan2(M[1] - S[1], M[0] - S[0]) + Math.PI / 2;
-    const flagR0 = rB + 0.2;
-    ctx.add(place(UPF, H.flag("drive-flag", flagR0, flagR0 + 6, dir, { at: [S[0], S[1], 0], z0: pz + 4, z1: pz + 5, joints: j })));
-    const sc = polar(S, flagR0 + 6 - 4, dir);
-    ctx.add(place(UPF, H.sensor("drive-sensor", { at: [sc[0], sc[1], 0], z0: pz + 1, z1: pz + 9, joints: j })));
-    ctx.add(place(UPF, H.standoff("drive-sensor-post", { at: [sc[0], sc[1] + 6, 0], z0: pz + 9, z1: bb, name: "Standoff Ø10 under the base, carries the sensor", joints: j })));
+    // the vane lies on the top flange and reaches past it into the fork, whose mouth stands 1 mm clear of the flange
+    const mouth = big.fd / 2 + 1;
+    const fz = pz + 4;
+    ctx.add(place(UPF, H.flag("drive-flag", rB, mouth + SENSOR.depth - 1.5, dir, { at: [S[0], S[1], 0], z0: fz, z1: fz + SENSOR.vane, joints: j, body: shaftBody })));
+    // the fork straddles the vane along the shaft axis: two jaws above and below it, joined behind the slot
+    const sz = fz + SENSOR.vane / 2 - SENSOR.h / 2;
+    const gap0 = fz + SENSOR.vane / 2 - SENSOR.slot / 2;
+    const gap1 = gap0 + SENSOR.slot;
+    const box = (r0: number, r1: number): Vec2[] => {
+      const c = Math.cos(dir), sn = Math.sin(dir), w = SENSOR.w / 2;
+      return [[r0, -w], [r1, -w], [r1, w], [r0, w]].map(([r, t]): Vec2 => [S[0] + r! * c - t! * sn, S[1] + r! * sn + t! * c]);
+    };
+    const fork = { kind: "sensor" as const, role: "hw" as const, joints: j, group: "drive-sensor" };
+    ctx.add(place(UPF, H.solid("drive-sensor", { ...fork, name: `Fork sensor, slotted optical, ${SENSOR.slot} mm gap`, mat: "PBT housing", outer: box(mouth, mouth + SENSOR.l), z0: sz, z1: gap0 })));
+    ctx.add(place(UPF, H.solid("drive-sensor-jaw", { ...fork, name: "", outer: box(mouth, mouth + SENSOR.l), z0: gap1, z1: sz + SENSOR.h })));
+    ctx.add(place(UPF, H.solid("drive-sensor-back", { ...fork, name: "", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: gap0, z1: gap1 })));
+    const post = polar(S, mouth + SENSOR.l - 6, dir);
+    ctx.add(place(UPF, H.standoff("drive-sensor-post", { at: [post[0], post[1], 0], z0: sz + SENSOR.h, z1: bb, name: "Standoff Ø10 under the base, carries the sensor", joints: j })));
     const tb = polar(M, 36, dir);
     ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
     ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));

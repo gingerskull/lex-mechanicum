@@ -12,7 +12,7 @@ type Wasm = Awaited<ReturnType<typeof manifold>>;
 type Mf = InstanceType<Wasm["Manifold"]>;
 
 /** Designed sliding faces: a thrust washer, a slide's wear strip (F4). */
-const SLIDING = new Set(["thrustWasher", "wearStrip"]);
+const SLIDING = new Set(["thrustWasher", "wearStrip", "belt"]);
 
 /** How far a face may lie from another and still touch, mm. */
 const TOUCH = 0.05;

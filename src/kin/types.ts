@@ -7,6 +7,8 @@ export type Vec = Num[]; // [x, y] or [x, y, z]; z defaults to 0
 
 export interface Frame {
   o?: Vec;
+  /** The record spec's name for `o`. */
+  origin?: Vec;
   rot?: Vec; // degrees, x then y then z
 }
 
@@ -127,6 +129,9 @@ export interface KinOutput {
   of: string;
   kind: "angle" | "position" | "speed-ratio" | "path";
   unit?: string;
+  /** An angle at the point `of` between the rays to the points `from` and `to` (0 to 180 degrees): a transmission angle. */
+  from?: string;
+  to?: string;
 }
 
 export interface Kin {

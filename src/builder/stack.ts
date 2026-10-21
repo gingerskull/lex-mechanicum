@@ -14,6 +14,7 @@ import { type Frame, parallel } from "./frames";
 import { Local, fitBore, half, type Fit, type Member } from "./lib";
 import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
+import { MIN_GAP } from "./constants";
 import { liveHousing, pillowBlocks } from "./supports";
 
 export type SupportKind = "housing" | "pillow" | "bridge" | "stub" | "hung";
@@ -106,6 +107,9 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   });
   const keyedSeats = seats.filter((s) => s.m.keyed && !moving);
   const anchor = seats[0]!;
+  // what the pin or shaft turns with: a shoulder bolt with the part it is threaded into, a live shaft with the part keyed
+  // to it; a dead axle stands still. Inner-race spacers, sleeves and clips on it ride the same body.
+  const turn = moving ? anchor.m.body : live ? (keyedSeats[0]?.m.body ?? anchor.m.body) : "ground";
   seats.forEach((s, i) => {
     const nm = `${id}-${i}`;
     const isAnchor = moving && s === anchor;
@@ -140,22 +144,26 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const above = next.b || !next.m.keyed || moving ? next.z0 : next.m.w0;
     if (moving && s === anchor) {
       // the bolt's shoulder runs from the anchor's face
-      if (above - s.m.w1 > SPACER_MIN) L.add(H.spacer(`${id}-${i}-sp`, d + 0.2, next.b ? innerRingD(next.b) : d + 3, { z0: s.m.w1, z1: above }));
+      if (above - s.m.w1 > SPACER_MIN) L.add(H.spacer(`${id}-${i}-sp`, d + 0.2, next.b ? innerRingD(next.b) : d + 3, { z0: s.m.w1, z1: above, body: turn }));
       return;
     }
     if (above - below > SPACER_MIN) {
-      L.add(H.spacer(`${id}-${i}-sp`, d + 0.2, s.b ? innerRingD(s.b) : next.b ? innerRingD(next.b) : d + 3, { z0: below, z1: above }));
+      L.add(H.spacer(`${id}-${i}-sp`, d + 0.2, s.b ? innerRingD(s.b) : next.b ? innerRingD(next.b) : d + 3, { z0: below, z1: above, body: turn }));
       serve("F4", `${id}-${i}-sp`);
     }
   });
-  // keyed parts: a key over Ø8 or the D-flat, and one hub per keyed part (A5, A22)
+  // keyed parts: a key over Ø8 or the D-flat, and one hub per keyed part (A5, A22). A live shaft that something sweeps
+  // over ends flush in its top keyed part, keyed in the part's own bore and held by a washer and a countersunk screw into
+  // the shaft end (F2, F3), so nothing stands over the part
   const kf = keyFor(d);
+  const endHeld = live && spec.held === "base" && keyedSeats.length > 0;
   keyedSeats.forEach((s, i) => {
     const nm = `${id}-k${i}`;
     if (kf) {
       L.add(H.key(`${nm}-key`, kf.b, Math.max(8, s.m.w1 - s.m.w0 + 4), { body: s.m.body, at: [d / 2 - kf.t1 + kf.h / 2 - 0.4, 0, 0], z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kf.h }));
       serve("F3", `${nm}-key`);
     }
+    if (endHeld) return;
     const hubH = 8;
     const hubD = d + 10;
     const sh = s.m.shim ?? 0;
@@ -169,7 +177,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   });
 
   const lastSeat = seats[seats.length - 1]!;
-  const hubTop = keyedSeats.length ? Math.max(...keyedSeats.map((s) => s.m.w1 + (s.m.shim ?? 0) + 8)) : -Infinity;
+  const hubTop = keyedSeats.length && !endHeld ? Math.max(...keyedSeats.map((s) => s.m.w1 + (s.m.shim ?? 0) + 8)) : -Infinity;
   const zTop = Math.max(lastSeat.b || !lastSeat.m.keyed ? lastSeat.z1 : lastSeat.m.w1, hubTop, moving ? lastSeat.m.w1 : -Infinity);
   const first = members[0]!;
   const bt = spec.base?.top ?? first.w0 - 2;
@@ -182,12 +190,15 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const sb = SHOULDER_BOLTS[d];
     const k = sb ? sb.k : headH(d);
     const dk = sb ? sb.dk : headD(d);
-    const top = zTop + 0.6;
-    const len = shoulderLength(top - anchor.m.w0);
-    const wTap = Math.min(top - len, anchor.m.w0);
-    const tl = Math.max(M, 1.5 * M);
-    L.add(H.shaft(bolt, { d, z0: wTap - tl, z1: top, thread: { M, z0: wTap - tl, z1: wTap } }, { body: anchor.m.body, name: `Shoulder bolt Ø${d} x ${len}, M${M} (ISO 7379)` }));
-    L.add(H.head(`${bolt}-head`, "socket", Math.max(3, M), { body: anchor.m.body, outer: circle(dk / 2, 0, 0, 36), z0: top, z1: top + k, name: "", D: dk, group: bolt }));
+    // the shoulder runs from the anchor's face to just over the top part, made up to the catalogue length by a washer
+    // under the head; the thread runs through the anchor, tapped through (M9), and stops at its far face
+    const need = zTop + 0.6 - anchor.m.w1;
+    const len = shoulderLength(need);
+    const wash = len - need;
+    const top = anchor.m.w1 + len;
+    if (wash > 0.2) L.add(H.washer(`${bolt}-wsh`, d + 0.3, Math.min(dk, d + 6), { body: turn, z0: top - wash, z1: top, name: `Shim washer ${d} x ${wash.toFixed(1)}, makes up the shoulder length`, group: bolt }));
+    L.add(H.shaft(bolt, { d, z0: anchor.m.w0, z1: top, thread: { M, z0: anchor.m.w0, z1: anchor.m.w1 } }, { body: turn, name: `Shoulder bolt Ø${d} x ${len}, M${M} (ISO 7379)` }));
+    L.add(H.head(`${bolt}-head`, "socket", Math.max(3, M), { body: turn, outer: circle(dk / 2, 0, 0, 36), z0: top, z1: top + k, name: "", D: dk, group: bolt }));
     bores.push({ solid: anchor.m.solid, r: M / 2 - 0.25 });
     serve("F2", bolt);
     serve("F3", bolt);
@@ -223,14 +234,17 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     }
   } else {
     if (fromBase) {
-      shoulders.push({ z: bt, D: d + 4, h: 1 });
+      // a dead axle stands on its shoulder on the base; a live shaft is located in its housing and only its thrust
+      // washer lies on the base (A12: nothing turning bears on a ground face)
+      if (!live) shoulders.push({ z: bt, D: d + 4, h: 1 });
+      const tw = live ? bt : bt + 1;
       shaftSpec.z0 = bb - (live ? 24 : 6);
       if (!live) shaftSpec.thread = { M: threadFor(d), z0: bb - 6, z1: bb - 0.5 };
-      L.add(H.thrustWasher(`${id}-tw`, d + 0.2, d + 8, { body: "ground", z0: bt + 1, z1: bt + 2 }));
+      L.add(H.thrustWasher(`${id}-tw`, d + 0.2, d + 8, { body: "ground", z0: tw, z1: tw + 1 }));
       serve("F4", `${id}-tw`);
       const fb = seats[0]!;
       const lo = fb.b || !fb.m.keyed ? fb.z0 : fb.m.w0;
-      if (lo - (bt + 2) > SPACER_MIN) L.add(H.spacer(`${id}-sp0`, d + 0.2, fb.b ? innerRingD(fb.b) : d + 3, { z0: bt + 2, z1: lo }));
+      if (lo - (tw + 1) > SPACER_MIN) L.add(H.spacer(`${id}-sp0`, d + 0.2, fb.b ? innerRingD(fb.b) : d + 3, { z0: tw + 1, z1: lo, body: turn }));
     } else {
       // hung from its bridge: a circlip under the first part keeps it up
       grooves.push(first.w0 - 4 + 0.6);
@@ -258,17 +272,29 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       ctx.routes.push({ support: `${id}-bridge`, site: id, kind: support, tried: route.tried, moved: route.moved, covers: route.covers, gap: route.gap });
       if (route.covers.length) ctx.covers.set(`${id}-bridge`, route.covers);
       // the axle runs up through a bushing in the beam; a sleeve fills the gap over the top part
-      if (beamBot - zTop > SPACER_MIN) L.add(H.tube(`${id}-slv`, d + 0.2, innerRingD({ d, D: d + 10 }), { z0: zTop, z1: beamBot }));
+      // (a live shaft is located in its housing and its parts keyed and hubbed, so it takes no sleeve)
+      if (!live && beamBot - zTop > SPACER_MIN) L.add(H.tube(`${id}-slv`, d + 0.2, innerRingD(lastSeat.b ?? { d, D: d + 10 }), { z0: zTop, z1: beamBot, body: turn }));
       L.add(H.bushing(`${id}-bb`, d, circleBushing(d), { body: "ground", z0: beamBot, z1: beamTop }));
-      grooves.push(beamTop + 0.3);
-      L.add(H.circlip(`${id}-ecl`, d, { z0: beamTop + 0.3, z1: beamTop + 0.3 + ce.s, body: "ground" }));
+      // a dead axle's clip bears on the bushing; a live shaft is located in its housing, so its clip only stands guard,
+      // clear of the fixed beam by the sweep margin (A12, A14)
+      const cz = beamTop + (live ? MIN_GAP + 0.1 : 0.3);
+      grooves.push(cz);
+      L.add(H.circlip(`${id}-ecl`, d, { z0: cz, z1: cz + ce.s, body: turn }));
       serve("F1", `${id}-bridge`);
       serve("F2", `${id}-ecl`);
-      shaftSpec.z1 = beamTop + 0.3 + ce.s + 1.5;
+      shaftSpec.z1 = cz + ce.s + 1.5;
+    } else if (endHeld) {
+      const top = keyedSeats[keyedSeats.length - 1]!.m;
+      const M = d >= 10 ? 5 : d >= 8 ? 4 : 3;
+      const wh = 1.5;
+      L.add(H.washer(`${id}-ew`, M + 0.4, d + 8, { body: turn, z0: top.w1, z1: top.w1 + wh, name: `End washer ${M + 0.4}x${d + 8}, holds the ${top.name.toLowerCase()} on the shaft end` }));
+      L.add(H.screw(`${id}-es`, "csk", M, 2 * M + wh, { body: turn, face: top.w1 + wh, dir: -1 }));
+      serve("F2", `${id}-ew`, `${id}-es`);
+      shaftSpec.z1 = top.w1;
     } else if (support !== "housing" || !spec.straddle) {
       const clZ = zTop + 0.3;
       grooves.push(clZ);
-      L.add(H.circlip(`${id}-ecl`, d, { z0: clZ, z1: clZ + ce.s, body: "ground" }));
+      L.add(H.circlip(`${id}-ecl`, d, { z0: clZ, z1: clZ + ce.s, body: turn }));
       serve("F2", `${id}-ecl`);
       shaftSpec.z1 = clZ + ce.s + 1.5;
     }
@@ -280,7 +306,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   }
   shaftSpec.shoulders = shoulders;
   shaftSpec.grooves = grooves;
-  const sh = H.shaft(shaftId, shaftSpec, { name, body: "ground" });
+  const sh = H.shaft(shaftId, shaftSpec, { name, body: turn });
   L.add(sh);
   if (live && spec.input) sh[sh.length - 1]!.accent = true;
   if (!live) serve("F1", shaftId);

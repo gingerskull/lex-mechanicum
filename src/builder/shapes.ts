@@ -7,7 +7,7 @@ import type { Kin, KinBody } from "../kin/types";
 import type { Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
-import { canon, frameAlong, planeCoords, type Frame } from "./frames";
+import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 
 export interface BodyGeom {
@@ -34,7 +34,8 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
   const f = S.bodyFrame.get(body.id);
   if (f && (f.t[0] || f.t[1] || f.t[2])) return f.t;
   // a body no joint reaches carries its own frame in the record
-  const own = (body.frame ?? body.at?.frame)?.o;
+  const f0 = body.frame ?? body.at?.frame;
+  const own = f0?.o ?? f0?.origin;
   if (own && own.every((v) => typeof v === "number")) return [own[0] as number, own[1] as number, (own[2] as number | undefined) ?? 0];
   if (!pins.length) return [0, 0, 0];
   const s = pins.reduce((a, p) => v3.add(a, p), [0, 0, 0] as Vec3);
@@ -132,17 +133,11 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const js = kin.joints.filter((j) => j.a === b.id || j.b === b.id).map((j) => S.joints.get(j.id)!);
     const at = b.at?.joint ? S.joints.get(b.at.joint) : undefined;
     const axis = at?.axis ?? js[0]?.axis ?? ([0, 0, 1] as Vec3);
-    const o = originOf(b, S, js.map((j) => j.at));
-    // x toward the first joint that is not at the origin, kept in the plane
-    let x: Vec3 | undefined;
-    for (const j of js) {
-      const d = v3.perp(v3.sub(j.at, o), v3.unit(axis));
-      if (v3.len(d) > 0.01) {
-        x = d;
-        break;
-      }
-    }
-    const frame = frameAlong(o, canon(axis), x ?? ([1, 0, 0] as Vec3));
+    // the body's own frame (src/kin: bodyFrameOf), which its shape and its points are given in; a body with neither an
+    // `at` joint nor a frame of its own stands round its joints in world axes
+    const own = b.at?.joint || (b.frame && typeof b.frame === "object") || b.at?.frame;
+    const F = own ? S.bodyFrame.get(b.id) : undefined;
+    const frame = F ? xfFrame(F) : frameAlong(originOf(b, S, js.map((j) => j.at)), canon(axis), [1, 0, 0]);
     const pins = js.map((j) => ({ joint: j.joint.id, ...(({ uv, w }) => ({ uv, w }))(planeCoords(frame, j.at)) }));
     const shape = (b.shape ?? {}) as Record<string, unknown>;
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));

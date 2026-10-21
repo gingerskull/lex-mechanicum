@@ -10,7 +10,7 @@
       "joints": [
         { "id": "O2", "type": "revolute", "a": "ground", "b": "crank", "at": [0, 0, 0], "axis": [0, 0, 1] },
         { "id": "A", "type": "revolute", "a": "crank", "b": "coupler", "at": [40, 0, 0], "axis": [0, 0, 1] },
-        { "id": "B", "type": "revolute", "a": "coupler", "b": "rocker", "at": [136.67, 71.1, 0], "axis": [0, 0, 1] },
+        { "id": "B", "type": "revolute", "a": "coupler", "b": "rocker", "at": [136.666666666667, 71.1024300256718, 0], "axis": [0, 0, 1] },
         { "id": "O4", "type": "revolute", "a": "ground", "b": "rocker", "at": [100, 0, 0], "axis": [0, 0, 1] }
       ],
       "params": [
@@ -37,7 +37,7 @@
       ],
       "outputs": [
         { "id": "rocker-angle", "of": "rocker", "kind": "angle", "unit": "deg" },
-        { "id": "transmission-angle", "of": "B", "kind": "angle", "unit": "deg" },
+        { "id": "transmission-angle", "of": "B", "from": "A", "to": "O4", "kind": "angle", "unit": "deg" },
         { "id": "coupler-curve", "of": "C", "kind": "path" }
       ],
       "fallback": null

@@ -3,15 +3,16 @@
 // of the body it rides. Build time, Node only.
 import type { Solid3 } from "../solids/types";
 import { createCtx, type RecordLike, type BuildCtx, type BuildOpts, type JointNote, type RouteLog } from "./ctx";
-import { moveFrame, toBody } from "./frames";
 import { applyPolish, type Polish, type PolishApi } from "./polish";
 import { rules, runRules } from "./registry";
 import type { Rule } from "./rules/types";
-import { xf } from "../kin/math";
 
 export interface Assembly {
   id: string;
-  /** Solids in the frames of the bodies they ride (ground: the world). */
+  /**
+   * Solids in the world coordinates of the reference configuration (every driver at its default). A body's kin pose
+   * (an Xf from the reference configuration to now) places every solid that rides it, as src/kin defines a pose.
+   */
   solids: Solid3[];
   notes: JointNote[];
   routes: RouteLog[];
@@ -25,6 +26,8 @@ export interface Assembly {
   /** What the polish changed (exceptions only). */
   polish?: PolishApi["log"];
   placement: { slabs: number; stackMm: number; clevis: number; slabOf: Record<string, number> };
+  /** Each placed body's top face as a plane [nx, ny, nz, t] (n · p = t, reference configuration): teaching points ride it. */
+  lifts: Record<string, [number, number, number, number]>;
 }
 
 /** Builds an assembly and returns it together with the live context (the caller disposes it). */
@@ -51,11 +54,17 @@ function finalize(ctx: BuildCtx): void {
 }
 
 function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
-  const bodyFrame = (id: string) => ctx.S.bodyFrame.get(id) ?? xf.id();
-  const solids = ctx.solids.map((s) => (s.body === "ground" ? s : { ...s, frame: toBody(bodyFrame(s.body), s.frame) }));
-  void moveFrame;
+  const solids = ctx.solids;
   const slabOf: Record<string, number> = {};
-  for (const [b, [, s]] of ctx.placement.slab) slabOf[b] = s;
+  const lifts: Assembly["lifts"] = {};
+  for (const [b, [, s]] of ctx.placement.slab) {
+    slabOf[b] = s;
+    const r = ctx.extent(b);
+    if (!r) continue;
+    const n = r.frame.z;
+    const o = r.frame.o;
+    lifts[b] = [n[0], n[1], n[2], n[0] * o[0] + n[1] * o[1] + n[2] * o[2] + r.w1];
+  }
   return {
     id: ctx.id,
     solids,
@@ -68,5 +77,6 @@ function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
     poseNotes: ctx.source.notes,
     ...(polish ? { polish } : {}),
     placement: { slabs: ctx.placement.height, stackMm: ctx.placement.stackMm, clevis: ctx.placement.clevis.length, slabOf },
+    lifts,
   };
 }

@@ -23,6 +23,8 @@ export interface Meta {
   name: string;
   teaching: Teaching | null;
   kin: Kin | null;
+  /** A 2.5D mechanism drawn lifted (before its rebuild): its model poses the bodies. A v3 one is posed by its record. */
+  lifted?: boolean;
 }
 
 /** One drawing: canvas size in CSS px, pixel ratio, phase, and the view over the record's own. */
@@ -63,10 +65,13 @@ const cache = new Map<string, Promise<Loaded>>();
 
 const bytes = async (url: string) => new Uint8Array(await (await fetch(`${url}?v=${stamp()}`)).arrayBuffer());
 
-function poserFor(l: { meta: Meta; model: MechanismModel | null; z: number; id?: string }, controls?: Controls): Poser {
+function poserFor(l: { meta: Meta; model: MechanismModel | null; z: number; id?: string; lifts?: Record<string, [number, number, number, number]> }, controls?: Controls): Poser {
   if (l.id === "fx3-ghost") return ghostPoser;
   const legacy: Poser = l.model ? legacyPoser(l.model, l.z) : staticPoser;
-  return l.meta.kin ? hybridPoser(legacy, kinPoser(new Kinematics(l.meta.kin as unknown as KinLib), controls)) : legacy;
+  if (!l.meta.kin) return legacy;
+  const kin = kinPoser(new Kinematics(l.meta.kin as unknown as KinLib), controls, l.model ? undefined : l.lifts);
+  // a record built by the v3 builder is posed by its own kinematics; a lifted 2.5D mechanism by its model
+  return l.model ? hybridPoser(legacy, kin) : kin;
 }
 
 async function load(id: string): Promise<Loaded> {
@@ -77,10 +82,10 @@ async function load(id: string): Promise<Loaded> {
     const t0 = performance.now();
     const s = await setupInline(blob);
     const setupMs = performance.now() - t0;
-    const model = models[id] ? await models[id]!() : null;
+    const model = meta.lifted !== false && models[id] ? await models[id]!() : null;
     const axes: Record<string, Vec3> = {};
     for (const j of meta.kin?.joints ?? []) if (Array.isArray(j.axis) && j.axis.length >= 3) axes[j.id] = [j.axis[0] as number, j.axis[1] as number, j.axis[2] as number];
-    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, model, z: s.pkg.bounds.z1, id }), teaching: meta.teaching, axes, ...(id === "fx3-ghost" ? { items: ghostItems } : {}), info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
+    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, model, z: s.pkg.bounds.z1, id, lifts: s.pkg.lifts }), teaching: meta.teaching, axes, ...(id === "fx3-ghost" ? { items: ghostItems } : {}), info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
     return { scene, meta, model, setupMs };
   })();
   cache.set(id, p);
@@ -116,7 +121,7 @@ async function session(id: string, o: Draw3Options): Promise<{ sess: Session3; s
   const b0 = performance.now();
   const sess = createSession3(canvas, l.scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
   const bakeMs = performance.now() - b0;
-  if (o.controls) sess.setPoser(poserFor({ meta: l.meta, model: l.model, z: l.scene.pkg.bounds.z1, id }, o.controls));
+  if (o.controls) sess.setPoser(poserFor({ meta: l.meta, model: l.model, z: l.scene.pkg.bounds.z1, id, lifts: l.scene.pkg.lifts }, o.controls));
   return { sess, scene: sess.scene, setupMs: l.setupMs, bakeMs };
 }
 

@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { chromium, type Browser, type Page } from "playwright-core";
 import { recordById } from "../src/catalog";
+import { engineOf } from "../src/checks/engine";
 import { ghostTeaching } from "../tests/fixtures/ghost3";
 import { buildAnyPackage } from "../src/package/any";
 import { encode2 } from "../src/package/format2";
@@ -67,7 +68,7 @@ function serve(js: string): Promise<{ server: Server; port: number }> {
       if (meta[1]!.startsWith("fx3-")) return send("application/json", JSON.stringify({ name: "Fixture", teaching: meta[1] === "fx3-ghost" ? ghostTeaching : null, kin: null } satisfies Meta));
       const rec = recordById(meta[1]!) as unknown as { name?: string; kin?: Meta["kin"]; teaching?: Meta["teaching"] } | undefined;
       if (!rec) return fail(404);
-      return send("application/json", JSON.stringify({ name: rec.name ?? meta[1]!, teaching: rec.teaching ?? null, kin: rec.kin ?? null } satisfies Meta));
+      return send("application/json", JSON.stringify({ name: rec.name ?? meta[1]!, teaching: rec.teaching ?? null, kin: rec.kin ?? null, lifted: engineOf(meta[1]!) !== "v3" } satisfies Meta));
     }
     fail(404);
   });

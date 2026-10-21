@@ -79,6 +79,11 @@ export interface Package2 {
   joints: Joint[];
   shapes: Shape2[];
   solids: PackedSolid3[];
+  /**
+   * Engine v3: where the builder drew each body's top face, as a plane [nx, ny, nz, t] (unit normal along the body's
+   * axis, n · p = t) in the reference configuration. A teaching point of the body is drawn on it (src/render/v3/poser).
+   */
+  lifts?: Record<string, [number, number, number, number]>;
 }
 
 export const hasFlag3 = (s: PackedSolid3, f: Flag3): boolean => (s.flags & FLAG3[f]) !== 0;

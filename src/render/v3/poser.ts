@@ -44,7 +44,31 @@ function fromXf(X: Xf): Mat4 {
  * The poser of a record's kinematic block. A solid's frame is placed in the reference configuration (every driver at its
  * default), so a body's pose Xf, which carries that configuration to the present one, is its matrix.
  */
-export function kinPoser(k: Kinematics, controls?: Controls): Poser {
+export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<string, [number, number, number, number]>): Poser {
+  // a teaching point is drawn on the top face of the body it rides, where the builder placed that body (package v2
+  // `lifts`); a joint rides the higher of its two bodies
+  const rideOf = new Map<string, string>();
+  if (lifts) {
+    const top = (b: string) => lifts[b]?.[3] ?? -Infinity;
+    for (const j of k.kin.joints) {
+      const b = [j.a, j.b].filter((x) => lifts[x]).sort((x, y) => top(y) - top(x))[0];
+      if (b) rideOf.set(j.id, b);
+    }
+    for (const p of k.kin.points ?? []) if (lifts[p.body]) rideOf.set(p.id, p.body);
+  }
+  const lifted = (P: ReturnType<Kinematics["pose"]>, id: string, ctl?: Controls): Vec3 | null => {
+    const p = P.points.get(id);
+    if (!p) return null;
+    const b = rideOf.get(id);
+    const X = b ? P.bodies.get(b) : undefined;
+    const ref = b ? k.setup(ctl ? { ...controls, ...ctl } : controls).refPts.get(id) : undefined;
+    if (!b || !X || !ref) return p;
+    const [nx, ny, nz, t] = lifts![b]!;
+    const d = t - (nx * ref[0] + ny * ref[1] + nz * ref[2]);
+    const R = X.R;
+    const v: Vec3 = [nx * d, ny * d, nz * d];
+    return [p[0] + R[0] * v[0] + R[1] * v[1] + R[2] * v[2], p[1] + R[3] * v[0] + R[4] * v[1] + R[5] * v[2], p[2] + R[6] * v[0] + R[7] * v[1] + R[8] * v[2]];
+  };
   let at = NaN;
   let cached: ReturnType<Kinematics["pose"]> | null = null;
   const pose = (u: number, ctl?: Controls) => {
@@ -61,7 +85,7 @@ export function kinPoser(k: Kinematics, controls?: Controls): Poser {
       const X = pose(u).bodies.get(s.body);
       return X ? fromXf(X) : ID4;
     },
-    point: (u, id, ctl) => pose(u, ctl).points.get(id) ?? null,
+    point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
     sweep: (point, range, branches) => {
       const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
       if (!d) return null;
@@ -73,7 +97,7 @@ export function kinPoser(k: Kinematics, controls?: Controls): Poser {
         const line: Vec3[] = [];
         for (let i = 0; i <= 180; i++) {
           try {
-            const p = k.poseAt({ [d.id]: lo + ((hi - lo) * i) / 180 }, { ...controls, ...ctl }).points.get(point);
+            const p = lifted(k.poseAt({ [d.id]: lo + ((hi - lo) * i) / 180 }, { ...controls, ...ctl }), point, ctl);
             if (p) line.push(p);
           } catch {
             // an angle outside this branch's range does not assemble: the line has a gap there
@@ -84,9 +108,9 @@ export function kinPoser(k: Kinematics, controls?: Controls): Poser {
       return out.length ? out : null;
     },
     span: (u, a, b) => {
-      const p = pose(u).points;
-      const A = p.get(a);
-      const B = p.get(b);
+      const P = pose(u);
+      const A = lifted(P, a);
+      const B = lifted(P, b);
       return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
     },
   };

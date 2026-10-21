@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-10-20",
+  "generated": "2026-10-21",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -2481,8 +2481,8 @@
             "a": "coupler",
             "b": "rocker",
             "at": [
-              136.67,
-              71.1,
+              136.666666666667,
+              71.1024300256718,
               0
             ],
             "axis": [
@@ -2638,6 +2638,8 @@
           {
             "id": "transmission-angle",
             "of": "B",
+            "from": "A",
+            "to": "O4",
             "kind": "angle",
             "unit": "deg"
           },

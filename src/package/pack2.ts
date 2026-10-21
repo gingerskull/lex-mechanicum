@@ -22,6 +22,7 @@ export interface Pack2Input {
   b0: number;
   b1: number;
   bounds: PackageBounds;
+  lifts?: Record<string, [number, number, number, number]>;
 }
 
 const FIELD_FLAGS = ["inset", "accent", "faint", "isBase", "headTop", "seeThrough"] as const satisfies readonly Flag3[];
@@ -150,6 +151,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     solids,
   };
   if (sampled.plotData) pkg.plot = Float32Array.from(sampled.plotData);
+  if (a.lifts && Object.keys(a.lifts).length) pkg.lifts = structuredClone(a.lifts);
   return pkg;
 }
 
