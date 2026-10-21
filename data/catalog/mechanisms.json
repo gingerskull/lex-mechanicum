@@ -6145,10 +6145,10 @@
         "motion": "One block slides along the horizontal groove and the other along the vertical one. A rod lies on top of both and is pinned to each, and a crank from the crossing to the rod's midpoint turns it round. The blocks pass through the crossing one at a time, and a pen at the rod's end traces an ellipse whose half-axes are its distances to the two blocks.",
         "forces": "Each groove can only push its block at right angles to the groove, so the blocks feel side forces only. Driving from the midpoint crank works but the crank and rod rotate in opposite directions, causing friction and wear at the midpoint pin.",
         "benefits": "Exact ellipses of any proportion from two adjustable distances on a straight bar, with no curved guide. The blocks themselves give exact straight-line motion and the midpoint traces a circle.",
-        "limits": "Sliders need clean, low-play grooves or the ellipse distorts. The blocks must cross the middle of the plate, so both grooves are cut through one plate and meet there; the rod rides above the plate on the blocks' pins, and the crank has to drive it from above."
+        "limits": "Sliders need clean, low-play grooves or the ellipse distorts. The blocks must cross the middle of the plate, so both grooves are cut through one plate and meet there; the rod rides above the plate on the blocks' pins, and the crank turns under the plate, its pin rising through the open middle to the rod."
       },
       "build": {
-        "ground": "one cross-shaped groove plate (a + sign, both grooves cut through it and meeting at O) on the base; the crank shaft comes down at O from a bridge above, outside the rod's sweep",
+        "ground": "one cross-shaped groove plate (a + sign, both grooves meeting at O, open round the middle where the crank pin runs) on the base; the crank shaft comes up at O from the base, under the plate",
         "input": "crank O→M, continuous rotation",
         "output": "pen point P path (ellipse)",
         "members": [
@@ -6258,7 +6258,7 @@
           "plot"
         ],
         "plot": "pen x and y vs crank angle",
-        "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Layout (rethink, #213): the rod on top, the two blocks in the plate's grooves and pinned up into it, the pen at the rod's end; the crank above the rod, driven from above, so nothing passes through the plate but the blocks. The groove plate stays and is drawn see-through where it covers a block or the rod. The crank to the midpoint duplicates a constraint the blocks already give (overconstrained)."
+        "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Layout (rethink, #213): the rod on top, the two blocks in the plate's grooves and pinned up into it, the pen at the rod's end; the crank under the blocks, its pin rising through the plate's open middle to the rod's midpoint. The groove plate stays and is drawn see-through where it covers a block or the rod. The crank to the midpoint duplicates a constraint the blocks already give (overconstrained)."
       },
       "examples": [
         {
@@ -6345,22 +6345,22 @@
                 ],
                 [
                   17,
-                  126
+                  92
                 ],
                 [
                   -17,
-                  126
+                  92
                 ],
                 [
                   -17,
                   17
                 ],
                 [
-                  -98,
+                  -92,
                   17
                 ],
                 [
-                  -98,
+                  -92,
                   -17
                 ],
                 [
@@ -6369,22 +6369,22 @@
                 ],
                 [
                   -17,
-                  -126
+                  -92
                 ],
                 [
                   17,
-                  -126
+                  -92
                 ],
                 [
                   17,
                   -17
                 ],
                 [
-                  98,
+                  92,
                   -17
                 ],
                 [
-                  98,
+                  92,
                   17
                 ]
               ],
@@ -6429,7 +6429,10 @@
             },
             "at": {
               "joint": "A"
-            }
+            },
+            "above": [
+              "crank"
+            ]
           },
           {
             "id": "blockY",
@@ -6441,6 +6444,21 @@
             },
             "at": {
               "joint": "B"
+            },
+            "above": [
+              "crank"
+            ],
+            "frame": {
+              "origin": [
+                0,
+                30,
+                0
+              ],
+              "rot": [
+                0,
+                0,
+                90
+              ]
             }
           },
           {
@@ -6462,7 +6480,11 @@
             },
             "at": {
               "joint": "A"
-            }
+            },
+            "above": [
+              "blockX",
+              "blockY"
+            ]
           },
           {
             "id": "crank",
@@ -6739,8 +6761,8 @@
       "teaching": {
         "review": {
           "verdict": "rethink",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #213 (rethink). The canonical layout: the rod lies on top, the two blocks run in the plate's crossed grooves and are pinned up into it, and the pen is at the rod's end, so the rod and both blocks read as one bar riding two slides. The crank to the rod's midpoint is driven from above, so nothing passes through the plate but the blocks. The groove plate stays and is drawn see-through where it covers a block. The pen's distances to the two blocks are drawn as the ellipse's half-axes; ghost traces for the pen at the midpoint (a circle) and at block Y (a straight line) show the family."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review and #213 (rethink). The canonical layout: the rod lies on top, the two blocks run in the plate's crossed grooves and are pinned up into it, and the pen is at the rod's end, so the rod and both blocks read as one bar riding two slides. Changed in the build (R2): the crank turns under the blocks on a shaft from the base, its pin M rising through the groove plate's open middle to the rod's midpoint, instead of a crank above the rod driven from a bridge: the builder holds a driven shaft from the base only, and the crank under the plate leaves the rod, the blocks and the pen on top in plain view. The groove plate replaces each slide's rails (teaching.exceptions). The pen's distances to the two blocks are drawn as the ellipse's half-axes; ghost traces for the pen at the midpoint (a circle) and at block Y (a straight line) show the family."
         },
         "principle": [
           {
@@ -6870,7 +6892,23 @@
             "tol": 0.001
           }
         ],
-        "exceptions": []
+        "exceptions": [
+          {
+            "solids": [
+              "SX-rail0",
+              "SX-rail1",
+              "SX-riser0",
+              "SX-riser1",
+              "SX-keeper",
+              "SY-rail0",
+              "SY-rail1",
+              "SY-riser0",
+              "SY-riser1",
+              "SY-keeper"
+            ],
+            "reason": "the blocks run in the crossed grooves of one groove plate (T12): rails for one slide would stand across the other block's path; the groove plate is built in its place by the polish"
+          }
+        ]
       }
     },
     {
@@ -18970,7 +19008,7 @@
             "role": "driver",
             "shape": {
               "type": "slider",
-              "length": 30,
+              "length": 18,
               "width": 20
             },
             "at": {
