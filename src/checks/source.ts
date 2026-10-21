@@ -16,7 +16,6 @@ import { conveyMatrix, mul4, turnMatrix } from "../solids/convey";
 import type { Solid3 } from "../solids/types";
 import type { RecordLike } from "../builder/ctx";
 import type { Kin } from "../kin/types";
-import type { Xf } from "../kin/math";
 import { xf } from "../kin/math";
 import type { Placer } from "./clash3";
 

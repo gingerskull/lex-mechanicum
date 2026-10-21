@@ -8,12 +8,12 @@ import { circle, roundRect, type Vec2 } from "../core/geom";
 import { H } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { housingBearing } from "../hardware/sub/housing";
-import { v3, xf, type Vec3 } from "../kin/math";
+import { v3, type Vec3 } from "../kin/math";
 import type { Kin, KinBody } from "../kin/types";
 import type { Setup } from "../kin/compose";
 import { helixPath, helixSweep } from "../solids/helix";
 import { along, pathLength, type ConveyPath } from "../solids/convey";
-import { extrudeOp, segmentsFor } from "../solids/tessellate";
+import { segmentsFor } from "../solids/tessellate";
 import type { Op, Profile, Solid3 } from "../solids/types";
 import type { BuildCtx } from "./ctx";
 import { place, type Frame } from "./frames";
@@ -484,7 +484,7 @@ function buildScrew(ctx: BuildCtx, sb: string): void {
   const hi = Math.max(...T.map((t) => t.to), ...nuts.map((n) => v3.dot(v3.sub(n.F.o, F.o), F.z) + n.d1 + n.L / 2 + 2));
   const journal = num((body.shape as Record<string, unknown>).journal, 8);
   let end: StackResult["end"];
-  let support: StackResult["support"] = "pillow";
+  const support: StackResult["support"] = "pillow";
   if (ground?.type === "revolute" && site) {
     const pb = pillowBlocks(ctx, { id: `${site.id}-pb`, frame: F, d: journal, live: true, lo, hi, baseTop, joints: site.joints });
     out.push(...pb.solids);
@@ -544,7 +544,6 @@ function buildScrew(ctx: BuildCtx, sb: string): void {
     for (const q of ks) if (q.id === `${sb}-knob`) q.flags.accent = true;
     out.push(...ks);
   }
-  void support;
   ctx.add(out);
   for (const n of nuts) {
     const i = nuts.indexOf(n);

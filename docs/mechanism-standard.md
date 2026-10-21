@@ -289,11 +289,12 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `j8-belt` | J8, V4 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
 | `strap-sheave` | J12, F1, F2, A11 |
-| `j11-screw` | J11, F3, F8 |
+| `j11-screw` | J11, J10, F2, F3, F4, F5, F8 |
 | `j13-compliant` | J13, A6, F1, F2, F5 |
 | `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
 | `stops` | F5, A22 |
 | `drive` | V1, V2, V3, V5, V6, F10 |
+| `yoke-drive` | V1, V2, V5, V6, F10 |
 | `adjustable-length` | F7, A22 |
 | `cable-clip` | A22, V6 |
 | `standoffs` | A6 |
