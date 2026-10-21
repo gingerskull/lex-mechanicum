@@ -10,6 +10,9 @@ import { type Vec3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
+import { spokes } from "../hardware/primitives";
+
+const signedArea = (p: Vec2[]): number => p.reduce((a, q, i) => { const r = p[(i + 1) % p.length]!; return a + q[0] * r[1] - r[0] * q[1]; }, 0) / 2;
 
 export interface BodyGeom {
   id: string;
@@ -98,6 +101,15 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const r = num(shape.radius, 20);
       const c = pair(shape.center, [0, 0]);
       const bore = num(shape.bore, 0);
+      // a ring (`ring: { inner, spokes?, hub? }`): a rim, bare (a floating disc) or spoked to a hub on its shaft
+      const ring = shape.ring as { inner?: unknown; spokes?: unknown; hub?: unknown } | undefined;
+      if (ring && typeof ring === "object") {
+        const inner = num(ring.inner, r * 0.6);
+        const n = num(ring.spokes, 0);
+        const cw = (h: Vec2[]): Vec2[] => (signedArea(h) > 0 ? [...h].reverse() : h);
+        const holes = n > 0 ? [...spokes({ rIn: num(ring.hub, 14), rOut: inner, n, half: 5, fillet: 3 }).map(cw), ...(bore ? [hole(bore / 2)] : [])] : [circle(inner, 0, 0, Math.max(36, Math.round(inner * 3))).reverse()];
+        return { profile: { outer: circle(r, c[0], c[1], Math.max(36, Math.round(r * 3))), holes }, thick: num(shape.thickness, 8), approx: false };
+      }
       return { profile: { outer: circle(r, c[0], c[1], Math.max(36, Math.round(r * 3))), holes: bore ? [hole(bore / 2)] : [] }, thick: num(shape.thickness, 8), approx: false };
     }
     case "gear": {

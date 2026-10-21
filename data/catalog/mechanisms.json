@@ -50142,18 +50142,18 @@
               "radius": 53,
               "thickness": 6,
               "ring": {
-                "inner": 30
+                "inner": 34,
+                "spokes": 3,
+                "hub": 14
               },
-              "pins": {
-                "count": 3,
-                "radius": 44
-              },
+              "bore": 12,
               "indexMark": {
                 "at": [
                   0,
                   48
                 ]
-              }
+              },
+              "axial": 0
             },
             "at": {
               "joint": "O1"
@@ -50186,7 +50186,9 @@
               "boss": [
                 8,
                 8
-              ]
+              ],
+              "thickness": 6,
+              "axial": 14
             },
             "at": {
               "joint": "PA1"
@@ -50202,7 +50204,9 @@
               "boss": [
                 8,
                 8
-              ]
+              ],
+              "thickness": 6,
+              "axial": 14
             },
             "at": {
               "joint": "PA2"
@@ -50218,7 +50222,9 @@
               "boss": [
                 8,
                 8
-              ]
+              ],
+              "thickness": 6,
+              "axial": 14
             },
             "at": {
               "joint": "PA3"
@@ -50232,24 +50238,21 @@
               "radius": 53,
               "thickness": 6,
               "ring": {
-                "inner": 30
-              },
-              "pins": {
-                "count": 6,
-                "radius": 44
+                "inner": 34
               },
               "indexMark": {
                 "at": [
                   0,
                   48
                 ]
-              }
+              },
+              "axial": 28
             },
             "frame": {
               "o": [
                 "e/2",
                 "side*sqrt(L^2-(e/2)^2)",
-                12
+                0
               ],
               "z": [
                 0,
@@ -50273,7 +50276,9 @@
               "boss": [
                 8,
                 8
-              ]
+              ],
+              "thickness": 6,
+              "axial": 42
             },
             "at": {
               "joint": "QB1"
@@ -50289,7 +50294,9 @@
               "boss": [
                 8,
                 8
-              ]
+              ],
+              "thickness": 6,
+              "axial": 42
             },
             "at": {
               "joint": "QB2"
@@ -50305,7 +50312,9 @@
               "boss": [
                 8,
                 8
-              ]
+              ],
+              "thickness": 6,
+              "axial": 42
             },
             "at": {
               "joint": "QB3"
@@ -50319,18 +50328,18 @@
               "radius": 53,
               "thickness": 6,
               "ring": {
-                "inner": 30
+                "inner": 34,
+                "spokes": 3,
+                "hub": 14
               },
-              "pins": {
-                "count": 3,
-                "radius": 44
-              },
+              "bore": 12,
               "indexMark": {
                 "at": [
                   0,
                   48
                 ]
-              }
+              },
+              "axial": 56
             },
             "at": {
               "joint": "O3"
@@ -50339,7 +50348,7 @@
               "o": [
                 "e",
                 0,
-                24
+                0
               ],
               "z": [
                 0,
@@ -50379,7 +50388,7 @@
             "at": [
               "0+r*cos(0)",
               "0+r*sin(0)",
-              6
+              0
             ],
             "axis": [
               0,
@@ -50395,7 +50404,7 @@
             "at": [
               "0+r*cos(120)",
               "0+r*sin(120)",
-              6
+              0
             ],
             "axis": [
               0,
@@ -50411,7 +50420,7 @@
             "at": [
               "0+r*cos(240)",
               "0+r*sin(240)",
-              6
+              0
             ],
             "axis": [
               0,
@@ -50427,7 +50436,7 @@
             "at": [
               "e/2+r*cos(0)",
               "side*sqrt(L^2-(e/2)^2)+r*sin(0)",
-              12
+              0
             ],
             "axis": [
               0,
@@ -50443,7 +50452,7 @@
             "at": [
               "e/2+r*cos(120)",
               "side*sqrt(L^2-(e/2)^2)+r*sin(120)",
-              12
+              0
             ],
             "axis": [
               0,
@@ -50459,7 +50468,7 @@
             "at": [
               "e/2+r*cos(240)",
               "side*sqrt(L^2-(e/2)^2)+r*sin(240)",
-              12
+              0
             ],
             "axis": [
               0,
@@ -50475,7 +50484,7 @@
             "at": [
               "e/2+r*cos(60)",
               "side*sqrt(L^2-(e/2)^2)+r*sin(60)",
-              18
+              0
             ],
             "axis": [
               0,
@@ -50491,7 +50500,7 @@
             "at": [
               "e/2+r*cos(180)",
               "side*sqrt(L^2-(e/2)^2)+r*sin(180)",
-              18
+              0
             ],
             "axis": [
               0,
@@ -50507,7 +50516,7 @@
             "at": [
               "e/2+r*cos(300)",
               "side*sqrt(L^2-(e/2)^2)+r*sin(300)",
-              18
+              0
             ],
             "axis": [
               0,
@@ -50523,7 +50532,7 @@
             "at": [
               "e+r*cos(60)",
               "0+r*sin(60)",
-              24
+              0
             ],
             "axis": [
               0,
@@ -50539,7 +50548,7 @@
             "at": [
               "e+r*cos(180)",
               "0+r*sin(180)",
-              24
+              0
             ],
             "axis": [
               0,
@@ -50555,7 +50564,7 @@
             "at": [
               "e+r*cos(300)",
               "0+r*sin(300)",
-              24
+              0
             ],
             "axis": [
               0,
@@ -50571,13 +50580,15 @@
             "at": [
               "e",
               0,
-              30
+              0
             ],
             "axis": [
               0,
               0,
               1
-            ]
+            ],
+            "support": "hung",
+            "note": "the output disc's shaft hangs from a bridge: the input disc lies under it"
           }
         ],
         "params": [
@@ -51005,7 +51016,12 @@
             "tol": 0.1
           }
         ],
-        "exceptions": []
+        "exceptions": [],
+        "seeThrough": [
+          "disc-in",
+          "disc-mid",
+          "disc-out"
+        ]
       }
     },
     {

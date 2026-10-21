@@ -502,7 +502,7 @@ export const materials: Rule = {
       if (s.mat) continue;
       if (s.kind === "part") {
         const shape = String(ctx.kin.bodies.find((b) => b.id === s.body)?.shape?.type);
-        s.mat = gearish.has(shape) ? "Steel C45, teeth induction-hardened" : s.role === "link" || s.role === "driver" || s.role === "output" ? "Steel C45, black oxide" : "Aluminium 6061-T6, anodised";
+        s.mat = gearish.has(shape) ? "Steel C45, teeth induction-hardened" : s.role === "link" || s.role === "link2" || s.role === "driver" || s.role === "output" ? "Steel C45, black oxide" : "Aluminium 6061-T6, anodised";
       } else s.mat = BY_KIND[s.kind] ?? "Steel";
       (ctx.fired.materials ??= []).push(s.id);
     }
