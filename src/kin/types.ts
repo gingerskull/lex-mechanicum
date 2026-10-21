@@ -134,6 +134,12 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
+  /** A point's position projected on this direction (mm), instead of the point itself. */
+  axis?: [number, number, number];
+  /** A value subtracted from a scalar output (mm or degrees): a height above a line, a datum. */
+  datum?: number;
+  /** An angle measured from the world x axis (the link's own direction) instead of from the reference pose. */
+  absolute?: boolean;
 }
 
 export interface Kin {

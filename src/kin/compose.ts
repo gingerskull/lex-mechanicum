@@ -416,12 +416,12 @@ class Run implements BlockCtx {
     if (set) return set;
     const tp = this.k._points.get(name);
     if (tp) {
-      const X = this.xfs.get(tp.body);
+      const X = this.xfs.get(tp.body) ?? this.fitNow(tp.body);
       if (X) return xf.apply(X, this.refPt(name));
     }
     const j = this.s.joints.get(name);
     if (j) {
-      const X = this.xfs.get(j.joint.a) ?? this.xfs.get(j.joint.b);
+      const X = this.xfs.get(j.joint.a) ?? this.xfs.get(j.joint.b) ?? this.fitNow(j.joint.a) ?? this.fitNow(j.joint.b);
       if (X) return xf.apply(X, j.at);
     }
     throw new KinError(`${this.step?.id ?? "?"}: point ${name} is not available yet (a block must produce it first)`);
@@ -513,44 +513,70 @@ class Run implements BlockCtx {
     return t.idxAt(this.u, t.refined);
   }
 
+  /** A body's pose from the points the blocks produced and its joints to bodies already posed, or null. */
+  private fitBody(body: string): Xf | null {
+    const joints = [...this.s.joints.values()];
+    const point = new Set(["revolute", "spherical", "universal", "flexure"]);
+    const ref: Vec3[] = [];
+    const now: Vec3[] = [];
+    let hint: Vec3 | undefined;
+    let slide = false;
+    // a prismatic partner already posed: the body keeps the partner's turn (a piston in a swinging cylinder)
+    let guide: Xf | undefined;
+    const add = (r: Vec3, n: Vec3) => {
+      if (ref.some((q) => v3.dist(q, r) < 1e-9)) return;
+      ref.push(r);
+      now.push(n);
+    };
+    for (const [id, tp] of this.k._points) if (tp.body === body && this.pts.has(id)) add(this.refPt(id), this.pts.get(id)!);
+    for (const r of joints) {
+      const j = r.joint;
+      if (j.a !== body && j.b !== body) continue;
+      if (j.type === "prismatic") {
+        slide = true;
+        const other = j.a === body ? j.b : j.a;
+        if (this.xfs.has(other)) guide = this.xfs.get(other);
+      }
+      if (j.type === "revolute" && !hint) hint = r.axis;
+      if (!point.has(j.type)) continue;
+      const other = j.a === body ? j.b : j.a;
+      if (this.pts.has(j.id)) add(r.at, this.pts.get(j.id)!);
+      else if (this.xfs.has(other)) add(r.at, xf.apply(this.xfs.get(other)!, r.at));
+    }
+    let X: Xf | null = null;
+    if (ref.length >= 2) X = fitXf(ref, now, hint);
+    else if (ref.length === 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
+    else if (ref.length === 1 && slide) X = xf.trans(v3.sub(now[0]!, ref[0]!));
+    return X;
+  }
+
+  /**
+   * A body a later block needs before the blocks are done (a six-bar's second loop starts on the first loop's rocker):
+   * fitted now from what is known, as resolveBodies would fit it at the end.
+   */
+  private fitting = new Set<string>();
+  private fitNow(id: string): Xf | undefined {
+    if (this.fitting.has(id) || !this.k._bodies.has(id)) return undefined;
+    this.fitting.add(id);
+    try {
+      const X = this.fitBody(id);
+      if (X) this.xfs.set(id, X);
+      return X ?? undefined;
+    } catch {
+      return undefined;
+    } finally {
+      this.fitting.delete(id);
+    }
+  }
+
   // ---- after the blocks
   resolveBodies(fb?: { unknown: Set<string>; warm?: Map<string, Xf> }): void {
     const joints = [...this.s.joints.values()];
-    const point = new Set(["revolute", "spherical", "universal", "flexure"]);
     for (let guard = 0; guard < 64; guard++) {
       let progress = false;
       for (const b of this.k.kin.bodies) {
         if (this.xfs.has(b.id)) continue;
-        const ref: Vec3[] = [];
-        const now: Vec3[] = [];
-        let hint: Vec3 | undefined;
-        let slide = false;
-        // a prismatic partner already posed: the body keeps the partner's turn (a piston in a swinging cylinder)
-        let guide: Xf | undefined;
-        const add = (r: Vec3, n: Vec3) => {
-          if (ref.some((q) => v3.dist(q, r) < 1e-9)) return;
-          ref.push(r);
-          now.push(n);
-        };
-        for (const [id, tp] of this.k._points) if (tp.body === b.id && this.pts.has(id)) add(this.refPt(id), this.pts.get(id)!);
-        for (const r of joints) {
-          const j = r.joint;
-          if (j.a !== b.id && j.b !== b.id) continue;
-          if (j.type === "prismatic") {
-            slide = true;
-            const other = j.a === b.id ? j.b : j.a;
-            if (this.xfs.has(other)) guide = this.xfs.get(other);
-          }
-          if (j.type === "revolute" && !hint) hint = r.axis;
-          if (!point.has(j.type)) continue;
-          const other = j.a === b.id ? j.b : j.a;
-          if (this.pts.has(j.id)) add(r.at, this.pts.get(j.id)!);
-          else if (this.xfs.has(other)) add(r.at, xf.apply(this.xfs.get(other)!, r.at));
-        }
-        let X: Xf | null = null;
-        if (ref.length >= 2) X = fitXf(ref, now, hint);
-        else if (ref.length === 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
-        else if (ref.length === 1 && slide) X = xf.trans(v3.sub(now[0]!, ref[0]!));
+        const X = this.fitBody(b.id);
         if (X) {
           this.xfs.set(b.id, X);
           progress = true;
@@ -589,7 +615,10 @@ class Run implements BlockCtx {
     }
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
+      let v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : o.from ? this.distance(o.of, o.from, points) : this.output(o.kind, o.of, points);
+      if (Array.isArray(v) && o.axis && o.kind === "position") v = v3.dot(v, v3.unit(o.axis));
+      if (typeof v === "number" && o.kind === "angle" && o.absolute && !(o.from && o.to)) v += this.refDirection(o.of);
+      if (typeof v === "number" && o.datum !== undefined) v -= o.datum;
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {
@@ -598,6 +627,25 @@ class Run implements BlockCtx {
       if (typeof a === "number" && typeof m === "number") outputs[o.id] = wrapPi((a - m) * D2R) * R2D;
     }
     return { u: this.u, bodies: this.xfs, points, values: this.vals, outputs, fallback: this.flagged ? this.fallbackBlocks : [] };
+  }
+
+  /** The distance from point `of` to point `from`, mm. */
+  private distance(of: string, from: string, points: Map<string, Vec3>): number | undefined {
+    const p = points.get(of), q = points.get(from);
+    return p && q ? v3.dist(p, q) : undefined;
+  }
+
+  /** The direction of a body's frame x in the reference pose, degrees about its own axis from the world x (or z). */
+  private refDirection(body: string): number {
+    const F = this.s.bodyFrame.get(body);
+    const n = this.bodyAxis(body);
+    if (!F || !n) return 0;
+    const z = v3.unit(n);
+    const h: Vec3 = Math.abs(z[0]) > 0.9 ? [0, 0, 1] : [1, 0, 0];
+    const e1 = v3.unit(v3.sub(h, v3.mul(z, v3.dot(h, z))));
+    const e2 = v3.cross(z, e1);
+    const x: Vec3 = [F.R[0]!, F.R[3]!, F.R[6]!];
+    return Math.atan2(v3.dot(x, e2), v3.dot(x, e1)) * R2D;
   }
 
   /** The angle at point `at` between the rays to `a` and `b`, degrees. */
