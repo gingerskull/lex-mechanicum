@@ -105,8 +105,10 @@ describe("site build", () => {
     expect(pre).toBeLessThan(html.indexOf('class="dlayout"'));
   });
 
-  it("shows the version in the footer and no colour literals in the page CSS", () => {
+  it("shows the release line in the footer: the laws, the codename once the release has one, the version", () => {
     const html = read("index.html");
-    expect(html).toContain(`Version ${JSON.parse(readFileSync("package.json", "utf8")).version}`);
+    const version: string = JSON.parse(readFileSync("package.json", "utf8")).version;
+    const codename: string | undefined = JSON.parse(readFileSync("data/codenames.json", "utf8"))[version.split(".").slice(0, 2).join(".")];
+    expect(html).toContain(`<span>drawn under XVI laws · ${codename ? `${codename} · ` : ""}${version}</span>`);
   });
 });

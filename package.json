@@ -16,6 +16,7 @@
     "package": "tsx tools/package.ts",
     "audit": "tsx tools/audit.ts",
     "conformance": "tsx tools/conformance.ts",
+    "release": "tsx tools/release.ts",
     "typecheck": "tsc",
     "lint": "eslint . && tsx tools/lint-style.ts",
     "test": "vitest run",

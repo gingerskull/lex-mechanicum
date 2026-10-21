@@ -17,6 +17,8 @@ Dependencies point downward only; nothing below imports from above.
 ```
 data/catalog/sources/*.json      research records (hand-edited, validated)
 data/catalog/mechanisms.json     generated merge, committed; the site, tools and tests read it
+data/release-names.json          the release codenames, in the order they are used (hand-edited)
+data/codenames.json              the codename of each named minor release, written by the release step; the footer reads it
 src/catalog/                     record schema and vocabularies, merge, validator, views, loadCatalog / recordById
 src/style/                       tokens (palettes, type, sizes), form (geometry-affecting values), draft (renderer
                                  knobs), detail (the detail ladder), kinds (solid kinds, roles, mark kinds, effects),
@@ -167,6 +169,7 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 | `site-assets` (in `prebuild`) | fonts and packages into `site/public`; checks the thumbnails' fingerprints and copies them (never draws) |
 | `lint-style` (in `npm run lint`) | colour and font literals outside `src/style`, style keys in records |
 | `standard-table`, `style-table` (`npm run docs:tables`) | the generated tables of the standard and the style reference |
+| `release minor \| patch [--date ...]` (`npm run release -- minor`) | the release step: the version bump, the CHANGELOG heading with the codename, `data/codenames.json` for the footer (`docs/workflow.md`, Versions) |
 
 Tools that draw go through `tools/chrome.ts`: it bundles the drawing page (`tools/draw-page`), serves it with the
 IBM Plex faces and the packages built from the current code, and opens it in the installed Chrome (playwright-core,
