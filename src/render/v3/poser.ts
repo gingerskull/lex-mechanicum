@@ -21,6 +21,7 @@ function jointFrame(at: Vec3, axis: Vec3): Xf {
 const moved = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
 void m3;
 import { IDENTITY, mat4, type Mat4 } from "../../solids/frame";
+import { conveyMatrix, mul4 } from "../../solids/convey";
 import type { PackedSolid3 } from "../../package/format2";
 import type { Vec3 } from "../../solids/types";
 
@@ -124,7 +125,10 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       const X = s.body === "ground" ? xf.id() : pose(u).bodies.get(s.body);
       const D = shiftOf(s);
       if (!X) return ID4;
-      return fromXf(D ? xf.mul(X, D) : X);
+      const M = fromXf(D ? xf.mul(X, D) : X);
+      // a conveyed solid: carried along its path by the travel, in the frame of the body that carries the path
+      const cv = s.cv?.path;
+      return cv ? (mul4(M, conveyMatrix(cv, s.cv!.s0, pose(u).values[cv.key] ?? 0)) as Mat4) : M;
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
     sweep: (point, range, branches) => {

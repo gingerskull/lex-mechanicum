@@ -376,7 +376,8 @@ const camBlock: BlockFn = (c, s) => {
  * screw. in: joint (a `screw` joint: lead, hand; a the shaft, b the nut), input (the shaft's angle about the joint's axis,
  * deg), nut (body; default the joint's b), hand (optional: the name of a design choice whose value "opposite" flips the
  * joint's hand, a differential screw's hand switch), lead2 (a second lead for a differential screw: the second nut `nut2`
- * advances (lead − lead2) per turn).
+ * advances (lead − lead2) per turn), balls ({ ratio, r }: a ball nut's balls, the ball
+ * centres' share of the turn and their circle's radius; their travel along the circuit is out.balls, mm).
  * The nut does not turn (its guide holds it), so it turns by −Δθ relative to the shaft and, by the helical law, moves
  * hand · lead · (−Δθ) / 2π along the axis relative to the shaft, plus whatever the shaft itself has advanced (a screw
  * running in a fixed nut of its own). A right-hand screw turned positively about +axis drives its nut toward −axis.
@@ -398,6 +399,10 @@ const screwBlock: BlockFn = (c, s) => {
   const adv = own + screwAdvance(lead, -d, hand);
   c.setXf((i.nut as string | undefined) ?? j.b, xf.trans(v3.mul(axis, adv)));
   outVal(c, s, adv, "advance");
+  // a ball nut's balls roll between the turning and the still groove: relative to the nut each ball centre turns at
+  // `ratio` of the screw's turn, on its helix of radius `r`; their travel along the circuit (mm) for the conveyed balls
+  const balls = i.balls as { ratio?: unknown; r?: unknown } | undefined;
+  if (balls) outVal(c, s, c.num(balls.ratio ?? 0.5) * d * Math.hypot(c.num(balls.r), lead / (2 * Math.PI)), "balls");
   if (i.lead2 !== undefined && typeof i.nut2 === "string") {
     const a2 = differentialAdvance(lead, c.num(i.lead2), d) * (j.hand === "left" ? -1 : 1);
     c.setXf(i.nut2, xf.trans(v3.mul(axis, a2)));

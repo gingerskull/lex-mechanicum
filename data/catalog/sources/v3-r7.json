@@ -2902,15 +2902,15 @@
      "shape": {
       "type": "plate",
       "rect": [
-       280,
-       80
+       300,
+       100
       ],
-      "note": "base with fixed and floating end bearings and a linear guide for the nut's flange"
+      "note": "base with the screw's two pillow blocks and the guide rail for the nut's flag"
      },
      "at": {
       "frame": {
        "origin": [
-        100,
+        90,
         0,
         0
        ]
@@ -2923,15 +2923,17 @@
      "shape": {
       "type": "shaft",
       "diameter": 16,
-      "length": 220,
+      "journal": 10,
       "groove": {
        "form": "gothic arch",
+       "major": 16,
        "lead": 5,
        "ballCircle": 16.6,
        "ball": 3.175,
+       "contact": 45,
        "hand": "right",
-       "from": 0,
-       "to": 200
+       "from": 40,
+       "to": 190
       }
      },
      "at": {
@@ -2942,16 +2944,16 @@
      "id": "nut",
      "role": "output",
      "shape": {
-      "type": "slider",
+      "type": "nut",
       "length": 45,
-      "width": 32,
-      "height": 32,
-      "flange": 48,
-      "groove": {
-       "form": "gothic arch",
-       "turns": 3
-      },
-      "return": "tube"
+      "width": 46,
+      "height": 46,
+      "turns": 3,
+      "return": "tube",
+      "flag": {
+       "side": -1,
+       "gap": 16
+      }
      },
      "at": {
       "joint": "guide"
@@ -3012,11 +3014,7 @@
      ],
      "lead": 5,
      "hand": "right",
-     "ball": true,
-     "ballDiameter": 3.175,
-     "ballCircle": 16.6,
-     "contactAngle": 45,
-     "loadedTurns": 3
+     "ball": true
     }
    ],
    "params": [
@@ -3067,6 +3065,22 @@
      "min": 1,
      "max": 5,
      "note": "loaded turns in the circuit"
+    },
+    {
+     "id": "kb",
+     "value": 0.4324,
+     "unit": "-",
+     "min": 0.4,
+     "max": 0.5,
+     "note": "the ball centres' share of the screw's turn relative to the nut: (1 - db cos(alpha) / dpw) / 2"
+    },
+    {
+     "id": "rpw",
+     "value": 8.3,
+     "unit": "mm",
+     "min": 6,
+     "max": 20.5,
+     "note": "ball-centre circle radius, dpw / 2"
     }
    ],
    "design": [
@@ -3103,36 +3117,17 @@
       "guide"
      ],
      "in": {
-      "screw": "screw",
+      "joint": "balls",
+      "input": "turn",
       "nut": "nut",
-      "lead": "l",
-      "turn": "turn"
+      "balls": {
+       "ratio": "kb",
+       "r": "rpw"
+      }
      },
-     "out": "x-nut",
-     "opts": {
-      "hand": "right",
-      "ball": true,
-      "sign": "a positive turn about +x moves the nut toward -x"
-     }
-    },
-    {
-     "block": "convey",
-     "id": "recirculation",
-     "joints": [],
-     "in": {
-      "screw": "screw",
-      "nut": "nut",
-      "lead": "l",
-      "db": "db",
-      "dpw": "dpw",
-      "alpha": "alpha",
-      "turns": "turns",
-      "return": "return"
-     },
-     "out": "ball-train",
-     "opts": {
-      "circuit": "3 loaded turns of the groove, then the return path back to the start",
-      "speed": "relative to the nut each ball centre turns at (1 - db cos(alpha) / dpw) / 2 = 0.43 of the screw's turn"
+     "out": {
+      "advance": "nut-advance",
+      "balls": "ball-travel"
      }
     }
    ],
@@ -3141,9 +3136,18 @@
      "id": "nut-mark",
      "body": "nut",
      "local": [
+      23,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "nut-centre",
+     "body": "nut",
+     "local": [
       0,
       0,
-      24
+      0
      ]
     },
     {
@@ -3152,7 +3156,7 @@
      "local": [
       150,
       0,
-      80
+      82
      ]
     },
     {
@@ -3161,14 +3165,14 @@
      "local": [
       120,
       0,
-      80
+      82
      ]
     }
    ],
    "outputs": [
     {
      "id": "nut-x",
-     "of": "nut-mark",
+     "of": "guide",
      "kind": "position",
      "unit": "mm"
     },
@@ -3193,9 +3197,6 @@
     },
     {
      "body": "nut"
-    },
-    {
-     "point": "balls"
     },
     {
      "point": "nut-mark"
@@ -3239,15 +3240,14 @@
       ],
       "normal": [
        0,
-       1,
+       -1,
        0
       ]
      },
+     "center": "nut-centre",
+     "scale": 2.5,
      "highlight": [
-      "balls",
-      "nut.return",
-      "nut.groove",
-      "screw.groove"
+      "nut"
      ]
     }
    ],
@@ -3256,11 +3256,6 @@
      "id": "turn",
      "kind": "driver",
      "driver": "turn"
-    },
-    {
-     "id": "return",
-     "kind": "design",
-     "design": "return"
     }
    ],
    "plot": {

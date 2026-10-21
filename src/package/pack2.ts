@@ -10,7 +10,8 @@ import { quantise } from "../solids/quantise";
 import { capOf, cleanRing, dropCollinear, orient, tessellate } from "../solids/tessellate";
 import { isPlain, type MeshData, type Op, type Profile, type Solid3, type Vec3 } from "../solids/types";
 import { gridFor, type PackageBounds } from "./format";
-import { FLAG3, type Flag3, type PackedSolid3, type Package2, type Shape2 } from "./format2";
+import { FLAG3, attachConveys, type Flag3, type PackedSolid3, type Package2, type Shape2 } from "./format2";
+import type { ConveyPath } from "../solids/convey";
 
 export interface Pack2Input {
   id: string;
@@ -113,6 +114,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     return shapes.length - 1;
   };
 
+  const conveys: ConveyPath[] = [];
   const solids = a.solids.map((s): PackedSolid3 => {
     let flags = 0;
     for (const f of FIELD_FLAGS) if (s.flags[f]) flags |= FLAG3[f];
@@ -130,6 +132,11 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     if (s.posedBy) p.posedBy = s.posedBy;
     if (s.reach) p.reach = { to: [s.reach.to[0], s.reach.to[1], s.reach.to[2]], end: s.reach.end };
     if (s.legacyAxis) p.legacyAxis = s.legacyAxis;
+    if (s.convey) {
+      let k = conveys.indexOf(s.convey.path);
+      if (k < 0) k = conveys.push(s.convey.path) - 1;
+      p.cv = { p: k, s0: +s.convey.s0.toFixed(3) };
+    }
     return p;
   });
   const traces: Record<string, Float32Array> = {};
@@ -152,6 +159,10 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
   };
   if (sampled.plotData) pkg.plot = Float32Array.from(sampled.plotData);
   if (a.lifts && Object.keys(a.lifts).length) pkg.lifts = structuredClone(a.lifts);
+  if (conveys.length) {
+    pkg.conveys = conveys.map((c) => ({ ...c, pts: c.pts.map((q): Vec3 => [+q[0].toFixed(3), +q[1].toFixed(3), +q[2].toFixed(3)]) }));
+    attachConveys(pkg);
+  }
   return pkg;
 }
 

@@ -11,7 +11,8 @@ import { housingBearing } from "../hardware/sub/housing";
 import { v3, xf, type Vec3 } from "../kin/math";
 import type { Kin, KinBody } from "../kin/types";
 import type { Setup } from "../kin/compose";
-import { helixSweep } from "../solids/helix";
+import { helixPath, helixSweep } from "../solids/helix";
+import { along, pathLength, type ConveyPath } from "../solids/convey";
 import { extrudeOp, segmentsFor } from "../solids/tessellate";
 import type { Op, Profile, Solid3 } from "../solids/types";
 import type { BuildCtx } from "./ctx";
@@ -154,7 +155,18 @@ function buildNut(ctx: BuildCtx, screwF: Frame, n: Nut, out: Solid3[], serves: R
   const rBore = ball ? t.major / 2 + 0.2 : t.major / 2 + 0.15;
   const name = ball ? `Ball nut, ${t.major} x ${t.lead}, ${num(n.shape.turns, 3)} loaded turns, preloaded, ${String(n.shape.return ?? "tube")} return` : `Flanged bronze nut Tr${t.major}x${t.pitch}, ${t.hand} hand`;
   // the nut's body in the carriage, its flange on the carriage's face toward the screw's low end
-  L.add(H.solid(`${id}-nut`, { name, kind: "bushing", role: "hw", mat: ball ? "Steel 100Cr6, hardened, ground grooves" : "Bronze CuSn12", outer: circle(Dn / 2, 0, 0, 48), holes: [circle(rBore, 0, 0, 48)], z0, z1, body: id }));
+  // a ball nut: its grooves only over the loaded turns, the bore past them clear of the screw's lands
+  const turns = num(n.shape.turns, 3);
+  const span = (turns * t.lead) / 2;
+  const cB = span + 3;
+  if (!ball) L.add(H.solid(`${id}-nut`, { name, kind: "bushing", role: "hw", mat: "Bronze CuSn12", outer: circle(Dn / 2, 0, 0, 48), holes: [circle(rBore, 0, 0, 48)], z0, z1, body: id }));
+  else {
+    const mat = "Steel 100Cr6, hardened, ground grooves";
+    const rGroove = nutRidge(t).rootR;
+    L.add(H.solid(`${id}-nut`, { name, kind: "bushing", role: "hw", mat, outer: circle(Dn / 2, 0, 0, 48), holes: [circle(rBore, 0, 0, 48)], z0, z1: -cB, body: id }));
+    L.add(H.solid(`${id}-nut-c`, { name: "", kind: "bushing", role: "hw", mat, outer: circle(Dn / 2, 0, 0, 48), holes: [circle(rGroove, 0, 0, 48)], z0: -cB, z1: cB, body: id, group: `${id}-nut` }));
+    L.add(H.solid(`${id}-nut-e`, { name: "", kind: "bushing", role: "hw", mat, outer: circle(Dn / 2, 0, 0, 48), holes: [circle(rBore, 0, 0, 48)], z0: cB, z1, body: id, group: `${id}-nut` }));
+  }
   L.add(H.solid(`${id}-nut-flange`, { name: "", kind: "bushing", role: "hw", mat: ball ? "Steel 100Cr6" : "Bronze CuSn12", outer: circle(fl.D / 2, 0, 0, 48), holes: [circle(rBore, 0, 0, 48)], z0: z0 - fl.t, z1: z0, body: id, group: `${id}-nut` }));
   // flange screws into the carriage's face (M13 threadlocked)
   const pcd = (Dn / 2 + fl.D / 2) / 2;
@@ -168,7 +180,11 @@ function buildNut(ctx: BuildCtx, screwF: Frame, n: Nut, out: Solid3[], serves: R
     L.add(H.solid(`${id}-wiper${k}`, { name: k ? "" : `Felt wiper ring ${t.major} x ${Dn - 2}, at each end of the nut`, kind: "wiper", role: "hw", mat: "Felt, oil soaked", outer: circle(Dn / 2 - 1, 0, 0, 40), holes: [circle(t.major / 2, 0, 0, 40)], z0: a, z1: b, body: id, ...(k ? { qty: 0 } : { qty: 2 }) }));
   serve("F8", `${id}-wiper0`);
   out.push(...L.out());
-  out.push(nutThread(screwF, t, w0 + z0, w0 + z1, id, `${id}-nut-thread`, n.joint));
+  if (!ball) out.push(nutThread(screwF, t, w0 + z0, w0 + z1, id, `${id}-nut-thread`, n.joint));
+  else {
+    out.push(nutThread(screwF, t, w0 - span, w0 + span, id, `${id}-nut-thread`, n.joint));
+    buildBalls(ctx, screwF, n, w0, span, Dn, out, serves);
+  }
   // the grease nipple on the carriage's top, feeding the nut (F8)
   const top = n.Ht / 2;
   const Lt = new Local({ o: v3.add(A.o, v3.mul(A.x, top)), x: A.z, z: A.x }, { joints: [n.joint] });
@@ -232,6 +248,104 @@ function buildFixedNut(ctx: BuildCtx, screwF: Frame, t: ThreadSpec, w0: number, 
   serve("F1", `${id}-dw0`);
   serve("F3", `${id}-bronze`, `${id}-fsc0`);
   serve("F8", `${id}-wiper0`, `${id}-nip`);
+}
+
+/**
+ * A ball nut's circuit (J11): the balls in the grooves over the loaded turns, a helix at the ball circle, and back
+ * through a return tube outside the nut, radially out at the circuit's end, along the nut and radially in at its start
+ * (whole turns end at the angle they began, so the tube runs straight along the nut). The balls are conveyed round the
+ * circuit (D9) by the travel the screw block gives (they roll between a turning and a still groove); the nut's middle
+ * ring is drilled for the tube's legs.
+ */
+function buildBalls(ctx: BuildCtx, screwF: Frame, n: Nut, w0: number, span: number, Dn: number, out: Solid3[], serves: Record<string, string[]>): void {
+  const t = n.t;
+  const b = t.ball!;
+  const id = n.body;
+  const step = ctx.kin.solve.find((q) => q.block === "screw" && q.in?.joint === n.joint);
+  const key = step && typeof step.out === "object" && !Array.isArray(step.out) ? step.out.balls : undefined;
+  if (!key) {
+    ctx.issues.push(`${id}: a ball nut whose screw step names no ball travel (out.balls): the balls are not built`);
+    return;
+  }
+  const s = t.hand === "left" ? -1 : 1;
+  const rc = b.circle / 2;
+  const za = w0 - span;
+  const zb = w0 + span;
+  // the groove's centre lies half a lead from the screw's land
+  const phase = s * ((2 * Math.PI * (za - t.from - t.lead / 2)) / t.lead);
+  const helix = helixPath({ r: rc, lead: t.lead, z0: za, z1: zb, hand: t.hand, phase, segments: 64 });
+  const rT = Dn / 2 + b.d / 2 + 2;
+  const R = 3;
+  const at = (r: number, z: number): Vec3 => [Math.cos(phase) * r, Math.sin(phase) * r, z];
+  // the return in the axial plane of the circuit's ends: out, along the nut, in, with rounded corners
+  const ret: Vec3[] = [];
+  for (let k = 1; k <= 4; k++) ret.push(at(rc + ((rT - R - rc) * k) / 4, zb));
+  for (let k = 1; k < 6; k++) {
+    const a = (k / 6) * (Math.PI / 2);
+    ret.push(at(rT - R + R * Math.sin(a), zb - R + R * Math.cos(a)));
+  }
+  const nz = Math.max(2, Math.round((zb - za - 2 * R) / 2));
+  for (let k = 0; k <= nz; k++) ret.push(at(rT, zb - R - ((zb - za - 2 * R) * k) / nz));
+  for (let k = 1; k < 6; k++) {
+    const a = (k / 6) * (Math.PI / 2);
+    ret.push(at(rT - R + R * Math.cos(a), za + R - R * Math.sin(a)));
+  }
+  for (let k = 0; k < 4; k++) ret.push(at(rT - R - ((rT - R - rc) * k) / 4, za));
+  const yv = v3.cross(screwF.z, screwF.x);
+  const toWorld = (p: Vec3): Vec3 => v3.add(screwF.o, v3.add(v3.mul(screwF.x, p[0]), v3.add(v3.mul(yv, p[1]), v3.mul(screwF.z, p[2]))));
+  const path: ConveyPath = { pts: [...helix.slice(0, -1), ...ret].map(toWorld), key, carrier: id };
+  const Lp = pathLength(path);
+  const count = Math.floor(Lp / (b.d + 0.1));
+  const sph: Vec2[] = [];
+  for (let k = 0; k <= 12; k++) {
+    const a = -Math.PI / 2 + (k / 12) * Math.PI;
+    sph.push([Math.max(0, (b.d / 2) * Math.cos(a)), (b.d / 2) * Math.sin(a)]);
+  }
+  for (let k = 0; k < count; k++) {
+    const s0 = (k * Lp) / count;
+    const p = along(path, s0).o;
+    out.push({ id: `${id}-ball${k}`, name: k ? "" : `Ball Ø${b.d}, ${count} in the circuit, grade 10`, role: "hw", kind: "roller", body: id, frame: { o: p, x: screwF.x, z: screwF.z }, profile: { outer: sph, holes: [] }, op: { op: "revolve", segments: 24 }, marks: [], ex: 0, joints: [n.joint], detail: "never", flags: {}, mat: "Steel 100Cr6, hardened", convey: { path, s0 }, group: `${id}-nut` });
+  }
+  // the return tube outside the nut, over its legs and its run along the nut
+  // in the screw's frame, so the tube explodes along the screw with its nut
+  const tubePts = ret.filter((q) => Math.hypot(q[0], q[1]) >= Dn / 2 - 1.5);
+  const rTo = b.d / 2 + 1;
+  out.push({ id: `${id}-tube`, name: `Return tube Ø${(2 * rTo).toFixed(1)}, steel, carries the balls back to the circuit's start`, role: "hw", kind: "tube", body: id, group: `${id}-nut`, frame: { ...screwF }, profile: { outer: circle(rTo, 0, 0, 20), holes: [circle(b.d / 2 + 0.15, 0, 0, 20).reverse()] }, op: { op: "sweep", path: tubePts }, marks: [], ex: 0, joints: [n.joint], detail: "never", flags: {}, mat: "Steel, hardened" });
+  // the tube's legs pass through the nut's middle ring and its lands: two radial bores
+  for (const ring of out.filter((q) => q.id === `${id}-nut-c` || q.id === `${id}-nut-thread`)) {
+    const F = ring.frame;
+    const y = v3.cross(F.z, F.x);
+    const loc = (q: Vec3): Vec3 => {
+      const d = v3.sub(q, F.o);
+      return [v3.dot(d, F.x), v3.dot(d, y), v3.dot(d, F.z)];
+    };
+    const dl = (q: Vec3): Vec3 => [v3.dot(q, F.x), v3.dot(q, y), v3.dot(q, F.z)];
+    const radial = v3.unit(v3.sub(toWorld(at(1, 0)), toWorld(at(0, 0))));
+    ring.features = [za, zb].map((z) => ({ mode: "cut" as const, profile: { outer: circle(rTo + 0.1, 0, 0, 20), holes: [] }, op: { op: "extrude" as const, h: Dn, steps: 1 }, frame: { o: loc(toWorld(at(rc - 1, z))), x: dl(screwF.z), z: dl(radial) } }));
+  }
+  // the carriage is slotted along its bore for the tube
+  const part = ctx.parts.get(id);
+  if (part) {
+    const F = part.frame;
+    const y = v3.cross(F.z, F.x);
+    const rad = v3.unit(v3.sub(toWorld(at(1, 0)), toWorld(at(0, 0))));
+    const th = Math.atan2(v3.dot(rad, y), v3.dot(rad, F.x));
+    const r0 = Dn / 2 + 0.05;
+    const w = rTo + 0.6;
+    const d = Math.asin(Math.min(0.99, w / r0));
+    const ring: Vec2[] = [];
+    for (let k = 0; k <= 40; k++) {
+      const a = th + d + ((2 * Math.PI - 2 * d) * k) / 40;
+      ring.push([r0 * Math.cos(a), r0 * Math.sin(a)]);
+    }
+    const R2 = rT + rTo + 0.6;
+    const c = Math.cos(th), sn = Math.sin(th);
+    const pt = (u: number, v: number): Vec2 => [u * c - v * sn, u * sn + v * c];
+    ring.push(pt(R2, -w), pt(R2, w));
+    part.profile.holes = part.profile.holes.filter((h) => Math.abs(Math.hypot(h[0]![0], h[0]![1]) - r0) > 0.01);
+    part.profile.holes.push(ring.reverse());
+  }
+  (serves.F8 ??= []).push(`${id}-tube`);
 }
 
 /**

@@ -122,6 +122,8 @@ export interface Solid3 {
   chamfer?: number;
   /** Nominal thread, the range of the drawn thread along the part's axis and its lead (a screw, a worm). */
   thread?: { m: number; z0: number; z1: number; lead?: number };
+  /** A conveyed solid (D9): carried along a closed path by a solved travel from its place `s0` on it (src/solids/convey.ts). */
+  convey?: { path: import("./convey").ConveyPath; s0: number };
   /** A stretched member's two solved points: its unit-length profile spans them. */
   stretch?: [string, string];
   /** A deforming member: its profile is made again each frame from the solved state, same point count per ring. */

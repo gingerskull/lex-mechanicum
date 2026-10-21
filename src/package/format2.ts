@@ -17,6 +17,7 @@ import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 import { MESH_GRID } from "../solids/quantise";
 import type { Frame, LoftSection, MeshData, Op, Profile, Vec3 } from "../solids/types";
 import type { PackageBounds } from "./format";
+import type { ConveyPath } from "../solids/convey";
 
 export const FORMAT2 = 2;
 
@@ -59,6 +60,8 @@ export interface PackedSolid3 {
   posedBy?: string;
   reach?: { to: Vec3; end: 0 | 1 };
   legacyAxis?: "x" | "y" | "p";
+  /** A conveyed solid: index into `Package2.conveys` and its place on the path; `path` is attached on reading. */
+  cv?: { p: number; s0: number; path?: ConveyPath };
   flags: number;
 }
 
@@ -84,6 +87,13 @@ export interface Package2 {
    * axis, dot(n, p) = t) in the reference configuration. A teaching point of the body is drawn on it (src/render/v3/poser).
    */
   lifts?: Record<string, [number, number, number, number]>;
+  /** The closed paths conveyed solids ride (D9). */
+  conveys?: ConveyPath[];
+}
+
+/** Gives every conveyed solid its path object (kept out of the JSON, which holds only its index). */
+export function attachConveys(pkg: Package2): void {
+  for (const s of pkg.solids) if (s.cv && pkg.conveys) Object.defineProperty(s.cv, "path", { value: pkg.conveys[s.cv.p], enumerable: false, configurable: true });
 }
 
 export const hasFlag3 = (s: PackedSolid3, f: Flag3): boolean => (s.flags & FLAG3[f]) !== 0;
@@ -357,6 +367,7 @@ export function decodeBody2(bytes: Uint8Array): Package2 {
     traces[k] = t;
   }
   const pkg: Package2 = { ...rest, traces, shapes };
+  attachConveys(pkg);
   if (plotLen) pkg.plot = new Float32Array(bytes.slice(at - bytes.byteOffset, at - bytes.byteOffset + plotLen * 4).buffer, 0, plotLen);
   return pkg;
 }

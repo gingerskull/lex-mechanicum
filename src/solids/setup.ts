@@ -1,6 +1,7 @@
 // Setup of a package v2 (R9): decode, tessellate, edges, in one go on this thread or in a worker. The worker takes the
 // blob, does all three, and sends back typed arrays only (transferred, not copied) with the package's solids and the
 // rest; the profile rings it decoded stay in the worker.
+import { attachConveys } from "../package/format2";
 import { decode2, type Package2 } from "../package/format2";
 import type { EdgeSet } from "./edges";
 import { bake, BAKE, type Baked } from "../render/v3/bake";
@@ -46,7 +47,11 @@ export async function setupForWorker(blob: Uint8Array): Promise<{ result: Setup;
 export function setupInWorker(worker: Worker, blob: Uint8Array): Promise<Setup & { wall: number }> {
   const t0 = performance.now();
   return new Promise((resolve, reject) => {
-    worker.onmessage = (e: MessageEvent<Setup>) => resolve({ ...e.data, wall: performance.now() - t0 });
+    worker.onmessage = (e: MessageEvent<Setup>) => {
+      // a conveyed solid's path does not survive the copy out of the worker: attach it again
+      attachConveys(e.data.pkg);
+      resolve({ ...e.data, wall: performance.now() - t0 });
+    };
     worker.onerror = (e) => reject(new Error(e.message));
     const copy = blob.slice();
     worker.postMessage(copy.buffer, [copy.buffer]);
