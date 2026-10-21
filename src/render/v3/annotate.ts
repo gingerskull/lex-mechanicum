@@ -574,10 +574,21 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
     label(text, x + dx, y + dy, ink, true);
   };
   const o = ov as Record<string, unknown>;
+  // a posed overlay is drawn where an output reaches an extreme (a dead centre, the ends of a stroke): `pose` for all
+  // its points, `fromPose` and `toPose` for its first and second
+  const posed = (ref: unknown, which?: unknown): Vec3 | null => {
+    const q = (which ?? o.pose) as { output?: string; stat?: string } | undefined;
+    if (!q?.output || (q.stat !== "max" && q.stat !== "min")) return pointOf(A, ref);
+    const u = A.rt.scene.poser.phaseOf?.(q.output, q.stat);
+    if (u === null || u === undefined || typeof ref !== "string") return pointOf(A, ref);
+    return A.rt.scene.poser.point(u, ref);
+  };
+  const fromPt = () => posed(o.from, o.fromPose);
+  const toPt = () => posed(o.to, o.toPose);
   switch (ov.kind) {
     case "line":
     case "chord": {
-      const a = pointOf(A, o.from), b = pointOf(A, o.to);
+      const a = fromPt(), b = toPt();
       if (!a || !b) return;
       const ext = o.extend === true ? 0.25 : 0;
       const d = sub(b, a);
@@ -586,8 +597,12 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       return;
     }
     case "dimension": {
-      const a = pointOf(A, o.from), b = pointOf(A, o.to);
+      const a = fromPt();
+      let b = toPt();
       if (!a || !b) return;
+      // one component of the span only (an offset measured square to a slide)
+      const k = typeof o.component === "string" ? "xyz".indexOf(o.component) : -1;
+      if (k >= 0) b = a.map((v, i) => (i === k ? b![i]! : v)) as Vec3;
       const p = P(A, a), q = P(A, b);
       ctx.save();
       ctx.fillStyle = ctx.strokeStyle;
@@ -614,7 +629,20 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
     case "arc": {
       const c = pointOf(A, o.center);
       if (!c) return;
-      const from = pointOf(A, o.from), to = pointOf(A, o.to), through = pointOf(A, o.through);
+      const from = fromPt(), to = toPt(), through = pointOf(A, o.through);
+      if (from && to && (o.fromPose || o.toPose)) {
+        // an arc on the circle a point runs on, between two of its poses (the cut and return of a crank): turning
+        // counter-clockwise about +z unless `sweep` is "cw"
+        const r = len(sub(from, c));
+        const a0 = Math.atan2(from[1] - c[1], from[0] - c[0]);
+        let a1 = Math.atan2(to[1] - c[1], to[0] - c[0]);
+        if (o.sweep === "cw") while (a1 > a0) a1 -= TAU;
+        else while (a1 < a0) a1 += TAU;
+        const pts = arcPts(c, [1, 0, 0], [0, 0, 1], r, a0, a1);
+        poly(pts);
+        tag(pts[32]!, 0, -10);
+        return;
+      }
       if (from && to) {
         const n = worldNormal(from, to, c);
         const e0 = unit(sub(from, c));

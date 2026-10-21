@@ -9,7 +9,11 @@ const rec = (id: string) => recordById(id)!;
 
 describe("the stage's controls from a record", () => {
   it("gives a design choice its options and its default", () => {
-    const c = controlsOf(rec("drag-link-quick-return"));
+    // the drag link keeps its assembly as a design choice; a control on it is added here (the built page drops it,
+    // as the parts are built for one assembly)
+    const r = rec("drag-link-quick-return");
+    const t = r.teaching!;
+    const c = controlsOf({ ...r, teaching: { ...t, controls: [...t.controls, { id: "assembly", kind: "design", design: "branch" }] } } as typeof r);
     const a = c.find((x) => x.key === "branch")!;
     expect(a.type).toBe("choice");
     expect(a.target).toBe("design");

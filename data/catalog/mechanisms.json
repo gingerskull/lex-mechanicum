@@ -1973,19 +1973,17 @@
               "G"
             ],
             "in": {
+              "kind": "rrp",
               "a": "E",
               "r": "l",
-              "line": "O",
-              "dir": [
+              "p": "O",
+              "d": [
                 1,
                 0,
                 0
               ]
             },
-            "out": "V",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "V"
           }
         ],
         "points": [],
@@ -1999,10 +1997,11 @@
           },
           {
             "id": "obliquity",
-            "of": "strap",
+            "of": "V",
+            "from": "E",
+            "to": "O",
             "kind": "angle",
-            "unit": "deg",
-            "from": "guide line"
+            "unit": "deg"
           }
         ],
         "fallback": null
@@ -2053,11 +2052,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "throw",
-            "kind": "param",
-            "param": "e"
           }
         ],
         "plot": {
@@ -5258,8 +5252,12 @@
                 24
               ]
             },
-            "at": {
-              "point": "Y"
+            "frame": {
+              "origin": [
+                40,
+                0,
+                0
+              ]
             }
           }
         ],
@@ -5291,20 +5289,22 @@
               0
             ],
             "slot": {
-              "body": "yoke",
-              "path": {
-                "line": {
-                  "from": [
-                    0,
-                    -41
-                  ],
-                  "to": [
-                    0,
-                    41
-                  ]
-                }
-              }
-            }
+              "from": [
+                40,
+                -41,
+                0
+              ],
+              "to": [
+                40,
+                41,
+                0
+              ]
+            },
+            "axis": [
+              0,
+              0,
+              1
+            ]
           },
           {
             "id": "G",
@@ -5371,24 +5371,17 @@
               "G"
             ],
             "in": {
+              "kind": "rpp",
               "a": "A",
-              "line": "O",
-              "dir": [
+              "p": "O",
+              "d": [
                 1,
                 0,
-                0
-              ],
-              "slot": [
-                0,
-                1,
                 0
               ]
             },
             "out": "Y",
-            "opts": {
-              "form": "pin-in-slot",
-              "note": "the slot replaces the rod: with the slot normal to the slide, x = r cos(theta)"
-            }
+            "note": "the slot is square to the slide: the slot centre is the pin's projection, x = r cos(theta)"
           }
         ],
         "points": [
@@ -5925,19 +5918,17 @@
               "P"
             ],
             "in": {
+              "kind": "rrp",
               "a": "A",
               "r": "l",
-              "line": "O",
-              "dir": [
+              "p": "O",
+              "d": [
                 1,
                 0,
                 0
               ]
             },
-            "out": "B",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "B"
           }
         ],
         "points": [],
@@ -5951,10 +5942,11 @@
           },
           {
             "id": "obliquity",
-            "of": "rod",
+            "of": "B",
+            "from": "A",
+            "to": "O",
             "kind": "angle",
-            "unit": "deg",
-            "from": "slide line"
+            "unit": "deg"
           }
         ],
         "fallback": null
@@ -5996,9 +5988,14 @@
         "overlays": [
           {
             "id": "line-of-stroke",
-            "kind": "axis-line",
+            "kind": "line",
             "from": "O",
             "to": "B",
+            "pose": {
+              "output": "slider-x",
+              "stat": "max"
+            },
+            "extend": true,
             "label": "LINE OF STROKE"
           },
           {
@@ -6031,11 +6028,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "rod",
-            "kind": "param",
-            "param": "l"
           }
         ],
         "plot": {
@@ -15626,8 +15618,12 @@
               "length": 36,
               "width": 26
             },
-            "at": {
-              "point": "T"
+            "frame": {
+              "origin": [
+                0,
+                "sqrt(L^2-(e+r)^2)",
+                0
+              ]
             }
           },
           {
@@ -15638,8 +15634,12 @@
               "length": 36,
               "width": 26
             },
-            "at": {
-              "point": "Bt"
+            "frame": {
+              "origin": [
+                0,
+                "-sqrt(L^2-(e+r)^2)",
+                0
+              ]
             }
           }
         ],
@@ -15650,7 +15650,7 @@
             "a": "ground",
             "b": "gear1",
             "at": [
-              -30,
+              "-e",
               0,
               0
             ],
@@ -15666,7 +15666,7 @@
             "a": "ground",
             "b": "gear2",
             "at": [
-              30,
+              "e",
               0,
               0
             ],
@@ -15679,16 +15679,29 @@
           {
             "id": "mesh",
             "type": "gear-mesh",
-            "a": "gear1",
-            "b": "gear2",
+            "a": "gear2",
+            "b": "gear1",
             "at": [
               0,
               0,
               0
             ],
-            "z": [
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "za": 30,
+            "zb": 30,
+            "ca": [
               30,
-              30
+              0,
+              0
+            ],
+            "cb": [
+              -30,
+              0,
+              0
             ]
           },
           {
@@ -15697,7 +15710,7 @@
             "a": "gear1",
             "b": "rod1",
             "at": [
-              -50,
+              "-(e+r)",
               0,
               0
             ],
@@ -15713,7 +15726,7 @@
             "a": "gear1",
             "b": "rod3",
             "at": [
-              -50,
+              "-(e+r)",
               0,
               0
             ],
@@ -15729,7 +15742,7 @@
             "a": "gear2",
             "b": "rod2",
             "at": [
-              50,
+              "e+r",
               0,
               0
             ],
@@ -15745,7 +15758,7 @@
             "a": "gear2",
             "b": "rod4",
             "at": [
-              50,
+              "e+r",
               0,
               0
             ],
@@ -15762,7 +15775,7 @@
             "b": "piston",
             "at": [
               0,
-              33.17,
+              "sqrt(L^2-(e+r)^2)",
               0
             ],
             "axis": [
@@ -15778,7 +15791,7 @@
             "b": "piston",
             "at": [
               0,
-              33.17,
+              "sqrt(L^2-(e+r)^2)",
               0
             ],
             "axis": [
@@ -15794,7 +15807,7 @@
             "b": "displacer",
             "at": [
               0,
-              -33.17,
+              "-sqrt(L^2-(e+r)^2)",
               0
             ],
             "axis": [
@@ -15810,7 +15823,7 @@
             "b": "displacer",
             "at": [
               0,
-              -33.17,
+              "-sqrt(L^2-(e+r)^2)",
               0
             ],
             "axis": [
@@ -15826,7 +15839,7 @@
             "b": "ground",
             "at": [
               0,
-              33.17,
+              "sqrt(L^2-(e+r)^2)",
               0
             ],
             "axis": [
@@ -15842,7 +15855,7 @@
             "b": "ground",
             "at": [
               0,
-              -33.17,
+              "-sqrt(L^2-(e+r)^2)",
               0
             ],
             "axis": [
@@ -15918,16 +15931,13 @@
               "G1"
             ],
             "in": {
-              "a": "gear2",
-              "b": "gear1",
-              "za": 30,
-              "zb": 30
+              "joint": "mesh",
+              "input": "input"
             },
-            "out": "gear1-angle",
-            "opts": {
-              "external": true,
-              "note": "1:1, counter-rotating: the crank pins stay mirrored about the axis"
-            }
+            "out": {
+              "angle": "gear1-turn"
+            },
+            "note": "1:1, counter-rotating: the crank pins stay mirrored about the axis"
           },
           {
             "block": "dyad",
@@ -15946,10 +15956,7 @@
               "rb": "L"
             },
             "branch": "power-branch",
-            "out": "T",
-            "opts": {
-              "side": "left"
-            }
+            "out": "T"
           },
           {
             "block": "dyad",
@@ -15962,16 +15969,13 @@
               "displacer-guide"
             ],
             "in": {
-              "a": "PLb",
-              "b": "PRb",
+              "a": "PRb",
+              "b": "PLb",
               "ra": "L",
               "rb": "L"
             },
             "branch": "displacer-branch",
-            "out": "Bt",
-            "opts": {
-              "side": "right"
-            }
+            "out": "Bt"
           }
         ],
         "points": [
@@ -16115,9 +16119,9 @@
         "claims": [
           {
             "text": "the two pistons slide along the same axis with a phase lag of about 64°",
-            "output": "displacer-y",
+            "output": "piston-y",
             "stat": "phase",
-            "against": "piston-y",
+            "against": "displacer-y",
             "value": 64.37,
             "tol": 1
           },
@@ -16671,8 +16675,12 @@
               },
               "thick": 10
             },
-            "at": {
-              "joint": "Lt"
+            "frame": {
+              "origin": [
+                242.28,
+                128.44,
+                0
+              ]
             }
           },
           {
@@ -16850,8 +16858,8 @@
             "a": "eccrod",
             "b": "link",
             "at": [
-              212.28,
-              46.44,
+              212.289669358201,
+              46.431692689121,
               0
             ],
             "axis": [
@@ -16882,24 +16890,27 @@
             "a": "radiusrod",
             "b": "link",
             "at": [
-              249.26,
-              178.05,
+              249.251540295467,
+              178.050000325303,
               0
             ],
             "slot": {
-              "body": "link",
-              "path": {
-                "arc": {
-                  "center": [
-                    180,
-                    0
-                  ],
-                  "radius": 180,
-                  "from": -31,
-                  "to": 31
-                }
+              "arc": {
+                "center": [
+                  422.28,
+                  128.44,
+                  0
+                ],
+                "radius": "R",
+                "from": -31,
+                "to": 31
               }
-            }
+            },
+            "axis": [
+              0,
+              0,
+              1
+            ]
           },
           {
             "id": "Dl",
@@ -16907,8 +16918,8 @@
             "a": "lifting",
             "b": "radiusrod",
             "at": [
-              249.26,
-              178.05,
+              249.251540295467,
+              178.050000325303,
               0
             ],
             "axis": [
@@ -16955,8 +16966,8 @@
             "a": "radiusrod",
             "b": "comblever",
             "at": [
-              422.28,
-              128.44,
+              422.2712505103,
+              128.438989680737,
               0
             ],
             "axis": [
@@ -16971,7 +16982,7 @@
             "a": "comblever",
             "b": "spindle",
             "at": [
-              434.28,
+              434.272802891291,
               110,
               0
             ],
@@ -16987,7 +16998,7 @@
             "a": "spindle",
             "b": "ground",
             "at": [
-              434.28,
+              434.272802891291,
               110,
               0
             ],
@@ -17003,8 +17014,8 @@
             "a": "comblever",
             "b": "union",
             "at": [
-              482.28,
-              36.24,
+              482.279012415257,
+              36.244041277053,
               0
             ],
             "axis": [
@@ -17166,10 +17177,8 @@
             ],
             "default": 0.8,
             "unit": "die position",
-            "map": {
-              "jointAngleDeg": "180 - 20 x die"
-            },
-            "note": "die position in the slot: +1 full forward, 0 mid gear, -1 full reverse; the reverse arm angle is 180° - 20° x die, which puts the die 20° x die along the slot from the trunnion at the dead centres"
+            "note": "die position in the slot: +1 full forward, 0 mid gear, -1 full reverse; the reverse arm turns -20 degrees per unit (180 - 20 x die), which puts the die 20 degrees x die along the slot from the trunnion at the dead centres",
+            "scale": -20
           }
         ],
         "solve": [
@@ -17182,19 +17191,17 @@
               "guide"
             ],
             "in": {
+              "kind": "rrp",
               "a": "Cp",
               "r": "Lm",
-              "line": "O",
-              "dir": [
+              "p": "O",
+              "d": [
                 1,
                 0,
                 0
               ]
             },
-            "out": "Xh",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "Xh"
           },
           {
             "block": "dyad",
@@ -17205,15 +17212,14 @@
               "Lt"
             ],
             "in": {
-              "a": "Rc",
-              "b": "Lt",
-              "ra": "Le",
-              "rb": "foot"
+              "a": "Lt",
+              "b": "Rc",
+              "ra": "foot",
+              "rb": "Le",
+              "body": "link"
             },
-            "out": "Lf",
-            "opts": {
-              "side": "right"
-            }
+            "branch": "left",
+            "out": "Lf"
           },
           {
             "block": "dyad",
@@ -17229,11 +17235,9 @@
               "ra": "R",
               "rb": "Llift"
             },
-            "out": "D",
-            "opts": {
-              "side": "left",
-              "note": "the die sits where the slot arc (about its centre Zw) meets the lifting link's circle; it slips a little along the slot as the link swings"
-            }
+            "branch": "left",
+            "out": "Dl",
+            "note": "the die sits where the slot arc (about its centre Zw) meets the lifting link's circle; it slips a little along the slot as the link swings"
           }
         ],
         "points": [
@@ -17279,43 +17283,31 @@
           },
           {
             "id": "return-crank-angle",
-            "of": "Rc",
+            "of": "O",
             "kind": "angle",
             "unit": "deg",
-            "about": "O",
-            "relativeTo": "Cp"
+            "from": "Cp",
+            "to": "Rc"
           }
         ],
         "fallback": {
           "numeric": true,
           "loops": [
-            {
-              "through": [
-                "D",
-                "Rt",
-                "Vs",
-                "vguide"
-              ],
-              "note": "radius rod, combination lever and valve spindle"
-            },
-            {
-              "through": [
-                "D",
-                "Rt",
-                "Ub",
-                "Uc"
-              ],
-              "note": "radius rod, combination lever and union link to the crosshead arm"
-            }
+            [
+              "radiusrod",
+              "comblever",
+              "spindle",
+              "union"
+            ]
           ],
+          "note": "radius rod, combination lever, valve spindle and union link: a triad on the die, the spindle guide and the crosshead arm does not decompose into dyads; solved by continuation from the previous pose",
           "joints": [
             "Rt",
             "Vs",
             "vguide",
             "Ub",
             "Uc"
-          ],
-          "note": "a triad (a ternary lever on three binaries) does not decompose into dyads; continue from the previous pose"
+          ]
         }
       },
       "teaching": {
@@ -23700,7 +23692,7 @@
             "a": "crank",
             "b": "rod",
             "at": [
-              30,
+              "r",
               0,
               0
             ],
@@ -23716,8 +23708,8 @@
             "a": "rod",
             "b": "slider",
             "at": [
-              110.62,
-              40,
+              "r+sqrt(l^2-e^2)",
+              "e",
               0
             ],
             "axis": [
@@ -23732,8 +23724,8 @@
             "a": "slider",
             "b": "ground",
             "at": [
-              110.62,
-              40,
+              "r+sqrt(l^2-e^2)",
+              "e",
               0
             ],
             "axis": [
@@ -23792,23 +23784,34 @@
               "guide"
             ],
             "in": {
+              "kind": "rrp",
               "a": "A",
               "r": "l",
-              "line": "O",
-              "offset": "e",
-              "dir": [
+              "p": [
+                0,
+                "e",
+                0
+              ],
+              "d": [
                 1,
                 0,
                 0
               ]
             },
-            "out": "B",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "B"
           }
         ],
-        "points": [],
+        "points": [
+          {
+            "id": "L",
+            "body": "ground",
+            "local": [
+              0,
+              "e",
+              0
+            ]
+          }
+        ],
         "outputs": [
           {
             "id": "slider-x",
@@ -23819,10 +23822,11 @@
           },
           {
             "id": "obliquity",
-            "of": "rod",
+            "of": "B",
+            "from": "A",
+            "to": "L",
             "kind": "angle",
-            "unit": "deg",
-            "from": "slide line"
+            "unit": "deg"
           }
         ],
         "fallback": null
@@ -23922,7 +23926,7 @@
             "id": "offset",
             "kind": "dimension",
             "from": "O",
-            "to": "B",
+            "to": "L",
             "component": "y",
             "label": "OFFSET e"
           }
@@ -23949,7 +23953,7 @@
           {
             "text": "time ratio 1.28:1",
             "output": "slider-x",
-            "stat": "ratio",
+            "stat": "time-ratio",
             "value": 1.283,
             "tol": 0.005
           },
@@ -24479,7 +24483,7 @@
             "a": "link",
             "b": "ram",
             "at": [
-              96.32,
+              96.31995121948,
               64,
               0
             ],
@@ -24495,7 +24499,7 @@
             "a": "ram",
             "b": "ground",
             "at": [
-              96.32,
+              96.31995121948,
               64,
               0
             ],
@@ -24571,12 +24575,13 @@
               "O3"
             ],
             "in": {
-              "a": "A",
-              "pivot": "O3"
+              "kind": "rpr",
+              "a": "O3",
+              "p": "A",
+              "body": "lever"
             },
-            "out": "lever-angle",
-            "opts": {
-              "form": "rotating-slide"
+            "out": {
+              "angle": "lever-turn"
             }
           },
           {
@@ -24588,19 +24593,17 @@
               "rails"
             ],
             "in": {
+              "kind": "rrp",
               "a": "B",
               "r": "l",
-              "line": "ram-line",
-              "dir": [
+              "p": "ram-line",
+              "d": [
                 1,
                 0,
                 0
               ]
             },
-            "out": "C",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "C"
           }
         ],
         "points": [
@@ -24626,8 +24629,7 @@
             "id": "lever-angle",
             "of": "lever",
             "kind": "angle",
-            "unit": "deg",
-            "from": "vertical"
+            "unit": "deg"
           }
         ],
         "fallback": null
@@ -24744,7 +24746,7 @@
           {
             "text": "cut:return 1.71:1",
             "output": "ram-x",
-            "stat": "ratio",
+            "stat": "time-ratio",
             "value": 1.711,
             "tol": 0.005
           },
@@ -25243,9 +25245,22 @@
               -17.1,
               0
             ],
-            "z": [
-              16,
-              50
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "za": 16,
+            "zb": 50,
+            "ca": [
+              -62.02,
+              -22.57,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              0
             ]
           },
           {
@@ -25334,7 +25349,7 @@
             "a": "rod",
             "b": "ram",
             "at": [
-              70.35,
+              70.350823478437,
               -20,
               0
             ],
@@ -25350,7 +25365,7 @@
             "a": "ram",
             "b": "ground",
             "at": [
-              70.35,
+              70.350823478437,
               -20,
               0
             ],
@@ -25406,7 +25421,8 @@
               1125
             ],
             "default": 0,
-            "note": "one cycle is one bull gear turn, 50/16 = 3.125 pinion turns"
+            "note": "one cycle is one bull gear turn, 50/16 = 3.125 pinion turns; the pinion turns clockwise so the bull gear and its crank turn counter-clockwise",
+            "speed": -1
           }
         ],
         "solve": [
@@ -25418,16 +25434,11 @@
               "O2"
             ],
             "in": {
-              "a": "pinion",
-              "b": "bull",
-              "za": 16,
-              "zb": 50
+              "joint": "mesh",
+              "input": "input"
             },
-            "out": "crank-angle",
-            "opts": {
-              "external": true,
-              "meshPhaseDeg": 273.75,
-              "note": "pinion tooth phase at input 0 so the teeth interleave with the bull gear at crank angle 0"
+            "out": {
+              "angle": "bull-turn"
             }
           },
           {
@@ -25439,12 +25450,13 @@
               "O3"
             ],
             "in": {
-              "a": "A",
-              "pivot": "O3"
+              "kind": "rpr",
+              "a": "O3",
+              "p": "A",
+              "body": "lever"
             },
-            "out": "lever-angle",
-            "opts": {
-              "form": "rotating-slide"
+            "out": {
+              "angle": "lever-turn"
             }
           },
           {
@@ -25456,19 +25468,17 @@
               "rails"
             ],
             "in": {
+              "kind": "rrp",
               "a": "B",
               "r": "Lr",
-              "line": "O3",
-              "dir": [
+              "p": "O3",
+              "d": [
                 1,
                 0,
                 0
               ]
             },
-            "out": "C",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "C"
           }
         ],
         "points": [],
@@ -25620,11 +25630,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "offset",
-            "kind": "param",
-            "param": "e"
           }
         ],
         "plot": {
@@ -25636,7 +25641,7 @@
           {
             "text": "cut:return 2:1 here",
             "output": "ram-x",
-            "stat": "ratio",
+            "stat": "time-ratio",
             "value": 2,
             "tol": 0.005
           },
@@ -26091,8 +26096,8 @@
             "a": "coupler",
             "b": "follower",
             "at": [
-              23.93,
-              59.99,
+              23.928571428571,
+              59.990432910726,
               0
             ],
             "axis": [
@@ -26123,8 +26128,8 @@
             "a": "follower",
             "b": "rod",
             "at": [
-              25.89,
-              -49.99,
+              25.891183616361,
+              -49.989978912994,
               0
             ],
             "axis": [
@@ -26139,7 +26144,7 @@
             "a": "rod",
             "b": "ram",
             "at": [
-              198.81,
+              198.810245631739,
               0,
               0
             ],
@@ -26155,7 +26160,7 @@
             "a": "ram",
             "b": "ground",
             "at": [
-              198.81,
+              198.810245631739,
               0,
               0
             ],
@@ -26248,16 +26253,14 @@
               "O4"
             ],
             "in": {
-              "a": "A",
-              "b": "O4",
-              "ra": "b",
-              "rb": "c"
+              "a": "O4",
+              "b": "A",
+              "ra": "c",
+              "rb": "b",
+              "body": "follower"
             },
-            "branch": "open",
-            "out": "B",
-            "opts": {
-              "side": "right"
-            }
+            "branch": "branch",
+            "out": "B"
           },
           {
             "block": "slider-dyad",
@@ -26268,19 +26271,17 @@
               "rails"
             ],
             "in": {
+              "kind": "rrp",
               "a": "D",
               "r": "L",
-              "line": "O2",
-              "dir": [
+              "p": "O2",
+              "d": [
                 1,
                 0,
                 0
               ]
             },
-            "out": "E",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "E"
           }
         ],
         "points": [],
@@ -26303,10 +26304,8 @@
             "of": "B",
             "kind": "angle",
             "unit": "deg",
-            "between": [
-              "A",
-              "O4"
-            ]
+            "from": "A",
+            "to": "O4"
           }
         ],
         "fallback": null
@@ -26374,11 +26373,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "assembly",
-            "kind": "design",
-            "design": "branch"
           }
         ],
         "plot": [
@@ -26397,7 +26391,7 @@
           {
             "text": "time ratio about 1.5:1 here",
             "output": "ram-x",
-            "stat": "ratio",
+            "stat": "time-ratio",
             "value": 1.509,
             "tol": 0.005
           },
@@ -38573,18 +38567,33 @@
           {
             "id": "mesh",
             "type": "gear-mesh",
-            "a": "rotor",
-            "b": "ground",
+            "a": "ground",
+            "b": "rotor",
             "at": [
               -30,
               0,
               0
             ],
-            "z": [
-              45,
-              30
+            "axis": [
+              0,
+              0,
+              1
             ],
-            "internal": "rotor"
+            "za": 30,
+            "zb": 45,
+            "internal": true,
+            "carrier": "shaft",
+            "ca": [
+              0,
+              0,
+              0
+            ],
+            "cb": [
+              15,
+              0,
+              0
+            ],
+            "note": "the fixed external gear (30) inside the rotor's internal gear (45); relative to the shaft they turn 30/45 the same way"
           }
         ],
         "params": [
@@ -38629,24 +38638,21 @@
         ],
         "solve": [
           {
-            "block": "willis",
+            "block": "gear-mesh",
             "id": "phasing-gears",
             "joints": [
-              "E",
-              "mesh"
+              "mesh",
+              "E"
             ],
             "in": {
-              "carrier": "shaft",
-              "sun": "ground",
-              "planet": "rotor",
-              "zs": 30,
-              "zp": 45
+              "joint": "mesh",
+              "input": "-input",
+              "parent": "shaft"
             },
-            "out": "rotor-angle",
-            "opts": {
-              "planetInternal": true,
-              "note": "the rotor's internal gear rolls on the fixed gear: rotor angle = shaft angle / 3"
-            }
+            "out": {
+              "angle": "rotor-rel"
+            },
+            "note": "the rotor turns on the eccentric by -2/3 of the shaft's turn: rotor angle = shaft angle / 3"
           }
         ],
         "points": [
@@ -46101,12 +46107,9 @@
               "ra": "sp",
               "rb": "r"
             },
-            "branch": "parallelogram",
+            "branch": "coupling-branch",
             "out": "C2",
-            "opts": {
-              "side": "parallel",
-              "note": "the parallelogram root keeps the rod level; never the crossed root"
-            }
+            "note": "the parallelogram closure keeps the rod level; it passes the line of centres twice a turn, where the two closures meet"
           },
           {
             "block": "slider-dyad",
@@ -46117,19 +46120,17 @@
               "guide"
             ],
             "in": {
+              "kind": "rrp",
               "a": "C1",
               "r": "Lm",
-              "line": "W1",
-              "dir": [
+              "p": "W1",
+              "d": [
                 -1,
                 0,
                 0
               ]
             },
-            "out": "X",
-            "opts": {
-              "side": "ahead"
-            }
+            "out": "X"
           }
         ],
         "points": [
@@ -46152,11 +46153,16 @@
             "axis": "x"
           },
           {
+            "id": "wheel2-angle",
+            "of": "wheel2",
+            "kind": "angle",
+            "unit": "deg"
+          },
+          {
             "id": "wheel-ratio",
             "of": "wheel2",
             "kind": "speed-ratio",
-            "unit": "",
-            "relativeTo": "wheel1"
+            "unit": ""
           },
           {
             "id": "coupling-angle",
@@ -46166,10 +46172,11 @@
           },
           {
             "id": "rod-angle",
-            "of": "main",
+            "of": "X",
+            "from": "C1",
+            "to": "W1",
             "kind": "angle",
-            "unit": "deg",
-            "from": "guide line"
+            "unit": "deg"
           }
         ],
         "fallback": null

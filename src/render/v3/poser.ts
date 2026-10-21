@@ -40,6 +40,8 @@ export interface Poser {
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
    */
   sweep?(point: string, range?: [number, number], branches?: string[]): Vec3[][] | null;
+  /** The cycle phase (radians) at which a kin output reaches its max or min; null where the poser has no such output. */
+  phaseOf?(output: string, stat: "max" | "min"): number | null;
 }
 
 export const ID4: Mat4 = mat4(IDENTITY);
@@ -110,6 +112,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   };
   let at = NaN;
   let cached: ReturnType<Kinematics["pose"]> | null = null;
+  const phases = new Map<string, number | null>();
   const pose = (u: number, ctl?: Controls) => {
     if (ctl) return k.pose(u, { ...controls, ...ctl });
     if (u !== at || !cached) {
@@ -147,6 +150,24 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
         if (line.length) out.push(line);
       }
       return out.length ? out : null;
+    },
+    phaseOf: (output, stat) => {
+      const key = `${output}|${stat}`;
+      if (phases.has(key)) return phases.get(key)!;
+      let best: number | null = null;
+      let bv = stat === "max" ? -Infinity : Infinity;
+      const N = 720;
+      for (let i = 0; i < N; i++) {
+        const u = (i / N) * Math.PI * 2;
+        const v = k.pose(u, controls).outputs[output];
+        if (typeof v !== "number") break;
+        if (stat === "max" ? v > bv : v < bv) {
+          bv = v;
+          best = u;
+        }
+      }
+      phases.set(key, best);
+      return best;
     },
     span: (u, a, b) => {
       const P = pose(u);

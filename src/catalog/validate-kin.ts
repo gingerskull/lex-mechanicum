@@ -141,7 +141,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
     if (key === "kind" || key === "mode" || key === "form") return;
-    if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
+    // a name, or an expression of names (the kinematics evaluate both: "-input", "2*e")
+    const names = isStr(v) ? (v.match(/[A-Za-z_][A-Za-z0-9_-]*/g) ?? []).filter((n) => !/^(sin|cos|tan|sqrt|abs)$/.test(n)) : [];
+    if (!isStr(v) || !(known.has(v) || (/[-+*/^() ]/.test(v) && names.length > 0 && names.every((n) => known.has(n)))))
+      say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   for (const s of kin.solve) {
     const by = s.id;
@@ -154,7 +157,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     const outs = typeof s.out === "string" ? [s.out] : isObj(s.out) && !Array.isArray(s.out) ? Object.values(s.out) : arr(s.out);
     if (!outs.length || !outs.every(isStr)) say(`solve ${by}: out must name what the block produces`);
     for (const o of outs as string[]) known.add(o);
-    if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch)) say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);
+    // a design choice or one of its options, or a plain side of the closure where there is no real choice
+    if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch) && s.branch !== "left" && s.branch !== "right") say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);
     for (const j of arr(s.joints) as string[]) claim(j, `solve ${by}`);
   }
   if (kin.fallback !== null) {
@@ -168,7 +172,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
 
   for (const p of kin.points) {
     if (!bodies.has(p.body)) say(`point ${p.id}: body "${String(p.body)}" is not a body`);
-    if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every(isNum))) say(`point ${p.id}: local must be [x, y, z]`);
+    if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every((x) => isNum(x) || isStr(x)))) say(`point ${p.id}: local must be [x, y, z]`);
   }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);

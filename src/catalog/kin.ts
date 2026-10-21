@@ -27,7 +27,7 @@ export const TEACHING_VOCAB = {
   viewName: ["PLAN", "FRONT", "SIDE", "ISOMETRIC", "DIMETRIC"],
   viewKind: ["section", "detail"],
   control: ["driver", "param", "design", "selector"],
-  stat: ["range", "max", "min", "mean", "ratio", "phase", "dwell", "at"],
+  stat: ["range", "max", "min", "mean", "ratio", "time-ratio", "phase", "dwell", "at"],
 } as const;
 
 type Vec3 = [number, number, number] | [number, number];

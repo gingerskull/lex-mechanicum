@@ -68,7 +68,15 @@ export interface KinJoint {
   ca?: Vec; // optional axis points whose distance the mesh keeps constant
   cb?: Vec;
   // pin-in-slot: a carries the pin (at), b carries the slot, given by two points in the reference configuration
-  slot?: { from: Vec; to: Vec; /** n equal slots about the wheel axis through `center` (a Geneva wheel): the pin may be in any of them */ repeat?: number; center?: Vec };
+  slot?: {
+    from?: Vec;
+    to?: Vec;
+    /** n equal slots about the wheel axis through `center` (a Geneva wheel): the pin may be in any of them */
+    repeat?: number;
+    center?: Vec;
+    /** A curved slot instead: an arc about `center` (reference world) of `radius` (an expansion link). */
+    arc?: { center: Vec; radius: Num; from?: Num; to?: Num };
+  };
   // cam-contact: the pitch radius of the cam as a function of its angle, and the follower kind
   follower?: "roller" | "flat" | "knife";
   // flexure
@@ -105,6 +113,11 @@ export interface KinDriver {
   /** Rotary and oscillating: turns per cycle (default 1; an integer keeps K2) and a phase offset, degrees. */
   speed?: number;
   phase?: number;
+  /**
+   * Joint motion per unit of the driver's value (degrees or mm per unit, default 1): a driver read in its own units, a
+   * die position from -1 to +1 that turns a reverse arm 20 degrees per unit.
+   */
+  scale?: number;
   /** A selector's named options, each setting values of other drivers and params. */
   options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }>;
   value?: string; // a selector's current option
@@ -134,6 +147,12 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
+  /**
+   * A point's position as one number: its world `x`, `y` or `z`, or its distance (`radius`) from the point `relativeTo`
+   * (the world origin without one). Without an axis, a point with `relativeTo` gives the distance between the two.
+   */
+  axis?: "x" | "y" | "z" | "radius";
+  relativeTo?: string;
 }
 
 export interface Kin {

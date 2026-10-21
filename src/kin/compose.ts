@@ -44,6 +44,8 @@ export interface Setup {
   bodyFrame: Map<string, Xf>;
   refPts: Map<string, Vec3>;
   defaults: Map<string, number>;
+  /** The drivers' record defaults: the reference configuration the joints are given in, whatever the controls hold. */
+  refDefaults: Map<string, number>;
   refVals: Map<string, number>;
   trackers: Map<string, Tracker>;
   tables: Map<string, BranchTable>;
@@ -115,6 +117,8 @@ export class Kinematics {
     const drv = (controls as { drivers?: Record<string, number> } | undefined)?.drivers ?? {};
     const defaults = new Map<string, number>();
     for (const d of kin.drivers) defaults.set(d.id, drv[d.id] ?? d.default ?? 0);
+    const refDefaults = new Map<string, number>();
+    for (const d of kin.drivers) refDefaults.set(d.id, d.default ?? 0);
     for (const [id, v] of held) defaults.set(id, v);
 
     const num = (v: unknown): number => {
@@ -147,6 +151,7 @@ export class Kinematics {
       bodyFrame,
       refPts,
       defaults,
+      refDefaults,
       refVals: new Map(),
       trackers: new Map(),
       tables: new Map(),
@@ -208,7 +213,14 @@ export class Kinematics {
   /** The reference pose: every driver at its default; every body at the identity. */
   referencePose(controls?: Controls): Pose {
     const s = this.setup(controls);
-    return this.run(s, 0, this.defaultValues(s), "ref").pose;
+    return this.run(s, 0, this.refValues(s), "ref").pose;
+  }
+
+  /** Driver values of the reference configuration (the record's defaults). */
+  refValues(s: Setup): Record<string, number> {
+    const v: Record<string, number> = {};
+    for (const d of this.kin.drivers) v[d.id] = s.refDefaults.get(d.id) ?? 0;
+    return v;
   }
 
   defaultValues(s: Setup): Record<string, number> {
@@ -226,7 +238,7 @@ export class Kinematics {
     const warm = s.fbWarm;
     if (!warm || dist(warm.vals, vals) > step) {
       // continue from the reference pose along a straight path in driver space
-      const v0 = this.defaultValues(s);
+      const v0 = this.refValues(s);
       const m = Math.min(720, Math.max(1, Math.ceil(dist(v0, vals) / step)));
       let w: Map<string, Xf> | undefined;
       for (let i = 1; i <= m; i++) {
@@ -249,7 +261,7 @@ export class Kinematics {
 
   private ensureTables(s: Setup): void {
     if (s.tablesReady) return;
-    const v0 = this.defaultValues(s);
+    const v0 = this.refValues(s);
     // reference run: finds the stateful blocks and the declared closures
     s.trackers.clear();
     s.stateful = [];
@@ -370,7 +382,7 @@ class Run implements BlockCtx {
         if (!r) throw new KinError(`driver ${d.id}: unknown joint ${d.joint}`);
         const a = this.xfs.get(r.joint.a);
         if (!a) continue;
-        const dv = (this.vals[d.id] ?? 0) - (this.s.defaults.get(d.id) ?? 0);
+        const dv = ((this.vals[d.id] ?? 0) - (this.s.refDefaults.get(d.id) ?? 0)) * (d.scale ?? 1);
         this.xfs.set(r.joint.b, xf.mul(a, driverMotion(r, d, dv)));
         pending.splice(i, 1);
       }
@@ -589,7 +601,7 @@ class Run implements BlockCtx {
     }
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
+      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points, o.axis, o.relativeTo);
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {
@@ -608,7 +620,7 @@ class Run implements BlockCtx {
     return Math.atan2(v3.len(v3.cross(u, w)), v3.dot(u, w)) * R2D;
   }
 
-  private output(kind: string, of: string, points: Map<string, Vec3>): number | Vec3 | undefined {
+  private output(kind: string, of: string, points: Map<string, Vec3>, axis?: string, relativeTo?: string): number | Vec3 | undefined {
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);
@@ -617,6 +629,13 @@ class Run implements BlockCtx {
         const Xb = this.xfs.get(r.joint.b) ?? xf.id();
         return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));
       }
+    }
+    if (kind === "position" && points.has(of) && (axis || relativeTo)) {
+      const p = points.get(of)!;
+      const q = relativeTo ? points.get(relativeTo) : ([0, 0, 0] as Vec3);
+      if (!q) return undefined;
+      if (axis === "x" || axis === "y" || axis === "z") return p["xyz".indexOf(axis)]! - (relativeTo ? q["xyz".indexOf(axis)]! : 0);
+      return v3.dist(p, q);
     }
     if (kind === "path" || (kind === "position" && points.has(of))) return points.get(of);
     if (kind === "angle") {

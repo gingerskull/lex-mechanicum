@@ -37,20 +37,33 @@ const str = (v: unknown, what: string): string => {
 const spin = (c: BlockCtx, body: string, center: Vec3, axis: Vec3, ang: number): void => c.setXf(body, xf.rotAbout(center, axis, ang));
 
 /**
- * dyad (RRR). in: a, b (points), ra, rb (lengths: the link from a, the link from b), n (plane normal, default +z).
+ * dyad (RRR). in: a, b (points), ra, rb (lengths: the link from a, the link from b), n (plane normal, default +z),
+ * body (optional: the link from a, posed here by its turn about a, so a later block can read its other points).
  * out: the point closing both links. branch picks the side (+1: left of a→b seen from +n).
  */
 const dyad: BlockFn = (c, s) => {
   const i = s.in ?? {};
-  const sol = dyadRRR(c.vec(i.a), c.vec(i.b), c.num(i.ra), c.num(i.rb), i.n ? c.vec(i.n) : [0, 0, 1]);
+  const n: Vec3 = i.n ? c.vec(i.n) : [0, 0, 1];
+  const a = c.vec(i.a);
+  const sol = dyadRRR(a, c.vec(i.b), c.num(i.ra), c.num(i.rb), n);
   const k = c.root(sol.roots, sol.h);
   outPoint(c, s, sol.roots[k]);
+  if (typeof i.body === "string") {
+    const a0 = c.refVec(i.a);
+    const p0 = c.refPt(outName(s) ?? "");
+    const nn = v3.unit(n);
+    const ang = (d: Vec3) => Math.atan2(v3.dot(nn, v3.cross([1, 0, 0], d)), v3.dot([1, 0, 0], d));
+    const dAng = ang(v3.sub(sol.roots[k], a)) - ang(v3.sub(p0, a0));
+    c.setXf(i.body, xf.mul(xf.trans(v3.sub(a, a0)), xf.rotAbout(a0, nn, dAng)));
+  }
 };
 
 /**
  * slider-dyad. in.kind "rrp": a (pivot), r (link length), p, d (a point and direction of the slide). out: the point;
  * out.s: the slide coordinate. branch: +1 far along d, −1 near.
  * in.kind "rpr": a (slot link pivot), p (the pin's point), body (the slotted link, optional), n. out.angle, out.dist (deg, mm).
+ * in.kind "rpp": a (the pin), p, d (a point and direction of the slide; the slot is square to it). out: the slotted
+ * body's point on the slide; out.s: the slide coordinate.
  */
 const sliderDyad: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -60,6 +73,16 @@ const sliderDyad: BlockFn = (c, s) => {
     const k = c.root(sol.points, sol.h);
     outPoint(c, s, sol.points[k], typeof s.out === "string" ? "" : "p");
     outVal(c, s, sol.s[k], "s");
+    return;
+  }
+  if (kind === "rpp") {
+    // a pin in a straight slot square to the slide (Scotch yoke): the slotted body's point on the slide is the pin's
+    // projection on it, x = r cos θ exactly
+    const p0 = c.vec(i.p);
+    const d = v3.unit(c.vec(i.d));
+    const t = v3.dot(v3.sub(c.vec(i.a), p0), d);
+    outPoint(c, s, v3.add(p0, v3.mul(d, t)), typeof s.out === "string" ? "" : "p");
+    outVal(c, s, t, "s");
     return;
   }
   if (kind === "rpr") {
