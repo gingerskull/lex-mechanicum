@@ -81,7 +81,7 @@ export interface Package2 {
   solids: PackedSolid3[];
   /**
    * Engine v3: where the builder drew each body's top face, as a plane [nx, ny, nz, t] (unit normal along the body's
-   * axis, n · p = t) in the reference configuration. A teaching point of the body is drawn on it (src/render/v3/poser).
+   * axis, dot(n, p) = t) in the reference configuration. A teaching point of the body is drawn on it (src/render/v3/poser).
    */
   lifts?: Record<string, [number, number, number, number]>;
 }

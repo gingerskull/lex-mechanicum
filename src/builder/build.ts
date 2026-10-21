@@ -26,7 +26,7 @@ export interface Assembly {
   /** What the polish changed (exceptions only). */
   polish?: PolishApi["log"];
   placement: { slabs: number; stackMm: number; clevis: number; slabOf: Record<string, number> };
-  /** Each placed body's top face as a plane [nx, ny, nz, t] (n · p = t, reference configuration): teaching points ride it. */
+  /** Each placed body's top face as a plane [nx, ny, nz, t] (dot(n, p) = t, reference configuration): teaching points ride it. */
   lifts: Record<string, [number, number, number, number]>;
 }
 
@@ -60,7 +60,8 @@ function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
   for (const [b, [, s]] of ctx.placement.slab) {
     slabOf[b] = s;
     const r = ctx.extent(b);
-    if (!r) continue;
+    // a bevel gear stands where its cone says, so its points are drawn where the kinematics put them
+    if (!r || ctx.geoms.get(b)?.scaleTop !== undefined) continue;
     const n = r.frame.z;
     const o = r.frame.o;
     lifts[b] = [n[0], n[1], n[2], n[0] * o[0] + n[1] * o[1] + n[2] * o[2] + r.w1];

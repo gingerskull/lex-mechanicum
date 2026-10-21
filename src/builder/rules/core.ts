@@ -52,7 +52,8 @@ export const placement: Rule = {
       const slab = ctx.extent(id);
       if (!slab) continue;
       const fam = slab.frame;
-      const o = fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      // a bevel gear sits on its pitch cone: its outer pitch circle at its joint, wherever a slab would put it
+      const o = g.scaleTop !== undefined ? g.frame.o : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
       const body = ctx.kin.bodies.find((b) => b.id === id)!;
       const role = BODY_ROLE[body.role] ?? "link";
       const frame = { o, x: g.frame.x, z: fam.z };
@@ -65,7 +66,7 @@ export const placement: Rule = {
         body: id,
         frame,
         profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: extrudeOp(g.thick),
+        op: extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),

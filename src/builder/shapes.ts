@@ -2,7 +2,8 @@
 // reference configuration. A link, plate, slot link, slider, gear, disc, wheel and shaft get their true outline; a body
 // whose shape is a profile of its own (cam, cage, cross, custom) gets the disc or box that holds its joints, flagged
 // `approx`, until the pilots (P) and the rebuild (R) give it a profile of its own.
-import { TAU, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
+import { D2R, TAU, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
+import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import type { Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
@@ -23,6 +24,8 @@ export interface BodyGeom {
   pins: { joint: string; uv: Vec2; w: number }[];
   /** The shape the record gave. */
   shape: Record<string, unknown>;
+  /** A bevel gear's toothed frustum: the scale of its inner end, toward the apex along +z (D8). */
+  scaleTop?: number;
 }
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -43,7 +46,7 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -84,6 +87,11 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
       const z = num(shape.z, 20);
       const m = num(shape.module, 2);
       const bore = num(shape.bore, 6);
+      if (typeof shape.cone === "number") {
+        // a straight bevel gear: Tredgold's back-cone teeth at the outer end, tapering toward the apex over the face
+        const bv = bevel(z, m, shape.cone * D2R, num(shape.face, 0) || undefined);
+        return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner };
+      }
       return { profile: { outer: gearOutline(z, m), holes: [hole(bore / 2)] }, thick: num(shape.face, 10), approx: false };
     }
     case "ringGear": {
@@ -141,7 +149,33 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const pins = js.map((j) => ({ joint: j.joint.id, ...(({ uv, w }) => ({ uv, w }))(planeCoords(frame, j.at)) }));
     const shape = (b.shape ?? {}) as Record<string, unknown>;
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
-    out.set(b.id, { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape });
+    out.set(b.id, { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}) });
   }
+  phaseMeshes(kin, S, out);
   return out;
 }
+
+/**
+ * Gears in mesh are turned so a tooth of the first meets a gap of the second at the mesh point (J6, J9): an outline
+ * has a tooth on its x axis, so the first is turned to put one on the mesh point and the second half a tooth further.
+ * A gear already turned by an earlier mesh keeps its turn.
+ */
+function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
+  const turned = new Set<string>();
+  for (const j of kin.joints) {
+    if (j.type !== "gear-mesh") continue;
+    const at = S.joints.get(j.id)?.at;
+    if (!at) continue;
+    ([[j.a, 0], [j.b, 1]] as const).forEach(([id, k]) => {
+      const g = geoms.get(id);
+      if (!g || turned.has(id) || String(g.shape.type) !== "gear") return;
+      const z = num(g.shape.z, 20);
+      const uv = planeCoords(g.frame, at).uv;
+      const a = Math.atan2(uv[1], uv[0]) + (k ? Math.PI / z : 0);
+      if (Math.abs(a) > 1e-9) g.profile = { outer: rot(g.profile.outer, a), holes: g.profile.holes.map((h) => rot(h, a)) };
+      turned.add(id);
+    });
+  }
+}
+
+const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);

@@ -97,9 +97,11 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const live = spec.kind === "live";
 
   // ---- the members: a bearing in each turning part, a key and hub on each keyed one
+  // a bevel gear (its teeth taper toward +w, the apex) is keyed in its own bore, its shim pack at its back face (J9)
+  const isBevel = (m: Member) => ctx.geoms.get(m.body)?.scaleTop !== undefined;
   const seats: Seat[] = members.map((m, i) => {
     const b = fit.bearing[i] ?? null;
-    if (m.keyed && !moving) return { m, b: null, z0: m.w0, z1: m.w1 };
+    if (m.keyed && !moving) return { m, b: null, z0: m.w0 - (isBevel(m) ? (m.shim ?? 0) : 0), z1: m.w1 };
     const B = b ? b.B : Math.min(6, m.w1 - m.w0);
     const c = (m.w0 + m.w1) / 2;
     const z0 = half(c - B / 2);
@@ -141,7 +143,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const next = seats[i + 1];
     if (!next) return;
     const below = s.b || !s.m.keyed || moving ? s.z1 : s.m.w1;
-    const above = next.b || !next.m.keyed || moving ? next.z0 : next.m.w0;
+    const above = next.b || !next.m.keyed || moving ? next.z0 : next.z0;
     if (moving && s === anchor) {
       // the bolt's shoulder runs from the anchor's face
       if (above - s.m.w1 > SPACER_MIN) L.add(H.spacer(`${id}-${i}-sp`, d + 0.2, next.b ? innerRingD(next.b) : d + 3, { z0: s.m.w1, z1: above, body: turn }));
@@ -167,6 +169,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const hubH = 8;
     const hubD = d + 10;
     const sh = s.m.shim ?? 0;
+    if (isBevel(s.m)) {
+      if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm at the back face, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: s.m.w0 - sh, z1: s.m.w0, body: s.m.body, inset: true }));
+      return;
+    }
     if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: s.m.w1, z1: s.m.w1 + sh, body: s.m.body, inset: true }));
     L.add(H.collar(`${nm}-hub`, d, hubD, { body: s.m.body, z0: s.m.w1 + sh, z1: s.m.w1 + sh + hubH, name: `Clamp hub Ø${d}x${hubD}, two set screws at 90°` }));
     for (const k of [0, 1]) {
@@ -177,7 +183,8 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   });
 
   const lastSeat = seats[seats.length - 1]!;
-  const hubTop = keyedSeats.length && !endHeld ? Math.max(...keyedSeats.map((s) => s.m.w1 + (s.m.shim ?? 0) + 8)) : -Infinity;
+  const hubbed = keyedSeats.filter((s) => !isBevel(s.m));
+  const hubTop = hubbed.length && !endHeld ? Math.max(...hubbed.map((s) => s.m.w1 + (s.m.shim ?? 0) + 8)) : -Infinity;
   const zTop = Math.max(lastSeat.b || !lastSeat.m.keyed ? lastSeat.z1 : lastSeat.m.w1, hubTop, moving ? lastSeat.m.w1 : -Infinity);
   const first = members[0]!;
   const bt = spec.base?.top ?? first.w0 - 2;
@@ -222,8 +229,18 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
     const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });
     extra.push(...p.solids);
-    shaftSpec.z0 = p.shaft[0] - (live ? 6 : 0);
+    shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
     shaftSpec.z1 = p.shaft[1] + (live ? 12 : 0);
+    // a part overhung past both blocks is held on the shaft's end by a washer and a countersunk screw (J10, F2)
+    const top = members[members.length - 1]!;
+    if (live && Math.max(...p.w) < top.w0) {
+      const M = d >= 10 ? 5 : d >= 8 ? 4 : 3;
+      const wh = 1.5;
+      L.add(H.washer(`${id}-ew`, M + 0.4, d + 8, { body: turn, z0: top.w1, z1: top.w1 + wh, name: `End washer ${M + 0.4}x${d + 8}, holds the ${top.name.toLowerCase()} on the shaft end` }));
+      L.add(H.screw(`${id}-es`, "csk", M, 2 * M + wh, { body: turn, face: top.w1 + wh, dir: -1 }));
+      serve("F2", `${id}-ew`, `${id}-es`);
+      shaftSpec.z1 = top.w1;
+    }
     ctx.routes.push({ support: `${id}-pb`, site: id, kind: "pillow", tried: p.tried, moved: p.moved, covers: p.covers, gap: p.gap });
     for (const [f, ids] of Object.entries(p.serves)) serve(f, ...ids);
     p.covers.forEach((c) => ctx.covers.set(`${id}-pb-b0`, [...(ctx.covers.get(`${id}-pb-b0`) ?? []), c]));

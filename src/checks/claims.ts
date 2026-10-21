@@ -95,7 +95,9 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   let y: number[];
   if (o.kind === "speed-ratio") {
     // the turn of the output body per turn of the input, from the series of its angle
-    const angle = poses.map((p) => angleOf(p, o.of));
+    // the angle of `of`: an output or value of that name, else the body's own angle output
+    const via = outputs.find((q) => q.of === o.of && q.kind === "angle")?.id;
+    const angle = poses.map((p) => angleOf(p, o.of) ?? (via ? angleOf(p, via) : undefined));
     if (angle.some((a) => a === undefined)) return `output ${o.id}: no angle of ${o.of}`;
     const a = unwrap(angle as number[]);
     const xs = unwrap(x);

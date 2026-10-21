@@ -633,9 +633,11 @@ function frameObj(f: unknown): { o?: unknown; rot?: unknown } | undefined {
  * `at` joint, z is that joint's axis (sign fixed so its largest component is positive), and x points toward the first
  * other joint of the body that lies off that axis, so a link's x runs along it; a body with no such joint keeps the
  * world x (or, on an axis in plan, the world z) made perpendicular to its axis. Without an `at` joint the frame is the
- * world's.
+ * world's, and the ground's frame is always the world's.
  */
 export function bodyFrameOf(b: KinBody, list: KinJoint[], joints: Map<string, ResolvedJoint>, vec: (v: unknown) => Vec3): Xf {
+  // the ground is the world: its `frame` only places the plate its shape draws
+  if (b.id === "ground") return xf.id();
   const f = frameObj(b.frame) ?? frameObj(b.at?.frame);
   if (f && (f.o !== undefined || f.rot !== undefined)) return { R: m3.eulerDeg(f.rot !== undefined ? vec(f.rot) : [0, 0, 0]), t: f.o !== undefined ? vec(f.o) : [0, 0, 0] };
   const at = b.at?.joint ? joints.get(b.at.joint) : undefined;

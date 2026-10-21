@@ -24,25 +24,31 @@ const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), 
 // ---------------------------------------------------------------------------------------------------- stops (A22, F5)
 
 /** Angular range of a body about a site's axis over the cycle, radians, from the poses. */
-export function swingOf(ctx: BuildCtx, body: string, axis: Vec3): { lo: number; hi: number; range: number } {
+export function swingOf(ctx: BuildCtx, body: string, axis: Vec3): { lo: number; hi: number; range: number; reverses: boolean } {
   let prev = 0;
   let acc = 0;
   let lo = 0;
   let hi = 0;
+  let up = false;
+  let down = false;
   ctx.sampled.us.forEach((_, i) => {
     const a = xf.angleAbout(ctx.xfOf(body, i), axis);
     if (i === 0) {
       acc = a;
       prev = a;
     } else {
-      acc += wrapPi(a - prev);
+      const d = wrapPi(a - prev);
+      if (d > 1e-6) up = true;
+      if (d < -1e-6) down = true;
+      acc += d;
       prev = a;
     }
     if (i === 0) lo = hi = acc;
     lo = Math.min(lo, acc);
     hi = Math.max(hi, acc);
   });
-  return { lo, hi, range: hi - lo };
+  // a part that swings turns both ways in the cycle; a crank or a gear turns one way only
+  return { lo, hi, range: hi - lo, reverses: up && down };
 }
 
 export const stops: Rule = {
@@ -58,8 +64,9 @@ export const stops: Rule = {
         const ext = ctx.extent(b);
         if (!g || !ext) continue;
         const sw = swingOf(ctx, b, s.axis);
-        // only a part that swings (a rocker, a lever) gets stops; a crank turns past them
-        if (sw.range > TAU * 0.75 || sw.range < 0.02) continue;
+        // only a part that swings (a rocker, a lever) gets stops; a crank, or a gear that turns on through the cycle,
+        // turns past them
+        if (sw.range > TAU * 0.75 || sw.range < 0.02 || !sw.reverses) continue;
         const pivot = planeCoords(ext.frame, s.at).uv;
         const pts = g.profile.outer.map((q) => planeCoords(ext.frame, fromPlane(g.frame, q, 0)).uv);
         const reach = Math.max(...pts.map((p) => Math.hypot(p[0] - pivot[0], p[1] - pivot[1])));

@@ -111,12 +111,15 @@ function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: bo
       why: "carries the block on the base and takes its screws and dowels (F1)",
     }),
   )[0]!;
-  const pedTop = Math.max(FOOT + 1, P[2] - o.baseTop);
+  // the pedestal rises into the boss, short of its bore, so the shaft runs clear of the casting
+  const bore = b ? b.D / 2 + 0.15 : o.d / 2 + 0.02;
+  const pedTop = Math.max(FOOT + 1, P[2] - o.baseTop - bore - 1);
   const ped = place(
     st,
     H.plate(`${o.id}-ped`, rect(Math.max(2, hl - FOOT_PAST), Rb), { kind: "housing", role: "ground", name: "", z0: FOOT, z1: pedTop, mat: "Cast iron EN-GJL-250", joints: [o.id], group: o.id }),
   )[0]!;
-  const bf = frameAlong(unitAlong(o.f, o.wb - W / 2), a, st.x);
+  // the boss's x stands up, across the shaft (the stand's x runs along it)
+  const bf = frameAlong(unitAlong(o.f, o.wb - W / 2), a, [0, 0, 1]);
   const boss = place(
     bf,
     H.plate(`${o.id}`, H.disc(Rb), {
