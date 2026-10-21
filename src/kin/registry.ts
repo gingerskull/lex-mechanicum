@@ -315,7 +315,8 @@ export function gearDelta(c: BlockCtx, j: import("./types").KinJoint, dA: number
 /**
  * willis. in: zs, zr (sun and ring teeth), zp (planet teeth, optional), center and axis (the common axis),
  * sun, ring, carrier: two of them as values (deg) or numbers (a held member is 0), the third is solved;
- * bodies {sun, ring, carrier}, planets [{ body, center }]. out {sun, ring, carrier, planet}: the angles turned (deg).
+ * bodies {sun, ring, carrier}, planets [{ body, center }]. out {sun, ring, carrier, planet, spin}: the angles turned (deg);
+ * planet is a planet's turn in the world, spin its turn on its own pin (relative to the carrier).
  */
 const willisBlock: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -337,7 +338,11 @@ const willisBlock: BlockFn = (c, s) => {
     const own = xf.rotAbout(pc, axis, (w.planet ?? 0) - w.carrier);
     c.setXf(p.body, xf.mul(xf.rotAbout(centre, axis, w.carrier), own));
   }
-  if (w.planet !== null) outVal(c, s, w.planet * R2D, "planet");
+  if (w.planet !== null) {
+    outVal(c, s, w.planet * R2D, "planet");
+    // a planet's turn on its own pin, relative to the carrier
+    outVal(c, s, (w.planet - w.carrier) * R2D, "spin");
+  }
 };
 
 const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" ? l : "cycloidal");

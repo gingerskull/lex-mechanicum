@@ -4,7 +4,7 @@
 // `approx`, until the pilots (P) and the rebuild (R) give it a profile of its own.
 import { D2R, TAU, capsule, circle, gearOutline, rackOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
 import { bevel, bevelOutline } from "../core/spatial";
-import type { Kin, KinBody } from "../kin/types";
+import type { Kin, KinBody, KinJoint } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
@@ -79,6 +79,12 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick: THICK, approx: false };
     }
     case "plate": {
+      // a spider (a planet carrier): a hub and an arm out to each of the body's pins off its centre
+      if (typeof shape.arms === "number") {
+        const [hub, arm] = pair(shape.boss, [18, 10]);
+        const ends = pins.filter((p) => Math.hypot(p[0], p[1]) > 1);
+        return { profile: { outer: spider(ends, hub, arm), holes: [] }, thick: num(shape.thickness, 6), approx: false };
+      }
       const pts = Array.isArray(shape.outline) ? (shape.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]) : null;
       const r = num(shape.boss, 8.5);
       if (pts && pts.length >= 2) return { profile: { outer: roundedPoly(pts, r), holes: [] }, thick: THICK, approx: false };
@@ -185,6 +191,41 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
   return out;
 }
 
+/**
+ * A hub of radius `hub` at the origin with an arm of half-width `arm` out to each end, rounded round each end: the
+ * outline of the union, which is star-shaped about the origin, sampled along rays from it.
+ */
+export function spider(ends: Vec2[], hub: number, arm: number, n = 240): Vec2[] {
+  const exitOf = (d: Vec2): number => {
+    let t = hub;
+    for (const e of ends) {
+      const L = Math.hypot(e[0], e[1]);
+      const u: Vec2 = [e[0] / L, e[1] / L];
+      // the ray leaves the capsule [0, e] of radius arm at the largest t still within arm of the segment
+      const inside = (s: number) => {
+        const q: Vec2 = [s * d[0], s * d[1]];
+        const k = Math.max(0, Math.min(L, q[0] * u[0] + q[1] * u[1]));
+        return Math.hypot(q[0] - k * u[0], q[1] - k * u[1]) <= arm;
+      };
+      let lo = 0;
+      let hi = L + arm;
+      for (let i = 0; i < 40; i++) {
+        const m = (lo + hi) / 2;
+        if (inside(m)) lo = m;
+        else hi = m;
+      }
+      t = Math.max(t, lo);
+    }
+    return t;
+  };
+  return Array.from({ length: n }, (_, i): Vec2 => {
+    const a = (i * TAU) / n;
+    const d: Vec2 = [Math.cos(a), Math.sin(a)];
+    const t = exitOf(d);
+    return [t * d[0], t * d[1]];
+  });
+}
+
 /** The further levels of a compound gear (`cluster`: [{ z, module, face, bore }]), plain spur outlines. */
 function clusterLevels(shape: Record<string, unknown>): NonNullable<BodyGeom["levels"]> {
   if (String(shape.type) !== "gear" || !Array.isArray(shape.cluster)) return [];
@@ -206,43 +247,118 @@ export function meshLevel(g: BodyGeom | undefined, j: { a: string; b: string; za
 /** The placer's name for a body's k-th cluster level. */
 export const levelId = (body: string, k: number): string => (k ? `${body}#${k}` : body);
 
+/** Angle wrapped into [-h, h) for a period 2h. */
+const wrapTo = (a: number, h: number): number => a - 2 * h * Math.floor((a + h) / (2 * h));
+
 /**
- * Gears in mesh are turned so a tooth of the first meets a gap of the second at the mesh point (J6, J9): an outline
- * has a tooth on its x axis, so the first is turned to put one on the mesh point and the second half a tooth further.
- * A gear already turned by an earlier mesh keeps its turn.
+ * Gears in mesh are turned so a tooth of one meets a gap of the other at the mesh point (J6, J9). Every outline starts
+ * with a tooth (a ring: a gap) on its x axis; a gear's turn is set once, by the first mesh that reaches it from a gear
+ * already set, from where that gear's nearest tooth stands off the mesh point: a train of several meshes (a sun and
+ * its planets, the planets and their ring) then meshes everywhere. A crossed mesh puts a tooth of the first and a gap
+ * of the second on the mesh point.
  */
 function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
-  const turned = new Set<string>();
-  for (const j of kin.joints) {
-    if (j.type !== "gear-mesh") continue;
-    const at = S.joints.get(j.id)?.at;
-    if (!at) continue;
-    ([[j.a, 0], [j.b, 1]] as const).forEach(([id, k]) => {
-      const g = geoms.get(id);
-      if (g && String(g.shape.type) === "rack" && num(g.shape.module, 0) > 0 && !turned.has(id)) {
-        // a rack: a gap on the mesh point (its partner turned a tooth onto it)
-        const m = num(g.shape.module, 0);
-        const L = num(g.shape.length, 120);
-        const x = planeCoords(g.frame, at).uv[0];
-        g.profile = { outer: rackOutline(m, -L / 2, L / 2, num(g.shape.height, 20), x + (Math.PI * m) / 2), holes: g.profile.holes };
-        turned.add(id);
-        return;
+  type Side = { id: string; key: string; g: BodyGeom; kind: "gear" | "ring" | "rack"; z: number; m: number; lv: number };
+  const sideOf = (id: string, j: KinJoint): Side | null => {
+    const g = geoms.get(id);
+    if (!g) return null;
+    const t = String(g.shape.type);
+    if (t === "rack") return num(g.shape.module, 0) > 0 ? { id, key: id, g, kind: "rack", z: 0, m: num(g.shape.module, 0), lv: 0 } : null;
+    if (t === "ringGear") return { id, key: id, g, kind: "ring", z: num(g.shape.z, 40), m: num(g.shape.module, 3), lv: 0 };
+    if (t !== "gear" || j.ncg) return null;
+    const lv = meshLevel(g, j);
+    const L = lv ? g.levels![lv - 1]! : null;
+    return { id, key: levelId(id, lv), g, kind: "gear", z: L ? L.z : num(g.shape.z, 20), m: num(g.shape.module, 2), lv };
+  };
+  // a gear's reference turn: its tooth (a ring's gap) stands at this angle; a rack's teeth are centred at this x
+  const set = new Map<string, number>();
+  const apply = (s: Side, v: number): void => {
+    set.set(s.key, v);
+    if (s.kind === "rack") {
+      const L = num(s.g.shape.length, 120);
+      s.g.profile = { outer: rackOutline(s.m, -L / 2, L / 2, num(s.g.shape.height, 20), v), holes: s.g.profile.holes };
+      return;
+    }
+    if (Math.abs(v) < 1e-12) return;
+    if (s.lv) {
+      const L = s.g.levels![s.lv - 1]!;
+      L.profile = { outer: rot(L.profile.outer, v), holes: L.profile.holes.map((h) => rot(h, v)) };
+    } else s.g.profile = { outer: rot(s.g.profile.outer, v), holes: s.g.profile.holes.map((h) => rot(h, v)) };
+  };
+  const meshes = kin.joints.filter((j) => j.type === "gear-mesh" && S.joints.get(j.id));
+  const done = new Set<string>();
+  for (let guard = 0; done.size < meshes.length && guard < 4 * meshes.length + 4; guard++) {
+    let progress = false;
+    for (const j of meshes) {
+      if (done.has(j.id)) continue;
+      const P = S.joints.get(j.id)!.at;
+      const A = sideOf(j.a, j);
+      const B = sideOf(j.b, j);
+      if (!A || !B) {
+        done.add(j.id);
+        continue;
       }
-      if (!g || String(g.shape.type) !== "gear") return;
-      const lv = meshLevel(g, j);
-      const key = levelId(id, lv);
-      if (turned.has(key)) return;
-      const z = lv ? g.levels![lv - 1]!.z : num(g.shape.z, 20);
-      const uv = planeCoords(g.frame, at).uv;
-      const a = Math.atan2(uv[1], uv[0]) + (k ? Math.PI / z : 0);
-      if (Math.abs(a) > 1e-9) {
-        if (lv) {
-          const L = g.levels![lv - 1]!;
-          L.profile = { outer: rot(L.profile.outer, a), holes: L.profile.holes.map((h) => rot(h, a)) };
-        } else g.profile = { outer: rot(g.profile.outer, a), holes: g.profile.holes.map((h) => rot(h, a)) };
+      const knownA = set.has(A.key);
+      const knownB = set.has(B.key);
+      // a mesh no gear already set reaches waits; a new train is started below when nothing else moves
+      if (!knownA && !knownB) continue;
+      done.add(j.id);
+      progress = true;
+      if (knownA && knownB) continue;
+      const phi = (s: Side): number => {
+        const uv = planeCoords(s.g.frame, P).uv;
+        return Math.atan2(uv[1], uv[0]);
+      };
+      if (j.crossed) {
+        // a tooth of the first, a gap of the second on the mesh point
+        if (!knownA && A.kind !== "rack") apply(A, phi(A));
+        if (!knownB && B.kind !== "rack") apply(B, phi(B) + (B.kind === "ring" ? 0 : Math.PI / B.z));
+        continue;
       }
-      turned.add(key);
-    });
+      // the known side, the side to set
+      const [K, U] = knownA || (!knownB && A.kind !== "rack") ? [A, B] : [B, A];
+      if (!set.has(K.key)) apply(K, K.kind === "rack" ? planeCoords(K.g.frame, P).uv[0] : phi(K));
+      if (K.kind === "rack") {
+        // a pinion set from its rack: a tooth into the rack's gap nearest the mesh point
+        const p = Math.PI * K.m;
+        const x = planeCoords(K.g.frame, P).uv[0];
+        const d = wrapTo(x - set.get(K.key)! - p / 2, p / 2);
+        const t = v3.unit(v3.cross(U.g.frame.z, v3.sub(P, U.g.frame.o)));
+        const sgn = Math.sign(v3.dot(t, K.g.frame.x)) || 1;
+        apply(U, phi(U) - (sgn * d) / ((U.z * U.m) / 2));
+        continue;
+      }
+      // where K's nearest tooth (a ring: its nearest gap) stands off the mesh point, as an arc on the pitch circle
+      const off = wrapTo(phi(K) - set.get(K.key)!, Math.PI / K.z);
+      const arc = off * ((K.z * K.m) / 2);
+      if (U.kind === "rack") {
+        // the rack's gap where the pinion's tooth is, along the pinion's turning direction at the mesh
+        const t = v3.unit(v3.cross(K.g.frame.z, v3.sub(P, K.g.frame.o)));
+        const sgn = Math.sign(v3.dot(t, U.g.frame.x)) || 1;
+        const x = planeCoords(U.g.frame, P).uv[0];
+        apply(U, x - sgn * arc + (Math.PI * U.m) / 2);
+        continue;
+      }
+      const rU = (U.z * U.m) / 2;
+      const internal = K.kind === "ring" || U.kind === "ring";
+      if (internal) {
+        // both centres on one side: the pitch circles run the same way at the mesh, a tooth faces a gap
+        apply(U, phi(U) - arc / rU);
+      } else {
+        // the pitch circles run opposite ways at the mesh; U's gap faces K's tooth
+        apply(U, phi(U) + arc / rU + Math.PI / U.z);
+      }
+    }
+    if (!progress) {
+      // a new train: its first gear puts a tooth on the mesh point
+      const j = meshes.find((q) => !done.has(q.id));
+      if (!j) break;
+      const A = sideOf(j.a, j);
+      if (A && A.kind !== "rack" && !set.has(A.key)) {
+        const uv = planeCoords(A.g.frame, S.joints.get(j.id)!.at).uv;
+        apply(A, Math.atan2(uv[1], uv[0]));
+      } else if (A) set.set(A.key, 0);
+    }
   }
 }
 

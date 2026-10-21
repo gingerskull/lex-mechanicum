@@ -129,6 +129,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   // names a solve block or a point may read: bodies, joints, params, design choices, drivers, earlier outs
   const known = new Set<string>([...bodies, ...joints, ...params, ...design, ...drivers, ...points]);
   const claimed = new Map<string, string>();
+  // the values the blocks produce (an angle a block solves, such as a planet's turn on its pin): an output may read one
+  const blockOuts = new Set<string>();
   const claim = (jointId: string, by: string) => {
     if (!joints.has(jointId)) return say(`${by}: joint "${jointId}" is not a joint`);
     const prev = claimed.get(jointId);
@@ -153,7 +155,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     // a name, a list of names, or the block's keyed outputs ({ angle: "gear-turn" }, as src/kin/registry reads them)
     const outs = typeof s.out === "string" ? [s.out] : isObj(s.out) && !Array.isArray(s.out) ? Object.values(s.out) : arr(s.out);
     if (!outs.length || !outs.every(isStr)) say(`solve ${by}: out must name what the block produces`);
-    for (const o of outs as string[]) known.add(o);
+    for (const o of outs as string[]) {
+      known.add(o);
+      blockOuts.add(o);
+    }
     if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch)) say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);
     for (const j of arr(s.joints) as string[]) claim(j, `solve ${by}`);
   }
@@ -172,7 +177,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);
-    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point or joint`);
+    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !blockOuts.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or block out`);
   }
 
   // mobility (K11)
