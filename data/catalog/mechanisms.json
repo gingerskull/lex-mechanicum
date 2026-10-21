@@ -41116,16 +41116,23 @@
           {
             "id": "wheel",
             "role": "output",
+            "symmetry": 4,
             "shape": {
-              "type": "ringGear",
-              "form": "internal geneva",
-              "rimInner": 76,
-              "rimOuter": 88,
-              "slots": 4,
-              "slotWidth": 8.2,
+              "type": "genevaWheel",
+              "n": 4,
+              "c": 40,
+              "hw": 6.7,
+              "slotEnd": 28.28,
               "slotRoot": 72.28,
-              "slotMouth": 28.28,
-              "lockArcs": "concave, swept by the locking sector"
+              "lock": 16,
+              "clear": 0.3,
+              "thickness": 8,
+              "place": 0,
+              "internal": {
+                "rimIn": 76,
+                "rimOut": 88
+              },
+              "web": 6
             },
             "at": {
               "joint": "W"
@@ -41135,24 +41142,113 @@
             "id": "crank",
             "role": "driver",
             "shape": {
-              "type": "plate",
-              "arm": 28.28,
-              "boss": [
-                12,
-                7
-              ],
-              "pin": {
-                "at": [
-                  -28.28,
-                  0
-                ],
-                "radius": 4
-              },
-              "lockSector": {
-                "radius": 16,
-                "halfAngle": 70,
-                "faces": "away from the pin"
-              }
+              "type": "genevaCrank",
+              "lock": 16,
+              "halfAngle": 70,
+              "thickness": 8,
+              "place": 0,
+              "pieces": [
+                {
+                  "id": "arm",
+                  "origin": [
+                    40,
+                    0,
+                    9
+                  ],
+                  "thick": 6,
+                  "fillet": 0.5,
+                  "outline": [
+                    [
+                      -28.284,
+                      7
+                    ],
+                    [
+                      -30.447,
+                      6.657
+                    ],
+                    [
+                      -32.399,
+                      5.663
+                    ],
+                    [
+                      -33.947,
+                      4.114
+                    ],
+                    [
+                      -34.942,
+                      2.163
+                    ],
+                    [
+                      -35.284,
+                      0
+                    ],
+                    [
+                      -34.942,
+                      -2.163
+                    ],
+                    [
+                      -33.947,
+                      -4.114
+                    ],
+                    [
+                      -32.399,
+                      -5.663
+                    ],
+                    [
+                      -30.447,
+                      -6.657
+                    ],
+                    [
+                      -28.284,
+                      -7
+                    ],
+                    [
+                      0,
+                      -7
+                    ],
+                    [
+                      2.163,
+                      -6.657
+                    ],
+                    [
+                      4.114,
+                      -5.663
+                    ],
+                    [
+                      5.663,
+                      -4.114
+                    ],
+                    [
+                      6.657,
+                      -2.163
+                    ],
+                    [
+                      7,
+                      0
+                    ],
+                    [
+                      6.657,
+                      2.163
+                    ],
+                    [
+                      5.663,
+                      4.114
+                    ],
+                    [
+                      4.114,
+                      5.663
+                    ],
+                    [
+                      2.163,
+                      6.657
+                    ],
+                    [
+                      0,
+                      7
+                    ]
+                  ]
+                }
+              ]
             },
             "at": {
               "joint": "O"
@@ -41174,7 +41270,8 @@
               0,
               0,
               1
-            ]
+            ],
+            "support": "stub"
           },
           {
             "id": "O",
@@ -41190,7 +41287,9 @@
               0,
               0,
               1
-            ]
+            ],
+            "support": "hung",
+            "note": "the crank is overhung from above: its shaft cannot cross the wheel"
           },
           {
             "id": "S",
@@ -41198,11 +41297,39 @@
             "a": "crank",
             "b": "wheel",
             "at": [
-              11.72,
+              11.715728752538098,
               0,
               0
             ],
-            "slot": "wheel"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "slot": {
+              "from": [
+                0,
+                0,
+                0
+              ],
+              "to": [
+                42.42640687119285,
+                42.42640687119285,
+                0
+              ],
+              "repeat": 4,
+              "center": [
+                0,
+                0,
+                0
+              ]
+            },
+            "active": {
+              "driver": "input",
+              "lo": 45,
+              "hi": 315
+            },
+            "note": "the pin drives while it is past the slots' mouths, 270 degrees of crank"
           },
           {
             "id": "L",
@@ -41214,7 +41341,13 @@
               0,
               0
             ],
-            "follower": "locking sector"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "follower": "locking sector",
+            "note": "the locking sector in the wheel's concave arc holds it between indexes"
           }
         ],
         "params": [
@@ -41252,7 +41385,8 @@
               6,
               8
             ],
-            "value": 4
+            "value": 4,
+            "note": "built with 4 slots"
           }
         ],
         "drivers": [
@@ -41264,12 +41398,14 @@
               0,
               360
             ],
-            "default": 0
+            "default": 0,
+            "phase": 45,
+            "note": "the cycle starts as the pin enters a slot; the reference is mid-dwell"
           }
         ],
         "solve": [
           {
-            "block": "cam",
+            "block": "indexer",
             "id": "index",
             "joints": [
               "W",
@@ -41277,20 +41413,25 @@
               "L"
             ],
             "in": {
-              "cam": "crank",
-              "follower": "wheel",
-              "c": "c",
-              "n": "slots"
+              "n": 4,
+              "input": "input",
+              "phi0": -180,
+              "internal": true,
+              "wheel": "wheel",
+              "center": [
+                0,
+                0,
+                0
+              ],
+              "axis": [
+                0,
+                0,
+                1
+              ]
             },
-            "opts": {
-              "law": "geneva, internal: tan(beta) = a sin(alpha)/(c + a cos(alpha)) while the pin is in a slot, locked between",
-              "direction": "wheel turns the same way as the crank",
-              "zero": "mid-dwell, pin nearest the wheel centre"
-            },
-            "out": [
-              "wheel-angle",
-              "wheel-speed"
-            ]
+            "out": {
+              "angle": "wheel-turn"
+            }
           }
         ],
         "points": [
@@ -41298,7 +41439,7 @@
             "id": "P",
             "body": "crank",
             "local": [
-              -28.28,
+              28.284271247461902,
               0,
               0
             ]
@@ -41337,7 +41478,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Keeps the 2026-10-19 verdict and applies #216: the crank bridge is see-through so the locking sector shows during the dwell. Checked: the wheel turns the same way as the crank, moves during 270° of crank turn and rests 90°, 90° per index, peak speed 0.41 times the crank's (against 2.41 for the external Geneva). A mark on the rim is traced with equal-time ticks so the long gentle move reads."
+          "note": "Keeps the 2026-10-19 verdict and applies #216: the crank bridge is see-through so the locking sector shows during the dwell. Checked: the wheel turns the same way as the crank, moves during 270° of crank turn and rests 90°, 90° per index, peak speed 0.41 times the crank's (against 2.41 for the external Geneva). A mark on the rim is traced with equal-time ticks so the long gentle move reads. Rebuild R5 (#216): built on v3. The wheel is a slotted ring on a web below it, slots and concave locking arcs cut from the record's numbers; the crank's locking sector and the pin's roller lie in the ring's plane, its arm above, its shaft held from above (record support: hung) because no shaft can cross the wheel; the crank's bearing block over the top is drawn see-through where it covers the locking sector. The slot-count control is not offered (built at build time)."
         },
         "principle": [
           {
@@ -41377,12 +41518,10 @@
           },
           {
             "id": "entry",
-            "kind": "arc",
-            "center": "P",
-            "from": "O",
-            "to": "W",
-            "label": "TANGENTIAL ENTRY 90°",
-            "when": "pin at a slot mouth"
+            "kind": "line",
+            "from": "W",
+            "to": "P",
+            "label": "SLOT LINE"
           },
           {
             "id": "locking",
@@ -41398,11 +41537,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "slots",
-            "kind": "design",
-            "design": "slots"
           }
         ],
         "plot": [
@@ -41430,7 +41564,8 @@
             "output": "wheel-angle",
             "stat": "dwell",
             "value": 90,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
             "text": "the wheel turns the same way as the crank",

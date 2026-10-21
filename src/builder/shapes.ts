@@ -36,7 +36,7 @@ export interface BodyGeom {
    */
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
-  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number }[];
+  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; features?: import("../solids/types").Feature[] }[];
   /** Shapes cut from or added to the part (a cam's groove), in the part's own coordinates (D8: a boolean result). */
   features?: import("../solids/types").Feature[];
   /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
@@ -185,7 +185,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // `place`: the part starts that far along its frame's z, where the joints put it (a roller down in a groove), not on a slab
     const placed = typeof shape.place === "number" ? { exact: { offset: shape.place } } : g.exact || fixed ? { exact: { offset: 0 } } : {};
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.features ? { features: g.features } : {}), ...placed };
-    const built = universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? geom;
+    const built = universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? ringWheel(geom) ?? geom;
     out.set(b.id, withPieces(b, built));
   }
   phaseMeshes(kin, S, out);
@@ -495,4 +495,19 @@ function lobes(kin: Kin, b: KinBody, g: BodyGeom): BodyGeom | null {
     exact: { offset: typeof g.shape.place === "number" ? g.shape.place : -len / 2 },
     pieces,
   };
+}
+
+/**
+ * An internal Geneva wheel (`genevaWheel` with `internal`): its own part is the web under the ring (`web` thick, a plain
+ * disc on the wheel's shaft), so the shaft's stack ends below the ring where the crank's pin passes; the slotted ring is a
+ * piece of the body in the ring's plane, its slots and arcs cut as features.
+ */
+function ringWheel(g: BodyGeom): BodyGeom | null {
+  if (String(g.shape.type) !== "genevaWheel" || !g.shape.internal) return null;
+  const web = num(g.shape.web, 6);
+  const place = num(g.shape.place, 0);
+  const rOut = num((g.shape.internal as Record<string, unknown>).rimOut, 88);
+  const F = g.frame;
+  const ring = { id: `${g.id}-ring`, name: "", frame: { o: v3.add(F.o, v3.mul(F.z, place)), x: F.x, z: F.z }, profile: g.profile, h: g.thick, ...(g.features ? { features: g.features } : {}) };
+  return { ...g, profile: { outer: circle(rOut, 0, 0, 144), holes: [] }, thick: web, features: [], exact: { offset: place - web - 1 }, pieces: [...(g.pieces ?? []), ring] };
 }

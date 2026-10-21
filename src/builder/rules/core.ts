@@ -80,7 +80,7 @@ export const placement: Rule = {
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);
