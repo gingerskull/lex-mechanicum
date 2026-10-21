@@ -109,7 +109,7 @@ export interface KinDriver {
   speed?: number;
   phase?: number;
   /** A selector's named options, each setting values of other drivers and params. */
-  options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }>;
+  options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }> | { id: string; drivers?: Record<string, number>; params?: Record<string, number> }[];
   value?: string; // a selector's current option
 }
 

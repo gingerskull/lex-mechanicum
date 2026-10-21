@@ -46657,13 +46657,13 @@
             "a": "hub-in",
             "b": "disc",
             "at": [
-              21,
-              12.12,
+              "e*cos(30)^2",
+              "e*cos(30)*sin(30)",
               15.5
             ],
             "axis": [
-              0.866,
-              0.5,
+              "cos(30)",
+              "sin(30)",
               0
             ],
             "limits": [
@@ -46678,13 +46678,13 @@
             "a": "disc",
             "b": "hub-out",
             "at": [
-              21,
-              12.12,
+              "e*cos(30)^2",
+              "e*cos(30)*sin(30)",
               15.5
             ],
             "axis": [
-              -0.5,
-              0.866,
+              "-sin(30)",
+              "cos(30)",
               0
             ],
             "limits": [
@@ -46699,7 +46699,7 @@
             "a": "ground",
             "b": "hub-out",
             "at": [
-              28,
+              "e",
               0,
               31
             ],
@@ -46775,7 +46775,7 @@
         ],
         "solve": [
           {
-            "block": "slider-dyad",
+            "block": "cross-slide",
             "id": "disc-centre",
             "joints": [
               "T1",
@@ -46783,21 +46783,21 @@
               "O2"
             ],
             "in": {
-              "a": "orbit-centre",
-              "ra": "e",
-              "b": "O1",
-              "dir": "hub-in"
+              "input": "input",
+              "joints": {
+                "in": "O1",
+                "out": "O2"
+              },
+              "slide": "T1",
+              "body": "disc",
+              "center": "C"
+            },
+            "out": {
+              "orbit": "orbit-turn"
             },
             "opts": {
-              "ra_scale": 0.5,
-              "construction": "C lies on the input slot line through O1 and on the circle of diameter O1 O2 (it sees O1 and O2 at a right angle)",
-              "root": "the root other than O1",
-              "angles": "disc and output hub keep the input angle: two prismatic pairs at right angles on one rigid disc"
-            },
-            "out": [
-              "disc",
-              "hub-out"
-            ]
+              "construction": "the disc turns with both shafts; its centre lies on the input slot line and on the output slot line, square to it, so it sees O1 and O2 at a right angle (Thales): a circle of diameter e, run twice per turn"
+            }
           }
         ],
         "points": [
@@ -46814,9 +46814,9 @@
             "id": "orbit-centre",
             "body": "ground",
             "local": [
+              14,
               0,
-              0,
-              25.5
+              15.5
             ]
           },
           {
@@ -46858,10 +46858,10 @@
           },
           {
             "id": "orbit-angle",
-            "of": "C",
+            "of": "orbit-turn",
             "kind": "angle",
             "unit": "deg",
-            "note": "angle of C about the orbit centre"
+            "note": "angle of C about the orbit centre, from the reference"
           },
           {
             "id": "disc-centre-path",
@@ -48936,10 +48936,23 @@
                 16
               ]
             },
-            "at": {
-              "joint": "F1"
-            },
-            "frame": "local x along the cage axis (the bisecting plane's normal), local y in the plane of the shafts"
+            "frame": {
+              "o": [
+                0,
+                0,
+                "H"
+              ],
+              "z": [
+                "cos(beta/2)",
+                "sin(beta/2)",
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            }
           },
           {
             "id": "ball-1",
@@ -48950,8 +48963,22 @@
               "profile": "sphere of diameter 16",
               "diameter": 16
             },
-            "at": {
-              "joint": "W1"
+            "frame": {
+              "o": [
+                "Rp*sin(90)*sin(beta/2)/sqrt(sin(90)^2+cos(90)^2*cos(beta/2)^2)",
+                "-Rp*sin(90)*cos(beta/2)/sqrt(sin(90)^2+cos(90)^2*cos(beta/2)^2)",
+                "H+Rp*cos(90)*cos(beta/2)/sqrt(sin(90)^2+cos(90)^2*cos(beta/2)^2)"
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           },
           {
@@ -48963,8 +48990,22 @@
               "profile": "sphere of diameter 16",
               "diameter": 16
             },
-            "at": {
-              "joint": "W2"
+            "frame": {
+              "o": [
+                "Rp*sin(150)*sin(beta/2)/sqrt(sin(150)^2+cos(150)^2*cos(beta/2)^2)",
+                "-Rp*sin(150)*cos(beta/2)/sqrt(sin(150)^2+cos(150)^2*cos(beta/2)^2)",
+                "H+Rp*cos(150)*cos(beta/2)/sqrt(sin(150)^2+cos(150)^2*cos(beta/2)^2)"
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           },
           {
@@ -48976,8 +49017,22 @@
               "profile": "sphere of diameter 16",
               "diameter": 16
             },
-            "at": {
-              "joint": "W3"
+            "frame": {
+              "o": [
+                "Rp*sin(210)*sin(beta/2)/sqrt(sin(210)^2+cos(210)^2*cos(beta/2)^2)",
+                "-Rp*sin(210)*cos(beta/2)/sqrt(sin(210)^2+cos(210)^2*cos(beta/2)^2)",
+                "H+Rp*cos(210)*cos(beta/2)/sqrt(sin(210)^2+cos(210)^2*cos(beta/2)^2)"
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           },
           {
@@ -48989,8 +49044,22 @@
               "profile": "sphere of diameter 16",
               "diameter": 16
             },
-            "at": {
-              "joint": "W4"
+            "frame": {
+              "o": [
+                "Rp*sin(270)*sin(beta/2)/sqrt(sin(270)^2+cos(270)^2*cos(beta/2)^2)",
+                "-Rp*sin(270)*cos(beta/2)/sqrt(sin(270)^2+cos(270)^2*cos(beta/2)^2)",
+                "H+Rp*cos(270)*cos(beta/2)/sqrt(sin(270)^2+cos(270)^2*cos(beta/2)^2)"
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           },
           {
@@ -49002,8 +49071,22 @@
               "profile": "sphere of diameter 16",
               "diameter": 16
             },
-            "at": {
-              "joint": "W5"
+            "frame": {
+              "o": [
+                "Rp*sin(330)*sin(beta/2)/sqrt(sin(330)^2+cos(330)^2*cos(beta/2)^2)",
+                "-Rp*sin(330)*cos(beta/2)/sqrt(sin(330)^2+cos(330)^2*cos(beta/2)^2)",
+                "H+Rp*cos(330)*cos(beta/2)/sqrt(sin(330)^2+cos(330)^2*cos(beta/2)^2)"
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           },
           {
@@ -49015,8 +49098,22 @@
               "profile": "sphere of diameter 16",
               "diameter": 16
             },
-            "at": {
-              "joint": "W6"
+            "frame": {
+              "o": [
+                "Rp*sin(390)*sin(beta/2)/sqrt(sin(390)^2+cos(390)^2*cos(beta/2)^2)",
+                "-Rp*sin(390)*cos(beta/2)/sqrt(sin(390)^2+cos(390)^2*cos(beta/2)^2)",
+                "H+Rp*cos(390)*cos(beta/2)/sqrt(sin(390)^2+cos(390)^2*cos(beta/2)^2)"
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           }
         ],
@@ -49029,7 +49126,7 @@
             "at": [
               -60,
               0,
-              80
+              "H"
             ],
             "axis": [
               1,
@@ -49043,13 +49140,13 @@
             "a": "ground",
             "b": "outer",
             "at": [
-              51.96,
-              30,
-              80
+              "60*cos(beta)",
+              "60*sin(beta)",
+              "H"
             ],
             "axis": [
-              0.866,
-              0.5,
+              "cos(beta)",
+              "sin(beta)",
               0
             ]
           },
@@ -49061,7 +49158,7 @@
             "at": [
               0,
               0,
-              80
+              "H"
             ],
             "note": "cage inner sphere on the inner race, concentric at J"
           },
@@ -49073,279 +49170,111 @@
             "at": [
               0,
               0,
-              80
+              "H"
             ],
             "note": "cage outer sphere in the bell, concentric at J"
           },
           {
             "id": "W1",
-            "type": "pin-in-slot",
+            "type": "planar",
             "a": "ball-1",
             "b": "cage",
             "at": [
-              -6.47,
-              24.15,
-              80
+              "Rp*sin(90)*sin(beta/2)/sqrt(sin(90)^2+cos(90)^2*cos(beta/2)^2)",
+              "-Rp*sin(90)*cos(beta/2)/sqrt(sin(90)^2+cos(90)^2*cos(beta/2)^2)",
+              "H+Rp*cos(90)*cos(beta/2)/sqrt(sin(90)^2+cos(90)^2*cos(beta/2)^2)"
             ],
-            "slot": {
-              "body": "cage",
-              "path": "window 1: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
-            }
+            "axis": [
+              "cos(beta/2)",
+              "sin(beta/2)",
+              0
+            ],
+            "note": "ball 1 in its cage window: its centre held in the cage's mid-plane, free to shift a little round the window; it also runs in inner groove 1 and outer groove 1 (higher pairs built as the races' grooves)"
           },
           {
             "id": "W2",
-            "type": "pin-in-slot",
+            "type": "planar",
             "a": "ball-2",
             "b": "cage",
             "at": [
-              -3.32,
-              12.39,
-              58.54
+              "Rp*sin(150)*sin(beta/2)/sqrt(sin(150)^2+cos(150)^2*cos(beta/2)^2)",
+              "-Rp*sin(150)*cos(beta/2)/sqrt(sin(150)^2+cos(150)^2*cos(beta/2)^2)",
+              "H+Rp*cos(150)*cos(beta/2)/sqrt(sin(150)^2+cos(150)^2*cos(beta/2)^2)"
             ],
-            "slot": {
-              "body": "cage",
-              "path": "window 2: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
-            }
+            "axis": [
+              "cos(beta/2)",
+              "sin(beta/2)",
+              0
+            ],
+            "note": "ball 2 in its cage window: its centre held in the cage's mid-plane, free to shift a little round the window; it also runs in inner groove 2 and outer groove 2 (higher pairs built as the races' grooves)"
           },
           {
             "id": "W3",
-            "type": "pin-in-slot",
+            "type": "planar",
             "a": "ball-3",
             "b": "cage",
             "at": [
-              3.32,
-              -12.39,
-              58.54
+              "Rp*sin(210)*sin(beta/2)/sqrt(sin(210)^2+cos(210)^2*cos(beta/2)^2)",
+              "-Rp*sin(210)*cos(beta/2)/sqrt(sin(210)^2+cos(210)^2*cos(beta/2)^2)",
+              "H+Rp*cos(210)*cos(beta/2)/sqrt(sin(210)^2+cos(210)^2*cos(beta/2)^2)"
             ],
-            "slot": {
-              "body": "cage",
-              "path": "window 3: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
-            }
+            "axis": [
+              "cos(beta/2)",
+              "sin(beta/2)",
+              0
+            ],
+            "note": "ball 3 in its cage window: its centre held in the cage's mid-plane, free to shift a little round the window; it also runs in inner groove 3 and outer groove 3 (higher pairs built as the races' grooves)"
           },
           {
             "id": "W4",
-            "type": "pin-in-slot",
+            "type": "planar",
             "a": "ball-4",
             "b": "cage",
             "at": [
-              6.47,
-              -24.15,
-              80
+              "Rp*sin(270)*sin(beta/2)/sqrt(sin(270)^2+cos(270)^2*cos(beta/2)^2)",
+              "-Rp*sin(270)*cos(beta/2)/sqrt(sin(270)^2+cos(270)^2*cos(beta/2)^2)",
+              "H+Rp*cos(270)*cos(beta/2)/sqrt(sin(270)^2+cos(270)^2*cos(beta/2)^2)"
             ],
-            "slot": {
-              "body": "cage",
-              "path": "window 4: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
-            }
+            "axis": [
+              "cos(beta/2)",
+              "sin(beta/2)",
+              0
+            ],
+            "note": "ball 4 in its cage window: its centre held in the cage's mid-plane, free to shift a little round the window; it also runs in inner groove 4 and outer groove 4 (higher pairs built as the races' grooves)"
           },
           {
             "id": "W5",
-            "type": "pin-in-slot",
+            "type": "planar",
             "a": "ball-5",
             "b": "cage",
             "at": [
-              3.32,
-              -12.39,
-              101.46
+              "Rp*sin(330)*sin(beta/2)/sqrt(sin(330)^2+cos(330)^2*cos(beta/2)^2)",
+              "-Rp*sin(330)*cos(beta/2)/sqrt(sin(330)^2+cos(330)^2*cos(beta/2)^2)",
+              "H+Rp*cos(330)*cos(beta/2)/sqrt(sin(330)^2+cos(330)^2*cos(beta/2)^2)"
             ],
-            "slot": {
-              "body": "cage",
-              "path": "window 5: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
-            }
+            "axis": [
+              "cos(beta/2)",
+              "sin(beta/2)",
+              0
+            ],
+            "note": "ball 5 in its cage window: its centre held in the cage's mid-plane, free to shift a little round the window; it also runs in inner groove 5 and outer groove 5 (higher pairs built as the races' grooves)"
           },
           {
             "id": "W6",
-            "type": "pin-in-slot",
+            "type": "planar",
             "a": "ball-6",
             "b": "cage",
             "at": [
-              -3.32,
-              12.39,
-              101.46
+              "Rp*sin(390)*sin(beta/2)/sqrt(sin(390)^2+cos(390)^2*cos(beta/2)^2)",
+              "-Rp*sin(390)*cos(beta/2)/sqrt(sin(390)^2+cos(390)^2*cos(beta/2)^2)",
+              "H+Rp*cos(390)*cos(beta/2)/sqrt(sin(390)^2+cos(390)^2*cos(beta/2)^2)"
             ],
-            "slot": {
-              "body": "cage",
-              "path": "window 6: holds the ball centre in the cage's mid-plane, free to shift a little round the cage"
-            }
-          },
-          {
-            "id": "G1",
-            "type": "pin-in-slot",
-            "a": "ball-1",
-            "b": "inner",
-            "at": [
-              -6.47,
-              24.15,
-              80
+            "axis": [
+              "cos(beta/2)",
+              "sin(beta/2)",
+              0
             ],
-            "slot": {
-              "body": "inner",
-              "path": "groove 1, centre offset 3 mm toward the input side of J"
-            }
-          },
-          {
-            "id": "G2",
-            "type": "pin-in-slot",
-            "a": "ball-2",
-            "b": "inner",
-            "at": [
-              -3.32,
-              12.39,
-              58.54
-            ],
-            "slot": {
-              "body": "inner",
-              "path": "groove 2, centre offset 3 mm toward the input side of J"
-            }
-          },
-          {
-            "id": "G3",
-            "type": "pin-in-slot",
-            "a": "ball-3",
-            "b": "inner",
-            "at": [
-              3.32,
-              -12.39,
-              58.54
-            ],
-            "slot": {
-              "body": "inner",
-              "path": "groove 3, centre offset 3 mm toward the input side of J"
-            }
-          },
-          {
-            "id": "G4",
-            "type": "pin-in-slot",
-            "a": "ball-4",
-            "b": "inner",
-            "at": [
-              6.47,
-              -24.15,
-              80
-            ],
-            "slot": {
-              "body": "inner",
-              "path": "groove 4, centre offset 3 mm toward the input side of J"
-            }
-          },
-          {
-            "id": "G5",
-            "type": "pin-in-slot",
-            "a": "ball-5",
-            "b": "inner",
-            "at": [
-              3.32,
-              -12.39,
-              101.46
-            ],
-            "slot": {
-              "body": "inner",
-              "path": "groove 5, centre offset 3 mm toward the input side of J"
-            }
-          },
-          {
-            "id": "G6",
-            "type": "pin-in-slot",
-            "a": "ball-6",
-            "b": "inner",
-            "at": [
-              -3.32,
-              12.39,
-              101.46
-            ],
-            "slot": {
-              "body": "inner",
-              "path": "groove 6, centre offset 3 mm toward the input side of J"
-            }
-          },
-          {
-            "id": "H1",
-            "type": "pin-in-slot",
-            "a": "ball-1",
-            "b": "outer",
-            "at": [
-              -6.47,
-              24.15,
-              80
-            ],
-            "slot": {
-              "body": "outer",
-              "path": "groove 1, centre offset 3 mm toward the output side of J"
-            }
-          },
-          {
-            "id": "H2",
-            "type": "pin-in-slot",
-            "a": "ball-2",
-            "b": "outer",
-            "at": [
-              -3.32,
-              12.39,
-              58.54
-            ],
-            "slot": {
-              "body": "outer",
-              "path": "groove 2, centre offset 3 mm toward the output side of J"
-            }
-          },
-          {
-            "id": "H3",
-            "type": "pin-in-slot",
-            "a": "ball-3",
-            "b": "outer",
-            "at": [
-              3.32,
-              -12.39,
-              58.54
-            ],
-            "slot": {
-              "body": "outer",
-              "path": "groove 3, centre offset 3 mm toward the output side of J"
-            }
-          },
-          {
-            "id": "H4",
-            "type": "pin-in-slot",
-            "a": "ball-4",
-            "b": "outer",
-            "at": [
-              6.47,
-              -24.15,
-              80
-            ],
-            "slot": {
-              "body": "outer",
-              "path": "groove 4, centre offset 3 mm toward the output side of J"
-            }
-          },
-          {
-            "id": "H5",
-            "type": "pin-in-slot",
-            "a": "ball-5",
-            "b": "outer",
-            "at": [
-              3.32,
-              -12.39,
-              101.46
-            ],
-            "slot": {
-              "body": "outer",
-              "path": "groove 5, centre offset 3 mm toward the output side of J"
-            }
-          },
-          {
-            "id": "H6",
-            "type": "pin-in-slot",
-            "a": "ball-6",
-            "b": "outer",
-            "at": [
-              -3.32,
-              12.39,
-              101.46
-            ],
-            "slot": {
-              "body": "outer",
-              "path": "groove 6, centre offset 3 mm toward the output side of J"
-            }
+            "note": "ball 6 in its cage window: its centre held in the cage's mid-plane, free to shift a little round the window; it also runs in inner groove 6 and outer groove 6 (higher pairs built as the races' grooves)"
           }
         ],
         "params": [
@@ -49380,6 +49309,14 @@
             "min": 1,
             "max": 6,
             "note": "groove centre offset either side of J, which steers the balls into the bisecting plane"
+          },
+          {
+            "id": "H",
+            "value": 80,
+            "unit": "mm",
+            "min": 60,
+            "max": 100,
+            "note": "shaft axis height above the base"
           }
         ],
         "design": [],
@@ -49397,7 +49334,7 @@
         ],
         "solve": [
           {
-            "block": "homokinetic",
+            "block": "rzeppa",
             "id": "cv",
             "joints": [
               "B2",
@@ -49408,39 +49345,49 @@
               "W3",
               "W4",
               "W5",
-              "W6",
-              "G1",
-              "G2",
-              "G3",
-              "G4",
-              "G5",
-              "G6",
-              "H1",
-              "H2",
-              "H3",
-              "H4",
-              "H5",
-              "H6"
+              "W6"
             ],
             "in": {
               "input": "input",
-              "beta": "beta",
-              "Rp": "Rp"
+              "joints": {
+                "in": "B1",
+                "out": "B2"
+              },
+              "center": "F1",
+              "cage": "cage",
+              "balls": [
+                {
+                  "body": "ball-1",
+                  "phase": 90
+                },
+                {
+                  "body": "ball-2",
+                  "phase": 150
+                },
+                {
+                  "body": "ball-3",
+                  "phase": 210
+                },
+                {
+                  "body": "ball-4",
+                  "phase": 270
+                },
+                {
+                  "body": "ball-5",
+                  "phase": 330
+                },
+                {
+                  "body": "ball-6",
+                  "phase": 390
+                }
+              ],
+              "rp": "Rp"
             },
-            "out": [
-              "outer",
-              "cage",
-              "ball-1",
-              "ball-2",
-              "ball-3",
-              "ball-4",
-              "ball-5",
-              "ball-6"
-            ],
+            "out": {
+              "tilt": "cage-tilt"
+            },
             "opts": {
-              "balls": 6,
-              "phase0": 90,
-              "relation": "cage in the plane through J whose normal bisects the shaft axes; ball k at the intersection of that plane with inner groove k (meridian angle theta + 90 + 60k about the input axis), radius Rp from J; output angle = input angle"
+              "relation": "output angle = input angle; the cage turns about the bisector of the two shaft axes, tilted beta/2 from each; ball k where the bisecting plane meets inner groove k (meridian at theta + 90 + 60(k-1) about the input axis), Rp from J"
             }
           }
         ],
@@ -49458,9 +49405,9 @@
             "id": "cage-normal",
             "body": "cage",
             "local": [
-              45,
               0,
-              0
+              0,
+              45
             ]
           },
           {
@@ -49476,18 +49423,18 @@
             "id": "in-ext",
             "body": "inner",
             "local": [
-              105,
               0,
-              0
+              0,
+              105
             ]
           },
           {
             "id": "out-ext",
             "body": "outer",
             "local": [
-              -15,
               0,
-              0
+              0,
+              -15
             ]
           },
           {
@@ -49520,7 +49467,7 @@
           },
           {
             "id": "cage-tilt",
-            "of": "cage",
+            "of": "cage-tilt",
             "kind": "angle",
             "unit": "deg",
             "note": "tilt of the cage axis from the input axis"
@@ -49530,7 +49477,12 @@
             "of": "ball-1-centre",
             "kind": "position",
             "unit": "mm",
-            "note": "ball 1 centre along the input axis, from J, in the inner race"
+            "note": "ball 1 centre along the input axis, from J",
+            "along": [
+              1,
+              0,
+              0
+            ]
           },
           {
             "id": "ball-path",
@@ -50022,6 +49974,23 @@
             },
             "at": {
               "joint": "O1"
+            },
+            "frame": {
+              "o": [
+                0,
+                0,
+                0
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           },
           {
@@ -50093,8 +50062,22 @@
                 ]
               }
             },
-            "at": {
-              "joint": "QA1"
+            "frame": {
+              "o": [
+                "e/2",
+                "side*sqrt(L^2-(e/2)^2)",
+                12
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           },
           {
@@ -50168,6 +50151,23 @@
             },
             "at": {
               "joint": "O3"
+            },
+            "frame": {
+              "o": [
+                "e",
+                0,
+                24
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ]
             }
           }
         ],
@@ -50194,8 +50194,8 @@
             "a": "disc-in",
             "b": "link-a1",
             "at": [
-              44,
-              0,
+              "0+r*cos(0)",
+              "0+r*sin(0)",
               6
             ],
             "axis": [
@@ -50210,8 +50210,8 @@
             "a": "disc-in",
             "b": "link-a2",
             "at": [
-              -22,
-              38.11,
+              "0+r*cos(120)",
+              "0+r*sin(120)",
               6
             ],
             "axis": [
@@ -50226,8 +50226,8 @@
             "a": "disc-in",
             "b": "link-a3",
             "at": [
-              -22,
-              -38.11,
+              "0+r*cos(240)",
+              "0+r*sin(240)",
               6
             ],
             "axis": [
@@ -50242,8 +50242,8 @@
             "a": "link-a1",
             "b": "disc-mid",
             "at": [
-              69,
-              54.54,
+              "e/2+r*cos(0)",
+              "side*sqrt(L^2-(e/2)^2)+r*sin(0)",
               12
             ],
             "axis": [
@@ -50258,8 +50258,8 @@
             "a": "link-a2",
             "b": "disc-mid",
             "at": [
-              3,
-              92.65,
+              "e/2+r*cos(120)",
+              "side*sqrt(L^2-(e/2)^2)+r*sin(120)",
               12
             ],
             "axis": [
@@ -50274,8 +50274,8 @@
             "a": "link-a3",
             "b": "disc-mid",
             "at": [
-              3,
-              16.44,
+              "e/2+r*cos(240)",
+              "side*sqrt(L^2-(e/2)^2)+r*sin(240)",
               12
             ],
             "axis": [
@@ -50290,8 +50290,8 @@
             "a": "disc-mid",
             "b": "link-b1",
             "at": [
-              47,
-              92.65,
+              "e/2+r*cos(60)",
+              "side*sqrt(L^2-(e/2)^2)+r*sin(60)",
               18
             ],
             "axis": [
@@ -50306,8 +50306,8 @@
             "a": "disc-mid",
             "b": "link-b2",
             "at": [
-              -19,
-              54.54,
+              "e/2+r*cos(180)",
+              "side*sqrt(L^2-(e/2)^2)+r*sin(180)",
               18
             ],
             "axis": [
@@ -50322,8 +50322,8 @@
             "a": "disc-mid",
             "b": "link-b3",
             "at": [
-              47,
-              16.44,
+              "e/2+r*cos(300)",
+              "side*sqrt(L^2-(e/2)^2)+r*sin(300)",
               18
             ],
             "axis": [
@@ -50338,8 +50338,8 @@
             "a": "link-b1",
             "b": "disc-out",
             "at": [
-              72,
-              38.11,
+              "e+r*cos(60)",
+              "0+r*sin(60)",
               24
             ],
             "axis": [
@@ -50354,8 +50354,8 @@
             "a": "link-b2",
             "b": "disc-out",
             "at": [
-              6,
-              0,
+              "e+r*cos(180)",
+              "0+r*sin(180)",
               24
             ],
             "axis": [
@@ -50370,8 +50370,8 @@
             "a": "link-b3",
             "b": "disc-out",
             "at": [
-              72,
-              -38.11,
+              "e+r*cos(300)",
+              "0+r*sin(300)",
               24
             ],
             "axis": [
@@ -50386,7 +50386,7 @@
             "a": "ground",
             "b": "disc-out",
             "at": [
-              50,
+              "e",
               0,
               30
             ],
@@ -50429,18 +50429,17 @@
             "min": 48,
             "max": 60,
             "note": "disc radius"
-          }
-        ],
-        "design": [
+          },
           {
-            "id": "middle-side",
-            "options": [
-              "above",
-              "below"
-            ],
-            "value": "above"
+            "id": "side",
+            "value": 1,
+            "min": -1,
+            "max": 1,
+            "note": "which side of the shaft line the middle disc runs: +1 above, -1 below (set by the middle-side choice)",
+            "unit": "sign"
           }
         ],
+        "design": [],
         "drivers": [
           {
             "id": "input",
@@ -50451,75 +50450,100 @@
               360
             ],
             "default": 0
+          },
+          {
+            "id": "middle-side",
+            "kind": "select",
+            "options": [
+              {
+                "id": "above",
+                "params": {
+                  "side": 1
+                }
+              },
+              {
+                "id": "below",
+                "params": {
+                  "side": -1
+                }
+              }
+            ],
+            "default": "above"
           }
         ],
         "solve": [
           {
-            "block": "dyad",
-            "id": "middle-centre",
-            "in": {
-              "a": "O1",
-              "b": "O3",
-              "ra": "L",
-              "rb": "L"
-            },
-            "branch": "above",
-            "out": "C",
-            "opts": {
-              "note": "the middle disc centre: |C - O1| = |C - O3| = L, fixed in space for a given offset"
-            }
-          },
-          {
-            "block": "dyad",
-            "id": "set-a",
+            "block": "parallel-cranks",
+            "id": "discs",
             "joints": [
               "PA1",
-              "QA1",
               "PA2",
-              "QA2",
               "PA3",
-              "QA3"
-            ],
-            "in": {
-              "a": "PA1",
-              "b": "C",
-              "ra": "L",
-              "rb": "r"
-            },
-            "out": [
               "QA1",
-              "disc-mid"
-            ],
-            "opts": {
-              "root": "parallelogram O1 PA1 QA1 C",
-              "redundant": "links A2 and A3 are the same parallelogram turned 120 and 240 degrees; they close identically"
-            }
-          },
-          {
-            "block": "dyad",
-            "id": "set-b",
-            "joints": [
+              "QA2",
+              "QA3",
               "QB1",
-              "PB1",
               "QB2",
-              "PB2",
               "QB3",
+              "PB1",
+              "PB2",
               "PB3",
               "O3"
             ],
             "in": {
-              "a": "QB1",
-              "b": "O3",
-              "ra": "L",
-              "rb": "r"
+              "input": "input",
+              "discs": [
+                {
+                  "body": "disc-in",
+                  "center": "O1"
+                },
+                {
+                  "body": "disc-mid",
+                  "center": "mid-centre"
+                },
+                {
+                  "body": "disc-out",
+                  "center": "O3"
+                }
+              ],
+              "links": [
+                {
+                  "body": "link-a1",
+                  "pin": "PA1",
+                  "disc": "disc-in"
+                },
+                {
+                  "body": "link-a2",
+                  "pin": "PA2",
+                  "disc": "disc-in"
+                },
+                {
+                  "body": "link-a3",
+                  "pin": "PA3",
+                  "disc": "disc-in"
+                },
+                {
+                  "body": "link-b1",
+                  "pin": "PB1",
+                  "disc": "disc-out"
+                },
+                {
+                  "body": "link-b2",
+                  "pin": "PB2",
+                  "disc": "disc-out"
+                },
+                {
+                  "body": "link-b3",
+                  "pin": "PB3",
+                  "disc": "disc-out"
+                }
+              ]
             },
-            "out": [
-              "PB1",
-              "disc-out"
-            ],
             "opts": {
-              "root": "parallelogram C QB1 PB1 O3",
-              "redundant": "links B2 and B3 close identically"
+              "relation": "every set of three equal parallel links makes parallelograms with the discs' centres, so all three discs turn alike and every link keeps its direction; the middle disc's centre C stands L from both shafts, fixed for a given offset"
+            },
+            "out": {
+              "turn": "disc-turn"
             }
           }
         ],
@@ -50611,7 +50635,12 @@
             "of": "mid-centre",
             "kind": "position",
             "unit": "mm",
-            "note": "distance of C from the shaft line O1 O3"
+            "note": "distance of C from the shaft line O1 O3",
+            "along": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "link-midpoint-path",
@@ -50726,8 +50755,8 @@
           },
           {
             "id": "middle-side",
-            "kind": "design",
-            "design": "middle-side"
+            "kind": "selector",
+            "selector": "middle-side"
           }
         ],
         "plot": [
@@ -61320,7 +61349,7 @@
         "revolute": 1,
         "prismatic": 5,
         "higher_pairs": 5,
-        "notes": "ground (cylinder block), shaft with swash plate, 5 pistons; each piston shoe slides on the plate face (higher pair)"
+        "notes": "ground (cylinder block), shaft, swash plate pinned to the shaft at the tilt angle, 5 pistons, 5 slipper shoes; each shoe swivels on its piston's ball end and slides flat on the plate face. The joint count gives 7: each shoe's spin about its piston is an idle freedom (5) and the tilt pin is locked while running (1); the true mobility is 1, the shaft's turn, solved in closed form by the plane-slide block."
       },
       "backdrivable": "Yes",
       "tags": {
@@ -61554,92 +61583,298 @@
             "shape": {
               "type": "shaft",
               "diameter": 14,
-              "length": 180,
-              "plate": {
-                "radius": 58,
-                "thickness": 8,
-                "tilt": "gamma",
-                "at": 0
-              }
+              "length": 180
             },
             "at": {
               "joint": "S"
+            }
+          },
+          {
+            "id": "plate",
+            "role": "link",
+            "shape": {
+              "type": "disc",
+              "radius": 58,
+              "thickness": 8,
+              "bore": 14
             },
-            "frame": "local x along the shaft, origin at the plate centre"
+            "frame": {
+              "o": [
+                "-8*cos(gamma)",
+                "-8*sin(gamma)",
+                70
+              ],
+              "z": [
+                "cos(gamma)",
+                "sin(gamma)",
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            },
+            "note": "the swash plate, pinned to the shaft at the tilt angle; its face is the plane through the shaft axis"
           },
           {
             "id": "piston-1",
             "role": "slider",
             "shape": {
-              "type": "slider",
-              "length": 40,
-              "width": 12,
-              "shoe": {
-                "radius": 9
-              }
+              "type": "shaft",
+              "diameter": 12,
+              "length": 40
             },
-            "at": {
-              "joint": "K1"
+            "frame": {
+              "o": [
+                "(h-R*cos(0)*sin(gamma))/cos(gamma)",
+                "R*cos(0)",
+                "70+R*sin(0)"
+              ],
+              "z": [
+                1,
+                0,
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "id": "shoe-1",
+            "role": "link",
+            "shape": {
+              "type": "disc",
+              "radius": 9,
+              "thickness": 4
+            },
+            "frame": {
+              "o": [
+                "(h-R*cos(0)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+                "R*cos(0)-h*sin(gamma)",
+                "70+R*sin(0)"
+              ],
+              "z": [
+                "cos(gamma)",
+                "sin(gamma)",
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
             }
           },
           {
             "id": "piston-2",
             "role": "slider",
             "shape": {
-              "type": "slider",
-              "length": 40,
-              "width": 12,
-              "shoe": {
-                "radius": 9
-              }
+              "type": "shaft",
+              "diameter": 12,
+              "length": 40
             },
-            "at": {
-              "joint": "K2"
+            "frame": {
+              "o": [
+                "(h-R*cos(72)*sin(gamma))/cos(gamma)",
+                "R*cos(72)",
+                "70+R*sin(72)"
+              ],
+              "z": [
+                1,
+                0,
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "id": "shoe-2",
+            "role": "link",
+            "shape": {
+              "type": "disc",
+              "radius": 9,
+              "thickness": 4
+            },
+            "frame": {
+              "o": [
+                "(h-R*cos(72)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+                "R*cos(72)-h*sin(gamma)",
+                "70+R*sin(72)"
+              ],
+              "z": [
+                "cos(gamma)",
+                "sin(gamma)",
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
             }
           },
           {
             "id": "piston-3",
             "role": "slider",
             "shape": {
-              "type": "slider",
-              "length": 40,
-              "width": 12,
-              "shoe": {
-                "radius": 9
-              }
+              "type": "shaft",
+              "diameter": 12,
+              "length": 40
             },
-            "at": {
-              "joint": "K3"
+            "frame": {
+              "o": [
+                "(h-R*cos(144)*sin(gamma))/cos(gamma)",
+                "R*cos(144)",
+                "70+R*sin(144)"
+              ],
+              "z": [
+                1,
+                0,
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "id": "shoe-3",
+            "role": "link",
+            "shape": {
+              "type": "disc",
+              "radius": 9,
+              "thickness": 4
+            },
+            "frame": {
+              "o": [
+                "(h-R*cos(144)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+                "R*cos(144)-h*sin(gamma)",
+                "70+R*sin(144)"
+              ],
+              "z": [
+                "cos(gamma)",
+                "sin(gamma)",
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
             }
           },
           {
             "id": "piston-4",
             "role": "slider",
             "shape": {
-              "type": "slider",
-              "length": 40,
-              "width": 12,
-              "shoe": {
-                "radius": 9
-              }
+              "type": "shaft",
+              "diameter": 12,
+              "length": 40
             },
-            "at": {
-              "joint": "K4"
+            "frame": {
+              "o": [
+                "(h-R*cos(216)*sin(gamma))/cos(gamma)",
+                "R*cos(216)",
+                "70+R*sin(216)"
+              ],
+              "z": [
+                1,
+                0,
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "id": "shoe-4",
+            "role": "link",
+            "shape": {
+              "type": "disc",
+              "radius": 9,
+              "thickness": 4
+            },
+            "frame": {
+              "o": [
+                "(h-R*cos(216)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+                "R*cos(216)-h*sin(gamma)",
+                "70+R*sin(216)"
+              ],
+              "z": [
+                "cos(gamma)",
+                "sin(gamma)",
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
             }
           },
           {
             "id": "piston-5",
             "role": "slider",
             "shape": {
-              "type": "slider",
-              "length": 40,
-              "width": 12,
-              "shoe": {
-                "radius": 9
-              }
+              "type": "shaft",
+              "diameter": 12,
+              "length": 40
             },
-            "at": {
-              "joint": "K5"
+            "frame": {
+              "o": [
+                "(h-R*cos(288)*sin(gamma))/cos(gamma)",
+                "R*cos(288)",
+                "70+R*sin(288)"
+              ],
+              "z": [
+                1,
+                0,
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "id": "shoe-5",
+            "role": "link",
+            "shape": {
+              "type": "disc",
+              "radius": 9,
+              "thickness": 4
+            },
+            "frame": {
+              "o": [
+                "(h-R*cos(288)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+                "R*cos(288)-h*sin(gamma)",
+                "70+R*sin(288)"
+              ],
+              "z": [
+                "cos(gamma)",
+                "sin(gamma)",
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
             }
           }
         ],
@@ -61661,14 +61896,31 @@
             ]
           },
           {
+            "id": "TP",
+            "type": "revolute",
+            "a": "shaft",
+            "b": "plate",
+            "at": [
+              0,
+              0,
+              70
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "note": "tilt pin: sets the swash angle, locked while the shaft turns"
+          },
+          {
             "id": "P1",
             "type": "prismatic",
             "a": "piston-1",
             "b": "ground",
             "at": [
-              9.28,
-              40,
-              70
+              "(h-R*cos(0)*sin(gamma))/cos(gamma)",
+              "R*cos(0)",
+              "70+R*sin(0)"
             ],
             "axis": [
               1,
@@ -61679,7 +61931,36 @@
               -13,
               13
             ],
-            "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+            "note": "bore parallel to the shaft"
+          },
+          {
+            "id": "SB1",
+            "type": "spherical",
+            "a": "piston-1",
+            "b": "shoe-1",
+            "at": [
+              "(h-R*cos(0)*sin(gamma))/cos(gamma)",
+              "R*cos(0)",
+              "70+R*sin(0)"
+            ],
+            "note": "ball end of the piston in the slipper's socket"
+          },
+          {
+            "id": "K1",
+            "type": "planar",
+            "a": "shoe-1",
+            "b": "plate",
+            "at": [
+              "(h-R*cos(0)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+              "R*cos(0)-h*sin(gamma)",
+              "70+R*sin(0)"
+            ],
+            "axis": [
+              "cos(gamma)",
+              "sin(gamma)",
+              0
+            ],
+            "note": "slipper face on the plate face"
           },
           {
             "id": "P2",
@@ -61687,9 +61968,9 @@
             "a": "piston-2",
             "b": "ground",
             "at": [
-              16.69,
-              12.36,
-              108.04
+              "(h-R*cos(72)*sin(gamma))/cos(gamma)",
+              "R*cos(72)",
+              "70+R*sin(72)"
             ],
             "axis": [
               1,
@@ -61700,7 +61981,36 @@
               -13,
               13
             ],
-            "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+            "note": "bore parallel to the shaft"
+          },
+          {
+            "id": "SB2",
+            "type": "spherical",
+            "a": "piston-2",
+            "b": "shoe-2",
+            "at": [
+              "(h-R*cos(72)*sin(gamma))/cos(gamma)",
+              "R*cos(72)",
+              "70+R*sin(72)"
+            ],
+            "note": "ball end of the piston in the slipper's socket"
+          },
+          {
+            "id": "K2",
+            "type": "planar",
+            "a": "shoe-2",
+            "b": "plate",
+            "at": [
+              "(h-R*cos(72)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+              "R*cos(72)-h*sin(gamma)",
+              "70+R*sin(72)"
+            ],
+            "axis": [
+              "cos(gamma)",
+              "sin(gamma)",
+              0
+            ],
+            "note": "slipper face on the plate face"
           },
           {
             "id": "P3",
@@ -61708,9 +62018,9 @@
             "a": "piston-3",
             "b": "ground",
             "at": [
-              28.67,
-              -32.36,
-              93.51
+              "(h-R*cos(144)*sin(gamma))/cos(gamma)",
+              "R*cos(144)",
+              "70+R*sin(144)"
             ],
             "axis": [
               1,
@@ -61721,7 +62031,36 @@
               -13,
               13
             ],
-            "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+            "note": "bore parallel to the shaft"
+          },
+          {
+            "id": "SB3",
+            "type": "spherical",
+            "a": "piston-3",
+            "b": "shoe-3",
+            "at": [
+              "(h-R*cos(144)*sin(gamma))/cos(gamma)",
+              "R*cos(144)",
+              "70+R*sin(144)"
+            ],
+            "note": "ball end of the piston in the slipper's socket"
+          },
+          {
+            "id": "K3",
+            "type": "planar",
+            "a": "shoe-3",
+            "b": "plate",
+            "at": [
+              "(h-R*cos(144)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+              "R*cos(144)-h*sin(gamma)",
+              "70+R*sin(144)"
+            ],
+            "axis": [
+              "cos(gamma)",
+              "sin(gamma)",
+              0
+            ],
+            "note": "slipper face on the plate face"
           },
           {
             "id": "P4",
@@ -61729,9 +62068,9 @@
             "a": "piston-4",
             "b": "ground",
             "at": [
-              28.67,
-              -32.36,
-              46.49
+              "(h-R*cos(216)*sin(gamma))/cos(gamma)",
+              "R*cos(216)",
+              "70+R*sin(216)"
             ],
             "axis": [
               1,
@@ -61742,7 +62081,36 @@
               -13,
               13
             ],
-            "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+            "note": "bore parallel to the shaft"
+          },
+          {
+            "id": "SB4",
+            "type": "spherical",
+            "a": "piston-4",
+            "b": "shoe-4",
+            "at": [
+              "(h-R*cos(216)*sin(gamma))/cos(gamma)",
+              "R*cos(216)",
+              "70+R*sin(216)"
+            ],
+            "note": "ball end of the piston in the slipper's socket"
+          },
+          {
+            "id": "K4",
+            "type": "planar",
+            "a": "shoe-4",
+            "b": "plate",
+            "at": [
+              "(h-R*cos(216)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+              "R*cos(216)-h*sin(gamma)",
+              "70+R*sin(216)"
+            ],
+            "axis": [
+              "cos(gamma)",
+              "sin(gamma)",
+              0
+            ],
+            "note": "slipper face on the plate face"
           },
           {
             "id": "P5",
@@ -61750,9 +62118,9 @@
             "a": "piston-5",
             "b": "ground",
             "at": [
-              16.69,
-              12.36,
-              31.96
+              "(h-R*cos(288)*sin(gamma))/cos(gamma)",
+              "R*cos(288)",
+              "70+R*sin(288)"
             ],
             "axis": [
               1,
@@ -61763,72 +62131,36 @@
               -13,
               13
             ],
-            "note": "bore parallel to the shaft; slide measured from the plate centre plane"
+            "note": "bore parallel to the shaft"
           },
           {
-            "id": "K1",
-            "type": "cam-contact",
-            "a": "piston-1",
-            "b": "shaft",
+            "id": "SB5",
+            "type": "spherical",
+            "a": "piston-5",
+            "b": "shoe-5",
             "at": [
-              -10.72,
-              40,
-              70
+              "(h-R*cos(288)*sin(gamma))/cos(gamma)",
+              "R*cos(288)",
+              "70+R*sin(288)"
             ],
-            "follower": "flat",
-            "note": "slipper on the plate face"
-          },
-          {
-            "id": "K2",
-            "type": "cam-contact",
-            "a": "piston-2",
-            "b": "shaft",
-            "at": [
-              -3.31,
-              12.36,
-              108.04
-            ],
-            "follower": "flat",
-            "note": "slipper on the plate face"
-          },
-          {
-            "id": "K3",
-            "type": "cam-contact",
-            "a": "piston-3",
-            "b": "shaft",
-            "at": [
-              8.67,
-              -32.36,
-              93.51
-            ],
-            "follower": "flat",
-            "note": "slipper on the plate face"
-          },
-          {
-            "id": "K4",
-            "type": "cam-contact",
-            "a": "piston-4",
-            "b": "shaft",
-            "at": [
-              8.67,
-              -32.36,
-              46.49
-            ],
-            "follower": "flat",
-            "note": "slipper on the plate face"
+            "note": "ball end of the piston in the slipper's socket"
           },
           {
             "id": "K5",
-            "type": "cam-contact",
-            "a": "piston-5",
-            "b": "shaft",
+            "type": "planar",
+            "a": "shoe-5",
+            "b": "plate",
             "at": [
-              -3.31,
-              12.36,
-              31.96
+              "(h-R*cos(288)*sin(gamma))/cos(gamma)-h*cos(gamma)",
+              "R*cos(288)-h*sin(gamma)",
+              "70+R*sin(288)"
             ],
-            "follower": "flat",
-            "note": "slipper on the plate face"
+            "axis": [
+              "cos(gamma)",
+              "sin(gamma)",
+              0
+            ],
+            "note": "slipper face on the plate face"
           }
         ],
         "params": [
@@ -61863,6 +62195,14 @@
             "min": 50,
             "max": 70,
             "note": "plate radius"
+          },
+          {
+            "id": "h",
+            "value": 9,
+            "unit": "mm",
+            "min": 6,
+            "max": 14,
+            "note": "ball centre above the plate face: slipper thickness plus ball radius"
           }
         ],
         "design": [],
@@ -61880,103 +62220,104 @@
         ],
         "solve": [
           {
-            "block": "slider-dyad",
-            "id": "piston-1",
+            "block": "plane-slide",
+            "id": "tilt-frame",
             "joints": [
+              "TP",
               "P1",
-              "K1"
-            ],
-            "in": {
-              "slide": "P1",
-              "plane": "shaft",
-              "r": "R",
-              "gamma": "gamma",
-              "phase": 0
-            },
-            "out": "piston-1",
-            "opts": {
-              "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
-              "law": "x = -R tan(gamma) cos(theta - phase)"
-            }
-          },
-          {
-            "block": "slider-dyad",
-            "id": "piston-2",
-            "joints": [
+              "SB1",
+              "K1",
               "P2",
-              "K2"
-            ],
-            "in": {
-              "slide": "P2",
-              "plane": "shaft",
-              "r": "R",
-              "gamma": "gamma",
-              "phase": 72
-            },
-            "out": "piston-2",
-            "opts": {
-              "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
-              "law": "x = -R tan(gamma) cos(theta - phase)"
-            }
-          },
-          {
-            "block": "slider-dyad",
-            "id": "piston-3",
-            "joints": [
+              "SB2",
+              "K2",
               "P3",
-              "K3"
-            ],
-            "in": {
-              "slide": "P3",
-              "plane": "shaft",
-              "r": "R",
-              "gamma": "gamma",
-              "phase": 144
-            },
-            "out": "piston-3",
-            "opts": {
-              "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
-              "law": "x = -R tan(gamma) cos(theta - phase)"
-            }
-          },
-          {
-            "block": "slider-dyad",
-            "id": "piston-4",
-            "joints": [
+              "SB3",
+              "K3",
               "P4",
-              "K4"
-            ],
-            "in": {
-              "slide": "P4",
-              "plane": "shaft",
-              "r": "R",
-              "gamma": "gamma",
-              "phase": 216
-            },
-            "out": "piston-4",
-            "opts": {
-              "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
-              "law": "x = -R tan(gamma) cos(theta - phase)"
-            }
-          },
-          {
-            "block": "slider-dyad",
-            "id": "piston-5",
-            "joints": [
+              "SB4",
+              "K4",
               "P5",
+              "SB5",
               "K5"
             ],
             "in": {
-              "slide": "P5",
-              "plane": "shaft",
-              "r": "R",
-              "gamma": "gamma",
-              "phase": 288
+              "plate": "plate",
+              "rides": "shaft",
+              "point": [
+                "h*cos(gamma)",
+                "h*sin(gamma)",
+                70
+              ],
+              "normal": [
+                "cos(gamma)",
+                "sin(gamma)",
+                0
+              ],
+              "pistons": [
+                {
+                  "body": "piston-1",
+                  "joint": "P1",
+                  "at": "SB1",
+                  "out": "slide-1"
+                },
+                {
+                  "body": "piston-2",
+                  "joint": "P2",
+                  "at": "SB2",
+                  "out": "slide-2"
+                },
+                {
+                  "body": "piston-3",
+                  "joint": "P3",
+                  "at": "SB3",
+                  "out": "slide-3"
+                },
+                {
+                  "body": "piston-4",
+                  "joint": "P4",
+                  "at": "SB4",
+                  "out": "slide-4"
+                },
+                {
+                  "body": "piston-5",
+                  "joint": "P5",
+                  "at": "SB5",
+                  "out": "slide-5"
+                }
+              ],
+              "shoes": [
+                {
+                  "body": "shoe-1",
+                  "at": "SB1"
+                },
+                {
+                  "body": "shoe-2",
+                  "at": "SB2"
+                },
+                {
+                  "body": "shoe-3",
+                  "at": "SB3"
+                },
+                {
+                  "body": "shoe-4",
+                  "at": "SB4"
+                },
+                {
+                  "body": "shoe-5",
+                  "at": "SB5"
+                }
+              ]
             },
-            "out": "piston-5",
+            "out": {
+              "slide-1": "slide-1",
+              "slide-2": "slide-2",
+              "slide-3": "slide-3",
+              "slide-4": "slide-4",
+              "slide-5": "slide-5"
+            },
             "opts": {
-              "surface": "the plate face: a plane through the plate centre tilted gamma, turning with the shaft (the tilt frame)",
-              "law": "x = -R tan(gamma) cos(theta - phase)"
+              "surface": "the plate face, offset by h to the ball centres: a plane tilted gamma, turning with the shaft (the tilt frame)",
+              "law": "x = (h - R sin(gamma) cos(theta + 72 k)) / cos(gamma): harmonic, stroke 2 R tan(gamma)"
             }
           }
         ],
@@ -62028,11 +62369,11 @@
           },
           {
             "id": "plate-centre",
-            "body": "shaft",
+            "body": "plate",
             "local": [
               0,
               0,
-              0
+              8
             ]
           },
           {
@@ -62040,17 +62381,17 @@
             "body": "shaft",
             "local": [
               0,
-              58,
+              0,
               0
             ]
           },
           {
             "id": "plate-rim",
-            "body": "shaft",
+            "body": "plate",
             "local": [
-              -15.01,
-              56.02,
-              0
+              58,
+              0,
+              8
             ]
           }
         ],
@@ -62060,35 +62401,60 @@
             "of": "head-1",
             "kind": "position",
             "unit": "mm",
-            "note": "along the shaft axis"
+            "along": [
+              1,
+              0,
+              0
+            ],
+            "note": "ball centre along the shaft axis"
           },
           {
             "id": "piston-2-x",
             "of": "head-2",
             "kind": "position",
             "unit": "mm",
-            "note": "along the shaft axis"
+            "along": [
+              1,
+              0,
+              0
+            ],
+            "note": "ball centre along the shaft axis"
           },
           {
             "id": "piston-3-x",
             "of": "head-3",
             "kind": "position",
             "unit": "mm",
-            "note": "along the shaft axis"
+            "along": [
+              1,
+              0,
+              0
+            ],
+            "note": "ball centre along the shaft axis"
           },
           {
             "id": "piston-4-x",
             "of": "head-4",
             "kind": "position",
             "unit": "mm",
-            "note": "along the shaft axis"
+            "along": [
+              1,
+              0,
+              0
+            ],
+            "note": "ball centre along the shaft axis"
           },
           {
             "id": "piston-5-x",
             "of": "head-5",
             "kind": "position",
             "unit": "mm",
-            "note": "along the shaft axis"
+            "along": [
+              1,
+              0,
+              0
+            ],
+            "note": "ball centre along the shaft axis"
           }
         ],
         "fallback": null
@@ -62102,6 +62468,9 @@
         "principle": [
           {
             "body": "shaft"
+          },
+          {
+            "body": "plate"
           },
           {
             "body": "piston-1"
@@ -62173,7 +62542,8 @@
             },
             "highlight": [
               "piston-1",
-              "shaft.plate",
+              "shoe-1",
+              "plate",
               "K1"
             ],
             "note": "through the shaft axis and piston 1"
@@ -62227,11 +62597,12 @@
             "tol": 0.05
           },
           {
-            "text": "the pistons are phased evenly round the circle",
+            "text": "the pistons are phased evenly round the circle: piston 1 is fully in at 0°, piston 2 72° later",
             "output": "piston-2-x",
             "stat": "phase",
             "value": 72,
-            "tol": 0.5
+            "tol": 0.5,
+            "of": "min"
           }
         ],
         "exceptions": []

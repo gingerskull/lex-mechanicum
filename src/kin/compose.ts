@@ -106,8 +106,11 @@ export class Kinematics {
     for (const [id, v] of Object.entries(controls?.design ?? {})) designs.set(id, v);
     for (const d of kin.drivers) {
       if (d.kind !== "select" || !d.options) continue;
-      const choice = controls?.select?.[d.id] ?? d.value ?? Object.keys(d.options)[0];
-      const opt = choice ? d.options[choice] : undefined;
+      // options keyed by name, or (the record spec's form) a list of { id, params, drivers }
+      const list = Array.isArray(d.options) ? (d.options as { id: string; params?: Record<string, number>; drivers?: Record<string, number> }[]) : null;
+      const names = list ? list.map((o) => o.id) : Object.keys(d.options);
+      const choice = controls?.select?.[d.id] ?? d.value ?? (typeof (d.default as unknown) === "string" ? (d.default as unknown as string) : undefined) ?? names[0];
+      const opt = choice ? (list ? list.find((o) => o.id === choice) : (d.options as Record<string, { params?: Record<string, number>; drivers?: Record<string, number> }>)[choice]) : undefined;
       for (const [id, v] of Object.entries(opt?.params ?? {})) params.set(id, v);
       for (const [id, v] of Object.entries(opt?.drivers ?? {})) held.set(id, v);
     }

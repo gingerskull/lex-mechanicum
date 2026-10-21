@@ -84,7 +84,8 @@ const crossSlideBlock: BlockFn = (c, s) => {
 /**
  * parallel-cranks. in: input (deg, a value), discs [{ body, center (a point or joint), axis }] (every disc turns by the
  * input's turn about its own centre; the input disc's own driver may already have turned it), links [{ body, pin (a
- * joint), disc }] (each link keeps its direction and moves with the pin it shares with that disc).
+ * joint), disc }] (each link keeps its direction and moves with the pin it shares with that disc). out { turn }: the
+ * discs' turn from the reference (deg).
  */
 const parallelCranks: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -102,22 +103,37 @@ const parallelCranks: BlockFn = (c, s) => {
     const p0 = c.jointAt(str(l.pin, "parallel-cranks.links.pin"));
     c.setXf(str(l.body, "parallel-cranks.links.body"), xf.trans(v3.sub(xf.apply(X, p0), p0)));
   }
+  outVal(c, s, "turn", d * R2D);
 };
 
+/** The least turn carrying the unit direction a onto the unit direction b. */
+export function turnOnto(a: Vec3, b: Vec3): Xf {
+  const ax = v3.cross(a, b);
+  const sn = v3.len(ax);
+  const cs = v3.dot(a, b);
+  if (sn < 1e-12) return cs > 0 ? xf.id() : xf.rotAbout([0, 0, 0], v3.unit(v3.perp(Math.abs(a[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0], a)), Math.PI);
+  return xf.rotAbout([0, 0, 0], ax, Math.atan2(sn, cs));
+}
+
 /**
- * plane-slide. in: plate (the body that carries the plane), point and normal (the plane in the reference configuration,
- * world: a point name or [x, y, z], and a direction), pistons [{ body, joint (its prismatic joint to the ground, whose
- * axis is the slide), at (a point on the slider that rides the plane), out (a value name: the slide, mm, from the
- * reference) }]. Each slider stands where its line meets the plane as the plate carries it now.
+ * plane-slide. in: plate (the body that carries the plane), rides (optional: a body the plate is fixed to, whose pose
+ * it takes: a swash plate pinned to its shaft at the tilt angle), point and normal (the plane in the reference
+ * configuration, world: a point name or [x, y, z], and a direction), pistons [{ body, joint (its prismatic joint to the
+ * ground, whose axis is the slide), at (the point of the slider held at a fixed distance from the plane: its ball
+ * centre), out (a value name: the slide, mm, from the reference) }], shoes [{ body, at (the ball centre it swivels on) }]
+ * (each shoe stays face to face with the plane and goes with its ball). Each slider stands where its line meets the
+ * plane as the plate carries it now.
  */
 const planeSlide: BlockFn = (c, s) => {
   const i = s.in ?? {};
   const plate = str(i.plate, "plane-slide.plate");
+  if (typeof i.rides === "string") c.setXf(plate, c.xf(i.rides));
   const X = c.xf(plate);
   const p0 = c.refVec(i.point);
   const n0 = v3.unit(c.vec(i.normal));
   const p = xf.apply(X, p0);
   const n = xf.dir(X, n0);
+  const moved = new Map<string, Vec3>();
   for (const q of (i.pistons as { body: unknown; joint: unknown; at: unknown; out?: unknown }[] | undefined) ?? []) {
     const jid = str(q.joint, "plane-slide.pistons.joint");
     const dir = c.jointAxis(jid);
@@ -126,7 +142,14 @@ const planeSlide: BlockFn = (c, s) => {
     const t0 = linePlane(a, dir, p0, n0);
     if (t === null || t0 === null) throw new KinError(`plane-slide ${s.id}: slider ${String(q.body)} runs in the plane`);
     c.setXf(str(q.body, "plane-slide.pistons.body"), xf.trans(v3.mul(dir, t - t0)));
+    if (typeof q.at === "string") moved.set(q.at, v3.add(a, v3.mul(dir, t - t0)));
     if (typeof q.out === "string") c.setVal(q.out, t - t0);
+  }
+  const T = turnOnto(n0, n);
+  for (const q of (i.shoes as { body: unknown; at: unknown }[] | undefined) ?? []) {
+    const a = c.refVec(q.at);
+    const now = (typeof q.at === "string" && moved.get(q.at)) || a;
+    c.setXf(str(q.body, "plane-slide.shoes.body"), { R: T.R, t: v3.sub(now, xf.dir(T, a)) });
   }
 };
 

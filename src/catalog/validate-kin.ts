@@ -140,7 +140,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   };
   const resolveIn = (v: unknown, by: string, key: string) => {
     if (Array.isArray(v)) return v.forEach((x) => resolveIn(x, by, key));
-    if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
+    // a nested `out` names a value the block writes (a slider's slide), not an input
+    if (isObj(v)) return Object.entries(v).forEach(([k, x]) => (k === "out" ? undefined : resolveIn(x, by, key)));
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
     if (key === "kind" || key === "mode" || key === "form") return;

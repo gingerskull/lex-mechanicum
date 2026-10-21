@@ -9,6 +9,7 @@
 //                          or end (`feature`);
 //   dwell                  the longest span of the cycle, degrees, in which the output stays within `band` (default
 //                          one thousandth of its range).
+// A path's `range` is its extent, the longest chord between two of its points.
 // A claim `over` a driver (a speed control) takes its statistic over that driver's range instead of the cycle. Outputs
 // the library does not compute are reported as uncheckable, never as a mismatch.
 import type { Kinematics } from "../kin/compose";
@@ -230,6 +231,15 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
       if (!swept.has(claim.over)) swept.set(claim.over, sweep(claim.over));
       P = swept.get(claim.over)!;
       if (typeof P === "string") return { claim, status: "uncheckable", why: P };
+    }
+    // a path's range is its extent: the longest chord between two of its points (an orbit's diameter)
+    const po = outputs.find((q) => q.id === claim.output);
+    if (po?.kind === "path" && claim.stat === "range") {
+      const pts = P.map((p) => p.outputs[po.id]).filter((v): v is [number, number, number] => Array.isArray(v));
+      if (pts.length !== P.length) return { claim, status: "uncheckable", why: `output ${po.id} is not computed` };
+      let got = 0;
+      for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) got = Math.max(got, Math.hypot(pts[a]![0] - pts[b]![0], pts[a]![1] - pts[b]![1], pts[a]![2] - pts[b]![2]));
+      return { claim, status: Math.abs(got - claim.value) <= claim.tol ? "ok" : "off", got };
     }
     const S = seriesOf(K, claim, outputs, P);
     if (typeof S === "string") return { claim, status: "uncheckable", why: S };
