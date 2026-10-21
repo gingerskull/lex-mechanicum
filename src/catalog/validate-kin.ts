@@ -305,6 +305,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (!isNum(c.value)) say(`claim "${String(c.text)}": value must be a number`);
     if (!isNum(c.tol) || c.tol < 0) say(`claim "${String(c.text)}": tol must be a number >= 0`);
   }
+  if (t.seeThrough !== undefined) for (const b of arr(t.seeThrough)) if (!bodies.has(String(b))) say(`teaching.seeThrough: "${String(b)}" is not a body`);
   if (!Array.isArray(t.exceptions)) say("teaching.exceptions must be an array");
   for (const e of arr(t.exceptions) as Obj[]) if (!isStr(e.reason)) say("an exception needs a reason (T12)");
 

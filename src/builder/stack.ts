@@ -269,7 +269,8 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       // hung from its bridge: a circlip under the first part keeps it up
       grooves.push(first.w0 - 4 + 0.6);
     }
-    if (support === "housing" || (live && spec.base)) {
+    // a live shaft hung from its bridge (named so by the record) turns in the bridge's bushing, no housing in the base
+    if (support === "housing" || (live && spec.base && support !== "hung")) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
       shaftSpec.z0 = h.bottom - 18;
       serve("F2", `${id}-hcl0`, `${id}-hcl1`);

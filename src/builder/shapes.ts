@@ -178,7 +178,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // partner, a governor's arm beside the spindle head), instead of a slab of the placement solver
     const axial = typeof shape.axial === "number" ? shape.axial : undefined;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(axial !== undefined ? { exact: { offset: axial } } : g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? spatialLink(S, geom) ?? geom));
+    out.set(b.id, withBars(withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? spatialLink(S, geom) ?? geom)));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -391,4 +391,27 @@ function spatialLink(S: Setup, g: BodyGeom): BodyGeom | null {
     exact: { offset: span[0] },
     pieces: [{ id: `${g.id}-bar`, name: "", frame: { o: a1, x: v3.unit(v3.perp(Math.abs(z[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0], z)), z }, profile: { outer: circle(rb, 0, 0, 28), holes: [] }, h: L }],
   };
+}
+
+/**
+ * Straight bars standing on a part's face (`bars: [{ from: [x, y], to: [x, y], width, z: [z0, z1] }]`, in the body's
+ * frame, z from its origin): a hub's slot jaws, an Oldham disc's tongues. Pieces of the body.
+ */
+function withBars(g: BodyGeom): BodyGeom {
+  const bars = g.shape.bars as { from?: unknown; to?: unknown; width?: unknown; z?: unknown }[] | undefined;
+  if (!Array.isArray(bars) || !bars.length) return g;
+  const pieces = bars.map((b, k) => {
+    const [x0, y0] = pair(b.from, [0, 0]);
+    const [x1, y1] = pair(b.to, [10, 0]);
+    const [z0, z1] = pair(b.z, [0, 5]);
+    const w = num(b.width, 10) / 2;
+    const L = Math.hypot(x1 - x0, y1 - y0) || 1;
+    const nx = (-(y1 - y0) / L) * w;
+    const ny = ((x1 - x0) / L) * w;
+    const outer: Vec2[] = [[x0 + nx, y0 + ny], [x0 - nx, y0 - ny], [x1 - nx, y1 - ny], [x1 + nx, y1 + ny]];
+    const area = (outer[1]![0] - outer[0]![0]) * (outer[2]![1] - outer[0]![1]) - (outer[2]![0] - outer[0]![0]) * (outer[1]![1] - outer[0]![1]);
+    if (area < 0) outer.reverse();
+    return { id: `${g.id}-bar${k}`, name: "", frame: { o: v3.add(g.frame.o, v3.mul(g.frame.z, z0)), x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: z1 - z0 };
+  });
+  return { ...g, pieces: [...(g.pieces ?? []), ...pieces] };
 }

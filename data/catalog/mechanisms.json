@@ -46656,14 +46656,44 @@
             "accent": true,
             "shape": {
               "type": "disc",
-              "radius": 68,
-              "thickness": 12,
-              "bore": 10,
+              "radius": 58,
+              "thickness": 8,
+              "axial": 0,
+              "bars": [
+                {
+                  "from": [
+                    -53,
+                    13
+                  ],
+                  "to": [
+                    53,
+                    13
+                  ],
+                  "width": 8,
+                  "z": [
+                    8,
+                    16
+                  ]
+                },
+                {
+                  "from": [
+                    -53,
+                    -13
+                  ],
+                  "to": [
+                    53,
+                    -13
+                  ],
+                  "width": 8,
+                  "z": [
+                    8,
+                    16
+                  ]
+                }
+              ],
               "slot": {
-                "along": "x",
-                "length": 106,
                 "width": 18,
-                "depth": 6
+                "length": 106
               }
             },
             "at": {
@@ -46675,27 +46705,61 @@
             "role": "link",
             "shape": {
               "type": "disc",
-              "radius": 50,
-              "thickness": 6,
-              "tongues": [
+              "radius": 30,
+              "thickness": 5,
+              "axial": 17,
+              "bars": [
                 {
-                  "face": "input",
-                  "along": "x",
-                  "length": 48,
-                  "width": 16,
-                  "height": 6
+                  "from": [
+                    -24,
+                    0
+                  ],
+                  "to": [
+                    24,
+                    0
+                  ],
+                  "width": 14,
+                  "z": [
+                    11,
+                    17
+                  ]
                 },
                 {
-                  "face": "output",
-                  "along": "y",
-                  "length": 48,
-                  "width": 16,
-                  "height": 6
+                  "from": [
+                    0,
+                    -24
+                  ],
+                  "to": [
+                    0,
+                    24
+                  ],
+                  "width": 14,
+                  "z": [
+                    22,
+                    28
+                  ]
                 }
               ]
             },
             "at": {
               "joint": "T1"
+            },
+            "frame": {
+              "o": [
+                "e*cos(30)^2",
+                "e*cos(30)*sin(30)",
+                0
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ],
+              "x": [
+                "cos(30)",
+                "sin(30)",
+                0
+              ]
             }
           },
           {
@@ -46703,14 +46767,44 @@
             "role": "output",
             "shape": {
               "type": "disc",
-              "radius": 68,
-              "thickness": 12,
-              "bore": 10,
+              "radius": 58,
+              "thickness": 8,
+              "axial": 34,
+              "bars": [
+                {
+                  "from": [
+                    -53,
+                    13
+                  ],
+                  "to": [
+                    53,
+                    13
+                  ],
+                  "width": 8,
+                  "z": [
+                    23,
+                    34
+                  ]
+                },
+                {
+                  "from": [
+                    -53,
+                    -13
+                  ],
+                  "to": [
+                    53,
+                    -13
+                  ],
+                  "width": 8,
+                  "z": [
+                    23,
+                    34
+                  ]
+                }
+              ],
               "slot": {
-                "along": "y",
-                "length": 106,
                 "width": 18,
-                "depth": 6
+                "length": 106
               }
             },
             "at": {
@@ -46785,13 +46879,15 @@
             "at": [
               "e",
               0,
-              31
+              0
             ],
             "axis": [
               0,
               0,
               1
-            ]
+            ],
+            "support": "hung",
+            "note": "the output hub's shaft hangs from a bridge: it cannot come up through the input side"
           }
         ],
         "params": [
@@ -46813,9 +46909,9 @@
           },
           {
             "id": "Rm",
-            "value": 50,
+            "value": 30,
             "unit": "mm",
-            "min": 40,
+            "min": 26,
             "max": 60,
             "note": "floating disc radius"
           },
@@ -46900,25 +46996,25 @@
             "local": [
               14,
               0,
-              15.5
+              0
             ]
           },
           {
             "id": "in-mark",
             "body": "hub-in",
             "local": [
-              60,
+              50,
               0,
-              12
+              8
             ]
           },
           {
             "id": "out-mark",
             "body": "hub-out",
             "local": [
-              60,
+              50,
               0,
-              0
+              34
             ]
           }
         ],
@@ -47100,7 +47196,10 @@
             "tol": 0.1
           }
         ],
-        "exceptions": []
+        "exceptions": [],
+        "seeThrough": [
+          "hub-out"
+        ]
       }
     },
     {

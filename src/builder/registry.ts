@@ -26,6 +26,8 @@ export const rules: Rule[] = [
   base,
   byId("j6-mesh"),
   byId("j9-crossed-mesh"),
+  // a tongue's slot hardware turns with its hub: built before the stacks, so a bridge is routed clear of it
+  byId("tongue-slot"),
   j3,
   j2,
   j10,
@@ -40,7 +42,6 @@ export const rules: Rule[] = [
   byId("pallet-contact"),
   byId("fork-pin"),
   byId("pawl-tooth"),
-  byId("tongue-slot"),
   byId("ring-hub"),
   byId("ring-rollers"),
   byId("j8-belt"),

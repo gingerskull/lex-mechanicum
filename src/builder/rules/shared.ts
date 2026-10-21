@@ -624,6 +624,14 @@ export const seeThrough: Rule = {
   applies: (ctx) => ctx.principle.size > 0,
   apply() {},
   after(ctx) {
+    // principle parts the record asks to see through (T10, transparency first): an Oldham coupling's output hub, which
+    // would hide the disc, its tongues and the slots
+    const asked = new Set(((ctx.teaching as { seeThrough?: unknown } | undefined)?.seeThrough as string[] | undefined) ?? []);
+    for (const s of ctx.solids)
+      if (asked.has(s.body) && !s.flags.seeThrough) {
+        s.flags.seeThrough = true;
+        (ctx.fired["see-through"] ??= []).push(s.id);
+      }
     const dir = ctx.viewDir();
     const principle = [...ctx.principle].map((b) => ({ b, sweep: ctx.sweeps.of(b) })).filter((p): p is { b: string; sweep: NonNullable<typeof p.sweep> } => !!p.sweep);
     if (!principle.length) return;

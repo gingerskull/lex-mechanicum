@@ -122,6 +122,10 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     eccentric: ctx.eccentric.has(site.id),
     baseTopWorld: ctx.base?.top ?? 0,
   };
+  // the record may name the support of a fixed site (`support` on one of its joints): an Oldham coupling's output hub,
+  // whose shaft cannot come up through the input side, hangs from a bridge
+  const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: string } | undefined)?.support).find((x) => !!x);
+  if (asked === "hung" || asked === "bridge" || asked === "stub" || asked === "housing" || asked === "pillow") spec.support = asked;
   const r = axialStack(ctx, spec);
   ctx.add(r.solids);
   ctx.stacks.set(site.id, r);

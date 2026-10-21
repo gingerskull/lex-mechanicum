@@ -129,4 +129,6 @@ export interface Teaching {
   plot: { x: string; y: string; label: string } | { x: string; y: string; label: string }[];
   claims: { text: string; output: string; stat: (typeof TEACHING_VOCAB.stat)[number]; value: number; tol: number }[];
   exceptions: { reason: string; [k: string]: unknown }[];
+  /** Principle bodies drawn see-through on purpose (T10): a part that would hide the principle behind it. */
+  seeThrough?: string[];
 }
