@@ -214,7 +214,6 @@ function universal(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null
   const F = g.frame;
   const o = F.o;
   const z = F.z;
-  const y = v3.cross(z, F.x);
   const along = (s: number): Vec3 => v3.add(o, v3.mul(z, s));
   const pinsOf = kin.joints.filter((j) => (j.a === b.id || j.b === b.id) && j.type === "revolute" && (isCross || crossOf(j))).map((j) => S.joints.get(j.id)!);
   if (!pinsOf.length) return null;
@@ -246,7 +245,6 @@ function universal(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null
   const sc = v3.dot(v3.sub(centre, o), z);
   const sg = Math.sign(sc) || 1;
   const p = v3.unit(pinsOf[0]!.axis);
-  const q = v3.cross(z, p);
   const sFace = sc - sg * (R + rb + 4);
   const sBar = sFace - sg * 8;
   const hub = 14;
@@ -273,7 +271,6 @@ function universal(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null
       arm(-1),
     ],
   };
-  void q;
 }
 
 /**

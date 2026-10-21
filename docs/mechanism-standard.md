@@ -272,6 +272,9 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `j3-moving-pin` | J3, A12, M3 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
+| `cross-bearings` | J3, F2, F8 |
+| `trunnion` | J1, F2, F4, F6 |
+| `piston-bore` | J5, M14 |
 | `j4-slot-roller` | J4, M14 |
 | `pin-lobe` | J4, M14 |
 | `groove-cam` | J7, M14 |
@@ -297,6 +300,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
 | `timing-marks` | F9 |
+| `trace-marks` | T4, L8 |
 | `locking` | M13 |
 | `materials` | M10 |
 | `fasteners` | A8, M4 |

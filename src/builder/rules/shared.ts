@@ -145,8 +145,7 @@ export const standoffs: Rule = {
     for (const b of ctx.kin.bodies) {
       if (!isFixedPlate(ctx, b.id)) continue;
       const part = ctx.parts.get(b.id)!;
-      const ext = ctx.extent(b.id);
-      if (!ext || part.body === "ground") continue;
+      if (!part || part.body === "ground") continue;
       const pts = part.profile.outer.map((q) => planeCoords(UPF, fromPlane(part.frame, q, 0)).uv);
       const c: Vec2 = [pts.reduce((a, p) => a + p[0], 0) / pts.length, pts.reduce((a, p) => a + p[1], 0) / pts.length];
       const far = [...pts].sort((p, q) => Math.hypot(q[0] - c[0], q[1] - c[1]) - Math.hypot(p[0] - c[0], p[1] - c[1]));

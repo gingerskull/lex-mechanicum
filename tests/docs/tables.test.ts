@@ -21,7 +21,7 @@ describe("audit template", () => {
   const heads = (t: string) => [...t.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
 
   it("has the sections a 2.5D sheet writes, in the same order, plus the 3.0 Supports section", () => {
-    const sheet = readFileSync(new URL("../../src/mechanisms/four-bar/audit.md", import.meta.url), "utf8");
+    const sheet = readFileSync(new URL("../../src/mechanisms/slider-crank/audit.md", import.meta.url), "utf8");
     expect(heads(block).filter((h) => h !== "Supports")).toEqual(heads(sheet));
   });
 

@@ -125,6 +125,6 @@ describe("views", () => {
     expect(sec.state.section?.normal).toEqual([0, 0, 1]);
     expect(sec.state.section?.name).toBe("SECTION PORT-FACE");
     expect(sec.state.orient.aux).toEqual([0, 0, 1]);
-    expect(sec.state.section?.highlight).toContain("inlet");
+    expect(sec.state.section?.highlight).toContain("port");
   });
 });
