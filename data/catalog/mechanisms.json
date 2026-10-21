@@ -40308,7 +40308,7 @@
         "revolute": 2,
         "prismatic": 0,
         "higher_pairs": 2,
-        "notes": "ground, driver with 5 teeth and a convex locking rim, driven gear with 4 concave locking arcs, all in one plane; the gear mesh and the locking contact alternate. The mobility counted from kin is 0 because both contacts are declared; only one acts at a time, so the true mobility is 1."
+        "notes": "ground, driver with 4 teeth and a convex locking rim, driven gear with 4 concave locking arcs, all in one plane; the gear mesh and the locking contact alternate. The mobility counted from kin is 0 because both contacts are declared; only one acts at a time, so the true mobility is 1."
       },
       "backdrivable": "No (self-locking)",
       "tags": {
@@ -40339,7 +40339,7 @@
         ]
       },
       "explain": {
-        "motion": "The driver has teeth on only part of its rim; the rest of its rim is a plain convex locking arc. While the teeth are in mesh, the driven gear turns at the normal gear ratio, the other way. When they have passed, the locking arc slides in a concave arc cut across the tips of two driven teeth and holds the driven gear still. Teeth and lock work in one plane. Here 5 of 20 teeth advance the driven gear 90° per driver turn, and it rests for the other 270°.",
+        "motion": "The driver has teeth on only part of its rim; the rest of its rim is a plain convex locking arc. While the teeth are in mesh, the driven gear turns at the normal gear ratio, the other way. When they have passed, the locking arc slides in a concave arc cut across the tips of two driven teeth and holds the driven gear still. Teeth and lock work in one plane. Here 4 teeth on a 20-tooth pitch carry the driven gear five teeth, 90°, per driver turn, and it rests for the other 270°.",
         "forces": "During mesh it acts like an ordinary spur pair at a 20° pressure angle. The first tooth hits the driven gear at full pitch-line speed, so there is a shock at engagement that grows with speed.",
         "benefits": "Any step size and dwell split can be set by tooth count, and the driven gear is positively located throughout.",
         "limits": "Sudden start and stop cause impact, so it suits slow or light duty. Geneva or cam indexers are preferred at high speed or load."
@@ -40438,7 +40438,7 @@
             "note": "locking arc radius on driven"
           }
         ],
-        "defining_relations": "Index angle per driver turn = 360° x nT/z2 = 90°. Driver moves the output for 360° x nT/z1 = 90°, dwell 270°. Number of stops per driven turn = z2/nT = 4 (must be an integer). Centre distance cd = m(z1+z2)/2 = 80. Locking: the driver's rim radius RL = 39 lies between its root (35) and pitch (40) circles; at rest it reaches 3 mm inside the driven tip circle (cd - RL = 41 against 44), into a locking gap whose two flanking tooth tips are cut to RC = RL + 0.5 about the driver axis.",
+        "defining_relations": "Index angle per driver turn = 360° x (nT + 1)/z2 = 90° for nT = 4 teeth: the teeth are in mesh from the first tooth's entry to the last tooth's exit, five pitches. The driver moves the output for 90°, dwell 270°. Stops per driven turn = z2/(nT + 1) = 4 (an integer). Centre distance cd = m(z1+z2)/2 = 80. Locking: the driver's rim radius RL = 39 lies between its root (35) and pitch (40) circles; at rest it reaches 3 mm inside the driven tip circle (cd - RL = 41 against 44), into a locking gap whose two flanking tooth tips are cut to RC = RL + 0.5 about the driver axis.",
         "range": "driver 360° continuous; driven steps 90° per driver turn",
         "overlays": [
           "forces",
@@ -40446,7 +40446,7 @@
           "plot"
         ],
         "plot": "driven angle vs driver angle (staircase with straight risers)",
-        "notes": "Single-plane form: teeth and lock in one plane, so plan view shows both. The 4 locking gaps of the driven gear are 5 teeth apart; the 8 teeth that flank them have their tips cut concave. The driver's end teeth are shortened (tips 42.8 and 43.5) so they clear the stopped gear, and the ends of its locking rim are relieved. Driven turns opposite to driver."
+        "notes": "Single-plane form: teeth and lock in one plane, so plan view shows both. The driver's 4 teeth are centred on a space; the 4 locking gaps of the driven gear are 5 teeth apart and the 8 teeth that flank them have their tips cut concave. The driver's end teeth are shortened (tips 42.8 and 43.5) and the ends of its locking rim relieved, so they clear the stopped gear (checked over the cycle: no overlap). Driven turns opposite to driver."
       },
       "examples": [
         {
@@ -40512,21 +40512,16 @@
             "shape": {
               "type": "plate",
               "rect": [
-                150,
-                70
-              ],
-              "center": [
-                40,
-                0,
-                -8
+                180,
+                110
               ]
             },
             "at": {
               "frame": {
                 "origin": [
-                  0,
-                  0,
-                  0
+                  -50,
+                  -55,
+                  -8
                 ]
               }
             }
@@ -40535,25 +40530,17 @@
             "id": "driver",
             "role": "driver",
             "shape": {
-              "type": "gear",
+              "type": "intermittentDriver",
               "z": 20,
-              "module": 4,
-              "face": 10,
-              "bore": 8,
-              "cut": {
-                "teeth": 5,
-                "centredAt": 180,
-                "note": "5 consecutive teeth of the 20 spacings, centred on local 180 degrees"
-              },
-              "lockRim": {
-                "radius": 39,
-                "note": "the untoothed 270 degrees are a plain convex rim between the root (35) and pitch (40) circles, relieved at its ends"
-              },
-              "endTeeth": {
-                "entryTip": 42.8,
-                "exitTip": 43.5,
-                "note": "the first and last teeth shortened so they clear the stopped gear"
-              }
+              "m": 4,
+              "kept": 4,
+              "at": 180,
+              "rim": 39,
+              "relief": 12,
+              "entryTip": 42.8,
+              "exitTip": 43.5,
+              "thickness": 10,
+              "bore": 10
             },
             "at": {
               "joint": "O1"
@@ -40562,19 +40549,17 @@
           {
             "id": "driven",
             "role": "output",
+            "symmetry": 4,
             "shape": {
-              "type": "gear",
+              "type": "intermittentDriven",
               "z": 20,
-              "module": 4,
-              "face": 10,
-              "bore": 8,
-              "lockArcs": {
-                "count": 4,
-                "every": 5,
-                "radius": 39.5,
-                "about": "the driver axis at rest",
-                "note": "each arc cut across the tips of the two teeth that flank a locking gap; at rest a locking gap faces the driver (local 180 degrees)"
-              }
+              "m": 4,
+              "every": 5,
+              "cd": 80,
+              "arc": 39.5,
+              "thickness": 10,
+              "bore": 10,
+              "space": true
             },
             "at": {
               "joint": "O2"
@@ -40624,10 +40609,24 @@
               0,
               0
             ],
-            "z": [
-              20,
-              20
-            ]
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "za": 20,
+            "zb": 20,
+            "cb": [
+              80,
+              0,
+              0
+            ],
+            "active": {
+              "driver": "input",
+              "lo": 135,
+              "hi": 225
+            },
+            "note": "in mesh while the driver's five teeth pass, 90 degrees of its turn"
           },
           {
             "id": "L",
@@ -40639,8 +40638,13 @@
               0,
               0
             ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
             "follower": "flat",
-            "note": "the locking rim in a locking arc"
+            "note": "the locking rim in a locking arc holds the driven gear for the rest of the turn"
           }
         ],
         "params": [
@@ -40687,12 +40691,14 @@
               0,
               360
             ],
-            "default": 0
+            "default": 0,
+            "phase": 135,
+            "note": "the cycle starts as the first tooth enters; the reference is mid-dwell"
           }
         ],
         "solve": [
           {
-            "block": "gear-mesh",
+            "block": "indexer",
             "id": "mesh",
             "joints": [
               "O2",
@@ -40700,24 +40706,26 @@
               "L"
             ],
             "in": {
-              "a": "driver",
-              "b": "driven",
-              "m": "m",
-              "cd": "cd",
-              "rim": "RL",
-              "arc": "RC"
-            },
-            "opts": {
-              "z1": 20,
-              "z2": 20,
-              "cut": 5,
-              "window": [
-                135,
-                225
+              "mode": "mutilated",
+              "window": 90,
+              "ratio": -1,
+              "input": "input",
+              "phi0": -180,
+              "wheel": "driven",
+              "center": [
+                80,
+                0,
+                0
               ],
-              "outside": "held by the locking rim"
+              "axis": [
+                0,
+                0,
+                1
+              ]
             },
-            "out": "driven-turn"
+            "out": {
+              "angle": "driven-turn"
+            }
           }
         ],
         "points": [
@@ -40764,7 +40772,7 @@
         "review": {
           "verdict": "rethink",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and issue #216: the single-plane form, so the teeth and the lock read in one plan view. The driver's untoothed rim is a convex locking arc of radius 39 that sits 3 mm deep in a locking gap of the driven gear, whose two flanking tooth tips are cut to a concave arc of radius 39.5 about the driver axis. A mark on the driven gear is traced with equal-time ticks, so stop and go reads; the bridge goes off the mesh."
+          "note": "Applies the 2026-10-19 review and issue #216: the single-plane form, so the teeth and the lock read in one plan view. The driver's untoothed rim is a convex locking arc of radius 39 that sits 3 mm deep in a locking gap of the driven gear, whose two flanking tooth tips are cut to a concave arc of radius 39.5 about the driver axis. A mark on the driven gear is traced with equal-time ticks, so stop and go reads; the bridge goes off the mesh. Rebuild R5 (#216): built on v3 in the single-plane form decided, with 4 driver teeth centred on a space instead of 5: the build showed 5 teeth on a tooth-centred window cannot leave the stopped gear (the end teeth sweep through its flanks); 4 teeth are in mesh for five pitches, so the index stays 90°. The driver's convex locking rim (relieved over 12° at its ends, end teeth 42.8 and 43.5) and the driven gear's concave locking arcs are cut from the record's numbers; a 2D sweep of the two gears over the cycle finds no overlap. Motion by the indexer block's mutilated-gear law (1:1 the other way for 90° of driver, held for 270°); the mesh joint is checked only while engaged. Both gears on live shafts in housings under the base: no bridge over the mesh."
         },
         "principle": [
           {
@@ -40829,7 +40837,7 @@
         },
         "claims": [
           {
-            "text": "5 of 20 teeth advance the driven gear 90° per driver turn",
+            "text": "4 teeth carry the driven gear 90° per driver turn",
             "output": "driven-angle",
             "stat": "range",
             "value": 90,
@@ -40840,7 +40848,8 @@
             "output": "driven-angle",
             "stat": "dwell",
             "value": 270,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
             "text": "in mesh it turns at the gear ratio, 1:1 the other way",

@@ -29,7 +29,7 @@ function relative(Xa: Xf, Xb: Xf): Xf {
   return xf.mul(Xb, xf.inv(Xa));
 }
 
-function wrapped(joint: KinJoint, driverValue: (id: string) => number | undefined): boolean {
+export function wrapped(joint: KinJoint, driverValue: (id: string) => number | undefined): boolean {
   const a = joint.active;
   if (!a) return true;
   const v = driverValue(a.driver);

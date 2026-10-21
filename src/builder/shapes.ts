@@ -13,7 +13,7 @@ import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 import { barrelGroove, camLawOf, flatCam, rollerCam } from "./cams";
-import { genevaCrank, genevaWheel } from "./indexers";
+import { genevaCrank, genevaWheel, intermittentDriven, intermittentDriver } from "./indexers";
 
 export interface BodyGeom {
   id: string;
@@ -135,6 +135,11 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "shaft": {
       const d = num(shape.diameter, 8);
       return { profile: { outer: circle(d / 2, 0, 0, 24), holes: [] }, thick: num(shape.length, 40), approx: false };
+    }
+    case "intermittentDriver":
+    case "intermittentDriven": {
+      const part = type === "intermittentDriver" ? intermittentDriver(shape, gearOutline) : intermittentDriven(shape, gearOutline);
+      return { profile: part.profile, thick: part.thick, approx: false, features: part.features };
     }
     case "genevaWheel":
     case "genevaCrank": {

@@ -3,7 +3,7 @@
 // listed above it.
 import { type BlockFn, type BlockCtx, KinError } from "./ctx";
 import { type SolveStep } from "./types";
-import { D2R, type Vec3, m3, v3, xf, R2D } from "./math";
+import { D2R, TAU, type Vec3, m3, v3, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
@@ -533,15 +533,31 @@ const escapementBlock: BlockFn = (c, s) => {
  * indexer (Geneva and star wheel). in: n (slots or teeth), input (the crank angle, deg, measured from the line of
  * centres with the pin nearest the wheel at 0; for an internal Geneva, `internal: true`, farthest from it), phi0 (its
  * reference value), wheel (body), center, axis, sense (+1 or −1; default −1 for an external Geneva, which turns against
- * its crank, +1 for an internal one).
+ * its crank, +1 for an internal one). `mode: "mutilated"`: a mutilated gear pair, `window` (deg of driver, centred on
+ * φ = 0) and `ratio` (driven per driver while in mesh, default −1).
  * out {angle}: the wheel's angle (deg).
  */
 const indexer: BlockFn = (c, s) => {
   const i = s.in ?? {};
-  const n = c.num(i.n);
+  const n = i.mode === "mutilated" ? 0 : c.num(i.n);
   const phi0 = c.num(i.phi0 ?? 0) * D2R;
   const phi = phi0 + c.delta("in", c.rad(i.input));
   // an external Geneva turns against its crank, an internal one with it
+  if (i.mode === "mutilated") {
+    // a mutilated gear: the driven gear turns at `ratio` while the driver's toothed `window` (deg, centred on φ = 0)
+    // passes the mesh, and is held by the locking rim for the rest of the turn
+    const w = c.num(i.window) * D2R;
+    const ratio = c.num(i.ratio ?? -1);
+    const law = (p: number) => {
+      const turns = Math.round(p / TAU);
+      const local = p - turns * TAU;
+      return ratio * (Math.max(-w / 2, Math.min(w / 2, local)) + turns * w);
+    };
+    const dm = law(phi) - law(phi0);
+    if (typeof i.wheel === "string") spin(c, i.wheel, c.vec(i.center), v3.unit(c.vec(i.axis ?? [0, 0, 1])), dm);
+    outVal(c, s, dm * R2D, "angle");
+    return;
+  }
   const internal = i.internal === true;
   const sense = i.sense !== undefined ? c.num(i.sense) : internal ? 1 : -1;
   const law = internal ? genevaInternalAngle : genevaAngle;

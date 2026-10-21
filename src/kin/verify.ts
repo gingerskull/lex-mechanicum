@@ -2,7 +2,7 @@
 // continuity through toggles. It reads only the joints and the body poses, never the blocks that made them.
 import { KinError } from "./ctx";
 import { TAU, type Vec3, m3, v3, xf, type Xf } from "./math";
-import { ncgResidual, stepResidual, jointResidual } from "./residual";
+import { ncgResidual, stepResidual, jointResidual, wrapped } from "./residual";
 import type { Kinematics } from "./compose";
 import type { Controls, Pose } from "./types";
 
@@ -91,7 +91,8 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const res = jointResidual(r, Xa, Xb, dv);
       for (const v of res) note(r.joint.id, P.u, v);
       const Q = poses[i + 1];
-      if (Q) {
+      // a joint engaged only in a window of a driver (a mutilated gear's mesh) is checked only across steps inside it
+      if (Q && wrapped(r.joint, dv) && wrapped(r.joint, (id) => Q.values[id])) {
         const car = r.joint.carrier;
         const s = stepResidual(r, { a0: Xa, a1: Q.bodies.get(r.joint.a)!, b0: Xb, b1: Q.bodies.get(r.joint.b)!, c0: car ? P.bodies.get(car) : undefined, c1: car ? Q.bodies.get(car) : undefined });
         if (s !== null) note(r.joint.id, P.u, s);
