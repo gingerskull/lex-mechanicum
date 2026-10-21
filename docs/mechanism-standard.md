@@ -275,6 +275,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `cross-bearings` | J3, F2, F8 |
 | `trunnion` | J1, F2, F4, F6 |
 | `piston-bore` | J5, M14 |
+| `ring-carrier` | J6, F1, F2 |
 | `j4-slot-roller` | J4, M14 |
 | `pin-lobe` | J4, M14 |
 | `groove-cam` | J7, M14 |

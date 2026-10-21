@@ -30437,12 +30437,16 @@
               0,
               0
             ],
-            "z": [
-              18,
-              40
-            ],
             "ratio": 0.45,
-            "internal": true
+            "internal": true,
+            "za": 18,
+            "zb": 40,
+            "cb": [
+              0,
+              0,
+              0
+            ],
+            "note": "pitch point; an internal mesh: both centres on one side of it, so both turn the same way"
           }
         ],
         "params": [
@@ -30508,20 +30512,15 @@
             "block": "gear-mesh",
             "id": "mesh",
             "joints": [
-              "M",
-              "O2"
+              "O2",
+              "M"
             ],
             "in": {
-              "a": "pinion",
-              "b": "ring",
-              "za": "z1",
-              "zb": "z2",
-              "module": "m"
+              "joint": "M",
+              "input": "input"
             },
-            "out": "ring-angle",
-            "opts": {
-              "internal": true,
-              "phase": 0
+            "out": {
+              "angle": "ring-turn"
             }
           }
         ],
@@ -30591,7 +30590,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and issue #215: a mark on the ring so its slow turn in the same direction reads. Marks on both pitch circles, ticked every 30 degrees of input, cover equal arcs; the line of centres shows both centres on the same side of the pitch point, which is why both turn the same way, the ring at 0.45 of the pinion."
+          "note": "Applies the 2026-10-19 review (keep) and issue #215: a mark on the ring so its slow turn in the same direction reads. Marks on both pitch circles, ticked every 30 degrees of input, cover equal arcs; the line of centres shows both centres on the same side of the pitch point, which is why both turn the same way, the ring at 0.45 of the pinion. Rebuild R4 (#215): built on v3 from this record; the ring, open in the middle where the pinion runs, rides on three flanged carrier rollers round its rim instead of a centre shaft; the ring's mark is engraved on it and traced; the six phases of the finished build read as decided; the tooth-count choices are not offered as controls, the parts are built for 18/40."
         },
         "principle": [
           {

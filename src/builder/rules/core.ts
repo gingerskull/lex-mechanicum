@@ -7,6 +7,9 @@ import { extrudeOp } from "../../solids/tessellate";
 import type { Solid3 } from "../../solids/types";
 import { type BuildCtx } from "../ctx";
 import { BASE_GAP, BASE_T } from "../constants";
+
+/** Room under a ring gear's rim for its carrier rollers' lower flanges and posts (ring-carrier), mm. */
+const RING_ROOM = 9;
 import { fromPlane, place, planeCoords } from "../frames";
 import { titleOf } from "../lib";
 import { edgeDist } from "../planar";
@@ -127,6 +130,12 @@ export const base: Rule = {
       const reach = 60;
       const zAt = Math.min(s.at[2] - reach * Math.abs(s.axis[2]), s.at[2] + reach * Math.abs(s.axis[2]));
       top = Math.min(top, zAt - pillowRise(10));
+    }
+    // a ring on carrier rollers needs room under its rim for the rollers' lower flanges and their posts
+    for (const j of ctx.joints) {
+      if (j.kit !== "ring-carrier") continue;
+      const ring = ctx.parts.get(j.a === "ground" ? j.b : j.a);
+      if (ring) top = Math.min(top, ring.frame.o[2] - RING_ROOM);
     }
     ctx.base = { top, bottom: top - BASE_T, outline: [] };
     (ctx.fired.base ??= []).push(`level ${top.toFixed(1)}`);

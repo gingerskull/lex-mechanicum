@@ -11,7 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore",
+  "cross-pin", "trunnion", "piston-bore", "ring-carrier",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -67,6 +67,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       const ground = j.a === "ground" || j.b === "ground";
       // a cylinder that swings on its trunnion turns on a pin in the port face under it
       if (ground && j.type === "revolute" && (a?.shape?.type === "cylinder" || b?.shape?.type === "cylinder")) return "trunnion";
+      // a ring gear is open in the middle: it runs on rollers round its rim, not on a centre shaft
+      if (ground && j.type === "revolute" && (a?.shape?.type === "ringGear" || b?.shape?.type === "ringGear")) return "ring-carrier";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
       if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";

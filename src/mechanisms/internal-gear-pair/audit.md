@@ -1,171 +1,215 @@
 # Audit: Internal gear pair (internal-gear-pair)
-standard: 2.6 · date: 2026-10-19 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 111 · FAIL 0 · N/A 10 · open: none
+PASS 146 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.6 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #110 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | DATA · catalogue validator clean (tests/catalog) |
-| P3 | PASS | DATA / SITE · ratio reduction 40/18 = 2.22:1, parallel axes, continuous output, backdrivable, other names, family, motion, level, dof 1, motorised drive: all in the record |
-| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | DATA · motion, forces, benefits, limits; three uses with one line each |
-| P6 | PASS | DATA · Wikipedia, KHK and SDP/SI engineering guides; a making video, an animation, a catalogue; real world is empty: no video of a real internal pair at work was found (none rather than a wrong one) |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts besides names, notes and build rules (engineering record, not on the page); lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · solve(): pinion u, ring u x 18/40 the same way (162° per pinion turn), the roller turns the other way at 72/14 times the ring; the record says 2.22:1 reduction, same direction |
-| P10 | PASS | HAND · velocity of the pinion tooth tip, input and output spin, the pressure angle, a plot of the ring angle over the pinion angle; no traced path (the pinion tip path is a circle, no information) |
-| P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
-| K1 | PASS | HAND · pitch circles, tooth profiles, centre distance 33 and the ring rim are the model's; flanges, screws and marks are fitted round them (check: max link error 0.0e+0 mm) (check: max link error 0.0e+0 mm) |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · only the part family: ring gear, gear, discs, caps; fixed or at placement with spin |
-| K4 | PASS | HAND · roles driver (pinion), output (ring), link (rollers), pin; accent only on the input cap p1 |
-| K5 | PASS | HAND · ring, pinion and rollers all on layer 0; check clean: no INTERFERE, OVERLAP or WARN (check: no INTERFERE, OVERLAP or WARN) |
-| K6 | PASS | DATA · m 3, z1 18, z2 40, 20°, cd 33, rim 72: as the catalogue. Deliberate differences, commented in model.ts: three carrier rollers carry the ring (the catalogue gives it no support); 0.12 mm backlash on the ring flanks; the pinion drawn involute down to the base circle with no undercut |
-| K7 | PASS | HAND · input rotary on the pinion (input rotary on pinion) |
-| D1 | PASS | HAND · involute teeth on the pinion, ring with swapped addendum and dedendum, keyed pinion bore; the rollers plain discs with flanges |
-| D2 | PASS | HAND · the ring is a rim with its teeth and nothing more; the pinion is solid; the bridges are shaped by the rules |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets (screenshots) |
-| D4 | PASS | AUTO · feet and corner holes concentric with the base corner arcs (fired: base (1 solid), feet (2 solids)) |
-| D5 | PASS | AUTO / HAND · bridges over the pinion shaft and over each roller axle, shaped by H.bridge on spigoted posts; nothing sweeps over the pinion or the rollers |
-| D6 | PASS | HAND / STYLE · bridges, flanges and screws read quieter than the gears; the bridge over the pinion is see-through over the mesh |
-| D7 | PASS | HAND · ring and pinion carry only load shape and marks; the richness is in the shafts, bearings, flanges, circlips, screws and marks |
-| A1 | PASS | AUTO · p1 J2, pR0 to pR2 J1, mesh-ring-pinion J6 (the rollers are three J1 joints) (p1 J2, pR0 J1, pR1 J1, pR2 J1, mesh-ring-pinion J6; fired: classify (no solids)) |
-| A2 | PASS | AUTO · p1 a live shaft (accent input, keyed pinion); the roller axles dead axles; the mesh gets mesh hardware (p1 J2, pR0 J1, pR1 J1, pR2 J1, mesh-ring-pinion J6) |
-| A3 | PASS | AUTO · 6800 on the Ø10 pinion shaft in the housing and bridge; F688 in each roller on its Ø8 axle (fired: classify (no solids)) |
-| A4 | PASS | AUTO · stepped keyed pinion shaft with circlip grooves; roller axles shoulder bolts with undercut (fired: j1-dead-axle (81 solids)) |
-| A5 | PASS | AUTO · feather key 3 x 3 on the Ø10 pinion shaft, pinion keyed (fired: j2-live-shaft (29 solids)) |
-| A6 | N/A | AUTO · no fixed plate floating above the base: the ring turns on its rollers and the bridges stand on spigoted posts (fired: standoffs (no solids)) |
-| A7 | PASS | AUTO · 8 mm base, counterbored corners, feet, front scale, clearance hole for every live shaft (fired: base (1 solid), feet (2 solids)) |
-| A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 (fired: fasteners (stage 3)) |
-| A9 | PASS | AUTO / HAND · pinion shaft straddle mounted: housing below, floating bearing in a bridge above; each roller axle held in the base and by a bridge over it: double support everywhere, nothing overhangs (fired: j2-straddle (25 solids)) |
-| A10 | PASS | HAND · ring, pinion and rollers in one plane; bridges above, flanges one each side of the ring; nothing stacked only to clear |
-| A11 | PASS | AUTO / HAND · pinion load: key, shaft, two bearings, housing and bridge posts to the base; ring load: three roller bearings, axles, bridges and posts, base; both axle ends held (fired: j1-dead-axle (81 solids)) |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · the batch issue (#215) holds only this mechanism's decisions; plan and status in #202 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site build) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in rebuild batch R4 (#215): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | PASS | DATA · catalogue validator clean |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no prose in a polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states about the motion is a claim and agrees (T9) |
+| P10 | PASS | HAND · ring and pinion marks traced, ticks every 30 deg; line of centres through both centres to the pitch point; both pitch circles; the 20 deg line of action; plot of ring angle |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 7.1e-15 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 1 block (gear-mesh); no numeric fallback · composed from the block library (gear-mesh, internal); no fallback, no one-off model |
+| K4 | PASS | HAND · pinion driver with the accent on its shaft, ring output |
+| K6 | PASS | DATA · module 3, 18 and 40 teeth: pitch radii 27 and 60, centre distance 33; ring rim radius 72 |
+| K7 | PASS | DATA · drivers input (rotary) · input kind declared with its driven joint |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one rotary driver; the tooth-count design choices are not offered as controls (parts built for 18/40) |
+| K10 | PASS | AUTO / DATA · every closure declared; tooth counts in the mesh joints |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
+| T2 | PASS | HAND · review before the build and again on the six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · principle parts declared; drawn whole, in depth order |
+| T4 | PASS | DATA · fired: trace-marks (1 solid) · a mark on the ring and one on the pinion traced, ticks every 30 deg: the ring's mark (engraved on the ring, F9) shows its slow turn the same way |
+| T5 | PASS | DATA · line of centres O2-O1-pitch point, both pitch circles, the line of action |
+| T6 | PASS | HAND / DATA · both centres on one side of the pitch point, so both turn the same way, the ring at 0.45 |
+| T7 | PASS | DATA · PLAN, where the ring, the pinion inside it and both pitch circles show true |
+| T8 | N/A | DATA · the principle lies in plain view, no section needed |
+| T9 | PASS | AUTO / DATA · claim table: 2 ok, 0 off, 0 uncheckable of 2 |
+| T10 | PASS | AUTO · 0 solids drawn see-through · the bridge over the pinion drawn see-through with its stack (A19); nothing covers the ring: it runs on rollers outside its rim |
+| T11 | PASS | AUTO · 1 support routed, 1 moved off a sweep · the pinion's bridge moved off the mesh; the ring's rollers stand outside the rim |
+| T12 | PASS | HAND · 16 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · nothing goes by in a blink |
+| T14 | PASS | HAND / DATA · the input; no other control (K9) |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · involute pinion and an internal involute ring (addendum and dedendum swapped), module 3; plain parts |
+| D2 | PASS | HAND · material where the teeth carry; plain gear discs on keyed hubs |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · one bridge over the pinion on two posts; three roller posts round the ring; motor flange |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
+| D9 | N/A | AUTO / HAND · no member changes shape |
+| D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
+| D11 | PASS | AUTO · SOLID: 0 of 102 solids unsound |
+| D7 | PASS | HAND · gears plain; richness in the stacks |
+| A1 | PASS | AUTO · M J6, O1 J2, O2 ring-carrier, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · M J6, O1 J2, O2 ring-carrier, drive drive · pinion on a live shaft (J2) straddled by a bridge; the ring, open in the middle, on three carrier rollers round its rim (ring-carrier); internal mesh J6 |
+| A3 | PASS | AUTO · fired: classify (3 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them |
+| A4 | PASS | AUTO · fired: j1-dead-axle (no solids), axial stack builder · stepped shafts with shoulders, grooves, flats and chamfered ends (H.shaft) |
+| A5 | PASS | AUTO · fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
+| A6 | N/A | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · no slide and no floating plate |
+| A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base 8 mm under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (15 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | PASS | AUTO / HAND · fired: placement solver · pinion straddle mounted; the ring carried at three points round its rim |
+| A10 | PASS | HAND · fired: placement (4 solids), placement solver · pinion and ring on one slab; nothing stacked to clear |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes, sets counted (208 solids, 104 unnamed (further items of a listed set)) |
-| A14 | PASS | HAND · roller posts and bridges outside the ring radius (72) and outside every sweep; clearance 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · a note and a badge on every joint, five build rules (5 build rules; no note: none; no badge: none) |
-| A17 | PASS | HAND · housing and pinion shaft from below, rollers on their axles, ring laid on the three flanges, retaining rings screwed on, bridges on their spigots last; every screw reached by its key, bearings pressed out past their circlips |
-| E1 | PASS | AUTO · one level per solid (every solid has one explode level; levels -8 to 2) |
-| E2 | PASS | AUTO · screws, shafts and bought units are groups (57 rigid groups; fired: explode) |
-| E3 | PASS | AUTO · screws leave along their axis to the head side, nuts the other way (screenshots at 28° and 70°) (fired: explode) |
-| E4 | PASS | HAND · bridges and retaining rings go furthest up, ring and pinion in the middle, flanges, spacers and axles below: reverse of assembly |
-| E5 | PASS | AUTO · bearings and circlips stay in their parts (fired: explode) |
-| E6 | PASS | AUTO · motor with its bracket, bearings whole (fired: explode) |
-| E7 | PASS | AUTO · spacers midway (fired: explode) |
-| E8 | PASS | AUTO · keyed parts keep their order on the shaft (fired: explode) |
-| E9 | PASS | HAND · looked at full explode at 28° and 70°, both sheets: nothing inside another part, nothing leaves the frame |
-| J1 | PASS | AUTO · three roller axles: shouldered, bearing in the roller, spacers, internal circlip, thrust washer, bridge on spigoted posts, oil sink (fired: j1-dead-axle (81 solids)) |
-| J2 | PASS | AUTO · pinion: housing with two bearings, sleeve, wave washer, circlips, dowelled; keyed shaft, end retainer, thrust washer, home flag; straddle mounted (fired: j2-live-shaft (29 solids), j2-straddle (25 solids)) |
-| J3 | N/A | AUTO · no such joint here (fired: j3-moving-pin (no solids)) |
-| J4 | N/A | AUTO · no such joint here (fired: j4-slot-roller (no solids)) |
-| J5 | N/A | AUTO · no such joint here (fired: j5-slide (no solids)) |
-| J6 | PASS | AUTO · ring-pinion: hub with set screw on the keyed pinion, eccentric bushing under the housing and in the bridge, marks on the pinion tooth and the ring gap (fired: j6-mesh (2 solids)) |
-| J7 | N/A | AUTO · no such joint here (fired: j7-cam (no solids)) |
-| J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension (fired: j8-belt (2 solids)) |
-| F1 | PASS | AUTO · housing dowelled; every bridge on two spigoted posts (round hole and slot) (served at p1, pR0, pR1, pR2, pR0-bridge-post, pR1-bridge-post, pR2-bridge-post, p1-bridge-post; fired: j2-live-shaft (29 solids)) |
-| F2 | PASS | AUTO · housing bearings on circlips; roller bearings on internal circlips; the ring captured by the roller flange and retaining ring; end retainer; bolt heads (served at p1, pR0, pR1, pR2; fired: j2-live-shaft (29 solids)) |
-| F3 | PASS | AUTO · feather key and hub set screw on the pinion; the rollers turn free, the ring is driven through the mesh (served at p1, mesh-ring-pinion; fired: j2-live-shaft (29 solids)) |
-| F4 | PASS | AUTO / HAND · bronze thrust washers on the pinion and each roller; wave washers in the housing; the flange carries the ring's weight; straight teeth carry no axial thrust (served at p1, pR0, pR1, pR2; fired: j2-live-shaft (29 solids)) |
-| F5 | N/A | AUTO / HAND · turns fully, nothing to over-travel (served at no joint; fired: j5-slide (no solids), stops (no solids)) |
-| F6 | N/A | AUTO / HAND · driven through the mesh; no rest position to hold (served at no joint; fired: j7-cam (no solids)) |
-| F7 | PASS | AUTO / HAND · eccentric bushing under the pinion housing and in its bridge sets the backlash; belt tension at the motor mount (served at p1, mesh-ring-pinion, drive; fired: j6-mesh (2 solids), j5-slide (no solids)) |
-| F8 | PASS | AUTO · open teeth greased at assembly; oil sinks on the roller bridges; bearings sealed or shielded (served at pR0, pR1, pR2; fired: lubrication (no solids)) |
-| F9 | PASS | AUTO / HAND · match mark on the pinion tooth and on the ring gap that meet on the line of centres (rule) (served at mesh-ring-pinion; fired: timing-marks (no solids)) |
-| F10 | PASS | AUTO / HAND · pulley flanges, home flag, fork sensor; no slip clutch (none planned) (served at drive; fired: drive (37 solids)) |
-| M1 | PASS | AUTO · edge breaks on every top face (fired: hardware primitives) |
-| M2 | PASS | HAND · the ring is a rim with no mass to remove; the pinion is small and solid; no lightening needed |
-| M3 | PASS | AUTO · bore entry chamfers on every seat and through hole (fired: j3-moving-pin (no solids), hardware primitives) |
-| M4 | PASS | AUTO / HAND · counterbored base corners and housing screws; countersunk screws flush in the retaining rings; button heads on the posts (fired: base (1 solid), fasteners (stage 3)) |
-| M5 | N/A | AUTO / HAND · no pockets or windows (fired: hardware primitives) |
+| A13 | PASS | AUTO / HAND · 102 solids, 60 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps; details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 4 joint notes; no note: none; no badge: M · a note per joint (the mesh's badge is not a shear case); build rules: the ring runs on three flanged rollers, the base lowered to give their lower flanges room |
+| A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
+| A18 | PASS | AUTO · placement: 1 slabs in the tallest stack (10.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver |
+| A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O1-bridge · bridge first choice, moved off the mesh; least gap 1.5 mm |
+| A20 | PASS | AUTO · support per joint: O1 bridge · one axial stack builder for the pinion; the ring-carrier kit for the ring |
+| A21 | PASS | AUTO · kit per joint: M J6, O1 J2, O2 ring-carrier, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · no stops (both turn on through the cycle); cable clip |
+| E1 | PASS | AUTO · every solid has one explode level; levels -5 to 4 · one level per solid, nothing stretches |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable in ISOMETRIC on both sheets, nothing leaves the frame |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | N/A | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) · no dead axle (the ring's rollers turn on shoulder screws, part of the ring-carrier kit) |
+| J2 | PASS | AUTO · fired: j2-live-shaft (43 solids) · pinion shaft: housing, keyed with a clamp hub, bridge over the top, the drive pulley below |
+| J3 | N/A | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), ring-hub (no solids) · no moving revolute |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J5 | N/A | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) · no slide |
+| J6 | PASS | AUTO · fired: j6-mesh (1 solid), ring-carrier (24 solids), ring-rollers (no solids) · internal mesh: eccentric bushing for the pinion's centre distance, timing marks at the mesh; the ring on three carrier rollers (ring-carrier kit) |
+| J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids) · no shaft in plan |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), ring-carrier (24 solids), strap-sheave (no solids), j13-compliant (no solids) · housing and bridge dowelled; the ring located by its three roller studs in posts on the base |
+| F2 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), ring-carrier (24 solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; the ring held axially by the rollers' flanges above and below its rim |
+| F3 | PASS | AUTO · served at O1; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
+| F4 | PASS | AUTO / HAND · served at O1; fired: j9-crossed-mesh (no solids), j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
+| F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · the gears turn continuously |
+| F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
+| F7 | PASS | AUTO / HAND · served at M; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · eccentric bushing sets the centre distance and backlash |
+| F8 | PASS | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (1 solid) · sealed bearings need none; open contacts oiled or greased where they occur |
+| F9 | PASS | AUTO / HAND · served at M; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), timing-marks (1 solid) · timing marks at the mesh |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) · home flag and fork sensor on the input (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · bosses round every loaded hole |
+| M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (15 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | N/A | HAND · no bracket or plate with a loaded inside corner in this build |
-| M8 | PASS | AUTO · thread undercut on the shoulder bolts and axles (fired: j1-dead-axle (81 solids)) |
-| M9 | PASS | AUTO / HAND · roller axle bolts M6 into a nut and washer below the base; flange screws M2.5 into 6 mm of steel (2.4 d); post screws M5 into the standoffs (fired: j1-dead-axle (81 solids)) |
-| M10 | PASS | AUTO / HAND · steel gears with induction-hardened teeth, case-hardened steel rollers and flanges, aluminium base, bronze washers (208 of 208 solids name a material) |
-| M11 | PASS | AUTO · centre holes and chamfered ends on the shafts (fired: j1-dead-axle (81 solids), hardware primitives) |
-| M12 | PASS | HAND · every head reachable; set screws from the side; bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw, nyloc where a nut, set screws low strength (94 threaded, 0 without a locking method) |
-| M14 | N/A | AUTO / HAND · no sliding wear surface: the rollers turn in bearings, teeth are hardened (fired: j4-slot-roller (no solids)) |
-| V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 (fired: drive (37 solids)) |
-| V2 | PASS | AUTO · one-piece bracket, flange screws up into the base (fired: drive (37 solids)) |
-| V3 | PASS | AUTO / HAND · belt and pulleys clear of feet and housing; clearance 0 (fired: drive (37 solids)) |
-| V4 | PASS | AUTO · flanges, set screws, slotted mount (fired: j8-belt (2 solids)) |
-| V5 | PASS | AUTO · rotary: belt to the input pulley on the pinion shaft (fired: drive (37 solids)) |
-| V6 | PASS | AUTO · home flag, fork sensor, leads to the terminal block, P-clip (fired: drive (37 solids)) |
-| L1 | PASS | STYLE · lint-style clean |
-| L2 | PASS | HAND · model and polish carry geometry, roles, marks and materials only |
-| L3 | PASS | HAND · pinion driver, ring output, rollers link, hardware hw |
-| L4 | PASS | HAND / STYLE · accent on the input cap only |
-| L5 | PASS | AUTO / HAND · screws, bearings and spacers are real solids in real holes; the bridge over the pinion is see-through over the mesh (fired: see-through) |
-| L6 | PASS | AUTO · depth order right at plan, 28°, side and explode in both sheets |
-| L7 | PASS | STYLE · tilt 0° to 88°, no shear |
-| L8 | PASS | AUTO / HAND · match marks and tapped-hole rings are marks |
-| R1 | PASS | HAND · the polish reuses H.plate, H.disc, H.screw and H.boltCircle; no inline standard part |
-| R2 | PASS | HAND · threads M2.5, M3, M5, M6; shafts Ø10 and Ø8 axles; two bearing sizes (threads M2.5, M3, M5, M6; joint Ø 8, 10; bearings 6800-2RS (10x19x5), F688 (8x16x5), F6800ZZ (10x19x5), floating) |
-| R3 | PASS | AUTO · housing, bridge and drive from their subassemblies (fired: hardware primitives) |
-| R4 | PASS | AUTO · package built at build time (package 30.2 KB) |
-| R5 | PASS | HAND · states only what differs; polish about 1 ms |
-| R6 | PASS | FLAG · FLAG: browser bench 2026-10-19: plan 2.85, 28° 3.42, side 2.47, explode 3.09 ms at full detail; setup 11.6 ms; under the 8 ms target at every dial position |
-| R7 | PASS | HAND · model.ts + polish.ts 7.6 KB |
-| R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung (71 of 208 solids on a dropping rung) |
-| DL2 | PASS | HAND · default dial full (model detail full) |
-| DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
-| DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
-| DL5 | PASS | FLAG · FLAG: rung counts and frame times in the detail ladder below |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 100 of 102 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 17 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
+| V1 | PASS | AUTO · fired: drive (26 solids) · pancake motor on the input, belted to the input shaft |
+| V2 | PASS | AUTO · fired: drive (26 solids) · one bracket for the motor |
+| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
+| V5 | PASS | AUTO · fired: drive (26 solids) · rotary input: belt to the input pulley |
+| V6 | PASS | AUTO · fired: drive (26 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records and polish carry no look |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (no solids) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (1 solid) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | N/A | AUTO / DATA · no section or detail view declared |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 24.2 KB · package v2 written at build time |
+| R5 | PASS | HAND · no polish; nothing sampled by hand |
+| R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 33 of 102 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 30.2 KB; site build not checked here · package written; site build left to CI |
-| Q4 | PASS | local: tools/shot · plan, 28°, side, explode at 28° and 70°, both sheets, overlays on, all looked at; attach to #110 |
-| Q5 | PASS | local: tools/bench · browser bench run; flags under Verification |
-| Q6 | PASS | · every row judged |
-| Q7 | PASS | · conformance: internal-gear-pair at 2.6, pass |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 24.2 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · dist/shots3/internal-gear-pair: record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench3 run (desktop) |
+| Q6 | PASS | every row judged |
+| Q7 | PASS | at 3.0 |
+| Q8 | PASS | teaching review: keep (2026-10-20); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| p1 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 3 x Internal circlip DIN 472, Ø19; External circlip DIN 471, Ø10; Socket head M5 x 10 (ISO 4762), into the shaft end; Bearing F6800ZZ (10x19x5), floating | Feather key 3 x 3 x 7 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – turns fully | – driven through the belt | Eccentric bushing Ø26, 0.3 mm offset bore Ø12, flanged; Eccentric bushing Ø25, 0.3 mm offset bore Ø19, flanged, top of the shaft | – sealed or shielded bearings | – the marks are on the mesh | – see drive |
-| pR0 | J1 | 2 x spigot | Internal circlip DIN 472, Ø16; Bearing F688 (8x16x5) | – the roller turns free on its bearing; torque is friction at the rim | Thrust washer 8.2x10.8, bronze | – turns fully, nothing to over-travel | – driven through the mesh; no rest position to hold | – the ring position is set by the three flanges; backlash is at the pinion | Bridge over the pivot, on two spigoted posts | – no phase | – nothing to protect |
-| pR1 | J1 | 2 x spigot | Internal circlip DIN 472, Ø16; Bearing F688 (8x16x5) | – the roller turns free on its bearing; torque is friction at the rim | Thrust washer 8.2x10.8, bronze | – turns fully, nothing to over-travel | – driven through the mesh; no rest position to hold | – the ring position is set by the three flanges; backlash is at the pinion | Bridge over the pivot, on two spigoted posts | – no phase | – nothing to protect |
-| pR2 | J1 | 2 x spigot | Internal circlip DIN 472, Ø16; Bearing F688 (8x16x5) | – the roller turns free on its bearing; torque is friction at the rim | Thrust washer 8.2x10.8, bronze | – turns fully, nothing to over-travel | – driven through the mesh; no rest position to hold | – the ring position is set by the three flanges; backlash is at the pinion | Bridge over the pivot, on two spigoted posts | – no phase | – nothing to protect |
-| mesh-ring-pinion | J6 | – located by the shafts | – nothing to retain | Gear hub Ø22, set screw M3 on the key; Set screw M3 (DIN 916), threadlocked | – straight teeth, no thrust | – turns fully, nothing to over-travel | – driven through the mesh; no rest position to hold | Eccentric bushing Ø26, 0.3 mm offset bore Ø12, flanged; Eccentric bushing Ø25, 0.3 mm offset bore Ø19, flanged, top of the shaft | – open teeth greased at assembly | Ring gear, 40 teeth, 4 x M2.5 tapped in the rim for the load; Pinion, 18 teeth | – see drive |
-| pR0-bridge-post | post | 2 x spigot | – | – | – | – | – | – | – | – | – |
-| pR1-bridge-post | post | 2 x spigot | – | – | – | – | – | – | – | – | – |
-| pR2-bridge-post | post | 2 x spigot | – | – | – | – | – | – | – | – | – |
-| drive | drive | – | – | – | – | – | – | bracket | – | – | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
-| p1-bridge-post | post | 2 x spigot | – | – | – | – | – | – | – | – | – |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| M | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Pinion; Ring | none |
+| O1 | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 14 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | ring-carrier | – | – | – | Standoff Ø10, M5 | Roller flange, under the rim; Roller flange, over the rim | none | none | none | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| O1-bridge | O1 | bridge | moved | 1.5 | pinion, ring | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| ring | no hub: the model has no shaft at its centre | three carrier rollers on dead axles at 90°, 210°, 330° (model), a flange under the ring and a retaining ring over it (polish) | a ring gear has no hub; this carries it with nothing over the mesh (F2, F4) |
-| ring output | none | four M2.5 tapped holes on the rim | the load is taken from the ring (F3) |
-| roller angles | 100°, 220°, 340° | 90°, 210°, 330° | the drive's bracket and its screw hole clear the base edge (M6) |
+| O2 (ring) | a centre shaft (J2) | three flanged carrier rollers round the rim (ring-carrier) | the ring is open in the middle where its pinion runs: a centre shaft would cross the pinion's teeth; promoted to a kit (ring gears in internal, planetary and Ravigneaux trains) |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 14 | 0 | 3.18 |
-| DL-B | 0 | 249 | 2.35 |
-| DL-C | 0 | 0 | 2.35 |
-| DL-D | 23 | 0 | 2.04 |
-| DL-E | 8 | 8 | 1.90 |
-| DL-F | 0 | 0 | 1.93 |
-| DL-G | 0 | 0 | 1.66 |
-| DL-H | 26 | 0 | 1.53 |
-| never | 137 | 153 | 3.44 (full) |
+| DL-A | 5 | 0 | – |
+| DL-B | 0 | 275 | – |
+| DL-C | 0 | 0 | 1.34 |
+| DL-D | 11 | 0 | – |
+| DL-E | 8 | 3 | – |
+| DL-F | 0 | 0 | – |
+| DL-G | 0 | 0 | 1.18 |
+| DL-H | 9 | 0 | – |
+| never | 69 | 101 | 1.00 (full) |
 
 ## Promotion candidates
-- A ring gear carried on rollers (flange under, retaining ring over, tapped output holes) is the first of its kind; a second internal-gear mechanism (a planetary with a rotating ring, Ravigneaux) makes it a primitive.
+None left: the ring on carrier rollers (ring-carrier) is a kit of the builder.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 30.2 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets, drawn in local Chrome to dist/shots/internal-gear-pair/ (plan, 28° and the explode looked at) · bench: browser, DPR 1.5, 2026-10-19; plan 2.85 ms, 28° 3.42 ms, side 2.47 ms, explode 70° 3.09 ms at full detail, 8 ms held at every dial (R6)
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.2 KB
+screenshots: dist/shots3/internal-gear-pair (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 1.00 ms full, 1.34 at C, 1.18 at G; phone by David)

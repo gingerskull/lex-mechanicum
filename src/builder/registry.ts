@@ -8,6 +8,7 @@ import { drive, explode, fasteners, feet, headroom, locking, lubrication, materi
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
 import { pistonBore, trunnion } from "./rules/cylinder";
+import { ringCarrier } from "./rules/ring";
 import type { Rule } from "./rules/types";
 
 const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
@@ -30,6 +31,7 @@ export const rules: Rule[] = [
   crossBearings,
   trunnion,
   pistonBore,
+  ringCarrier,
   byId("j4-slot-roller"),
   byId("pin-lobe"),
   byId("groove-cam"),
