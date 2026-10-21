@@ -2,7 +2,7 @@
 // library page until hover, and the JavaScript a mechanism page loads under 96 KB gzipped: its scripts, everything they
 // import (the engine included), and its own model, package excluded (R8, SS8). Other mechanisms' model chunks are
 // imported dynamically and never fetched by that page, so they are not counted; each stays under 4 KB instead.
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
@@ -21,11 +21,16 @@ function closure(file: string, seen = new Set<string>(), skip: (f: string) => bo
     const f = join("_astro", m[1]!.replace(/^\.\//, "")).split("\\").join("/");
     if (!skip(f)) closure(f, seen, skip);
   }
+  // a module worker the page starts (the v3 stage's setup) is part of what the page loads
+  for (const m of src.matchAll(/new URL\(\s*[`"'][^`"']*?(_astro\/[^`"']+\.js)[`"']/g)) if (!skip(m[1]!)) closure(m[1]!, seen, skip);
   return seen;
 }
 
 /** A mechanism's model chunks: every lazily loaded model module. */
 const isModel = (f: string) => /(^|\/)model\.[\w-]+\.js$/.test(f);
+
+/** Every mechanism page in the build. */
+const pages = (): string[] => readdirSync(join(OUT, "mechanisms"));
 
 describe("site build", () => {
   it("has the library and a page for every registered mechanism", () => {
@@ -49,18 +54,27 @@ describe("site build", () => {
 
   it("keeps the JavaScript a mechanism page loads under 96 KB gzipped, and every model chunk under 4 KB", () => {
     const models = new Set<string>();
-    for (const id of Object.keys(mechanisms)) for (const src of scripts(read(join("mechanisms", id, "index.html")))) for (const f of closure(src.replace(/^\//, ""))) if (isModel(f)) models.add(f);
+    for (const id of pages()) for (const src of scripts(read(join("mechanisms", id, "index.html")))) for (const f of closure(src.replace(/^\//, ""))) if (isModel(f)) models.add(f);
     for (const f of models) expect(gzipSync(read(f)).byteLength, f).toBeLessThan(4 * 1024);
-    for (const id of Object.keys(mechanisms)) {
+    for (const id of pages()) {
       const files = new Set<string>();
       for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files, isModel);
-      // the page's own model: the model chunk that defines its id
+      // the page's own model: the model chunk that defines its id (a mechanism on engine v3 has none)
       const q = "[\"'`]";
       const own = [...models].filter((f) => new RegExp(`id:\\s*${q}${id}${q}`).test(read(f)));
-      expect(own.length, `${id}: its model chunk`).toBeGreaterThan(0);
+      if (id in mechanisms) expect(own.length, `${id}: its model chunk`).toBeGreaterThan(0);
       for (const f of own) closure(f, files);
       const gz = [...files].reduce((n, f) => n + gzipSync(read(f)).byteLength, 0);
       expect(gz, `${id}: ${[...files].join(", ")}`).toBeLessThan(96 * 1024);
+    }
+  });
+
+  it("counts the setup worker in a v3 page's JavaScript", () => {
+    const v3 = pages().filter((id) => read(join("mechanisms", id, "index.html")).includes('data-engine="v3"'));
+    for (const id of v3) {
+      const files = new Set<string>();
+      for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files, isModel);
+      expect([...files].some((f) => /edges-worker/.test(f)), id).toBe(true);
     }
   });
 

@@ -10,7 +10,7 @@ import type { MeshData, Vec3 } from "../../solids/types";
 import { DRAFT, type RoleSurface, type SurfaceKey } from "../../style/draft";
 import { FORM } from "../../style/form";
 import type { Ladder } from "../detail";
-import { bake, type Baked } from "./bake";
+import { bake, BAKE, type Baked } from "./bake";
 import type { Item3 } from "./annotate";
 import type { Poser } from "./poser";
 
@@ -34,6 +34,8 @@ export interface Scene {
   info: SheetInfo;
   /** Joint axes by joint id (unit, world), for axis-line overlays; the record's `kin.joints[].axis`. */
   axes?: Record<string, Vec3>;
+  /** The vertex and edge arrays when the setup worker already made them (R9); else `runtime` bakes them. */
+  baked?: Baked;
   /** Force and angle items per phase and the points that carry a velocity arrow (SD14): none unless the mechanism gives them. */
   items?: { forces?(u: number): Item3[]; angles?(u: number): Item3[]; velocity?: { point: string; max: number }[] };
 }
@@ -86,10 +88,7 @@ export const applyMat = (m: ArrayLike<number>, p: Vec3, o = 0): Vec3 => [
 export function runtime(scene: Scene): Runtime {
   const { pkg, poser } = scene;
   const n = pkg.solids.length;
-  const baked = bake(pkg, scene.meshes, scene.edges, pkg.shapes.length ? pkg.shapes : scene.meshes.map(() => ({})), {
-    ringSegments: DRAFT.lines.accentRing.segments,
-    ringRadius: DRAFT.lines.accentRing.radius,
-  });
+  const baked = scene.baked ?? bake(pkg, scene.meshes, scene.edges, pkg.shapes.length ? pkg.shapes : scene.meshes.map(() => ({})), BAKE);
   const isBase = new Uint8Array(n);
   const isPlate = new Uint8Array(n);
   const principle = new Uint8Array(n);

@@ -7,7 +7,7 @@
 import { DRAFT } from "../../style/draft";
 import type { ResolvedTheme } from "../../style/theme";
 import { MARK_KINDS } from "../../style/kinds";
-import type { Card } from "../canvas";
+import type { Card, CanvasFactory } from "../canvas";
 import { tile } from "../patterns";
 import { EF2, VF, type Baked } from "./bake";
 import type { Camera } from "./camera";
@@ -58,16 +58,24 @@ export function onRestored(f: () => void): () => void {
   return () => listeners.delete(f);
 }
 
-function compile(gl: WebGL2RenderingContext, vs: string, fs: string): WebGLProgram {
+/** Submits a program: compiles both shaders and links, without asking for the result yet. */
+function submit(gl: WebGL2RenderingContext, vs: string, fs: string): { p: WebGLProgram; shaders: WebGLShader[] } {
   const p = gl.createProgram()!;
+  const shaders: WebGLShader[] = [];
   for (const [type, src] of [[gl.VERTEX_SHADER, vs], [gl.FRAGMENT_SHADER, fs]] as const) {
     const s = gl.createShader(type)!;
     gl.shaderSource(s, src);
     gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS) && !gl.isContextLost()) throw new Error(`render: shader: ${gl.getShaderInfoLog(s)}`);
     gl.attachShader(p, s);
+    shaders.push(s);
   }
   gl.linkProgram(p);
+  return { p, shaders };
+}
+
+/** Asks for the result of a submitted program (this waits for the driver) and throws on an error. */
+function settle(gl: WebGL2RenderingContext, { p, shaders }: { p: WebGLProgram; shaders: WebGLShader[] }): WebGLProgram {
+  for (const s of shaders) if (!gl.getShaderParameter(s, gl.COMPILE_STATUS) && !gl.isContextLost()) throw new Error(`render: shader: ${gl.getShaderInfoLog(s)}`);
   if (!gl.getProgramParameter(p, gl.LINK_STATUS) && !gl.isContextLost()) throw new Error(`render: link: ${gl.getProgramInfoLog(p)}`);
   return p;
 }
@@ -84,9 +92,15 @@ function uniforms(gl: WebGL2RenderingContext, p: WebGLProgram): U {
 
 function build(gl: WebGL2RenderingContext, canvas: HTMLCanvasElement, gen: number): Gpu3 {
   const t0 = performance.now();
-  const peel = compile(gl, PEEL_VERT, PEEL_FRAG);
-  const comp = compile(gl, QUAD_VERT, COMP_FRAG);
-  const line = compile(gl, LINE_VERT, LINE_FRAG);
+  // all three programs are handed to the driver before the first result is asked for, and with
+  // KHR_parallel_shader_compile on they build on the driver's own threads at the same time
+  gl.getExtension("KHR_parallel_shader_compile");
+  const sp = submit(gl, PEEL_VERT, PEEL_FRAG);
+  const sc = submit(gl, QUAD_VERT, COMP_FRAG);
+  const sl = submit(gl, LINE_VERT, LINE_FRAG);
+  const peel = settle(gl, sp);
+  const comp = settle(gl, sc);
+  const line = settle(gl, sl);
   return { gl, canvas, gen, lost: false, peel, comp, line, up: uniforms(gl, peel), uc: uniforms(gl, comp), ul: uniforms(gl, line), patTex: null, w: 0, h: 0, layers: [], out: null, buildMs: performance.now() - t0 };
 }
 
@@ -109,6 +123,9 @@ export function gpu3(card: Card): Gpu3 {
   G = g;
   return g;
 }
+
+/** Makes the shared context and builds its programs now, so a page does it while its data loads (R9). */
+export const warm3 = (f: CanvasFactory): Gpu3 => gpu3({ f } as unknown as Card);
 
 /** False while the shared context is lost: a frame then keeps the image it has, and redraws once onRestored fires. */
 export const gpuReady = (card: Card): boolean => {
@@ -201,6 +218,8 @@ export interface Stats3 {
   edges: number;
   layers: number;
   draws: number;
+  /** How long the GPU was still busy with the previous frame when this one started (a fence), ms: the adaptive dial's measure (DL4). */
+  gpuLagMs: number;
 }
 
 /** What a frame needs besides the solid table. */
@@ -235,11 +254,13 @@ export class Geometry {
   private tableTex: WebGLTexture;
   private rows: number;
   private px = new Uint8Array(4);
+  private fence: WebGLSync | null = null;
+  private fenceAt = 0;
 
   constructor(readonly g: Gpu3, readonly baked: Baked, readonly n: number) {
     const gl = g.gl;
     this.gen = g.gen;
-    this.stats = { tris: baked.nVerts / 3, edges: baked.nEdges, layers: 0, draws: 0 };
+    this.stats = { tris: baked.nVerts / 3, edges: baked.nEdges, layers: 0, draws: 0, gpuLagMs: 0 };
     this.vao = gl.createVertexArray()!;
     gl.bindVertexArray(this.vao);
     const vb = gl.createBuffer()!;
@@ -302,6 +323,13 @@ export class Geometry {
     targets(g, p.cw, p.ch);
     patterns(g, p.card);
     stats.draws = 0;
+    // is the GPU done with the previous frame?
+    stats.gpuLagMs = 0;
+    if (this.fence) {
+      if (gl.getSyncParameter(this.fence, gl.SYNC_STATUS) !== gl.SIGNALED) stats.gpuLagMs = performance.now() - this.fenceAt;
+      gl.deleteSync(this.fence);
+      this.fence = null;
+    }
     gl.bindTexture(gl.TEXTURE_2D, this.tableTex);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, TABLE_W, this.rows, gl.RGBA, gl.FLOAT, table);
     gl.viewport(0, 0, p.cw, p.ch);
@@ -409,6 +437,8 @@ export class Geometry {
     gl.blitFramebuffer(0, 0, p.cw, p.ch, 0, g.h - p.ch, p.cw, g.h, gl.COLOR_BUFFER_BIT, gl.NEAREST);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     stats.layers = K;
+    this.fence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+    this.fenceAt = performance.now();
   }
 
   /** Waits for the GPU: a one-pixel read-back (the bench's "gpu" time). */
@@ -421,6 +451,8 @@ export class Geometry {
   dispose(): void {
     const gl = this.g.gl;
     if (this.g.gen !== this.gen || gl.isContextLost()) return;
+    if (this.fence) gl.deleteSync(this.fence);
+    this.fence = null;
     for (const b of this.buffers) gl.deleteBuffer(b);
     gl.deleteVertexArray(this.vao);
     gl.deleteVertexArray(this.evao);

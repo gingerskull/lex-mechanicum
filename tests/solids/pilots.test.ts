@@ -6,6 +6,9 @@ import { encode2 } from "../../src/package/format2";
 import { checkMesh } from "../../src/solids/check";
 import { manifold, meshOf } from "../../src/solids/manifold";
 import { meshOfShape } from "../../src/solids/prepare";
+import { bake, BAKE } from "../../src/render/v3/bake";
+import { staticPoser } from "../../src/render/v3/poser";
+import { runtime } from "../../src/render/v3/scene";
 import { setupForWorker, setupInline } from "../../src/solids/setup";
 import { volume } from "../../src/solids/tessellate";
 
@@ -53,5 +56,20 @@ describe.each(PILOTS)("%s", (id) => {
     expect(w.result.pkg.shapes).toEqual([]);
     expect(w.result.pkg.solids.length).toBe(built[id]!.pkg.solids.length);
     expect(new Set(w.transfer).size).toBe(w.transfer.length);
+  });
+
+  it("bakes the GPU arrays in the worker exactly as the session would", async () => {
+    const blob = await encode2(built[id]!.pkg);
+    const a = await setupInline(blob);
+    const w = await setupForWorker(blob);
+    const own = bake(a.pkg, a.meshes, a.edges, a.pkg.shapes, BAKE);
+    const got = w.result.baked!;
+    expect(got.nVerts).toBe(own.nVerts);
+    expect(got.nEdges).toBe(own.nEdges);
+    expect(Array.from(got.verts)).toEqual(Array.from(own.verts));
+    expect(Array.from(got.edges)).toEqual(Array.from(own.edges));
+    expect(Array.from(got.vrange)).toEqual(Array.from(own.vrange));
+    // a baked scene gets the same runtime as one the session bakes
+    expect(runtime({ pkg: w.result.pkg, meshes: w.result.meshes, edges: w.result.edges, baked: got, poser: staticPoser, teaching: null, info: { title: id, no: "" } }).n).toBe(a.pkg.solids.length);
   });
 });
