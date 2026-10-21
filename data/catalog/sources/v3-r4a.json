@@ -94,11 +94,15 @@
             0,
             0
           ],
-          "z": [
-            14,
-            28
+          "ratio": -0.5,
+          "za": 14,
+          "zb": 28,
+          "cb": [
+            84,
+            0,
+            0
           ],
-          "ratio": -0.5
+          "note": "pitch point; signed about each body's own axis"
         }
       ],
       "params": [
@@ -165,20 +169,15 @@
           "block": "gear-mesh",
           "id": "mesh",
           "joints": [
-            "M",
-            "O2"
+            "O2",
+            "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "gear",
-            "za": "z1",
-            "zb": "z2",
-            "module": "m"
+            "joint": "M",
+            "input": "input"
           },
-          "out": "gear-angle",
-          "opts": {
-            "external": true,
-            "phase": 6.429
+          "out": {
+            "angle": "gear-turn"
           }
         }
       ],
@@ -248,7 +247,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The pair reads as the textbook figure: two pitch circles rolling at the pitch point, the gear turning the other way at half speed. Marks on both pitch circles with ticks every 30 degrees of input show equal arcs at the pitch line, which is why the ratio is the tooth ratio; the line of action is drawn at the 20 degree pressure angle."
+        "note": "Applies the 2026-10-19 review (keep). The pair reads as the textbook figure: two pitch circles rolling at the pitch point, the gear turning the other way at half speed. Marks on both pitch circles with ticks every 30 degrees of input show equal arcs at the pitch line, which is why the ratio is the tooth ratio; the line of action is drawn at the 20 degree pressure angle. Rebuild R4 (#215): built on v3 from this record; the six phases of the finished build read as decided (the bridges over both gears drawn see-through, moved off the pitch point); the tooth-count choices are not offered as controls, the parts are built for 14/28."
       },
       "principle": [
         {
