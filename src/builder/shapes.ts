@@ -35,6 +35,11 @@ export interface BodyGeom {
   pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number }[];
   /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
   plan?: Vec2[];
+  /**
+   * A compound gear's further toothed levels on the same body (a cluster: a `gear` with `cluster`), each in a slab of
+   * its own above the body's part; a mesh whose tooth count for this body is a level's meshes with that level.
+   */
+  levels?: { z: number; profile: Profile; thick: number }[];
 }
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -170,11 +175,34 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    const levels = clusterLevels(shape);
+    if (levels.length) geom.levels = levels;
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
   return out;
 }
+
+/** The further levels of a compound gear (`cluster`: [{ z, module, face, bore }]), plain spur outlines. */
+function clusterLevels(shape: Record<string, unknown>): NonNullable<BodyGeom["levels"]> {
+  if (String(shape.type) !== "gear" || !Array.isArray(shape.cluster)) return [];
+  return (shape.cluster as Record<string, unknown>[]).map((l) => {
+    const z = num(l.z, 12);
+    return { z, profile: { outer: gearOutline(z, num(l.module, num(shape.module, 2))), holes: [circle(num(l.bore, num(shape.bore, 6)) / 2, 0, 0, 28)] }, thick: num(l.face, num(shape.face, 10)) };
+  });
+}
+
+/** Which level of a body a mesh joint reaches: 0 its own part, k its k-th cluster level (by the tooth count the joint gives it). */
+export function meshLevel(g: BodyGeom | undefined, j: { a: string; b: string; za?: unknown; zb?: unknown }): number {
+  if (!g?.levels?.length) return 0;
+  const z = g.id === j.a ? j.za : g.id === j.b ? j.zb : undefined;
+  if (typeof z !== "number" || z === num(g.shape.z, 20)) return 0;
+  const k = g.levels.findIndex((l) => l.z === z);
+  return k < 0 ? 0 : k + 1;
+}
+
+/** The placer's name for a body's k-th cluster level. */
+export const levelId = (body: string, k: number): string => (k ? `${body}#${k}` : body);
 
 /**
  * Gears in mesh are turned so a tooth of the first meets a gap of the second at the mesh point (J6, J9): an outline
@@ -189,12 +217,20 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
     if (!at) continue;
     ([[j.a, 0], [j.b, 1]] as const).forEach(([id, k]) => {
       const g = geoms.get(id);
-      if (!g || turned.has(id) || String(g.shape.type) !== "gear") return;
-      const z = num(g.shape.z, 20);
+      if (!g || String(g.shape.type) !== "gear") return;
+      const lv = meshLevel(g, j);
+      const key = levelId(id, lv);
+      if (turned.has(key)) return;
+      const z = lv ? g.levels![lv - 1]!.z : num(g.shape.z, 20);
       const uv = planeCoords(g.frame, at).uv;
       const a = Math.atan2(uv[1], uv[0]) + (k ? Math.PI / z : 0);
-      if (Math.abs(a) > 1e-9) g.profile = { outer: rot(g.profile.outer, a), holes: g.profile.holes.map((h) => rot(h, a)) };
-      turned.add(id);
+      if (Math.abs(a) > 1e-9) {
+        if (lv) {
+          const L = g.levels![lv - 1]!;
+          L.profile = { outer: rot(L.profile.outer, a), holes: L.profile.holes.map((h) => rot(h, a)) };
+        } else g.profile = { outer: rot(g.profile.outer, a), holes: g.profile.holes.map((h) => rot(h, a)) };
+      }
+      turned.add(key);
     });
   }
 }

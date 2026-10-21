@@ -38,4 +38,17 @@ describe("placement solver", () => {
     expect(slab("j")).toBeGreaterThan(slab("crank"));
     expect(slab("k")).toBeGreaterThan(slab("j"));
   });
+
+  it("stacks a compound gear's levels one slab apart, each meshing at its own level", async () => {
+    const { ctx } = await buildWithContext(recordById("gear-train")!);
+    ctxs.push(ctx);
+    const slab = (b: string) => ctx.placement.slab.get(b)![1];
+    // the cluster's 36 teeth mesh with the input in one slab, its 12-tooth level with the output in the next
+    expect(slab("cluster#1")).toBe(slab("cluster") + 1);
+    expect(slab("a")).toBe(slab("cluster"));
+    expect(slab("d")).toBe(slab("cluster#1"));
+    const level = ctx.solids.find((s) => s.id === "cluster-z12")!;
+    expect(level.body).toBe("cluster");
+    expect(ctx.placement.conflicts).toEqual([]);
+  });
 });

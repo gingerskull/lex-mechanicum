@@ -6,7 +6,7 @@ import { H } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { type Vec3, xf } from "../kin/math";
 import type { Solid3 } from "../solids/types";
-import type { BuildCtx, JointNote } from "./ctx";
+import { ownParts, type BuildCtx, type JointNote } from "./ctx";
 import { place, type Frame } from "./frames";
 import { Local } from "./lib";
 
@@ -74,10 +74,10 @@ export function polishApi(ctx: BuildCtx): PolishApi {
       const x = g?.frame.x ?? [1, 0, 0];
       return { o, x, z: z as Vec3 };
     },
-    get: (id) => ctx.get(id) ?? [...ctx.parts.values(), ...ctx.twins.values()].find((s) => s.id === id),
+    get: (id) => ctx.get(id) ?? ownParts(ctx).find((s) => s.id === id),
     find(f) {
       const m = match(f);
-      return [...ctx.solids, ...ctx.parts.values(), ...ctx.twins.values()].filter(m);
+      return [...ctx.solids, ...ownParts(ctx)].filter(m);
     },
     add(...s) {
       ctx.rule = "polish";

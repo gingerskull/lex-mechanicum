@@ -4,7 +4,8 @@
 import { circle, type Vec2 } from "../core/geom";
 import { v3, xf, type Vec3 } from "../kin/math";
 import type { Solid3 } from "../solids/types";
-import type { BuildCtx } from "./ctx";
+import { ownParts, type BuildCtx } from "./ctx";
+import { levelId, meshLevel } from "./shapes";
 import { fromPlane, parallel, planeCoords, type Frame } from "./frames";
 import { Local } from "./lib";
 import type { JointInfo } from "./sites";
@@ -73,7 +74,8 @@ export function contactOf(ctx: BuildCtx, ji: JointInfo): Contact | null {
   const xs = loc.map((q) => q[0]);
   const ys = loc.map((q) => q[1]);
   const range = (b: string): [number, number] | null => {
-    const e = ctx.extent(b);
+    // a mesh with a compound gear runs at the level it meets
+    const e = ctx.extent(ji.joint.type === "gear-mesh" ? levelId(b, meshLevel(ctx.geoms.get(b), ji.joint)) : b);
     if (!e || !parallel(e.frame.z, fam.z)) return null;
     return [e.w0, e.w1];
   };
@@ -111,7 +113,7 @@ export function stadium(x0: number, x1: number, r: number, y = 0): Vec2[] {
 
 /** Cuts a ring (given in the contact frame, about the contact point) from a body's part as a hole in its profile. */
 export function cutRing(ctx: BuildCtx, c: Contact, solidId: string, ring: Vec2[]): void {
-  const part = [...ctx.parts.values(), ...ctx.twins.values()].find((p) => p.id === solidId);
+  const part = ownParts(ctx).find((p) => p.id === solidId);
   if (!part) return;
   const p0 = planeCoords(c.frame, c.at).uv;
   const pts = ring.map(([u, v]): Vec2 => planeCoords(part.frame, fromPlane(c.frame, [p0[0] + u, p0[1] + v], 0)).uv);

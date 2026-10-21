@@ -78,6 +78,15 @@ export const placement: Rule = {
       };
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
+      // a compound gear's further levels, each on its own slab above the part (keyed to the same shaft)
+      (g.levels ?? []).forEach((L, i) => {
+        const r = ctx.extent(`${id}#${i + 1}`);
+        if (!r) return;
+        const lo = fromPlane(r.frame, planeCoords(r.frame, g.frame.o).uv, r.w0);
+        const lv: Solid3 = { ...part, id: `${id}-z${L.z}`, name: `${titleOf(id)}, ${L.z}-tooth level`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick), marks: [], joints: [...part.joints] };
+        ctx.levels.set(id, [...(ctx.levels.get(id) ?? []), lv]);
+        (ctx.fired.placement ??= []).push(lv.id);
+      });
       for (const pc of g.pieces ?? [])
         ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });
     }

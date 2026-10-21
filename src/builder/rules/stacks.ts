@@ -3,7 +3,7 @@
 // solver set, and records the hardware, the bores it needs and the engineering note (A16).
 import { circle } from "../../core/geom";
 import type { Solid3 } from "../../solids/types";
-import type { BuildCtx } from "../ctx";
+import { ownParts, type BuildCtx } from "../ctx";
 import { fromPlane, parallel, planeCoords, type Frame } from "../frames";
 import { type Member, titleOf } from "../lib";
 import { bossRadius } from "./core";
@@ -32,9 +32,10 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
   for (const b of site.bodies) {
     const joint = site.joints.find((j) => ctx.kin.joints.find((q) => q.id === j && (q.a === b || q.b === b)));
     const R = joint ? bossRadius(ctx, b, joint) : 8;
-    for (const part of [ctx.parts.get(b), ctx.twins.get(b)]) {
+    const lv = ctx.levels.get(b) ?? [];
+    for (const [k, part] of [ctx.parts.get(b), ctx.twins.get(b), ...lv].entries()) {
       if (!part) continue;
-      const slab = ctx.extent(b);
+      const slab = ctx.extent(k >= 2 ? `${b}#${k - 1}` : b);
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
       // the twin's second half sits in its own slab
       const w = (part.frame.o[0] - frame.o[0]) * frame.z[0] + (part.frame.o[1] - frame.o[1]) * frame.z[1] + (part.frame.o[2] - frame.o[2]) * frame.z[2];
@@ -66,7 +67,7 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
 
 /** A bore in a part, at the world point of the axis, as a clockwise hole in its profile. */
 export function cutBore(ctx: BuildCtx, solidId: string, at: readonly number[], r: number): void {
-  const part = [...ctx.parts.values(), ...ctx.twins.values()].find((p) => p.id === solidId);
+  const part = ownParts(ctx).find((p) => p.id === solidId);
   if (!part) return;
   const uv = planeCoords(part.frame, [at[0]!, at[1]!, at[2]!]).uv;
   part.profile.holes.push(circle(r, uv[0], uv[1], Math.max(24, Math.round(r * 5))).reverse());

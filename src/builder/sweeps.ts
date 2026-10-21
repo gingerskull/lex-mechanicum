@@ -172,6 +172,7 @@ export class Sweeps {
     if (p) out.push(p);
     const t = this.ctx.twins.get(body);
     if (t) out.push(t);
+    out.push(...(this.ctx.levels.get(body) ?? []));
     for (const s of this.ctx.solids) if (s.body === body) out.push(s);
     return out;
   }

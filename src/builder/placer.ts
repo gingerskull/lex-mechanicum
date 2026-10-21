@@ -12,7 +12,7 @@ import type { Kin } from "../kin/types";
 import { HEADROOM, LATERAL, PITCH, SLAB_GAP, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
 import { pointDist, ringDist } from "./planar";
-import type { BodyGeom } from "./shapes";
+import { type BodyGeom, levelId, meshLevel } from "./shapes";
 import type { JointInfo, Site } from "./sites";
 
 export interface Sampled {
@@ -82,12 +82,24 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
   // a body no joint reaches stands at its own frame (a fixed plate, a port face): it takes no slab
   const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
   const ids = [...geoms.keys()].filter((id) => joined.has(id));
+  // a compound gear's further levels are placed as bodies of their own, each one slab above the last (`#k`)
+  const level = new Map<string, { body: string; k: number }>();
+  for (const id of ids) (geoms.get(id)!.levels ?? []).forEach((_, i) => level.set(levelId(id, i + 1), { body: id, k: i + 1 }));
+  const geomOf = (id: string): BodyGeom => {
+    const l = level.get(id);
+    if (!l) return geoms.get(id)!;
+    const g = geoms.get(l.body)!;
+    const L = g.levels![l.k - 1]!;
+    return { ...g, id, profile: L.profile, thick: L.thick, plan: undefined, levels: undefined };
+  };
+  const bodyOf = (id: string): string => level.get(id)?.body ?? id;
+  ids.push(...level.keys());
   // families by normal
   const famOf = new Map<string, number>();
   const famFrames: Frame[] = [];
   const famIds: string[][] = [];
   for (const id of ids) {
-    const g = geoms.get(id)!;
+    const g = geomOf(id);
     let k = famFrames.findIndex((f) => parallel(f.z, g.frame.z));
     if (k < 0) {
       k = famFrames.length;
@@ -100,7 +112,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
   // origin of a family on its lowest declared plane
   famFrames.forEach((f, k) => {
     let lo = Infinity;
-    for (const id of famIds[k]!) lo = Math.min(lo, planeCoords(f, geoms.get(id)!.frame.o).w);
+    for (const id of famIds[k]!) lo = Math.min(lo, planeCoords(f, geomOf(id).frame.o).w);
     f.o = fromPlane(f, [0, 0], lo);
   });
 
@@ -119,8 +131,12 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact";
       if (!planar || !parent.has(j.a) || !parent.has(j.b)) continue;
       if (j.joint.crossed) continue;
-      contact.add(pairKey(j.a, j.b));
-      parent.set(find(j.a), find(j.b));
+      // a mesh with a compound gear meets the level whose tooth count it gives
+      const ja = t === "gear-mesh" ? levelId(j.a, meshLevel(geoms.get(j.a), j.joint)) : j.a;
+      const jb = t === "gear-mesh" ? levelId(j.b, meshLevel(geoms.get(j.b), j.joint)) : j.b;
+      if (!parent.has(ja) || !parent.has(jb)) continue;
+      contact.add(pairKey(ja, jb));
+      parent.set(find(ja), find(jb));
     }
     const nodes = new Map<string, Node>();
     for (const id of fid) {
@@ -136,8 +152,8 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     // outlines per sample
     const rings = new Map<string, Vec2[][]>();
     for (const id of fid) {
-      const g = geoms.get(id)!;
-      const xs = sampled.xfs.get(id) ?? [];
+      const g = geomOf(id);
+      const xs = sampled.xfs.get(bodyOf(id)) ?? [];
       rings.set(id, sampleIdx.map((i) => outlineAt(g, xs[i] ?? xf.id(), fam)));
     }
 
@@ -163,8 +179,9 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     }
     // bodies on one pin site share its column: they clash even when a boss is missing
     const famSites = sites.filter((s) => parallel(s.axis, fam.z) && s.bodies.some((b) => parent.has(b)));
+    const withLevels = (bs: string[]): string[] => [...bs, ...[...level].filter(([, l]) => bs.includes(l.body)).map(([q]) => q)];
     for (const s of famSites) {
-      const inFam = s.bodies.filter((b) => parent.has(b));
+      const inFam = withLevels(s.bodies).filter((b) => parent.has(b));
       for (let a = 0; a < inFam.length; a++)
         for (let b = a + 1; b < inFam.length; b++) {
           const i = idx.get(nodeOf(inFam[a]!))!;
@@ -181,11 +198,11 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     }
     const siteCs: SiteC[] = [];
     for (const s of famSites) {
-      const members = [...new Set(s.bodies.filter((b) => parent.has(b)).map((b) => idx.get(nodeOf(b))!))];
+      const members = [...new Set(withLevels(s.bodies).filter((b) => parent.has(b)).map((b) => idx.get(nodeOf(b))!))];
       if (!members.length) continue;
       const passers = new Set<number>();
       for (const id of fid) {
-        if (s.bodies.includes(id)) continue;
+        if (s.bodies.includes(bodyOf(id))) continue;
         const n = idx.get(nodeOf(id))!;
         if (members.includes(n)) continue;
         for (const i of sampleIdx) {
@@ -203,7 +220,16 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     }
 
     // thickness of each node (a slab is as high as the thickest body in it)
-    const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geoms.get(id)!.thick)));
+    const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geomOf(id).thick)));
+    // each level one slab above the one under it
+    const above: [number, number][] = [];
+    for (const [q, l] of level) {
+      if (!parent.has(q)) continue;
+      const under = idx.get(nodeOf(levelId(l.body, l.k - 1)));
+      const me = idx.get(nodeOf(q));
+      if (under !== undefined && me !== undefined) above.push([under, me]);
+    }
+    const levelsOk = (assign: number[]): boolean => above.every(([u, m]) => assign[u]! < 0 || assign[m]! < 0 || assign[m] === assign[u]! + 1);
 
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);
@@ -239,7 +265,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           for (let s = 0; s < h; s++) {
             if (clash[v]!.some((c, u) => c && assign[u] === s)) continue;
             assign[v] = s;
-            if (relax || passOk(assign, siteCs)) dfs(k + 1);
+            if (levelsOk(assign) && (relax || passOk(assign, siteCs))) dfs(k + 1);
             assign[v] = -1;
             const f = found as Best | null;
             if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] <= -clevisCap(siteCs)) return;

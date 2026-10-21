@@ -50,6 +50,7 @@ function finalize(ctx: BuildCtx): void {
   ctx.rule = "placement";
   for (const p of ctx.parts.values()) ctx.add(p);
   for (const t of ctx.twins.values()) ctx.add(t);
+  for (const l of ctx.levels.values()) ctx.add(l);
   ctx.rule = "polish";
 }
 
@@ -59,6 +60,7 @@ function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
   const lifts: Assembly["lifts"] = {};
   for (const [b, [, s]] of ctx.placement.slab) {
     slabOf[b] = s;
+    if (ctx.geoms.get(b)?.levels && b.includes("#")) continue;
     const r = ctx.extent(b);
     // a bevel gear stands where its cone says, so its points are drawn where the kinematics put them
     if (!r || ctx.geoms.get(b)?.exact) continue;

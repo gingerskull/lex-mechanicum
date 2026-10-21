@@ -87,6 +87,8 @@ export interface BuildCtx {
   parts: Map<string, Solid3>;
   /** A clevis's second half. */
   twins: Map<string, Solid3>;
+  /** A compound gear's further toothed levels, by body (bores not cut yet). */
+  levels: Map<string, Solid3[]>;
   bores: Map<string, Bore[]>;
   /** Holes the base needs, world xy and radius, with the joint that asked. */
   baseHoles: { at: [number, number]; r: number; joint: string }[];
@@ -163,6 +165,7 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
     principle,
     parts: new Map(),
     twins: new Map(),
+    levels: new Map(),
     bores: new Map(),
     baseHoles: [],
     baseMarks: [],
@@ -216,3 +219,6 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
 
 /** A solid's frame in world coordinates after `X` (used for the pose of a body at a sample). */
 export const posed = (s: Solid3, X: Xf): Frame => moveFrame(s.frame, X);
+
+/** Every body's own solids not yet among the solids: parts, clevis twins and compound-gear levels. */
+export const ownParts = (ctx: BuildCtx): Solid3[] => [...ctx.parts.values(), ...ctx.twins.values(), ...[...ctx.levels.values()].flat()];

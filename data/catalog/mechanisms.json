@@ -28573,8 +28573,7 @@
                 {
                   "z": 12,
                   "module": 3,
-                  "face": 8,
-                  "dz": 10
+                  "face": 8
                 }
               ]
             },
@@ -28656,11 +28655,14 @@
               0,
               0
             ],
-            "z": [
-              12,
-              36
-            ],
-            "ratio": -0.3333333333333333
+            "ratio": -0.3333333333333333,
+            "za": 12,
+            "zb": 36,
+            "cb": [
+              72,
+              0,
+              0
+            ]
           },
           {
             "id": "M2",
@@ -28672,12 +28674,15 @@
               15.893,
               10
             ],
-            "z": [
-              12,
-              36
-            ],
             "ratio": -0.3333333333333333,
-            "note": "the cluster's 12-tooth pinion, one layer up"
+            "note": "the cluster's 12-tooth level, one slab up",
+            "za": 12,
+            "zb": 36,
+            "cb": [
+              105.802,
+              63.572,
+              10
+            ]
           }
         ],
         "params": [
@@ -28757,42 +28762,30 @@
             "block": "gear-mesh",
             "id": "stage1",
             "joints": [
-              "M1",
-              "B"
+              "B",
+              "M1"
             ],
             "in": {
-              "a": "a",
-              "b": "cluster",
-              "za": "za",
-              "zb": "zb",
-              "module": "m"
+              "joint": "M1",
+              "input": "input"
             },
-            "out": "cluster-angle",
-            "opts": {
-              "external": true,
-              "phase": 185
+            "out": {
+              "angle": "cluster-turn"
             }
           },
           {
             "block": "gear-mesh",
             "id": "stage2",
             "joints": [
-              "M2",
-              "D"
+              "D",
+              "M2"
             ],
             "in": {
-              "a": "cluster",
-              "b": "d",
-              "za": "zc",
-              "zb": "zd",
-              "angle": "cluster-angle",
-              "module": "m"
+              "joint": "M2",
+              "input": "cluster-turn"
             },
-            "out": "d-angle",
-            "opts": {
-              "external": true,
-              "line": 62,
-              "phase": 206
+            "out": {
+              "angle": "d-turn"
             }
           }
         ],
@@ -28841,7 +28834,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep). Two 3:1 stages on a shared shaft read clearly, the second one layer above the first. Equal-time ticks every 45 degrees on a mark of the input pinion and of the output gear make the 9:1 visible: eight ticks round a full circle against eight ticks inside 40 degrees, both turning the same way."
+          "note": "Applies the 2026-10-19 review (keep). Two 3:1 stages on a shared shaft read clearly, the second one layer above the first. Equal-time ticks every 45 degrees on a mark of the input pinion and of the output gear make the 9:1 visible: eight ticks round a full circle against eight ticks inside 40 degrees, both turning the same way. Rebuild R4 (#215): built on v3 from this record; the cluster is one body with two keyed levels (36 and 12 teeth), its 12-tooth level one slab up meshing with the output; the six phases of the finished build read as decided; the tooth-count choices are not offered as controls, the parts are built for 12/36 twice."
         },
         "principle": [
           {
