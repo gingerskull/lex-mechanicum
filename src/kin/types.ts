@@ -134,6 +134,10 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
+  /** A point's position read along this direction (world mm): the coordinate of a plunger pin along its slide. */
+  axis?: [number, number, number];
+  /** A speed ratio of the point `of` over the point `over` (their speeds), instead of a body's turn per input. */
+  over?: string;
 }
 
 export interface Kin {

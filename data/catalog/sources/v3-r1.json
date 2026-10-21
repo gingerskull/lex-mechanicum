@@ -3361,11 +3361,29 @@
             "type": "slider",
             "length": 70,
             "width": 20,
-            "from": -15,
-            "pad": 63
+            "from": -15
           },
           "at": {
             "joint": "B"
+          }
+        },
+        {
+          "id": "workpiece",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              30,
+              40
+            ],
+            "thickness": 12
+          },
+          "frame": {
+            "o": [
+              202.5,
+              -20,
+              -2
+            ]
           }
         }
       ],
@@ -3396,8 +3414,8 @@
           "a": "handle",
           "b": "link",
           "at": [
-            34.64,
-            -20,
+            34.64101615137755,
+            -19.999999999999996,
             0
           ],
           "axis": [
@@ -3412,7 +3430,7 @@
           "a": "link",
           "b": "plunger",
           "at": [
-            101.72,
+            101.72305547637123,
             0,
             0
           ],
@@ -3428,7 +3446,7 @@
           "a": "ground",
           "b": "plunger",
           "at": [
-            101.72,
+            101.72305547637123,
             0,
             0
           ],
@@ -3498,11 +3516,13 @@
         {
           "id": "handle",
           "joint": "O",
-          "kind": "manual",
+          "kind": "oscillating",
           "range": [
             -70,
             3
           ],
+          "lo": -70,
+          "hi": 3,
           "default": -30
         }
       ],
@@ -3516,14 +3536,21 @@
             "slide"
           ],
           "in": {
+            "kind": "rrp",
             "a": "A",
-            "ra": "b",
-            "guide": "slide"
+            "r": "b",
+            "p": [
+              0,
+              0,
+              0
+            ],
+            "d": [
+              1,
+              0,
+              0
+            ]
           },
-          "out": "B",
-          "opts": {
-            "side": "+x of the knee"
-          }
+          "out": "B"
         }
       ],
       "points": [
@@ -3540,7 +3567,7 @@
           "id": "pad",
           "body": "plunger",
           "local": [
-            63,
+            91,
             0,
             0
           ]
@@ -3557,7 +3584,12 @@
           "id": "plunger-position",
           "of": "B",
           "kind": "position",
-          "unit": "mm"
+          "unit": "mm",
+          "axis": [
+            1,
+            0,
+            0
+          ]
         },
         {
           "id": "mechanical-advantage",

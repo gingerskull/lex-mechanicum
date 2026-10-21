@@ -130,6 +130,8 @@ const j5 = contactRule({
     const slider = c.a === "ground" ? c.b : c.a;
     const host = slider === c.a ? c.b : c.a;
     const e = extentIn(ctx, c, slider);
+    // the contact's run is a's travel against b: the slider's own travel when it is a, reversed when it is b
+    const run: [number, number] = slider === c.a ? c.run : [-c.run[1], -c.run[0]];
     const zs = ctx.extent(slider);
     if (!zs) return;
     const w0 = zs.w0;
@@ -137,8 +139,8 @@ const j5 = contactRule({
     const Ls = e[1] - e[0];
     const Ws = e[3] - e[2];
     // the rails run past the travel far enough for the wipers and an end stop clear of them at each end
-    const x0 = c.run[0] + e[0] - 16;
-    const x1 = c.run[1] + e[1] + 16;
+    const x0 = run[0] + e[0] - 16;
+    const x1 = run[1] + e[1] + 16;
     const hostBody = bodyOf(ctx, host);
     const rh = w1 - w0 + 1.5;
     const gap = 3;
@@ -178,7 +180,7 @@ const j5 = contactRule({
     }
     return {
       serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: [`${id}-stop0`, `${id}-stop1`], F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`] },
-      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on a dowelled reference rail and a gibbed rail under a keeper; wipers, a grease nipple and an end stop with a pad at each end of the ${(c.run[1] - c.run[0]).toFixed(0)} mm travel.`,
+      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on a dowelled reference rail and a gibbed rail under a keeper; wipers, a grease nipple and an end stop with a pad at each end of the ${(run[1] - run[0]).toFixed(0)} mm travel.`,
     };
   },
 });
