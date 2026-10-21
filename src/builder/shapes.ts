@@ -128,6 +128,11 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const d = num(shape.diameter, 8);
       return { profile: { outer: circle(d / 2, 0, 0, 24), holes: [] }, thick: num(shape.length, 40), approx: false };
     }
+    case "spatial-link": {
+      // a link between skew hinges (Bennett): its knuckle on its own hinge; the bar and the far knuckle come after
+      const span = pair(shape.span, [-5, 5]);
+      return { profile: { outer: circle(num(shape.knuckle, 9), 0, 0, 40), holes: [] }, thick: span[1] - span[0], approx: false };
+    }
     case "rack": {
       const L = num(shape.length, 120);
       const h = num(shape.height, 20);
@@ -173,7 +178,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // partner, a governor's arm beside the spindle head), instead of a slab of the placement solver
     const axial = typeof shape.axial === "number" ? shape.axial : undefined;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(axial !== undefined ? { exact: { offset: axial } } : g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom));
+    out.set(b.id, withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? spatialLink(S, geom) ?? geom));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -353,4 +358,37 @@ function withBall(g: BodyGeom): BodyGeom {
   const L = num(g.shape.length, 0);
   const o = v3.add(g.frame.o, v3.add(v3.mul(g.frame.x, L), v3.mul(g.frame.z, g.exact.offset + g.thick / 2)));
   return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-ball`, name: `Flyweight ball Ø${2 * r}`, frame: { o, x: g.frame.x, z: g.frame.z }, profile: ballProfile(r), h: 0, revolve: true }] };
+}
+
+/**
+ * A link between two skew hinges (`spatial-link`, a Bennett linkage): a knuckle on each hinge, side by side with its
+ * neighbour's along the hinge (`span` on its own hinge, `far.span` on the other, both along the hinge's axis from the
+ * joint, its sign fixed as `canon`), and a round bar between the knuckles (`barAt`: where it leaves each, along its
+ * hinge; default the knuckles' middles). The far
+ * knuckle is a lug of the far hinge's stack (rules/lugs); the bar is a piece of the body.
+ */
+function spatialLink(S: Setup, g: BodyGeom): BodyGeom | null {
+  const sh = g.shape;
+  if (String(sh.type) !== "spatial-link") return null;
+  const span = pair(sh.span, [-5, 5]);
+  const far = (sh.far ?? {}) as { joint?: unknown; span?: unknown };
+  const fj = typeof far.joint === "string" ? S.joints.get(far.joint) : undefined;
+  if (!fj) return { ...g, exact: { offset: span[0] } };
+  const fs = pair(far.span, [-5, 5]);
+  // the bar leaves each knuckle at `bar.at` along the hinge (default the knuckle's middle): a long barrel can carry the
+  // bar well off the common normal, clear of the other links where the loop passes through a crossed pose
+  const at = (sh.barAt ?? []) as number[];
+  const a = v3.add(g.frame.o, v3.mul(g.frame.z, typeof at[0] === "number" ? at[0] : (span[0] + span[1]) / 2));
+  const b = v3.add(fj.at, v3.mul(canon(fj.axis), typeof at[1] === "number" ? at[1] : (fs[0] + fs[1]) / 2));
+  const z = v3.unit(v3.sub(b, a));
+  const rb = num(sh.bar, 6);
+  // the bar starts and ends in the knuckles' walls, clear of the pin bores
+  const rk = num(sh.knuckle, 9) - 1;
+  const a1 = v3.add(a, v3.mul(z, rk));
+  const L = v3.dist(a, b) - 2 * rk;
+  return {
+    ...g,
+    exact: { offset: span[0] },
+    pieces: [{ id: `${g.id}-bar`, name: "", frame: { o: a1, x: v3.unit(v3.perp(Math.abs(z[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0], z)), z }, profile: { outer: circle(rb, 0, 0, 28), holes: [] }, h: L }],
+  };
 }

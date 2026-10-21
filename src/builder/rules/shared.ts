@@ -203,9 +203,14 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   // the motor on the side with more room, away from the other fixed sites
   const others = ctx.sites.filter((q) => q !== site && q.fixed).map((q) => q.at as Vec3);
   const room = (sg: number) => Math.min(...others.map((o) => v3.dist(o, v3.add(S, v3.mul(lat, sg * C)))), 999);
-  const sg = room(1) >= room(-1) ? 1 : -1;
   const foot = 4;
   const vm = Math.max(0, mot.R + foot + 2 - h);
+  // the side whose motor keeps clear of the moving parts' sweeps, else the one with more room from the other sites
+  const motorAt = (side: number) => place(PF, H.solid("drive-motor-t", { name: "", kind: "motor", role: "hw", outer: circle(mot.R + 2, side * C, vm, 32), z0: 9, z1: 15 + mot.H, joints: ["drive"] }));
+  const gapOf = (side: number) => clearance(ctx, motorAt(side));
+  const g1 = gapOf(1);
+  const g2 = gapOf(-1);
+  const sg = g1 >= MIN_GAP && g2 >= MIN_GAP ? (room(1) >= room(-1) ? 1 : -1) : g1 >= g2 ? 1 : -1;
   const Mc: Vec2 = [sg * C, vm];
   const j = ["drive"];
   const small = PULLEYS[16];

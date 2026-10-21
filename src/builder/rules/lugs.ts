@@ -16,6 +16,8 @@ export interface LugSpec {
   span: [number, number];
   /** Boss radius round the pin (default 8). */
   r?: number;
+  /** A plain knuckle on the axis, no web to the body's part (a spatial link's far knuckle, joined by its bar). */
+  round?: boolean;
 }
 
 /** The point of a polygon nearest `p`, and whether `p` is inside it. */
@@ -56,10 +58,13 @@ export const lugs: Rule = {
   tier: "AUTO",
   ids: ["A1", "A2"],
   fixture: "sarrus-linkage",
-  applies: (ctx) => ctx.kin.bodies.some((b) => Array.isArray((b.shape as { lugs?: unknown } | undefined)?.lugs)),
+  applies: (ctx) => ctx.kin.bodies.some((b) => Array.isArray((b.shape as { lugs?: unknown } | undefined)?.lugs) || b.shape?.type === "spatial-link"),
   apply(ctx: BuildCtx) {
     for (const b of ctx.kin.bodies) {
-      const specs = ((b.shape as { lugs?: LugSpec[] } | undefined)?.lugs ?? []) as LugSpec[];
+      const sh = (b.shape ?? {}) as { lugs?: LugSpec[]; type?: unknown; far?: { joint?: string; span?: [number, number] }; knuckle?: number };
+      const specs: LugSpec[] = [...(sh.lugs ?? [])];
+      // a spatial link's knuckle on its far hinge is a lug standing on the axis (its bar joins it to the body)
+      if (sh.type === "spatial-link" && sh.far?.joint && sh.far.span) specs.push({ joint: sh.far.joint, span: sh.far.span, r: sh.knuckle ?? 9, round: true });
       const part = ctx.parts.get(b.id);
       if (!specs.length || !part) continue;
       for (const L of specs) {
@@ -72,7 +77,7 @@ export const lugs: Rule = {
         const r = L.r ?? 8;
         const [w0, w1] = L.span[0] <= L.span[1] ? L.span : [L.span[1], L.span[0]];
         const f = frameAlong(v3.add(j.at as Vec3, v3.mul(axis, w0)), axis);
-        const root = planeCoords(f, rootOf(part, j.at as Vec3)).uv;
+        const root: Vec2 = L.round ? [0, 0] : planeCoords(f, rootOf(part, j.at as Vec3)).uv;
         const outer = Math.hypot(root[0], root[1]) > 1 ? roundedPoly([[0, 0], root], r) : circle(r, 0, 0, 36);
         const lug: Solid3 = {
           ...part,

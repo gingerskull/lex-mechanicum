@@ -22,8 +22,8 @@ const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
 export const rules: Rule[] = [
   classify,
   placement,
-  base,
   lugs,
+  base,
   byId("j6-mesh"),
   byId("j9-crossed-mesh"),
   j3,

@@ -181,7 +181,12 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
     const side = below.length ? -1 : 1;
     const w0 = (below[0] ?? above[0])!;
     if (w0 === undefined) throw new Error(`${o.id}: no place for a pillow block clears the sweeps`);
-    const step = W + 4;
+    // one block width apart along the shaft, and on a sloping shaft far enough that the feet do not overlap
+    const a = o.frame.z;
+    const run = Math.hypot(a[0], a[1]);
+    const Rb = bossR(o.d, o.live);
+    const foot = 2 * ((W / 2) * run + Rb * Math.sqrt(Math.max(0, 1 - run * run)) + FOOT_PAST);
+    const step = Math.max(W + 4, run > 1e-6 ? (foot + 4) / run : W + 4);
     w = side < 0 ? [w0, w0 - step] : [w0, w0 + step];
     moved = true;
   }

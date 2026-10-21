@@ -361,6 +361,8 @@ class Run implements BlockCtx {
     private declared: boolean,
   ) {
     this.vals = { ...vals };
+    // a body fixed to the ground (a ground link drawn as a link) stands where it is
+    for (const b of k.kin.bodies) if (b.fixed) this.xfs.set(b.id, xf.id());
   }
 
   // ---- drivers: each rotates or slides the driven body of its joint relative to the driven joint's first body

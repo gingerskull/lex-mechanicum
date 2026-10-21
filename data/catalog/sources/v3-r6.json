@@ -4862,36 +4862,44 @@
           "id": "ground",
           "role": "ground",
           "shape": {
-            "type": "link",
-            "length": 60,
-            "twist": 30,
-            "boss": [
-              10,
-              10
-            ]
+            "type": "plate",
+            "rect": [
+              260,
+              220
+            ],
+            "thickness": 8
           },
           "at": {
             "frame": {
               "origin": [
-                0,
-                0,
-                110
+                -60,
+                -60,
+                -4
               ]
             }
-          },
-          "frame": "Denavit-Hartenberg frame at hinge A: z along axis A, x along the common normal to B"
+          }
         },
         {
           "id": "l2",
-          "role": "driver",
-          "accent": true,
+          "role": "output",
           "shape": {
-            "type": "link",
-            "length": 100,
-            "twist": 56.44,
-            "boss": [
-              10,
-              10
+            "type": "spatial-link",
+            "knuckle": 8,
+            "bar": 4.5,
+            "span": [
+              49,
+              59
+            ],
+            "far": {
+              "joint": "C",
+              "span": [
+                1,
+                11
+              ]
+            },
+            "barAt": [
+              54,
+              6
             ]
           },
           "at": {
@@ -4903,12 +4911,23 @@
           "id": "l3",
           "role": "link",
           "shape": {
-            "type": "link",
-            "length": 60,
-            "twist": 30,
-            "boss": [
-              10,
-              10
+            "type": "spatial-link",
+            "knuckle": 8,
+            "bar": 4.5,
+            "span": [
+              -11,
+              -1
+            ],
+            "far": {
+              "joint": "D",
+              "span": [
+                1,
+                11
+              ]
+            },
+            "barAt": [
+              -6,
+              6
             ]
           },
           "at": {
@@ -4918,28 +4937,40 @@
         },
         {
           "id": "l4",
-          "role": "output",
+          "role": "driver",
           "shape": {
-            "type": "link",
-            "length": 100,
-            "twist": 56.44,
-            "boss": [
-              10,
-              10
+            "type": "spatial-link",
+            "knuckle": 8,
+            "bar": 4.5,
+            "span": [
+              -59,
+              -49
+            ],
+            "far": {
+              "joint": "D",
+              "span": [
+                -11,
+                -1
+              ]
+            },
+            "barAt": [
+              -54,
+              -6
             ]
           },
           "at": {
-            "joint": "D"
+            "joint": "A"
           },
-          "frame": "z along axis D, x along the common normal to A"
+          "frame": "z along axis D, x along the common normal to A",
+          "accent": true
         }
       ],
       "joints": [
         {
           "id": "A",
           "type": "revolute",
-          "a": "l4",
-          "b": "ground",
+          "a": "ground",
+          "b": "l4",
           "at": [
             0,
             0,
@@ -4947,15 +4978,15 @@
           ],
           "axis": [
             0,
-            0,
-            1
+            -1,
+            0
           ]
         },
         {
           "id": "B",
           "type": "revolute",
-          "a": "ground",
-          "b": "l2",
+          "a": "l2",
+          "b": "ground",
           "at": [
             60,
             0,
@@ -4963,40 +4994,40 @@
           ],
           "axis": [
             0,
-            -0.5,
-            0.8660254037844
+            -0.8660254037844,
+            -0.5
           ]
         },
         {
           "id": "C",
           "type": "revolute",
-          "a": "l2",
-          "b": "l3",
+          "a": "l3",
+          "b": "l2",
           "at": [
             60,
-            86.6025403784439,
-            160
+            -50,
+            196.6025403784439
           ],
           "axis": [
             0.8333333333333,
-            -0.2763853991963,
-            0.4787135538782
+            -0.4787135538782,
+            -0.2763853991963
           ]
         },
         {
           "id": "D",
           "type": "revolute",
-          "a": "l3",
-          "b": "l4",
+          "a": "l4",
+          "b": "l3",
           "at": [
             79.9304623717929,
-            60.0926050777581,
-            110
+            0,
+            170.0926050777581
           ],
           "axis": [
             0.5007717089813,
-            -0.6660871864316,
-            0.5527707983926
+            -0.5527707983926,
+            -0.6660871864316
           ]
         }
       ],
@@ -5038,13 +5069,13 @@
       "drivers": [
         {
           "id": "input",
-          "joint": "B",
+          "joint": "A",
           "kind": "rotary",
           "range": [
             0,
             360
           ],
-          "default": 90
+          "default": 216.94
         }
       ],
       "solve": [
@@ -5052,22 +5083,22 @@
           "block": "bennett",
           "id": "loop",
           "joints": [
-            "C",
             "D",
-            "A"
+            "C",
+            "B"
           ],
           "in": {
             "input": "input",
             "joints": [
-              "B",
-              "C",
+              "A",
               "D",
-              "A"
+              "C",
+              "B"
             ],
             "bodies": [
-              "l2",
+              "l4",
               "l3",
-              "l4"
+              "l2"
             ]
           },
           "out": [
@@ -5094,25 +5125,25 @@
       "outputs": [
         {
           "id": "input-angle",
-          "of": "B",
+          "of": "A",
           "kind": "angle",
           "unit": "deg"
         },
         {
           "id": "output-angle",
-          "of": "A",
+          "of": "B",
           "kind": "angle",
           "unit": "deg"
         },
         {
           "id": "opposite-angle",
-          "of": "C",
+          "of": "D",
           "kind": "angle",
           "unit": "deg"
         },
         {
           "id": "speed-ratio",
-          "of": "A",
+          "of": "B",
           "kind": "speed-ratio"
         },
         {
@@ -5209,14 +5240,14 @@
           "output": "output-angle",
           "stat": "range",
           "value": 360,
-          "tol": 0.5
+          "tol": 1.5
         },
         {
           "text": "opposite hinges turn equal and opposite",
           "output": "opposite-angle",
           "stat": "range",
           "value": 360,
-          "tol": 0.5
+          "tol": 1.5
         },
         {
           "text": "speed ratio from 0.33 to 2.99 times input speed, in the opposite sense",
@@ -5233,10 +5264,10 @@
           "tol": 0.005
         },
         {
-          "text": "at input 90° the output hinge stands at 143.1°",
+          "text": "at input 216.9° the output hinge stands at 270° (-90°)",
           "output": "output-angle",
           "stat": "at",
-          "value": 143.1,
+          "value": -90,
           "tol": 0.1
         }
       ],

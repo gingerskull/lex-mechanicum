@@ -4,7 +4,7 @@
 import { circle } from "../../core/geom";
 import type { Solid3 } from "../../solids/types";
 import type { BuildCtx } from "../ctx";
-import { fromPlane, parallel, planeCoords, type Frame } from "../frames";
+import { canon, fromPlane, parallel, planeCoords, type Frame } from "../frames";
 import { type Member, titleOf } from "../lib";
 import { bossRadius } from "./core";
 import { axialStack, type StackResult, type StackSpec, type SupportKind } from "../stack";
@@ -23,6 +23,9 @@ export function siteFrame(ctx: BuildCtx, site: Site): Frame | null {
     const uv = planeCoords(fam, site.at).uv;
     return { o: fromPlane(fam, uv, 0), x: fam.x, z: fam.z };
   }
+  // only hinge lugs on the axis (a spatial link's far knuckle): the stack stands on the site's own point
+  const lug = ctx.lugs.get(site.id)?.[0];
+  if (lug) return { o: [...site.at] as Frame["o"], x: lug.frame.x, z: canon(site.axis) };
   return null;
 }
 
