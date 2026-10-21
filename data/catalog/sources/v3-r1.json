@@ -1881,12 +1881,12 @@
                 0
               ],
               [
-                40,
+                60,
                 0
               ],
               [
                 0,
-                -60
+                40
               ]
             ],
             "boss": 12
@@ -1931,7 +1931,7 @@
           "shape": {
             "type": "slider",
             "length": 36,
-            "width": 20
+            "width": 28
           },
           "at": {
             "joint": "S"
@@ -1943,7 +1943,7 @@
           "shape": {
             "type": "slider",
             "length": 36,
-            "width": 20
+            "width": 28
           },
           "at": {
             "joint": "G"
@@ -2159,22 +2159,44 @@
           "out": "A"
         },
         {
+          "block": "dyad",
+          "id": "lever-arm",
+          "joints": [
+            "B"
+          ],
+          "in": {
+            "a": "O",
+            "b": "A",
+            "ra": "r2",
+            "rb": "sqrt(r1^2+r2^2-2*r1*r2*cos(alpha))"
+          },
+          "branch": "elbow-up",
+          "out": "B"
+        },
+        {
           "block": "slider-dyad",
           "id": "output-rod",
           "joints": [
-            "B",
             "G",
             "G-slide"
           ],
           "in": {
+            "kind": "rrp",
             "a": "B",
-            "ra": "Lout",
-            "guide": "G-slide"
+            "r": "Lout",
+            "p": [
+              40,
+              100,
+              0
+            ],
+            "d": [
+              0,
+              1,
+              0
+            ]
           },
-          "out": "G",
-          "opts": {
-            "side": "above B"
-          }
+          "branch": "elbow-up",
+          "out": "G"
         }
       ],
       "points": [],
@@ -2196,11 +2218,6 @@
           "of": "slide-out",
           "kind": "position",
           "unit": "mm"
-        },
-        {
-          "id": "displacement-ratio",
-          "of": "slide-out",
-          "kind": "speed-ratio"
         }
       ],
       "fallback": null
@@ -2298,9 +2315,8 @@
         },
         {
           "text": "output motion = input motion x r2 / r1 = 0.67 for small swings",
-          "output": "displacement-ratio",
-          "stat": "at",
-          "at": 0,
+          "output": "output-position",
+          "stat": "ratio",
           "value": 0.667,
           "tol": 0.005
         }

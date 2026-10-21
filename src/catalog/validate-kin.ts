@@ -35,6 +35,9 @@ export function mobility(kin: Kin, plane: "Planar" | "Spatial"): number | undefi
 const VIEW_VERTICES = /^VIEW -?\d+(\.\d+)? -?\d+(\.\d+)?$/;
 
 /** Checks the `kin` and `teaching` blocks of one record against the record spec. Returns lines, `<id>: <what>`. */
+/** The functions a parameter expression may call (src/kin/expr.ts). */
+const EXPR_FNS = new Set(["sin", "cos", "tan", "sqrt", "abs"]);
+
 export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean }): string[] {
   const problems: string[] = [];
   const say = (what: string) => problems.push(`${r.id}: ${what}`);
@@ -141,6 +144,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
     if (key === "kind" || key === "mode" || key === "form") return;
+    // a parameter expression (src/kin/expr.ts) is fine when every name in it is known
+    if (isStr(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   for (const s of kin.solve) {

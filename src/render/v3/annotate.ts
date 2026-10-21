@@ -620,7 +620,18 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       return;
     }
     case "dimension": {
-      const a = pointOf(A, o.from), b = pointOf(A, o.to);
+      const a = pointOf(A, o.from);
+      // a moment arm: from the point square to a line through two named points (the foot of the perpendicular, in plan)
+      const ln = Array.isArray(o.line) && o.line.length === 2 ? [pointOf(A, o.line[0]), pointOf(A, o.line[1])] : null;
+      let b = ln ? null : pointOf(A, o.to);
+      if (a && ln && ln[0] && ln[1]) {
+        const d: Vec3 = [ln[1][0] - ln[0][0], ln[1][1] - ln[0][1], 0];
+        const t = ((a[0] - ln[0][0]) * d[0] + (a[1] - ln[0][1]) * d[1]) / Math.max(1e-9, d[0] * d[0] + d[1] * d[1]);
+        b = [ln[0][0] + d[0] * t, ln[0][1] + d[1] * t, a[2]];
+        // the line itself, carried to the foot where it falls outside the two points
+        const lo = Math.min(0, t), hi = Math.max(1, t);
+        poly([add(ln[0], mul(sub(ln[1], ln[0]), lo)), add(ln[0], mul(sub(ln[1], ln[0]), hi))]);
+      }
       if (!a || !b) return;
       const p = P(A, a), q = P(A, b);
       ctx.save();
@@ -634,7 +645,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       arrowHead(ctx, q, p, O.arrowDim);
       arrowHead(ctx, p, q, O.arrowDim);
       ctx.restore();
-      const m = typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
+      const m = ln ? Math.hypot(b[0] - a[0], b[1] - a[1]) : typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
       if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
       return;
     }
