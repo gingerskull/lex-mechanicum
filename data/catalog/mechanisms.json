@@ -7687,8 +7687,8 @@
             "note": "arm angle from vertical, default pose"
           }
         ],
-        "defining_relations": "Watt (conical pendulum) balance, neglecting sleeve load: h = L cos(phi) = g / omega^2, so omega = sqrt(g / (L cos phi)). Sleeve position below P: y = -(p cos phi + sqrt(q^2 - (p sin phi)^2)) = -2p cos(phi) when p = q. Here phi 20° to 60° gives 97.6 to 133.8 rpm and sleeve lift 52.8 mm.",
-        "range": "spindle continuous; arm angle 20° to 60° over about 98 to 134 rpm; sleeve travels 52.8 mm",
+        "defining_relations": "Watt (conical pendulum) balance, neglecting sleeve load: h = L cos(phi) = g / omega^2, so omega = sqrt(g / (L cos phi)). The link pins sit on the sleeve d = 14 mm off the spindle axis, so the sleeve stands y = -(p cos phi + sqrt(q^2 - (p sin phi - d)^2)) below the arm pivot. Here phi 20° to 60° gives 97.6 to 133.8 rpm and a sleeve lift of 39.6 mm.",
+        "range": "spindle continuous; arm angle 20° to 60° over about 98 to 134 rpm; sleeve travels 39.6 mm",
         "overlays": [
           "forces",
           "angles",
@@ -7808,7 +7808,17 @@
             "shape": {
               "type": "shaft",
               "diameter": 16,
-              "length": 230
+              "length": 190,
+              "lugs": [
+                {
+                  "joint": "PL",
+                  "span": [
+                    -8.5,
+                    8.5
+                  ],
+                  "r": 9
+                }
+              ]
             },
             "at": {
               "joint": "S"
@@ -7822,8 +7832,10 @@
               "length": 100,
               "boss": [
                 8,
-                7
+                6
               ],
+              "thickness": 6,
+              "axial": 9,
               "ball": {
                 "diameter": 36
               }
@@ -7840,8 +7852,10 @@
               "length": 100,
               "boss": [
                 8,
-                7
+                6
               ],
+              "thickness": 6,
+              "axial": -15,
               "ball": {
                 "diameter": 36
               }
@@ -7859,7 +7873,9 @@
               "boss": [
                 7,
                 6
-              ]
+              ],
+              "thickness": 5,
+              "axial": 15.5
             },
             "at": {
               "joint": "ML"
@@ -7874,7 +7890,9 @@
               "boss": [
                 7,
                 6
-              ]
+              ],
+              "thickness": 5,
+              "axial": -20.5
             },
             "at": {
               "joint": "MR"
@@ -7884,10 +7902,29 @@
             "id": "sleeve",
             "role": "output",
             "shape": {
-              "type": "slider",
-              "length": 24,
-              "width": 28,
-              "bore": 16
+              "type": "disc",
+              "radius": 13,
+              "thickness": 24,
+              "bore": 16,
+              "axial": -12,
+              "lugs": [
+                {
+                  "joint": "QL",
+                  "span": [
+                    21,
+                    26.5
+                  ],
+                  "r": 7
+                },
+                {
+                  "joint": "QR",
+                  "span": [
+                    -26.5,
+                    -21
+                  ],
+                  "r": 7
+                }
+              ]
             },
             "at": {
               "joint": "Sl"
@@ -7981,9 +8018,9 @@
             "a": "link-l",
             "b": "sleeve",
             "at": [
+              "-d",
               0,
-              0,
-              "Hp-p*cos(30)-sqrt(q^2-(p*sin(30))^2)"
+              "Hp-p*cos(30)-sqrt(q^2-(p*sin(30)-d)^2)"
             ],
             "axis": [
               0,
@@ -7997,9 +8034,9 @@
             "a": "link-r",
             "b": "sleeve",
             "at": [
+              "d",
               0,
-              0,
-              "Hp-p*cos(30)-sqrt(q^2-(p*sin(30))^2)"
+              "Hp-p*cos(30)-sqrt(q^2-(p*sin(30)-d)^2)"
             ],
             "axis": [
               0,
@@ -8015,7 +8052,7 @@
             "at": [
               0,
               0,
-              "Hp-p*cos(30)-sqrt(q^2-(p*sin(30))^2)"
+              "Hp-p*cos(30)-sqrt(q^2-(p*sin(30)-d)^2)"
             ],
             "axis": [
               0,
@@ -8068,6 +8105,14 @@
             "min": 150,
             "max": 250,
             "note": "arm pivot height on the spindle"
+          },
+          {
+            "id": "d",
+            "value": 14,
+            "unit": "mm",
+            "min": 10,
+            "max": 20,
+            "note": "sleeve pin offset from the spindle axis (the pins sit in the sleeve's lugs, clear of the spindle)"
           }
         ],
         "design": [],
@@ -8130,19 +8175,17 @@
           },
           {
             "block": "slider-dyad",
-            "id": "sleeve",
+            "id": "sleeve-l",
             "joints": [
               "ML",
               "QL",
-              "Sl",
-              "MR",
-              "QR"
+              "Sl"
             ],
             "in": {
               "kind": "rrp",
               "a": "ML",
               "r": "q",
-              "p": "S",
+              "p": "rail-l",
               "d": [
                 0,
                 0,
@@ -8151,7 +8194,30 @@
             },
             "out": "QL",
             "opts": {
-              "root": "sleeve below the link pin; the right link and the sleeve follow from their joints"
+              "root": "the left link's sleeve pin, below its arm pin"
+            }
+          },
+          {
+            "block": "slider-dyad",
+            "id": "sleeve-r",
+            "joints": [
+              "MR",
+              "QR"
+            ],
+            "in": {
+              "kind": "rrp",
+              "a": "MR",
+              "r": "q",
+              "p": "rail-r",
+              "d": [
+                0,
+                0,
+                -1
+              ]
+            },
+            "out": "QR",
+            "opts": {
+              "root": "the right link's sleeve pin, below its arm pin; the sleeve follows its two pins on the spindle"
             }
           }
         ],
@@ -8179,6 +8245,24 @@
             "body": "sleeve",
             "local": [
               0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "rail-l",
+            "body": "spindle",
+            "local": [
+              -14,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "rail-r",
+            "body": "spindle",
+            "local": [
+              14,
               0,
               0
             ]
@@ -8340,10 +8424,10 @@
             "over": "speed"
           },
           {
-            "text": "sleeve travels 52.8 mm",
+            "text": "sleeve travels 39.6 mm",
             "output": "sleeve-height",
             "stat": "range",
-            "value": 52.8,
+            "value": 39.57,
             "tol": 0.2,
             "over": "speed"
           },
@@ -48246,10 +48330,10 @@
           },
           {
             "id": "Lc",
-            "value": 110,
+            "value": 134,
             "unit": "mm",
-            "min": 100,
-            "max": 140,
+            "min": 130,
+            "max": 160,
             "note": "centre yoke length, cross 1 to cross 2 (the two forks back to back)"
           },
           {
@@ -48368,7 +48452,7 @@
             "local": [
               30,
               0,
-              -55
+              -67
             ]
           },
           {
@@ -48395,7 +48479,7 @@
             "local": [
               0,
               0,
-              95
+              -27
             ]
           }
         ],
@@ -60859,10 +60943,11 @@
               "type": "link",
               "length": 60,
               "boss": [
-                8,
-                8
+                7,
+                7
               ],
-              "width": 40
+              "thickness": 19,
+              "axial": -20
             },
             "at": {
               "joint": "H1"
@@ -60875,10 +60960,11 @@
               "type": "link",
               "length": 60,
               "boss": [
-                8,
-                8
+                7,
+                7
               ],
-              "width": 40
+              "thickness": 19,
+              "axial": 1
             },
             "at": {
               "joint": "K1"
@@ -60891,10 +60977,11 @@
               "type": "link",
               "length": 60,
               "boss": [
-                8,
-                8
+                7,
+                7
               ],
-              "width": 40
+              "thickness": 19,
+              "axial": -20
             },
             "at": {
               "joint": "H2"
@@ -60907,10 +60994,11 @@
               "type": "link",
               "length": 60,
               "boss": [
-                8,
-                8
+                7,
+                7
               ],
-              "width": 40
+              "thickness": 19,
+              "axial": 1
             },
             "at": {
               "joint": "K2"
@@ -60921,11 +61009,42 @@
             "role": "output",
             "shape": {
               "type": "plate",
-              "rect": [
-                80,
-                80
+              "outline": [
+                [
+                  -32,
+                  -32
+                ],
+                [
+                  32,
+                  -32
+                ],
+                [
+                  32,
+                  32
+                ],
+                [
+                  -32,
+                  32
+                ]
               ],
-              "thickness": 6
+              "boss": 8,
+              "thickness": 6,
+              "lugs": [
+                {
+                  "joint": "T1",
+                  "span": [
+                    -20,
+                    -1
+                  ]
+                },
+                {
+                  "joint": "T2",
+                  "span": [
+                    -20,
+                    -1
+                  ]
+                }
+              ]
             },
             "at": {
               "joint": "T1"
@@ -60934,7 +61053,7 @@
               "o": [
                 0,
                 0,
-                "2*L*cos(40)"
+                "2*L*cos(40)+10"
               ],
               "z": [
                 0,
@@ -61137,7 +61256,7 @@
             "local": [
               0,
               0,
-              0
+              -10
             ]
           },
           {

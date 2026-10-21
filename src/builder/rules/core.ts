@@ -3,7 +3,7 @@ import { circle, roundRect, type Vec2 } from "../../core/geom";
 import { rungOf } from "../../style/detail";
 import { H } from "../../hardware/primitives";
 import { pillowRise } from "../../hardware/sub/pillow";
-import { extrudeOp } from "../../solids/tessellate";
+import { extrudeOp, revolveOp } from "../../solids/tessellate";
 import type { Solid3 } from "../../solids/types";
 import { type BuildCtx } from "../ctx";
 import { BASE_GAP, BASE_T } from "../constants";
@@ -79,7 +79,7 @@ export const placement: Rule = {
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);

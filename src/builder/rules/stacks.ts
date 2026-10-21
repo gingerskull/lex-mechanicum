@@ -42,6 +42,14 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
       out.push({ solid: part.id, body: b, w0: w, w1: w + thick, R, keyed: keyedIds.has(b), shim: ctx.shim.get(b) ?? 0, name: part.name });
     }
   }
+  // hinge lugs of bodies whose plane is not square to the axis (rules/lugs)
+  for (const lug of ctx.lugs.get(site.id) ?? []) {
+    const w = (lug.frame.o[0] - frame.o[0]) * frame.z[0] + (lug.frame.o[1] - frame.o[1]) * frame.z[1] + (lug.frame.o[2] - frame.o[2]) * frame.z[2];
+    const h = lug.op.op === "extrude" ? lug.op.h : 6;
+    const sgn = lug.frame.z[0] * frame.z[0] + lug.frame.z[1] * frame.z[1] + lug.frame.z[2] * frame.z[2] < 0 ? -1 : 1;
+    const [a, b] = sgn > 0 ? [w, w + h] : [w - h, w];
+    out.push({ solid: lug.id, body: lug.body, w0: a, w1: b, R: 8, keyed: keyedIds.has(lug.body), shim: 0, name: titleOf(lug.body) });
+  }
   return out.sort((a, c) => a.w0 - c.w0);
 }
 
@@ -66,7 +74,7 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
 
 /** A bore in a part, at the world point of the axis, as a clockwise hole in its profile. */
 export function cutBore(ctx: BuildCtx, solidId: string, at: readonly number[], r: number): void {
-  const part = [...ctx.parts.values(), ...ctx.twins.values()].find((p) => p.id === solidId);
+  const part = [...ctx.parts.values(), ...ctx.twins.values(), ...[...ctx.lugs.values()].flat()].find((p) => p.id === solidId);
   if (!part) return;
   const uv = planeCoords(part.frame, [at[0]!, at[1]!, at[2]!]).uv;
   part.profile.holes.push(circle(r, uv[0], uv[1], Math.max(24, Math.round(r * 5))).reverse());

@@ -554,8 +554,9 @@ class Run implements BlockCtx {
           else if (this.xfs.has(other)) add(r.at, xf.apply(this.xfs.get(other)!, r.at));
         }
         let X: Xf | null = null;
-        if (ref.length >= 2) X = fitXf(ref, now, carried ? undefined : hint) ?? (carried ? fitAxis(ref, now, carried) : null);
-        else if (ref.length === 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
+        // a prismatic partner fixes the turn outright: the body slides on it without turning against it
+        if (ref.length >= 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
+        else if (ref.length >= 2) X = fitXf(ref, now, carried ? undefined : hint) ?? (carried ? fitAxis(ref, now, carried) : null);
         else if (ref.length === 1 && slide) X = xf.trans(v3.sub(now[0]!, ref[0]!));
         if (X) {
           this.xfs.set(b.id, X);

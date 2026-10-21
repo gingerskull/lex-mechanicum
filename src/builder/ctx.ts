@@ -87,6 +87,8 @@ export interface BuildCtx {
   parts: Map<string, Solid3>;
   /** A clevis's second half. */
   twins: Map<string, Solid3>;
+  /** Hinge lugs by site: parts of a body whose plane is not square to the hinge (rules/lugs). */
+  lugs: Map<string, Solid3[]>;
   bores: Map<string, Bore[]>;
   /** Holes the base needs, world xy and radius, with the joint that asked. */
   baseHoles: { at: [number, number]; r: number; joint: string }[];
@@ -163,6 +165,7 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
     principle,
     parts: new Map(),
     twins: new Map(),
+    lugs: new Map(),
     bores: new Map(),
     baseHoles: [],
     baseMarks: [],

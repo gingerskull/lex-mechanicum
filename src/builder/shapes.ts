@@ -32,7 +32,7 @@ export interface BodyGeom {
    */
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
-  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number }[];
+  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; revolve?: boolean }[];
   /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
   plan?: Vec2[];
 }
@@ -71,12 +71,12 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "link": {
       const L = num(shape.length, far);
       const [r0, r1] = pair(shape.boss, [8, 8]);
-      return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick: THICK, approx: false };
+      return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick: num(shape.thickness, THICK), approx: false };
     }
     case "plate": {
       const pts = Array.isArray(shape.outline) ? (shape.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]) : null;
       const r = num(shape.boss, 8.5);
-      if (pts && pts.length >= 2) return { profile: { outer: roundedPoly(pts, r), holes: [] }, thick: THICK, approx: false };
+      if (pts && pts.length >= 2) return { profile: { outer: roundedPoly(pts, r), holes: [] }, thick: num(shape.thickness, THICK), approx: false };
       if (Array.isArray(shape.rect)) {
         const [w, h] = pair(shape.rect, [60, 40]);
         return { profile: { outer: roundRect(0, 0, w, h, Math.min(8, w / 4, h / 4)), holes: [] }, thick: num(shape.thickness, 8), approx: false };
@@ -169,8 +169,11 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
+    // `axial`: the record places the part itself, its start that far along its frame's z (a hinge leaf beside its
+    // partner, a governor's arm beside the spindle head), instead of a slab of the placement solver
+    const axial = typeof shape.axial === "number" ? shape.axial : undefined;
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(axial !== undefined ? { exact: { offset: axial } } : g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    out.set(b.id, withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -328,3 +331,26 @@ function cylinder(b: KinBody, g: BodyGeom): BodyGeom | null {
 }
 
 const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);
+
+/** A sphere's half profile for a revolve about its frame's z: radius r, centred on the frame's origin. */
+export function ballProfile(r: number, n = 24): Profile {
+  const pts: Vec2[] = [];
+  for (let i = 0; i <= n; i++) {
+    const t = (Math.PI * i) / n;
+    pts.push([Math.max(0, r * Math.sin(t)), -r * Math.cos(t)]);
+  }
+  return { outer: pts, holes: [] };
+}
+
+/**
+ * A link that ends in a ball (`ball: { diameter }`, a governor's flyweight): a sphere on the link's far end, centred in
+ * its thickness. Only for a part the record places itself (`axial`), whose thickness is known here.
+ */
+function withBall(g: BodyGeom): BodyGeom {
+  const ball = g.shape.ball as { diameter?: unknown } | undefined;
+  if (!ball || String(g.shape.type) !== "link" || !g.exact) return g;
+  const r = num(ball.diameter, 30) / 2;
+  const L = num(g.shape.length, 0);
+  const o = v3.add(g.frame.o, v3.add(v3.mul(g.frame.x, L), v3.mul(g.frame.z, g.exact.offset + g.thick / 2)));
+  return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-ball`, name: `Flyweight ball Ø${2 * r}`, frame: { o, x: g.frame.x, z: g.frame.z }, profile: ballProfile(r), h: 0, revolve: true }] };
+}

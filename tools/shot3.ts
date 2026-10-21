@@ -1,5 +1,6 @@
 // npx tsx tools/shot3.ts <id> [--view record|PLAN|FRONT|SIDE|ISOMETRIC|DIMETRIC|"AUX O2"|"VIEW 30 40"|<view id>] [--theme dark|light]
-//   [--explode 0] [--detail full] [--u 1.1] [--w 1393] [--h 870] [--dpr 1.5] [--card] [out.png]
+//   [--explode 0] [--detail full] [--u 1.1] [--w 1393] [--h 870] [--dpr 1.5] [--card] [--params a=1,b=2]
+//   [--select name=option] [--drivers speed=120] [out.png]
 // Draws one frame of a mechanism with the 3D renderer, in local Chrome (tools/chrome3.ts), to a PNG.
 // --set [dir] draws the set of standard Q4 instead: the record's default view, PLAN, FRONT, SIDE and ISOMETRIC, every
 // section and detail view of the record, and the full explode, each on both sheets, with the overlays on, into
@@ -53,6 +54,13 @@ export async function shotSet(id: string, dir: string): Promise<string[]> {
   return files;
 }
 
+/** --params a=1,b=2 --select s=above --drivers speed=120: settings of the record's controls. */
+function controlsArg(): NonNullable<Draw3Options["controls"]> {
+  const pairs = (v: string | undefined) => Object.fromEntries((v ?? "").split(",").filter(Boolean).map((kv) => kv.split("=") as [string, string]));
+  const nums = (v: string | undefined) => Object.fromEntries(Object.entries(pairs(v)).map(([k, x]) => [k, Number(x)]));
+  return { params: nums(arg("params")), select: pairs(arg("select")), drivers: nums(arg("drivers")) };
+}
+
 export async function main() {
   const id = process.argv[2];
   if (!id) {
@@ -84,6 +92,7 @@ export async function main() {
         detail: (arg("detail") ?? "full") as Dial,
         ...(arg("zoom") ? { zoom: { centre: arg("zoom")!, scale: Number(arg("scale") ?? 4) } } : {}),
         ...(process.argv.includes("--card") ? { card: true } : {}),
+        ...(arg("params") || arg("select") || arg("drivers") ? { controls: controlsArg() } : {}),
       }),
     );
     mkdirSync(dirname(out), { recursive: true });

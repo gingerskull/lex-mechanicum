@@ -12,7 +12,7 @@ import { MIN_GAP } from "../constants";
 import { type Contact, contactOf, cutRing, freeSpot, localAt, mid, ringOffsets, stadium } from "../contact";
 import { titleOf } from "../lib";
 import type { KitId } from "../sites";
-import type { Local } from "../lib";
+import { Local } from "../lib";
 import type { Rule } from "./types";
 import { v3 } from "../../kin/math";
 
@@ -120,6 +120,23 @@ function extentIn(ctx: BuildCtx, c: Contact, body: string): [number, number, num
   return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
 }
 
+/** A collar on a turning shaft, sliding along it: a bronze bushing pressed into its bore, running on the shaft (J5). */
+function sleeveOnShaft(ctx: BuildCtx, c: Contact, slider: string, host: string): ReturnType<KitBuild> {
+  const part = ctx.parts.get(slider);
+  const d = Number((ctx.kin.bodies.find((b) => b.id === host)?.shape as { diameter?: unknown } | undefined)?.diameter ?? 16);
+  if (!part || part.op.op !== "extrude") return { note: `${titleOf(c.id)}: ${titleOf(slider)} slides on ${titleOf(host)}.`, serves: {} };
+  const h = part.op.h;
+  const D = d + 4;
+  part.profile.holes = [circle(D / 2 + 0.05, 0, 0, 40).reverse()];
+  const L = new Local(part.frame, { joints: [c.id] });
+  L.add(H.bushing(`${c.id}-bush`, d, D, { body: slider, z0: 0, z1: h, name: `Bronze bushing ${d}x${D}x${h}`, mat: "Bronze CuSn8, oil-impregnated" }));
+  ctx.add(L.out());
+  return {
+    note: `${titleOf(c.id)}: ${titleOf(slider)} slides on the Ø${d} ${titleOf(host)} in a bronze bushing; it turns with the shaft because its links ride the shaft's arms.`,
+    serves: { F2: [`${c.id}-bush`] },
+  };
+}
+
 const j5 = contactRule({
   id: "j5-slide",
   ids: ["J5", "F5", "F7", "A6"],
@@ -129,6 +146,8 @@ const j5 = contactRule({
     const id = c.id;
     const slider = c.a === "ground" ? c.b : c.a;
     const host = slider === c.a ? c.b : c.a;
+    // a collar sliding on a turning shaft (a governor's sleeve): the shaft is its guide, a bushing in its bore
+    if (host !== "ground" && String(ctx.kin.bodies.find((b) => b.id === host)?.shape?.type) === "shaft") return sleeveOnShaft(ctx, c, slider, host);
     const e = extentIn(ctx, c, slider);
     const zs = ctx.extent(slider);
     if (!zs) return;
