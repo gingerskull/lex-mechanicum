@@ -1,184 +1,220 @@
 # Audit: Whitworth quick-return (whitworth)
-standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-21 · result: open · detail: full · pass: build
+teaching: tweak · decisions in the record
 
 ## Summary
-PASS 119 · FAIL 0 · N/A 2 · open: none
+PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.3 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #42 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | DATA · catalogue validator clean (unit tests pass) |
-| P3 | PASS | DATA / SITE · ratio (stroke, cut:return 1.59:1, stroke 64 mm), axes, output character, backdrivable, other names, family, motion, level, dof, motorised drive |
-| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | DATA · motion, forces, benefits, limits; three uses with one line each |
-| P6 | PASS | DATA · Wikipedia (two), a guide and course notes; videos and a photo page. Real world: two YouTube videos of an Atlas Rhodes shaper in action, both checked live (oEmbed) and on topic (the Whitworth motion on a real shaper); kept |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts; lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · solve() gives stroke 64.00 mm (x 68 to 132), cut 221.0° and return 139.0°, ratio 1.590: as the catalogue text |
-| P10 | PASS | HAND · paths of B and the crank pin, velocity at C and B, rod force line, input spin on the pinion, lever angle, ram position plot |
-| P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
-| K1 | PASS | HAND · check: link error 4.3e-14 mm; the polish changes heights, hardware and the cabling position only |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · disc (hub), gears, slotLink, link, slider, plate (ram cap), rails, caps; at, between and fixed placement |
-| K4 | PASS | HAND · roles driver (pinion), link, output, ground, pin; accent only on the pinion shaft cap pPn |
-| K5 | PASS | HAND · check clean. Layers: hub -1; gears 0 (plated 3 mm low); lever 1 (plated 1.5 mm up); ram and rails 2; rod 3; ram cap 4. Plating by `dz` in model.ts, the rules build every stack on it (K1) |
-| K6 | PASS | DATA · r 40, e 14, R 32, Lr 100, 50T and 16T module 2, centre distance 66, pinion at 200°, ram line y -14, pinion phased to mesh (a tooth meets a gap on the line of centres): as the catalogue. Deliberate additions: the bull gear is a ring on a hub; the rails start at x 54 (were 68) so the ram never leaves them (see Variants) |
-| K7 | PASS | HAND · input rotary on the pinion |
-| D1 | PASS | HAND · tapered rod (R8.5 and R8), slotted lever with stadium slot, involute gears, slider with square ends on twin stadium rails, squircle base |
-| D2 | PASS | HAND · bosses round every pin; the bull gear is a ring where the load runs (rim, bore ring); the lever keeps constant 22 mm width: its load runs the whole length. No windows |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
-| D4 | PASS | AUTO · feet concentric with the corner arcs |
-| D5 | PASS | AUTO / HAND · rails on ground risers; the hub on two posts with dowels; the ram cap on one shaped post |
-| D6 | PASS | HAND / STYLE · hub hardware, slide hardware and leads read quieter than lever, rod and ram |
-| D7 | PASS | HAND · lever, rod, ram, rails and base carry only load shape and manufacturing marks |
-| A1 | PASS | AUTO · pPn J2, pO3 J1, pA J4, pB J3, pC J3, slide-ram J5, mesh J6; the bull gear on its hub is written by hand (O2, J1 form) |
-| A2 | PASS | AUTO · live pinion shaft, dead axle at O3, track roller at A, shoulder bolts at B and C, slide on the rails, mesh hardware |
-| A3 | PASS | AUTO · 6800-2RS on the Ø10 pinion shaft, F6800 at O3, F686ZZ at B and C, track roller on a Ø8 stud at A; spacers in every gap |
-| A4 | PASS | AUTO · stepped shoulder bolts and axle with undercut threads; keyed pinion shaft with end retainer |
-| A5 | PASS | AUTO · feather key 3 x 3 on the Ø10 pinion shaft |
-| A6 | PASS | AUTO · rails on one 32 mm ground steel riser each, starting past the lever's sweep, two countersunk M3 into the base each, the reference rail dowelled (v2.4); the hub on two Ø10 standoffs (placed by hand: the rule's pair fell on the pivot bore) |
-| A7 | PASS | AUTO · 8 mm base, counterbored corners, feet, paths engraved, front scale, clearance holes for the pinion shaft and the pivot axle |
-| A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 (retainer plate and hub included) |
-| A9 | PASS | HAND · C a clevis (ram below the rod, cap above on a post): double shear. A, B, O3 and the pinion are single shear because a part sweeps over each: the lever over the gear (A) and under the rod (B), the rod over the pivot (O3), the lever tip over the pinion hub (0.9 mm). A runs 1.5 mm over the gear on a roller stud; the pinion has no straddle bridge for the same reason and sits on two housing bearings 15 mm apart |
-| A10 | PASS | HAND · planes follow the sweeps: gears share one, lever over them, ram and rails over the lever's tip, rod over the ram. The ram sits high (z 20) only because the lever tip sweeps under it; no plate is stacked only to clear |
-| A11 | PASS | HAND · pinion to key to shaft to housing (screwed and dowelled); roller stud to bull gear to bushing to hub to posts, dowels and base; lever to bearing to axle to hub and base (nyloc under the base); rod pins to lever and ram, ram to rails, keeper, gib and risers, risers screwed, the reference rail dowelled |
-| A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes, sets counted; the bull bushing, thrust washers and retainer plate named by hand |
-| A14 | PASS | HAND · margins at the extremes: lever over pinion shaft end 0.9 mm, hub screw heads under the lever 1.3 mm, rod over the keeper 0.7 mm, pivot axle head under the rod 3.9 mm, cap post clear of the rod's big end by 2 mm; rails start 54 mm from O3 so the ram (C from 68 to 132, 28 wide) is on them at both ends of the stroke, the lever passing under their near end and the risers starting past its 66 mm sweep (the rule seats the rail on its free run); clearance 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · a note and a badge on every joint, five build rules |
-| A17 | PASS | HAND · housing, pinion shaft, pinion; hub on its posts and dowels, flange, thrust washer, bull gear with bushing, thrust washer, retainer and screws; pivot axle, lever; rail risers, rails, gib, ram, keeper; rod on B then C; cap post and cap; wrist pin last |
-| E1 | PASS | AUTO · one level per solid |
-| E2 | PASS | AUTO · screws, bolts with their shims, shafts and bought units are groups |
-| E3 | PASS | AUTO · pins and cap screw upward, housing, hub and drive screws downward |
-| E4 | PASS | HAND · retainer plate and its screws leave before the bull gear; lever before the gear; wrist pin and cap above the rod, rod above ram: last fitted goes furthest |
-| E5 | PASS | AUTO · bearings, bushing and circlips stay in their parts |
-| E6 | PASS | AUTO · motor with its bracket, bearings whole |
-| E7 | PASS | AUTO · spacers midway |
-| E8 | PASS | AUTO · pinion hub and key keep their order on the shaft |
-| E9 | PASS | HAND · looked at: readable at full explode at 28° and 70°, both sheets, nothing leaves the frame |
-| J1 | PASS | AUTO / HAND · pivot O3: shouldered axle through hub and base to a nyloc, bearing in the lever, spacers, thrust washer, circlip. No bridge: the rod sweeps over the pivot, so the head sits 1 mm over the bearing (variant). Bull gear on its hub: bronze bushing, hub flange, thrust washers, retainer plate, oil sinks (by hand) |
-| J2 | PASS | AUTO · pinion: housing with two sealed bearings, sleeve, wave washer, circlips, screwed and dowelled; keyed shaft, pulley hub with two set screws, end retainer, thrust washer, home flag. No straddle (the lever sweeps over it) |
-| J3 | PASS | AUTO · B and C: shoulder bolts, bearings in the rod, inner-race spacers, threadlocker; clevis at C (variant) |
-| J4 | PASS | AUTO · A: track roller on the stud in the lever's slot, hardened wear strips in both walls, felt oiler, slot cut for the full 26 to 54 mm run |
-| J5 | PASS | AUTO · rails, keeper, bronze gib clamped under the keeper by the rail screws, set on slotted holes, wipers, nipple, one end stop (far end; the rule drops the near end's stop, the lever sweeps there) |
-| J6 | PASS | AUTO · pinion hub with key and set screw, eccentric bushing under the housing, timing marks on the meshing teeth |
-| J7 | N/A | no cam |
-| J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension |
-| F1 | PASS | AUTO · housing, hub (two dowels) and the reference rail (dowelled by its end screws) located; the lever and rod carry bearings but are not removable plates |
-| F2 | PASS | AUTO · bearings held by circlip and flange; bull gear by the retainer plate; keeper holds the ram; shaft end retainer |
-| F3 | PASS | AUTO · feather key and set screw on the pinion; the bull gear takes torque at its teeth only, no key |
-| F4 | PASS | AUTO · bronze thrust washers under and over the bull gear, at O3 and the pinion; wave washer preloading the pinion shaft |
-| F5 | PASS | AUTO / HAND · one end stop with a neoprene pad just past the far end of the stroke; the near end has none (the lever sweeps there and the rule drops it): the rod and lever limit the ram on that side. The lever turns fully, nothing to limit |
-| F6 | N/A | driven through the gears; no rest position to hold |
-| F7 | PASS | AUTO · eccentric on the pinion shaft sets backlash; bronze gib on the ram; belt tension at the motor mount. The time ratio depends on e/r only and is fixed by the dowelled hub |
-| F8 | PASS | AUTO / HAND · bull bushing oiled from two sinks in the retainer; felt oiler on the slot; wipers and nipple on the slide; sealed and shielded bearings elsewhere |
-| F9 | PASS | AUTO · timing marks at the meshing teeth |
-| F10 | PASS | AUTO / HAND · pulley flanges, home flag and fork sensor; no slip clutch: the stops are never touched in running |
-| M1 | PASS | AUTO · edge breaks on every top face |
-| M2 | PASS | HAND · the bull gear is a rim ring (no hub, it is carried on the hub bushing); pinion hub; no wheel that starts, stops or reverses |
-| M3 | PASS | AUTO · bore entry chamfers on every seat and through hole |
-| M4 | PASS | AUTO / HAND · counterbored housing screws and base corners, countersinks for rail screws; the retainer plate sits flat under button heads |
-| M5 | PASS | AUTO / HAND · no milled pockets or windows |
+| S1 | ? | DATA |
+| S2 | ? | HAND |
+| S3 | ? | AUTO |
+| S4 | ? | SITE |
+| S5 | ? | SITE |
+| S6 | ? | AUTO |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | ? | DATA |
+| P3 | ? | DATA / SITE |
+| P4 | ? | DATA |
+| P5 | ? | DATA |
+| P6 | ? | DATA |
+| P7 | ? | HAND / SITE |
+| P8 | ? | SITE |
+| P9 | ? | AUTO / HAND |
+| P10 | ? | HAND |
+| P11 | ? | DATA |
+| P12 | ? | AUTO / DATA |
+| P13 | ? | HAND |
+| K1 | PASS | AUTO · K1 residual 3.4e-13 (tolerance 1e-9) over 360 samples, reference 3.1e-13 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | ? | AUTO / HAND · 3 blocks (gear-mesh, slider-dyad); no numeric fallback |
+| K4 | ? | HAND |
+| K6 | ? | DATA |
+| K7 | ? | DATA · drivers input (rotary) |
+| K8 | ? | AUTO / DATA |
+| K9 | ? | DATA |
+| K10 | ? | AUTO / DATA |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | ? | DATA |
+| T1 | ? | HAND |
+| T2 | ? | HAND |
+| T3 | ? | DATA |
+| T4 | ? | DATA · fired: trace-marks (no solids) |
+| T5 | ? | DATA |
+| T6 | ? | HAND / DATA |
+| T7 | ? | DATA |
+| T8 | ? | DATA |
+| T9 | PASS | AUTO / DATA · claim table: 4 ok, 0 off, 0 uncheckable of 4 |
+| T10 | ? | AUTO · 16 solids drawn see-through: rails-rail0, rails-rail1, rails-riser1, rails-keeper, rails-stop0, rails-stop1, rails-pad1, O3-slv |
+| T11 | ? | AUTO · 1 support routed, 1 moved off a sweep |
+| T12 | PASS | HAND · 24 support solids; dropped by the polish: none |
+| T13 | ? | DATA |
+| T14 | ? | HAND / DATA |
+| T15 | ? | HAND |
+| T16 | ? | HAND / STYLE |
+| T17 | ? | AUTO |
+| D1 | ? | HAND |
+| D2 | ? | HAND |
+| D3 | ? | STYLE |
+| D4 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
+| D5 | ? | AUTO / HAND |
+| D6 | ? | HAND / STYLE |
+| D8 | ? | AUTO / HAND |
+| D9 | ? | AUTO / HAND |
+| D10 | ? | AUTO |
+| D11 | PASS | AUTO · SOLID: 0 of 179 solids unsound |
+| D7 | ? | HAND |
+| A1 | ? | AUTO · mesh J6, A J3, B J3, C J3, Op J2, O2 J2, slot J5, rails J5, O3 J1, drive drive |
+| A2 | ? | AUTO · mesh J6, A J3, B J3, C J3, Op J2, O2 J2, slot J5, rails J5, O3 J1, drive drive |
+| A3 | ? | AUTO · fired: classify (9 solids), axial stack builder |
+| A4 | ? | AUTO · fired: j1-dead-axle (24 solids), axial stack builder |
+| A5 | ? | AUTO · fired: j2-live-shaft (51 solids), j10-shaft-in-plan (no solids), axial stack builder |
+| A6 | ? | AUTO · fired: j5-slide (40 solids), j13-compliant (no solids), standoffs (no solids) |
+| A7 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
+| A8 | ? | AUTO · fired: fasteners (18 solids) |
+| A9 | ? | AUTO / HAND · fired: placement solver |
+| A10 | ? | HAND · fired: placement (12 solids), placement solver |
+| A11 | ? | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (24 solids) |
+| A12 | FAIL | AUTO · clamp: slot-rail0 (turning) touches the ground face of rails-riser1; slot-rail0 (turning) touches the ground face of rails-keeper; slot-riser0 (turning) touches the ground face of rails-rail1; slot-riser0 (turning) touches the ground face of rails-stop1; slot-riser0 (turning) touches the ground face of base; slot-riser1 (turning) touches the ground face of base; slot-dw0 (turning) touches the ground face of rails-keeper; slot-dw0 (turning) touches the ground face of base; slot-dw1 (turning) touches the ground face of base; block (turning) touches the ground face of rails-riser1; ram (turning) touches the ground face of rails-riser0 |
+| A13 | ? | AUTO / HAND · 179 solids, 88 unnamed (further items of a listed set) |
+| A14 | ? | AUTO / HAND · fired: support router |
+| A15 | FAIL | AUTO · clearance in 3D over 8 phases: 91 clashes: slot-riser1 x bull 4.81 mm; slot-riser0 x bull 4.73 mm; slot-riser0 x rails-riser1 4.39 mm; O2-axle x slot-riser1 3.80 mm; hand allow: 0 named, 0 unnecessary |
+| A16 | ? | HAND · 10 joint notes; no note: none; no badge: mesh, slot, rails |
+| A17 | ? | HAND |
+| A18 | ? | AUTO · placement: 4 slabs in the tallest stack (49.0 mm), 0 clevises; stack per joint in the Joints table |
+| A19 | ? | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O3-bridge |
+| A20 | ? | AUTO · support per joint: O3 hung |
+| A21 | PASS | AUTO · kit per joint: mesh J6, A J3, B J3, C J3, Op J2, O2 J2, slot J5, rails J5, O3 J1, drive drive |
+| A22 | ? | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) |
+| E1 | ? | AUTO · every solid has one explode level; levels -4 to 7.5 |
+| E2 | ? | AUTO · fired: explode (1 solid) |
+| E3 | ? | AUTO · fired: explode (1 solid) |
+| E4 | ? | HAND |
+| E5 | ? | AUTO · fired: explode (1 solid) |
+| E6 | ? | AUTO · fired: explode (1 solid) |
+| E7 | ? | AUTO · fired: explode (1 solid) |
+| E8 | ? | AUTO · fired: explode (1 solid) |
+| E9 | ? | HAND |
+| E10 | ? | AUTO · fired: explode (1 solid) |
+| J1 | ? | AUTO · fired: trunnion (no solids), j1-dead-axle (24 solids) |
+| J2 | ? | AUTO · fired: j2-live-shaft (51 solids) |
+| J3 | ? | AUTO · fired: j3-moving-pin (27 solids), cross-bearings (no solids), ring-hub (no solids) |
+| J4 | ? | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) |
+| J5 | ? | AUTO · fired: piston-bore (no solids), j5-slide (40 solids), tongue-slot (no solids) |
+| J6 | ? | AUTO · fired: j6-mesh (1 solid), ring-rollers (no solids) |
+| J7 | ? | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) |
+| J8 | ? | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) |
+| J9 | ? | AUTO · fired: j9-crossed-mesh (no solids) |
+| J10 | ? | AUTO · fired: j10-shaft-in-plan (no solids) |
+| J12 | ? | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) |
+| J13 | ? | AUTO · fired: j13-compliant (no solids) |
+| J11 | ? | AUTO · fired: j11-screw (no solids) |
+| F1 | ? | AUTO · served at Op, O2, slot, rails, O3; fired: j2-live-shaft (51 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F2 | ? | AUTO · served at A, B, C, Op, O2, slot, rails, O3; fired: j2-live-shaft (51 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F3 | ? | AUTO · served at A, B, C, Op, O2; fired: j2-live-shaft (51 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
+| F4 | ? | AUTO / HAND · served at Op, O2; fired: j9-crossed-mesh (no solids), j2-live-shaft (51 solids), j10-shaft-in-plan (no solids), trunnion (no solids) |
+| F5 | ? | AUTO / HAND · served at slot, rails; fired: j5-slide (40 solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) |
+| F6 | ? | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) |
+| F7 | ? | AUTO / HAND · served at mesh, slot, rails; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), j5-slide (40 solids), j12-flexible (no solids), adjustable-length (no solids) |
+| F8 | ? | AUTO · served at slot, rails; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (1 solid) |
+| F9 | ? | AUTO / HAND · served at mesh; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), timing-marks (1 solid) |
+| F10 | ? | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) |
+| M1 | ? | AUTO · fired: hardware primitives |
+| M2 | ? | HAND |
+| M3 | ? | AUTO · fired: j3-moving-pin (27 solids), hardware primitives |
+| M4 | ? | AUTO / HAND · fired: base (3 solids), fasteners (18 solids) |
+| M5 | ? | AUTO / HAND · fired: hardware primitives |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | PASS | HAND · lever and rod are stadiums and tapered hulls; no inside corner |
-| M8 | PASS | AUTO · undercuts on every shoulder bolt and axle thread |
-| M9 | PASS | AUTO / HAND · pins into the bronze or steel parts over full thickness; the cap screw 3 mm into the ram (1 d, M3); the axle through the base to a nyloc; standard lengths |
-| M10 | PASS | AUTO / HAND · steel and bronze by role, hardened ground rails, bronze bushing and thrust washers |
-| M11 | PASS | AUTO · centre holes and chamfered ends on the shafts |
-| M12 | PASS | HAND · hub screws reached with the lever swung clear; every other head reachable; bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw, nyloc on the axle; the gib is held by the keeper's clamp, no lock nuts |
-| M14 | PASS | AUTO / HAND · wear strips in the lever slot; hardened rails and the bronze gib; bronze bushing and thrust washers under the bull gear |
-| V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 |
-| V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
-| V3 | PASS | AUTO / HAND · belt and pulleys clear; the terminal block moved along the base edge clear of the bracket wall (variant: the cabling rule put it under the wall); clearance 0 |
-| V4 | PASS | AUTO · flanges, set screws, slotted mount |
-| V5 | PASS | AUTO · rotary: belt to the pinion's input pulley |
-| V6 | PASS | AUTO · home flag, fork sensor on the housing, leads to the terminal block, one P-clip |
-| L1 | PASS | STYLE · lint-style clean |
-| L2 | PASS | HAND · the model and polish carry geometry, roles, marks and materials only |
-| L3 | PASS | HAND · pinion driver, bull gear and lever and rod link, ram and cap output, hub and rails ground, hardware hw |
-| L4 | PASS | HAND / STYLE · accent on the pinion shaft only |
-| L5 | PASS | AUTO / HAND · screws, bearings, bushing and roller are real solids in real holes; the retainer plate lets the bushing and hub show through the dashed hidden lines |
-| L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
-| L7 | PASS | STYLE · tilt 0° to 88°, no shear |
-| L8 | PASS | AUTO / HAND · engraved paths and scale are marks |
-| R1 | PASS | HAND · the polish reuses H.plate, H.bushing, H.thrustWasher, H.standoff, H.dowel, H.screw, H.lead; plating, the clevis twin and the ring gear are the model's; no inline standard part |
-| R2 | PASS | HAND · threads M2, M2.5, M3, M4, M5, M6, M8; joints Ø6, 8, 10; bearings 6800-2RS, F686ZZ, F6800ZZ; GT2 16T and 32T |
-| R3 | PASS | AUTO · housing, eccentric, slide and drive from their subassemblies |
-| R4 | PASS | AUTO · package built at build time, 35.9 KB |
-| R5 | PASS | HAND · states only what differs; no sampling; rules 0.26 s, polish 1 ms |
-| R6 | PASS | FLAG · Node CPU bench at DPR 1.5 (not the browser bench): plan 356, 28° 323, side 246, explode 243 ms at full detail; 45 ms at dial H. Heavier than the slider-crank: 208 solids, a 50-tooth gear and a 16-tooth gear. Browser numbers to be taken with the browser bench |
-| R7 | PASS | HAND · model.ts + polish.ts 16.6 KB |
-| R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
-| DL2 | PASS | HAND · default dial full |
-| DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
-| DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
-| DL5 | PASS | FLAG · rung counts and frame times in the detail ladder below |
-| Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 35.9 KB; site build and site tests pass |
-| Q4 | PASS | plan, 28°, side, explode at 28° and 70°, both sheets, overlays on; all looked at |
-| Q5 | PASS | Node CPU bench; flags under R6 |
-| Q6 | PASS | every row judged |
-| Q7 | PASS | conformance: whitworth at 2.3, pass |
+| M7 | ? | HAND |
+| M8 | ? | AUTO · fired: j1-dead-axle (24 solids) |
+| M9 | ? | AUTO / HAND · fired: j1-dead-axle (24 solids) |
+| M10 | ? | AUTO / HAND · 173 of 179 solids name a material |
+| M11 | ? | AUTO · fired: j1-dead-axle (24 solids), hardware primitives |
+| M12 | ? | HAND |
+| M13 | ? | AUTO / HAND · 23 threaded |
+| M14 | ? | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) |
+| V1 | ? | AUTO · fired: drive (26 solids) |
+| V2 | ? | AUTO · fired: drive (26 solids) |
+| V3 | ? | AUTO / HAND · fired: drive (26 solids) |
+| V4 | ? | AUTO · fired: j8-belt (no solids) |
+| V5 | ? | AUTO · fired: drive (26 solids) |
+| V6 | ? | AUTO · fired: drive (26 solids), cable-clip (2 solids) |
+| L1 | ? | STYLE |
+| L2 | ? | HAND |
+| L3 | ? | HAND |
+| L4 | ? | HAND / STYLE |
+| L5 | ? | AUTO / HAND · fired: see-through (16 solids) |
+| L6 | ? | AUTO |
+| L7 | ? | STYLE |
+| L8 | ? | AUTO / HAND · fired: trace-marks (no solids) |
+| L9 | ? | AUTO / DATA |
+| L10 | ? | AUTO / STYLE |
+| R1 | ? | HAND |
+| R2 | ? | HAND |
+| R3 | ? | AUTO · fired: hardware primitives |
+| R4 | ? | AUTO · package v2 32.3 KB |
+| R5 | ? | HAND |
+| R6 | ? | FLAG |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | ? | AUTO / SITE |
+| R9 | ? | AUTO / SITE |
+| R10 | ? | FLAG |
+| DL1 | ? | AUTO / HAND · 72 of 179 solids on a dropping rung |
+| DL2 | ? | HAND |
+| DL3 | ? | AUTO |
+| DL4 | ? | SITE |
+| DL6 | ? | AUTO |
+| DL5 | ? | FLAG |
+| Q1 | FAIL | 0 findings, 11 clamp, 0 edge |
+| Q2 | FAIL | 91 clashes, 0 unnecessary allows |
+| Q3 | ? | package v2 written, 32.3 KB; site build not checked here |
+| Q4 | ? | local: tools/shot |
+| Q5 | ? | local: tools/bench |
+| Q6 | ? |  |
+| Q7 | ? |  |
+| Q8 | ? | teaching review: tweak (2026-10-20); the six phases of the finished build are looked at by eye |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pPn | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; External circlip DIN 471, Ø10; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 7 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – driven, turns fully | – driven through the belt | Eccentric bushing Ø26, 0.3 mm offset bore Ø12, flanged | – sealed bearings | – marks at the mesh (J6) | – see drive |
-| pO3 | J1 | 2 x Axle, shoulder bolt Ø10 x 70, M8 (ISO 7379), through the base, M8 nyloc underneath | Internal circlip DIN 472, Ø19; Bearing F6800ZZ (10x19x5) | – no keyed part | Thrust washer 10.2x13.1, bronze | – the lever turns fully | – driven | – the hub is dowelled; the time ratio is fixed | – shielded bearing | – no phase of its own | – none needed |
-| pA | J4 | – no removable plate on a moving pin | head | – no keyed part | Track roller located by its stud shoulder | – limited by the linkage | – driven | – no adjustable length | Felt oiler, oil-soaked wool felt | – no phase of its own | – none needed |
-| pB | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase of its own | – none needed |
-| pC | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | – the cap is clamped on the shoulder; no keyed part | F686ZZ located by flange and circlip, inner race clamped | – limited by the slide's stops | – driven | – no adjustable length | – shielded bearing, greased for life | – no phase of its own | – none needed |
-| slide-ram | J5 | – the reference rail is dowelled to the base | Keeper plate, holds the slider down | – prismatic, no torque | – the keeper takes the lift, the base the weight | End stop block, hardened | – driven | Gib strip 101 x 7 x 2.3, bronze, slotted, clamped under the keeper | 2 x wiper; Grease nipple M6 (DIN 71412) | – no phase to keep | – stops never touched in running |
-| mesh-bull-pinion | J6 | – located by the housing and the hub | – each shaft retained at its own joint | Gear hub Ø22, set screw M3 on the key; Set screw M3 (DIN 916), threadlocked | – thrust at each shaft | – turn fully | – driven | Eccentric bushing Ø26, 0.3 mm offset bore Ø12, flanged | – greased open gears | Bull gear, 50 teeth; Pinion, 16 teeth | – none needed |
-| raila-seat | post | – not dowelled: the gib on it takes up the fit against the reference rail | – screwed down through keeper, gib, rail and riser | – static | – static | – static | – static | – the gib on this rail adjusts the fit | – static | – static | – static |
-| railb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | – screwed down through rail and riser | – static | – static | – static | – static | – the gib on the other rail adjusts the fit | – static | – static | – static |
-| drive | drive | – bracket screwed up into the base | – pulley hub set screws (pPn) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
-| hub-post | post | 2 x Dowel pin Ø3 h6 (ISO 8734), hub to base | – M5 screws from both sides | – static | – static | – static | – static | – the dowels fix the pivot's offset | – static | – static | – static |
-| O2 | J1 | Pivot hub; Hub flange Ø68, steel, pressed on and pinned | Bull gear retainer plate Ø62 x 2 | – torque at the teeth, no key | 2 x Thrust washer Ø48 x Ø62 x 1.5, bronze | – turns fully | – driven | – none: the ring is a bushing fit | Bronze bushing Ø48 x Ø52 x 7, oil-impregnated; Bull gear retainer plate Ø62 x 2 | – marks on the teeth (J6) | – none needed |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| mesh | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Pinion; Bull | none |
+| A | J3 | slider-dyad | – | – | none | Shoulder bolt Ø5 x 12, M4 (ISO 7379) | Shoulder bolt Ø5 x 12, M4 (ISO 7379) | none | none | none | none | none | none | none |
+| B | J3 | slider-dyad | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
+| C | J3 | – | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
+| Op | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the pinion on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 14 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | J2 | – | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the bull on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 14 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| slot | J5 | – | – | slab 3 | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 61.8, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| rails | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 92, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| O3 | J1 | slider-dyad | hung (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø10, shouldered, M8 end | External circlip DIN 471, Ø10 | none | none | none | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| O3-bridge | O3 | hung | moved | 1.5 | bull, block, lever, rod, ram | see-through |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| bull gear | gear on a shaft at O2 | ring gear (Ø52 bore) on a fixed Ø48 hub, in the model | O3 lies 14 mm from O2, inside the gear: a shaft at O2 cannot carry the pivot. The hub carries the pivot stud |
-| O2 | no rule for a ring on a hub | bronze bushing, hub flange, two thrust washers, retainer plate screwed to the hub, oil sinks (polish) | nothing in the rules builds this; see promotion candidates |
-| hub posts | two posts on the outline's far points | two posts at (±15, 11), two dowels | the rule's pair fell on the pivot bore (edge distance) |
-| pO3 | dead axle with a bridge on spigoted posts | axle head 1 mm over the bearing, no bridge; held in the hub and the base | the rod sweeps over the pivot: a bridge or a tall axle would meet it (clearance 8 mm) |
-| gears | layer 0, z 0 to 7 | plated 3 mm low (`dz`), z -3 to 4 | the lever tip sweeps over the pinion hub and circlip |
-| ram, rails, rod, cap | layers 0 and 1 | ram and rails layer 2, rod layer 3, cap layer 4 | the lever tip (66 mm) sweeps under the ram's whole left end; the rod's pin B sits above the lever; the rails start 54 mm from O3, the rail risers start past the lever's sweep, found by the rule |
-| pC | wrist pin through ram and rod, single shear | ram cap twinned with the ram in the model, on a post at x 14 | A9: double shear |
-| terminal block | on the base edge below the motor, under the bracket wall | moved 28 mm along the edge, leads re-run, clip moved | V3: the screw cut the bracket wall |
-| pPn, pA, pB, pO3 | single shear | kept | sweeps forbid a bridge or plate (A9) |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 12 | 0 | 262.5 |
-| DL-B | 0 | 250 | 261.6 |
-| DL-C | 0 | 0 | 70.2 |
-| DL-D | 28 | 0 | 59.8 |
-| DL-E | 12 | 6 | 57.1 |
-| DL-F | 0 | 0 | 55.0 |
-| DL-G | 0 | 0 | 51.4 |
-| DL-H | 17 | 0 | 44.9 |
-| never | 116 | 153 | 325.1 (full) |
+| DL-A | 17 | 0 | ? |
+| DL-B | 0 | 239 | ? |
+| DL-C | 0 | 0 | ? |
+| DL-D | 19 | 0 | ? |
+| DL-E | 14 | 3 | ? |
+| DL-F | 0 | 0 | ? |
+| DL-G | 0 | 0 | ? |
+| DL-H | 22 | 0 | ? |
+| never | 107 | 225 | ? |
 
 ## Promotion candidates
-Hand fixes that should become rules or primitives.
-
-- Ring gear on a hub (hub flange, bushing, thrust washers, retainer plate, oil sinks): a joint type for a part that turns on a fixed hub round another pivot. First occurrence; wait for a second before promoting.
-- Cabling (`cabling()` in src/hardware/sub/drive.ts): the terminal block is put at the base edge nearest the motor lead without testing the motor bracket. Here the base grew to carry the bracket and the block, at 22 mm from the bracket centre, landed under the wall (hole wall -0.58 mm). Patch: try candidate points along the edge and keep the first whose block (±10 x ±4) clears the bracket circle by 3 mm.
-- Standoff rule (`standoffs.ts`): posts on the two farthest points of a disc's polygon outline fall on a pivot bore through the plate. Patch: skip a candidate within a hole's wall distance (M6) of a hole in the plate.
-- Dead axle bridge (`j1-dead-axle.ts`): a bridge is built at any height above the stack; it is not checked against parts that sweep over the axle column (here the rod, 8 mm of clash). A rule that tests the axle column against sweeps, and otherwise uses a head 1 mm over the bearing, would replace the hand override.
+None yet.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 35.2 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (local .scratch, baselines in tests/visual/__baselines__) · bench: Node CPU, DPR 1.5, 2026-10-18; full detail 325 ms, dial H 45 ms (flag, R6)
+check: clean · K1 residual: 3.4e-13 · claims: 4 of 4 ok · clearance: 91 clashes · clamp: faults · edge distance: clean · package: 32.3 KB
+screenshots: ? · bench: ?

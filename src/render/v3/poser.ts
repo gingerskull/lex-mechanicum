@@ -252,6 +252,7 @@ export function hybridPoser(bodies: Poser, points: Poser): Poser {
     point: (u, id, ctl) => safe(() => points.point(u, id, ctl)) ?? (ctl ? null : bodies.point(u, id)),
     span: (u, a, b) => bodies.span(u, a, b) ?? safe(() => points.span(u, a, b)),
     ...(points.sweep ? { sweep: (pt: string, r?: [number, number], br?: string[]) => safe(() => points.sweep!(pt, r, br)) } : {}),
+    ...(points.phaseOf ? { phaseOf: (o: string, st: "max" | "min") => safe(() => points.phaseOf!(o, st)) } : {}),
   };
 }
 

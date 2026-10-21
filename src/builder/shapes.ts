@@ -167,6 +167,14 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const pins = js.map((j) => ({ joint: j.joint.id, ...(({ uv, w }) => ({ uv, w }))(planeCoords(frame, j.at)) }));
     const shape = (b.shape ?? {}) as Record<string, unknown>;
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
+    // a slider"s block lies along its slide: its length on the prismatic joint"s axis, whatever the body"s frame
+    const slide = String(shape.type) === "slider" ? js.find((j) => j.joint.type === "prismatic") : undefined;
+    if (slide) {
+      const d = planeCoords(frame, v3.add(frame.o, slide.axis)).uv;
+      const o = planeCoords(frame, frame.o).uv;
+      const ang = Math.atan2(d[1] - o[1], d[0] - o[0]);
+      if (Math.abs(Math.sin(ang)) > 1e-6) g.profile = { outer: rot(g.profile.outer, ang), holes: g.profile.holes.map((h) => rot(h, ang)) };
+    }
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };

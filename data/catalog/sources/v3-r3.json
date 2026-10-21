@@ -1551,8 +1551,8 @@
           "a": "link",
           "b": "ram",
           "at": [
-            96.31995121948,
-            64,
+            84.149059828469,
+            80,
             0
           ],
           "axis": [
@@ -1567,8 +1567,8 @@
           "a": "ram",
           "b": "ground",
           "at": [
-            96.31995121948,
-            64,
+            84.149059828469,
+            80,
             0
           ],
           "axis": [
@@ -1613,11 +1613,11 @@
         },
         {
           "id": "yR",
-          "value": 64,
+          "value": 80,
           "unit": "mm",
-          "min": 64,
-          "max": 64,
-          "note": "ram line above O2"
+          "min": 80,
+          "max": 80,
+          "note": "ram line above O2 (raised from 64 so the ram rails clear the block sliding in the lever)"
         }
       ],
       "design": [],
@@ -1680,7 +1680,7 @@
           "body": "ground",
           "local": [
             0,
-            64,
+            "yR",
             0
           ]
         }
