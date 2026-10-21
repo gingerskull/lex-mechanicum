@@ -2756,15 +2756,6 @@
      ]
     },
     {
-     "id": "turn-mark",
-     "body": "screw",
-     "local": [
-      5.5,
-      0,
-      40
-     ]
-    },
-    {
      "id": "travel-0",
      "body": "ground",
      "local": [
@@ -2823,9 +2814,6 @@
     },
     {
      "point": "nut-mark"
-    },
-    {
-     "point": "turn-mark"
     }
    ],
    "traces": [

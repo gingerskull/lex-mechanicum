@@ -307,8 +307,10 @@ function buildScrew(ctx: BuildCtx, sb: string): void {
     const Dn = ball ? Math.round(n.t.major + 14) : Math.round(n.t.major + 8);
     if (part) part.profile.holes.push(circle(Dn / 2 + 0.05, 0, 0, 48).reverse());
   }
-  const names = nuts.map((n) => buildNut(ctx, F, n, out, serves));
-  for (const n of nuts) buildGuide(ctx, F, n, baseTop, out, serves);
+  const nutServes = nuts.map(() => ({}) as Record<string, string[]>);
+  const guideServes = nuts.map(() => ({}) as Record<string, string[]>);
+  const names = nuts.map((n, i) => buildNut(ctx, F, n, out, nutServes[i]!));
+  nuts.forEach((n, i) => buildGuide(ctx, F, n, baseTop, out, guideServes[i]!));
   // the nuts and guides first: the pillow blocks are routed clear of the rail's posts as well as the sweeps
   ctx.add(out.splice(0));
   // the screw's supports: a live screw in two pillow blocks past what it carries
@@ -348,10 +350,11 @@ function buildScrew(ctx: BuildCtx, sb: string): void {
   void support;
   ctx.add(out);
   for (const n of nuts) {
-    ctx.note({ id: n.joint, kit: "J11", at: ctx.S.joints.get(n.joint)!.at, title: `J11 · ${titleOf(n.joint)}`, note: `${titleOf(n.joint)}: ${names[nuts.indexOf(n)]} screwed to the carriage by its flange, its ridge in the screw's groove; a felt wiper at each end and a grease nipple on the carriage (F8).`, serves: { F3: serves.F3 ?? [], F8: serves.F8 ?? [] } });
+    const i = nuts.indexOf(n);
+    ctx.note({ id: n.joint, kit: "J11", at: ctx.S.joints.get(n.joint)!.at, title: `J11 · ${titleOf(n.joint)}`, note: `${titleOf(n.joint)}: ${names[i]} screwed to the carriage by its flange, its ridge in the screw's groove; a felt wiper at each end and a grease nipple on the carriage (F8).`, badge: ["nut carried by the screw's flanks", "ok"], serves: nutServes[i]! });
     const guide = ctx.kin.joints.find((j) => j.type === "prismatic" && (j.a === n.body || j.b === n.body));
     if (guide)
-      ctx.note({ id: guide.id, kit: "J11", at: ctx.S.joints.get(guide.id)!.at, title: `J11 · ${titleOf(guide.id)}`, note: `${titleOf(guide.id)}: the nut's flag straddles a ground rail beside the screw with bronze pads in its fork, so the nut cannot turn and only slides (F3); an end stop with a neoprene pad on the rail past each end of the travel (F5); the rail on two posts screwed to the base (F1).`, badge: ["anti-rotation by the rail", "ok"], serves: { F3: serves.F3 ?? [], F5: serves.F5 ?? [], F1: serves.F1 ?? [] } });
+      ctx.note({ id: guide.id, kit: "J11", at: ctx.S.joints.get(guide.id)!.at, title: `J11 · ${titleOf(guide.id)}`, note: `${titleOf(guide.id)}: the nut's flag straddles a ground rail beside the screw with bronze pads in its fork, so the nut cannot turn and only slides (F3); an end stop with a neoprene pad on the rail past each end of the travel (F5); the rail on two posts screwed to the base (F1).`, badge: ["anti-rotation by the rail", "ok"], serves: guideServes[i]! });
   }
   (ctx.fired["j11-screw"] ??= []).push(sb);
 }
