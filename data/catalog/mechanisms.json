@@ -63423,9 +63423,18 @@
             "id": "beamL-a",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
               "thickness": 6,
               "note": "anchor half of the left beam (pseudo-rigid)"
             },
@@ -63437,9 +63446,18 @@
             "id": "beamL-b",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
               "thickness": 6,
               "note": "shuttle half of the left beam"
             },
@@ -63451,10 +63469,20 @@
             "id": "beamR-a",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
-              "thickness": 6
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
+              "thickness": 6,
+              "note": "anchor half of the right beam"
             },
             "at": {
               "joint": "AR"
@@ -63464,10 +63492,20 @@
             "id": "beamR-b",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
-              "thickness": 6
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
+              "thickness": 6,
+              "note": "shuttle half of the right beam"
             },
             "at": {
               "joint": "TR"
@@ -63477,22 +63515,25 @@
             "id": "shuttle",
             "role": "output",
             "shape": {
-              "type": "slider",
-              "length": 56,
-              "width": 24,
-              "span": [
-                -13,
-                43
-              ],
-              "window": {
-                "length": 45,
-                "width": 12,
-                "centre": [
-                  0,
-                  14.5
+              "type": "plate",
+              "outline": [
+                [
+                  -13,
+                  0
+                ],
+                [
+                  43,
+                  0
                 ]
+              ],
+              "boss": 12,
+              "thickness": 6,
+              "window": {
+                "from": -8,
+                "to": 37,
+                "width": 12
               },
-              "note": "shuttle of the blank, a window for the pusher's roller between two springs"
+              "note": "the blank's shuttle, a window for the pusher's roller between two springs"
             },
             "at": {
               "joint": "SL"
@@ -63502,14 +63543,47 @@
             "id": "pusher",
             "role": "driver",
             "shape": {
-              "type": "slider",
-              "length": 30,
-              "width": 24,
-              "roller": 5.5,
-              "arm": 76
+              "type": "plate",
+              "outline": [
+                [
+                  -12,
+                  46
+                ],
+                [
+                  12,
+                  46
+                ],
+                [
+                  12,
+                  76
+                ],
+                [
+                  -12,
+                  76
+                ]
+              ],
+              "boss": 3,
+              "thickness": 6,
+              "arm": {
+                "from": [
+                  0,
+                  0
+                ],
+                "to": [
+                  0,
+                  46
+                ],
+                "width": 10
+              },
+              "roller": 11,
+              "note": "a slider guided beyond the shuttle, its arm reaching back over it to the roller in the window"
             },
-            "at": {
-              "joint": "slide"
+            "frame": {
+              "origin": [
+                0,
+                21.446,
+                0
+              ]
             }
           }
         ],
@@ -63520,7 +63594,7 @@
             "a": "ground",
             "b": "beamL-a",
             "at": [
-              -39.392,
+              "-L0*cos(theta0)",
               0,
               0
             ],
@@ -63545,13 +63619,13 @@
             "a": "beamL-a",
             "b": "beamL-b",
             "at": [
-              -19.696,
-              3.473,
+              "-L0*cos(theta0)/2",
+              "L0*sin(theta0)/2",
               0
             ],
             "axis": [
-              0.9848,
-              0.1736,
+              "cos(theta0)",
+              "sin(theta0)",
               0
             ],
             "limits": [
@@ -63567,7 +63641,7 @@
             "b": "shuttle",
             "at": [
               0,
-              6.946,
+              "L0*sin(theta0)",
               0
             ],
             "axis": [
@@ -63586,7 +63660,7 @@
             "a": "ground",
             "b": "beamR-a",
             "at": [
-              39.392,
+              "L0*cos(theta0)",
               0,
               0
             ],
@@ -63611,13 +63685,13 @@
             "a": "beamR-a",
             "b": "beamR-b",
             "at": [
-              19.696,
-              3.473,
+              "L0*cos(theta0)/2",
+              "L0*sin(theta0)/2",
               0
             ],
             "axis": [
-              -0.9848,
-              0.1736,
+              "-cos(theta0)",
+              "sin(theta0)",
               0
             ],
             "limits": [
@@ -63633,7 +63707,7 @@
             "b": "shuttle",
             "at": [
               0,
-              6.946,
+              "L0*sin(theta0)",
               0
             ],
             "axis": [
@@ -63653,7 +63727,7 @@
             "b": "shuttle",
             "at": [
               0,
-              21.446,
+              "L0*sin(theta0)+14.5",
               0
             ],
             "axis": [
@@ -63675,7 +63749,7 @@
             "b": "pusher",
             "at": [
               0,
-              21.446,
+              "L0*sin(theta0)+14.5",
               0
             ],
             "axis": [
@@ -63733,7 +63807,10 @@
               0,
               13.89
             ],
-            "default": 0
+            "default": 0,
+            "lo": 0,
+            "hi": 13.89,
+            "pin": "Q"
           }
         ],
         "solve": [
@@ -63750,21 +63827,38 @@
               "window"
             ],
             "in": {
+              "mode": "snap",
               "drive": "push",
+              "dir": -1,
               "L0": "L0",
               "theta0": "theta0",
               "ka": "ka",
-              "ks": "ks"
+              "ks": "ks",
+              "span": 8,
+              "shuttle": "shuttle",
+              "axis": [
+                0,
+                1,
+                0
+              ],
+              "beams": [
+                {
+                  "a": "beamL-a",
+                  "b": "beamL-b",
+                  "anchor": "AL",
+                  "tip": "SL"
+                },
+                {
+                  "a": "beamR-a",
+                  "b": "beamR-b",
+                  "anchor": "AR",
+                  "tip": "SR"
+                }
+              ]
             },
-            "out": [
-              "y",
-              "beam-bend"
-            ],
-            "opts": {
-              "model": "von Mises truss, pseudo-rigid: F(y) = 2 ka (L0 - L) y / L, L = sqrt(c^2 + y^2), c = L0 cos(theta0)",
-              "balance": "the springs hold the shuttle where ks (q - y) = -F(y), q the pusher offset, on the branch it is on",
-              "snap": "where dF/dy = ks the branch ends and the shuttle jumps to the far branch (y = ±3.43 mm here)",
-              "snapSpan": 8
+            "out": {
+              "y": "y",
+              "bend": "beam-bend"
             }
           }
         ],
@@ -63783,7 +63877,7 @@
             "body": "pusher",
             "local": [
               0,
-              0,
+              66,
               0
             ]
           },
@@ -63795,6 +63889,51 @@
               0,
               0
             ]
+          },
+          {
+            "id": "AL0",
+            "body": "ground",
+            "local": [
+              -19.696,
+              3.473,
+              0
+            ]
+          },
+          {
+            "id": "Rp",
+            "body": "pusher",
+            "local": [
+              0,
+              5.5,
+              0
+            ]
+          },
+          {
+            "id": "Rm",
+            "body": "pusher",
+            "local": [
+              0,
+              -5.5,
+              0
+            ]
+          },
+          {
+            "id": "Wp",
+            "body": "shuttle",
+            "local": [
+              36.2,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "Wm",
+            "body": "shuttle",
+            "local": [
+              -7.2,
+              0,
+              0
+            ]
           }
         ],
         "outputs": [
@@ -63802,13 +63941,23 @@
             "id": "shuttle-y",
             "of": "S",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "pusher-q",
             "of": "Q",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "beam-angle",
@@ -63823,7 +63972,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the shuttle holds near +7 mm, follows the pusher down to y = 3.43 mm (just past the 4.09 N force peak at 3.99 mm) and snaps 10 mm ahead of it to the far branch, then back the same way; that reads well. But the snap took 8° of the cycle, gone in a blink, and the pusher's 1 mm overshoot left the shuttle at ±7.01 mm instead of the stable ±6.95. Decided: the pusher's stroke ends at the stable states, so the shuttle comes to rest at ±6.95 mm with the springs unloaded; a time map slows the snap; ticks on the shuttle's path show the jump; the unstable centre line and the beam chords drawn."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the shuttle holds near +7 mm, follows the pusher down to y = 3.43 mm (just past the 4.09 N force peak at 3.99 mm) and snaps 10 mm ahead of it to the far branch, then back the same way; that reads well. But the snap took 8° of the cycle, gone in a blink, and the pusher's 1 mm overshoot left the shuttle at ±7.01 mm instead of the stable ±6.95. Decided: the pusher's stroke ends at the stable states, so the shuttle comes to rest at ±6.95 mm with the springs unloaded; a time map slows the snap; ticks on the shuttle's path show the jump; the unstable centre line and the beam chords drawn. Rebuild (R7): the beams are drawn as their pseudo-rigid halves, rigid either side of each flexure (D9), with the bend on the overlays; the springs either side of the pusher's roller are drawn stretched between the roller and the window's ends; both snaps are slowed by the time map (spans)."
         },
         "principle": [
           {
@@ -63871,8 +64020,7 @@
             "id": "chord-left",
             "kind": "line",
             "from": "AL",
-            "to": "S",
-            "label": "BEAM CHORD"
+            "to": "S"
           },
           {
             "id": "chord-right",
@@ -63884,6 +64032,8 @@
             "id": "anchor-bend",
             "kind": "bend",
             "at": "AL",
+            "from": "AL0",
+            "to": "ML",
             "label": "BEAM BEND"
           }
         ],
@@ -63898,9 +64048,15 @@
         "timeMap": {
           "feature": "snap",
           "slow": 4,
-          "span": [
-            159.7,
-            167.7
+          "spans": [
+            [
+              159.7,
+              167.7
+            ],
+            [
+              339.7,
+              347.7
+            ]
           ]
         },
         "plot": {

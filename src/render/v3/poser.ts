@@ -153,10 +153,11 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       }
       return out.length ? out : null;
     },
+    // a stretched member's length: its two points as solved (not lifted to the top faces the teaching layers draw on)
     span: (u, a, b) => {
       const P = pose(u);
-      const A = lifted(P, a);
-      const B = lifted(P, b);
+      const A = P.points.get(a);
+      const B = P.points.get(b);
       return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
     },
   };

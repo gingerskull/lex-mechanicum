@@ -116,7 +116,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
     for (const j of joints) {
       const t = j.joint.type;
-      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact";
+      // one compliant blank lies in one plane: its flexures, and the axial give of its pseudo-rigid beams
+      const flex = (b: string) => kin.joints.some((q) => q.type === "flexure" && (q.a === b || q.b === b));
+      const blank = t === "flexure" || (t === "prismatic" && flex(j.a) && flex(j.b));
+      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || blank;
       if (!planar || !parent.has(j.a) || !parent.has(j.b)) continue;
       if (j.joint.crossed) continue;
       contact.add(pairKey(j.a, j.b));

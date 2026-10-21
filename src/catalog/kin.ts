@@ -123,7 +123,7 @@ export interface Teaching {
   view: string;
   views?: { id: string; kind: (typeof TEACHING_VOCAB.viewKind)[number]; highlight?: string[]; [k: string]: unknown }[];
   controls: { id: string; kind: (typeof TEACHING_VOCAB.control)[number]; [k: string]: unknown }[];
-  timeMap?: { feature: string; slow: number; span: [number, number] };
+  timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: [number, number][] };
   plot: { x: string; y: string; label: string } | { x: string; y: string; label: string }[];
   claims: { text: string; output: string; stat: (typeof TEACHING_VOCAB.stat)[number]; value: number; tol: number }[];
   exceptions: { reason: string; [k: string]: unknown }[];

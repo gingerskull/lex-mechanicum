@@ -4,6 +4,7 @@
 // `approx`, until the pilots (P) and the rebuild (R) give it a profile of its own.
 import { D2R, TAU, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
 import { bevel, bevelOutline } from "../core/spatial";
+import { hullOf } from "../hardware/primitives";
 import type { Kin, KinBody } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
@@ -61,15 +62,34 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean; plan?: Vec2[] } {
   const g = outlineOf0(shape, role, pins);
+  // a window along a plate's x (a shuttle's window for the pusher's roller): { from, to, width }
+  const win = shape.window as { from?: unknown; to?: unknown; width?: unknown } | undefined;
+  if (win && shape.type === "plate") {
+    const w = num(win.width, 10) / 2;
+    const x0 = num(win.from, 0) + w;
+    const x1 = num(win.to, 20) - w;
+    const ring: Vec2[] = [];
+    for (let i = 0; i <= 16; i++) ring.push([x1 + w * Math.cos(-Math.PI / 2 + (Math.PI * i) / 16), w * Math.sin(-Math.PI / 2 + (Math.PI * i) / 16)]);
+    for (let i = 0; i <= 16; i++) ring.push([x0 + w * Math.cos(Math.PI / 2 + (Math.PI * i) / 16), w * Math.sin(Math.PI / 2 + (Math.PI * i) / 16)]);
+    g.profile.holes.push(ring.reverse());
+  }
+  // an arm a plate carries in its own plane (a pusher's arm to its roller): the placer sees its whole footprint
+  const arm = shape.arm as { from?: unknown; to?: unknown; width?: unknown } | undefined;
+  if (arm && shape.type === "plate") {
+    const p0: Vec2 = Array.isArray(arm.from) ? [num(arm.from[0], 0), num(arm.from[1], 0)] : [0, 0];
+    const p1: Vec2 = Array.isArray(arm.to) ? [num(arm.to[0], 0), num(arm.to[1], 0)] : [0, 0];
+    const w = num(arm.width, 10) / 2;
+    g.plan = hullOf([...g.profile.outer.map((q): [number, number, number] => [q[0], q[1], 0.5]), [p0[0], p0[1], Math.max(w, num(shape.roller, 0) / 2)], [p1[0], p1[1], w]]);
+  }
   // holes the record names on a disc or a plate ([x, y, r] in the body's frame): a port face's ports
   if (Array.isArray(shape.holes) && (shape.type === "disc" || shape.type === "plate"))
     for (const h of shape.holes as number[][]) g.profile.holes.push(circle(h[2]!, h[0]!, h[1]!, 28).reverse());
   return g;
 }
 
-function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
+function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean; plan?: Vec2[] } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -82,7 +102,7 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "plate": {
       const pts = Array.isArray(shape.outline) ? (shape.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]) : null;
       const r = num(shape.boss, 8.5);
-      if (pts && pts.length >= 2) return { profile: { outer: roundedPoly(pts, r), holes: [] }, thick: THICK, approx: false };
+      if (pts && pts.length >= 2) return { profile: { outer: roundedPoly(pts, r), holes: [] }, thick: num(shape.thickness, THICK), approx: false };
       if (Array.isArray(shape.rect)) {
         const [w, h] = pair(shape.rect, [60, 40]);
         return { profile: { outer: roundRect(0, 0, w, h, Math.min(8, w / 4, h / 4)), holes: [] }, thick: num(shape.thickness, 8), approx: false };
@@ -175,7 +195,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.plan ? { plan: g.plan } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);

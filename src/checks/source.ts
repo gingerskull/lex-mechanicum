@@ -117,11 +117,20 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = 
       const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0)) as Mat4) : B;
       return mul(C, mat4(s.frame));
     },
+    // a stretched member (a spring between two points): its length at the phase
+    stretch(s, u) {
+      if (!s.stretch) return 1;
+      const P = poseAt(u).points;
+      const a = P.get(s.stretch[0]);
+      const b = P.get(s.stretch[1]);
+      return a && b ? Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) : 1;
+    },
     // a conveyed solid moves along its path, not with its carrier
     key: (s) => (s.convey ? `cv:${s.id}` : s.spin ? `spin:${s.spin.at.join(",")}` : s.body),
   };
   const kin = src.kin;
-  const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type)).map((j): [string, string] => [j.a, j.b]);
+  // a slide held by springs touches by design (a pseudo-rigid beam's two halves, a roller between springs in a window)
+  const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type) || (j.type === "prismatic" && (j as { spring?: unknown }).spring !== undefined)).map((j): [string, string] => [j.a, j.b]);
   return { id: rec.id, engine: "v3", solids: assembly3.solids, placer, contact, assembly3, kin };
 }
 

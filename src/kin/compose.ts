@@ -467,6 +467,9 @@ class Run implements BlockCtx {
     if (ref === undefined) throw new KinError(`${this.step.id}: no reference value for ${key}`);
     return now - ref;
   }
+  driver(id: string): KinDriver | undefined {
+    return this.k.kin.drivers.find((d) => d.id === id);
+  }
   design(id: string): string | undefined {
     return this.s.designs.get(id);
   }
@@ -593,12 +596,8 @@ class Run implements BlockCtx {
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
       let v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
-      // a point's position along a direction (a tip's travel across its lever), mm from the reference
-      if (o.axis && Array.isArray(v)) {
-        const ax = v3.unit(o.axis as Vec3);
-        const r0 = this.s.refPts.get(o.of);
-        v = v3.dot(r0 ? v3.sub(v, r0) : v, ax);
-      }
+      // a point's position along a direction (a tip's travel across its lever, a shuttle's place), mm
+      if (o.axis && Array.isArray(v)) v = v3.dot(v, v3.unit(o.axis as Vec3));
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {

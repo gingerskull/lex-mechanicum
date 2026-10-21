@@ -265,8 +265,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
 
   if (t.timeMap !== undefined) {
     const tm = t.timeMap;
-    if (!isStr(tm.feature) || !isNum(tm.slow) || tm.slow <= 0 || !(Array.isArray(tm.span) && tm.span.length === 2 && tm.span.every(isNum))) {
-      say("teaching.timeMap needs feature, slow > 0 and span [from, to]");
+    const pair = (v: unknown) => Array.isArray(v) && v.length === 2 && v.every(isNum);
+    const spans = (tm as { spans?: unknown }).spans;
+    if (!isStr(tm.feature) || !isNum(tm.slow) || tm.slow <= 0 || !(pair(tm.span) || (Array.isArray(spans) && spans.length > 0 && spans.every(pair)))) {
+      say("teaching.timeMap needs feature, slow > 0 and span [from, to] (or spans, a list of them)");
     }
   }
 

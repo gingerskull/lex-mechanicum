@@ -79,6 +79,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (a?.shape?.type === "piston" || b?.shape?.type === "piston") return "piston-bore";
       // a nut's guide: the screw kit builds the anti-rotation with the nut (J11, F3)
       if (kin.joints.some((q) => q.type === "screw" && (q.b === j.a || q.b === j.b) && q.b !== "ground" && isScrew(body(q.a)?.shape as Record<string, unknown> | undefined))) return "J11";
+      // a slide held by springs (a pseudo-rigid beam's give, a roller between springs in a window): the compliant kit
+      if (rec.spring !== undefined) return "J13";
       return /tongue/i.test(text(rec.note)) ? "tongue-slot" : "J5";
     case "pin-in-slot": {
       const s = text(j.slot) + text(rec.slot);

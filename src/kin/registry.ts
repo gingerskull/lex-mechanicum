@@ -3,12 +3,12 @@
 // listed above it.
 import { type BlockFn, type BlockCtx, KinError } from "./ctx";
 import { type SolveStep } from "./types";
-import { D2R, type Vec3, m3, v3, xf, R2D } from "./math";
+import { D2R, TAU, type Vec3, m3, v3, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
-import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
+import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance, vonMises } from "./blocks/members";
 import { genevaAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
@@ -447,6 +447,7 @@ const conveyBlock: BlockFn = (c, s) => {
  */
 const flexureBlock: BlockFn = (c, s) => {
   const i = s.in ?? {};
+  if (i.mode === "snap") return snapBlock(c, s);
   const jid = str(i.joint, "flexure.joint");
   const th = c.rad(i.input);
   const d = c.delta("in", th);
@@ -456,6 +457,83 @@ const flexureBlock: BlockFn = (c, s) => {
   outVal(c, s, e.bend, "bend");
   outVal(c, s, e.a, "end");
 };
+
+/**
+ * flexure, mode "snap": a bistable shuttle held by two inclined beams (vonMises in blocks/members) and driven by a
+ * pusher through springs. in: drive (the pusher's driver value, mm), q0 (the pusher's place at drive 0; default the
+ * stable rest L0 sin θ0), dir (+1 or −1: the pusher's place moves dir · drive), L0, theta0 (deg), ka, ks, span (deg of
+ * the cycle the snap takes, so a fold is not a jump, K2), shuttle (body), axis (its slide), beams [{ a, b, anchor, tip }]
+ * (each beam's two pseudo-rigid halves, its anchor joint and its joint on the shuttle). On the way out (the drive rising,
+ * the first half of the cycle) the shuttle stays on its first branch until the pusher passes the fold, then crosses to the
+ * other over `span`; on the way back the same, mirrored. out { y, bend }: the shuttle's place and the beams' turn (deg).
+ */
+function snapBlock(c: BlockCtx, s: SolveStep): void {
+  const i = s.in ?? {};
+  const vm = vonMises({ L0: c.num(i.L0), theta0: c.num(i.theta0) * D2R, ka: c.num(i.ka), ks: c.num(i.ks) });
+  const dir = i.dir !== undefined ? c.num(i.dir) : 1;
+  const q0 = i.q0 !== undefined ? c.num(i.q0) : vm.rest;
+  const drive = c.num(i.drive);
+  const q = q0 + dir * drive;
+  const span = c.num(i.span ?? 8) * D2R;
+  const u = ((c.u % TAU) + TAU) % TAU;
+  // the side the shuttle starts on is the one its rest is on; the pusher's place at each phase of the driver's cosine law
+  const start: 1 | -1 = q0 >= 0 ? 1 : -1;
+  const qAt = (x: number): number => q0 + dir * driveAt(c, str(i.drive, "flexure.drive"), x);
+  let y: number;
+  const blend = (t: number) => t * t * (3 - 2 * t);
+  const out = u <= Math.PI;
+  const from: 1 | -1 = out ? start : (-start as 1 | -1);
+  // the fold on this half: the branch `from` ends where q passes from · qFold toward the other side
+  const fold = from * vm.qFold;
+  const beyond = (qq: number) => (from > 0 ? qq < fold : qq > fold);
+  // the phase of the fold on this half (bisection on the cosine law, which is monotonic in each half)
+  let us = NaN;
+  {
+    let lo = out ? 0 : Math.PI;
+    let hi = out ? Math.PI : TAU;
+    if (beyond(qAt(hi)) && !beyond(qAt(lo))) {
+      for (let k = 0; k < 60; k++) {
+        const m = (lo + hi) / 2;
+        if (beyond(qAt(m))) hi = m;
+        else lo = m;
+      }
+      us = (lo + hi) / 2;
+    }
+  }
+  if (c.u === 0 || !Number.isFinite(us) || u < us) y = vm.solve(beyond(q) ? fold : q, from);
+  else if (u < us + span) {
+    const t = blend((u - us) / span);
+    y = (1 - t) * vm.solve(fold, from) + t * vm.solve(q, (-from) as 1 | -1);
+  } else y = vm.solve(q, (-from) as 1 | -1);
+  const dy = c.delta("y", y);
+  const axis = v3.unit(c.vec(i.axis ?? [0, 1, 0]));
+  if (typeof i.shuttle === "string") c.setXf(i.shuttle, xf.trans(v3.mul(axis, dy)));
+  let bend = 0;
+  for (const b of (i.beams as { a: string; b: string; anchor: string; tip: string }[] | undefined) ?? []) {
+    const A = c.jointAt(b.anchor);
+    const T0 = c.jointAt(b.tip);
+    const T = v3.add(T0, v3.mul(axis, dy));
+    const n = c.jointAxis(b.anchor);
+    const ang = (p: Vec3) => Math.atan2(v3.dot(n, v3.cross([1, 0, 0], v3.sub(p, A))), v3.dot([1, 0, 0], v3.sub(p, A)));
+    let dphi = ang(T) - ang(T0);
+    while (dphi > Math.PI) dphi -= TAU;
+    while (dphi < -Math.PI) dphi += TAU;
+    c.setXf(b.a, xf.rotAbout(A, n, dphi));
+    c.setXf(b.b, xf.mul(xf.trans(v3.sub(T, T0)), xf.rotAbout(T0, n, dphi)));
+    bend = dphi * R2D;
+  }
+  outVal(c, s, y, "y");
+  outVal(c, s, bend, "bend");
+}
+
+/** A driver's value at cycle phase x by its own law (the oscillating and linear cosine law, lo at 0). */
+function driveAt(c: BlockCtx, id: string, x: number): number {
+  const d = c.driver(id);
+  if (!d) return 0;
+  const lo = d.lo ?? d.range?.[0] ?? 0;
+  const hi = d.hi ?? d.range?.[1] ?? 0;
+  return lo + (hi - lo) * (0.5 - 0.5 * Math.cos(x));
+}
 
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
