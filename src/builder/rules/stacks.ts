@@ -148,9 +148,9 @@ function siteRule(kit: "J1" | "J2" | "J10" | "J3"): Rule {
     tier: "AUTO",
     ids: def.ids,
     fixture: def.fixture,
-    applies: (ctx) => ctx.sites.some((s) => s.kit === kit),
+    applies: (ctx) => ctx.sites.some((s) => s.kit === kit && !s.owner),
     apply(ctx) {
-      for (const s of ctx.sites.filter((q) => q.kit === kit)) buildSite(ctx, s);
+      for (const s of ctx.sites.filter((q) => q.kit === kit && !q.owner)) buildSite(ctx, s);
     },
   };
 }

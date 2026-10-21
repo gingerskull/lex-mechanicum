@@ -303,24 +303,7 @@ const strapSheave = contactRule({
   },
 });
 
-// ------------------------------------------------------------------------------------------------ J11, J13
-
-const j11 = contactRule({
-  id: "j11-screw",
-  ids: ["J11", "F3", "F8"],
-  fixture: "kin:leadScrew",
-  kits: ["J11"],
-  build(ctx, c, L) {
-    const id = c.id;
-    const nut = ctx.kin.bodies.find((b) => b.id === c.b)?.role === "slider" || c.b !== "ground" ? c.b : c.a;
-    const z = mid(ctx.extent(nut) ? [ctx.extent(nut)!.w0, ctx.extent(nut)!.w1] : null, 0);
-    const d = 8;
-    L.add(H.collar(`${id}-nut`, d, d + 10, { body: bodyOf(ctx, nut), at: [0, 0, 0], z0: z - 10, z1: z + 10, name: `Flanged bronze nut Ø${d}, 20 long` }));
-    L.add(H.plate(`${id}-flange`, circle(d + 9, 0, 0, 40), { body: bodyOf(ctx, nut), kind: "plate", role: "ground", name: "Nut flange, screwed to the carriage", z0: z + 10, z1: z + 13, holes: [circle(d / 2 + 0.1, 0, 0, 24)] }));
-    for (const [k, x] of [[0, -11], [1, 11]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x - 1, -(d + 4)], [x + 1, -(d + 4)], [x + 1, d + 4], [x - 1, d + 4]], { body: bodyOf(ctx, nut), z0: z - 12, z1: z - 10, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    return { serves: { F3: [`${id}-nut`], F8: [`${id}-wip0`] }, note: `${titleOf(id)}: flanged bronze nut on the carriage, a wiper at each end, anti-rotation from the carriage's slide.` };
-  },
-});
+// ------------------------------------------------------------------------------------------------ J13 (J11 is src/builder/screws.ts)
 
 const j13 = contactRule({
   id: "j13-compliant",
@@ -436,7 +419,7 @@ const ringRollers = contactRule({
   },
 });
 
-export const contactRules: Rule[] = [j6, j9, j11, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave, j13];
+export const contactRules: Rule[] = [j6, j9, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave, j13];
 
 void MIN_GAP;
 void ringOffsets;

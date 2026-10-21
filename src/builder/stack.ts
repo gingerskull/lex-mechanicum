@@ -16,6 +16,7 @@ import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
 import { MIN_GAP } from "./constants";
 import { liveHousing, pillowBlocks } from "./supports";
+import type { Vec3 } from "../kin/math";
 
 export type SupportKind = "housing" | "pillow" | "bridge" | "stub" | "hung";
 
@@ -59,6 +60,8 @@ export interface StackResult {
   notes: string[];
   /** Where the bridge's beam is and what it covers; the bridge's id. */
   bridge?: { id: string; route: BridgeRoute };
+  /** A shaft in plan's free end for the drive (its end point, the outward direction and the body it turns with). */
+  end?: { at: Vec3; out: Vec3; body: string };
 }
 
 const SPACER_MIN = 0.5;

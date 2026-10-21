@@ -188,11 +188,12 @@ export const standoffs: Rule = {
 function driveInPlan(ctx: BuildCtx, site: Site): void {
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
-  if (!ctx.base || !axle) return;
-  // H.shaft starts at its low end, the free one: the axle's frame origin is that end, its z the shaft's axis
-  const out: Vec3 = v3.mul(v3.unit(axle.frame.z as Vec3), -1);
-  const end = axle.frame.o as Vec3;
-  const shaftBody = axle.body;
+  if (!ctx.base || (!axle && !st.end)) return;
+  // H.shaft starts at its low end, the free one: the axle's frame origin is that end, its z the shaft's axis (a screw,
+  // its own shaft, names its free end itself)
+  const out: Vec3 = st.end ? v3.unit(st.end.out) : v3.mul(v3.unit(axle!.frame.z as Vec3), -1);
+  const end = st.end ? st.end.at : (axle!.frame.o as Vec3);
+  const shaftBody = st.end ? st.end.body : axle!.body;
   const S: Vec3 = v3.add(end, v3.mul(out, -6)); // the pulley's centre, 6 mm in from the end
   const up: Vec3 = [0, 0, 1];
   const lat = v3.unit(v3.cross(up, out));
@@ -254,17 +255,29 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   const tb: [number, number, number] = [w1 + mot.H + 14, Mc[0], 0];
   ctx.add(place(FF, H.terminalBlock("drive-terminals", 4, { at: tb, z0: 0, z1: 6, joints: j })));
   ctx.add(place(FF, H.lead("drive-lead", [[w1 + mot.H, Mc[0]], [w1 + mot.H + 6, Mc[0] + sg * 4], [tb[0], tb[1]]], { z0: 0, z1: 1, joints: j })));
-  ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+  ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: (ctx.kin.drivers.some((d) => d.kind === "oscillating" && beltDriven(d)) ? "Reversing drive (the input turns several turns each way): " : "") + "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
 }
+
+/**
+ * A driver the belt drive serves: a rotary input, or an oscillating one that turns its shaft more than a turn each way
+ * (a screw's input: the motor reverses, V5's crank and link cannot swing a shaft through several turns).
+ */
+const beltDriven = (d: { kind: string; lo?: number; hi?: number; range?: [number, number] }): boolean => {
+  if (d.kind === "rotary") return true;
+  if (d.kind !== "oscillating") return false;
+  const lo = d.lo ?? d.range?.[0] ?? 0;
+  const hi = d.hi ?? d.range?.[1] ?? 0;
+  return Math.abs(hi - lo) > 360;
+};
 
 export const drive: Rule = {
   id: "drive",
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary"),
+  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some(beltDriven),
   apply(ctx) {
-    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
+    const drv = ctx.kin.drivers.find(beltDriven);
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));

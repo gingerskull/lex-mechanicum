@@ -38,6 +38,8 @@ export interface BlockCtx {
    * pass through a double root stays on the analytic branch.
    */
   root(roots: [number[], number[]], h: number): 0 | 1;
+  /** The chosen value of a design choice (its default, or the controls' setting). */
+  design(id: string): string | undefined;
   /** The design choice or literal `branch` of the step as a side, +1 or −1. */
   declaredSide(): 1 | -1;
   /** Mark that this pose used the numeric fallback. */

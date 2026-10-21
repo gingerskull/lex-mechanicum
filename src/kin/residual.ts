@@ -188,7 +188,9 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const pa0 = xf.apply(s.a0, r.at);
     const pa1 = xf.apply(s.a1, r.at);
     const adv = v3.dot(v3.sub(v3.sub(p1, pa1), v3.sub(p0, pa0)), ax);
-    const turnRel = turn(s.a0, s.a1, ax) - turn(s.b0, s.b1, ax); // the shaft's turn relative to the nut
+    // the helical law: b turns relative to a by Δθ about +axis and moves hand · lead · Δθ / 2π along it (right-hand:
+    // a right-hand screw turned positively in a held nut advances along +axis, so the nut moves back along it)
+    const turnRel = turn(s.b0, s.b1, ax) - turn(s.a0, s.a1, ax);
     return adv - screwAdvance(n(j.lead), turnRel, j.hand ?? "right");
   }
   return null;

@@ -467,6 +467,9 @@ class Run implements BlockCtx {
     if (ref === undefined) throw new KinError(`${this.step.id}: no reference value for ${key}`);
     return now - ref;
   }
+  design(id: string): string | undefined {
+    return this.s.designs.get(id);
+  }
   declaredSide(): 1 | -1 {
     const b = this.step.branch;
     if (b === undefined) return 1;

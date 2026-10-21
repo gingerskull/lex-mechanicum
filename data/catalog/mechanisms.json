@@ -50889,10 +50889,10 @@
             "shape": {
               "type": "plate",
               "rect": [
-                230,
-                70
+                260,
+                90
               ],
-              "note": "frame with two screw bearings and a guide rail for the nut's flag, 22 mm beside the screw"
+              "note": "base with the screw's two pillow blocks and the guide rail for the nut's flag"
             },
             "at": {
               "frame": {
@@ -50910,21 +50910,16 @@
             "shape": {
               "type": "shaft",
               "diameter": 12,
-              "length": 180,
+              "journal": 8,
               "thread": {
                 "form": "Tr",
                 "major": 12,
-                "mean": 10.5,
+                "minor": 8.5,
                 "pitch": 3,
                 "starts": 1,
                 "hand": "right",
-                "angle": 30,
-                "from": 0,
+                "from": 40,
                 "to": 160
-              },
-              "handwheel": {
-                "diameter": 50,
-                "at": -20
               }
             },
             "at": {
@@ -50935,16 +50930,15 @@
             "id": "nut",
             "role": "output",
             "shape": {
-              "type": "slider",
+              "type": "nut",
               "length": 30,
-              "width": 28,
-              "height": 28,
-              "bore": "Tr12x3",
+              "width": 34,
+              "height": 34,
               "flag": {
                 "side": -1,
-                "to": "guide rail"
+                "gap": 16
               },
-              "material": "bronze"
+              "material": "aluminium carriage, bronze nut"
             },
             "at": {
               "joint": "guide"
@@ -50974,7 +50968,7 @@
             "a": "ground",
             "b": "nut",
             "at": [
-              120,
+              130,
               0,
               40
             ],
@@ -50994,7 +50988,7 @@
             "a": "screw",
             "b": "nut",
             "at": [
-              120,
+              130,
               0,
               40
             ],
@@ -51004,8 +50998,6 @@
               0
             ],
             "lead": 3,
-            "pitch": 3,
-            "starts": 1,
             "hand": "right",
             "ball": false
           }
@@ -51084,17 +51076,12 @@
               "guide"
             ],
             "in": {
-              "screw": "screw",
-              "nut": "nut",
-              "pitch": "p",
-              "starts": "starts",
-              "turn": "turn"
+              "joint": "thread",
+              "input": "turn",
+              "nut": "nut"
             },
-            "out": "x-nut",
-            "opts": {
-              "hand": "right",
-              "held": "screw axially fixed in its bearings, nut kept from turning by the guide",
-              "sign": "a positive turn about +x moves the nut toward -x"
+            "out": {
+              "advance": "nut-advance"
             }
           }
         ],
@@ -51103,43 +51090,52 @@
             "id": "nut-mark",
             "body": "nut",
             "local": [
+              17,
               0,
-              0,
-              14
+              0
             ]
           },
           {
-            "id": "wheel-mark",
+            "id": "turn-mark",
             "body": "screw",
             "local": [
-              -20,
+              5.5,
               0,
-              25
+              40
             ]
           },
           {
             "id": "travel-0",
             "body": "ground",
             "local": [
-              120,
+              130,
               0,
-              60
+              72
             ]
           },
           {
             "id": "travel-1",
             "body": "ground",
             "local": [
-              90,
+              100,
               0,
-              60
+              72
+            ]
+          },
+          {
+            "id": "nut-centre",
+            "body": "nut",
+            "local": [
+              0,
+              0,
+              0
             ]
           }
         ],
         "outputs": [
           {
             "id": "nut-x",
-            "of": "nut-mark",
+            "of": "guide",
             "kind": "position",
             "unit": "mm"
           },
@@ -51169,7 +51165,7 @@
             "point": "nut-mark"
           },
           {
-            "point": "wheel-mark"
+            "point": "turn-mark"
           }
         ],
         "traces": [
@@ -51204,20 +51200,20 @@
             "kind": "section",
             "plane": {
               "origin": [
-                120,
+                130,
                 0,
                 40
               ],
               "normal": [
                 0,
-                1,
+                -1,
                 0
               ]
             },
+            "center": "nut-centre",
+            "scale": 3,
             "highlight": [
-              "thread",
-              "nut.flank",
-              "screw.flank"
+              "nut"
             ]
           }
         ],

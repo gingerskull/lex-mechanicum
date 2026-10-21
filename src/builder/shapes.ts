@@ -7,7 +7,8 @@ import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
-import type { Profile } from "../solids/types";
+import type { Op, Profile } from "../solids/types";
+import { nutGeom, screwGeom } from "./screws";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 
@@ -32,7 +33,11 @@ export interface BodyGeom {
    */
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
-  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number }[];
+  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; op?: Op }[];
+  /** The body's own part when it is not an extrusion of `profile` (a screw's core, revolved): its profile and operation. */
+  part?: { profile: Profile; op: Op };
+  /** A body of revolution about the axis it turns on (a screw): its sweep is a revolve, its samples need no probes. */
+  axisym?: boolean;
   /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
   plan?: Vec2[];
 }
@@ -170,7 +175,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
+    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
   return out;
