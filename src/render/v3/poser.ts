@@ -7,7 +7,19 @@ import { poseOf } from "../../model/pose";
 import type { MechanismModel } from "../../model/types";
 import { Kinematics } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
-import type { Xf } from "../../kin/math";
+import { m3, v3, xf, type Xf } from "../../kin/math";
+
+/** A joint's frame: at its point, z along its axis, x the world up (or x) made square to it. */
+function jointFrame(at: Vec3, axis: Vec3): Xf {
+  const z = v3.unit(axis);
+  const h: Vec3 = Math.abs(z[2]) > 0.9 ? [1, 0, 0] : [0, 0, 1];
+  const x = v3.unit(v3.sub(h, v3.mul(z, v3.dot(h, z))));
+  const y = v3.cross(z, x);
+  return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: at };
+}
+
+const moved = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
+void m3;
 import { IDENTITY, mat4, type Mat4 } from "../../solids/frame";
 import type { PackedSolid3 } from "../../package/format2";
 import type { Vec3 } from "../../solids/types";
@@ -69,6 +81,33 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
     const v: Vec3 = [nx * d, ny * d, nz * d];
     return [p[0] + R[0] * v[0] + R[1] * v[1] + R[2] * v[2], p[1] + R[3] * v[0] + R[4] * v[1] + R[5] * v[2], p[2] + R[6] * v[0] + R[7] * v[1] + R[8] * v[2]];
   };
+  // the solids are built at the record's own settings; a control that changes the geometry (a bend, an offset) moves
+  // each body's reference frame, so a body is carried from its built frame to the new one, and the ground hardware of
+  // a joint that moves (an output shaft's blocks) goes with that joint
+  const built = k.setup(undefined);
+  const now = k.setup(controls);
+  const bodyShift = new Map<string, Xf>();
+  const jointShift = new Map<string, Xf>();
+  if (now !== built) {
+    for (const [id, F1] of now.bodyFrame) {
+      const D = xf.mul(F1, xf.inv(built.bodyFrame.get(id) ?? xf.id()));
+      if (moved(D)) bodyShift.set(id, D);
+    }
+    for (const [id, r1] of now.joints) {
+      const r0 = built.joints.get(id);
+      if (!r0) continue;
+      const D = xf.mul(jointFrame(r1.at, r1.axis), xf.inv(jointFrame(r0.at, r0.axis)));
+      if (moved(D)) jointShift.set(id, D);
+    }
+  }
+  const shiftOf = (s: PackedSolid3): Xf | undefined => {
+    if (s.body !== "ground") return bodyShift.get(s.body);
+    for (const j of s.joints ?? []) {
+      const D = jointShift.get(j);
+      if (D) return D;
+    }
+    return undefined;
+  };
   let at = NaN;
   let cached: ReturnType<Kinematics["pose"]> | null = null;
   const pose = (u: number, ctl?: Controls) => {
@@ -82,8 +121,10 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   return {
     period: Math.PI * 2,
     place: (s, u) => {
-      const X = pose(u).bodies.get(s.body);
-      return X ? fromXf(X) : ID4;
+      const X = s.body === "ground" ? xf.id() : pose(u).bodies.get(s.body);
+      const D = shiftOf(s);
+      if (!X) return ID4;
+      return fromXf(D ? xf.mul(X, D) : X);
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
     sweep: (point, range, branches) => {

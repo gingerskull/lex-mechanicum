@@ -86,7 +86,7 @@ interface BlockGeom {
 }
 
 /** The three castings of a block at axial position wb: foot plate, pedestal and boss. */
-function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: boolean; wb: number; baseTop: number; first: boolean }): BlockGeom {
+function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: boolean; wb: number; baseTop: number; first: boolean; joints?: string[] }): BlockGeom {
   const W = pillowWidth(o.d, o.live);
   const Rb = bossR(o.d, o.live);
   const half = footHalf(o.d, o.live);
@@ -106,7 +106,7 @@ function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: bo
       z0: 0,
       z1: FOOT,
       mat: "Cast iron EN-GJL-250",
-      joints: [o.id],
+      joints: [...(o.joints ?? []), o.id],
       group: o.id,
       why: "carries the block on the base and takes its screws and dowels (F1)",
     }),
@@ -116,7 +116,7 @@ function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: bo
   const pedTop = Math.max(FOOT + 1, P[2] - o.baseTop - bore - 1);
   const ped = place(
     st,
-    H.plate(`${o.id}-ped`, rect(Math.max(2, hl - FOOT_PAST), Rb), { kind: "housing", role: "ground", name: "", z0: FOOT, z1: pedTop, mat: "Cast iron EN-GJL-250", joints: [o.id], group: o.id }),
+    H.plate(`${o.id}-ped`, rect(Math.max(2, hl - FOOT_PAST), Rb), { kind: "housing", role: "ground", name: "", z0: FOOT, z1: pedTop, mat: "Cast iron EN-GJL-250", joints: [...(o.joints ?? []), o.id], group: o.id }),
   )[0]!;
   // the boss's x stands up, across the shaft (the stand's x runs along it)
   const bf = frameAlong(unitAlong(o.f, o.wb - W / 2), a, [0, 0, 1]);
@@ -130,7 +130,7 @@ function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: bo
       z1: W,
       holes: [H.disc(b ? b.D / 2 + 0.15 : o.d / 2 + 0.02)],
       mat: "Cast iron EN-GJL-250",
-      joints: [o.id],
+      joints: [...(o.joints ?? []), o.id],
       group: o.id,
       chamfer: 0.6,
       why: "holds the shaft's bearing at the shaft's height",
@@ -194,7 +194,7 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
   w.forEach((wb, k) => {
     const id = `${o.id}-b${k}`;
     const first = k === 0;
-    const g = blockGeom(ctx, { id, f: o.frame, d: o.d, live: o.live, wb, baseTop: o.baseTop, first });
+    const g = blockGeom(ctx, { id, f: o.frame, d: o.d, live: o.live, wb, baseTop: o.baseTop, first, joints: o.joints });
     solids.push(...geomList(g));
     const L = new Local(o.frame, { joints: [...o.joints, id] });
     if (b) {
@@ -217,7 +217,7 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
     const st = standFrame(P, o.frame.z, o.baseTop);
     const Rb = bossR(o.d, o.live);
     const sx = Rb + 4.5;
-    const S = new Local(st, { joints: [id] });
+    const S = new Local(st, { joints: [...o.joints, id] });
     for (const [n, u] of [[0, -sx], [1, sx]] as const) {
       S.add(H.screw(`${id}-sc${n}`, "socket", 5, FOOT + 8, { at: [0, u, 0], face: FOOT, dir: -1, ...(n || !first ? { name: "", qty: 0 } : {}) }));
       S.add(H.dowel(`${id}-dw${n}`, 4, { at: [n ? -3 : 3, n ? u + 2.5 : u - 2.5, 0], z0: 0.5 - 6, z1: FOOT, ...(n || !first ? { name: "", qty: 0 } : { name: "Dowel pin Ø4 x 14 h6, block to base", qty: 2 }) }));
