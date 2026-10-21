@@ -589,7 +589,9 @@ class Run implements BlockCtx {
     }
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
+      // a scalar a block wrote under the output's own id (a cam's pressure angle) is read as it stands
+      const own = (o.kind === "angle" || o.kind === "position") && !o.from && o.id in this.vals ? this.vals[o.id] : undefined;
+      const v = own ?? (o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points));
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {
@@ -689,6 +691,20 @@ export function bodyFrameOf(b: KinBody, list: KinJoint[], joints: Map<string, Re
   const y = v3.cross(z, x);
   return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: at.at };
 }
+
+/**
+ * A point a kit pins to a body without a name in the record (a spring's end on a follower, its seat on the ground):
+ * `@<body>:<x>:<y>:<z>`, the point's world coordinates in the reference configuration, carried by the body's pose.
+ */
+export function anchorAt(name: string, bodies: Map<string, Xf>): Vec3 | null {
+  const m = /^@([^:]+):(-?[\d.e+-]+):(-?[\d.e+-]+):(-?[\d.e+-]+)$/.exec(name);
+  if (!m) return null;
+  const X = m[1] === "ground" ? xf.id() : bodies.get(m[1]!);
+  return X ? xf.apply(X, [Number(m[2]), Number(m[3]), Number(m[4])]) : null;
+}
+
+/** The anchor name of a world reference point on a body (src/kin anchorAt). */
+export const anchorName = (body: string, p: readonly number[]): string => `@${body}:${p.map((v) => +v.toFixed(3)).join(":")}`;
 
 /** An axis with a fixed sign: its largest component positive, so parallel axes compare equal. */
 export function canonAxis(a: Vec3): Vec3 {

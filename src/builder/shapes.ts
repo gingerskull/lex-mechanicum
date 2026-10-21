@@ -10,6 +10,7 @@ import { type Vec3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
+import { camLawOf, flatCam, rollerCam } from "./cams";
 
 export interface BodyGeom {
   id: string;
@@ -170,7 +171,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
+    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -328,3 +329,22 @@ function cylinder(b: KinBody, g: BodyGeom): BodyGeom | null {
 }
 
 const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);
+
+/**
+ * A plate cam (`cam` shape) from the cam-contact joint it drives: the outline is the law wrapped round the cam's centre
+ * (src/builder/cams.ts), a roller follower's as the roller's inner envelope, a flat face's as the face lines' envelope;
+ * bored for its shaft. The joint's `at` is the roller centre (or the face's point on the follower line) at the reference.
+ */
+function plateCam(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  if (String(g.shape.type) !== "cam" || g.shape.form === "barrel") return null;
+  const j = kin.joints.find((q) => q.type === "cam-contact" && (q.b === b.id || q.a === b.id) && q.cam);
+  const r = j ? S.joints.get(j.id) : undefined;
+  if (!j || !r) return null;
+  const uv = planeCoords(g.frame, r.at).uv;
+  const L = camLawOf(j, r.num, Math.atan2(uv[1], uv[0]));
+  if (!L) return null;
+  const rr = num(g.shape.rollerRadius, 0);
+  const outer = j.follower === "flat" || !rr ? flatCam(L) : rollerCam(L, rr);
+  const bore = num(g.shape.bore, 8);
+  return { ...g, profile: { outer, holes: [circle(bore / 2, 0, 0, 28).reverse()] }, thick: num(g.shape.thick, num(g.shape.thickness, THICK)), approx: false };
+}

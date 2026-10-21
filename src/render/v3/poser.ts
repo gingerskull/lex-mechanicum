@@ -5,7 +5,7 @@
 import { frameAxis } from "../../core/axis";
 import { poseOf } from "../../model/pose";
 import type { MechanismModel } from "../../model/types";
-import { Kinematics } from "../../kin/compose";
+import { Kinematics, anchorAt } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
 
@@ -40,6 +40,8 @@ export interface Poser {
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
    */
   sweep?(point: string, range?: [number, number], branches?: string[]): Vec3[][] | null;
+  /** A body's pose at phase u (reference configuration to now) as a matrix: a trace or arc drawn in a moving body's frame. */
+  body?(u: number, id: string, ctl?: Controls): Mat4 | null;
 }
 
 export const ID4: Mat4 = mat4(IDENTITY);
@@ -70,7 +72,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   }
   const lifted = (P: ReturnType<Kinematics["pose"]>, id: string, ctl?: Controls): Vec3 | null => {
     const p = P.points.get(id);
-    if (!p) return null;
+    if (!p) return id.startsWith("@") ? anchorAt(id, P.bodies) : null;
     const b = rideOf.get(id);
     const X = b ? P.bodies.get(b) : undefined;
     const ref = b ? k.setup(ctl ? { ...controls, ...ctl } : controls).refPts.get(id) : undefined;
@@ -127,6 +129,10 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       return fromXf(D ? xf.mul(X, D) : X);
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
+    body: (u, id, ctl) => {
+      const X = id === "ground" ? xf.id() : pose(u, ctl).bodies.get(id);
+      return X ? fromXf(X) : null;
+    },
     sweep: (point, range, branches) => {
       const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
       if (!d) return null;
@@ -230,6 +236,7 @@ export function hybridPoser(bodies: Poser, points: Poser): Poser {
     place: (s, u) => bodies.place(s, u),
     point: (u, id, ctl) => safe(() => points.point(u, id, ctl)) ?? (ctl ? null : bodies.point(u, id)),
     span: (u, a, b) => bodies.span(u, a, b) ?? safe(() => points.span(u, a, b)),
+    ...(points.body ? { body: (u: number, id: string, ctl?: Controls) => safe(() => points.body!(u, id, ctl)) } : {}),
     ...(points.sweep ? { sweep: (pt: string, r?: [number, number], br?: string[]) => safe(() => points.sweep!(pt, r, br)) } : {}),
   };
 }

@@ -15,6 +15,8 @@ import type { KitId } from "../sites";
 import type { Local } from "../lib";
 import type { Rule } from "./types";
 import { v3 } from "../../kin/math";
+import { anchorName } from "../../kin/compose";
+import { Local as LocalFrame } from "../lib";
 
 interface KitBuild {
   (ctx: BuildCtx, c: Contact, L: Local): { serves?: Record<string, string[]>; note: string; badge?: [string, "ok" | "warn"] } | void;
@@ -120,6 +122,20 @@ function extentIn(ctx: BuildCtx, c: Contact, body: string): [number, number, num
   return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
 }
 
+/**
+ * A slider's declared guide length (`shape.guide` [s0, s1], mm along the slide's own axis from the body's frame origin)
+ * in a contact's frame, or null.
+ */
+function guideIn(ctx: BuildCtx, c: Contact, body: string): [number, number] | null {
+  const gd = ctx.geoms.get(body);
+  const gv = gd?.shape.guide;
+  if (!gd || !Array.isArray(gv) || gv.length < 2) return null;
+  const ax = c.ji.r.axis;
+  const p0 = planeCoords(c.frame, c.at).uv;
+  const xs = [Number(gv[0]), Number(gv[1])].map((x) => planeCoords(c.frame, v3.add(gd.frame.o, v3.mul(ax, x))).uv[0] - p0[0]);
+  return [Math.min(...xs), Math.max(...xs)];
+}
+
 const j5 = contactRule({
   id: "j5-slide",
   ids: ["J5", "F5", "F7", "A6"],
@@ -130,6 +146,12 @@ const j5 = contactRule({
     const slider = c.a === "ground" ? c.b : c.a;
     const host = slider === c.a ? c.b : c.a;
     const e = extentIn(ctx, c, slider);
+    // a slider whose part reaches past its guide (a cam follower's stem down to its roller) is held over its `guide`
+    // only ([x0, x1] along its own frame x): rails, stops and wipers stay on that length, off what the rest reaches over
+    const g = guideIn(ctx, c, slider);
+    const reachLo = g ? e[0] < g[0] - 0.5 : false;
+    const reachHi = g ? e[1] > g[1] + 0.5 : false;
+    if (g) [e[0], e[1]] = [Math.max(e[0], g[0]), Math.min(e[1], g[1])];
     const zs = ctx.extent(slider);
     if (!zs) return;
     const w0 = zs.w0;
@@ -150,7 +172,9 @@ const j5 = contactRule({
     for (const [k, y] of sideY) {
       L.add(H.plate(`${id}-rail${k}`, mk(k, y), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
       // a ground riser along the straight run (A6)
-      if (w0 - baseTop > 0.5) L.add(H.plate(`${id}-riser${k}`, roundRect(x0, y - 6, x1, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
+      // its inner edge flush with the rail's, so the slider never runs on the riser's face (A12)
+      const out = k ? -1 : 1;
+      if (w0 - baseTop > 0.5) L.add(H.plate(`${id}-riser${k}`, roundRect(x0, Math.min(y - out * 3.5, y + out * 8.5), x1, Math.max(y - out * 3.5, y + out * 8.5), 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
     }
     // gib on the gibbed side, between the slider and its rail (F7)
     L.add(H.gib(`${id}-gib`, x1 - x0 - 20, { body: hostBody, at: [x0 + 10, e[2] - gap / 2 - 0.5, 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
@@ -168,13 +192,19 @@ const j5 = contactRule({
     for (const [k, x] of [[0, c.run[0] + e[0] - 3], [1, c.run[0] + e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
     L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [(x0 + x1) / 2, ky, 0], z0: w0 + rh + 3, z1: w0 + rh + 3 + 9 }));
     // one end stop block with a neoprene pad just past each end of the travel (F5)
+    const stops: string[] = [];
     for (const [k, x, s] of [[0, x0 + 1, 1], [1, x1 - 1, -1]] as const) {
+      // no stop across an end the part reaches out of
+      if ((k === 0 && reachLo) || (k === 1 && reachHi)) continue;
       const sx = x - s * 4;
-      L.add(H.stop(`${id}-stop${k}`, roundRect(Math.min(x, x - s * 8), e[2] - 4, Math.max(x, x - s * 8), e[3] + 4, 1), { body: hostBody, z0: w0, z1: w1 + 2, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-      L.add(H.bumper(`${id}-pad${k}`, 3, 8, { body: hostBody, at: [sx + s * 6, 0, 0], z0: w0 + 1, z1: w0 + 3, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+      const n = reachLo || reachHi ? 1 : 2;
+      const named = !stops.length;
+      L.add(H.stop(`${id}-stop${k}`, roundRect(Math.min(x, x - s * 8), e[2] - 4, Math.max(x, x - s * 8), e[3] + 4, 1), { body: hostBody, z0: w0, z1: w1 + 2, ...(named ? { qty: n } : { name: "", qty: 0 }) }));
+      L.add(H.bumper(`${id}-pad${k}`, 3, 8, { body: hostBody, at: [sx + s * 6, 0, 0], z0: w0 + 1, z1: w0 + 3, ...(named ? { qty: n } : { name: "", qty: 0 }) }));
+      stops.push(`${id}-stop${k}`);
     }
     return {
-      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: [`${id}-stop0`, `${id}-stop1`], F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`] },
+      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: stops, F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`] },
       note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on a dowelled reference rail and a gibbed rail under a keeper; wipers, a grease nipple and an end stop with a pad at each end of the ${(c.run[1] - c.run[0]).toFixed(0)} mm travel.`,
     };
   },
@@ -230,25 +260,93 @@ const j9 = contactRule({
 
 // ------------------------------------------------------------------------------------------------ J7 and cams
 
-const camBuild: KitBuild = (ctx, c, L) => {
+/**
+ * J7: a cam and its follower. The record's roller (a disc body on a pin in the follower) is the roller, so the kit adds
+ * none; a translating follower gets its return spring (F6), a compression spring stretched between a pin on the
+ * follower's far end and a post past the guide's end stop, above the slide, pushing the follower onto the cam; a felt
+ * oiler rides the follower behind the roller (F8); a zero line is engraved on the cam from its hub to its base circle
+ * (F9). A swinging follower is held on its cam by its own linkage or by a form-closed partner and takes no spring.
+ */
+const camBuild: KitBuild = (ctx, c) => {
   const id = c.id;
-  const follower = ctx.kin.bodies.find((b) => b.id === c.b)?.role === "follower" || ctx.kin.bodies.find((b) => b.id === c.a)?.role === "cam" ? c.b : c.a;
-  const cam = follower === c.a ? c.b : c.a;
-  const fb = bodyOf(ctx, follower);
-  const z = mid(ctx.extent(follower) ? [ctx.extent(follower)!.w0, ctx.extent(follower)!.w1] : null, mid(c.za, mid(c.zb)));
-  const d = 5;
-  const D = 13;
-  L.add(H.roller(`${id}-roller`, d, D, { body: fb, z0: z - 2, z1: z + 2 }));
-  L.add(H.shaft(`${id}-stud`, { d, z0: z - 4, z1: z + 4.5 }, { body: fb, name: `Follower stud Ø${d}` }));
-  // a return spring on a seat with a preload screw along the follower's run (F6)
-  const k = c.run[1] - c.run[0] > 1 ? 1 : 1;
-  const far = c.run[1] + D / 2 + 6;
-  L.add(H.spring(`${id}-spring`, "compression", { body: fb, at: [far + 8, 0, 0], z0: z - 3, z1: z + 3 }));
-  L.add(H.plate(`${id}-seat`, roundRect(far + 14, -6, far + 20, 6, 1), { body: "ground", kind: "bracket", role: "ground", name: "Spring seat with preload screw", z0: z - 6, z1: z + 6 }));
-  L.add(H.felt(`${id}-oil`, [[-2, D / 2 + 2], [2, D / 2 + 2], [2, D / 2 + 5], [-2, D / 2 + 5]], { body: "ground", z0: z - 2, z1: z + 2 }));
-  const zero = timingMark(ctx, cam, c.at);
-  void k;
-  return { serves: { F6: [`${id}-spring`, `${id}-seat`], F8: [`${id}-oil`], F9: zero ? [cam] : [] }, note: `${titleOf(id)}: roller follower on a stud; return spring on a seat with a preload screw; felt oiler on the track; zero line on the cam.` };
+  const isCam = (b: string) => String(ctx.geoms.get(b)?.shape.type) === "cam";
+  const cam = isCam(c.b) ? c.b : c.a;
+  const other = cam === c.a ? c.b : c.a;
+  const camG = ctx.geoms.get(cam);
+  const up = c.frame.z;
+  const serves: Record<string, string[]> = {};
+  const notes: string[] = [];
+  // the translating follower: the other body, or the body it rides on a pin, on a prismatic joint to the ground
+  const carriers = [other, ...ctx.kin.joints.filter((j) => j.type === "revolute" && (j.a === other || j.b === other)).map((j) => (j.a === other ? j.b : j.a))];
+  const slide = ctx.kin.joints.find((j) => j.type === "prismatic" && (j.a === "ground" || j.b === "ground") && carriers.includes(j.a === "ground" ? j.b : j.a));
+  const F = slide ? (slide.a === "ground" ? slide.b : slide.a) : null;
+  const partF = F ? ctx.parts.get(F) : undefined;
+  const exF = F ? ctx.extent(F) : null;
+  if (F && slide && partF && exF && camG) {
+    const r = ctx.joints.find((q) => q.id === slide.id)!.r;
+    const centre = camG.frame.o;
+    const away = v3.dot(v3.sub(c.at, centre), r.axis) >= 0 ? 1 : -1;
+    const d = v3.unit(v3.mul(v3.perp(r.axis, up), away));
+    const o = v3.sub(c.at, v3.mul(up, v3.dot(v3.sub(c.at, c.frame.o), up)));
+    const Lf = new LocalFrame({ o, x: d, z: up }, { joints: [id] });
+    const xOf = (p: readonly number[]) => v3.dot(v3.sub([p[0]!, p[1]!, p[2]!], o), d);
+    const pts = partF.profile.outer.map((q) => fromPlane(partF.frame, q, 0));
+    const far = Math.max(...pts.map(xOf));
+    const top = v3.dot(v3.sub(fromPlane(exF.frame, [0, 0], exF.w1), o), up);
+    // the stroke: the slide's limits, else how far the follower moves along its axis over the cycle
+    const along = ctx.sampled.us.map((_, i) => v3.dot(ctx.xfOf(F, i).t, d));
+    const travel = Math.max(1, slide.limits ? Math.abs(slide.limits[1] - slide.limits[0]) : Math.max(...along) - Math.min(...along));
+    const Ds = 6;
+    const zs0 = top + 3;
+    const zs1 = zs0 + Ds;
+    const xa = far - 6;
+    const xb = far + travel + 18;
+    const baseTop = ctx.base ? ctx.base.top - o[2] : baseZ(ctx, c);
+    {
+      Lf.add(H.shaft(`${id}-spin`, { d: 4, z0: top - 0.5, z1: zs1 + 1 }, { body: F, at: [xa, 0, 0], name: "Spring pin Ø4, pressed into the follower" }));
+      Lf.add(H.standoff(`${id}-post`, { body: "ground", at: [xb, 0, 0], z0: baseTop, z1: zs1 + 1, name: "Spring post Ø8 on the base, M4" }));
+    }
+    // the spring at unit length along the follower's axis, stretched from the pin to the post each frame (D9)
+    // from the pin's face to the post's (pin Ø4, post Ø8)
+    const aW = v3.add(o, v3.add(v3.mul(d, xa + 2.5), v3.mul(up, (zs0 + zs1) / 2)));
+    const bW = v3.add(o, v3.add(v3.mul(d, xb - 5.5), v3.mul(up, (zs0 + zs1) / 2)));
+    const coil = H.spring(`${id}-spring`, "compression", { body: F, D: Ds, z0: zs0, z1: zs1, name: `Compression spring Ø${Ds}, wire 0.8: holds the follower on the cam` });
+    coil.outer = [[0, -Ds / 2], [1, -Ds / 2], [1, Ds / 2], [0, Ds / 2]];
+    coil.holes = [];
+    coil.marks = [{ kind: "boss", pts: Array.from({ length: 13 }, (_, k): [number, number] => [k / 12, (k % 2 ? 1 : -1) * (Ds / 2 - 0.6)]) }];
+    coil.at = [xa + 2.5, 0, 0];
+    coil.stretch = [anchorName(F, aW), anchorName("ground", bW)];
+    Lf.add(coil);
+    // the felt oiler behind the roller, on the follower (F8)
+    const rr = Number(ctx.geoms.get(other)?.shape.radius ?? 0);
+    const exO = ctx.extent(other);
+    if (rr > 0 && exO) {
+      const z0 = v3.dot(v3.sub(fromPlane(exO.frame, [0, 0], exO.w0), o), up);
+      const z1 = v3.dot(v3.sub(fromPlane(exO.frame, [0, 0], exO.w1), o), up);
+      Lf.add(H.felt(`${id}-oil`, [[rr + 0.6, -3], [rr + 3.6, -3], [rr + 3.6, 3], [rr + 0.6, 3]], { body: F, z0: z0 + 1, z1: z1 - 1, name: "Felt oiler on the roller, oil-soaked wool felt" }));
+      serves.F8 = [`${id}-oil`];
+    } else if (!rr) {
+      // a flat face: a felt pad on the foot beside the stem keeps the face oiled
+      Lf.add(H.felt(`${id}-oil`, [[1, 9], [7, 9], [7, 15], [1, 15]], { body: F, z0: top, z1: top + 3, name: "Felt oiler on the follower's foot, oil-soaked wool felt" }));
+      serves.F8 = [`${id}-oil`];
+    }
+    ctx.add(Lf.out());
+    serves.F6 = [`${id}-spring`, `${id}-post`, `${id}-spin`];
+    notes.push(`a compression spring between a pin on the follower and a post past the guide holds the follower on the cam (${travel.toFixed(0)} mm stroke)`);
+  } else notes.push("the follower is held on the cam by its own linkage or a form-closed partner");
+  // the zero line on the cam, from its hub to its base circle, toward the follower at the reference (F9)
+  const part = ctx.parts.get(cam);
+  if (part && camG) {
+    const p = planeCoords(part.frame, c.at).uv;
+    const rIn = Number(camG.shape.bore ?? 8) / 2 + 5;
+    const rOut = Math.min(...part.profile.outer.map(([x, y]) => Math.hypot(x, y))) - 2;
+    const L0 = Math.hypot(p[0], p[1]) || 1;
+    if (rOut > rIn) {
+      part.marks.push({ kind: "timing", pts: [[(p[0] / L0) * rIn, (p[1] / L0) * rIn], [(p[0] / L0) * rOut, (p[1] / L0) * rOut]] });
+      serves.F9 = [cam];
+    }
+  }
+  return { serves, note: `${titleOf(id)}: ${other === F ? "follower" : "roller follower on its pin"}; ${notes.join("; ")}; felt oiler; zero line on the cam.` };
 };
 const j7 = contactRule({ id: "j7-cam", ids: ["J7", "F6"], fixture: "kin:camFollower", kits: ["J7"], build: camBuild });
 

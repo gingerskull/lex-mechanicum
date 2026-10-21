@@ -42841,15 +42841,15 @@
             "shape": {
               "type": "plate",
               "rect": [
-                120,
-                200
+                150,
+                250
               ]
             },
             "at": {
               "frame": {
                 "origin": [
                   0,
-                  40,
+                  70,
                   -10
                 ]
               }
@@ -42860,18 +42860,10 @@
             "role": "driver",
             "shape": {
               "type": "cam",
-              "base": 30,
               "law": "cycloidal",
-              "lift": 22,
-              "rise": 120,
-              "dwellOuter": 60,
-              "return": 120,
-              "dwellInner": 60,
-              "follower": "roller",
               "rollerRadius": 8,
-              "offset": 0,
-              "thick": 8,
-              "bore": 8
+              "thick": 10,
+              "bore": 10
             },
             "at": {
               "joint": "O"
@@ -42881,12 +42873,34 @@
             "id": "follower",
             "role": "follower",
             "shape": {
-              "type": "slider",
-              "length": 80,
-              "width": 20
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  105,
+                  0
+                ]
+              ],
+              "boss": 5.5,
+              "guide": [
+                55,
+                105
+              ]
             },
-            "at": {
-              "joint": "G"
+            "frame": {
+              "origin": [
+                0,
+                38,
+                0
+              ],
+              "rot": [
+                0,
+                0,
+                90
+              ]
             }
           },
           {
@@ -42895,7 +42909,7 @@
             "shape": {
               "type": "disc",
               "radius": 8,
-              "thickness": 8
+              "thickness": 10
             },
             "at": {
               "joint": "F"
@@ -42922,11 +42936,11 @@
           {
             "id": "G",
             "type": "prismatic",
-            "a": "ground",
-            "b": "follower",
+            "a": "follower",
+            "b": "ground",
             "at": [
               0,
-              38,
+              118,
               0
             ],
             "axis": [
@@ -42958,14 +42972,50 @@
           {
             "id": "C",
             "type": "cam-contact",
-            "a": "cam",
-            "b": "roller",
+            "a": "roller",
+            "b": "cam",
             "at": [
               0,
-              30,
+              38,
               0
             ],
-            "follower": "roller"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "ca": [
+              0,
+              0,
+              0
+            ],
+            "follower": "roller",
+            "cam": {
+              "schedule": [
+                {
+                  "kind": "rise",
+                  "span": "rise",
+                  "law": "cycloidal"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "dwelltop"
+                },
+                {
+                  "kind": "return",
+                  "span": "return",
+                  "law": "cycloidal"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "360-rise-dwelltop-return"
+                }
+              ],
+              "lift": "h",
+              "rb": "rb+rr",
+              "theta0": 0
+            },
+            "note": "at is the roller centre on the prime circle; the cam's outline is the roller's envelope on the pitch curve"
           }
         ],
         "params": [
@@ -43002,7 +43052,7 @@
             "note": "rise angle"
           },
           {
-            "id": "dwell-top",
+            "id": "dwelltop",
             "value": 60,
             "unit": "deg",
             "min": 0,
@@ -43018,17 +43068,7 @@
             "note": "return angle; the inner dwell is the rest of the turn (60 by default)"
           }
         ],
-        "design": [
-          {
-            "id": "motion-law",
-            "options": [
-              "cycloidal",
-              "3-4-5 polynomial",
-              "simple harmonic"
-            ],
-            "value": "cycloidal"
-          }
-        ],
+        "design": [],
         "drivers": [
           {
             "id": "input",
@@ -43051,28 +43091,24 @@
               "C"
             ],
             "in": {
-              "cam": "cam",
-              "follower": "follower",
-              "roller": "roller",
-              "rb": "rb",
-              "rr": "rr",
-              "h": "h",
-              "rise": "rise",
-              "dwell-top": "dwell-top",
-              "return": "return",
-              "law": "motion-law"
+              "joint": "C",
+              "input": "input",
+              "follower": [
+                "follower",
+                "roller"
+              ],
+              "axis": [
+                0,
+                1,
+                0
+              ],
+              "rr": "rr"
             },
-            "opts": {
-              "follower": "translating roller",
-              "offset": 0,
-              "profile": "envelope of the roller on the pitch curve rb + rr + s",
-              "turns": "ccw"
-            },
-            "out": [
-              "lift",
-              "pressure-angle",
-              "C"
-            ]
+            "out": {
+              "s": "lift-s",
+              "pressure": "pressure-angle",
+              "contact": "K"
+            }
           }
         ],
         "points": [
@@ -43080,10 +43116,20 @@
             "id": "Fd",
             "body": "follower",
             "local": [
-              0,
               -30,
+              0,
               0
             ]
+          },
+          {
+            "id": "K",
+            "body": "cam",
+            "local": [
+              30,
+              0,
+              0
+            ],
+            "note": "the contact point; the cam block places it each pose"
           }
         ],
         "outputs": [
@@ -43111,7 +43157,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #216. The old default had no dwell (cycloidal 180° up, 180° down), so it read as an eccentric. The default is now rise 120°, dwell 60°, return 120°, dwell 60°, h 22, cycloidal on both flanks: the cam reads as the displacement diagram wrapped round the base circle. The outline is the roller's envelope on the pitch curve, so the lift is exactly the law. The pressure angle peaks at 23.6° (the review's about 23°). Output character corrected from Harmonic to Dwell. The bridge off the cam face is hardware."
+          "note": "Applies the 2026-10-19 review and #216. The old default had no dwell (cycloidal 180° up, 180° down), so it read as an eccentric. The default is now rise 120°, dwell 60°, return 120°, dwell 60°, h 22, cycloidal on both flanks: the cam reads as the displacement diagram wrapped round the base circle. The outline is the roller's envelope on the pitch curve, so the lift is exactly the law. The pressure angle peaks at 23.6° (the review's about 23°). Output character corrected from Harmonic to Dwell. The bridge off the cam face is hardware. Rebuild R5 (#216): built on v3 from this record. The cam's outline is made from the cam-contact joint's own law (the roller's envelope), so the build and the kinematics cannot differ. The lift, base-radius and motion-law controls are not offered: the cam is built at build time and a control cannot reshape it (as the pilots' tooth-count controls); the record keeps the design values. The stem is guided off the cam's sweep (shape.guide), so no rail or bridge lies over the cam; the cam is overhung on its live shaft in a housing under the base."
         },
         "principle": [
           {
@@ -43124,7 +43170,7 @@
             "body": "roller"
           },
           {
-            "point": "C"
+            "point": "K"
           }
         ],
         "traces": [
@@ -43159,8 +43205,8 @@
             "center": "O",
             "radius": 66,
             "range": [
-              120,
-              180
+              270,
+              330
             ],
             "frame": "cam",
             "label": "DWELL"
@@ -43171,8 +43217,8 @@
             "center": "O",
             "radius": 44,
             "range": [
-              300,
-              360
+              90,
+              150
             ],
             "frame": "cam",
             "label": "DWELL"
@@ -43180,7 +43226,7 @@
           {
             "id": "normal",
             "kind": "line",
-            "from": "C",
+            "from": "K",
             "to": "F",
             "label": "CONTACT NORMAL"
           },
@@ -43189,7 +43235,7 @@
             "kind": "arc",
             "center": "F",
             "from": "Fd",
-            "to": "C",
+            "to": "K",
             "label": "PRESSURE ANGLE"
           }
         ],
@@ -43199,21 +43245,6 @@
             "id": "cam",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "lift",
-            "kind": "param",
-            "param": "h"
-          },
-          {
-            "id": "base",
-            "kind": "param",
-            "param": "rb"
-          },
-          {
-            "id": "law",
-            "kind": "design",
-            "design": "motion-law"
           }
         ],
         "plot": [
@@ -43249,7 +43280,8 @@
             "output": "lift",
             "stat": "dwell",
             "value": 60,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
             "text": "Here it peaks at 23.6°",

@@ -346,7 +346,9 @@ const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "pol
  * cam. in: joint (a `cam-contact` joint carrying cam: schedule, lift, rb, e, theta0), input (the cam angle, deg),
  * follower (body), axis (the follower's direction of travel, unit; or the pivot axis when swing is true),
  * swing (true: an oscillating follower about the joint's `at`; lift is then radians' worth in degrees).
- * out {s, v, pressure}: displacement (mm or deg), ds/dθ, pressure angle (deg).
+ * follower may be a list (the follower and the bodies it carries); rr (roller radius) or flat (true: a flat face) place
+ * the contact point, which needs the joint's `ca` (the cam's centre).
+ * out {s, v, pressure, contact}: displacement (mm or deg), ds/dθ, pressure angle (deg), the contact point.
  */
 const camBlock: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -361,15 +363,32 @@ const camBlock: BlockFn = (c, s) => {
   const th = th0 + c.delta("in", c.rad(i.input));
   const m = camMotion(sched, th);
   const m0 = camMotion(sched, th0);
-  const follower = str(i.follower, "cam.follower");
-  if (i.swing === true) {
-    c.setXf(follower, xf.rotAbout(c.jointAt(jid), c.vec(i.axis), (m.s - m0.s) * D2R));
-  } else {
-    c.setXf(follower, xf.trans(v3.mul(v3.unit(c.vec(i.axis)), m.s - m0.s)));
-  }
+  // the follower and the bodies it carries (a roller on its stud): one name or a list
+  const carried = (Array.isArray(i.follower) ? i.follower : [i.follower]).map((f) => str(f, "cam.follower"));
+  const X = i.swing === true ? xf.rotAbout(c.jointAt(jid), c.vec(i.axis), (m.s - m0.s) * D2R) : xf.trans(v3.mul(v3.unit(c.vec(i.axis)), m.s - m0.s));
+  for (const f of carried) c.setXf(f, X);
+  const rb = c.num(j.cam.rb);
   outVal(c, s, m.s, "s");
   outVal(c, s, m.v, "v");
-  outVal(c, s, pressureAngle({ rb: c.num(j.cam.rb), e: j.cam.e !== undefined ? c.num(j.cam.e) : 0 }, m.s, m.v) * R2D, "pressure");
+  outVal(c, s, pressureAngle({ rb, e: j.cam.e !== undefined ? c.num(j.cam.e) : 0 }, m.s, m.v) * R2D, "pressure");
+  // the contact point on the cam (a translating follower in line with the cam centre): a roller of radius `rr` touches
+  // along the pitch curve's normal, n ∝ ρ r̂ + v t̂ with ρ = rb + s; a flat face (`flat: true`) touches at ρ r̂ − v t̂,
+  // the envelope of its lines. r̂ is the follower's direction from the cam centre, t̂ = axis × r̂, the cam turning about +axis.
+  const kOut = outName(s, "contact");
+  if (kOut && i.swing !== true && j.ca) {
+    const ax = c.jointAxis(jid);
+    const centre = c.vec(j.ca);
+    const tip = xf.apply(X, c.jointAt(jid));
+    const rel = v3.sub(tip, centre);
+    const rHat = v3.unit(v3.sub(rel, v3.mul(ax, v3.dot(rel, ax))));
+    const tHat = v3.cross(ax, rHat);
+    const rho = rb + m.s;
+    if (i.flat === true) c.setPt(kOut, v3.add(v3.add(centre, v3.mul(ax, v3.dot(rel, ax))), v3.sub(v3.mul(rHat, rho), v3.mul(tHat, m.v))));
+    else {
+      const n = v3.unit(v3.add(v3.mul(rHat, rho), v3.mul(tHat, m.v)));
+      c.setPt(kOut, v3.sub(tip, v3.mul(n, c.num(i.rr ?? 0))));
+    }
+  }
 };
 
 /**

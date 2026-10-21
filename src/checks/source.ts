@@ -16,7 +16,8 @@ import type { Solid3 } from "../solids/types";
 import type { RecordLike } from "../builder/ctx";
 import type { Kin } from "../kin/types";
 import type { Xf } from "../kin/math";
-import { xf } from "../kin/math";
+import { v3, xf } from "../kin/math";
+import { anchorAt } from "../kin/compose";
 import type { Placer } from "./clash3";
 
 export interface CheckSource {
@@ -115,6 +116,15 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = 
       return mul(xfMat(X), mat4(s.frame));
     },
     key: (s) => s.body,
+    // a stretched member spans its two points (named kin points, or a kit's body anchors)
+    stretch(s, u) {
+      const st = (s as Solid3).stretch;
+      if (!st) return 1;
+      const P = K.pose(u);
+      const a = P.points.get(st[0]) ?? anchorAt(st[0], P.bodies);
+      const b = P.points.get(st[1]) ?? anchorAt(st[1], P.bodies);
+      return a && b ? v3.dist(a, b) : 1;
+    },
   };
   const kin = src.kin;
   const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type)).map((j): [string, string] => [j.a, j.b]);
