@@ -44198,14 +44198,14 @@
             "shape": {
               "type": "plate",
               "rect": [
-                260,
+                280,
                 180
               ]
             },
             "at": {
               "frame": {
                 "origin": [
-                  50,
+                  55,
                   0,
                   -12
                 ]
@@ -44228,11 +44228,12 @@
               "return": 120,
               "dwellInner": 60,
               "groove": {
-                "width": 10.2,
+                "width": 14.2,
                 "depth": 6,
                 "walls": "pitch curve offset by half the width"
               },
-              "bore": 10
+              "bore": 10,
+              "place": 0
             },
             "at": {
               "joint": "O"
@@ -44242,14 +44243,56 @@
             "id": "follower",
             "role": "follower",
             "shape": {
-              "type": "slider",
-              "length": 90,
-              "width": 20,
-              "end": "fork",
-              "forkGap": 12
+              "type": "plate",
+              "exact": true,
+              "fillet": 1.5,
+              "place": 17.5,
+              "thickness": 7,
+              "guide": [
+                60,
+                130
+              ],
+              "outline": [
+                [
+                  -4.6,
+                  -4.6
+                ],
+                [
+                  30,
+                  -4.6
+                ],
+                [
+                  40,
+                  -10
+                ],
+                [
+                  130,
+                  -10
+                ],
+                [
+                  130,
+                  10
+                ],
+                [
+                  40,
+                  10
+                ],
+                [
+                  30,
+                  4.6
+                ],
+                [
+                  -4.6,
+                  4.6
+                ]
+              ]
             },
-            "at": {
-              "joint": "G"
+            "frame": {
+              "origin": [
+                35,
+                0,
+                0
+              ]
             }
           },
           {
@@ -44257,8 +44300,9 @@
             "role": "follower",
             "shape": {
               "type": "disc",
-              "radius": 5,
-              "thickness": 6
+              "radius": 7,
+              "thickness": 5,
+              "place": 10.5
             },
             "at": {
               "joint": "F"
@@ -44285,12 +44329,12 @@
           {
             "id": "G",
             "type": "prismatic",
-            "a": "ground",
-            "b": "follower",
+            "a": "follower",
+            "b": "ground",
             "at": [
-              35,
+              130,
               0,
-              10
+              0
             ],
             "axis": [
               1,
@@ -44310,7 +44354,7 @@
             "at": [
               35,
               0,
-              10
+              0
             ],
             "axis": [
               0,
@@ -44321,15 +44365,51 @@
           {
             "id": "C",
             "type": "cam-contact",
-            "a": "disc",
-            "b": "roller",
+            "a": "roller",
+            "b": "disc",
             "at": [
-              30,
+              35,
               0,
-              10
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "ca": [
+              0,
+              0,
+              0
             ],
             "follower": "roller",
-            "closure": "form"
+            "closure": "form",
+            "cam": {
+              "schedule": [
+                {
+                  "kind": "rise",
+                  "span": "rise",
+                  "law": "poly345"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "dwelltop"
+                },
+                {
+                  "kind": "return",
+                  "span": "return",
+                  "law": "poly345"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "360-rise-dwelltop-return"
+                }
+              ],
+              "lift": "h",
+              "rb": "rb",
+              "theta0": 0
+            },
+            "note": "at is the roller centre on the groove's centre line (the pitch curve); the groove is cut half its width each side of it"
           }
         ],
         "params": [
@@ -44358,7 +44438,7 @@
             "note": "rise angle"
           },
           {
-            "id": "dwell-top",
+            "id": "dwelltop",
             "value": 60,
             "unit": "deg",
             "min": 0,
@@ -44375,11 +44455,11 @@
           },
           {
             "id": "rr",
-            "value": 5,
+            "value": 7,
             "unit": "mm",
             "min": 4,
-            "max": 8,
-            "note": "roller radius (groove 0.2 mm wider than the roller)"
+            "max": 9,
+            "note": "roller radius (groove 0.2 mm wider than the roller): 7 so the roller shows either side of the arm's tongue"
           }
         ],
         "design": [],
@@ -44405,29 +44485,24 @@
               "C"
             ],
             "in": {
-              "cam": "disc",
-              "follower": "follower",
-              "roller": "roller",
-              "rb": "rb",
-              "rr": "rr",
-              "h": "h",
-              "rise": "rise",
-              "dwell-top": "dwell-top",
-              "return": "return"
+              "joint": "C",
+              "input": "input",
+              "follower": [
+                "follower",
+                "roller"
+              ],
+              "axis": [
+                1,
+                0,
+                0
+              ],
+              "rr": "rr"
             },
-            "opts": {
-              "law": "3-4-5 polynomial",
-              "follower": "translating roller, radial",
-              "closure": "groove",
-              "turns": "ccw",
-              "wall": "inner wall while the follower accelerates outward, outer wall while it accelerates inward"
-            },
-            "out": [
-              "lift",
-              "pressure-angle",
-              "C",
-              "loaded-wall"
-            ]
+            "out": {
+              "s": "lift-s",
+              "pressure": "pressure-angle",
+              "contact": "K"
+            }
           }
         ],
         "points": [
@@ -44439,6 +44514,16 @@
               0,
               0
             ]
+          },
+          {
+            "id": "K",
+            "body": "disc",
+            "local": [
+              30,
+              0,
+              0
+            ],
+            "note": "the roller's contact on the groove's inner wall; the cam block places it each pose"
           }
         ],
         "outputs": [
@@ -44453,6 +44538,11 @@
             "of": "C",
             "kind": "angle",
             "unit": "deg"
+          },
+          {
+            "id": "pitch-curve",
+            "of": "F",
+            "kind": "path"
           }
         ],
         "fallback": null
@@ -44461,7 +44551,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #216. The roller in its groove is the contact that shows form closure, so the arm ends in a fork round the roller (an exception, decided in #216) and the detail view highlights the wall that carries the load: the inner wall while the follower accelerates outward, the outer wall while it accelerates inward. The groove push is drawn along the groove normal, not sideways. Checked: lift 20 mm, 60° dwells, pressure angle 22.1° at most (the defining relations said about 24°; corrected)."
+          "note": "Applies the 2026-10-19 review and #216. The roller in its groove is the contact that shows form closure, so the arm ends in a fork round the roller (an exception, decided in #216) and the detail view highlights the wall that carries the load: the inner wall while the follower accelerates outward, the outer wall while it accelerates inward. The groove push is drawn along the groove normal, not sideways. Checked: lift 20 mm, 60° dwells, pressure angle 22.1° at most (the defining relations said about 24°; corrected). Rebuild R5 (#216): built on v3 from this record. The groove is cut into the disc's face by the builder from the cam joint's own law (its centre line is the pitch curve, half the width each side), so build and kinematics agree. The lift control is not offered (the groove is built at build time). The arm narrows to a tongue over the stud, narrower than the roller (see exceptions); the guide stands past the disc's rim. The per-phase loaded-wall highlight of the detail view is not drawn yet (the renderer has no highlightBy): the detail view highlights the roller and the disc."
         },
         "principle": [
           {
@@ -44477,7 +44567,7 @@
             "point": "F"
           },
           {
-            "point": "C"
+            "point": "K"
           }
         ],
         "traces": [
@@ -44495,8 +44585,9 @@
           {
             "id": "groove-push",
             "kind": "line",
-            "from": "C",
+            "from": "K",
             "to": "F",
+            "extend": true,
             "label": "GROOVE PUSH, ALONG THE GROOVE NORMAL"
           },
           {
@@ -44504,18 +44595,19 @@
             "kind": "arc",
             "center": "F",
             "from": "Fo",
-            "to": "C",
+            "to": "K",
             "label": "PRESSURE ANGLE"
           },
           {
             "id": "guide-axis",
             "kind": "axis-line",
-            "through": "O",
-            "direction": [
+            "at": "O",
+            "axis": [
               1,
               0,
               0
             ],
+            "length": 150,
             "label": "RADIAL GUIDE"
           }
         ],
@@ -44527,15 +44619,13 @@
             "center": [
               45,
               0,
-              10
+              14
             ],
             "scale": 3,
             "highlight": [
-              "disc.inner-wall",
-              "disc.outer-wall",
-              "roller"
-            ],
-            "highlightBy": "loaded-wall"
+              "roller",
+              "disc"
+            ]
           }
         ],
         "controls": [
@@ -44543,11 +44633,6 @@
             "id": "disc",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "lift",
-            "kind": "param",
-            "param": "h"
           }
         ],
         "plot": [
@@ -44583,7 +44668,8 @@
             "output": "lift",
             "stat": "dwell",
             "value": 60,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
             "text": "pressure angle 22.1° at most",
@@ -44595,9 +44681,9 @@
         ],
         "exceptions": [
           {
-            "reason": "The follower arm ends in a fork round the roller (decided in #216), so the roller and both groove walls show between the tines in plan. The arm is a moving principle part; drawn see-through it would hide which wall carries the load.",
+            "reason": "The follower arm narrows to a tongue over the roller's stud, narrower than the roller (the fork end decided in #216): the roller and both groove walls show either side of it in plan. The arm is a moving principle part; drawn see-through it would hide which wall carries the load.",
             "body": "follower",
-            "construction": "fork end at the roller"
+            "construction": "a tongue narrower than the roller at the stud"
           }
         ]
       }

@@ -107,7 +107,48 @@ function rollerInSlot(ctx: BuildCtx, c: Contact, L: Local, what: string): Return
 
 const j4 = contactRule({ id: "j4-slot-roller", ids: ["J4", "M14"], fixture: "kin:geneva", kits: ["J4"], build: (ctx, c, L) => rollerInSlot(ctx, c, L, "pin in a slot") });
 const pinLobe = contactRule({ id: "pin-lobe", ids: ["J4", "M14"], fixture: "kin:pinLobe", kits: ["pin-lobe"], build: (ctx, c, L) => rollerInSlot(ctx, c, L, "pin and lobe") });
-const grooveCam = contactRule({ id: "groove-cam", ids: ["J7", "M14"], fixture: "kin:grooveCam", kits: ["groove-cam"], build: (ctx, c, L) => rollerInSlot(ctx, c, L, "roller in a groove") });
+/**
+ * A groove cam. Where the cam's own shape carries its groove (a face-groove or barrel cam, cut by the builder from the
+ * joint's law) and the record carries the roller, the kit adds what the groove needs: a felt oiler on the follower beside
+ * the roller (F8) and a zero line on the cam (F9); the groove holds the follower both ways, so no spring (F6). Otherwise
+ * it is a roller in a slot cut in the other body.
+ */
+const grooveCam = contactRule({
+  id: "groove-cam",
+  ids: ["J7", "M14"],
+  fixture: "kin:grooveCam",
+  kits: ["groove-cam"],
+  build(ctx, c, L) {
+    const camBody = [c.a, c.b].find((b) => { const sh = ctx.geoms.get(b)?.shape; return String(sh?.type) === "cam" && (sh?.form === "face-groove" || sh?.form === "barrel"); });
+    if (!camBody) return rollerInSlot(ctx, c, L, "roller in a groove");
+    const roller = camBody === c.a ? c.b : c.a;
+    const rg = ctx.geoms.get(roller);
+    const rr = Number(rg?.shape.radius ?? 5);
+    // the body the roller's pin is in: the follower that carries the oiler
+    const pinJ = ctx.kin.joints.find((j) => j.type === "revolute" && (j.a === roller || j.b === roller));
+    const carrier = pinJ ? (pinJ.a === roller ? pinJ.b : pinJ.a) : roller;
+    const exC = ctx.extent(carrier);
+    const serves: Record<string, string[]> = {};
+    if (rg && exC) {
+      // a felt wick on the follower's underside dipping toward the groove, beside the roller, clear of the walls' tops
+      const Lw = new LocalFrame({ o: rg.frame.o, x: rg.frame.x, z: rg.frame.z }, { joints: [c.id] });
+      const zc = v3.dot(v3.sub(fromPlane(exC.frame, [0, 0], exC.w0), rg.frame.o), rg.frame.z);
+      Lw.add(H.felt(`${c.id}-oil`, [[-2, rr + 1.5], [2, rr + 1.5], [2, rr + 4.5], [-2, rr + 4.5]], { body: carrier, z0: zc - 0.8, z1: zc, name: "Felt oiler over the groove, oil-soaked wool felt" }));
+      ctx.add(Lw.out());
+      serves.F8 = [`${c.id}-oil`];
+    }
+    const part = ctx.parts.get(camBody);
+    if (part) {
+      const p = planeCoords(part.frame, c.at).uv;
+      const L0 = Math.hypot(p[0], p[1]) || 1;
+      const r0 = Number(ctx.geoms.get(camBody)?.shape.bore ?? 10) / 2 + 5;
+      part.marks.push({ kind: "timing", pts: [[(p[0] / L0) * r0, (p[1] / L0) * r0], [(p[0] / L0) * (L0 - rr - 3), (p[1] / L0) * (L0 - rr - 3)]] });
+      serves.F9 = [camBody];
+    }
+    void L;
+    return { serves, note: `${titleOf(c.id)}: roller in the cam's own groove (form-closed, so no spring); felt oiler over the groove; zero line on the cam.` };
+  },
+});
 
 // ------------------------------------------------------------------------------------------------ J5
 

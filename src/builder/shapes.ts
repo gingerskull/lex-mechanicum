@@ -35,6 +35,8 @@ export interface BodyGeom {
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
   pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number }[];
+  /** Shapes cut from or added to the part (a cam's groove), in the part's own coordinates (D8: a boolean result). */
+  features?: import("../solids/types").Feature[];
   /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
   plan?: Vec2[];
 }
@@ -173,7 +175,9 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    // `place`: the part starts that far along its frame's z, where the joints put it (a roller down in a groove), not on a slab
+    const placed = typeof shape.place === "number" ? { exact: { offset: shape.place } } : g.exact || fixed ? { exact: { offset: 0 } } : {};
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...placed };
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
@@ -340,6 +344,7 @@ const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * M
  */
 function plateCam(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
   if (String(g.shape.type) !== "cam" || g.shape.form === "barrel") return null;
+  if (g.shape.form === "face-groove") return faceGroove(kin, S, b, g);
   const j = kin.joints.find((q) => q.type === "cam-contact" && (q.b === b.id || q.a === b.id) && q.cam);
   const r = j ? S.joints.get(j.id) : undefined;
   if (!j || !r) return null;
@@ -350,4 +355,33 @@ function plateCam(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null 
   const outer = j.follower === "flat" || !rr ? flatCam(L) : rollerCam(L, rr);
   const bore = num(g.shape.bore, 8);
   return { ...g, profile: { outer, holes: [circle(bore / 2, 0, 0, 28).reverse()] }, thick: num(g.shape.thick, num(g.shape.thickness, THICK)), approx: false };
+}
+
+/**
+ * A face-groove cam (`cam` with `form: face-groove`): a plain disc of `radius` with the groove cut into its top face,
+ * the pitch curve offset by half the groove's `width` each side, `depth` deep. The roller runs on the pitch curve, so
+ * the groove's centre line is the law (the joint's rb is the pitch radius).
+ */
+function faceGroove(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const j = kin.joints.find((q) => q.type === "cam-contact" && (q.b === b.id || q.a === b.id) && q.cam);
+  const r = j ? S.joints.get(j.id) : undefined;
+  if (!j || !r) return null;
+  const uv = planeCoords(g.frame, r.at).uv;
+  const L = camLawOf(j, r.num, Math.atan2(uv[1], uv[0]));
+  if (!L) return null;
+  const gr = (g.shape.groove ?? {}) as Record<string, unknown>;
+  const w = num(gr.width, 10.2);
+  const depth = num(gr.depth, 6);
+  const thick = num(g.shape.thick, num(g.shape.thickness, 16));
+  const R = num(g.shape.radius, 75);
+  const bore = num(g.shape.bore, 10);
+  const outerWall = rollerCam(L, -w / 2);
+  const innerWall = rollerCam(L, w / 2).reverse();
+  return {
+    ...g,
+    profile: { outer: circle(R, 0, 0, 144), holes: [circle(bore / 2, 0, 0, 28).reverse()] },
+    thick,
+    approx: false,
+    features: [{ mode: "cut", profile: { outer: outerWall, holes: [innerWall] }, op: { op: "extrude", h: depth + 1, steps: 1 }, frame: { o: [0, 0, thick - depth], x: [1, 0, 0], z: [0, 0, 1] } }],
+  };
 }

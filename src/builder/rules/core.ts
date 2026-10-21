@@ -70,6 +70,7 @@ export const placement: Rule = {
         frame,
         profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
         op: extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
+        ...(g.features?.length ? { features: g.features } : {}),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),
