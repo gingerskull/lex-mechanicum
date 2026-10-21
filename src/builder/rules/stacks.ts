@@ -7,6 +7,7 @@ import { ownParts, type BuildCtx } from "../ctx";
 import { fromPlane, parallel, planeCoords, type Frame } from "../frames";
 import { type Member, titleOf } from "../lib";
 import { bossRadius } from "./core";
+import { beltDriven } from "./shared";
 import { axialStack, type StackResult, type StackSpec, type SupportKind } from "../stack";
 import { UP, type Site } from "../sites";
 import type { Rule } from "./types";
@@ -96,7 +97,7 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   if (!members.length) return null;
   const alongUp = parallel(frame.z, UP);
   const base = alongUp && ctx.base ? { top: ctx.base.top - frame.o[2], bottom: ctx.base.bottom - frame.o[2] } : null;
-  const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual");
+  const driver = ctx.kin.drivers.find((d) => beltDriven(d) || d.kind === "manual");
   const held = ctx.placement.held.get(site.id) ?? "both";
   const straddle = site.live && alongUp && held !== "base" && [...keyedIds].some((b) => ["gear", "pulley", "sprocket"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)));
   const spec: StackSpec = {

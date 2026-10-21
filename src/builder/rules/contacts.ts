@@ -138,34 +138,55 @@ const j5 = contactRule({
     const Ws = e[3] - e[2];
     const x0 = c.run[0] + e[0] - 10;
     const x1 = c.run[1] + e[1] + 10;
+    // a rack is guided from its back: its toothed side stays open for the pinion, which holds it against the gibbed rail
+    const rack = String(ctx.kin.bodies.find((b) => b.id === slider)?.shape?.type) === "rack";
+    const meshAt = rack ? ctx.kin.joints.find((j) => j.type === "gear-mesh" && (j.a === slider || j.b === slider)) : undefined;
+    const p0 = planeCoords(c.frame, c.at).uv;
+    const teeth = meshAt ? Math.sign(planeCoords(c.frame, ctx.S.joints.get(meshAt.id)!.at).uv[1] - p0[1] - (e[2] + e[3]) / 2) : 0;
+    // the gibbed side (1) is the one away from the teeth: mirror the build when the teeth face -y
+    const flip = teeth < 0 ? -1 : 1;
+    const ey = (k: 2 | 3): number => (flip > 0 ? e[k] : -e[k === 2 ? 3 : 2]);
+    const Y = (y: number): number => flip * y;
     const hostBody = bodyOf(ctx, host);
     const rh = w1 - w0 + 1.5;
     const gap = 3;
     // the reference rail (plain, dowelled) and the gibbed rail with its keeper (F1, F2, F7)
     const yr = Ws / 2 + 3.5;
-    const sideY: [number, number][] = [[0, e[3] + 3.5 + 0.5], [1, e[2] - 3.5 - 0.5 - gap]];
+    const sideY: [number, number][] = [[0, Y(ey(3) + 3.5 + 0.5)], [1, Y(ey(2) - 3.5 - 0.5 - gap)]];
     const mk = (k: number, y: number): Vec2[] => roundRect(x0, y - 3.5, x1, y + 3.5, 3.5);
     void yr;
     const baseTop = baseZ(ctx, c);
+    // a rack rides on a hardened strip under its back half instead of a rail on its toothed side
+    if (teeth) {
+      const ya = Y(ey(2) + 1);
+      const yb = Y(ey(2) + Math.min(Ws / 2, 14));
+      const strip = roundRect(x0 + 8, Math.min(ya, yb), x1 - 8, Math.max(ya, yb), 1);
+      if (w0 - baseTop > 2) L.add(H.plate(`${id}-way`, strip, { body: hostBody, kind: "plate", role: "ground", name: "Way under the rack's back, ground", z0: baseTop, z1: w0 - 1.5, mat: "Steel C45, ground" }));
+      L.add(H.wearStrip(`${id}-strip`, strip, { body: hostBody, z0: w0 - 1.5, z1: w0, name: "Wear strip under the rack, hardened" }));
+    }
     for (const [k, y] of sideY) {
+      if (teeth && k === 0) continue;
       L.add(H.plate(`${id}-rail${k}`, mk(k, y), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
       // a ground riser along the straight run (A6)
       if (w0 - baseTop > 0.5) L.add(H.plate(`${id}-riser${k}`, roundRect(x0, y - 6, x1, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
     }
     // gib on the gibbed side, between the slider and its rail (F7)
-    L.add(H.gib(`${id}-gib`, x1 - x0 - 20, { body: hostBody, at: [x0 + 10, e[2] - gap / 2 - 0.5, 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
+    L.add(H.gib(`${id}-gib`, x1 - x0 - 20, { body: hostBody, at: [x0 + 10, Y(ey(2) - gap / 2 - 0.5), 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
     // keeper plate over the gibbed rail, lapping the slider (F2)
-    const ky = e[2] - 3.5 - 0.5 - gap;
-    L.add(H.plate(`${id}-keeper`, roundRect(x0 + 8, ky - 5, x1 - 8, ky + 5 + 4, 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + 3, mat: "Aluminium 6061-T6, anodised" }));
+    const ky = Y(ey(2) - 3.5 - 0.5 - gap);
+    L.add(H.plate(`${id}-keeper`, roundRect(x0 + 8, Math.min(ky - 5 * flip, ky + 9 * flip), x1 - 8, Math.max(ky - 5 * flip, ky + 9 * flip), 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + 3, mat: "Aluminium 6061-T6, anodised" }));
     const nScrew = Math.max(2, Math.ceil((x1 - x0 - 16) / 100) + 1);
     for (let k = 0; k < nScrew; k++) {
       const x = x0 + 12 + ((x1 - x0 - 24) * k) / (nScrew - 1);
       L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + 3 + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + 3, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
     }
-    for (const [k, x] of [[0, x0 + 4], [1, x1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, e[3] + 4, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, reference rail to base", qty: 2 }) }));
+    // the dowels locate the reference rail, or the gibbed rail of a rack (its only rail)
+    const dy = teeth ? sideY[1]![1] : e[3] + 4;
+    for (const [k, x] of [[0, x0 + 4], [1, x1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, dy, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 h6, ${teeth ? "gibbed" : "reference"} rail to base`, qty: 2 }) }));
     // wipers at both ends of the slider and a grease nipple on the keeper (F8)
     const sb = bodyOf(ctx, slider);
-    for (const [k, x] of [[0, c.run[0] + e[0] - 3], [1, c.run[0] + e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    // on the slider's own ends, where it stands in the reference configuration
+    for (const [k, x] of [[0, e[0] - 3], [1, e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
     L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [(x0 + x1) / 2, ky, 0], z0: w0 + rh + 3, z1: w0 + rh + 3 + 9 }));
     // one end stop block with a neoprene pad just past each end of the travel (F5)
     for (const [k, x, s] of [[0, x0 + 1, 1], [1, x1 - 1, -1]] as const) {
@@ -174,8 +195,10 @@ const j5 = contactRule({
       L.add(H.bumper(`${id}-pad${k}`, 3, 8, { body: hostBody, at: [sx + s * 6, 0, 0], z0: w0 + 1, z1: w0 + 3, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
     }
     return {
-      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: [`${id}-stop0`, `${id}-stop1`], F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`] },
-      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on a dowelled reference rail and a gibbed rail under a keeper; wipers, a grease nipple and an end stop with a pad at each end of the ${(c.run[1] - c.run[0]).toFixed(0)} mm travel.`,
+      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: [`${id}-stop0`, `${id}-stop1`], F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`], ...(teeth ? { M14: [`${id}-strip`] } : {}) },
+      note: teeth
+        ? `${titleOf(id)}: ${Ls.toFixed(0)} mm rack guided from its back: a gibbed rail under a keeper and a hardened strip under its back half; its toothed side stays open, the pinion holds it against the gib, which sets the mesh; wipers, a grease nipple and an end stop with a pad at each end of the ${(c.run[1] - c.run[0]).toFixed(0)} mm travel.`
+        : `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on a dowelled reference rail and a gibbed rail under a keeper; wipers, a grease nipple and an end stop with a pad at each end of the ${(c.run[1] - c.run[0]).toFixed(0)} mm travel.`,
     };
   },
 });

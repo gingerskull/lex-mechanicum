@@ -124,6 +124,27 @@ export function gearOutline(z: number, m: number, ad = 1, de = 1.25, teeth?: (k:
   return pts;
 }
 
+/**
+ * A straight rack, 20° flanks: pitch line on y = 0, tips at +ad·m, roots at -de·m, its back at y = -h, from x0 to x1.
+ * Tooth centres at x = shift + k·πm.
+ */
+export function rackOutline(m: number, x0: number, x1: number, h: number, shift = 0, ad = 1, de = 1.25): Vec2[] {
+  const p = Math.PI * m;
+  const t = Math.tan(20 * D2R);
+  const half = (y: number) => p / 4 - y * t;
+  const pts: Vec2[] = [[x1, -h], [x0, -h]];
+  const k0 = Math.ceil((x0 - shift + half(-de * m)) / p);
+  const k1 = Math.floor((x1 - shift - half(-de * m)) / p);
+  pts.push([x0, -de * m]);
+  for (let k = k0; k <= k1; k++) {
+    const c = shift + k * p;
+    pts.push([c - half(-de * m), -de * m], [c - half(ad * m), ad * m], [c + half(ad * m), ad * m], [c + half(-de * m), -de * m]);
+  }
+  pts.push([x1, -de * m]);
+  // counter-clockwise, as every outer ring
+  return pts.reverse();
+}
+
 /** Link outline with boss radii r0 at (0, 0) and r1 at (L, 0), joined by outer tangents (D1). */
 export function taper(L: number, r0: number, r1: number, n = 40): Vec2[] {
   const a = Math.acos((r0 - r1) / L);

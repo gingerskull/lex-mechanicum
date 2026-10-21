@@ -257,14 +257,25 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
 }
 
+/**
+ * A driver the standard belt drive turns: a rotary input, or an oscillating one whose swing is more than a crank and
+ * link can give (over 180°): the motor then reverses at each end of the swing (V5).
+ */
+export const beltDriven = (d: { kind: string; range?: unknown; lo?: unknown; hi?: unknown }): boolean => {
+  if (d.kind === "rotary") return true;
+  if (d.kind !== "oscillating") return false;
+  const r = Array.isArray(d.range) ? (d.range as number[]) : [Number(d.lo), Number(d.hi)];
+  return Number.isFinite(r[0]) && Number.isFinite(r[1]) && Math.abs(r[1]! - r[0]!) > 180;
+};
+
 export const drive: Rule = {
   id: "drive",
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary"),
+  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some(beltDriven),
   apply(ctx) {
-    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
+    const drv = ctx.kin.drivers.find(beltDriven);
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
@@ -272,7 +283,10 @@ export const drive: Rule = {
     const st = ctx.stacks.get(site.id)!;
     const bb = ctx.base.bottom;
     const S: Vec2 = [site.at[0], site.at[1]];
-    const pz = bb - 28;
+    // the belt plane under the base, and under the shaft's housing where a tall stack hangs it lower
+    const housing = ctx.get(`${site.id}-housing`);
+    const hz = housing ? Math.min(...worldPoints(ctx.M, housing).map((p) => p[2])) : bb;
+    const pz = Math.min(bb - 28, hz - 7);
     if (st.w0 + (ctx.stacks.get(site.id) ? 0 : 0) > pz - 2 - 0) {
       // the shaft does not reach the belt plane (no housing): the drive is not built
       ctx.issues.push(`drive: the live shaft ${site.id} does not reach below the base`);
@@ -345,7 +359,7 @@ export const drive: Rule = {
     const tb = polar(M, 36, dir);
     ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
     ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));
-    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: "Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.${drv?.kind === "oscillating" ? " The input swings further than a crank and link can drive, so the motor reverses at each end of the swing, homed on the flag." : ""}`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
     void LEVER_WALL;
   },
 };

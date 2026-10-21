@@ -780,6 +780,13 @@
           },
           "at": {
             "joint": "S"
+          },
+          "frame": {
+            "origin": [
+              6.283,
+              -32,
+              0
+            ]
           }
         }
       ],
@@ -830,12 +837,14 @@
             -32,
             0
           ],
-          "z": [
-            16
-          ],
-          "rack": true,
-          "ratio": 32,
-          "note": "rack: travel mm per radian of pinion = pitch radius"
+          "note": "rack: the rack slides along +x by the pitch radius (32 mm) per radian of pinion",
+          "radiusA": 32,
+          "za": 16,
+          "axis2": [
+            1,
+            0,
+            0
+          ]
         }
       ],
       "params": [
@@ -894,19 +903,15 @@
           "block": "gear-mesh",
           "id": "mesh",
           "joints": [
-            "M",
-            "S"
+            "S",
+            "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "rack",
-            "za": "z",
-            "module": "m"
+            "joint": "M",
+            "input": "input"
           },
-          "out": "rack-x",
-          "opts": {
-            "rack": true,
-            "offset": 6.283
+          "out": {
+            "travel": "rack-x"
           }
         }
       ],
@@ -978,7 +983,7 @@
       "outputs": [
         {
           "id": "rack-travel",
-          "of": "rack-mark",
+          "of": "rack",
           "kind": "position",
           "unit": "mm"
         },
@@ -995,7 +1000,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The pinion swings 150 degrees each way and the rack slides 167.6 mm. A mark on the pinion's pitch circle and one on the rack's pitch line, both ticked every 30 degrees of input, show the same 16.8 mm per tick: the pitch circle rolls on the pitch line without slip. The line of action at 20 degrees is drawn through the pitch point."
+        "note": "Applies the 2026-10-19 review (keep). The pinion swings 150 degrees each way and the rack slides 167.6 mm. A mark on the pinion's pitch circle and one on the rack's pitch line, both ticked every 30 degrees of input, show the same 16.8 mm per tick: the pitch circle rolls on the pitch line without slip. The line of action at 20 degrees is drawn through the pitch point. Rebuild R4 (#215): built on v3 from this record; the rack is toothed on its pitch line and guided from its back (its toothed side open for the pinion); the pinion's 300 deg swing is driven by the belt drive with a reversing motor; the six phases of the finished build read as decided; the tooth-count choice is not offered as a control, the parts are built for 16 teeth."
       },
       "principle": [
         {

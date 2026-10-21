@@ -2,7 +2,7 @@
 // reference configuration. A link, plate, slot link, slider, gear, disc, wheel and shaft get their true outline; a body
 // whose shape is a profile of its own (cam, cage, cross, custom) gets the disc or box that holds its joints, flagged
 // `approx`, until the pilots (P) and the rebuild (R) give it a profile of its own.
-import { D2R, TAU, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
+import { D2R, TAU, capsule, circle, gearOutline, rackOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
 import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
@@ -134,9 +134,11 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       return { profile: { outer: circle(d / 2, 0, 0, 24), holes: [] }, thick: num(shape.length, 40), approx: false };
     }
     case "rack": {
+      // toothed along its pitch line (y = 0, the frame's x); the mesh phasing shifts the teeth to put a gap at the mesh
       const L = num(shape.length, 120);
       const h = num(shape.height, 20);
-      return { profile: { outer: roundRect(-L / 2, -h, L / 2, 0, 1), holes: [] }, thick: num(shape.face, 12), approx: false };
+      const m = num(shape.module, 0);
+      return { profile: { outer: m > 0 ? rackOutline(m, -L / 2, L / 2, h) : roundRect(-L / 2, -h, L / 2, 0, 1), holes: [] }, thick: num(shape.face, 12), approx: false };
     }
     default:
       break;
@@ -217,6 +219,15 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
     if (!at) continue;
     ([[j.a, 0], [j.b, 1]] as const).forEach(([id, k]) => {
       const g = geoms.get(id);
+      if (g && String(g.shape.type) === "rack" && num(g.shape.module, 0) > 0 && !turned.has(id)) {
+        // a rack: a gap on the mesh point (its partner turned a tooth onto it)
+        const m = num(g.shape.module, 0);
+        const L = num(g.shape.length, 120);
+        const x = planeCoords(g.frame, at).uv[0];
+        g.profile = { outer: rackOutline(m, -L / 2, L / 2, num(g.shape.height, 20), x + (Math.PI * m) / 2), holes: g.profile.holes };
+        turned.add(id);
+        return;
+      }
       if (!g || String(g.shape.type) !== "gear") return;
       const lv = meshLevel(g, j);
       const key = levelId(id, lv);

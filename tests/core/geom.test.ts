@@ -1,9 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { area, capsule, gearOutline, offsetPoly, roundedPoly, wrap, xf, xfPose, type Vec2 } from "../../src/core/geom";
+import { area, capsule, gearOutline, offsetPoly, rackOutline, roundedPoly, wrap, xf, xfPose, type Vec2 } from "../../src/core/geom";
 
 describe("geom", () => {
   it("roundedPoly of two points is the capsule", () => {
     expect(roundedPoly([[0, 0], [50, 0]], 8)).toEqual(capsule(50, 16));
+  });
+
+  it("rackOutline: teeth of pitch πm on the pitch line, tips at +m, roots at -1.25m, counter-clockwise", () => {
+    const m = 4;
+    const pts = rackOutline(m, -60, 60, 20, 0);
+    const tips = pts.filter(([, y]) => Math.abs(y - m) < 1e-9);
+    // two tip corners per tooth, centred on k·πm
+    const centres = [];
+    for (let i = 0; i < tips.length; i += 2) centres.push((tips[i]![0] + tips[i + 1]![0]) / 2);
+    centres.sort((a, b) => a - b);
+    for (let i = 1; i < centres.length; i++) expect(centres[i]! - centres[i - 1]!).toBeCloseTo(Math.PI * m, 9);
+    expect(centres.some((c) => Math.abs(c) < 1e-9)).toBe(true);
+    expect(Math.min(...pts.map((p) => p[1]))).toBe(-20);
+    expect(area(pts)).toBeGreaterThan(0);
   });
 
   it("gearOutline(14, 4) has 14 teeth, tip radius 32 and root radius 23", () => {
