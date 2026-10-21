@@ -577,7 +577,13 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
   switch (ov.kind) {
     case "line":
     case "chord": {
-      const a = pointOf(A, o.from), b = pointOf(A, o.to);
+      // a line drawn at a fixed pose (a toggle, an aim line at neutral) holds its driver at that value
+      const fixed = o.pose as { driver?: unknown; value?: unknown } | undefined;
+      const at = (ref: unknown) =>
+        fixed && typeof fixed.driver === "string" && typeof fixed.value === "number" && typeof ref === "string" && A.rt.scene.poser.pointAt
+          ? A.rt.scene.poser.pointAt({ [fixed.driver]: fixed.value }, ref)
+          : pointOf(A, ref);
+      const a = at(o.from), b = at(o.to);
       if (!a || !b) return;
       const ext = o.extend === true ? 0.25 : 0;
       const d = sub(b, a);

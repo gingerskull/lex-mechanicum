@@ -172,7 +172,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);
-    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point or joint`);
+    // an angle output may read a driver's own value (absolute, in the driver's units)
+    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !(o.kind === "angle" && drivers.has(o.of))) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or (for an angle) driver`);
   }
 
   // mobility (K11)

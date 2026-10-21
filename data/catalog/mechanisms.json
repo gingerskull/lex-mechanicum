@@ -9246,8 +9246,8 @@
             "a": "rocker-in",
             "b": "coupler",
             "at": [
-              64.28,
-              76.6,
+              64.27876096865394,
+              76.60444431189781,
               0
             ],
             "axis": [
@@ -9262,8 +9262,8 @@
             "a": "coupler",
             "b": "rocker-out",
             "at": [
-              124.28,
-              76.23,
+              124.27757556167113,
+              76.22728727199564,
               0
             ],
             "axis": [
@@ -9366,25 +9366,39 @@
             "out": "B"
           }
         ],
-        "points": [],
+        "points": [
+          {
+            "id": "X4",
+            "body": "ground",
+            "local": [
+              200,
+              0,
+              0
+            ]
+          }
+        ],
         "outputs": [
           {
             "id": "input-angle",
-            "of": "rocker-in",
+            "of": "input",
             "kind": "angle",
             "unit": "deg"
           },
           {
             "id": "output-angle",
-            "of": "rocker-out",
+            "of": "O4",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "X4",
+            "to": "B"
           },
           {
             "id": "transmission-angle",
             "of": "B",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "A",
+            "to": "O4"
           }
         ],
         "fallback": null
