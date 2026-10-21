@@ -365,6 +365,7 @@ export class Kinematics {
     run.drive();
     for (const step of this.kin.solve) run.runStep(step);
     run.resolveBodies(fb ?? { unknown: new Set((this.kin.fallback?.loops ?? []).flat()) });
+    run.readCycleDrivers();
     return { pose: run.pose(), hs: run.hs, fb: run.fbPoses };
   }
 
@@ -403,7 +404,8 @@ class Run implements BlockCtx {
 
   // ---- drivers: each rotates or slides the driven body of its joint relative to the driven joint's first body
   drive(): void {
-    const pending = this.k.kin.drivers.filter((d) => d.joint && d.kind !== "select");
+    // a driver the cycle sets through a block (a path the tip follows, inverse kinematics) is not applied here
+    const pending = this.k.kin.drivers.filter((d) => d.joint && d.kind !== "select" && !d.cycle);
     for (let guard = 0; pending.length && guard < 8; guard++) {
       for (let i = pending.length - 1; i >= 0; i--) {
         const d = pending[i]!;
@@ -619,6 +621,19 @@ class Run implements BlockCtx {
     }
   }
 
+  /** A driver the cycle sets through a block reads its value off the solved pose: its default plus its joint's turn. */
+  readCycleDrivers(): void {
+    for (const d of this.k.kin.drivers) {
+      if (!d.cycle || !d.joint) continue;
+      const r = this.s.joints.get(d.joint);
+      if (!r) continue;
+      const Xa = this.xfs.get(r.joint.a) ?? xf.id();
+      const Xb = this.xfs.get(r.joint.b) ?? xf.id();
+      const rel = xf.mul(xf.inv(Xa), Xb);
+      this.vals[d.id] = (this.s.defaults.get(d.id) ?? 0) + xf.angleAbout(rel, r.axis) * R2D;
+    }
+  }
+
   pose(): Pose {
     const points = new Map<string, Vec3>();
     for (const id of this.s.refPts.keys()) {
@@ -632,7 +647,12 @@ class Run implements BlockCtx {
     for (const [id, p] of this.pts) if (!points.has(id)) points.set(id, p);
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points, o.axis);
+      const v =
+        o.from && o.to
+          ? this.between(o.of, o.from, o.to, points)
+          : o.from && o.kind === "position" && points.has(o.of) && points.has(o.from)
+            ? v3.dist(points.get(o.of)!, points.get(o.from)!)
+            : this.output(o.kind, o.of, points, o.axis);
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {

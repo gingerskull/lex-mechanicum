@@ -143,7 +143,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
-    if (key === "kind" || key === "mode" || key === "form") return;
+    if (key === "kind" || key === "mode" || key === "form" || key === "shape") return;
     // a parameter expression (src/kin/expr.ts) is fine when every name in it is known
     if (isStr(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
@@ -229,7 +229,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (!isStr(ref) || !set.has(ref)) say(`control ${String(c.id)}: ${kind} "${String(ref)}" is not a ${kind === "param" || kind === "design" ? kind : "driver"} of kin`);
     else controlled.add(ref);
   }
-  for (const d of kin.drivers) if (!controlled.has(d.id)) say(`driver ${d.id} has no control (T14)`);
+  // a driver the cycle sets through a block (a path the tip follows) is the scrubber itself: no control of its own
+  for (const d of kin.drivers) if (!controlled.has(d.id) && !isObj((d as { cycle?: unknown }).cycle)) say(`driver ${d.id} has no control (T14)`);
 
   ids("teaching.traces", arr(t.traces));
   for (const tr of arr(t.traces) as Obj[]) {

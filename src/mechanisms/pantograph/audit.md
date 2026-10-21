@@ -1,180 +1,216 @@
 # Audit: Pantograph (pantograph)
-standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: audit+fix
+standard: 3.0 · date: 2026-10-21 · result: open · detail: full · pass: build
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 102 · FAIL 0 · N/A 19 · open: none
+PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.5 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #32 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | DATA · catalogue validator clean |
-| P3 | PASS | DATA / SITE · ratio (scaling, 2:1), axes, output character, backdrivable, other names, family, motion, level, dof and the drive (hand operated) |
-| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | DATA · motion, forces, benefits, limits; four uses with one line each |
-| P6 | PASS | DATA · Wikipedia and the Galileo Project page on Scheiner; two videos, a photo page, an animation; both real-world videos (Gorton engraver) checked: found, on topic, embeddable (YouTube oEmbed), kept |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts; lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · solve(): E = 2T exactly, plot constant 2; the elbow stays under 150° (max about 140°) as the text says |
-| P10 | PASS | HAND · paths for the pen (comet) and the stylus, velocity on both, arm and bar forces, elbow angle, scale plot (constant 2) |
-| P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
-| K1 | PASS | HAND · centres exact (link error 4e-14 mm); plating and hardware never move a pin |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · four tapered links, two custom plates (one the front strap of the elbow arm, A to M2), caps and the pen tracer |
-| K4 | PASS | HAND · roles driver, link, output, pin, trace; accent only on the input cap pO |
-| K5 | PASS | HAND · layers 0 to 2 at 10 mm; check clean, no INTERFERE, OVERLAP or WARN; ground pivot at -1, moving pins at 5.5 |
-| K6 | PASS | DATA · arms 110, bars 55, k 2, flower centre (72, 14), r 25 + 5 cos 5u; elbow branch +1; as the catalogue |
-| K7 | PASS | HAND · input manual on armO. The catalogue input is the stylus path; the model drives the stylus round it and the hand knob sits on the arm O-A, which is the part with the ground pivot the stops and the drive rule read (decision for David, see open items) |
-| D1 | PASS | HAND · tapered links sized to their bearings, boss rings, flush caps, ground pivot larger; same forms as the four-bar |
-| D2 | PASS | HAND · material in the web between bosses, bosses round every pin |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
-| D4 | PASS | AUTO · feet concentric with the corner arcs |
-| D5 | N/A | AUTO / HAND · one ground pivot with a housing behind the base; nothing needs a bridge or post pair |
-| D6 | PASS | HAND / STYLE · knob, stops and scale read quieter than the linkage |
-| D7 | PASS | HAND · arms and bars carry only load shape and manufacturing marks |
-| A1 | PASS | AUTO · pO J2, pA, pM1, pM2, pT J3 |
-| A2 | PASS | AUTO · pO live shaft (accent input, keyed arm); the four moving pins shoulder bolts |
-| A3 | PASS | AUTO · 6800 on the Ø10 input, F688ZZ in all four moving joints |
-| A4 | PASS | AUTO · stepped keyed shaft with circlip grooves; shoulder bolts with undercut |
-| A5 | PASS | AUTO · feather key 3 x 3 on the Ø10 input |
-| A6 | N/A | AUTO · no floating fixed plate |
-| A7 | PASS | AUTO · 8 mm base, counterbored corners, feet, front scale, clearance hole for the input shaft, both paths engraved |
-| A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 |
-| A9 | PASS | HAND · every moving joint is a clevis: the arm O-A and the bar T-M2 are middle plates, the arm A-E and the bar M1-T pairs round them (twins in the model, 1.5 mm clear); the input is carried from behind. The pen end is a single plate, carrying a pen, not a pin |
-| A10 | PASS | HAND · three layers only: the two middle plates share layer 1, the two pairs layers 0 and 2; nothing is stacked only to clear something |
-| A11 | PASS | HAND · knob and pull to the keyed arm, the shaft, the housing (screwed and dowelled) and the base; every moving pin carries its load in double shear through bearings to the bolt threaded into the rear plate |
+| S1 | ? | DATA |
+| S2 | ? | HAND |
+| S3 | ? | AUTO |
+| S4 | ? | SITE |
+| S5 | ? | SITE |
+| S6 | ? | AUTO |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | ? | DATA |
+| P3 | ? | DATA / SITE |
+| P4 | ? | DATA |
+| P5 | ? | DATA |
+| P6 | ? | DATA |
+| P7 | ? | HAND / SITE |
+| P8 | ? | SITE |
+| P9 | ? | AUTO / HAND |
+| P10 | ? | HAND |
+| P11 | ? | DATA |
+| P12 | ? | AUTO / DATA |
+| P13 | ? | HAND |
+| K1 | PASS | AUTO · K1 residual 8.5e-14 (tolerance 1e-9) over 360 samples, reference 5.7e-14 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | ? | AUTO / HAND · 4 blocks (target-path, dyad, lerp); no numeric fallback |
+| K4 | ? | HAND |
+| K6 | ? | DATA |
+| K7 | ? | DATA · drivers stylus (manual) |
+| K8 | ? | AUTO / DATA |
+| K9 | ? | DATA |
+| K10 | ? | AUTO / DATA |
+| K11 | PASS | AUTO · mobility counted 2, dof 2 |
+| K12 | ? | DATA |
+| T1 | ? | HAND |
+| T2 | ? | HAND |
+| T3 | ? | DATA |
+| T4 | ? | DATA · fired: trace-marks (1 solid) |
+| T5 | ? | DATA |
+| T6 | ? | HAND / DATA |
+| T7 | ? | DATA |
+| T8 | ? | DATA |
+| T9 | PASS | AUTO / DATA · claim table: 6 ok, 0 off, 0 uncheckable of 6 |
+| T10 | ? | AUTO · 7 solids drawn see-through: O-slv, O-bb, O-ecl, O-axle-s2, O-axle-s4, O-axle-s5, O-bridge |
+| T11 | ? | AUTO · 1 support routed, 1 moved off a sweep |
+| T12 | PASS | HAND · 10 support solids; dropped by the polish: none |
+| T13 | ? | DATA |
+| T14 | ? | HAND / DATA |
+| T15 | ? | HAND |
+| T16 | ? | HAND / STYLE |
+| T17 | ? | AUTO |
+| D1 | ? | HAND · fired: wheels (no solids) |
+| D2 | ? | HAND |
+| D3 | ? | STYLE |
+| D4 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
+| D5 | ? | AUTO / HAND |
+| D6 | ? | HAND / STYLE |
+| D8 | ? | AUTO / HAND |
+| D9 | ? | AUTO / HAND |
+| D10 | ? | AUTO |
+| D11 | PASS | AUTO · SOLID: 0 of 74 solids unsound |
+| D7 | ? | HAND |
+| A1 | ? | AUTO · A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops |
+| A2 | ? | AUTO · A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops |
+| A3 | ? | AUTO · fired: classify (5 solids), axial stack builder |
+| A4 | ? | AUTO · fired: j1-dead-axle (26 solids), axial stack builder |
+| A5 | ? | AUTO · fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), axial stack builder |
+| A6 | ? | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) |
+| A7 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
+| A8 | ? | AUTO · fired: fasteners (3 solids) |
+| A9 | ? | AUTO / HAND · fired: placement solver |
+| A10 | ? | HAND · fired: placement (8 solids), placement solver |
+| A11 | ? | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (26 solids) |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · named catalogue sizes; the 47 unnamed solids are further items of a listed set; the turnbuckle named with its M3 thread and stud length |
-| A14 | PASS | HAND · stop posts found outside every sweep of the whole linkage (clearance 1 mm or more); the knob clear of the bars over the whole range |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · a note and a badge on every joint, five build rules |
-| A17 | PASS | HAND · housing and shaft from below; arm, rear plates (the elbow arm's two halves first joined and set on the turnbuckle at 110 mm), middle plates, front plates, bolts from the top, knob last; every head reachable; the turnbuckle body and nuts open to a spanner past the front strap |
-| E1 | PASS | AUTO · one level per solid |
-| E2 | PASS | AUTO · 18 rigid groups: bolts, stop screws, shaft stack |
-| E3 | PASS | AUTO · bolts and stop screws up, housing screws down |
-| E4 | PASS | HAND · front plates and bolts go first, then middle plates, then rear plates; checked in explode at 28° and 70° |
-| E5 | PASS | AUTO · bearings and circlips stay in their plates; the turnbuckle stays in the rear plate's plane with both halves (it is assembled along the arm, not up a pin axis) |
-| E6 | N/A | AUTO · no bought unit besides the bearings (hand operated, no motor) |
-| E7 | PASS | AUTO · spacers midway |
-| E8 | PASS | AUTO · arm and key keep their order on the input shaft |
-| E9 | PASS | HAND · readable at full explode at 28° and 70°; nothing leaves the frame |
-| J1 | N/A | no dead axle |
-| J2 | PASS | AUTO · input: housing with two sealed bearings, sleeve, wave washer, circlips, screwed and dowelled; keyed shaft, end retainer, thrust washer |
-| J3 | PASS | AUTO · A, M1, M2, T: shoulder bolts threaded into the rear plates, bearings in the middle plates, inner-race spacers, threadlocked; clevis everywhere (model) |
-| J4 | N/A | no pin in a slot |
-| J5 | N/A | no slide |
-| J6 | N/A | no gear mesh |
-| J7 | N/A | no cam |
-| J8 | N/A | no belt (hand operated) |
-| F1 | PASS | AUTO · housing dowelled to the base; no removable bearing plate on a moving pin |
-| F2 | PASS | AUTO · bearings held by a circlip and their flange; bolt heads; shaft end retainer; the turnbuckle body held by its two jam nuts |
-| F3 | PASS | AUTO · feather key at the input |
-| F4 | PASS | AUTO · bronze thrust washer on the base under the arm, wave washer preloading the input |
-| F5 | PASS | AUTO / HAND · rubber-faced stops either side of the arm's swing (28° to 92°): the upper from the rule, the lower placed by hand because the rule's spot is inside the working zone |
-| F6 | N/A | hand held; a position is held by the hand, and friction in the sealed bearings keeps it |
-| F7 | PASS | HAND · the pen stays on the line O-T at exactly 2 : 1 only while M2 divides the elbow arm as M1 divides the arm O-A (A-M2 : A-E = O-M1 : O-A). M1 and M2 are free pins, so H.eccentricMount does not apply: H.turnbuckle on the elbow arm's rear plate between M2 and the pen sets A-E against the drilled A-M2, M3 left and right hand studs, a 12 x 6 x 15 body milled flat, two DIN 439 jam nuts, flush in the plate's plane; set at 110 mm, drawn length exact. The front plate is a strap from A to M2 (model), so the turnbuckle is in view |
-| F8 | PASS | AUTO · shielded bearings greased for life, sealed bearings in the input |
-| F9 | PASS | HAND · the arm's swing engraved on the base as a scale, with an index line on the arm tip |
-| F10 | N/A | hand operated: no pulley, flag or sensor; the stops protect the linkage's end of travel |
-| M1 | PASS | AUTO · edge breaks on every top face |
-| M2 | N/A | HAND · slow hand-driven parts of small mass; no window or hub needed |
-| M3 | PASS | AUTO · bore entry chamfers on every seat and through hole |
-| M4 | PASS | AUTO / HAND · counterbored housing screws and base corners |
-| M5 | N/A | AUTO / HAND · no milled pockets or windows |
+| A13 | ? | AUTO / HAND · 74 solids, 41 unnamed (further items of a listed set) |
+| A14 | ? | AUTO / HAND · fired: support router |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | ? | HAND · 6 joint notes; no note: none; no badge: none |
+| A17 | ? | HAND |
+| A18 | ? | AUTO · placement: 2 slabs in the tallest stack (16.0 mm), 0 clevises; stack per joint in the Joints table |
+| A19 | ? | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O-bridge |
+| A20 | ? | AUTO · support per joint: O bridge |
+| A21 | PASS | AUTO · kit per joint: A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops |
+| A22 | ? | AUTO · fired: stops (4 solids), adjustable-length (no solids), cable-clip (no solids) |
+| E1 | ? | AUTO · every solid has one explode level; levels -2 to 2.5 |
+| E2 | ? | AUTO · fired: explode (1 solid) |
+| E3 | ? | AUTO · fired: explode (1 solid) |
+| E4 | ? | HAND |
+| E5 | ? | AUTO · fired: explode (1 solid) |
+| E6 | ? | AUTO · fired: explode (1 solid) |
+| E7 | ? | AUTO · fired: explode (1 solid) |
+| E8 | ? | AUTO · fired: explode (1 solid) |
+| E9 | ? | HAND |
+| E10 | ? | AUTO · fired: explode (1 solid) |
+| J1 | ? | AUTO · fired: trunnion (no solids), j1-dead-axle (26 solids) |
+| J2 | ? | AUTO · fired: j2-live-shaft (no solids) |
+| J3 | ? | AUTO · fired: j3-moving-pin (36 solids), cross-bearings (no solids), ring-hub (no solids) |
+| J4 | ? | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) |
+| J5 | ? | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) |
+| J6 | ? | AUTO · fired: j6-mesh (no solids), ring-rollers (no solids) |
+| J7 | ? | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) |
+| J8 | ? | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) |
+| J9 | ? | AUTO · fired: j9-crossed-mesh (no solids) |
+| J10 | ? | AUTO · fired: j10-shaft-in-plan (no solids) |
+| J12 | ? | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) |
+| J13 | ? | AUTO · fired: j13-compliant (no solids) |
+| J11 | ? | AUTO · fired: j11-screw (no solids) |
+| F1 | ? | AUTO · served at O; fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F2 | ? | AUTO · served at A, M1, M2, T, O; fired: wheels (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F3 | ? | AUTO · served at A, M1, M2, T; fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
+| F4 | ? | AUTO / HAND · served at O; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (no solids), trunnion (no solids) |
+| F5 | ? | AUTO / HAND · served at O-arm-O-stops; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (4 solids) |
+| F6 | ? | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) |
+| F7 | ? | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) |
+| F8 | ? | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (1 solid) |
+| F9 | ? | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (2 solids) |
+| F10 | ? | AUTO / HAND · served at no joint; fired: j12-flexible (no solids), drive (no solids) |
+| M1 | ? | AUTO · fired: hardware primitives |
+| M2 | ? | HAND |
+| M3 | ? | AUTO · fired: j3-moving-pin (36 solids), hardware primitives |
+| M4 | ? | AUTO / HAND · fired: base (3 solids), fasteners (3 solids) |
+| M5 | ? | AUTO / HAND · fired: hardware primitives |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | PASS | HAND · every plate is a hull of circles; no inside corner |
-| M8 | PASS | AUTO · undercuts on every shoulder bolt thread |
-| M9 | PASS | AUTO / HAND · bolts into the steel rear plates over full thickness; standard lengths |
-| M10 | PASS | AUTO / HAND · every solid names its material |
-| M11 | PASS | AUTO · centre holes and chamfered ends on the shaft |
-| M12 | PASS | HAND · every head reachable; bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw, including the added stop screw; turnbuckle studs threadlocked into the halves, the body locked by jam nuts |
-| M14 | N/A | no sliding contact |
-| V1 | N/A | hand operated (manual input): no motor |
-| V2 | N/A | hand operated: no bracket |
-| V3 | N/A | hand operated: no belt |
-| V4 | N/A | hand operated: no pulleys |
-| V5 | PASS | AUTO · manual: a knob Ø12 on the input arm and stops at both ends of its swing; the page says hand operated (the knob was moved by hand onto the arm's axis: the rule put it off the narrow link) |
-| V6 | N/A | hand operated: no sensor or cable |
-| L1 | PASS | STYLE · lint-style clean |
-| L2 | PASS | HAND · the polish carries geometry, roles, marks and materials only |
-| L3 | PASS | HAND · arm O-A driver, other plates output, bars link, hardware hw |
-| L4 | PASS | HAND / STYLE · accent on the input only |
-| L5 | PASS | AUTO / HAND · screws, bearings and the pen are real solids in real holes |
-| L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
-| L7 | PASS | STYLE · tilt 0° to 88°, no shear |
-| L8 | PASS | AUTO / HAND · engraved paths and the swing scale are marks |
-| R1 | PASS | HAND · the polish reuses H.bumper, H.screw, H.turnbuckle, locking and materials; the custom front strap uses the part family; no inline standard part |
-| R2 | PASS | HAND · threads M3, M4, M5, M6; joints Ø8, Ø10; two bearing sizes |
-| R3 | PASS | AUTO · housing and drive from their subassemblies |
-| R4 | PASS | AUTO · package built at build time |
-| R5 | PASS | HAND · states only what differs; one stop search (about 30 clearance probes), polish under 40 ms |
-| R6 | PASS | FLAG · Node CPU bench, DPR 1.5: plan 234, 28° 280, side 184, explode 211 ms at full detail; no dial position reaches 8 ms on this CPU bench (20 ms at dial H, 75 at C). Slower than the browser figures of other audits; flag, to look at in #14 |
-| R7 | PASS | HAND · model.ts + polish.ts 10.7 KB |
-| R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the turnbuckle body and nuts DL-H, the studs and the arm's second half never; the polish moves nothing |
-| DL2 | PASS | HAND · default dial full |
-| DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
-| DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
-| DL5 | PASS | FLAG · rung counts and frame times in the detail ladder below |
+| M7 | ? | HAND |
+| M8 | ? | AUTO · fired: j1-dead-axle (26 solids) |
+| M9 | ? | AUTO / HAND · fired: j1-dead-axle (26 solids) |
+| M10 | ? | AUTO / HAND · 70 of 74 solids name a material |
+| M11 | ? | AUTO · fired: j1-dead-axle (26 solids), hardware primitives |
+| M12 | ? | HAND |
+| M13 | ? | AUTO / HAND · 10 threaded |
+| M14 | ? | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) |
+| V1 | ? | AUTO · fired: drive (no solids) |
+| V2 | ? | AUTO · fired: drive (no solids) |
+| V3 | ? | AUTO / HAND · fired: drive (no solids) |
+| V4 | ? | AUTO · fired: j8-belt (no solids) |
+| V5 | ? | AUTO · fired: drive (no solids) |
+| V6 | ? | AUTO · fired: drive (no solids), cable-clip (no solids) |
+| L1 | ? | STYLE |
+| L2 | ? | HAND |
+| L3 | ? | HAND |
+| L4 | ? | HAND / STYLE |
+| L5 | ? | AUTO / HAND · fired: see-through (7 solids) |
+| L6 | ? | AUTO |
+| L7 | ? | STYLE |
+| L8 | ? | AUTO / HAND · fired: trace-marks (1 solid) |
+| L9 | ? | AUTO / DATA |
+| L10 | ? | AUTO / STYLE |
+| R1 | ? | HAND |
+| R2 | ? | HAND |
+| R3 | ? | AUTO · fired: hardware primitives |
+| R4 | ? | AUTO · package v2 14.3 KB |
+| R5 | ? | HAND |
+| R6 | ? | FLAG |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | ? | AUTO / SITE |
+| R9 | ? | AUTO / SITE |
+| R10 | ? | FLAG |
+| DL1 | ? | AUTO / HAND · 24 of 74 solids on a dropping rung |
+| DL2 | ? | HAND |
+| DL3 | ? | AUTO |
+| DL4 | ? | SITE |
+| DL6 | ? | AUTO |
+| DL5 | ? | FLAG |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 17.0 KB; site build and site tests pass |
-| Q4 | PASS | plan, 28°, side, explode at 28° and 70°, both sheets, looked at one by one, again with the turnbuckle |
-| Q5 | PASS | Node CPU bench at DPR 1.5; flags under R6 |
-| Q6 | PASS | every row judged; no FAIL |
-| Q7 | PASS | conformance: pantograph at 2.5, pass |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | ? | package v2 written, 14.3 KB; site build not checked here |
+| Q4 | ? | local: tools/shot |
+| Q5 | ? | local: tools/bench |
+| Q6 | ? |  |
+| Q7 | ? |  |
+| Q8 | ? | teaching review: keep (2026-10-20); the six phases of the finished build are looked at by eye |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pO | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – stops on the arm (drive) | – held by the hand | – no adjustable length | – sealed bearings | Index line on the arm tip, swing scale on the base | – hand operated, nothing to protect |
-| pA | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – the front plate is clamped on the shoulder; no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage and the stops | – held by the hand | – see armE-adjust | – shielded bearing, greased for life | – no phase to keep | – none needed |
-| pM1 | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – the front plate is clamped on the shoulder; no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – held by the hand | – drilled at the arm's midpoint; M2 is set to match at armE-adjust | – shielded bearing, greased for life | – no phase to keep | – none needed |
-| pM2 | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – the front plate is clamped on the shoulder; no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – held by the hand | – its share of the elbow arm is set at armE-adjust | – shielded bearing, greased for life | – no phase to keep | – none needed |
-| pT | J3 | – no removable plate on a moving pin | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – the front plate is clamped on the shoulder; no keyed part | F688ZZ located by flange and circlip, inner race clamped | – limited by the linkage | – held by the hand | – no adjustable length | – shielded bearing, greased for life | – no phase to keep | – none needed |
-| drive | drive | – knob on a shoulder screw in the arm | – shoulder screw M4 | – hand torque on the knob | – the arm rides on its thrust washer | Stop bumper, neoprene sleeve Ø12 | – held by the hand | – none | – no sliding contact | – the swing scale | – hand operated: no flag, sensor or cable |
-| armE-adjust | post | – the halves are located by the studs in the body | 2 x Jam nut M3 (DIN 439), one left hand and one right hand | – static: the studs are threadlocked into the halves | – static | – static | – static | Turnbuckle body 12 x 6 x 15, milled flat, M3 left and right hand; 2 x Jam nut M3 (DIN 439), one left hand and one right hand; 2 x Stud M3 x 13.8, one left hand and one right hand, threadlocked into the halves | – static | Index line across the body at the set point | – static |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| M1 | J3 | lerp | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| M2 | J3 | – | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| T | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| O | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
+| O-arm-O-stops | stops | – | – | – | none | none | none | none | Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| O-bridge | O | bridge | moved | 1.5 | arm-O | see-through |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| drive knob | Ø12 knob on the arm at 85% of its reach, off the link's axis (local y 101) | moved onto the axis at x 30, between the input boss and the M1 boss | the rule's offsets assume a broad part; on a 19 mm link the knob hung beside the arm. Promotion candidate |
-| drive stops | upper stop placed, lower one dropped (no clear spot at the rule's fixed radius 84) | lower stop added by hand at r 31 from the pivot, outside every sweep | F5; the working zone fills the base round the rule's radius |
-| elbow arm A-E | clevis pair over the full length | front plate a strap from A to M2 (model) | the clevis is needed at A and M2 only; the pen is a tracer on the rear plate (the check treats a tracer inside a twin as a pin out of range), and the turnbuckle past M2 stays in view |
-| elbow arm A-E, rear plate | one plate from A to the pen | two halves on one body, joined by H.turnbuckle between M2 and the pen | F7: the 2 : 1 scale needs A-M2 : A-E = O-M1 : O-A, set at this one length |
-| pen | n/a | tracer on the rear plate at layer 0 | as above |
-| arms and bars | middle plates single, pairs round them | in the model (twin, dz) | A9: double shear at every moving joint |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 12 | 0 | 170.6 |
-| DL-B | 0 | 214 | 197.8 |
-| DL-C | 0 | 0 | 75.4 |
-| DL-D | 28 | 0 | 32.7 |
-| DL-E | 0 | 0 | 23.3 |
-| DL-F | 0 | 0 | 21.0 |
-| DL-G | 0 | 0 | 23.0 |
-| DL-H | 7 | 0 | 20.2 |
-| never | 59 | 173 | 271.0 (full) |
+| DL-A | 10 | 0 | ? |
+| DL-B | 0 | 124 | ? |
+| DL-C | 0 | 0 | ? |
+| DL-D | 10 | 0 | ? |
+| DL-E | 0 | 1 | ? |
+| DL-F | 0 | 0 | ? |
+| DL-G | 0 | 0 | ? |
+| DL-H | 4 | 0 | ? |
+| never | 50 | 151 | ? |
 
 ## Promotion candidates
-Hand fixes that should become rules or primitives.
-
-- Manual drive (`drive.ts`, `manual()`): the knob candidates are offset from the link's axis by `reach * f` at four
-  angles, so a narrow link gets a knob beside it; try the part's own axis first, between its bosses. Seen here
-  (pantograph arm O-A).
-- `stops()` uses one fixed radius per stop (`max(20, 0.7 * reach)`) and gives up when the working zone covers it. Let it
-  search over radius as well, as this polish does; the lower stop here came from a radius search.
-- A tracer that falls inside a clevis twin (a pen at the end of a clevis plate) is flagged WARN by `checkModel` unless the
-  twin is cut short. Either the check should skip twins of the tracer's host, or the tracer should take a `span`.
+None yet.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.8 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (scratch PNGs, looked at, again with the turnbuckle; attach to #32) · bench: Node CPU at DPR 1.5, 2026-10-18, before the turnbuckle (not re-run; 5 small solids added); 28° frame 280 ms at full detail, 8 ms not reached at any dial position (flag, R6)
-open: none
+check: clean · K1 residual: 8.5e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.3 KB
+screenshots: ? · bench: ?

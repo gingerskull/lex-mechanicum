@@ -2398,8 +2398,8 @@
           "a": "crank-left",
           "b": "distal-left",
           "at": [
-            -22.28,
-            55.71,
+            -22.27881362378541,
+            55.71045201321412,
             0
           ],
           "axis": [
@@ -2414,8 +2414,8 @@
           "a": "crank-right",
           "b": "distal-right",
           "at": [
-            102.28,
-            29.44,
+            102.27833864382097,
+            29.444444444444443,
             0
           ],
           "axis": [
@@ -2526,10 +2526,10 @@
             95,
             175
           ],
-          "default": 111.8,
+          "default": 111.79665078259171,
           "cycle": {
-            "from": "ik-left",
-            "note": "the cycle runs the tip round the target; this crank angle comes from the inverse kinematics"
+            "from": "ik",
+            "note": "the cycle runs the tip round the target; the crank angles come from the inverse kinematics"
           }
         },
         {
@@ -2540,79 +2540,60 @@
             5,
             85
           ],
-          "default": 29.39,
+          "default": 29.3892799478888,
           "cycle": {
-            "from": "ik-right",
-            "note": "as crank-left"
+            "from": "ik",
+            "note": "the cycle runs the tip round the target; the crank angles come from the inverse kinematics"
           }
         }
       ],
       "solve": [
         {
-          "block": "new:target-path",
+          "block": "target-path",
           "id": "target",
+          "joints": [
+            "P"
+          ],
           "in": {
+            "shape": "rounded-square",
             "cx": "tx",
             "cy": "ty",
             "side": "side",
             "corner": "corner"
           },
-          "out": "T",
-          "opts": {
-            "shape": "rounded-square",
-            "direction": "ccw",
-            "start": "middle of the right side",
-            "speed": "constant along the path"
-          }
+          "out": "P"
         },
         {
-          "block": "dyad",
-          "id": "ik-left",
-          "in": {
-            "a": "O1",
-            "b": "T",
-            "ra": "l1",
-            "rb": "l2"
-          },
-          "branch": "elbows",
-          "out": "A-target",
-          "opts": {
-            "side": 1,
-            "sets": "crank-left"
-          }
-        },
-        {
-          "block": "dyad",
-          "id": "ik-right",
-          "in": {
-            "a": "O2",
-            "b": "T",
-            "ra": "l1",
-            "rb": "l2"
-          },
-          "branch": "elbows",
-          "out": "B-target",
-          "opts": {
-            "side": -1,
-            "sets": "crank-right"
-          }
-        },
-        {
-          "block": "dyad",
-          "id": "tip-close",
+          "block": "five-bar",
+          "id": "ik",
           "joints": [
             "A",
-            "B",
-            "P"
+            "B"
           ],
           "in": {
-            "a": "A",
-            "b": "B",
-            "ra": "l2",
-            "rb": "l2"
+            "mode": "ik",
+            "A1": "O1",
+            "A2": "O2",
+            "l1": "l1",
+            "l2": "l1",
+            "l3": "l2",
+            "l4": "l2",
+            "target": "P",
+            "elbow1": 1,
+            "elbow2": -1,
+            "cranks": [
+              "crank-left",
+              "crank-right"
+            ],
+            "joints": [
+              "O1",
+              "O2"
+            ]
           },
-          "branch": "tip",
-          "out": "P"
+          "out": {
+            "E1": "A",
+            "E2": "B"
+          }
         }
       ],
       "points": [],
@@ -2638,7 +2619,9 @@
           "id": "tip-angle",
           "of": "P",
           "kind": "angle",
-          "unit": "deg"
+          "unit": "deg",
+          "from": "A",
+          "to": "B"
         }
       ],
       "fallback": null
@@ -2704,16 +2687,6 @@
       ],
       "view": "PLAN",
       "controls": [
-        {
-          "id": "crank-left",
-          "kind": "driver",
-          "driver": "crank-left"
-        },
-        {
-          "id": "crank-right",
-          "kind": "driver",
-          "driver": "crank-right"
-        },
         {
           "id": "target-size",
           "kind": "param",
@@ -2884,8 +2857,8 @@
           "a": "arm-O",
           "b": "arm-E",
           "at": [
-            96.73,
-            52.37,
+            96.73351644295707,
+            52.37009448702716,
             0
           ],
           "axis": [
@@ -2900,8 +2873,8 @@
           "a": "arm-O",
           "b": "bar-M1",
           "at": [
-            48.37,
-            26.19,
+            48.366758221478534,
+            26.18504724351358,
             0
           ],
           "axis": [
@@ -2916,8 +2889,8 @@
           "a": "arm-E",
           "b": "bar-M2",
           "at": [
-            150.37,
-            40.19,
+            150.36675822147853,
+            40.18504724351358,
             0
           ],
           "axis": [
@@ -3007,26 +2980,24 @@
           "default": 0,
           "cycle": {
             "from": "flower",
-            "note": "the cycle moves the stylus T once round the target flower"
+            "note": "the cycle moves the stylus T once round the flower"
           }
         }
       ],
       "solve": [
         {
-          "block": "new:target-path",
+          "block": "target-path",
           "id": "flower",
+          "joints": [],
           "in": {
+            "shape": "flower",
             "cx": "cx",
             "cy": "cy",
             "r0": "r0",
-            "lobe": "lobe"
+            "lobe": "lobe",
+            "lobes": 5
           },
-          "out": "S",
-          "opts": {
-            "shape": "flower",
-            "lobes": 5,
-            "law": "r = r0 + lobe cos 5u"
-          }
+          "out": "T"
         },
         {
           "block": "dyad",
@@ -3042,16 +3013,25 @@
             "rb": "h"
           },
           "branch": "elbow",
-          "out": "M1",
-          "opts": {
-            "note": "A = 2 M1"
-          }
+          "out": "M1"
+        },
+        {
+          "block": "lerp",
+          "id": "elbow",
+          "joints": [
+            "A"
+          ],
+          "in": {
+            "a": "O",
+            "b": "M1",
+            "t": 2
+          },
+          "out": "A"
         },
         {
           "block": "dyad",
           "id": "rhombus",
           "joints": [
-            "A",
             "M2"
           ],
           "in": {
@@ -3060,10 +3040,8 @@
             "ra": "h",
             "rb": "h"
           },
-          "out": "M2",
-          "opts": {
-            "pick": "the root that is not M1, closing the rhombus M1-A-M2-T"
-          }
+          "branch": "elbow",
+          "out": "M2"
         }
       ],
       "points": [
@@ -3098,7 +3076,9 @@
           "id": "elbow-angle",
           "of": "A",
           "kind": "angle",
-          "unit": "deg"
+          "unit": "deg",
+          "from": "O",
+          "to": "E"
         },
         {
           "id": "stylus-reach",
@@ -3172,13 +3152,7 @@
         }
       ],
       "view": "PLAN",
-      "controls": [
-        {
-          "id": "stylus",
-          "kind": "driver",
-          "driver": "stylus"
-        }
-      ],
+      "controls": [],
       "plot": {
         "x": "stylus",
         "y": "scale",

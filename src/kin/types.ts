@@ -108,6 +108,8 @@ export interface KinDriver {
   /** A selector's named options, each setting values of other drivers and params. */
   options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }>;
   value?: string; // a selector's current option
+  /** Set by the cycle through a block (a target path and inverse kinematics), not applied as a joint motion. */
+  cycle?: { from?: string; note?: string };
 }
 
 export interface SolveStep {

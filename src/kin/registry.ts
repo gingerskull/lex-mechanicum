@@ -3,7 +3,7 @@
 // listed above it.
 import { type BlockFn, type BlockCtx, KinError } from "./ctx";
 import { type SolveStep } from "./types";
-import { D2R, type Vec3, m3, v3, xf, R2D } from "./math";
+import { D2R, TAU, type Vec3, m3, v3, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
@@ -527,6 +527,53 @@ const lineCrossing: BlockFn = (c, s) => {
   outPoint(c, s, v3.add(p, v3.mul(u, rho)));
 };
 
+/**
+ * target-path. A point that goes once round a closed curve per cycle, from the cycle phase itself: the target a tip or a
+ * stylus follows, the linkage closing on it by inverse kinematics. in.shape "rounded-square": cx, cy (centre), side,
+ * corner (radius), at constant speed along the outline, counter-clockwise from the middle of the right side; "flower":
+ * cx, cy, r0, lobe, lobes (default 5): r = r0 + lobe cos(lobes u) at the polar angle u. n (plane normal) is +z.
+ */
+const targetPath: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const cx = c.num(i.cx), cy = c.num(i.cy);
+  const u = ((c.u % TAU) + TAU) % TAU;
+  if (i.shape === "flower") {
+    const r = c.num(i.r0) + c.num(i.lobe) * Math.cos(c.num(i.lobes ?? 5) * u);
+    outPoint(c, s, [cx + r * Math.cos(u), cy + r * Math.sin(u), 0]);
+    return;
+  }
+  if (i.shape !== "rounded-square") throw new KinError(`target-path ${s.id}: unknown shape ${String(i.shape)}`);
+  outPoint(c, s, roundedSquareAt(cx, cy, c.num(i.side), c.num(i.corner), u / TAU));
+};
+
+/** A point at the fraction f of the way round a rounded square, counter-clockwise from the middle of its right side. */
+export function roundedSquareAt(cx: number, cy: number, side: number, corner: number, f: number): Vec3 {
+  const h = side / 2;
+  const st = side - 2 * corner;
+  const arc = (Math.PI / 2) * corner;
+  const total = 4 * (st + arc);
+  let L = ((((f % 1) + 1) % 1) * total + st / 2) % total; // from the bottom of the right side's straight run
+  // four sides in turn: right (up), top (left), left (down), bottom (right); each a straight run then a corner
+  const dirs: [number, number][] = [[0, 1], [-1, 0], [0, -1], [1, 0]];
+  const starts: [number, number][] = [[h, -h + corner], [h - corner, h], [-h, h - corner], [-h + corner, -h]];
+  for (let k = 0; k < 4; k++) {
+    const [dx, dy] = dirs[k]!;
+    const [sx, sy] = starts[k]!;
+    if (L <= st) return [cx + sx + dx * L, cy + sy + dy * L, 0];
+    L -= st;
+    if (L <= arc || k === 3) {
+      // the corner's centre is inward of the run's end; it turns a quarter, counter-clockwise
+      const ex = sx + dx * st, ey = sy + dy * st;
+      const ox = ex - dy * corner, oy = ey + dx * corner;
+      const a0 = Math.atan2(ey - oy, ex - ox);
+      const a = a0 + Math.min(L, arc) / corner;
+      return [cx + ox + corner * Math.cos(a), cy + oy + corner * Math.sin(a), 0];
+    }
+    L -= arc;
+  }
+  return [cx + h, cy, 0];
+}
+
 void sideOf;
 void angleFrom;
 
@@ -548,4 +595,5 @@ export const BLOCKS: Record<string, BlockFn> = {
   indexer,
   lerp,
   "line-crossing": lineCrossing,
+  "target-path": targetPath,
 };

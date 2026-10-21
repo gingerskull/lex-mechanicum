@@ -738,6 +738,15 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const pt = typeof o.point === "string" ? o.point : "";
       const poser = A.rt.scene.poser;
       const pts: Vec3[] = [];
+      // the outline a tip reaches over two drivers' ranges (a five-bar's workspace)
+      if (Array.isArray(o.over) && o.over.length === 2 && poser.area) {
+        const out = poser.area(pt, [String(o.over[0]), String(o.over[1])]);
+        if (out) {
+          poly(out, true);
+          tag(out[Math.floor(out.length / 8)]!, 0, -12);
+        }
+        return;
+      }
       // the point's path seen from a moving body, carried by that body now: the centrode that rolls on the fixed one
       if (typeof o.frame === "string" && poser.bodyAt) {
         const now = poser.bodyAt(A.u, o.frame);
