@@ -2,7 +2,8 @@
 // reference configuration. A link, plate, slot link, slider, gear, disc, wheel and shaft get their true outline; a body
 // whose shape is a profile of its own (cam, cage, cross, custom) gets the disc or box that holds its joints, flagged
 // `approx`, until the pilots (P) and the rebuild (R) give it a profile of its own.
-import { D2R, TAU, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
+import { D2R, TAU, area, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
+import { filletPoly } from "../hardware/primitives";
 import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
@@ -77,6 +78,8 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "plate": {
       const pts = Array.isArray(shape.outline) ? (shape.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]) : null;
       const r = num(shape.boss, 8.5);
+      // `exact`: the outline as drawn (a T-shaped follower, a notched plate), its corners filleted; else rounded round its points
+      if (pts && pts.length >= 3 && shape.exact === true) return { profile: { outer: filletPoly(area(pts) < 0 ? pts.slice().reverse() : pts, num(shape.fillet, 1.5)), holes: [] }, thick: num(shape.thickness, THICK), approx: false };
       if (pts && pts.length >= 2) return { profile: { outer: roundedPoly(pts, r), holes: [] }, thick: THICK, approx: false };
       if (Array.isArray(shape.rect)) {
         const [w, h] = pair(shape.rect, [60, 40]);

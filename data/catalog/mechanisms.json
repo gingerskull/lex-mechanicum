@@ -43530,15 +43530,15 @@
             "shape": {
               "type": "plate",
               "rect": [
-                120,
-                200
+                150,
+                230
               ]
             },
             "at": {
               "frame": {
                 "origin": [
                   0,
-                  40,
+                  60,
                   -10
                 ]
               }
@@ -43549,15 +43549,8 @@
             "role": "driver",
             "shape": {
               "type": "cam",
-              "base": 30,
               "law": "cycloidal",
-              "lift": 15,
-              "rise": 120,
-              "dwellOuter": 60,
-              "return": 120,
-              "dwellInner": 60,
-              "follower": "flat",
-              "thick": 8,
+              "thick": 10,
               "bore": 10
             },
             "at": {
@@ -43583,19 +43576,19 @@
                   8
                 ],
                 [
-                  7,
+                  6,
                   8
                 ],
                 [
-                  7,
-                  68
+                  6,
+                  100
                 ],
                 [
-                  -7,
-                  68
+                  -6,
+                  100
                 ],
                 [
-                  -7,
+                  -6,
                   8
                 ],
                 [
@@ -43603,10 +43596,18 @@
                   8
                 ]
               ],
-              "face": 40
+              "guide": [
+                42,
+                100
+              ],
+              "exact": true
             },
-            "at": {
-              "joint": "G"
+            "frame": {
+              "origin": [
+                0,
+                30,
+                0
+              ]
             }
           }
         ],
@@ -43630,11 +43631,11 @@
           {
             "id": "G",
             "type": "prismatic",
-            "a": "ground",
-            "b": "follower",
+            "a": "follower",
+            "b": "ground",
             "at": [
               0,
-              30,
+              101,
               0
             ],
             "axis": [
@@ -43650,14 +43651,50 @@
           {
             "id": "C",
             "type": "cam-contact",
-            "a": "cam",
-            "b": "follower",
+            "a": "follower",
+            "b": "cam",
             "at": [
               0,
               30,
               0
             ],
-            "follower": "flat"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "ca": [
+              0,
+              0,
+              0
+            ],
+            "follower": "flat",
+            "cam": {
+              "schedule": [
+                {
+                  "kind": "rise",
+                  "span": "rise",
+                  "law": "cycloidal"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "dwelltop"
+                },
+                {
+                  "kind": "return",
+                  "span": "return",
+                  "law": "cycloidal"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "360-rise-dwelltop-return"
+                }
+              ],
+              "lift": "h",
+              "rb": "rb",
+              "theta0": 0
+            },
+            "note": "at is the face's point on the follower's axis; the cam's outline is the envelope of the face's lines"
           }
         ],
         "params": [
@@ -43686,7 +43723,7 @@
             "note": "rise angle"
           },
           {
-            "id": "dwell-top",
+            "id": "dwelltop",
             "value": 60,
             "unit": "deg",
             "min": 0,
@@ -43732,26 +43769,21 @@
               "C"
             ],
             "in": {
-              "cam": "cam",
+              "joint": "C",
+              "input": "input",
               "follower": "follower",
-              "rb": "rb",
-              "h": "h",
-              "rise": "rise",
-              "dwell-top": "dwell-top",
-              "return": "return"
+              "axis": [
+                0,
+                1,
+                0
+              ],
+              "flat": true
             },
-            "opts": {
-              "law": "cycloidal",
-              "follower": "translating flat face",
-              "profile": "envelope of the face lines at rb + s",
-              "turns": "ccw",
-              "contactOffset": "ds/dtheta"
-            },
-            "out": [
-              "lift",
-              "contact-offset",
-              "C"
-            ]
+            "out": {
+              "s": "lift-s",
+              "v": "contact-offset",
+              "contact": "K"
+            }
           }
         ],
         "points": [
@@ -43763,6 +43795,16 @@
               0,
               0
             ]
+          },
+          {
+            "id": "K",
+            "body": "cam",
+            "local": [
+              30,
+              0,
+              0
+            ],
+            "note": "the contact point on the face; the cam block places it each pose"
           }
         ],
         "outputs": [
@@ -43774,13 +43816,13 @@
           },
           {
             "id": "contact-offset",
-            "of": "C",
+            "of": "K",
             "kind": "position",
             "unit": "mm"
           },
           {
             "id": "contact-path",
-            "of": "C",
+            "of": "K",
             "kind": "path"
           }
         ],
@@ -43790,7 +43832,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Keeps the 2026-10-19 verdict: the contact point's sweep across the face reads well. Checked: lift 15 mm, 60° dwells, contact offset up to 14.32 mm inside the 20 mm half face. The defining relations' least radius of curvature was wrong (9.9 mm); rb + s + s'' is 22 mm at its least, so the cam is convex with margin. Text corrected."
+          "note": "Keeps the 2026-10-19 verdict: the contact point's sweep across the face reads well. Checked: lift 15 mm, 60° dwells, contact offset up to 14.32 mm inside the 20 mm half face. The defining relations' least radius of curvature was wrong (9.9 mm); rb + s + s'' is 22 mm at its least, so the cam is convex with margin. Text corrected. Rebuild R5 (#216): built on v3 from this record; the cam's outline is the envelope of the face's lines from the cam joint's own law. The lift and rise controls are not offered: the cam is built at build time and a control cannot reshape it; the record keeps the design values. The stem is guided off the cam's sweep (shape.guide)."
         },
         "principle": [
           {
@@ -43800,13 +43842,13 @@
             "body": "follower"
           },
           {
-            "point": "C"
+            "point": "K"
           }
         ],
         "traces": [
           {
             "id": "contact",
-            "point": "C",
+            "point": "K",
             "ticks": {
               "every": 15
             },
@@ -43817,19 +43859,20 @@
           {
             "id": "stroke-axis",
             "kind": "axis-line",
-            "through": "O",
-            "direction": [
+            "at": "O",
+            "axis": [
               0,
               1,
               0
             ],
+            "length": 110,
             "label": "STROKE AXIS"
           },
           {
             "id": "offset",
             "kind": "dimension",
             "from": "Fc",
-            "to": "C",
+            "to": "K",
             "label": "OFFSET = ds/dθ"
           },
           {
@@ -43846,16 +43889,6 @@
             "id": "cam",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "lift",
-            "kind": "param",
-            "param": "h"
-          },
-          {
-            "id": "rise",
-            "kind": "param",
-            "param": "rise"
           }
         ],
         "plot": [
@@ -43891,7 +43924,8 @@
             "output": "lift",
             "stat": "dwell",
             "value": 60,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
             "text": "the contact slides up to 14.32 mm off the axis",
