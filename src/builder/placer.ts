@@ -9,7 +9,7 @@
 import type { Vec2 } from "../core/geom";
 import { v3, xf, type Xf } from "../kin/math";
 import type { Kin } from "../kin/types";
-import { HEADROOM, LATERAL, PITCH, SLAB_GAP, THREAD_ROOM } from "./constants";
+import { HEADROOM, KEEPER_ROOM, LATERAL, PITCH, SLAB_GAP, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
 import { pointDist, ringDist } from "./planar";
 import type { BodyGeom } from "./shapes";
@@ -205,10 +205,20 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     // thickness of each node (a slab is as high as the thickest body in it)
     const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geoms.get(id)!.thick)));
 
+    // a slider on the ground rides rails on the base where it can: raised, its rails stand on risers under the parts
+    // that pass over them
+    const onGround = new Set(kin.joints.filter((j) => j.type === "prismatic" && (j.a === "ground" || j.b === "ground")).map((j) => (j.a === "ground" ? j.b : j.a)));
+    const sliders = nodeIds.map((r, i) => (nodes.get(r)!.ids.some((id) => onGround.has(id)) ? i : -1)).filter((i) => i >= 0);
+
+    // bodies the record lays above others: [upper node, lower node]
+    const aboves: [number, number][] = [];
+    for (const b of kin.bodies) for (const u of b.above ?? []) if (idx.has(nodeOf(b.id)) && idx.has(nodeOf(u))) aboves.push([idx.get(nodeOf(b.id))!, idx.get(nodeOf(u))!]);
+    const orderOk = (assign: number[]) => aboves.every(([a, b]) => assign[a]! < 0 || assign[b]! < 0 || assign[a]! > assign[b]!);
+
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);
     const lb = Math.max(1, cliqueBound(clash));
-    type Best = { assign: number[]; cost: [number, number, number] };
+    type Best = { assign: number[]; cost: [number, number, number, number] };
     const limit = N;
     let budget = 1_500_000;
     // strict: every passer on one side of its pin; relaxed: a pin with parts passing on both sides is allowed (it needs a
@@ -226,9 +236,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           const picks = clevisPicks(assign, siteCs, clash, h, nodeIds, nodes);
           // a fixed pin held from a bridge only (something passes under it) is the last resort
           const hung = siteCs.reduce((t, c) => t + (c.site.fixed && c.passers.some((p) => assign[p]! < Math.min(...c.members.map((m) => assign[m]!))) ? 1 : 0), 0);
-          const cost: [number, number, number] = [spacers, hung, -picks.length];
+          const raised = sliders.filter((i) => assign[i]! > 0).length;
+          const cost: [number, number, number, number] = [spacers, raised, hung, -picks.length];
           const f = found;
-          const less = !f || cost[0] < f.cost[0] || (cost[0] === f.cost[0] && (cost[1] < f.cost[1] || (cost[1] === f.cost[1] && cost[2] < f.cost[2])));
+          const less = !f || cost.some((c, i) => c !== f.cost[i]) && cost.findIndex((c, i) => c !== f.cost[i]) === cost.findIndex((c, i) => c < f.cost[i]!);
           if (less) found = { assign: assign.slice(), cost };
         };
         const dfs = (k: number): void => {
@@ -239,10 +250,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           for (let s = 0; s < h; s++) {
             if (clash[v]!.some((c, u) => c && assign[u] === s)) continue;
             assign[v] = s;
-            if (relax || passOk(assign, siteCs)) dfs(k + 1);
+            if (orderOk(assign) && (relax || passOk(assign, siteCs))) dfs(k + 1);
             assign[v] = -1;
             const f = found as Best | null;
-            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] <= -clevisCap(siteCs)) return;
+            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] === 0 && f.cost[3] <= -clevisCap(siteCs)) return;
           }
         };
         dfs(0);
@@ -263,7 +274,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         while (clash[v]!.some((c, u) => c && assign[u] === s)) s++;
         assign[v] = s;
       }
-      best = { assign, cost: [0, 0, 0] };
+      best = { assign, cost: [0, 0, 0, 0] };
       placement.conflicts.push(fid);
     }
     const assign = (best as { assign: number[] }).assign;
@@ -280,6 +291,8 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       const low = Math.min(...c.members.map((m) => assign[m]!));
       if (!c.site.fixed && low > 0 && c.passers.some((p) => assign[p] === low - 1)) gapAfter[low - 1] = Math.max(gapAfter[low - 1]!, THREAD_ROOM);
     }
+    // a slider's rails stand 1.5 mm above it with a 3 mm keeper lapping it: room for them under the slab above
+    for (const i of sliders) if (assign[i]! + 1 < slabs) gapAfter[assign[i]!] = Math.max(gapAfter[assign[i]!]!, KEEPER_ROOM);
     const w0: number[] = [];
     let w = 0;
     for (let s = 0; s < slabs; s++) {

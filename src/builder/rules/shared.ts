@@ -96,8 +96,10 @@ export const stops: Rule = {
             // the pin is judged against the other moving parts; the lever itself is meant to meet it
             const m = worldManifold(ctx.M, pin[0]!);
             const g2 = ctx.sweeps.gap(m, others, MIN_GAP + 1);
+            // and it clears the lever itself over the cycle (a plate lever's far corner sweeps past its edge line)
+            const g3 = g2 < MIN_GAP ? 0 : ctx.sweeps.gap(m, [b], 1);
             m.delete();
-            if (g2 < MIN_GAP) continue;
+            if (g2 < MIN_GAP || g3 < 0.5) continue;
             ctx.add(pin);
             ctx.add(place(UPF, H.screw(`${s.id}-${b}-stop${k}-sc`, "button", 4, 12, { at: [w[0], w[1], 0], face: ctx.base!.bottom, dir: 1, name: "", qty: 0, joints: [s.id] })));
             placed.push(pin[0]!.id);

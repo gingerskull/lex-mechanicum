@@ -150,7 +150,8 @@ const j5 = contactRule({
     for (const [k, y] of sideY) {
       L.add(H.plate(`${id}-rail${k}`, mk(k, y), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
       // a ground riser along the straight run (A6)
-      if (w0 - baseTop > 0.5) L.add(H.plate(`${id}-riser${k}`, roundRect(x0, y - 6, x1, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
+      // (as wide as its rail: wider, it would reach under the slider's edge)
+      if (w0 - baseTop > 0.5) L.add(H.plate(`${id}-riser${k}`, roundRect(x0, y - 3.5, x1, y + 3.5, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
     }
     // gib on the gibbed side, between the slider and its rail (F7)
     L.add(H.gib(`${id}-gib`, x1 - x0 - 20, { body: hostBody, at: [x0 + 10, e[2] - gap / 2 - 0.5, 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
@@ -165,8 +166,10 @@ const j5 = contactRule({
     for (const [k, x] of [[0, x0 + 4], [1, x1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, e[3] + 4, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, reference rail to base", qty: 2 }) }));
     // wipers at both ends of the slider and a grease nipple on the keeper (F8)
     const sb = bodyOf(ctx, slider);
-    for (const [k, x] of [[0, c.run[0] + e[0] - 3], [1, c.run[0] + e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [(x0 + x1) / 2, ky, 0], z0: w0 + rh + 3, z1: w0 + rh + 3 + 9 }));
+    // (on the slider as built, at its reference place: its own extent, not the travel's)
+    for (const [k, x] of [[0, e[0] - 3], [1, e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    // the nipple on the far end stop, out of the way of parts passing over the keeper
+    L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [x1 - 5, 0, 0], z0: w1 + 2, z1: w1 + 2 + 9 }));
     // one end stop block with a neoprene pad just past each end of the travel (F5)
     for (const [k, x, s] of [[0, x0 + 1, 1], [1, x1 - 1, -1]] as const) {
       const sx = x - s * 4;

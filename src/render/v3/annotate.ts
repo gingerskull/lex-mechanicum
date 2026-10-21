@@ -658,9 +658,12 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       return;
     }
     case "axis-line": {
-      const c = pointOf(A, o.at);
+      // `at` and `axis`, or a `point` and its direction `dir`
+      const at = o.at ?? o.point;
+      const c = pointOf(A, at);
       if (!c) return;
-      const ax = Array.isArray(o.axis) ? (o.axis as Vec3) : (A.rt.scene.axes?.[typeof o.at === "string" ? o.at : ""] ?? [0, 0, 1]);
+      const dir = o.axis ?? o.dir;
+      const ax = Array.isArray(dir) ? (dir as Vec3) : (A.rt.scene.axes?.[typeof at === "string" ? at : ""] ?? [0, 0, 1]);
       const a = unit(ax);
       const L = typeof o.length === "number" ? o.length : 80;
       poly([sub(c, mul(a, L)), add(c, mul(a, L))]);
