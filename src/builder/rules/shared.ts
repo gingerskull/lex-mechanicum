@@ -154,7 +154,10 @@ export const standoffs: Rule = {
       // two posts under the plate, far apart, each standing clear of every moving part and of the supports already built
       const swept = ctx.sweeps.planPolys();
       const fixed = ctx.solids.filter((q) => ["standoff", "bridge", "housing", "bracket", "foot", "stop"].includes(q.kind) && q.body === "ground" && !q.flags.isBase).map((q) => ctx.sweeps.staticPolys(q));
-      const free = (p: Vec2): boolean => swept.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + MIN_GAP || insideOwn(part.body, ctx, p)) && fixed.every((f) => f.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + 1));
+      // a post is clear of the moving parts in plan, or, where they sweep over the plate, in 3D under it
+      const clear3d = (p: Vec2): boolean => clearance(ctx, place(UPF, H.standoff("probe", { at: [p[0], p[1], 0], z0: base.top, z1 }))) >= MIN_GAP;
+      const inPlan = (p: Vec2): boolean => swept.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + MIN_GAP || insideOwn(part.body, ctx, p));
+      const free = (p: Vec2): boolean => (inPlan(p) || clear3d(p)) && fixed.every((f) => f.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + 1));
       const cands = far.flatMap((p) => [0.18, 0.3, 0.45].map((k): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k])).filter(free);
       const a = cands[0];
       const bFar = a ? cands.find((p) => Math.hypot(p[0] - a[0], p[1] - a[1]) > 30) : undefined;
@@ -166,7 +169,8 @@ export const standoffs: Rule = {
         const at: [number, number, number] = [inset[0], inset[1], 0];
         (ctx.fired.standoffs ??= []).push(`${b.id}-post${k}`);
         ctx.add(place(UPF, H.standoff(`${b.id}-post${k}`, { at, z0: base.top, z1, joints: [b.id], ...(k ? { name: "", qty: 0 } : { name: `Standoff Ø${STANDOFF.D} x ${+(z1 - base.top).toFixed(1)}, M${STANDOFF.M}`, qty: 2 }) })));
-        ctx.add(place(UPF, H.screw(`${b.id}-post${k}-top`, "button", STANDOFF.M, 6 + 1.5 * STANDOFF.M, { at, face: z1 + (part.op.op === "extrude" ? part.op.h : 6), dir: -1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
+        // a screw that something sweeps over is countersunk flush (A6)
+        ctx.add(place(UPF, H.screw(`${b.id}-post${k}-top`, inPlan(inset) ? "button" : "csk", STANDOFF.M, 6 + 1.5 * STANDOFF.M, { at, face: z1 + (part.op.op === "extrude" ? part.op.h : 6) - (inPlan(inset) ? 0 : 0.5), dir: -1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
         ctx.add(place(UPF, H.screw(`${b.id}-post${k}-bot`, "button", STANDOFF.M, base.top - base.bottom + 1.5 * STANDOFF.M, { at, face: base.bottom, dir: 1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
       });
     }

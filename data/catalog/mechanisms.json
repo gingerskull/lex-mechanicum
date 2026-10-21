@@ -2654,8 +2654,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-19",
-          "note": "Reads as the textbook crank-rocker: the full crank circle, the limited rocker arc and the coupler curve."
+          "date": "2026-10-21",
+          "note": "Reads as the textbook crank-rocker: the full crank circle, the limited rocker arc and the coupler curve. Pilot (P), 2026-10-21: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The assembly-branch control is not offered, because the parts are built for the elbow-up closure and a control cannot rebuild them; the branch stays a declared design choice. The coupler point C is engraved on the coupler (trace mark)."
         },
         "principle": [
           {
@@ -2694,11 +2694,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "assembly",
-            "kind": "design",
-            "design": "branch"
           }
         ],
         "plot": {

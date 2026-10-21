@@ -3,7 +3,7 @@
 // under the header, the kit and the block of each joint, the K1 residual and the claim table (T9) in the tool-decided
 // rows, and a Supports section for the support router (A19) and the see-through stage (T10 to T12). Judged rows, hand
 // cells and hand sections of an earlier sheet survive regeneration, as in the 2.5D generator.
-import { statSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type { Assembly } from "../builder";
 import { autoTable, rules } from "../builder/registry";
@@ -100,7 +100,7 @@ function evidence(inp: AuditInput3, reqs: Requirement[]): Record<string, Row> {
   {
     const rec = inp.recordMissing === null ? "no catalogue record" : inp.recordMissing.length ? `record missing ${inp.recordMissing.join(", ")}` : "record v3 complete (kin and teaching blocks)";
     const ok = inp.recordMissing !== null && !inp.recordMissing.length && inp.files["audit.md"] !== undefined;
-    set("P1", `${rec}; ${inp.files["polish.ts"] !== undefined ? "polish.ts, " : "no polish, "}audit.md present`, ok ? "PASS" : "FAIL");
+    set("P1", `${rec}; ${inp.files["polish.ts"] !== undefined ? "polish3.ts, " : "no polish, "}audit.md present`, ok ? "PASS" : "FAIL");
   }
   // K: the verifier's report
   {
@@ -182,7 +182,9 @@ function evidence(inp: AuditInput3, reqs: Requirement[]): Record<string, Row> {
     set("M13", `${threaded.length} threaded`);
   }
   set("R4", `package v2 ${kb(inp.packageBytes)}; ${out.R4?.evidence ?? ""}`.replace(/; $/, ""));
-  set("R7", `polish ${kb(inp.files["polish.ts"] ?? 0)}; ${plural(a.polish?.added.length ?? 0, "solid")} added, ${plural(a.polish?.set.length ?? 0, "override")} by the polish`);
+  // R7: a polish of true exceptions only, under the plan's 30 lines (a longer one is a promotion candidate, A22)
+  const lines = inp.files["polish.lines"] ?? 0;
+  set("R7", `polish ${inp.files["polish.ts"] === undefined ? "none" : `${lines} lines (${kb(inp.files["polish.ts"])})`}; ${plural(a.polish?.added.length ?? 0, "solid")} added, ${plural(a.polish?.set.length ?? 0, "override")} by the polish`, lines < 30 ? "PASS" : "?");
   set("DL1", `${solids.filter((s) => s.detail !== "never").length} of ${solids.length} solids on a dropping rung`);
   // Q
   {
@@ -312,7 +314,10 @@ export async function generateAudit3(id: string, opts: { existing?: string | nul
   const existing = opts.existing === undefined ? readAudit(id) : opts.existing;
   const files: Record<string, number> = { "audit.md": 0 };
   try {
-    files["polish.ts"] = statSync(join(ROOT, "src", "mechanisms", id, "polish.ts")).size;
+    // the v3 polish is polish3.ts while the 2.5D polish.ts lives on beside it until the cut-over
+    const f = join(ROOT, "src", "mechanisms", id, "polish3.ts");
+    files["polish.ts"] = statSync(f).size;
+    files["polish.lines"] = readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim() && !l.trim().startsWith("//")).length;
   } catch {
     // none: a mechanism that needs no exception has no polish
   }

@@ -9,12 +9,12 @@ const rec = (id: string) => recordById(id)!;
 
 describe("the stage's controls from a record", () => {
   it("gives a design choice its options and its default", () => {
-    const c = controlsOf(rec("four-bar"));
+    const c = controlsOf(rec("drag-link-quick-return"));
     const a = c.find((x) => x.key === "branch")!;
     expect(a.type).toBe("choice");
     expect(a.target).toBe("design");
-    expect(a.options!.map((o) => o.value)).toEqual(["elbow-up", "elbow-down"]);
-    expect(a.value).toBe("elbow-up");
+    expect(a.options!.map((o) => o.value)).toEqual(["open", "crossed"]);
+    expect(a.value).toBe("open");
   });
 
   it("leaves the cycle's own driver to the scrubber", () => {

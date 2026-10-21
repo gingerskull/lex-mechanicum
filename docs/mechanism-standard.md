@@ -703,7 +703,9 @@ oscillating cylinder, locomotive drive, Walschaerts, Wankel, toggle clamp)
   nipple, an end stop at each end); J4 in every slot with wear strips.
 - Teaching: dead-centre and tangent lines and the chord splitting cut and return as construction overlays; a die control
   with ghost traces for its other settings, never an automatic sweep (T14); a section view through a port face with the
-  open port highlighted.
+  open port highlighted. An oscillating cylinder's trunnion and its piston are kits of their own: the trunnion pin
+  pressed into the cylinder's port pad, in a bushing in the port face, a spring and a nut holding the faces together
+  (trunnion); the piston on two rings in the bore (piston-bore).
 - Scotch yoke: slide block in the slot (M14 liners). Toggle clamp: `manual`, over-centre stop visible (F5), adjustable
   spindle with lock nut (F7), a workpiece block. Oscillating cylinder: pivot pin retained (F2); spring holding the port
   face (F6).
@@ -717,7 +719,8 @@ oscillating cylinder, locomotive drive, Walschaerts, Wankel, toggle clamp)
 
 **Couplings** (Oldham, Schmidt, universal joint, double Cardan, Rzeppa, flexible couplings)
 - Blocks: Hooke, homokinetic, and the dyad for the Oldham and Schmidt families. Each shaft on its own support (J2 or J10);
-  the cross of a universal joint in needle cups held by circlips (F2), a grease nipple on the cross (F8); clamp hubs or
+  the cross of a universal joint in needle cups held by circlips (F2), a grease nipple on the cross (F8), the cross-pin
+  kit; each yoke a keyed hub, a bar and two arms bored for the cups, placed on the cross's centre; clamp hubs or
   keyed yokes on the shaft ends (F3); F8 lubrication of sliding tongues.
 - A member that tilts as it turns (the cross, a cage, a swash plate) is a part whose frame is a solved body; the cross's
   arms lie along the two yokes' pins.
