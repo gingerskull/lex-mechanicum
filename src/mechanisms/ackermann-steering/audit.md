@@ -47,7 +47,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | T7 | ? | DATA |
 | T8 | ? | DATA |
 | T9 | PASS | AUTO / DATA · claim table: 5 ok, 0 off, 0 uncheckable of 5 |
-| T10 | ? | AUTO · 6 solids drawn see-through: KR-slv, KR-bb, KR-ecl, KR-axle-s4, KR-axle-s5, KR-bridge |
+| T10 | ? | AUTO · 7 solids drawn see-through: KR-slv, KR-bb, KR-ecl, KR-axle-s2, KR-axle-s4, KR-axle-s5, KR-bridge |
 | T11 | ? | AUTO · 1 support routed, 1 moved off a sweep |
 | T12 | PASS | HAND · 11 support solids; dropped by the polish: none |
 | T13 | ? | DATA |
@@ -55,7 +55,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | T15 | ? | HAND |
 | T16 | ? | HAND / STYLE |
 | T17 | ? | AUTO |
-| D1 | ? | HAND |
+| D1 | ? | HAND · fired: wheels (26 solids) |
 | D2 | ? | HAND |
 | D3 | ? | STYLE |
 | D4 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
@@ -64,10 +64,10 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | D8 | ? | AUTO / HAND |
 | D9 | ? | AUTO / HAND |
 | D10 | ? | AUTO |
-| D11 | PASS | AUTO · SOLID: 0 of 93 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 117 solids unsound |
 | D7 | ? | HAND |
-| A1 | ? | AUTO · PL J3, PR J3, KL J2, KR J1, KL-knuckle-left-stops stops, KR-knuckle-right-stops stops |
-| A2 | ? | AUTO · PL J3, PR J3, KL J2, KR J1, KL-knuckle-left-stops stops, KR-knuckle-right-stops stops |
+| A1 | ? | AUTO · knuckle-left-wheel wheels, knuckle-right-wheel wheels, PL J3, PR J3, KL J2, KR J1, KL-knuckle-left-stops stops, KR-knuckle-right-stops stops |
+| A2 | ? | AUTO · knuckle-left-wheel wheels, knuckle-right-wheel wheels, PL J3, PR J3, KL J2, KR J1, KL-knuckle-left-stops stops, KR-knuckle-right-stops stops |
 | A3 | ? | AUTO · fired: classify (4 solids), axial stack builder |
 | A4 | ? | AUTO · fired: j1-dead-axle (27 solids), axial stack builder |
 | A5 | ? | AUTO · fired: j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), axial stack builder |
@@ -78,17 +78,17 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | A10 | ? | HAND · fired: placement (6 solids), placement solver |
 | A11 | ? | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (27 solids) |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | ? | AUTO / HAND · 93 solids, 54 unnamed (further items of a listed set) |
+| A13 | ? | AUTO / HAND · 117 solids, 64 unnamed (further items of a listed set) |
 | A14 | ? | AUTO / HAND · fired: support router |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | ? | HAND · 6 joint notes; no note: none; no badge: none |
+| A16 | ? | HAND · 8 joint notes; no note: none; no badge: none |
 | A17 | ? | HAND |
 | A18 | ? | AUTO · placement: 2 slabs in the tallest stack (16.0 mm), 0 clevises; stack per joint in the Joints table |
 | A19 | ? | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: KR-bridge |
 | A20 | ? | AUTO · support per joint: KR bridge |
 | A21 | PASS | AUTO · kit per joint: PL J3, PR J3, KL J2, KR J1, KL-knuckle-left-stops stops, KR-knuckle-right-stops stops |
 | A22 | ? | AUTO · fired: stops (16 solids), adjustable-length (no solids), cable-clip (no solids) |
-| E1 | ? | AUTO · every solid has one explode level; levels -3 to 3.5 |
+| E1 | ? | AUTO · every solid has one explode level; levels -11.5 to 12.5 |
 | E2 | ? | AUTO · fired: explode (1 solid) |
 | E3 | ? | AUTO · fired: explode (1 solid) |
 | E4 | ? | HAND |
@@ -112,7 +112,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | J13 | ? | AUTO · fired: j13-compliant (no solids) |
 | J11 | ? | AUTO · fired: j11-screw (no solids) |
 | F1 | ? | AUTO · served at KL, KR; fired: j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) |
-| F2 | ? | AUTO · served at PL, PR, KL, KR; fired: j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F2 | ? | AUTO · served at knuckle-left-wheel, knuckle-right-wheel, PL, PR, KL, KR; fired: wheels (26 solids), j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
 | F3 | ? | AUTO · served at PL, PR, KL; fired: j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
 | F4 | ? | AUTO / HAND · served at KL, KR; fired: j9-crossed-mesh (no solids), j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), trunnion (no solids) |
 | F5 | ? | AUTO / HAND · served at KL-knuckle-left-stops, KR-knuckle-right-stops; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (16 solids) |
@@ -130,7 +130,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | M7 | ? | HAND |
 | M8 | ? | AUTO · fired: j1-dead-axle (27 solids) |
 | M9 | ? | AUTO / HAND · fired: j1-dead-axle (27 solids) |
-| M10 | ? | AUTO / HAND · 90 of 93 solids name a material |
+| M10 | ? | AUTO / HAND · 114 of 117 solids name a material |
 | M11 | ? | AUTO · fired: j1-dead-axle (27 solids), hardware primitives |
 | M12 | ? | HAND |
 | M13 | ? | AUTO / HAND · 14 threaded |
@@ -145,7 +145,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | L2 | ? | HAND |
 | L3 | ? | HAND |
 | L4 | ? | HAND / STYLE |
-| L5 | ? | AUTO / HAND · fired: see-through (6 solids) |
+| L5 | ? | AUTO / HAND · fired: see-through (7 solids) |
 | L6 | ? | AUTO |
 | L7 | ? | STYLE |
 | L8 | ? | AUTO / HAND · fired: trace-marks (no solids) |
@@ -154,14 +154,14 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | R1 | ? | HAND |
 | R2 | ? | HAND |
 | R3 | ? | AUTO · fired: hardware primitives |
-| R4 | ? | AUTO · package v2 18.0 KB |
+| R4 | ? | AUTO · package v2 20.5 KB |
 | R5 | ? | HAND |
 | R6 | ? | FLAG |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | ? | AUTO / SITE |
 | R9 | ? | AUTO / SITE |
 | R10 | ? | FLAG |
-| DL1 | ? | AUTO / HAND · 35 of 93 solids on a dropping rung |
+| DL1 | ? | AUTO / HAND · 49 of 117 solids on a dropping rung |
 | DL2 | ? | HAND |
 | DL3 | ? | AUTO |
 | DL4 | ? | SITE |
@@ -169,7 +169,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | DL5 | ? | FLAG |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | ? | package v2 written, 18.0 KB; site build not checked here |
+| Q3 | ? | package v2 written, 20.5 KB; site build not checked here |
 | Q4 | ? | local: tools/shot |
 | Q5 | ? | local: tools/bench |
 | Q6 | ? |  |
@@ -179,6 +179,8 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| knuckle-left-wheel | wheels | – | – | – | none | Nyloc nut M8 (DIN 985) | none | none | none | none | none | none | none | none |
+| knuckle-right-wheel | wheels | – | – | – | none | Nyloc nut M8 (DIN 985) | none | none | none | none | none | none | none | none |
 | PL | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | PR | J3 | – | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | KL | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 10 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
@@ -198,19 +200,19 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 10 | 0 | ? |
-| DL-B | 0 | 121 | ? |
+| DL-A | 18 | 0 | ? |
+| DL-B | 0 | 125 | ? |
 | DL-C | 0 | 0 | ? |
-| DL-D | 12 | 0 | ? |
+| DL-D | 16 | 0 | ? |
 | DL-E | 0 | 1 | ? |
 | DL-F | 0 | 0 | ? |
 | DL-G | 0 | 0 | ? |
-| DL-H | 13 | 0 | ? |
-| never | 58 | 166 | ? |
+| DL-H | 15 | 0 | ? |
+| never | 68 | 318 | ? |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 6.4e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 18.0 KB
+check: clean · K1 residual: 6.4e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.5 KB
 screenshots: ? · bench: ?

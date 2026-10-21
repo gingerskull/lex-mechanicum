@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-21 · result: open · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
+PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -77,18 +77,18 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | A9 | ? | AUTO / HAND · fired: placement solver |
 | A10 | ? | HAND · fired: placement (10 solids), placement solver |
 | A11 | ? | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (26 solids) |
-| A12 | FAIL | AUTO · clamp: carriage (turning) touches the ground face of S-slide-riser0; slide-out (turning) touches the ground face of G-slide-riser0 |
+| A12 | PASS | AUTO · clamp check clean |
 | A13 | ? | AUTO / HAND · 116 solids, 58 unnamed (further items of a listed set) |
 | A14 | ? | AUTO / HAND · fired: support router |
-| A15 | FAIL | AUTO · clearance in 3D over 72 phases: 5 clashes: G-slide-wip0 x G-slide-stop0 1.44 mm; S-slide-wip0 x S-slide-stop0 1.40 mm; S-slide-wip0 x S-slide-pad0 0.83 mm; G-slide-wip0 x G-slide-pad0 0.83 mm; hand allow: 0 named, 0 unnecessary |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
 | A16 | ? | HAND · 8 joint notes; no note: none; no badge: S-slide, G-slide |
 | A17 | ? | HAND |
-| A18 | ? | AUTO · placement: 2 slabs in the tallest stack (17.0 mm), 0 clevises; stack per joint in the Joints table |
+| A18 | ? | AUTO · placement: 2 slabs in the tallest stack (20.0 mm), 0 clevises; stack per joint in the Joints table |
 | A19 | ? | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O-bridge |
 | A20 | ? | AUTO · support per joint: O bridge |
 | A21 | PASS | AUTO · kit per joint: A J3, B J3, S J3, G J3, S-slide J5, G-slide J5, O J1, O-lever-stops stops |
 | A22 | ? | AUTO · fired: stops (8 solids), adjustable-length (no solids), cable-clip (no solids) |
-| E1 | ? | AUTO · every solid has one explode level; levels -2 to 2.5 |
+| E1 | ? | AUTO · every solid has one explode level; levels -2 to 3 |
 | E2 | ? | AUTO · fired: explode (1 solid) |
 | E3 | ? | AUTO · fired: explode (1 solid) |
 | E4 | ? | HAND |
@@ -154,7 +154,7 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | R1 | ? | HAND |
 | R2 | ? | HAND |
 | R3 | ? | AUTO · fired: hardware primitives |
-| R4 | ? | AUTO · package v2 18.0 KB |
+| R4 | ? | AUTO · package v2 16.2 KB |
 | R5 | ? | HAND |
 | R6 | ? | FLAG |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -167,9 +167,9 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | DL4 | ? | SITE |
 | DL6 | ? | AUTO |
 | DL5 | ? | FLAG |
-| Q1 | FAIL | 0 findings, 2 clamp, 0 edge |
-| Q2 | FAIL | 5 clashes, 0 unnecessary allows |
-| Q3 | ? | package v2 written, 18.0 KB; site build not checked here |
+| Q1 | PASS | check, clamp and edge distance clean |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | ? | package v2 written, 16.2 KB; site build not checked here |
 | Q4 | ? | local: tools/shot |
 | Q5 | ? | local: tools/bench |
 | Q6 | ? |  |
@@ -179,12 +179,12 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A | J3 | dyad | – | – | none | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | none | none | none | none | none | none | none |
-| B | J3 | slider-dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| S | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| G | J3 | – | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| S-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 77, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
-| G-slide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 47.4, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| A | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| B | J3 | slider-dyad | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| S | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| G | J3 | – | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| S-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 89, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| G-slide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 67.4, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | O | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | O-lever-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 
@@ -201,18 +201,18 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 10 | 0 | ? |
-| DL-B | 0 | 125 | ? |
+| DL-B | 0 | 129 | ? |
 | DL-C | 0 | 0 | ? |
 | DL-D | 10 | 0 | ? |
 | DL-E | 6 | 1 | ? |
 | DL-F | 0 | 0 | ? |
 | DL-G | 0 | 0 | ? |
 | DL-H | 19 | 0 | ? |
-| never | 71 | 143 | ? |
+| never | 71 | 149 | ? |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 5 clashes · clamp: faults · edge distance: clean · package: 18.0 KB
+check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.2 KB
 screenshots: ? · bench: ?

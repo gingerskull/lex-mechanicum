@@ -55,7 +55,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | T15 | ? | HAND |
 | T16 | ? | HAND / STYLE |
 | T17 | ? | AUTO |
-| D1 | ? | HAND |
+| D1 | ? | HAND · fired: wheels (no solids) |
 | D2 | ? | HAND |
 | D3 | ? | STYLE |
 | D4 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
@@ -112,7 +112,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | J13 | ? | AUTO · fired: j13-compliant (no solids) |
 | J11 | ? | AUTO · fired: j11-screw (no solids) |
 | F1 | ? | AUTO · served at O2, O4; fired: j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) |
-| F2 | ? | AUTO · served at A, B, O2, O4; fired: j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F2 | ? | AUTO · served at A, B, O2, O4; fired: wheels (no solids), j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
 | F3 | ? | AUTO · served at A, B, O2; fired: j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
 | F4 | ? | AUTO / HAND · served at O2, O4; fired: j9-crossed-mesh (no solids), j2-live-shaft (28 solids), j10-shaft-in-plan (no solids), trunnion (no solids) |
 | F5 | ? | AUTO / HAND · served at O2-rocker-in-stops, O4-rocker-out-stops; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (16 solids) |
@@ -206,7 +206,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | DL-F | 0 | 0 | ? |
 | DL-G | 0 | 0 | ? |
 | DL-H | 13 | 0 | ? |
-| never | 58 | 158 | ? |
+| never | 58 | 167 | ? |
 
 ## Promotion candidates
 None yet.

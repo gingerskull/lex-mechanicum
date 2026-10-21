@@ -6,7 +6,7 @@
 import type { Polish } from "../../builder";
 import type { Vec3 } from "../../kin/math";
 
-export const polish: Polish = (A, H) => {
+export const polish: Polish = (A) => {
   const face = A.pin("plunger", [55, 0, 0]);
   const plunger = A.get("plunger")!;
   const mid = plunger.frame.o[2] + (plunger.op.op === "extrude" ? plunger.op.h : 7) / 2;

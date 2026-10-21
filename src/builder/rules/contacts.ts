@@ -59,7 +59,8 @@ function contactRule(def: KitDef): Rule {
           title: `${ji.kit} · ${titleOf(ji.id)}`,
           note: r?.note ?? `${titleOf(ji.id)}: ${ji.kit} built from the declared joint.`,
           serves: r?.serves ?? {},
-          ...(r?.badge ? { badge: r.badge } : {}),
+          // the kit built the joint's hardware: its badge says so unless the kit gave its own
+          badge: r?.badge ?? (solids.length ? [`${ji.kit} built`, "ok"] : [`${ji.kit}: nothing built`, "warn"]),
         };
         ctx.note(note);
         (ctx.fired[def.id] ??= []).push(ji.id);
