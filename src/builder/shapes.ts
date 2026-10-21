@@ -5,7 +5,7 @@
 import { D2R, TAU, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
 import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
-import type { Setup } from "../kin/compose";
+import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
@@ -33,6 +33,8 @@ export interface BodyGeom {
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
   pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number }[];
+  /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
+  plan?: Vec2[];
 }
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -54,6 +56,14 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
 function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
+  const g = outlineOf0(shape, role, pins);
+  // holes the record names on a disc or a plate ([x, y, r] in the body's frame): a port face's ports
+  if (Array.isArray(shape.holes) && (shape.type === "disc" || shape.type === "plate"))
+    for (const h of shape.holes as number[][]) g.profile.holes.push(circle(h[2]!, h[0]!, h[1]!, 28).reverse());
+  return g;
+}
+
+function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -151,13 +161,16 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // the body's own frame (src/kin: bodyFrameOf), which its shape and its points are given in; a body with neither an
     // `at` joint nor a frame of its own stands round its joints in world axes
     const own = b.at?.joint || (b.frame && typeof b.frame === "object") || b.at?.frame;
-    const F = own ? S.bodyFrame.get(b.id) : undefined;
+    // a body no joint reaches is out of the kinematics' setup: its frame is read from the record the same way
+    const F = own ? (S.bodyFrame.get(b.id) ?? bodyFrameOf(b, kin.joints, S.joints, (v) => (Array.isArray(v) ? [Number(v[0]), Number(v[1]), Number(v[2] ?? 0)] : [0, 0, 0]))) : undefined;
     const frame = F ? xfFrame(F) : frameAlong(originOf(b, S, js.map((j) => j.at)), canon(axis), [1, 0, 0]);
     const pins = js.map((j) => ({ joint: j.joint.id, ...(({ uv, w }) => ({ uv, w }))(planeCoords(frame, j.at)) }));
     const shape = (b.shape ?? {}) as Record<string, unknown>;
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, universal(kin, S, b, geom) ?? geom);
+    // a body no joint reaches stands at its own frame
+    const fixed = !js.length && !!F;
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -261,6 +274,60 @@ function universal(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null
     ],
   };
   void q;
+}
+
+/**
+ * A cylinder that swings on a trunnion (`cylinder`) and its piston on a rod (`piston`), in the body's frame: x along
+ * the bore, z the trunnion's axis. The cylinder is a port pad on the trunnion, its flat port face at `face`, the port
+ * drilled through it at `port` [x, r]; a tube on the pad along x at `axis` height, open at the rod end through a gland,
+ * closed at the other. The piston is a rod from its eye on the crank pin to a head that fills the bore. Both stand
+ * where their joints put them.
+ */
+function cylinder(b: KinBody, g: BodyGeom): BodyGeom | null {
+  const sh = g.shape;
+  const type = String(sh.type);
+  if (type !== "cylinder" && type !== "piston") return null;
+  const F = g.frame;
+  const yv = v3.cross(F.z, F.x);
+  const at = (x: number, y: number, z: number): Vec3 => v3.add(F.o, v3.add(v3.mul(F.x, x), v3.add(v3.mul(yv, y), v3.mul(F.z, z))));
+  const h = num(sh.axis, 14);
+  const bore = num(sh.bore, 40);
+  if (type === "cylinder") {
+    const R = bore / 2 + num(sh.wall, 6);
+    const [x0, x1] = pair(sh.span, [-46, 46]);
+    const face = num(sh.face, -14);
+    const [p0, p1, pw] = (Array.isArray(sh.pad) ? sh.pad : [-12, 40, 28]) as number[];
+    const [px, pr] = pair(sh.port, [30, 2.5]);
+    const tube = (id: string, a: number, c: number, holeR: number) => ({ id, name: "", frame: { o: at(a, 0, h), x: F.z, z: F.x }, profile: { outer: circle(R, 0, 0, 48), holes: holeR > 0 ? [circle(holeR, 0, 0, 40).reverse()] : [] }, h: c - a });
+    return {
+      ...g,
+      frame: F,
+      profile: { outer: roundRect(p0!, -pw! / 2, p1!, pw! / 2, 4), holes: [circle(pr, px, 0, 24).reverse()] },
+      // the pad rises from the port face into the tube's wall, short of the bore
+      thick: h - bore / 2 - face,
+      approx: false,
+      exact: { offset: face },
+      plan: roundRect(x0 - 5, -R, x1 + 5, R, 4),
+      pieces: [tube(`${b.id}-tube`, x0, x1, bore / 2), tube(`${b.id}-head`, x1, x1 + 5, 0), tube(`${b.id}-gland`, x0 - 5, x0, num(sh.rod, 10) / 2 + 0.5)],
+    };
+  }
+  // the piston: its eye on the crank pin at the origin, the rod along x to the head
+  const L = num(sh.length, 120);
+  const rod = num(sh.rod, 10);
+  const eye = num(sh.eye, 9);
+  const [hl, hd] = pair(sh.head, [16, bore - 1]);
+  return {
+    ...g,
+    profile: { outer: circle(eye, 0, 0, 36), holes: [] },
+    thick: rod,
+    approx: false,
+    exact: { offset: h - rod / 2 },
+    plan: roundedPoly([[0, 0], [L + hl / 2, 0]], Math.max(eye, hd / 2)),
+    pieces: [
+      { id: `${b.id}-rod`, name: "", frame: { o: at(eye - 2, 0, h), x: F.z, z: F.x }, profile: { outer: circle(rod / 2, 0, 0, 24), holes: [] }, h: L - hl / 2 - (eye - 2) },
+      { id: `${b.id}-head`, name: "", frame: { o: at(L - hl / 2, 0, h), x: F.z, z: F.x }, profile: { outer: circle(hd / 2, 0, 0, 48), holes: [] }, h: hl },
+    ],
+  };
 }
 
 const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);

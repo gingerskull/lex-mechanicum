@@ -525,6 +525,8 @@ class Run implements BlockCtx {
         const now: Vec3[] = [];
         let hint: Vec3 | undefined;
         let slide = false;
+        // a prismatic partner already posed: the body keeps the partner's turn (a piston in a swinging cylinder)
+        let guide: Xf | undefined;
         const add = (r: Vec3, n: Vec3) => {
           if (ref.some((q) => v3.dist(q, r) < 1e-9)) return;
           ref.push(r);
@@ -534,7 +536,11 @@ class Run implements BlockCtx {
         for (const r of joints) {
           const j = r.joint;
           if (j.a !== b.id && j.b !== b.id) continue;
-          if (j.type === "prismatic") slide = true;
+          if (j.type === "prismatic") {
+            slide = true;
+            const other = j.a === b.id ? j.b : j.a;
+            if (this.xfs.has(other)) guide = this.xfs.get(other);
+          }
           if (j.type === "revolute" && !hint) hint = r.axis;
           if (!point.has(j.type)) continue;
           const other = j.a === b.id ? j.b : j.a;
@@ -543,6 +549,7 @@ class Run implements BlockCtx {
         }
         let X: Xf | null = null;
         if (ref.length >= 2) X = fitXf(ref, now, hint);
+        else if (ref.length === 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
         else if (ref.length === 1 && slide) X = xf.trans(v3.sub(now[0]!, ref[0]!));
         if (X) {
           this.xfs.set(b.id, X);
@@ -551,6 +558,8 @@ class Run implements BlockCtx {
       }
       if (!progress) break;
     }
+    // a body no joint reaches is fixed where it stands (a port face, a fixed plate)
+    for (const b of this.k.kin.bodies) if (!this.xfs.has(b.id) && !this.k.kin.joints.some((j) => j.a === b.id || j.b === b.id)) this.xfs.set(b.id, xf.id());
     const missing = this.k.kin.bodies.filter((b) => !this.xfs.has(b.id)).map((b) => b.id);
     if (missing.length) {
       const bad = fb ? missing.filter((m) => !fb.unknown.has(m)) : missing;
@@ -600,6 +609,15 @@ class Run implements BlockCtx {
   }
 
   private output(kind: string, of: string, points: Map<string, Vec3>): number | Vec3 | undefined {
+    if (kind === "position") {
+      // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
+      const r = this.s.joints.get(of);
+      if (r && (r.joint.type === "prismatic" || r.joint.type === "cylindrical")) {
+        const Xa = this.xfs.get(r.joint.a) ?? xf.id();
+        const Xb = this.xfs.get(r.joint.b) ?? xf.id();
+        return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));
+      }
+    }
     if (kind === "path" || (kind === "position" && points.has(of))) return points.get(of);
     if (kind === "angle") {
       if (of in this.vals) return this.vals[of];

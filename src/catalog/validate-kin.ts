@@ -21,7 +21,9 @@ const FREEDOM: Record<"Planar" | "Spatial", Record<string, number>> = {
 /** Mobility from bodies and joints (Gruebler / Kutzbach): 3 (planar) or 6 (spatial) per free body minus what each joint removes. */
 export function mobility(kin: Kin, plane: "Planar" | "Spatial"): number | undefined {
   const per = plane === "Planar" ? 3 : 6;
-  let m = per * (kin.bodies.length - 1);
+  // a body no joint reaches is fixed where it stands (a port face, a fixed plate): it is part of the ground
+  const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
+  let m = per * (kin.bodies.filter((b) => b.id !== "ground" && joined.has(b.id)).length);
   for (const j of kin.joints) {
     const f = FREEDOM[plane][j.type];
     if (f === undefined) return undefined;
@@ -137,6 +139,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (Array.isArray(v)) return v.forEach((x) => resolveIn(x, by, key));
     if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
     if (isNum(v) || typeof v === "boolean") return;
+    // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
+    if (key === "kind" || key === "mode" || key === "form") return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   for (const s of kin.solve) {

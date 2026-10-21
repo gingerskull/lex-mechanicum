@@ -7,6 +7,7 @@ import { adjustableLength, cableClip } from "./rules/fixes";
 import { drive, explode, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
+import { pistonBore, trunnion } from "./rules/cylinder";
 import type { Rule } from "./rules/types";
 
 const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
@@ -27,6 +28,8 @@ export const rules: Rule[] = [
   j2,
   j10,
   crossBearings,
+  trunnion,
+  pistonBore,
   byId("j4-slot-roller"),
   byId("pin-lobe"),
   byId("groove-cam"),

@@ -10,11 +10,12 @@ import { BASE_GAP, BASE_T } from "../constants";
 import { fromPlane, place, planeCoords } from "../frames";
 import { titleOf } from "../lib";
 import { edgeDist } from "../planar";
+import { inside } from "../../core/poly";
 import { worldPoints } from "../sweeps";
 import { v3, xf } from "../../kin/math";
 import type { Rule } from "./types";
 
-const BODY_ROLE: Record<string, Solid3["role"]> = { driver: "driver", output: "output" };
+const BODY_ROLE: Record<string, Solid3["role"]> = { driver: "driver", output: "output", frame: "ground" };
 
 export const classify: Rule = {
   id: "classify",
@@ -50,15 +51,16 @@ export const placement: Rule = {
   apply(ctx) {
     for (const [id, g] of ctx.geoms) {
       const slab = ctx.extent(id);
-      if (!slab) continue;
-      const fam = slab.frame;
+      if (!slab && !g.exact) continue;
+      const fam = slab?.frame ?? g.frame;
       // a body that stands where its joints put it (a bevel gear on its pitch cone, a yoke and a cross on their centre)
       // is placed there, wherever a slab would put it
-      const o = g.exact ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact.offset)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      const o = g.exact || !slab ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact?.offset ?? 0)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
       const body = ctx.kin.bodies.find((b) => b.id === id)!;
       const role = BODY_ROLE[body.role] ?? "link";
       const frame = { o, x: g.frame.x, z: g.exact ? g.frame.z : fam.z };
-      const marks = g.pins.map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
+      // a boss ring round each pin the part carries (a joint off the part, a slide's line, has none)
+      const marks = g.pins.filter((p) => inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
       const part: Solid3 = {
         id,
         name: titleOf(id),

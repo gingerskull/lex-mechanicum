@@ -63,7 +63,7 @@ export const stops: Rule = {
       for (const b of s.bodies) {
         const g = ctx.geoms.get(b);
         const ext = ctx.extent(b);
-        if (!g || !ext) continue;
+        if (!g || !ext || g.exact) continue;
         const sw = swingOf(ctx, b, s.axis);
         // only a part that swings (a rocker, a lever) gets stops; a crank, or a gear that turns on through the cycle,
         // turns past them

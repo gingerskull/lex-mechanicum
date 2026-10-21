@@ -113,6 +113,8 @@ export interface Solid3 {
   group?: string;
   /** Solids this one overlaps by design (a rope through a sheave, a shank in its tapped hole); `why` gives the reason (A15). */
   allow?: string[];
+  /** Solids this one slides on face to face by design (a cylinder's port face on its standard's, A12): not packed. */
+  slides?: string[];
   mat?: string;
   motion?: Motion;
   closure?: "open" | "shield" | "seal";

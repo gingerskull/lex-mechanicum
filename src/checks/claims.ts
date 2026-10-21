@@ -23,7 +23,7 @@ export interface Claim {
   at?: number;
   of?: string;
   feature?: string;
-  band?: number;
+  band?: number | [number, number];
   over?: string;
   [k: string]: unknown;
 }
@@ -173,7 +173,7 @@ function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
     }
     case "phase": {
       if (c.feature && /dwell/.test(c.feature)) {
-        const d = longestDwell(y, c.band ?? (hi - lo) * 1e-3);
+        const d = longestDwell(y, typeof c.band === "number" ? c.band : (hi - lo) * 1e-3);
         if (d.len === 0) return "no dwell";
         return /end/.test(c.feature) ? ((d.start + d.len) % n * 360) / n : (d.start * 360) / n;
       }
@@ -181,7 +181,22 @@ function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
       return u[y.findIndex((v) => Math.abs(v - want) < 1e-9 * (1 + Math.abs(want)))]!;
     }
     case "dwell": {
-      const band = typeof c.band === "number" ? c.band : (hi - lo) * 1e-3;
+      // a band [lo, hi]: the longest stretch of the cycle with the output inside it (a port open while the swing is
+      // in a range); a number: the longest stretch where the output holds within that much (a dwell)
+      const bv: unknown = c.band;
+      if (Array.isArray(bv) && bv.length === 2) {
+        const [b0, b1] = [Math.min(bv[0] as number, bv[1] as number), Math.max(bv[0] as number, bv[1] as number)];
+        const inside = y.map((v) => v >= b0 && v <= b1);
+        if (inside.every(Boolean)) return 360;
+        let best = 0;
+        let run = 0;
+        for (let i = 0; i < 2 * n; i++) {
+          run = inside[i % n] ? run + 1 : 0;
+          best = Math.max(best, Math.min(run, n));
+        }
+        return (best * 360) / n;
+      }
+      const band: number = typeof bv === "number" ? bv : (hi - lo) * 1e-3;
       return (longestDwell(y, band).len * 360) / n;
     }
     default:

@@ -100,6 +100,8 @@ export async function clampCheck3(solids: Solid3[], placer: Placer, n = 12): Pro
       for (let g = 0; g < S.length; g++) {
         const G = S[g]!;
         if (moving[g] || SLIDING.has(G.kind) || !local[g]) continue;
+        // a face the design slides on (a port face on its standard) is no clamp
+        if (R.slides?.includes(G.id) || G.slides?.includes(R.id)) continue;
         const key = `${R.id} (turning) touches the ground face of ${G.id}`;
         if (out.has(key) || !obbMeet(obb[r]!, obb[g]!, -TOUCH)) continue;
         if (!baseOf(r) || !baseOf(g)) continue;

@@ -66,7 +66,7 @@ export interface Placement {
 
 /** The outline of a body at one sample, in the plane coordinates of a family frame. */
 function outlineAt(g: BodyGeom, X: Xf, fam: Frame): Vec2[] {
-  return g.profile.outer.map((p) => {
+  return (g.plan ?? g.profile.outer).map((p) => {
     const q = planeCoords(fam, xf.apply(X, fromPlane(g.frame, p)));
     return q.uv;
   });
@@ -79,7 +79,9 @@ interface Node {
 }
 
 export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: Sampled, joints: JointInfo[], sites: Site[]): Placement {
-  const ids = [...geoms.keys()];
+  // a body no joint reaches stands at its own frame (a fixed plate, a port face): it takes no slab
+  const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
+  const ids = [...geoms.keys()].filter((id) => joined.has(id));
   // families by normal
   const famOf = new Map<string, number>();
   const famFrames: Frame[] = [];

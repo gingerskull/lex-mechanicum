@@ -2967,14 +2967,7 @@
               70,
               0
             ],
-            "z": -8,
-            "standard": {
-              "center": [
-                120,
-                0
-              ],
-              "radius": 40
-            }
+            "z": -8
           },
           "at": {
             "frame": {
@@ -2984,6 +2977,39 @@
                 0
               ]
             }
+          }
+        },
+        {
+          "id": "standard",
+          "role": "frame",
+          "shape": {
+            "type": "disc",
+            "radius": 40,
+            "thickness": 8,
+            "holes": [
+              [
+                29.45,
+                -5.72,
+                2.5
+              ],
+              [
+                29.45,
+                5.72,
+                2.5
+              ],
+              [
+                0,
+                0,
+                6.05
+              ]
+            ]
+          },
+          "frame": {
+            "origin": [
+              120,
+              0,
+              -22
+            ]
           }
         },
         {
@@ -3005,21 +3031,15 @@
           "id": "piston",
           "role": "slider",
           "shape": {
-            "type": "custom",
-            "op": "extrude",
-            "profile": {
-              "rod": [
-                0,
-                120,
-                28
-              ],
-              "piston": {
-                "at": 120,
-                "length": 16,
-                "width": 38
-              }
-            },
-            "thick": 9
+            "type": "piston",
+            "length": 120,
+            "rod": 10,
+            "eye": 9,
+            "head": [
+              16,
+              39
+            ],
+            "axis": 14
           },
           "at": {
             "joint": "A"
@@ -3029,27 +3049,25 @@
           "id": "cylinder",
           "role": "output",
           "shape": {
-            "type": "custom",
-            "op": "extrude",
-            "profile": {
-              "body": {
-                "length": 100,
-                "width": 56,
-                "corner": 8
-              },
-              "bore": {
-                "length": 90,
-                "width": 40
-              },
-              "port": {
-                "at": [
-                  30,
-                  0
-                ],
-                "radius": 2.5
-              }
-            },
-            "thick": 28
+            "type": "cylinder",
+            "bore": 40,
+            "wall": 6,
+            "span": [
+              -46,
+              46
+            ],
+            "face": -14,
+            "pad": [
+              -12,
+              40,
+              28
+            ],
+            "port": [
+              30,
+              2.5
+            ],
+            "rod": 10,
+            "axis": 14
           },
           "at": {
             "joint": "O3"
@@ -3196,16 +3214,14 @@
             "O3"
           ],
           "in": {
-            "a": "A",
-            "pivot": "O3",
-            "r": "Lp"
+            "kind": "rpr",
+            "a": "O3",
+            "p": "A",
+            "body": "cylinder"
           },
-          "out": [
-            "cyl-angle",
-            "Pc"
-          ],
-          "opts": {
-            "form": "rotating-slide"
+          "out": {
+            "angle": "cyl-turn",
+            "dist": "cyl-dist"
           }
         }
       ],
@@ -3225,7 +3241,7 @@
           "local": [
             30,
             0,
-            0
+            -14
           ]
         },
         {
@@ -3234,7 +3250,7 @@
           "local": [
             149.45,
             -5.72,
-            0
+            -14
           ]
         },
         {
@@ -3243,7 +3259,7 @@
           "local": [
             149.45,
             5.72,
-            0
+            -14
           ]
         }
       ],
@@ -3252,8 +3268,7 @@
           "id": "cyl-angle",
           "of": "cylinder",
           "kind": "angle",
-          "unit": "deg",
-          "from": "line O2-O3"
+          "unit": "deg"
         },
         {
           "id": "piston-s",
@@ -3325,9 +3340,8 @@
           "id": "swing",
           "kind": "arc",
           "center": "O3",
-          "from": "O2",
-          "to": "A",
-          "label": "SWING"
+          "label": "SWING",
+          "through": "port"
         }
       ],
       "view": "PLAN",
@@ -3339,7 +3353,7 @@
             "origin": [
               120,
               0,
-              -14
+              -13
             ],
             "normal": [
               0,
@@ -3348,12 +3362,9 @@
             ]
           },
           "highlight": [
-            "port",
-            "inlet",
-            "exhaust",
-            "cylinder.port"
+            "port"
           ],
-          "note": "the face between the cylinder and the standard; the open port is the one the cylinder's port overlaps"
+          "note": "1 mm into the cylinder's port pad, over the face it shares with the standard: the pad's port, cut, over the standard's inlet and exhaust; the open port is the one the cylinder's port overlaps"
         }
       ],
       "controls": [

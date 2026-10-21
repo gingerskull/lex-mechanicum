@@ -74,6 +74,8 @@ export const KITS: Record<KitId, Kit> = {
   "ring-rollers": mk("ring-rollers", "Ring on rollers", ["J6"], ["gear-mesh"], "ring-rollers", ["washer"], normalOf, pinZone("the rollers")),
   "strap-sheave": mk("strap-sheave", "Strap on sheave", ["J12"], ["convey"], "strap-sheave", ["dowel", "collar", "plate"], normalOf, pinZone("the wrap on the sheave")),
   "cross-pin": mk("cross-pin", "Yoke pin in a universal joint's cross", ["J3"], ["hooke"], "cross-bearings", ["bearing", "circlipInternal", "nipple"], own, pinZone("the cross")),
+  trunnion: mk("trunnion", "Cylinder trunnion in a port face", ["J1"], ["slider-dyad"], "trunnion", ["shaft", "bushing", "thrustWasher", "spring", "nut", "washer"], own, pinZone("the port face")),
+  "piston-bore": mk("piston-bore", "Piston in its bore", ["J5"], ["slider-dyad"], "piston-bore", ["wearStrip"], own, pinZone("the bore")),
   "groove-cam": mk("groove-cam", "Groove cam", ["J7"], ["cam"], "groove-cam", ["roller", "shaft", "wearStrip", "felt"], normalOf, runZone("the roller in the groove")),
 };
 
