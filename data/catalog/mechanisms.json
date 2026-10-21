@@ -42208,7 +42208,7 @@
             "shape": {
               "type": "plate",
               "rect": [
-                240,
+                260,
                 200
               ]
             },
@@ -42216,8 +42216,8 @@
               "frame": {
                 "origin": [
                   0,
-                  -30,
-                  0
+                  -20,
+                  -10
                 ]
               }
             }
@@ -42238,12 +42238,13 @@
               "return": 120,
               "dwellInner": 60,
               "groove": {
-                "width": 12.1,
+                "width": 14.1,
                 "depth": 8,
                 "centreline": "x = -15 + s(theta) at the pitch radius",
-                "make": "boolean: the roller's sweep along the pitch curve subtracted from the cylinder"
+                "make": "boolean: a tube of the groove's section carried round the drum on the law, subtracted from the cylinder"
               },
-              "shaft": 16
+              "shaft": 16,
+              "bore": 16
             },
             "at": {
               "joint": "O"
@@ -42253,12 +42254,73 @@
             "id": "slide",
             "role": "follower",
             "shape": {
-              "type": "slider",
-              "length": 50,
-              "width": 30
+              "type": "plate",
+              "exact": true,
+              "outline": [
+                [
+                  -30,
+                  -20
+                ],
+                [
+                  30,
+                  -20
+                ],
+                [
+                  30,
+                  20
+                ],
+                [
+                  -30,
+                  20
+                ]
+              ],
+              "fillet": 4,
+              "thickness": 8,
+              "pieces": [
+                {
+                  "id": "upright",
+                  "origin": [
+                    -15,
+                    -66,
+                    0
+                  ],
+                  "rot": [
+                    90,
+                    0,
+                    0
+                  ],
+                  "thick": 6,
+                  "outline": [
+                    [
+                      -14,
+                      8
+                    ],
+                    [
+                      14,
+                      8
+                    ],
+                    [
+                      4.5,
+                      90
+                    ],
+                    [
+                      0,
+                      94.5
+                    ],
+                    [
+                      -4.5,
+                      90
+                    ]
+                  ]
+                }
+              ]
             },
-            "at": {
-              "joint": "G"
+            "frame": {
+              "origin": [
+                -15,
+                -70,
+                0
+              ]
             }
           },
           {
@@ -42266,8 +42328,9 @@
             "role": "follower",
             "shape": {
               "type": "disc",
-              "radius": 6,
-              "thickness": 8
+              "radius": 7,
+              "thickness": 6,
+              "place": -3
             },
             "at": {
               "joint": "F"
@@ -42294,12 +42357,12 @@
           {
             "id": "G",
             "type": "prismatic",
-            "a": "ground",
-            "b": "slide",
+            "a": "slide",
+            "b": "ground",
             "at": [
               -15,
-              -84,
-              90
+              -70,
+              0
             ],
             "axis": [
               1,
@@ -42330,15 +42393,52 @@
           {
             "id": "C",
             "type": "cam-contact",
-            "a": "drum",
-            "b": "roller",
+            "a": "roller",
+            "b": "drum",
             "at": [
-              -21,
+              -15,
               -60,
               90
             ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "ca": [
+              0,
+              0,
+              90
+            ],
             "follower": "roller",
-            "closure": "form"
+            "closure": "form",
+            "cam": {
+              "form": "barrel",
+              "schedule": [
+                {
+                  "kind": "rise",
+                  "span": "rise",
+                  "law": "cycloidal"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "dwelltop"
+                },
+                {
+                  "kind": "return",
+                  "span": "rise",
+                  "law": "cycloidal"
+                },
+                {
+                  "kind": "dwell",
+                  "span": "360-2*rise-dwelltop"
+                }
+              ],
+              "lift": "h",
+              "rb": "Rp",
+              "theta0": 0
+            },
+            "note": "at is the roller centre at the pitch radius Rp (mid-depth of the groove); the groove's centre line runs along the axis by the law"
           }
         ],
         "params": [
@@ -42367,7 +42467,7 @@
             "note": "rise angle; the return is equal"
           },
           {
-            "id": "dwell-top",
+            "id": "dwelltop",
             "value": 60,
             "unit": "deg",
             "min": 10,
@@ -42376,10 +42476,10 @@
           },
           {
             "id": "rr",
-            "value": 6,
+            "value": 7,
             "unit": "mm",
             "min": 4,
-            "max": 8,
+            "max": 9,
             "note": "roller radius (groove 0.1 mm wider than the roller)"
           }
         ],
@@ -42406,26 +42506,24 @@
               "C"
             ],
             "in": {
-              "cam": "drum",
-              "follower": "slide",
-              "roller": "roller",
-              "h": "h",
-              "Rp": "Rp",
-              "rise": "rise",
-              "dwell-top": "dwell-top",
+              "joint": "C",
+              "input": "input",
+              "follower": [
+                "slide",
+                "roller"
+              ],
+              "axis": [
+                1,
+                0,
+                0
+              ],
               "rr": "rr"
             },
-            "opts": {
-              "law": "cycloidal",
-              "follower": "translating roller, along the drum axis",
-              "closure": "groove",
-              "pressure": "atan(s'/Rp)"
-            },
-            "out": [
-              "stroke",
-              "pressure-angle",
-              "C"
-            ]
+            "out": {
+              "s": "stroke-s",
+              "pressure": "pressure-angle",
+              "contact": "K"
+            }
           }
         ],
         "points": [
@@ -42434,9 +42532,19 @@
             "body": "slide",
             "local": [
               -30,
-              24,
-              0
+              10,
+              90
             ]
+          },
+          {
+            "id": "K",
+            "body": "drum",
+            "local": [
+              0,
+              0,
+              0
+            ],
+            "note": "the roller's contact on the groove wall; the cam block places it each pose"
           }
         ],
         "outputs": [
@@ -42459,7 +42567,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "New review against the record (#216, unbuilt). The record's 20° dwells (160° rise, 160° return) would go by in a blink, and its 29.8° peak pressure angle sat on the 30° limit. Decided: rise 120°, dwell 60°, return 120°, dwell 60°, the cam family's timing, so the slide visibly stops at each end; stroke 30 mm on a 60 mm pitch radius, so the pressure angle peaks at 25.5°. Default view is front elevation with the roller on the near side, where the groove's slope under the roller is the pressure angle at true size. The groove is a boolean on the cylinder (a build kit)."
+          "note": "New review against the record (#216, unbuilt). The record's 20° dwells (160° rise, 160° return) would go by in a blink, and its 29.8° peak pressure angle sat on the 30° limit. Decided: rise 120°, dwell 60°, return 120°, dwell 60°, the cam family's timing, so the slide visibly stops at each end; stroke 30 mm on a 60 mm pitch radius, so the pressure angle peaks at 25.5°. Default view is front elevation with the roller on the near side, where the groove's slope under the roller is the pressure angle at true size. The groove is a boolean on the cylinder (a build kit). Rebuild R5 (#216): built on v3. The groove is cut by Manifold from the law: a tube of the groove's section carried round the drum and subtracted (D8). The slide runs on rails on the base under the drum and carries the roller's stud on an upright in front of the drum, narrower than the roller, so the roller in its groove shows in FRONT. Roller radius 7 (groove 14.1). The stroke and radius controls are not offered (the drum is built at build time)."
         },
         "principle": [
           {
@@ -42473,6 +42581,9 @@
           },
           {
             "point": "F"
+          },
+          {
+            "point": "K"
           }
         ],
         "traces": [
@@ -42489,19 +42600,21 @@
           {
             "id": "drum-axis",
             "kind": "axis-line",
-            "through": "O",
-            "direction": [
+            "at": "O",
+            "axis": [
               1,
               0,
               0
             ],
+            "length": 110,
             "label": "DRUM AXIS"
           },
           {
             "id": "groove-slope",
             "kind": "line",
-            "from": "C",
+            "from": "K",
             "to": "F",
+            "extend": true,
             "label": "GROOVE NORMAL"
           },
           {
@@ -42509,7 +42622,7 @@
             "kind": "arc",
             "center": "F",
             "from": "Fs",
-            "to": "C",
+            "to": "K",
             "label": "PRESSURE ANGLE"
           }
         ],
@@ -42519,16 +42632,6 @@
             "id": "drum",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "stroke",
-            "kind": "param",
-            "param": "h"
-          },
-          {
-            "id": "radius",
-            "kind": "param",
-            "param": "Rp"
           }
         ],
         "plot": {
@@ -42557,7 +42660,8 @@
             "output": "stroke",
             "stat": "dwell",
             "value": 60,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
             "text": "here Rp is 60 mm and phi peaks at 25.5°",

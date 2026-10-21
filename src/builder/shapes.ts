@@ -7,11 +7,11 @@ import { filletPoly } from "../hardware/primitives";
 import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
-import { type Vec3, v3 } from "../kin/math";
+import { type Vec3, m3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
-import { camLawOf, flatCam, rollerCam } from "./cams";
+import { barrelGroove, camLawOf, flatCam, rollerCam } from "./cams";
 
 export interface BodyGeom {
   id: string;
@@ -178,7 +178,8 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // `place`: the part starts that far along its frame's z, where the joints put it (a roller down in a groove), not on a slab
     const placed = typeof shape.place === "number" ? { exact: { offset: shape.place } } : g.exact || fixed ? { exact: { offset: 0 } } : {};
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...placed };
-    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? geom);
+    const built = universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? geom;
+    out.set(b.id, withPieces(b, built));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -343,7 +344,8 @@ const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * M
  * bored for its shaft. The joint's `at` is the roller centre (or the face's point on the follower line) at the reference.
  */
 function plateCam(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
-  if (String(g.shape.type) !== "cam" || g.shape.form === "barrel") return null;
+  if (String(g.shape.type) !== "cam") return null;
+  if (g.shape.form === "barrel") return barrel(kin, S, b, g);
   if (g.shape.form === "face-groove") return faceGroove(kin, S, b, g);
   const j = kin.joints.find((q) => q.type === "cam-contact" && (q.b === b.id || q.a === b.id) && q.cam);
   const r = j ? S.joints.get(j.id) : undefined;
@@ -384,4 +386,54 @@ function faceGroove(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | nul
     approx: false,
     features: [{ mode: "cut", profile: { outer: outerWall, holes: [innerWall] }, op: { op: "extrude", h: depth + 1, steps: 1 }, frame: { o: [0, 0, thick - depth], x: [1, 0, 0], z: [0, 0, 1] } }],
   };
+}
+
+/**
+ * A barrel cam (`cam` with `form: barrel`): a drum of `radius` and `length` on its axis (the body's frame z), centred on
+ * its joint unless `place` says where it starts, its groove cut by the law: a tube of the groove's section carried round
+ * the drum (src/builder/cams.ts barrelGroove), subtracted by Manifold. The roller's joint sets the pitch radius's place
+ * and the groove's axial origin.
+ */
+function barrel(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const j = kin.joints.find((q) => q.type === "cam-contact" && (q.b === b.id || q.a === b.id) && q.cam);
+  const r = j ? S.joints.get(j.id) : undefined;
+  if (!j || !r) return null;
+  const pc = planeCoords(g.frame, r.at);
+  const L = camLawOf(j, r.num, Math.atan2(pc.uv[1], pc.uv[0]));
+  if (!L) return null;
+  const R = num(g.shape.radius, 64);
+  const len = num(g.shape.length, 140);
+  const gr = (g.shape.groove ?? {}) as Record<string, unknown>;
+  const w = num(gr.width, 12.1);
+  const depth = num(gr.depth, 8);
+  const rp = Math.hypot(pc.uv[0], pc.uv[1]);
+  const offset = typeof g.shape.place === "number" ? g.shape.place : -len / 2;
+  const bore = num(g.shape.bore, num(g.shape.shaft, 16));
+  const mesh = barrelGroove(L, pc.w, rp, w, R - depth, R + 2);
+  return {
+    ...g,
+    profile: { outer: circle(R, 0, 0, 144), holes: [circle(bore / 2, 0, 0, 32).reverse()] },
+    thick: len,
+    approx: false,
+    exact: { offset },
+    features: [{ mode: "cut", profile: { outer: [], holes: [] }, op: { op: "extrude", h: 1, steps: 1 }, frame: { o: [0, 0, -offset], x: [1, 0, 0], z: [0, 0, 1] }, mesh }],
+  };
+}
+
+/**
+ * Plates of a body beyond its own part, declared in its shape (`pieces`: { id, outline, origin, rot, thick, fillet }, the
+ * frame in world reference coordinates, the outline filleted as drawn): an upright on a slide that carries a roller's stud.
+ */
+function withPieces(b: KinBody, g: BodyGeom): BodyGeom {
+  const list = g.shape.pieces;
+  if (!Array.isArray(list) || !list.length) return g;
+  const pieces = [...(g.pieces ?? [])];
+  list.forEach((pc: Record<string, unknown>, k) => {
+    const pts = (pc.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]);
+    const o = (pc.origin as number[] | undefined) ?? [0, 0, 0];
+    const R = m3.eulerDeg(((pc.rot as number[] | undefined) ?? [0, 0, 0]) as Vec3);
+    const frame = { o: [o[0]!, o[1]!, o[2] ?? 0] as Vec3, x: [R[0], R[3], R[6]] as Vec3, z: [R[2], R[5], R[8]] as Vec3 };
+    pieces.push({ id: `${b.id}-${String(pc.id ?? `piece${k}`)}`, name: "", frame, profile: { outer: filletPoly(area(pts) < 0 ? pts.slice().reverse() : pts, num(pc.fillet, 1.5)), holes: [] }, h: num(pc.thick, 8) });
+  });
+  return { ...g, pieces };
 }

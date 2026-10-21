@@ -74,7 +74,7 @@ export interface KinJoint {
   // flexure
   neck?: Record<string, unknown>;
   // cam-contact: the cam's schedule (spans in degrees), lift, base (or prime) radius, offset and its angle at the reference
-  cam?: { schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string }[]; lift: Num; rb: Num; e?: Num; theta0?: Num };
+  cam?: { schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string }[]; lift: Num; rb: Num; e?: Num; theta0?: Num; /** "barrel": the follower runs along the cam's axis at the pitch radius rb (a barrel cam's groove). */ form?: "plate" | "barrel" };
   /** The joint is engaged only while this driver is inside [lo, hi] degrees (mod 360): a Geneva pin in its slot. */
   active?: { driver: string; lo: number; hi: number };
 }

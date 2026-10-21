@@ -99,3 +99,43 @@ export function curvature(pts: Vec2[]): { least: number; convex: boolean } {
   }
   return { least, convex };
 }
+
+/**
+ * The cutter of a barrel cam's groove, in the drum's frame (z its axis): a closed tube whose section is the groove's
+ * rectangle, from `rIn` to `rOut` radially and the groove's `width` wide square to its centre line at the pitch radius
+ * `rp`, carried round the drum on the law (the centre line's axial place `a0 + s - s0`, the roller at ψ = β0). Watertight,
+ * outward facing, for Manifold to subtract (D8).
+ */
+export function barrelGroove(L: CamLawSpec, a0: number, rp: number, width: number, rIn: number, rOut: number, steps = 360): import("../solids/types").MeshData {
+  const s0 = camMotion(L.sched, L.theta0).s;
+  const pos: number[] = [];
+  for (let k = 0; k < steps; k++) {
+    const psi = (k / steps) * TAU;
+    const m = camMotion(L.sched, L.theta0 + L.beta0 - psi);
+    const a = a0 + m.s - s0;
+    // the centre line's slope against the circumference: the width is held square to it
+    const hw = (width / 2) * Math.hypot(1, m.v / rp);
+    const c = Math.cos(psi);
+    const s = Math.sin(psi);
+    for (const [r, z] of [[rIn, a - hw], [rOut, a - hw], [rOut, a + hw], [rIn, a + hw]] as const) pos.push(r * c, r * s, z);
+  }
+  const tri: number[] = [];
+  for (let k = 0; k < steps; k++) {
+    const n = (k + 1) % steps;
+    for (let e = 0; e < 4; e++) {
+      const a = k * 4 + e;
+      const b = k * 4 + ((e + 1) % 4);
+      const c = n * 4 + ((e + 1) % 4);
+      const d = n * 4 + e;
+      tri.push(a, c, b, a, d, c);
+    }
+  }
+  // outward: flip every triangle if the signed volume is negative
+  let vol = 0;
+  for (let t = 0; t < tri.length; t += 3) {
+    const [i, j, k] = [tri[t]! * 3, tri[t + 1]! * 3, tri[t + 2]! * 3];
+    vol += pos[i]! * (pos[j + 1]! * pos[k + 2]! - pos[j + 2]! * pos[k + 1]!) - pos[i + 1]! * (pos[j]! * pos[k + 2]! - pos[j + 2]! * pos[k]!) + pos[i + 2]! * (pos[j]! * pos[k + 1]! - pos[j + 1]! * pos[k]!);
+  }
+  if (vol < 0) for (let t = 0; t < tri.length; t += 3) [tri[t + 1], tri[t + 2]] = [tri[t + 2]!, tri[t + 1]!];
+  return { pos: new Float32Array(pos), tri: new Uint32Array(tri), tag: new Uint8Array(tri.length / 3) };
+}

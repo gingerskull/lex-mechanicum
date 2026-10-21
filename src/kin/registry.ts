@@ -370,7 +370,9 @@ const camBlock: BlockFn = (c, s) => {
   const rb = c.num(j.cam.rb);
   outVal(c, s, m.s, "s");
   outVal(c, s, m.v, "v");
-  outVal(c, s, pressureAngle({ rb, e: j.cam.e !== undefined ? c.num(j.cam.e) : 0 }, m.s, m.v) * R2D, "pressure");
+  // a barrel cam's follower runs along the axis at the pitch radius: tan φ = s' / rb
+  const phi = j.cam.form === "barrel" ? Math.atan2(m.v, rb) : pressureAngle({ rb, e: j.cam.e !== undefined ? c.num(j.cam.e) : 0 }, m.s, m.v);
+  outVal(c, s, phi * R2D, "pressure");
   // the contact point on the cam (a translating follower in line with the cam centre): a roller of radius `rr` touches
   // along the pitch curve's normal, n ∝ ρ r̂ + v t̂ with ρ = rb + s; a flat face (`flat: true`) touches at ρ r̂ − v t̂,
   // the envelope of its lines. r̂ is the follower's direction from the cam centre, t̂ = axis × r̂, the cam turning about +axis.
@@ -383,7 +385,9 @@ const camBlock: BlockFn = (c, s) => {
     const rHat = v3.unit(v3.sub(rel, v3.mul(ax, v3.dot(rel, ax))));
     const tHat = v3.cross(ax, rHat);
     const rho = rb + m.s;
-    if (i.flat === true) c.setPt(kOut, v3.add(v3.add(centre, v3.mul(ax, v3.dot(rel, ax))), v3.sub(v3.mul(rHat, rho), v3.mul(tHat, m.v))));
+    // a barrel cam: the groove's normal in the cylinder's tangent plane, n ∝ rb â + s' t̂ (â the axis)
+    if (j.cam.form === "barrel") c.setPt(kOut, v3.sub(tip, v3.mul(v3.unit(v3.add(v3.mul(ax, rb), v3.mul(tHat, m.v))), c.num(i.rr ?? 0))));
+    else if (i.flat === true) c.setPt(kOut, v3.add(v3.add(centre, v3.mul(ax, v3.dot(rel, ax))), v3.sub(v3.mul(rHat, rho), v3.mul(tHat, m.v))));
     else {
       const n = v3.unit(v3.add(v3.mul(rHat, rho), v3.mul(tHat, m.v)));
       c.setPt(kOut, v3.sub(tip, v3.mul(n, c.num(i.rr ?? 0))));

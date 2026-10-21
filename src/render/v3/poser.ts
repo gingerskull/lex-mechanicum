@@ -46,6 +46,9 @@ export interface Poser {
 
 export const ID4: Mat4 = mat4(IDENTITY);
 
+/** How far a teaching point is carried onto its body's top face at most, mm: a deep stack of slabs, no more. */
+const LIFT_REACH = 40;
+
 const m4 = (X: Vec3, Y: Vec3, Z: Vec3, T: Vec3): Mat4 => [X[0], X[1], X[2], 0, Y[0], Y[1], Y[2], 0, Z[0], Z[1], Z[2], 0, T[0], T[1], T[2], 1];
 
 /** A kin body pose (reference configuration to now) as a matrix. */
@@ -79,6 +82,8 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
     if (!b || !X || !ref) return p;
     const [nx, ny, nz, t] = lifts![b]!;
     const d = t - (nx * ref[0] + ny * ref[1] + nz * ref[2]);
+    // a point far off the body's face is not on it (a roller's centre up on a slide's upright): drawn where it is
+    if (Math.abs(d) > LIFT_REACH) return p;
     const R = X.R;
     const v: Vec3 = [nx * d, ny * d, nz * d];
     return [p[0] + R[0] * v[0] + R[1] * v[1] + R[2] * v[2], p[1] + R[3] * v[0] + R[4] * v[1] + R[5] * v[2], p[2] + R[6] * v[0] + R[7] * v[1] + R[8] * v[2]];
