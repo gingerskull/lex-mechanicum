@@ -61583,7 +61583,7 @@
         "revolute": 1,
         "prismatic": 5,
         "higher_pairs": 5,
-        "notes": "ground (cylinder block), shaft, swash plate pinned to the shaft at the tilt angle, 5 pistons, 5 slipper shoes; each shoe swivels on its piston's ball end and slides flat on the plate face. The joint count gives 7: each shoe's spin about its piston is an idle freedom (5) and the tilt pin is locked while running (1); the true mobility is 1, the shaft's turn, solved in closed form by the plane-slide block."
+        "notes": "ground, cylinder block (fixed), shaft with the swash plate fixed on it at the tilt angle, 5 pistons, 5 slipper shoes; each piston slides in a bore of the block, each shoe swivels on its piston's ball end and slides flat on the plate face. The joint count does not give the mobility: each shoe's spin about its piston is an idle freedom, and the plate is fixed to the shaft rather than jointed (overconstrained in the count). The true mobility is 1, the shaft's turn, solved in closed form by the plane-slide block (the tilt frame)."
       },
       "backdrivable": "Yes",
       "tags": {
@@ -61795,20 +61795,101 @@
             "id": "ground",
             "role": "ground",
             "shape": {
-              "type": "custom",
-              "op": "extrude",
-              "profile": "cylinder block of radius 60, 50 long along x, with 5 bores of 12 mm on pitch radius 40",
-              "length": 50
+              "type": "plate",
+              "rect": [
+                260,
+                160
+              ],
+              "thickness": 8
             },
             "at": {
               "frame": {
                 "origin": [
-                  45,
-                  0,
-                  70
+                  -80,
+                  -80,
+                  -4
                 ]
               }
             }
+          },
+          {
+            "id": "block",
+            "role": "frame",
+            "fixed": true,
+            "shape": {
+              "type": "disc",
+              "radius": 58,
+              "thickness": 40,
+              "axial": 0,
+              "holes": [
+                [
+                  0,
+                  -40,
+                  8.05
+                ],
+                [
+                  38.0423,
+                  -12.3607,
+                  8.05
+                ],
+                [
+                  23.5114,
+                  32.3607,
+                  8.05
+                ],
+                [
+                  -23.5114,
+                  32.3607,
+                  8.05
+                ],
+                [
+                  -38.0423,
+                  -12.3607,
+                  8.05
+                ],
+                [
+                  0,
+                  0,
+                  10
+                ]
+              ],
+              "posts": [
+                {
+                  "at": [
+                    38,
+                    0
+                  ],
+                  "top": 15,
+                  "r": 8
+                },
+                {
+                  "at": [
+                    60,
+                    0
+                  ],
+                  "top": 15,
+                  "r": 8
+                }
+              ]
+            },
+            "frame": {
+              "o": [
+                30,
+                0,
+                70
+              ],
+              "z": [
+                1,
+                0,
+                0
+              ],
+              "x": [
+                0,
+                0,
+                1
+              ]
+            },
+            "note": "the cylinder block: five bores on the pitch circle and a clearance bore for the shaft"
           },
           {
             "id": "shaft",
@@ -61817,7 +61898,8 @@
             "shape": {
               "type": "shaft",
               "diameter": 14,
-              "length": 180
+              "length": 200,
+              "axial": -60
             },
             "at": {
               "joint": "S"
@@ -61830,7 +61912,8 @@
               "type": "disc",
               "radius": 58,
               "thickness": 8,
-              "bore": 14
+              "bore": 20,
+              "axial": 0
             },
             "frame": {
               "o": [
@@ -61848,8 +61931,7 @@
                 0,
                 1
               ]
-            },
-            "note": "the swash plate, pinned to the shaft at the tilt angle; its face is the plane through the shaft axis"
+            }
           },
           {
             "id": "piston-1",
@@ -61857,7 +61939,12 @@
             "shape": {
               "type": "shaft",
               "diameter": 12,
-              "length": 40
+              "length": 44,
+              "axial": 0,
+              "plunger": true,
+              "ball": {
+                "diameter": 14
+              }
             },
             "frame": {
               "o": [
@@ -61883,7 +61970,8 @@
             "shape": {
               "type": "disc",
               "radius": 9,
-              "thickness": 4
+              "thickness": 4,
+              "axial": 0
             },
             "frame": {
               "o": [
@@ -61909,7 +61997,12 @@
             "shape": {
               "type": "shaft",
               "diameter": 12,
-              "length": 40
+              "length": 44,
+              "axial": 0,
+              "plunger": true,
+              "ball": {
+                "diameter": 14
+              }
             },
             "frame": {
               "o": [
@@ -61935,7 +62028,8 @@
             "shape": {
               "type": "disc",
               "radius": 9,
-              "thickness": 4
+              "thickness": 4,
+              "axial": 0
             },
             "frame": {
               "o": [
@@ -61961,7 +62055,12 @@
             "shape": {
               "type": "shaft",
               "diameter": 12,
-              "length": 40
+              "length": 44,
+              "axial": 0,
+              "plunger": true,
+              "ball": {
+                "diameter": 14
+              }
             },
             "frame": {
               "o": [
@@ -61987,7 +62086,8 @@
             "shape": {
               "type": "disc",
               "radius": 9,
-              "thickness": 4
+              "thickness": 4,
+              "axial": 0
             },
             "frame": {
               "o": [
@@ -62013,7 +62113,12 @@
             "shape": {
               "type": "shaft",
               "diameter": 12,
-              "length": 40
+              "length": 44,
+              "axial": 0,
+              "plunger": true,
+              "ball": {
+                "diameter": 14
+              }
             },
             "frame": {
               "o": [
@@ -62039,7 +62144,8 @@
             "shape": {
               "type": "disc",
               "radius": 9,
-              "thickness": 4
+              "thickness": 4,
+              "axial": 0
             },
             "frame": {
               "o": [
@@ -62065,7 +62171,12 @@
             "shape": {
               "type": "shaft",
               "diameter": 12,
-              "length": 40
+              "length": 44,
+              "axial": 0,
+              "plunger": true,
+              "ball": {
+                "diameter": 14
+              }
             },
             "frame": {
               "o": [
@@ -62091,7 +62202,8 @@
             "shape": {
               "type": "disc",
               "radius": 9,
-              "thickness": 4
+              "thickness": 4,
+              "axial": 0
             },
             "frame": {
               "o": [
@@ -62130,27 +62242,10 @@
             ]
           },
           {
-            "id": "TP",
-            "type": "revolute",
-            "a": "shaft",
-            "b": "plate",
-            "at": [
-              0,
-              0,
-              70
-            ],
-            "axis": [
-              0,
-              0,
-              1
-            ],
-            "note": "tilt pin: sets the swash angle, locked while the shaft turns"
-          },
-          {
             "id": "P1",
             "type": "prismatic",
             "a": "piston-1",
-            "b": "ground",
+            "b": "block",
             "at": [
               "(h-R*cos(0)*sin(gamma))/cos(gamma)",
               "R*cos(0)",
@@ -62200,7 +62295,7 @@
             "id": "P2",
             "type": "prismatic",
             "a": "piston-2",
-            "b": "ground",
+            "b": "block",
             "at": [
               "(h-R*cos(72)*sin(gamma))/cos(gamma)",
               "R*cos(72)",
@@ -62250,7 +62345,7 @@
             "id": "P3",
             "type": "prismatic",
             "a": "piston-3",
-            "b": "ground",
+            "b": "block",
             "at": [
               "(h-R*cos(144)*sin(gamma))/cos(gamma)",
               "R*cos(144)",
@@ -62300,7 +62395,7 @@
             "id": "P4",
             "type": "prismatic",
             "a": "piston-4",
-            "b": "ground",
+            "b": "block",
             "at": [
               "(h-R*cos(216)*sin(gamma))/cos(gamma)",
               "R*cos(216)",
@@ -62350,7 +62445,7 @@
             "id": "P5",
             "type": "prismatic",
             "a": "piston-5",
-            "b": "ground",
+            "b": "block",
             "at": [
               "(h-R*cos(288)*sin(gamma))/cos(gamma)",
               "R*cos(288)",
@@ -62432,11 +62527,11 @@
           },
           {
             "id": "h",
-            "value": 9,
+            "value": 11,
             "unit": "mm",
             "min": 6,
             "max": 14,
-            "note": "ball centre above the plate face: slipper thickness plus ball radius"
+            "note": "ball centre above the plate face: slipper thickness 4 plus ball radius 7"
           }
         ],
         "design": [],
@@ -62457,7 +62552,6 @@
             "block": "plane-slide",
             "id": "tilt-frame",
             "joints": [
-              "TP",
               "P1",
               "SB1",
               "K1",

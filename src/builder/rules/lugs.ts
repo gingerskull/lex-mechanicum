@@ -9,6 +9,8 @@ import { extrudeOp } from "../../solids/tessellate";
 import { type Vec3, v3 } from "../../kin/math";
 import type { BuildCtx } from "../ctx";
 import { canon, fromPlane, frameAlong, planeCoords } from "../frames";
+import { H } from "../../hardware/primitives";
+import { Local, titleOf } from "../lib";
 import type { Rule } from "./types";
 
 export interface LugSpec {
@@ -95,6 +97,33 @@ export const lugs: Rule = {
         list.push(lug);
         ctx.lugs.set(site, list);
       }
+    }
+  },
+};
+
+/**
+ * Posts under a fixed body that has joints of its own (a swash plate's cylinder block, which no stack holds): the record
+ * names them in its shape, `posts: [{ at: [x, y], top, r? }]` in world reference coordinates, each a round column from
+ * the base's top up into the body, screwed through the base (F1).
+ */
+export const posts: Rule = {
+  id: "posts",
+  tier: "AUTO",
+  ids: ["A7", "F1"],
+  fixture: "swash-plate",
+  applies: (ctx) => ctx.kin.bodies.some((b) => Array.isArray((b.shape as { posts?: unknown } | undefined)?.posts)),
+  apply(ctx: BuildCtx) {
+    if (!ctx.base) return;
+    for (const b of ctx.kin.bodies) {
+      const list = ((b.shape as { posts?: { at: [number, number]; top: number; r?: number }[] } | undefined)?.posts ?? []);
+      list.forEach((p, k) => {
+        const r = p.r ?? 8;
+        const f = frameAlong([p.at[0], p.at[1], ctx.base!.top], [0, 0, 1]);
+        const L = new Local(f, { joints: [] });
+        L.add(H.solid(`${b.id}-post${k}`, { name: k ? "" : `Post Ø${2 * r}, carries the ${titleOf(b.id).toLowerCase()}`, qty: k ? 0 : list.length, kind: "standoff", role: "ground", mat: "Steel C45, ground", outer: circle(r, 0, 0, 32), z0: 0, z1: p.top - ctx.base!.top, body: "ground" }));
+        L.add(H.screw(`${b.id}-post${k}-sc`, "socket", 6, 16, { face: ctx.base!.bottom - ctx.base!.top, dir: 1, body: "ground", ...(k ? { name: "", qty: 0 } : {}) }));
+        ctx.add(L.out());
+      });
     }
   },
 };

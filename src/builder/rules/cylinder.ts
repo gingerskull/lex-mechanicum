@@ -9,7 +9,8 @@ import { inside } from "../../core/poly";
 import { H } from "../../hardware/primitives";
 import { type Vec3, v3 } from "../../kin/math";
 import type { BuildCtx } from "../ctx";
-import { frameAlong, planeCoords } from "../frames";
+import { frameAlong, fromPlane, planeCoords } from "../frames";
+import type { JointInfo } from "../sites";
 import { Local, titleOf } from "../lib";
 import type { Rule } from "./types";
 
@@ -83,6 +84,7 @@ export const pistonBore: Rule = {
   applies: (ctx) => ctx.joints.some((j) => j.kit === "piston-bore"),
   apply(ctx) {
     for (const j of ctx.joints.filter((q) => q.kit === "piston-bore")) {
+      if (plungerBore(ctx, j)) continue;
       const piston = [j.a, j.b].find((b) => String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type) === "piston");
       const head = piston ? ctx.get(`${piston}-head`) : undefined;
       if (!piston || !head || head.op.op !== "extrude") continue;
@@ -98,5 +100,27 @@ export const pistonBore: Rule = {
     }
   },
 };
+
+/**
+ * A plunger (a `shaft` shape marked `plunger`, a swash plate's piston) in a bore of a fixed block: a bronze liner pressed
+ * into the block's bore, the plunger running in it. True when the joint is one.
+ */
+function plungerBore(ctx: BuildCtx, j: JointInfo): boolean {
+  const shape = (id: string) => ctx.kin.bodies.find((q) => q.id === id)?.shape as Record<string, unknown> | undefined;
+  const plunger = [j.a, j.b].find((b) => shape(b)?.plunger);
+  if (!plunger) return false;
+  const block = plunger === j.a ? j.b : j.a;
+  const bp = ctx.parts.get(block);
+  const d = num(shape(plunger)!.diameter, 12);
+  if (!bp || bp.op.op !== "extrude") return true;
+  // the liner runs the block's length, on the bore's axis
+  const uv = planeCoords(bp.frame, j.at as Vec3).uv;
+  const L = new Local({ o: fromPlane(bp.frame, uv, 0), x: bp.frame.x, z: bp.frame.z }, { joints: [j.id] });
+  L.add(H.bushing(`${j.id}-liner`, d, d + 4, { body: block, z0: 0, z1: bp.op.h, name: `Bore liner ${d}x${d + 4}x${bp.op.h}, bronze`, mat: "Bronze CuSn8, honed" }));
+  ctx.add(L.out());
+  ctx.note({ id: j.id, kit: "piston-bore", at: j.at, title: `piston-bore · ${titleOf(j.id)}`, note: `${titleOf(j.id)}: the Ø${d} plunger slides in a bronze liner pressed into the ${titleOf(block).toLowerCase()}'s bore, the replaceable wear part.`, serves: { F2: [`${j.id}-liner`] } });
+  (ctx.fired["piston-bore"] ??= []).push(j.id);
+  return true;
+}
 
 void v3;

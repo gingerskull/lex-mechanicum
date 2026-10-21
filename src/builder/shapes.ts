@@ -365,11 +365,12 @@ export function ballProfile(r: number, n = 24): Profile {
  */
 function withBall(g: BodyGeom): BodyGeom {
   const ball = g.shape.ball as { diameter?: unknown } | undefined;
-  if (!ball || String(g.shape.type) !== "link" || !g.exact) return g;
+  const type = String(g.shape.type);
+  if (!ball || (type !== "link" && type !== "shaft") || !g.exact) return g;
   const r = num(ball.diameter, 30) / 2;
-  const L = num(g.shape.length, 0);
-  const o = v3.add(g.frame.o, v3.add(v3.mul(g.frame.x, L), v3.mul(g.frame.z, g.exact.offset + g.thick / 2)));
-  return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-ball`, name: `Flyweight ball Ø${2 * r}`, frame: { o, x: g.frame.x, z: g.frame.z }, profile: ballProfile(r), h: 0, revolve: true }] };
+  // a link's ball on its far end, in its thickness; a shaft's (a plunger's ball end) on its start
+  const o = type === "shaft" ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact.offset)) : v3.add(g.frame.o, v3.add(v3.mul(g.frame.x, num(g.shape.length, 0)), v3.mul(g.frame.z, g.exact.offset + g.thick / 2)));
+  return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-ball`, name: type === "shaft" ? "" : `Flyweight ball Ø${2 * r}`, frame: { o, x: g.frame.x, z: g.frame.z }, profile: ballProfile(r), h: 0, revolve: true }] };
 }
 
 /**

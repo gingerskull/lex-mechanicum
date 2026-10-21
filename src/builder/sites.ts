@@ -11,7 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore",
+  "cross-pin", "trunnion", "piston-bore", "ball-socket", "slipper",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -69,11 +69,13 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (ground && j.type === "revolute" && (a?.shape?.type === "cylinder" || b?.shape?.type === "cylinder")) return "trunnion";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
       if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
+      // a ball end in a slipper's socket (a swash plate's piston)
+      if (!ground && j.type === "spherical" && (a?.shape?.ball || b?.shape?.ball)) return "ball-socket";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
       return parallel(axis, UP) ? "J1" : "J10";
     }
     case "prismatic":
-      if (a?.shape?.type === "piston" || b?.shape?.type === "piston") return "piston-bore";
+      if (a?.shape?.type === "piston" || b?.shape?.type === "piston" || a?.shape?.plunger || b?.shape?.plunger) return "piston-bore";
       return /tongue/i.test(text(rec.note)) ? "tongue-slot" : "J5";
     case "pin-in-slot": {
       const s = text(j.slot) + text(rec.slot);
@@ -103,6 +105,9 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       return "J11";
     case "flexure":
       return "J13";
+    case "planar":
+      // a slipper's flat face on a plate
+      return "slipper";
     default:
       return "J3";
   }

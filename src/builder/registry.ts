@@ -7,8 +7,9 @@ import { adjustableLength, cableClip } from "./rules/fixes";
 import { drive, explode, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
-import { lugs } from "./rules/lugs";
+import { lugs, posts } from "./rules/lugs";
 import { pistonBore, trunnion } from "./rules/cylinder";
+import { ballSocket } from "./rules/slipper";
 import type { Rule } from "./rules/types";
 
 const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
@@ -24,6 +25,7 @@ export const rules: Rule[] = [
   placement,
   lugs,
   base,
+  posts,
   byId("j6-mesh"),
   byId("j9-crossed-mesh"),
   // a tongue's slot hardware turns with its hub: built before the stacks, so a bridge is routed clear of it
@@ -34,6 +36,7 @@ export const rules: Rule[] = [
   crossBearings,
   trunnion,
   pistonBore,
+  ballSocket,
   byId("j4-slot-roller"),
   byId("pin-lobe"),
   byId("groove-cam"),
