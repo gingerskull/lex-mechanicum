@@ -656,6 +656,25 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       }
       return;
     }
+    case "bend": {
+      // a flexure's bend (record spec, overlay kind bend): the turn of a point of the bent part about the flexure, from
+      // its rest place, as a signed arc with the angle in degrees, about the joint's axis
+      const c = pointOf(A, o.at);
+      const from = pointOf(A, o.from), to = pointOf(A, o.to);
+      if (!c || !from || !to) return;
+      const n = unit((A.rt.scene.axes?.[typeof o.at === "string" ? o.at : ""] as Vec3 | undefined) ?? [0, 0, 1]);
+      const e0 = unit(sub(from, c));
+      const e1 = cross(n, e0);
+      const v = sub(to, c);
+      const ang = Math.atan2(dot(v, e1), dot(v, e0));
+      const r = len(sub(from, c));
+      const pts = arcPts(c, e0, n, r, Math.min(0, ang), Math.max(0, ang));
+      poly([c, from]);
+      if (Math.abs(ang) > 1e-4) poly(pts);
+      const deg = (ang * 180) / Math.PI;
+      if (text) label(`${text} ${deg >= 0 ? "+" : ""}${deg.toFixed(2)}°`, P(A, from)[0], P(A, from)[1] - 14, ink, true);
+      return;
+    }
     case "axis-line": {
       const c = pointOf(A, o.at);
       if (!c) return;

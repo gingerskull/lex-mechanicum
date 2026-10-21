@@ -1,168 +1,211 @@
 # Audit: Flexure hinge (flexure-hinge)
-standard: 2.13 · date: 2026-10-20 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
+teaching: tweak · decisions in the record
 
 ## Summary
-PASS 99 · FAIL 0 · N/A 29 · open: none
+PASS 140 · FAIL 0 · N/A 27 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.13 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #148 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · the pass issue holds only this mechanism's decisions; plan and status in #218 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in rebuild batch R7 (#218): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
 | P2 | PASS | DATA · catalogue validator clean |
-| P3 | PASS | DATA / SITE · ratio (unity, 1:1, K about 13 N·m/rad), axes coaxial, reciprocating and harmonic output, backdrivable, other names, family, motion, level, dof and the motorised drive |
-| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | DATA · motion, forces, benefits, limits; three uses with one line each |
-| P6 | PASS | DATA · two Wikipedia pages, a paper and an engineering guide; three videos and a photo page; the real-world video checked (oEmbed: it exists, Physik Instrumente's NanoCube flexure stage on the maker's own channel) |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts; lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · the lever rocks ±2° about the neck centre (solve), the tip moves ±2.09 mm, the restoring torque is K times the angle with K = 12,984 N·mm/rad as the catalogue; 'a few degrees in metal' holds |
-| P10 | PASS | HAND · tip path traced with its velocity, the tip force square to the lever, the neck's bend overlay and the lever angle, restoring torque plot (linear) |
-| P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
-| K1 | PASS | HAND · check: max link error 0.0e+0 mm; the neck centre, lever length and angle are solved; the polish changes notes and build rules only |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · custom outlines (block, neck, lever); no pins in the model, the joint is the declared compliant neck |
-| K4 | PASS | HAND · roles: driver (lever), link (neck), ground (block); the accent on the drive pin in the lever's tip, where the input acts (a flexure has no input shaft) |
-| K5 | PASS | HAND · check clean; the one blank on layer 0, 10 mm thick (the hinge width b) rather than 6, because K depends on b |
-| K6 | PASS | DATA · R 5, t 0.8, b 10, E 71,700, lever 60 and ±2° as the catalogue, K = 12,984 N·mm/rad; the angle drawn true, not exaggerated (the catalogue allows it, K1 keeps it exact); the catalogue's fixed block is a 40 x 40 block clamped to the base |
-| K7 | PASS | HAND · input oscillating on the lever |
-| D1 | PASS | HAND · the blank: a block, a circular notch milled from both sides as two full-radius slots tangent to the block's and the lever's faces, a lever tapering to a boss round the drive pin |
-| D2 | PASS | HAND · the lever widest at its root (18 mm) where the bending moment is largest, tapering to the tip boss; the neck thin only where it must bend |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
-| D4 | PASS | AUTO · base corners from the form style; feet concentric with the corner arcs, none at the corner where the motor bracket hangs |
-| D5 | PASS | AUTO / HAND · the block on one ground seat plate under one clamp plate; the motor in its one-piece bracket |
-| D6 | PASS | HAND / STYLE · clamp, seat, stops and drive read quieter than the blank |
-| D8 | N/A | AUTO / HAND · every part lies on z: the hinge works in one plane |
-| D9 | PASS | AUTO / HAND · the neck drawn rigid, its bend and stress zone by the bend overlay; nothing stretches or deforms |
-| D7 | PASS | HAND · blank, seat, clamp plate and base carry only load shape and manufacturing marks |
-| A1 | PASS | AUTO · flexure-neck J13 (declared in compliant); no pin joints |
-| A2 | PASS | AUTO · the neck as a compliant joint; no other joint in the model |
-| A3 | N/A | AUTO · no bearing joint in the model; the drive link runs on two bronze bushings 4x7 |
-| A4 | N/A | AUTO · no shaft or axle; the drive pins are plain hardened pins |
-| A5 | N/A | AUTO · no keyed part but the drive crank, a D-bore on the motor's D-flat shaft |
-| A6 | PASS | AUTO · J13 stands the block on a 2 mm ground seat plate of its own outline; the standoffs rule posts neither the block nor the neck, so nothing goes through the neck |
-| A7 | PASS | AUTO · 8 mm base, counterbored corners, feet, the tip path engraved, front scale; the arc slot for the drive pin cut by the drive rule |
-| A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 |
-| A9 | N/A | HAND · no pin joint: the neck carries the lever in one piece; the drive pins are pressed in and held by circlips |
-| A10 | PASS | HAND · the blank in one plane; the drive under the base |
-| A11 | PASS | HAND · lever to neck to block (one piece), block to seat and base by the clamp screws, dowels against shift; the drive's push from link to pin to lever, its reaction through crank, motor and bracket to the base |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no prose in a polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states that the motion can check is a claim and agrees (T9) |
+| P10 | PASS | HAND · the lever's tip traced on its arc; the neck's bend as a signed arc with its angle; the tip arc and the lever's length; plot of the tip's travel against the lever angle |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run against the record in E2 (#204) before the build and again on the finished drawing (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 0.0e+0 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 1 block (flexure); no numeric fallback · composed from the block library; no fallback, no one-off model |
+| K4 | PASS | HAND · the input body is the driver with the accent on its shaft; the output body declared |
+| K6 | PASS | DATA · circular notch R 5, neck 0.8, width 10, 7075: K = 2 E b t^2.5 / (9 pi sqrt R) = 12,984 N mm/rad; the lever 100 mm, tip ±3.49 mm at ±2 deg |
+| K7 | PASS | DATA · drivers bend (oscillating) · input kind declared with its driven joint |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one oscillating driver, ±2 deg, the neck's elastic range |
+| K10 | PASS | AUTO / DATA · one closure, no branch to choose; design choices declared |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
+| T2 | PASS | HAND · review before the build (E2) and again on the six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · principle parts declared; drawn whole, in depth order |
+| T4 | PASS | DATA · fired: trace-marks (1 solid) · the tip traced on its arc with the comet |
+| T5 | PASS | DATA · neck bend (signed arc with its angle), tip arc, lever length |
+| T6 | PASS | HAND / DATA · the true metal swing of ±2 deg kept (K1): on the 100 mm lever the tip moves ±3.5 mm and the neck's bend reads in degrees on the overlay |
+| T7 | PASS | DATA · PLAN: the notch, the lever and its swing lie in the plane |
+| T8 | PASS | DATA · detail of the neck, 6x: the two notch circles and the 0.8 mm neck between them |
+| T9 | PASS | AUTO / DATA · claim table: 2 ok, 0 off, 0 uncheckable of 2 |
+| T10 | N/A | AUTO · 0 solids drawn see-through · nothing static covers the lever or the neck in the plan view |
+| T11 | PASS | AUTO · 0 supports routed, 0 moved off a sweep · no support crosses the lever's sweep: the blank's block is clamped on its seat beside it; the stops stand past its swing |
+| T12 | PASS | HAND · 12 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · nothing goes by in a blink |
+| T14 | PASS | HAND / DATA · the lever's swing is the one control |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · one blank: block, notch and lever, the lever a flat root tapering to a boss round the drive pin |
+| D2 | PASS | HAND · material where the load runs, bosses round every pin |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · one seat plate and one clamp plate for the block; the motor on one plate hung from the base |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
+| D9 | PASS | AUTO / HAND · the neck drawn rigid either side of its centre; its bend shown by the bend overlay (D9) |
+| D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
+| D11 | PASS | AUTO · SOLID: 0 of 40 solids unsound |
+| D7 | PASS | HAND · the blank plain; richness in the clamp, the stops and the drive |
+| A1 | PASS | AUTO · N J13, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · N J13, drive drive · the neck a compliant joint (J13); the drive by the input kind (V5) |
+| A3 | N/A | AUTO · fired: classify (1 solid), axial stack builder · no bore to size: the lever turns on its neck |
+| A4 | PASS | AUTO · fired: j1-dead-axle (no solids), axial stack builder · the drive pin and the motor shaft from H.shaft, chamfered |
+| A5 | PASS | AUTO · fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), axial stack builder · the crank disc on the motor shaft by a set screw on its flat |
+| A6 | PASS | AUTO · fired: j5-slide (no solids), j13-compliant (11 solids), standoffs (no solids) · the blank's block on a ground seat plate of its outline, never on posts; nothing through the neck |
+| A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base 8 mm under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (4 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | N/A | AUTO / HAND · fired: placement solver · no pin: the neck is one piece with block and lever |
+| A10 | PASS | HAND · fired: placement (2 solids), placement solver · the blank in one plane; nothing stacked to clear |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · 55 solids, 23 unnamed (further items of a listed set); catalogue sizes named: clamp screws M4 x 25, dowels Ø3, stop pins Ø5, pins Ø4, bushings 4x7, motor Ø50 x 18 |
-| A14 | PASS | HAND · the stop pins clear the lever by 0.32 mm at the ends of the swing; the drive pin clears its arc slot by 1 mm; the link passes under the bracket's top flange with 1.5 mm; the terminal block clear of the bracket; clearance 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · a note and a badge on both joints; five build rules |
-| A17 | PASS | HAND · base, seat, blank, dowels, clamp plate and screws; stop pins pressed into the base; drive pin pressed into the lever; from below: bracket, motor, crank with its pin, link over both pins, circlips; leads last |
-| E1 | PASS | AUTO · one level per solid; levels -8 to 2 |
-| E2 | PASS | AUTO · screws, the motor and the bracket are groups |
-| E3 | PASS | AUTO · clamp screws upward, bracket and terminal screws downward |
-| E4 | PASS | HAND · the clamp screws and plate come off first, then the blank with its pressed drive pin; the drive drops below the base |
-| E5 | PASS | AUTO · dowels, stop pins and the drive pin stay in their parts; the bushings stay in the link |
-| E6 | PASS | AUTO · motor whole with its shaft; bracket one group |
-| E7 | N/A | AUTO · no loose spacer or washer |
-| E8 | N/A | AUTO · no keyed shaft stack |
-| E9 | PASS | HAND · readable at full explode at 0°, 28° and 88°; nothing leaves the frame |
-| J1 | N/A | no dead axle |
-| J2 | N/A | no live shaft |
-| J3 | N/A | no moving pin in the model; the drive link's pins are the drive's |
-| J4 | N/A | no slot |
-| J5 | N/A | no slide |
-| J6 | N/A | no gear mesh |
-| J7 | N/A | no cam |
-| J8 | N/A | no belt: the motor turns the crank directly |
-| J9 | N/A | no crossed-axis mesh |
-| J10 | N/A | no shaft in plan |
-| J12 | N/A | no flexible member |
-| J13 | PASS | AUTO · the neck drawn rigid with its bend overlay, one piece with block and lever; a stop pin each side on the lever's edge 0.4° past the swing; the block on a ground seat plate, clamped under a plate, two screws and two dowels reamed through block, plate and seat |
-| J11 | N/A | no screw |
-| F1 | PASS | AUTO · two dowels locate the blank and its clamp plate on the base |
-| F2 | PASS | AUTO / HAND · the clamp plate holds the blank down; circlips under the link on the drive pin and over it on the crank pin |
-| F3 | N/A | AUTO · no torque passes a joint: the neck is one piece; the crank sits on the motor's D-flat |
-| F4 | N/A | AUTO / HAND · no thrust: the blank is clamped, the link sits between its circlips |
-| F5 | PASS | AUTO / HAND · stop pins catch the lever 0.4° past each end of the ±2° swing, before the neck yields |
-| F6 | N/A | AUTO / HAND · the neck itself is the spring that returns the lever; driven |
-| F7 | N/A | AUTO / HAND · no adjustable fit: the swing is set by the crank's throw and the link's dead centres, as the oscillating drive rule sets it |
-| F8 | PASS | AUTO · nothing to oil at the neck (no sliding); the link's bushings are oil-impregnated bronze |
-| F9 | N/A | AUTO / HAND · no phase to keep between parts; the home flag gives the drive its zero |
-| F10 | PASS | AUTO · home flag on the crank read by a fork sensor; the stops protect the neck |
-| M1 | PASS | AUTO · edge breaks on every top face |
-| M2 | N/A | HAND · nothing with inertia worth lightening: the lever's tip moves ±2 mm |
-| M3 | PASS | AUTO · bore entry chamfers on every seat and through hole |
-| M4 | PASS | AUTO / HAND · counterbored base corners, seats for the clamp screws |
-| M5 | PASS | AUTO / HAND · the notch is two full-radius slots; no pockets |
+| A13 | PASS | AUTO / HAND · 40 solids, 16 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 2 joint notes; no note: none; no badge: none · a note per joint with its badge; build rules: one blank, no pivot; the neck in its elastic range, the stops a fifth of the half swing past it; the drive pin through a slot in the base to a Scotch yoke |
+| A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
+| A18 | PASS | AUTO · placement: 1 slabs in the tallest stack (10.0 mm), 0 clevises; stack per joint in the Joints table · placement: one slab; the block, seat and clamp placed against it |
+| A19 | N/A | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none · no stack support to route: the block is clamped on its seat |
+| A20 | N/A | AUTO · support per joint: none · no revolute stack |
+| A21 | PASS | AUTO · kit per joint: N J13, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · the stop pins of the compliant kit; cable clip |
+| E1 | PASS | AUTO · every solid has one explode level; levels -4.5 to 1 · one level per solid, nothing stretches |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable in ISOMETRIC on both sheets, nothing leaves the frame |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | N/A | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) · no dead axle |
+| J2 | N/A | AUTO · fired: j2-live-shaft (no solids) · no live shaft on the base normal |
+| J3 | N/A | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), ring-hub (no solids) · no moving revolute |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J5 | N/A | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) · no plain slide |
+| J6 | N/A | AUTO · fired: j6-mesh (no solids), ring-rollers (no solids) · no parallel mesh |
+| J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids), j11-screw (no solids) · no shaft in plan |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | PASS | AUTO · fired: j13-compliant (11 solids) · neck drawn rigid, its bend on the overlay; one piece with block and lever; a hardened stop pin each side, a fifth of the half swing past each end; the block on a ground seat plate, clamped under a plate by two screws and two dowels; one material, 7075-T6 |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at N; fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (11 solids) · two dowels reamed through clamp, block and seat (Joints table) |
+| F2 | PASS | AUTO · served at N; fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (11 solids) · the block clamped under its plate; the yoke and crank pin pressed on their pins |
+| F3 | PASS | AUTO · served at no joint; fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · the crank disc by a set screw on the motor shaft's flat; the drive pin pressed into the lever |
+| F4 | N/A | AUTO / HAND · served at no joint; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (no solids), trunnion (no solids), j11-screw (no solids) · nothing turns free on a shaft along it |
+| F5 | PASS | AUTO / HAND · served at N; fired: j5-slide (no solids), pawl-tooth (no solids), j11-screw (no solids), j13-compliant (11 solids), stops (no solids) · stop pins each side of the lever, past the swing, before the neck yields |
+| F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
+| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · nothing to adjust: the crank's throw and the yoke set the swing exactly |
+| F8 | N/A | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) · no sliding contact but the crank pin in the hardened yoke slot, which runs dry at this load |
+| F9 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (no solids) · no phase to keep between parts |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (no solids), yoke-drive (21 solids) · home flag on the crank disc, fork sensor on a standoff (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · the lever tapers from its root to a boss round the drive pin |
+| M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (4 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | PASS | HAND · the notch radius R 5 is the fillet where the block and the lever meet the neck |
-| M8 | N/A | AUTO · no shouldered thread |
-| M9 | PASS | AUTO / HAND · clamp screws M4 through plate, blank and seat into the base; standard lengths |
-| M10 | PASS | AUTO · the blank one material, 7075-T6 (J13's); the seat ground C45, hardened pins, bronze bushings; materials on every solid |
-| M11 | N/A | AUTO · no turned shaft but the motor's (bought) |
-| M12 | PASS | HAND · clamp screws from above; bracket, terminal and clip screws from below; the circlips reachable from below |
-| M13 | PASS | AUTO · 18 threaded, all with a locking method |
-| M14 | N/A | AUTO / HAND · no sliding contact: the neck bends, the link turns on bushings |
-| V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base; the oscillating drive for a J13 lever |
-| V2 | PASS | AUTO · one-piece bracket, top flange screwed up into the base, window toward the link |
-| V3 | PASS | AUTO / HAND · crank and link clear of the bracket, the feet and the base; clearance 0 |
-| V4 | N/A | AUTO · no belt: the crank is on the motor shaft, as the oscillating drive builds it |
-| V5 | PASS | AUTO · oscillating through a pin pressed into the lever's tip: a 2.09 mm crank and a 30 mm link swing the lever through exactly ±2° (dead centres at the ends) |
-| V6 | PASS | AUTO · home flag on the crank, fork sensor, leads to a terminal block on the base edge clear of the bracket, one P-clip |
-| L1 | PASS | STYLE · lint-style clean |
-| L2 | PASS | HAND · the model and polish carry geometry, roles, marks and materials only |
-| L3 | PASS | HAND · lever driver, neck link, block ground, hardware hw |
-| L4 | PASS | HAND / STYLE · accent on the drive pin only, with the traced path and the forces |
-| L5 | PASS | AUTO / HAND · screws, dowels and pins are real solids in real holes |
-| L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
-| L7 | PASS | STYLE · tilt 0° to 88°, no shear |
-| L8 | PASS | AUTO / HAND · engraved path and scale are marks |
-| R1 | PASS | HAND · everything from the rules and H.*; the polish adds no solid |
-| R2 | PASS | HAND · threads M3, M4; pins Ø4; bushings 4x7; dowels Ø3, stop pins Ø5 |
-| R3 | PASS | AUTO · stops, seat and clamp from J13, the drive and sensor from H.drive |
-| R4 | PASS | AUTO · package 9.7 KB |
-| R5 | PASS | HAND · states only what differs: notes and build rules; no sampling |
-| R6 | PASS | FLAG · browser bench, DPR 1.5: plan 1.43, 28° 1.8, side 1.3, explode 70° 1.6 ms; setup 5.6 ms; under every target |
-| R7 | PASS | HAND · model.ts + polish.ts 6.9 KB |
-| R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
-| DL2 | PASS | HAND · default dial full |
-| DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
-| DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
-| DL5 | PASS | FLAG · rung counts and frame times in the detail ladder below |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 39 of 40 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 4 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | PASS | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · the yoke's slot hardened, the crank pin hardened |
+| V1 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · a gear motor under the base, one turn per cycle, drives the crank (a swing of a few degrees needs no belt) |
+| V2 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · the motor on one plate hung from the base on two standoffs |
+| V3 | N/A | AUTO / HAND · fired: drive (no solids) · no belt |
+| V4 | N/A | AUTO · fired: j8-belt (no solids) · no belt |
+| V5 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · oscillating input of a compliant lever (J13): a pin pressed into its tip runs down through a slot in the base to a slotted yoke driven by a crank (a Scotch yoke, so the swing follows the driver's cosine law exactly) |
+| V6 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records and polish carry no look |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (no solids) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (1 solid) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | PASS | AUTO / DATA · the neck's detail drawn by the renderer at 6x |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 7.6 KB · package v2 written at build time |
+| R5 | PASS | HAND · the polish states only exceptions, no sampling |
+| R6 | PASS | FLAG · FLAG: bench run (desktop): no flag; the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 13 of 40 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 9.7 KB; the site build runs on the family branch |
-| Q4 | PASS | plan, 28°, side, explode at 0°, 28° and 88°, light sheet, and 28° dark, looked at (dist/shots-flexure-hinge, local) |
-| Q5 | PASS | browser bench; no flag |
-| Q6 | PASS | every row judged; no FAIL |
-| Q7 | PASS | conformance: flexure-hinge at 2.13, pass |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 7.6 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · dist/shots3/flexure-hinge: record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench run: dist/bench/report-v2.md |
+| Q6 | PASS | every row judged |
+| Q7 | PASS | at 3.0 |
+| Q8 | PASS | teaching review: tweak (2026-10-20); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| flexure-neck | J13 | 2 x Dowel pin Ø3, blank to base | Clamp plate 34 x 34 x 4 over the blank's block | – one piece: the neck carries the lever's torque by bending | – the blank is clamped on its seat | 2 x Stop pin Ø5, hardened, just past each end of the swing | – the neck is the spring; driven | – no fit to adjust: the notch is cut to size | – nothing slides | – no phase to keep | – the stops keep the neck in its elastic range |
-| drive | drive | – bracket screwed up into the base | 2 x External circlip DIN 471, Ø4 | – crank on the motor's D-flat | – link between its circlips | – the crank turns freely; the stops limit the lever | – motor holds when powered | – swing set by the crank's throw and the dead centres | 2 x Bronze bushing 4x7, oil-impregnated | – home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| N | J13 | flexure | – | – | Dowel pin Ø3 h6, reamed through clamp, block and seat | Clamp plate over the blank's block | none | none | 2 x Stop pin Ø4, hardened, pressed into the base | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| blank thickness | 6 mm (K5) | 10 mm | the catalogue's hinge width b; K is proportional to it |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 2 | 0 | 1.59 |
-| DL-B | 0 | 54 | 1.57 |
-| DL-C | 0 | 0 | 1.41 |
-| DL-D | 0 | 0 | 1.34 |
-| DL-E | 8 | 0 | 1.22 |
-| DL-F | 0 | 0 | 1.31 |
-| DL-G | 0 | 0 | 1.16 |
-| DL-H | 8 | 0 | 1.09 |
-| never | 37 | 35 | 1.73 (full) |
+| DL-A | 1 | 0 | 1.59 |
+| DL-B | 0 | 80 | 1.51 |
+| DL-C | 0 | 0 | 1.62 |
+| DL-D | 0 | 0 | 1.65 |
+| DL-E | 8 | 0 | 1.79 |
+| DL-F | 0 | 0 | 1.64 |
+| DL-G | 0 | 0 | 1.61 |
+| DL-H | 4 | 0 | 1.66 |
+| never | 27 | 50 | 1.61 |
 
 ## Promotion candidates
-- None. The seat, the reamed dowels, the stops on the lever's edge, the neck one piece with its lever, the drive through the lever's tip and the blank's material were promoted to rules in standard 2.13.
+None left: the compliant kit (J13: the blank's block and neck, the seat, clamp and stop pins) and the yoke drive (V5 for a short swing or slide) are rules of the builder; the bend overlay is drawn by the renderer.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 9.7 KB
-screenshots: plan, 28°, side, explode at 0°, 28° and 88°, light sheet; 28° dark (dist/shots-flexure-hinge, local) · bench: browser, RTX 5090, DPR 1.5, 2026-10-20; 28° frame 1.73 ms at full detail, no flag
+check: clean · K1 residual: 0.0e+0 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 7.6 KB
+screenshots: dist/shots3/flexure-hinge (record view, PLAN, FRONT, SIDE, ISOMETRIC, detail of the neck, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

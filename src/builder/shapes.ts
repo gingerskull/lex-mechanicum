@@ -9,6 +9,7 @@ import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
 import type { Op, Profile } from "../solids/types";
 import { nutGeom, screwGeom } from "./screws";
+import { flexureGeom } from "./compliant";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 
@@ -175,7 +176,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? geom);
+    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
   return out;

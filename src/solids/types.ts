@@ -124,6 +124,11 @@ export interface Solid3 {
   thread?: { m: number; z0: number; z1: number; lead?: number };
   /** A conveyed solid (D9): carried along a closed path by a solved travel from its place `s0` on it (src/solids/convey.ts). */
   convey?: { path: import("./convey").ConveyPath; s0: number };
+  /**
+   * A drive part that turns with the cycle itself (a crank on a gear motor that makes one turn per cycle): about the
+   * axis through `at` by u − u0, u0 the cycle phase of the reference configuration it was built in.
+   */
+  spin?: { at: Vec3; axis: Vec3; u0: number };
   /** A stretched member's two solved points: its unit-length profile spans them. */
   stretch?: [string, string];
   /** A deforming member: its profile is made again each frame from the solved state, same point count per ring. */

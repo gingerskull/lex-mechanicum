@@ -592,7 +592,13 @@ class Run implements BlockCtx {
     }
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
+      let v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points);
+      // a point's position along a direction (a tip's travel across its lever), mm from the reference
+      if (o.axis && Array.isArray(v)) {
+        const ax = v3.unit(o.axis as Vec3);
+        const r0 = this.s.refPts.get(o.of);
+        v = v3.dot(r0 ? v3.sub(v, r0) : v, ax);
+      }
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {

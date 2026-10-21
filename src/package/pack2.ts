@@ -132,6 +132,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     if (s.posedBy) p.posedBy = s.posedBy;
     if (s.reach) p.reach = { to: [s.reach.to[0], s.reach.to[1], s.reach.to[2]], end: s.reach.end };
     if (s.legacyAxis) p.legacyAxis = s.legacyAxis;
+    if (s.spin) p.spin = { at: [...s.spin.at], axis: [...s.spin.axis], u0: s.spin.u0 };
     if (s.convey) {
       let k = conveys.indexOf(s.convey.path);
       if (k < 0) k = conveys.push(s.convey.path) - 1;

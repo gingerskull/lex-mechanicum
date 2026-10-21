@@ -303,32 +303,7 @@ const strapSheave = contactRule({
   },
 });
 
-// ------------------------------------------------------------------------------------------------ J13 (J11 is src/builder/screws.ts)
-
-const j13 = contactRule({
-  id: "j13-compliant",
-  ids: ["J13", "A6", "F1", "F2", "F5"],
-  fixture: "kin:flexureHinge",
-  kits: ["J13"],
-  build(ctx, c, L) {
-    const id = c.id;
-    const lever = c.a === "ground" ? c.b : c.a;
-    const e = extentIn(ctx, c, lever);
-    const reach = Math.max(Math.abs(e[0]), Math.abs(e[1]));
-    const z0 = ctx.extent(lever)?.w0 ?? 0;
-    const z1 = ctx.extent(lever)?.w1 ?? z0 + 6;
-    // stop pins each side at 70 % of the lever's reach, a fifth of the half swing past each end (F5)
-    const half = Math.max(0.05, (c.ra > 0 ? 0.25 : 0.2));
-    for (const [k, s] of [[0, 1], [1, -1]] as const) L.add(H.stop(`${id}-stop${k}`, circle(2.5, reach * 0.7, s * reach * (0.7 * half + 0.1), 16), { body: "ground", z0, z1: z1 + 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    // the blank clamped under a plate by two screws and two dowels (F1, F2)
-    L.add(H.plate(`${id}-clamp`, roundRect(-30, -14, -4, 14, 2), { body: "ground", kind: "plate", role: "ground", name: "Clamp plate over the blank's ground block", z0: z1, z1: z1 + 4 }));
-    for (const [k, y] of [[0, -8], [1, 8]] as const) {
-      L.add(H.screw(`${id}-sc${k}`, "socket", 3, 4 + 6 + 4, { body: "ground", at: [-17, y, 0], face: z1 + 4, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
-      L.add(H.dowel(`${id}-dw${k}`, 3, { body: "ground", at: [-24, y, 0], z0: z0 - 2, z1: z1 + 2, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    }
-    return { serves: { F5: [`${id}-stop0`, `${id}-stop1`], F1: [`${id}-dw0`], F2: [`${id}-clamp`] }, note: `${titleOf(id)}: compliant neck drawn rigid; a hardened stop pin each side so the neck never leaves its elastic range; the blank clamped under a plate on two screws and two dowels.` };
-  },
-});
+// J11 is src/builder/screws.ts, J13 src/builder/compliant.ts
 
 // ------------------------------------------------------------------------------------------------ the missing kinds
 
@@ -419,7 +394,7 @@ const ringRollers = contactRule({
   },
 });
 
-export const contactRules: Rule[] = [j6, j9, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave, j13];
+export const contactRules: Rule[] = [j6, j9, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave];
 
 void MIN_GAP;
 void ringOffsets;

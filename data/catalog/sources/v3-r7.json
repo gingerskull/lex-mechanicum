@@ -1716,7 +1716,7 @@
        40
       ],
       "thickness": 10,
-      "note": "block left of the notch, clamped; one blank with the lever, aluminium 7075-T6"
+      "note": "the blank's block left of the notch, clamped; one blank with the lever, aluminium 7075-T6"
      },
      "at": {
       "frame": {
@@ -1734,11 +1734,15 @@
      "shape": {
       "type": "link",
       "length": 100,
-      "root": 18,
+      "root": {
+       "at": 5,
+       "half": 9
+      },
       "boss": [
-       7,
-       2
+       9,
+       7
       ],
+      "pin": 4,
       "thickness": 10
      },
      "at": {
@@ -1829,7 +1833,8 @@
      ],
      "default": 0,
      "lo": -2,
-     "hi": 2
+     "hi": 2,
+     "pin": "T"
     }
    ],
    "solve": [
@@ -1839,18 +1844,13 @@
      "joints": [],
      "in": {
       "joint": "N",
-      "R": "R",
-      "t": "t",
-      "b": "b",
-      "E": "E"
+      "input": "bend",
+      "beam": "lever",
+      "l": "Larm",
+      "thetaMax": 2
      },
-     "out": [
-      "bend-state",
-      "restoring-torque"
-     ],
-     "opts": {
-      "model": "Paros and Weisbord circular notch, pseudo-rigid revolute at the neck centre",
-      "K": "2 E b t^2.5 / (9 pi sqrt(R)) = 12,984 N·mm/rad"
+     "out": {
+      "bend": "bend-state"
      }
     }
    ],
@@ -1860,6 +1860,24 @@
      "body": "lever",
      "local": [
       100,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "B0",
+     "body": "ground",
+     "local": [
+      30,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "B",
+     "body": "lever",
+     "local": [
+      30,
       0,
       0
      ]
@@ -1876,7 +1894,12 @@
      "id": "tip",
      "of": "T",
      "kind": "position",
-     "unit": "mm"
+     "unit": "mm",
+     "axis": [
+      0,
+      1,
+      0
+     ]
     }
    ],
    "fallback": null
@@ -1885,7 +1908,7 @@
    "review": {
     "verdict": "tweak",
     "date": "2026-10-20",
-    "note": "Reviewed after the original review with its method. Six phases from the solve: the lever rocks ±2° about the neck centre and the stiffness is 12,984 N·mm/rad, as the text says; but on the 60 mm lever the tip moved only ±2.1 mm, so the six phases looked almost the same. Decided: keep the true metal angle (a few degrees is part of the lesson, and K1 forbids exaggerating it); lengthen the lever to 100 mm so the tip moves ±3.5 mm; trace the tip on its arc; draw the neck's bend; and a 6x detail view of the neck where the bending happens."
+    "note": "Reviewed after the original review with its method. Six phases from the solve: the lever rocks ±2° about the neck centre and the stiffness is 12,984 N·mm/rad, as the text says; but on the 60 mm lever the tip moved only ±2.1 mm, so the six phases looked almost the same. Decided: keep the true metal angle (a few degrees is part of the lesson, and K1 forbids exaggerating it); lengthen the lever to 100 mm so the tip moves ±3.5 mm; trace the tip on its arc; draw the neck's bend; and a 6x detail view of the neck where the bending happens. Rebuild (R7): the neck's bend is drawn as a signed arc with its angle (the bend overlay), the neck itself rigid either side of its centre (D9); the drive is a crank and slotted yoke under the base through a pin in the lever's tip."
    },
    "principle": [
     {
@@ -1910,6 +1933,8 @@
      "id": "neck-bend",
      "kind": "bend",
      "at": "N",
+     "from": "B0",
+     "to": "B",
      "label": "NECK BEND"
     },
     {
@@ -1939,8 +1964,7 @@
      ],
      "scale": 6,
      "highlight": [
-      "N",
-      "lever"
+      "N"
      ]
     }
    ],
@@ -3189,7 +3213,7 @@
    "review": {
     "verdict": "tweak",
     "date": "2026-10-20",
-    "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice."
+    "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice. Rebuild (R7): the return type is not offered as a control, because it changes the built nut; the tube return is built."
    },
    "principle": [
     {

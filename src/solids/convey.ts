@@ -94,6 +94,19 @@ export function mul4(a: ArrayLike<number>, b: ArrayLike<number>): number[] {
   return o;
 }
 
+/** A turn about the axis through `at` by `a` radians, column-major. */
+export function turnMatrix(at: Vec3, axis: Vec3, a: number): number[] {
+  const l = Math.hypot(axis[0], axis[1], axis[2]) || 1;
+  const [x, y, z] = [axis[0] / l, axis[1] / l, axis[2] / l];
+  const c = Math.cos(a), s = Math.sin(a), t = 1 - c;
+  const R = [t * x * x + c, t * x * y + s * z, t * x * z - s * y, t * x * y - s * z, t * y * y + c, t * y * z + s * x, t * x * z + s * y, t * y * z - s * x, t * z * z + c];
+  const m = [R[0]!, R[1]!, R[2]!, 0, R[3]!, R[4]!, R[5]!, 0, R[6]!, R[7]!, R[8]!, 0, 0, 0, 0, 1];
+  m[12] = at[0] - (m[0]! * at[0] + m[4]! * at[1] + m[8]! * at[2]);
+  m[13] = at[1] - (m[1]! * at[0] + m[5]! * at[1] + m[9]! * at[2]);
+  m[14] = at[2] - (m[2]! * at[0] + m[6]! * at[1] + m[10]! * at[2]);
+  return m;
+}
+
 /** The move of a solid placed at `s0` on the path to where a travel carries it, in the carrier's frame (column-major). */
 export function conveyMatrix(p: ConveyPath, s0: number, travel: number): number[] {
   return mul4(frameAt(p, s0 + travel), inv(frameAt(p, s0)));

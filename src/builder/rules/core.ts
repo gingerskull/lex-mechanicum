@@ -161,6 +161,7 @@ export const base: Rule = {
     const holes: Vec2[][] = [];
     for (const c of corners) holes.push(circle(2.75, c[0], c[1], 20).reverse());
     for (const h of ctx.baseHoles) holes.push(circle(h.r, h.at[0], h.at[1], Math.max(20, Math.round(h.r * 4))).reverse());
+    for (const sl of ctx.baseSlots) holes.push([...sl].reverse() as Vec2[]);
     // the 5 mm engraved scale along the front edge and the traced paths engraved (A7)
     const ticks: Vec2[][] = [];
     const sx0 = Math.ceil((x0 - m + 14) / 5) * 5;

@@ -90,6 +90,8 @@ export interface BuildCtx {
   bores: Map<string, Bore[]>;
   /** Holes the base needs, world xy and radius, with the joint that asked. */
   baseHoles: { at: [number, number]; r: number; joint: string }[];
+  /** Slots the base is cut with, polygons in world xy (a drive pin's run). */
+  baseSlots: [number, number][][];
   /** Marks engraved on the base top: swing scales, index lines (F5, F9). */
   baseMarks: { kind: "scale" | "index" | "engrave"; pts: [number, number][] }[];
   /** Backlash eccentrics a mesh asked for, by site id. */
@@ -165,6 +167,7 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
     twins: new Map(),
     bores: new Map(),
     baseHoles: [],
+    baseSlots: [],
     baseMarks: [],
     eccentric: new Set(),
     shim: new Map(),

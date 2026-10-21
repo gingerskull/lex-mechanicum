@@ -134,6 +134,8 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
+  /** A position read along this direction (a scalar, mm from the reference place). */
+  axis?: [number, number, number];
 }
 
 export interface Kin {

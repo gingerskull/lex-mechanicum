@@ -12,7 +12,7 @@ import type { MechanismModel } from "../model/types";
 import { planeMatrix } from "../render/v3/poser";
 import { IDENTITY, mat4, type Mat4 } from "../solids/frame";
 import { liftAll } from "../solids/lift";
-import { conveyMatrix, mul4 } from "../solids/convey";
+import { conveyMatrix, mul4, turnMatrix } from "../solids/convey";
 import type { Solid3 } from "../solids/types";
 import type { RecordLike } from "../builder/ctx";
 import type { Kin } from "../kin/types";
@@ -115,11 +115,11 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = 
     place(s, u) {
       const X = s.body === "ground" ? xf.id() : (posed(u).get(s.body) ?? xf.id());
       const B = xfMat(X);
-      const C = s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0)) as Mat4) : B;
+      const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0)) as Mat4) : B;
       return mul(C, mat4(s.frame));
     },
     // a conveyed solid moves along its path, not with its carrier
-    key: (s) => (s.convey ? `cv:${s.id}` : s.body),
+    key: (s) => (s.convey ? `cv:${s.id}` : s.spin ? `spin:${s.spin.at.join(",")}` : s.body),
   };
   const kin = src.kin;
   const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type)).map((j): [string, string] => [j.a, j.b]);
