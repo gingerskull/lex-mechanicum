@@ -15,6 +15,7 @@ import { clearance } from "../router";
 import { projectAlong } from "../view";
 import { worldManifold, worldPoints } from "../sweeps";
 import { lowestZ } from "./core";
+import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
@@ -331,6 +332,34 @@ export const timingMarks: Rule = {
         ctx.baseMarks.push({ kind: "index", pts: [[w[0], w[1]], [w2[0], w2[1]]] });
         (ctx.fired["timing-marks"] ??= []).push(b);
       }
+    }
+  },
+};
+
+/**
+ * T4: a traced point on a moving body is engraved on that body: a ring and a cross at the point on the part's face, so
+ * the eye finds on the part the point whose path the trace draws. A point outside the part's outline (a pen off the
+ * body) gets nothing.
+ */
+export const traceMarks: Rule = {
+  id: "trace-marks",
+  tier: "AUTO",
+  ids: ["T4", "L8"],
+  fixture: "four-bar",
+  applies: (ctx) => (ctx.teaching?.traces ?? []).length > 0,
+  apply(ctx) {
+    for (const t of ctx.teaching?.traces ?? []) {
+      const pt = ctx.kin.points?.find((q) => q.id === t.point);
+      const part = pt ? ctx.parts.get(pt.body) : undefined;
+      const P = pt ? ctx.S.refPts.get(pt.id) : undefined;
+      if (!pt || !part || !P || pt.body === "ground") continue;
+      const uv = planeCoords(part.frame, P).uv;
+      if (!inside(part.profile.outer, uv)) continue;
+      const r = 2.5;
+      part.marks.push({ kind: "index", pts: circle(r, uv[0], uv[1], 24) });
+      part.marks.push({ kind: "index", pts: [[uv[0] - r - 1.5, uv[1]], [uv[0] + r + 1.5, uv[1]]] });
+      part.marks.push({ kind: "index", pts: [[uv[0], uv[1] - r - 1.5], [uv[0], uv[1] + r + 1.5]] });
+      (ctx.fired["trace-marks"] ??= []).push(pt.id);
     }
   },
 };
