@@ -127,7 +127,14 @@ tests/                           unit and fixture tests, per-mechanism checks, s
    instead. Every
    session on a page shares one WebGL2 context; a lost context is rebuilt and the drawing redrawn. Thumbnails, the
    stage, the screenshot tool and the visual tests all use this one renderer.
-5. **Site.** Astro builds one static page per registered mechanism: the drawing stage, controls, at-a-glance facts,
+5. **Site (two engines).** A mechanism drawn by the v3 engine (its audit at 3.0, or one listed in `SITE_V3` for a trial
+   build, `site/src/drawn.ts`) has a package v2 and a `meta` file (the record's name, teaching and kin blocks) in the site
+   build and a stage of its own (`Stage3.astro`, `islands/stage3.ts`, the engine chunk `islands/engine3.ts`): orbit, the
+   named views, the record's section and detail views and controls, the time map. Its setup, bake included, runs in a
+   module worker; the shared GPU context builds its programs while the package downloads; the first frame draws at the
+   coarsest dial until the page is idle. Every other mechanism keeps the 2.5D stage and its v1 package. The 3D stamp is
+   an HTML mark beside the sheet number on the card and the page header, and the renderer draws it in the title block.
+   Astro builds one static page per registered mechanism: the drawing stage, controls, at-a-glance facts,
    plot, tags, explanation, references and media. Library thumbnails are committed images; the engine loads on hover
    or navigation. A browser without WebGL2 gets the stage's still and a one-line note; the rest of the page works.
 
@@ -149,6 +156,7 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 | `shot3 <id> [--view ...]`, `pilots3`, `bench3 [id ...]` | the 3D renderer in local Chrome (`tools/chrome3.ts`): one frame to a PNG in any named view, section, detail or explode; the acceptance shot set of the pilots and the teaching layers; frame times per view and dial position |
 | `bench [id ...]` (`npm run bench`) | the browser bench: frame times per view and dial position, draw counters, package size, rung counts (Q5, DL5); a mechanism on engine v3 (or `--v3`) runs the v2 page without today's renderer, with the flags of R6 |
 | `bench --page` (`npm run bench:page`), `bench --v2` | the package v2 bench: `--page` builds a static page (`dist/bench-page`) to publish and open on a phone, `--v2` runs it in local Chrome; setup split into decode, tessellate, edges and GPU, frames per view and dial position (R6, R10) |
+| `npm run test:e2e` (`tools/site-e2e.ts`) | builds the site with three mechanisms on the v3 stage (`SITE_V3`), then runs the stage's browser tests (desktop, phone, no WebGL2) in local Chrome |
 | `compare [--shots --ref dir] [--cards] [--lose] [--v3]` | the renderer's look against reference images, card drawings per dial position, the lost-context check; `--v3` with the 3D renderer |
 | `tokens-css` (`npm run tokens`) | writes `site/styles/tokens.css` and its `@font-face` rules |
 | `site-assets` (in `prebuild`) | fonts and packages into `site/public`; checks the thumbnails' fingerprints and copies them (never draws) |
