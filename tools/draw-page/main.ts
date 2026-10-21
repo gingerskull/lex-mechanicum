@@ -1,6 +1,7 @@
 // The drawing page: every tool that draws (shot, thumbs, bench, compare, the visual snapshots) loads it in local Chrome
 // through tools/chrome.ts and calls the functions it puts on window. Packages come from the page's server (built on
 // demand); all drawings on the page share one GPU context, as on the site.
+import { compose, differ } from "../page-image";
 import { models } from "../../src/mechanisms/models";
 import { loadPackage } from "../../src/package/loader";
 import type { Package } from "../../src/package/format";
@@ -139,53 +140,6 @@ async function bench(id: string, o: { w: number; h: number; dpr: number; frames:
   return { id, samples, setupMs, views, cpu, dial, counters };
 }
 
-/** Lays images out on a white sheet: one row per row, labels above, each cell scaled to w x h. Returns a PNG data URL. */
-async function compose(g: { w: number; h: number; pad: number; columns: string[]; rows: { label: string; cells: (string | null)[] }[] }): Promise<string> {
-  const c = document.createElement("canvas");
-  const n = Math.max(...g.rows.map((r) => r.cells.length), g.columns.length);
-  c.width = g.pad + n * (g.w + 6);
-  c.height = g.pad + g.rows.length * (g.h + g.pad);
-  const x = c.getContext("2d")!;
-  x.fillStyle = "white";
-  x.fillRect(0, 0, c.width, c.height);
-  x.fillStyle = "black";
-  x.font = "16px sans-serif";
-  g.columns.forEach((t, i) => x.fillText(t, g.pad + i * (g.w + 6) + 4, 20));
-  for (const [k, r] of g.rows.entries()) {
-    const y = g.pad + k * (g.h + g.pad);
-    x.fillStyle = "black";
-    x.fillText(r.label, g.pad + 4, y + 18);
-    for (const [i, url] of r.cells.entries()) {
-      if (!url) continue;
-      const img = new Image();
-      img.src = url;
-      await img.decode();
-      x.drawImage(img, g.pad + i * (g.w + 6), y + g.pad - 4, g.w, g.h);
-    }
-  }
-  return c.toDataURL("image/png");
-}
-
-/** Pixels of two images (data URLs, same size) whose channels differ by more than `tolerance` of 255. */
-async function differ(a: string, b: string, tolerance: number): Promise<number> {
-  const px = async (u: string) => {
-    const img = new Image();
-    img.src = u;
-    await img.decode();
-    const c = document.createElement("canvas");
-    c.width = img.naturalWidth;
-    c.height = img.naturalHeight;
-    const x = c.getContext("2d", { willReadFrequently: true })!;
-    x.drawImage(img, 0, 0);
-    return x.getImageData(0, 0, c.width, c.height).data;
-  };
-  const [A, B] = await Promise.all([px(a), px(b)]);
-  if (A.length !== B.length) return Infinity;
-  let n = 0;
-  for (let i = 0; i < A.length; i += 4)
-    if (Math.max(Math.abs(A[i]! - B[i]!), Math.abs(A[i + 1]! - B[i + 1]!), Math.abs(A[i + 2]! - B[i + 2]!), Math.abs(A[i + 3]! - B[i + 3]!)) > tolerance * 255) n++;
-  return n;
-}
 
 /** The GPU's name, for reports. */
 function gpu(): string {

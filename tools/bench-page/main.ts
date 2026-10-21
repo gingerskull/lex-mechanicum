@@ -21,7 +21,7 @@ import { DETAIL } from "../../src/style/detail";
 import { Kinematics } from "../../src/kin/compose";
 import type { Kin as KinLib } from "../../src/kin/types";
 import { gpu3 } from "../../src/render/v3/gpu";
-import { hybridPoser, kinPoser, legacyPoser } from "../../src/render/v3/poser";
+import { hybridPoser, kinPoser, legacyPoser, staticPoser } from "../../src/render/v3/poser";
 import { createSession3, recordDrawView, type DrawView3 } from "../../src/render/v3/session";
 import type { Meta } from "../draw3-page/main";
 
@@ -137,9 +137,10 @@ function canvasIn(host: HTMLElement): HTMLCanvasElement {
 }
 
 async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): Promise<Row> {
-  const model = await models[id]!();
+  // a mechanism rebuilt on engine v3 has no 2.5D model and no v1 package: posed by its record alone
+  const model = models[id] ? await models[id]!() : null;
   const blob2 = await bytes(`packages/${id}.mx2`);
-  const blob1 = await bytes(`packages/${id}.mxp`);
+  const blob1 = model ? await bytes(`packages/${id}.mxp`) : null;
   const meta = (await (await fetch(`meta/${id}.json?v=${stamp()}`)).json()) as Meta;
   const dials: Dial[] = ["full", ...DETAIL.map((r) => r.id)];
   const setups: Row["setup"][] = [];
@@ -152,7 +153,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     const s = await setupInline(blob2.slice());
     const g0 = performance.now();
     const canvas = canvasIn(host.gpu);
-    const legacy = legacyPoser(model, s.pkg.bounds.z1);
+    const legacy = model ? legacyPoser(model, s.pkg.bounds.z1) : staticPoser;
     const poser = meta.kin ? hybridPoser(legacy, kinPoser(new Kinematics(meta.kin as unknown as KinLib))) : legacy;
     const scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser, teaching: meta.teaching, info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
     const sess = createSession3(canvas, scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
@@ -180,7 +181,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
   const field = (k: keyof Row["setup"]) => r2(med(setups.map((x) => x[k])));
   const row: Row = {
     id,
-    kb: { v1: r2(blob1.length / 1024), v2: r2(blob2.length / 1024) },
+    kb: { v1: blob1 ? r2(blob1.length / 1024) : 0, v2: r2(blob2.length / 1024) },
     solids: counts.solids,
     shapes: counts.shapes,
     triangles: counts.triangles,
@@ -192,7 +193,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     instances: counts.instances,
   };
   if (workers.length) row.worker = { wall: r2(med(workers)) };
-  if (o.today) row.today = await todays(id, o, host.today, log);
+  if (o.today && model) row.today = await todays(id, o, host.today, log);
   return row;
 }
 
@@ -224,6 +225,11 @@ async function todays(id: string, o: Opts, host: HTMLElement, log: (s: string) =
   return { setup: r2(med(setup)), views: pick(views), cpu: pick(cpus), dial: pick(dial) };
 }
 
+/** The targets of standard R6 in ms: a desktop frame, a mid-range phone frame, setup. */
+export const FRAME_TARGET = 8;
+export const FRAME_PHONE = 16;
+export const SETUP_TARGET = 20;
+
 /** The report as Markdown, to paste into the issue. */
 export function markdown(r: Report): string {
   const L: string[] = [];
@@ -242,6 +248,16 @@ export function markdown(r: Report): string {
     L.push(``, `Today's renderer (package v1), paced ms:`, ``, `| Mechanism | setup | ${vs.join(" | ")} | script at 28° |`, `|---|---|${vs.map(() => "---").join("|")}|---|`);
     for (const x of r.rows) if (x.today) L.push(`| ${x.id} | ${x.today.setup} | ${vs.map((k) => x.today!.views[k]).join(" | ")} | ${x.today.cpu["28"]} |`);
   }
+  // R6: over the target is a flag to look at, never a failure
+  const flags: string[] = [];
+  for (const x of r.rows) {
+    if (x.setup.total > SETUP_TARGET) flags.push(`${x.id}: setup ${x.setup.total} ms over the ${SETUP_TARGET} ms target`);
+    for (const k of vs) {
+      const v = x.views[k];
+      if (v && v.gpu > FRAME_TARGET) flags.push(`${x.id}, ${k}: ${v.gpu} ms with a GPU wait over the ${FRAME_TARGET} ms desktop target${v.gpu > FRAME_PHONE ? ` (and the ${FRAME_PHONE} ms phone target)` : ""}`);
+    }
+  }
+  L.push(``, `Flags (R6, not failures; the targets are ${FRAME_TARGET} ms a frame on the desktop, ${FRAME_PHONE} ms on a phone, ${SETUP_TARGET} ms setup):`, ``, ...(flags.length ? flags.map((f) => `- ${f}`) : ["- none"]));
   return L.join("\n") + "\n";
 }
 

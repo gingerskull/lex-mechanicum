@@ -3,8 +3,14 @@
 // change fails until its audit is redone or the change is deferred in the sheet with a reason
 // (`defer: K7, V5 · <reason>`, or a standard version to defer all its HAND changes). AUTO and STYLE changes never
 // need a re-audit. A mechanism without an audit sheet yet is reported as not audited, not failed.
-import { mechanisms } from "../mechanisms";
+//
+// Two engines live side by side until the cut-over (S6). An audit below 3.0 belongs to a 2.5D mechanism: it stays
+// current at its own standard, and the HAND changes of 3.0 and later never count against it (they bind at the rebuild,
+// whose pass replaces the audit). An audit at 3.0 or later belongs to a mechanism rebuilt from its record v3: it is
+// held to every HAND change after its version, and it must carry the `teaching:` line (S2, T2).
+import { allIds } from "../checks/engine";
 import {
+  TEACHING_VERDICTS,
   changelog,
   compareVersions,
   parseHeader,
@@ -15,10 +21,15 @@ import {
   tableRows,
 } from "./sheet";
 
-export type Status = "current" | "deferred" | "behind" | "not audited" | "no header";
+export type Status = "current" | "deferred" | "behind" | "not audited" | "no header" | "no teaching";
+
+/** The standard version from which a mechanism is built from its record v3; an audit below it is a 2.5D audit. */
+export const V3_FROM = "3.0";
 
 export interface MechanismConformance {
   id: string;
+  /** Which engine the audit belongs to: "2.5D" below 3.0, "v3" from 3.0 on. */
+  engine: "2.5D" | "v3" | null;
   status: Status;
   /** Standard version of the audit, null without one. */
   audited: string | null;
@@ -48,6 +59,7 @@ export function evaluate(standard: string, audits: Record<string, string | null>
   for (const [id, text] of Object.entries(audits)) {
     const base: MechanismConformance = {
       id,
+      engine: null,
       status: "not audited",
       audited: null,
       result: null,
@@ -70,17 +82,22 @@ export function evaluate(standard: string, audits: Record<string, string | null>
       const s = r[1] as keyof MechanismConformance["rows"];
       if (s in base.rows) base.rows[s]++;
     }
-    // HAND changes in every changelog entry after the audited version, up to the current one
-    const since = log.filter((e) => compareVersions(e.version, h.standard) > 0 && compareVersions(e.version, current) <= 0);
+    const v3 = compareVersions(h.standard, V3_FROM) >= 0;
+    base.engine = v3 ? "v3" : "2.5D";
+    // HAND changes in every changelog entry after the audited version, up to the current one; a 2.5D audit is only
+    // behind the changes of its own engine (S6)
+    const since = log.filter((e) => compareVersions(e.version, h.standard) > 0 && compareVersions(e.version, current) <= 0 && (v3 || compareVersions(e.version, V3_FROM) < 0));
     const hand: { id: string; version: string }[] = [];
     for (const e of since) for (const c of e.changes) if (c.tiers.includes("HAND")) for (const id of c.ids) hand.push({ id, version: e.version });
     const deferredBy = (x: { id: string; version: string }) => h.defers.some((d) => d.items.includes(x.id) || d.items.includes(x.version));
     const uniq = (xs: string[]) => [...new Set(xs)];
     const deferred = uniq(hand.filter(deferredBy).map((x) => x.id));
     const behind = uniq(hand.filter((x) => !deferredBy(x)).map((x) => x.id));
+    // S2: a 3.0 sheet records the teaching review's verdict
+    const noTeaching = v3 && !(TEACHING_VERDICTS as readonly string[]).includes(h.teaching);
     out.push({
       ...base,
-      status: behind.length ? "behind" : deferred.length ? "deferred" : "current",
+      status: noTeaching ? "no teaching" : behind.length ? "behind" : deferred.length ? "deferred" : "current",
       audited: h.standard,
       result: h.result,
       date: h.date,
@@ -89,19 +106,20 @@ export function evaluate(standard: string, audits: Record<string, string | null>
       behind,
     });
   }
-  return { standard: current, mechanisms: out, failing: out.filter((m) => m.status === "behind" || m.status === "no header").map((m) => m.id) };
+  return { standard: current, mechanisms: out, failing: out.filter((m) => m.status === "behind" || m.status === "no header" || m.status === "no teaching").map((m) => m.id) };
 }
 
 /** The report for every registered mechanism, from the files in the repository. */
 export function conformance(): Report {
-  return evaluate(readStandard(), Object.fromEntries(Object.keys(mechanisms).map((id) => [id, readAudit(id)])));
+  return evaluate(readStandard(), Object.fromEntries(allIds().map((id) => [id, readAudit(id)])));
 }
 
 /** The report as table lines. */
 export function formatReport(r: Report, checks: Record<string, string> = {}): string[] {
-  const head = ["mechanism", "audited", "result", "rows (pass/fail/na/?)", "HAND since", "status", ...(Object.keys(checks).length ? ["checks (K, A15, A12)"] : [])];
+  const head = ["mechanism", "engine", "audited", "result", "rows (pass/fail/na/?)", "HAND since", "status", ...(Object.keys(checks).length ? ["checks (K1, A15, A12)"] : [])];
   const body = r.mechanisms.map((m) => [
     m.id,
+    m.engine ?? "-",
     m.audited ?? "-",
     m.result ?? "-",
     m.audited ? `${m.rows.PASS}/${m.rows.FAIL}/${m.rows["N/A"]}/${m.rows["?"]}` : "-",

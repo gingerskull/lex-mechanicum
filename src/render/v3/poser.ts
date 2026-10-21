@@ -93,7 +93,7 @@ export function kinPoser(k: Kinematics, controls?: Controls): Poser {
 }
 
 /** The axis conventions of today's model: a part's 2D pose (x, y, angle) is in the plane normal to its axis. */
-function planeMatrix(axis: "x" | "y" | "z" | "p", pose: [number, number, number], frame?: { o: Vec3; u: Vec3; v: Vec3 }): Mat4 {
+export function planeMatrix(axis: "x" | "y" | "z" | "p", pose: [number, number, number], frame?: { o: Vec3; u: Vec3; v: Vec3 }): Mat4 {
   const [px, py, a] = pose;
   const c = Math.cos(a), s = Math.sin(a);
   if (axis === "p" && frame) {

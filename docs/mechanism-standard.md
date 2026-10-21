@@ -607,10 +607,13 @@ renderer change. Q4 and Q5 run locally.
 
 ## 11. Audit sheet template
 
-`tools/audit <id>` writes this. A row the tools decide outright (P1, K1, K2, T9, A12, A15, M6, Q1, Q2) is filled and
-regenerated every time; every other row gets its tier and the evidence the tools collect (rule firing, joint types,
-names, sizes, materials, locking, rungs) and a `?` to judge. Judged rows, hand entries in the joints table, the
-header, deferrals, variants, promotion candidates and measured frame times survive regeneration. A deferral is a line
+`tools/audit <id>` writes this. A row the tools decide outright (P1, K1, K2, K11, T9, D11, A12, A15, M6, Q1, Q2) is
+filled and regenerated every time; every other row gets its tier and the evidence the tools collect (rule firing, kits,
+supports, names, sizes, materials, locking, rungs) and a `?` to judge. The evidence of K1 is the K1 residual, of T9 the
+claim table, of A15 the 3D clashes and the unnecessary `allow` exemptions. Judged rows, hand entries in the joints
+table, the header, the `teaching:` line, deferrals, variants, promotion candidates and measured frame times survive
+regeneration. A sheet audited below 3.0 is a 2.5D sheet: it has no `teaching:` line, no Kit, Block, Support and Stack
+columns and no Supports section, and stays current until its mechanism is rebuilt (S6). A deferral is a line
 `defer: <ids or version> · <reason>`; no reason, no deferral.
 
 ```markdown
@@ -628,9 +631,14 @@ PASS n · FAIL n · N/A n · open: ...
 | ... | | |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| <joint> | J3 | component / none / – reason | | | | | | | | | |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| <joint> | J3 | dyad | bridge (moved) | slab 1 | component / none / – reason | | | | | | | | | |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| <support> | <joint> | bridge | moved / first choice | 1.5 | principle bodies still covered | see-through / – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -644,7 +652,7 @@ PASS n · FAIL n · N/A n · open: ...
 Hand fixes that should become rules or primitives.
 
 ## Verification
-check · clearance · clamp · edge distance · package
+check (K1 residual, claims) · clearance (3D, unnecessary allow) · clamp · edge distance · package
 screenshots (paths) · bench (flags)
 ```
 

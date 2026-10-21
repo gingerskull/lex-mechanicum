@@ -46,7 +46,14 @@ src/builder/                     engine v3's hardware builder, beside the 2.5D e
 src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> headroom -> see-through ->
                                  explode; the polish API; solid poses; clearance, clamp and edge-distance checks
 src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)
-src/audit/                       the audit generator and the conformance report
+src/audit/                       the audit generator (2.5D and, from 3.0, v3: generate3.ts) and the conformance report, which tells the
+                                 two engines apart by the audit's standard (S6)
+src/checks/                      the 3D checks (engine v3): clash3 (A15: Manifold intersections after a box and oriented-box filter,
+                                 penetration depth 2V/A against 0.1 mm, hand `allow` flagged unnecessary), clamp3 (A12, M6), record
+                                 (the K checks of a record: the E4 verifier's K1 residual, K2, branch continuity, mobility K11, the
+                                 claim table T9 in claims.ts, SOLID D11), source (solids and poses: a 2.5D mechanism lifted, or a
+                                 record built by the hardware builder), run (the `ci` and `full` profiles and the result cache),
+                                 engine (which engine a mechanism is on)
 src/render/                      canvas factory, projector, world solids, slices, session, the drafting frame,
                                  detail dial, pattern tiles, sheet frame and title block, overlays, plot
 src/render/v3/                   the 3D drafting renderer (E7), beside the 2.5D one until cut-over: camera (turntable and AUX bases, named
@@ -131,18 +138,18 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 | Tool | What it does |
 |---|---|
 | `catalog` (`npm run catalog`) | merges and validates the sources, writes `mechanisms.json` and the CSV and Markdown views |
-| `check <id>` | kinematic checks of a model (standard Q1) |
-| `clearance <id \| all>` | assembles and reports clashes, clamp faults and hole walls (Q2) |
-| `package [id ...]` (`npm run package`) | writes `dist/packages/<id>.mxp` (Q3) |
-| `package --v2 [id ...]` | writes package v2 (`.mx2`) from the lifted v3 solids: Manifold meshes and checks every solid (SOLID), prints size against v1 and shapes per kind |
-| `audit <id>` (`npm run audit`) | writes or regenerates `src/mechanisms/<id>/audit.md` (Q6) |
-| `conformance` (`npm run conformance`) | audited standard version per mechanism (Q7), part of `npm run check` |
-| `shot <id> [options]` (`npm run shot`) | one frame to a PNG (Q4) |
-| `thumbs [id ...] [--all] [--hook]` (`npm run thumbs`) | redraws the stale thumbnails and stills in `site/thumbs` and their manifest |
+| `check <id>` | kinematic checks (standard Q1): a 2.5D mechanism on its model; one audited at 3.0 or later (or `--v3`) from its record: K1 residual, periodicity, branch continuity, mobility, the claim table, SOLID |
+| `clearance <id \| all \| changed>` | clashes, clamp faults and hole walls (Q2): `--2d` the 2.5D check, `--3d` the same mechanism lifted and tested in 3D (the transition view), `--v3` a record built by the hardware builder; `--ci` samples 8 phases, the default `--full` 72 phases and audits the hand `allow` exemptions; `changed` is the pre-push selection |
+| `package [id ...]` (`npm run package`) | writes `dist/packages/<id>.mxp` (Q3); a mechanism on engine v3 writes v2 only |
+| `package --v2 [id ...]` | writes package v2 (`.mx2`): from the lifted 2.5D solids, or from the record by the builder; Manifold meshes and checks every solid (SOLID), prints size against v1 and shapes per kind |
+| `audit <id>` (`npm run audit`) | writes or regenerates `src/mechanisms/<id>/audit.md` (Q6): the 2.5D sheet, or from 3.0 the v3 sheet with the `teaching:` line, kit and block per joint, K1 residual, claim table and supports |
+| `conformance` (`npm run conformance`) | audited standard version and engine per mechanism (Q7), part of `npm run check` |
+| `shot <id> [options]` (`npm run shot`) | one frame to a PNG (Q4); a mechanism on engine v3 (or `--v3`) goes to `shot3`, whose `--set` draws the Q4 set |
+| `thumbs [id ...] [--all] [--hook]` (`npm run thumbs`) | redraws the stale thumbnails and stills in `site/thumbs` and their manifest, with the renderer of the mechanism's engine |
 | `shot3 <id> [--view ...]`, `pilots3`, `bench3 [id ...]` | the 3D renderer in local Chrome (`tools/chrome3.ts`): one frame to a PNG in any named view, section, detail or explode; the acceptance shot set of the pilots and the teaching layers; frame times per view and dial position |
-| `bench [id ...]` (`npm run bench`) | the browser bench: frame times per view and dial position, draw counters, package size, rung counts (Q5, DL5) |
+| `bench [id ...]` (`npm run bench`) | the browser bench: frame times per view and dial position, draw counters, package size, rung counts (Q5, DL5); a mechanism on engine v3 (or `--v3`) runs the v2 page without today's renderer, with the flags of R6 |
 | `bench --page` (`npm run bench:page`), `bench --v2` | the package v2 bench: `--page` builds a static page (`dist/bench-page`) to publish and open on a phone, `--v2` runs it in local Chrome; setup split into decode, tessellate, edges and GPU, frames per view and dial position (R6, R10) |
-| `compare [--shots --ref dir] [--cards] [--lose]` | the renderer's look against reference images, card drawings per dial position, the lost-context check |
+| `compare [--shots --ref dir] [--cards] [--lose] [--v3]` | the renderer's look against reference images, card drawings per dial position, the lost-context check; `--v3` with the 3D renderer |
 | `tokens-css` (`npm run tokens`) | writes `site/styles/tokens.css` and its `@font-face` rules |
 | `site-assets` (in `prebuild`) | fonts and packages into `site/public`; checks the thumbnails' fingerprints and copies them (never draws) |
 | `lint-style` (in `npm run lint`) | colour and font literals outside `src/style`, style keys in records |
