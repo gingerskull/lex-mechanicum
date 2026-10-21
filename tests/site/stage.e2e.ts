@@ -10,7 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const OUT = join("dist", "site");
 const TYPES: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".woff2": "font/woff2" };
-const V3 = ["four-bar", "bevel-gears", "oscillating-cylinder"];
+const V3 = ["four-bar", "bevel-gears", "oscillating-cylinder", "universal-joint"];
 const V1 = "slider-crank";
 
 let server: Server;
