@@ -141,7 +141,9 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
     if (key === "kind" || key === "mode" || key === "form") return;
-    if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
+    // an expression of known names ("-input": a turn relative to a carrier) is read by the block like a position's
+    const names = isStr(v) && /[-+*/() ]/.test(v) ? v.match(/[A-Za-z_][\w-]*/g) ?? [] : [v];
+    if (!isStr(v) || !names.every((n) => isStr(n) && (known.has(n) || /^(sin|cos|tan|sqrt|abs|pi|atan2?|asin|acos)$/.test(n)))) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   for (const s of kin.solve) {
     const by = s.id;
@@ -168,7 +170,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
 
   for (const p of kin.points) {
     if (!bodies.has(p.body)) say(`point ${p.id}: body "${String(p.body)}" is not a body`);
-    if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every(isNum))) say(`point ${p.id}: local must be [x, y, z]`);
+    // a coordinate may be an expression of the params, as a joint's position may (a pen a control moves along its rod)
+    if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every((c) => isNum(c) || isStr(c)))) say(`point ${p.id}: local must be [x, y, z]`);
   }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);

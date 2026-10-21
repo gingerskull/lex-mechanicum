@@ -26,7 +26,7 @@ export interface Claim {
   feature?: string;
   band?: number | [number, number];
   over?: string;
-  /** The window of the cycle, degrees (may wrap past 360), the statistic is taken over. */
+  /** The window of the input's values (a rotary input's degrees may wrap past 360) the statistic is taken over. */
   span?: [number, number];
   /** The statistic is taken on the absolute value. */
   abs?: boolean;
@@ -101,12 +101,19 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   if (o.kind === "speed-ratio" && poses.every((p) => p.points.has(o.of)) && !K.kin.bodies.some((b) => b.id === o.of)) {
     // a point's speed: per unit of input (P's speed over a slider's), or with unit "%" as a share of its mean speed over
     // the cycle (a tip that slows on its straight)
-    const xs = unwrap(x);
-    const sp = poses.map((_, i) => {
-      const a = poses[(i + n - 1) % n]!.points.get(o.of)!;
-      const b = poses[(i + 1) % n]!.points.get(o.of)!;
-      const dx = (xs[(i + 1) % n]! - xs[(i + n - 1) % n]!) || (xs[1]! - xs[0]!) * 2;
+    // a rotary input wraps by its span at the end of the cycle; the step across the wrap is the step before it
+    const wrap = drv.kind === "rotary" ? (drv.range ? drv.range[1] - drv.range[0] : 360) : 0;
+    const step = (i: number, j: number) => {
+      const a = poses[i]!.points.get(o.of)!;
+      const b = poses[j]!.points.get(o.of)!;
+      let dx = x[j]! - x[i]!;
+      if (wrap) dx -= wrap * Math.round(dx / wrap);
       return Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) / Math.abs(dx);
+    };
+    // centred, or one-sided where an oscillating input turns back (its centred step is zero)
+    const sp = poses.map((_, i) => {
+      const c = step((i + n - 1) % n, (i + 1) % n);
+      return Number.isFinite(c) ? c : step(i, (i + 1) % n);
     });
     const mean = sp.reduce((a, b) => a + b, 0) / n;
     y = (o as { unit?: string }).unit === "%" ? sp.map((v) => (100 * v) / mean) : sp;
@@ -139,13 +146,14 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   if (claim.abs) y = y.map(Math.abs);
   const span = claim.span as [number, number] | undefined;
   if (span) {
-    // only the samples whose cycle angle lies in the window (which may wrap past 360)
+    // only the samples whose input value lies in the window: for a rotary input in degrees, which may wrap past 360
     const [a, b] = span;
     const inside = (d: number) => {
+      if (drv.kind !== "rotary") return d >= a - 1e-9 && d <= b + 1e-9;
       const t = (((d - a) % 360) + 360) % 360;
       return t <= b - a + 1e-9;
     };
-    const keep = u.map(inside);
+    const keep = x.map(inside);
     return { u: u.filter((_, i) => keep[i]), x: x.filter((_, i) => keep[i]), y: y.filter((_, i) => keep[i]) };
   }
   return { u, x, y };

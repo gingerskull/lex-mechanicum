@@ -32,6 +32,9 @@ export class BranchTable {
 interface Tracker {
   p1?: number[];
   p2?: number[];
+  /** The driver values of p1 and p2. */
+  v1?: number[];
+  v2?: number[];
 }
 
 export interface Setup {
@@ -261,7 +264,9 @@ export class Kinematics {
     for (const id of s.stateful) s.tables.set(id, new BranchTable(TABLE_STEPS));
     // homotopy from the reference values to the cycle start, then the cycle
     const startVals = this.driverValuesFor(s, 0);
-    const m = 48;
+    // fine enough steps that a closure near a toggle (a root that moves fast as the two roots draw together) is followed
+    const far = Math.max(0, ...Object.keys(v0).map((k) => Math.abs(startVals[k]! - v0[k]!)));
+    const m = Math.min(2000, Math.max(48, Math.ceil(far / 0.1)));
     for (let i = 1; i <= m; i++) {
       const vi: Record<string, number> = {};
       for (const k of Object.keys(v0)) vi[k] = v0[k]! + (startVals[k]! - v0[k]!) * (i / m);
@@ -293,7 +298,13 @@ export class Kinematics {
             if (hOf(m1) < hOf(m2)) hi = m2;
             else lo = m1;
           }
-          flips.push((lo + hi) / 2);
+          // h runs as |u - u0| through a crossing and its floor is rounding noise: place u0 by the V through two
+          // points either side, where h is well above the noise
+          const c = (lo + hi) / 2;
+          const w = 1e-5;
+          const hl = hOf(c - w), hr = hOf(c + w);
+          const v = (c - w) + (2 * w * hl) / (hl + hr);
+          flips.push(Number.isFinite(v) && Math.abs(v - c) < w ? v : c);
         }
       }
       t.flips = flips.filter((f) => f < TAU);
@@ -496,13 +507,20 @@ class Run implements BlockCtx {
       const tr = this.s.trackers.get(id) ?? {};
       this.s.trackers.set(id, tr);
       let idx: 0 | 1 = declaredIdx;
+      const v = Object.keys(this.vals).sort().map((k) => this.vals[k]!);
       if (tr.p1) {
-        const pred = tr.p2 ? tr.p1.map((x, i) => 2 * x - tr.p2![i]!) : tr.p1;
+        // ahead along the closure's motion; where the drivers turn back (an oscillating input at a toggle of the
+        // closure) the motion retraces, so the point before is the better guess
+        const back = tr.v1 && tr.v2 && v.reduce((a, x, i) => a + (x - tr.v1![i]!) * (tr.v1![i]! - tr.v2![i]!), 0) < 0;
+        const still = tr.v1 && v.every((x, i) => x === tr.v1![i]);
+        const pred = tr.p2 && !still ? (back ? tr.p2 : tr.p1.map((x, i) => 2 * x - tr.p2![i]!)) : tr.p1;
         const d = (r: number[]) => Math.hypot(...r.map((x, i) => x - pred[i]!));
         idx = d(roots[0]) <= d(roots[1]) ? 0 : 1;
       }
       tr.p2 = tr.p1;
       tr.p1 = roots[idx];
+      tr.v2 = tr.v1;
+      tr.v1 = v;
       const rec = this.s.recording;
       const t = this.s.tables.get(id);
       if (rec && t) t.sampled[rec.index] = idx;

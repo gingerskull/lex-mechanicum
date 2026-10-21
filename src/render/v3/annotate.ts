@@ -629,12 +629,16 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       }
       if (through) {
         // the arc a point sweeps about the centre over the cycle: its extreme angles about the plane's normal (z)
+        // (with `range`, only over those driver values: the stretch of a coupler curve that is a circular arc, at the
+        // arc's own `radius` when the record gives one)
         const poser = A.rt.scene.poser;
-        const r = len(sub(through, c));
+        const r = typeof o.radius === "number" ? o.radius : len(sub(through, c));
+        const name = typeof o.through === "string" ? o.through : "";
+        const swept = Array.isArray(o.range) && poser.sweep ? poser.sweep(name, o.range as [number, number])?.[0] : undefined;
+        const samples = swept ?? Array.from({ length: 120 }, (_, k) => poser.point((k / 120) * poser.period, name));
         const angs: number[] = [];
         let prev = 0;
-        for (let k = 0; k < 120; k++) {
-          const p = poser.point((k / 120) * poser.period, typeof o.through === "string" ? o.through : "");
+        for (const p of samples) {
           if (!p) continue;
           let a = Math.atan2(p[1] - c[1], p[0] - c[0]);
           if (angs.length) {

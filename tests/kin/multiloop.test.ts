@@ -4,7 +4,7 @@
 import { describe, expect, it } from "vitest";
 import { dyadRRR, Kinematics, TAU, verifyK1, type Kin, type Vec3 } from "../../src/kin";
 import { checkClaims, type Claim } from "../../src/checks/claims";
-import { crankRocker } from "./fixtures";
+import { crankRocker, fourBar } from "./fixtures";
 
 const D = Math.PI / 180;
 
@@ -79,5 +79,25 @@ describe("a second loop on a body the first loop places", () => {
     const res = checkClaims(K, claims, K.kin.outputs ?? []);
     expect(res.map((r) => r.status)).toEqual(["ok", "ok", "ok"]);
     expect(res[1]!.got!).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe("an oscillating input that turns back near a toggle of the closure", () => {
+  it("stays on the declared branch (Chebyshev: the midpoint keeps to its line over the whole swing)", () => {
+    // ground 120, rockers 150, coupler 60; the input rocker's low limit is a toggle of the far side
+    for (const root of [0, 1] as const) {
+      const k = fourBar({ d: 120, a: 150, c: 60, b: 150, theta0: 63.43, root, driver: { kind: "oscillating", lo: 36.87, hi: 90 } });
+      const K = new Kinematics(k);
+      const ref = K.referencePose();
+      const mid = (p: ReturnType<typeof K.pose>) => {
+        const A = p.points.get("A")!, B = p.points.get("B")!;
+        return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+      };
+      const y0 = mid(ref)[1]!;
+      if (Math.abs(y0 - 120) > 1) continue; // the uncrossed branch is not the straight-line one
+      for (let i = 0; i < 360; i++) expect(Math.abs(mid(K.pose((i / 360) * TAU))[1]! - 120)).toBeLessThan(0.5);
+      return;
+    }
+    throw new Error("neither branch is the crossed one");
   });
 });
