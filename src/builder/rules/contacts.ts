@@ -196,8 +196,8 @@ const j5 = contactRule({
     const ky = e[2] - 3.5 - 0.5 - gap;
     const sideY: [number, number][] = [[0, e[3] + 3.5 + 0.5], [1, e[2] - 3.5 - 0.5 - gap]];
     // the rails and their risers run 10 mm past the slider's travel at each end, less where another part sweeps by
-    // (a crank turning past the near end), down to a quarter of the slider short of its extreme (it overhangs the ways
-    // there); each side is trimmed on its own. A riser under a rail stops shorter still where a part sweeps by
+    // (a crank turning past the near end), down to part of the slider short of its extreme (it overhangs the ways
+    // there, at most by half its length); each side is trimmed on its own. A riser under a rail stops shorter still where a part sweeps by
     // under the rail's end (the rod of an eccentric): the rail overhangs it there
     const railFor = (k: number, y: number, a: number, b: number): Solid3[] => {
       const T = localAt(ctx, c);
@@ -214,19 +214,21 @@ const j5 = contactRule({
     const risen = w0 - baseTop > 0.5;
     const lo = c.run[0] + e[0];
     const hi = c.run[1] + e[1];
-    const margins = [10, 7, 4, 2, 0, -Ls / 8, -Ls / 4];
+    const margins = [10, 7, 4, 2, 0, -Ls / 8, -Ls / 4, -Ls / 3, -Ls / 2];
     const ends = sideY.map(([k, y]): [number, number] => {
-      // judged on the rail's first 12 mm as it would be built
-      const a = margins.find((m) => clearOf(ctx, railFor(k, y, lo - m, lo - m + 12), others));
-      const b = margins.find((m) => clearOf(ctx, railFor(k, y, hi + m - 12, hi + m), others));
+      // judged on the end of the rail as it would be built, a slider's length of it
+      const chunk = Math.max(12, Ls);
+      const a = margins.find((m) => clearOf(ctx, railFor(k, y, lo - m, lo - m + chunk), others));
+      const b = margins.find((m) => clearOf(ctx, railFor(k, y, hi + m - chunk, hi + m), others));
       return [lo - (a ?? margins[margins.length - 1]!), hi + (b ?? margins[margins.length - 1]!)];
     });
+    // a riser keeps at least 20 mm under its rail (the rail cantilevers past it toward a sweep)
     const riserEnds = sideY.map(([k, y]): [number, number] => {
       const [a, b] = ends[k]!;
-      const most = (b - a) / 3;
-      const steps = [0, 3, 6, 10, 15, 20, 30, 40].filter((d) => d <= most);
-      const da = steps.find((d) => clearOf(ctx, riserFor(k, y, a + d, a + d + 4), others)) ?? most;
-      const db = steps.find((d) => clearOf(ctx, riserFor(k, y, b - d - 4, b - d), others)) ?? most;
+      const steps = [0, 3, 6, 10, 15, 20, 30, 40, 55, 70, 90, 120];
+      const cut = (from: number, dir: 1 | -1, limit: number) => steps.filter((d) => d <= limit).find((d) => clearOf(ctx, riserFor(k, y, dir > 0 ? from + d : from - d - 4, dir > 0 ? from + d + 4 : from - d), others));
+      const da = cut(a, 1, b - a - 20) ?? 0;
+      const db = cut(b, -1, b - a - 20 - da) ?? 0;
       return [a + da, b - db];
     });
     // the gibbed side carries the keeper, the gib and their screws; the stops sit where both rails run
@@ -252,9 +254,11 @@ const j5 = contactRule({
     // keeper plate over the gibbed rail, lapping the slider (F2)
     L.add(H.plate(`${id}-keeper`, roundRect(g0 + 8, ky - 5, g1 - 8, ky + 5 + 4, 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + 3, mat: "Aluminium 6061-T6, anodised" }));
     ways.push(`${id}-gib`, `${id}-keeper`);
-    const nScrew = Math.max(2, Math.ceil((g1 - g0 - 16) / 100) + 1);
+    // the keeper's screws go down through the gibbed rail and its riser into the base
+    const [s0, s1] = risen ? riserEnds[1]! : [g0, g1];
+    const nScrew = Math.max(2, Math.ceil((s1 - s0 - 16) / 100) + 1);
     for (let k = 0; k < nScrew; k++) {
-      const x = g0 + 12 + ((g1 - g0 - 24) * k) / (nScrew - 1);
+      const x = s1 - s0 < 24 ? (s0 + s1) / 2 + (k ? 4 : -4) : s0 + 6 + ((s1 - s0 - 12) * k) / (nScrew - 1);
       L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + 3 + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + 3, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
     }
     for (const [k, x] of [[0, riserEnds[0]![0] + 4], [1, riserEnds[0]![1] - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, e[3] + 4, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, reference rail to base", qty: 2 }) }));

@@ -585,6 +585,14 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
   };
   const fromPt = () => posed(o.from, o.fromPose);
   const toPt = () => posed(o.to, o.toPose);
+  // the same point where the kinematics put it, for a true length: the drawn point rides the top of its part
+  const rawOf = (ref: unknown, which?: unknown): Vec3 | null => {
+    const P = A.rt.scene.poser;
+    if (typeof ref !== "string" || !P.rawPoint) return null;
+    const q = (which ?? o.pose) as { output?: string; stat?: string } | undefined;
+    const u = q?.output && (q.stat === "max" || q.stat === "min") ? (P.phaseOf?.(q.output, q.stat) ?? A.u) : A.u;
+    return P.rawPoint(u, ref);
+  };
   switch (ov.kind) {
     case "line":
     case "chord": {
@@ -615,7 +623,11 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       arrowHead(ctx, q, p, O.arrowDim);
       arrowHead(ctx, p, q, O.arrowDim);
       ctx.restore();
-      if (text) label(`${text} ${len(sub(b, a)).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
+      const ra = rawOf(o.from, o.fromPose);
+      let rb = rawOf(o.to, o.toPose);
+      if (ra && rb && k >= 0) rb = ra.map((v, i) => (i === k ? rb![i]! : v)) as Vec3;
+      const L = ra && rb ? len(sub(rb, ra)) : len(sub(b, a));
+      if (text) label(`${text} ${L.toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
       return;
     }
     case "circle": {

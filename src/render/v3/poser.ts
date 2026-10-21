@@ -42,6 +42,8 @@ export interface Poser {
   sweep?(point: string, range?: [number, number], branches?: string[]): Vec3[][] | null;
   /** The cycle phase (radians) at which a kin output reaches its max or min; null where the poser has no such output. */
   phaseOf?(output: string, stat: "max" | "min"): number | null;
+  /** A named point where the kinematics put it, not raised to the top face of its part (a dimension's true length). */
+  rawPoint?(u: number, id: string): Vec3 | null;
 }
 
 export const ID4: Mat4 = mat4(IDENTITY);
@@ -130,6 +132,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       return fromXf(D ? xf.mul(X, D) : X);
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
+    rawPoint: (u, id) => pose(u).points.get(id) ?? null,
     sweep: (point, range, branches) => {
       const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
       if (!d) return null;
@@ -252,6 +255,7 @@ export function hybridPoser(bodies: Poser, points: Poser): Poser {
     point: (u, id, ctl) => safe(() => points.point(u, id, ctl)) ?? (ctl ? null : bodies.point(u, id)),
     span: (u, a, b) => bodies.span(u, a, b) ?? safe(() => points.span(u, a, b)),
     ...(points.sweep ? { sweep: (pt: string, r?: [number, number], br?: string[]) => safe(() => points.sweep!(pt, r, br)) } : {}),
+    ...(points.rawPoint ? { rawPoint: (u: number, id: string) => safe(() => points.rawPoint!(u, id)) } : {}),
     ...(points.phaseOf ? { phaseOf: (o: string, st: "max" | "min") => safe(() => points.phaseOf!(o, st)) } : {}),
   };
 }
