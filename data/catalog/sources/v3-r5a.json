@@ -1406,14 +1406,14 @@
           "shape": {
             "type": "plate",
             "rect": [
-              200,
-              60
+              220,
+              90
             ]
           },
           "at": {
             "frame": {
               "origin": [
-                0,
+                -10,
                 0,
                 0
               ]
@@ -1425,30 +1425,28 @@
           "role": "driver",
           "shape": {
             "type": "cam",
-            "form": "conjugate pair",
-            "law": "cycloidal",
-            "lift": 12,
-            "rise": 90,
-            "dwellOuter": 0,
-            "return": 90,
-            "dwellInner": 180,
+            "form": "lobes",
+            "hub": 10,
+            "place": -24,
+            "length": 48,
+            "bore": 12,
             "lobes": [
               {
                 "id": "opening",
-                "base": 18,
-                "plane": -10,
-                "follower": "rocker-open"
+                "shoe": "P1",
+                "radius": 8,
+                "from": -14,
+                "to": -6
               },
               {
                 "id": "closing",
-                "base": 31.9,
-                "plane": 10,
-                "follower": "rocker-close",
-                "lash": 0.1
+                "shoe": "P2",
+                "radius": 8,
+                "lash": 0.1,
+                "from": 6,
+                "to": 14
               }
-            ],
-            "shaft": 12,
-            "bore": 8
+            ]
           },
           "at": {
             "joint": "O"
@@ -1459,42 +1457,118 @@
           "role": "follower",
           "shape": {
             "type": "plate",
+            "exact": true,
+            "place": 0,
+            "thickness": 8,
+            "fillet": 2,
             "outline": [
               [
-                0,
+                -9,
                 -8
               ],
               [
-                80,
-                -6
+                0,
+                -10
+              ],
+              [
+                56,
+                -8
+              ],
+              [
+                72,
+                -5
               ],
               [
                 80,
-                6
+                -5
+              ],
+              [
+                84,
+                0
+              ],
+              [
+                80,
+                5
+              ],
+              [
+                64,
+                5
+              ],
+              [
+                56,
+                10
               ],
               [
                 0,
+                10
+              ],
+              [
+                -9,
                 8
               ]
             ],
-            "boss": 10,
-            "shoe": {
-              "at": [
-                56,
-                0
-              ],
-              "radius": 8
-            },
-            "nose": {
-              "at": [
-                80,
-                0
-              ],
-              "radius": 5
-            }
+            "pieces": [
+              {
+                "id": "nose",
+                "origin": [
+                  24,
+                  4,
+                  134
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 10,
+                "outline": [
+                  [
+                    -5,
+                    0
+                  ],
+                  [
+                    -3.5,
+                    -3.5
+                  ],
+                  [
+                    0,
+                    -5
+                  ],
+                  [
+                    3.5,
+                    -3.5
+                  ],
+                  [
+                    5,
+                    0
+                  ],
+                  [
+                    3.5,
+                    3.5
+                  ],
+                  [
+                    0,
+                    5
+                  ],
+                  [
+                    -3.5,
+                    3.5
+                  ]
+                ]
+              }
+            ]
           },
-          "at": {
-            "joint": "Q1"
+          "frame": {
+            "origin": [
+              -56,
+              -6,
+              134
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
           }
         },
         {
@@ -1502,49 +1576,150 @@
           "role": "follower",
           "shape": {
             "type": "plate",
+            "exact": true,
+            "place": 0,
+            "thickness": 8,
+            "fillet": 2,
             "outline": [
               [
-                0,
+                -9,
                 -8
               ],
               [
-                50,
+                0,
+                -10
+              ],
+              [
+                40,
                 -6
               ],
               [
                 50,
+                -5
+              ],
+              [
+                54,
+                0
+              ],
+              [
+                50,
+                5
+              ],
+              [
+                12,
                 6
               ],
               [
+                -4,
+                46
+              ],
+              [
                 -12.1,
-                37.81
+                45.8
+              ],
+              [
+                -20,
+                40
+              ],
+              [
+                -20,
+                30
+              ],
+              [
+                -9,
+                8
               ]
             ],
-            "boss": 10,
-            "fork": {
-              "gap": 10,
-              "at": [
-                50,
-                0
-              ]
-            },
-            "shoe": {
-              "at": [
-                -12.1,
-                37.81
-              ],
-              "radius": 8
-            },
-            "nose": {
-              "at": [
-                50,
-                0
-              ],
-              "radius": 5
-            }
+            "pieces": [
+              {
+                "id": "tine",
+                "origin": [
+                  24,
+                  -5,
+                  110
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 7,
+                "outline": [
+                  [
+                    -14,
+                    -5
+                  ],
+                  [
+                    0,
+                    -5
+                  ],
+                  [
+                    3.5,
+                    -3.5
+                  ],
+                  [
+                    5,
+                    0
+                  ],
+                  [
+                    3.5,
+                    3.5
+                  ],
+                  [
+                    0,
+                    5
+                  ],
+                  [
+                    -14,
+                    5
+                  ]
+                ]
+              },
+              {
+                "id": "bridge",
+                "origin": [
+                  10,
+                  -12,
+                  104
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "thick": 3,
+                "outline": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    4,
+                    0
+                  ],
+                  [
+                    4,
+                    26
+                  ],
+                  [
+                    0,
+                    26
+                  ]
+                ]
+              }
+            ]
           },
-          "at": {
-            "joint": "Q2"
+          "frame": {
+            "origin": [
+              -26,
+              14,
+              110
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
           }
         },
         {
@@ -1553,16 +1728,70 @@
           "shape": {
             "type": "shaft",
             "diameter": 7,
-            "length": 99,
-            "head": 34,
-            "collar": {
-              "from": -45,
-              "to": -37,
-              "diameter": 18
-            }
+            "length": 79,
+            "place": 50,
+            "pieces": [
+              {
+                "id": "collar",
+                "origin": [
+                  24,
+                  0,
+                  115
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "thick": 6,
+                "outline": [
+                  [
+                    9,
+                    0
+                  ],
+                  [
+                    6.4,
+                    6.4
+                  ],
+                  [
+                    0,
+                    9
+                  ],
+                  [
+                    -6.4,
+                    6.4
+                  ],
+                  [
+                    -9,
+                    0
+                  ],
+                  [
+                    -6.4,
+                    -6.4
+                  ],
+                  [
+                    0,
+                    -9
+                  ],
+                  [
+                    6.4,
+                    -6.4
+                  ]
+                ]
+              }
+            ],
+            "guide": [
+              62,
+              82
+            ],
+            "guideHalf": 14
           },
-          "at": {
-            "joint": "G"
+          "frame": {
+            "origin": [
+              24,
+              0,
+              0
+            ]
           }
         }
       ],
@@ -1618,8 +1847,8 @@
         {
           "id": "G",
           "type": "prismatic",
-          "a": "ground",
-          "b": "follower",
+          "a": "follower",
+          "b": "ground",
           "at": [
             24,
             0,
@@ -1633,31 +1862,65 @@
           "limits": [
             0,
             12
-          ]
+          ],
+          "cam": {
+            "schedule": [
+              {
+                "kind": "rise",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "return",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "360-2*rise"
+              }
+            ],
+            "lift": "h",
+            "rb": 1,
+            "theta0": 0
+          },
+          "note": "the stem's travel is the cam's law: down 12 over 90 degrees, up over 90, closed for 180"
         },
         {
           "id": "C1",
           "type": "cam-contact",
-          "a": "camshaft",
-          "b": "rocker-open",
+          "a": "rocker-open",
+          "b": "camshaft",
           "at": [
             0,
             -10,
             142
           ],
-          "follower": "flat shoe"
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "round shoe",
+          "note": "the opening lobe is the envelope of the opening shoe"
         },
         {
           "id": "C2",
           "type": "cam-contact",
-          "a": "camshaft",
-          "b": "rocker-close",
+          "a": "rocker-close",
+          "b": "camshaft",
           "at": [
             -30.38,
             10,
             150.28
           ],
-          "follower": "round shoe"
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "round shoe",
+          "note": "the closing lobe is the envelope of the closing shoe, 0.1 mm lash"
         },
         {
           "id": "T1",
@@ -1669,7 +1932,13 @@
             0,
             129
           ],
-          "follower": "flat face"
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "flat face",
+          "note": "the opening rocker's nose on the stem's end"
         },
         {
           "id": "T2",
@@ -1681,7 +1950,13 @@
             0,
             115
           ],
-          "follower": "flat face"
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "flat face",
+          "note": "the closing fork under the collar"
         }
       ],
       "params": [
@@ -1763,20 +2038,22 @@
             "G"
           ],
           "in": {
-            "cam": "camshaft",
+            "joint": "G",
+            "input": "input",
             "follower": "follower",
-            "h": "h",
-            "rise": "rise"
+            "axis": [
+              0,
+              0,
+              -1
+            ]
           },
-          "opts": {
-            "law": "cycloidal",
-            "dwellOuter": 0,
-            "turns": "ccw in the front view"
-          },
-          "out": "lift"
+          "out": {
+            "s": "lift-s",
+            "v": "lift-v"
+          }
         },
         {
-          "block": "cam",
+          "block": "rocker",
           "id": "opening",
           "joints": [
             "Q1",
@@ -1784,26 +2061,21 @@
             "T1"
           ],
           "in": {
-            "cam": "camshaft",
-            "follower": "rocker-open",
-            "pivot": "Q1",
-            "lift": "lift",
-            "shoe": "a1",
-            "nose": "b1"
+            "joint": "Q1",
+            "value": "lift-s",
+            "v": "lift-v",
+            "arm": "b1",
+            "sense": -1,
+            "shoe": "P1",
+            "cam": "O"
           },
-          "opts": {
-            "follower": "oscillating, flat nose on the stem's end",
-            "angle": "asin(lift / b1)",
-            "profile": "envelope of the shoe"
-          },
-          "out": [
-            "psi-open",
-            "P1",
-            "N1"
-          ]
+          "out": {
+            "angle": "psi-open",
+            "pressure": "pressure-open"
+          }
         },
         {
-          "block": "cam",
+          "block": "rocker",
           "id": "closing",
           "joints": [
             "Q2",
@@ -1811,24 +2083,18 @@
             "T2"
           ],
           "in": {
-            "cam": "camshaft",
-            "follower": "rocker-close",
-            "pivot": "Q2",
-            "lift": "lift",
-            "shoe": "a2",
-            "fork": "b2",
-            "lash": "lash"
+            "joint": "Q2",
+            "value": "lift-s",
+            "v": "lift-v",
+            "arm": "b2",
+            "sense": -1,
+            "shoe": "P2",
+            "cam": "O"
           },
-          "opts": {
-            "follower": "oscillating bell crank, fork under the collar",
-            "angle": "asin(lift / b2)",
-            "profile": "envelope of the shoe offset by the lash (conjugate to the opening lobe)"
-          },
-          "out": [
-            "psi-close",
-            "P2",
-            "N2"
-          ]
+          "out": {
+            "angle": "psi-close",
+            "pressure": "pressure-close"
+          }
         }
       ],
       "points": [
@@ -1838,7 +2104,7 @@
           "local": [
             56,
             0,
-            0
+            -4
           ]
         },
         {
@@ -1846,8 +2112,8 @@
           "body": "rocker-open",
           "local": [
             80,
-            10,
-            0
+            0,
+            -4
           ]
         },
         {
@@ -1855,8 +2121,8 @@
           "body": "rocker-close",
           "local": [
             -12.1,
-            0,
-            37.81
+            37.81,
+            -4
           ]
         },
         {
@@ -1864,8 +2130,8 @@
           "body": "rocker-close",
           "local": [
             50,
-            -10,
-            0
+            0,
+            -4
           ]
         },
         {
@@ -1874,7 +2140,7 @@
           "local": [
             0,
             0,
-            49
+            129
           ]
         }
       ],
@@ -1916,7 +2182,7 @@
       "review": {
         "verdict": "rethink",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #216. Rebuilt in its true orientation and seen in front elevation: camshaft on top, the follower vertical below it, the opening finger pressing the stem's end down and the forked closing bell crank lifting the collar. The law is now rise 90°, return 90°, closed 180°, h 12 (was 60°, 60° and 10), so half the frames show it open. The lobes read as distinct: the opening lobe grows from 18 to 26.4 mm, the closing lobe shrinks from 31.9 to 22.4 mm over the same angles. The loaded rocker is the view highlight: opening rocker from 0° to 45° and from 135° to 180°, closing rocker from 45° to 135°. Keeping supports off the lobes and shoes is hardware work, not record data."
+        "note": "Applies the 2026-10-19 review and #216. Rebuilt in its true orientation and seen in front elevation: camshaft on top, the follower vertical below it, the opening finger pressing the stem's end down and the forked closing bell crank lifting the collar. The law is now rise 90°, return 90°, closed 180°, h 12 (was 60°, 60° and 10), so half the frames show it open. The lobes read as distinct: the opening lobe grows from 18 to 26.4 mm, the closing lobe shrinks from 31.9 to 22.4 mm over the same angles. The loaded rocker is the view highlight: opening rocker from 0° to 45° and from 135° to 180°, closing rocker from 45° to 135°. Keeping supports off the lobes and shoes is hardware work, not record data. Rebuild R5 (#216): built on v3. The stem's travel is the law (on its slide joint); each rocker follows from it by the rocker block (ψ = asin(s / arm), exact for a round nose level with its pivot), and each lobe is built as the envelope of its shoe's path in the camshaft's frame (the closing one with 0.1 mm lash), so the lobes are conjugate by construction. The pressure angles, measured between each shoe's path on its lobe and the shoe's own motion, are 24.4° and 29.8° (the review's 23.1° and 27.7° were estimates); the closing lobe sits near the 30° limit. The lift and rise controls are not offered (the lobes are built at build time). The per-phase loaded-rocker highlight waits on the renderer (highlightBy); the detail view highlights both rockers."
       },
       "principle": [
         {
@@ -1961,12 +2227,13 @@
         {
           "id": "stroke-axis",
           "kind": "axis-line",
-          "through": "tip",
-          "direction": [
+          "at": "tip",
+          "axis": [
             0,
             0,
             1
           ],
+          "length": 70,
           "label": "STROKE AXIS"
         },
         {
@@ -1996,14 +2263,14 @@
         {
           "id": "open-push",
           "kind": "line",
-          "from": "C1",
+          "from": "O",
           "to": "P1",
           "label": "OPENING PUSH"
         },
         {
           "id": "close-push",
           "kind": "line",
-          "from": "C2",
+          "from": "O",
           "to": "P2",
           "label": "CLOSING PUSH"
         }
@@ -2049,16 +2316,6 @@
           "id": "cam",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "lift",
-          "kind": "param",
-          "param": "h"
-        },
-        {
-          "id": "rise",
-          "kind": "param",
-          "param": "rise"
         }
       ],
       "plot": {
@@ -2087,7 +2344,8 @@
           "output": "lift",
           "stat": "dwell",
           "value": 180,
-          "tol": 0.5
+          "tol": 1,
+          "band": 1e-9
         },
         {
           "text": "the opening rocker swings 8.6°",
@@ -2104,18 +2362,18 @@
           "tol": 0.2
         },
         {
-          "text": "pressure angle at most 23.1° on the opening lobe",
+          "text": "pressure angle at most 24.4° on the opening lobe",
           "output": "pressure-open",
           "stat": "max",
-          "value": 23.1,
-          "tol": 0.5
+          "value": 24.4,
+          "tol": 0.3
         },
         {
-          "text": "pressure angle at most 27.7° on the closing lobe",
+          "text": "pressure angle at most 29.8° on the closing lobe",
           "output": "pressure-close",
           "stat": "max",
-          "value": 27.7,
-          "tol": 0.5
+          "value": 29.8,
+          "tol": 0.3
         }
       ],
       "exceptions": []
@@ -2123,7 +2381,7 @@
     "edit": {
       "ratio.typical": "lift 12 mm per cam turn: rise 90°, return 90°, closed 180°",
       "build.ground": "head plate standing upright: camshaft O on top, rocker pivots Q1 and Q2 beside and below it, follower guide vertical below",
-      "build.defining_relations": "Lift y = s(theta), cycloidal, rise 90°, return 90°, closed 180°, h 12. Opening rocker: a finger pivoted at Q1, shoe 56 mm and nose 80 mm from the pivot, so psi1 = asin(y/80) (8.6° at full lift); its lobe is the envelope of the Ø16 shoe, radius 18 mm closed to 26.4 mm at full lift. Closing rocker: a bell crank pivoted at Q2, fork arm 50 mm level to the collar, cam arm 39.7 mm at 107.7° to it, on the tangent to the shoe circle; psi2 = asin(y/50) (13.9° at full lift); its lobe is the envelope of its shoe offset by the 0.1 mm lash, radius 31.9 mm closed to 22.4 mm at full lift. Both lobes are cut from the same law, so at every angle both shoes touch (conjugate): the opening lobe grows where the closing lobe shrinks. Pressure angles at most 23.1° (opening) and 27.7° (closing).",
+      "build.defining_relations": "Lift y = s(theta), cycloidal, rise 90°, return 90°, closed 180°, h 12. Opening rocker: a finger pivoted at Q1, shoe 56 mm and nose 80 mm from the pivot, so psi1 = asin(y/80) (8.6° at full lift); its lobe is the envelope of the Ø16 shoe, radius 18 mm closed to 26.4 mm at full lift. Closing rocker: a bell crank pivoted at Q2, fork arm 50 mm level to the collar, cam arm 39.7 mm at 107.7° to it, on the tangent to the shoe circle; psi2 = asin(y/50) (13.9° at full lift); its lobe is the envelope of its shoe offset by the 0.1 mm lash, radius 31.9 mm closed to 22.4 mm at full lift. Both lobes are cut from the same law, so at every angle both shoes touch (conjugate): the opening lobe grows where the closing lobe shrinks. Pressure angles at most 24.4° (opening) and 29.8° (closing): the angle between each shoe's path on its lobe and the shoe's own motion.",
       "build.range": "camshaft 360° continuous; follower 0 to 12 mm lift in 180° of cam, closed for 180°",
       "build.notes": "Seen in front elevation. Highlight the rocker currently carrying the follower: the opening rocker from 0° to 45° and from 135° to 180° of cam, the closing rocker from 45° to 135°. Keep the lash visible but tiny. The two lobes lie side by side on the shaft and overlap in this view: tell them apart by pattern and stacking.",
       "topology.notes": "ground, camshaft (opening and closing lobes), opening rocker, closing rocker, follower; cam-rocker and rocker-follower contacts; overconstrained on purpose (conjugate cams): counted mobility 0, the four contacts hold one motion"

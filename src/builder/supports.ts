@@ -159,13 +159,13 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
   const below: number[] = [];
   const above: number[] = [];
   let tried = 0;
-  for (let k = 0; k < 12 && below.length < 2; k++) {
+  for (let k = 0; k < 30 && below.length < 2; k++) {
     const wb = o.lo - W / 2 - gap - 2 * k;
     tried++;
     if (tryAt(wb)) below.push(wb);
     if (below.length === 1) break;
   }
-  for (let k = 0; k < 12 && above.length < 2; k++) {
+  for (let k = 0; k < 30 && above.length < 2; k++) {
     const wb = o.hi + W / 2 + gap + 2 * k;
     tried++;
     if (tryAt(wb)) above.push(wb);

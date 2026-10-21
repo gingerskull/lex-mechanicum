@@ -189,9 +189,13 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
   if (!ctx.base || !axle) return;
-  // H.shaft starts at its low end, the free one: the axle's frame origin is that end, its z the shaft's axis
-  const out: Vec3 = v3.mul(v3.unit(axle.frame.z as Vec3), -1);
-  const end = axle.frame.o as Vec3;
+  // H.shaft starts at its low end: the axle's frame origin is that end, its z the shaft's axis. The drive takes that end,
+  // unless it faces the eye in the default view (a front elevation looking at the low end): then the far end
+  const zA = v3.unit(axle.frame.z as Vec3);
+  const far = v3.dot(zA, ctx.viewDir()) > 0.5;
+  const hA = axle.op.op === "extrude" ? axle.op.h : 0;
+  const out: Vec3 = far ? zA : v3.mul(zA, -1);
+  const end = far ? v3.add(axle.frame.o as Vec3, v3.mul(zA, hA)) : (axle.frame.o as Vec3);
   const shaftBody = axle.body;
   const S: Vec3 = v3.add(end, v3.mul(out, -6)); // the pulley's centre, 6 mm in from the end
   const up: Vec3 = [0, 0, 1];

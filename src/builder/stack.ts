@@ -15,6 +15,7 @@ import { Local, fitBore, half, type Fit, type Member } from "./lib";
 import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
 import { MIN_GAP } from "./constants";
+import { v3 } from "../kin/math";
 import { liveHousing, pillowBlocks } from "./supports";
 
 export type SupportKind = "housing" | "pillow" | "bridge" | "stub" | "hung";
@@ -233,7 +234,8 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
-    shaftSpec.z1 = p.shaft[1] + (live ? 12 : 0);
+    // the drive's pulley goes on the end facing away from the default view (rules/shared.ts driveInPlan)
+    shaftSpec.z1 = p.shaft[1] + (live ? (spec.input && v3.dot(spec.frame.z, ctx.viewDir()) > 0.5 ? 18 : 12) : 0);
     // a part overhung past both blocks is held on the shaft's end by a washer and a countersunk screw (J10, F2)
     const top = members[members.length - 1]!;
     if (live && Math.max(...p.w) < top.w0) {

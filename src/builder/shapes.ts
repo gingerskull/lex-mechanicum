@@ -6,7 +6,8 @@ import { D2R, TAU, area, capsule, circle, gearOutline, roundRect, roundedPoly, s
 import { filletPoly } from "../hardware/primitives";
 import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
-import { bodyFrameOf, type Setup } from "../kin/compose";
+import { Kinematics, bodyFrameOf, type Setup } from "../kin/compose";
+import { xf } from "../kin/math";
 import { type Vec3, m3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
@@ -346,6 +347,7 @@ const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * M
 function plateCam(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
   if (String(g.shape.type) !== "cam") return null;
   if (g.shape.form === "barrel") return barrel(kin, S, b, g);
+  if (g.shape.form === "lobes") return lobes(kin, b, g);
   if (g.shape.form === "face-groove") return faceGroove(kin, S, b, g);
   const j = kin.joints.find((q) => q.type === "cam-contact" && (q.b === b.id || q.a === b.id) && q.cam);
   const r = j ? S.joints.get(j.id) : undefined;
@@ -436,4 +438,55 @@ function withPieces(b: KinBody, g: BodyGeom): BodyGeom {
     pieces.push({ id: `${b.id}-${String(pc.id ?? `piece${k}`)}`, name: "", frame, profile: { outer: filletPoly(area(pts) < 0 ? pts.slice().reverse() : pts, num(pc.fillet, 1.5)), holes: [] }, h: num(pc.thick, 8) });
   });
   return { ...g, pieces };
+}
+
+/**
+ * A camshaft of conjugate lobes (`cam` with `form: lobes`): a hub along the shaft (`hub` radius, from `place` for
+ * `length`), and one lobe per entry of `lobes` ({ id, shoe, radius, lash, from, to }): the inner envelope of a circle of
+ * `radius + lash` round the named shoe point's path in the camshaft's frame over the cycle, as the kinematics move it,
+ * between `from` and `to` along the shaft's axis. Each lobe is then exactly what its rocker needs (K1).
+ */
+function lobes(kin: Kin, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const list = g.shape.lobes;
+  if (!Array.isArray(list)) return null;
+  const K = new Kinematics(kin);
+  const N = 720;
+  const poses = Array.from({ length: N }, (_, k) => K.pose((k / N) * TAU));
+  const F = g.frame;
+  const pieces = [...(g.pieces ?? [])];
+  for (const lb of list as Record<string, unknown>[]) {
+    const shoe = String(lb.shoe);
+    const path: Vec2[] = [];
+    for (const P of poses) {
+      const X = P.bodies.get(b.id);
+      const p = P.points.get(shoe);
+      if (!X || !p) return null;
+      path.push(planeCoords(F, xf.apply(xf.inv(X), p)).uv);
+    }
+    const r = num(lb.radius, 8) + num(lb.lash, 0);
+    // the inner offset of the shoe's path (counter-clockwise about the shaft) by r, along its normals
+    const ccw = area(path) < 0 ? path.slice().reverse() : path;
+    const n = ccw.length;
+    const outer: Vec2[] = ccw.map((q, k) => {
+      const a = ccw[(k - 1 + n) % n]!;
+      const c = ccw[(k + 1) % n]!;
+      const tx = c[0] - a[0];
+      const ty = c[1] - a[1];
+      const L = Math.hypot(tx, ty) || 1;
+      // the outward normal of a counter-clockwise curve is (ty, -tx)
+      return [q[0] - (r * ty) / L, q[1] + (r * tx) / L];
+    });
+    const z0 = num(lb.from, 0);
+    const z1 = num(lb.to, 8);
+    pieces.push({ id: `${b.id}-${String(lb.id ?? "lobe")}`, name: "", frame: { o: v3.add(F.o, v3.mul(F.z, z0)), x: F.x, z: F.z }, profile: { outer, holes: [] }, h: z1 - z0 });
+  }
+  const len = num(g.shape.length, 40);
+  return {
+    ...g,
+    profile: { outer: circle(num(g.shape.hub, 10), 0, 0, 48), holes: [] },
+    thick: len,
+    approx: false,
+    exact: { offset: typeof g.shape.place === "number" ? g.shape.place : -len / 2 },
+    pieces,
+  };
 }

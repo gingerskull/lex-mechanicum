@@ -463,6 +463,41 @@ const flexureBlock: BlockFn = (c, s) => {
   outVal(c, s, e.a, "end");
 };
 
+/**
+ * rocker: a rocker held against a translating follower's end by a round nose, its pivot level with the nose at the
+ * reference, so the nose drops exactly the follower's travel: ψ = sense · asin(s / arm). in: value (the travel s, mm, a
+ * value name), v (ds/dθ of the driving cam, mm per radian, a value name), joint (the rocker's ground revolute), body (the
+ * rocker; default the joint's b), arm (pivot to nose, mm), sense (+1 or −1 about the joint's axis), shoe (a point on the
+ * rocker riding a cam lobe) and cam (the cam's ground revolute), for the pressure angle at the shoe: the angle between
+ * the shoe's path in the cam's frame and the arm square to its motion. out {angle, pressure} (deg).
+ */
+const rockerBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const jid = str(i.joint, "rocker.joint");
+  const sOf = c.num(i.value);
+  const b = c.num(i.arm);
+  const sense = i.sense !== undefined ? c.num(i.sense) : 1;
+  if (Math.abs(sOf) > b) throw new KinError(`rocker ${s.id}: travel ${sOf.toFixed(2)} beyond the arm ${b}`);
+  const psi = sense * Math.asin(sOf / b);
+  const body = (i.body as string | undefined) ?? c.joint(jid).b;
+  const ax = c.jointAxis(jid);
+  const Q = c.jointAt(jid);
+  const X = xf.rotAbout(Q, ax, psi - sense * Math.asin(c.num(i.ref ?? 0) / b));
+  c.setXf(body, X);
+  outVal(c, s, psi * R2D, "angle");
+  if (typeof i.shoe === "string" && typeof i.cam === "string" && i.v !== undefined) {
+    // the shoe's path relative to the cam turning about +a: T = ψ'·a×(P−Q) − a×(P−O), ψ' = sense·v / (arm cos ψ)
+    const P = xf.apply(X, c.refPt(i.shoe));
+    const O = c.jointAt(i.cam);
+    const a = c.jointAxis(i.cam);
+    const dpsi = (sense * c.num(i.v)) / (b * Math.cos(psi));
+    const T = v3.sub(v3.mul(v3.cross(ax, v3.sub(P, Q)), dpsi * v3.dot(ax, a)), v3.cross(a, v3.sub(P, O)));
+    const r = v3.sub(P, Q);
+    const cos = Math.abs(v3.dot(T, r)) / (v3.len(T) * v3.len(r) || 1);
+    outVal(c, s, Math.acos(Math.min(1, cos)) * R2D, "pressure");
+  }
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -525,6 +560,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   "gear-mesh": gearMesh,
   willis: willisBlock,
   cam: camBlock,
+  rocker: rockerBlock,
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,

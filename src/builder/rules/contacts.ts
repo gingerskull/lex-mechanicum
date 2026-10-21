@@ -164,6 +164,35 @@ function extentIn(ctx: BuildCtx, c: Contact, body: string): [number, number, num
 }
 
 /**
+ * A stem that slides along its own axis (a `shaft` on a prismatic joint, a desmodromic's follower): a bronze bushing in a
+ * guide block round the stem, the block on four standoffs from the base, clear of what the stem carries. The block
+ * stands at the stem's `guide` ([z0, z1] along its axis from its frame origin), else at the middle of its free length.
+ */
+function stemGuide(ctx: BuildCtx, c: Contact, id: string, stem: string): ReturnType<KitBuild> {
+  const g = ctx.geoms.get(stem)!;
+  const ax = g.frame.z;
+  const d = Number(g.shape.diameter ?? 8);
+  const gv = Array.isArray(g.shape.guide) ? (g.shape.guide as number[]) : null;
+  const place = Number(g.shape.place ?? 0);
+  const len = Number(g.shape.length ?? 60);
+  const [z0, z1] = gv ? [gv[0]!, gv[1]!] : [place + len * 0.3, place + len * 0.55];
+  const Lg = new LocalFrame({ o: g.frame.o, x: g.frame.x, z: ax }, { joints: [id] });
+  const D = d + 6;
+  const half = Number(g.shape.guideHalf ?? 25);
+  Lg.add(H.bushing(`${id}-bush`, d + 0.05, D, { body: "ground", z0, z1, name: `Guide bushing ${d}x${D}x${z1 - z0}, sintered bronze, oil-impregnated` }));
+  Lg.add(H.plate(`${id}-block`, roundRect(-half, -half, half, half, 4), { body: "ground", kind: "plate", role: "ground", name: "Guide block, bored for the bushing", z0: z0 + 2, z1: z1 - 2, holes: [circle(D / 2 + 0.05, 0, 0, 36)], mat: "Aluminium 6061-T6, anodised", joints: [id] }));
+  const baseTop = ctx.base ? ctx.base.top - g.frame.o[2] : -4;
+  const legs: string[] = [];
+  for (const [k, x, y] of [[0, -1, -1], [1, 1, -1], [2, 1, 1], [3, -1, 1]] as const) {
+    Lg.add(H.standoff(`${id}-leg${k}`, { body: "ground", at: [x * (half - 6), y * (half - 6), 0], z0: baseTop, z1: z0 + 2, ...(k ? { name: "", qty: 0 } : { qty: 4, name: "Standoff Ø10, M5, carries the guide block" }) }));
+    legs.push(`${id}-leg${k}`);
+  }
+  ctx.add(Lg.out());
+  void c;
+  return { serves: { F1: legs, F8: [`${id}-bush`] }, note: `${titleOf(id)}: the stem in an oil-impregnated bronze bushing, in a guide block on four standoffs from the base.` };
+}
+
+/**
  * A slider's declared guide length (`shape.guide` [s0, s1], mm along the slide's own axis from the body's frame origin)
  * in a contact's frame, or null.
  */
@@ -186,6 +215,7 @@ const j5 = contactRule({
     const id = c.id;
     const slider = c.a === "ground" ? c.b : c.a;
     const host = slider === c.a ? c.b : c.a;
+    if (String(ctx.geoms.get(slider)?.shape.type) === "shaft") return stemGuide(ctx, c, id, slider);
     const e = extentIn(ctx, c, slider);
     // a slider whose part reaches past its guide (a cam follower's stem down to its roller) is held over its `guide`
     // only ([x0, x1] along its own frame x): rails, stops and wipers stay on that length, off what the rest reaches over
@@ -311,6 +341,8 @@ const j9 = contactRule({
 const camBuild: KitBuild = (ctx, c) => {
   const id = c.id;
   const isCam = (b: string) => String(ctx.geoms.get(b)?.shape.type) === "cam";
+  // a rocker's nose on a follower (a desmodromic's opening finger on the stem's end): the rocker's own stack holds it
+  if (!isCam(c.a) && !isCam(c.b)) return { serves: {}, note: `${titleOf(id)}: a rocker's nose on the follower; nothing to add, the rocker's pivot and the follower's guide hold both.` };
   const cam = isCam(c.b) ? c.b : c.a;
   const other = cam === c.a ? c.b : c.a;
   const camG = ctx.geoms.get(cam);
