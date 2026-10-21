@@ -4,7 +4,7 @@
 // groove cam. Each builds its canonical hardware in the contact's own frame from the declared joint.
 import { circle, roundRect, type Vec2 } from "../../core/geom";
 import { H } from "../../hardware/primitives";
-import { BEARINGS, circlipExt } from "../../hardware/tables";
+import { BEARINGS, NIPPLES, circlipExt } from "../../hardware/tables";
 import { planeCoords } from "../frames";
 import { fromPlane } from "../frames";
 import type { BuildCtx, JointNote } from "../ctx";
@@ -197,20 +197,37 @@ const j5 = contactRule({
     const sideY: [number, number][] = [[0, e[3] + 3.5 + 0.5], [1, e[2] - 3.5 - 0.5 - gap]];
     // the rails and their risers run 10 mm past the slider's travel at each end, less where another part sweeps by
     // (a crank turning past the near end), down to a quarter of the slider short of its extreme (it overhangs the ways
-    // there); each side is trimmed on its own
+    // there); each side is trimmed on its own. A riser under a rail stops shorter still where a part sweeps by
+    // under the rail's end (the rod of an eccentric): the rail overhangs it there
     const railFor = (k: number, y: number, a: number, b: number): Solid3[] => {
       const T = localAt(ctx, c);
       T.add(H.plate(`${id}-rail${k}`, roundRect(a, y - 3.5, b, y + 3.5, 3.5), { body: hostBody, kind: "plate", role: "ground", z0: w0, z1: w0 + rh }));
-      if (w0 - baseTop > 0.5) T.add(H.plate(`${id}-riser${k}`, roundRect(a, y - 6, b, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", z0: baseTop, z1: w0 }));
       return T.out();
     };
+    // a riser runs under its rail and laps 1 mm under the slider's edge, the way it runs on
+    const riserOutline = (a: number, b: number, k: number, y: number): Vec2[] => (k ? roundRect(a, y - 6, b, e[2] + 1, 1) : roundRect(a, e[3] - 1, b, y + 6, 1));
+    const riserFor = (k: number, y: number, a: number, b: number): Solid3[] => {
+      const T = localAt(ctx, c);
+      T.add(H.plate(`${id}-riser${k}`, riserOutline(a, b, k, y), { body: hostBody, kind: "plate", role: "ground", z0: baseTop, z1: w0 }));
+      return T.out();
+    };
+    const risen = w0 - baseTop > 0.5;
     const lo = c.run[0] + e[0];
     const hi = c.run[1] + e[1];
     const margins = [10, 7, 4, 2, 0, -Ls / 8, -Ls / 4];
     const ends = sideY.map(([k, y]): [number, number] => {
-      const a = margins.find((m) => clearOf(ctx, railFor(k, y, lo - m, lo), others));
-      const b = margins.find((m) => clearOf(ctx, railFor(k, y, hi, hi + m), others));
+      // judged on the rail's first 12 mm as it would be built
+      const a = margins.find((m) => clearOf(ctx, railFor(k, y, lo - m, lo - m + 12), others));
+      const b = margins.find((m) => clearOf(ctx, railFor(k, y, hi + m - 12, hi + m), others));
       return [lo - (a ?? margins[margins.length - 1]!), hi + (b ?? margins[margins.length - 1]!)];
+    });
+    const riserEnds = sideY.map(([k, y]): [number, number] => {
+      const [a, b] = ends[k]!;
+      const most = (b - a) / 3;
+      const steps = [0, 3, 6, 10, 15, 20, 30, 40].filter((d) => d <= most);
+      const da = steps.find((d) => clearOf(ctx, riserFor(k, y, a + d, a + d + 4), others)) ?? most;
+      const db = steps.find((d) => clearOf(ctx, riserFor(k, y, b - d - 4, b - d), others)) ?? most;
+      return [a + da, b - db];
     });
     // the gibbed side carries the keeper, the gib and their screws; the stops sit where both rails run
     const [g0, g1] = ends[1]!;
@@ -224,8 +241,9 @@ const j5 = contactRule({
       L.add(H.plate(`${id}-rail${k}`, roundRect(a, y - 3.5, b, y + 3.5, 3.5), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
       ways.push(`${id}-rail${k}`);
       // a ground riser along the straight run (A6): its inner lip is the way the slider runs on
-      if (w0 - baseTop > 0.5) {
-        L.add(H.plate(`${id}-riser${k}`, roundRect(a, y - 6, b, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
+      if (risen) {
+        const [ra, rb] = riserEnds[k]!;
+        L.add(H.plate(`${id}-riser${k}`, riserOutline(ra, rb, k, y), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
         ways.push(`${id}-riser${k}`);
       }
     }
@@ -239,7 +257,7 @@ const j5 = contactRule({
       const x = g0 + 12 + ((g1 - g0 - 24) * k) / (nScrew - 1);
       L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + 3 + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + 3, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
     }
-    for (const [k, x] of [[0, ends[0]![0] + 4], [1, ends[0]![1] - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, e[3] + 4, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, reference rail to base", qty: 2 }) }));
+    for (const [k, x] of [[0, riserEnds[0]![0] + 4], [1, riserEnds[0]![1] - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, e[3] + 4, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, reference rail to base", qty: 2 }) }));
     // wipers at both ends of the slider and a grease nipple on the keeper (F8)
     const sb = bodyOf(ctx, slider);
     for (const [k, x] of [[0, c.run[0] + e[0] - 3], [1, c.run[0] + e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
@@ -534,7 +552,44 @@ const ringRollers = contactRule({
   },
 });
 
-export const contactRules: Rule[] = [j6, j9, j11, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave, j13];
+// ------------------------------------------------------------------------------------------------ eccentric
+
+/**
+ * A sheave turning in its strap (an eccentric): the strap's bore lined with a split bronze liner on the sheave's rim, a
+ * cheek ring screwed to the sheave's top face lapping the strap, which its pin at the far end locates the other way
+ * (F2), an oil nipple on the strap's ring (F8). The journal is the sheave itself, so there is no pin.
+ */
+const eccentric = contactRule({
+  id: "eccentric",
+  ids: ["J3", "F2", "F8", "M14"],
+  fixture: "eccentric-sheave",
+  kits: ["eccentric"],
+  build(ctx, c, L) {
+    const id = c.id;
+    const rec = c.ji.joint as unknown as { radius: number };
+    const R = rec.radius;
+    const sheave = ctx.kin.bodies.find((b) => b.id === c.a)?.shape?.type === "disc" ? c.a : c.b;
+    const strap = sheave === c.a ? c.b : c.a;
+    const zs = ctx.extent(sheave);
+    const zt = ctx.extent(strap);
+    const z0 = Math.min(zs?.w0 ?? -4, zt?.w0 ?? -4);
+    const z1 = Math.max(zs?.w1 ?? 4, zt?.w1 ?? 4);
+    const bore = ((ctx.kin.bodies.find((b) => b.id === strap)?.shape as { bore?: number } | undefined)?.bore ?? R + 2);
+    L.add(H.bushing(`${id}-liner`, 2 * R + 0.1, 2 * bore, { body: bodyOf(ctx, strap), z0: (zt?.w0 ?? z0) + 0.3, z1: (zt?.w1 ?? z1) - 0.3, name: `Split bronze liner ${2 * R}x${2 * bore}, in the strap round the sheave` }));
+    const lap = bore + 2;
+    L.add(H.washer(`${id}-cheek`, 2 * R - 10, 2 * lap, { body: bodyOf(ctx, sheave), z0: z1 + 0.3, z1: z1 + 2.3, name: `Cheek ring ${2 * R - 10}x${2 * lap}, screwed to the sheave, laps the strap` }));
+    // the nipple on the strap's ring, outside the cheek ring, on the side away from the rod
+    L.add(H.nipple(`${id}-nip`, { body: bodyOf(ctx, strap), at: [-(lap + NIPPLES.s / 2 + 2), 0, 0], z0: zt?.w1 ?? z1, z1: (zt?.w1 ?? z1) + 9 }));
+    const part = ctx.parts.get(strap);
+    if (part) part.slides = [...(part.slides ?? []), `${id}-cheek`];
+    return {
+      serves: { F2: [`${id}-cheek`], F8: [`${id}-nip`], M14: [`${id}-liner`] },
+      note: `${titleOf(id)}: the Ø${2 * R} sheave turns in the strap on a split bronze liner (the replaceable wear part); a cheek ring on the sheave's top face laps the strap, whose pin at the rod end locates it the other way; an oil nipple on the strap's ring feeds the liner.`,
+    };
+  },
+});
+
+export const contactRules: Rule[] = [eccentric, j6, j9, j11, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave, j13];
 
 void MIN_GAP;
 void ringOffsets;

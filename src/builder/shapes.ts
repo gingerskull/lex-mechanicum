@@ -71,6 +71,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "link": {
       const L = num(shape.length, far);
       const [r0, r1] = pair(shape.boss, [8, 8]);
+      // a bore at its origin: an eccentric strap, a ring round its sheave with a slim rod to the far pin
+      const bore = num(shape.bore, 0);
+      if (bore > 0 && r0 > r1) return { profile: { outer: ringAndRod(L, r0, r1), holes: [circle(bore, 0, 0, 96).reverse()] }, thick: THICK, approx: false };
       return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick: THICK, approx: false };
     }
     case "plate": {
@@ -335,6 +338,22 @@ function cylinder(b: KinBody, g: BodyGeom): BodyGeom | null {
       { id: `${b.id}-head`, name: "", frame: { o: at(L - hl / 2, 0, h), x: F.z, z: F.x }, profile: { outer: circle(hd / 2, 0, 0, 48), holes: [] }, h: hl },
     ],
   };
+}
+
+/** A ring of radius r0 at the origin with a rod of half width r1 to a round end at L along x (counter-clockwise). */
+function ringAndRod(L: number, r0: number, r1: number): Vec2[] {
+  const a = Math.asin(r1 / r0);
+  const out: Vec2[] = [];
+  const n = 96;
+  for (let k = 0; k <= n; k++) {
+    const t = a + ((TAU - 2 * a) * k) / n;
+    out.push([r0 * Math.cos(t), r0 * Math.sin(t)]);
+  }
+  for (let k = 0; k <= 16; k++) {
+    const t = -Math.PI / 2 + (Math.PI * k) / 16;
+    out.push([L + r1 * Math.cos(t), r1 * Math.sin(t)]);
+  }
+  return out;
 }
 
 const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);

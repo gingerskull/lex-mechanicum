@@ -116,7 +116,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
     for (const j of joints) {
       const t = j.joint.type;
-      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact";
+      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || j.kit === "eccentric";
       if (!planar || !parent.has(j.a) || !parent.has(j.b)) continue;
       if (j.joint.crossed) continue;
       contact.add(pairKey(j.a, j.b));

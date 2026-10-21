@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-21 · result: open · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
+PASS 12 · FAIL 2 · N/A 0 · open: FAIL A15, Q2; 153 unjudged
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -64,23 +64,23 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | D8 | ? | AUTO / HAND |
 | D9 | ? | AUTO / HAND |
 | D10 | ? | AUTO |
-| D11 | PASS | AUTO · SOLID: 0 of 132 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 128 solids unsound |
 | D7 | ? | HAND |
 | A1 | ? | AUTO · A J3, B J3, D J3, E J3, O2 J2, rails J5, O4 J1, drive drive |
 | A2 | ? | AUTO · A J3, B J3, D J3, E J3, O2 J2, rails J5, O4 J1, drive drive |
 | A3 | ? | AUTO · fired: classify (7 solids), axial stack builder |
 | A4 | ? | AUTO · fired: j1-dead-axle (12 solids), axial stack builder |
 | A5 | ? | AUTO · fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), axial stack builder |
-| A6 | ? | AUTO · fired: j5-slide (22 solids), j13-compliant (no solids), standoffs (no solids) |
+| A6 | ? | AUTO · fired: j5-slide (18 solids), j13-compliant (no solids), standoffs (no solids) |
 | A7 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
 | A8 | ? | AUTO · fired: fasteners (14 solids) |
 | A9 | ? | AUTO / HAND · fired: placement solver |
 | A10 | ? | HAND · fired: placement (10 solids), placement solver |
 | A11 | ? | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (12 solids) |
-| A12 | FAIL | AUTO · clamp: ram (turning) touches the ground face of rails-riser0 |
-| A13 | ? | AUTO / HAND · 132 solids, 67 unnamed (further items of a listed set) |
+| A12 | PASS | AUTO · clamp check clean |
+| A13 | ? | AUTO / HAND · 128 solids, 65 unnamed (further items of a listed set) |
 | A14 | ? | AUTO / HAND · fired: support router |
-| A15 | FAIL | AUTO · clearance in 3D over 8 phases: 5 clashes: O4-axle-s2 x crank 2.99 mm; rails-wip1 x rails-stop0 1.40 mm; O4-sp0 x crank 1.17 mm; rails-wip1 x rails-pad0 0.84 mm; hand allow: 0 named, 0 unnecessary |
+| A15 | FAIL | AUTO · clearance in 3D over 8 phases: 2 clashes: O4-axle-s2 x crank 2.99 mm; O4-sp0 x crank 1.17 mm; hand allow: 0 named, 0 unnecessary |
 | A16 | ? | HAND · 8 joint notes; no note: none; no badge: rails |
 | A17 | ? | HAND |
 | A18 | ? | AUTO · placement: 4 slabs in the tallest stack (41.0 mm), 0 clevises; stack per joint in the Joints table |
@@ -102,7 +102,7 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | J2 | ? | AUTO · fired: j2-live-shaft (25 solids) |
 | J3 | ? | AUTO · fired: j3-moving-pin (36 solids), cross-bearings (no solids), ring-hub (no solids) |
 | J4 | ? | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) |
-| J5 | ? | AUTO · fired: piston-bore (no solids), j5-slide (22 solids), tongue-slot (no solids) |
+| J5 | ? | AUTO · fired: piston-bore (no solids), j5-slide (18 solids), tongue-slot (no solids) |
 | J6 | ? | AUTO · fired: j6-mesh (no solids), ring-rollers (no solids) |
 | J7 | ? | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) |
 | J8 | ? | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) |
@@ -115,9 +115,9 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | F2 | ? | AUTO · served at A, B, D, E, O2, rails, O4; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
 | F3 | ? | AUTO · served at A, B, D, E, O2; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
 | F4 | ? | AUTO / HAND · served at O2, O4; fired: j9-crossed-mesh (no solids), j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), trunnion (no solids) |
-| F5 | ? | AUTO / HAND · served at rails; fired: j5-slide (22 solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) |
+| F5 | ? | AUTO / HAND · served at no joint; fired: j5-slide (18 solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) |
 | F6 | ? | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) |
-| F7 | ? | AUTO / HAND · served at rails; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (22 solids), j12-flexible (no solids), adjustable-length (no solids) |
+| F7 | ? | AUTO / HAND · served at rails; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (18 solids), j12-flexible (no solids), adjustable-length (no solids) |
 | F8 | ? | AUTO · served at rails; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) |
 | F9 | ? | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (1 solid) |
 | F10 | ? | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) |
@@ -130,7 +130,7 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | M7 | ? | HAND |
 | M8 | ? | AUTO · fired: j1-dead-axle (12 solids) |
 | M9 | ? | AUTO / HAND · fired: j1-dead-axle (12 solids) |
-| M10 | ? | AUTO / HAND · 127 of 132 solids name a material |
+| M10 | ? | AUTO / HAND · 123 of 128 solids name a material |
 | M11 | ? | AUTO · fired: j1-dead-axle (12 solids), hardware primitives |
 | M12 | ? | HAND |
 | M13 | ? | AUTO / HAND · 16 threaded |
@@ -154,22 +154,22 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | R1 | ? | HAND |
 | R2 | ? | HAND |
 | R3 | ? | AUTO · fired: hardware primitives |
-| R4 | ? | AUTO · package v2 23.2 KB |
+| R4 | ? | AUTO · package v2 23.0 KB |
 | R5 | ? | HAND |
 | R6 | ? | FLAG |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | ? | AUTO / SITE |
 | R9 | ? | AUTO / SITE |
 | R10 | ? | FLAG |
-| DL1 | ? | AUTO / HAND · 52 of 132 solids on a dropping rung |
+| DL1 | ? | AUTO / HAND · 48 of 128 solids on a dropping rung |
 | DL2 | ? | HAND |
 | DL3 | ? | AUTO |
 | DL4 | ? | SITE |
 | DL6 | ? | AUTO |
 | DL5 | ? | FLAG |
-| Q1 | FAIL | 0 findings, 1 clamp, 0 edge |
-| Q2 | FAIL | 5 clashes, 0 unnecessary allows |
-| Q3 | ? | package v2 written, 23.2 KB; site build not checked here |
+| Q1 | PASS | check, clamp and edge distance clean |
+| Q2 | FAIL | 2 clashes, 0 unnecessary allows |
+| Q3 | ? | package v2 written, 23.0 KB; site build not checked here |
 | Q4 | ? | local: tools/shot |
 | Q5 | ? | local: tools/bench |
 | Q6 | ? |  |
@@ -206,12 +206,12 @@ PASS 10 · FAIL 4 · N/A 0 · open: FAIL A12, A15, Q1, Q2; 153 unjudged
 | DL-E | 11 | 0 | ? |
 | DL-F | 0 | 0 | ? |
 | DL-G | 0 | 0 | ? |
-| DL-H | 10 | 0 | ? |
+| DL-H | 6 | 0 | ? |
 | never | 80 | 210 | ? |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 8.0e-13 · claims: 8 of 8 ok · clearance: 5 clashes · clamp: faults · edge distance: clean · package: 23.2 KB
+check: clean · K1 residual: 8.0e-13 · claims: 8 of 8 ok · clearance: 2 clashes · clamp: clean · edge distance: clean · package: 23.0 KB
 screenshots: ? · bench: ?

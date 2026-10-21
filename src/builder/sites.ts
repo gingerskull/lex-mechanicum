@@ -11,7 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore",
+  "cross-pin", "trunnion", "piston-bore", "eccentric",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -69,6 +69,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (ground && j.type === "revolute" && (a?.shape?.type === "cylinder" || b?.shape?.type === "cylinder")) return "trunnion";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
       if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
+      // a journal as large as a disc (a sheave turning in its strap) is an eccentric, not a pin
+      if (!ground && j.type === "revolute" && typeof rec.radius === "number" && rec.radius > 12) return "eccentric";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
       return parallel(axis, UP) ? "J1" : "J10";
     }
