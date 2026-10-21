@@ -25,6 +25,7 @@ export function record(id: string, over: Partial<CatalogRecord> = {}): CatalogRe
       { product: "p2", use: "u", url: "https://youtu.be/aaaaaaaaaa2" },
     ],
     related: [],
+    origin: { date: "1900-01-01", precision: "day", note: "n" },
     ...over,
   };
 }

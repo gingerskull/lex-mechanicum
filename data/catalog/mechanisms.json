@@ -177,6 +177,11 @@
       "photos",
       "animation",
       "interactive"
+    ],
+    "precision": [
+      "day",
+      "year",
+      "period"
     ]
   },
   "mechanisms": [
@@ -419,6 +424,11 @@
         "rack-pinion",
         "bell-crank"
       ],
+      "origin": {
+        "date": "1816-02-11",
+        "precision": "year",
+        "note": "Georg Lankensperger devises the steering linkage in Munich; Rudolph Ackermann patents it in Britain in 1818. An earlier idea by Erasmus Darwin (1758) is not confirmed. Source: https://en.wikipedia.org/wiki/Georg_Lankensperger"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -1094,6 +1104,11 @@
         "double-rocker",
         "ackermann-steering"
       ],
+      "origin": {
+        "date": "1727-03-19",
+        "precision": "year",
+        "note": "Best guess: house bells worked by wires and cranks, the system the bell crank is named after, are first recorded in a 1727 inventory of Kiveton House. Source: https://www.poplarforest.org/servant-bells-at-poplar-forest/"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -1782,6 +1797,11 @@
         "locomotive-drive",
         "cam-follower"
       ],
+      "origin": {
+        "date": "1800-03-14",
+        "precision": "period",
+        "note": "Best guess: eccentrics drove steam engine slide valves by about 1800 (period: around 1800). No dated first use was found."
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -2352,6 +2372,11 @@
         "hoekens-linkage",
         "watt-six-bar"
       ],
+      "origin": {
+        "date": "1235-02-06",
+        "precision": "period",
+        "note": "Best guess: Villard de Honnecourt's sawmill sketch of the 1230s seems to show a four-bar linkage (period: 13th century); the source finds no unequivocal evidence before the 16th century. Source: https://gutenberg.org/cache/epub/27106/pg27106-images.html"
+      },
       "real_world": [
         {
           "product": "Air balanced oil well pumpjack",
@@ -2972,6 +2997,11 @@
         "five-bar",
         "elliptic-trammel"
       ],
+      "origin": {
+        "date": "1603-04-04",
+        "precision": "year",
+        "note": "Christoph Scheiner invents the pantograph; he publishes it in Pantographice in 1631. Source: https://en.wikipedia.org/wiki/Christoph_Scheiner"
+      },
       "real_world": [
         {
           "product": "Gorton pantograph engraver",
@@ -3671,6 +3701,11 @@
         "pantograph",
         "scissor-lift"
       ],
+      "origin": {
+        "date": "1784-03-25",
+        "precision": "year",
+        "note": "James Watt's parallel motion for the beam engine, described in a June 1784 letter to Boulton, is built on a parallelogram linkage. Source: https://en.wikipedia.org/wiki/Parallel_motion_linkage"
+      },
       "real_world": [
         {
           "product": "Anglepoise Original 1227 desk lamp",
@@ -4296,6 +4331,11 @@
         "sarrus-linkage",
         "toggle-clamp"
       ],
+      "origin": {
+        "date": "1836-10-27",
+        "precision": "year",
+        "note": "Best guess: the earliest dated use of the name lazy tongs for the scissor linkage is from 1836; the linkage is likely older. Source: https://dictionary.com/browse/lazy-tongs"
+      },
       "real_world": [
         {
           "product": "300kg hydraulic scissor lift table SC-300-D-M",
@@ -5177,6 +5217,11 @@
         "elliptic-trammel",
         "crank-shaper"
       ],
+      "origin": {
+        "date": "1872-11-21",
+        "precision": "year",
+        "note": "Earliest dated use found: William Thomson's first tide-predicting machine makes each tidal term with a crank and slot. Older uses are likely. Source: https://en.wikipedia.org/wiki/Tide-predicting_machine"
+      },
       "real_world": [
         {
           "product": "Spring-return scotch yoke valve actuator",
@@ -5736,6 +5781,11 @@
         "whitworth",
         "crank-shaper"
       ],
+      "origin": {
+        "date": "0260-03-18",
+        "precision": "period",
+        "note": "The Hierapolis sawmill relief shows a water wheel driving saws by crank and connecting rod (period: second half of the 3rd century AD). Source: https://en.wikipedia.org/wiki/Hierapolis_sawmill"
+      },
       "real_world": [
         {
           "product": "Running cutaway engine",
@@ -6318,6 +6368,11 @@
         "pantograph",
         "peaucellier-lipkin"
       ],
+      "origin": {
+        "date": "0450-09-02",
+        "precision": "period",
+        "note": "Ellipsographs are believed to go back to Proclus, about 412 to 485 AD (period: 5th century AD). Source: https://en.wikipedia.org/wiki/Ellipsograph"
+      },
       "real_world": [
         {
           "product": "Rockler Ellipse and Circle Jig",
@@ -7080,6 +7135,11 @@
         "non-circular-gears",
         "double-crank"
       ],
+      "origin": {
+        "date": "1874-05-22",
+        "precision": "year",
+        "note": "Harry Hart publishes his first inversor, built on an antiparallelogram. No earlier dated use was found. Source: https://en.wikipedia.org/wiki/Hart%27s_inversors"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -7761,6 +7821,11 @@
         "bell-crank",
         "slider-crank"
       ],
+      "origin": {
+        "date": "1787-07-13",
+        "precision": "year",
+        "note": "Thomas Mead patents a centrifugal regulator for windmill millstones; Watt adapts it to the steam engine in 1788. Source: https://millsarchive.org/product/thomas-meads-patent-for-a-self-regulating-governor/"
+      },
       "real_world": [
         {
           "product": "Flyball governor on a dual oscillating steam engine",
@@ -8564,6 +8629,11 @@
         "antiparallelogram",
         "double-rocker"
       ],
+      "origin": {
+        "date": "1829-11-13",
+        "precision": "year",
+        "note": "Elijah Galloway patents the feathering paddle wheel (the Morgan wheel), whose floats are worked by a drag-link (double-crank) linkage. Source: https://etc.usf.edu/clipart/25900/25905/feathere_pad_25905.htm"
+      },
       "real_world": [
         {
           "product": "Steam locomotive driving wheels with coupling rods",
@@ -9147,6 +9217,11 @@
         "toggle-clamp",
         "watt-six-bar"
       ],
+      "origin": {
+        "date": "1784-04-28",
+        "precision": "day",
+        "note": "James Watt's patent specification of 28 April 1784 describes his linkage, a double rocker. Source: https://en.wikipedia.org/wiki/Parallel_motion_linkage"
+      },
       "real_world": [
         {
           "product": "Bristol Dockside level luffing crane No. 29",
@@ -9760,6 +9835,11 @@
         "double-crank",
         "parallelogram-linkage"
       ],
+      "origin": {
+        "date": "1991-02-18",
+        "precision": "year",
+        "note": "Best guess: the earliest dated description found is Huissoon and Wang's paper on a direct-drive five-bar manipulator; the linkage is surely older. Source: https://www.cambridge.org/core/journals/robotica/article/abs/on-the-design-of-a-direct-drive-5barlinkage-manipulator/58B2CC7F018F823112676E2093D248AA"
+      },
       "real_world": [
         {
           "product": "DexTAR high-speed five-bar parallel robot",
@@ -10507,6 +10587,11 @@
         "locomotive-drive",
         "eccentric-sheave"
       ],
+      "origin": {
+        "date": "1785-08-24",
+        "precision": "year",
+        "note": "William Murdoch makes a model oscillating cylinder engine at Boulton and Watt. Source: https://en.wikipedia.org/wiki/Oscillating_cylinder_steam_engine"
+      },
       "real_world": [
         {
           "product": "Paddle steamer Diesbar oscillating engine",
@@ -11265,6 +11350,11 @@
         "hoekens-linkage",
         "double-rocker"
       ],
+      "origin": {
+        "date": "1842-04-18",
+        "precision": "year",
+        "note": "Best guess: the Stephenson chain is named after the Stephenson link motion of 1842; the chain's own first use is not dated. Source: https://en.wikipedia.org/wiki/Six-bar_linkage"
+      },
       "real_world": [
         {
           "product": "Yeti 160E electric enduro mountain bike (Sixfinity suspension)",
@@ -12124,6 +12214,11 @@
         "double-rocker",
         "four-bar"
       ],
+      "origin": {
+        "date": "1936-12-26",
+        "precision": "year",
+        "note": "DE-STA-CO files the patent for the first manual toggle clamp, made for the Packard Motor Car Company. Source: https://www.destaco.com/about-us.html"
+      },
       "real_world": [
         {
           "product": "DESTACO manual toggle clamps in workholding fixtures",
@@ -12816,6 +12911,11 @@
         "double-rocker",
         "pantograph"
       ],
+      "origin": {
+        "date": "1784-09-13",
+        "precision": "year",
+        "note": "Best guess: the Watt chain is named after James Watt's 1784 parallel motion linkages; the chain's own first use is not dated. Source: https://en.wikipedia.org/wiki/Parallel_motion_linkage"
+      },
       "real_world": [
         {
           "product": "Crofton Pumping Station Boulton and Watt beam engine in steam",
@@ -13673,6 +13773,11 @@
         "four-bar",
         "stephenson-six-bar"
       ],
+      "origin": {
+        "date": "1990-07-10",
+        "precision": "year",
+        "note": "Theo Jansen builds his first Strandbeest, Animaris Vulgaris. Source: https://en.wikipedia.org/wiki/Theo_Jansen"
+      },
       "real_world": [
         {
           "product": "Theo Jansen Strandbeest at the Exploratorium",
@@ -14650,6 +14755,11 @@
         "hoekens-linkage",
         "four-bar"
       ],
+      "origin": {
+        "date": "1994-12-18",
+        "precision": "year",
+        "note": "Joe Klann develops the linkage. Source: https://en.wikipedia.org/wiki/Klann_linkage"
+      },
       "real_world": [
         {
           "product": "Mondo Spider at Burning Man 2009",
@@ -15484,6 +15594,11 @@
         "scotch-yoke",
         "locomotive-drive"
       ],
+      "origin": {
+        "date": "1900-03-04",
+        "precision": "period",
+        "note": "Developed around 1900 for the twin-cylinder Lanchester car engine (period: around 1900); Philips later uses it in Stirling engines. Source: https://en.wikipedia.org/wiki/Rhombic_drive"
+      },
       "real_world": [
         {
           "product": "Rhombic drive Stirling engine",
@@ -16526,6 +16641,11 @@
         "four-bar",
         "watt-six-bar"
       ],
+      "origin": {
+        "date": "1844-02-06",
+        "precision": "year",
+        "note": "Egide Walschaerts devises the valve gear in Belgium. Source: https://en.wikipedia.org/wiki/Walschaerts_valve_gear"
+      },
       "real_world": [
         {
           "product": "Live steam locomotive with Walschaerts gear",
@@ -17741,6 +17861,11 @@
         "klann-linkage",
         "jansen-linkage"
       ],
+      "origin": {
+        "date": "1854-03-02",
+        "precision": "year",
+        "note": "Pafnuty Chebyshev reads his first memoir on approximate straight-line linkages in St Petersburg. Source: https://www.math.auckland.ac.nz/hat/people/chebyshev.html"
+      },
       "real_world": [
         {
           "product": "Clockwork plantigrade walking machine (Chebyshev lambda linkage)",
@@ -18336,6 +18461,11 @@
         "hoekens-linkage",
         "double-rocker"
       ],
+      "origin": {
+        "date": "1841-01-17",
+        "precision": "year",
+        "note": "Best guess: Richard Roberts of Manchester is credited with the linkage by 1841. Source: https://arxiv.org/pdf/2106.15694"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -18883,6 +19013,11 @@
         "slider-crank",
         "watt-linkage"
       ],
+      "origin": {
+        "date": "1803-11-17",
+        "precision": "day",
+        "note": "William Freemantle's British Patent 2741 covers the linkage, long before John Scott Russell. Source: https://en.wikipedia.org/wiki/Scott_Russell_linkage"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -19477,6 +19612,11 @@
         "double-rocker",
         "watt-six-bar"
       ],
+      "origin": {
+        "date": "1784-04-28",
+        "precision": "day",
+        "note": "One of the linkages in James Watt's patent specification of 28 April 1784. Source: https://en.wikipedia.org/wiki/Parallel_motion_linkage"
+      },
       "real_world": [
         {
           "product": "Model beam engine with Watt's parallel motion",
@@ -20075,6 +20215,11 @@
         "elliptic-trammel",
         "roberts-linkage"
       ],
+      "origin": {
+        "date": "1801-08-07",
+        "precision": "year",
+        "note": "Oliver Evans draws a high-pressure grasshopper beam engine. Source: https://en.wikipedia.org/wiki/Grasshopper_beam_engine"
+      },
       "real_world": [
         {
           "product": "Model grasshopper beam steam engine",
@@ -20709,6 +20854,11 @@
         "jansen-linkage",
         "klann-linkage"
       ],
+      "origin": {
+        "date": "1926-03-26",
+        "precision": "year",
+        "note": "Karl Hoecken publishes the linkage. Source: https://en.wikipedia.org/wiki/Hoecken_linkage"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -21329,6 +21479,11 @@
         "scotch-yoke",
         "peaucellier-lipkin"
       ],
+      "origin": {
+        "date": "1245-10-27",
+        "precision": "period",
+        "note": "Nasir al-Din al-Tusi first publishes the couple in his Persian Hall-i mushkilat-i Mu'iniyya, written after 1235 and before his Tahrir al-Majisti of 1247 (period: 1235 to 1247). Source: https://ismi.mpiwg-berlin.mpg.de/node/2599005"
+      },
       "real_world": [
         {
           "product": "Model of Murray's hypocycloidal steam engine",
@@ -21965,6 +22120,11 @@
         "watt-linkage",
         "scott-russell"
       ],
+      "origin": {
+        "date": "1874-08-23",
+        "precision": "year",
+        "note": "Harry Hart publishes his first inversor. Source: https://en.wikipedia.org/wiki/Hart%27s_inversors"
+      },
       "real_world": [
         {
           "product": "Engino Hart's A-frame linkage build",
@@ -22783,6 +22943,11 @@
         "sarrus-linkage",
         "antiparallelogram"
       ],
+      "origin": {
+        "date": "1864-11-18",
+        "precision": "year",
+        "note": "Charles-Nicolas Peaucellier announces the exact straight-line linkage; Lipkin finds it on his own in 1871. Source: https://en.wikipedia.org/wiki/Peaucellier%E2%80%93Lipkin_linkage"
+      },
       "real_world": [
         {
           "product": "Beam engine using a Peaucellier linkage",
@@ -23606,6 +23771,11 @@
         "scotch-yoke",
         "drag-link-quick-return"
       ],
+      "origin": {
+        "date": "1912-11-08",
+        "precision": "year",
+        "note": "Earliest dated use found: the 1912 Peugeot racing engine has its cylinders set desaxe, offset from the crankshaft. Older uses are likely. Source: https://simanaitissays.com/2019/05/24/racing-peugeots-1912-1913-part-2/"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -24275,6 +24445,11 @@
         "slider-crank",
         "oscillating-cylinder"
       ],
+      "origin": {
+        "date": "1836-03-25",
+        "precision": "year",
+        "note": "Best guess: James Nasmyth builds an early shaping machine, often called the first practical shaper; the date of the slotted-lever drive itself is not known. Source: https://en.wikipedia.org/wiki/James_Nasmyth"
+      },
       "real_world": [
         {
           "product": "Atlas 7B bench shaper",
@@ -25083,6 +25258,11 @@
         "spur-gears",
         "offset-slider-crank"
       ],
+      "origin": {
+        "date": "1840-06-28",
+        "precision": "period",
+        "note": "Joseph Whitworth creates the quick-return motion in the mid-1800s (period: mid-19th century; one source gives 1840). Source: https://en.wikipedia.org/wiki/Quick_return_mechanism"
+      },
       "real_world": [
         {
           "product": "Atlas Rhodes shaper",
@@ -25941,6 +26121,11 @@
         "whitworth",
         "slider-crank"
       ],
+      "origin": {
+        "date": "1850-10-21",
+        "precision": "period",
+        "note": "Best guess: the drag link (patented in a paddle wheel in 1829) drives shaper rams by the mid-1800s (period: mid-19th century). No dated first use was found."
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -26688,6 +26873,11 @@
         "scotch-yoke",
         "slider-crank"
       ],
+      "origin": {
+        "date": "-0270-07-20",
+        "precision": "period",
+        "note": "Ctesibius's water clock, as Vitruvius reports it, uses a rack and pinion (period: 3rd century BC). Source: https://geartechnology.com/ext/resources/issues/0599x/addendum.pdf"
+      },
       "real_world": [
         {
           "product": "Pilatus Railway, Switzerland",
@@ -27289,6 +27479,11 @@
         "rack-pinion",
         "planetary"
       ],
+      "origin": {
+        "date": "-0350-01-14",
+        "precision": "period",
+        "note": "The earliest surviving gears, from China, are kept at the Luoyang Museum (period: 4th century BC). Source: https://en.wikipedia.org/wiki/Gear"
+      },
       "real_world": [
         {
           "product": "Homemade 150:1 five-stage spur gear reducer",
@@ -27870,6 +28065,11 @@
         "worm-drive",
         "crossed-helical-gears"
       ],
+      "origin": {
+        "date": "-0125-11-21",
+        "precision": "period",
+        "note": "Best guess: the Antikythera mechanism is reconstructed with a crown gear meshing at a right angle (period: 2nd century BC). Source: https://www.asme.org/about-asme/engineering-history/landmarks/271-the-antikythera-mechanism"
+      },
       "real_world": [
         {
           "product": "Eggbeater style hand drill",
@@ -28513,6 +28713,11 @@
         "worm-drive",
         "helical-gears"
       ],
+      "origin": {
+        "date": "-0125-02-08",
+        "precision": "period",
+        "note": "The Antikythera mechanism carries a train of some 30 gears (period: 2nd century BC, about 150 to 100 BC). Source: https://www.asme.org/about-asme/engineering-history/landmarks/271-the-antikythera-mechanism"
+      },
       "real_world": [
         {
           "product": "Clock movement with its motion works (dial train)",
@@ -29170,6 +29375,11 @@
         "crossed-helical-gears",
         "gear-train"
       ],
+      "origin": {
+        "date": "1675-07-01",
+        "precision": "period",
+        "note": "Best guess: Robert Hooke is credited with helical (stepped) gearing (period: second half of the 17th century). Source: https://www.sciencedirect.com/topics/engineering/helical-gearing"
+      },
       "real_world": [
         {
           "product": "Helical reduction gearbox (industrial)",
@@ -29764,6 +29974,11 @@
         "bevel-gears",
         "crossed-helical-gears"
       ],
+      "origin": {
+        "date": "1894-02-13",
+        "precision": "period",
+        "note": "Gustaf de Laval introduces double helical reduction gears for his steam turbines (period: 1890s, sources give 1892 to 1894). Source: https://www.britannica.com/print/article/332618"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -30345,6 +30560,11 @@
         "cycloidal-drive",
         "sun-and-planet"
       ],
+      "origin": {
+        "date": "1588-12-12",
+        "precision": "year",
+        "note": "Earliest dated drawing found: plate 78 of Agostino Ramelli's book of machines shows an internal spur gear driven by a lantern pinion. Source: https://digital.sciencehistory.org/works/h702q6667"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -30941,6 +31161,11 @@
         "gear-train",
         "watt-linkage"
       ],
+      "origin": {
+        "date": "1781-10-25",
+        "precision": "day",
+        "note": "James Watt's patent of 25 October 1781 covers William Murdoch's sun and planet gear. Source: https://beta.nationalarchives.gov.uk/catalogue/id/dd5cf905-fc3e-43eb-8862-6768a54a85ab"
+      },
       "real_world": [
         {
           "product": "Boulton and Watt rotative steam engine of 1785 (Whitbread engine), Powerhouse Museum, Sydney",
@@ -31642,6 +31867,11 @@
         "bevel-gears",
         "gear-train"
       ],
+      "origin": {
+        "date": "-0250-12-16",
+        "precision": "period",
+        "note": "Archimedes is traditionally credited with the endless screw driving a toothed wheel (period: 3rd century BC). Source: https://iris.unipa.it/retrieve/e3ad8915-d631-da0e-e053-3705fe0a2b96/A21_357%20final.pdf"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -32238,6 +32468,11 @@
         "hypoid-gears",
         "bevel-gears"
       ],
+      "origin": {
+        "date": "1495-03-24",
+        "precision": "period",
+        "note": "Best guess: Leonardo da Vinci's gear studies in the Codex Madrid I may show skew gears (period: 1493 to 1497); not confirmed. Source: https://discoveringdavinci.com/notebooks/madrid-codices/"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -32829,6 +33064,11 @@
         "internal-gear-pair",
         "eccentric-sheave"
       ],
+      "origin": {
+        "date": "1925-03-18",
+        "precision": "year",
+        "note": "Lorenz Braren patents the cycloidal gearbox in Germany. Source: https://en.wikipedia.org/wiki/Cycloidal_drive"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -33574,6 +33814,11 @@
         "ravigneaux",
         "ball-disc-integrator"
       ],
+      "origin": {
+        "date": "1720-05-13",
+        "precision": "year",
+        "note": "Joseph Williamson's equation clock is the earliest verified use of a differential; earlier claims (Antikythera, south-pointing chariot) are unproven. Source: https://en.wikipedia.org/wiki/Differential_(mechanical_device)"
+      },
       "real_world": [
         {
           "product": "AAM 11.5 axle with Torsen and Eaton TruTrac anti-spin differentials",
@@ -34544,6 +34789,11 @@
         "internal-gear-pair",
         "flexure-hinge"
       ],
+      "origin": {
+        "date": "1955-12-27",
+        "precision": "year",
+        "note": "C. Walton Musser files the strain wave gearing patent, US 2,906,143, granted in 1959. Source: https://patents.google.com/patent/US2906143"
+      },
       "real_world": [
         {
           "product": "Harmonic Drive HD25-100 gear unit",
@@ -35155,6 +35405,11 @@
         "worm-drive",
         "crossed-helical-gears"
       ],
+      "origin": {
+        "date": "1924-12-11",
+        "precision": "year",
+        "note": "Ernest Wildhaber of Gleason invents hypoid gearing. Source: https://www.gleason.com/gear-technology-solutions/files/basic-html/page50.html"
+      },
       "real_world": [
         {
           "product": "Automotive differential ring and pinion set",
@@ -35731,6 +35986,11 @@
         "drag-link-quick-return",
         "whitworth"
       ],
+      "origin": {
+        "date": "1364-12-13",
+        "precision": "period",
+        "note": "Best guess: Giovanni de Dondi's Astrarium, finished in 1364, is reported to use non-circular gears (period: 1348 to 1364). Source: https://www.geartechnology.com/noncircular-gears"
+      },
       "real_world": [
         {
           "product": "Physical non-circular and elliptical gear models in Mechanical Principles (1930 film)",
@@ -36397,6 +36657,11 @@
         "harmonic-drive",
         "cycloidal-drive"
       ],
+      "origin": {
+        "date": "-0150-12-04",
+        "precision": "period",
+        "note": "The Antikythera mechanism is the earliest surviving device with epicyclic gearing (period: 2nd century BC). Source: https://en.wikipedia.org/wiki/Antikythera_mechanism"
+      },
       "real_world": [
         {
           "product": "Shimano Nexus 8 speed internal gear hub",
@@ -37248,6 +37513,11 @@
         "gear-train",
         "internal-gear-pair"
       ],
+      "origin": {
+        "date": "1949-07-28",
+        "precision": "day",
+        "note": "Pol Ravigneaux files his patent application in France. A 1935 filing of his is cited elsewhere but not confirmed as this gearset. Source: https://en.wikipedia.org/wiki/Ravigneaux_planetary_gearset"
+      },
       "real_world": [
         {
           "product": "Toyota U660E / U760E six-speed automatic transaxle",
@@ -38442,6 +38712,11 @@
         "slider-crank",
         "cycloidal-drive"
       ],
+      "origin": {
+        "date": "1929-12-06",
+        "precision": "year",
+        "note": "Felix Wankel obtains his first rotary engine patent. Source: https://en.wikipedia.org/wiki/Felix_Wankel"
+      },
       "real_world": [
         {
           "product": "See-through running Wankel rotary engine",
@@ -39041,6 +39316,11 @@
         "internal-geneva",
         "lever-escapement"
       ],
+      "origin": {
+        "date": "1700-04-15",
+        "precision": "period",
+        "note": "Best guess: star wheels with jumpers are in use in clock calendar work by about 1700 (period: 17th to 18th century). No dated first use was found."
+      },
       "real_world": [
         {
           "product": "ETA 2824-2 automatic watch movement",
@@ -39773,6 +40053,11 @@
         "star-wheel",
         "ratchet-pawl"
       ],
+      "origin": {
+        "date": "1700-02-19",
+        "precision": "period",
+        "note": "The Geneva stop is credited to 17th or 18th century watchmakers, who used it to stop overwinding (period: 17th to 18th century). Source: https://en.wikipedia.org/wiki/Geneva_drive"
+      },
       "real_world": [
         {
           "product": "35mm cinema projector",
@@ -40375,6 +40660,11 @@
         "star-wheel",
         "ratchet-pawl"
       ],
+      "origin": {
+        "date": "-0025-09-10",
+        "precision": "period",
+        "note": "Vitruvius describes an odometer in which one pin on the axle moves a 400-tooth wheel on by one tooth per turn (period: about 27 to 23 BC). Source: https://en.wikipedia.org/wiki/Odometer"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -40956,6 +41246,11 @@
         "star-wheel",
         "internal-gear-pair"
       ],
+      "origin": {
+        "date": "1900-04-24",
+        "precision": "period",
+        "note": "Best guess: internal Geneva drives appear with early film projector pull-downs (period: around 1900). No dated first use was found."
+      },
       "real_world": [
         {
           "product": "3D-printed day of week clock",
@@ -41560,6 +41855,11 @@
         "intermittent-gear",
         "cam-follower"
       ],
+      "origin": {
+        "date": "1930-10-12",
+        "precision": "period",
+        "note": "Best guess: globoidal cam index drives follow Wildhaber's globoidal worm of 1922 (period: 1920s to 1930s). No dated first roller gear indexer was found. Source: https://gearsolutions.com/departments/tooth-tips/tooth-tips-william-crosher-7/"
+      },
       "real_world": [
         {
           "product": "CAMCO roller gear index drives on production machines",
@@ -42192,6 +42492,11 @@
         "lead-screw",
         "swash-plate"
       ],
+      "origin": {
+        "date": "0850-08-14",
+        "precision": "period",
+        "note": "The Banu Musa brothers in Baghdad describe an automatic organ played by a pinned cylinder (period: 9th century). Source: https://en.wikipedia.org/wiki/Music_box"
+      },
       "real_world": [
         {
           "product": "Honda Nighthawk 700S gearbox",
@@ -42825,6 +43130,11 @@
         "slider-crank",
         "scotch-yoke"
       ],
+      "origin": {
+        "date": "0060-06-02",
+        "precision": "period",
+        "note": "Hero of Alexandria's wind organ: pegs on the wind wheel's axle lift a lever that works the air pump (period: 1st century AD). A 3rd century BC origin is claimed but not confirmed. Source: https://famousscientists.org/astonishing-ancient-greek-automatons"
+      },
       "real_world": [
         {
           "product": "Toyota 4A-C single overhead cam engine (1986 Corolla)",
@@ -43489,6 +43799,11 @@
         "barrel-cam",
         "eccentric-sheave"
       ],
+      "origin": {
+        "date": "1900-03-04",
+        "precision": "period",
+        "note": "Best guess: flat tappets are common in early internal combustion engine valve trains (period: around 1900). No dated first use was found."
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -44123,6 +44438,11 @@
         "desmodromic-cam",
         "geneva"
       ],
+      "origin": {
+        "date": "1850-08-17",
+        "precision": "period",
+        "note": "Best guess: grooved face cams for positive drive are in use in 19th century machinery (period: 19th century). No dated first use was found."
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -44815,6 +45135,11 @@
         "face-groove-cam",
         "bell-crank"
       ],
+      "origin": {
+        "date": "1896-04-02",
+        "precision": "year",
+        "note": "Gustav Mees is named as the first to patent desmodromic valves; the claim lacks a citation. Source: https://en.wikipedia.org/wiki/Desmodromic_valve"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -45806,6 +46131,11 @@
         "eccentric-sheave",
         "double-crank"
       ],
+      "origin": {
+        "date": "1825-10-06",
+        "precision": "year",
+        "note": "Locomotion No. 1 of the Stockton and Darlington Railway is the first locomotive with coupling rods. Source: https://steamindex.com/library/young.htm"
+      },
       "real_world": [
         {
           "product": "Steam locomotive main rod",
@@ -46509,6 +46839,11 @@
         "double-cardan",
         "tusi-couple"
       ],
+      "origin": {
+        "date": "1821-01-24",
+        "precision": "year",
+        "note": "John Oldham invents the coupling for paddle wheels. Source: https://collection.sciencemuseumgroup.org.uk/people/cp136297/oldham-john"
+      },
       "real_world": [
         {
           "product": "Printrbot Go 3D printer Z lead screw",
@@ -47237,6 +47572,11 @@
         "schmidt-coupling",
         "bevel-gears"
       ],
+      "origin": {
+        "date": "1664-04-08",
+        "precision": "year",
+        "note": "Gaspar Schott describes the joint in Technica curiosa; Robert Hooke analyses it later. Source: https://www.wikipedia.org/wiki/U-joint"
+      },
       "real_world": [
         {
           "product": "Automotive propeller shaft with U-joints (shop demonstration)",
@@ -47878,6 +48218,11 @@
         "schmidt-coupling",
         "oldham-coupling"
       ],
+      "origin": {
+        "date": "1683-03-13",
+        "precision": "year",
+        "note": "Robert Hooke proposes two joints 90 degrees out of phase on an intermediate shaft to cancel the speed variation. Source: https://www.wikipedia.org/wiki/U-joint"
+      },
       "real_world": [
         {
           "product": "Ford Bronco / F-150 front driveshaft double Cardan joint",
@@ -48686,6 +49031,11 @@
         "differential",
         "schmidt-coupling"
       ],
+      "origin": {
+        "date": "1926-11-19",
+        "precision": "year",
+        "note": "Alfred H. Rzeppa invents his constant-velocity joint, later US patent 1,665,280. Source: https://en.wikipedia.org/wiki/Alfred_H._Rzeppa"
+      },
       "real_world": [
         {
           "product": "Air-cooled VW CV joint",
@@ -49793,6 +50143,11 @@
         "double-cardan",
         "locomotive-drive"
       ],
+      "origin": {
+        "date": "1963-02-06",
+        "precision": "year",
+        "note": "Richard Schmidt files the German patent for the coupling. Source: https://en.wikipedia.org/wiki/Schmidt_coupling"
+      },
       "real_world": [
         {
           "product": "Zero-Max Schmidt offset coupling",
@@ -50861,6 +51216,11 @@
         "rack-pinion",
         "worm-drive"
       ],
+      "origin": {
+        "date": "-0100-03-16",
+        "precision": "period",
+        "note": "The screw press, a screw turning in a nut, was probably invented in Greece (period: 1st or 2nd century BC). Source: https://britannica.com/technology/screw"
+      },
       "real_world": [
         {
           "product": "Monarch engine lathe",
@@ -51490,6 +51850,11 @@
         "differential-screw",
         "rack-pinion"
       ],
+      "origin": {
+        "date": "1898-10-13",
+        "precision": "year",
+        "note": "H. M. Stevenson and D. Glenn are granted patents for ball-bearing screws. Source: https://www.wikipedia.org/wiki/Ball_screw"
+      },
       "real_world": [
         {
           "product": "Homebuilt multi-axis CNC machine with ballscrews",
@@ -52095,6 +52460,11 @@
         "differential",
         "block-and-tackle"
       ],
+      "origin": {
+        "date": "1780-12-21",
+        "precision": "day",
+        "note": "William Hunter's essay on a new method of applying the screw is read to the Royal Society. Source: https://makingscience.royalsociety.org/items/l-and-p_7_179"
+      },
       "real_world": [
         {
           "product": "Machine shop differential screw fine-adjust fixture",
@@ -52738,6 +53108,11 @@
         "spur-gears",
         "block-and-tackle"
       ],
+      "origin": {
+        "date": "-0015-06-11",
+        "precision": "year",
+        "note": "Yang Xiong's dictionary Fangyan gives the first written reference to a belt drive, on a quilling machine. Source: https://www.wikipedia.com/wiki/V-belt"
+      },
       "real_world": [
         {
           "product": "Line-shaft machine shop",
@@ -53348,6 +53723,11 @@
         "bell-crank",
         "toggle-clamp"
       ],
+      "origin": {
+        "date": "-0250-12-05",
+        "precision": "period",
+        "note": "Archimedes is credited with compound pulleys, said to move a ship single-handed (period: 3rd century BC). Source: https://en.wikipedia.org/wiki/Pulley"
+      },
       "real_world": [
         {
           "product": "Gin pole with block and tackle lifting logs",
@@ -54267,6 +54647,11 @@
         "gear-train",
         "locomotive-drive"
       ],
+      "origin": {
+        "date": "-0250-08-18",
+        "precision": "period",
+        "note": "Philo of Byzantium describes the chain drive of the polybolos repeating catapult (period: 3rd century BC). Source: https://en.wikipedia.org/wiki/Polybolos"
+      },
       "real_world": [
         {
           "product": "Lantech chain driven live roller conveyor",
@@ -54891,6 +55276,11 @@
         "chain-drive",
         "planetary"
       ],
+      "origin": {
+        "date": "1879-03-14",
+        "precision": "year",
+        "note": "Milton Reeves builds a variable-speed pulley drive to control sawmill saws. Source: https://en.wikipedia.org/wiki/Milton_Reeves"
+      },
       "real_world": [
         {
           "product": "DAF Variomatic",
@@ -55602,6 +55992,11 @@
         "belt-drive",
         "spur-gears"
       ],
+      "origin": {
+        "date": "1877-01-24",
+        "precision": "year",
+        "note": "Best guess: C. W. Hunt's patent for a variable-speed friction drive is the earliest found; friction gearing is likely older. Source: https://ntrs.nasa.gov/api/citations/19830011852/downloads/19830011852.pdf"
+      },
       "real_world": [
         {
           "product": "Snowblower friction wheel drive",
@@ -56181,6 +56576,11 @@
         "cvt-belt",
         "gear-train"
       ],
+      "origin": {
+        "date": "1876-09-06",
+        "precision": "year",
+        "note": "James Thomson describes his disc, globe and cylinder integrator to the Royal Society. Source: https://en.wikipedia.org/wiki/James_Thomson_(engineer)"
+      },
       "real_world": [
         {
           "product": "Rebuilt Meccano differential analyser",
@@ -56846,6 +57246,11 @@
         "ratchet-pawl",
         "centrifugal-governor"
       ],
+      "origin": {
+        "date": "1670-09-15",
+        "precision": "year",
+        "note": "The Wadham College clock, probably by Joseph Knibb, is the oldest known anchor escapement clock. Source: https://en.wikipedia.org/wiki/Anchor_escapement"
+      },
       "real_world": [
         {
           "product": "English longcase clock movement, Cornish",
@@ -57588,6 +57993,11 @@
         "lever-escapement",
         "ratchet-pawl"
       ],
+      "origin": {
+        "date": "1283-07-24",
+        "precision": "year",
+        "note": "Dunstable Priory records a clock in 1283, probably a verge and foliot; the first clear drawing of a verge is Dondi's of 1364. Source: https://www.dunstablehistory.co.uk/Articles/Dunstable%20Priory%20in%201283_oldest%20recorded%20mechanical%20clock.htm"
+      },
       "real_world": [
         {
           "product": "Antique English bracket clock",
@@ -58394,6 +58804,11 @@
         "verge-escapement",
         "ratchet-pawl"
       ],
+      "origin": {
+        "date": "1754-10-14",
+        "precision": "year",
+        "note": "Thomas Mudge makes the first detached lever escapement, in a table clock. Source: https://en.wikipedia.org/wiki/Thomas_Mudge_(horologist)"
+      },
       "real_world": [
         {
           "product": "Mechanical wristwatch movement",
@@ -59171,6 +59586,11 @@
         "anchor-escapement",
         "star-wheel"
       ],
+      "origin": {
+        "date": "-0410-10-23",
+        "precision": "period",
+        "note": "The Greek gastraphetes holds its drawn slider with ratchets and pawls; Zopyrus of Tarentum designs versions between 421 and 401 BC (period: late 5th century BC). Source: https://military-history.fandom.com/wiki/Gastraphetes"
+      },
       "real_world": [
         {
           "product": "Coffing LSB-C ratchet lever hoist",
@@ -59887,6 +60307,11 @@
         "ravigneaux",
         "friction-wheel-drive"
       ],
+      "origin": {
+        "date": "1943-03-11",
+        "precision": "year",
+        "note": "Best guess: Formgrind, later Formsprag, develops sprag overrunning clutches for an aircraft supercharger; earlier one-way clutch patents may exist. Source: https://manufacturing-today.com/news/formsprag-clutch/"
+      },
       "real_world": [],
       "kin": {
         "bodies": [
@@ -60618,6 +61043,11 @@
         "flexure-hinge",
         "hart-inversor"
       ],
+      "origin": {
+        "date": "1853-08-02",
+        "precision": "year",
+        "note": "Pierre Frederic Sarrus publishes the linkage in the Comptes rendus of the Paris Academy of Sciences. Source: https://en.wikipedia.org/wiki/Sarrus_linkage"
+      },
       "real_world": [
         {
           "product": "Sarrus linkage axis on a homebuilt 3D printer",
@@ -61320,6 +61750,11 @@
         "slider-crank",
         "rhombic-drive"
       ],
+      "origin": {
+        "date": "1588-01-03",
+        "precision": "year",
+        "note": "Agostino Ramelli's book of machines shows swashplate pumps. Source: https://ecp.ep.liu.se/index.php/WIEFP/article/download/652/580"
+      },
       "real_world": [
         {
           "product": "Axial swashplate piston pump cutaway",
@@ -62290,6 +62725,11 @@
         "universal-joint",
         "double-cardan"
       ],
+      "origin": {
+        "date": "1903-02-28",
+        "precision": "year",
+        "note": "G. T. Bennett publishes 'A new mechanism' in Engineering. Source: https://eng.ox.ac.uk/specialstructuresgroup/research/expandable-structures-based-on-the-bennett-linkage"
+      },
       "real_world": [
         {
           "product": "Bennett linkage physical toy model",
@@ -62885,6 +63325,11 @@
         "parallelogram-linkage",
         "sarrus-linkage"
       ],
+      "origin": {
+        "date": "1944-03-13",
+        "precision": "year",
+        "note": "Earliest dated study found: Young's 1944 investigation of the cross-spring flexure pivot, cited by Haringx in 1949. Flexures were used earlier. Source: https://link.springer.com/doi/10.1007/BF02120338"
+      },
       "real_world": [
         {
           "product": "NanoCube XYZ piezo flexure stage",
@@ -63397,6 +63842,11 @@
         "four-bar",
         "ratchet-pawl"
       ],
+      "origin": {
+        "date": "1923-12-12",
+        "precision": "year",
+        "note": "Richard von Mises analyses the bistable snap-through truss in ZAMM. Source: https://arxiv.org/pdf/1809.04620"
+      },
       "real_world": [],
       "kin": {
         "bodies": [

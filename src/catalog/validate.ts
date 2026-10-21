@@ -1,3 +1,4 @@
+import { originProblems } from "./origin";
 import { validateKinTeaching, validateRetired } from "./validate-kin";
 import { VOCABULARIES, type CatalogRecord, type Vocabularies, type Waivable } from "./schema";
 
@@ -40,6 +41,7 @@ export function validate(records: CatalogRecord[], opts: { asVersion?: 2 | 3 } =
     for (const x of [...(r.references ?? []), ...(r.media ?? [])]) if (!URL_OK.test(x.url ?? "")) say(`bad url ${String(x.url)}`);
     problems.push(...validateKinTeaching(r, { required: v3 }));
     if (v3 && opts.asVersion === undefined) problems.push(...validateRetired(r));
+    problems.push(...originProblems(r));
     for (const x of r.real_world ?? []) if (!YOUTUBE.test(x.url ?? "")) say(`real-world example not a YouTube video: ${String(x.url)}`);
   }
 
