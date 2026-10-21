@@ -79,7 +79,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       if (pts && pts.length >= 2) return { profile: { outer: roundedPoly(pts, r), holes: [] }, thick: THICK, approx: false };
       if (Array.isArray(shape.rect)) {
         const [w, h] = pair(shape.rect, [60, 40]);
-        return { profile: { outer: roundRect(0, 0, w, h, Math.min(8, w / 4, h / 4)), holes: [] }, thick: num(shape.thickness, 8), approx: false };
+        // from its corner at the frame origin, or about the point `center` of its frame
+        const [cx, cy] = pair(shape.center, [w / 2, h / 2]);
+        return { profile: { outer: roundRect(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2, Math.min(8, w / 4, h / 4)), holes: [] }, thick: num(shape.thickness, 8), approx: false };
       }
       break;
     }

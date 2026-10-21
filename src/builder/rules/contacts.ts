@@ -196,60 +196,57 @@ const j5 = contactRule({
     const ky = e[2] - 3.5 - 0.5 - gap;
     const sideY: [number, number][] = [[0, e[3] + 3.5 + 0.5], [1, e[2] - 3.5 - 0.5 - gap]];
     // the rails and their risers run 10 mm past the slider's travel at each end, less where another part sweeps by
-    // (a crank turning past the near end), never less than the travel itself
-    const railsFor = (a: number, b: number): Solid3[] => {
+    // (a crank turning past the near end), down to a quarter of the slider short of its extreme (it overhangs the ways
+    // there); each side is trimmed on its own
+    const railFor = (k: number, y: number, a: number, b: number): Solid3[] => {
       const T = localAt(ctx, c);
-      for (const [k, y] of sideY) {
-        T.add(H.plate(`${id}-rail${k}`, roundRect(a, y - 3.5, b, y + 3.5, 3.5), { body: hostBody, kind: "plate", role: "ground", z0: w0, z1: w0 + rh }));
-        if (w0 - baseTop > 0.5) T.add(H.plate(`${id}-riser${k}`, roundRect(a, y - 6, b, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", z0: baseTop, z1: w0 }));
-      }
+      T.add(H.plate(`${id}-rail${k}`, roundRect(a, y - 3.5, b, y + 3.5, 3.5), { body: hostBody, kind: "plate", role: "ground", z0: w0, z1: w0 + rh }));
+      if (w0 - baseTop > 0.5) T.add(H.plate(`${id}-riser${k}`, roundRect(a, y - 6, b, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", z0: baseTop, z1: w0 }));
       return T.out();
     };
     const lo = c.run[0] + e[0];
     const hi = c.run[1] + e[1];
-    const margins = [10, 7, 4, 2, 0];
-    let x0 = lo;
-    let x1 = hi;
-    for (const m of margins)
-      if (clearOf(ctx, railsFor(lo - m, lo), others)) {
-        x0 = lo - m;
-        break;
-      }
-    for (const m of margins)
-      if (clearOf(ctx, railsFor(hi, hi + m), others)) {
-        x1 = hi + m;
-        break;
-      }
-    const run = x1 - x0;
+    const margins = [10, 7, 4, 2, 0, -Ls / 8, -Ls / 4];
+    const ends = sideY.map(([k, y]): [number, number] => {
+      const a = margins.find((m) => clearOf(ctx, railFor(k, y, lo - m, lo), others));
+      const b = margins.find((m) => clearOf(ctx, railFor(k, y, hi, hi + m), others));
+      return [lo - (a ?? margins[margins.length - 1]!), hi + (b ?? margins[margins.length - 1]!)];
+    });
+    // the gibbed side carries the keeper, the gib and their screws; the stops sit where both rails run
+    const [g0, g1] = ends[1]!;
+    const x0 = Math.max(ends[0]![0], g0);
+    const x1 = Math.min(ends[0]![1], g1);
+    const run = g1 - g0;
     // the reference rail (plain, dowelled) and the gibbed rail with its keeper (F1, F2, F7)
     const ways: string[] = [];
     for (const [k, y] of sideY) {
-      L.add(H.plate(`${id}-rail${k}`, roundRect(x0, y - 3.5, x1, y + 3.5, 3.5), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
+      const [a, b] = ends[k]!;
+      L.add(H.plate(`${id}-rail${k}`, roundRect(a, y - 3.5, b, y + 3.5, 3.5), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
       ways.push(`${id}-rail${k}`);
       // a ground riser along the straight run (A6): its inner lip is the way the slider runs on
       if (w0 - baseTop > 0.5) {
-        L.add(H.plate(`${id}-riser${k}`, roundRect(x0, y - 6, x1, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
+        L.add(H.plate(`${id}-riser${k}`, roundRect(a, y - 6, b, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
         ways.push(`${id}-riser${k}`);
       }
     }
     // gib on the gibbed side, between the slider and its rail (F7)
-    L.add(H.gib(`${id}-gib`, Math.max(10, run - 20), { body: hostBody, at: [x0 + Math.min(10, run / 4), e[2] - gap / 2 - 0.5, 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
+    L.add(H.gib(`${id}-gib`, Math.max(10, run - 20), { body: hostBody, at: [g0 + Math.min(10, run / 4), e[2] - gap / 2 - 0.5, 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
     // keeper plate over the gibbed rail, lapping the slider (F2)
-    L.add(H.plate(`${id}-keeper`, roundRect(x0 + 8, ky - 5, x1 - 8, ky + 5 + 4, 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + 3, mat: "Aluminium 6061-T6, anodised" }));
+    L.add(H.plate(`${id}-keeper`, roundRect(g0 + 8, ky - 5, g1 - 8, ky + 5 + 4, 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + 3, mat: "Aluminium 6061-T6, anodised" }));
     ways.push(`${id}-gib`, `${id}-keeper`);
-    const nScrew = Math.max(2, Math.ceil((x1 - x0 - 16) / 100) + 1);
+    const nScrew = Math.max(2, Math.ceil((g1 - g0 - 16) / 100) + 1);
     for (let k = 0; k < nScrew; k++) {
-      const x = x0 + 12 + ((x1 - x0 - 24) * k) / (nScrew - 1);
+      const x = g0 + 12 + ((g1 - g0 - 24) * k) / (nScrew - 1);
       L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + 3 + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + 3, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
     }
-    for (const [k, x] of [[0, x0 + 4], [1, x1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, e[3] + 4, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, reference rail to base", qty: 2 }) }));
+    for (const [k, x] of [[0, ends[0]![0] + 4], [1, ends[0]![1] - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, e[3] + 4, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, reference rail to base", qty: 2 }) }));
     // wipers at both ends of the slider and a grease nipple on the keeper (F8)
     const sb = bodyOf(ctx, slider);
     for (const [k, x] of [[0, c.run[0] + e[0] - 3], [1, c.run[0] + e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
     // the nipple on the keeper where nothing sweeps over it: mid run, else nearer an end
     // (on the keeper, else on the reference rail, whose oilway feeds the same way)
     const nipAt = ([x, y, z]: [number, number, number]) => H.nipple(`${id}-nip`, { body: hostBody, at: [x, y, 0], z0: z, z1: z + 9 });
-    const along = [0.5, 0.25, 0.75, 0.1, 0.9].map((f) => x0 + 12 + (run - 24) * f);
+    const along = [0.5, 0.25, 0.75, 0.1, 0.9].map((f) => g0 + 12 + (run - 24) * f);
     const spots: [number, number, number][] = [...along.map((x): [number, number, number] => [x, ky, w0 + rh + 3]), ...along.map((x): [number, number, number] => [x, sideY[0]![1], w0 + rh])];
     const nx = spots.find((q) => {
       const T = localAt(ctx, c);
@@ -273,10 +270,10 @@ const j5 = contactRule({
     }
     const part = ctx.parts.get(slider);
     if (part) part.slides = [...(part.slides ?? []), ...ways];
-    const ends = stops.length === 2 ? "an end stop with a pad at each end" : stops.length ? "an end stop with a pad at one end" : "no end stops, as the rod drives the slider and other parts sweep past both ends";
+    const stopText = stops.length === 2 ? "an end stop with a pad at each end" : stops.length ? "an end stop with a pad at one end" : "no end stops, as the rod drives the slider and other parts sweep past both ends";
     return {
       serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: stops, F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`] },
-      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on the lips of two ground risers, between a dowelled reference rail and a gibbed rail under a keeper; wipers and a grease nipple; ${ends} of the ${(c.run[1] - c.run[0]).toFixed(0)} mm travel.`,
+      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on the lips of two ground risers, between a dowelled reference rail and a gibbed rail under a keeper; wipers and a grease nipple; ${stopText} of the ${(c.run[1] - c.run[0]).toFixed(0)} mm travel.`,
     };
   },
 });

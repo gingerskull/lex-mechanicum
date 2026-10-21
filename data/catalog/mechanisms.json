@@ -5237,20 +5237,17 @@
             "id": "yoke",
             "role": "output",
             "shape": {
-              "type": "slotLink",
-              "length": 110,
-              "slot": 82,
-              "slotWidth": 12,
-              "axis": [
+              "type": "plate",
+              "rect": [
+                28,
+                110
+              ],
+              "center": [
                 0,
-                1,
                 0
               ],
-              "bar": 120,
-              "crosshead": [
-                36,
-                24
-              ]
+              "thickness": 7,
+              "note": "the yoke: a block 110 long across the slide with the slot through it; its long sides run between the rails, clear of the crank circle"
             },
             "frame": {
               "origin": [
@@ -5312,7 +5309,7 @@
             "a": "yoke",
             "b": "ground",
             "at": [
-              160,
+              40,
               0,
               0
             ],
@@ -5339,14 +5336,6 @@
             "min": 41,
             "max": 41,
             "note": "slot half length, fixed by the yoke"
-          },
-          {
-            "id": "d",
-            "value": 120,
-            "unit": "mm",
-            "min": 120,
-            "max": 120,
-            "note": "slot centre to crosshead centre (tie bar)"
           }
         ],
         "design": [],
@@ -5390,15 +5379,6 @@
             "body": "yoke",
             "local": [
               0,
-              0,
-              0
-            ]
-          },
-          {
-            "id": "Gc",
-            "body": "yoke",
-            "local": [
-              120,
               0,
               0
             ]
@@ -23880,7 +23860,7 @@
           {
             "id": "inner-dead-centre",
             "kind": "line",
-            "from": "A",
+            "from": "O",
             "to": "B",
             "pose": {
               "output": "slider-x",
