@@ -115,7 +115,9 @@ export const posts: Rule = {
   apply(ctx: BuildCtx) {
     if (!ctx.base) return;
     for (const b of ctx.kin.bodies) {
-      const list = ((b.shape as { posts?: { at: [number, number]; top: number; r?: number }[] } | undefined)?.posts ?? []);
+      const raw = (b.shape as { posts?: unknown } | undefined)?.posts;
+      // a `posts` in prose (a record's note on its frame) is not a list of posts
+      const list = (Array.isArray(raw) ? raw : []) as { at: [number, number]; top: number; r?: number }[];
       list.forEach((p, k) => {
         const r = p.r ?? 8;
         const f = frameAlong([p.at[0], p.at[1], ctx.base!.top], [0, 0, 1]);

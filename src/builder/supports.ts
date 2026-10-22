@@ -186,7 +186,7 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
     const run = Math.hypot(a[0], a[1]);
     const Rb = bossR(o.d, o.live);
     const foot = 2 * ((W / 2) * run + Rb * Math.sqrt(Math.max(0, 1 - run * run)) + FOOT_PAST);
-    const step = Math.max(W + 4, run > 1e-6 ? (foot + 4) / run : W + 4);
+    const step = run < 0.999 && run > 1e-6 ? Math.max(W + 4, (foot + 4) / run) : W + 4;
     w = side < 0 ? [w0, w0 - step] : [w0, w0 + step];
     moved = true;
   }

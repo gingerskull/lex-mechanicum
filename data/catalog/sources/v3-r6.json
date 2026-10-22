@@ -440,7 +440,7 @@
       "review": {
         "verdict": "rethink",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #217. The output hub covered the floating disc and both tongues, the whole principle. It is drawn see-through so the disc, both tongues and both slots show at once; a slotted yoke hub only if that still reads badly. The disc centre C is traced and its orbit drawn as a full circle of diameter e = 28 mm midway between the shafts; ticks every 15 degrees of input land 30 degrees apart on it, so C goes round twice per shaft turn. A right-angle arc at C shows why: C always sees O1 and O2 at 90 degrees."
+        "note": "Applies the 2026-10-19 review and #217. The output hub covered the floating disc and both tongues, the whole principle. It is drawn see-through so the disc, both tongues and both slots show at once; a slotted yoke hub only if that still reads badly. The disc centre C is traced and its orbit drawn as a full circle of diameter e = 28 mm midway between the shafts; ticks every 15 degrees of input land 30 degrees apart on it, so C goes round twice per shaft turn. A right-angle arc at C shows why: C always sees O1 and O2 at 90 degrees. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. Slim hubs carry slot jaws, the disc is smaller with a tongue on each face, and the output hub is drawn see-through, so both slots, both tongues and the disc show at once; the disc centre's orbit reads twice per turn. A slotted yoke hub was not needed. The output hub's shaft hangs from a bridge, see-through where it covers."
       },
       "principle": [
         {
@@ -1317,7 +1317,7 @@
       "review": {
         "verdict": "rethink",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #217. Three opaque discs overlapped and the output disc hid link set B, so neither point showed: the parallel links of each set, and all three discs keeping one orientation. The discs become see-through rings with one bold index mark each, so three parallel marks turn together. The two link sets are told apart by role pattern and stacking, not colour, and drawn on top. The midpoint of link A1 is traced: it draws a circle of radius r = 44 mm while the link never turns. The offset e is a control (20 to 100 mm) with ghost traces at 30 and 90 mm; the middle disc centre moves along the bisector of O1 O3 and the output stays in phase."
+        "note": "Applies the 2026-10-19 review and #217. Three opaque discs overlapped and the output disc hid link set B, so neither point showed: the parallel links of each set, and all three discs keeping one orientation. The discs become see-through rings with one bold index mark each, so three parallel marks turn together. The two link sets are told apart by role pattern and stacking, not colour, and drawn on top. The midpoint of link A1 is traced: it draws a circle of radius r = 44 mm while the link never turns. The offset e is a control (20 to 100 mm) with ghost traces at 30 and 90 mm; the middle disc centre moves along the bisector of O1 O3 and the output stays in phase. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. The three discs are see-through rings, each with an engraved index arrow, and the arrows stay parallel; set A is dotted, set B cross-hatched, each on its own level; the midpoint trace draws its circle while the link never turns. The index arrows are thin at card size."
       },
       "principle": [
         {
@@ -2432,7 +2432,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review against the record (not in the 2026-10-19 review). At 15 degrees per joint the centre yoke's wobble (speed ratio 0.966 to 1.035) is too small to see next to the flat output, so the default angle per joint is 20 degrees (total 40): the centre yoke's speed ratio runs 0.940 to 1.064 and it leads and lags by 1.8 degrees, while the output stays exactly in phase. The phase between the centre yoke's forks is a control (0 to 90 degrees): at 90 the two fluctuations add instead of cancelling. The centre yoke arm end is traced with ticks every 15 degrees of input (uneven), the output arm end likewise (even); the plot shows both speed ratios."
+        "note": "Review against the record (not in the 2026-10-19 review). At 15 degrees per joint the centre yoke's wobble (speed ratio 0.966 to 1.035) is too small to see next to the flat output, so the default angle per joint is 20 degrees (total 40): the centre yoke's speed ratio runs 0.940 to 1.064 and it leads and lags by 1.8 degrees, while the output stays exactly in phase. The phase between the centre yoke's forks is a control (0 to 90 degrees): at 90 the two fluctuations add instead of cancelling. The centre yoke arm end is traced with ticks every 15 degrees of input (uneven), the output arm end likewise (even); the plot shows both speed ratios. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The centre yoke's second fork is a collar clamped on its tube at the phase angle, so the phase control turns it as built, and at 90 degrees the output's fluctuation shows; the centre yoke is 134 mm long, the two forks back to back."
       },
       "principle": [
         {
@@ -3228,7 +3228,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 45 degrees); the plot shows output minus input (flat) and the ball's run along its groove."
+        "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 45 degrees); the plot shows output minus input (flat) and the ball's run along its groove. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The bell is see-through; the cage with its six windows, the balls and the grooved races show, and the section through the plane of the shafts shows balls 1 and 4 in their grooves with the cage tilted half the shaft angle."
       },
       "principle": [
         {
@@ -4404,7 +4404,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Review against the record (not in the 2026-10-19 review). A 15 degree plate on a 40 mm pitch radius gives a 21.4 mm stroke, large enough to read. Decided: the swash angle is a control (0 to 18 degrees) with a ghost trace at 8 degrees; piston 1's head is traced with ticks every 15 degrees of shaft angle, bunched at the stroke ends, which shows the simple harmonic motion; the swash angle is drawn as an arc between the plate and the plane square to the shaft; a section through the shaft axis and piston 1 shows the plate face and the slipper; the plot shows all five pistons, 72 degrees apart."
+        "note": "Review against the record (not in the 2026-10-19 review). A 15 degree plate on a 40 mm pitch radius gives a 21.4 mm stroke, large enough to read. Decided: the swash angle is a control (0 to 18 degrees) with a ghost trace at 8 degrees; piston 1's head is traced with ticks every 15 degrees of shaft angle, bunched at the stroke ends, which shows the simple harmonic motion; the swash angle is drawn as an arc between the plate and the plane square to the shaft; a section through the shaft axis and piston 1 shows the plate face and the slipper; the plot shows all five pistons, 72 degrees apart. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): keep. The plate is pinned to the shaft at the tilt, so the swash angle control turns it; five plungers run in a bored block on posts, slippers swivel on ball ends; section A-A shows piston 1's slipper on the face."
       },
       "principle": [
         {
@@ -4959,7 +4959,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Review against the record (not in the 2026-10-19 review). The record's proportions read well: links of 60 mm folding from 10 to 80 degrees move the top plate 97.3 mm along an exact vertical line. Built as two orthogonal planar dyads, limb 1 in one vertical plane and limb 2 in the plane at 90 degrees. Decided: trace the top plate centre (a straight line) with ticks every 5 degrees of input, which bunch near the top where it moves slowly, and both knees; draw both limbs' hinge axes so the right angle between the two planes shows, and the straight line itself."
+        "note": "Review against the record (not in the 2026-10-19 review). The record's proportions read well: links of 60 mm folding from 10 to 80 degrees move the top plate 97.3 mm along an exact vertical line. Built as two orthogonal planar dyads, limb 1 in one vertical plane and limb 2 in the plane at 90 degrees. Decided: trace the top plate centre (a straight line) with ticks every 5 degrees of input, which bunch near the top where it moves slowly, and both knees; draw both limbs' hinge axes so the right angle between the two planes shows, and the straight line itself. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): keep. Each limb's leaves sit side by side along their hinges and the top plate rides two lugs; the straight rise and the two hinge directions at right angles read. No drive is built yet (deferred: an oscillating swing under 180 degrees)."
       },
       "principle": [
         {
@@ -5379,7 +5379,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Review against the record (not in the 2026-10-19 review). The principle is that four hinges with skew axes still close and move with one freedom. Decided: all four hinge axes drawn as axis lines, so their skew shows; the midpoint of the link opposite the ground is traced, a closed space curve, with ticks every 15 degrees of input; the plot shows output against input and the speed ratio, which runs from 0.33 to 2.99 times input speed, in the opposite sense. Solved in closed form by the Bennett block."
+        "note": "Review against the record (not in the 2026-10-19 review). The principle is that four hinges with skew axes still close and move with one freedom. Decided: all four hinge axes drawn as axis lines, so their skew shows; the midpoint of the link opposite the ground is traced, a closed space curve, with ticks every 15 degrees of input; the plot shows output against input and the speed ratio, which runs from 0.33 to 2.99 times input speed, in the opposite sense. Solved in closed form by the Bennett block. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): keep. The links are round bars between knuckles on the skew hinges, the knuckles set apart along each hinge because the loop passes through crossed poses where the link lines meet; the loop is laid on its side and driven at A (the loop is symmetric, its numbers carry over). The bars read thin at card size."
       },
       "principle": [
         {
@@ -6036,7 +6036,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review against the record (not in the 2026-10-19 review). The principle is the conical pendulum: the faster the spin, the higher and wider the balls run, and the links lift the sleeve. The speed is the control (97.6 to 133.8 rpm, default 101.6); the arm angle follows from the balance h = g / omega^2, never sweeping by itself. A ball centre is traced, a horizontal circle, with ghost circles at both ends of the speed range, low and narrow against high and wide. The pendulum height h from the pivot down to the ball is dimensioned. The plot shows arm angle and sleeve height against speed. View near front elevation, slightly from above, so the circles read as flat ellipses and heights read true."
+        "note": "Review against the record (not in the 2026-10-19 review). The principle is the conical pendulum: the faster the spin, the higher and wider the balls run, and the links lift the sleeve. The speed is the control (97.6 to 133.8 rpm, default 101.6); the arm angle follows from the balance h = g / omega^2, never sweeping by itself. A ball centre is traced, a horizontal circle, with ghost circles at both ends of the speed range, low and narrow against high and wide. The pendulum height h from the pivot down to the ball is dimensioned. The plot shows arm angle and sleeve height against speed. View near front elevation, slightly from above, so the circles read as flat ellipses and heights read true. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The arms stand where the speed balances them; the balls, the cross-head and the sleeve read in the tipped front view; the link pins sit on the sleeve's lugs off the axis, so the sleeve travels 39.6 mm (record and claim updated)."
       },
       "principle": [
         {

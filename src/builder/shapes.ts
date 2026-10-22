@@ -78,7 +78,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "link": {
       const L = num(shape.length, far);
       const [r0, r1] = pair(shape.boss, [8, 8]);
-      return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick: num(shape.thickness, THICK), approx: false };
+      // a link the record places itself (`axial`) takes its own thickness (a Sarrus leaf, a governor's arm)
+      const thick = typeof shape.axial === "number" ? num(shape.thickness, THICK) : THICK;
+      return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick, approx: false };
     }
     case "plate": {
       const pts = Array.isArray(shape.outline) ? (shape.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]) : null;
@@ -194,7 +196,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // partner, a governor's arm beside the spindle head), instead of a slab of the placement solver
     const axial = typeof shape.axial === "number" ? shape.axial : undefined;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(axial !== undefined ? { exact: { offset: axial } } : g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, withBars(withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? spatialLink(S, geom) ?? spherical(kin, S, b, geom) ?? geom)));
+    out.set(b.id, withIndex(withBars(withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? spatialLink(S, geom) ?? spherical(kin, S, b, geom) ?? geom))));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -434,7 +436,7 @@ function withBars(g: BodyGeom): BodyGeom {
 }
 
 /** Points of an arc in (r, z) about (0, zc), radius R, from angle a0 to a1 (radians, from the +r axis toward +z). */
-function arcRZ(R: number, zc: number, a0: number, a1: number, n = 24): Vec2[] {
+function arcRZ(R: number, zc: number, a0: number, a1: number, n = 12): Vec2[] {
   return Array.from({ length: n + 1 }, (_, i) => {
     const a = a0 + ((a1 - a0) * i) / n;
     return [Math.max(0, R * Math.cos(a)), zc + R * Math.sin(a)] as Vec2;
@@ -446,12 +448,14 @@ function grooveCut(sJ: number, rp: number, rb: number, phase: number, span: numb
   const path: Vec3[] = [];
   const c = Math.cos(phase * D2R);
   const s = Math.sin(phase * D2R);
-  for (let i = 0; i <= 24; i++) {
-    const a = -span + (2 * span * i) / 24;
+  // 16 steps keep the chord's sag under 0.05 mm on a 25 mm arc; an 18-sided tube keeps its inscribed radius over the
+  // ball's (rb is the ball's radius plus 0.2)
+  for (let i = 0; i <= 16; i++) {
+    const a = -span + (2 * span * i) / 16;
     const r = rp * Math.cos(a);
     path.push([r * c, r * s, sJ + rp * Math.sin(a)]);
   }
-  return { mode: "cut", profile: { outer: circle(rb, 0, 0, 24), holes: [] }, op: { op: "sweep", path }, frame: { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] } };
+  return { mode: "cut", profile: { outer: circle(rb, 0, 0, 18), holes: [] }, op: { op: "sweep", path }, frame: { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] } };
 }
 
 /**
@@ -531,4 +535,23 @@ function spherical(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null
     approx: false,
     pieces: [{ id: `${b.id}-bell`, name: "", frame: { o: g.frame.o, x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: 0, revolve: true, features: grooves }],
   };
+}
+
+/**
+ * An index mark (`indexMark: { at: [x, y] }`, a Schmidt coupling's discs) as a raised arrow on the part's top face,
+ * pointing out along the radius through `at`: one bold mark per part, so parts that keep their orientation show it. It
+ * stays opaque when its part is drawn see-through. Only on a part the record places itself (`axial`).
+ */
+function withIndex(g: BodyGeom): BodyGeom {
+  const at = (g.shape.indexMark as { at?: number[] } | undefined)?.at;
+  if (!Array.isArray(at) || at.length < 2 || !g.exact) return g;
+  const L = Math.hypot(at[0]!, at[1]!) || 1;
+  const u: Vec2 = [at[0]! / L, at[1]! / L];
+  const v: Vec2 = [-u[1], u[0]];
+  const p = (s: number, w: number): Vec2 => [u[0] * s + v[0] * w, u[1] * s + v[1] * w];
+  // a shaft of 12 mm and a head of 8, 6 mm wide, ending at the mark's point
+  let outer: Vec2[] = [p(L - 20, -1.5), p(L - 8, -1.5), p(L - 8, -3.5), p(L, 0), p(L - 8, 3.5), p(L - 8, 1.5), p(L - 20, 1.5)];
+  if (signedArea(outer) < 0) outer = outer.reverse();
+  const o = v3.add(g.frame.o, v3.mul(g.frame.z, g.exact.offset + g.thick));
+  return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-index`, name: "Index arrow, raised", frame: { o, x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: 1.5 }] };
 }

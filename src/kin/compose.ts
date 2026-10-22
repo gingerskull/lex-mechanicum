@@ -551,7 +551,11 @@ class Run implements BlockCtx {
           if (!point.has(j.type)) continue;
           const other = j.a === b.id ? j.b : j.a;
           // a hinge to a posed body: its axis as that body carries it now
-          if (j.type === "revolute" && !carried && this.xfs.has(other)) carried = [r.axis, xf.dir(this.xfs.get(other)!, r.axis)];
+          if (j.type === "revolute" && !carried && this.xfs.has(other)) {
+            // only when that body has turned the axis (a spinning spindle's hinge); a planar partner leaves it as it was
+            const now = xf.dir(this.xfs.get(other)!, r.axis);
+            if (v3.dist(now, r.axis) > 1e-12) carried = [r.axis, now];
+          }
           if (this.pts.has(j.id)) add(r.at, this.pts.get(j.id)!);
           else if (this.xfs.has(other)) add(r.at, xf.apply(this.xfs.get(other)!, r.at));
         }

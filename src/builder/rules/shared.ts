@@ -628,7 +628,8 @@ export const seeThrough: Rule = {
     // would hide the disc, its tongues and the slots
     const asked = new Set(((ctx.teaching as { seeThrough?: unknown } | undefined)?.seeThrough as string[] | undefined) ?? []);
     for (const s of ctx.solids)
-      if (asked.has(s.body) && !s.flags.seeThrough) {
+      // an index arrow stays opaque on its see-through part: it is the mark that part is read by
+      if (asked.has(s.body) && !s.flags.seeThrough && !s.id.endsWith("-index")) {
         s.flags.seeThrough = true;
         (ctx.fired["see-through"] ??= []).push(s.id);
       }

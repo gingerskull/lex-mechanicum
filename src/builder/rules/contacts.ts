@@ -435,7 +435,7 @@ const tongueSlot = contactRule({
     const g0 = slotted ? ctx.geoms.get(slotted) : undefined;
     const jaws = (g0?.shape.bars as { z?: [number, number] }[] | undefined)?.map((b) => b.z).filter((q): q is [number, number] => Array.isArray(q));
     const wz = (h: number) => (g0 ? planeCoords(L.frame, v3.add(g0.frame.o, v3.mul(g0.frame.z, h))).w : z);
-    const [lz0, lz1] = jaws?.length ? ([wz(Math.min(...jaws.map((q) => q[0]))), wz(Math.max(...jaws.map((q) => q[1])))].sort((p, q) => p - q) as [number, number]) : [z - 2.5, z + 2.5];
+    const [lz0, lz1] = jaws?.length ? ([wz(Math.min(...jaws.map((q) => q[0]))), wz(Math.max(...jaws.map((q) => q[1])))].sort((p, q) => p - q) as [number, number]) : [z - 2, z + 2];
     for (const [k, y] of [[0, half], [1, -half]] as const) L.add(H.wearStrip(`${id}-liner${k}`, [[-run / 2 - 4, y - 0.6], [run / 2 + 4, y - 0.6], [run / 2 + 4, y + 0.6], [-run / 2 - 4, y + 0.6]], { body, z0: lz0 + 0.5, z1: lz1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
     if (slot?.length && slotted) {
       // the slot runs symmetric about the slotted body's centre; the nipple stands at its end beyond the liners
