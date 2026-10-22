@@ -217,6 +217,13 @@ header.top {
   gap: 14px;
   min-width: 0;
 }
+/* the page for a missing address: its header and the way back, with room before the footer */
+.lost {
+  min-height: 60vh;
+}
+.lost .dhead {
+  margin-block: 24px;
+}
 footer {
   color: var(--faint);
   font: 500 10.5px var(--font-mono);

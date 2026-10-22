@@ -461,6 +461,16 @@
   padding: 40px 0;
   text-align: center;
 }
+.empty h2 {
+  font: 700 26px / 1.1 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.empty p {
+  margin: 0;
+}
 
 /* the stage */
 .stage {

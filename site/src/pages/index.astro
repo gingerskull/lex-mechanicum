@@ -27,7 +27,10 @@ import { DEFAULT_ORDER, sortBy } from "../sort";
     <div class="status"><span id="shown">{SHEETS.length} sheets</span><button id="clear" type="button" hidden>Clear filters</button></div>
     <div class="grid" id="grid">
       {sortBy(SHEETS, DEFAULT_ORDER, sortableOf).map((s) => <Card sheet={s} />)}
-      <p class="empty" id="empty" hidden>No mechanism matches. Clear a filter or the search.</p>
+      <div class="empty" id="empty" hidden>
+        <h2>No pattern found</h2>
+        <p>No pattern in the archive matches. Clear a filter or the search.</p>
+      </div>
     </div>
   </main>
   <script>

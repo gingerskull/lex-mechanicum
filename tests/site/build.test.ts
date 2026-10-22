@@ -111,6 +111,13 @@ describe("site build", () => {
     expect(cards.map((c) => c.id)).toEqual(sortBy(cards, DEFAULT_ORDER).map((c) => c.id));
   });
 
+  it("has a 404 page for a missing address, with the way back to the library", () => {
+    const html = read("404.html");
+    expect(html).toContain("<h1>Sheet ST-404</h1>");
+    expect(html).toContain("This sheet is not in the archive. Its pattern may be lost, or not yet recovered.");
+    expect(html).toMatch(/<a class="btn" href="\/"/);
+  });
+
   it("gives the stage its view modes: the Wide toggle, full screen and the remembered mode set before paint", () => {
     const html = read(join("mechanisms", Object.keys(mechanisms)[0]!, "index.html"));
     expect(html).toMatch(/<button[^>]*id="wide"[^>]*aria-pressed="false"/);

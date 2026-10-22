@@ -1,8 +1,9 @@
 // The library in a real browser (SS1, SS3, SS10), local only: `npm run test:e2e` builds the site and runs this with the
 // stage's tests. The Sort button sits beside Filters and opens a menu of the orders, by mouse, touch or keyboard; the
 // cards follow the order picked, through search and filters, and the address keeps it; Clear filters returns to New;
-// Previous and Next on a mechanism page follow the sorted library. Desktop and phone width, both sheets. Uses the
-// installed Chrome; CHROME_PATH runs another Chromium build instead.
+// Previous and Next on a mechanism page follow the sorted library; the empty search and the 404 page say what happened
+// and offer a way back. Desktop and phone width, both sheets. Uses the installed Chrome; CHROME_PATH runs another
+// Chromium build instead.
 import { existsSync, readFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { extname, join } from "node:path";
@@ -18,13 +19,14 @@ let base = "";
 let browser: Browser;
 beforeAll(async () => {
   if (!existsSync(join(OUT, "index.html"))) throw new Error("build the site first (npm run test:e2e does)");
+  // as GitHub Pages: a path the site does not have gets its 404 page, with the 404 status
   server = createServer((q, r) => {
     let p = decodeURIComponent(new URL(q.url ?? "/", "http://x").pathname);
     if (p.endsWith("/")) p += "index.html";
     const f = join(OUT, p);
     if (!existsSync(f)) {
-      r.writeHead(404);
-      r.end();
+      r.writeHead(404, { "content-type": "text/html" });
+      r.end(readFileSync(join(OUT, "404.html")));
       return;
     }
     r.writeHead(200, { "content-type": TYPES[extname(f)] ?? "application/octet-stream" });
@@ -207,6 +209,39 @@ describe("sorting the library on a desktop", () => {
     expect(await page.locator("#back").getAttribute("href")).toBe("/?sort=name");
     await ctx.close();
   });
+});
+
+describe("the quiet states", () => {
+  it("says no pattern was found when nothing matches, and Clear filters brings the sheets back", async () => {
+    const ctx = await desktop();
+    const { page, errors } = await open(ctx, "/");
+    await page.locator("#q").fill("zzzz qqqq");
+    expect(await page.locator("#empty").isVisible()).toBe(true);
+    expect(await page.locator("#empty h2").textContent()).toBe("No pattern found");
+    expect(await page.locator("#empty p").textContent()).toBe("No pattern in the archive matches. Clear a filter or the search.");
+    expect(await page.locator("#shown").textContent()).toMatch(/^0 of \d+ sheets$/);
+    await page.locator("#clear").click();
+    expect(await page.locator("#empty").isVisible()).toBe(false);
+    expect((await shownCards(page)).length).toBe(await page.locator(".grid .card").count());
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  for (const [name, make] of [["desktop", desktop], ["phone", phone]] as const)
+    it(`answers a missing address with sheet ST-404 and a way to the library (${name})`, async () => {
+      const ctx = await make();
+      const page = await ctx.newPage();
+      const res = await page.goto(base + "/mechanisms/no-such-sheet/");
+      expect(res?.status()).toBe(404);
+      expect(await page.title()).toBe("Sheet ST-404 · Mechanism Library");
+      expect(await page.locator("h1").textContent()).toBe("Sheet ST-404");
+      expect(await page.locator(".dhead p").textContent()).toBe("This sheet is not in the archive. Its pattern may be lost, or not yet recovered.");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+      await page.locator("main a.btn").click();
+      await page.waitForURL(base + "/");
+      expect(await page.locator(".grid .card").count()).toBeGreaterThan(0);
+      await ctx.close();
+    });
 });
 
 describe("sorting the library on a phone", () => {
