@@ -67,6 +67,12 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
   // holes the record names on a disc or a plate ([x, y, r] in the body's frame): a port face's ports
   if (Array.isArray(shape.holes) && (shape.type === "disc" || shape.type === "plate"))
     for (const h of shape.holes as number[][]) g.profile.holes.push(circle(h[2]!, h[0]!, h[1]!, 28).reverse());
+  // windows the record draws as polygons (a spider's windows over the sprags)
+  if (Array.isArray(shape.windows))
+    for (const w of shape.windows as number[][][]) {
+      const ring = w.map((q): Vec2 => [q[0]!, q[1]!]);
+      g.profile.holes.push(area(ring) > 0 ? ring.reverse() : ring);
+    }
   return g;
 }
 
@@ -457,7 +463,8 @@ function withPieces(b: KinBody, g: BodyGeom): BodyGeom {
     const o = (pc.origin as number[] | undefined) ?? [0, 0, 0];
     const R = m3.eulerDeg(((pc.rot as number[] | undefined) ?? [0, 0, 0]) as Vec3);
     const frame = { o: [o[0]!, o[1]!, o[2] ?? 0] as Vec3, x: [R[0], R[3], R[6]] as Vec3, z: [R[2], R[5], R[8]] as Vec3 };
-    pieces.push({ id: `${b.id}-${String(pc.id ?? `piece${k}`)}`, name: "", frame, profile: { outer: filletPoly(area(pts) < 0 ? pts.slice().reverse() : pts, num(pc.fillet, 1.5)), holes: [] }, h: num(pc.thick, 8) });
+    const holes = Array.isArray(pc.holes) ? (pc.holes as number[][][]).map((h) => { const r = h.map((q): Vec2 => [q[0]!, q[1]!]); return area(r) > 0 ? r.reverse() : r; }) : [];
+    pieces.push({ id: `${b.id}-${String(pc.id ?? `piece${k}`)}`, name: "", frame, profile: { outer: filletPoly(area(pts) < 0 ? pts.slice().reverse() : pts, num(pc.fillet, 1.5)), holes }, h: num(pc.thick, 8) });
   });
   return { ...g, pieces };
 }

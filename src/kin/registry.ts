@@ -584,6 +584,42 @@ const ratchetBlock: BlockFn = (c, s) => {
   }
 };
 
+/**
+ * one-way (a freewheel, a sprag clutch): the output follows the input 1:1 while the input turns forward and stays while
+ * it turns back, so an oscillating input steps it. in: input (an oscillating driver, deg, from `lo`; its cycle runs
+ * forward for the first half), lo, stroke (its travel, deg), phase (the driver's, deg), output (body), joint (its ground revolute), carried
+ * (bodies that turn with the output: a sprag set), thrust ([a, b]: two points whose line, against the radius at a,
+ * gives the grip angle). out {angle, grip}: the output's turn and the grip angle (deg).
+ */
+const oneWay: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const lo = c.num(i.lo ?? 0);
+  const ph = c.num(i.phase ?? 0) * D2R;
+  const lv = c.num(i.input);
+  // the forward half follows the input; the return holds; `stroke` (deg) is the input's travel per half cycle
+  const span = (u: number, v: number) => {
+    const turns = Math.floor((u + ph) / TAU);
+    const w = u + ph - turns * TAU;
+    return w < Math.PI ? turns * c.num(i.stroke ?? 0) + (v - lo) : (turns + 1) * c.num(i.stroke ?? 0);
+  };
+  const d = c.delta("out", span(c.u, lv) * D2R);
+  const jid = str(i.joint, "one-way.joint");
+  const O = c.jointAt(jid);
+  const ax = c.jointAxis(jid);
+  for (const b of [str(i.output, "one-way.output"), ...((i.carried as string[] | undefined) ?? [])]) spin(c, b, O, ax, d);
+  outVal(c, s, d * R2D, "angle");
+  const th = i.thrust as string[] | undefined;
+  if (th && th.length === 2) {
+    const X = c.xf(str(i.output, "one-way.output"));
+    const a = xf.apply(X, c.refPt(th[0]!));
+    const b = xf.apply(X, c.refPt(th[1]!));
+    // in the plane square to the axis
+    const t = v3.perp(v3.sub(b, a), ax);
+    const r = v3.perp(v3.sub(a, O), ax);
+    outVal(c, s, Math.acos(Math.min(1, Math.abs(v3.dot(t, r)) / (v3.len(t) * v3.len(r)))) * R2D, "grip");
+  }
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -669,6 +705,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   rocker: rockerBlock,
   star: starBlock,
   ratchet: ratchetBlock,
+  "one-way": oneWay,
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,

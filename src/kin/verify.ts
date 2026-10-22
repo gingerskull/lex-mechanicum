@@ -111,7 +111,11 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const Y = pN.bodies.get(b) ?? X;
       const body = k.kin.bodies.find((q) => q.id === b);
       const n = body?.symmetry ?? (typeof body?.shape?.z === "number" ? (body.shape.z as number) : undefined);
-      const jr = [...setup.joints.values()].find((r) => r.joint.a === b || r.joint.b === b);
+      // the symmetry turns about the body's joint to the ground, else about its own frame's axis (a carried sprag set)
+      const all = [...setup.joints.values()].filter((r) => r.joint.a === b || r.joint.b === b);
+      const g = all.find((r) => r.joint.a === "ground" || r.joint.b === "ground");
+      const F = setup.bodyFrame.get(b);
+      const jr = g ?? (F ? { at: F.t, axis: [F.R[2], F.R[5], F.R[8]] as Vec3 } : all[0]);
       const ax = jr?.axis;
       if (n && ax) {
         // rotation about the axis may differ by a whole number of symmetry steps; nothing else may differ
