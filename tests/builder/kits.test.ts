@@ -33,6 +33,7 @@ describe("joint kits", () => {
     "eccentric-bearing": "cycloidal-drive",
     "pin-ring": "cycloidal-drive",
     "pin-hole": "cycloidal-drive",
+    "spider-pin": "differential",
   };
   for (const id of KIT_IDS) {
     it(`${id}: builds its joint, with an axis, a zone and a note`, async () => {

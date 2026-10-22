@@ -279,6 +279,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `eccentric-bearing` | J3, F2 |
 | `pin-ring` | J6, F1, F2 |
 | `pin-hole` | J4, M14 |
+| `spider-pin` | J3, F2, F4 |
 | `j4-slot-roller` | J4, M14 |
 | `pin-lobe` | J4, M14 |
 | `groove-cam` | J7, M14 |

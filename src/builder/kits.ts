@@ -80,6 +80,7 @@ export const KITS: Record<KitId, Kit> = {
   "eccentric-bearing": mk("eccentric-bearing", "Disc on an eccentric", ["J3"], ["gear-mesh"], "eccentric-bearing", ["bearing"], own, pinZone("the eccentric")),
   "pin-ring": mk("pin-ring", "Lobed disc on ring pins", ["J6"], ["gear-mesh"], "pin-ring", ["roller", "dowel", "housing", "plate", "head", "shank"], own, pinZone("the lobes on the pins")),
   "pin-hole": mk("pin-hole", "Output pins in oversized holes", ["J4"], ["dyad"], "pin-hole", ["dowel", "roller"], own, pinZone("the pins in their holes")),
+  "spider-pin": mk("spider-pin", "Spider on a cross-pin", ["J3"], ["bevel-diff"], "spider-pin", ["dowel", "bushing", "thrustWasher"], own, pinZone("the spider")),
   "groove-cam": mk("groove-cam", "Groove cam", ["J7"], ["cam"], "groove-cam", ["roller", "shaft", "wearStrip", "felt"], normalOf, runZone("the roller in the groove")),
 };
 

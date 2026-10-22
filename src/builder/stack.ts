@@ -10,7 +10,7 @@ import { SHOULDER_BOLTS, circlipExt, circlipInt, headD, headH, innerRingD, keyFo
 import { housingBearing } from "../hardware/sub/housing";
 import type { Solid3 } from "../solids/types";
 import type { BuildCtx } from "./ctx";
-import { type Frame, parallel } from "./frames";
+import { type Frame, fromPlane, parallel } from "./frames";
 import { Local, fitBore, half, type Fit, type Member } from "./lib";
 import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
@@ -103,7 +103,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const ownHub = (m: Member) => !!ctx.geoms.get(m.body)?.exact && !isBevel(m);
   const seats: Seat[] = members.map((m, i) => {
     const b = fit.bearing[i] ?? null;
-    if (m.keyed && !moving) return { m, b: null, z0: m.w0 - (isBevel(m) ? (m.shim ?? 0) : 0), z1: m.w1 };
+    if (m.keyed && !moving) {
+      const down = (ctx.geoms.get(m.body)?.scaleTop ?? 1) > 1;
+      return { m, b: null, z0: m.w0 - (isBevel(m) && !down ? (m.shim ?? 0) : 0), z1: m.w1 + (isBevel(m) && down ? (m.shim ?? 0) : 0) };
+    }
     const B = b ? b.B : Math.min(6, m.w1 - m.w0);
     const c = (m.w0 + m.w1) / 2;
     const z0 = half(c - B / 2);
@@ -177,7 +180,9 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const sh = s.m.shim ?? 0;
     if (ownHub(s.m)) return;
     if (isBevel(s.m)) {
-      if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm at the back face, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: s.m.w0 - sh, z1: s.m.w0, body: s.m.body, inset: true }));
+      // the back face is the gear's low end, or its high end when its apex lies below it
+      const down = (ctx.geoms.get(s.m.body)?.scaleTop ?? 1) > 1;
+      if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm at the back face, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: down ? s.m.w1 : s.m.w0 - sh, z1: down ? s.m.w1 + sh : s.m.w0, body: s.m.body, inset: true }));
       return;
     }
     if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: s.m.w1, z1: s.m.w1 + sh, body: s.m.body, inset: true }));
@@ -230,8 +235,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const fromBase = support !== "hung" && support !== "pillow" && spec.base !== null;
 
   if (support === "pillow") {
-    const lo = Math.min(...L.list.map((x) => x.z0), first.w0);
-    const hi = Math.max(...L.list.map((x) => x.z1), zTop);
+    // the blocks stand clear of the members and of any further pieces of theirs the shaft runs through (a case's cage)
+    const span = piecesSpan(ctx, spec);
+    const lo = Math.min(...L.list.map((x) => x.z0), first.w0, span[0]);
+    const hi = Math.max(...L.list.map((x) => x.z1), zTop, span[1]);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
     const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });
@@ -353,3 +360,23 @@ const circleBushing = (d: number): number => d + 4;
 
 export type { Solid };
 export { housingBearing };
+
+/** The range along a stack's axis of its members' further pieces (a differential case's cage), [Infinity, -Infinity] if none. */
+function piecesSpan(ctx: BuildCtx, spec: StackSpec): [number, number] {
+  let lo = Infinity;
+  let hi = -Infinity;
+  const z = spec.frame.z;
+  const o = spec.frame.o;
+  for (const m of spec.members) {
+    for (const pc of ctx.geoms.get(m.body)?.pieces ?? []) {
+      for (const q of pc.profile.outer)
+        for (const w of [0, pc.h]) {
+          const p = fromPlane(pc.frame, q, w);
+          const t = (p[0] - o[0]) * z[0] + (p[1] - o[1]) * z[1] + (p[2] - o[2]) * z[2];
+          lo = Math.min(lo, t);
+          hi = Math.max(hi, t);
+        }
+    }
+  }
+  return [lo, hi];
+}

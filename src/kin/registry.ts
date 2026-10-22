@@ -602,6 +602,31 @@ const wave: BlockFn = (c, s) => {
   outVal(c, s, bend0, "bend");
 };
 
+/**
+ * bevel-diff. A bevel differential's spider train on its case. in: case (body, posed before), difference (the left side
+ * gear's turn relative to the case, deg), sides { left: [body, joint], right: [body, joint] } (their revolutes to the case),
+ * spiders [{ body, joint }] (on the cross-pin), zs, zp (side and spider teeth). The left side gear turns +difference
+ * relative to the case, the right one -difference, and each spider spins on its pin by difference zs / zp about its own
+ * joint's axis. out { left, right, spin }: the side gears' and a spider's turns relative to the case (deg).
+ */
+const bevelDiff: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const C = c.xf(str(i.case, "bevel-diff.case"));
+  const d = c.delta("diff", c.rad(i.difference));
+  const sides = (i.sides ?? {}) as Record<string, [string, string]>;
+  const put = (pair: [string, string] | undefined, a: number) => {
+    if (!pair) return;
+    c.setXf(pair[0], xf.mul(C, xf.rotAbout(c.refVec(pair[1]), c.jointAxis(pair[1]), a)));
+  };
+  put(sides.left, d);
+  put(sides.right, -d);
+  const spin = (d * c.num(i.zs)) / c.num(i.zp);
+  for (const sp of (i.spiders as { body: string; joint: string }[] | undefined) ?? []) c.setXf(sp.body, xf.mul(C, xf.rotAbout(c.refVec(sp.joint), c.jointAxis(sp.joint), spin)));
+  outVal(c, s, d * R2D, "left");
+  outVal(c, s, -d * R2D, "right");
+  outVal(c, s, spin * R2D, "spin");
+};
+
 void sideOf;
 void angleFrom;
 
@@ -623,4 +648,5 @@ export const BLOCKS: Record<string, BlockFn> = {
   indexer,
   follow,
   wave,
+  "bevel-diff": bevelDiff,
 };

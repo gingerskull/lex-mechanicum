@@ -113,7 +113,8 @@ export interface KinDriver {
   lo?: number;
   hi?: number;
   /** Rotary and oscillating: turns per cycle (default 1; an integer keeps K2) and a phase offset, degrees. */
-  speed?: number;
+  /** Turns per cycle relative to the range, or a param expression (a differential's second input at a split). */
+  speed?: number | string;
   phase?: number;
   /** A selector's named options, each setting values of other drivers and params. */
   options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }>;

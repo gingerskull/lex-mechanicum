@@ -10,6 +10,7 @@ import { crossBearings } from "./rules/cross";
 import { pistonBore, trunnion } from "./rules/cylinder";
 import { ringCarrier } from "./rules/ring";
 import { eccentricBearing, pinHole, pinRing } from "./rules/cycloid";
+import { spiderPin } from "./rules/differential";
 import type { Rule } from "./rules/types";
 
 const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
@@ -36,6 +37,7 @@ export const rules: Rule[] = [
   eccentricBearing,
   pinRing,
   pinHole,
+  spiderPin,
   byId("j4-slot-roller"),
   byId("pin-lobe"),
   byId("groove-cam"),

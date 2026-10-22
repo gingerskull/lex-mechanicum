@@ -33609,7 +33609,7 @@
               "frame": {
                 "origin": [
                   0,
-                  40,
+                  -40,
                   -110
                 ]
               }
@@ -33637,23 +33637,20 @@
               "type": "gear",
               "z": 41,
               "module": 4.878,
-              "face": 26,
+              "face": 18,
               "cone": 76.293,
-              "bore": 30,
-              "case": {
-                "type": "cage",
-                "radius": 52,
-                "length": 90,
-                "pin": {
-                  "axis": [
-                    0,
-                    0,
-                    1
-                  ],
-                  "diameter": 14
-                }
-              },
-              "note": "the ring gear bolted to the case that carries the cross-pin"
+              "bore": 120,
+              "note": "the ring gear, bolted to the case's cage that carries the cross-pin",
+              "facing": -1,
+              "backFace": 24.39,
+              "cage": {
+                "from": -42,
+                "to": 30.4,
+                "half": 54,
+                "wall": 6,
+                "thickness": 10,
+                "reach": 72
+              }
             },
             "at": {
               "joint": "Oc"
@@ -33668,7 +33665,8 @@
               "module": 4,
               "face": 14,
               "bore": 14,
-              "cone": 32.005
+              "cone": 32.005,
+              "facing": -1
             },
             "at": {
               "joint": "Os0"
@@ -33698,7 +33696,8 @@
               "module": 4,
               "face": 14,
               "bore": 16,
-              "cone": 57.995
+              "cone": 57.995,
+              "backFace": -20
             },
             "at": {
               "joint": "OL"
@@ -33713,7 +33712,9 @@
               "module": 4,
               "face": 14,
               "bore": 16,
-              "cone": 57.995
+              "cone": 57.995,
+              "facing": -1,
+              "backFace": 20
             },
             "at": {
               "joint": "OR"
@@ -33728,7 +33729,7 @@
             "b": "pinion",
             "at": [
               0,
-              100,
+              -100,
               0
             ],
             "axis": [
@@ -33791,7 +33792,7 @@
             "a": "case",
             "b": "sideL",
             "at": [
-              -20,
+              0,
               0,
               0
             ],
@@ -33807,7 +33808,7 @@
             "a": "case",
             "b": "sideR",
             "at": [
-              20,
+              0,
               0,
               0
             ],
@@ -33824,14 +33825,29 @@
             "b": "case",
             "at": [
               24.39,
-              100,
+              -100,
               0
             ],
-            "z": [
-              10,
-              41
+            "crossed": true,
+            "za": 10,
+            "zb": 41,
+            "ratio": 0.24390243902439024,
+            "axis": [
+              0,
+              1,
+              0
             ],
-            "crossed": 90
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              0
+            ],
+            "note": "the pinion on the ring gear, the case's; a positive pinion turn about +y turns the case by +10/41 about +x"
           },
           {
             "id": "M0L",
@@ -33843,11 +33859,26 @@
               0,
               32
             ],
-            "z": [
-              10,
-              16
+            "crossed": true,
+            "za": 10,
+            "zb": 16,
+            "ratio": 0.625,
+            "axis": [
+              0,
+              0,
+              1
             ],
-            "crossed": 90
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              0
+            ],
+            "carrier": "case"
           },
           {
             "id": "M0R",
@@ -33859,11 +33890,26 @@
               0,
               32
             ],
-            "z": [
-              10,
-              16
+            "crossed": true,
+            "za": 10,
+            "zb": 16,
+            "ratio": -0.625,
+            "axis": [
+              0,
+              0,
+              1
             ],
-            "crossed": 90
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              0
+            ],
+            "carrier": "case"
           },
           {
             "id": "M1L",
@@ -33875,11 +33921,26 @@
               0,
               -32
             ],
-            "z": [
-              10,
-              16
+            "crossed": true,
+            "za": 10,
+            "zb": 16,
+            "ratio": 0.625,
+            "axis": [
+              0,
+              0,
+              -1
             ],
-            "crossed": 90
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              0
+            ],
+            "carrier": "case"
           },
           {
             "id": "M1R",
@@ -33891,11 +33952,26 @@
               0,
               -32
             ],
-            "z": [
-              10,
-              16
+            "crossed": true,
+            "za": 10,
+            "zb": 16,
+            "ratio": -0.625,
+            "axis": [
+              0,
+              0,
+              -1
             ],
-            "crossed": 90
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              0
+            ],
+            "carrier": "case"
           }
         ],
         "params": [
@@ -33978,12 +34054,12 @@
             "joint": "OL",
             "kind": "rotary",
             "range": [
-              -360,
-              360
+              -180,
+              180
             ],
             "default": 0,
-            "rate": "split",
-            "note": "the second input: the left side gear's angle relative to the case, split times the case angle"
+            "note": "the second input: the left side gear's turn relative to the case, split times the case's turn per cycle",
+            "speed": "split"
           }
         ],
         "solve": [
@@ -33991,24 +34067,19 @@
             "block": "gear-mesh",
             "id": "final-drive",
             "joints": [
-              "Mpr",
-              "Oc"
+              "Oc",
+              "Mpr"
             ],
             "in": {
-              "a": "pinion",
-              "b": "case",
-              "za": "z_pinion",
-              "zb": "z_ring",
-              "module": "m-ring"
+              "joint": "Mpr",
+              "input": "input"
             },
-            "out": "case-angle",
-            "opts": {
-              "bevel": true,
-              "crossed": 90
+            "out": {
+              "angle": "case-turn"
             }
           },
           {
-            "block": "willis",
+            "block": "bevel-diff",
             "id": "spider-train",
             "joints": [
               "OR",
@@ -34020,26 +34091,35 @@
               "M1R"
             ],
             "in": {
-              "carrier": "case",
-              "carrierAngle": "case-angle",
-              "left": "sideL",
-              "right": "sideR",
-              "spiders": [
-                "spider0",
-                "spider1"
-              ],
+              "case": "case",
               "difference": "difference",
-              "zs": "z_side",
-              "zp": "z_spider"
+              "sides": {
+                "left": [
+                  "sideL",
+                  "OL"
+                ],
+                "right": [
+                  "sideR",
+                  "OR"
+                ]
+              },
+              "spiders": [
+                {
+                  "body": "spider0",
+                  "joint": "Os0"
+                },
+                {
+                  "body": "spider1",
+                  "joint": "Os1"
+                }
+              ],
+              "zs": 16,
+              "zp": 10
             },
-            "out": [
-              "left-angle",
-              "right-angle",
-              "spider-angle"
-            ],
-            "opts": {
-              "relation": "(wL - wc)/(wR - wc) = -1; spider spin relative to the case = (wL - wc) z_side / z_spider",
-              "bevel": true
+            "out": {
+              "left": "left-rel",
+              "right": "right-rel",
+              "spin": "spider-spin-v"
             }
           }
         ],
@@ -34050,7 +34130,7 @@
             "local": [
               0,
               32,
-              0
+              -20
             ]
           },
           {
@@ -34059,7 +34139,7 @@
             "local": [
               0,
               32,
-              0
+              20
             ]
           },
           {
@@ -34085,7 +34165,7 @@
             "body": "ground",
             "local": [
               0,
-              190,
+              -190,
               0
             ]
           },
@@ -34102,18 +34182,18 @@
             "id": "pin-top",
             "body": "case",
             "local": [
+              52,
               0,
-              0,
-              52
+              0
             ]
           },
           {
             "id": "pin-bottom",
             "body": "case",
             "local": [
+              -52,
               0,
-              0,
-              -52
+              0
             ]
           }
         ],
@@ -34138,7 +34218,7 @@
           },
           {
             "id": "spider-spin",
-            "of": "Os0",
+            "of": "spider-spin-v",
             "kind": "angle",
             "unit": "deg"
           }
@@ -34149,7 +34229,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms."
+          "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms. Rebuild R4 (#215): built on v3 from this record (first build): the pinion turns the case through the ring gear, a bevel-diff block turns the side gears plus and minus the difference relative to the case and spins the spiders on the cage's cross-pin; the second driver's speed follows the split param (claims at split 0 and -1 checked at those settings). Record fixes: the meshes in the block's form (signed ratios, axes, the case as carrier of the spider meshes), the pinion moved to the other side of the case (its shaft's free end away from the case takes the drive, and the case then turns +10/41 as claimed), bevels facing down where their apex lies below their frame, the side gears' revolutes at the case's centre (they run on its shaft), the ring's face 18 (it clears the right side gear along the shaft), the axis overlays as lines. The six phases and the section read as decided."
         },
         "principle": [
           {
@@ -34188,21 +34268,21 @@
         "overlays": [
           {
             "id": "side-axis",
-            "kind": "axis-line",
+            "kind": "line",
             "from": "side-axis-l",
             "to": "side-axis-r",
             "label": "SIDE GEAR AXIS"
           },
           {
             "id": "pinion-axis",
-            "kind": "axis-line",
+            "kind": "line",
             "from": "apex",
             "to": "pinion-axis-end",
             "label": "PINION AXIS"
           },
           {
             "id": "cross-pin",
-            "kind": "axis-line",
+            "kind": "line",
             "from": "pin-top",
             "to": "pin-bottom",
             "label": "CROSS-PIN"

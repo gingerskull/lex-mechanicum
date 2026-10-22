@@ -16,7 +16,7 @@ export const KIN_VOCAB = {
   driver: ["rotary", "oscillating", "linear", "manual", "select"],
   block: [
     "dyad", "slider-dyad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
-    "flexure", "escapement", "follow", "wave",
+    "flexure", "escapement", "follow", "wave", "bevel-diff",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

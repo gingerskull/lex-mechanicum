@@ -11,7 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore", "ring-carrier", "eccentric-bearing", "pin-ring", "pin-hole",
+  "cross-pin", "trunnion", "piston-bore", "ring-carrier", "eccentric-bearing", "pin-ring", "pin-hole", "spider-pin",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -69,6 +69,17 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (ground && j.type === "revolute" && (a?.shape?.type === "cylinder" || b?.shape?.type === "cylinder")) return "trunnion";
       // a ring gear is open in the middle: it runs on rollers round its rim, not on a centre shaft
       if (ground && j.type === "revolute" && (a?.shape?.type === "ringGear" || b?.shape?.type === "ringGear")) return "ring-carrier";
+      // a differential's spider turns on the cross-pin in its case's cage
+      if (!ground && j.type === "revolute" && (a?.shape?.cage || b?.shape?.cage)) {
+        // a joint across the case's own axis (a side gear on the case's axis turns on its shaft)
+        const caseId = a?.shape?.cage ? j.a : j.b;
+        const cj = kin.joints.find((q) => (q.a === caseId || q.b === caseId) && (q.a === "ground" || q.b === "ground") && q.axis);
+        const ca = cj?.axis as number[] | undefined;
+        if (ca && Array.isArray(ca) && ca.every((v) => typeof v === "number")) {
+          const dot = Math.abs(ca[0]! * axis[0] + ca[1]! * axis[1] + (ca[2] ?? 0) * axis[2]) / Math.hypot(ca[0]!, ca[1]!, ca[2] ?? 0);
+          if (dot < 0.5) return "spider-pin";
+        }
+      }
       // a disc that runs on an eccentric (a cam whose centre is the pin) turns on a needle ring round it, not on a pin
       if (!ground && j.type === "revolute" && (typeof a?.shape?.offset === "number" || typeof b?.shape?.offset === "number")) return "eccentric-bearing";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms

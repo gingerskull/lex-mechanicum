@@ -169,7 +169,14 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
   const ax = r.axis;
   const ax2 = r.axis2 ?? r.axis;
   if (j.type === "gear-mesh") {
-    const dC = s.c0 && s.c1 ? turn(s.c0, s.c1, ax) : 0;
+    // a mesh carried round by a carrier is checked in the carrier's frame (a planet's mesh, a differential's spiders on
+    // a case that turns about another axis)
+    if (s.c0 && s.c1) {
+      const i0 = xf.inv(s.c0);
+      const i1 = xf.inv(s.c1);
+      s = { a0: xf.mul(i0, s.a0), a1: xf.mul(i1, s.a1), b0: xf.mul(i0, s.b0), b1: xf.mul(i1, s.b1) };
+    }
+    const dC = 0;
     const dA = turn(s.a0, s.a1, ax) - dC;
     if (j.radiusA !== undefined && j.radiusB === undefined && j.zb === undefined && j.ratio === undefined && !j.ncg) {
       // rack: b's origin travels along axis2 by r Δθa

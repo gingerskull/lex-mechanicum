@@ -152,7 +152,14 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
           });
           return { profile: { outer, holes: [] }, thick: bv.axial, approx: false, scaleTop: bv.inner, loft, exact: true };
         }
-        return { profile: { outer, holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
+        // its back face at `backFace` along the frame's z (default the frame's origin); `facing: -1` puts its apex toward
+        // -z: the frustum then runs from its small end up to its back face
+        const back = num(shape.backFace, 0);
+        if (shape.facing === -1) {
+          const s = bv.inner;
+          return { profile: { outer: outer.map(([x, y]): Vec2 => [x * s, y * s]), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: 1 / s, exact: true, exactOffset: back - bv.axial };
+        }
+        return { profile: { outer, holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true, ...(back ? { exactOffset: back } : {}) };
       }
       if (shape.form === "worm" || shape.form === "worm wheel") return wormShape(shape, z, m);
       // a non-circular gear: teeth along its own pitch curve (the gear it drives is cut conjugate to it, conjugate.ts)
@@ -292,6 +299,23 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.loft ? { loft: g.loft } : {}), ...(g.exact || fixed ? { exact: { offset: g.exactOffset ?? 0 } } : {}) };
     const levels = clusterLevels(shape, pins);
     if (levels.length) geom.levels = levels;
+    // a differential's case: its ring gear (the part) and a cage frame round the spiders and side gears, in the plane of
+    // the cross-pin and the case's axis (`cage`: from, to along the axis; half its height along the pin; its wall; its
+    // thickness across; reach, how far its end member runs out to bolt to the ring gear's back face)
+    if (String(shape.type) === "gear" && shape.cage && typeof shape.cage === "object") {
+      const cg = shape.cage as Record<string, unknown>;
+      const x0 = num(cg.from, -40);
+      const x1 = num(cg.to, 30);
+      const h = num(cg.half, 50);
+      const w = num(cg.wall, 6);
+      const R = num(cg.reach, h);
+      const t = num(cg.thickness, 10);
+      // the cage's plane: the case's axis (frame z) and the cross-pin (frame x); its normal the third direction
+      const n = v3.cross(frame.z, frame.x);
+      const outer: Vec2[] = [[x0, -h], [x1 - w, -h], [x1 - w, -R], [x1, -R], [x1, R], [x1 - w, R], [x1 - w, h], [x0, h]];
+      const win: Vec2[] = [[x0 + w, -h + w], [x0 + w, h - w], [x1 - w, h - w], [x1 - w, -h + w]];
+      geom.pieces = [...(geom.pieces ?? []), { id: `${b.id}-cage`, name: "Case cage, bolted to the ring gear, carries the cross-pin", frame: { o: v3.add(frame.o, v3.mul(n, -t / 2)), x: frame.z, z: n }, profile: { outer, holes: [win] }, h: t }];
+    }
     // a flexspline segment's strip of the cup wall, down from its rim
     const ft = ((shape.profile ?? {}) as Record<string, unknown>).flexTooth as Record<string, unknown> | undefined;
     if (String(shape.type) === "custom" && ft && typeof ft.wall === "object" && ft.wall) {

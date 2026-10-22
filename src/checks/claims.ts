@@ -215,8 +215,23 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
     return claims.map((claim) => ({ claim, status: "uncheckable", why: `does not solve: ${(e as Error).message}` }));
   }
   const rotary = K.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual")?.kind === "rotary";
+  // a claim that holds at a setting of the params (`setting: { split: 0 }`) is checked on the motion at that setting
+  const at = new Map<string, Pose[]>();
+  const posesFor = (claim: Claim): Pose[] => {
+    const setting = claim.setting as Record<string, number> | undefined;
+    if (!setting || typeof setting !== "object") return poses;
+    const key = JSON.stringify(setting);
+    if (!at.has(key)) at.set(key, Array.from({ length: n }, (_, i) => K.pose((i / n) * Math.PI * 2, { params: setting })));
+    return at.get(key)!;
+  };
   return claims.map((claim): ClaimResult => {
-    const S = seriesOf(K, claim, outputs, poses);
+    let P: Pose[];
+    try {
+      P = posesFor(claim);
+    } catch (e) {
+      return { claim, status: "uncheckable", why: `does not solve at its setting: ${(e as Error).message}` };
+    }
+    const S = seriesOf(K, claim, outputs, P);
     if (typeof S === "string") return { claim, status: "uncheckable", why: S };
     const v = evaluate(S, claim, rotary);
     if (typeof v === "string") return { claim, status: "uncheckable", why: v };

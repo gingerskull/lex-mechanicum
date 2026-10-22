@@ -175,7 +175,7 @@ export class Kinematics {
         out[d.id] = held;
         continue;
       }
-      const speed = d.speed ?? 1;
+      const speed = typeof d.speed === "string" ? evalExpr(d.speed, (n) => s.params.get(n)) : (d.speed ?? 1);
       const ph = (d.phase ?? 0) * D2R;
       if (d.kind === "rotary") {
         const span = d.range ? d.range[1] - d.range[0] : 360;

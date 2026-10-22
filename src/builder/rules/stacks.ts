@@ -68,7 +68,9 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
   if (!out.size && site.bodies[0]) out.add(site.bodies[0]);
   // one shaft turns only the bodies that turn together: the driven one (else the first) is keyed, a body that turns at
   // another rate on the same axis (a sun-and-planet's retainer on the sun's shaft) runs free on it in bearings
-  const first = [...out].find((b) => site.joints.some((j) => driver.has(j) && ctx.kin.joints.some((q) => q.id === j && (q.a === b || q.b === b)))) ?? [...out][0];
+  // the body a driver turns against the ground (a driver between two moving bodies, a differential's second input, does
+  // not turn the shaft)
+  const first = [...out].find((b) => site.joints.some((j) => driver.has(j) && ctx.kin.joints.some((q) => q.id === j && (q.a === b || q.b === b) && (q.a === "ground" || q.b === "ground")))) ?? [...out][0];
   if (first) {
     const xa = ctx.sampled.xfs.get(first) ?? [];
     const same = (b: string) => (ctx.sampled.xfs.get(b) ?? []).every((X, i) => X.R.every((v, k) => Math.abs(v - (xa[i]?.R[k] ?? NaN)) < 1e-6));
