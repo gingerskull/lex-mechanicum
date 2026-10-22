@@ -6,12 +6,15 @@ import type { Kin, Teaching } from "../../src/catalog/kin";
 import { allIds } from "../../src/checks/engine";
 import { mechanisms } from "../../src/mechanisms";
 import { drawnBy3 } from "./drawn";
+import { originKey, type Sortable } from "./sort";
 
 export const VERSION = pkg.version;
 
 export interface Sheet {
   id: string;
   no: string;
+  /** The sheet number as a number: 1 for MX-01. */
+  n: number;
   rec: CatalogRecord;
 }
 
@@ -19,9 +22,24 @@ export interface Sheet {
 const KNOWN = new Set(allIds());
 export const SHEETS: Sheet[] = loadCatalog()
   .mechanisms.filter((r) => KNOWN.has(r.id))
-  .map((rec, i) => ({ id: rec.id, no: `MX-${String(i + 1).padStart(2, "0")}`, rec }));
+  .map((rec, i) => ({ id: rec.id, no: `MX-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec }));
 
 export const sheetOf = (id: string) => SHEETS.find((s) => s.id === id)!;
+
+/** The day a record's sheet went live (its `added` date, YYYY-MM-DD), when the record has one. */
+function addedOf(r: CatalogRecord): string | undefined {
+  const v = (r as { added?: unknown }).added;
+  return typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : undefined;
+}
+
+/** A record's date of origin (`origin.date`, YYYY-MM-DD with a negative year before the year 1) as a sort key. */
+function originOf(r: CatalogRecord): number | undefined {
+  const v = (r as { origin?: { date?: unknown } }).origin?.date;
+  return typeof v === "string" ? originKey(v) : undefined;
+}
+
+/** What the library's orders read from a sheet (site/src/sort.ts). */
+export const sortableOf = (s: Sheet): Sortable => ({ no: s.n, name: s.rec.name, added: addedOf(s.rec), origin: originOf(s.rec) });
 
 /** The drive line of the at-a-glance facts (P3, V5), from the model's input kind. */
 export async function driveOf(id: string): Promise<string> {

@@ -1,5 +1,6 @@
 // npm run test:e2e: builds the site with three 2.5D mechanisms on the v3 stage (SITE_V3, site/src/drawn.ts) and runs the
-// stage's browser tests against it, in local Chrome. Local only; CI never draws. `--skip-build` reuses dist/site.
+// browser tests of the stage and the library against it, in local Chrome. Local only; CI never draws. `--skip-build`
+// reuses dist/site.
 import { spawnSync } from "node:child_process";
 
 const env = { ...process.env, SITE_V3: "four-bar,bevel-gears,oscillating-cylinder,universal-joint" };

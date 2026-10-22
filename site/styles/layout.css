@@ -247,6 +247,15 @@ footer {
   .dlayout {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* Sort keeps its name only, so the bar's row fits once it sticks; the current order is still read out */
+  .bar .sortv {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
   .side {
     grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
   }
@@ -270,9 +279,23 @@ footer {
   .bar .search {
     flex: 1;
   }
-  .bar .fbtn {
+  .bar .fbtn,
+  .bar .sort {
     align-self: stretch;
     justify-content: center;
+  }
+  /* Filters and Sort by name only and a little narrower, so the search keeps its room */
+  .bar .fbtn {
+    gap: 6px;
+    padding-inline: 10px;
+  }
+  .bar .fbtn svg {
+    display: none;
+  }
+  /* the menu opens toward the screen's middle, under the button's right edge */
+  .bar .sortmenu {
+    left: auto;
+    right: 0;
   }
   .bartitle {
     font-size: 16px;

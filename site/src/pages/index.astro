@@ -1,10 +1,12 @@
 ---
-// The library (SS1 to SS3): every drawn mechanism as a sheet of the set.
+// The library (SS1 to SS3): every drawn mechanism as a sheet of the set, built in the default order (New); the filters
+// island sorts the cards again when the visitor picks another order.
 import Sheet from "../layouts/Sheet.astro";
 import Bar from "../components/Bar.astro";
 import Facets from "../components/Facets.astro";
 import Card from "../components/Card.astro";
-import { SHEETS, VERSION } from "../data";
+import { SHEETS, VERSION, sortableOf } from "../data";
+import { DEFAULT_ORDER, sortBy } from "../sort";
 ---
 <Sheet title="Mechanism Library" description="Mechanical mechanisms drawn live as working bench assemblies: linkages, gears, cams, indexing drives.">
   <header class="wrap top">
@@ -24,7 +26,7 @@ import { SHEETS, VERSION } from "../data";
   <main class="wrap" id="library">
     <div class="status"><span id="shown">{SHEETS.length} sheets</span><button id="clear" type="button" hidden>Clear filters</button></div>
     <div class="grid" id="grid">
-      {SHEETS.map((s) => <Card sheet={s} />)}
+      {sortBy(SHEETS, DEFAULT_ORDER, sortableOf).map((s) => <Card sheet={s} />)}
       <p class="empty" id="empty" hidden>No mechanism matches. Clear a filter or the search.</p>
     </div>
   </main>
