@@ -117,7 +117,13 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const F = setup.bodyFrame.get(b);
       const jr = g ?? (F ? { at: F.t, axis: [F.R[2], F.R[5], F.R[8]] as Vec3 } : all[0]);
       const ax = jr?.axis;
-      if (n && ax) {
+      // a sheave half is a body of revolution: it may come back turned by any angle about its axis
+      if (body?.shape?.sheave !== undefined && ax) {
+        const rel = xf.mul(Y, xf.inv(X));
+        const R = xf.rotAbout(jr!.at, ax, xf.angleAbout(rel, ax));
+        const resid = xf.mul(xf.inv(R), rel);
+        periodicity = Math.max(periodicity, v3.len(v3.perp(resid.t, ax)), v3.len(v3.perp(m3.log(resid.R), ax)));
+      } else if (n && ax) {
         // rotation about the axis may differ by a whole number of symmetry steps; nothing else may differ
         const rel = xf.mul(Y, xf.inv(X));
         const ang = xf.angleAbout(rel, ax);

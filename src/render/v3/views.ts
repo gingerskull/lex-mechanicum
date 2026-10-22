@@ -81,7 +81,10 @@ export function viewsOf(t: Pick<Teaching, "view" | "views"> | null | undefined, 
       const plane = v.plane as { origin?: unknown; normal?: unknown } | undefined;
       const origin = vec3(plane?.origin), normal = vec3(plane?.normal);
       if (!origin || !normal) continue;
-      out.push({ id: v.id, state: { orient: { yaw: 0, tilt: 0, aux: normal }, section: { name: `SECTION ${label(v.id)}`, origin, normal, highlight: v.highlight ?? [] }, explode: 0 } });
+      // a section may magnify a window of its cut (a thread's flanks in a nut): a centre and a scale, as a detail
+      const centre = vec3(v.center) ?? (typeof v.center === "string" ? v.center : null);
+      const detail = centre && typeof v.scale === "number" ? { detail: { name: `SECTION ${label(v.id)}`, centre, scale: v.scale, highlight: [] } } : {};
+      out.push({ id: v.id, state: { orient: { yaw: 0, tilt: 0, aux: normal }, section: { name: `SECTION ${label(v.id)}`, origin, normal, highlight: v.highlight ?? [] }, ...detail, explode: 0 } });
     } else if (v.kind === "detail") {
       const centre = vec3(v.center) ?? (typeof v.center === "string" ? v.center : null);
       if (!centre) continue;

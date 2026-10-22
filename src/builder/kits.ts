@@ -76,6 +76,7 @@ export const KITS: Record<KitId, Kit> = {
   "cross-pin": mk("cross-pin", "Yoke pin in a universal joint's cross", ["J3"], ["hooke"], "cross-bearings", ["bearing", "circlipInternal", "nipple"], own, pinZone("the cross")),
   trunnion: mk("trunnion", "Cylinder trunnion in a port face", ["J1"], ["slider-dyad"], "trunnion", ["shaft", "bushing", "thrustWasher", "spring", "nut", "washer"], own, pinZone("the port face")),
   "piston-bore": mk("piston-bore", "Piston in its bore", ["J5"], ["slider-dyad"], "piston-bore", ["wearStrip"], own, pinZone("the bore")),
+  "ball-cage": mk("ball-cage", "Ball in a cage, rolling on a disc and a cylinder", ["J6"], ["integrator"], "integrator-carriage", ["plate", "stop", "dowel"], own, pinZone("the ball's contacts")),
   "groove-cam": mk("groove-cam", "Groove cam", ["J7"], ["cam"], "groove-cam", ["roller", "shaft", "wearStrip", "felt"], normalOf, runZone("the roller in the groove")),
 };
 

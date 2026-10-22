@@ -527,6 +527,15 @@ class Run implements BlockCtx {
     if (ref === undefined) throw new KinError(`${this.step.id}: no reference value for ${key}`);
     return now - ref;
   }
+  driver(id: string): KinDriver | undefined {
+    return this.k.kin.drivers.find((d) => d.id === id);
+  }
+  driverAt(id: string, u: number): number {
+    return this.k.driverValues(u, this.s.controls)[id] ?? 0;
+  }
+  design(id: string): string | undefined {
+    return this.s.designs.get(id);
+  }
   declaredSide(): 1 | -1 {
     const b = this.step.branch;
     if (b === undefined) return 1;
@@ -741,10 +750,12 @@ class Run implements BlockCtx {
   }
 
   private output(kind: string, of: string, points: Map<string, Vec3>, axis?: Vec3): number | Vec3 | undefined {
+    // a value a block gives (a chain's speed over its peak), whatever the kind it is read as
+    if (of in this.vals && !this.xfs.has(of) && !points.has(of) && !this.s.joints.has(of)) return this.vals[of];
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);
-      if (r && (r.joint.type === "prismatic" || r.joint.type === "cylindrical")) {
+      if (r && (r.joint.type === "prismatic" || r.joint.type === "cylindrical" || r.joint.type === "screw")) {
         const Xa = this.xfs.get(r.joint.a) ?? xf.id();
         const Xb = this.xfs.get(r.joint.b) ?? xf.id();
         return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));

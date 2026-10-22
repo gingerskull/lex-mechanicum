@@ -9,6 +9,12 @@ import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
 import { wheels } from "./rules/wheels";
 import { pistonBore, trunnion } from "./rules/cylinder";
+import { j11 } from "./screws";
+import { j13 } from "./compliant";
+import { j12 } from "./flexible";
+import { cvt } from "./cvt";
+import { integrator } from "./integrator";
+import { friction } from "./friction";
 import type { Rule } from "./rules/types";
 
 const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
@@ -25,7 +31,12 @@ export const rules: Rule[] = [
   base,
   wheels,
   byId("j6-mesh"),
+  friction,
   byId("j9-crossed-mesh"),
+  // a belt or chain loop first: the stacks' bridges are routed clear of what it carries round
+  j12,
+  cvt,
+  integrator,
   j3,
   j2,
   j10,
@@ -44,10 +55,10 @@ export const rules: Rule[] = [
   byId("ring-hub"),
   byId("ring-rollers"),
   byId("j8-belt"),
-  byId("j12-flexible"),
+  byId("j12-other"),
   byId("strap-sheave"),
-  byId("j11-screw"),
-  byId("j13-compliant"),
+  j11,
+  j13,
   j1,
   stops,
   drive,

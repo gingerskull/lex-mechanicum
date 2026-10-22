@@ -104,6 +104,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     f.o = fromPlane(f, [0, 0], lo);
   });
 
+  twinnable = (id: string) => !["pulley", "sprocket", "disc", "gear"].includes(String(geoms.get(id)?.shape.type));
   const placement: Placement = { families: [], slab: new Map(), clevis: [], passes: [], height: 0, stackMm: 0, held: new Map(), conflicts: [], relaxed: [] };
   const sampleIdx = sampled.us.map((_, i) => i);
 
@@ -116,7 +117,11 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
     for (const j of joints) {
       const t = j.joint.type;
-      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact";
+      // one compliant blank lies in one plane: its flexures, and the axial give of its pseudo-rigid beams
+      const flex = (b: string) => kin.joints.some((q) => q.type === "flexure" && (q.a === b || q.b === b));
+      const blank = t === "flexure" || (t === "prismatic" && flex(j.a) && flex(j.b));
+      // a rope part ties the sheaves it runs between to one plane, unless it crosses between planes (skipped below)
+      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || blank;
       if (!planar || !parent.has(j.a) || !parent.has(j.b)) continue;
       if (j.joint.crossed) continue;
       contact.add(pairKey(j.a, j.b));
@@ -427,15 +432,17 @@ interface ClevisPick {
  * pair that straddles the other (A9), when the slab on the far side exists, is free of anything that would meet the
  * pair, and puts no passer inside either pin stack.
  */
+let twinnable: (id: string) => boolean = () => true;
+
 function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][], H: number, nodeIds: string[], nodes: Map<string, Node>): ClevisPick[] {
-  void nodeIds;
-  void nodes;
   const picks: ClevisPick[] = [];
   const twinned = new Set<number>();
   for (const c of cs) {
     if (c.members.length !== 2 || c.site.joints.length > 2) continue;
     const [m0, m1] = c.members as [number, number];
     for (const [host, twin] of [[m0, m1], [m1, m0]] as const) {
+      // only a link or a plate is built as a pair: a wheel (a sheave, a gear) is one part
+      if (!nodes.get(nodeIds[twin]!)!.ids.every((id) => twinnable(id))) continue;
       if (twinned.has(twin) || Math.abs(assign[host]! - assign[twin]!) !== 1) continue;
       const t = 2 * assign[host]! - assign[twin]!;
       if (t < 0 || t >= H) continue;

@@ -930,6 +930,8 @@ export function manualDrive(ctx: BuildCtx): void {
   manual.forEach((drv, n) => {
     const jt = ctx.joints.find((q) => q.id === drv.joint);
     if (!jt) return;
+    // an input that turns about its own axis and has its knob from its kit (a screw's knurled knob on its end, J11)
+    if ([jt.a, jt.b].some((b) => !!(ctx.kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined)?.knob)) return;
     const placed = [jt.a, jt.b].filter((b) => b !== "ground" && ctx.parts.has(b)).some((body) => {
       const part = ctx.parts.get(body)!;
       const pts = worldPoints(ctx.M, part);

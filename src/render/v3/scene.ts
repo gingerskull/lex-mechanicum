@@ -6,6 +6,7 @@ import type { Package2 } from "../../package/format2";
 import { hasFlag3 } from "../../package/format2";
 import type { EdgeSet } from "../../solids/edges";
 import { mat4, type Mat4 } from "../../solids/frame";
+import { stretchMatrix } from "../../solids/convey";
 import type { MeshData, Vec3 } from "../../solids/types";
 import { DRAFT, type RoleSurface, type SurfaceKey } from "../../style/draft";
 import { FORM } from "../../style/form";
@@ -128,10 +129,16 @@ export function place(rt: Runtime, u: number, explode: number, out: Float32Array
   const { scene } = rt;
   const gap = FORM.explode.gap * explode;
   scene.pkg.solids.forEach((s, i) => {
-    const M: Mat4 = mulMat(scene.poser.place(s, u), mat4(s.fr));
+    let M: Mat4 = mulMat(scene.poser.place(s, u), mat4(s.fr));
     if (s.stretch) {
-      const L = scene.poser.span(u, s.stretch[0], s.stretch[1]);
-      if (L !== null) for (let k = 0; k < 3; k++) M[k] = M[k]! * L;
+      // between its two points as solved: at the first, x toward the second, its unit length scaled to the span
+      const e = scene.poser.ends?.(u, s.stretch[0], s.stretch[1]);
+      const e0 = scene.poser.refEnds?.(s.stretch[0], s.stretch[1]);
+      if (e && e0) M = stretchMatrix(e[0], e[1], e0[0], e0[1], mat4(s.fr)) as Mat4;
+      else {
+        const L = scene.poser.span(u, s.stretch[0], s.stretch[1]);
+        if (L !== null) for (let k = 0; k < 3; k++) M[k] = M[k]! * L;
+      }
     }
     if (gap && s.ex) {
       const d = gap * s.ex;

@@ -2,16 +2,17 @@
 // point and an axis (the crank pin that joins the crank and two bars) are one site, the unit of an axial stack.
 // Nothing is inferred from overlapping outlines.
 import type { Setup } from "../kin/compose";
-import type { Kin, KinJoint } from "../kin/types";
+import type { Kin, KinBody, KinJoint } from "../kin/types";
 import type { ResolvedJoint } from "../kin/residual";
 import { type Vec3, v3 } from "../kin/math";
 import { canon, parallel } from "./frames";
+import { isScrew } from "./threads";
 
 /** The kits: today's J1 to J13 and the kinds the audits found missing. */
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore",
+  "cross-pin", "trunnion", "piston-bore", "ball-cage",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -42,6 +43,8 @@ export interface Site {
   kit: "J1" | "J2" | "J3" | "J10";
   /** The axis is not the base normal: a shaft in plan or a tilted one (J10). */
   inPlan: boolean;
+  /** A kit that builds the site itself (a screw is its own shaft: J11 builds its journals and blocks). */
+  owner?: KitId;
 }
 
 /** The base normal. */
@@ -59,6 +62,9 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
   const roles = [a?.role, b?.role];
   const any = (r: string) => roles.includes(r);
   const rec = j as unknown as Record<string, unknown>;
+  // an integrator's ball: its rolling contacts and the cage that holds it on the carriage (src/builder/integrator.ts)
+  const caged = (x: KinBody | undefined) => x?.shape?.type === "slider" && !!(x.shape as Record<string, unknown>).cage;
+  if ((j.type === "rolling" && rec.integrator) || (j.type === "spherical" && (caged(a) || caged(b)))) return "ball-cage";
   switch (j.type) {
     case "revolute":
     case "cylindrical":
@@ -74,6 +80,10 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
     }
     case "prismatic":
       if (a?.shape?.type === "piston" || b?.shape?.type === "piston") return "piston-bore";
+      // a nut's guide: the screw kit builds the anti-rotation with the nut (J11, F3)
+      if (kin.joints.some((q) => q.type === "screw" && (q.b === j.a || q.b === j.b) && q.b !== "ground" && isScrew(body(q.a)?.shape as Record<string, unknown> | undefined))) return "J11";
+      // a slide held by springs (a pseudo-rigid beam's give, a roller between springs in a window): the compliant kit
+      if (rec.spring !== undefined) return "J13";
       return /tongue/i.test(text(rec.note)) ? "tongue-slot" : "J5";
     case "pin-in-slot": {
       const s = text(j.slot) + text(rec.slot);
@@ -130,17 +140,32 @@ export function classifyJoints(kin: Kin, S: Setup): { joints: JointInfo[]; sites
       else if (!s.bodies.includes(id)) s.bodies.push(id);
     }
   }
+  // a rope's sheave turns free on its pin (each at its own speed): it is not keyed
+  const ropeSheave = (j: KinJoint) => (j as unknown as Record<string, unknown>).flexible === "rope";
+  const sheaveOnly = (id: string) => kin.joints.some((j) => j.type === "belt" && ropeSheave(j) && (j.a === id || j.b === id));
   const keyedBody = (id: string) => {
     const b = kin.bodies.find((q) => q.id === id);
     if (!b) return false;
+    if (sheaveOnly(id)) return false;
     if (KEYED.has(String(b.shape?.type))) return true;
-    return kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === id || j.b === id));
+    return kin.joints.some((j) => (j.type === "gear-mesh" || (j.type === "belt" && !ropeSheave(j)) || j.type === "screw") && (j.a === id || j.b === id));
   };
   for (const s of sites) {
     s.inPlan = !parallel(s.axis, UP);
     s.live = s.fixed && (s.joints.some((id) => driven.has(id)) || s.bodies.some(keyedBody));
     s.kit = s.fixed ? (s.inPlan ? "J10" : s.live ? "J2" : "J1") : "J3";
+    // a body that is its own shaft, its ends turned to journals (an integrator's cylinder): src/builder/integrator.ts
+    if (s.fixed && s.bodies.some((b) => journalled(kin.bodies.find((q) => q.id === b)))) s.owner = "J10";
+    // a variator's shaft is built with its sheave halves (src/builder/cvt.ts)
+    if (s.fixed && s.bodies.some((b) => (kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined)?.sheave !== undefined)) s.owner = "J12";
+    if (s.fixed && s.bodies.length > 0 && s.bodies.every((b) => isScrew(kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined))) s.owner = "J11";
     for (const id of s.joints) joints.find((q) => q.id === id)!.kit = s.kit;
   }
   return { joints, sites };
 }
+
+/** A disc that is its own shaft, its ends turned to journals (shape.journal): an integrator's cylinder. */
+export const journalled = (b: KinBody | undefined): boolean => {
+  const sh = b?.shape as Record<string, unknown> | undefined;
+  return sh?.type === "disc" && sh.journal !== undefined;
+};
