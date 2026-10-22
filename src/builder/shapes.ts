@@ -8,6 +8,7 @@ import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import { Kinematics, bodyFrameOf, type Setup } from "../kin/compose";
 import { xf } from "../kin/math";
+import { lawRise, type CamLaw } from "../kin/blocks/cam";
 import { sawOutline, starOutline, type StarSpec } from "../kin/blocks/timed";
 import { type Vec3, m3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
@@ -223,6 +224,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const placed = typeof shape.place === "number" ? { exact: { offset: shape.place } } : g.exact || fixed ? { exact: { offset: 0 } } : {};
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.features ? { features: g.features } : {}), ...placed };
     const built = universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? ringWheel(geom) ?? crown(kin, S, b, geom) ?? vergeStaff(geom) ?? geom;
+    if (built.shape.rollers && typeof built.shape.rollers === "object") built.pieces = [...(built.pieces ?? []), ...turretRollers(built)];
     out.set(b.id, withPieces(b, built));
   }
   phaseMeshes(kin, S, out);
@@ -391,6 +393,7 @@ function plateCam(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null 
   if (String(g.shape.type) !== "cam") return null;
   if (g.shape.form === "barrel") return barrel(kin, S, b, g);
   if (g.shape.form === "lobes") return lobes(kin, b, g);
+  if (g.shape.form === "globoid") return globoid(kin, S, b, g);
   if (g.shape.form === "face-groove") return faceGroove(kin, S, b, g);
   const j = kin.joints.find((q) => q.type === "cam-contact" && (q.b === b.id || q.a === b.id) && q.cam);
   const r = j ? S.joints.get(j.id) : undefined;
@@ -620,4 +623,96 @@ function vergeStaff(g: BodyGeom): BodyGeom | null {
   pieces.push({ id: `${g.id}-foliot`, name: "", frame: { o: top, x: [1, 0, 0], z: up }, profile: { outer: roundedPoly([[-L, 0], [L, 0]], 3), holes: [] }, h: 5 });
   for (const s2 of [1, -1]) pieces.push({ id: `${g.id}-weight${s2 > 0 ? 0 : 1}`, name: "", frame: { o: v3.add(top, v3.mul(up, -2)), x: [1, 0, 0], z: up }, profile: { outer: circle(num(fo.weightR, 8), s2 * num(fo.weights, 60), 0, 32), holes: [] }, h: 9 });
   return { ...g, profile: { outer: circle(d / 2, 0, 0, 24), holes: [] }, thick: to - from, approx: false, exact: { offset: from }, pieces };
+}
+
+/**
+ * A roller-gear indexer's globoidal cam (`cam` with `form: globoid`): a blank cylinder of `blank` radius and `length` on
+ * the camshaft, bored for its shaft, with every pose of the turret's rollers over a turn subtracted in the camshaft's
+ * frame (the turret stepping `step` deg by `law` over `index` deg of camshaft from `phi0`, dwelling the rest): what
+ * remains is the rib, the envelope of the rollers, straight over the dwell and twisted over the index (D8, a boolean).
+ * The turret is the cam contact's other body; its shape's `rollers` { n, pitchRadius, diameter, length, firstAt } give
+ * the rollers, radial in its mid-plane.
+ */
+function globoid(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const cj = kin.joints.find((q) => q.type === "cam-contact" && (q.a === b.id || q.b === b.id));
+  if (!cj) return null;
+  const turret = cj.a === b.id ? cj.b : cj.a;
+  const tb = kin.bodies.find((q) => q.id === turret);
+  const tj = kin.joints.find((q) => (q.a === "ground" || q.b === "ground") && (q.a === turret || q.b === turret));
+  const aj = kin.joints.find((q) => (q.a === "ground" || q.b === "ground") && (q.a === b.id || q.b === b.id));
+  if (!tb || !tj || !aj) return null;
+  const B = S.joints.get(tj.id)!;
+  const A = S.joints.get(aj.id)!;
+  const ro = (tb.shape?.rollers ?? {}) as Record<string, number>;
+  const n = num(ro.n, 8);
+  const Rp = num(ro.pitchRadius, 60);
+  const rr = num(ro.diameter, 20) / 2 + num(g.shape.clearance, 0.15);
+  const len = num(ro.length, 18);
+  const first = num(ro.firstAt, 0) * D2R;
+  const step = num(g.shape.step, 45) * D2R;
+  const index = num(g.shape.index, 120) * D2R;
+  const phi0 = num(g.shape.phi0, 0) * D2R;
+  const sense = num(g.shape.sense, 1) >= 0 ? 1 : -1;
+  const law = (String(g.shape.law ?? "modsine") === "modified sine" ? "modsine" : String(g.shape.law ?? "modsine")) as CamLaw;
+  const turn = (p: number) => {
+    const k = Math.floor(p / TAU);
+    return step * (k + lawRise(law, Math.min(1, (p - k * TAU) / index)).s);
+  };
+  const length = num(g.shape.length, 96);
+  const offset = -length / 2;
+  const F = g.frame;
+  const Fy = v3.cross(F.z, F.x);
+  const P0 = v3.add(F.o, v3.mul(F.z, offset));
+  const toPart = (p: Vec3): Vec3 => { const d = v3.sub(p, P0); return [v3.dot(d, F.x), v3.dot(d, Fy), v3.dot(d, F.z)]; };
+  const dirPart = (d: Vec3): Vec3 => [v3.dot(d, F.x), v3.dot(d, Fy), v3.dot(d, F.z)];
+  const features: import("../solids/types").Feature[] = [];
+  const toCam = v3.unit(v3.sub([A.at[0], A.at[1], B.at[2]], [B.at[0], B.at[1], B.at[2]]));
+  const samples = Math.round(num(g.shape.samples, 240));
+  for (let i = 0; i < samples; i++) {
+    const th = (i / samples) * TAU;
+    const t = sense * (turn(phi0 + th) - turn(phi0));
+    // the camshaft turned by th: a world point in the cam's frame is turned back by −th about its axis
+    const back = xf.rotAbout(A.at, A.axis, -th);
+    for (let k = 0; k < n; k++) {
+      const be = first + (k * TAU) / n + t;
+      const d: Vec3 = [Math.cos(be), Math.sin(be), 0];
+      if (v3.dot(d, toCam) < Math.cos(75 * D2R)) continue;
+      // each cutter runs 4 mm past the roller's inner end, so it breaks cleanly through the blank's surface
+      const start = xf.apply(back, v3.add(B.at, v3.mul(d, Rp - len / 2 - 4)));
+      const dir = xf.dir(back, d);
+      const zl = dirPart(dir);
+      const h0: Vec3 = Math.abs(zl[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+      const xl = v3.unit(v3.cross(h0, zl));
+      features.push({ mode: "cut", profile: { outer: circle(rr, 0, 0, 20), holes: [] }, op: { op: "extrude", h: len + 4, steps: 1 }, frame: { o: toPart(start), x: xl, z: zl } });
+    }
+  }
+  return {
+    ...g,
+    profile: { outer: circle(num(g.shape.blank, 50), 0, 0, 96), holes: [circle(num(g.shape.shaft, 20) / 2, 0, 0, 32).reverse()] },
+    thick: length,
+    approx: false,
+    exact: { offset },
+    features,
+  };
+}
+
+/** A turret's radial rollers (`rollers` { n, pitchRadius, diameter, length, firstAt }) in its mid-plane, as pieces. */
+function turretRollers(g: BodyGeom): NonNullable<BodyGeom["pieces"]> {
+  const ro = g.shape.rollers as Record<string, number>;
+  const F = g.frame;
+  const Fy = v3.cross(F.z, F.x);
+  const mid = num(g.shape.place, 0) + g.thick / 2;
+  const out: NonNullable<BodyGeom["pieces"]> = [];
+  const n = num(ro.n, 8);
+  const len = num(ro.length, 18);
+  for (let k = 0; k < n; k++) {
+    // firstAt is from the world x, as the rib reads it; in the body's frame, from its own x
+    const a = num(ro.firstAt, 0) * D2R + (k * TAU) / n;
+    const d: Vec3 = [Math.cos(a), Math.sin(a), 0];
+    const o = v3.add(v3.add(F.o, v3.mul(F.z, mid)), v3.mul(d, num(ro.pitchRadius, 60) - len / 2));
+    const x = v3.unit(v3.cross(F.z, d));
+    out.push({ id: `${g.id}-roller${k}`, name: "", frame: { o, x, z: d }, profile: { outer: circle(num(ro.diameter, 20) / 2, 0, 0, 32), holes: [] }, h: len });
+  }
+  void Fy;
+  return out;
 }

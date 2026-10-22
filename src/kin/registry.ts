@@ -7,7 +7,7 @@ import { D2R, TAU, type Vec3, m3, v3, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
-import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
+import { type CamLaw, type CamSchedule, camMotion, lawRise, pressureAngle } from "./blocks/cam";
 import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
 import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscape, simulateEscapement, simulateStar, simulateVerge, type VergeSpec, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
 
@@ -340,7 +340,7 @@ const willisBlock: BlockFn = (c, s) => {
   if (w.planet !== null) outVal(c, s, w.planet * R2D, "planet");
 };
 
-const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" ? l : "cycloidal");
+const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" || l === "modsine" ? l : "cycloidal");
 
 /**
  * cam. in: joint (a `cam-contact` joint carrying cam: schedule, lift, rb, e, theta0), input (the cam angle, deg),
@@ -795,10 +795,26 @@ const escapementBlock: BlockFn = (c, s) => {
  */
 const indexer: BlockFn = (c, s) => {
   const i = s.in ?? {};
-  const n = i.mode === "mutilated" ? 0 : c.num(i.n);
+  const n = i.mode === "mutilated" || i.mode === "cam" ? 0 : c.num(i.n);
   const phi0 = c.num(i.phi0 ?? 0) * D2R;
   const phi = phi0 + c.delta("in", c.rad(i.input));
   // an external Geneva turns against its crank, an internal one with it
+  if (i.mode === "cam") {
+    // a cam indexer (a roller-gear or barrel indexer): the output steps `step` deg by the law over `index` deg of input
+    // (from φ = 0 each turn) and dwells the rest
+    const step = c.num(i.step) * D2R;
+    const idx = c.num(i.index) * D2R;
+    const law = lawOf(i.law as string | undefined);
+    const at = (p: number) => {
+      const turns = Math.floor(p / TAU);
+      const local = p - turns * TAU;
+      return step * (turns + lawRise(law, Math.min(1, local / idx)).s);
+    };
+    const dm = (c.num(i.sense ?? 1) >= 0 ? 1 : -1) * (at(phi) - at(phi0));
+    if (typeof i.wheel === "string") spin(c, i.wheel, c.vec(i.center), v3.unit(c.vec(i.axis ?? [0, 0, 1])), dm);
+    outVal(c, s, dm * R2D, "angle");
+    return;
+  }
   if (i.mode === "mutilated") {
     // a mutilated gear: the driven gear turns at `ratio` while the driver's toothed `window` (deg, centred on φ = 0)
     // passes the mesh, and is held by the locking rim for the rest of the turn

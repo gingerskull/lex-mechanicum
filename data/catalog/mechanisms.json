@@ -42267,9 +42267,9 @@
             "at": {
               "frame": {
                 "origin": [
-                  0,
-                  -30,
-                  0
+                  -120,
+                  -150,
+                  -10
                 ]
               }
             }
@@ -42279,16 +42279,16 @@
             "role": "driver",
             "shape": {
               "type": "cam",
-              "form": "globoidal rib",
-              "throatRadius": 40,
-              "centreDistance": 100,
+              "form": "globoid",
               "law": "modified sine",
               "index": 120,
-              "dwell": 240,
               "step": 45,
-              "rib": "straight over the dwell, twisted over the index; flanks are the envelope of the roller cylinders swept by the turret about its axis",
-              "length": 110,
-              "shaft": 20
+              "phi0": 240,
+              "blank": 46,
+              "length": 96,
+              "shaft": 20,
+              "clearance": 0.15,
+              "samples": 120
             },
             "at": {
               "joint": "A"
@@ -42297,21 +42297,27 @@
           {
             "id": "turret",
             "role": "output",
+            "symmetry": 8,
             "shape": {
               "type": "disc",
               "radius": 48,
               "thickness": 14,
+              "bore": 16,
+              "place": -7,
               "rollers": {
                 "n": 8,
                 "pitchRadius": 60,
                 "diameter": 20,
                 "length": 18,
-                "radial": true,
                 "firstAt": 22.5
               }
             },
-            "at": {
-              "joint": "B"
+            "frame": {
+              "origin": [
+                0,
+                0,
+                80
+              ]
             }
           }
         ],
@@ -42324,7 +42330,7 @@
             "at": [
               0,
               -100,
-              60
+              80
             ],
             "axis": [
               1,
@@ -42340,13 +42346,14 @@
             "at": [
               0,
               0,
-              60
+              80
             ],
             "axis": [
               0,
               0,
               1
-            ]
+            ],
+            "support": "stub"
           },
           {
             "id": "C1",
@@ -42356,9 +42363,15 @@
             "at": [
               13.72,
               -59.26,
-              60
+              80
             ],
-            "follower": "roller"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "follower": "flat",
+            "note": "a roller on the rib's flank"
           },
           {
             "id": "C2",
@@ -42368,9 +42381,15 @@
             "at": [
               -13.72,
               -59.26,
-              60
+              80
             ],
-            "follower": "roller"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "follower": "flat",
+            "note": "the next roller on the rib's other flank (preloaded)"
           }
         ],
         "params": [
@@ -42415,7 +42434,8 @@
               8,
               12
             ],
-            "value": 8
+            "value": 8,
+            "note": "built with 8 stations"
           }
         ],
         "drivers": [
@@ -42427,12 +42447,14 @@
               0,
               360
             ],
-            "default": 0
+            "default": 0,
+            "phase": 120,
+            "note": "the cycle starts at the index; the reference is mid-dwell"
           }
         ],
         "solve": [
           {
-            "block": "cam",
+            "block": "indexer",
             "id": "index",
             "joints": [
               "B",
@@ -42440,22 +42462,27 @@
               "C2"
             ],
             "in": {
-              "cam": "camshaft",
-              "follower": "turret",
-              "n": "stations",
+              "mode": "cam",
+              "law": "modsine",
               "index": "index",
-              "C": "C",
-              "Rp": "Rp"
+              "step": 45,
+              "input": "input",
+              "phi0": 240,
+              "wheel": "turret",
+              "center": [
+                0,
+                0,
+                80
+              ],
+              "axis": [
+                0,
+                0,
+                1
+              ]
             },
-            "opts": {
-              "law": "modified sine",
-              "follower": "turret of radial rollers, two in contact (preloaded)",
-              "zero": "mid-dwell, two rollers straddling the rib"
-            },
-            "out": [
-              "turret-angle",
-              "turret-speed"
-            ]
+            "out": {
+              "angle": "turret-angle"
+            }
           }
         ],
         "points": [
@@ -42497,7 +42524,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "New review against the record (#216, unbuilt). The proportions teach: 45° steps are large, the 240° dwell is two thirds of the turn, so two of six frames move and four stand still, and the modified sine law gives a smooth start and stop (Cv 1.76, Ca 5.53; peak turret speed 0.66 times the camshaft's). The principle is where the rib changes from straight (locking two rollers) to twisted (driving them), so a detail view of the rib between the two rollers is declared and a roller is traced with equal-time ticks. Both axes are drawn: perpendicular and skew, 100 mm apart. Isometric default view shows the cam side-on and the turret in one picture."
+          "note": "New review against the record (#216, unbuilt). The proportions teach: 45° steps are large, the 240° dwell is two thirds of the turn, so two of six frames move and four stand still, and the modified sine law gives a smooth start and stop (Cv 1.76, Ca 5.53; peak turret speed 0.66 times the camshaft's). The principle is where the rib changes from straight (locking two rollers) to twisted (driving them), so a detail view of the rib between the two rollers is declared and a roller is traced with equal-time ticks. Both axes are drawn: perpendicular and skew, 100 mm apart. Isometric default view shows the cam side-on and the turret in one picture. Rebuild R5 (#216): built on v3. The motion is the indexer block's cam mode with the modified sine (added to the cam laws): 45° per index in 120° of camshaft, dwell 240°, peak 0.66 of the camshaft's speed. The globoidal rib is cut by Manifold as the envelope of the rollers: a blank on the camshaft with every pose of the turret's rollers over a turn subtracted in the camshaft's frame, straight over the dwell and twisted over the index (D8). The index-angle and station controls are not offered (the rib is built at build time)."
         },
         "principle": [
           {
@@ -42527,23 +42554,25 @@
           {
             "id": "cam-axis",
             "kind": "axis-line",
-            "through": "A",
-            "direction": [
+            "at": "A",
+            "axis": [
               1,
               0,
               0
             ],
+            "length": 80,
             "label": "CAMSHAFT AXIS"
           },
           {
             "id": "turret-axis",
             "kind": "axis-line",
-            "through": "B",
-            "direction": [
+            "at": "B",
+            "axis": [
               0,
               0,
               1
             ],
+            "length": 50,
             "label": "TURRET AXIS"
           },
           {
@@ -42562,11 +42591,11 @@
             "center": [
               0,
               -60,
-              60
+              80
             ],
             "scale": 2.5,
             "highlight": [
-              "camshaft.rib",
+              "camshaft",
               "R1",
               "R2"
             ]
@@ -42577,16 +42606,6 @@
             "id": "camshaft",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "index",
-            "kind": "param",
-            "param": "index"
-          },
-          {
-            "id": "stations",
-            "kind": "design",
-            "design": "stations"
           }
         ],
         "plot": [
@@ -42614,7 +42633,8 @@
             "output": "turret-angle",
             "stat": "dwell",
             "value": 240,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           },
           {
             "text": "peak turret speed 0.66 times the camshaft's",

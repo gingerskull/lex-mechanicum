@@ -140,7 +140,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
-    if (key === "kind" || key === "mode" || key === "form" || key === "plane") return;
+    if (key === "kind" || key === "mode" || key === "form" || key === "plane" || key === "law") return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   for (const s of kin.solve) {
