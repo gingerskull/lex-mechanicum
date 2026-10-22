@@ -1,8 +1,8 @@
 // A ball-and-disc integrator: a ball held in a cage on a carriage rolls on a disc's face at the carriage's radius and
 // drives a cylinder above it. The ball is a sphere standing where its cage puts it. The carriage is an arm over the
 // disc's face, its cage round the ball's equator open below (onto the disc) and toward the cylinder; the arm runs out past
-// the disc's rim to a block that straddles a rail on the base, with end stops past its travel (F5). Its drive pin (the
-// driver's `pin`) is taken down through the base by the yoke drive (src/builder/compliant.ts).
+// the disc's rim to a block that straddles a rail on the base, with end stops past its travel (F5). The rail runs
+// outboard of the block's middle, so the linear drive's slot and carriage run under the block's inner half (V5).
 import { TAU, roundRect, type Vec2 } from "../core/geom";
 import { H } from "../hardware/primitives";
 import { v3, type Vec3 } from "../kin/math";
@@ -94,10 +94,11 @@ function buildCarriage(ctx: BuildCtx, b: KinBody): void {
   const L = new Local({ o: [F.o[0], F.o[1], 0], x: F.x, z: [0, 0, 1] }, { joints: [sj.id] });
   const rail = { h: 8, w: 12 };
   const bx = -reach + 8;
-  const blockW = 30;
+  // the rail runs outboard of the block's middle, so the drive's slot can run under the block's inner half (V5)
+  const rx = bx - 10;
   const blockL = 24;
-  L.add(H.solid(`${body}-block`, { name: "Carriage block, the arm screwed to it, over the rail", kind: "part", role: "driver", mat: "Steel C45", outer: roundRect(bx - blockW / 2, -blockL / 2, bx + blockW / 2, blockL / 2, 2), z0: bt + rail.h + 0.3, z1: armBot, body, group: body }));
-  for (const [k, s] of [[0, -1], [1, 1]] as const) L.add(H.solid(`${body}-cheek${k}`, { name: "", kind: "part", role: "driver", mat: "Steel C45", outer: roundRect(s < 0 ? bx - blockW / 2 : bx + rail.w / 2 + 0.3, -blockL / 2, s < 0 ? bx - rail.w / 2 - 0.3 : bx + blockW / 2, blockL / 2, 1), z0: bt + 0.6, z1: bt + rail.h + 0.3, body, group: body }));
+  L.add(H.solid(`${body}-block`, { name: "Carriage block, the arm screwed to it, over the rail", kind: "part", role: "driver", mat: "Steel C45", outer: roundRect(rx - 12, -blockL / 2, bx + 15, blockL / 2, 2), z0: bt + rail.h + 0.3, z1: armBot, body, group: body }));
+  for (const [k, s] of [[0, -1], [1, 1]] as const) L.add(H.solid(`${body}-cheek${k}`, { name: "", kind: "part", role: "driver", mat: "Steel C45", outer: roundRect(s < 0 ? rx - 12 : rx + rail.w / 2 + 0.3, -blockL / 2, s < 0 ? rx - rail.w / 2 - 0.3 : rx + 12, blockL / 2, 1), z0: bt + 0.6, z1: bt + rail.h + 0.3, body, group: body }));
   for (const [k, y] of [[0, -6], [1, 6]] as const) L.add(H.screw(`${body}-as${k}`, "socket", 4, 8, { body, at: [bx, y, 0], face: armBot + c.h, dir: -1, ...(k ? { name: "", qty: 0 } : { qty: 2, name: "Socket screw M4, the arm to its block" }) }));
   // the rail, dowelled to the base, with an end stop and a pad past each end of the travel (F1, F5)
   const sgn = v3.dot(axis, [0, 1, 0]) >= 0 ? 1 : -1;
@@ -107,11 +108,11 @@ function buildCarriage(ctx: BuildCtx, b: KinBody): void {
   const y1 = sgn * t1 + blockL / 2 + 10;
   const ya = Math.min(y0, -y1, y1, -y0);
   const yb = Math.max(y0, -y1, y1, -y0);
-  L.add(H.plate(`${body}-rail`, roundRect(bx - rail.w / 2, ya, bx + rail.w / 2, yb, 1), { kind: "plate", role: "ground", name: "Carriage rail, ground, screwed and dowelled to the base", z0: bt, z1: bt + rail.h, mat: "Steel C45, ground" }));
-  for (const [k, y] of [[0, ya + 5], [1, yb - 5]] as const) L.add(H.dowel(`${body}-rd${k}`, 3, { at: [bx, y, 0], z0: bt - 5, z1: bt + rail.h - 1, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, rail to base", qty: 2 }) }));
+  L.add(H.plate(`${body}-rail`, roundRect(rx - rail.w / 2, ya, rx + rail.w / 2, yb, 1), { kind: "plate", role: "ground", name: "Carriage rail, ground, screwed and dowelled to the base", z0: bt, z1: bt + rail.h, mat: "Steel C45, ground" }));
+  for (const [k, y] of [[0, ya + 5], [1, yb - 5]] as const) L.add(H.dowel(`${body}-rd${k}`, 3, { at: [rx, y, 0], z0: bt - 5, z1: bt + rail.h - 1, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 h6, rail to base", qty: 2 }) }));
   for (const [k, y, s] of [[0, ya, 1], [1, yb, -1]] as const) {
-    L.add(H.stop(`${body}-stop${k}`, roundRect(bx - blockW / 2, Math.min(y, y + s * 6), bx + blockW / 2, Math.max(y, y + s * 6), 1), { z0: bt + rail.h, z1: bt + rail.h + 8, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    L.add(H.bumper(`${body}-pad${k}`, 3, 8, { at: [bx, y + s * 8, 0], z0: bt + rail.h + 2, z1: bt + rail.h + 6, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    L.add(H.stop(`${body}-stop${k}`, roundRect(rx - 12, Math.min(y, y + s * 6), rx + 12, Math.max(y, y + s * 6), 1), { z0: bt + rail.h, z1: bt + rail.h + 8, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    L.add(H.bumper(`${body}-pad${k}`, 3, 8, { at: [rx, y + s * 8, 0], z0: bt + rail.h + 2, z1: bt + rail.h + 6, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
   }
   ctx.add(L.out());
   ctx.note({ id: sj.id, kit: "J5", at: ctx.S.joints.get(sj.id)!.at, title: `J5 · ${titleOf(sj.id)}`, note: `${titleOf(sj.id)}: the carriage's arm reaches over the disc's face to the cage round the ball (open below onto the disc and toward the cylinder); its block straddles a rail screwed and dowelled to the base past the disc's rim, with an end stop and a pad past each end of the ${(t1 - t0).toFixed(0)} mm travel (F5).`, badge: ["ball held at its radius", "ok"], serves: { F1: [`${body}-rd0`], F5: [`${body}-stop0`, `${body}-stop1`] } });

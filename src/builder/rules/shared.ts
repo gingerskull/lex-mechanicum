@@ -18,6 +18,7 @@ import { lowestZ } from "./core";
 import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 import type { Site } from "../sites";
+import { linearDrive, manualDrive, oscillatingDrive } from "./drive";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
@@ -286,9 +287,6 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
  * A driver the belt drive serves: a rotary input, or an oscillating one that turns its shaft more than a turn each way
  * (a screw's input: the motor reverses, V5's crank and link cannot swing a shaft through several turns).
  */
-/** A driver the belt drive serves: rotary or oscillating, unless a Scotch yoke takes it at a pin. */
-const beltServed = (d: { kind: string; pin?: unknown }): boolean => (d.kind === "rotary" || d.kind === "oscillating") && typeof d.pin !== "string";
-
 const beltDriven = (d: { kind: string; lo?: number; hi?: number; range?: [number, number] }): boolean => {
   if (d.kind === "rotary") return true;
   if (d.kind !== "oscillating") return false;
@@ -297,16 +295,70 @@ const beltDriven = (d: { kind: string; lo?: number; hi?: number; range?: [number
   return Math.abs(hi - lo) > 360;
 };
 
+/** Plan boxes [x0, y0, x1, y1] of a second drive's parts under the base, each moving one's over the cycle. */
+function secondDriveBoxes(ctx: BuildCtx): [number, number, number, number][] {
+  const out: [number, number, number, number][] = [];
+  for (const q of ctx.solids) {
+    if (!q.id.startsWith("drive2")) continue;
+    const pts = worldPoints(ctx.M, q);
+    const xs: number[] = [];
+    const ys: number[] = [];
+    const moves = q.body !== "ground" ? (ctx.sampled.xfs.get(q.body) ?? []) : [];
+    for (const X of moves.length ? moves : [null])
+      for (const p of pts) {
+        xs.push(p[0] + (X ? X.t[0] : 0));
+        ys.push(p[1] + (X ? X.t[1] : 0));
+      }
+    out.push([Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]);
+  }
+  return out;
+}
+
+/**
+ * Builds a drive as a second one beside the first: what it adds (solids, base holes, its note) is renamed from drive-* to
+ * drive2-*, so the first drive, built after it, keeps its own ids.
+ */
+function secondDrive(ctx: BuildCtx, build: () => void): void {
+  const n0 = ctx.solids.length;
+  const h0 = ctx.baseHoles.length;
+  const k0 = ctx.notes.length;
+  build();
+  const re = (x: string) => x.replace(/^drive(?=-|$)/, "drive2");
+  for (const q of ctx.solids.slice(n0)) {
+    q.id = re(q.id);
+    if (q.group) q.group = re(q.group);
+    q.joints = q.joints.map(re);
+  }
+  for (const h of ctx.baseHoles.slice(h0)) h.joint = re(h.joint);
+  for (const nt of ctx.notes.slice(k0)) {
+    nt.id = re(nt.id);
+    nt.title = nt.title.replace(/^Drive/, "Drive 2");
+    if (nt.serves) for (const f of Object.keys(nt.serves) as (keyof typeof nt.serves)[]) nt.serves[f] = nt.serves[f]!.map(re);
+  }
+}
+
 export const drive: Rule = {
   id: "drive",
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  // a rotary input, or an oscillating one (the same motor and belt, the motor reversing through the stroke: a servo);
-  // a driver with a `pin` is the yoke drive's (src/builder/compliant.ts)
-  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some(beltServed),
+  applies: (ctx) => (ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary")) || ctx.kin.drivers.some((d) => d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"),
   apply(ctx) {
-    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary" && beltServed(d)) ?? ctx.kin.drivers.find(beltServed);
+    // an oscillating or a linear input has its own drive (rules/drive.ts); a rotary one is belted to its shaft. An input
+    // that turns a shaft in plan more than a turn each way (a screw's) is belted the same way, the motor reversing: V5's
+    // crank and link cannot swing it through several turns, and its step-up sector is for a shaft on the base normal
+    // (the one exception to V5's oscillating form)
+    const reversing = (d: (typeof ctx.kin.drivers)[number]) => d.kind === "oscillating" && beltDriven(d) && ctx.sites.some((s) => s.inPlan && s.joints.includes(d.joint ?? ""));
+    const rotary = ctx.kin.drivers.find((d) => d.kind === "rotary" || reversing(d));
+    const extra = ctx.kin.drivers.filter((d) => (d.kind === "oscillating" && !reversing(d)) || d.kind === "linear");
+    if (!rotary) {
+      const other = extra[0];
+      if (other) return other.kind === "oscillating" ? oscillatingDrive(ctx, other) : linearDrive(ctx, other);
+      return manualDrive(ctx);
+    }
+    // a second input beside a rotary one (an integrator's carriage beside its disc): its own V5 drive, ids drive2-*
+    for (const o of extra) secondDrive(ctx, () => (o.kind === "oscillating" ? oscillatingDrive(ctx, o) : linearDrive(ctx, o)));
+    const drv = rotary;
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
@@ -323,9 +375,13 @@ export const drive: Rule = {
     const C = 46;
     let M: Vec2 | null = null;
     let best = -1;
+    // a second drive already under the base (drive2-*): its parts' plan boxes, a moving part's over its travel
+    const taken = secondDriveBoxes(ctx);
     for (let k = 0; k < 12; k++) {
       const a = (k / 12) * TAU;
       const m = polar(S, C, a);
+      // the flange is 58 mm square about the motor
+      if (taken.some((b) => m[0] + 32 > b[0] && m[0] - 32 < b[2] && m[1] + 32 > b[1] && m[1] - 32 < b[3])) continue;
       const clear = Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999);
       if (clear > best) {
         best = clear;
@@ -387,7 +443,7 @@ export const drive: Rule = {
     const tb = polar(M, 36, dir);
     ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
     ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));
-    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base${drv?.kind === "oscillating" ? ", run as a servo that reverses through the stroke" : ""}, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
     void LEVER_WALL;
   },
 };

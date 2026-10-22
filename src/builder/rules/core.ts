@@ -103,6 +103,13 @@ export function lowestZ(ctx: BuildCtx, below = Infinity): number {
   return z;
 }
 
+/** A hole ring turned clockwise, as the base's holes are. */
+const clockwise = (r: readonly (readonly [number, number])[]): Vec2[] => {
+  const a = r.reduce((s, p, i) => s + p[0] * r[(i + 1) % r.length]![1] - r[(i + 1) % r.length]![0] * p[1], 0);
+  const pts = r.map((p): Vec2 => [p[0], p[1]]);
+  return a > 0 ? pts.reverse() : pts;
+};
+
 export const base: Rule = {
   id: "base",
   tier: "AUTO",
@@ -154,6 +161,7 @@ export const base: Rule = {
     for (const h of ctx.baseHoles) {
       grow([h.at[0] - h.r, h.at[1] - h.r]);
       grow([h.at[0] + h.r, h.at[1] + h.r]);
+      for (const p of h.ring ?? []) grow(p);
     }
     if (!isFinite(x0)) return;
     const m = 16;
@@ -163,8 +171,7 @@ export const base: Rule = {
     const corners: Vec2[] = [[x0 - m + inset, y0 - m + inset], [x1 + m - inset, y0 - m + inset], [x1 + m - inset, y1 + m - inset], [x0 - m + inset, y1 + m - inset]];
     const holes: Vec2[][] = [];
     for (const c of corners) holes.push(circle(2.75, c[0], c[1], 20).reverse());
-    for (const h of ctx.baseHoles) holes.push(circle(h.r, h.at[0], h.at[1], Math.max(20, Math.round(h.r * 4))).reverse());
-    for (const sl of ctx.baseSlots) holes.push([...sl].reverse() as Vec2[]);
+    for (const h of ctx.baseHoles) holes.push(h.ring ? clockwise(h.ring) : circle(h.r, h.at[0], h.at[1], Math.max(20, Math.round(h.r * 4))).reverse());
     // the 5 mm engraved scale along the front edge and the traced paths engraved (A7)
     const ticks: Vec2[][] = [];
     const sx0 = Math.ceil((x0 - m + 14) / 5) * 5;

@@ -395,8 +395,7 @@
      ],
      "default": 0,
      "lo": 0,
-     "hi": 160,
-     "pin": "haulPin"
+     "hi": 160
     }
    ],
    "solve": [
@@ -1906,8 +1905,7 @@
      ],
      "default": 0,
      "lo": -2,
-     "hi": 2,
-     "pin": "T"
+     "hi": 2
     }
    ],
    "solve": [
@@ -2511,8 +2509,7 @@
      ],
      "default": 0,
      "lo": 0,
-     "hi": 13.89,
-     "pin": "Q"
+     "hi": 13.89
     }
    ],
    "solve": [
@@ -3717,7 +3714,7 @@
     {
      "id": "knob",
      "joint": "fixed-thread",
-     "kind": "oscillating",
+     "kind": "manual",
      "range": [
       0,
       3600
@@ -4597,7 +4594,7 @@
      "a": "ground",
      "b": "carriage",
      "at": [
-      0,
+      -71,
       0,
       26
      ],
@@ -4724,9 +4721,7 @@
      "lo": -40,
      "hi": 40,
      "phase": 90,
-     "note": "by default x = 40 sin(disc angle): a quarter turn ahead of a cosine sweep",
-     "pin": "P",
-     "yokeSide": -1
+     "note": "by default x = 40 sin(disc angle): a quarter turn ahead of a cosine sweep"
     }
    ],
    "solve": [

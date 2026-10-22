@@ -123,6 +123,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     if (s.joints.length) p.joints = [...s.joints];
     if (s.group !== undefined) p.group = s.group;
     if (s.motion) p.motion = s.motion;
+    if (s.drive) p.drive = s.drive;
     if (s.mat !== undefined) p.mat = s.mat;
     if (s.closure) p.closure = s.closure;
     if (s.headKind) p.headKind = s.headKind;

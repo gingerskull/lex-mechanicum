@@ -81,12 +81,12 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 | A13 | PASS | AUTO / HAND · 67 solids, 39 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | PASS | HAND · 3 joint notes; no note: none; no badge: none · a note per joint with its badge; build rules: the screw advances through the fixed nut, hand turned at a knob; the moving nut flanged to its carriage; anti-rotation by a fork on a rail |
+| A16 | PASS | HAND · 4 joint notes; no note: none; no badge: none · a note per joint with its badge; build rules: the screw advances through the fixed nut, hand turned at a knob; the moving nut flanged to its carriage; anti-rotation by a fork on a rail |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
 | A18 | PASS | AUTO · placement: 2 slabs in the tallest stack (225.0 mm), 0 clevises; stack per joint in the Joints table · screw and nuts stand on their axis where the joints put them; no slabs to place |
 | A19 | PASS | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none · no stack support routed: the fixed nut's pedestal and the rail posts stand clear of every sweep (A15) |
 | A20 | PASS | AUTO · support per joint: none · no revolute stack: the screw is held by its nuts |
-| A21 | PASS | AUTO · kit per joint: fixed-thread J11, moving-thread J11, guide J11 |
+| A21 | PASS | AUTO · kit per joint: fixed-thread J11, moving-thread J11, guide J11, drive drive |
 | A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (no solids) · end stops on the rail |
 | E1 | PASS | AUTO · every solid has one explode level; levels -5.5 to 16 · one level per solid, nothing stretches |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
@@ -117,7 +117,7 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 | F4 | PASS | AUTO / HAND · served at no joint; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (no solids), trunnion (no solids), j11-screw (59 solids) · the screw's thrust carried by the fixed nut's flanks into its pedestal |
 | F5 | PASS | AUTO / HAND · served at guide; fired: j5-slide (no solids), pawl-tooth (no solids), j11-screw (59 solids), j13-compliant (no solids), stops (no solids) · an end stop with a neoprene pad on the rail past each end of the nut's travel |
 | F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
-| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · nothing to adjust |
+| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (no solids), j12-cvt (no solids), j5-slide (no solids), j12-other (no solids), adjustable-length (no solids) · nothing to adjust |
 | F8 | PASS | AUTO · served at fixed-thread, moving-thread; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (59 solids), lubrication (no solids) · felt wipers at both ends of each nut, grease nipples on the pedestal and the carriage |
 | F9 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (no solids) · no phase to keep between parts |
 | F10 | N/A | AUTO / HAND · served at no joint; fired: j12-flexible (no solids), drive (no solids) · hand turned at the knob: no motor to protect or sense |
@@ -135,11 +135,11 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
 | M13 | PASS | AUTO / HAND · 14 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | PASS | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · bronze pads in the fork's jaws are the replaceable wear parts on the rail |
-| V1 | N/A | AUTO · fired: drive (no solids) · the screw advances 50 mm through its fixed nut, so a belt drive could not follow it: turned by hand at a knurled knob on its end (V5 manual), animated by its oscillating driver |
+| V1 | N/A | AUTO · fired: drive (no solids) · a manual input (V5's hand stroke): the screw advances 50 mm through its fixed nut, so it is turned by hand at the knurled knob on its end; no motor |
 | V2 | N/A | AUTO · fired: drive (no solids) · no motor |
 | V3 | N/A | AUTO / HAND · fired: drive (no solids) · no belt |
 | V4 | N/A | AUTO · fired: j8-belt (no solids) · no drive belt |
-| V5 | PASS | AUTO · fired: drive (no solids) · hand drive: a knurled knob on the screw's free end with an index line, the travel ended by the rail's stops |
+| V5 | PASS | AUTO · fired: drive (no solids) · hand drive: the screw kit's knurled knob on the screw's free end with an index line, the travel ended by the rail's stops; the cycle works the hand stroke |
 | V6 | N/A | AUTO · fired: drive (no solids), cable-clip (no solids) · no motor, no sensor |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
@@ -154,7 +154,7 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 17.8 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 17.9 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop): setup 24.9 ms over the 20 ms target (two helices tessellated in the browser); the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -182,6 +182,7 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 | fixed-thread | J11 | driver | – | – | Dowel pin Ø4 x 12 h6, nut block to base | none | Flanged bronze nut Tr24x5, right hand, fixed; Socket head M3 x 12 (ISO 4762) | none | none | none | none | Felt wiper ring 24 x 30, at each end of the nut; Grease nipple M6 (DIN 71412) | none | none |
 | moving-thread | J11 | screw | – | – | none | none | Flanged bronze nut Tr20x4, right hand; Socket head M3 x 12 (ISO 4762) | none | none | none | none | Felt wiper ring 20 x 26, at each end of the nut; Grease nipple M6 (DIN 71412) | none | none |
 | guide | J11 | – | – | – | Rail post, screwed and dowelled to the base | none | Flag with a fork, keeps the nut from turning; Bronze pad, bears on the guide rail | none | 2 x End stop on the rail, screwed down | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | none |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -208,5 +209,5 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 None: the fixed nut and the knob are part of the screw kit (J11).
 
 ## Verification
-check: clean · K1 residual: 3.3e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.8 KB
+check: clean · K1 residual: 3.3e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.9 KB
 screenshots: dist/shots3/differential-screw (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

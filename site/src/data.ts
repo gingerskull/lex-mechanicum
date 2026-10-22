@@ -91,8 +91,9 @@ export function controlsOf(rec: CatalogRecord): StageControl[] {
       if (d && ids.length) out.push({ id: c.id, label, target: "select", key: d.id, type: "choice", value: String(d.default ?? ids[0]), options: ids.map((o) => ({ value: o, label: o })) });
     } else if (c.kind === "driver") {
       const d = kin.drivers.find((x) => x.id === c.driver);
-      // the first rotary, oscillating or linear driver is the cycle (the scrubber); another driver, held by hand, is a slider
-      const cycle = kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating" || x.kind === "linear");
+      // the first rotary, oscillating or linear driver, or a hand stroke (a manual driver with lo and hi), is the cycle (the
+      // scrubber); another driver, held by hand, is a slider
+      const cycle = kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating" || x.kind === "linear" || (x.kind === "manual" && typeof x.lo === "number" && typeof x.hi === "number"));
       if (d && d !== cycle && d.range) out.push({ id: c.id, label, target: "drivers", key: d.id, type: "range", min: d.range[0], max: d.range[1], step: stepOf(d.range[0], d.range[1]), value: Number(d.default ?? d.range[0]), unit: d.kind === "linear" ? "mm" : "°" });
     }
   }

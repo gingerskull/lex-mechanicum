@@ -1,9 +1,9 @@
 # Audit: Pantograph (pantograph)
-standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 139 · FAIL 0 · N/A 28 · open: none
+PASS 140 · FAIL 0 · N/A 27 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -64,10 +64,10 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 74 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 76 solids unsound |
 | D7 | PASS | HAND · links plain; the richness in the stacks |
-| A1 | PASS | AUTO · A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops · every joint read from the record and built by its kit |
-| A2 | PASS | AUTO · A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops · ground pivots by their kits (live shaft J2, dead axle J1), moving pins J3 (Joints table) |
+| A1 | PASS | AUTO · A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops, drive drive · ground pivots by their kits (live shaft J2, dead axle J1), moving pins J3 (Joints table) |
 | A3 | PASS | AUTO · fired: classify (5 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them |
 | A4 | PASS | AUTO · fired: j1-dead-axle (26 solids), axial stack builder · stepped shafts with shoulders, grooves, flats and chamfered ends (H.shaft) |
 | A5 | PASS | AUTO · fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
@@ -78,17 +78,17 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | A10 | PASS | HAND · fired: placement (8 solids), placement solver · slabs from the placement solver (Joints table) |
 | A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (26 solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · 74 solids, 41 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A13 | PASS | AUTO / HAND · 76 solids, 41 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | PASS | HAND · 6 joint notes; no note: none; no badge: none · a note and badge per joint; build rules: stops and a swing scale on arm-O |
+| A16 | PASS | HAND · 7 joint notes; no note: none; no badge: none · a note and badge per joint; build rules: stops and a swing scale on arm-O |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
 | A18 | PASS | AUTO · placement: 2 slabs in the tallest stack (16.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver |
 | A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O-bridge · routed, least gap 1.5 mm; see-through where it still covers a principle part |
 | A20 | PASS | AUTO · support per joint: O bridge · one axial stack builder with its support selector |
-| A21 | PASS | AUTO · kit per joint: A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops |
+| A21 | PASS | AUTO · kit per joint: A J3, M1 J3, M2 J3, T J3, O J1, O-arm-O-stops stops, drive drive |
 | A22 | PASS | AUTO · fired: stops (4 solids), adjustable-length (no solids), cable-clip (no solids) · promoted fixes fired where they apply (stops and swing scale on swinging parts, cable clip on a drive lead) |
-| E1 | PASS | AUTO · every solid has one explode level; levels -2 to 2.5 · one level per solid, nothing stretches |
+| E1 | PASS | AUTO · every solid has one explode level; levels -2 to 3.5 · one level per solid, nothing stretches |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
 | E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
 | E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
@@ -120,7 +120,7 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · no exact length or mesh to adjust |
 | F8 | PASS | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (1 solid) · grease nipples, wipers and oil sinks where fitted; the other bearings sealed |
 | F9 | PASS | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (2 solids) · zero line on the input and on the base (timing marks) |
-| F10 | N/A | AUTO / HAND · served at no joint; fired: j12-flexible (no solids), drive (no solids) · no motor: an input set by a path is not built by the drive rule yet (follow-up); the stylus is moved by hand |
+| F10 | N/A | AUTO / HAND · served at no joint; fired: j12-flexible (no solids), drive (2 solids) · manual input: not motor-driven |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
 | M2 | PASS | HAND · bosses round every loaded hole |
 | M3 | PASS | AUTO · fired: j3-moving-pin (36 solids), hardware primitives · bore entry chamfers |
@@ -130,17 +130,17 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | M7 | N/A | HAND · no bracket corner turns a load |
 | M8 | PASS | AUTO · fired: j1-dead-axle (26 solids) · thread undercuts on stepped shafts |
 | M9 | PASS | AUTO / HAND · fired: j1-dead-axle (26 solids) · ISO coarse threads, engagement through the tapped part or to a nut |
-| M10 | PASS | AUTO / HAND · 70 of 74 solids name a material · materials named by kind and role |
+| M10 | PASS | AUTO / HAND · 72 of 76 solids name a material · materials named by kind and role |
 | M11 | PASS | AUTO · fired: j1-dead-axle (26 solids), hardware primitives · centre holes, chamfered ends on turned parts |
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
 | M13 | PASS | AUTO / HAND · 10 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
-| V1 | N/A | AUTO · fired: drive (no solids) · no motor: an input set by a path is not built by the drive rule yet (follow-up); the stylus is moved by hand |
-| V2 | N/A | AUTO · fired: drive (no solids) · no motor: an input set by a path is not built by the drive rule yet (follow-up); the stylus is moved by hand |
-| V3 | N/A | AUTO / HAND · fired: drive (no solids) · no motor: an input set by a path is not built by the drive rule yet (follow-up); the stylus is moved by hand |
-| V4 | N/A | AUTO · fired: j8-belt (no solids) · no belt |
-| V5 | N/A | AUTO · fired: drive (no solids) · no motor: an input set by a path is not built by the drive rule yet (follow-up); the stylus is moved by hand |
-| V6 | N/A | AUTO · fired: drive (no solids), cable-clip (no solids) · no motor: an input set by a path is not built by the drive rule yet (follow-up); the stylus is moved by hand |
+| V1 | N/A | AUTO · fired: drive (2 solids) · manual input: hand operated, no motor (V1 motorises rotary, oscillating and linear inputs) |
+| V2 | N/A | AUTO · fired: drive (2 solids) · manual input: no motor, no bracket |
+| V3 | N/A | AUTO / HAND · fired: drive (2 solids) · manual input: no belt or pulleys |
+| V4 | N/A | AUTO · fired: j8-belt (no solids) · manual input: no drive belt |
+| V5 | PASS | AUTO · fired: drive (2 solids) · manual: a knob on a shoulder screw beside the stylus; the stylus runs a closed path, so its range has no end to stop; the page says hand operated |
+| V6 | N/A | AUTO · fired: drive (2 solids), cable-clip (no solids) · manual input: no motor or sensor to wire |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
 | L3 | PASS | HAND · roles right on every solid (both sheets) |
@@ -154,14 +154,14 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 14.3 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 14.7 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
 | R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
 | R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
-| DL1 | PASS | AUTO / HAND · 24 of 74 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL1 | PASS | AUTO / HAND · 25 of 76 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
 | DL2 | PASS | HAND · default dial: full |
 | DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
 | DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
@@ -169,7 +169,7 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | PASS | package v2 written, 14.3 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q3 | PASS | package v2 written, 14.7 KB; site build not checked here · package v2 written; site builds (npm run build) |
 | Q4 | PASS | local: tools/shot · dist/shots3/<id>: record view, PLAN, FRONT, SIDE, ISOMETRIC, full explode, both sheets |
 | Q5 | PASS | local: tools/bench · tools/bench run: dist/bench/report-v2.md |
 | Q6 | PASS | every row judged |
@@ -185,6 +185,7 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | T | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | O | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | O-arm-O-stops | stops | – | – | – | none | none | none | none | Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | none |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -201,16 +202,16 @@ PASS 139 · FAIL 0 · N/A 28 · open: none
 | DL-A | 10 | 0 | 1.42 |
 | DL-B | 0 | 124 | 1.47 |
 | DL-C | 0 | 0 | 1.38 |
-| DL-D | 10 | 0 | 1.37 |
+| DL-D | 11 | 0 | 1.37 |
 | DL-E | 0 | 1 | 1.35 |
 | DL-F | 0 | 0 | 1.42 |
 | DL-G | 0 | 0 | 1.46 |
 | DL-H | 4 | 0 | 1.38 |
-| never | 50 | 151 | 1.43 |
+| never | 51 | 151 | 1.43 |
 
 ## Promotion candidates
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 8.5e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.3 KB
+check: clean · K1 residual: 8.5e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.7 KB
 screenshots: dist/shots3/pantograph (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.2
+version: 3.3
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -299,7 +299,6 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
 | `stops` | F5, A22 |
 | `drive` | V1, V2, V3, V5, V6, F10 |
-| `yoke-drive` | V1, V2, V5, V6, F10 |
 | `adjustable-length` | F7, A22 |
 | `cable-clip` | A22, V6 |
 | `standoffs` | A6 |
@@ -863,6 +862,12 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.3 (2026-10-22).** The V5 crank-and-link drive replaces R5's interim reversing servo for every oscillating input.
+  The `drive` rule builds the lever on a live shaft, on a shaft in plan with the motor on an angle bracket, or by a pin
+  in a compliant lever's tip through an arc slot; a gear step-up (sector and pinion) where the swing is wider than a
+  crank and link can give; the linear drive (a belt loop, a carriage through a slot in the base, a tensioner); and a
+  knob on a hand-worked input. A `manual` driver with `lo` and `hi` is a hand stroke, cycled with no motor [V1, V2,
+  V3, V4, V5, V6, F10, K7, AUTO].
 - **3.2 (2026-10-22).** Rebuild batch R5 (cams, intermittent motion, escapements). The J7 cam kit takes the record's
   roller, a stretched return spring and an oiler; a groove cam carries its own groove; a pawl's spring sits on its
   carrier [J7, F6, F8, AUTO]. J5 slides are held over a declared guide, and a shaft slider gets a stem guide [J5,

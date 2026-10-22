@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 140 · FAIL 0 · N/A 27 · open: none
+PASS 141 · FAIL 0 · N/A 26 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -49,7 +49,7 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | T9 | PASS | AUTO / DATA · claim table: 2 ok, 0 off, 0 uncheckable of 2 |
 | T10 | N/A | AUTO · 0 solids drawn see-through · nothing static covers the lever or the neck in the plan view |
 | T11 | PASS | AUTO · 0 supports routed, 0 moved off a sweep · no support crosses the lever's sweep: the blank's block is clamped on its seat beside it; the stops stand past its swing |
-| T12 | PASS | HAND · 12 support solids; dropped by the polish: none |
+| T12 | PASS | HAND · 11 support solids; dropped by the polish: none |
 | T13 | N/A | DATA · nothing goes by in a blink |
 | T14 | PASS | HAND / DATA · the lever's swing is the one control |
 | T15 | PASS | HAND · labels state the mechanism, never its use |
@@ -64,7 +64,7 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · the neck drawn rigid either side of its centre; its bend shown by the bend overlay (D9) |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 40 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 53 solids unsound |
 | D7 | PASS | HAND · the blank plain; richness in the clamp, the stops and the drive |
 | A1 | PASS | AUTO · N J13, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · N J13, drive drive · the neck a compliant joint (J13); the drive by the input kind (V5) |
@@ -78,7 +78,7 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | A10 | PASS | HAND · fired: placement (2 solids), placement solver · the blank in one plane; nothing stacked to clear |
 | A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · 40 solids, 16 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A13 | PASS | AUTO / HAND · 53 solids, 25 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
 | A16 | PASS | HAND · 2 joint notes; no note: none; no badge: none · a note per joint with its badge; build rules: one blank, no pivot; the neck in its elastic range, the stops a fifth of the half swing past it; the drive pin through a slot in the base to a Scotch yoke |
@@ -87,7 +87,7 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | A19 | N/A | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none · no stack support to route: the block is clamped on its seat |
 | A20 | N/A | AUTO · support per joint: none · no revolute stack |
 | A21 | PASS | AUTO · kit per joint: N J13, drive drive |
-| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · the stop pins of the compliant kit; cable clip |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (4 solids) · the stop pins of the compliant kit; cable clip |
 | E1 | PASS | AUTO · every solid has one explode level; levels -4.5 to 1 · one level per solid, nothing stretches |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
 | E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
@@ -117,10 +117,10 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | F4 | N/A | AUTO / HAND · served at no joint; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (no solids), trunnion (no solids), j11-screw (no solids) · nothing turns free on a shaft along it |
 | F5 | PASS | AUTO / HAND · served at N; fired: j5-slide (no solids), pawl-tooth (no solids), j11-screw (no solids), j13-compliant (11 solids), stops (no solids) · stop pins each side of the lever, past the swing, before the neck yields |
 | F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
-| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · nothing to adjust: the crank's throw and the yoke set the swing exactly |
+| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (no solids), j12-cvt (no solids), j5-slide (no solids), j12-other (no solids), adjustable-length (no solids) · nothing to adjust: the crank and link set the swing |
 | F8 | N/A | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) · no sliding contact but the crank pin in the hardened yoke slot, which runs dry at this load |
 | F9 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (no solids) · no phase to keep between parts |
-| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (no solids), yoke-drive (21 solids) · home flag on the crank disc, fork sensor on a standoff (drive) |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (32 solids) · home flag and fork sensor (drive) |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
 | M2 | PASS | HAND · the lever tapers from its root to a boss round the drive pin |
 | M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
@@ -130,17 +130,17 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | M7 | N/A | HAND · no bracket corner turns a load |
 | M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
 | M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
-| M10 | PASS | AUTO / HAND · 39 of 40 solids name a material · materials named by kind and role |
+| M10 | PASS | AUTO / HAND · 52 of 53 solids name a material · materials named by kind and role |
 | M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
-| M13 | PASS | AUTO / HAND · 4 threaded · threadlocker or nyloc on every threaded fastener |
+| M13 | PASS | AUTO / HAND · 7 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | PASS | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · the yoke's slot hardened, the crank pin hardened |
-| V1 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · a gear motor under the base, one turn per cycle, drives the crank (a swing of a few degrees needs no belt) |
-| V2 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · the motor on one plate hung from the base on two standoffs |
-| V3 | N/A | AUTO / HAND · fired: drive (no solids) · no belt |
-| V4 | N/A | AUTO · fired: j8-belt (no solids) · no belt |
-| V5 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · oscillating input of a compliant lever (J13): a pin pressed into its tip runs down through a slot in the base to a slotted yoke driven by a crank (a Scotch yoke, so the swing follows the driver's cosine law exactly) |
-| V6 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| V1 | PASS | AUTO · fired: drive (32 solids) · V5's compliant form: pancake motor in a one-piece bracket under the base on the line of the tip's 7 mm chord, a 3.5 mm crank and a link to a pin pressed into the lever's tip |
+| V2 | PASS | AUTO · fired: drive (32 solids) · one one-piece bracket under the base |
+| V3 | PASS | AUTO / HAND · fired: drive (32 solids) · the drive under the base, clear of the feet (A15) |
+| V4 | N/A | AUTO · fired: j8-belt (no solids) · no drive belt: a crank and link |
+| V5 | PASS | AUTO · fired: drive (32 solids) · oscillating input of a compliant lever (J13): the pin in the lever's tip runs down through an arc slot in the base to V5's crank and link, at a dead centre at each end of the swing |
+| V6 | PASS | AUTO · fired: drive (32 solids), cable-clip (4 solids) · home flag on the pin, fork sensor on a post, terminals, leads and clips |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
 | L3 | PASS | HAND · roles right on every solid (both sheets) |
@@ -154,14 +154,14 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 7.6 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 10.5 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop): no flag; the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
 | R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
 | R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
-| DL1 | PASS | AUTO / HAND · 13 of 40 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL1 | PASS | AUTO / HAND · 20 of 53 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
 | DL2 | PASS | HAND · default dial: full |
 | DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
 | DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
@@ -180,7 +180,7 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | N | J13 | flexure | – | – | Dowel pin Ø3 h6, reamed through clamp, block and seat | Clamp plate over the blank's block | none | none | 2 x Stop pin Ø4, hardened, pressed into the base | none | none | none | none | none |
-| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+| drive | drive | – | – | – | none | 2 x External circlip DIN 471, Ø4 | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -194,18 +194,18 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 1 | 0 | 1.59 |
-| DL-B | 0 | 80 | 1.51 |
+| DL-B | 0 | 39 | 1.51 |
 | DL-C | 0 | 0 | 1.62 |
 | DL-D | 0 | 0 | 1.65 |
-| DL-E | 8 | 0 | 1.79 |
+| DL-E | 11 | 0 | 1.79 |
 | DL-F | 0 | 0 | 1.64 |
 | DL-G | 0 | 0 | 1.61 |
-| DL-H | 4 | 0 | 1.66 |
-| never | 27 | 50 | 1.61 |
+| DL-H | 8 | 0 | 1.66 |
+| never | 33 | 49 | 1.61 |
 
 ## Promotion candidates
 None left: the compliant kit (J13: the blank's block and neck, the seat, clamp and stop pins) and the yoke drive (V5 for a short swing or slide) are rules of the builder; the bend overlay is drawn by the renderer.
 
 ## Verification
-check: clean · K1 residual: 0.0e+0 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 7.6 KB
+check: clean · K1 residual: 0.0e+0 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 10.5 KB
 screenshots: dist/shots3/flexure-hinge (record view, PLAN, FRONT, SIDE, ISOMETRIC, detail of the neck, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

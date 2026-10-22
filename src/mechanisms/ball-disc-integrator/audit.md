@@ -49,7 +49,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | T9 | PASS | AUTO / DATA · claim table: 4 ok, 0 off, 0 uncheckable of 4 |
 | T10 | PASS | AUTO · 11 solids drawn see-through: Oc-pb-b1-foot, Oc-pb-b1-ped, Oc-pb-b1, Oc-pb-b1-brg, Oc-pb-b1-brg-balls, Oc-pb-b1-brg-cage, Oc-pb-b1-sc0, Oc-pb-b1-sc1 · the cylinder's far pillow block drawn see-through where it covers the disc in plan |
 | T11 | PASS | AUTO · 1 support routed, 1 moved off a sweep · the cylinder's pillow block moved off the disc's sweep |
-| T12 | PASS | HAND · 20 support solids; dropped by the polish: none |
+| T12 | PASS | HAND · 21 support solids; dropped by the polish: none |
 | T13 | N/A | DATA · nothing goes by in a blink |
 | T14 | PASS | HAND / DATA · the disc and the carriage are the two controls |
 | T15 | PASS | HAND · labels state the mechanism, never its use |
@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · fired: j12-cvt (no solids) · every solid rigid on its body; the ball's spin solved by the integrator block |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 129 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 157 solids unsound |
 | D7 | PASS | HAND · disc, ball and cylinder plain; richness in the cage, the carriage and its rail |
 | A1 | PASS | AUTO · Oc J10, slide J5, Od J2, drive drive, drive2 drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · Oc J10, slide J5, Od J2, drive drive, drive2 drive · the disc on a live shaft (J2); the cylinder its own shaft in two pillow blocks (J10); the carriage on its rail (J5); the ball in its cage (ball-cage) |
@@ -78,16 +78,16 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | A10 | PASS | HAND · fired: placement (8 solids), placement solver · the ball's centre stays on the disc's face at the cage's height; the cylinder's axis parallel to the travel |
 | A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · 129 solids, 68 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A13 | PASS | AUTO / HAND · 157 solids, 89 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | PASS | HAND · 5 joint notes; no note: none; no badge: none · a note per joint with its badge; build rules: the cage open below and toward the cylinder; the arm over the disc to a block past its rim; the cylinder its own shaft; two drives |
+| A16 | PASS | HAND · 8 joint notes; no note: none; no badge: none · a note per joint with its badge; build rules: the cage open below and toward the cylinder; the arm over the disc to a block past its rim; the cylinder its own shaft; two drives |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
 | A18 | PASS | AUTO · placement: 2 slabs in the tallest stack (100.0 mm), 0 clevises; stack per joint in the Joints table · disc, ball, carriage and cylinder stand where their joints put them |
 | A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: Oc-pb · the cylinder's pillow block routed off the disc's sweep; see-through where it still covers the disc in plan |
 | A20 | PASS | AUTO · support per joint: Oc pillow · one axial stack builder with its support selector |
-| A21 | PASS | AUTO · kit per joint: Oc J10, slide J5, Od J2, drive drive, drive2 drive |
-| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (4 solids) · cable clips on both drives' leads |
+| A21 | PASS | AUTO · kit per joint: Oc J10, cage ball-cage, disc-contact ball-cage, cyl-contact ball-cage, slide J5, Od J2, drive2 drive, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (7 solids) · cable clips on both drives' leads |
 | E1 | PASS | AUTO · every solid has one explode level; levels -7 to 7.5 · one level per solid, nothing stretches |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
 | E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
@@ -117,10 +117,10 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | F4 | PASS | AUTO / HAND · served at Oc, Od; fired: j9-crossed-mesh (no solids), j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), trunnion (no solids), j11-screw (no solids) · the cylinder located in one pillow block; the disc's thrust on its housing |
 | F5 | PASS | AUTO / HAND · served at slide; fired: integrator-carriage (44 solids), j5-slide (no solids), pawl-tooth (no solids), j11-screw (no solids), j13-compliant (no solids), stops (no solids) · stops with pads past each end of the carriage's travel |
 | F6 | PASS | AUTO / HAND · served at no joint; fired: friction-contact (no solids), j12-flexible (no solids), j12-cvt (no solids), trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · the cylinder's height presses the ball onto the disc (the contact's preload) |
-| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (no solids), j12-cvt (no solids), j5-slide (no solids), j12-other (no solids), adjustable-length (no solids) · nothing to adjust: the radius is the carriage's driver |
+| F7 | N/A | AUTO / HAND · served at drive2; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (no solids), j12-cvt (no solids), j5-slide (no solids), j12-other (no solids), adjustable-length (no solids) · nothing to adjust: the radius is the carriage's driver |
 | F8 | PASS | AUTO · served at no joint; fired: j12-flexible (no solids), cross-bearings (no solids), tongue-slot (no solids), j11-screw (no solids), lubrication (no solids) · sealed bearings; the rail greased |
 | F9 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (1 solid) · nothing to time: a friction drive |
-| F10 | PASS | AUTO / HAND · served at drive, drive2; fired: j12-flexible (no solids), drive (26 solids), yoke-drive (21 solids) · home flags and fork sensors on both drives |
+| F10 | PASS | AUTO / HAND · served at drive2, drive; fired: j12-flexible (no solids), drive (72 solids) · home flags and fork sensors on both drives |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
 | M2 | N/A | HAND · no large part starts and stops with a motor but the disc, plain |
 | M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
@@ -130,17 +130,17 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | M7 | N/A | HAND · no bracket corner turns a load |
 | M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
 | M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
-| M10 | PASS | AUTO / HAND · 125 of 129 solids name a material · materials named by kind and role |
+| M10 | PASS | AUTO / HAND · 153 of 157 solids name a material · materials named by kind and role |
 | M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
-| M13 | PASS | AUTO / HAND · 16 threaded · threadlocker or nyloc on every threaded fastener |
+| M13 | PASS | AUTO / HAND · 24 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
-| V1 | PASS | AUTO · fired: drive (26 solids), yoke-drive (21 solids) · two drives: a pancake motor and a GT2 belt to the disc's shaft; a gear motor and a Scotch yoke to a pin in the carriage's block |
-| V2 | PASS | AUTO · fired: drive (26 solids), yoke-drive (21 solids) · one angle bracket: upright and foot |
-| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
-| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
-| V5 | PASS | AUTO · fired: drive (26 solids), yoke-drive (21 solids) · rotary disc: belt; linear carriage: a Scotch yoke, which follows its sine law exactly (the crank set a quarter turn ahead) |
-| V6 | PASS | AUTO · fired: drive (26 solids), yoke-drive (21 solids), cable-clip (4 solids) · home flag, fork sensor, terminals, lead and clip |
+| V1 | PASS | AUTO · fired: drive (72 solids) · two drives under the base: the disc's pancake motor and GT2 belt to its shaft; V5's linear drive for the carriage (a belt loop along its 80 mm stroke, a carriage through a slot in the base clamping the belt, under the carriage's block) |
+| V2 | PASS | AUTO · fired: drive (72 solids) · the disc's motor flange and the carriage drive's one-piece bracket, both screwed up into the base |
+| V3 | PASS | AUTO / HAND · fired: drive (72 solids) · the loop, the carriage and the bracket under the base, clear of the feet (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · a GT2 belt loop in one plane under the base, its idler on a slotted tensioner plate |
+| V5 | PASS | AUTO · fired: drive (72 solids) · rotary disc: belt; linear carriage: V5's belt loop and carriage, following the driver's law a quarter turn ahead |
+| V6 | PASS | AUTO · fired: drive (72 solids), cable-clip (7 solids) · home flags and fork sensors on both inputs; terminals, leads and clips |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
 | L3 | PASS | HAND · roles right on every solid (both sheets) |
@@ -154,14 +154,14 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 18.6 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 21.5 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop): setup 27.8 ms over the 20 ms target; frames 1.6 to 2.2 ms; the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
 | R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
 | R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
-| DL1 | PASS | AUTO / HAND · 48 of 129 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL1 | PASS | AUTO / HAND · 53 of 157 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
 | DL2 | PASS | HAND · default dial: full |
 | DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
 | DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
@@ -185,8 +185,8 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | cyl-contact | ball-cage | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | slide | J5 | driver | – | – | Dowel pin Ø3 h6, rail to base | none | none | none | 2 x Stop block | none | none | none | none | none |
 | Od | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the disc on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 7 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| drive2 | drive | – | – | – | none | Belt clamp plate, the near span between it and the jaw | none | none | none | none | Belt tensioner plate, slotted, 2 x M4 up into the base | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
-| drive2 | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -201,18 +201,18 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 10 | 0 | 2.1 |
-| DL-B | 0 | 283 | 2.1 |
+| DL-B | 0 | 290 | 2.1 |
 | DL-C | 0 | 0 | 2.05 |
-| DL-D | 8 | 0 | 1.93 |
-| DL-E | 16 | 0 | 2.23 |
+| DL-D | 9 | 0 | 1.93 |
+| DL-E | 20 | 0 | 2.23 |
 | DL-F | 0 | 0 | 1.96 |
 | DL-G | 0 | 0 | 2.1 |
 | DL-H | 14 | 0 | 2.11 |
-| never | 81 | 144 | 2.18 |
+| never | 104 | 124 | 2.18 |
 
 ## Promotion candidates
 None left: the integral is a kin block (closed form for the standard driver laws, quadrature otherwise); the ball in its cage, the carriage on its rail and a body that is its own shaft are the integrator rule and the ball-cage kit; the Scotch yoke takes a driver's phase and side.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 18.8 KB
+check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.5 KB
 screenshots: dist/shots3/ball-disc-integrator (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; phone by David)

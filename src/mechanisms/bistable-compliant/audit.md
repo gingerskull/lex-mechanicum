@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 144 · FAIL 0 · N/A 23 · open: none
+PASS 146 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -49,7 +49,7 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | T9 | PASS | AUTO / DATA · claim table: 3 ok, 0 off, 0 uncheckable of 3 |
 | T10 | PASS | AUTO · 6 solids drawn see-through: slide-wip0, slide-stop0, slide-pad0, pusher-arm, pusher-arm-riser, window-stud · the slide's guide parts drawn see-through where they lie over the pusher's arm in plan |
 | T11 | PASS | AUTO · 0 supports routed, 0 moved off a sweep · no support routed into the blank's sweep: the pads are clamped on their seats beside it |
-| T12 | PASS | HAND · 19 support solids; dropped by the polish: none |
+| T12 | PASS | HAND · 20 support solids; dropped by the polish: none |
 | T13 | PASS | DATA · time map: both snaps (159.7 to 167.7 and 339.7 to 347.7 deg) slowed 4x; the plot keeps the true input |
 | T14 | PASS | HAND / DATA · the pusher's stroke is the one control |
 | T15 | PASS | HAND · labels state the mechanism, never its use |
@@ -64,7 +64,7 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · the beams drawn rigid either side of each flexure, as their pseudo-rigid halves; the springs stretched between the roller and the window's ends |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 79 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 107 solids unsound |
 | D7 | PASS | HAND · blank and pusher plain; richness in the pads' clamps, the springs, the slide and the drive |
 | A1 | PASS | AUTO · slide J5, AL J13, TL J13, SL J13, AR J13, TR J13, SR J13, window J13, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · slide J5, AL J13, TL J13, SL J13, AR J13, TR J13, SR J13, window J13, drive drive · the beams' flexures and the window's springs by the compliant kit (J13); the pusher on a slide (J5); the drive by the input kind (V5) |
@@ -78,17 +78,17 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | A10 | PASS | HAND · fired: placement (12 solids), placement solver · the blank in one plane, the pusher above it; nothing stacked only to clear |
 | A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · 79 solids, 34 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A13 | PASS | AUTO / HAND · 107 solids, 55 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | PASS | HAND · 9 joint notes; no note: none; no badge: slide · a note per joint with its badge; build rules: one blank with no pivot; the pusher drives the shuttle through springs, which let it snap; stops past the shuttle's travel |
+| A16 | PASS | HAND · 9 joint notes; no note: none; no badge: none · a note per joint with its badge; build rules: one blank with no pivot; the pusher drives the shuttle through springs, which let it snap; stops past the shuttle's travel |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
 | A18 | PASS | AUTO · placement: 2 slabs in the tallest stack (16.0 mm), 0 clevises; stack per joint in the Joints table · placement: the blank on one slab (its flexures and the beams' give keep it so), the pusher on the next |
 | A19 | N/A | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none · no stack support to route |
 | A20 | N/A | AUTO · support per joint: none · no revolute stack |
 | A21 | PASS | AUTO · kit per joint: slide J5, AL J13, TL J13, SL J13, AR J13, TR J13, SR J13, window J13, drive drive |
-| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · the slide's end stops and the shuttle's stop pins; cable clip |
-| E1 | PASS | AUTO · every solid has one explode level; levels -4.5 to 2.5 · one level per solid, nothing stretches |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (5 solids) · the slide's end stops and the shuttle's stop pins; cable clip |
+| E1 | PASS | AUTO · every solid has one explode level; levels -3.5 to 2.5 · one level per solid, nothing stretches |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
 | E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
 | E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
@@ -117,10 +117,10 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | F4 | N/A | AUTO / HAND · served at no joint; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (no solids), trunnion (no solids), j11-screw (no solids) · nothing turns free on a shaft along it |
 | F5 | PASS | AUTO / HAND · served at slide; fired: j5-slide (20 solids), pawl-tooth (no solids), j11-screw (no solids), j13-compliant (26 solids), stops (no solids) · stop pins past each end of the shuttle's travel; end stops with pads on the slide |
 | F6 | PASS | AUTO / HAND · served at window; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · the two compression springs hold the shuttle against the pusher's roller |
-| F7 | PASS | AUTO / HAND · served at slide; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (20 solids), j12-flexible (no solids), adjustable-length (no solids) · the slide's gib |
+| F7 | PASS | AUTO / HAND · served at slide, drive; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (no solids), j12-cvt (no solids), j5-slide (20 solids), j12-other (no solids), adjustable-length (no solids) · the slide's gib; the drive belt's tensioner |
 | F8 | PASS | AUTO · served at slide; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) · wipers and a grease nipple on the slide |
 | F9 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (no solids) · no phase to keep between parts |
-| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (no solids), yoke-drive (21 solids) · home flag on the crank disc, fork sensor on a standoff (drive) |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (46 solids) · home flag on the carriage read by a fork sensor (drive) |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
 | M2 | PASS | HAND · the shuttle's window and the pusher's arm carry the load where it runs |
 | M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
@@ -130,17 +130,17 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | M7 | N/A | HAND · no bracket corner turns a load |
 | M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
 | M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
-| M10 | PASS | AUTO / HAND · 73 of 79 solids name a material · materials named by kind and role |
+| M10 | PASS | AUTO / HAND · 101 of 107 solids name a material · materials named by kind and role |
 | M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
-| M13 | PASS | AUTO / HAND · 8 threaded · threadlocker or nyloc on every threaded fastener |
+| M13 | PASS | AUTO / HAND · 16 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | PASS | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · the slide's rails and gib, the yoke's slot and the crank pin hardened |
-| V1 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · a gear motor under the base, one turn per cycle, drives the crank |
-| V2 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · the motor on one plate hung from the base on two standoffs |
-| V3 | N/A | AUTO / HAND · fired: drive (no solids) · no belt |
-| V4 | N/A | AUTO · fired: j8-belt (no solids) · no belt |
-| V5 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · linear input: a pin pressed into the pusher runs down through a slot in the base to a slotted yoke driven by a crank (a Scotch yoke: the stroke follows the driver's cosine law exactly) |
-| V6 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| V1 | PASS | AUTO · fired: drive (46 solids) · V5's linear drive: pancake motor in a one-piece bracket under the base at one end of the 13.9 mm stroke, a GT2 belt loop along it, a carriage through a slot in the base clamps the belt to the pusher |
+| V2 | PASS | AUTO · fired: drive (46 solids) · one one-piece bracket screwed up into the base |
+| V3 | PASS | AUTO / HAND · fired: drive (46 solids) · the loop, the carriage and the bracket under the base, clear of the feet (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · a GT2 belt loop in one plane under the base, its idler on a slotted tensioner plate |
+| V5 | PASS | AUTO · fired: drive (46 solids) · linear input: V5's belt loop and carriage, the carriage following the driver's cosine law |
+| V6 | PASS | AUTO · fired: drive (46 solids), cable-clip (5 solids) · home flag on the carriage, fork sensor on a post, terminals, leads and clips |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
 | L3 | PASS | HAND · roles right on every solid (both sheets) |
@@ -154,14 +154,14 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 11.4 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 14.9 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop): no flag; the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
 | R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
 | R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
-| DL1 | PASS | AUTO / HAND · 25 of 79 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL1 | PASS | AUTO / HAND · 30 of 107 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
 | DL2 | PASS | HAND · default dial: full |
 | DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
 | DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
@@ -187,7 +187,7 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | TR | J13 | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | SR | J13 | flexure | – | – | none | none | none | none | none | none | none | none | none | none |
 | window | J13 | – | – | – | none | none | none | none | none | Compression spring Ø5, 7 coils, between the roller and the window's end | none | none | none | none |
-| drive | drive | flexure | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+| drive | drive | flexure | – | – | none | Belt clamp plate, the near span between it and the jaw | none | none | none | none | Belt tensioner plate, slotted, 2 x M4 up into the base | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -201,18 +201,18 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 1 | 0 | 2.22 |
-| DL-B | 0 | 112 | 2.12 |
+| DL-B | 0 | 119 | 2.12 |
 | DL-C | 0 | 0 | 1.93 |
-| DL-D | 0 | 0 | 2.12 |
-| DL-E | 11 | 0 | 1.97 |
+| DL-D | 1 | 0 | 2.12 |
+| DL-E | 15 | 0 | 1.97 |
 | DL-F | 0 | 0 | 1.98 |
 | DL-G | 0 | 0 | 2.03 |
 | DL-H | 13 | 0 | 1.92 |
-| never | 54 | 51 | 1.98 |
+| never | 77 | 51 | 1.98 |
 
 ## Promotion candidates
 None left: the compliant kit builds the pads, the window's roller and springs, and the shuttle's stop pins; the yoke drive serves the linear pusher; the snap is a mode of the flexure block.
 
 ## Verification
-check: clean · K1 residual: 4.0e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 11.4 KB
+check: clean · K1 residual: 4.0e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.9 KB
 screenshots: dist/shots3/bistable-compliant (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

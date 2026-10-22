@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 148 · FAIL 0 · N/A 19 · open: none
+PASS 149 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -49,7 +49,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | T9 | PASS | AUTO / DATA · claim table: 6 ok, 0 off, 0 uncheckable of 6 |
 | T10 | PASS | AUTO · 13 solids drawn see-through: part-3-rope, fall-rope, sheave-UB-wrap, fall-slide-rail0, fall-slide-keeper, U-A-0-sp, U-A-slv, U-A-bb · the crossing part, the fall, the upper bridge and the slide's rail and keeper drawn see-through where they cross principle parts in plan |
 | T11 | PASS | AUTO · 1 support routed, 1 moved off a sweep · the upper block's bridge moved off the sweeps |
-| T12 | PASS | HAND · 18 support solids; dropped by the polish: none |
+| T12 | PASS | HAND · 24 support solids; dropped by the polish: none |
 | T13 | N/A | DATA · nothing goes by in a blink |
 | T14 | PASS | HAND / DATA · the fall hauled is the one control |
 | T15 | PASS | HAND · labels state the mechanism, never its use |
@@ -64,7 +64,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · each rope part stretched between its two solved tangent points (D9), the crossing part slanting between its sheaves' planes; wraps fixed arcs on the far side of each sheave |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 143 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 170 solids unsound |
 | D7 | PASS | HAND · sheaves plain; richness in the rope, the guide and the slide |
 | A1 | PASS | AUTO · guide J5, L-A J3, fall-slide J5, U-A J1, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · guide J5, L-A J3, fall-slide J5, U-A J1, drive drive · upper sheaves on a dead axle in a bridge (J1); lower sheaves on a shoulder bolt in the lower block (J3); the rope by J12 |
@@ -78,17 +78,17 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | A10 | PASS | HAND · fired: placement (12 solids), placement solver · each pair of sheaves in one plane (A and B); only the crossing part runs between planes, slanted |
 | A11 | PASS | AUTO / HAND · fired: j12-flexible (37 solids), strap-sheave (no solids), j1-dead-axle (33 solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · 142 solids, 69 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A13 | PASS | AUTO / HAND · 170 solids, 89 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | PASS | HAND · 5 joint notes; no note: none; no badge: fall-slide · a note per joint with its badge (the carriage's slide is the driver's, its note the drive's); build rules: the rope reeved over two planes, the crossing part slanting; the load on a guide rod; the fall clamped on the carriage |
+| A16 | PASS | HAND · 5 joint notes; no note: none; no badge: none · a note per joint with its badge (the carriage's slide is the driver's, its note the drive's); build rules: the rope reeved over two planes, the crossing part slanting; the load on a guide rod; the fall clamped on the carriage |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
 | A18 | PASS | AUTO · placement: 3 slabs in the tallest stack (32.0 mm), 0 clevises; stack per joint in the Joints table · placement: the A sheaves on one slab, the B sheaves and the carriage on the next (the rope's parts tie them), the guide on the lower block's |
 | A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: U-A-bridge · the upper bridge routed off the sweeps; see-through where it still covers the upper sheaves in plan |
 | A20 | PASS | AUTO · support per joint: U-A bridge · one axial stack builder with its support selector |
-| A21 | PASS | AUTO · kit per joint: guide J5, L-A J3, fall-slide J5, U-A J1 |
-| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (3 solids) · cable clips on the drive's lead |
-| E1 | PASS | AUTO · every solid has one explode level; levels -20 to 4 · one level per solid; the rope parts stretch, and explode with their blocks |
+| A21 | PASS | AUTO · kit per joint: guide J5, L-A J3, fall-slide J5, U-A J1, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (5 solids) · cable clips on the drive's lead |
+| E1 | PASS | AUTO · every solid has one explode level; levels -20 to 5.5 · one level per solid; the rope parts stretch, and explode with their blocks |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
 | E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
 | E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
@@ -117,10 +117,10 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | F4 | PASS | AUTO / HAND · served at L-A, U-A; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (no solids), trunnion (no solids), j11-screw (no solids) · thrust washers between the sheaves |
 | F5 | PASS | AUTO / HAND · served at fall-slide; fired: j5-slide (24 solids), pawl-tooth (no solids), j11-screw (no solids), j13-compliant (no solids), stops (no solids) · stops with neoprene pads past each end of the carriage's travel |
 | F6 | N/A | AUTO / HAND · served at no joint; fired: friction-contact (no solids), j12-flexible (37 solids), trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no rest position to hold: the drive positions every part |
-| F7 | PASS | AUTO / HAND · served at fall-slide; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (37 solids), j5-slide (24 solids), j12-other (no solids), adjustable-length (no solids) · the gib sets the carriage's slide |
+| F7 | PASS | AUTO / HAND · served at fall-slide, drive; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (37 solids), j12-cvt (no solids), j5-slide (24 solids), j12-other (no solids), adjustable-length (no solids) · the gib sets the carriage's slide |
 | F8 | PASS | AUTO · served at fall-slide; fired: j12-flexible (37 solids), cross-bearings (no solids), tongue-slot (no solids), j11-screw (no solids), lubrication (1 solid) · wipers and a grease nipple on the slide; sealed bearings |
 | F9 | PASS | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (no solids) · an index mark on every sheave's top flange: their turns count 1:2:3:4 |
-| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (37 solids), drive (no solids), yoke-drive (21 solids) · home flag and fork sensor on the crank (drive) |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (37 solids), drive (46 solids) · home flag on the carriage read by a fork sensor (drive) |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
 | M2 | N/A | HAND · nothing large starts and stops with the motor but the yoke and crank |
 | M3 | PASS | AUTO · fired: j3-moving-pin (14 solids), hardware primitives · bore entry chamfers |
@@ -130,17 +130,17 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | M7 | N/A | HAND · no bracket corner turns a load |
 | M8 | PASS | AUTO · fired: j1-dead-axle (33 solids) · thread undercuts on stepped shafts |
 | M9 | PASS | AUTO / HAND · fired: j1-dead-axle (33 solids) · ISO coarse threads, engagement through the tapped part or to a nut |
-| M10 | PASS | AUTO / HAND · 136 of 142 solids name a material · materials named by kind and role |
+| M10 | PASS | AUTO / HAND · 164 of 170 solids name a material · materials named by kind and role |
 | M11 | PASS | AUTO · fired: j1-dead-axle (33 solids), hardware primitives · centre holes, chamfered ends on turned parts |
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
-| M13 | PASS | AUTO / HAND · 16 threaded · threadlocker or nyloc on every threaded fastener |
+| M13 | PASS | AUTO / HAND · 24 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
-| V1 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · gear motor under the base, one turn per cycle, a crank and a Scotch yoke to a pin in the carriage |
-| V2 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · one motor plate hung from the base on two standoffs |
-| V3 | PASS | AUTO / HAND · fired: drive (no solids) · yoke, crank and motor clear of the feet (A15) |
-| V4 | N/A | AUTO · fired: j8-belt (no solids) · no drive belt: a Scotch yoke |
-| V5 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids) · a linear input of 160 mm: a Scotch yoke follows the driver's cosine law exactly |
-| V6 | PASS | AUTO · fired: drive (no solids), yoke-drive (21 solids), cable-clip (3 solids) · home flag, fork sensor, terminals, lead and clip |
+| V1 | PASS | AUTO · fired: drive (46 solids) · V5's linear drive: pancake motor in a one-piece bracket under the base at one end of the 160 mm stroke, a GT2 belt loop along it, a carriage through a slot in the base clamps the belt to the fall's carriage |
+| V2 | PASS | AUTO · fired: drive (46 solids) · one one-piece bracket screwed up into the base |
+| V3 | PASS | AUTO / HAND · fired: drive (46 solids) · the loop, the carriage and the bracket under the base, clear of the feet (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · a GT2 belt loop in one plane under the base, its idler on a slotted tensioner plate |
+| V5 | PASS | AUTO · fired: drive (46 solids) · linear input: V5's belt loop and carriage, the carriage following the driver's cosine law |
+| V6 | PASS | AUTO · fired: drive (46 solids), cable-clip (5 solids) · home flag on the carriage, fork sensor on a post, terminals, leads and clips |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
 | L3 | PASS | HAND · roles right on every solid (both sheets) |
@@ -154,14 +154,14 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 22.0 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 23.6 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop): setup 30.3 ms over the 20 ms target (142 solids, the drive's 21 among them); frames 1.3 to 1.9 ms; the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
 | R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
 | R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
-| DL1 | PASS | AUTO / HAND · 43 of 142 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL1 | PASS | AUTO / HAND · 48 of 170 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
 | DL2 | PASS | HAND · default dial: full |
 | DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
 | DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
@@ -183,7 +183,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | L-A | J3 | reeve | – | – | none | 2 x Internal circlip DIN 472, Ø24; Shoulder bolt Ø12 x 35, M10 (ISO 7379) | Shoulder bolt Ø12 x 35, M10 (ISO 7379) | Inner-race spacer 12.2x16.2 | none | none | none | none | none | none |
 | fall-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 222, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | U-A | J1 | reeve | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | 2 x Internal circlip DIN 472, Ø24; External circlip DIN 471, Ø12 | none | Inner-race spacer 12.2x16.2; Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
-| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+| drive | drive | – | – | – | none | Belt clamp plate, the near span between it and the jaw | none | none | none | none | Belt tensioner plate, slotted, 2 x M4 up into the base | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -198,18 +198,18 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 9 | 0 | 1.82 |
-| DL-B | 0 | 171 | 1.77 |
+| DL-B | 0 | 178 | 1.77 |
 | DL-C | 0 | 0 | 1.9 |
-| DL-D | 11 | 0 | 1.68 |
-| DL-E | 12 | 1 | 1.74 |
+| DL-D | 12 | 0 | 1.68 |
+| DL-E | 15 | 1 | 1.74 |
 | DL-F | 0 | 0 | 1.63 |
 | DL-G | 0 | 0 | 1.81 |
 | DL-H | 12 | 0 | 1.73 |
-| never | 99 | 143 | 1.74 |
+| never | 122 | 111 | 1.74 |
 
 ## Promotion candidates
 None left: the rope (stretched parts between solved tangent points, slanting between planes; wraps; the rope's end clamped on a moving body) and the load's guide rod are the J12 rule; the reeve is a kin block.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.8 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.6 KB
 screenshots: dist/shots3/block-and-tackle (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

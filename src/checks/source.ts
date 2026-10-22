@@ -11,6 +11,7 @@ import { buildPackage } from "../package/build";
 import type { MechanismModel } from "../model/types";
 import { planeMatrix } from "../render/v3/poser";
 import { IDENTITY, mat4, type Mat4 } from "../solids/frame";
+import { driveXf } from "../solids/drive";
 import { liftAll } from "../solids/lift";
 import { conveyMatrix, mul4, stretchMatrix, turnMatrix } from "../solids/convey";
 import type { Solid3 } from "../solids/types";
@@ -118,6 +119,8 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish; con
   const endOf = (P: { points: Map<string, Vec3>; bodies: Map<string, Xf> }, n: string) => P.points.get(n) ?? anchorAt(n, P.bodies);
   const placer: Placer = {
     place(s, u) {
+      // the drive's crank and link are posed from the input (they have no body in the record)
+      if (s.drive) return mul(xfMat(driveXf(s.drive, posed(u).get(s.drive.input) ?? xf.id(), u)), mat4(s.frame));
       if (s.stretch) {
         const P = poseAt(u);
         const a = endOf(P, s.stretch[0]);
@@ -134,7 +137,7 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish; con
     },
 
     // a conveyed solid moves along its path, not with its carrier
-    key: (s) => (s.convey ? `cv:${s.id}` : s.spin ? `spin:${s.spin.at.join(",")}` : s.body),
+    key: (s) => (s.drive ? `drive:${s.drive.part}` : s.convey ? `cv:${s.id}` : s.spin ? `spin:${s.spin.at.join(",")}` : s.body),
   };
   const kin = src.kin;
   // a slide held by springs touches by design (a pseudo-rigid beam's two halves, a roller between springs in a window)

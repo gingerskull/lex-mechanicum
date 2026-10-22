@@ -23,6 +23,8 @@ const MAKERS: Record<string, Maker> = {
   geneva: () => rec("geneva", F.geneva()),
   escapement: () => rec("escapement", withJoint(withBody(F.escapement(), "pallet", { role: "link" }), "Rp", { type: "cam-contact", a: "pallet", b: "wheel", at: [0, 30, 0], follower: "flat" })),
   flexureHinge: () => rec("flexureHinge", F.flexureHinge()),
+  // the flexure's beam drawn as the lever it is, for the compliant drive (V5)
+  compliantLever: () => rec("compliantLever", withBody(F.flexureHinge(), "beam", { shape: { type: "link", length: 50, boss: [7, 5] } })),
   beltDrive: () => rec("beltDrive", F.beltDrive()),
   universalJoint: () => rec("universalJoint", F.universalJoint()),
   bennett: () => rec("bennett", F.bennett()),

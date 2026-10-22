@@ -10,7 +10,7 @@ import { crossBearings } from "./rules/cross";
 import { wheels } from "./rules/wheels";
 import { pistonBore, trunnion } from "./rules/cylinder";
 import { j11 } from "./screws";
-import { j13, yokeDrive } from "./compliant";
+import { j13 } from "./compliant";
 import { j12 } from "./flexible";
 import { cvt } from "./cvt";
 import { integrator } from "./integrator";
@@ -62,7 +62,6 @@ export const rules: Rule[] = [
   j1,
   stops,
   drive,
-  yokeDrive,
   adjustableLength,
   cableClip,
   standoffs,

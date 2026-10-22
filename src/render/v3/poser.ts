@@ -5,7 +5,7 @@
 import { frameAxis } from "../../core/axis";
 import { poseOf } from "../../model/pose";
 import type { MechanismModel } from "../../model/types";
-import { Kinematics, anchorAt } from "../../kin/compose";
+import { Kinematics, anchorAt, handStroke } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
 import { fiveBarFK } from "../../kin/blocks/linkage";
@@ -21,6 +21,7 @@ function jointFrame(at: Vec3, axis: Vec3): Xf {
 
 const moved = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
 void m3;
+import { driveXf } from "../../solids/drive";
 import { IDENTITY, mat4, type Mat4 } from "../../solids/frame";
 import { conveyMatrix, mul4, turnMatrix } from "../../solids/convey";
 import type { PackedSolid3 } from "../../package/format2";
@@ -147,6 +148,8 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   return {
     period: Math.PI * 2,
     place: (s, u) => {
+      // a drive part the record has no body for is posed from the input it swings
+      if (s.drive) return fromXf(driveXf(s.drive, pose(u).bodies.get(s.drive.input) ?? xf.id(), u));
       const X = s.body === "ground" ? xf.id() : pose(u).bodies.get(s.body);
       const D = shiftOf(s);
       if (!X) return ID4;
@@ -163,7 +166,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       return X ? fromXf(X) : null;
     },
     sweep: (point, range, branches) => {
-      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
+      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating" || handStroke(x));
       if (!d) return null;
       const lo = range?.[0] ?? d.range?.[0] ?? 0;
       const hi = range?.[1] ?? d.range?.[1] ?? 360;

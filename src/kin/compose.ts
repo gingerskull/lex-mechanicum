@@ -71,6 +71,12 @@ const key = (c?: Controls): string =>
 
 const joinPlain = (v: unknown): string => String(v);
 
+/** A hand-worked driver that gives the ends of its stroke (lo, hi): the cycle works it through them, and no motor drives it. */
+export const handStroke = (d: KinDriver): boolean => d.kind === "manual" && typeof d.lo === "number" && typeof d.hi === "number";
+
+/** A driver the cycle moves: a rotary, oscillating or linear input, or a hand stroke. */
+export const cycleDriven = (d: KinDriver): boolean => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || handStroke(d);
+
 export class Kinematics {
   private setups = new Map<string, Setup>();
   private bodyIds: Set<string>;
@@ -183,7 +189,7 @@ export class Kinematics {
       if (d.kind === "rotary") {
         const span = d.range ? d.range[1] - d.range[0] : 360;
         out[d.id] = def + ((speed * u + ph) * R2D * span) / 360;
-      } else if (d.kind === "oscillating" || d.kind === "linear") {
+      } else if (d.kind === "oscillating" || d.kind === "linear" || handStroke(d)) {
         const lo = d.lo ?? d.range?.[0] ?? def;
         const hi = d.hi ?? d.range?.[1] ?? def;
         out[d.id] = lo + (hi - lo) * (0.5 - 0.5 * Math.cos(speed * u + ph));
@@ -211,7 +217,7 @@ export class Kinematics {
   private addRates(s: Setup, P: Pose, u: number, controls?: Controls): void {
     const rates = (this.kin.outputs ?? []).filter((o) => o.kind === "speed-ratio");
     if (!rates.length) return;
-    const drv = this.kin.drivers.find((d) => (d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear") && !s.held.has(d.id));
+    const drv = this.kin.drivers.find((d) => cycleDriven(d) && !s.held.has(d.id));
     const h = 1e-4;
     let Q: Pose;
     try {

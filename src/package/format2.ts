@@ -11,6 +11,7 @@
 // triangle indices (int32 differences), mesh tags (bytes), the plot (float32).
 import type { Vec2 } from "../core/geom";
 import type { Motion } from "../hardware/solid";
+import type { DriveMotion } from "../solids/drive";
 import type { Joint } from "../rules/types";
 import type { RungId } from "../style/detail";
 import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
@@ -51,6 +52,7 @@ export interface PackedSolid3 {
   joints?: string[];
   group?: string;
   motion?: Motion;
+  drive?: DriveMotion;
   mat?: string;
   closure?: "open" | "shield" | "seal";
   headKind?: "socket" | "button" | "csk";
