@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.4
+version: 3.5
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -865,6 +865,12 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.5 (2026-10-22).** Rebuild batch R6 (couplings and spatial linkages), and a check fix from R7. A drive on a shaft
+  in plan, belt or crank and link, takes the far end only where it clears the moving parts' sweeps, else the low end; a
+  lever's fork sensor that cannot stand under a low shaft's hub goes beside it [V1, V5, V6, AUTO]. Lugs and posts rules;
+  ball-socket, slipper and sphere-fit kits [A21, J3, AUTO]. The clamp check reads what moves at probe phases off the
+  profile's grid as well, so a part turning a whole number of times per cycle is not taken for ground at a coarse
+  profile [A12, AUTO].
 - **3.4 (2026-10-22).** Rebuild batch R7 (screws, flexible and compliant members). An oscillating input of more than one
   turn on a shaft in plan is driven by a reversing motor through the in-plan belt drive [V5, AUTO]; a mechanism with two
   drivers gets a second drive beside the first, and a manual input whose body has a knob gets no second one [V5, V1,
