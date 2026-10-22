@@ -5,7 +5,7 @@ export const KIN_VOCAB = {
   bodyRole: ["ground", "driver", "link", "output", "slider", "gear", "cam", "follower", "pawl", "spring", "belt", "frame"],
   shape: [
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
-    "rope", "cage", "cross", "tracer", "cylinder", "piston", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
+    "rope", "cage", "cross", "tracer", "cylinder", "piston", "nut", "fork", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
@@ -16,7 +16,7 @@ export const KIN_VOCAB = {
   driver: ["rotary", "oscillating", "linear", "manual", "select"],
   block: [
     "dyad", "slider-dyad", "triad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
-    "flexure", "escapement", "five-bar", "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet",
+    "flexure", "escapement", "reeve", "variator", "integrator", "five-bar", "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet",
     "one-way", "escape", "verge",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
@@ -124,7 +124,7 @@ export interface Teaching {
   view: string;
   views?: { id: string; kind: (typeof TEACHING_VOCAB.viewKind)[number]; highlight?: string[]; [k: string]: unknown }[];
   controls: { id: string; kind: (typeof TEACHING_VOCAB.control)[number]; [k: string]: unknown }[];
-  timeMap?: { feature: string; slow: number; span: [number, number] };
+  timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: [number, number][] };
   plot: { x: string; y: string; label: string } | { x: string; y: string; label: string }[];
   claims: { text: string; output: string; stat: (typeof TEACHING_VOCAB.stat)[number]; value: number; tol: number }[];
   exceptions: { reason: string; [k: string]: unknown }[];

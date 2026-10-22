@@ -76,8 +76,10 @@ export async function clampCheck3(solids: Solid3[], placer: Placer, n = 12): Pro
   const S = solids.filter((s) => !s.flags.faint && s.role !== "trace");
   const phases = Array.from({ length: n }, (_, i) => (i / n) * Math.PI * 2);
   const mats: Mat4[][] = phases.map((u) => S.map((s) => withScale(placer.place(s, u), placer.stretch?.(s, u) ?? 1)));
-  // a stretched member (a belt) changes length, not place: it is as fixed as its seat
-  const rigid: Mat4[][] = phases.map((u) => S.map((s) => placer.place(s, u)));
+  // a stretched member (a belt) changes length, not place: it is as fixed as its seat. What moves is judged at a few
+  // irregular phases too: at evenly spaced ones a part geared up a whole number of turns (a wheel at 2:1) stands in
+  // the same place each time and would read as ground
+  const rigid: Mat4[][] = [...phases, 0.6180339, 2.2360679, 4.1231056].map((u) => S.map((s) => placer.place(s, u)));
   const moving = S.map((_, i) => rigid.some((row) => !matClose(row[i]!, rigid[0]![i]!)));
   const local: (Box | null)[] = S.map((s) => localBox(M, s));
   const base: (Mf | null | undefined)[] = S.map((_, i) => (local[i] ? undefined : null));

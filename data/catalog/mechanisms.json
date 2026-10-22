@@ -52387,10 +52387,10 @@
             "shape": {
               "type": "plate",
               "rect": [
-                230,
-                70
+                260,
+                90
               ],
-              "note": "frame with two screw bearings and a guide rail for the nut's flag, 22 mm beside the screw"
+              "note": "base with the screw's two pillow blocks and the guide rail for the nut's flag"
             },
             "at": {
               "frame": {
@@ -52408,21 +52408,16 @@
             "shape": {
               "type": "shaft",
               "diameter": 12,
-              "length": 180,
+              "journal": 8,
               "thread": {
                 "form": "Tr",
                 "major": 12,
-                "mean": 10.5,
+                "minor": 8.5,
                 "pitch": 3,
                 "starts": 1,
                 "hand": "right",
-                "angle": 30,
-                "from": 0,
+                "from": 40,
                 "to": 160
-              },
-              "handwheel": {
-                "diameter": 50,
-                "at": -20
               }
             },
             "at": {
@@ -52433,16 +52428,15 @@
             "id": "nut",
             "role": "output",
             "shape": {
-              "type": "slider",
+              "type": "nut",
               "length": 30,
-              "width": 28,
-              "height": 28,
-              "bore": "Tr12x3",
+              "width": 34,
+              "height": 34,
               "flag": {
                 "side": -1,
-                "to": "guide rail"
+                "gap": 16
               },
-              "material": "bronze"
+              "material": "aluminium carriage, bronze nut"
             },
             "at": {
               "joint": "guide"
@@ -52472,7 +52466,7 @@
             "a": "ground",
             "b": "nut",
             "at": [
-              120,
+              130,
               0,
               40
             ],
@@ -52492,7 +52486,7 @@
             "a": "screw",
             "b": "nut",
             "at": [
-              120,
+              130,
               0,
               40
             ],
@@ -52502,8 +52496,6 @@
               0
             ],
             "lead": 3,
-            "pitch": 3,
-            "starts": 1,
             "hand": "right",
             "ball": false
           }
@@ -52582,17 +52574,12 @@
               "guide"
             ],
             "in": {
-              "screw": "screw",
-              "nut": "nut",
-              "pitch": "p",
-              "starts": "starts",
-              "turn": "turn"
+              "joint": "thread",
+              "input": "turn",
+              "nut": "nut"
             },
-            "out": "x-nut",
-            "opts": {
-              "hand": "right",
-              "held": "screw axially fixed in its bearings, nut kept from turning by the guide",
-              "sign": "a positive turn about +x moves the nut toward -x"
+            "out": {
+              "advance": "nut-advance"
             }
           }
         ],
@@ -52601,43 +52588,43 @@
             "id": "nut-mark",
             "body": "nut",
             "local": [
+              17,
               0,
-              0,
-              14
-            ]
-          },
-          {
-            "id": "wheel-mark",
-            "body": "screw",
-            "local": [
-              -20,
-              0,
-              25
+              0
             ]
           },
           {
             "id": "travel-0",
             "body": "ground",
             "local": [
-              120,
+              130,
               0,
-              60
+              72
             ]
           },
           {
             "id": "travel-1",
             "body": "ground",
             "local": [
-              90,
+              100,
               0,
-              60
+              72
+            ]
+          },
+          {
+            "id": "nut-centre",
+            "body": "nut",
+            "local": [
+              0,
+              0,
+              0
             ]
           }
         ],
         "outputs": [
           {
             "id": "nut-x",
-            "of": "nut-mark",
+            "of": "guide",
             "kind": "position",
             "unit": "mm"
           },
@@ -52654,7 +52641,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Unbuilt; reviewed against the record. The relation is exact and linear (3 mm per turn), but the record's 200 mm stroke takes 66.7 turns, and a screw turning one way cannot repeat its cycle. Decided: the screw turns 10 turns out and back, so the nut travels 30 mm, one lead per turn, with a tick on the nut's path at each turn; a mark on the handwheel to count turns; the guide that keeps the nut from turning is part of the lesson and stays in view; a section through the nut on the screw axis shows the loaded thread flank, the inclined plane of the text. Tr12x3 is kept: lead angle 5.2° against a friction angle of 8.5°, so it is self-locking."
+          "note": "Unbuilt; reviewed against the record. The relation is exact and linear (3 mm per turn), but the record's 200 mm stroke takes 66.7 turns, and a screw turning one way cannot repeat its cycle. Decided: the screw turns 10 turns out and back, so the nut travels 30 mm, one lead per turn, with a tick on the nut's path at each turn; a mark on the handwheel to count turns; the guide that keeps the nut from turning is part of the lesson and stays in view; a section through the nut on the screw axis shows the loaded thread flank, the inclined plane of the text. Tr12x3 is kept: lead angle 5.2° against a friction angle of 8.5°, so it is self-locking. Rebuild (R7): the input is a reversing belt drive to the screw's end; the nut's ticks count the turns, so the handwheel mark is not kept."
         },
         "principle": [
           {
@@ -52665,9 +52652,6 @@
           },
           {
             "point": "nut-mark"
-          },
-          {
-            "point": "wheel-mark"
           }
         ],
         "traces": [
@@ -52702,20 +52686,20 @@
             "kind": "section",
             "plane": {
               "origin": [
-                120,
+                130,
                 0,
                 40
               ],
               "normal": [
                 0,
-                1,
+                -1,
                 0
               ]
             },
+            "center": "nut-centre",
+            "scale": 3,
             "highlight": [
-              "thread",
-              "nut.flank",
-              "screw.flank"
+              "nut"
             ]
           }
         ],
@@ -53004,15 +52988,15 @@
             "shape": {
               "type": "plate",
               "rect": [
-                280,
-                80
+                300,
+                100
               ],
-              "note": "base with fixed and floating end bearings and a linear guide for the nut's flange"
+              "note": "base with the screw's two pillow blocks and the guide rail for the nut's flag"
             },
             "at": {
               "frame": {
                 "origin": [
-                  100,
+                  90,
                   0,
                   0
                 ]
@@ -53025,15 +53009,17 @@
             "shape": {
               "type": "shaft",
               "diameter": 16,
-              "length": 220,
+              "journal": 10,
               "groove": {
                 "form": "gothic arch",
+                "major": 16,
                 "lead": 5,
                 "ballCircle": 16.6,
                 "ball": 3.175,
+                "contact": 45,
                 "hand": "right",
-                "from": 0,
-                "to": 200
+                "from": 40,
+                "to": 190
               }
             },
             "at": {
@@ -53044,16 +53030,16 @@
             "id": "nut",
             "role": "output",
             "shape": {
-              "type": "slider",
+              "type": "nut",
               "length": 45,
-              "width": 32,
-              "height": 32,
-              "flange": 48,
-              "groove": {
-                "form": "gothic arch",
-                "turns": 3
-              },
-              "return": "tube"
+              "width": 46,
+              "height": 46,
+              "turns": 3,
+              "return": "tube",
+              "flag": {
+                "side": -1,
+                "gap": 16
+              }
             },
             "at": {
               "joint": "guide"
@@ -53114,11 +53100,7 @@
             ],
             "lead": 5,
             "hand": "right",
-            "ball": true,
-            "ballDiameter": 3.175,
-            "ballCircle": 16.6,
-            "contactAngle": 45,
-            "loadedTurns": 3
+            "ball": true
           }
         ],
         "params": [
@@ -53169,6 +53151,22 @@
             "min": 1,
             "max": 5,
             "note": "loaded turns in the circuit"
+          },
+          {
+            "id": "kb",
+            "value": 0.4324,
+            "unit": "-",
+            "min": 0.4,
+            "max": 0.5,
+            "note": "the ball centres' share of the screw's turn relative to the nut: (1 - db cos(alpha) / dpw) / 2"
+          },
+          {
+            "id": "rpw",
+            "value": 8.3,
+            "unit": "mm",
+            "min": 6,
+            "max": 20.5,
+            "note": "ball-centre circle radius, dpw / 2"
           }
         ],
         "design": [
@@ -53205,36 +53203,17 @@
               "guide"
             ],
             "in": {
-              "screw": "screw",
+              "joint": "balls",
+              "input": "turn",
               "nut": "nut",
-              "lead": "l",
-              "turn": "turn"
+              "balls": {
+                "ratio": "kb",
+                "r": "rpw"
+              }
             },
-            "out": "x-nut",
-            "opts": {
-              "hand": "right",
-              "ball": true,
-              "sign": "a positive turn about +x moves the nut toward -x"
-            }
-          },
-          {
-            "block": "convey",
-            "id": "recirculation",
-            "joints": [],
-            "in": {
-              "screw": "screw",
-              "nut": "nut",
-              "lead": "l",
-              "db": "db",
-              "dpw": "dpw",
-              "alpha": "alpha",
-              "turns": "turns",
-              "return": "return"
-            },
-            "out": "ball-train",
-            "opts": {
-              "circuit": "3 loaded turns of the groove, then the return path back to the start",
-              "speed": "relative to the nut each ball centre turns at (1 - db cos(alpha) / dpw) / 2 = 0.43 of the screw's turn"
+            "out": {
+              "advance": "nut-advance",
+              "balls": "ball-travel"
             }
           }
         ],
@@ -53243,9 +53222,18 @@
             "id": "nut-mark",
             "body": "nut",
             "local": [
+              23,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "nut-centre",
+            "body": "nut",
+            "local": [
               0,
               0,
-              24
+              0
             ]
           },
           {
@@ -53254,7 +53242,7 @@
             "local": [
               150,
               0,
-              80
+              82
             ]
           },
           {
@@ -53263,14 +53251,14 @@
             "local": [
               120,
               0,
-              80
+              82
             ]
           }
         ],
         "outputs": [
           {
             "id": "nut-x",
-            "of": "nut-mark",
+            "of": "guide",
             "kind": "position",
             "unit": "mm"
           },
@@ -53287,7 +53275,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice."
+          "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice. Rebuild (R7): the return type is not offered as a control, because it changes the built nut; the tube return is built."
         },
         "principle": [
           {
@@ -53295,9 +53283,6 @@
           },
           {
             "body": "nut"
-          },
-          {
-            "point": "balls"
           },
           {
             "point": "nut-mark"
@@ -53341,15 +53326,14 @@
               ],
               "normal": [
                 0,
-                1,
+                -1,
                 0
               ]
             },
+            "center": "nut-centre",
+            "scale": 2.5,
             "highlight": [
-              "balls",
-              "nut.return",
-              "nut.groove",
-              "screw.groove"
+              "nut"
             ]
           }
         ],
@@ -53358,11 +53342,6 @@
             "id": "turn",
             "kind": "driver",
             "driver": "turn"
-          },
-          {
-            "id": "return",
-            "kind": "design",
-            "design": "return"
           }
         ],
         "plot": {
@@ -53610,27 +53589,18 @@
               "type": "plate",
               "rect": [
                 300,
-                70
+                90
               ],
               "nut": {
-                "at": [
-                  15,
-                  0,
-                  40
-                ],
                 "length": 30,
                 "thread": "Tr24x5"
               },
-              "rail": {
-                "side": -1,
-                "offset": 24
-              },
-              "note": "frame carrying the fixed nut and a guide rail for the moving nut"
+              "note": "base with the fixed nut's pedestal and the guide rail for the moving nut's flag"
             },
             "at": {
               "frame": {
                 "origin": [
-                  100,
+                  80,
                   0,
                   0
                 ]
@@ -53643,28 +53613,29 @@
             "shape": {
               "type": "shaft",
               "diameter": 24,
-              "length": 250,
               "threads": [
                 {
                   "form": "Tr",
                   "major": 24,
+                  "minor": 18.5,
                   "pitch": 5,
                   "hand": "right",
-                  "from": -65,
-                  "to": 15
+                  "from": -45,
+                  "to": 25
                 },
                 {
                   "form": "Tr",
                   "major": 20,
+                  "minor": 15.5,
                   "pitch": 4,
                   "hand": "right",
-                  "from": 50,
-                  "to": 160
+                  "from": 60,
+                  "to": 150
                 }
               ],
               "knob": {
-                "diameter": 30,
-                "at": -80
+                "diameter": 40,
+                "at": -62
               }
             },
             "at": {
@@ -53675,14 +53646,13 @@
             "id": "nut",
             "role": "output",
             "shape": {
-              "type": "slider",
-              "length": 25,
-              "width": 30,
-              "height": 30,
-              "bore": "Tr20x4",
+              "type": "nut",
+              "length": 26,
+              "width": 40,
+              "height": 40,
               "flag": {
                 "side": -1,
-                "to": "guide rail"
+                "gap": 16
               }
             },
             "at": {
@@ -53716,7 +53686,7 @@
             "a": "screw",
             "b": "nut",
             "at": [
-              120,
+              135,
               0,
               40
             ],
@@ -53727,7 +53697,6 @@
             ],
             "lead": 4,
             "hand": "right",
-            "handFrom": "hands",
             "ball": false
           },
           {
@@ -53736,7 +53705,7 @@
             "a": "ground",
             "b": "nut",
             "at": [
-              120,
+              135,
               0,
               40
             ],
@@ -53747,7 +53716,7 @@
             ],
             "limits": [
               0,
-              90
+              10
             ]
           }
         ],
@@ -53791,7 +53760,7 @@
           {
             "id": "knob",
             "joint": "fixed-thread",
-            "kind": "oscillating",
+            "kind": "manual",
             "range": [
               0,
               3600
@@ -53810,19 +53779,13 @@
               "guide"
             ],
             "in": {
-              "screw": "screw",
+              "joint": "moving-thread",
+              "input": "knob",
               "nut": "nut",
-              "p1": "p1",
-              "p2": "p2",
-              "hands": "hands",
-              "turn": "knob"
+              "hand": "hands"
             },
-            "out": [
-              "x-screw",
-              "x-nut"
-            ],
-            "opts": {
-              "relation": "x_screw = p1 turn / 360; x_nut = (p1 - p2) turn / 360 with the same hands, (p1 + p2) turn / 360 with opposite hands"
+            "out": {
+              "advance": "nut-advance"
             }
           }
         ],
@@ -53831,40 +53794,40 @@
             "id": "screw-end",
             "body": "screw",
             "local": [
-              165,
               0,
-              0
+              0,
+              150
             ]
           },
           {
             "id": "nut-mark",
             "body": "nut",
             "local": [
+              20,
               0,
-              0,
-              15
+              0
             ]
           },
           {
-            "id": "knob-mark",
-            "body": "screw",
+            "id": "nut-centre",
+            "body": "nut",
             "local": [
-              -80,
               0,
-              15
+              0,
+              0
             ]
           }
         ],
         "outputs": [
           {
             "id": "screw-x",
-            "of": "screw-end",
+            "of": "fixed-thread",
             "kind": "position",
             "unit": "mm"
           },
           {
             "id": "nut-x",
-            "of": "nut-mark",
+            "of": "guide",
             "kind": "position",
             "unit": "mm"
           },
@@ -53881,7 +53844,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Unbuilt; reviewed against the record. With 1.0 and 0.8 mm pitches the nut moves 0.2 mm per turn: nothing would show, and the record's own note asked to exaggerate the drawing, which K1 forbids. Decided: real coarse threads of 5 and 4 mm (Tr24x5 in the fixed nut, Tr20x4 for the moving nut), the same 5:1 as the fine pair, so over 10 turns out and back the screw advances 50 mm and the nut 10 mm, both at true size; ticks once per turn on the screw's end and on the nut so 5 mm against 1 mm per turn reads; a same or opposite hand switch with the opposite-hand nut path (9 mm per turn) as a ghost; a section through both nuts shows the two pitches engaged."
+          "note": "Unbuilt; reviewed against the record. With 1.0 and 0.8 mm pitches the nut moves 0.2 mm per turn: nothing would show, and the record's own note asked to exaggerate the drawing, which K1 forbids. Decided: real coarse threads of 5 and 4 mm (Tr24x5 in the fixed nut, Tr20x4 for the moving nut), the same 5:1 as the fine pair, so over 10 turns out and back the screw advances 50 mm and the nut 10 mm, both at true size; ticks once per turn on the screw's end and on the nut so 5 mm against 1 mm per turn reads; a same or opposite hand switch with the opposite-hand nut path (9 mm per turn) as a ghost; a section through both nuts shows the two pitches engaged. Rebuild (R7): the hand switch is not offered as a control, because the threads are built right hand and a control cannot change built parts; the opposite-hand nut path stays as a ghost. The screw advances through its fixed nut, so it is turned by a knob on its end, not belted."
         },
         "principle": [
           {
@@ -53895,9 +53858,6 @@
           },
           {
             "point": "nut-mark"
-          },
-          {
-            "point": "knob-mark"
           }
         ],
         "traces": [
@@ -53938,19 +53898,19 @@
             "kind": "section",
             "plane": {
               "origin": [
-                70,
+                75,
                 0,
                 40
               ],
               "normal": [
                 0,
-                1,
+                -1,
                 0
               ]
             },
             "highlight": [
-              "fixed-thread",
-              "moving-thread"
+              "screw",
+              "nut"
             ]
           }
         ],
@@ -53959,11 +53919,6 @@
             "id": "knob",
             "kind": "driver",
             "driver": "knob"
-          },
-          {
-            "id": "hands",
-            "kind": "design",
-            "design": "hands"
           }
         ],
         "plot": [
@@ -54332,7 +54287,7 @@
             "a": "ground",
             "b": "driven",
             "at": [
-              201.68,
+              201.680553,
               0,
               0
             ],
@@ -54359,7 +54314,9 @@
             "pitchLength": 696,
             "width": 6,
             "arrangement": "open",
-            "note": "upper span runs onto the driver (counter-clockwise): tight side; lower span slack"
+            "note": "upper span runs onto the driver (counter-clockwise): tight side; lower span slack",
+            "radiusA": 30.557749,
+            "radiusB": 61.115498
           }
         ],
         "params": [
@@ -54373,7 +54330,7 @@
           },
           {
             "id": "C",
-            "value": 201.68,
+            "value": 201.680553,
             "unit": "mm",
             "min": 195,
             "max": 210,
@@ -54395,41 +54352,23 @@
         ],
         "solve": [
           {
-            "block": "gear-mesh",
-            "id": "belt-ratio",
+            "block": "convey",
+            "id": "belt-travel",
             "joints": [
               "belt",
               "O2"
             ],
             "in": {
-              "a": "driver",
-              "b": "driven",
-              "za": 24,
-              "zb": 48
+              "joint": "belt",
+              "input": "input",
+              "C": "C",
+              "r": 30.557749,
+              "driven": "driven",
+              "drivenCenter": "O2"
             },
-            "out": "theta2",
-            "opts": {
-              "sense": "same",
-              "flexible": "timing belt",
-              "phase": "a groove of each pulley meets a belt tooth"
-            }
-          },
-          {
-            "block": "convey",
-            "id": "teeth",
-            "joints": [],
-            "in": {
-              "travel": "input",
-              "pitch": "p",
-              "over": [
-                "driver",
-                "driven"
-              ]
-            },
-            "out": "belt-teeth",
-            "opts": {
-              "path": "pitch path of the open belt",
-              "travel": "driver pitch radius times its angle"
+            "out": {
+              "angle": "driven-turn",
+              "travel": "belt-travel"
             }
           }
         ],
@@ -54438,7 +54377,7 @@
             "id": "rim1",
             "body": "driver",
             "local": [
-              30.56,
+              30.557749,
               0,
               0
             ]
@@ -54447,7 +54386,7 @@
             "id": "rim2",
             "body": "driven",
             "local": [
-              61.12,
+              61.115498,
               0,
               0
             ]
@@ -54508,7 +54447,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven pulley turns 180° per driver turn, the same way, with the belt teeth carried in the grooves; the numbers in the relations were for 60 and 120 mm pulleys at 200 mm, not the built 24 and 48 groove pulleys. The principle (one belt speed at both rims) had nothing to show it. Decided: keep the open timing belt; trace a pitch-circle point on each pulley with equal-time ticks, so each tick is the same 16 mm of rim on both pulleys while the turns are 30° and 15°; one index mark per pulley to count 2:1; tight and slack spans and the wrap angle drawn; the relations restated for the built pulleys."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven pulley turns 180° per driver turn, the same way, with the belt teeth carried in the grooves; the numbers in the relations were for 60 and 120 mm pulleys at 200 mm, not the built 24 and 48 groove pulleys. The principle (one belt speed at both rims) had nothing to show it. Decided: keep the open timing belt; trace a pitch-circle point on each pulley with equal-time ticks, so each tick is the same 16 mm of rim on both pulleys while the turns are 30° and 15°; one index mark per pulley to count 2:1; tight and slack spans and the wrap angle drawn; the relations restated for the built pulleys. Rebuild (R7): the belt's teeth are carried round on a pitch path exactly 87 teeth long, the pulleys' grooves phased to them."
         },
         "principle": [
           {
@@ -54584,7 +54523,7 @@
             "output": "driven-angle",
             "stat": "range",
             "value": 180,
-            "tol": 0.1
+            "tol": 0.5
           },
           {
             "text": "ratio = D2/D1 (2:1 default)",
@@ -54885,7 +54824,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "upper block, plane A"
             },
             "at": {
               "joint": "U-A"
@@ -54899,7 +54839,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "upper block, plane B"
             },
             "at": {
               "joint": "U-B"
@@ -54910,21 +54851,25 @@
             "role": "output",
             "shape": {
               "type": "plate",
-              "rect": [
-                24,
-                78
-              ],
-              "hook": {
-                "at": [
+              "outline": [
+                [
                   0,
-                  -56,
-                  0
+                  12
+                ],
+                [
+                  0,
+                  -44
                 ]
-              },
-              "note": "lower block cheeks carrying both sheave pins and the hook"
+              ],
+              "boss": 12,
+              "note": "lower block: cheeks carrying both sheaves' pin and the hook"
             },
-            "at": {
-              "joint": "guide"
+            "frame": {
+              "origin": [
+                8,
+                -135,
+                0
+              ]
             }
           },
           {
@@ -54935,7 +54880,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "lower block, plane A"
             },
             "at": {
               "joint": "L-A"
@@ -54949,7 +54895,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "lower block, plane B"
             },
             "at": {
               "joint": "L-B"
@@ -54959,12 +54906,26 @@
             "id": "carriage",
             "role": "driver",
             "shape": {
-              "type": "slider",
-              "length": 30,
-              "width": 20
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  8
+                ],
+                [
+                  0,
+                  -22
+                ]
+              ],
+              "boss": 10,
+              "note": "the fall's carriage, the fall's end clamped on it"
             },
-            "at": {
-              "joint": "fall-slide"
+            "frame": {
+              "origin": [
+                -28.4,
+                -205,
+                0
+              ]
             }
           }
         ],
@@ -54977,7 +54938,7 @@
             "at": [
               0,
               0,
-              10
+              0
             ],
             "axis": [
               0,
@@ -54993,7 +54954,7 @@
             "at": [
               0,
               0,
-              30
+              0
             ],
             "axis": [
               0,
@@ -55019,7 +54980,9 @@
             "limits": [
               0,
               40.1
-            ]
+            ],
+            "rod": true,
+            "note": "the load's line: the hook block runs on a guide rod along it"
           },
           {
             "id": "L-A",
@@ -55029,7 +54992,7 @@
             "at": [
               8,
               -135,
-              10
+              0
             ],
             "axis": [
               0,
@@ -55045,7 +55008,7 @@
             "at": [
               8,
               -135,
-              30
+              0
             ],
             "axis": [
               0,
@@ -55060,8 +55023,8 @@
             "b": "carriage",
             "at": [
               -28.4,
-              -170,
-              30
+              -205,
+              0
             ],
             "axis": [
               0,
@@ -55084,20 +55047,12 @@
               -52,
               10
             ],
-            "span": [
-              [
-                -20.4,
-                -52,
-                10
-              ],
-              [
-                -20.4,
-                -135,
-                10
-              ]
-            ],
             "rope": 3.2,
-            "note": "standing part from the becket (dead end) down to lower sheave A"
+            "note": "standing part from the becket (dead end) down to lower sheave A",
+            "ends": [
+              "dead",
+              "LAl"
+            ]
           },
           {
             "id": "part-2",
@@ -55110,19 +55065,11 @@
               -133.32,
               10
             ],
-            "span": [
-              [
-                36.35,
-                -133.32,
-                10
-              ],
-              [
-                28.35,
-                1.68,
-                10
-              ]
-            ],
-            "rope": 3.2
+            "rope": 3.2,
+            "ends": [
+              "LAr",
+              "UAr"
+            ]
           },
           {
             "id": "part-3",
@@ -55135,20 +55082,13 @@
               -1.68,
               20
             ],
-            "span": [
-              [
-                -28.35,
-                -1.68,
-                20
-              ],
-              [
-                -20.35,
-                -136.68,
-                20
-              ]
-            ],
             "rope": 3.2,
-            "note": "crosses from plane A to plane B between the sheaves"
+            "note": "crosses from plane A to plane B between the sheaves",
+            "ends": [
+              "UAl",
+              "LBl"
+            ],
+            "crossed": true
           },
           {
             "id": "part-4",
@@ -55161,19 +55101,11 @@
               -133.32,
               30
             ],
-            "span": [
-              [
-                36.35,
-                -133.32,
-                30
-              ],
-              [
-                28.35,
-                1.68,
-                30
-              ]
-            ],
-            "rope": 3.2
+            "rope": 3.2,
+            "ends": [
+              "LBr",
+              "UBr"
+            ]
           },
           {
             "id": "fall",
@@ -55186,20 +55118,12 @@
               0,
               30
             ],
-            "span": [
-              [
-                -28.4,
-                0,
-                30
-              ],
-              [
-                -28.4,
-                -170,
-                30
-              ]
-            ],
             "rope": 3.2,
-            "note": "the fall, hauled by the carriage"
+            "note": "the fall, hauled by the carriage",
+            "ends": [
+              "UBl",
+              "fallEnd"
+            ]
           }
         ],
         "params": [
@@ -55262,12 +55186,14 @@
               0,
               160
             ],
-            "default": 0
+            "default": 0,
+            "lo": 0,
+            "hi": 160
           }
         ],
         "solve": [
           {
-            "block": "new:reeve",
+            "block": "reeve",
             "id": "reeve",
             "joints": [
               "guide",
@@ -55283,30 +55209,128 @@
             ],
             "in": {
               "fall": "haul",
-              "parts": "n",
-              "pitch": "RP",
-              "fleet": "DX",
-              "spacing": "D0",
-              "deadEnd": "dead-y"
-            },
-            "out": [
-              "rise",
-              "sheave-turns"
-            ],
-            "opts": {
-              "order": [
-                "part-1",
-                "part-2",
-                "part-3",
-                "part-4",
-                "fall"
+              "D0": "D0",
+              "DX": "DX",
+              "slanted": 3,
+              "RP": "RP",
+              "block": "block",
+              "axis": [
+                0,
+                1,
+                0
               ],
-              "rope": "length conserved: haul = (D0 - D) + 3 (hypot(DX, D0) - hypot(DX, D)), D the pin spacing",
-              "sheaves": "each sheave turns by the rope paid past it over RP: lower A 1x, upper A 2x, lower B 3x, upper B 4x the load's travel"
+              "sheaves": [
+                {
+                  "body": "sheave-LA",
+                  "center": "L-A",
+                  "k": 0,
+                  "moving": true
+                },
+                {
+                  "body": "sheave-UA",
+                  "center": "U-A",
+                  "k": 1
+                },
+                {
+                  "body": "sheave-LB",
+                  "center": "L-B",
+                  "k": 2,
+                  "moving": true
+                },
+                {
+                  "body": "sheave-UB",
+                  "center": "U-B",
+                  "k": 3
+                }
+              ]
+            },
+            "out": {
+              "rise": "rise"
             }
           }
         ],
         "points": [
+          {
+            "id": "dead",
+            "body": "ground",
+            "local": [
+              -20.4,
+              -52,
+              4.5
+            ]
+          },
+          {
+            "id": "UAr",
+            "body": "ground",
+            "local": [
+              28.35,
+              1.68,
+              4.5
+            ]
+          },
+          {
+            "id": "UAl",
+            "body": "ground",
+            "local": [
+              -28.35,
+              -1.68,
+              4.5
+            ]
+          },
+          {
+            "id": "UBr",
+            "body": "ground",
+            "local": [
+              28.35,
+              1.68,
+              17.5
+            ]
+          },
+          {
+            "id": "UBl",
+            "body": "ground",
+            "local": [
+              -28.4,
+              0,
+              17.5
+            ]
+          },
+          {
+            "id": "LAl",
+            "body": "block",
+            "local": [
+              -28.4,
+              0,
+              4.5
+            ]
+          },
+          {
+            "id": "LAr",
+            "body": "block",
+            "local": [
+              28.35,
+              1.68,
+              4.5
+            ]
+          },
+          {
+            "id": "LBl",
+            "body": "block",
+            "local": [
+              -28.35,
+              -1.68,
+              17.5
+            ]
+          },
+          {
+            "id": "LBr",
+            "body": "block",
+            "local": [
+              28.35,
+              1.68,
+              17.5
+            ]
+          },
           {
             "id": "hook",
             "body": "block",
@@ -55317,47 +55341,20 @@
             ]
           },
           {
-            "id": "fall-end",
+            "id": "fallEnd",
             "body": "carriage",
             "local": [
               0,
-              0,
-              0
+              4,
+              26
             ]
           },
           {
-            "id": "mark-UA",
-            "body": "sheave-UA",
+            "id": "haulPin",
+            "body": "carriage",
             "local": [
               0,
-              26,
-              0
-            ]
-          },
-          {
-            "id": "mark-UB",
-            "body": "sheave-UB",
-            "local": [
-              0,
-              26,
-              0
-            ]
-          },
-          {
-            "id": "mark-LA",
-            "body": "sheave-LA",
-            "local": [
-              0,
-              26,
-              0
-            ]
-          },
-          {
-            "id": "mark-LB",
-            "body": "sheave-LB",
-            "local": [
-              0,
-              26,
+              -10,
               0
             ]
           }
@@ -55367,11 +55364,16 @@
             "id": "rise",
             "of": "hook",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "hauled",
-            "of": "fall-end",
+            "of": "fall-slide",
             "kind": "position",
             "unit": "mm"
           },
@@ -55428,7 +55430,7 @@
             "point": "hook"
           },
           {
-            "point": "fall-end"
+            "point": "fallEnd"
           }
         ],
         "traces": [
@@ -55442,7 +55444,7 @@
           },
           {
             "id": "fall-path",
-            "point": "fall-end",
+            "point": "fallEnd",
             "ticks": {
               "every": 20
             }
@@ -55459,7 +55461,12 @@
           {
             "id": "load-line",
             "kind": "axis-line",
-            "through": "guide",
+            "at": "guide",
+            "axis": [
+              0,
+              1,
+              0
+            ],
             "label": "LOAD LINE"
           }
         ],
@@ -55804,7 +55811,8 @@
               "pitch": 12.7,
               "roller": 8.5,
               "standard": "ISO 606 08B",
-              "bore": 12
+              "bore": 12,
+              "face": 7
             },
             "at": {
               "joint": "O1"
@@ -55819,7 +55827,8 @@
               "pitch": 12.7,
               "roller": 8.5,
               "standard": "ISO 606 08B",
-              "bore": 14.4
+              "bore": 14.4,
+              "face": 7
             },
             "at": {
               "joint": "O2"
@@ -55849,7 +55858,7 @@
             "a": "ground",
             "b": "driven",
             "at": [
-              248.46,
+              248.976692,
               0,
               0
             ],
@@ -55874,7 +55883,11 @@
             "pitch": 12.7,
             "roller": 8.5,
             "standard": "ISO 606 08B",
-            "note": "upper span runs onto the driver (counter-clockwise): tight side; lower span slack"
+            "note": "upper span runs onto the driver (counter-clockwise): tight side; lower span slack",
+            "za": 15,
+            "zb": 30,
+            "phaseA": 0,
+            "phaseB": 5.5157
           }
         ],
         "params": [
@@ -55896,7 +55909,7 @@
           },
           {
             "id": "C",
-            "value": 248.46,
+            "value": 248.976692,
             "unit": "mm",
             "min": 240,
             "max": 256,
@@ -55919,27 +55932,24 @@
         "solve": [
           {
             "block": "convey",
-            "id": "chain",
+            "id": "chain-advance",
             "joints": [
               "chain",
               "O2"
             ],
             "in": {
-              "driver": "driver",
+              "mode": "chain",
+              "joint": "chain",
+              "input": "input",
+              "C": "C",
+              "r": 30.541813,
               "driven": "driven",
-              "za": 15,
-              "zb": 30,
-              "pitch": "p",
-              "links": "N"
+              "drivenCenter": "O2"
             },
-            "out": [
-              "theta2",
-              "v-chain"
-            ],
-            "opts": {
-              "seat": "pitch polygon",
-              "chordal": true,
-              "note": "rollers seat on each sprocket's pitch polygon; the tight span is a straight run of whole pitches between the last seated roller on each sprocket, so the chain speed and the driven speed ripple once per tooth; on average theta2 = theta1 z1/z2"
+            "out": {
+              "angle": "driven-turn",
+              "travel": "chain-travel",
+              "speed": "chain-v"
             }
           }
         ],
@@ -55948,7 +55958,7 @@
             "id": "rim1",
             "body": "driver",
             "local": [
-              30.54,
+              30.541813,
               0,
               0
             ]
@@ -55957,7 +55967,7 @@
             "id": "rim2",
             "body": "driven",
             "local": [
-              60.75,
+              60.749004,
               0,
               0
             ]
@@ -56013,8 +56023,9 @@
           },
           {
             "id": "chain-speed",
-            "of": "chain",
-            "kind": "speed-ratio"
+            "of": "chain-v",
+            "kind": "position",
+            "unit": "of peak"
           }
         ],
         "fallback": null
@@ -56023,7 +56034,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven sprocket turns 180° per driver turn, the same way, and the rollers seat in every gap; but the chain ran on the pitch circles, so the chordal action the text explains (and the record's output character, Non-uniform) was absent from the motion. Decided: the chain is solved on the pitch polygon, so the chain speed falls to 0.978 of its peak once per tooth (2.2% for 15 teeth) and the speed plot shows the ripple the record promises; the pitch chord of the driver drawn; equal-time ticks on a pitch point of each sprocket and an index mark on each to count 2:1; the relations corrected to the built centre distance (62 links give 248.5 mm, not 254)."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven sprocket turns 180° per driver turn, the same way, and the rollers seat in every gap; but the chain ran on the pitch circles, so the chordal action the text explains (and the record's output character, Non-uniform) was absent from the motion. Decided: the chain is solved on the pitch polygon, so the chain speed falls to 0.978 of its peak once per tooth (2.2% for 15 teeth) and the speed plot shows the ripple the record promises; the pitch chord of the driver drawn; equal-time ticks on a pitch point of each sprocket and an index mark on each to count 2:1; the relations corrected to the built centre distance (62 links give 248.5 mm, not 254). Rebuild (R7): the chordal action is solved (the convey block's chain mode); the rollers ride the sprockets' seats exactly; the 0.67 mm span rise is not drawn."
         },
         "principle": [
           {
@@ -56105,7 +56116,7 @@
             "output": "driven-angle",
             "stat": "range",
             "value": 180,
-            "tol": 0.1
+            "tol": 0.5
           },
           {
             "text": "ratio = z2/z1 (30/15 = 2:1 default)",
@@ -56416,17 +56427,16 @@
             "shape": {
               "type": "plate",
               "rect": [
-                320,
-                170
-              ],
-              "note": "case with the input and output shaft bearings"
+                340,
+                240
+              ]
             },
             "at": {
               "frame": {
                 "origin": [
                   75,
-                  0,
-                  -40
+                  10,
+                  -90
                 ]
               }
             }
@@ -56438,9 +56448,11 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "fixed",
-              "halfAngle": 11,
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": -1,
               "shaft": 20,
-              "side": "below"
+              "note": "the input shaft with its fixed sheave half, keyed"
             },
             "at": {
               "joint": "O1"
@@ -56453,9 +56465,13 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "movable",
-              "halfAngle": 11,
-              "spline": 20,
-              "side": "above"
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": 1,
+              "shaft": 20,
+              "built": "r1",
+              "shift": true,
+              "note": "slides on the shaft's keys; the shift fork in its hub's groove sets it (the ratio)"
             },
             "at": {
               "joint": "S1"
@@ -56468,9 +56484,11 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "fixed",
-              "halfAngle": 11,
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": 1,
               "shaft": 20,
-              "side": "above"
+              "note": "the output shaft with its fixed sheave half, keyed"
             },
             "at": {
               "joint": "O2"
@@ -56483,13 +56501,28 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "movable",
-              "halfAngle": 11,
-              "spline": 20,
-              "side": "below",
-              "spring": "pushes the sheave closed"
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": -1,
+              "shaft": 20,
+              "built": "r2",
+              "spring": true,
+              "note": "slides on the shaft's keys; a spring pushes it closed, the belt's tension opens it"
             },
             "at": {
               "joint": "S2"
+            }
+          },
+          {
+            "id": "shifter",
+            "role": "link",
+            "shape": {
+              "type": "fork",
+              "groove": "in-movable",
+              "note": "the shift fork on its carriage: the ratio setting"
+            },
+            "at": {
+              "joint": "shift"
             }
           }
         ],
@@ -56506,8 +56539,8 @@
             ],
             "axis": [
               0,
-              0,
-              1
+              1,
+              0
             ]
           },
           {
@@ -56516,14 +56549,14 @@
             "a": "ground",
             "b": "out-fixed",
             "at": [
-              150,
+              "C",
               0,
               0
             ],
             "axis": [
               0,
-              0,
-              1
+              1,
+              0
             ]
           },
           {
@@ -56538,14 +56571,15 @@
             ],
             "axis": [
               0,
-              0,
-              -1
+              -1,
+              0
             ],
             "limits": [
-              0,
-              14.41
+              -1.944,
+              12.467
             ],
-            "note": "closing the input sheaves pushes the belt out"
+            "spline": true,
+            "note": "closing the input sheave (toward -y) pushes the belt out to a larger radius"
           },
           {
             "id": "S2",
@@ -56553,20 +56587,42 @@
             "a": "out-fixed",
             "b": "out-movable",
             "at": [
-              150,
+              "C",
               0,
               0
             ],
             "axis": [
               0,
-              0,
-              -1
+              1,
+              0
             ],
             "limits": [
-              0,
-              14.41
+              -12.944,
+              1.467
             ],
-            "note": "the output sheaves open as the belt is pulled in"
+            "spline": true,
+            "note": "the output sheave opens (toward -y) as the belt is pulled in"
+          },
+          {
+            "id": "shift",
+            "type": "prismatic",
+            "a": "ground",
+            "b": "shifter",
+            "at": [
+              0,
+              40,
+              0
+            ],
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "limits": [
+              -1.944,
+              12.467
+            ],
+            "note": "the shift fork's carriage, set by the ratio control"
           },
           {
             "id": "belt",
@@ -56575,13 +56631,17 @@
             "a": "in-fixed",
             "b": "out-fixed",
             "at": [
+              "C/2",
               0,
-              30,
               0
             ],
-            "pitchLength": 582.74,
+            "radiusA": "r1",
+            "C": "C",
+            "pitchLength": "Lb",
             "element": "steel push belt",
-            "width": 24
+            "width": 24,
+            "elements": 150,
+            "note": "a steel push belt: elements in compression between the sheaves"
           }
         ],
         "params": [
@@ -56589,40 +56649,32 @@
             "id": "C",
             "value": 150,
             "unit": "mm",
-            "min": 120,
-            "max": 200,
+            "min": 150,
+            "max": 150,
             "note": "centre distance"
           },
           {
             "id": "rmin",
             "value": 25,
             "unit": "mm",
-            "min": 15,
-            "max": 40,
-            "note": "minimum pitch radius"
-          },
-          {
-            "id": "rmax",
-            "value": 62.07,
-            "unit": "mm",
-            "min": 50,
-            "max": 70,
-            "note": "maximum pitch radius (the other at rmin)"
+            "min": 25,
+            "max": 25,
+            "note": "pitch radius at a sheave's open stop"
           },
           {
             "id": "alpha",
             "value": 11,
             "unit": "deg",
-            "min": 8,
-            "max": 15,
+            "min": 11,
+            "max": 11,
             "note": "sheave half-angle"
           },
           {
             "id": "Lb",
-            "value": 582.74,
+            "value": 582.7433,
             "unit": "mm",
-            "min": 500,
-            "max": 700,
+            "min": 582.7433,
+            "max": 582.7433,
             "note": "belt pitch length, set from r1 = r2 = 45"
           },
           {
@@ -56630,7 +56682,7 @@
             "value": 30,
             "unit": "mm",
             "min": 25,
-            "max": 62.07,
+            "max": 62.069,
             "note": "input pitch radius, the ratio setting"
           }
         ],
@@ -56649,61 +56701,47 @@
         ],
         "solve": [
           {
-            "block": "new:variator",
+            "block": "variator",
             "id": "radii",
             "joints": [
-              "S1",
-              "S2"
-            ],
-            "in": {
-              "r1": "r1",
-              "C": "C",
-              "length": "Lb",
-              "alpha": "alpha",
-              "rmin": "rmin"
-            },
-            "out": [
-              "r2",
-              "shift1",
-              "shift2"
-            ],
-            "opts": {
-              "belt": "L = 2C cos(psi) + pi (r1 + r2) + 2 psi (r1 - r2), psi = asin((r1 - r2)/C), held at Lb",
-              "shift": "each movable sheave moves 2 dr tan(alpha) from its open stop"
-            }
-          },
-          {
-            "block": "gear-mesh",
-            "id": "belt-ratio",
-            "joints": [
               "O2",
+              "S1",
+              "S2",
+              "shift",
               "belt"
             ],
             "in": {
-              "a": "in-fixed",
-              "b": "out-fixed",
-              "ra": "r1",
-              "rb": "r2"
-            },
-            "out": "theta2",
-            "opts": {
-              "sense": "same",
-              "flexible": "cvt"
-            }
-          },
-          {
-            "block": "convey",
-            "id": "elements",
-            "joints": [],
-            "in": {
-              "travel": "input",
               "r1": "r1",
-              "r2": "r2",
-              "C": "C"
+              "built": 30,
+              "C": "C",
+              "length": "Lb",
+              "alpha": "alpha",
+              "rmin": "rmin",
+              "input": "input",
+              "wheels": [
+                {
+                  "fixed": "in-fixed",
+                  "movable": "in-movable",
+                  "joint": "O1",
+                  "slide": "S1"
+                },
+                {
+                  "fixed": "out-fixed",
+                  "movable": "out-movable",
+                  "joint": "O2",
+                  "slide": "S2"
+                }
+              ],
+              "shifter": "shifter"
             },
-            "out": "belt-elements",
-            "opts": {
-              "path": "pitch path of the belt at the current radii"
+            "out": {
+              "r1": "r1v",
+              "r2": "r2",
+              "shift1": "shift1",
+              "shift2": "shift2",
+              "angle": "output-turn",
+              "travel": "belt-travel",
+              "offset": "belt-offset"
             }
           }
         ],
@@ -56714,7 +56752,7 @@
             "local": [
               64,
               0,
-              0
+              -20
             ]
           },
           {
@@ -56723,7 +56761,25 @@
             "local": [
               64,
               0,
-              0
+              20
+            ]
+          },
+          {
+            "id": "sp1",
+            "body": "out-movable",
+            "local": [
+              0,
+              0,
+              -16.5
+            ]
+          },
+          {
+            "id": "sp2",
+            "body": "out-fixed",
+            "local": [
+              0,
+              0,
+              -52.5
             ]
           }
         ],
@@ -56740,8 +56796,14 @@
             "kind": "speed-ratio"
           },
           {
+            "id": "pitch-r2",
+            "of": "r2",
+            "kind": "position",
+            "unit": "mm"
+          },
+          {
             "id": "sheave-shift",
-            "of": "in-movable",
+            "of": "shift1",
             "kind": "position",
             "unit": "mm"
           }
@@ -56768,7 +56830,10 @@
             "body": "out-movable"
           },
           {
-            "point": "belt"
+            "point": "m1"
+          },
+          {
+            "point": "m2"
           }
         ],
         "traces": [
@@ -56785,7 +56850,7 @@
               },
               {
                 "control": "r1",
-                "value": 62.07
+                "value": 62.069
               }
             ],
             "comet": true
@@ -56803,15 +56868,25 @@
             "id": "pitch-in",
             "kind": "circle",
             "center": "O1",
-            "radius": "r1",
-            "label": "PITCH RADIUS r1"
+            "radius": "r1v",
+            "label": "PITCH RADIUS r1",
+            "normal": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "pitch-out",
             "kind": "circle",
             "center": "O2",
             "radius": "r2",
-            "label": "PITCH RADIUS r2"
+            "label": "PITCH RADIUS r2",
+            "normal": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "centres",
@@ -56834,14 +56909,13 @@
               ],
               "normal": [
                 0,
-                1,
-                0
+                0,
+                1
               ]
             },
             "highlight": [
               "in-movable",
-              "out-movable",
-              "belt"
+              "out-movable"
             ]
           }
         ],
@@ -56874,8 +56948,22 @@
             "text": "r1 = 30 mm gives the output 0.515 x the input",
             "output": "speed-ratio",
             "stat": "mean",
-            "value": 0.515,
+            "value": 0.5146,
             "tol": 0.002
+          },
+          {
+            "text": "the belt's length held, r2 = 58.30 mm",
+            "output": "pitch-r2",
+            "stat": "mean",
+            "value": 58.296,
+            "tol": 0.01
+          },
+          {
+            "text": "the input sheave closed 1.94 mm from its open stop",
+            "output": "sheave-shift",
+            "stat": "mean",
+            "value": 1.944,
+            "tol": 0.01
           }
         ],
         "exceptions": []
@@ -57159,26 +57247,27 @@
                 "material": "rubber",
                 "thickness": 4
               },
-              "spline": "hex sleeve AF 16"
-            },
-            "at": {
-              "frame": {
-                "origin": [
-                  60,
+              "slide": {
+                "param": "R",
+                "along": [
+                  1,
                   0,
-                  48
-                ],
-                "rot": [
-                  0,
-                  90,
                   0
-                ]
+                ],
+                "offset": -6
               }
             },
-            "along": {
-              "joint": "Ow",
-              "param": "R",
-              "note": "the wheel slides along its shaft to the contact radius R"
+            "frame": {
+              "origin": [
+                "R-6",
+                0,
+                48
+              ],
+              "rot": [
+                0,
+                90,
+                0
+              ]
             }
           }
         ],
@@ -57191,7 +57280,7 @@
             "at": [
               0,
               0,
-              18
+              10
             ],
             "axis": [
               0,
@@ -57214,7 +57303,7 @@
               0,
               0
             ],
-            "note": "wheel shaft across the disc, 30 mm over the face, crossing the disc's axis"
+            "note": "the wheel's shaft across the disc, 30 mm over the face, crossing the disc's axis; the wheel slides along it on a hex sleeve"
           },
           {
             "id": "contact",
@@ -57222,12 +57311,27 @@
             "a": "disc",
             "b": "wheel",
             "at": [
-              60,
+              "R",
               0,
               18
             ],
-            "radius": "R",
-            "note": "tyre on the disc face at radius R; sign follows R"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              48
+            ],
+            "ratio": "R/rw",
+            "note": "the tyre on the disc's face at radius R: the wheel turns R / rw of the disc, backward past the centre"
           }
         ],
         "params": [
@@ -57286,16 +57390,11 @@
               "contact"
             ],
             "in": {
-              "a": "disc",
-              "b": "wheel",
-              "ra": "R",
-              "rb": "rw"
+              "joint": "contact",
+              "input": "disc"
             },
-            "out": "theta-w",
-            "opts": {
-              "axes": "perpendicular intersecting",
-              "contact": "friction, wheel rim on the disc face",
-              "ratio": "omega_w / omega_d = R / rw, sign follows R, zero at the disc centre"
+            "out": {
+              "angle": "theta-w"
             }
           }
         ],
@@ -57306,7 +57405,25 @@
             "local": [
               0,
               30,
-              0
+              6
+            ]
+          },
+          {
+            "id": "C",
+            "body": "ground",
+            "local": [
+              "R",
+              0,
+              18
+            ]
+          },
+          {
+            "id": "O",
+            "body": "ground",
+            "local": [
+              0,
+              0,
+              18
             ]
           }
         ],
@@ -57321,12 +57438,6 @@
             "id": "speed-ratio",
             "of": "wheel",
             "kind": "speed-ratio"
-          },
-          {
-            "id": "contact-radius",
-            "of": "contact",
-            "kind": "position",
-            "unit": "mm"
           }
         ],
         "fallback": null
@@ -57335,7 +57446,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the wheel turns at R / rw of the disc (3.0 at R 90, still at the centre, -1.0 at R -30), which matches the text; but the contact radius swept by itself over the cycle, so no setting could be held and the ratio was mixed with the shift. Decided: the contact radius R is a control (default 60, 2.0x), with ghost tread traces at R 30 (1:1) and R -30 (reverse); the contact circle on the disc and R as a dimension; the speed ratio plotted against R as the record asks."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the wheel turns at R / rw of the disc (3.0 at R 90, still at the centre, -1.0 at R -30), which matches the text; but the contact radius swept by itself over the cycle, so no setting could be held and the ratio was mixed with the shift. Decided: the contact radius R is a control (default 60, 2.0x), with ghost tread traces at R 30 (1:1) and R -30 (reverse); the contact circle on the disc and R as a dimension; the speed ratio plotted against R as the record asks. Rebuild (R7): the wheel is set along its shaft by the R control and clamped there; the contact point and circle are ground points that follow R. The plot of speed ratio against R needs the engine to sweep a param, so the plot shows the wheel's angle; the ratio at each R reads from the ghosts and the claim."
         },
         "principle": [
           {
@@ -57345,7 +57456,7 @@
             "body": "wheel"
           },
           {
-            "point": "contact"
+            "point": "C"
           },
           {
             "point": "tread"
@@ -57375,21 +57486,21 @@
           {
             "id": "contact-circle",
             "kind": "circle",
-            "center": "Od",
-            "through": "contact",
+            "center": "O",
+            "through": "C",
             "label": "CONTACT CIRCLE"
           },
           {
             "id": "contact-radius",
             "kind": "dimension",
-            "from": "Od",
-            "to": "contact",
+            "from": "O",
+            "to": "C",
             "label": "CONTACT RADIUS R"
           },
           {
             "id": "wheel-axis",
             "kind": "axis-line",
-            "through": "Ow",
+            "at": "Ow",
             "label": "WHEEL AXIS"
           }
         ],
@@ -57406,18 +57517,11 @@
             "param": "R"
           }
         ],
-        "plot": [
-          {
-            "x": "disc",
-            "y": "wheel-angle",
-            "label": "WHEEL ANGLE"
-          },
-          {
-            "x": "contact-radius",
-            "y": "speed-ratio",
-            "label": "SPEED RATIO AGAINST CONTACT RADIUS"
-          }
-        ],
+        "plot": {
+          "x": "disc",
+          "y": "wheel-angle",
+          "label": "WHEEL ANGLE"
+        },
         "claims": [
           {
             "text": "R = 60 turns the wheel at 2.0 x disc speed",
@@ -57431,7 +57535,7 @@
             "output": "wheel-angle",
             "stat": "range",
             "value": 720,
-            "tol": 0.5
+            "tol": 2
           }
         ],
         "exceptions": []
@@ -57694,10 +57798,10 @@
             "shape": {
               "type": "plate",
               "rect": [
-                200,
-                170
+                240,
+                200
               ],
-              "note": "frame carrying the disc bearing, the carriage rail and the cylinder bearings"
+              "note": "frame carrying the disc's shaft, the carriage's rail and the cylinder's blocks"
             },
             "at": {
               "frame": {
@@ -57716,7 +57820,7 @@
               "type": "disc",
               "radius": 60,
               "thickness": 8,
-              "note": "the joint is on the face"
+              "note": "steel, face ground: the ball rolls on its top face at z 20"
             },
             "at": {
               "joint": "Od"
@@ -57735,10 +57839,18 @@
                   "below",
                   "toward the cylinder"
                 ]
-              }
+              },
+              "reach": 90
             },
             "at": {
               "joint": "slide"
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                26
+              ]
             }
           },
           {
@@ -57750,7 +57862,7 @@
               "profile": {
                 "circle": 6
               },
-              "note": "steel ball 12 mm"
+              "note": "steel ball 12 mm, held in the carriage's cage"
             },
             "at": {
               "joint": "cage"
@@ -57760,12 +57872,24 @@
             "id": "cylinder",
             "role": "output",
             "shape": {
-              "type": "shaft",
-              "diameter": 30,
-              "length": 100
+              "type": "disc",
+              "radius": 15,
+              "thickness": 100,
+              "note": "the output cylinder, hardened and ground, parallel to the carriage's travel",
+              "journal": 12,
+              "place": 0
             },
-            "at": {
-              "joint": "Oc"
+            "frame": {
+              "origin": [
+                14.85,
+                50,
+                40.85
+              ],
+              "rot": [
+                90,
+                0,
+                0
+              ]
             }
           }
         ],
@@ -57778,13 +57902,14 @@
             "at": [
               0,
               0,
-              20
+              12
             ],
             "axis": [
               0,
               0,
               1
-            ]
+            ],
+            "note": "the disc's top face at z 20"
           },
           {
             "id": "slide",
@@ -57792,7 +57917,7 @@
             "a": "ground",
             "b": "carriage",
             "at": [
-              0,
+              -71,
               0,
               26
             ],
@@ -57843,7 +57968,9 @@
               0,
               0,
               20
-            ]
+            ],
+            "integrator": true,
+            "note": "the ball on the disc's face at radius x: it spins at ω x / rb about the travel"
           },
           {
             "id": "cyl-contact",
@@ -57854,7 +57981,9 @@
               4.24,
               0,
               30.24
-            ]
+            ],
+            "integrator": true,
+            "note": "the ball on the cylinder at 45°: the cylinder turns at ω x / rc"
           }
         ],
         "params": [
@@ -57912,49 +58041,40 @@
               40
             ],
             "default": 0,
-            "follows": {
-              "driver": "disc",
-              "law": "x = A sin(disc angle)"
-            }
+            "lo": -40,
+            "hi": 40,
+            "phase": 90,
+            "note": "by default x = 40 sin(disc angle): a quarter turn ahead of a cosine sweep"
           }
         ],
         "solve": [
           {
-            "block": "gear-mesh",
-            "id": "disc-ball",
+            "block": "integrator",
+            "id": "integral",
             "joints": [
               "disc-contact",
-              "cage"
-            ],
-            "in": {
-              "a": "disc",
-              "b": "ball",
-              "ra": "carriage",
-              "rb": "rb"
-            },
-            "out": "ball-spin",
-            "opts": {
-              "contact": "ball rolling on the disc face at radius x, the carriage position",
-              "note": "ball turns about an axis parallel to the carriage travel at omega_d x / rb"
-            }
-          },
-          {
-            "block": "gear-mesh",
-            "id": "ball-cylinder",
-            "joints": [
               "cyl-contact",
+              "cage",
               "Oc"
             ],
             "in": {
-              "a": "ball",
-              "b": "cylinder",
-              "ra": "rb",
-              "rb": "rc"
+              "disc": "disc",
+              "x": "carriage",
+              "rc": "rc",
+              "rb": "rb",
+              "ball": "ball",
+              "centre": "cage",
+              "spinAxis": [
+                0,
+                1,
+                0
+              ],
+              "cylinder": "cylinder",
+              "cylJoint": "Oc"
             },
-            "out": "theta-c",
-            "opts": {
-              "contact": "rolling, ball on cylinder at 45°",
-              "result": "theta_c = (1/rc) integral of x d(theta_d)"
+            "out": {
+              "angle": "theta-c",
+              "spin": "ball-spin"
             }
           }
         ],
@@ -57969,12 +58089,39 @@
             ]
           },
           {
+            "id": "C",
+            "body": "carriage",
+            "local": [
+              0,
+              0,
+              -6
+            ]
+          },
+          {
+            "id": "D0",
+            "body": "ground",
+            "local": [
+              0,
+              0,
+              20
+            ]
+          },
+          {
             "id": "cyl-mark",
             "body": "cylinder",
             "local": [
               0,
+              15,
+              50
+            ]
+          },
+          {
+            "id": "P",
+            "body": "carriage",
+            "local": [
+              -91,
               0,
-              15
+              -14
             ]
           }
         ],
@@ -57989,7 +58136,12 @@
             "id": "carriage-x",
             "of": "B",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "speed-ratio",
@@ -58019,10 +58171,7 @@
             "body": "carriage"
           },
           {
-            "point": "disc-contact"
-          },
-          {
-            "point": "cyl-contact"
+            "point": "C"
           }
         ],
         "traces": [
@@ -58046,14 +58195,19 @@
           {
             "id": "integrand",
             "kind": "dimension",
-            "from": "Od",
-            "to": "disc-contact",
+            "from": "D0",
+            "to": "C",
             "label": "INTEGRAND x"
           },
           {
             "id": "output-axis",
             "kind": "axis-line",
-            "through": "Oc",
+            "at": "Oc",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
             "label": "OUTPUT AXIS"
           }
         ],
@@ -70271,7 +70425,7 @@
                 40
               ],
               "thickness": 10,
-              "note": "block left of the notch, clamped; one blank with the lever, aluminium 7075-T6"
+              "note": "the blank's block left of the notch, clamped; one blank with the lever, aluminium 7075-T6"
             },
             "at": {
               "frame": {
@@ -70289,11 +70443,15 @@
             "shape": {
               "type": "link",
               "length": 100,
-              "root": 18,
+              "root": {
+                "at": 5,
+                "half": 9
+              },
               "boss": [
-                7,
-                2
+                9,
+                7
               ],
+              "pin": 4,
               "thickness": 10
             },
             "at": {
@@ -70394,18 +70552,13 @@
             "joints": [],
             "in": {
               "joint": "N",
-              "R": "R",
-              "t": "t",
-              "b": "b",
-              "E": "E"
+              "input": "bend",
+              "beam": "lever",
+              "l": "Larm",
+              "thetaMax": 2
             },
-            "out": [
-              "bend-state",
-              "restoring-torque"
-            ],
-            "opts": {
-              "model": "Paros and Weisbord circular notch, pseudo-rigid revolute at the neck centre",
-              "K": "2 E b t^2.5 / (9 pi sqrt(R)) = 12,984 N·mm/rad"
+            "out": {
+              "bend": "bend-state"
             }
           }
         ],
@@ -70415,6 +70568,24 @@
             "body": "lever",
             "local": [
               100,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "B0",
+            "body": "ground",
+            "local": [
+              30,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "B",
+            "body": "lever",
+            "local": [
+              30,
               0,
               0
             ]
@@ -70431,7 +70602,12 @@
             "id": "tip",
             "of": "T",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           }
         ],
         "fallback": null
@@ -70440,7 +70616,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the lever rocks ±2° about the neck centre and the stiffness is 12,984 N·mm/rad, as the text says; but on the 60 mm lever the tip moved only ±2.1 mm, so the six phases looked almost the same. Decided: keep the true metal angle (a few degrees is part of the lesson, and K1 forbids exaggerating it); lengthen the lever to 100 mm so the tip moves ±3.5 mm; trace the tip on its arc; draw the neck's bend; and a 6x detail view of the neck where the bending happens."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the lever rocks ±2° about the neck centre and the stiffness is 12,984 N·mm/rad, as the text says; but on the 60 mm lever the tip moved only ±2.1 mm, so the six phases looked almost the same. Decided: keep the true metal angle (a few degrees is part of the lesson, and K1 forbids exaggerating it); lengthen the lever to 100 mm so the tip moves ±3.5 mm; trace the tip on its arc; draw the neck's bend; and a 6x detail view of the neck where the bending happens. Rebuild (R7): the neck's bend is drawn as a signed arc with its angle (the bend overlay), the neck itself rigid either side of its centre (D9); the drive is a crank and slotted yoke under the base through a pin in the lever's tip."
         },
         "principle": [
           {
@@ -70465,6 +70641,8 @@
             "id": "neck-bend",
             "kind": "bend",
             "at": "N",
+            "from": "B0",
+            "to": "B",
             "label": "NECK BEND"
           },
           {
@@ -70494,8 +70672,7 @@
             ],
             "scale": 6,
             "highlight": [
-              "N",
-              "lever"
+              "N"
             ]
           }
         ],
@@ -70810,9 +70987,18 @@
             "id": "beamL-a",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
               "thickness": 6,
               "note": "anchor half of the left beam (pseudo-rigid)"
             },
@@ -70824,9 +71010,18 @@
             "id": "beamL-b",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
               "thickness": 6,
               "note": "shuttle half of the left beam"
             },
@@ -70838,10 +71033,20 @@
             "id": "beamR-a",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
-              "thickness": 6
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
+              "thickness": 6,
+              "note": "anchor half of the right beam"
             },
             "at": {
               "joint": "AR"
@@ -70851,10 +71056,20 @@
             "id": "beamR-b",
             "role": "link",
             "shape": {
-              "type": "link",
-              "length": 20,
-              "width": 1.5,
-              "thickness": 6
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  0
+                ],
+                [
+                  20,
+                  0
+                ]
+              ],
+              "boss": 0.75,
+              "thickness": 6,
+              "note": "shuttle half of the right beam"
             },
             "at": {
               "joint": "TR"
@@ -70864,22 +71079,25 @@
             "id": "shuttle",
             "role": "output",
             "shape": {
-              "type": "slider",
-              "length": 56,
-              "width": 24,
-              "span": [
-                -13,
-                43
-              ],
-              "window": {
-                "length": 45,
-                "width": 12,
-                "centre": [
-                  0,
-                  14.5
+              "type": "plate",
+              "outline": [
+                [
+                  -13,
+                  0
+                ],
+                [
+                  43,
+                  0
                 ]
+              ],
+              "boss": 12,
+              "thickness": 6,
+              "window": {
+                "from": -8,
+                "to": 37,
+                "width": 12
               },
-              "note": "shuttle of the blank, a window for the pusher's roller between two springs"
+              "note": "the blank's shuttle, a window for the pusher's roller between two springs"
             },
             "at": {
               "joint": "SL"
@@ -70889,15 +71107,51 @@
             "id": "pusher",
             "role": "driver",
             "shape": {
-              "type": "slider",
-              "length": 30,
-              "width": 24,
-              "roller": 5.5,
-              "arm": 76
+              "type": "plate",
+              "outline": [
+                [
+                  -12,
+                  46
+                ],
+                [
+                  12,
+                  46
+                ],
+                [
+                  12,
+                  76
+                ],
+                [
+                  -12,
+                  76
+                ]
+              ],
+              "boss": 3,
+              "thickness": 6,
+              "arm": {
+                "from": [
+                  0,
+                  0
+                ],
+                "to": [
+                  0,
+                  46
+                ],
+                "width": 10
+              },
+              "roller": 11,
+              "note": "a slider guided beyond the shuttle, its arm reaching back over it to the roller in the window"
             },
-            "at": {
-              "joint": "slide"
-            }
+            "frame": {
+              "origin": [
+                0,
+                21.446,
+                0
+              ]
+            },
+            "above": [
+              "shuttle"
+            ]
           }
         ],
         "joints": [
@@ -70907,7 +71161,7 @@
             "a": "ground",
             "b": "beamL-a",
             "at": [
-              -39.392,
+              "-L0*cos(theta0)",
               0,
               0
             ],
@@ -70932,13 +71186,13 @@
             "a": "beamL-a",
             "b": "beamL-b",
             "at": [
-              -19.696,
-              3.473,
+              "-L0*cos(theta0)/2",
+              "L0*sin(theta0)/2",
               0
             ],
             "axis": [
-              0.9848,
-              0.1736,
+              "cos(theta0)",
+              "sin(theta0)",
               0
             ],
             "limits": [
@@ -70954,7 +71208,7 @@
             "b": "shuttle",
             "at": [
               0,
-              6.946,
+              "L0*sin(theta0)",
               0
             ],
             "axis": [
@@ -70973,7 +71227,7 @@
             "a": "ground",
             "b": "beamR-a",
             "at": [
-              39.392,
+              "L0*cos(theta0)",
               0,
               0
             ],
@@ -70998,13 +71252,13 @@
             "a": "beamR-a",
             "b": "beamR-b",
             "at": [
-              19.696,
-              3.473,
+              "L0*cos(theta0)/2",
+              "L0*sin(theta0)/2",
               0
             ],
             "axis": [
-              -0.9848,
-              0.1736,
+              "-cos(theta0)",
+              "sin(theta0)",
               0
             ],
             "limits": [
@@ -71020,7 +71274,7 @@
             "b": "shuttle",
             "at": [
               0,
-              6.946,
+              "L0*sin(theta0)",
               0
             ],
             "axis": [
@@ -71040,7 +71294,7 @@
             "b": "shuttle",
             "at": [
               0,
-              21.446,
+              "L0*sin(theta0)+14.5",
               0
             ],
             "axis": [
@@ -71062,7 +71316,7 @@
             "b": "pusher",
             "at": [
               0,
-              21.446,
+              "L0*sin(theta0)+14.5",
               0
             ],
             "axis": [
@@ -71120,7 +71374,9 @@
               0,
               13.89
             ],
-            "default": 0
+            "default": 0,
+            "lo": 0,
+            "hi": 13.89
           }
         ],
         "solve": [
@@ -71137,21 +71393,38 @@
               "window"
             ],
             "in": {
+              "mode": "snap",
               "drive": "push",
+              "dir": -1,
               "L0": "L0",
               "theta0": "theta0",
               "ka": "ka",
-              "ks": "ks"
+              "ks": "ks",
+              "span": 8,
+              "shuttle": "shuttle",
+              "axis": [
+                0,
+                1,
+                0
+              ],
+              "beams": [
+                {
+                  "a": "beamL-a",
+                  "b": "beamL-b",
+                  "anchor": "AL",
+                  "tip": "SL"
+                },
+                {
+                  "a": "beamR-a",
+                  "b": "beamR-b",
+                  "anchor": "AR",
+                  "tip": "SR"
+                }
+              ]
             },
-            "out": [
-              "y",
-              "beam-bend"
-            ],
-            "opts": {
-              "model": "von Mises truss, pseudo-rigid: F(y) = 2 ka (L0 - L) y / L, L = sqrt(c^2 + y^2), c = L0 cos(theta0)",
-              "balance": "the springs hold the shuttle where ks (q - y) = -F(y), q the pusher offset, on the branch it is on",
-              "snap": "where dF/dy = ks the branch ends and the shuttle jumps to the far branch (y = ±3.43 mm here)",
-              "snapSpan": 8
+            "out": {
+              "y": "y",
+              "bend": "beam-bend"
             }
           }
         ],
@@ -71170,7 +71443,7 @@
             "body": "pusher",
             "local": [
               0,
-              0,
+              66,
               0
             ]
           },
@@ -71182,6 +71455,51 @@
               0,
               0
             ]
+          },
+          {
+            "id": "AL0",
+            "body": "ground",
+            "local": [
+              -19.696,
+              3.473,
+              0
+            ]
+          },
+          {
+            "id": "Rp",
+            "body": "pusher",
+            "local": [
+              0,
+              5.5,
+              0
+            ]
+          },
+          {
+            "id": "Rm",
+            "body": "pusher",
+            "local": [
+              0,
+              -5.5,
+              0
+            ]
+          },
+          {
+            "id": "Wp",
+            "body": "shuttle",
+            "local": [
+              36.2,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "Wm",
+            "body": "shuttle",
+            "local": [
+              -7.2,
+              0,
+              0
+            ]
           }
         ],
         "outputs": [
@@ -71189,13 +71507,23 @@
             "id": "shuttle-y",
             "of": "S",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "pusher-q",
             "of": "Q",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "beam-angle",
@@ -71210,7 +71538,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the shuttle holds near +7 mm, follows the pusher down to y = 3.43 mm (just past the 4.09 N force peak at 3.99 mm) and snaps 10 mm ahead of it to the far branch, then back the same way; that reads well. But the snap took 8° of the cycle, gone in a blink, and the pusher's 1 mm overshoot left the shuttle at ±7.01 mm instead of the stable ±6.95. Decided: the pusher's stroke ends at the stable states, so the shuttle comes to rest at ±6.95 mm with the springs unloaded; a time map slows the snap; ticks on the shuttle's path show the jump; the unstable centre line and the beam chords drawn."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the shuttle holds near +7 mm, follows the pusher down to y = 3.43 mm (just past the 4.09 N force peak at 3.99 mm) and snaps 10 mm ahead of it to the far branch, then back the same way; that reads well. But the snap took 8° of the cycle, gone in a blink, and the pusher's 1 mm overshoot left the shuttle at ±7.01 mm instead of the stable ±6.95. Decided: the pusher's stroke ends at the stable states, so the shuttle comes to rest at ±6.95 mm with the springs unloaded; a time map slows the snap; ticks on the shuttle's path show the jump; the unstable centre line and the beam chords drawn. Rebuild (R7): the beams are drawn as their pseudo-rigid halves, rigid either side of each flexure (D9), with the bend on the overlays; the springs either side of the pusher's roller are drawn stretched between the roller and the window's ends; both snaps are slowed by the time map (spans)."
         },
         "principle": [
           {
@@ -71258,8 +71586,7 @@
             "id": "chord-left",
             "kind": "line",
             "from": "AL",
-            "to": "S",
-            "label": "BEAM CHORD"
+            "to": "S"
           },
           {
             "id": "chord-right",
@@ -71271,6 +71598,8 @@
             "id": "anchor-bend",
             "kind": "bend",
             "at": "AL",
+            "from": "AL0",
+            "to": "ML",
             "label": "BEAM BEND"
           }
         ],
@@ -71285,9 +71614,15 @@
         "timeMap": {
           "feature": "snap",
           "slow": 4,
-          "span": [
-            159.7,
-            167.7
+          "spans": [
+            [
+              159.7,
+              167.7
+            ],
+            [
+              339.7,
+              347.7
+            ]
           ]
         },
         "plot": {

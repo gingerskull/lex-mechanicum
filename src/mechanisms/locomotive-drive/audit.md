@@ -212,5 +212,5 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 None left.
 
 ## Verification
-check: clean · K1 residual: 6.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.9 KB
+check: clean · K1 residual: 6.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.3 KB
 screenshots: dist/shots3/locomotive-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

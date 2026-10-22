@@ -89,7 +89,10 @@ export function controlFor(t: Teaching | null, id: string, value: unknown): Cont
     case "param": return { params: { [key("param")]: num } };
     case "design": return { design: { [key("design")]: String(value) } };
     case "selector": return { select: { [key("selector")]: String(value) } };
-    default: return { drivers: { [key("driver")]: num } };
+    case "driver": return { drivers: { [key("driver")]: num } };
+    // a ghost of a design choice the page does not offer as a control (one that would change the built parts): the
+    // choice by its id, so its path is still drawn
+    default: return typeof value === "string" && !Number.isFinite(num) ? { design: { [id]: value } } : { drivers: { [key("driver")]: num } };
   }
 }
 
@@ -765,11 +768,15 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       return;
     }
     case "circle": {
-      // a circle at a named point, or where the lines it names meet (a turning centre)
+      // a circle at a named point, or where the lines it names meet (a turning centre); of a given radius, of a radius the
+      // kinematics solve (a variator's pitch radius), or through a point (a contact circle on a disc)
       const c = o.meet !== undefined ? meetOf(A, o.meet) : pointOf(A, o.center);
-      const r = typeof o.radius === "number" ? o.radius : null;
-      if (!c || r === null) return;
       const { n, e0 } = planeOf(A, o);
+      const th = pointOf(A, o.through);
+      const rv = typeof o.radius === "string" ? (A.rt.scene.poser.value?.(A.u, o.radius) ?? null) : null;
+      const across = (d: Vec3) => len(sub(d, mul(n, dot(d, n))));
+      const r = typeof o.radius === "number" ? o.radius : rv !== null ? rv : c && th ? across(sub(th, c)) : null;
+      if (!c || r === null) return;
       poly(arcPts(c, e0, n, r, 0, TAU), true);
       tag(add(c, mul(e0, r)), 18, 0);
       return;
@@ -851,6 +858,25 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         poly(pts, full);
         tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
       }
+      return;
+    }
+    case "bend": {
+      // a flexure's bend (record spec, overlay kind bend): the turn of a point of the bent part about the flexure, from
+      // its rest place, as a signed arc with the angle in degrees, about the joint's axis
+      const c = pointOf(A, o.at);
+      const from = pointOf(A, o.from), to = pointOf(A, o.to);
+      if (!c || !from || !to) return;
+      const n = unit((A.rt.scene.axes?.[typeof o.at === "string" ? o.at : ""] as Vec3 | undefined) ?? [0, 0, 1]);
+      const e0 = unit(sub(from, c));
+      const e1 = cross(n, e0);
+      const v = sub(to, c);
+      const ang = Math.atan2(dot(v, e1), dot(v, e0));
+      const r = len(sub(from, c));
+      const pts = arcPts(c, e0, n, r, Math.min(0, ang), Math.max(0, ang));
+      poly([c, from]);
+      if (Math.abs(ang) > 1e-4) poly(pts);
+      const deg = (ang * 180) / Math.PI;
+      if (text) label(`${text} ${deg >= 0 ? "+" : ""}${deg.toFixed(2)}°`, P(A, from)[0], P(A, from)[1] - 14, ink, true);
       return;
     }
     case "axis-line": {

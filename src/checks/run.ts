@@ -28,7 +28,7 @@ export const PROFILES: Record<Profile3["name"], Profile3> = {
 };
 
 /** Bump when a check changes what it reports, so stale cache entries are never read. */
-export const CHECKS_VERSION = 1;
+export const CHECKS_VERSION = 2;
 
 export interface Result3 {
   engine: CheckSource["engine"];
