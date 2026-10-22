@@ -610,10 +610,15 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const c = pointOf(A, o.center);
       // a circle through a point (a contact circle on a disc), or of a given radius
       const th = pointOf(A, o.through);
-      const r = typeof o.radius === "number" ? o.radius : c && th ? Math.hypot(th[0] - c[0], th[1] - c[1]) : null;
+      // the radius may be a value the kinematics solve (a variator's pitch radius); `normal` the circle's plane
+      const rv = typeof o.radius === "string" ? (A.rt.scene.poser.value?.(A.u, o.radius) ?? null) : null;
+      const r = typeof o.radius === "number" ? o.radius : rv !== null ? rv : c && th ? Math.hypot(th[0] - c[0], th[1] - c[1]) : null;
       if (!c || r === null) return;
-      poly(arcPts(c, [1, 0, 0], [0, 0, 1], r, 0, TAU), true);
-      tag(add(c, [r, 0, 0]), 18, 0);
+      const n = Array.isArray(o.normal) ? unit(o.normal as Vec3) : ([0, 0, 1] as Vec3);
+      const ref: Vec3 = Math.abs(n[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0];
+      const e0 = unit(sub(ref, mul(n, dot(ref, n))));
+      poly(arcPts(c, e0, n, r, 0, TAU), true);
+      tag(add(c, mul(e0, r)), 18, 0);
       return;
     }
     case "arc": {

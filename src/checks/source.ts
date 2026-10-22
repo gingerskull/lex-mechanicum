@@ -96,15 +96,16 @@ export async function legacySourceOf(id: string, opts: { polish?: boolean } = {}
 const CONTACT_JOINTS = new Set(["gear-mesh", "cam-contact", "belt", "rolling", "screw", "flexure"]);
 
 /** A record built by the hardware builder and posed by its own kinematic block. */
-export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = {}): Promise<CheckSource> {
+export async function recordSource(rec: RecordLike, opts: { polish?: Polish; controls?: Parameters<typeof makePoseSource>[1] } = {}): Promise<CheckSource> {
   const assembly3 = await buildAssembly(rec, opts.polish ? { polish: opts.polish } : {});
-  const src = makePoseSource(rec.kin as Kin);
+  // the solids are built at the record's defaults; `controls` poses them at another setting (a param control's range)
+  const src = makePoseSource(rec.kin as Kin, opts.controls);
   const K = src.K;
   let at = NaN;
   let pz: ReturnType<typeof K.pose> | null = null;
   const poseAt = (u: number) => {
     if (u !== at || !pz) {
-      pz = K.pose(u);
+      pz = K.pose(u, opts.controls);
       at = u;
     }
     return pz;
@@ -124,7 +125,7 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = 
       }
       const X = s.body === "ground" ? xf.id() : (posed(u).get(s.body) ?? xf.id());
       const B = xfMat(X);
-      const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0, s.convey.s1)) as Mat4) : B;
+      const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0, s.convey.s1, poseAt(u).values)) as Mat4) : B;
       return mul(C, mat4(s.frame));
     },
 

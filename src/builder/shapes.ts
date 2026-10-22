@@ -11,6 +11,7 @@ import { type Vec3, v3 } from "../kin/math";
 import type { Op, Profile } from "../solids/types";
 import { nutGeom, screwGeom } from "./screws";
 import { flexureGeom } from "./compliant";
+import { forkGeom, sheaveGeom } from "./cvt";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 
@@ -202,7 +203,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
       const rev = js.find((r) => r.joint.type === "revolute" && (r.joint.a === "ground" || r.joint.b === "ground"));
       if (rev && Math.abs(Math.abs(v3.dot(v3.unit(rev.axis), frame.z)) - 1) < 1e-6 && v3.len(v3.cross(v3.sub(frame.o, rev.at), v3.unit(rev.axis))) < 1e-6) geom.axisym = true;
     }
-    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? geom);
+    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? sheaveGeom(kin, S, b, geom) ?? forkGeom(kin, S, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
   return out;

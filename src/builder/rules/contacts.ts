@@ -27,7 +27,7 @@ interface KitDef {
   kits: KitId[];
   build: KitBuild;
   /** Joints of the kit another rule builds. */
-  skip?: (ji: JointInfo) => boolean;
+  skip?: (ji: JointInfo, ctx: BuildCtx) => boolean;
 }
 
 const bodyOf = (ctx: BuildCtx, id: string): string => (ctx.parts.has(id) ? id : "ground");
@@ -42,9 +42,9 @@ function contactRule(def: KitDef): Rule {
     tier: "AUTO",
     ids: def.ids,
     fixture: def.fixture,
-    applies: (ctx) => ctx.joints.some((j) => def.kits.includes(j.kit) && !def.skip?.(j)),
+    applies: (ctx) => ctx.joints.some((j) => def.kits.includes(j.kit) && !def.skip?.(j, ctx)),
     apply(ctx) {
-      for (const ji of ctx.joints.filter((j) => def.kits.includes(j.kit) && !def.skip?.(j))) {
+      for (const ji of ctx.joints.filter((j) => def.kits.includes(j.kit) && !def.skip?.(j, ctx))) {
         const c = contactOf(ctx, ji);
         if (!c) {
           ctx.issues.push(`joint ${ji.id}: no body of it is stacked, kit ${ji.kit} not built`);
@@ -128,7 +128,12 @@ const j5 = contactRule({
   fixture: "kin:sliderCrank",
   kits: ["J5"],
   // a load's guide rod (a tackle's hook on its line) is built with the rope (src/builder/flexible.ts)
-  skip: (ji) => !!(ji.joint as unknown as Record<string, unknown>).rod,
+  // a sheave half sliding on its shaft and the shift fork's carriage are built by the CVT kit (src/builder/cvt.ts)
+  skip: (ji, ctx) => {
+    const r = ji.joint as unknown as Record<string, unknown>;
+    const fork = [ji.a, ji.b].some((b) => (ctx.kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined)?.type === "fork");
+    return !!r.rod || !!r.spline || fork;
+  },
   build(ctx, c, L) {
     const id = c.id;
     const slider = c.a === "ground" ? c.b : c.a;
@@ -298,7 +303,7 @@ function idler(ctx: BuildCtx, c: Contact, L: Local, what: string): ReturnType<Ki
 
 const j8 = contactRule({ id: "j8-belt", ids: ["J8", "V4"], fixture: "kin:beltDrive", kits: ["J8"], build: (ctx, c, L) => idler(ctx, c, L, "belt") });
 // a timing belt between two pulleys is built by src/builder/flexible.ts
-const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:cableLoop", kits: ["J12"], skip: (ji) => ["belt", "chain", "rope"].includes(String((ji.joint as unknown as Record<string, unknown>).flexible)), build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
+const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:cableLoop", kits: ["J12"], skip: (ji) => ["belt", "chain", "rope", "cvt"].includes(String((ji.joint as unknown as Record<string, unknown>).flexible)), build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
 
 const strapSheave = contactRule({
   id: "strap-sheave",

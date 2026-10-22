@@ -140,3 +140,27 @@ export function reeve(o: { D0: number; DX: number; slanted: number }) {
   };
   return { haul, spacing, slant: (D: number) => s(o.D0) - s(D) };
 }
+
+/** The length of an open belt round two wheels of pitch radii r1 and r2 at centre distance C. */
+export function openBeltLength(r1: number, r2: number, C: number): number {
+  const psi = Math.asin((r1 - r2) / C);
+  return 2 * C * Math.cos(psi) + Math.PI * (r1 + r2) + 2 * psi * (r1 - r2);
+}
+
+/**
+ * A variator (a belt CVT): the pitch radius on wheel 2 that keeps an open belt of length L when wheel 1 runs at r1, and
+ * the shift of a movable sheave from its open stop (at rmin) for a pitch radius r: the V of half-angle alpha closes by
+ * 2 · (r − rmin) · tan alpha.
+ */
+export function variatorR2(r1: number, C: number, L: number): number {
+  let lo = Math.max(1e-6, r1 - C + 1e-6);
+  let hi = r1 + C - 1e-6;
+  for (let i = 0; i < 100; i++) {
+    const m = (lo + hi) / 2;
+    if (openBeltLength(r1, m, C) < L) lo = m;
+    else hi = m;
+  }
+  return (lo + hi) / 2;
+}
+
+export const sheaveShift = (r: number, rmin: number, alphaRad: number): number => 2 * (r - rmin) * Math.tan(alphaRad);

@@ -36,6 +36,8 @@ export interface Poser {
   point(u: number, id: string, ctl?: Controls): Vec3 | null;
   /** The distance of its two points at phase u (mm). */
   span(u: number, a: string, b: string): number | null;
+  /** A value the kinematics solve (a block's output, a pitch radius) at phase u; null if unknown. */
+  value?(u: number, name: string, ctl?: Controls): number | null;
   /** Two named points as solved at phase u (a stretched member's ends), world mm. */
   ends?(u: number, a: string, b: string): [Vec3, Vec3] | null;
   /** The same two points in the reference configuration (where the member was built). */
@@ -133,9 +135,10 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       // a conveyed solid: carried along its path by the travel, in the frame of the body that carries the path
       const cv = s.cv?.path;
       if (s.spin) return mul4(M, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4;
-      return cv ? (mul4(M, conveyMatrix(cv, s.cv!.s0, pose(u).values[cv.key] ?? 0, s.cv!.s1)) as Mat4) : M;
+      return cv ? (mul4(M, conveyMatrix(cv, s.cv!.s0, pose(u).values[cv.key] ?? 0, s.cv!.s1, pose(u).values)) as Mat4) : M;
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
+    value: (u, name, ctl) => pose(u, ctl).values[name] ?? null,
     sweep: (point, range, branches) => {
       const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
       if (!d) return null;

@@ -8,7 +8,7 @@ import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkag
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
-import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, reeve, screwAdvance, vonMises } from "./blocks/members";
+import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, reeve, screwAdvance, sheaveShift, variatorR2, vonMises } from "./blocks/members";
 import { genevaAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
@@ -578,6 +578,51 @@ const reeveBlock: BlockFn = (c, s) => {
   outVal(c, s, rise, "rise");
 };
 
+/**
+ * variator (a belt CVT). in: r1 (wheel 1's pitch radius, the ratio setting), built (the r1 the solids are built at), C,
+ * length (the belt's pitch length), alpha (sheave half-angle, deg), rmin (pitch radius at a sheave's open stop), input
+ * (wheel 1's angle, deg); wheels [{ fixed, movable, joint (the shaft's revolute), slide (the movable half's prismatic
+ * joint, its axis the closing direction) }, same for wheel 2]; shifter (optional: a body that carries wheel 1's shift).
+ * Wheel 2's radius keeps the belt's length; each movable half sits closed by its shift from the open stop; wheel 2 turns
+ * r1/r2 times wheel 1; the belt advances r1 per radian. out { r1, r2, shift1, shift2, angle, travel, offset }: offset is the
+ * belt plane's move along wheel 1's axis from where it is built (half of each sheave's move, averaged).
+ */
+const variatorBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const C = c.num(i.C);
+  const L = c.num(i.length);
+  const al = c.rad(i.alpha);
+  const rmin = c.num(i.rmin);
+  const r1 = c.num(i.r1);
+  const r2 = variatorR2(r1, C, L);
+  const rb1 = c.num(i.built ?? i.r1);
+  const rb2 = variatorR2(rb1, C, L);
+  const sh = [sheaveShift(r1, rmin, al), sheaveShift(r2, rmin, al)];
+  const d = [sheaveShift(r1, rmin, al) - sheaveShift(rb1, rmin, al), sheaveShift(r2, rmin, al) - sheaveShift(rb2, rmin, al)];
+  const dA = c.delta("in", c.rad(i.input));
+  const turns = [dA, (r1 / r2) * dA];
+  const wheels = (i.wheels as { fixed: string; movable: string; joint: string; slide: string }[] | undefined) ?? [];
+  const ax0 = wheels[0] ? c.jointAxis(wheels[0].joint) : ([0, 0, 1] as Vec3);
+  let off = 0;
+  wheels.forEach((w, k) => {
+    const at = c.jointAt(w.joint);
+    const ax = c.jointAxis(w.joint);
+    const R = xf.rotAbout(at, ax, turns[k]!);
+    c.setXf(w.fixed, R);
+    const close = c.jointAxis(w.slide);
+    c.setXf(w.movable, xf.mul(xf.trans(v3.mul(close, d[k]!)), R));
+    off += (d[k]! / 2) * v3.dot(close, ax0);
+  });
+  if (typeof i.shifter === "string" && wheels[0]) c.setXf(i.shifter, xf.trans(v3.mul(c.jointAxis(wheels[0].slide), d[0]!)));
+  outVal(c, s, r1, "r1");
+  outVal(c, s, r2, "r2");
+  outVal(c, s, sh[0]!, "shift1");
+  outVal(c, s, sh[1]!, "shift2");
+  outVal(c, s, turns[1]! * R2D, "angle");
+  outVal(c, s, r1 * dA, "travel");
+  outVal(c, s, off / 2, "offset");
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -644,6 +689,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   convey: conveyBlock,
   flexure: flexureBlock,
   reeve: reeveBlock,
+  variator: variatorBlock,
   escapement: escapementBlock,
   indexer,
 };

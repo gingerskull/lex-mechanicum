@@ -20,6 +20,62 @@ export interface ConveyPath {
    * length in it) and the path distance `d` at each, linear between.
    */
   map?: { c: number[]; d: number[] };
+  /**
+   * A loop whose shape follows kin values (a CVT's belt): an open belt round two wheels at c1 and c2 (their axes along
+   * `axis`) whose pitch radii are the values `r1` and `r2`, its plane moved along the axis by the value `offset`. `pts`
+   * is the same loop at the radii it is built at; a pose carries each solid from its place on `pts` to the same distance
+   * plus the travel on the loop the values give (the belt's length is the same).
+   */
+  live?: { c1: Vec3; c2: Vec3; axis: Vec3; r1: string; r2: string; offset?: string; n: number };
+}
+
+/**
+ * The open-belt loop round two wheels (counter-clockwise seen from +axis): from where it leaves wheel 1's far arc on the
+ * upper tangent, round wheel 1's far side, the lower tangent, round wheel 2's far side; n points on each arc.
+ */
+export function beltLoop(c1: Vec3, c2: Vec3, axis: Vec3, r1: number, r2: number, n: number): Vec3[] {
+  const l = Math.hypot(axis[0], axis[1], axis[2]) || 1;
+  const w: Vec3 = [axis[0] / l, axis[1] / l, axis[2] / l];
+  const d: Vec3 = [c2[0] - c1[0], c2[1] - c1[1], c2[2] - c1[2]];
+  const k = d[0] * w[0] + d[1] * w[1] + d[2] * w[2];
+  const dp: Vec3 = [d[0] - k * w[0], d[1] - k * w[1], d[2] - k * w[2]];
+  const C = Math.hypot(dp[0], dp[1], dp[2]) || 1;
+  const u: Vec3 = [dp[0] / C, dp[1] / C, dp[2] / C];
+  const v: Vec3 = [w[1] * u[2] - w[2] * u[1], w[2] * u[0] - w[0] * u[2], w[0] * u[1] - w[1] * u[0]];
+  const b = Math.asin((r2 - r1) / C);
+  const out: Vec3[] = [];
+  const arc = (o: Vec3, r: number, t0: number, t1: number) => {
+    for (let i = 0; i < n; i++) {
+      const t = t0 + ((t1 - t0) * i) / (n - 1);
+      const x = r * Math.cos(t);
+      const y = r * Math.sin(t);
+      out.push([o[0] + u[0] * x + v[0] * y, o[1] + u[1] * x + v[1] * y, o[2] + u[2] * x + v[2] * y]);
+    }
+  };
+  arc(c1, r1, Math.PI / 2 + b, 2 * Math.PI - Math.PI / 2 - b);
+  arc([c1[0] + dp[0], c1[1] + dp[1], c1[2] + dp[2]], r2, -Math.PI / 2 - b, Math.PI / 2 + b);
+  return out;
+}
+
+const liveCache = new WeakMap<ConveyPath, { key: string; path: ConveyPath }>();
+
+/** The loop a live path takes at the given kin values (itself when it is not live or the values are missing). */
+export function livePath(p: ConveyPath, vals?: Record<string, number>): ConveyPath {
+  const lv = p.live;
+  if (!lv || !vals) return p;
+  const r1 = vals[lv.r1];
+  const r2 = vals[lv.r2];
+  if (r1 === undefined || r2 === undefined) return p;
+  const off = lv.offset ? (vals[lv.offset] ?? 0) : 0;
+  const key = `${r1}|${r2}|${off}`;
+  const hit = liveCache.get(p);
+  if (hit && hit.key === key) return hit.path;
+  const l = Math.hypot(lv.axis[0], lv.axis[1], lv.axis[2]) || 1;
+  const sh: Vec3 = [(lv.axis[0] / l) * off, (lv.axis[1] / l) * off, (lv.axis[2] / l) * off];
+  const add = (a: Vec3): Vec3 => [a[0] + sh[0], a[1] + sh[1], a[2] + sh[2]];
+  const path: ConveyPath = { pts: beltLoop(add(lv.c1), add(lv.c2), lv.axis, r1, r2, lv.n), key: p.key, carrier: p.carrier, ...(p.up ? { up: p.up } : {}) };
+  liveCache.set(p, { key, path });
+  return path;
 }
 
 /** The path distance of a place given in the path's travel coordinate. */
@@ -161,9 +217,11 @@ export function turnMatrix(at: Vec3, axis: Vec3, a: number): number[] {
 }
 
 /** The move of a solid placed at `s0` on the path to where a travel carries it, in the carrier's frame (column-major). */
-export function conveyMatrix(p: ConveyPath, s0: number, travel: number, s1?: number): number[] {
-  if (s1 !== undefined) return mul4(linkFrame(p, s0 + travel, s1 + travel), inv(linkFrame(p, s0, s1)));
-  return mul4(frameAt(p, distOf(p, s0 + travel)), inv(frameAt(p, distOf(p, s0))));
+export function conveyMatrix(p: ConveyPath, s0: number, travel: number, s1?: number, vals?: Record<string, number>): number[] {
+  // a live loop: the place on the loop the values give, from the place on the loop as built
+  const q = livePath(p, vals);
+  if (s1 !== undefined) return mul4(linkFrame(q, s0 + travel, s1 + travel), inv(linkFrame(p, s0, s1)));
+  return mul4(frameAt(q, distOf(q, s0 + travel)), inv(frameAt(p, distOf(p, s0))));
 }
 
 /** A rigid link between two places on the path (a chain's plate between two rollers): at the first, x toward the second. */

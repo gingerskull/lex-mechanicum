@@ -5,7 +5,7 @@ import { evalExpr } from "./expr";
 import type { KinJoint } from "./types";
 import { ellipticalAngle, meshRatio } from "./blocks/gears";
 import { type CamSchedule, camMotion, type CamLaw } from "./blocks/cam";
-import { chainAdvance, screwAdvance } from "./blocks/members";
+import { chainAdvance, screwAdvance, variatorR2 } from "./blocks/members";
 import { reflection, bisectorNormal } from "./blocks/spatial";
 
 /** A joint with its numbers and vectors evaluated (parameters bound) and its reference geometry in world coordinates. */
@@ -185,6 +185,12 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const ta1 = ta0 + turn(s.a0, s.a1, ax);
     const tb1 = tb0 + turn(s.b0, s.b1, ax2);
     return chainAdvance(ta1, za, p, pa) - chainAdvance(ta0, za, p, pa) - (chainAdvance(tb1, zb, p, pb) - chainAdvance(tb0, zb, p, pb));
+  }
+  if (j.type === "belt" && jr.flexible === "cvt") {
+    // a variator's belt: wheel 2 runs at the radius that keeps the belt's length, and turns r1/r2 times wheel 1
+    const r1 = n(j.radiusA);
+    const r2 = variatorR2(r1, n(jr.C), n(jr.pitchLength));
+    return wrapPi(turn(s.b0, s.b1, ax2) - (r1 / r2) * turn(s.a0, s.a1, ax));
   }
   if ((j.type === "belt" || j.type === "rolling") && j.ratio !== undefined) {
     // a friction pair given by its ratio (a wheel on a disc's face at a set radius): b turns ratio times a

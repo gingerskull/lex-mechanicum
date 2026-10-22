@@ -54930,17 +54930,16 @@
             "shape": {
               "type": "plate",
               "rect": [
-                320,
-                170
-              ],
-              "note": "case with the input and output shaft bearings"
+                340,
+                240
+              ]
             },
             "at": {
               "frame": {
                 "origin": [
                   75,
-                  0,
-                  -40
+                  10,
+                  -90
                 ]
               }
             }
@@ -54952,9 +54951,11 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "fixed",
-              "halfAngle": 11,
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": -1,
               "shaft": 20,
-              "side": "below"
+              "note": "the input shaft with its fixed sheave half, keyed"
             },
             "at": {
               "joint": "O1"
@@ -54967,9 +54968,13 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "movable",
-              "halfAngle": 11,
-              "spline": 20,
-              "side": "above"
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": 1,
+              "shaft": 20,
+              "built": "r1",
+              "shift": true,
+              "note": "slides on the shaft's keys; the shift fork in its hub's groove sets it (the ratio)"
             },
             "at": {
               "joint": "S1"
@@ -54982,9 +54987,11 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "fixed",
-              "halfAngle": 11,
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": 1,
               "shaft": 20,
-              "side": "above"
+              "note": "the output shaft with its fixed sheave half, keyed"
             },
             "at": {
               "joint": "O2"
@@ -54997,13 +55004,28 @@
               "type": "pulley",
               "diameter": 132,
               "sheave": "movable",
-              "halfAngle": 11,
-              "spline": 20,
-              "side": "below",
-              "spring": "pushes the sheave closed"
+              "halfAngle": "alpha",
+              "width": 24,
+              "side": -1,
+              "shaft": 20,
+              "built": "r2",
+              "spring": true,
+              "note": "slides on the shaft's keys; a spring pushes it closed, the belt's tension opens it"
             },
             "at": {
               "joint": "S2"
+            }
+          },
+          {
+            "id": "shifter",
+            "role": "link",
+            "shape": {
+              "type": "fork",
+              "groove": "in-movable",
+              "note": "the shift fork on its carriage: the ratio setting"
+            },
+            "at": {
+              "joint": "shift"
             }
           }
         ],
@@ -55020,8 +55042,8 @@
             ],
             "axis": [
               0,
-              0,
-              1
+              1,
+              0
             ]
           },
           {
@@ -55030,14 +55052,14 @@
             "a": "ground",
             "b": "out-fixed",
             "at": [
-              150,
+              "C",
               0,
               0
             ],
             "axis": [
               0,
-              0,
-              1
+              1,
+              0
             ]
           },
           {
@@ -55052,14 +55074,15 @@
             ],
             "axis": [
               0,
-              0,
-              -1
+              -1,
+              0
             ],
             "limits": [
-              0,
-              14.41
+              -1.944,
+              12.467
             ],
-            "note": "closing the input sheaves pushes the belt out"
+            "spline": true,
+            "note": "closing the input sheave (toward -y) pushes the belt out to a larger radius"
           },
           {
             "id": "S2",
@@ -55067,20 +55090,42 @@
             "a": "out-fixed",
             "b": "out-movable",
             "at": [
-              150,
+              "C",
               0,
               0
             ],
             "axis": [
               0,
-              0,
-              -1
+              1,
+              0
             ],
             "limits": [
-              0,
-              14.41
+              -12.944,
+              1.467
             ],
-            "note": "the output sheaves open as the belt is pulled in"
+            "spline": true,
+            "note": "the output sheave opens (toward -y) as the belt is pulled in"
+          },
+          {
+            "id": "shift",
+            "type": "prismatic",
+            "a": "ground",
+            "b": "shifter",
+            "at": [
+              0,
+              40,
+              0
+            ],
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "limits": [
+              -1.944,
+              12.467
+            ],
+            "note": "the shift fork's carriage, set by the ratio control"
           },
           {
             "id": "belt",
@@ -55089,13 +55134,17 @@
             "a": "in-fixed",
             "b": "out-fixed",
             "at": [
+              "C/2",
               0,
-              30,
               0
             ],
-            "pitchLength": 582.74,
+            "radiusA": "r1",
+            "C": "C",
+            "pitchLength": "Lb",
             "element": "steel push belt",
-            "width": 24
+            "width": 24,
+            "elements": 150,
+            "note": "a steel push belt: elements in compression between the sheaves"
           }
         ],
         "params": [
@@ -55103,40 +55152,32 @@
             "id": "C",
             "value": 150,
             "unit": "mm",
-            "min": 120,
-            "max": 200,
+            "min": 150,
+            "max": 150,
             "note": "centre distance"
           },
           {
             "id": "rmin",
             "value": 25,
             "unit": "mm",
-            "min": 15,
-            "max": 40,
-            "note": "minimum pitch radius"
-          },
-          {
-            "id": "rmax",
-            "value": 62.07,
-            "unit": "mm",
-            "min": 50,
-            "max": 70,
-            "note": "maximum pitch radius (the other at rmin)"
+            "min": 25,
+            "max": 25,
+            "note": "pitch radius at a sheave's open stop"
           },
           {
             "id": "alpha",
             "value": 11,
             "unit": "deg",
-            "min": 8,
-            "max": 15,
+            "min": 11,
+            "max": 11,
             "note": "sheave half-angle"
           },
           {
             "id": "Lb",
-            "value": 582.74,
+            "value": 582.7433,
             "unit": "mm",
-            "min": 500,
-            "max": 700,
+            "min": 582.7433,
+            "max": 582.7433,
             "note": "belt pitch length, set from r1 = r2 = 45"
           },
           {
@@ -55144,7 +55185,7 @@
             "value": 30,
             "unit": "mm",
             "min": 25,
-            "max": 62.07,
+            "max": 62.069,
             "note": "input pitch radius, the ratio setting"
           }
         ],
@@ -55163,61 +55204,47 @@
         ],
         "solve": [
           {
-            "block": "new:variator",
+            "block": "variator",
             "id": "radii",
             "joints": [
-              "S1",
-              "S2"
-            ],
-            "in": {
-              "r1": "r1",
-              "C": "C",
-              "length": "Lb",
-              "alpha": "alpha",
-              "rmin": "rmin"
-            },
-            "out": [
-              "r2",
-              "shift1",
-              "shift2"
-            ],
-            "opts": {
-              "belt": "L = 2C cos(psi) + pi (r1 + r2) + 2 psi (r1 - r2), psi = asin((r1 - r2)/C), held at Lb",
-              "shift": "each movable sheave moves 2 dr tan(alpha) from its open stop"
-            }
-          },
-          {
-            "block": "gear-mesh",
-            "id": "belt-ratio",
-            "joints": [
               "O2",
+              "S1",
+              "S2",
+              "shift",
               "belt"
             ],
             "in": {
-              "a": "in-fixed",
-              "b": "out-fixed",
-              "ra": "r1",
-              "rb": "r2"
-            },
-            "out": "theta2",
-            "opts": {
-              "sense": "same",
-              "flexible": "cvt"
-            }
-          },
-          {
-            "block": "convey",
-            "id": "elements",
-            "joints": [],
-            "in": {
-              "travel": "input",
               "r1": "r1",
-              "r2": "r2",
-              "C": "C"
+              "built": 30,
+              "C": "C",
+              "length": "Lb",
+              "alpha": "alpha",
+              "rmin": "rmin",
+              "input": "input",
+              "wheels": [
+                {
+                  "fixed": "in-fixed",
+                  "movable": "in-movable",
+                  "joint": "O1",
+                  "slide": "S1"
+                },
+                {
+                  "fixed": "out-fixed",
+                  "movable": "out-movable",
+                  "joint": "O2",
+                  "slide": "S2"
+                }
+              ],
+              "shifter": "shifter"
             },
-            "out": "belt-elements",
-            "opts": {
-              "path": "pitch path of the belt at the current radii"
+            "out": {
+              "r1": "r1v",
+              "r2": "r2",
+              "shift1": "shift1",
+              "shift2": "shift2",
+              "angle": "output-turn",
+              "travel": "belt-travel",
+              "offset": "belt-offset"
             }
           }
         ],
@@ -55228,7 +55255,7 @@
             "local": [
               64,
               0,
-              0
+              -20
             ]
           },
           {
@@ -55237,7 +55264,25 @@
             "local": [
               64,
               0,
-              0
+              20
+            ]
+          },
+          {
+            "id": "sp1",
+            "body": "out-movable",
+            "local": [
+              0,
+              0,
+              -16.5
+            ]
+          },
+          {
+            "id": "sp2",
+            "body": "out-fixed",
+            "local": [
+              0,
+              0,
+              -52.5
             ]
           }
         ],
@@ -55254,8 +55299,14 @@
             "kind": "speed-ratio"
           },
           {
+            "id": "pitch-r2",
+            "of": "r2",
+            "kind": "position",
+            "unit": "mm"
+          },
+          {
             "id": "sheave-shift",
-            "of": "in-movable",
+            "of": "shift1",
             "kind": "position",
             "unit": "mm"
           }
@@ -55282,7 +55333,10 @@
             "body": "out-movable"
           },
           {
-            "point": "belt"
+            "point": "m1"
+          },
+          {
+            "point": "m2"
           }
         ],
         "traces": [
@@ -55299,7 +55353,7 @@
               },
               {
                 "control": "r1",
-                "value": 62.07
+                "value": 62.069
               }
             ],
             "comet": true
@@ -55317,15 +55371,25 @@
             "id": "pitch-in",
             "kind": "circle",
             "center": "O1",
-            "radius": "r1",
-            "label": "PITCH RADIUS r1"
+            "radius": "r1v",
+            "label": "PITCH RADIUS r1",
+            "normal": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "pitch-out",
             "kind": "circle",
             "center": "O2",
             "radius": "r2",
-            "label": "PITCH RADIUS r2"
+            "label": "PITCH RADIUS r2",
+            "normal": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "centres",
@@ -55348,14 +55412,13 @@
               ],
               "normal": [
                 0,
-                1,
-                0
+                0,
+                1
               ]
             },
             "highlight": [
               "in-movable",
-              "out-movable",
-              "belt"
+              "out-movable"
             ]
           }
         ],
@@ -55388,8 +55451,22 @@
             "text": "r1 = 30 mm gives the output 0.515 x the input",
             "output": "speed-ratio",
             "stat": "mean",
-            "value": 0.515,
+            "value": 0.5146,
             "tol": 0.002
+          },
+          {
+            "text": "the belt's length held, r2 = 58.30 mm",
+            "output": "pitch-r2",
+            "stat": "mean",
+            "value": 58.296,
+            "tol": 0.01
+          },
+          {
+            "text": "the input sheave closed 1.94 mm from its open stop",
+            "output": "sheave-shift",
+            "stat": "mean",
+            "value": 1.944,
+            "tol": 0.01
           }
         ],
         "exceptions": []

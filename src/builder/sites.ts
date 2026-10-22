@@ -151,6 +151,8 @@ export function classifyJoints(kin: Kin, S: Setup): { joints: JointInfo[]; sites
     s.inPlan = !parallel(s.axis, UP);
     s.live = s.fixed && (s.joints.some((id) => driven.has(id)) || s.bodies.some(keyedBody));
     s.kit = s.fixed ? (s.inPlan ? "J10" : s.live ? "J2" : "J1") : "J3";
+    // a variator's shaft is built with its sheave halves (src/builder/cvt.ts)
+    if (s.fixed && s.bodies.some((b) => (kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined)?.sheave !== undefined)) s.owner = "J12";
     if (s.fixed && s.bodies.length > 0 && s.bodies.every((b) => isScrew(kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined))) s.owner = "J11";
     for (const id of s.joints) joints.find((q) => q.id === id)!.kit = s.kit;
   }

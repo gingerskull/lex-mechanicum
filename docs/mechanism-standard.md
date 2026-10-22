@@ -271,6 +271,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `friction-contact` | J6, F6, F7, M10 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
+| `j12-cvt` | J12, J10, D9, F6, F7 |
 | `j3-moving-pin` | J3, A12, M3 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
