@@ -2,6 +2,7 @@
 // the solids built so far, and the log the audit reads. Everything is in the reference configuration's world
 // coordinates until the end, where `finish` gives each solid the frame of the body it rides.
 import type { CatalogRecord } from "../catalog/schema";
+import { armPoses, withArms } from "./arms";
 
 /** What the builder needs of a record: its id, its kinematic block and its teaching block. */
 export type RecordLike = Pick<CatalogRecord, "id"> & { kin?: unknown; teaching?: Teaching | undefined };
@@ -129,13 +130,16 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
   const M = await manifold();
   // the catalogue types leave a joint position open to a point name; the kinematic library resolves it
   const source = makePoseSource(rec.kin as Kin, opts.controls);
-  const kin = source.kin;
   const K = source.K;
-  const S = K.setup(opts.controls);
+  // outboard arms are bodies of their own for the build (src/builder/arms.ts)
+  const W = withArms(source.kin, K.setup(opts.controls));
+  const kin = W.kin;
+  const S = W.S;
   const geoms = bodyGeoms(kin, S);
   const { joints, sites } = classifyJoints(kin, S);
   const n = opts.samples ?? (source.route === "numeric" ? SAMPLES_NUMERIC : SAMPLES);
   const sampled = sampleBodies(K, kin, n, opts.controls, geoms);
+  armPoses(kin, sampled.xfs);
   const placement = solvePlacement(kin, geoms, sampled, joints, sites);
   const principle = new Set<string>();
   for (const p of rec.teaching?.principle ?? []) {

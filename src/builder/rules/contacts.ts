@@ -194,7 +194,9 @@ const j5 = contactRule({
     const w1 = sp && sp.op.op === "extrude" ? Math.min(zs.w1, w0 + sp.op.h) : zs.w1;
     const Ls = e[1] - e[0];
     const hostBody = bodyOf(ctx, host);
-    const rh = w1 - w0 + 1.5;
+    // the rails stand flush with the slider's top and a thin keeper laps it, so a part pinned over the slider passes clear
+    const rh = w1 - w0;
+    const KT = 2;
     const gap = 3;
     const others = ctx.sweeps.moving().filter((m) => m !== slider);
     const baseTop = baseZ(ctx, c);
@@ -273,19 +275,20 @@ const j5 = contactRule({
     const ky = out(gs, railOff(gs));
     const kA = out(gs, railOff(gs) + 5);
     const kB = out(gs, -2);
-    L.add(H.plate(`${id}-keeper`, roundRect(g0 + 8, Math.min(kA, kB), g1 - 8, Math.max(kA, kB), 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + 3, mat: "Aluminium 6061-T6, anodised" }));
+    L.add(H.plate(`${id}-keeper`, roundRect(g0 + 8, Math.min(kA, kB), g1 - 8, Math.max(kA, kB), 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + KT, mat: "Aluminium 6061-T6, anodised" }));
     ways.push(`${id}-gib`, `${id}-keeper`);
     // the keeper's screws go down through the gibbed rail and its riser into the base
     const [s0, s1] = risen ? riserEnds.get(gs)! : [g0, g1];
     const nScrew = Math.max(2, Math.ceil((s1 - s0 - 16) / 100) + 1);
     for (let k = 0; k < nScrew; k++) {
       const x = s1 - s0 < 24 ? (s0 + s1) / 2 + (k ? 4 : -4) : s0 + 6 + ((s1 - s0 - 12) * k) / (nScrew - 1);
-      L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + 3 + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + 3, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
+      L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + KT + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + KT, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
     }
     // dowels: the reference rail to the base, or the riser alone where an arm runs over that side
     const [d0, d1] = risen ? riserEnds.get(rs)! : span(rs);
     const dy = out(rs, rs === armSide ? 3 : railOff(rs));
-    const dz1 = rs === armSide ? w0 : w0 + rh;
+    // (recessed under the riser's top where the arm runs over it)
+    const dz1 = rs === armSide ? w0 - 0.5 : w0 + rh;
     for (const [k, x] of [[0, d0 + 4], [1, d1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, dy, 0], z0: baseTop, z1: dz1, ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 h6, ${rs === armSide ? "riser" : "reference rail"} to base`, qty: 2 }) }));
     // wipers at both ends of the slider where they clear, and a grease nipple (F8)
     const sb = bodyOf(ctx, slider);
@@ -302,7 +305,7 @@ const j5 = contactRule({
     const nipAt = ([x, y, z]: [number, number, number]) => H.nipple(`${id}-nip`, { body: hostBody, at: [x, y, 0], z0: z, z1: z + 9 });
     const along = [0.5, 0.25, 0.75, 0.1, 0.9].map((f) => g0 + 12 + (run - 24) * f);
     const spots: [number, number, number][] = [
-      ...along.map((x): [number, number, number] => [x, ky, w0 + rh + 3]),
+      ...along.map((x): [number, number, number] => [x, ky, w0 + rh + KT]),
       ...(rs !== armSide ? along.map((x): [number, number, number] => [x, out(rs, railOff(rs)), w0 + rh]) : []),
     ];
     const nx = spots.find((q) => clearOf(ctx, one((T) => T.add(nipAt(q))), others));

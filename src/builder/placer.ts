@@ -202,6 +202,21 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       siteCs.push({ site: s, members, passers: [...passers] });
     }
 
+    // order between slabs: [u, v] puts u over v. A die rides in its link's groove from above, so its pin carrier lies
+    // over the slotted link; a slider on ground ways (J5) stands on risers from the base, so every part pinned to it
+    // lies over it
+    const above: [number, number][] = [];
+    for (const j of joints) {
+      if (j.kit === "die" && parent.has(j.a) && parent.has(j.b)) above.push([idx.get(nodeOf(j.a))!, idx.get(nodeOf(j.b))!]);
+      if (j.kit === "J5" && (j.a === "ground" || j.b === "ground")) {
+        const sl = j.a === "ground" ? j.b : j.a;
+        if (!parent.has(sl)) continue;
+        for (const st of famSites)
+          if (st.bodies.includes(sl)) for (const o of st.bodies) if (o !== sl && parent.has(o) && nodeOf(o) !== nodeOf(sl)) above.push([idx.get(nodeOf(o))!, idx.get(nodeOf(sl))!]);
+      }
+    }
+    const orderOk = (assign: number[]) => above.every(([u, v]) => assign[u]! < 0 || assign[v]! < 0 || assign[u]! > assign[v]!);
+
     // thickness of each node (a slab is as high as the thickest body in it)
     const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geoms.get(id)!.thick)));
 
@@ -223,7 +238,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
             const s = c.members.map((m) => assign[m]!);
             return t + (Math.max(...s) - Math.min(...s) + 1 - new Set(s).size);
           }, 0);
-          const picks = clevisPicks(assign, siteCs, clash, h, nodeIds, nodes);
+          const picks = clevisPicks(assign, siteCs, clash, h, nodeIds, nodes, above);
           // a fixed pin held from a bridge only (something passes under it) is the last resort
           const hung = siteCs.reduce((t, c) => t + (c.site.fixed && c.passers.some((p) => assign[p]! < Math.min(...c.members.map((m) => assign[m]!))) ? 1 : 0), 0);
           const cost: [number, number, number] = [spacers, hung, -picks.length];
@@ -239,7 +254,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           for (let s = 0; s < h; s++) {
             if (clash[v]!.some((c, u) => c && assign[u] === s)) continue;
             assign[v] = s;
-            if (relax || passOk(assign, siteCs)) dfs(k + 1);
+            if (orderOk(assign) && (relax || passOk(assign, siteCs))) dfs(k + 1);
             assign[v] = -1;
             const f = found as Best | null;
             if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] <= -clevisCap(siteCs)) return;
@@ -288,7 +303,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     }
     placement.families.push({ frame: fam, bodies: fid, slabs, w0, h: hts });
     for (const id of fid) placement.slab.set(id, [k, assign[idx.get(nodeOf(id))!]!]);
-    for (const c of clevisPicks(assign, siteCs, clash, slabs, nodeIds, nodes)) {
+    for (const c of clevisPicks(assign, siteCs, clash, slabs, nodeIds, nodes, above)) {
       const host = nodes.get(nodeIds[c.host]!)!.ids[0]!;
       const twin = nodes.get(nodeIds[c.twin]!)!.ids[0]!;
       placement.clevis.push({ site: c.site, host, twin, slab: c.slab });
@@ -382,7 +397,7 @@ interface ClevisPick {
  * pair that straddles the other (A9), when the slab on the far side exists, is free of anything that would meet the
  * pair, and puts no passer inside either pin stack.
  */
-function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][], H: number, nodeIds: string[], nodes: Map<string, Node>): ClevisPick[] {
+function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][], H: number, nodeIds: string[], nodes: Map<string, Node>, above: [number, number][] = []): ClevisPick[] {
   void nodeIds;
   void nodes;
   const picks: ClevisPick[] = [];
@@ -396,6 +411,8 @@ function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][],
       if (t < 0 || t >= H) continue;
       // nothing already there meets the twin
       if (assign.some((s, u) => s === t && u !== twin && clash[twin]![u])) continue;
+      // the twin's second half keeps the order between slabs (over a slider it is pinned to, over a grooved link)
+      if (above.some(([u, v]) => (u === twin && t <= assign[v]!) || (v === twin && assign[u]! <= t))) continue;
       // the twin's second half is a member of every site the twin is in: no passer inside that stack
       const trial = assign.slice();
       const bad = cs.some((q) => {

@@ -16554,23 +16554,23 @@
             "id": "wheel",
             "role": "driver",
             "shape": {
-              "type": "plate",
-              "outline": [
-                [
-                  0,
-                  0
-                ],
-                [
-                  60,
-                  0
-                ],
-                [
-                  -5.34,
-                  24.42
-                ]
+              "type": "link",
+              "length": 60,
+              "boss": [
+                14,
+                10
               ],
-              "boss": 12,
-              "note": "crank web with the main crank pin at 60 and the return crank pin at 25 from O"
+              "arm": {
+                "at": "Cp",
+                "joints": [
+                  "Rc"
+                ],
+                "boss": [
+                  10,
+                  9
+                ]
+              },
+              "note": "the crank web with the main crank pin at 60; the return crank is fixed on the outer end of the main crank pin, outboard of the main rod, carrying the return crank pin Rc"
             },
             "at": {
               "joint": "O"

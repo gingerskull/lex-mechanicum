@@ -4,6 +4,7 @@
 // joint and a tilted one. A support selector chooses housing, pillow block, bridge, or a stub or hung axle from where
 // the sweeps leave room and what the load needs; the router (src/builder/router.ts) places the support.
 import { circle } from "../core/geom";
+import { realBody } from "./arms";
 import { H } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { SHOULDER_BOLTS, circlipExt, circlipInt, headD, headH, innerRingD, keyFor, shoulderLength, threadFor, type Bearing } from "../hardware/tables";
@@ -109,8 +110,11 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const isBevel = (m: Member) => ctx.geoms.get(m.body)?.scaleTop !== undefined;
   // a part with a hub of its own (a yoke) is keyed in its own bore and takes no clamp hub
   const ownHub = (m: Member) => !!ctx.geoms.get(m.body)?.exact && !isBevel(m);
+  const anchorBody = realBody(ctx.kin, members[0]!.body);
+  const clamped = (m: Member) => moving && m !== members[0] && realBody(ctx.kin, m.body) === anchorBody;
   const seats: Seat[] = members.map((m, i) => {
-    const b = fit.bearing[i] ?? null;
+    const b = clamped(m) ? null : (fit.bearing[i] ?? null);
+    if (clamped(m)) return { m, b: null, z0: m.w0, z1: m.w1 };
     if (m.keyed && !moving) return { m, b: null, z0: m.w0 - (isBevel(m) ? (m.shim ?? 0) : 0), z1: m.w1 };
     const B = b ? b.B : Math.min(6, m.w1 - m.w0);
     const c = (m.w0 + m.w1) / 2;
@@ -141,6 +145,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
         L.add(H.circlip(`${nm}-cl`, s.b.D, { internal: true, body: s.m.body, z0: s.z0 - c.s, z1: s.z0 }));
         serve("F2", `${nm}-cl`);
       }
+    } else if (clamped(s.m)) {
+      // fixed on the pin's end, clamped under the head: bored to the pin, no bearing
+      bores.push({ solid: s.m.solid, r: d / 2 + 0.05 });
+      notes.push(`${s.m.name}: fixed on the pin's end, clamped under its head`);
     } else if (!s.m.keyed || moving) {
       const D = d + 3;
       L.add(H.bushing(`${nm}-bush`, d, D, { body: s.m.body, z0: s.m.w0, z1: s.m.w1 }));
