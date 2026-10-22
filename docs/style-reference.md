@@ -493,6 +493,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.arrow` | 10 | px, force arrowhead |
 | `draft.overlays.arrowSmall` | 9 | px, axial and spin arrowheads |
 | `draft.overlays.arrowDim` | 7 | px, dimension arrowheads |
+| `draft.overlays.shortLine` | 70 | px, a construction line shorter than this carries its label past its far end |
+| `draft.overlays.shortGap` | 8 | px, gap from that end to the label |
 | `draft.overlays.arrowAngle` | 0.42 | radians, arrowhead half-angle |
 | `draft.overlays.axialDash` | [5, 4] | px |
 | `draft.overlays.axialOvershoot` | 14 | px past each end |

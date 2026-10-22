@@ -275,6 +275,8 @@ export const DRAFT = {
     arrow: 10, // px, force arrowhead
     arrowSmall: 9, // px, axial and spin arrowheads
     arrowDim: 7, // px, dimension arrowheads
+    shortLine: 70, // px, a construction line shorter than this carries its label past its far end
+    shortGap: 8, // px, gap from that end to the label
     arrowAngle: 0.42, // radians, arrowhead half-angle
     axialDash: [5, 4] as const, // px
     axialOvershoot: 14, // px past each end

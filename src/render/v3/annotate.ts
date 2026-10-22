@@ -601,7 +601,19 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const ext = o.extend === true ? 0.25 : 0;
       const d = sub(b, a);
       poly([sub(a, mul(d, ext)), add(b, mul(d, ext))]);
-      tag(mul(add(a, b), 0.5));
+      // a line too short to carry its label (an eccentric's O-E) keeps it clear, past its far end
+      const [sx, sy] = P(A, a);
+      const [tx, ty] = P(A, b);
+      const sl = Math.hypot(tx - sx, ty - sy);
+      if (text && sl < O.shortLine) {
+        const ux = sl > 1e-6 ? (tx - sx) / sl : 1;
+        const uy = sl > 1e-6 ? (ty - sy) / sl : 0;
+        ctx.save();
+        ctx.font = font(DRAFT.type.overlaySmall);
+        const w = ctx.measureText(DRAFT.type.uppercase ? text.toUpperCase() : text).width / 2 + O.labelPadX + O.shortGap;
+        ctx.restore();
+        label(text, tx + ux * w, ty + uy * (O.labelHSmall / 2 + O.shortGap), ink, true);
+      } else tag(mul(add(a, b), 0.5));
       return;
     }
     case "dimension": {

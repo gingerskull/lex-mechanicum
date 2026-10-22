@@ -27,9 +27,9 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | P11 | ? | DATA |
 | P12 | ? | AUTO / DATA |
 | P13 | ? | HAND |
-| K1 | PASS | AUTO · K1 residual 9.9e-13 (tolerance 1e-9) over 360 samples, reference 1.6e-12; numeric fallback in fallback:radiusrod, fallback:comblever, fallback:union, fallback:spindle |
+| K1 | PASS | AUTO · K1 residual 5.1e-13 (tolerance 1e-9) over 360 samples, reference 2.0e-12 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
-| K3 | ? | AUTO / HAND · 3 blocks (slider-dyad, dyad); numeric fallback: fallback:radiusrod, fallback:comblever, fallback:union, fallback:spindle |
+| K3 | ? | AUTO / HAND · 4 blocks (slider-dyad, dyad, triad); no numeric fallback |
 | K4 | ? | HAND |
 | K6 | ? | DATA |
 | K7 | ? | DATA · drivers input (rotary), die (manual) |
@@ -111,13 +111,13 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | J12 | ? | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) |
 | J13 | ? | AUTO · fired: j13-compliant (no solids) |
 | J11 | ? | AUTO · fired: j11-screw (no solids) |
-| F1 | ? | AUTO · served at O, Rs, guide, vguide, Lt; fired: j2-live-shaft (55 solids), j10-shaft-in-plan (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids) |
-| F2 | ? | AUTO · served at Cp, Xh, Rc, Lf, Dl, Lr, Rt, Vs, Ub, Uc, O, Rs, guide, vguide, Lt; fired: j2-live-shaft (55 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F1 | ? | AUTO · served at O, Rs, guide, vguide, Lt; fired: j2-live-shaft (55 solids), j10-shaft-in-plan (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) |
+| F2 | ? | AUTO · served at Cp, Xh, Rc, Lf, Dl, Lr, Rt, Vs, Ub, Uc, O, Rs, guide, vguide, Lt; fired: j2-live-shaft (55 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) |
 | F3 | ? | AUTO · served at Cp, Xh, Rc, Lf, Dl, Lr, Rt, Vs, Ub, Uc, O, Rs; fired: j2-live-shaft (55 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
 | F4 | ? | AUTO / HAND · served at Cp, Rt, Vs, Ub, Uc, O, Rs, Lt; fired: j9-crossed-mesh (no solids), j2-live-shaft (55 solids), j10-shaft-in-plan (no solids), trunnion (no solids) |
 | F5 | ? | AUTO / HAND · served at Lt-link-stops; fired: j5-slide (32 solids), pawl-tooth (no solids), j13-compliant (no solids), stops (8 solids) |
 | F6 | ? | AUTO / HAND · served at Rs; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) |
-| F7 | ? | AUTO / HAND · served at guide, vguide; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (32 solids), j12-flexible (no solids), adjustable-length (no solids) |
+| F7 | ? | AUTO / HAND · served at guide, vguide; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (32 solids), j12-flexible (no solids), adjustable-length (no solids), covers (no solids) |
 | F8 | ? | AUTO · served at guide, vguide; fired: cross-bearings (no solids), tongue-slot (no solids), eccentric (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) |
 | F9 | ? | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (2 solids) |
 | F10 | ? | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) |
@@ -183,16 +183,16 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | Xh | J3 | – | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
 | Rc | J3 | dyad | – | – | none | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | none | none | none | none | none | none | none |
 | Lf | J3 | – | – | – | none | Shoulder bolt Ø6 x 25, M5 (ISO 7379) | Shoulder bolt Ø6 x 25, M5 (ISO 7379) | none | none | none | none | none | none | none |
-| Dl | J3 | – | – | – | none | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | none | none | none | none | none | none | none |
+| Dl | J3 | triad | – | – | none | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | none | none | none | none | none | none | none |
 | Lr | J3 | dyad | – | – | none | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | none | none | none | none | none | none | none |
-| Rt | J3 | – | – | – | none | Shoulder bolt Ø6 x 40, M5 (ISO 7379) | Shoulder bolt Ø6 x 40, M5 (ISO 7379) | Inner-race spacer 6.2x9.1 | none | none | none | none | none | none |
-| Vs | J3 | – | – | – | none | Shoulder bolt Ø4 x 55, M3 (ISO 7379) | Shoulder bolt Ø4 x 55, M3 (ISO 7379) | Inner-race spacer 4.2x7.1 | none | none | none | none | none | none |
-| Ub | J3 | – | – | – | none | Shoulder bolt Ø6 x 55, M5 (ISO 7379) | Shoulder bolt Ø6 x 55, M5 (ISO 7379) | 2 x Inner-race spacer 6.2x9.1 | none | none | none | none | none | none |
-| Uc | J3 | – | – | – | none | Shoulder bolt Ø6 x 60, M5 (ISO 7379) | Shoulder bolt Ø6 x 60, M5 (ISO 7379) | Inner-race spacer 6.2x8.4 | none | none | none | none | none | none |
+| Rt | J3 | triad | – | – | none | Shoulder bolt Ø6 x 40, M5 (ISO 7379) | Shoulder bolt Ø6 x 40, M5 (ISO 7379) | Inner-race spacer 6.2x9.1 | none | none | none | none | none | none |
+| Vs | J3 | triad | – | – | none | Shoulder bolt Ø4 x 55, M3 (ISO 7379) | Shoulder bolt Ø4 x 55, M3 (ISO 7379) | Inner-race spacer 4.2x7.1 | none | none | none | none | none | none |
+| Ub | J3 | triad | – | – | none | Shoulder bolt Ø6 x 55, M5 (ISO 7379) | Shoulder bolt Ø6 x 55, M5 (ISO 7379) | 2 x Inner-race spacer 6.2x9.1 | none | none | none | none | none | none |
+| Uc | J3 | triad | – | – | none | Shoulder bolt Ø6 x 60, M5 (ISO 7379) | Shoulder bolt Ø6 x 60, M5 (ISO 7379) | Inner-race spacer 6.2x8.4 | none | none | none | none | none | none |
 | O | J2 | slider-dyad | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the wheel on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | Rs | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø13; External circlip DIN 471, Ø6 | Clamp hub Ø6x16, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 6.2x14, bronze; Wave washer 9.5x12.8, spring steel | none | Split clamp collar 6x18 with a thumb screw: holds the setting | none | none | none | none |
 | guide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, riser to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 146, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
-| vguide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 67.6, bronze | 2 x Felt wiper in a steel clip | none | none |
+| vguide | J5 | triad | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 67.6, bronze | 2 x Felt wiper in a steel clip | none | none |
 | slot | die | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | Lt | J1 | dyad | – | – | Dead axle Ø12, shouldered, M10 end | Internal circlip DIN 472, Ø24; External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | Lt-link-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
@@ -223,5 +223,5 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 None yet.
 
 ## Verification
-check: clean · K1 residual: 9.9e-13 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 39.9 KB
+check: clean · K1 residual: 5.1e-13 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 39.9 KB
 screenshots: ? · bench: ?
