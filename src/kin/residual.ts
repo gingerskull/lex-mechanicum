@@ -190,6 +190,8 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     // a friction pair given by its ratio (a wheel on a disc's face at a set radius): b turns ratio times a
     return wrapPi(turn(s.b0, s.b1, ax2) - n(j.ratio) * turn(s.a0, s.a1, ax));
   }
+  // a rope's part has no ratio of its own: the reeve block keeps the rope's length (K1 checks its sheaves' pins)
+  if (j.type === "belt" && jr.flexible === "rope") return null;
   if (j.type === "belt" || j.type === "rolling") {
     const dA = turn(s.a0, s.a1, ax);
     const ra = n(j.radiusA);

@@ -8,7 +8,7 @@ import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkag
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
-import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance, vonMises } from "./blocks/members";
+import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, reeve, screwAdvance, vonMises } from "./blocks/members";
 import { genevaAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
@@ -549,6 +549,35 @@ function driveAt(c: BlockCtx, id: string, x: number): number {
   return lo + (hi - lo) * (0.5 - 0.5 * Math.cos(x));
 }
 
+/**
+ * reeve (a block and tackle). in: fall (the driver: the fall hauled, mm), D0 (pin spacing at no haul), DX (the lower pin's
+ * offset across the load line, the fleet), slanted (parts at the fleet; the first part is vertical), block (the lower
+ * block, body), axis (its rise), sheaves [{ body, center (joint or point), k }] (k the slanted parts the rope has run
+ * before reaching the sheave: the turn is (rise + k · shortening) / RP), RP (rope pitch radius), turn axis (default +z).
+ * out { rise }: the block's rise (mm).
+ */
+const reeveBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const r = reeve({ D0: c.num(i.D0), DX: c.num(i.DX), slanted: c.num(i.slanted ?? 3) });
+  const h = c.num(i.fall);
+  const D = r.spacing(h);
+  const rise = c.num(i.D0) - D;
+  const slant = r.slant(D);
+  const dRise = c.delta("rise", rise);
+  const dSlant = c.delta("slant", slant);
+  const ax = v3.unit(c.vec(i.axis ?? [0, 1, 0]));
+  if (typeof i.block === "string") c.setXf(i.block, xf.trans(v3.mul(ax, dRise)));
+  const n = v3.unit(c.vec(i.turnAxis ?? [0, 0, 1]));
+  const RP = c.num(i.RP);
+  for (const sh of (i.sheaves as { body: string; center: string; k: number; moving?: boolean }[] | undefined) ?? []) {
+    const ang = (dRise + sh.k * dSlant) / RP;
+    const ctr = c.refVec(sh.center);
+    const turn = xf.rotAbout(ctr, n, ang);
+    c.setXf(sh.body, sh.moving ? xf.mul(xf.trans(v3.mul(ax, dRise)), turn) : turn);
+  }
+  outVal(c, s, rise, "rise");
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -614,6 +643,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,
+  reeve: reeveBlock,
   escapement: escapementBlock,
   indexer,
 };

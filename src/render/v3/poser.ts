@@ -36,6 +36,10 @@ export interface Poser {
   point(u: number, id: string, ctl?: Controls): Vec3 | null;
   /** The distance of its two points at phase u (mm). */
   span(u: number, a: string, b: string): number | null;
+  /** Two named points as solved at phase u (a stretched member's ends), world mm. */
+  ends?(u: number, a: string, b: string): [Vec3, Vec3] | null;
+  /** The same two points in the reference configuration (where the member was built). */
+  refEnds?(a: string, b: string): [Vec3, Vec3] | null;
   /**
    * The path of a named point over a range of the input (degrees or mm; the whole input range when omitted), one polyline
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
@@ -152,6 +156,18 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
         if (line.length) out.push(line);
       }
       return out.length ? out : null;
+    },
+    refEnds: (a, b) => {
+      const P = k.referencePose(controls).points;
+      const A = P.get(a);
+      const B = P.get(b);
+      return A && B ? [A, B] : null;
+    },
+    ends: (u, a, b) => {
+      const P = pose(u);
+      const A = P.points.get(a);
+      const B = P.points.get(b);
+      return A && B ? [A, B] : null;
     },
     // a stretched member's length: its two points as solved (not lifted to the top faces the teaching layers draw on)
     span: (u, a, b) => {

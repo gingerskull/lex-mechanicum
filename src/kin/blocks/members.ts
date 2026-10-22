@@ -119,3 +119,24 @@ export function chainSpeed(theta: number, z: number, phi = 0): number {
   const x = theta + phi;
   return Math.cos(x - Math.round(x / d) * d);
 }
+
+/**
+ * A tackle reeved with one vertical part and `slanted` parts at a fleet offset DX (block and tackle): hauling the fall
+ * by h raises the lower block so the rope's length is kept, h = (D0 − D) + slanted (√(DX² + D0²) − √(DX² + D²)), D the
+ * pin spacing. Returns the spacing for a haul (bisection; h is monotonic in D) and the shortening of a slanted part.
+ */
+export function reeve(o: { D0: number; DX: number; slanted: number }) {
+  const s = (D: number) => Math.hypot(o.DX, D);
+  const haul = (D: number) => o.D0 - D + o.slanted * (s(o.D0) - s(D));
+  const spacing = (h: number): number => {
+    let lo = 0;
+    let hi = o.D0 + h + 1;
+    for (let k = 0; k < 80; k++) {
+      const m = (lo + hi) / 2;
+      if (haul(m) > h) lo = m;
+      else hi = m;
+    }
+    return (lo + hi) / 2;
+  };
+  return { haul, spacing, slant: (D: number) => s(o.D0) - s(D) };
+}

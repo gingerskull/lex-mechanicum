@@ -114,6 +114,39 @@ export function mul4(a: ArrayLike<number>, b: ArrayLike<number>): number[] {
   return o;
 }
 
+/**
+ * The frame of a stretched member between two points (a rope's span, a spring): at the first, x toward the second, z as
+ * near `up` as square to it; column-major, unscaled (the member's profile is given at unit length along x).
+ */
+export function stretchFrame(a: Vec3, b: Vec3, up: Vec3): number[] {
+  const l = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) || 1;
+  const t: Vec3 = [(b[0] - a[0]) / l, (b[1] - a[1]) / l, (b[2] - a[2]) / l];
+  const k = up[0] * t[0] + up[1] * t[1] + up[2] * t[2];
+  let z: Vec3 = [up[0] - k * t[0], up[1] - k * t[1], up[2] - k * t[2]];
+  let lz = Math.hypot(z[0], z[1], z[2]);
+  if (lz < 1e-9) {
+    z = Math.abs(t[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+    const k2 = z[0] * t[0] + z[1] * t[1] + z[2] * t[2];
+    z = [z[0] - k2 * t[0], z[1] - k2 * t[1], z[2] - k2 * t[2]];
+    lz = Math.hypot(z[0], z[1], z[2]);
+  }
+  z = [z[0] / lz, z[1] / lz, z[2] / lz];
+  const y: Vec3 = [z[1] * t[2] - z[2] * t[1], z[2] * t[0] - z[0] * t[2], z[0] * t[1] - z[1] * t[0]];
+  return [t[0], t[1], t[2], 0, y[0], y[1], y[2], 0, z[0], z[1], z[2], 0, a[0], a[1], a[2], 1];
+}
+
+/**
+ * The matrix of a stretched member whose solid was built with frame F0 between the points a0, b0 and now spans a, b: its
+ * place relative to its ends kept (an offset along its z), its unit length along x scaled to the span (column-major).
+ */
+export function stretchMatrix(a: Vec3, b: Vec3, a0: Vec3, b0: Vec3, F0: ArrayLike<number>): number[] {
+  const up: Vec3 = [F0[8]!, F0[9]!, F0[10]!];
+  const L = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
+  const S = stretchFrame(a, b, up);
+  for (let k = 0; k < 3; k++) S[k] = S[k]! * L;
+  return mul4(S, mul4(inv(stretchFrame(a0, b0, up)), F0));
+}
+
 /** A turn about the axis through `at` by `a` radians, column-major. */
 export function turnMatrix(at: Vec3, axis: Vec3, a: number): number[] {
   const l = Math.hypot(axis[0], axis[1], axis[2]) || 1;
