@@ -1,175 +1,213 @@
 # Audit: Tusi couple (tusi-couple)
-standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 107 · FAIL 0 · N/A 12 · open: none
+PASS 145 · FAIL 0 · N/A 22 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.3 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #40 holds only this mechanism's open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | DATA · catalogue validator clean (npm run catalog: vocab OK) |
-| P3 | PASS | DATA / SITE · ratio (stroke), axes Rotary-to-in-plane, output Reciprocating and Harmonic, partly backdrivable, other names, family, motion, level, dof 1 and the motorised drive are in the record |
-| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | DATA · motion, forces, benefits, limits; three uses with one line each |
-| P6 | PASS | DATA · three Wikipedia pages, a UNLV physics page and an engineering guide; two videos and a Commons photo page of the Thinktank Murray engine (added; the dead animation link 1apwd5X5EC0 was removed); the three real_world YouTube videos of Murray engine models answer oEmbed today with titles on topic (Hypocycloidal steam engine; Matthew Murray's hypocycloidal steam engine; Murray hypocycloidal engine), none kept blind. Playing was not watched |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts; lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page; nothing changed in the site |
-| P9 | PASS | HAND · solve(): the planet turns back once per arm turn, each tracer runs 128 mm (-64 to +64) on a straight diameter, X and Y at right angles, as the text says |
-| P10 | PASS | HAND · paths of both tracers (X first, with the comet), tracer velocity, input spin and the tooth force at the mesh, arm angle, plot of tracer X against arm angle (a cosine) |
-| P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
-| K1 | PASS | HAND · max link error 7.1e-15 mm; posts, pins, bearing, marks and the ring plating are cut round the model's centres and pitch circles |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · ringGear, link, gear, caps and tracers; fixed, between and at placement with spin |
-| K4 | PASS | HAND · roles ground, driver, output, pin, trace; accent only on the input cap pO |
-| K5 | PASS | HAND · check clean: arm on layer 0 (its sweep, radius 42, never reaches the ring teeth at 60); planet and tracers on layer 1; ring on layer 0 plated 10 mm up (RING_DZ) so its teeth are in the planet's plane, because the planet covers the input axis and the input cap must stay under it |
-| K6 | PASS | DATA · m 4, ring 32T R 64, planet 16T r 32, arm 32, stroke 128: as the catalogue. Tracer Y is the planet tooth opposite X (it crosses the input axis), the catalogue's '90 degrees round' read on the ring (code comment) |
-| K7 | PASS | HAND · input rotary on the arm |
-| D1 | PASS | HAND · tapered carrier arm with boss rings, true involute teeth on ring and planet, flush caps, squircle base |
-| D2 | PASS | HAND · bosses round the keyed input and the planet pin; no windows: the gears are small and turn at constant speed |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
-| D4 | PASS | AUTO · feet and corner holes concentric with the base arcs |
-| D5 | N/A | AUTO / HAND · no bridge is possible: the planet covers the input axis, so nothing can stand over it; the ring is held by four posts |
-| D6 | PASS | HAND / STYLE · posts, screws, pins and marks read quieter than the ring, planet and arm; the ring is see-through over the mesh |
-| D7 | PASS | HAND · ring, planet and arm carry only teeth, boss rings and the 15 degree scale |
-| A1 | PASS | AUTO · pO J2, pC J3, mesh J6 (internal); no slot, slide or cam |
-| A2 | PASS | AUTO · live shaft at the accent input, shoulder bolt at the planet pin, mesh hardware at the teeth |
-| A3 | PASS | AUTO · Ø8 pin joint: F698ZZ flanged bearing in the planet; Ø8 input shaft on 688-2RS in the housing |
-| A4 | PASS | AUTO · stepped Ø8 h6 input shaft with D-flat, circlip grooves and end retainer; no dead axle here |
-| A5 | PASS | AUTO · D-flat on the Ø8 input shaft, D-bored arm |
-| A6 | PASS | AUTO · the ring floats over the base on four Ø10 x 12 standoffs, M5 button heads from both sides (the rule built two, the polish adds two), spigoted |
-| A7 | PASS | AUTO · 8 mm base, 200 mm, counterbored corners, feet, scale, hole for the input shaft, both tracer lines engraved |
-| A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 |
-| A9 | PASS | AUTO / HAND · single shear at the input and at the planet pin, both forced: the planet's pitch circle passes through the input axis, so it always covers it and no bridge or second carrier plate can reach over; the input shaft rides two housing bearings 15 mm apart and the planet pin has a short overhang on a flanged bearing |
-| A10 | PASS | HAND · arm alone below; ring, planet and tracers in one plane above it |
-| A11 | PASS | AUTO / HAND · tooth force to planet bearing to bolt to arm to keyed shaft to housing bearings (screwed, dowelled) to base; ring to four posts, screws both sides, two spigots; tracer pins pressed into planet teeth |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · the pass issue (#213) holds only this mechanism's decisions; plan and status in #202 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site build) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in rebuild batch R2 (#213): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | PASS | DATA · catalogue validator clean |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no prose in the polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states is a claim and agrees (T9) |
+| P10 | PASS | HAND · X and Y traced (comet on X); overlays: diameter xy, line of x and line of y; plot of tracer x position |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 1.1e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 1 block (gear-mesh); no numeric fallback · composed from the block library; no fallback, no one-off model |
+| K4 | PASS | HAND · arm driver with the accent ring on the input;  output |
+| K6 | PASS | DATA · proportions and limits as the record's defining relations state them |
+| K7 | PASS | DATA · drivers input (rotary) · input kind declared with its driven joint |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one rotary driver, its control the arm |
+| K10 | PASS | AUTO / DATA · no two-root closure to declare; continuous (no POSE JUMP) |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
+| T2 | PASS | HAND · review before the build and again on the six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · principle parts declared; drawn whole, in depth order |
+| T4 | PASS | DATA · fired: trace-marks (no solids) · X and Y traced, comet on X |
+| T5 | PASS | DATA · construction overlays: diameter xy, line of x and line of y |
+| T6 | PASS | HAND / DATA · the claimed motion reads at the default view (claim table, T9) |
+| T7 | PASS | DATA · PLAN, where the planar mechanism reads whole |
+| T8 | N/A | DATA · the principle lies in plain view, no section needed |
+| T9 | PASS | AUTO / DATA · claim table: 5 ok, 0 off, 0 uncheckable of 5 |
+| T10 | PASS | AUTO · 0 solids drawn see-through · nothing fixed covers a principle part |
+| T11 | PASS | AUTO · 0 supports routed, 0 moved off a sweep · no support to route |
+| T12 | PASS | HAND · 8 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · nothing goes by in a blink |
+| T14 | PASS | HAND / DATA · the arm (driver) |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · links sized to their bosses, plates with boss rings, plain base |
+| D2 | PASS | HAND · material round every pin |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · the fixed ring on two posts under its rim; the arm's shaft stands on the base |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
+| D9 | N/A | AUTO / HAND · no member changes shape |
+| D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
+| D11 | PASS | AUTO · SOLID: 0 of 81 solids unsound |
+| D7 | PASS | HAND · links and plates plain; the richness in the stacks |
+| A1 | PASS | AUTO · mesh J6, C J3, O J2, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · mesh J6, C J3, O J2, drive drive · fixed pins on their kits, moving pins J3 |
+| A3 | PASS | AUTO · fired: classify (3 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them |
+| A4 | N/A | AUTO · fired: j1-dead-axle (no solids), axial stack builder · no dead axle |
+| A5 | PASS | AUTO · fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
+| A6 | PASS | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (12 solids) · the fixed ring on two posts under its rim |
+| A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base 8 mm under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (6 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | PASS | AUTO / HAND · fired: placement solver · pins in single or double shear as the placement solver sets them, shortest overhang |
+| A10 | PASS | HAND · fired: placement (6 solids), placement solver · slabs from the placement solver: parts that keep apart share a slab |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · named hardware with catalogue sizes; the unnamed solids are further items of a listed set |
-| A14 | PASS | HAND · ring posts' inner edge 71 mm from the axis, 3 mm outside the planet's tooth tips (68); the ring screw heads clear the tracers by 4 mm; arm sweep radius 42; clearance tool 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · notes and badges on pO, pC, mesh, ring posts and tracers; five build rules |
-| A17 | PASS | HAND · base, housing, input shaft, arm on its D-flat, ring on its posts, planet on its bearing and spacer, bolt, tracer pins; screws reached from above and below, bearings pulled after their circlips |
-| E1 | PASS | AUTO · every solid rigid, one level; checked at full explode |
-| E2 | PASS | AUTO · heads stay on their shanks at full explode |
-| E3 | PASS | AUTO · screws and bolt back out along their axes |
-| E4 | PASS | HAND · bolt, planet and bearing, spacer, then the ring on its posts and the arm; walked at 70 degrees |
-| E5 | PASS | AUTO · bearings, circlips and tracer pins stay in their parts |
-| E6 | PASS | AUTO · motor and bracket move as one |
-| E7 | PASS | AUTO · spacers and washers sit midway |
-| E8 | PASS | AUTO · keyed arm and thrust washer keep their order on the input shaft |
-| E9 | PASS | HAND · full explode at 28 and 70 degrees, both sheets: nothing inside another part, nothing leaves the frame |
-| J1 | N/A | AUTO · no ground dead axle: the ring is fixed, the planet pin is a moving pin |
-| J2 | PASS | AUTO · input: housing cartridge with two bearings, sleeve, wave washer, circlips, dowels, keyed shaft, thrust washer, end retainer, home flag. Not straddled: nothing can stand over the shaft (A9) |
-| J3 | PASS | AUTO · shoulder bolt Ø8 into the arm, flanged bearing in the planet with circlip, inner-race spacer, washer under the head, threadlocker |
-| J4 | N/A | AUTO · no slot or roller |
-| J5 | N/A | AUTO · no slide |
-| J6 | PASS | AUTO · internal mesh, timing marks (corrected by hand), circlip and flanged bearing on the planet. N/A lines: hub with set screw (neither gear is keyed), eccentric for backlash (centre distance is the arm, exact), see F7 |
-| J7 | N/A | AUTO · no cam |
-| J8 | PASS | AUTO · belt of the drive: GT2 32:16, flanged pulleys, tension slot |
-| F1 | PASS | AUTO · housing dowels at the input; round and slotted spigots on the ring posts; tracer pins pressed into the teeth |
-| F2 | PASS | AUTO · circlips and end retainer on the input shaft, circlip and flange on the planet bearing, screws on the ring posts |
-| F3 | PASS | AUTO · D-flat Ø8 on the input shaft and the arm bore |
-| F4 | PASS | AUTO / HAND · wave and thrust washers at the input; bearing flange and inner-race spacer at the planet, which never touches the arm |
-| F5 | N/A | AUTO / HAND · continuous rotary input, nothing to over-travel |
-| F6 | N/A | AUTO / HAND · positive drive, no rest position to hold |
-| F7 | N/A | AUTO / HAND · the centre distance R - r is the arm and exact (K1); backlash comes from the cut tooth thickness. No eccentric can sit on the planet pin without changing a modelled length. Promotion candidate noted. The drive's bracket slot adjusts the belt |
-| F8 | N/A | AUTO · shielded bearings, no sliding contact; the open teeth are greased at assembly (in the mesh note) |
-| F9 | PASS | AUTO / HAND · match line on the ring space and on the planet tooth that meet at arm angle 0, an index on the arm, a 15 degree scale on the ring face |
-| F10 | PASS | AUTO / HAND · drive by the rule: home flag, fork sensor, pulley flanges; no slip clutch (nothing can jam: the load is a free tracer) |
-| M1 | PASS | AUTO · top edges chamfered by the primitives |
-| M2 | N/A | HAND · both gears are small and run at constant speed, they do not start, stop or reverse |
-| M3 | PASS | AUTO · bore entry rings on the planet bearing seat and the arm |
-| M4 | PASS | AUTO / HAND · counterbores in the base, button heads on the ring's flat face |
-| M5 | PASS | AUTO / HAND · the one cut-out beyond the teeth, the ring's spigot slot, has full-radius ends |
+| A13 | PASS | AUTO / HAND · 81 solids, 43 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 4 joint notes; no note: none; no badge: mesh · a note per joint; the joints named after "no badge" have a kit that gives no badge yet (kit follow-up) |
+| A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
+| A18 | PASS | AUTO · placement: 2 slabs in the tallest stack (24.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver |
+| A19 | PASS | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none · no support to route |
+| A20 | PASS | AUTO · support per joint: none · one axial stack builder with its support selector |
+| A21 | PASS | AUTO · kit per joint: mesh J6, C J3, O J2, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · no part swings back and forth; no exact length to adjust |
+| E1 | PASS | AUTO · every solid has one explode level; levels -4 to 2.5 · one level per solid, nothing stretches |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable in ISOMETRIC on both sheets, nothing leaves the frame |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | N/A | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) · no dead axle |
+| J2 | PASS | AUTO · fired: j2-live-shaft (25 solids) · O: housing with two bearings, keyed shaft, pulley, flag |
+| J3 | PASS | AUTO · fired: j3-moving-pin (10 solids), cross-bearings (no solids), ring-hub (no solids) · moving pins: shoulder bolts threaded through the lower part, bearings, inner-race spacers, made up by a washer |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J5 | N/A | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) · no slide |
+| J6 | PASS | AUTO · fired: j6-mesh (1 solid), ring-rollers (no solids) · mesh: the planet in the fixed ring (its own body at the planet's height, on two posts under its rim), teeth phased to mesh |
+| J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids) · no shaft in plan |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
+| F2 | PASS | AUTO · served at C, O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F3 | PASS | AUTO · served at C, O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
+| F4 | PASS | AUTO / HAND · served at O; fired: j9-crossed-mesh (no solids), j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
+| F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · nothing has an end to stop: the input turns on |
+| F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
+| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · the ring and planet centres are fixed by the arm: nothing to adjust |
+| F8 | PASS | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) · lubrication where a part runs on a ground face; the other bearings sealed |
+| F9 | PASS | AUTO / HAND · served at mesh; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), timing-marks (1 solid) · zero line on the input and on the base (timing marks) |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) · home flag and fork sensor on the input (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · bosses round every loaded hole |
+| M3 | PASS | AUTO · fired: j3-moving-pin (10 solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (6 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | N/A | HAND · no bracket or plate turns a load round a corner |
-| M8 | PASS | AUTO · ISO 7379 shoulder bolt carries its undercut; the shaft's threaded end by A4 |
-| M9 | PASS | AUTO / HAND · ISO coarse threads M3 to M6 with lengths from the standard series |
-| M10 | PASS | AUTO / HAND · every solid names a material |
-| M11 | PASS | AUTO · chamfers and centre holes on the input shaft by A4 |
-| M12 | PASS | HAND · ring screws reached from above and from under the base, planet bolt from above, housing screws under the base; planet bearing pulled after its circlip |
-| M13 | PASS | AUTO / HAND · no threaded fastener without a locking method |
-| M14 | N/A | AUTO / HAND · no sliding contact to wear |
-| V1 | PASS | AUTO · pancake outrunner under the base, 32:16 belt |
-| V2 | PASS | AUTO · one bracket, flange screws up into the base |
-| V3 | PASS | AUTO / HAND · belt and pulleys clear of feet and housings; clearance 0 |
-| V4 | PASS | AUTO · pulley flanges, set screws, tension slot |
-| V5 | PASS | AUTO · rotary: belt to the input pulley |
-| V6 | PASS | AUTO · home flag, fork sensor, leads, terminal block, cable clip |
-| L1 | PASS | STYLE · no look value in the mechanism files; lint-style clean |
-| L2 | PASS | HAND · model and polish carry geometry, roles, materials, marks and accent only |
-| L3 | PASS | HAND · arm driver stipple, planet output hatching, ring ground dashes, base dot grid, hardware plain |
-| L4 | PASS | HAND / STYLE · accent only on the input cap; the accent shows on the shaft ring, the traced paths and the forces |
-| L5 | PASS | AUTO / HAND · the ring over the pitch point is drawn see-through; the hidden-share test passes |
-| L6 | PASS | AUTO · depth order right at plan, 28, 70 and side elevation |
-| L7 | PASS | STYLE · tilt 0 to 88 degrees, no shear |
-| L8 | PASS | AUTO / HAND · chain centrelines automatic; tracer lines and the scale engraved; match marks as fine ink lines |
-| R1 | PASS | HAND · polish uses H.disc, H.spigot, H.dowel and clones the rules' own post solids; the only outline made is the spigot slot, from core geometry |
-| R2 | PASS | HAND · threads M3, M4, M5, M6; bearings 688-2RS, F698ZZ; Ø10 standoffs; Ø6 spigots; Ø2 and Ø3 pins; GT2 16T and 32T |
-| R3 | PASS | AUTO · no part copied: the two added posts are the rule's post duplicated |
-| R4 | PASS | AUTO · package 22.1 KB |
-| R5 | PASS | HAND · polish 1 ms, no sampling |
-| R6 | FLAG | FLAG · bench in Node (CPU canvas, DPR 1.5, 1393 x 870): 254 ms plan, 241 ms 28 degrees, 274 ms side, 239 ms explode 70 degrees at full detail; 50 ms at dial C, 33 ms at dial H. The Node canvas runs far slower than the browser; flag only |
-| R7 | PASS | HAND · model.ts + polish.ts 11.7 KB |
-| R8 | PASS | AUTO / SITE · site behaviour, unchanged |
-| DL1 | PASS | AUTO / HAND · 35 of 111 solids on a dropping rung; no solid moved on the ladder |
-| DL2 | PASS | HAND · model detail full |
-| DL3 | PASS | AUTO · table-driven |
-| DL4 | PASS | SITE · site |
-| DL5 | FLAG | FLAG · bench reports the rungs: see the detail ladder |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | N/A | AUTO · fired: j1-dead-axle (no solids) · no stepped dead axle |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 78 of 81 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 13 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
+| V1 | PASS | AUTO · fired: drive (26 solids) · brushless pancake motor, GT2 32:16 |
+| V2 | PASS | AUTO · fired: drive (26 solids) · one bracket for the motor |
+| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
+| V5 | PASS | AUTO · fired: drive (26 solids) · rotary input: belt to the input pulley |
+| V6 | PASS | AUTO · fired: drive (26 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records and polish carry no look |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (no solids) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (no solids) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | N/A | AUTO / DATA · no section or detail view declared |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 20.3 KB · package v2 written at build time |
+| R5 | PASS | HAND · the polish states only exceptions, no sampling |
+| R6 | PASS | FLAG · FLAG: bench run (desktop, ladder below); the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 26 of 81 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 22.2 KB; site build not checked here · package written, 22.1 KB; the site page reads the catalogue by id |
-| Q4 | PASS | local: tools/shot · tools/shot: plan, 28, side, explode at 28 and 70 degrees, dark and light, overlays on; looked at every one |
-| Q5 | PASS | local: tools/bench · bench run: Node numbers in R6 (flag) |
-| Q6 | PASS | every requirement PASS, N/A with reason, or FLAG; ten-function table filled for every joint |
-| Q7 | PASS | tools/conformance at 2.3 |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 20.3 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · tools/shot3 --set: record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench run: dist/bench/report-v2.md |
+| Q6 | PASS | every row judged |
+| Q7 | PASS | at 3.0 |
+| Q8 | PASS | teaching review: keep (2026-10-22); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pO | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø16; Countersunk M4 x 10 (ISO 10642), into the shaft end, flush; Socket head M4 x 8 (ISO 4762), into the shaft end | Input shaft Ø8 h6, D-flat | Wave washer 12x15.8, spring steel; Thrust washer 8.2x14, bronze | – continuous rotation | – positive drive | – belt slot at the drive; no gear on this shaft | – sealed bearings | – arm index mark, zero at +x | – see drive |
-| pC | J3 | – the shoulder of the bolt seats in the arm; no plate to locate | Internal circlip DIN 472, Ø19; Bearing F698ZZ (8x19x6); head | – bearing carries the planet, no key | Bearing F698ZZ (8x19x6); Inner-race spacer sleeve 8.2x11.9 | – continuous rotation | – positive mesh | – centre distance is the arm, exact | – shielded bearing | – match marks at the mesh | – nothing can jam |
-| mesh-ring-planet | J6 | – the arm and the posts fix the centres | – the planet's circlip and bearing flange hold it | – neither gear is keyed: the planet turns free on its bearing | – the planet does not touch the arm (4 mm gap, spacer and flange carry the thrust) | – continuous rotation | – positive mesh | – N/A: centre distance fixed by the arm (promotion candidate: eccentric planet pin) | – open teeth greased at assembly (noted) | Ring gear, 32 teeth; Planet, 16 teeth; Carrier arm | – nothing can jam |
-| ring-post | post | 2 x Spigot Ø6 h7 on the standoff, one round, one in a slot | 4 x Button head M5 x 16 (ISO 7380) | – static | – static | – static | – static | – static | – none | – none | – none |
-| drive | drive | – by the rule | – by the rule | – by the rule | – by the rule | – n/a | – n/a | bracket | – n/a | – home flag | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
-| tracers | post | 2 x Tracer pin Ø2 h6, pressed in the planet tooth | 2 x Tracer pin Ø2 h6, pressed in the planet tooth | – friction fit, no torque | – the head sits 1 mm over the planet face | – n/a | – n/a | – n/a | – none | – X and Y on opposite teeth | – n/a |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| mesh | J6 | gear-mesh | – | – | none | none | none | none | none | none | none | none | Planet | none |
+| C | J3 | – | – | – | none | Internal circlip DIN 472, Ø22; Shoulder bolt Ø8 x 20, M6 (ISO 7379) | Shoulder bolt Ø8 x 20, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the arm on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| ring posts | two posts at the farthest points, no spigot | four posts, round spigot and slotted spigot | A ring 168 mm across on two posts is not held or located; spigots put it back centred (F1, A11) |
-| ring rim | rim 80 | rim 84 (model) | the posts stand outside the planet's tooth tips (68) with 3 mm to spare |
-| ring plating | layer plane | layer 0, plated +10 mm (model) | the planet covers the input axis, so the arm sits under it and the ring must lie in the planet's plane |
-| timing marks | marks at the mesh point | replaced by a line on the ring space and the planet tooth that meet at arm angle 0 | the rule puts an internal mesh's marks on the far side of the ring (promotion candidate) |
-| tracers | marker only | a Ø2 pin pressed into the planet tooth under each head | a tracer is a real part on the pitch circle |
-| pO, pC | single shear, warn | kept | the planet always covers the input axis, so nothing can reach over it |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 8 | 0 | 221.2 |
-| DL-B | 0 | 136 | 197.8 |
-| DL-C | 0 | 0 | 49.7 |
-| DL-D | 11 | 0 | 39.0 |
-| DL-E | 8 | 2 | 35.8 |
-| DL-F | 0 | 0 | 38.2 |
-| DL-G | 0 | 0 | 36.3 |
-| DL-H | 8 | 0 | 32.8 |
-| never | 76 | 116 | 257.1 (full) |
+| DL-A | 7 | 0 | 1.33 |
+| DL-B | 0 | 143 | 1.46 |
+| DL-C | 0 | 0 | 1.33 |
+| DL-D | 9 | 0 | 1.37 |
+| DL-E | 8 | 1 | 1.36 |
+| DL-F | 0 | 0 | 1.33 |
+| DL-G | 0 | 0 | 1.31 |
+| DL-H | 2 | 0 | 1.36 |
+| never | 55 | 97 | 1.35 |
 
 ## Promotion candidates
-Hand fixes that should become rules or primitives.
-
-- `classify` (src/rules/classify.ts, `meshes`): the mesh point of an internal pair has the wrong sign (`ringA ? -ra : ra` puts it on the far side of the ring when the ring is the first gear, and on the ring centre when the planet is). It should be `ringA ? ra : -ra`. It misplaces the F9 timing marks and the mesh joint's position; the polish replaces the marks.
-- `check` (src/model/check.ts): a fixed pin inside a ring gear's big opening counts as rigid with the ring and warns when the ring's layer is out of its range, although the rule's classify ignores big openings. Worked round by plating the ring into layer 0 (RING_DZ); a check that skips holes big enough to clear the pin would let the ring sit on the planet's own layer.
-- `j6-mesh`: F7 for a planet carried on an arm: an eccentric planet pin (or shims) to set backlash; no live shaft to put the eccentric on.
-- `standoffs`: a round plate of radius above 40 mm gets two posts; four posts at 90 degrees with a round and a slotted spigot (done here by cloning) would be the rule for large rings.
+None: no hand fix in this mechanism.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.2 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, dark and light, overlays on (tools/shot, looked at every one; attach to #40) · bench: Node CPU, 254 ms plan, 241 ms 28°, 274 ms side, 239 ms explode 70° at full detail; 50 ms at dial C (flag, R6)
+check: clean · K1 residual: 1.1e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.3 KB
+screenshots: dist/shots3/tusi-couple (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -96,7 +96,9 @@ export const cableClip: Rule = {
           acc = 0;
         }
       }
-      at.push(centre[centre.length - 1]!);
+      const last = centre[centre.length - 1]!;
+      const prev = at[at.length - 1]!;
+      if (Math.hypot(last[0] - prev[0], last[1] - prev[1]) > 1) at.push(last);
       const z0 = lead.frame.o[2];
       at.forEach((p, k) => {
         const w = fromPlane(lead.frame, p, 0);

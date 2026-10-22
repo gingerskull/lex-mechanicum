@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.0
+version: 3.3
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -267,6 +267,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `classify` | A1, A2, A3 |
 | `placement` | A10, A18 |
 | `base` | A7, D4, M4 |
+| `wheels` | D1, F2 |
 | `j6-mesh` | J6, F7, F9 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
 | `j3-moving-pin` | J3, A12, M3 |
@@ -876,6 +877,19 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.3 (2026-10-22).** The V5 crank-and-link drive replaces R5's interim reversing servo for every oscillating input.
+  The `drive` rule builds the lever on a live shaft, on a shaft in plan with the motor on an angle bracket, or by a pin
+  in a compliant lever's tip through an arc slot; a gear step-up (sector and pinion) where the swing is wider than a
+  crank and link can give; the linear drive (a belt loop, a carriage through a slot in the base, a tensioner); and a
+  knob on a hand-worked input. A `manual` driver with `lo` and `hi` is a hand stroke, cycled with no motor [V1, V2,
+  V3, V4, V5, V6, F10, K7, AUTO].
+- **3.2 (2026-10-22).** Rebuild batch R5 (cams, intermittent motion, escapements). The J7 cam kit takes the record's
+  roller, a stretched return spring and an oiler; a groove cam carries its own groove; a pawl's spring sits on its
+  carrier [J7, F6, F8, AUTO]. J5 slides are held over a declared guide, and a shaft slider gets a stem guide [J5,
+  AUTO]. Feather keys run along their shaft [A5, F3, AUTO]. R5 also drove an oscillating input with a reversing servo;
+  that is interim, replaced by the V5 crank-and-link drive [V5, AUTO].
+- **3.1 (2026-10-22).** Rebuild batch R1 (planar linkages): a body's `shape.wheel` is built as a wheel on a stub
+  axle in an upright tube, by the new `wheels` rule [D1, F2, AUTO].
 - **3.0 (2026-10-20).** True 3D parts and a record-driven build; the 2.5D engine is replaced at cut-over. The pipeline
   is catalogue record v3 (a `kin` block and a `teaching` block), closed-form kinematic blocks verified by a loop-closure
   residual, a hardware builder (joint kits, one axial stack builder, a support router, a placement solver), true 3D

@@ -8,6 +8,9 @@ import { hasFlag3 } from "../../package/format2";
 import { EF, EDGE, EFLAG } from "../../solids/edges";
 import { mat4 } from "../../solids/frame";
 import type { Vec3 } from "../../solids/types";
+import { xf } from "../../kin/math";
+const xfApply = xf.apply;
+const xfInv = xf.inv;
 import { DRAFT } from "../../style/draft";
 import { FORM } from "../../style/form";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
@@ -89,6 +92,65 @@ export function controlFor(t: Teaching | null, id: string, value: unknown): Cont
     default: return { drivers: { [key("driver")]: num } };
   }
 }
+
+/** The inverse of a rigid 4 x 4 (column-major): [Rᵀ | −Rᵀt]. */
+const invRigid = (m: ArrayLike<number>): number[] => {
+  const t: Vec3 = [m[12]!, m[13]!, m[14]!];
+  const r = (i: number, j: number) => m[j * 4 + i]!;
+  const o = [r(0, 0), r(0, 1), r(0, 2), 0, r(1, 0), r(1, 1), r(1, 2), 0, r(2, 0), r(2, 1), r(2, 2), 0, 0, 0, 0, 1];
+  o[12] = -(o[0]! * t[0] + o[4]! * t[1] + o[8]! * t[2]);
+  o[13] = -(o[1]! * t[0] + o[5]! * t[1] + o[9]! * t[2]);
+  o[14] = -(o[2]! * t[0] + o[6]! * t[1] + o[10]! * t[2]);
+  return o;
+};
+
+/**
+ * The path of a named point over one cycle as the body `frame` sees it, drawn where that body is at phase u (a cam's
+ * pitch curve turns with the cam): each sample is carried back by the body's pose at its own phase, then forward by the
+ * pose at u. Null without the body's poses.
+ */
+export function framedPath(A: Ann, point: string, frame: string): Float32Array | null {
+  const poser = A.rt.scene.poser;
+  if (!poser.body) return null;
+  const key = `${point}@${frame}`;
+  let local = A.cache.paths.get(key);
+  if (!local) {
+    local = new Float32Array(SAMPLES * 3);
+    for (let k = 0; k < SAMPLES; k++) {
+      const u = (k / SAMPLES) * poser.period;
+      const p = poser.point(u, point);
+      const M = poser.body(u, frame);
+      if (!p || !M) {
+        local = new Float32Array(0);
+        break;
+      }
+      local.set(applyMat(invRigid(M), p), k * 3);
+    }
+    A.cache.paths.set(key, local);
+  }
+  const Mu = poser.body(A.u, frame);
+  if (!local.length || !Mu) return null;
+  const out = new Float32Array(local.length);
+  for (let k = 0; k < local.length; k += 3) out.set(applyMat(Mu, [local[k]!, local[k + 1]!, local[k + 2]!]), k);
+  return out;
+}
+
+/** The path's sample nearest a fraction of the cycle. */
+const sampleAt = (path: Float32Array, f: number): Vec3 | null => {
+  const n = path.length / 3;
+  if (!n) return null;
+  const k = Math.round(f * n) % n;
+  return [path[k * 3]!, path[k * 3 + 1]!, path[k * 3 + 2]!];
+};
+
+/** A projected path whose last sample is far from its first (more than four times its mean step): it does not close. */
+const isOpen = (pts: [number, number][]): boolean => {
+  const n = pts.length;
+  if (n < 3) return true;
+  let sum = 0;
+  for (let k = 1; k < n; k++) sum += Math.hypot(pts[k]![0] - pts[k - 1]![0], pts[k]![1] - pts[k - 1]![1]);
+  return Math.hypot(pts[0]![0] - pts[n - 1]![0], pts[0]![1] - pts[n - 1]![1]) > (4 * sum) / (n - 1) + 1;
+};
 
 const pathPts = (A: Ann, path: Float32Array): [number, number][] => {
   const out: [number, number][] = [];
@@ -356,13 +418,15 @@ export function traces(A: Ann, f: TraceFlags): void {
   }
   if (f.traces) {
     t.traces.forEach((tr, i) => {
-      const path = pathOf(A, tr.point);
+      const path = tr.frame ? framedPath(A, tr.point, tr.frame) : pathOf(A, tr.point);
       if (!path) return;
       const pts = pathPts(A, path);
       ctx.setLineDash([...SP.dash]);
       ctx.lineWidth = SP.width;
       ctx.strokeStyle = paint(T[SP.color], SP.alpha * (i ? SP.otherGain : 1));
-      stroke(ctx, pts, true);
+      // a path that does not close over a cycle (an indexing wheel's mark moves on a step each turn) is drawn open
+      const open = isOpen(pts);
+      stroke(ctx, pts, !open);
       ctx.setLineDash([]);
       if (f.ticks && tr.ticks?.every) {
         const n = Math.max(1, Math.floor(360 / tr.ticks.every));
@@ -371,7 +435,8 @@ export function traces(A: Ann, f: TraceFlags): void {
         ctx.strokeStyle = paint(T.ink, DRAFT.tick.alpha);
         ctx.beginPath();
         for (let k = 0; k < n; k++) {
-          const p = poser.point((k / n) * poser.period, tr.point);
+          // in a body's frame, the tick is the path's sample at that phase (the path is already carried to now)
+          const p = tr.frame ? sampleAt(path, k / n) : poser.point((k / n) * poser.period, tr.point);
           if (!p) continue;
           const [x, y] = P(A, p);
           ctx.moveTo(x - h, y - h); ctx.lineTo(x + h, y + h);
@@ -384,6 +449,7 @@ export function traces(A: Ann, f: TraceFlags): void {
         const idx = Math.round(((((u % TAU) + TAU) % TAU) / TAU) * N);
         const L = Math.min(SP.cometSamples, N >> 1);
         for (let k = 0; k < L; k++) {
+          if (open && idx - k - 1 < 0) break;
           const a = pts[(idx - k - 1 + 10 * N) % N]!;
           const b = pts[(idx - k + 10 * N) % N]!;
           ctx.beginPath();
@@ -537,6 +603,18 @@ function arcPts(c: Vec3, e0: Vec3, n: Vec3, r: number, a0: number, a1: number, s
   return out;
 }
 
+/**
+ * The plane of a circle or ranged arc: its `normal`, else the axis of the joint it is centred on (a circle about a shaft in
+ * front elevation lies in that shaft's plane), else z; x is the world x made square to the normal (the world y where the
+ * normal is x).
+ */
+function planeOf(A: Ann, o: Record<string, unknown>): { n: Vec3; e0: Vec3 } {
+  const ax = Array.isArray(o.normal) ? (o.normal as Vec3) : typeof o.center === "string" ? A.rt.scene.axes?.[o.center] : undefined;
+  const n = unit(ax ?? [0, 0, 1]);
+  const h: Vec3 = Math.abs(n[0]) > 0.9 ? [0, 1, 0] : [1, 0, 0];
+  return { n, e0: unit(sub(h, mul(n, dot(h, n)))) };
+}
+
 const worldNormal = (a: Vec3, b: Vec3, c: Vec3): Vec3 => {
   const n = cross(sub(a, c), sub(b, c));
   return len(n) < 1e-6 ? [0, 0, 1] : unit(n);
@@ -556,6 +634,34 @@ export function overlays(A: Ann): void {
   ctx.lineWidth = O.line.width;
   for (const ov of t.overlays) drawOverlay(A, ov, label, ink);
   ctx.restore();
+}
+
+/** The two points of a line overlay drawn through two named points (`from` and `through`, or `from` and `to`). */
+function lineOf(A: Ann, ov: Ov | undefined): [Vec3, Vec3] | null {
+  if (!ov) return null;
+  const o = ov as Record<string, unknown>;
+  if (o.from === undefined || (o.through === undefined && o.to === undefined)) return null;
+  const a = pointOf(A, o.from), b = pointOf(A, o.through ?? o.to);
+  return a && b && len(sub(b, a)) > 1e-6 ? [a, b] : null;
+}
+
+/** Where two lines cross in the plan plane (at the first line's height); null when they are near parallel. */
+function crossing(l: [Vec3, Vec3], m: [Vec3, Vec3]): Vec3 | null {
+  const d1 = sub(l[1], l[0]), d2 = sub(m[1], m[0]);
+  const den = d1[0] * d2[1] - d1[1] * d2[0];
+  if (Math.abs(den) < 1e-9 * len(d1) * len(d2)) return null;
+  const w = sub(m[0], l[0]);
+  const t = (w[0] * d2[1] - w[1] * d2[0]) / den;
+  return add(l[0], mul(d1, t));
+}
+
+/** The point where the lines a `meet` overlay names cross (the first two of them), if they do. */
+function meetOf(A: Ann, names: unknown): Vec3 | null {
+  if (!Array.isArray(names) || names.length < 2) return null;
+  const all = A.rt.scene.teaching?.overlays ?? [];
+  const l = lineOf(A, all.find((q) => q.id === names[0]));
+  const m = lineOf(A, all.find((q) => q.id === names[1]));
+  return l && m ? crossing(l, m) : null;
 }
 
 function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
@@ -596,7 +702,12 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
   switch (ov.kind) {
     case "line":
     case "chord": {
-      const a = fromPt(), b = toPt();
+      // a line drawn at a fixed pose (a toggle, an aim line at neutral) holds its driver at that value; one posed at an
+      // output's extreme (a dead centre) is drawn there
+      const fixed = o.pose as { driver?: unknown; value?: unknown } | undefined;
+      const held = fixed && typeof fixed.driver === "string" && typeof fixed.value === "number" && A.rt.scene.poser.pointAt;
+      const at = (ref: unknown) => (typeof ref === "string" ? A.rt.scene.poser.pointAt!({ [fixed!.driver as string]: fixed!.value as number }, ref) : pointOf(A, ref));
+      const a = held ? at(o.from) : fromPt(), b = held ? at(o.to) : toPt();
       if (!a || !b) return;
       const ext = o.extend === true ? 0.25 : 0;
       const d = sub(b, a);
@@ -618,7 +729,17 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
     }
     case "dimension": {
       const a = fromPt();
-      let b = toPt();
+      // a moment arm: from the point square to a line through two named points (the foot of the perpendicular, in plan)
+      const ln = Array.isArray(o.line) && o.line.length === 2 ? [pointOf(A, o.line[0]), pointOf(A, o.line[1])] : null;
+      let b = ln ? null : toPt();
+      if (a && ln && ln[0] && ln[1]) {
+        const d: Vec3 = [ln[1][0] - ln[0][0], ln[1][1] - ln[0][1], 0];
+        const t = ((a[0] - ln[0][0]) * d[0] + (a[1] - ln[0][1]) * d[1]) / Math.max(1e-9, d[0] * d[0] + d[1] * d[1]);
+        b = [ln[0][0] + d[0] * t, ln[0][1] + d[1] * t, a[2]];
+        // the line itself, carried to the foot where it falls outside the two points
+        const lo = Math.min(0, t), hi = Math.max(1, t);
+        poly([add(ln[0], mul(sub(ln[1], ln[0]), lo)), add(ln[0], mul(sub(ln[1], ln[0]), hi))]);
+      }
       if (!a || !b) return;
       // one component of the span only (an offset measured square to a slide)
       const k = typeof o.component === "string" ? "xyz".indexOf(o.component) : -1;
@@ -635,24 +756,43 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       arrowHead(ctx, q, p, O.arrowDim);
       arrowHead(ctx, p, q, O.arrowDim);
       ctx.restore();
-      const ra = rawOf(o.from, o.fromPose);
-      let rb = rawOf(o.to, o.toPose);
+      // the true length: between the points where the kinematics put them (at their poses, one component if asked)
+      const ra = ln ? null : rawOf(o.from, o.fromPose);
+      let rb = ln ? null : rawOf(o.to, o.toPose);
       if (ra && rb && k >= 0) rb = ra.map((v, i) => (i === k ? rb![i]! : v)) as Vec3;
-      const L = ra && rb ? len(sub(rb, ra)) : len(sub(b, a));
-      if (text) label(`${text} ${L.toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
+      const m = ln ? Math.hypot(b[0] - a[0], b[1] - a[1]) : ra && rb ? len(sub(rb, ra)) : typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
+      if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
       return;
     }
     case "circle": {
-      const c = pointOf(A, o.center);
+      // a circle at a named point, or where the lines it names meet (a turning centre)
+      const c = o.meet !== undefined ? meetOf(A, o.meet) : pointOf(A, o.center);
       const r = typeof o.radius === "number" ? o.radius : null;
       if (!c || r === null) return;
-      poly(arcPts(c, [1, 0, 0], [0, 0, 1], r, 0, TAU), true);
-      tag(add(c, [r, 0, 0]), 18, 0);
+      const { n, e0 } = planeOf(A, o);
+      poly(arcPts(c, e0, n, r, 0, TAU), true);
+      tag(add(c, mul(e0, r)), 18, 0);
       return;
     }
     case "arc": {
       const c = pointOf(A, o.center);
       if (!c) return;
+      if (typeof o.radius === "number" && Array.isArray(o.range)) {
+        // an arc over a range of angles (degrees from the plane's x, about its normal), turning with the body `frame`
+        const { n, e0 } = planeOf(A, o);
+        const [a0, a1] = (o.range as number[]).map((x) => x * (Math.PI / 180));
+        let pts = arcPts(c, e0, n, o.radius, a0!, a1!);
+        const M = typeof o.frame === "string" ? A.rt.scene.poser.body?.(A.u, o.frame) : null;
+        if (M) {
+          const M0 = A.rt.scene.poser.body?.(A.u, o.frame as string);
+          // the centre is where the body's joint is now; the arc is laid out in the reference and carried by the pose
+          const cRef = applyMat(invRigid(M0!), c);
+          pts = arcPts(cRef, e0, n, o.radius, a0!, a1!).map((p) => applyMat(M, p));
+        }
+        poly(pts);
+        tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
+        return;
+      }
       const from = fromPt(), to = toPt(), through = pointOf(A, o.through);
       if (from && to && (o.fromPose || o.toPose)) {
         // an arc on the circle a point runs on, between two of its poses (the cut and return of a crank): turning
@@ -682,13 +822,20 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       }
       if (through) {
         // the arc a point sweeps about the centre over the cycle: its extreme angles about the plane's normal (z)
-        // (from the point's cached path: sampling it each frame costs a pose per sample)
-        const r = len(sub(through, c));
+        // (with `range`, only over those driver values: the stretch of a coupler curve that is a circular arc, at the
+        // arc's own `radius` when the record gives one; else from the point's cached path, since sampling it each frame
+        // costs a pose per sample)
+        const poser = A.rt.scene.poser;
+        const r = typeof o.radius === "number" ? o.radius : len(sub(through, c));
+        const name = typeof o.through === "string" ? o.through : "";
+        const swept = Array.isArray(o.range) && poser.sweep ? poser.sweep(name, o.range as [number, number])?.[0] : undefined;
+        const path = swept || !name ? null : pathOf(A, name);
+        const cached = path ? Array.from({ length: path.length / 3 }, (_, k): Vec3 => [path[3 * k]!, path[3 * k + 1]!, path[3 * k + 2]!]) : null;
+        const samples = swept ?? cached ?? Array.from({ length: 120 }, (_, k) => poser.point((k / 120) * poser.period, name));
         const angs: number[] = [];
         let prev = 0;
-        const path = typeof o.through === "string" ? pathOf(A, o.through) : null;
-        for (let k = 0; path && k < path.length; k += 3) {
-          const p: Vec3 = [path[k]!, path[k + 1]!, path[k + 2]!];
+        for (const p of samples) {
+          if (!p) continue;
           let a = Math.atan2(p[1] - c[1], p[0] - c[0]);
           if (angs.length) {
             while (a - prev > Math.PI) a -= TAU;
@@ -707,9 +854,33 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       return;
     }
     case "axis-line": {
-      const c = pointOf(A, o.at);
+      // a line from one named point through another (a wheel's axis), carried on to where it meets the line named by
+      // `extend`, or to the meeting point of a circle overlay that names it
+      const ln = lineOf(A, ov);
+      if (ln) {
+        const [p, q] = ln;
+        const d = sub(q, p);
+        const all = A.rt.scene.teaching?.overlays ?? [];
+        const ends: number[] = [0, 1];
+        const reach = (x: Vec3 | null) => {
+          if (x && len(sub(x, p)) < 50 * len(d)) ends.push(dot(sub(x, p), d) / dot(d, d));
+        };
+        if (typeof o.extend === "string") reach(crossing(ln, lineOf(A, all.find((m) => m.id === o.extend)) ?? ln));
+        for (const m of all) {
+          const mm = m as Record<string, unknown>;
+          if (Array.isArray(mm.meet) && mm.meet.includes(ov.id)) reach(meetOf(A, mm.meet));
+        }
+        const lo = Math.min(...ends) - 0.1, hi = Math.max(...ends) + 0.1;
+        poly([add(p, mul(d, lo)), add(p, mul(d, hi))]);
+        tag(add(p, mul(d, hi)), 0, -12);
+        return;
+      }
+      // or at a point (`at`, or `point`) with its direction (`axis`, or `dir`)
+      const at = o.at ?? o.point;
+      const c = pointOf(A, at);
       if (!c) return;
-      const ax = Array.isArray(o.axis) ? (o.axis as Vec3) : (A.rt.scene.axes?.[typeof o.at === "string" ? o.at : ""] ?? [0, 0, 1]);
+      const dir = o.axis ?? o.dir;
+      const ax = Array.isArray(dir) ? (dir as Vec3) : (A.rt.scene.axes?.[typeof at === "string" ? at : ""] ?? [0, 0, 1]);
       const a = unit(ax);
       const L = typeof o.length === "number" ? o.length : 80;
       poly([sub(c, mul(a, L)), add(c, mul(a, L))]);
@@ -720,6 +891,29 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const pt = typeof o.point === "string" ? o.point : "";
       const poser = A.rt.scene.poser;
       const pts: Vec3[] = [];
+      // the outline a tip reaches over two drivers' ranges (a five-bar's workspace)
+      if (Array.isArray(o.over) && o.over.length === 2 && poser.area) {
+        const out = poser.area(pt, [String(o.over[0]), String(o.over[1])]);
+        if (out) {
+          poly(out, true);
+          tag(out[Math.floor(out.length / 8)]!, 0, -12);
+        }
+        return;
+      }
+      // the point's path seen from a moving body, carried by that body now: the centrode that rolls on the fixed one
+      if (typeof o.frame === "string" && poser.bodyAt) {
+        const now = poser.bodyAt(A.u, o.frame);
+        if (!now) return;
+        const n = 180;
+        for (let k = 0; k <= n; k++) {
+          const u = (k / n) * poser.period;
+          const p = poser.point(u, pt), X = poser.bodyAt(u, o.frame);
+          if (p && X) pts.push(xfApply(now, xfApply(xfInv(X), p)));
+        }
+        poly(pts, true);
+        if (pts[0]) tag(pts[Math.floor(n / 4)]!, 0, -12);
+        return;
+      }
       const sweeps = poser.sweep ? poser.sweep(pt, Array.isArray(o.range) ? (o.range as [number, number]) : undefined, Array.isArray(o.branches) ? (o.branches as string[]) : undefined) : null;
       if (sweeps) for (const line of sweeps) { poly(line); if (line.length) pts.push(line[Math.floor(line.length / 2)]!); }
       else {

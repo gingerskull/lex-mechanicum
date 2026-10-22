@@ -180,7 +180,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | mesh | J6 | gear-mesh | – | – | none | none | none | none | none | none | none | none | Stator; Rotor | none |
-| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; End washer 5.4x18, holds the shaft on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 3 x 3 x 12 (DIN 6885) | Thrust washer 10.2x18, bronze; Wave washer 14.5x18.8, spring steel | none | none | none | none | none | none |
+| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; End washer 5.4x18, holds the shaft on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 3 x 3 x 7 (DIN 6885) | Thrust washer 10.2x18, bronze; Wave washer 14.5x18.8, spring steel | none | none | none | none | none | none |
 | E | eccentric | – | – | – | none | Cheek ring 42x60, screwed to the sheave, laps the strap | none | none | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 | stator-fix | covers | – | – | – | Dowel pin Ø3 h6, stator to the cover, fitted after the backlash is set | Countersunk M3 x 10 (ISO 10642) | none | none | none | none | Countersunk M3 x 10 (ISO 10642) | none | none | none |
@@ -211,5 +211,5 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 None left: fixed members of a joint, bodies at another's level, rotor and housing shapes and the covers rule are in the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.8 KB
+check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.9 KB
 screenshots: dist/shots3/wankel (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

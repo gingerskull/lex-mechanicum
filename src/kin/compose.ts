@@ -32,6 +32,9 @@ export class BranchTable {
 interface Tracker {
   p1?: number[];
   p2?: number[];
+  /** The driver values of p1 and p2. */
+  v1?: number[];
+  v2?: number[];
 }
 
 export interface Setup {
@@ -69,6 +72,12 @@ const key = (c?: Controls): string =>
   ]);
 
 const joinPlain = (v: unknown): string => String(v);
+
+/** A hand-worked driver that gives the ends of its stroke (lo, hi): the cycle works it through them, and no motor drives it. */
+export const handStroke = (d: KinDriver): boolean => d.kind === "manual" && typeof d.lo === "number" && typeof d.hi === "number";
+
+/** A driver the cycle moves: a rotary, oscillating or linear input, or a hand stroke. */
+export const cycleDriven = (d: KinDriver): boolean => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || handStroke(d);
 
 export class Kinematics {
   private setups = new Map<string, Setup>();
@@ -185,7 +194,7 @@ export class Kinematics {
       if (d.kind === "rotary") {
         const span = d.range ? d.range[1] - d.range[0] : 360;
         out[d.id] = def + ((speed * u + ph) * R2D * span) / 360;
-      } else if (d.kind === "oscillating" || d.kind === "linear") {
+      } else if (d.kind === "oscillating" || d.kind === "linear" || handStroke(d)) {
         const lo = d.lo ?? d.range?.[0] ?? def;
         const hi = d.hi ?? d.range?.[1] ?? def;
         out[d.id] = lo + (hi - lo) * (0.5 - 0.5 * Math.cos(speed * u + ph));
@@ -200,7 +209,48 @@ export class Kinematics {
   pose(u: number, controls?: Controls): Pose {
     const s = this.setup(controls);
     this.ensureTables(s);
-    return this.withFallback(s, u, this.driverValues(u, controls), "normal");
+    const P = this.withFallback(s, u, this.driverValues(u, controls), "normal");
+    this.addRates(s, P, u, controls);
+    return P;
+  }
+
+  /**
+   * The `speed-ratio` outputs at phase u, by a small forward step of the cycle: the turn of the body `of` per unit of
+   * the primary driver (degrees per degree or per mm), or, with `over`, the speed of the point `of` over the speed of
+   * the point `over` (a mechanical advantage at a grip).
+   */
+  private addRates(s: Setup, P: Pose, u: number, controls?: Controls): void {
+    const rates = (this.kin.outputs ?? []).filter((o) => o.kind === "speed-ratio");
+    if (!rates.length) return;
+    const drv = this.kin.drivers.find((d) => cycleDriven(d) && !s.held.has(d.id));
+    const h = 1e-4;
+    let Q: Pose;
+    try {
+      Q = this.withFallback(s, u + h, this.driverValues(u + h, controls), "normal");
+    } catch {
+      return;
+    }
+    const dx = drv ? (Q.values[drv.id] ?? 0) - (P.values[drv.id] ?? 0) : 0;
+    for (const o of rates) {
+      if (o.over) {
+        const a0 = P.points.get(o.of), a1 = Q.points.get(o.of), b0 = P.points.get(o.over), b1 = Q.points.get(o.over);
+        if (!a0 || !a1 || !b0 || !b1) continue;
+        const db = v3.dist(b0, b1);
+        if (db > 1e-12) P.outputs[o.id] = v3.dist(a0, a1) / db;
+        continue;
+      }
+      const X0 = P.bodies.get(o.of), X1 = Q.bodies.get(o.of);
+      const axis = this.groundAxis(s, o.of);
+      if (!X0 || !X1 || !axis || Math.abs(dx) < 1e-12) continue;
+      const turn = v3.dot(m3.log(m3.mul(X1.R, m3.T(X0.R))), axis) * R2D;
+      P.outputs[o.id] = turn / dx;
+    }
+  }
+
+  /** A body's own axis: that of its joint to the ground, else of its first joint (not a mesh). */
+  private groundAxis(s: Setup, body: string): Vec3 | undefined {
+    const rs = [...s.joints.values()].filter((r) => (r.joint.a === body || r.joint.b === body) && r.joint.type !== "gear-mesh");
+    return (rs.find((r) => r.joint.a === "ground" || r.joint.b === "ground") ?? rs[0])?.axis;
   }
 
   /** The pose at explicit driver values (declared branch where a block has two closures). */
@@ -273,7 +323,9 @@ export class Kinematics {
     for (const id of s.stateful) s.tables.set(id, new BranchTable(TABLE_STEPS));
     // homotopy from the reference values to the cycle start, then the cycle
     const startVals = this.driverValuesFor(s, 0);
-    const m = 48;
+    // fine enough steps that a closure near a toggle (a root that moves fast as the two roots draw together) is followed
+    const far = Math.max(0, ...Object.keys(v0).map((k) => Math.abs(startVals[k]! - v0[k]!)));
+    const m = Math.min(2000, Math.max(48, Math.ceil(far / 0.1)));
     for (let i = 1; i <= m; i++) {
       const vi: Record<string, number> = {};
       for (const k of Object.keys(v0)) vi[k] = v0[k]! + (startVals[k]! - v0[k]!) * (i / m);
@@ -305,7 +357,13 @@ export class Kinematics {
             if (hOf(m1) < hOf(m2)) hi = m2;
             else lo = m1;
           }
-          flips.push((lo + hi) / 2);
+          // h runs as |u - u0| through a crossing and its floor is rounding noise: place u0 by the V through two
+          // points either side, where h is well above the noise
+          const c = (lo + hi) / 2;
+          const w = 1e-5;
+          const hl = hOf(c - w), hr = hOf(c + w);
+          const v = (c - w) + (2 * w * hl) / (hl + hr);
+          flips.push(Number.isFinite(v) && Math.abs(v - c) < w ? v : c);
         }
       }
       t.flips = flips.filter((f) => f < TAU);
@@ -337,6 +395,7 @@ export class Kinematics {
     run.drive();
     for (const step of this.kin.solve) run.runStep(step);
     run.resolveBodies(fb ?? { unknown: new Set((this.kin.fallback?.loops ?? []).flat()) });
+    run.readCycleDrivers();
     return { pose: run.pose(), hs: run.hs, fb: run.fbPoses };
   }
 
@@ -375,7 +434,8 @@ class Run implements BlockCtx {
 
   // ---- drivers: each rotates or slides the driven body of its joint relative to the driven joint's first body
   drive(): void {
-    const pending = this.k.kin.drivers.filter((d) => d.joint && d.kind !== "select");
+    // a driver the cycle sets through a block (a path the tip follows, inverse kinematics) is not applied here
+    const pending = this.k.kin.drivers.filter((d) => d.joint && d.kind !== "select" && !d.cycle);
     for (let guard = 0; pending.length && guard < 8; guard++) {
       for (let i = pending.length - 1; i >= 0; i--) {
         const d = pending[i]!;
@@ -429,12 +489,12 @@ class Run implements BlockCtx {
     if (set) return set;
     const tp = this.k._points.get(name);
     if (tp) {
-      const X = this.xfs.get(tp.body);
+      const X = this.xfs.get(tp.body) ?? this.fitNow(tp.body);
       if (X) return xf.apply(X, this.refPt(name));
     }
     const j = this.s.joints.get(name);
     if (j) {
-      const X = this.xfs.get(j.joint.a) ?? this.xfs.get(j.joint.b);
+      const X = this.xfs.get(j.joint.a) ?? this.xfs.get(j.joint.b) ?? this.fitNow(j.joint.a) ?? this.fitNow(j.joint.b);
       if (X) return xf.apply(X, j.at);
     }
     throw new KinError(`${this.step?.id ?? "?"}: point ${name} is not available yet (a block must produce it first)`);
@@ -509,13 +569,20 @@ class Run implements BlockCtx {
       const tr = this.s.trackers.get(id) ?? {};
       this.s.trackers.set(id, tr);
       let idx: 0 | 1 = declaredIdx;
+      const v = Object.keys(this.vals).sort().map((k) => this.vals[k]!);
       if (tr.p1) {
-        const pred = tr.p2 ? tr.p1.map((x, i) => 2 * x - tr.p2![i]!) : tr.p1;
+        // ahead along the closure's motion; where the drivers turn back (an oscillating input at a toggle of the
+        // closure) the motion retraces, so the point before is the better guess
+        const back = tr.v1 && tr.v2 && v.reduce((a, x, i) => a + (x - tr.v1![i]!) * (tr.v1![i]! - tr.v2![i]!), 0) < 0;
+        const still = tr.v1 && v.every((x, i) => x === tr.v1![i]);
+        const pred = tr.p2 && !still ? (back ? tr.p2 : tr.p1.map((x, i) => 2 * x - tr.p2![i]!)) : tr.p1;
         const d = (r: number[]) => Math.hypot(...r.map((x, i) => x - pred[i]!));
         idx = d(roots[0]) <= d(roots[1]) ? 0 : 1;
       }
       tr.p2 = tr.p1;
       tr.p1 = roots[idx];
+      tr.v2 = tr.v1;
+      tr.v1 = v;
       const rec = this.s.recording;
       const t = this.s.tables.get(id);
       if (rec && t) t.sampled[rec.index] = idx;
@@ -526,44 +593,70 @@ class Run implements BlockCtx {
     return t.idxAt(this.u, t.refined);
   }
 
+  /** A body's pose from the points the blocks produced and its joints to bodies already posed, or null. */
+  private fitBody(body: string): Xf | null {
+    const joints = [...this.s.joints.values()];
+    const point = new Set(["revolute", "spherical", "universal", "flexure"]);
+    const ref: Vec3[] = [];
+    const now: Vec3[] = [];
+    let hint: Vec3 | undefined;
+    let slide = false;
+    // a prismatic partner already posed: the body keeps the partner's turn (a piston in a swinging cylinder)
+    let guide: Xf | undefined;
+    const add = (r: Vec3, n: Vec3) => {
+      if (ref.some((q) => v3.dist(q, r) < 1e-9)) return;
+      ref.push(r);
+      now.push(n);
+    };
+    for (const [id, tp] of this.k._points) if (tp.body === body && this.pts.has(id)) add(this.refPt(id), this.pts.get(id)!);
+    for (const r of joints) {
+      const j = r.joint;
+      if (j.a !== body && j.b !== body) continue;
+      if (j.type === "prismatic") {
+        slide = true;
+        const other = j.a === body ? j.b : j.a;
+        if (this.xfs.has(other)) guide = this.xfs.get(other);
+      }
+      if (j.type === "revolute" && !hint) hint = r.axis;
+      if (!point.has(j.type)) continue;
+      const other = j.a === body ? j.b : j.a;
+      if (this.pts.has(j.id)) add(r.at, this.pts.get(j.id)!);
+      else if (this.xfs.has(other)) add(r.at, xf.apply(this.xfs.get(other)!, r.at));
+    }
+    let X: Xf | null = null;
+    if (ref.length >= 2) X = fitXf(ref, now, hint);
+    else if (ref.length === 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
+    else if (ref.length === 1 && slide) X = xf.trans(v3.sub(now[0]!, ref[0]!));
+    return X;
+  }
+
+  /**
+   * A body a later block needs before the blocks are done (a six-bar's second loop starts on the first loop's rocker):
+   * fitted now from what is known, as resolveBodies would fit it at the end.
+   */
+  private fitting = new Set<string>();
+  private fitNow(id: string): Xf | undefined {
+    if (this.fitting.has(id) || !this.k._bodies.has(id)) return undefined;
+    this.fitting.add(id);
+    try {
+      const X = this.fitBody(id);
+      if (X) this.xfs.set(id, X);
+      return X ?? undefined;
+    } catch {
+      return undefined;
+    } finally {
+      this.fitting.delete(id);
+    }
+  }
+
   // ---- after the blocks
   resolveBodies(fb?: { unknown: Set<string>; warm?: Map<string, Xf> }): void {
     const joints = [...this.s.joints.values()];
-    const point = new Set(["revolute", "spherical", "universal", "flexure"]);
     for (let guard = 0; guard < 64; guard++) {
       let progress = false;
       for (const b of this.k.kin.bodies) {
         if (this.xfs.has(b.id)) continue;
-        const ref: Vec3[] = [];
-        const now: Vec3[] = [];
-        let hint: Vec3 | undefined;
-        let slide = false;
-        // a prismatic partner already posed: the body keeps the partner's turn (a piston in a swinging cylinder)
-        let guide: Xf | undefined;
-        const add = (r: Vec3, n: Vec3) => {
-          if (ref.some((q) => v3.dist(q, r) < 1e-9)) return;
-          ref.push(r);
-          now.push(n);
-        };
-        for (const [id, tp] of this.k._points) if (tp.body === b.id && this.pts.has(id)) add(this.refPt(id), this.pts.get(id)!);
-        for (const r of joints) {
-          const j = r.joint;
-          if (j.a !== b.id && j.b !== b.id) continue;
-          if (j.type === "prismatic") {
-            slide = true;
-            const other = j.a === b.id ? j.b : j.a;
-            if (this.xfs.has(other)) guide = this.xfs.get(other);
-          }
-          if (j.type === "revolute" && !hint) hint = r.axis;
-          if (!point.has(j.type)) continue;
-          const other = j.a === b.id ? j.b : j.a;
-          if (this.pts.has(j.id)) add(r.at, this.pts.get(j.id)!);
-          else if (this.xfs.has(other)) add(r.at, xf.apply(this.xfs.get(other)!, r.at));
-        }
-        let X: Xf | null = null;
-        if (ref.length >= 2) X = fitXf(ref, now, hint);
-        else if (ref.length === 1 && guide) X = { R: guide.R, t: v3.sub(now[0]!, m3.mulV(guide.R, ref[0]!)) };
-        else if (ref.length === 1 && slide) X = xf.trans(v3.sub(now[0]!, ref[0]!));
+        const X = this.fitBody(b.id);
         if (X) {
           this.xfs.set(b.id, X);
           progress = true;
@@ -591,6 +684,19 @@ class Run implements BlockCtx {
     }
   }
 
+  /** A driver the cycle sets through a block reads its value off the solved pose: its default plus its joint's turn. */
+  readCycleDrivers(): void {
+    for (const d of this.k.kin.drivers) {
+      if (!d.cycle || !d.joint) continue;
+      const r = this.s.joints.get(d.joint);
+      if (!r) continue;
+      const Xa = this.xfs.get(r.joint.a) ?? xf.id();
+      const Xb = this.xfs.get(r.joint.b) ?? xf.id();
+      const rel = xf.mul(xf.inv(Xa), Xb);
+      this.vals[d.id] = (this.s.defaults.get(d.id) ?? 0) + xf.angleAbout(rel, r.axis) * R2D;
+    }
+  }
+
   pose(): Pose {
     const points = new Map<string, Vec3>();
     for (const id of this.s.refPts.keys()) {
@@ -600,9 +706,16 @@ class Run implements BlockCtx {
         // a joint between two bodies that were both solved still resolves above; anything else is skipped
       }
     }
+    // construction points a block made (a crossing of two lines) that no body carries
+    for (const [id, p] of this.pts) if (!points.has(id)) points.set(id, p);
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      const v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : this.output(o.kind, o.of, points, o.axis, o.relativeTo);
+      // a scalar a block wrote under the output's own id (a cam's pressure angle) is read as it stands
+      const own = (o.kind === "angle" || o.kind === "position") && !o.from && o.id in this.vals ? this.vals[o.id] : undefined;
+      let v = own ?? (o.from && o.to ? this.between(o.of, o.from, o.to, points) : o.from ? this.distance(o.of, o.from, points) : this.output(o.kind, o.of, points, o.axis, o.relativeTo));
+      if (Array.isArray(v) && Array.isArray(o.axis) && o.kind === "position") v = v3.dot(v, v3.unit(o.axis));
+      if (typeof v === "number" && o.kind === "angle" && o.absolute && !(o.from && o.to)) v += this.refDirection(o.of);
+      if (typeof v === "number" && o.datum !== undefined) v -= o.datum;
       if (v !== undefined) outputs[o.id] = v;
     }
     for (const o of this.k.kin.outputs ?? []) {
@@ -613,6 +726,25 @@ class Run implements BlockCtx {
     return { u: this.u, bodies: this.xfs, points, values: this.vals, outputs, fallback: this.flagged ? this.fallbackBlocks : [] };
   }
 
+  /** The distance from point `of` to point `from`, mm. */
+  private distance(of: string, from: string, points: Map<string, Vec3>): number | undefined {
+    const p = points.get(of), q = points.get(from);
+    return p && q ? v3.dist(p, q) : undefined;
+  }
+
+  /** The direction of a body's frame x in the reference pose, degrees about its own axis from the world x (or z). */
+  private refDirection(body: string): number {
+    const F = this.s.bodyFrame.get(body);
+    const n = this.bodyAxis(body);
+    if (!F || !n) return 0;
+    const z = v3.unit(n);
+    const h: Vec3 = Math.abs(z[0]) > 0.9 ? [0, 0, 1] : [1, 0, 0];
+    const e1 = v3.unit(v3.sub(h, v3.mul(z, v3.dot(h, z))));
+    const e2 = v3.cross(z, e1);
+    const x: Vec3 = [F.R[0]!, F.R[3]!, F.R[6]!];
+    return Math.atan2(v3.dot(x, e2), v3.dot(x, e1)) * R2D;
+  }
+
   /** The angle at point `at` between the rays to `a` and `b`, degrees. */
   private between(at: string, a: string, b: string, points: Map<string, Vec3>): number | undefined {
     const p = points.get(at), q = points.get(a), r = points.get(b);
@@ -621,7 +753,7 @@ class Run implements BlockCtx {
     return Math.atan2(v3.len(v3.cross(u, w)), v3.dot(u, w)) * R2D;
   }
 
-  private output(kind: string, of: string, points: Map<string, Vec3>, axis?: string, relativeTo?: string): number | Vec3 | undefined {
+  private output(kind: string, of: string, points: Map<string, Vec3>, axis?: string | Vec3, relativeTo?: string): number | Vec3 | undefined {
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);
@@ -631,16 +763,17 @@ class Run implements BlockCtx {
         return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));
       }
     }
-    // (only the named forms: an axis given as a vector elsewhere keeps the point's position)
-    const named = typeof axis === "string" && /^-?[xyz]$|^radius$/.test(axis);
+    // the named forms: a component, or a distance from a point (an axis given as a vector is a projection, below)
+    const named = typeof axis === "string" && /^-?[xyz]$|^radius$/.test(axis) ? axis : undefined;
     if (kind === "position" && points.has(of) && (named || (relativeTo && axis === undefined))) {
       const p = points.get(of)!;
       const q = relativeTo ? points.get(relativeTo) : ([0, 0, 0] as Vec3);
       if (!q) return undefined;
-      const k = named && axis !== "radius" ? "xyz".indexOf(axis!.replace("-", "")) : -1;
-      if (k >= 0) return (axis!.startsWith("-") ? -1 : 1) * (p[k]! - (relativeTo ? q[k]! : 0));
+      const k = named && named !== "radius" ? "xyz".indexOf(named.replace("-", "")) : -1;
+      if (k >= 0) return (named!.startsWith("-") ? -1 : 1) * (p[k]! - (relativeTo ? q[k]! : 0));
       return v3.dist(p, q);
     }
+    if (kind === "position" && Array.isArray(axis) && points.has(of)) return v3.dot(points.get(of)!, v3.unit(axis));
     if (kind === "path" || (kind === "position" && points.has(of))) return points.get(of);
     if (kind === "angle") {
       if (of in this.vals) return this.vals[of];
@@ -712,6 +845,20 @@ export function bodyFrameOf(b: KinBody, list: KinJoint[], joints: Map<string, Re
   const y = v3.cross(z, x);
   return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: at.at };
 }
+
+/**
+ * A point a kit pins to a body without a name in the record (a spring's end on a follower, its seat on the ground):
+ * `@<body>:<x>:<y>:<z>`, the point's world coordinates in the reference configuration, carried by the body's pose.
+ */
+export function anchorAt(name: string, bodies: Map<string, Xf>): Vec3 | null {
+  const m = /^@([^:]+):(-?[\d.e+-]+):(-?[\d.e+-]+):(-?[\d.e+-]+)$/.exec(name);
+  if (!m) return null;
+  const X = m[1] === "ground" ? xf.id() : bodies.get(m[1]!);
+  return X ? xf.apply(X, [Number(m[2]), Number(m[3]), Number(m[4])]) : null;
+}
+
+/** The anchor name of a world reference point on a body (src/kin anchorAt). */
+export const anchorName = (body: string, p: readonly number[]): string => `@${body}:${p.map((v) => +v.toFixed(3)).join(":")}`;
 
 /** An axis with a fixed sign: its largest component positive, so parallel axes compare equal. */
 export function canonAxis(a: Vec3): Vec3 {

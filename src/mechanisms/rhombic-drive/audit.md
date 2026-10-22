@@ -180,12 +180,12 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | mesh | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Gear2; Gear1 | none |
-| PLa | J3 | dyad | – | – | none | Shoulder bolt Ø5 x 40, M4 (ISO 7379) | Shoulder bolt Ø5 x 40, M4 (ISO 7379) | Inner-race spacer 5.2x7.8 | none | none | none | none | none | none |
-| PRa | J3 | dyad | – | – | none | Shoulder bolt Ø5 x 40, M4 (ISO 7379) | Shoulder bolt Ø5 x 40, M4 (ISO 7379) | Inner-race spacer 5.2x7.8 | none | none | none | none | none | none |
-| Ta | J3 | – | – | – | none | Shoulder bolt Ø6 x 25, M5 (ISO 7379) | Shoulder bolt Ø6 x 25, M5 (ISO 7379) | Inner-race spacer 6.2x8.4 | none | none | none | none | none | none |
+| PLa | J3 | dyad | – | – | none | Shoulder bolt Ø5 x 55, M4 (ISO 7379) | Shoulder bolt Ø5 x 55, M4 (ISO 7379) | Inner-race spacer 5.2x7.8 | none | none | none | none | none | none |
+| PRa | J3 | dyad | – | – | none | Shoulder bolt Ø5 x 55, M4 (ISO 7379) | Shoulder bolt Ø5 x 55, M4 (ISO 7379) | Inner-race spacer 5.2x7.8 | none | none | none | none | none | none |
+| Ta | J3 | – | – | – | none | Shoulder bolt Ø6 x 40, M5 (ISO 7379) | Shoulder bolt Ø6 x 40, M5 (ISO 7379) | Inner-race spacer 6.2x8.4 | none | none | none | none | none | none |
 | Ba | J3 | – | – | – | none | Shoulder bolt Ø6 x 25, M5 (ISO 7379) | Shoulder bolt Ø6 x 25, M5 (ISO 7379) | Inner-race spacer 6.2x8.4 | none | none | none | none | none | none |
-| G1 | J2 | – | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the gear1 on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 14 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| G2 | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the gear2 on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 14 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| G1 | J2 | – | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the gear1 on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 9 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| G2 | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the gear2 on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 9 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | piston-guide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 55.7, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | displacer-guide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 55.7, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -216,5 +216,5 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 None left.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.3 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.6 KB
 screenshots: dist/shots3/rhombic-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)
