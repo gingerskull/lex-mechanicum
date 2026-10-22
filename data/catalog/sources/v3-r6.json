@@ -2380,6 +2380,15 @@
             0,
             -27
           ]
+        },
+        {
+          "id": "centre-ext2",
+          "body": "centre",
+          "local": [
+            0,
+            0,
+            107
+          ]
         }
       ],
       "outputs": [
@@ -2503,7 +2512,7 @@
           "id": "angle-2",
           "kind": "arc",
           "center": "C2a",
-          "from": "centre-ext",
+          "from": "centre-ext2",
           "to": "B2",
           "label": "β"
         }
