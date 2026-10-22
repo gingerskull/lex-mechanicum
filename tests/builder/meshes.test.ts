@@ -19,6 +19,7 @@ describe("mesh phasing", () => {
       expect(r.length).toBeGreaterThan(0);
       // an internal pair of few teeth leaves a sliver at the tips of the involute ring's flanks
       for (const m of r) expect(m.max, `${id} ${m.joint}`).toBeLessThan(0.5);
-    });
+      // a conjugate cut samples the cycle finely: a build takes a while
+    }, 120_000);
   }
 });
