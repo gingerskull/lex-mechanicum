@@ -276,13 +276,17 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       serve("F1", `${id}-hdw0`, `${id}-hdw1`);
       serve("F4", `${id}-hww`);
     }
-    if (support === "bridge" || support === "hung") {
-      const o = spec.frame.o;
+    // a bridge over the stack, where a pair of posts clears the sweeps; a live shaft in its housing does without one
+    // when none does (the parts round it sweep the whole plan), and says so
+    const o = spec.frame.o;
+    const route = support === "bridge" || support === "hung" ? routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom: o[2] + zTop + BEAM_GAP, baseTop: spec.baseTopWorld ?? o[2] + bt }) : null;
+    if ((support === "bridge" || support === "hung") && !route) {
+      if (!(live && spec.base)) throw new Error(`${id}: no pair of posts clears the sweeps for a bridge`);
+      notes.push("no pair of posts clears the sweeps for a bridge: the shaft is held in its housing alone");
+    }
+    if (route) {
       const baseTopW = spec.baseTopWorld ?? o[2] + bt;
       const baseBotW = o[2] + bb;
-      const minBottom = o[2] + zTop + BEAM_GAP;
-      const route = routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom, baseTop: baseTopW });
-      if (!route) throw new Error(`${id}: no pair of posts clears the sweeps for a bridge`);
       const beamBot = route.bottom - o[2];
       const beamTop = route.top - o[2];
       const hole = (circleBushing(d) / 2) + 0.05;
@@ -311,7 +315,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       L.add(H.screw(`${id}-es`, "csk", M, 2 * M + wh, { body: turn, face: top.w1 + wh, dir: -1 }));
       serve("F2", `${id}-ew`, `${id}-es`);
       shaftSpec.z1 = top.w1;
-    } else if (support !== "housing" || !spec.straddle) {
+    } else if (support !== "housing" || !spec.straddle || !route) {
       const clZ = zTop + 0.3;
       grooves.push(clZ);
       L.add(H.circlip(`${id}-ecl`, d, { z0: clZ, z1: clZ + ce.s, body: turn }));
@@ -330,7 +334,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   L.add(sh);
   if (live && spec.input) sh[sh.length - 1]!.accent = true;
   if (!live) serve("F1", shaftId);
-  return done(L, support, undefined, extra, bridge);
+  return done(L, bridge || (support !== "bridge" && support !== "hung") ? support : "housing", undefined, extra, bridge);
 
   function done(Lc: Local, sup: SupportKind, top?: number, more: Solid3[] = [], br?: StackResult["bridge"]): StackResult {
     for (const x of Lc.list) if (!x.joints.length) x.joints = [...spec.joints];

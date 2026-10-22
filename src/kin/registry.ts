@@ -277,11 +277,15 @@ const sarrus: BlockFn = (c, s) => {
  * gear-mesh. in: joint (a `gear-mesh` joint: za/zb or ratio, internal, crossed/sign, radiusA for a rack, ncg), input (a
  * value: body a's angle, deg), ref (b's angle in the reference configuration, default 0), parent (a body whose pose
  * carries b's centre, for a planet), shaft b's axis is joint.axis2 or joint.axis. out: b's angle (deg) or rack travel (mm).
+ * A gear a on a moving centre (a planet fixed to a rod, the sun-and-planet gear): `line` [p, q], two points of body a
+ * whose direction gives a's turn in place of `input`, and `carrier` (a value: the angle of the link that carries a's
+ * centre round b, deg); b turns by the carrier's turn plus the ratio times a's turn relative to the carrier.
  */
 const gearMesh: BlockFn = (c, s) => {
   const i = s.in ?? {};
   const jid = str(i.joint, "gear-mesh.joint");
   const j = c.joint(jid);
+  if (Array.isArray(i.line)) return planetMesh(c, s, j);
   const dA = c.delta("in", c.rad(i.input));
   const axisB = j.axis2 ? v3.unit(c.vec(j.axis2)) : c.jointAxis(jid);
   let X: Xf;
@@ -299,6 +303,20 @@ const gearMesh: BlockFn = (c, s) => {
   c.setXf(j.b, parent && c.has(parent) ? xf.mul(c.xf(parent), X) : X);
   outVal(c, s, dB * R2D + c.num(i.ref ?? 0), "angle");
 };
+
+/** gear-mesh with a on a moving centre: a's turn from a line of two of its points, b's turn about its fixed axis. */
+function planetMesh(c: BlockCtx, s: SolveStep, j: import("./types").KinJoint): void {
+  const i = s.in ?? {};
+  const [p, q] = i.line as unknown[];
+  const axisB = j.axis2 ? v3.unit(c.vec(j.axis2)) : c.jointAxis(j.id);
+  const e0 = v3.sub(c.refVec(q), c.refVec(p));
+  const e1 = v3.sub(c.vec(q), c.vec(p));
+  const dA = angleFrom(e1, axisB, v3.unit(e0));
+  const dC = i.carrier !== undefined ? c.delta("carrier", c.rad(i.carrier)) : 0;
+  const dB = dC + gearDelta(c, j, dA - dC);
+  c.setXf(j.b, xf.rotAbout(c.vec(j.cb ?? j.at), axisB, dB));
+  outVal(c, s, dB * R2D + c.num(i.ref ?? 0), "angle");
+}
 
 /** Angle of gear b for a turn dA of a, from the joint's ratio, tooth counts or non-circular pitch curve. */
 export function gearDelta(c: BlockCtx, j: import("./types").KinJoint, dA: number): number {

@@ -3019,8 +3019,7 @@
               "z": 24,
               "module": 5,
               "face": 14,
-              "at": "P",
-              "note": "the planet is fixed to the rod's lower end"
+              "at": "P"
             }
           },
           "at": {
@@ -3038,9 +3037,7 @@
             "bore": 16,
             "disc": {
               "radius": 130,
-              "thickness": 16,
-              "dz": -24,
-              "note": "flywheel on the sun shaft"
+              "thickness": 12
             }
           },
           "at": {
@@ -3154,10 +3151,15 @@
             0,
             0
           ],
-          "z": [
-            24,
-            24
-          ]
+          "za": 24,
+          "zb": 24,
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "carrier": "retainer",
+          "note": "the planet is fixed to the rod's end: the sun turns by the orbit plus the ratio times the rod's turn relative to the retainer"
         }
       ],
       "params": [
@@ -3268,27 +3270,36 @@
           "out": "B"
         },
         {
-          "block": "willis",
+          "block": "gear-mesh",
           "id": "sun-planet",
           "joints": [
             "M",
             "Os"
           ],
           "in": {
-            "carrier": "retainer",
-            "planet": "rod",
-            "sun": "sun",
-            "zs": "zs",
-            "zp": "zp"
+            "joint": "M",
+            "line": [
+              "P",
+              "B"
+            ],
+            "carrier": "orbit"
           },
-          "out": "sun-angle",
-          "opts": {
-            "relation": "(ws - wc)/(wp - wc) = -zp/zs; the planet turns with the rod",
-            "phase": 7.5
+          "out": {
+            "angle": "sun-turn"
           }
         }
       ],
-      "points": [],
+      "points": [
+        {
+          "id": "sun-mark",
+          "body": "sun",
+          "local": [
+            110,
+            0,
+            0
+          ]
+        }
+      ],
       "outputs": [
         {
           "id": "sun-angle",
@@ -3342,6 +3353,10 @@
         {
           "id": "beam-end",
           "point": "B"
+        },
+        {
+          "id": "sun-mark",
+          "point": "sun-mark"
         }
       ],
       "overlays": [

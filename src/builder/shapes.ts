@@ -8,8 +8,22 @@ import type { Kin, KinBody, KinJoint } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
-import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
+import { canon, frameAlong, fromPlane, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
+
+/**
+ * A further level of a body, in a slab of its own: a compound gear's next gear (a `gear` with `cluster`), a gear fixed
+ * on a link's end (a `link` with `gear`, centred on one of its joints) or a disc under a gear (a `gear` with `disc`, a
+ * flywheel). `z` is its tooth count (0 for a disc), `center` its centre in the body's frame, `below` that it stands
+ * under the body's part instead of over it.
+ */
+export interface Level {
+  z: number;
+  profile: Profile;
+  thick: number;
+  center?: Vec2;
+  below?: boolean;
+}
 
 export interface BodyGeom {
   id: string;
@@ -26,6 +40,8 @@ export interface BodyGeom {
   shape: Record<string, unknown>;
   /** A bevel gear's toothed frustum: the scale of its inner end, toward the apex along +z (D8). */
   scaleTop?: number;
+  /** A helical gear's teeth: the turn of the outline over its face, degrees, counter-clockwise for a right hand (D8). */
+  twist?: number;
   /**
    * The body stands where its joints put it, not on a slab of the placement solver (a bevel gear on its cone, a
    * universal joint's yoke and cross on their centre); its own part starts `offset` along the frame's z.
@@ -39,7 +55,7 @@ export interface BodyGeom {
    * A compound gear's further toothed levels on the same body (a cluster: a `gear` with `cluster`), each in a slab of
    * its own above the body's part; a mesh whose tooth count for this body is a level's meshes with that level.
    */
-  levels?: { z: number; profile: Profile; thick: number }[];
+  levels?: Level[];
 }
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -60,7 +76,7 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; exact?: boolean } {
   const g = outlineOf0(shape, role, pins);
   // holes the record names on a disc or a plate ([x, y, r] in the body's frame): a port face's ports
   if (Array.isArray(shape.holes) && (shape.type === "disc" || shape.type === "plate"))
@@ -68,7 +84,7 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
   return g;
 }
 
-function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; exact?: boolean } {
+function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; exact?: boolean } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -119,6 +135,15 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
         // a straight bevel gear: Tredgold's back-cone teeth at the outer end, tapering toward the apex over the face
         const bv = bevel(z, m, shape.cone * D2R, num(shape.face, 0) || undefined);
         return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
+      }
+      if (typeof shape.helix === "number" && shape.helix !== 0) {
+        // a helical gear: the transverse outline of the normal module, turned along the face by its helix (right hand
+        // counter-clockwise going up its axis); it stands at its joint's plane, so both of a pair share their faces
+        const beta = shape.helix * D2R;
+        const mt = shape.modules === "transverse" ? m : m / Math.cos(beta);
+        const b = num(shape.face, 10);
+        const turn = ((b * Math.tan(beta)) / ((z * mt) / 2)) * (shape.hand === "left" ? -1 : 1);
+        return { profile: { outer: gearOutline(z, mt), holes: [hole(bore / 2)] }, thick: b, approx: false, twist: turn / D2R, exact: true };
       }
       return { profile: { outer: gearOutline(z, m), holes: [hole(bore / 2)] }, thick: num(shape.face, 10), approx: false };
     }
@@ -182,8 +207,8 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    const levels = clusterLevels(shape);
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    const levels = clusterLevels(shape, pins);
     if (levels.length) geom.levels = levels;
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
   }
@@ -226,13 +251,31 @@ export function spider(ends: Vec2[], hub: number, arm: number, n = 240): Vec2[] 
   });
 }
 
-/** The further levels of a compound gear (`cluster`: [{ z, module, face, bore }]), plain spur outlines. */
-function clusterLevels(shape: Record<string, unknown>): NonNullable<BodyGeom["levels"]> {
-  if (String(shape.type) !== "gear" || !Array.isArray(shape.cluster)) return [];
-  return (shape.cluster as Record<string, unknown>[]).map((l) => {
-    const z = num(l.z, 12);
-    return { z, profile: { outer: gearOutline(z, num(l.module, num(shape.module, 2))), holes: [circle(num(l.bore, num(shape.bore, 6)) / 2, 0, 0, 28)] }, thick: num(l.face, num(shape.face, 10)) };
-  });
+/**
+ * A body's further levels (Level): a compound gear's `cluster` ([{ z, module, face, bore }]) over its part, a link's
+ * `gear` ({ z, module, face, at: the joint it is centred on }) over its part, a gear's `disc` ({ radius, thickness }, a
+ * flywheel) under it.
+ */
+function clusterLevels(shape: Record<string, unknown>, pins: { joint: string; uv: Vec2 }[]): Level[] {
+  const out: Level[] = [];
+  const type = String(shape.type);
+  if (type === "gear" && Array.isArray(shape.cluster))
+    for (const l of shape.cluster as Record<string, unknown>[]) {
+      const z = num(l.z, 12);
+      out.push({ z, profile: { outer: gearOutline(z, num(l.module, num(shape.module, 2))), holes: [circle(num(l.bore, num(shape.bore, 6)) / 2, 0, 0, 28)] }, thick: num(l.face, num(shape.face, 10)) });
+    }
+  if (type === "link" && shape.gear && typeof shape.gear === "object") {
+    const l = shape.gear as Record<string, unknown>;
+    const c = pins.find((p) => p.joint === l.at)?.uv ?? ([0, 0] as Vec2);
+    const z = num(l.z, 20);
+    out.push({ z, center: c, profile: { outer: gearOutline(z, num(l.module, 2)).map(([x, y]): Vec2 => [x + c[0], y + c[1]]), holes: [] }, thick: num(l.face, 10) });
+  }
+  if (type === "gear" && shape.disc && typeof shape.disc === "object") {
+    const d = shape.disc as Record<string, unknown>;
+    const R = num(d.radius, 60);
+    out.push({ z: 0, below: true, profile: { outer: circle(R, 0, 0, Math.max(72, Math.round(R * 2))), holes: [circle(num(shape.bore, 6) / 2, 0, 0, 28)] }, thick: num(d.thickness, 10) });
+  }
+  return out;
 }
 
 /** Which level of a body a mesh joint reaches: 0 its own part, k its k-th cluster level (by the tooth count the joint gives it). */
@@ -240,7 +283,7 @@ export function meshLevel(g: BodyGeom | undefined, j: { a: string; b: string; za
   if (!g?.levels?.length) return 0;
   const z = g.id === j.a ? j.za : g.id === j.b ? j.zb : undefined;
   if (typeof z !== "number" || z === num(g.shape.z, 20)) return 0;
-  const k = g.levels.findIndex((l) => l.z === z);
+  const k = g.levels.findIndex((l) => l.z > 0 && l.z === z);
   return k < 0 ? 0 : k + 1;
 }
 
@@ -258,17 +301,20 @@ const wrapTo = (a: number, h: number): number => a - 2 * h * Math.floor((a + h) 
  * of the second on the mesh point.
  */
 function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
-  type Side = { id: string; key: string; g: BodyGeom; kind: "gear" | "ring" | "rack"; z: number; m: number; lv: number };
+  type Side = { id: string; key: string; g: BodyGeom; kind: "gear" | "ring" | "rack"; z: number; m: number; lv: number; c?: Vec2 };
   const sideOf = (id: string, j: KinJoint): Side | null => {
     const g = geoms.get(id);
     if (!g) return null;
     const t = String(g.shape.type);
     if (t === "rack") return num(g.shape.module, 0) > 0 ? { id, key: id, g, kind: "rack", z: 0, m: num(g.shape.module, 0), lv: 0 } : null;
     if (t === "ringGear") return { id, key: id, g, kind: "ring", z: num(g.shape.z, 40), m: num(g.shape.module, 3), lv: 0 };
-    if (t !== "gear" || j.ncg) return null;
+    if ((t !== "gear" && t !== "link") || j.ncg) return null;
     const lv = meshLevel(g, j);
+    // a link meshes only through a gear fixed on it
+    if (t === "link" && !lv) return null;
     const L = lv ? g.levels![lv - 1]! : null;
-    return { id, key: levelId(id, lv), g, kind: "gear", z: L ? L.z : num(g.shape.z, 20), m: num(g.shape.module, 2), lv };
+    const m = t === "link" ? num((g.shape.gear as Record<string, unknown> | undefined)?.module, 2) : num(g.shape.module, 2);
+    return { id, key: levelId(id, lv), g, kind: "gear", z: L ? L.z : num(g.shape.z, 20), m, lv, ...(L?.center ? { c: L.center } : {}) };
   };
   // a gear's reference turn: its tooth (a ring's gap) stands at this angle; a rack's teeth are centred at this x
   const set = new Map<string, number>();
@@ -282,7 +328,9 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
     if (Math.abs(v) < 1e-12) return;
     if (s.lv) {
       const L = s.g.levels![s.lv - 1]!;
-      L.profile = { outer: rot(L.profile.outer, v), holes: L.profile.holes.map((h) => rot(h, v)) };
+      const c = L.center ?? [0, 0];
+      const r = (pts: Vec2[]) => rot(pts.map(([x, y]): Vec2 => [x - c[0], y - c[1]]), v).map(([x, y]): Vec2 => [x + c[0], y + c[1]]);
+      L.profile = { outer: r(L.profile.outer), holes: L.profile.holes.map(r) };
     } else s.g.profile = { outer: rot(s.g.profile.outer, v), holes: s.g.profile.holes.map((h) => rot(h, v)) };
   };
   const meshes = kin.joints.filter((j) => j.type === "gear-mesh" && S.joints.get(j.id));
@@ -307,7 +355,8 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
       if (knownA && knownB) continue;
       const phi = (s: Side): number => {
         const uv = planeCoords(s.g.frame, P).uv;
-        return Math.atan2(uv[1], uv[0]);
+        const c = s.c ?? [0, 0];
+        return Math.atan2(uv[1] - c[1], uv[0] - c[0]);
       };
       if (j.crossed) {
         // a tooth of the first, a gap of the second on the mesh point
@@ -323,7 +372,7 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
         const p = Math.PI * K.m;
         const x = planeCoords(K.g.frame, P).uv[0];
         const d = wrapTo(x - set.get(K.key)! - p / 2, p / 2);
-        const t = v3.unit(v3.cross(U.g.frame.z, v3.sub(P, U.g.frame.o)));
+        const t = v3.unit(v3.cross(U.g.frame.z, v3.sub(P, fromPlane(U.g.frame, U.c ?? [0, 0], 0))));
         const sgn = Math.sign(v3.dot(t, K.g.frame.x)) || 1;
         apply(U, phi(U) - (sgn * d) / ((U.z * U.m) / 2));
         continue;
@@ -333,7 +382,7 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
       const arc = off * ((K.z * K.m) / 2);
       if (U.kind === "rack") {
         // the rack's gap where the pinion's tooth is, along the pinion's turning direction at the mesh
-        const t = v3.unit(v3.cross(K.g.frame.z, v3.sub(P, K.g.frame.o)));
+        const t = v3.unit(v3.cross(K.g.frame.z, v3.sub(P, fromPlane(K.g.frame, K.c ?? [0, 0], 0))));
         const sgn = Math.sign(v3.dot(t, U.g.frame.x)) || 1;
         const x = planeCoords(U.g.frame, P).uv[0];
         apply(U, x - sgn * arc + (Math.PI * U.m) / 2);
@@ -356,7 +405,8 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
       const A = sideOf(j.a, j);
       if (A && A.kind !== "rack" && !set.has(A.key)) {
         const uv = planeCoords(A.g.frame, S.joints.get(j.id)!.at).uv;
-        apply(A, Math.atan2(uv[1], uv[0]));
+        const c = A.c ?? [0, 0];
+        apply(A, Math.atan2(uv[1] - c[1], uv[0] - c[0]));
       } else if (A) set.set(A.key, 0);
     }
   }

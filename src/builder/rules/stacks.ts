@@ -2,6 +2,7 @@
 // Each rule reads the sites of its kit, hands every site to the one stack builder with the members the placement
 // solver set, and records the hardware, the bores it needs and the engineering note (A16).
 import { circle } from "../../core/geom";
+import { inside } from "../../core/poly";
 import type { Solid3 } from "../../solids/types";
 import { ownParts, type BuildCtx } from "../ctx";
 import { fromPlane, parallel, planeCoords, type Frame } from "../frames";
@@ -36,6 +37,8 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
     const lv = ctx.levels.get(b) ?? [];
     for (const [k, part] of [ctx.parts.get(b), ctx.twins.get(b), ...lv].entries()) {
       if (!part) continue;
+      // a level is a member where the pin goes through it (a gear on a link's end only on that end's pin)
+      if (k >= 2 && !inside(part.profile.outer, planeCoords(part.frame, site.at).uv)) continue;
       const slab = ctx.extent(k >= 2 ? `${b}#${k - 1}` : b);
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
       // the twin's second half sits in its own slab
@@ -63,6 +66,14 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
     if (ctx.kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === b || j.b === b))) out.add(b);
   }
   if (!out.size && site.bodies[0]) out.add(site.bodies[0]);
+  // one shaft turns only the bodies that turn together: the driven one (else the first) is keyed, a body that turns at
+  // another rate on the same axis (a sun-and-planet's retainer on the sun's shaft) runs free on it in bearings
+  const first = [...out].find((b) => site.joints.some((j) => driver.has(j) && ctx.kin.joints.some((q) => q.id === j && (q.a === b || q.b === b)))) ?? [...out][0];
+  if (first) {
+    const xa = ctx.sampled.xfs.get(first) ?? [];
+    const same = (b: string) => (ctx.sampled.xfs.get(b) ?? []).every((X, i) => X.R.every((v, k) => Math.abs(v - (xa[i]?.R[k] ?? NaN)) < 1e-6));
+    for (const b of [...out]) if (b !== first && !same(b)) out.delete(b);
+  }
   return out;
 }
 

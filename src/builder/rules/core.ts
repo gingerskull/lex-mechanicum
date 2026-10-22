@@ -72,7 +72,7 @@ export const placement: Rule = {
         body: id,
         frame,
         profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
+        op: extrudeOp(g.thick, { ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}) }),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),
@@ -86,7 +86,7 @@ export const placement: Rule = {
         const r = ctx.extent(`${id}#${i + 1}`);
         if (!r) return;
         const lo = fromPlane(r.frame, planeCoords(r.frame, g.frame.o).uv, r.w0);
-        const lv: Solid3 = { ...part, id: `${id}-z${L.z}`, name: `${titleOf(id)}, ${L.z}-tooth level`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick), marks: [], joints: [...part.joints] };
+        const lv: Solid3 = { ...part, id: L.z ? `${id}-z${L.z}` : `${id}-disc`, name: L.z ? `${titleOf(id)}, ${L.z}-tooth ${String(g.shape.type) === "link" ? "gear fixed on it" : "level"}` : `${titleOf(id)}, flywheel disc`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick), marks: [], joints: [...part.joints] };
         ctx.levels.set(id, [...(ctx.levels.get(id) ?? []), lv]);
         (ctx.fired.placement ??= []).push(lv.id);
       });

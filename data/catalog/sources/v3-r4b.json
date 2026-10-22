@@ -1247,8 +1247,7 @@
             "bore": 12,
             "helix": 20,
             "hand": "left",
-            "modules": "normal",
-            "phase": "half a tooth"
+            "modules": "normal"
           },
           "at": {
             "joint": "O2"
@@ -1298,13 +1297,15 @@
             0,
             25
           ],
-          "z1": 17,
-          "z2": 34,
-          "hand": [
-            "right",
-            "left"
+          "za": 17,
+          "zb": 34,
+          "ratio": -0.5,
+          "cb": [
+            81.41,
+            0,
+            10
           ],
-          "helix": 20
+          "note": "pitch point at mid-face; opposite hands, so the teeth meet along the face as the pair turns"
         }
       ],
       "params": [
@@ -1363,18 +1364,12 @@
             "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "gear",
-            "za": 17,
-            "zb": 34,
-            "mn": "mn",
-            "beta": "beta"
+            "joint": "M",
+            "input": "input"
           },
-          "opts": {
-            "form": "parallel helical",
-            "centres": "mn (z1 + z2) / (2 cos beta)"
-          },
-          "out": "gear-turn"
+          "out": {
+            "angle": "gear-turn"
+          }
         }
       ],
       "points": [
@@ -1400,8 +1395,8 @@
           "id": "Gb",
           "body": "gear",
           "local": [
-            -54.042,
-            -5.008,
+            54.042,
+            5.008,
             0
           ]
         },
@@ -1409,8 +1404,8 @@
           "id": "Gt",
           "body": "gear",
           "local": [
-            -53.952,
-            5.893,
+            53.952,
+            -5.893,
             30
           ]
         },
@@ -1420,7 +1415,7 @@
           "local": [
             27.137,
             0,
-            18
+            10
           ]
         },
         {
@@ -1429,7 +1424,7 @@
           "local": [
             27.137,
             0,
-            48
+            40
           ]
         }
       ],
@@ -1453,7 +1448,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review of the 0.36.0 build (six phases, ratio -0.5 exact, centre distance 81.41, overlap ratio 1.09, thrust tan 20° = 0.36 of the tangential force): the numbers are right, but in plan a helical pair is a spur pair, so the twist, the gradual engagement and the thrust cannot be seen. Decided: open in isometric so the face shows; the pitch line at the mesh and one tooth's helix on each gear (the pinion's twists 23.1° across the 30 mm face, the gear's 11.5°) as construction lines, so a tooth is seen crossing the pitch line from one end of the face to the other; the two ends of the pinion's helix traced with ticks every 15°, the bottom end reaching the mesh first. The helix angle is a control: it changes the twist and the thrust, never the ratio."
+        "note": "Review of the 0.36.0 build (six phases, ratio -0.5 exact, centre distance 81.41, overlap ratio 1.09, thrust tan 20° = 0.36 of the tangential force): the numbers are right, but in plan a helical pair is a spur pair, so the twist, the gradual engagement and the thrust cannot be seen. Decided: open in isometric so the face shows; the pitch line at the mesh and one tooth's helix on each gear (the pinion's twists 23.1° across the 30 mm face, the gear's 11.5°) as construction lines, so a tooth is seen crossing the pitch line from one end of the face to the other; the two ends of the pinion's helix traced with ticks every 15°, the bottom end reaching the mesh first. The helix angle is a control: it changes the twist and the thrust, never the ratio. Rebuild R4 (#215): built on v3 from this record; the helical teeth are the transverse outline twisted along the face (right hand counter-clockwise up the axis), both gears placed at their joints' plane; the gear's helix points given in its own frame (x toward the mesh). The helix-angle control is not offered: it changes the built teeth, which a control cannot move on prebuilt solids; the axial thrust arrows are not drawn yet (forces from the record are renderer work). The six phases of the finished build read as decided."
       },
       "principle": [
         {
@@ -1515,11 +1510,6 @@
           "id": "input",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "helix",
-          "kind": "param",
-          "param": "beta"
         }
       ],
       "plot": {
