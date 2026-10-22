@@ -228,6 +228,14 @@ footer {
   flex-wrap: wrap;
   justify-content: space-between;
 }
+/* the set's mark, faded in the sheet's ink, on its own row under the footer line: the row is the full width and the
+   drawing sits in its middle (the SVG's own centring) */
+footer .foot-mark {
+  flex: 0 0 100%;
+  height: var(--size-mark);
+  margin-top: 28px;
+  color: var(--mark);
+}
 @media (max-width: 1000px) {
   /* the set title block becomes one low strip across the header: four cells in a row (SS2) */
   header.top .tblock {
