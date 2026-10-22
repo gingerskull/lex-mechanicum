@@ -96,7 +96,11 @@ function describe(site: Site, r: StackResult, m: Member[]): string {
 
 /** Builds one site's stack and records everything it needs. */
 export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
-  const frame = siteFrame(ctx, site);
+  const f0 = siteFrame(ctx, site);
+  // the record may turn a moving pin end for end (`head: "-"` on its joint): its head on the other side, where a part
+  // sweeps past the usual one (a Bennett loop's hinge)
+  const flip = !site.fixed && site.joints.some((j) => (ctx.kin.joints.find((q) => q.id === j) as { head?: string } | undefined)?.head === "-");
+  const frame = f0 && flip ? { o: f0.o, x: f0.x, z: [-f0.z[0], -f0.z[1], -f0.z[2]] as Frame["z"] } : f0;
   if (!frame) {
     ctx.issues.push(`site ${site.id}: no family of bodies stacked along its axis`);
     return null;

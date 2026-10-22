@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-10-21",
+  "generated": "2026-10-22",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -63366,7 +63366,9 @@
               0.5007717089813,
               -0.5527707983926,
               -0.6660871864316
-            ]
+            ],
+            "head": "-",
+            "note": "its pin turned end for end: the head on the side no link sweeps past"
           }
         ],
         "params": [
