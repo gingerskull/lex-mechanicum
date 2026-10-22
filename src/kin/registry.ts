@@ -278,6 +278,9 @@ const sarrus: BlockFn = (c, s) => {
  * a }: out contact, the driver's pitch radius at the contact), input (a
  * value: body a's angle, deg), ref (b's angle in the reference configuration, default 0), parent (a body whose pose
  * carries b's centre, for a planet), shaft b's axis is joint.axis2 or joint.axis. out: b's angle (deg) or rack travel (mm).
+ * With `carrier` (the angle of a link that carries the mesh round, deg) b turns relative to the carrier by the ratio
+ * times a's turn relative to it (a ring of pins held still and a disc on an eccentric: a is the ground, no input; b's
+ * centre rides the carrier given as `parent`).
  * A gear a on a moving centre (a planet fixed to a rod, the sun-and-planet gear): `line` [p, q], two points of body a
  * whose direction gives a's turn in place of `input`, and `carrier` (a value: the angle of the link that carries a's
  * centre round b, deg); b turns by the carrier's turn plus the ratio times a's turn relative to the carrier.
@@ -287,7 +290,9 @@ const gearMesh: BlockFn = (c, s) => {
   const jid = str(i.joint, "gear-mesh.joint");
   const j = c.joint(jid);
   if (Array.isArray(i.line)) return planetMesh(c, s, j);
-  const dA = c.delta("in", c.rad(i.input));
+  // a's turn (a held ring or ground pins have none); with a carrier, b's turn relative to it follows a's relative to it
+  const dA = i.input !== undefined ? c.delta("in", c.rad(i.input)) : 0;
+  const dC = i.carrier !== undefined ? c.delta("carrier", c.rad(i.carrier)) : 0;
   const axisB = j.axis2 ? v3.unit(c.vec(j.axis2)) : c.jointAxis(jid);
   let X: Xf;
   let dB = 0;
@@ -297,7 +302,7 @@ const gearMesh: BlockFn = (c, s) => {
     X = xf.trans(v3.mul(axisB, t));
     outVal(c, s, t, "travel");
   } else {
-    dB = gearDelta(c, j, dA);
+    dB = gearDelta(c, j, dA - dC);
     X = xf.rotAbout(c.vec(j.cb ?? j.at), axisB, dB);
   }
   if (j.ncg && j.ncg.a !== undefined) {
@@ -314,8 +319,16 @@ const gearMesh: BlockFn = (c, s) => {
     }
   }
   const parent = i.parent as string | undefined;
-  c.setXf(j.b, parent && c.has(parent) ? xf.mul(c.xf(parent), X) : X);
-  outVal(c, s, dB * R2D + c.num(i.ref ?? 0), "angle");
+  // with a carrier but no parent, b's centre stands still and it turns by the carrier's turn as well
+  const own = i.carrier !== undefined && !(parent && c.has(parent)) ? xf.mul(xf.rotAbout(c.vec(j.cb ?? j.at), axisB, dC), X) : X;
+  c.setXf(j.b, parent && c.has(parent) ? xf.mul(c.xf(parent), own) : own);
+  // the pitch point carried round with b's centre on the line of centres from a's (out.point)
+  if (parent && c.has(parent) && j.ca !== undefined && j.cb !== undefined) {
+    const ca = c.vec(j.ca);
+    const cbNow = xf.apply(c.xf(parent), c.vec(j.cb));
+    outPoint(c, s, v3.add(ca, v3.mul(v3.unit(v3.sub(cbNow, ca)), v3.dist(c.vec(j.at), ca))), "point");
+  }
+  outVal(c, s, (dB + dC) * R2D + c.num(i.ref ?? 0), "angle");
 };
 
 /** gear-mesh with a on a moving centre: a's turn from a line of two of its points, b's turn about its fixed axis. */
@@ -525,6 +538,21 @@ const indexer: BlockFn = (c, s) => {
   outVal(c, s, d * R2D, "angle");
 };
 
+/**
+ * follow. in: body (the follower), joint (its revolute to the ground), of (a body solved before it). The follower turns
+ * about its joint exactly as `of` turns (a cycloidal drive's output flange with its disc, whose pins in oversized holes
+ * make a parallelogram at every pin). out: the angle turned (deg).
+ */
+const follow: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const jid = str(i.joint, "follow.joint");
+  const of = str(i.of, "follow.of");
+  const axis = c.jointAxis(jid);
+  const a = xf.angleAbout(c.xf(of), axis);
+  spin(c, str(i.body, "follow.body"), c.jointAt(jid), axis, a);
+  outVal(c, s, a * R2D, "angle");
+};
+
 void sideOf;
 void angleFrom;
 
@@ -544,4 +572,5 @@ export const BLOCKS: Record<string, BlockFn> = {
   flexure: flexureBlock,
   escapement: escapementBlock,
   indexer,
+  follow,
 };

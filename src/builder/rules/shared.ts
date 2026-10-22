@@ -638,8 +638,11 @@ export const seeThrough: Rule = {
     const principle = [...ctx.principle].map((b) => ({ b, sweep: ctx.sweeps.of(b) })).filter((p): p is { b: string; sweep: NonNullable<typeof p.sweep> } => !!p.sweep);
     if (!principle.length) return;
     const proj = principle.map((p) => ({ b: p.b, cs: p.sweep.project(dir), c: centroidDepth(ctx, p.b, dir) }));
+    // a ring pin a lobed disc rolls on is a principle part, though fixed: drawn whole (pin-ring)
+    const ringPins = new Set(ctx.joints.filter((j) => j.kit === "pin-ring").map((j) => j.id));
     for (const s of ctx.solids) {
       if (ctx.principle.has(s.body) || s.flags.isBase || s.kind === "foot") continue;
+      if ((s.kind === "roller" || s.kind === "dowel") && s.joints.some((j) => ringPins.has(j))) continue;
       if (ctx.parts.get(s.body)?.id === s.id) continue;
       const m = worldManifold(ctx.M, s);
       const sp = projectAlong(m, dir);

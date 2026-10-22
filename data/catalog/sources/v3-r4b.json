@@ -430,7 +430,7 @@
               "Rr": 5,
               "e": 4
             },
-            "bore": 14,
+            "bore": 30,
             "holes": {
               "count": 6,
               "radius": 8,
@@ -440,6 +440,13 @@
           },
           "at": {
             "joint": "E"
+          },
+          "frame": {
+            "origin": [
+              4,
+              0,
+              0
+            ]
           }
         },
         {
@@ -458,6 +465,13 @@
           },
           "at": {
             "joint": "O_out"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              -8
+            ]
           }
         }
       ],
@@ -502,7 +516,7 @@
           "at": [
             0,
             0,
-            -8
+            0
           ],
           "axis": [
             0,
@@ -512,15 +526,30 @@
         },
         {
           "id": "RP",
-          "type": "rolling",
-          "a": "disc",
-          "b": "ground",
+          "type": "gear-mesh",
+          "a": "ground",
+          "b": "disc",
           "at": [
             40,
             0,
             0
           ],
-          "note": "the disc's lobes on the ring pins; kinematically its rolling circle (radius e n) inside the pins' (radius e N), touching on the line O-E"
+          "note": "the disc's 9 lobes on the 10 ring pins: its rolling circle (radius e(N-1)) inside the pins' (radius eN), touching at the pitch point on the line O-E; relative to the eccentric the disc turns 10/9 of the pins' turn",
+          "za": 10,
+          "zb": 9,
+          "ratio": 1.1111111111111112,
+          "internal": true,
+          "ca": [
+            0,
+            0,
+            0
+          ],
+          "cb": [
+            4,
+            0,
+            0
+          ],
+          "carrier": "eccentric"
         },
         {
           "id": "OP",
@@ -528,16 +557,21 @@
           "a": "flange",
           "b": "disc",
           "at": [
-            23.383,
+            23.382685902179844,
             13.5,
             0
           ],
           "slot": {
             "body": "disc",
             "path": "circle",
-            "radius": 8
+            "radius": 4,
+            "center": [
+              27.382685902179844,
+              13.5,
+              0
+            ]
           },
-          "note": "output pin in its hole; the hole radius exceeds the pin's by e, one of six alike"
+          "note": "output pin in its hole: the hole radius exceeds the pin's by e, so the pin centre runs round the hole centre at e; one of six alike"
         }
       ],
       "params": [
@@ -608,46 +642,37 @@
       ],
       "solve": [
         {
-          "block": "willis",
+          "block": "gear-mesh",
           "id": "wobble",
           "joints": [
             "E",
             "RP"
           ],
           "in": {
-            "carrier": "eccentric",
-            "planet": "disc",
-            "ring": "ground",
-            "zr": "N",
-            "e": "e"
+            "joint": "RP",
+            "carrier": "input",
+            "parent": "eccentric"
           },
-          "opts": {
-            "zp": "N - 1",
-            "note": "ring fixed: disc turns -1/(N-1) of the input; its centre E rides at e on the input angle"
-          },
-          "out": [
-            "disc-angle"
-          ]
+          "out": {
+            "angle": "disc-turn",
+            "point": "RP"
+          }
         },
         {
-          "block": "dyad",
-          "id": "output-pin",
+          "block": "follow",
+          "id": "output",
           "joints": [
             "O_out",
             "OP"
           ],
           "in": {
-            "a": "O_out",
-            "b": "H0",
-            "ra": "Ro",
-            "rb": "e"
+            "body": "flange",
+            "joint": "O_out",
+            "of": "disc"
           },
-          "opts": {
-            "root": "the parallelogram O, E, H0, pin: the flange turns exactly with the disc"
-          },
-          "out": [
-            "flange-angle"
-          ]
+          "out": {
+            "angle": "flange-turn"
+          }
         }
       ],
       "points": [
@@ -664,7 +689,7 @@
           "id": "H0",
           "body": "disc",
           "local": [
-            23.383,
+            23.382685902179844,
             13.5,
             0
           ]
@@ -695,7 +720,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail."
+        "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail. Rebuild R4 (#215): built on v3 from this record: a true cycloidal disc on a needle ring round the eccentric, ten ring pins (rollers on pins in a ring housing, a cover ring over their tops, see-through), six output pins pressed into the flange running round the disc's holes, the flange under the disc on bearings on the input shaft. Record fixes: the disc's bore 30 (the needle ring round the 24 mm eccentric), the disc's own frame at E, the output flange's ground joint on the input's axis (one shaft), the disc-pins mesh as a gear-mesh carried by the eccentric (ratio 10/9 relative to it), the flange following the disc (follow block) instead of a dyad that could flip at the parallelogram's straight positions, the output pin's hole given as a round hole. The eccentricity and pin-count controls are not offered (they change the built parts). The six phases and the detail read as decided."
       },
       "principle": [
         {
@@ -777,16 +802,6 @@
           "id": "input",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "eccentricity",
-          "kind": "param",
-          "param": "e"
-        },
-        {
-          "id": "pins",
-          "kind": "design",
-          "design": "N"
         }
       ],
       "plot": {

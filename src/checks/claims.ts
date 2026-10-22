@@ -152,7 +152,8 @@ function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
       const xlo = Math.min(...x);
       const xhi = Math.max(...x);
       // a value inside the input's range is a driver value, else a cycle angle
-      const inRange = target >= xlo - 1e-9 && target <= xhi + 1e-9 && xhi - xlo < 359.5;
+      // (a full turn of input is ambiguous at its ends: 360 is 0; a range of several turns is not)
+      const inRange = target >= xlo - 1e-9 && target <= xhi + 1e-9 && Math.abs(xhi - xlo - 360) > 0.5;
       const key = inRange ? x : u;
       const at = inRange ? target : ((target % 360) + 360) % 360;
       let best = -1;

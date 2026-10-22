@@ -68,7 +68,17 @@ export interface KinJoint {
   ca?: Vec; // optional axis points whose distance the mesh keeps constant
   cb?: Vec;
   // pin-in-slot: a carries the pin (at), b carries the slot, given by two points in the reference configuration
-  slot?: { from: Vec; to: Vec; /** n equal slots about the wheel axis through `center` (a Geneva wheel): the pin may be in any of them */ repeat?: number; center?: Vec };
+  slot?: {
+    from?: Vec;
+    to?: Vec;
+    /** n equal slots about the wheel axis through `center` (a Geneva wheel): the pin may be in any of them */
+    repeat?: number;
+    center?: Vec;
+    /** A round hole (`path: "circle"`) the pin's centre runs round at `radius` about `center` (a cycloidal output pin). */
+    path?: string;
+    radius?: Num;
+    body?: string;
+  };
   // cam-contact: the pitch radius of the cam as a function of its angle, and the follower kind
   follower?: "roller" | "flat" | "knife";
   // flexure

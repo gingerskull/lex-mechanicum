@@ -22,8 +22,10 @@ const PHASES = [0, 1.3, 2.9, 4.4, 5.8];
 function dropUnusableSlots(kin: Kin, notes: string[]): Kin {
   const joints = kin.joints.map((j) => {
     if (j.type !== "pin-in-slot" || !j.slot) return j;
-    const s = j.slot as unknown as { from?: unknown; to?: unknown };
+    const s = j.slot as unknown as { from?: unknown; to?: unknown; path?: unknown; center?: unknown };
     if (Array.isArray(s.from) && Array.isArray(s.to)) return j;
+    // a round hole with its centre: the residual reads it (the pin's centre at a radius from the hole's)
+    if (s.path === "circle" && Array.isArray(s.center)) return j;
     notes.push(`joint ${j.id}: slot given as a path, not a line; the pin is left to the other joints`);
     const { slot: _s, ...rest } = j;
     void _s;

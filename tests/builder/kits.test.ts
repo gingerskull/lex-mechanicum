@@ -30,6 +30,9 @@ describe("joint kits", () => {
     pallet: "kin:escapement", "fork-pin": "kin:fork", "pawl-tooth": "kin:ratchet", "pin-lobe": "kin:pinLobe", "tongue-slot": "kin:tongueSlot",
     "ring-hub": "kin:ringHub", "ring-rollers": "kin:ringRollers", "strap-sheave": "kin:rope", "groove-cam": "kin:grooveCam", "cross-pin": "universal-joint", trunnion: "oscillating-cylinder", "piston-bore": "oscillating-cylinder",
     "ring-carrier": "internal-gear-pair",
+    "eccentric-bearing": "cycloidal-drive",
+    "pin-ring": "cycloidal-drive",
+    "pin-hole": "cycloidal-drive",
   };
   for (const id of KIT_IDS) {
     it(`${id}: builds its joint, with an axis, a zone and a note`, async () => {

@@ -77,6 +77,9 @@ export const KITS: Record<KitId, Kit> = {
   trunnion: mk("trunnion", "Cylinder trunnion in a port face", ["J1"], ["slider-dyad"], "trunnion", ["shaft", "bushing", "thrustWasher", "spring", "nut", "washer"], own, pinZone("the port face")),
   "piston-bore": mk("piston-bore", "Piston in its bore", ["J5"], ["slider-dyad"], "piston-bore", ["wearStrip"], own, pinZone("the bore")),
   "ring-carrier": mk("ring-carrier", "Ring gear on carrier rollers", ["J6"], ["gear-mesh", "willis"], "ring-carrier", ["roller", "washer", "standoff", "head", "shank"], own, pinZone("the ring's centre")),
+  "eccentric-bearing": mk("eccentric-bearing", "Disc on an eccentric", ["J3"], ["gear-mesh"], "eccentric-bearing", ["bearing"], own, pinZone("the eccentric")),
+  "pin-ring": mk("pin-ring", "Lobed disc on ring pins", ["J6"], ["gear-mesh"], "pin-ring", ["roller", "dowel", "housing", "plate", "head", "shank"], own, pinZone("the lobes on the pins")),
+  "pin-hole": mk("pin-hole", "Output pins in oversized holes", ["J4"], ["dyad"], "pin-hole", ["dowel", "roller"], own, pinZone("the pins in their holes")),
   "groove-cam": mk("groove-cam", "Groove cam", ["J7"], ["cam"], "groove-cam", ["roller", "shaft", "wearStrip", "felt"], normalOf, runZone("the roller in the groove")),
 };
 

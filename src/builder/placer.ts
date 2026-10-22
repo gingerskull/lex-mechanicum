@@ -11,7 +11,7 @@ import { v3, xf, type Xf } from "../kin/math";
 import type { Kin } from "../kin/types";
 import { HEADROOM, LATERAL, PITCH, SLAB_GAP, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
-import { pointDist, ringDist } from "./planar";
+import { edgeDist, pointDist, ringDist } from "./planar";
 import { inside } from "../core/poly";
 import { type BodyGeom, levelId, meshLevel } from "./shapes";
 import type { JointInfo, Site } from "./sites";
@@ -157,6 +157,16 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       const xs = sampled.xfs.get(bodyOf(id)) ?? [];
       rings.set(id, sampleIdx.map((i) => outlineAt(g, xs[i] ?? xf.id(), fam)));
     }
+    // the holes of each outline per sample: a part that stays inside another's bore (a disc on its eccentric) is no clash
+    const holeRings = new Map<string, Vec2[][][]>();
+    for (const id of fid) {
+      const g = geomOf(id);
+      if (!g.profile.holes.length) continue;
+      const xs = sampled.xfs.get(bodyOf(id)) ?? [];
+      holeRings.set(id, sampleIdx.map((i) => g.profile.holes.map((h) => outlineAt({ ...g, plan: h }, xs[i] ?? xf.id(), fam))));
+    }
+    const within = (inner: Vec2[], hs: Vec2[][] | undefined): boolean => !!hs && hs.some((h) => inner.every((q) => inside(h, q) && edgeDist(h, q[0], q[1]) > LATERAL));
+    const nested = (A: string, B: string, i: number): boolean => within(rings.get(A)![i]!, holeRings.get(B)?.[i]) || within(rings.get(B)![i]!, holeRings.get(A)?.[i]);
 
     // clash graph between nodes
     const clash: boolean[][] = Array.from({ length: N }, () => new Array<boolean>(N).fill(false));
@@ -167,7 +177,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         if (contact.has(pairKey(A, B)) || nodeOf(A) === nodeOf(B)) continue;
         let hit = false;
         for (const i of sampleIdx) {
-          if (ringDist(rings.get(A)![i]!, rings.get(B)![i]!, LATERAL) <= LATERAL) {
+          if (ringDist(rings.get(A)![i]!, rings.get(B)![i]!, LATERAL) <= LATERAL && !nested(A, B, i)) {
             hit = true;
             break;
           }
@@ -212,7 +222,9 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           const carrier = s.bodies[0];
           const X = s.fixed || !carrier ? xf.id() : (sampled.xfs.get(carrier)?.[i] ?? xf.id());
           const p = planeCoords(fam, xf.apply(X, s.at)).uv;
-          if (pointDist(rings.get(id)![i]!, p[0], p[1]) < HEAD_R + LATERAL) {
+          // a pin inside one of the part's holes, clear of its edge, is not passed over (a shaft in a disc's bore)
+          const inHole = (holeRings.get(id)?.[i] ?? []).some((h) => inside(h, p) && edgeDist(h, p[0], p[1]) >= HEAD_R + LATERAL);
+          if (pointDist(rings.get(id)![i]!, p[0], p[1]) < HEAD_R + LATERAL && !inHole) {
             passers.add(n);
             break;
           }
@@ -245,7 +257,14 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);
     const lb = Math.max(1, cliqueBound(clash));
-    type Best = { assign: number[]; cost: [number, number, number] };
+    type Best = { assign: number[]; cost: [number, number, number, number] };
+    // where nothing else decides, a body the record declares lower goes lower (an output flange under its disc)
+    const declared = nodeIds.map((r) => Math.min(...nodes.get(r)!.ids.map((id) => planeCoords(fam, geomOf(id).frame.o).w)));
+    const disorder = (assign: number[]): number => {
+      let n = 0;
+      for (let u = 0; u < N; u++) for (let v = 0; v < N; v++) if (declared[u]! < declared[v]! - 0.5 && assign[u]! > assign[v]!) n++;
+      return n;
+    };
     const limit = N;
     let budget = 1_500_000;
     // strict: every passer on one side of its pin; relaxed: a pin with parts passing on both sides is allowed (it needs a
@@ -263,9 +282,9 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           const picks = clevisPicks(assign, siteCs, clash, h, nodeIds, nodes);
           // a fixed pin held from a bridge only (something passes under it) is the last resort
           const hung = siteCs.reduce((t, c) => t + (c.site.fixed && c.passers.some((p) => assign[p]! < Math.min(...c.members.map((m) => assign[m]!))) ? 1 : 0), 0);
-          const cost: [number, number, number] = [spacers, hung, -picks.length];
+          const cost: [number, number, number, number] = [spacers, hung, -picks.length, disorder(assign)];
           const f = found;
-          const less = !f || cost[0] < f.cost[0] || (cost[0] === f.cost[0] && (cost[1] < f.cost[1] || (cost[1] === f.cost[1] && cost[2] < f.cost[2])));
+          const less = !f || cost[0] < f.cost[0] || (cost[0] === f.cost[0] && (cost[1] < f.cost[1] || (cost[1] === f.cost[1] && (cost[2] < f.cost[2] || (cost[2] === f.cost[2] && cost[3] < f.cost[3])))));
           if (less) found = { assign: assign.slice(), cost };
         };
         const dfs = (k: number): void => {
@@ -279,7 +298,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
             if (levelsOk(assign) && (relax || passOk(assign, siteCs))) dfs(k + 1);
             assign[v] = -1;
             const f = found as Best | null;
-            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] <= -clevisCap(siteCs)) return;
+            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] <= -clevisCap(siteCs) && f.cost[3] === 0) return;
           }
         };
         dfs(0);
@@ -300,7 +319,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         while (clash[v]!.some((c, u) => c && assign[u] === s)) s++;
         assign[v] = s;
       }
-      best = { assign, cost: [0, 0, 0] };
+      best = { assign, cost: [0, 0, 0, 0] };
       placement.conflicts.push(fid);
     }
     const assign = (best as { assign: number[] }).assign;

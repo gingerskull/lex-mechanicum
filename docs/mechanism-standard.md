@@ -276,6 +276,9 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `trunnion` | J1, F2, F4, F6 |
 | `piston-bore` | J5, M14 |
 | `ring-carrier` | J6, F1, F2 |
+| `eccentric-bearing` | J3, F2 |
+| `pin-ring` | J6, F1, F2 |
+| `pin-hole` | J4, M14 |
 | `j4-slot-roller` | J4, M14 |
 | `pin-lobe` | J4, M14 |
 | `groove-cam` | J7, M14 |

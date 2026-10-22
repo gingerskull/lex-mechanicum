@@ -542,6 +542,11 @@ class Run implements BlockCtx {
             if (this.xfs.has(other)) guide = this.xfs.get(other);
           }
           if (j.type === "revolute" && !hint) hint = r.axis;
+          // a pin in a slot: the pin's centre is a point of the pin's body (a), where a block put it
+          if (j.type === "pin-in-slot" && j.a === b.id && this.pts.has(j.id)) {
+            add(r.at, this.pts.get(j.id)!);
+            continue;
+          }
           if (!point.has(j.type)) continue;
           const other = j.a === b.id ? j.b : j.a;
           if (this.pts.has(j.id)) add(r.at, this.pts.get(j.id)!);

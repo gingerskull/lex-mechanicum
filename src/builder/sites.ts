@@ -11,7 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore", "ring-carrier",
+  "cross-pin", "trunnion", "piston-bore", "ring-carrier", "eccentric-bearing", "pin-ring", "pin-hole",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -69,6 +69,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (ground && j.type === "revolute" && (a?.shape?.type === "cylinder" || b?.shape?.type === "cylinder")) return "trunnion";
       // a ring gear is open in the middle: it runs on rollers round its rim, not on a centre shaft
       if (ground && j.type === "revolute" && (a?.shape?.type === "ringGear" || b?.shape?.type === "ringGear")) return "ring-carrier";
+      // a disc that runs on an eccentric (a cam whose centre is the pin) turns on a needle ring round it, not on a pin
+      if (!ground && j.type === "revolute" && (typeof a?.shape?.offset === "number" || typeof b?.shape?.offset === "number")) return "eccentric-bearing";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
       if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
@@ -78,12 +80,16 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (a?.shape?.type === "piston" || b?.shape?.type === "piston") return "piston-bore";
       return /tongue/i.test(text(rec.note)) ? "tongue-slot" : "J5";
     case "pin-in-slot": {
+      // pins on a circle running in round holes larger by the eccentricity (a cycloidal drive's output)
+      if ((j.slot as { path?: unknown } | undefined)?.path === "circle") return "pin-hole";
       const s = text(j.slot) + text(rec.slot);
       if (/fork/i.test(s) || /fork/i.test(text(rec.note))) return "fork-pin";
       if (/groove/i.test(s)) return "groove-cam";
       return "J4";
     }
     case "gear-mesh":
+      // a lobed disc rolling on pins fixed to the ground (a cycloidal drive)
+      if ((j.a === "ground" || j.b === "ground") && kin.bodies.find((q) => q.id === "ground")?.shape?.pins) return "pin-ring";
       return j.crossed ? "J9" : "J6";
     case "cam-contact": {
       if (j.follower === "knife" || any("pawl")) return "pawl-tooth";

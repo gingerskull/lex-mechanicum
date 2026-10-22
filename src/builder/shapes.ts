@@ -126,7 +126,8 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     }
     case "disc": {
       const r = num(shape.radius, 20);
-      const c = pair(shape.center, [0, 0]);
+      // an eccentric: a disc whose centre stands `offset` off its shaft, toward the frame's x (its other joint)
+      const c = typeof shape.offset === "number" ? ([shape.offset, 0] as [number, number]) : pair(shape.center, [0, 0]);
       const bore = num(shape.bore, 0);
       return { profile: { outer: circle(r, c[0], c[1], Math.max(36, Math.round(r * 3))), holes: bore ? [hole(bore / 2)] : [] }, thick: num(shape.thickness, 8), approx: false };
     }
@@ -196,6 +197,24 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const p = num(shape.pitch, 8);
       const r = (z * p) / TAU + (type === "pulley" ? 1.4 : 2.5);
       return { profile: { outer: circle(r, 0, 0, Math.max(36, Math.round(r * 3))), holes: [hole(num(shape.bore, 8) / 2)] }, thick: num(shape.face, 10), approx: false };
+    }
+    case "custom": {
+      const prof = (shape.profile ?? {}) as Record<string, unknown>;
+      if (/trochoid/.test(String(prof.curve ?? ""))) {
+        // a cycloidal disc: N - 1 lobes rolling on N ring pins (radius Rr on a circle R), eccentricity e; 0.1 mm running
+        // clearance on the pins; its bore and the output pins' holes ({ count, radius, circle, start })
+        const outer = cycloidalDisc(num(prof.R, 50), num(prof.Rr, 5) + 0.1, num(prof.e, 4), num(prof.N, 10));
+        const holes: Vec2[][] = [];
+        if (typeof shape.bore === "number") holes.push(hole(shape.bore / 2).reverse());
+        const hs = (shape.holes ?? {}) as Record<string, unknown>;
+        const n = num(hs.count, 0);
+        for (let k = 0; k < n; k++) {
+          const a = (num(hs.start, 0) + (k * 360) / n) * D2R;
+          holes.push(circle(num(hs.radius, 5), num(hs.circle, 20) * Math.cos(a), num(hs.circle, 20) * Math.sin(a), 32).reverse());
+        }
+        return { profile: { outer, holes }, thick: num(shape.thickness, 10), approx: false };
+      }
+      break;
     }
     case "shaft": {
       const d = num(shape.diameter, 8);
@@ -326,6 +345,21 @@ export function meshLevel(g: BodyGeom | undefined, j: { a: string; b: string; za
 
 /** The placer's name for a body's k-th cluster level. */
 export const levelId = (body: string, k: number): string => (k ? `${body}#${k}` : body);
+
+/**
+ * A cycloidal disc's outline (counter-clockwise, about its centre): the curtate epitrochoid offset by the pin radius
+ * that rolls N - 1 lobes on N pins of radius Rr on a circle R, eccentricity e; at its reference the disc's centre stands
+ * at +e on x and a pin at angle 0 sits between two lobes.
+ */
+export function cycloidalDisc(R: number, Rr: number, e: number, N: number, n = 720): Vec2[] {
+  const pts: Vec2[] = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i * TAU) / n;
+    const psi = Math.atan2(Math.sin((1 - N) * t), R / (e * N) - Math.cos((1 - N) * t));
+    pts.push([R * Math.cos(t) - Rr * Math.cos(t + psi) - e * Math.cos(N * t), -R * Math.sin(t) + Rr * Math.sin(t + psi) + e * Math.sin(N * t)]);
+  }
+  return pts.reverse();
+}
 
 /**
  * A worm (`form: "worm"`, `z` starts, `module` axial, `pitchDiameter`, `face` its length) or its wheel

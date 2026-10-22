@@ -57,7 +57,7 @@ export const ringCarrier: Rule = {
           a0 = a;
         }
       }
-      const L = new Local(frameAlong([0, 0, 0], [0, 0, 1]), { joints: [j.id] });
+      const L = new Local(frameAlong([0, 0, 0], [0, 0, 1], [1, 0, 0]), { joints: [j.id] });
       const bt = ctx.base.top;
       const bb = ctx.base.bottom;
       const f0 = r.z0 - 0.5 - 2;
