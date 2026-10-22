@@ -55,7 +55,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
-| D1 | PASS | HAND · arms as tapered links ending in true spheres; links as bars; the sleeve a collar with two lugs; the spindle head a cross-head between the arms |
+| D1 | PASS | HAND · fired: wheels (no solids) · arms as tapered links ending in true spheres; links as bars; the sleeve a collar with two lugs; the spindle head a cross-head between the arms |
 | D2 | PASS | HAND · bosses round every pin, lugs as webs into the sleeve and spindle |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
@@ -81,7 +81,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | A13 | PASS | AUTO / HAND · 118 solids, 61 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | PASS | HAND · 8 joint notes; no note: none; no badge: Sl · a note per joint; the spindle head and sleeve carry lugs (record) |
+| A16 | PASS | HAND · 8 joint notes; no note: none; no badge: none · a note per joint; the spindle head and sleeve carry lugs (record) |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings and liners pullable through their bores |
 | A18 | PASS | AUTO · placement: 4 slabs in the tallest stack (222.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver; bodies on their cone or centre placed where the joints put them |
 | A19 | PASS | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none · blocks routed, least gap 1.5 mm, see-through where they cover the input yoke |
@@ -112,7 +112,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
 | F1 | PASS | AUTO · served at S; fired: posts (no solids), j2-live-shaft (24 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
-| F2 | PASS | AUTO · served at PL, ML, MR, QL, QR, S, Sl; fired: j2-live-shaft (24 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F2 | PASS | AUTO · served at PL, ML, MR, QL, QR, S, Sl; fired: wheels (no solids), j2-live-shaft (24 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
 | F3 | PASS | AUTO · served at PL, ML, MR, QL, QR; fired: j2-live-shaft (24 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
 | F4 | PASS | AUTO / HAND · served at PL, S; fired: j9-crossed-mesh (no solids), j2-live-shaft (24 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (2 solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · no part swings past its range: the speed control sets the arms |
@@ -201,15 +201,15 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 17 | 0 | 1.4 |
-| DL-B | 0 | 210 | 1.37 |
-| DL-C | 0 | 0 | 1.41 |
-| DL-D | 17 | 0 | 1.36 |
-| DL-E | 8 | 0 | 1.35 |
-| DL-F | 0 | 0 | 1.4 |
-| DL-G | 0 | 0 | 1.37 |
-| DL-H | 2 | 0 | 1.46 |
-| never | 74 | 161 | 1.4 |
+| DL-A | 17 | 0 | 2 |
+| DL-B | 0 | 210 | 1.93 |
+| DL-C | 0 | 0 | 1.7 |
+| DL-D | 17 | 0 | 1.82 |
+| DL-E | 8 | 0 | 1.93 |
+| DL-F | 0 | 0 | 1.91 |
+| DL-G | 0 | 0 | 1.85 |
+| DL-H | 2 | 0 | 2.15 |
+| never | 74 | 161 | 1.87 |
 
 ## Promotion candidates
 Promoted in this pass: the `conical-pendulum` block, claims over a driver's range (`over`), a collar sliding on a turning shaft (J5), ball ends (`ball`) as revolved spheres.

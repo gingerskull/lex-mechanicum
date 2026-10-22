@@ -56,7 +56,7 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
-| D1 | PASS | HAND · leaves as wide hinged bars side by side on their hinges; the top plate on two lugs |
+| D1 | PASS | HAND · fired: wheels (no solids) · leaves as wide hinged bars side by side on their hinges; the top plate on two lugs |
 | D2 | PASS | HAND · bosses round every pin; lugs as webs into the plate |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
@@ -113,7 +113,7 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
 | F1 | PASS | AUTO · served at H1, H2; fired: posts (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
-| F2 | PASS | AUTO · served at K1, T1, K2, T2, H1, H2; fired: j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F2 | PASS | AUTO · served at K1, T1, K2, T2, H1, H2; fired: wheels (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
 | F3 | PASS | AUTO · served at K1, T1, K2, T2; fired: j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
 | F4 | PASS | AUTO / HAND · served at H1; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), trunnion (no solids) · thrust washers where a part turns free axially |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
@@ -202,15 +202,15 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 14 | 0 | 1.68 |
-| DL-B | 0 | 262 | 1.64 |
-| DL-C | 0 | 0 | 1.73 |
-| DL-D | 15 | 0 | 1.74 |
-| DL-E | 0 | 0 | 1.7 |
-| DL-F | 0 | 0 | 1.92 |
-| DL-G | 0 | 0 | 1.79 |
-| DL-H | 12 | 0 | 1.6 |
-| never | 65 | 146 | 1.67 |
+| DL-A | 14 | 0 | 2.07 |
+| DL-B | 0 | 262 | 2.3 |
+| DL-C | 0 | 0 | 2.37 |
+| DL-D | 15 | 0 | 2.38 |
+| DL-E | 0 | 0 | 2.22 |
+| DL-F | 0 | 0 | 2.37 |
+| DL-G | 0 | 0 | 2.31 |
+| DL-H | 12 | 0 | 1.93 |
+| never | 65 | 146 | 2.26 |
 
 ## Promotion candidates
 Promoted in this pass: hinge lugs (`lugs` on a shape, the lugs rule), record-placed parts (`axial`), a link's `thickness`.

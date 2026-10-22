@@ -55,7 +55,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
-| D1 | PASS | HAND · inner race a spherical band with six swept meridian grooves on a keyed hub; bell a cup with a spherical cavity and six grooves; cage a spherical band with six windows; balls true spheres |
+| D1 | PASS | HAND · fired: wheels (no solids) · inner race a spherical band with six swept meridian grooves on a keyed hub; bell a cup with a spherical cavity and six grooves; cage a spherical band with six windows; balls true spheres |
 | D2 | PASS | HAND · race band and bell wall round the grooves; cage rims round the windows |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
@@ -88,7 +88,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | A20 | PASS | AUTO · support per joint: B1 pillow, B2 pillow · one axial stack builder with its support selector |
 | A21 | PASS | AUTO · kit per joint: B1 J10, B2 J10, F1 sphere-fit, F2 sphere-fit, W1 slipper, W2 slipper, W3 slipper, W4 slipper, W5 slipper, W6 slipper, drive drive |
 | A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · no stops (both shafts turn on); cable clip |
-| E1 | PASS | AUTO · every solid has one explode level; levels -10.5 to 7 · one level per solid, nothing stretches |
+| E1 | PASS | AUTO · every solid has one explode level; levels -10 to 7 · one level per solid, nothing stretches |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
 | E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
 | E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
@@ -112,7 +112,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
 | F1 | PASS | AUTO · served at B1, B2; fired: posts (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
-| F2 | PASS | AUTO · served at B1, B2; fired: j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F2 | PASS | AUTO · served at B1, B2; fired: wheels (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
 | F3 | PASS | AUTO · served at B1; fired: j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
 | F4 | PASS | AUTO / HAND · served at B1; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), trunnion (no solids) · thrust washers where a part turns free axially |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · both shafts turn continuously |
@@ -154,7 +154,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 110.4 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 70.0 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -169,7 +169,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | PASS | package v2 written, 110.4 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q3 | PASS | package v2 written, 70.0 KB; site build not checked here · package v2 written; site builds (npm run build) |
 | Q4 | PASS | local: tools/shot · dist/shots3/<id> (and the batch's shot set): record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
 | Q5 | PASS | local: tools/bench · tools/bench3 run (desktop): frame times per view in the ladder above; the phone is measured by David |
 | Q6 | PASS |  |
@@ -205,15 +205,15 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 7 | 0 | 1.46 |
-| DL-B | 0 | 274 | 1.44 |
-| DL-C | 0 | 0 | 1.6 |
-| DL-D | 4 | 0 | 1.53 |
-| DL-E | 8 | 0 | 1.57 |
-| DL-F | 0 | 0 | 1.51 |
-| DL-G | 0 | 0 | 1.48 |
-| DL-H | 12 | 0 | 1.47 |
-| never | 75 | 105 | 1.45 |
+| DL-A | 7 | 0 | 1.62 |
+| DL-B | 0 | 274 | 1.62 |
+| DL-C | 0 | 0 | 1.56 |
+| DL-D | 4 | 0 | 1.56 |
+| DL-E | 8 | 0 | 1.6 |
+| DL-F | 0 | 0 | 1.58 |
+| DL-G | 0 | 0 | 1.7 |
+| DL-H | 12 | 0 | 1.64 |
+| never | 75 | 105 | 1.7 |
 
 ## Promotion candidates
 Promoted in this pass: the `ball`, `race`, `bell` and `cage` shapes (revolves with swept grooves and cut windows), the sphere-fit kit, the `rzeppa` block.

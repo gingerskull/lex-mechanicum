@@ -55,7 +55,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
-| D1 | PASS | HAND · hubs as discs carrying slot jaws; the disc as a plate with a tongue on each face, square to each other |
+| D1 | PASS | HAND · fired: wheels (no solids) · hubs as discs carrying slot jaws; the disc as a plate with a tongue on each face, square to each other |
 | D2 | PASS | HAND · jaws and tongues of solid section; hubs' bosses round the bores |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
@@ -81,7 +81,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | A13 | PASS | AUTO / HAND · 94 solids, 52 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | PASS | HAND · 5 joint notes; no note: none; no badge: T1, T2 · a note per joint; the output hub hung from its bridge (record), the slot liners on the jaws |
+| A16 | PASS | HAND · 5 joint notes; no note: none; no badge: none · a note per joint; the output hub hung from its bridge (record), the slot liners on the jaws |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings and liners pullable through their bores |
 | A18 | PASS | AUTO · placement: 3 slabs in the tallest stack (33.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver; bodies on their cone or centre placed where the joints put them |
 | A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O2-bridge · blocks routed, least gap 1.5 mm, see-through where they cover the input yoke |
@@ -112,7 +112,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
 | F1 | PASS | AUTO · served at O1, O2; fired: posts (no solids), j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
-| F2 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F2 | PASS | AUTO · served at O1, O2; fired: wheels (no solids), j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
 | F3 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
 | F4 | PASS | AUTO / HAND · served at O1; fired: j9-crossed-mesh (no solids), j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · both shafts turn continuously |
@@ -200,15 +200,15 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 5 | 0 | 1.54 |
-| DL-B | 0 | 118 | 1.6 |
-| DL-C | 0 | 0 | 1.53 |
-| DL-D | 6 | 0 | 1.55 |
-| DL-E | 10 | 1 | 1.51 |
-| DL-F | 0 | 0 | 1.57 |
-| DL-G | 0 | 0 | 1.62 |
-| DL-H | 9 | 0 | 1.6 |
-| never | 64 | 92 | 1.54 |
+| DL-A | 5 | 0 | 1.53 |
+| DL-B | 0 | 118 | 1.55 |
+| DL-C | 0 | 0 | 1.5 |
+| DL-D | 6 | 0 | 1.59 |
+| DL-E | 10 | 1 | 1.47 |
+| DL-F | 0 | 0 | 1.51 |
+| DL-G | 0 | 0 | 1.49 |
+| DL-H | 9 | 0 | 1.43 |
+| never | 64 | 92 | 1.52 |
 
 ## Promotion candidates
 Promoted in this pass: record-named see-through principle parts (`teaching.seeThrough`), record-named supports (`support` on a joint), `bars` on a part's face, the tongue-slot kit reading its slot (`slot: { width, length }`), the `cross-slide` block.

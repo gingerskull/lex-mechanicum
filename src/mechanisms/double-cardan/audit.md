@@ -55,7 +55,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
-| D1 | PASS | HAND · yokes as hub, bar and bored arms; the centre yoke a double fork (two collars back to back on one tube); crosses as two trunnions on a block |
+| D1 | PASS | HAND · fired: wheels (no solids) · yokes as hub, bar and bored arms; the centre yoke a double fork (two collars back to back on one tube); crosses as two trunnions on a block |
 | D2 | PASS | HAND · material round the cup bores and hubs |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
@@ -112,7 +112,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
 | F1 | PASS | AUTO · served at B1, B2; fired: posts (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
-| F2 | PASS | AUTO · served at B1, B2, C1a, C1b, C2a, C2b; fired: j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), cross-bearings (29 solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F2 | PASS | AUTO · served at B1, B2, C1a, C1b, C2a, C2b; fired: wheels (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), cross-bearings (29 solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
 | F3 | PASS | AUTO · served at B1, B2; fired: j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
 | F4 | PASS | AUTO / HAND · served at B1, B2; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), trunnion (no solids) · thrust washers where a part turns free axially |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · both shafts turn continuously |
@@ -154,7 +154,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 16.7 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 16.8 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -169,7 +169,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | PASS | package v2 written, 16.7 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q3 | PASS | package v2 written, 16.8 KB; site build not checked here · package v2 written; site builds (npm run build) |
 | Q4 | PASS | local: tools/shot · dist/shots3/<id> (and the batch's shot set): record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
 | Q5 | PASS | local: tools/bench · tools/bench3 run (desktop): frame times per view in the ladder above; the phone is measured by David |
 | Q6 | PASS |  |
@@ -201,15 +201,15 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 9 | 0 | 1.66 |
-| DL-B | 0 | 273 | 1.65 |
-| DL-C | 0 | 0 | 1.62 |
-| DL-D | 13 | 0 | 1.76 |
-| DL-E | 9 | 0 | 1.66 |
-| DL-F | 0 | 0 | 1.61 |
-| DL-G | 0 | 0 | 1.69 |
-| DL-H | 12 | 0 | 1.73 |
-| never | 104 | 183 | 1.76 |
+| DL-A | 9 | 0 | 1.81 |
+| DL-B | 0 | 273 | 2.03 |
+| DL-C | 0 | 0 | 1.92 |
+| DL-D | 13 | 0 | 1.87 |
+| DL-E | 9 | 0 | 2.19 |
+| DL-F | 0 | 0 | 1.85 |
+| DL-G | 0 | 0 | 1.83 |
+| DL-H | 12 | 0 | 1.77 |
+| never | 104 | 183 | 1.99 |
 
 ## Promotion candidates
 Promoted in this pass: the Hooke block with a shaft that has no ground joint (`shafts`), body frames given by axes (`frame: { z, x }`) so a control can turn them.
