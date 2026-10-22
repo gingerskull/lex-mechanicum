@@ -3,7 +3,7 @@
 // written in the joint's own coordinates (z along the axis) and placed on the axis frame, so the same code serves a z
 // joint and a tilted one. A support selector chooses housing, pillow block, bridge, or a stub or hung axle from where
 // the sweeps leave room and what the load needs; the router (src/builder/router.ts) places the support.
-import { circle } from "../core/geom";
+import { circle, roundRect } from "../core/geom";
 import { H } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { SHOULDER_BOLTS, circlipExt, circlipInt, headD, headH, innerRingD, keyFor, shoulderLength, threadFor, type Bearing } from "../hardware/tables";
@@ -15,6 +15,7 @@ import { Local, fitBore, half, type Fit, type Member } from "./lib";
 import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
 import { MIN_GAP } from "./constants";
+import { v3 } from "../kin/math";
 import { liveHousing, pillowBlocks } from "./supports";
 import type { Vec3 } from "../kin/math";
 
@@ -43,6 +44,8 @@ export interface StackSpec {
   eccentric?: boolean;
   /** The axial range a member set along the shaft by a control reaches (its slide), for where the blocks go. */
   reach?: [number, number];
+  /** A shaft in plan held from one side only (both pillow blocks): +1 along the axis, −1 against it. */
+  side?: 1 | -1;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
 }
@@ -169,7 +172,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   keyedSeats.forEach((s, i) => {
     const nm = `${id}-k${i}`;
     if (kf) {
-      L.add(H.key(`${nm}-key`, kf.b, Math.max(8, s.m.w1 - s.m.w0 + 4), { body: s.m.body, at: [d / 2 - kf.t1 + kf.h / 2 - 0.4, 0, 0], z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kf.h }));
+      // the key runs along the shaft through the keyed part: its b x h section in the plane, its length along the axis
+      const kl = Math.max(4, s.m.w1 - s.m.w0 - 1);
+      const kr = d / 2 - kf.t1 + kf.h / 2 - 0.4;
+      L.add(H.key(`${nm}-key`, kf.b, kl, { body: s.m.body, outer: roundRect(kr - kf.h / 2, -kf.b / 2, kr + kf.h / 2, kf.b / 2, 0.4), z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kl }));
       serve("F3", `${nm}-key`);
     }
     if (endHeld) return;
@@ -236,10 +242,11 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const hi = Math.max(...L.list.map((x) => x.z1), zTop, spec.reach?.[1] ?? -Infinity);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
-    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, far: !!spec.reach });
+    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, far: !!spec.reach, ...(spec.side ? { side: spec.side } : {}) });
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
-    shaftSpec.z1 = p.shaft[1] + (live ? 12 : 0);
+    // the drive's pulley goes on the end facing away from the default view (rules/shared.ts driveInPlan)
+    shaftSpec.z1 = p.shaft[1] + (live ? (spec.input && v3.dot(spec.frame.z, ctx.viewDir()) > 0.5 ? 18 : 12) : 0);
     // a part overhung past both blocks is held on the shaft's end by a washer and a countersunk screw (J10, F2)
     const top = members[members.length - 1]!;
     if (live && Math.max(...p.w) < top.w0) {
@@ -272,8 +279,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       const lo = fb.b || !fb.m.keyed ? fb.z0 : fb.m.w0;
       if (lo - (tw + 1) > SPACER_MIN) L.add(H.spacer(`${id}-sp0`, d + 0.2, fb.b ? innerRingD(fb.b) : d + 3, { z0: tw + 1, z1: lo, body: turn }));
     } else {
-      // hung from its bridge: a circlip under the first part keeps it up
-      grooves.push(first.w0 - 4 + 0.6);
+      // hung from its bridge: a circlip under the first part keeps it up; the axle ends just under it, clear of a part
+      // that passes beneath (A12)
+      shaftSpec.z0 = first.w0 - 2.5;
+      grooves.push(first.w0 - 2.5 + 0.6);
     }
     if (support === "housing" || (live && spec.base)) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });

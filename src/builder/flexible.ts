@@ -506,7 +506,9 @@ function buildLoadRod(ctx: BuildCtx, j: KinJoint): void {
   const top = -eyeL + hi + 12;
   const bot = -eyeL + lo - 40;
   const lat = v3.cross(UP, axis);
-  const rodAt: Vec3 = v3.add([H0[0], H0[1], zc], v3.mul(lat, side));
+  // the rod's axis mid-way up the block, or high enough that the eye clears the base
+  const zRod = Math.max(zc, ctx.base.top + 0.6 + eyeD / 2);
+  const rodAt: Vec3 = v3.add([H0[0], H0[1], zRod], v3.mul(lat, side));
   // the eye: a boss along the rod, the bushing pressed in, part of the hook block
   const E = new Local({ o: v3.add(rodAt, v3.mul(axis, -eyeL - eyeLen / 2)), x: UP, z: axis }, { joints: [j.id] });
   E.add(H.solid(`${j.id}-eye`, { name: "", kind: "part", role: "output", mat: "Steel C45, forged", outer: circle(eyeD / 2, 0, 0, 32), holes: [circle(bushD / 2, 0, 0, 32).reverse()], z0: 0, z1: eyeLen, body, group: `${j.id}-hook` }));
@@ -521,7 +523,7 @@ function buildLoadRod(ctx: BuildCtx, j: KinJoint): void {
   const e = axis;
   const f = v3.cross(UP, e);
   const corner = (u: number, w: number): Vec2 => [P0[0] + e[0] * u + f[0] * w, P0[1] + e[1] * u + f[1] * w];
-  B.add(H.plate(`${j.id}-rodblock`, [corner(-12, -11), corner(12, -11), corner(12, 11), corner(-12, 11)], { kind: "bracket", role: "ground", name: "Rod block, screwed and dowelled to the base, the rod pressed in", z0: bt, z1: zc + rodD / 2 + 5, mat: "Steel C45" }));
+  B.add(H.plate(`${j.id}-rodblock`, [corner(-12, -11), corner(12, -11), corner(12, 11), corner(-12, 11)], { kind: "bracket", role: "ground", name: "Rod block, screwed and dowelled to the base, the rod pressed in", z0: bt, z1: zRod + rodD / 2 + 5, mat: "Steel C45" }));
   for (const [k, u] of [[0, -6], [1, 6]] as const) {
     const c = corner(u, 7);
     const d = corner(u, -7);

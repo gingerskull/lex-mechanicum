@@ -179,7 +179,7 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 49.9, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 61.9, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | AL | J13 | flexure | – | – | none | none | none | none | none | none | none | none | none | none |
 | TL | J13 | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | SL | J13 | flexure | – | – | none | none | none | none | none | none | none | none | none | none |

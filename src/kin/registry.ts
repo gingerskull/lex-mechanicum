@@ -7,9 +7,9 @@ import { D2R, TAU, type Vec3, m3, v3, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
-import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
+import { type CamLaw, type CamSchedule, camMotion, lawRise, pressureAngle } from "./blocks/cam";
 import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, reeve, screwAdvance, sheaveShift, variatorR2, vonMises } from "./blocks/members";
-import { genevaAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
+import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscape, simulateEscapement, simulateStar, simulateVerge, type VergeSpec, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
   const o = step.out;
@@ -340,13 +340,15 @@ const willisBlock: BlockFn = (c, s) => {
   if (w.planet !== null) outVal(c, s, w.planet * R2D, "planet");
 };
 
-const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" ? l : "cycloidal");
+const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" || l === "modsine" ? l : "cycloidal");
 
 /**
  * cam. in: joint (a `cam-contact` joint carrying cam: schedule, lift, rb, e, theta0), input (the cam angle, deg),
  * follower (body), axis (the follower's direction of travel, unit; or the pivot axis when swing is true),
  * swing (true: an oscillating follower about the joint's `at`; lift is then radians' worth in degrees).
- * out {s, v, pressure}: displacement (mm or deg), ds/dθ, pressure angle (deg).
+ * follower may be a list (the follower and the bodies it carries); rr (roller radius) or flat (true: a flat face) place
+ * the contact point, which needs the joint's `ca` (the cam's centre).
+ * out {s, v, pressure, contact}: displacement (mm or deg), ds/dθ, pressure angle (deg), the contact point.
  */
 const camBlock: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -361,15 +363,36 @@ const camBlock: BlockFn = (c, s) => {
   const th = th0 + c.delta("in", c.rad(i.input));
   const m = camMotion(sched, th);
   const m0 = camMotion(sched, th0);
-  const follower = str(i.follower, "cam.follower");
-  if (i.swing === true) {
-    c.setXf(follower, xf.rotAbout(c.jointAt(jid), c.vec(i.axis), (m.s - m0.s) * D2R));
-  } else {
-    c.setXf(follower, xf.trans(v3.mul(v3.unit(c.vec(i.axis)), m.s - m0.s)));
-  }
+  // the follower and the bodies it carries (a roller on its stud): one name or a list
+  const carried = (Array.isArray(i.follower) ? i.follower : [i.follower]).map((f) => str(f, "cam.follower"));
+  const X = i.swing === true ? xf.rotAbout(c.jointAt(jid), c.vec(i.axis), (m.s - m0.s) * D2R) : xf.trans(v3.mul(v3.unit(c.vec(i.axis)), m.s - m0.s));
+  for (const f of carried) c.setXf(f, X);
+  const rb = c.num(j.cam.rb);
   outVal(c, s, m.s, "s");
   outVal(c, s, m.v, "v");
-  outVal(c, s, pressureAngle({ rb: c.num(j.cam.rb), e: j.cam.e !== undefined ? c.num(j.cam.e) : 0 }, m.s, m.v) * R2D, "pressure");
+  // a barrel cam's follower runs along the axis at the pitch radius: tan φ = s' / rb
+  const phi = j.cam.form === "barrel" ? Math.atan2(m.v, rb) : pressureAngle({ rb, e: j.cam.e !== undefined ? c.num(j.cam.e) : 0 }, m.s, m.v);
+  outVal(c, s, phi * R2D, "pressure");
+  // the contact point on the cam (a translating follower in line with the cam centre): a roller of radius `rr` touches
+  // along the pitch curve's normal, n ∝ ρ r̂ + v t̂ with ρ = rb + s; a flat face (`flat: true`) touches at ρ r̂ − v t̂,
+  // the envelope of its lines. r̂ is the follower's direction from the cam centre, t̂ = axis × r̂, the cam turning about +axis.
+  const kOut = outName(s, "contact");
+  if (kOut && i.swing !== true && j.ca) {
+    const ax = c.jointAxis(jid);
+    const centre = c.vec(j.ca);
+    const tip = xf.apply(X, c.jointAt(jid));
+    const rel = v3.sub(tip, centre);
+    const rHat = v3.unit(v3.sub(rel, v3.mul(ax, v3.dot(rel, ax))));
+    const tHat = v3.cross(ax, rHat);
+    const rho = rb + m.s;
+    // a barrel cam: the groove's normal in the cylinder's tangent plane, n ∝ rb â + s' t̂ (â the axis)
+    if (j.cam.form === "barrel") c.setPt(kOut, v3.sub(tip, v3.mul(v3.unit(v3.add(v3.mul(ax, rb), v3.mul(tHat, m.v))), c.num(i.rr ?? 0))));
+    else if (i.flat === true) c.setPt(kOut, v3.add(v3.add(centre, v3.mul(ax, v3.dot(rel, ax))), v3.sub(v3.mul(rHat, rho), v3.mul(tHat, m.v))));
+    else {
+      const n = v3.unit(v3.add(v3.mul(rHat, rho), v3.mul(tHat, m.v)));
+      c.setPt(kOut, v3.sub(tip, v3.mul(n, c.num(i.rr ?? 0))));
+    }
+  }
 };
 
 /**
@@ -684,6 +707,297 @@ const integratorBlock: BlockFn = (c, s) => {
   outVal(c, s, phi * R2D, "spin");
 };
 
+/**
+ * rocker: a rocker held against a translating follower's end by a round nose, its pivot level with the nose at the
+ * reference, so the nose drops exactly the follower's travel: ψ = sense · asin(s / arm). in: value (the travel s, mm, a
+ * value name), v (ds/dθ of the driving cam, mm per radian, a value name), joint (the rocker's ground revolute), body (the
+ * rocker; default the joint's b), arm (pivot to nose, mm), sense (+1 or −1 about the joint's axis), shoe (a point on the
+ * rocker riding a cam lobe) and cam (the cam's ground revolute), for the pressure angle at the shoe: the angle between
+ * the shoe's path in the cam's frame and the arm square to its motion. out {angle, pressure} (deg).
+ */
+const rockerBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const jid = str(i.joint, "rocker.joint");
+  const sOf = c.num(i.value);
+  const b = c.num(i.arm);
+  const sense = i.sense !== undefined ? c.num(i.sense) : 1;
+  if (Math.abs(sOf) > b) throw new KinError(`rocker ${s.id}: travel ${sOf.toFixed(2)} beyond the arm ${b}`);
+  const psi = sense * Math.asin(sOf / b);
+  const body = (i.body as string | undefined) ?? c.joint(jid).b;
+  const ax = c.jointAxis(jid);
+  const Q = c.jointAt(jid);
+  const X = xf.rotAbout(Q, ax, psi - sense * Math.asin(c.num(i.ref ?? 0) / b));
+  c.setXf(body, X);
+  outVal(c, s, psi * R2D, "angle");
+  if (typeof i.shoe === "string" && typeof i.cam === "string" && i.v !== undefined) {
+    // the shoe's path relative to the cam turning about +a: T = ψ'·a×(P−Q) − a×(P−O), ψ' = sense·v / (arm cos ψ)
+    const P = xf.apply(X, c.refPt(i.shoe));
+    const O = c.jointAt(i.cam);
+    const a = c.jointAxis(i.cam);
+    const dpsi = (sense * c.num(i.v)) / (b * Math.cos(psi));
+    const T = v3.sub(v3.mul(v3.cross(ax, v3.sub(P, Q)), dpsi * v3.dot(ax, a)), v3.cross(a, v3.sub(P, O)));
+    const r = v3.sub(P, Q);
+    const cos = Math.abs(v3.dot(T, r)) / (v3.len(T) * v3.len(r) || 1);
+    outVal(c, s, Math.acos(Math.min(1, cos)) * R2D, "pressure");
+  }
+};
+
+const starCache = new Map<string, ReturnType<typeof simulateStar>>();
+
+/**
+ * star (a star wheel driven by a finger, held and snapped by a jumper): in: input (the driver's angle, deg), driver (its
+ * ground joint), star and jumper (bodies), starJoint and jumperJoint (their ground revolutes), n, tip, root, tip0 (deg,
+ * a tip's angle at rest), rf (finger radius), pin (its contact radius), finger0 (deg, the finger's angle at rest), arm,
+ * roller, swing ([deg, deg] the arm's range about its pivot), snap (deg of driver). The star turns clockwise (seen from
+ * +z) by ψ; the jumper rides it. out {star, push, jumper}: ψ (deg), the finger's push alone (deg), the jumper's turn (deg,
+ * counter-clockwise).
+ */
+const starBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const O = c.jointAt(str(i.driver, "star.driver"));
+  const sj = str(i.starJoint, "star.starJoint");
+  const jj = str(i.jumperJoint, "star.jumperJoint");
+  const C = c.jointAt(sj);
+  const J = c.jointAt(jj);
+  const spec: StarSpec = {
+    n: c.num(i.n), tip: c.num(i.tip), root: c.num(i.root), tip0: c.num(i.tip0),
+    c: [C[0] - O[0], C[1] - O[1]], rf: c.num(i.rf), pin: c.num(i.pin), finger0: c.num(i.finger0),
+    jumper: [J[0] - O[0], J[1] - O[1]], swing: (i.swing as number[]).map((v) => c.num(v)) as [number, number],
+    arm: c.num(i.arm), roller: c.num(i.roller), snap: c.num(i.snap),
+  };
+  const key = JSON.stringify(spec);
+  let sim = starCache.get(key);
+  if (!sim) {
+    sim = simulateStar(spec);
+    starCache.set(key, sim);
+  }
+  const th = c.delta("in", c.num(i.input));
+  const x = ((((th % 360) + 360) % 360) / sim.step);
+  const k = Math.min(sim.star.length - 2, Math.floor(x));
+  const f = x - k;
+  const lerp = (t: Float64Array) => t[k]! + (t[k + 1]! - t[k]!) * f;
+  const turns = Math.floor(th / 360);
+  const pitch = 360 / spec.n;
+  const psi = lerp(sim.star) + turns * pitch;
+  const jum = lerp(sim.jumper);
+  spin(c, str(i.star, "star.star"), C, [0, 0, 1], -psi * D2R);
+  spin(c, str(i.jumper, "star.jumper"), J, [0, 0, 1], jum * D2R);
+  outVal(c, s, psi, "star");
+  outVal(c, s, lerp(sim.push), "push");
+  outVal(c, s, jum, "jumper");
+};
+
+/**
+ * ratchet (a lever ratchet with a driving pawl on the lever and a holding pawl on the ground): in: input (the lever's
+ * angle, deg, an oscillating driver from `lo`), lo, lost (deg of lost motion before the pawl meets a face), wheel (body),
+ * wheelJoint, the sawtooth (n, root, tip, face, back, tip0: see blocks/timed sawOutline), pawls ([{ body, joint (its
+ * pivot), tip (a point at its tip at rest), carrier (the body its pivot rides, "ground" or the lever), carrierJoint,
+ * swing (deg either side of its line at rest) }]). The wheel steps one pitch per forward stroke; each pawl rides the teeth
+ * where its spring holds it. out {wheel}: the wheel's turn (deg).
+ */
+const ratchetBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const spec: RatchetSpec = { n: c.num(i.n), root: c.num(i.root), tip: c.num(i.tip), face: c.num(i.face), back: c.num(i.back), tip0: c.num(i.tip0) };
+  const W = c.jointAt(str(i.wheelJoint, "ratchet.wheelJoint"));
+  const lever = c.num(i.input);
+  const lo = c.num(i.lo);
+  const pitch = 360 / spec.n;
+  // the driver's own phase (deg): the cycle may start part way through the stroke
+  const ph = c.num(i.phase ?? 0) * D2R;
+  const turn = (u: number, lv: number) => ratchetWheel(u + ph, lv, lo, c.num(i.lost), pitch) - ratchetWheel(ph, lo, lo, c.num(i.lost), pitch);
+  const w = c.delta("wheel", turn(c.u, lever) * D2R);
+  spin(c, str(i.wheel, "ratchet.wheel"), W, [0, 0, 1], w);
+  outVal(c, s, w * R2D, "wheel");
+  const local = (p: Vec3): [number, number] => [p[0] - W[0], p[1] - W[1]];
+  for (const pw of (i.pawls as Record<string, unknown>[] | undefined) ?? []) {
+    const body = str(pw.body, "ratchet.pawls.body");
+    const jp = str(pw.joint, "ratchet.pawls.joint");
+    const P0 = c.jointAt(jp);
+    const T0 = c.refPt(str(pw.tip, "ratchet.pawls.tip"));
+    const arm = Math.hypot(T0[0] - P0[0], T0[1] - P0[1]);
+    const line0 = Math.atan2(T0[1] - P0[1], T0[0] - P0[0]);
+    const carrier = (pw.carrier as string | undefined) ?? "ground";
+    const Xc = carrier === "ground" ? xf.id() : c.xf(carrier);
+    const P = xf.apply(Xc, P0);
+    const cTurn = carrier === "ground" ? 0 : xf.angleAbout(Xc, [0, 0, 1]);
+    const sw = c.num(pw.swing ?? 25);
+    const ride = (ww: number, pv: [number, number], base: number) => rideAngle(sawOutline(spec, ww), pv, arm, 0, [(base - sw * D2R) * R2D, (base + sw * D2R) * R2D], [0, 0]);
+    const a = ride(w, local(P), line0 + cTurn);
+    // the record's tip point is where the tip rests at the reference, so the reference pose is the identity
+    c.setXf(body, xf.mul(xf.rotAbout(P, [0, 0, 1], a - line0 - cTurn), Xc));
+  }
+};
+
+/**
+ * one-way (a freewheel, a sprag clutch): the output follows the input 1:1 while the input turns forward and stays while
+ * it turns back, so an oscillating input steps it. in: input (an oscillating driver, deg, from `lo`; its cycle runs
+ * forward for the first half), lo, stroke (its travel, deg), phase (the driver's, deg), output (body), joint (its ground revolute), carried
+ * (bodies that turn with the output: a sprag set), thrust ([a, b]: two points whose line, against the radius at a,
+ * gives the grip angle). out {angle, grip}: the output's turn and the grip angle (deg).
+ */
+const oneWay: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const lo = c.num(i.lo ?? 0);
+  const ph = c.num(i.phase ?? 0) * D2R;
+  const lv = c.num(i.input);
+  // the forward half follows the input; the return holds; `stroke` (deg) is the input's travel per half cycle
+  const span = (u: number, v: number) => {
+    const turns = Math.floor((u + ph) / TAU);
+    const w = u + ph - turns * TAU;
+    return w < Math.PI ? turns * c.num(i.stroke ?? 0) + (v - lo) : (turns + 1) * c.num(i.stroke ?? 0);
+  };
+  const d = c.delta("out", span(c.u, lv) * D2R);
+  const jid = str(i.joint, "one-way.joint");
+  const O = c.jointAt(jid);
+  const ax = c.jointAxis(jid);
+  for (const b of [str(i.output, "one-way.output"), ...((i.carried as string[] | undefined) ?? [])]) spin(c, b, O, ax, d);
+  outVal(c, s, d * R2D, "angle");
+  const th = i.thrust as string[] | undefined;
+  if (th && th.length === 2) {
+    const X = c.xf(str(i.output, "one-way.output"));
+    const a = xf.apply(X, c.refPt(th[0]!));
+    const b = xf.apply(X, c.refPt(th[1]!));
+    // in the plane square to the axis
+    const t = v3.perp(v3.sub(b, a), ax);
+    const r = v3.perp(v3.sub(a, O), ax);
+    outVal(c, s, Math.acos(Math.min(1, Math.abs(v3.dot(t, r)) / (v3.len(t) * v3.len(r)))) * R2D, "grip");
+  }
+};
+
+const escapeCache = new Map<string, ReturnType<typeof simulateEscape>>();
+
+/**
+ * escape (a geometric escapement in a plane: anchor, lever): the pallets swing with the oscillating driver of their arbor
+ * (`lo` to `hi` deg over the cycle, `default` at the reference); the escape wheel, urged forward by its train, goes on
+ * until a tooth meets a pallet and is pushed back where a pallet moves into a tooth (blocks/timed simulateEscape).
+ * in: input (the pallets' angle, deg), lo, hi, default, wheel (body), wheelJoint, palletJoint, plane ("xz" or "xy": the
+ * escapement's plane, its 2D axes), sense (+1: the wheel goes forward counter-clockwise in the plane), the wheel's teeth
+ * (n, tip, root, lead and back: the tip's two roots, deg from the tip, positive ahead), tip0 (deg), pallets (outlines,
+ * [u, v] in the plane relative to the arbor at the reference); `fork` (a balance driving a lever: see below) with
+ * `pallets_body` (the lever) and `rate` (a speed limit on the wheel). out {advance, recoil, pallet}: the wheel's turn
+ * since the cycle's start, the recoil of the current beat, the lever's angle (deg).
+ */
+const escapeBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const E = c.jointAt(str(i.wheelJoint, "escape.wheelJoint"));
+  const Aj = str(i.palletJoint, "escape.palletJoint");
+  const A = c.jointAt(Aj);
+  const plane = (i.plane as string | undefined) ?? "xy";
+  const P2 = (p: Vec3): [number, number] => (plane === "xz" ? [p[0], p[2]] : [p[0], p[1]]);
+  const n = c.num(i.n);
+  const D = Math.PI / 180;
+  const tip0 = c.num(i.tip0 ?? 0);
+  const wc = P2(E);
+  const wheel: [number, number][] = [];
+  // a tooth: the record's polygon (in the wheel's plane, its tip at angle 0), else a pointed tip with its two roots
+  const tooth = i.tooth as number[][] | undefined;
+  for (let k = 0; k < n; k++) {
+    const a = (tip0 + (360 / n) * k) * D;
+    if (tooth) {
+      for (const q of tooth) wheel.push([wc[0] + q[0]! * Math.cos(a) - q[1]! * Math.sin(a), wc[1] + q[0]! * Math.sin(a) + q[1]! * Math.cos(a)]);
+      continue;
+    }
+    for (const [r, b] of [[c.num(i.root), a + c.num(i.lead) * D], [c.num(i.tip), a], [c.num(i.root), a + c.num(i.back) * D]] as const) wheel.push([wc[0] + r * Math.cos(b), wc[1] + r * Math.sin(b)]);
+  }
+  const ac = P2(A);
+  const pallets = ((i.pallets as number[][][] | undefined) ?? []).map((pl) => pl.map((q): [number, number] => [ac[0] + q[0]!, ac[1] + q[1]!]));
+  const lo = c.num(i.lo);
+  const hi = c.num(i.hi);
+  const def = c.num(i.default ?? 0);
+  const sense = (c.num(i.sense ?? 1) >= 0 ? 1 : -1) as 1 | -1;
+  const spec = { wheel, wc, pallets, ac, n, sense };
+  // the pallets' angle (rad, from the reference) at cycle phase u: the driver's own swing, or, with a `fork` (a lever's
+  // fork on a balance's impulse pin: { joint (the balance's), roller, reach (lever pivot to fork), window (deg) }), the
+  // lever following the pin while the balance is within the window and resting on its banking outside it
+  const fork = i.fork as Record<string, unknown> | undefined;
+  const swing = (u: number) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D;
+  let palletAt = swing;
+  if (fork) {
+    const rr = c.num(fork.roller);
+    const reach = c.num(fork.reach);
+    const win = c.num(fork.window) * D;
+    const follow = (t: number) => Math.atan2(-rr * Math.sin(t), reach + rr - rr * Math.cos(t));
+    const bank = Math.abs(follow(win));
+    palletAt = (u) => {
+      const t = swing(u);
+      return Math.abs(t) < win ? follow(t) : -Math.sign(t) * bank;
+    };
+  }
+  const rate = i.rate !== undefined ? c.num(i.rate) : Infinity;
+  const key = JSON.stringify([spec, lo, hi, def, fork ?? null, rate]);
+  let sim = escapeCache.get(key);
+  if (!sim) {
+    sim = simulateEscape(spec, palletAt, 1440, rate);
+    escapeCache.set(key, sim);
+  }
+  const N = sim.wheel.length - 1;
+  // the reference (every driver at its default) is where the swing first passes the default
+  const input = c.num(i.input);
+  const uRef = Math.acos(Math.max(-1, Math.min(1, (lo + hi - 2 * def) / (hi - lo))));
+  const u = c.u === 0 && Math.abs(input - def) < 1e-12 && Math.abs(def - lo) > 1e-12 ? uRef : c.u;
+  const turns = Math.floor(u / TAU);
+  const f = ((u - turns * TAU) / TAU) * N;
+  const k = Math.min(N - 1, Math.floor(f));
+  const t = f - k;
+  const w = sim.wheel[k]! + (sim.wheel[k + 1]! - sim.wheel[k]!) * t + turns * sim.advance;
+  const d = c.delta("wheel", w);
+  // the wheel's axis: its plane's normal, the sense of the 2D turn (xz: about −y; xy: about +z)
+  spin(c, str(i.wheel, "escape.wheel"), E, plane === "xz" ? [0, -1, 0] : [0, 0, 1], sense * d);
+  if (fork && typeof i.pallets_body === "string") {
+    // the lever, moved by the fork (its arbor is not driven)
+    spin(c, i.pallets_body, A, plane === "xz" ? [0, -1, 0] : [0, 0, 1], palletAt(u) - palletAt(uRef));
+    outVal(c, s, palletAt(u) * R2D, "pallet");
+  }
+  outVal(c, s, (w - sim.wheel[0]!) * R2D, "advance");
+  outVal(c, s, sim.recoil[k]! * R2D, "recoil");
+  outVal(c, s, w * R2D, "phase");
+};
+
+const vergeCache = new Map<string, ReturnType<typeof simulateVerge>>();
+
+/**
+ * verge (a crown wheel and a verge with two flag pallets): in: input (the foliot's angle, deg, an oscillating driver: lo,
+ * hi, default), wheel (body), wheelJoint (its revolute, axis along y, the crown's rim face in the plane through it, the
+ * teeth pointing toward −y), vergeJoint (the staff's, axis z), n, R, h, back (deg), upper and lower (the pallets'
+ * directions at foliot 0, deg from +x about +z), from, to, width (the pallets' reach and width), sense. out {advance,
+ * recoil} (deg).
+ */
+const vergeBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const C = c.jointAt(str(i.wheelJoint, "verge.wheelJoint"));
+  const V = c.jointAt(str(i.vergeJoint, "verge.vergeJoint"));
+  const D = Math.PI / 180;
+  const sense = (c.num(i.sense ?? 1) >= 0 ? 1 : -1) as 1 | -1;
+  const spec: VergeSpec = {
+    n: c.num(i.n), R: c.num(i.R), h: c.num(i.h), back: c.num(i.back) * D,
+    staff: [V[0] - C[0], V[1] - C[1]], upper: c.num(i.upper) * D, lower: c.num(i.lower) * D,
+    from: c.num(i.from), to: c.num(i.to), width: c.num(i.width), sense,
+  };
+  const lo = c.num(i.lo);
+  const hi = c.num(i.hi);
+  const def = c.num(i.default ?? 0);
+  const key = JSON.stringify([spec, lo, hi, def]);
+  let sim = vergeCache.get(key);
+  if (!sim) {
+    sim = simulateVerge(spec, (u) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D);
+    vergeCache.set(key, sim);
+  }
+  const N = sim.wheel.length - 1;
+  const input = c.num(i.input);
+  const uRef = Math.acos(Math.max(-1, Math.min(1, (lo + hi - 2 * def) / (hi - lo))));
+  const u = c.u === 0 && Math.abs(input - def) < 1e-12 && Math.abs(def - lo) > 1e-12 ? uRef : c.u;
+  const turns = Math.floor(u / TAU);
+  const f = ((u - turns * TAU) / TAU) * N;
+  const k = Math.min(N - 1, Math.floor(f));
+  const w = sim.wheel[k]! + (sim.wheel[k + 1]! - sim.wheel[k]!) * (f - k) + turns * sim.advance;
+  // the crown turns about +y: its top teeth move toward +x for a positive turn
+  spin(c, str(i.wheel, "verge.wheel"), C, [0, 1, 0], sense * c.delta("wheel", w));
+  outVal(c, s, (w - sim.wheel[0]!) * R2D, "advance");
+  outVal(c, s, sim.recoil[k]! * R2D, "recoil");
+  // the wheel's absolute angle in the simulation (the drawn wheel's teeth stand at its value at the reference)
+  outVal(c, s, w * R2D, "phase");
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -717,20 +1031,142 @@ const escapementBlock: BlockFn = (c, s) => {
 
 /**
  * indexer (Geneva and star wheel). in: n (slots or teeth), input (the crank angle, deg, measured from the line of
- * centres with the pin nearest the wheel at 0), phi0 (its reference value), wheel (body), center, axis, sense (+1 or −1,
- * default −1: an external Geneva turns against its crank).
+ * centres with the pin nearest the wheel at 0; for an internal Geneva, `internal: true`, farthest from it), phi0 (its
+ * reference value), wheel (body), center, axis, sense (+1 or −1; default −1 for an external Geneva, which turns against
+ * its crank, +1 for an internal one). `mode: "mutilated"`: a mutilated gear pair, `window` (deg of driver, centred on
+ * φ = 0) and `ratio` (driven per driver while in mesh, default −1).
  * out {angle}: the wheel's angle (deg).
  */
 const indexer: BlockFn = (c, s) => {
   const i = s.in ?? {};
-  const n = c.num(i.n);
+  const n = i.mode === "mutilated" || i.mode === "cam" ? 0 : c.num(i.n);
   const phi0 = c.num(i.phi0 ?? 0) * D2R;
   const phi = phi0 + c.delta("in", c.rad(i.input));
-  const sense = i.sense !== undefined ? c.num(i.sense) : -1; // an external Geneva turns against its crank
-  const d = sense * (genevaAngle(n, phi) - genevaAngle(n, phi0));
+  // an external Geneva turns against its crank, an internal one with it
+  if (i.mode === "cam") {
+    // a cam indexer (a roller-gear or barrel indexer): the output steps `step` deg by the law over `index` deg of input
+    // (from φ = 0 each turn) and dwells the rest
+    const step = c.num(i.step) * D2R;
+    const idx = c.num(i.index) * D2R;
+    const law = lawOf(i.law as string | undefined);
+    const at = (p: number) => {
+      const turns = Math.floor(p / TAU);
+      const local = p - turns * TAU;
+      return step * (turns + lawRise(law, Math.min(1, local / idx)).s);
+    };
+    const dm = (c.num(i.sense ?? 1) >= 0 ? 1 : -1) * (at(phi) - at(phi0));
+    if (typeof i.wheel === "string") spin(c, i.wheel, c.vec(i.center), v3.unit(c.vec(i.axis ?? [0, 0, 1])), dm);
+    outVal(c, s, dm * R2D, "angle");
+    return;
+  }
+  if (i.mode === "mutilated") {
+    // a mutilated gear: the driven gear turns at `ratio` while the driver's toothed `window` (deg, centred on φ = 0)
+    // passes the mesh, and is held by the locking rim for the rest of the turn
+    const w = c.num(i.window) * D2R;
+    const ratio = c.num(i.ratio ?? -1);
+    const law = (p: number) => {
+      const turns = Math.round(p / TAU);
+      const local = p - turns * TAU;
+      return ratio * (Math.max(-w / 2, Math.min(w / 2, local)) + turns * w);
+    };
+    const dm = law(phi) - law(phi0);
+    if (typeof i.wheel === "string") spin(c, i.wheel, c.vec(i.center), v3.unit(c.vec(i.axis ?? [0, 0, 1])), dm);
+    outVal(c, s, dm * R2D, "angle");
+    return;
+  }
+  const internal = i.internal === true;
+  const sense = i.sense !== undefined ? c.num(i.sense) : internal ? 1 : -1;
+  const law = internal ? genevaInternalAngle : genevaAngle;
+  const d = sense * (law(n, phi) - law(n, phi0));
   if (typeof i.wheel === "string") spin(c, i.wheel, c.vec(i.center), v3.unit(c.vec(i.axis ?? [0, 0, 1])), d);
   outVal(c, s, d * R2D, "angle");
 };
+
+/**
+ * lerp. in: a, b (points), t (a number): out = a + t (b − a), a point on the line through two others (a scissor bar's
+ * far pin, 2 M − R, from its near pin and its middle pin).
+ */
+const lerp: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const a = c.vec(i.a);
+  outPoint(c, s, v3.add(a, v3.mul(v3.sub(c.vec(i.b), a), c.num(i.t))));
+};
+
+/**
+ * line-crossing. in: a1, a2 (two points of one line), b1, b2 (of the other), n (plane normal, default +z), sum
+ * (optional). out: where the lines cross in that plane (the crossing of an antiparallelogram's bars, an instant
+ * centre). Where the lines run together (an antiparallelogram's change points) the crossing is the limit: the point
+ * on the line a1→a2 whose distances to a1 and b1 add up to `sum` (the ellipse with foci a1 and b1); without `sum`
+ * parallel lines do not cross and the block fails there.
+ */
+const lineCrossing: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const n = v3.unit(i.n ? c.vec(i.n) : [0, 0, 1]);
+  const p = c.vec(i.a1);
+  const d = v3.perp(v3.sub(c.vec(i.a2), p), n);
+  const q = c.vec(i.b1);
+  const e = v3.perp(v3.sub(c.vec(i.b2), q), n);
+  const den = v3.dot(v3.cross(d, e), n);
+  if (Math.abs(den) > 1e-6 * v3.len(d) * v3.len(e)) {
+    const t = v3.dot(v3.cross(v3.sub(q, p), e), n) / den;
+    outPoint(c, s, v3.add(p, v3.mul(d, t)));
+    return;
+  }
+  if (i.sum === undefined) throw new KinError(`line-crossing ${s.id}: the lines are parallel`);
+  // on the ray p + rho u: rho + |p + rho u - q| = L gives rho = (L^2 - |q - p|^2) / (2 (L - u.(q - p)))
+  const L = c.num(i.sum);
+  const u = v3.unit(d);
+  const w = v3.perp(v3.sub(q, p), n);
+  const rho = (L * L - v3.dot(w, w)) / (2 * (L - v3.dot(u, w)));
+  outPoint(c, s, v3.add(p, v3.mul(u, rho)));
+};
+
+/**
+ * target-path. A point that goes once round a closed curve per cycle, from the cycle phase itself: the target a tip or a
+ * stylus follows, the linkage closing on it by inverse kinematics. in.shape "rounded-square": cx, cy (centre), side,
+ * corner (radius), at constant speed along the outline, counter-clockwise from the middle of the right side; "flower":
+ * cx, cy, r0, lobe, lobes (default 5): r = r0 + lobe cos(lobes u) at the polar angle u. n (plane normal) is +z.
+ */
+const targetPath: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const cx = c.num(i.cx), cy = c.num(i.cy);
+  const u = ((c.u % TAU) + TAU) % TAU;
+  if (i.shape === "flower") {
+    const r = c.num(i.r0) + c.num(i.lobe) * Math.cos(c.num(i.lobes ?? 5) * u);
+    outPoint(c, s, [cx + r * Math.cos(u), cy + r * Math.sin(u), 0]);
+    return;
+  }
+  if (i.shape !== "rounded-square") throw new KinError(`target-path ${s.id}: unknown shape ${String(i.shape)}`);
+  outPoint(c, s, roundedSquareAt(cx, cy, c.num(i.side), c.num(i.corner), u / TAU));
+};
+
+/** A point at the fraction f of the way round a rounded square, counter-clockwise from the middle of its right side. */
+export function roundedSquareAt(cx: number, cy: number, side: number, corner: number, f: number): Vec3 {
+  const h = side / 2;
+  const st = side - 2 * corner;
+  const arc = (Math.PI / 2) * corner;
+  const total = 4 * (st + arc);
+  let L = ((((f % 1) + 1) % 1) * total + st / 2) % total; // from the bottom of the right side's straight run
+  // four sides in turn: right (up), top (left), left (down), bottom (right); each a straight run then a corner
+  const dirs: [number, number][] = [[0, 1], [-1, 0], [0, -1], [1, 0]];
+  const starts: [number, number][] = [[h, -h + corner], [h - corner, h], [-h, h - corner], [-h + corner, -h]];
+  for (let k = 0; k < 4; k++) {
+    const [dx, dy] = dirs[k]!;
+    const [sx, sy] = starts[k]!;
+    if (L <= st) return [cx + sx + dx * L, cy + sy + dy * L, 0];
+    L -= st;
+    if (L <= arc || k === 3) {
+      // the corner's centre is inward of the run's end; it turns a quarter, counter-clockwise
+      const ex = sx + dx * st, ey = sy + dy * st;
+      const ox = ex - dy * corner, oy = ey + dx * corner;
+      const a0 = Math.atan2(ey - oy, ex - ox);
+      const a = a0 + Math.min(L, arc) / corner;
+      return [cx + ox + corner * Math.cos(a), cy + oy + corner * Math.sin(a), 0];
+    }
+    L -= arc;
+  }
+  return [cx + h, cy, 0];
+}
 
 void sideOf;
 void angleFrom;
@@ -746,6 +1182,12 @@ export const BLOCKS: Record<string, BlockFn> = {
   "gear-mesh": gearMesh,
   willis: willisBlock,
   cam: camBlock,
+  rocker: rockerBlock,
+  star: starBlock,
+  ratchet: ratchetBlock,
+  "one-way": oneWay,
+  escape: escapeBlock,
+  verge: vergeBlock,
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,
@@ -754,4 +1196,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   integrator: integratorBlock,
   escapement: escapementBlock,
   indexer,
+  lerp,
+  "line-crossing": lineCrossing,
+  "target-path": targetPath,
 };

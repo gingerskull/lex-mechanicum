@@ -1,7 +1,7 @@
 // Cam block: a motion law (rise, dwell, return, dwell), the follower kinds and the pressure angle.
 import { TAU } from "../math";
 
-export type CamLaw = "cycloidal" | "harmonic" | "poly345" | "uniform";
+export type CamLaw = "cycloidal" | "harmonic" | "poly345" | "uniform" | "modsine";
 
 /** Normalised law on x in 0..1: displacement s, and ds/dx, d²s/dx². */
 export function lawRise(law: CamLaw, x: number): { s: number; v: number; a: number } {
@@ -15,6 +15,13 @@ export function lawRise(law: CamLaw, x: number): { s: number; v: number; a: numb
       return { s: 10 * t ** 3 - 15 * t ** 4 + 6 * t ** 5, v: 30 * t ** 2 - 60 * t ** 3 + 30 * t ** 4, a: 60 * t - 180 * t ** 2 + 120 * t ** 3 };
     case "uniform":
       return { s: t, v: 1, a: 0 };
+    case "modsine": {
+      // modified sine (Cv 1.76): sine acceleration over the first and last eighths, a long sine between
+      const k = Math.PI + 4;
+      if (t <= 1 / 8) return { s: (Math.PI * t - 0.25 * Math.sin(4 * Math.PI * t)) / k, v: (Math.PI - Math.PI * Math.cos(4 * Math.PI * t)) / k, a: (4 * Math.PI * Math.PI * Math.sin(4 * Math.PI * t)) / k };
+      if (t <= 7 / 8) return { s: (2 + Math.PI * t - 2.25 * Math.sin((Math.PI / 3) * (1 + 4 * t))) / k, v: (Math.PI - 3 * Math.PI * Math.cos((Math.PI / 3) * (1 + 4 * t))) / k, a: (4 * Math.PI * Math.PI * Math.sin((Math.PI / 3) * (1 + 4 * t))) / k };
+      return { s: (4 + Math.PI * t - 0.25 * Math.sin(4 * Math.PI * t)) / k, v: (Math.PI - Math.PI * Math.cos(4 * Math.PI * t)) / k, a: (4 * Math.PI * Math.PI * Math.sin(4 * Math.PI * t)) / k };
+    }
   }
 }
 

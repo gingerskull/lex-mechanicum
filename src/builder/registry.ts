@@ -7,6 +7,7 @@ import { adjustableLength, cableClip } from "./rules/fixes";
 import { drive, explode, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
+import { wheels } from "./rules/wheels";
 import { pistonBore, trunnion } from "./rules/cylinder";
 import { j11 } from "./screws";
 import { j13, yokeDrive } from "./compliant";
@@ -28,6 +29,7 @@ export const rules: Rule[] = [
   classify,
   placement,
   base,
+  wheels,
   byId("j6-mesh"),
   friction,
   byId("j9-crossed-mesh"),

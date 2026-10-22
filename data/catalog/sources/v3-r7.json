@@ -2283,7 +2283,10 @@
        21.446,
        0
       ]
-     }
+     },
+     "above": [
+      "shuttle"
+     ]
     }
    ],
    "joints": [
@@ -4553,8 +4556,8 @@
       "radius": 15,
       "thickness": 100,
       "note": "the output cylinder, hardened and ground, parallel to the carriage's travel",
-      "exact": true,
-      "journal": 12
+      "journal": 12,
+      "place": 0
      },
      "frame": {
       "origin": [

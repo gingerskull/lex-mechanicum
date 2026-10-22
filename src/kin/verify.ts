@@ -2,7 +2,7 @@
 // continuity through toggles. It reads only the joints and the body poses, never the blocks that made them.
 import { KinError } from "./ctx";
 import { TAU, type Vec3, m3, v3, xf, type Xf } from "./math";
-import { ncgResidual, stepResidual, jointResidual } from "./residual";
+import { ncgResidual, stepResidual, jointResidual, wrapped } from "./residual";
 import type { Kinematics } from "./compose";
 import type { Controls, Pose } from "./types";
 
@@ -91,7 +91,8 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const res = jointResidual(r, Xa, Xb, dv);
       for (const v of res) note(r.joint.id, P.u, v);
       const Q = poses[i + 1];
-      if (Q) {
+      // a joint engaged only in a window of a driver (a mutilated gear's mesh) is checked only across steps inside it
+      if (Q && wrapped(r.joint, dv) && wrapped(r.joint, (id) => Q.values[id])) {
         const car = r.joint.carrier;
         const s = stepResidual(r, { a0: Xa, a1: Q.bodies.get(r.joint.a)!, b0: Xb, b1: Q.bodies.get(r.joint.b)!, c0: car ? P.bodies.get(car) : undefined, c1: car ? Q.bodies.get(car) : undefined });
         if (s !== null) note(r.joint.id, P.u, s);
@@ -110,7 +111,11 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const Y = pN.bodies.get(b) ?? X;
       const body = k.kin.bodies.find((q) => q.id === b);
       const n = body?.symmetry ?? (typeof body?.shape?.z === "number" ? (body.shape.z as number) : undefined);
-      const jr = [...setup.joints.values()].find((r) => r.joint.a === b || r.joint.b === b);
+      // the symmetry turns about the body's joint to the ground, else about its own frame's axis (a carried sprag set)
+      const all = [...setup.joints.values()].filter((r) => r.joint.a === b || r.joint.b === b);
+      const g = all.find((r) => r.joint.a === "ground" || r.joint.b === "ground");
+      const F = setup.bodyFrame.get(b);
+      const jr = g ?? (F ? { at: F.t, axis: [F.R[2], F.R[5], F.R[8]] as Vec3 } : all[0]);
       const ax = jr?.axis;
       // a sheave half is a body of revolution: it may come back turned by any angle about its axis
       if (body?.shape?.sheave !== undefined && ax) {
@@ -144,7 +149,15 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
     }
     scale = v3.dist(lo, hi) || 1;
   }
-  const ids = first ? [...first.points.keys()] : [];
+  // a body that moves by instant drops (an escapement's wheel, `drops: true`) jumps by design: its points are not checked
+  const dropping = new Set(k.kin.bodies.filter((b) => (b as { drops?: boolean }).drops).map((b) => b.id));
+  const onDropping = (id: string) => {
+    const p = k.kin.points?.find((q) => q.id === id);
+    if (p) return dropping.has(p.body);
+    const j = k.kin.joints.find((q) => q.id === id);
+    return !!j && (dropping.has(j.a) || dropping.has(j.b));
+  };
+  const ids = first ? [...first.points.keys()].filter((id) => !onDropping(id)) : [];
   for (const id of ids) {
     const steps: number[] = [];
     for (let i = 0; i < N; i++) {

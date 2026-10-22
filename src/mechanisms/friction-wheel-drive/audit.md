@@ -64,7 +64,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 97 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 92 solids unsound |
 | D7 | PASS | HAND · disc and wheel plain; richness in the stacks and the tyre |
 | A1 | PASS | AUTO · contact J6, Od J2, Ow J10, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · contact J6, Od J2, Ow J10, drive drive · the disc on a live shaft (J2), the wheel on a live shaft in plan (J10); the friction contact (J6 recorded) by its rule |
@@ -180,8 +180,8 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | contact | J6 | gear-mesh | – | – | none | none | none | none | none | Tyre, rubber 4 mm, vulcanised to the hub: the contact's grip | none | none | none | none |
-| Od | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 12 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| Ow | J10 | – | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø21 | Feather key 4 x 4 x 16 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
+| Od | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| Ow | J10 | – | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø21 | Feather key 4 x 4 x 11 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -197,18 +197,18 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 9 | 0 | 1.48 |
-| DL-B | 0 | 201 | 1.47 |
+| DL-B | 0 | 197 | 1.47 |
 | DL-C | 0 | 0 | 1.41 |
 | DL-D | 7 | 0 | 1.45 |
 | DL-E | 8 | 0 | 1.33 |
 | DL-F | 0 | 0 | 1.34 |
 | DL-G | 0 | 0 | 1.4 |
 | DL-H | 15 | 0 | 1.38 |
-| never | 58 | 151 | 1.39 |
+| never | 53 | 85 | 1.39 |
 
 ## Promotion candidates
 None left: the friction contact (tyre, preload, the setting clamped and read on a scale) is a rule of the builder; pillow blocks reach the range of a part set along its shaft.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.8 KB
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.0 KB
 screenshots: dist/shots3/friction-wheel-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -184,7 +184,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | disc-contact | ball-cage | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | cyl-contact | ball-cage | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | slide | J5 | driver | – | – | Dowel pin Ø3 h6, rail to base | none | none | none | 2 x Stop block | none | none | none | none | none |
-| Od | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the disc on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 12 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| Od | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the disc on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 7 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 | drive2 | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
@@ -214,5 +214,5 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 None left: the integral is a kin block (closed form for the standard driver laws, quadrature otherwise); the ball in its cage, the carriage on its rail and a body that is its own shaft are the integrator rule and the ball-cage kit; the Scotch yoke takes a driver's phase and side.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 18.7 KB
+check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 18.8 KB
 screenshots: dist/shots3/ball-disc-integrator (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; phone by David)

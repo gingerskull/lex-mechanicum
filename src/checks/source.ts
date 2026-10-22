@@ -16,7 +16,9 @@ import { conveyMatrix, mul4, stretchMatrix, turnMatrix } from "../solids/convey"
 import type { Solid3 } from "../solids/types";
 import type { RecordLike } from "../builder/ctx";
 import type { Kin } from "../kin/types";
+import type { Vec3, Xf } from "../kin/math";
 import { xf } from "../kin/math";
+import { anchorAt } from "../kin/compose";
 import type { Placer } from "./clash3";
 
 export interface CheckSource {
@@ -111,15 +113,17 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish; con
     return pz;
   };
   const posed = (u: number) => poseAt(u).bodies;
-  const ref = K.referencePose().points;
+  const refPose = K.referencePose();
+  // a stretched member's end: a named kin point, or a kit's body anchor (@body:x:y:z)
+  const endOf = (P: { points: Map<string, Vec3>; bodies: Map<string, Xf> }, n: string) => P.points.get(n) ?? anchorAt(n, P.bodies);
   const placer: Placer = {
     place(s, u) {
       if (s.stretch) {
-        const P = poseAt(u).points;
-        const a = P.get(s.stretch[0]);
-        const b = P.get(s.stretch[1]);
-        const a0 = ref.get(s.stretch[0]);
-        const b0 = ref.get(s.stretch[1]);
+        const P = poseAt(u);
+        const a = endOf(P, s.stretch[0]);
+        const b = endOf(P, s.stretch[1]);
+        const a0 = endOf(refPose, s.stretch[0]);
+        const b0 = endOf(refPose, s.stretch[1]);
         // the member's whole matrix, its length included (stretch() then gives 1)
         if (a && b && a0 && b0) return stretchMatrix(a, b, a0, b0, mat4(s.frame)) as Mat4;
       }
@@ -135,6 +139,9 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish; con
   const kin = src.kin;
   // a slide held by springs touches by design (a pseudo-rigid beam's two halves, a roller between springs in a window)
   const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type) || (j.type === "prismatic" && (j as { spring?: unknown }).spring !== undefined)).map((j): [string, string] => [j.a, j.b]);
+  // a gear no joint reaches is part of the ground (a fixed ring): a mesh with the ground is a mesh with it
+  const fixedGears = kin.bodies.filter((b) => b.id !== "ground" && /gear|rack/i.test(String(b.shape?.type ?? "")) && !kin.joints.some((j) => j.a === b.id || j.b === b.id)).map((b) => b.id);
+  for (const j of kin.joints) if (j.type === "gear-mesh" && (j.a === "ground" || j.b === "ground")) for (const g of fixedGears) contact.push([g, j.a === "ground" ? j.b : j.a]);
   return { id: rec.id, engine: "v3", solids: assembly3.solids, placer, contact, assembly3, kin };
 }
 

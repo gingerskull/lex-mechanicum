@@ -147,28 +147,27 @@ const geomList = (g: BlockGeom): Solid3[] => [g.foot, g.ped, g.boss];
  * where something sweeps past its far end; each routed against the sweeps (A19). The nearer end's block locates a live
  * shaft, the other floats (F2, F4).
  */
-export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: number; live: boolean; lo: number; hi: number; baseTop: number; joints: string[]; far?: boolean }): PillowOut {
+export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: number; live: boolean; lo: number; hi: number; baseTop: number; joints: string[]; far?: boolean; side?: 1 | -1 }): PillowOut {
   const W = pillowWidth(o.d, o.live);
   // a live shaft's locating block carries a 4 mm collar on each face: the gap to the parts leaves room for it
   const gap = o.live ? 8 : 3;
   const tryAt = (wb: number): boolean => {
     const g = blockGeom(ctx, { id: `${o.id}-t`, f: o.frame, d: o.d, live: o.live, wb, baseTop: o.baseTop, first: false });
     const c = clearance(ctx, geomList(g));
-    if (process.env.PBDBG && c < MIN_GAP) { const m = worldManifold(ctx.M, geomList(g)[0]!); console.log("PB", o.id, wb.toFixed(1), geomList(g)[0]!.id, ctx.sweeps.moving().map((b) => `${b}:${ctx.sweeps.gap(m, [b], 5).toFixed(1)}`).join(" ")); m.delete(); }
     return c >= MIN_GAP;
   };
   const below: number[] = [];
   const above: number[] = [];
   let tried = 0;
   // a shaft whose member slides along it (a friction wheel's setting) searches further for a free place
-  const steps = o.far ? 80 : 12;
-  for (let k = 0; k < steps && below.length < 2; k++) {
+  const steps = o.far ? 80 : 30;
+  for (let k = 0; k < steps && below.length < 2 && o.side !== 1; k++) {
     const wb = o.lo - W / 2 - gap - 2 * k;
     tried++;
     if (tryAt(wb)) below.push(wb);
     if (below.length === 1) break;
   }
-  for (let k = 0; k < steps && above.length < 2; k++) {
+  for (let k = 0; k < steps && above.length < 2 && o.side !== -1; k++) {
     const wb = o.hi + W / 2 + gap + 2 * k;
     tried++;
     if (tryAt(wb)) above.push(wb);
@@ -183,7 +182,6 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
     // both on the one side that clears, one block width apart
     const side = below.length ? -1 : 1;
     const w0 = (below[0] ?? above[0])!;
-    if (w0 === undefined && process.env.PBDBG) return pillowBlocks(ctx, { ...o, lo: o.lo - 1000, hi: o.hi + 1000 });
     if (w0 === undefined) throw new Error(`${o.id}: no place for a pillow block clears the sweeps`);
     const step = W + 4;
     w = side < 0 ? [w0, w0 - step] : [w0, w0 + step];
