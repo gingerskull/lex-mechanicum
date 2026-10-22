@@ -13,7 +13,7 @@ import { fixtureRecord } from "./fixtures";
 let ctx: BuildCtx;
 beforeAll(async () => {
   ctx = await createCtx(fixtureRecord("kin:crankRocker"));
-  for (const r of rules.slice(0, 3)) {
+  for (const r of rules.slice(0, rules.findIndex((q) => q.id === "base") + 1)) {
     ctx.rule = r.id;
     r.apply(ctx);
   }

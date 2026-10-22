@@ -266,15 +266,19 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 |---|---|
 | `classify` | A1, A2, A3 |
 | `placement` | A10, A18 |
+| `lugs` | A1, A2 |
 | `base` | A7, D4, M4 |
+| `posts` | A7, F1 |
 | `j6-mesh` | J6, F7, F9 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
+| `tongue-slot` | J5, F8, M14 |
 | `j3-moving-pin` | J3, A12, M3 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
 | `cross-bearings` | J3, F2, F8 |
 | `trunnion` | J1, F2, F4, F6 |
 | `piston-bore` | J5, M14 |
+| `ball-socket` | J3, J7, F8 |
 | `j4-slot-roller` | J4, M14 |
 | `pin-lobe` | J4, M14 |
 | `groove-cam` | J7, M14 |
@@ -283,7 +287,6 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `pallet-contact` | J7, F6, M14 |
 | `fork-pin` | J4, F2 |
 | `pawl-tooth` | J7, F6, F5 |
-| `tongue-slot` | J5, F8, M14 |
 | `ring-hub` | J3, F2 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |

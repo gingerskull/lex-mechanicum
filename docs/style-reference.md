@@ -346,6 +346,10 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.role.link.step` | 2.4 |  |
 | `draft.role.link.alpha` | 0.34 |  |
 | `draft.role.link.tint` | 0 |  |
+| `draft.role.link2.pattern` | `cross` | a second set of like links, told apart from the first (T16) |
+| `draft.role.link2.step` | 2.6 | a second set of like links, told apart from the first (T16) |
+| `draft.role.link2.alpha` | 0.3 | a second set of like links, told apart from the first (T16) |
+| `draft.role.link2.tint` | 0 | a second set of like links, told apart from the first (T16) |
 | `draft.role.output.pattern` | `hatch` |  |
 | `draft.role.output.step` | 2.1 |  |
 | `draft.role.output.alpha` | 0.3 |  |
