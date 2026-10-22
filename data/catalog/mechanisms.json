@@ -29816,8 +29816,7 @@
                 "width": 25,
                 "gap": 10
               },
-              "modules": "normal",
-              "phase": "half a tooth"
+              "modules": "normal"
             },
             "at": {
               "joint": "O2"
@@ -29873,14 +29872,15 @@
               0,
               22.5
             ],
-            "z1": 20,
-            "z2": 40,
-            "hand": [
-              "right",
-              "left"
-            ],
-            "helix": 30,
-            "note": "lower half"
+            "note": "lower half",
+            "za": 20,
+            "zb": 40,
+            "ratio": -0.5,
+            "cb": [
+              103.923,
+              0,
+              10
+            ]
           },
           {
             "id": "ML",
@@ -29892,14 +29892,15 @@
               0,
               57.5
             ],
-            "z1": 20,
-            "z2": 40,
-            "hand": [
-              "left",
-              "right"
-            ],
-            "helix": 30,
-            "note": "upper half"
+            "note": "upper half",
+            "za": 20,
+            "zb": 40,
+            "ratio": -0.5,
+            "cb": [
+              103.923,
+              0,
+              10
+            ]
           }
         ],
         "params": [
@@ -29967,21 +29968,12 @@
               "ML"
             ],
             "in": {
-              "a": "pinion",
-              "b": "gear",
-              "za": 20,
-              "zb": 40,
-              "mn": "mn",
-              "beta": "beta"
+              "joint": "MR",
+              "input": "input"
             },
-            "opts": {
-              "form": "double helical",
-              "float": "the pinion's slide on O1 is set by the two meshes: their thrusts are equal and opposite, so it stays at 0"
-            },
-            "out": [
-              "gear-turn",
-              "pinion-slide"
-            ]
+            "out": {
+              "angle": "gear-turn"
+            }
           }
         ],
         "points": [
@@ -30048,7 +30040,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Review against the record (unbuilt): the record's plan reads, a V of teeth with two opposed thrust arrows cancelling. Decided: open in isometric so the V shows; one tooth's two helix lines on the pinion (each half twists 23.9° over its 25 mm) as construction lines meeting across the groove; the pinion on a cylindrical joint, free to slide, held centred by the two half-meshes of opposite hand (a single helical would push it to one side), the gear located. The two thrust arrows per shaft are drawn equal and opposite. The helix angle is a control: at any angle the thrusts still cancel."
+          "note": "Review against the record (unbuilt): the record's plan reads, a V of teeth with two opposed thrust arrows cancelling. Decided: open in isometric so the V shows; one tooth's two helix lines on the pinion (each half twists 23.9° over its 25 mm) as construction lines meeting across the groove; the pinion on a cylindrical joint, free to slide, held centred by the two half-meshes of opposite hand (a single helical would push it to one side), the gear located. The two thrust arrows per shaft are drawn equal and opposite. The helix angle is a control: at any angle the thrusts still cancel. Rebuild R4 (#215): built on v3 from this record (first build): the teeth are a loft of two opposite-hand halves meeting in a V across a 10 mm relief groove cut to the root circle, both gears at their joints' plane; the mesh joints in the block's form. The helix-angle control is not offered (it changes the built teeth); the thrust arrows and a shaft left free to float are open. The six phases of the finished build read as decided."
         },
         "principle": [
           {
@@ -30087,11 +30079,6 @@
             "id": "input",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "helix",
-            "kind": "param",
-            "param": "beta"
           }
         ],
         "plot": {
@@ -31062,8 +31049,8 @@
             "a": "beam",
             "b": "rod",
             "at": [
-              -0.578,
-              381.394,
+              -0.5775548382523823,
+              381.393567419835,
               0
             ],
             "axis": [
@@ -31211,10 +31198,11 @@
           {
             "id": "branch",
             "options": [
-              "beam-level",
-              "beam-hanging"
+              "beam-hanging",
+              "beam-level"
             ],
-            "value": "beam-level"
+            "value": "beam-level",
+            "note": "the dyad's root: beam-level is the right-hand closure of rod and beam seen from above"
           }
         ],
         "drivers": [

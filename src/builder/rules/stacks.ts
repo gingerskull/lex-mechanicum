@@ -43,7 +43,7 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
       // the twin's second half sits in its own slab
       const w = (part.frame.o[0] - frame.o[0]) * frame.z[0] + (part.frame.o[1] - frame.o[1]) * frame.z[1] + (part.frame.o[2] - frame.o[2]) * frame.z[2];
-      const thick = part.op.op === "extrude" ? part.op.h : 6;
+      const thick = part.op.op === "extrude" ? part.op.h : part.op.op === "loft" ? Math.max(...part.op.sections.map((x) => x.z)) : 6;
       out.push({ solid: part.id, body: b, w0: w, w1: w + thick, R, keyed: keyedIds.has(b), shim: ctx.shim.get(b) ?? 0, name: part.name });
     }
   }

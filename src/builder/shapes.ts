@@ -7,7 +7,7 @@ import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody, KinJoint } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
-import type { Profile } from "../solids/types";
+import type { LoftSection, Profile } from "../solids/types";
 import { canon, frameAlong, fromPlane, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 
@@ -42,6 +42,8 @@ export interface BodyGeom {
   scaleTop?: number;
   /** A helical gear's teeth: the turn of the outline over its face, degrees, counter-clockwise for a right hand (D8). */
   twist?: number;
+  /** A part made by a loft (a herringbone gear's two halves and its groove): the sections above the profile's z = 0. */
+  loft?: LoftSection[];
   /**
    * The body stands where its joints put it, not on a slab of the placement solver (a bevel gear on its cone, a
    * universal joint's yoke and cross on their centre); its own part starts `offset` along the frame's z.
@@ -76,7 +78,7 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; exact?: boolean } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean } {
   const g = outlineOf0(shape, role, pins);
   // holes the record names on a disc or a plate ([x, y, r] in the body's frame): a port face's ports
   if (Array.isArray(shape.holes) && (shape.type === "disc" || shape.type === "plate"))
@@ -84,7 +86,7 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
   return g;
 }
 
-function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; exact?: boolean } {
+function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -135,6 +137,35 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
         // a straight bevel gear: Tredgold's back-cone teeth at the outer end, tapering toward the apex over the face
         const bv = bevel(z, m, shape.cone * D2R, num(shape.face, 0) || undefined);
         return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
+      }
+      if (typeof shape.helix === "number" && shape.helix !== 0 && Array.isArray(shape.hand)) {
+        // a herringbone (double-helical) gear: two halves of opposite hand meeting in a V across a relief groove cut to
+        // the root circle; a loft of sections every few millimetres so each half's twist stays true
+        const beta = shape.helix * D2R;
+        const mt = shape.modules === "transverse" ? m : m / Math.cos(beta);
+        const halves = (shape.halves ?? {}) as Record<string, unknown>;
+        const w = num(halves.width, 20);
+        const gap = num(halves.gap, 0);
+        const rp = (z * mt) / 2;
+        const sense = shape.hand[0] === "left" ? -1 : 1;
+        const t = (sense * w * Math.tan(beta)) / rp;
+        const base = gearOutline(z, mt);
+        const rf = rp - 1.25 * mt - 0.4;
+        // a loft's hole rings wind clockwise
+        const bore = [hole(num(shape.bore, 6) / 2).reverse()];
+        const ring = (a: number, groove = false): Vec2[] =>
+          rot(base, a).map(([x, y]): Vec2 => {
+            const r = Math.hypot(x, y);
+            return groove && r > rf ? [(x * rf) / r, (y * rf) / r] : [x, y];
+          });
+        const n = Math.max(2, Math.ceil(Math.abs(t / D2R) / 3));
+        const sections: LoftSection[] = [];
+        for (let i = 1; i <= n; i++) sections.push({ z: (w * i) / n, outer: ring((t * i) / n), holes: bore });
+        if (gap > 0) {
+          sections.push({ z: w + 0.01, outer: ring(t, true), holes: bore }, { z: w + gap - 0.01, outer: ring(t, true), holes: bore }, { z: w + gap, outer: ring(t), holes: bore });
+        }
+        for (let i = 1; i <= n; i++) sections.push({ z: w + gap + (w * i) / n, outer: ring(t - (t * i) / n), holes: bore });
+        return { profile: { outer: base, holes: bore }, thick: 2 * w + gap, approx: false, loft: sections, exact: true };
       }
       if (typeof shape.helix === "number" && shape.helix !== 0) {
         // a helical gear: the transverse outline of the normal module, turned along the face by its helix (right hand
@@ -207,7 +238,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.loft ? { loft: g.loft } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
     const levels = clusterLevels(shape, pins);
     if (levels.length) geom.levels = levels;
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
@@ -331,7 +362,10 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
       const c = L.center ?? [0, 0];
       const r = (pts: Vec2[]) => rot(pts.map(([x, y]): Vec2 => [x - c[0], y - c[1]]), v).map(([x, y]): Vec2 => [x + c[0], y + c[1]]);
       L.profile = { outer: r(L.profile.outer), holes: L.profile.holes.map(r) };
-    } else s.g.profile = { outer: rot(s.g.profile.outer, v), holes: s.g.profile.holes.map((h) => rot(h, v)) };
+    } else {
+      s.g.profile = { outer: rot(s.g.profile.outer, v), holes: s.g.profile.holes.map((h) => rot(h, v)) };
+      if (s.g.loft) s.g.loft = s.g.loft.map((x) => ({ z: x.z, outer: rot(x.outer, v), holes: x.holes.map((h) => rot(h, v)) }));
+    }
   };
   const meshes = kin.joints.filter((j) => j.type === "gear-mesh" && S.joints.get(j.id));
   const done = new Set<string>();

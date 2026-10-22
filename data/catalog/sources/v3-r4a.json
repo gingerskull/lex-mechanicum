@@ -3083,8 +3083,8 @@
           "a": "beam",
           "b": "rod",
           "at": [
-            -0.578,
-            381.394,
+            -0.5775548382523823,
+            381.393567419835,
             0
           ],
           "axis": [
@@ -3232,10 +3232,11 @@
         {
           "id": "branch",
           "options": [
-            "beam-level",
-            "beam-hanging"
+            "beam-hanging",
+            "beam-level"
           ],
-          "value": "beam-level"
+          "value": "beam-level",
+          "note": "the dyad's root: beam-level is the right-hand closure of rod and beam seen from above"
         }
       ],
       "drivers": [
