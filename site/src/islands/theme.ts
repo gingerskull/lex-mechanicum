@@ -9,8 +9,8 @@ const current = (): "dark" | "light" => (root.dataset.theme === "light" ? "light
 function label() {
   const to = NAMES[current() === "dark" ? "light" : "dark"];
   for (const b of document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")) {
-    b.setAttribute("aria-label", `Switch to the ${to} sheet`);
-    b.title = `${to} sheet`;
+    b.setAttribute("aria-label", `Switch to ${to}`);
+    b.title = `Switch to ${to}`;
   }
 }
 
