@@ -18,6 +18,7 @@ import { lowestZ } from "./core";
 import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 import type { Site } from "../sites";
+import { linearDrive, manualDrive, oscillatingDrive } from "./drive";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
@@ -275,10 +276,13 @@ export const drive: Rule = {
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  // a rotary input, or an oscillating one (the same motor and belt, the motor reversing through the stroke: a servo)
-  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary" || d.kind === "oscillating"),
+  applies: (ctx) => (ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary")) || ctx.kin.drivers.some((d) => d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"),
   apply(ctx) {
-    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary") ?? ctx.kin.drivers.find((d) => d.kind === "oscillating");
+    // an oscillating or a linear input has its own drive (rules/drive.ts); a rotary one is belted to its shaft
+    const other = ctx.kin.drivers.some((d) => d.kind === "rotary") ? undefined : ctx.kin.drivers.find((d) => d.kind === "oscillating" || d.kind === "linear");
+    if (other) return other.kind === "oscillating" ? oscillatingDrive(ctx, other) : linearDrive(ctx, other);
+    if (!ctx.kin.drivers.some((d) => d.kind === "rotary")) return manualDrive(ctx);
+    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
@@ -359,7 +363,7 @@ export const drive: Rule = {
     const tb = polar(M, 36, dir);
     ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
     ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));
-    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base${drv?.kind === "oscillating" ? ", run as a servo that reverses through the stroke" : ""}, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
     void LEVER_WALL;
   },
 };

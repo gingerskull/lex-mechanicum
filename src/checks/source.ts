@@ -11,6 +11,7 @@ import { buildPackage } from "../package/build";
 import type { MechanismModel } from "../model/types";
 import { planeMatrix } from "../render/v3/poser";
 import { IDENTITY, mat4, type Mat4 } from "../solids/frame";
+import { driveXf } from "../solids/drive";
 import { liftAll } from "../solids/lift";
 import type { Solid3 } from "../solids/types";
 import type { RecordLike } from "../builder/ctx";
@@ -112,10 +113,12 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = 
   };
   const placer: Placer = {
     place(s, u) {
+      if (s.drive) return mul(xfMat(driveXf(s.drive, posed(u).get(s.drive.input) ?? xf.id(), u)), mat4(s.frame));
       const X = s.body === "ground" ? xf.id() : (posed(u).get(s.body) ?? xf.id());
       return mul(xfMat(X), mat4(s.frame));
     },
-    key: (s) => s.body,
+    // the drive's crank and link each move as one
+    key: (s) => (s.drive ? `drive:${s.drive.part}` : s.body),
     // a stretched member spans its two points (named kin points, or a kit's body anchors)
     stretch(s, u) {
       const st = (s as Solid3).stretch;
