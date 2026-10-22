@@ -4,6 +4,8 @@
 //   teaching and kin blocks) for every mechanism the v3 stage draws (a mechanism on engine v3 has only these);
 // - thumbs/<id>-<theme>.webp and -still.webp: the card drawings and the stage's still, committed in site/thumbs (R8, SS1); their fingerprints are checked
 //   first, and a stale one fails the build with the command to run. Nothing is drawn here.
+// - favicon.svg, favicon-*.png, favicon.ico, apple-touch-icon.png, social.png: the mark's icons and the social card,
+//   committed in site/brand by tools/brand.ts and checked the same way.
 import { copyFileSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -15,6 +17,7 @@ import { buildPackage } from "../src/package/build";
 import { encode } from "../src/package/format";
 import { encode2 } from "../src/package/format2";
 import { drawnBy3 } from "../site/src/drawn";
+import { copyBrand } from "./brand";
 import { checkThumbs, imagesOf, THUMBS_DIR } from "./thumbs";
 import { FONT_FILES } from "./tokens-css";
 
@@ -23,6 +26,7 @@ const pub = join(root, "site", "public");
 const require = createRequire(import.meta.url);
 
 export async function siteAssets(ids = allIds()): Promise<void> {
+  copyBrand(pub);
   mkdirSync(join(pub, "fonts"), { recursive: true });
   for (const f of FONT_FILES) {
     const dir = join(dirname(require.resolve(`@fontsource/${f.slug}/package.json`)), "files");
@@ -57,7 +61,7 @@ export async function siteAssets(ids = allIds()): Promise<void> {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try {
     await siteAssets();
-    console.log(`wrote fonts, packages and thumbnails to ${pub}`);
+    console.log(`wrote the icons, fonts, packages and thumbnails to ${pub}`);
   } catch (e) {
     console.error(`site-assets: ${e instanceof Error ? e.message : String(e)}`);
     process.exitCode = 1;
