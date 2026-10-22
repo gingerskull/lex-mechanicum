@@ -1,8 +1,8 @@
 # Mechanism standard
 
 ```
-version: 3.8
-date: 2026-10-20
+version: 3.9
+date: 2026-10-22
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
 
@@ -107,16 +107,16 @@ citing their ids. Every requirement id falls under exactly one law, so a new req
 | S2 | Every mechanism's audit sheet (`src/mechanisms/<id>/audit.md`) starts with a header: `standard: <version>`, `date`, `result: pass | open`, `detail: full | <rung>`. It is the only per-mechanism record of conformance. From 3.0 the audit also records the teaching review's verdict (T2) on a `teaching:` line under the header. | HAND |
 | S3 | `tools/conformance` reads every audit header and this changelog and reports, per mechanism: the audited version, the HAND changes since, the current check results (K1 residual, A15, A12). It runs as a test: a mechanism behind a HAND change fails until its audit is redone or the item is deferred in the report with a reason. AUTO and STYLE changes never require a re-audit; they rerun every mechanism's checks. | AUTO |
 | S4 | Board issues hold mechanism-specific decisions and open items only, pointing at requirement ids. No requirement text, style values or rule descriptions live in issues. | SITE |
-| S5 | **Transition mark.** Between the first and the last pull request to main of the v3 plan, a page drawn by the v3 engine carries a visible 3D stamp in its title block and on its library card. At cut-over the stamp, the 2.5D engine, v1 packages and the old polishes are removed together. | SITE |
-| S6 | **3.0 binds a mechanism at its rebuild.** The HAND requirements new or changed in 3.0 bind a mechanism from the pass that rebuilds it from its record v3 (section 1). The audits of the 2.5D pipeline are replaced by that pass, never re-audited against 3.0, so their conformance entry reads as current until then. | AUTO |
+| S5 | **No engine mark.** One engine draws the library, so a page and a library card carry no mark of the engine that drew them. The 3D stamp of the v3 plan's transition left at cut-over with the 2.5D engine, v1 packages and the old polishes. | SITE |
+| S6 | **A mechanism is a 3.0 build.** A registered mechanism is built from its record v3 and has an audit at 3.0 or later; it is held to every HAND change after its audited version (S3). A record without such an audit is not yet a mechanism: its first pass (section 1) writes one. | AUTO |
 
 ---
 
 ## 1. The conformance pass
 
 Run this for any mechanism, whatever state it is in. Every mechanism is built **from scratch** from its catalogue record
-v3, the shared blocks and kits, and the rules. A model, polish or audit left from the 2.5D pipeline is at most a loose
-before/after comparison and never a template.
+v3, the shared blocks and kits, and the rules. An earlier build, polish or audit is at most a loose before/after
+comparison and never a template.
 
 1. **Locate.** `data/catalog/sources` holds the record v3 (`kin` and `teaching` blocks, spec in
    `data/catalog/record-spec.md`); `src/mechanisms/<id>/` holds `audit.md` and, only where the mechanism has true
@@ -661,8 +661,7 @@ filled and regenerated every time; every other row gets its tier and the evidenc
 supports, names, sizes, materials, locking, rungs) and a `?` to judge. The evidence of K1 is the K1 residual, of T9 the
 claim table, of A15 the 3D clashes and the unnecessary `allow` exemptions. Judged rows, hand entries in the joints
 table, the header, the `teaching:` line, deferrals, variants, promotion candidates and measured frame times survive
-regeneration. A sheet audited below 3.0 is a 2.5D sheet: it has no `teaching:` line, no Kit, Block, Support and Stack
-columns and no Supports section, and stays current until its mechanism is rebuilt (S6). A deferral is a line
+regeneration. A sheet below 3.0 does not register its mechanism; the pass writes a 3.0 sheet (S6). A deferral is a line
 `defer: <ids or version> · <reason>`; no reason, no deferral.
 
 ```markdown
@@ -676,7 +675,7 @@ PASS n · FAIL n · N/A n · open: ...
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks) |
 | ... | | |
 
 ## Joints
@@ -879,7 +878,7 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 | Hardware covering the principle: never remove posts or plates; see-through first, supports moved second, a different construction only rarely; principle parts never out of depth order | T10, T11, T12, T17, A19, L5, L6 | AUTO (T10, T11, T17, A19), HAND (T12) |
 | Teaching content lives in the record's teaching block | T3 to T9, T13, T14, P12 | DATA |
 | Kinematics: closed-form blocks, numeric fallback, the solver verifies and does not drive | K1, K3, K8 to K12 | AUTO, DATA |
-| Transition: a 3D stamp until cut-over; old engine removed entirely | S5, S6 | SITE, AUTO |
+| Transition: a 3D stamp until cut-over; old engine removed entirely (done at cut-over, 3.9) | S5, S6 | SITE, AUTO |
 | Delivery, parallel work, main frozen during the plan | `docs/workflow.md` (process, not a requirement of a mechanism) | none |
 | Phone measurement by a published bench page | R6, R10, Q5 | FLAG |
 | Teaching test | T1, T2, T15, Q8, section 1 step 2 | HAND |
@@ -917,6 +916,10 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.9 (2026-10-22).** Cut-over: the 2.5D engine, v1 packages, the old models and polishes and the 3D stamp are
+  gone; every mechanism is built from its record v3 and drawn by the one engine, and a page or card carries no engine
+  mark [S5, SITE]. A registered mechanism is a record with an audit at 3.0 or later, held to every HAND change since its
+  version; the conformance report no longer tells two engines apart [S6, S3, AUTO].
 - **3.8 (2026-10-22).** The sixteen laws: the standard grouped into sixteen numbered rules, each naming the sections
   and requirement ids it covers; every requirement id falls under exactly one law, checked by a test. No requirement
   changes [S1, DATA].

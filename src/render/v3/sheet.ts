@@ -1,7 +1,6 @@
-// The drawing sheet of the 3D renderer (style SD10, SS13): the frame with its zone marks and the title block, with the VIEW
-// and SCALE cells read from the camera (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX, VIEW az/el; a section or detail adds
-// its name) and the 3D stamp that marks a page drawn by this engine while both engines are on main. The paper, grid and
-// paper tooth are the generic ones in src/render/sheet.ts.
+// The drawing sheet of the 3D renderer (style SD10): the frame with its zone marks and the title block, with the VIEW and
+// SCALE cells read from the camera (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX, VIEW az/el; a section or detail adds its
+// name). The paper, grid and paper tooth are the generic ones in src/render/sheet.ts.
 import { DRAFT } from "../../style/draft";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
 import type { Card } from "../canvas";
@@ -102,18 +101,7 @@ export function sheetFrame(card: Card, T: ResolvedTheme, text: SheetText): void 
       while (t.length > 3 && ctx.measureText(t).width > wd - S.titleValueMargin) t = t.slice(0, -2) + "…";
       ctx.fillText(t, x + S.titleValueX, y + rh / 2 + 0.5);
     };
-    // the 3D stamp sits at the right end of the title row (SS13)
-    const st = S.stamp;
-    ctx.font = font(DRAFT.type.titleValue);
-    const sw = ctx.measureText(st.text).width + 8;
-    cell("TITLE", up(text.title), x0, y0, bw - sw - 6);
-    ctx.lineWidth = st.width;
-    ctx.strokeStyle = paint(T.ink, st.alpha);
-    ctx.strokeRect(x0 + bw - sw - 3.5, y0 + 3.5, sw, rh - 7);
-    ctx.fillStyle = paint(T.ink, st.alpha);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(st.text, x0 + bw - sw / 2 - 3.5, y0 + rh / 2 + 0.5);
+    cell("TITLE", up(text.title), x0, y0, bw);
     cell("DWG", text.no, x0, y0 + rh, c1 - x0);
     cell("SCALE", text.scale, c1, y0 + rh, x0 + bw - c1);
     cell("VIEW", text.view, x0, y0 + 2 * rh, c1 - x0);

@@ -1,88 +1,38 @@
-// Registry: mechanism id -> its model (models.ts) and a lazy import of its polish. Node tools, assembly and packaging
-// load both; the browser loads models.ts only.
-import type { Polish } from "../assemble/api";
-import type { MechanismModel } from "../model/types";
-import { models } from "./models";
+// The registry (Node only): a mechanism is a catalogue record v3 built by the hardware builder (src/builder), registered
+// by its audit sheet at standard 3.0 or later (src/mechanisms/<id>/audit.md). Its polish, where the builder needs a true
+// exception, is listed in v3.ts. The browser never loads this module: the site ships packages and the records' blocks.
+import { loadCatalog, recordById } from "../catalog";
+import type { CatalogRecord } from "../catalog/schema";
+import { compareVersions, parseHeader, readAudit } from "../audit/sheet";
+import type { Polish } from "../builder";
+import { polishes3 } from "./v3";
 
-export { models };
+/** The standard version from which a mechanism is built from its record v3. */
+export const V3_STANDARD = "3.0";
 
-export interface MechanismEntry {
-  model: MechanismModel;
-  polish?: Polish;
+/** The audited standard of a mechanism, null without an audit sheet. */
+export function auditedStandard(id: string): string | null {
+  const text = readAudit(id);
+  return (text && parseHeader(text)?.standard) || null;
 }
 
-const polishes: Record<string, () => Promise<{ polish: Polish }>> = {
-  "four-bar": () => import("./four-bar/polish"),
-  "peaucellier-lipkin": () => import("./peaucellier-lipkin/polish"),
-  "intermittent-gear": () => import("./intermittent-gear/polish"),
-  geneva: () => import("./geneva/polish"),
-  "spur-gears": () => import("./spur-gears/polish"),
-  "jansen-linkage": () => import("./jansen-linkage/polish"),
-  "gear-train": () => import("./gear-train/polish"),
-  "slider-crank": () => import("./slider-crank/polish"),
-  "toggle-clamp": () => import("./toggle-clamp/polish"),
-  "tusi-couple": () => import("./tusi-couple/polish"),
-  "rack-pinion": () => import("./rack-pinion/polish"),
-  "cam-follower": () => import("./cam-follower/polish"),
-  "ratchet-pawl": () => import("./ratchet-pawl/polish"),
-  "chebyshev-linkage": () => import("./chebyshev-linkage/polish"),
-  pantograph: () => import("./pantograph/polish"),
-  "crank-shaper": () => import("./crank-shaper/polish"),
-  planetary: () => import("./planetary/polish"),
-  "scissor-lift": () => import("./scissor-lift/polish"),
-  "elliptic-trammel": () => import("./elliptic-trammel/polish"),
-  "watt-linkage": () => import("./watt-linkage/polish"),
-  "roberts-linkage": () => import("./roberts-linkage/polish"),
-  "scott-russell": () => import("./scott-russell/polish"),
-  "evans-grasshopper": () => import("./evans-grasshopper/polish"),
-  "locomotive-drive": () => import("./locomotive-drive/polish"),
-  whitworth: () => import("./whitworth/polish"),
-  "oldham-coupling": () => import("./oldham-coupling/polish"),
-  "oscillating-cylinder": () => import("./oscillating-cylinder/polish"),
-  "scotch-yoke": () => import("./scotch-yoke/polish"),
-  "hart-inversor": () => import("./hart-inversor/polish"),
-  "rhombic-drive": () => import("./rhombic-drive/polish"),
-  "walschaerts-valve-gear": () => import("./walschaerts-valve-gear/polish"),
-  "drag-link-quick-return": () => import("./drag-link-quick-return/polish"),
-  "hoekens-linkage": () => import("./hoekens-linkage/polish"),
-  "offset-slider-crank": () => import("./offset-slider-crank/polish"),
-  "eccentric-sheave": () => import("./eccentric-sheave/polish"),
-  "klann-linkage": () => import("./klann-linkage/polish"),
-  "watt-six-bar": () => import("./watt-six-bar/polish"),
-  "stephenson-six-bar": () => import("./stephenson-six-bar/polish"),
-  "five-bar": () => import("./five-bar/polish"),
-  "bell-crank": () => import("./bell-crank/polish"),
-  "ackermann-steering": () => import("./ackermann-steering/polish"),
-  "parallelogram-linkage": () => import("./parallelogram-linkage/polish"),
-  antiparallelogram: () => import("./antiparallelogram/polish"),
-  "double-crank": () => import("./double-crank/polish"),
-  "double-rocker": () => import("./double-rocker/polish"),
-  "internal-gear-pair": () => import("./internal-gear-pair/polish"),
-  "sun-and-planet": () => import("./sun-and-planet/polish"),
-  "non-circular-gears": () => import("./non-circular-gears/polish"),
-  "cycloidal-drive": () => import("./cycloidal-drive/polish"),
-  ravigneaux: () => import("./ravigneaux/polish"),
-  wankel: () => import("./wankel/polish"),
-  "star-wheel": () => import("./star-wheel/polish"),
-  "flat-faced-cam": () => import("./flat-faced-cam/polish"),
-  "face-groove-cam": () => import("./face-groove-cam/polish"),
-  "schmidt-coupling": () => import("./schmidt-coupling/polish"),
-  "sprag-clutch": () => import("./sprag-clutch/polish"),
-  "desmodromic-cam": () => import("./desmodromic-cam/polish"),
-  "internal-geneva": () => import("./internal-geneva/polish"),
-  "anchor-escapement": () => import("./anchor-escapement/polish"),
-  "lever-escapement": () => import("./lever-escapement/polish"),
-  "bevel-gears": () => import("./bevel-gears/polish"),
-  "block-and-tackle": () => import("./block-and-tackle/polish"),
-  "belt-drive": () => import("./belt-drive/polish"),
-  "friction-wheel-drive": () => import("./friction-wheel-drive/polish"),
-  "chain-drive": () => import("./chain-drive/polish"),
-  "flexure-hinge": () => import("./flexure-hinge/polish"),
-  "bistable-compliant": () => import("./bistable-compliant/polish"),
-  "worm-drive": () => import("./worm-drive/polish"),
-  "helical-gears": () => import("./helical-gears/polish"),
-};
+/** True when a record is a registered mechanism: its audit sheet is at standard 3.0 or later. */
+export function isBuilt(id: string): boolean {
+  const v = auditedStandard(id);
+  return !!v && compareVersions(v, V3_STANDARD) >= 0;
+}
 
-export const mechanisms: Record<string, () => Promise<MechanismEntry>> = Object.fromEntries(
-  Object.keys(models).map((id) => [id, async () => ({ model: await models[id]!(), polish: (await polishes[id]!()).polish })]),
-);
+/** Every registered mechanism, in catalogue order. */
+export const allIds = (): string[] => loadCatalog().mechanisms.filter((r) => isBuilt(r.id)).map((r) => r.id);
+
+/** The record and polish of a mechanism. */
+export async function loadV3(id: string): Promise<{ record: CatalogRecord; polish?: Polish }> {
+  const record = recordById(id);
+  if (!record) throw new Error(`no catalogue record "${id}"`);
+  const load = polishes3[id];
+  const polish = load ? (await load()).polish : undefined;
+  return { record, ...(polish ? { polish } : {}) };
+}
+
+/** True when an id is a catalogue record (registered or not). */
+export const isKnown = (id: string): boolean => !!recordById(id);

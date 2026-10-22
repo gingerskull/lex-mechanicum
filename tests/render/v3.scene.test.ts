@@ -2,13 +2,12 @@ import { describe, expect, it } from "vitest";
 import { recordById } from "../../src/catalog";
 import { Kinematics } from "../../src/kin/compose";
 import type { Kin } from "../../src/kin/types";
-import { models } from "../../src/mechanisms/models";
-import { buildPackage2 } from "../../src/package/build2";
+import { buildPackage } from "../../src/package/build";
 import { newCache, controlFor, extremes, pathOf, type Ann } from "../../src/render/v3/annotate";
 import { bake, EDGE_RING, EF2, VF } from "../../src/render/v3/bake";
 import { basisOfOrient, fit, namedOrient } from "../../src/render/v3/camera";
-import { hybridPoser, kinPoser, legacyPoser } from "../../src/render/v3/poser";
-import { mulMat, place, rows, runtime, ST, worldBox } from "../../src/render/v3/scene";
+import { kinPoser } from "../../src/render/v3/poser";
+import { place, rows, runtime, ST, worldBox } from "../../src/render/v3/scene";
 import { seeThrough, swept } from "../../src/render/v3/visibility";
 import { ladder } from "../../src/render/detail";
 import { setupInline } from "../../src/solids/setup";
@@ -196,23 +195,21 @@ describe("teaching layers", () => {
 });
 
 describe("posers", () => {
-  it("today's model places the lifted four-bar's solids: the crank turns about O2 and the ground stays", async () => {
-    const b = await buildPackage2("four-bar");
-    const model = await models["four-bar"]!();
-    const P = legacyPoser(model, 20);
-    const crank = b.pkg.solids.find((s) => s.body === "crank" && s.kind === "part")!;
+  it("the record's kinematic block places the four-bar's solids: the crank turns a radian a radian and the ground stays", async () => {
+    const b = await buildPackage("four-bar");
+    const rec = recordById("four-bar") as unknown as { kin: Kin };
+    const P = kinPoser(new Kinematics(rec.kin), undefined, b.pkg.lifts);
+    const crank = b.pkg.solids.find((s) => s.body === "crank")!;
     const ground = b.pkg.solids.find((s) => s.body === "ground")!;
     expect(P.place(ground, 0)).toEqual(P.place(ground, 2));
-    const m0 = mulMat(P.place(crank, 0), [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+    // the crank's rotation from phase 0 to phase 1 is one radian about its axis
+    const m0 = P.place(crank, 0);
     const m1 = P.place(crank, 1);
-    expect(m1[0]).toBeCloseTo(Math.cos(1));
-    expect(m1[1]).toBeCloseTo(Math.sin(1));
-    expect(m0[0]).toBeCloseTo(1);
-    expect(P.point(0, "A")![0]).toBeCloseTo(40);
-    expect(P.span(0, "O2", "A")).toBeCloseTo(40);
+    const turn = Math.atan2(m0[0]! * m1[1]! - m0[1]! * m1[0]!, m0[0]! * m1[0]! + m0[1]! * m1[1]!);
+    expect(Math.abs(turn)).toBeCloseTo(1, 5);
   }, 60_000);
 
-  it("the record's kinematic block gives the same named points, and the hybrid takes them from it", () => {
+  it("the record's kinematic block gives the named points, ghost settings and a sweep", () => {
     const rec = recordById("four-bar") as unknown as { kin: Kin };
     const K = kinPoser(new Kinematics(rec.kin));
     const A = K.point(1.3, "A")!;
@@ -222,19 +219,17 @@ describe("posers", () => {
     // a ghost setting: a longer crank moves the point
     const G = K.point(1.3, "B", { params: { b: 130 } })!;
     expect(Math.hypot(G[0] - 10.7, G[1] - 38.54)).toBeCloseTo(130, 1);
-    const H = hybridPoser(legacyPoser({ parts: [], solve: () => ({ pts: { Q: [1, 2] } }) } as never, 7), K);
-    expect(H.point(0, "Q")).toEqual([1, 2, 7]);
-    expect(H.point(1.3, "A")![0]).toBeCloseTo(10.7, 1);
     // the workspace of a record that gives a sweep
     const sw = K.sweep!("A", undefined, undefined)!;
     expect(sw[0]!.length).toBeGreaterThan(100);
   });
 
-  it("sets up a lifted package in Node as the browser does (decode, tessellate, edges)", async () => {
-    const b = await buildPackage2("four-bar");
+  it("sets up a package in Node as the browser does (decode, tessellate, edges)", async () => {
+    const b = await buildPackage("four-bar");
     const s = await setupInline(await encode2(b.pkg));
     expect(s.meshes.length).toBe(b.pkg.shapes.length);
-    const rt = runtime({ pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: legacyPoser(await models["four-bar"]!(), 10), teaching: null, info: { title: "t", no: "n" } });
+    const rec = recordById("four-bar") as unknown as { kin: Kin };
+    const rt = runtime({ pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: kinPoser(new Kinematics(rec.kin), undefined, s.pkg.lifts), teaching: null, info: { title: "t", no: "n" } });
     expect(rt.baked.nVerts).toBeGreaterThan(10_000);
     expect(rt.fixed.some((f) => f === 0)).toBe(true);
     expect(rt.fixed.some((f) => f === 1)).toBe(true);

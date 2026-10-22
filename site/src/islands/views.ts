@@ -1,5 +1,5 @@
 // The stage's view modes (SS9): Wide (the stage across the layout, the panels below; CSS keeps it to wide screens) and
-// full screen. Shared by the 2.5D stage and the v3 stage; each canvas follows its own CSS size after a mode change.
+// full screen. Each canvas follows its own CSS size after a mode change.
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 

@@ -12,17 +12,50 @@
 import type { Vec2 } from "../core/geom";
 import type { Motion } from "../hardware/solid";
 import type { DriveMotion } from "../solids/drive";
-import type { Joint } from "../rules/types";
 import type { RungId } from "../style/detail";
 import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 import { MESH_GRID } from "../solids/quantise";
 import type { Frame, LoftSection, MeshData, Op, Profile, Vec3 } from "../solids/types";
-import type { PackageBounds } from "./format";
 import type { ConveyPath } from "../solids/convey";
 
 export const FORMAT2 = 2;
 
-/** Bits of `PackedSolid3.flags` (the same bits as package v1). */
+/** The engineering record of a joint (A16): read by the audit and the tools, never shown on the page (P8). */
+export interface Joint {
+  id: string;
+  /** The joint type of its kit (J1 to J13), or a post, the drive or a stop. */
+  type: `J${number}` | "post" | "drive" | "stop";
+  at: Vec2;
+  title: string;
+  note: string;
+  badge?: [string, "ok" | "warn"];
+  d?: number;
+  /** Solid ids that serve each of the ten functions (F1 to F10). */
+  serves: Partial<Record<"F1" | "F2" | "F3" | "F4" | "F5" | "F6" | "F7" | "F8" | "F9" | "F10", string[]>>;
+}
+
+export interface PackageBounds {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+  /** z range of all solids, assembled. */
+  z0: number;
+  z1: number;
+}
+
+/** Finest grid: 1/256 mm. A larger mechanism gets a coarser grid so its farthest point still fits in int16. */
+const MAX_GRID = 256;
+
+/** The finest power-of-two grid on which every |coordinate| up to `max` fits in int16. */
+export function gridFor(max: number): number {
+  let g = MAX_GRID;
+  while (g > 1 && max * g > INT16) g /= 2;
+  if (max * g > INT16) throw new Error(`package: a coordinate of ${max.toFixed(0)} mm does not fit the int16 grid`);
+  return g;
+}
+
+/** Bits of `PackedSolid3.flags`. */
 export const FLAG3 = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32, deform: 256 } as const;
 export type Flag3 = keyof typeof FLAG3;
 
@@ -253,7 +286,7 @@ export async function encode2(p: Package2): Promise<Uint8Array> {
 
 /** Reads a blob written by encode2(). */
 export async function decode2(buf: Uint8Array): Promise<Package2> {
-  if (buf[0] !== MAGIC[0] || buf[1] !== MAGIC[1] || buf[2] !== MAGIC[2]) throw new Error("package: not an .mxp blob");
+  if (buf[0] !== MAGIC[0] || buf[1] !== MAGIC[1] || buf[2] !== MAGIC[2]) throw new Error("package: not a package blob");
   if (buf[3] !== FORMAT2) throw new Error(`package: format ${buf[3]}, this reader knows ${FORMAT2}`);
   return decodeBody2(await pipe(buf.subarray(4), new DecompressionStream("deflate-raw")));
 }

@@ -22,6 +22,7 @@ version: 2.0
 
 const sheet = (version: string, extra = "") => `# Audit: Fixture (fx)
 standard: ${version} · date: 2026-10-16 · result: pass · detail: full · pass: build
+teaching: keep · decisions in the record
 ${extra}
 ## Requirements
 | Id | Status | Evidence / action |
@@ -92,7 +93,7 @@ describe("standard 2.7", () => {
   });
 });
 
-describe("conformance across the two engines (S6)", () => {
+describe("conformance of a 3.0 audit (S6)", () => {
   const SPLIT = `# Mechanism standard
 
 \`\`\`
@@ -119,22 +120,18 @@ ${teaching}
 | K7 | PASS | rotary |
 `;
 
-  it("keeps a 2.5D audit current across the 3.0 HAND changes", () => {
-    // behind only the 2.5D engine's own change (2.0); K8, T1 and R7 bind at the rebuild
-    const behind = evaluate(SPLIT, { fx: sheet("1.0") });
-    expect(behind.mechanisms[0]).toMatchObject({ engine: "2.5D", status: "behind", behind: ["K7", "V5"] });
-    const current = evaluate(SPLIT, { fx: sheet("2.0") });
-    expect(current.mechanisms[0]).toMatchObject({ engine: "2.5D", status: "current", hand: [] });
-    expect(current.failing).toEqual([]);
+  it("holds an audit to every HAND change after it, the 3.0 ones included", () => {
+    const behind = evaluate(SPLIT, { fx: sheet("2.0") });
+    expect(behind.mechanisms[0]).toMatchObject({ status: "behind", behind: expect.arrayContaining(["K8", "T1", "R7"]) });
   });
 
   it("holds a 3.0 audit to the HAND changes after it, and to the teaching line", () => {
     const behind = evaluate(SPLIT, { fx: v3sheet("3.0") });
-    expect(behind.mechanisms[0]).toMatchObject({ engine: "v3", status: "behind", behind: ["R7"] });
+    expect(behind.mechanisms[0]).toMatchObject({ status: "behind", behind: ["R7"] });
     const current = evaluate(SPLIT, { fx: v3sheet("3.1") });
-    expect(current.mechanisms[0]).toMatchObject({ engine: "v3", status: "current" });
+    expect(current.mechanisms[0]).toMatchObject({ status: "current" });
     const none = evaluate(SPLIT, { fx: v3sheet("3.1", "") });
-    expect(none.mechanisms[0]).toMatchObject({ engine: "v3", status: "no teaching" });
+    expect(none.mechanisms[0]).toMatchObject({ status: "no teaching" });
     expect(none.failing).toEqual(["fx"]);
     expect(evaluate(SPLIT, { fx: v3sheet("3.1", "teaching: ? · decisions in the record") }).failing).toEqual(["fx"]);
   });

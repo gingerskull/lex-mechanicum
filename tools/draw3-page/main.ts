@@ -1,17 +1,16 @@
-// The drawing page of the 3D renderer: tools/chrome3.ts loads it in local Chrome and calls the functions it puts on
-// window (shot, bench, lose). Packages (v2) and the records' teaching and kin blocks come from the page's server; every
-// drawing on the page shares one GPU context, as on the site.
+// The drawing page of the 3D renderer: every tool that draws (shot3, thumbs, bench3, compare, the visual snapshots) loads
+// it in local Chrome through tools/chrome3.ts and calls the functions it puts on window (shot, bench, lose). Packages (v2)
+// and the records' teaching and kin blocks come from the page's server; every drawing on the page shares one GPU context,
+// as on the site.
 import { compose, differ } from "../page-image";
 import type { Kin, Teaching } from "../../src/catalog/kin";
 import { Kinematics } from "../../src/kin/compose";
 import type { Controls, Kin as KinLib } from "../../src/kin/types";
-import { models } from "../../src/mechanisms/models";
-import type { MechanismModel } from "../../src/model/types";
 import { browserFactory } from "../../src/render/canvas";
 import type { Dial } from "../../src/render/detail";
 import { ghostItems, ghostPoser } from "../../tests/fixtures/ghost3";
 import { gpu3, loseContext } from "../../src/render/v3/gpu";
-import { hybridPoser, kinPoser, legacyPoser, staticPoser, type Poser } from "../../src/render/v3/poser";
+import { kinPoser, staticPoser, type Poser } from "../../src/render/v3/poser";
 import type { Scene } from "../../src/render/v3/scene";
 import { createSession3, recordDrawView, type DrawView3, type Session3 } from "../../src/render/v3/session";
 import { parseView, viewsOf, type ViewState } from "../../src/render/v3/views";
@@ -23,8 +22,6 @@ export interface Meta {
   name: string;
   teaching: Teaching | null;
   kin: Kin | null;
-  /** A 2.5D mechanism drawn lifted (before its rebuild): its model poses the bodies. A v3 one is posed by its record. */
-  lifted?: boolean;
 }
 
 /** One drawing: canvas size in CSS px, pixel ratio, phase, and the view over the record's own. */
@@ -43,7 +40,7 @@ export interface Draw3Options {
   controls?: Controls;
   /** A detail window on a named point or a world point: the drawing magnified about it. */
   zoom?: { centre: string | Vec3; scale: number; name?: string };
-  /** Moves a record section's cut plane (the lifted pilots' z differs from the record's frame until the new builders place solids by the record). */
+  /** Moves a record section's cut plane. */
   sectionShift?: Vec3;
   over?: Partial<DrawView3>;
 }
@@ -58,20 +55,16 @@ const stamp = () => document.body.dataset.v ?? "";
 interface Loaded {
   scene: Scene;
   meta: Meta;
-  model: MechanismModel | null;
   setupMs: number;
 }
 const cache = new Map<string, Promise<Loaded>>();
 
 const bytes = async (url: string) => new Uint8Array(await (await fetch(`${url}?v=${stamp()}`)).arrayBuffer());
 
-function poserFor(l: { meta: Meta; model: MechanismModel | null; z: number; id?: string; lifts?: Record<string, [number, number, number, number]> }, controls?: Controls): Poser {
+function poserFor(l: { meta: Meta; id?: string; lifts?: Record<string, [number, number, number, number]> }, controls?: Controls): Poser {
   if (l.id === "fx3-ghost") return ghostPoser;
-  const legacy: Poser = l.model ? legacyPoser(l.model, l.z) : staticPoser;
-  if (!l.meta.kin) return legacy;
-  const kin = kinPoser(new Kinematics(l.meta.kin as unknown as KinLib), controls, l.model ? undefined : l.lifts);
-  // a record built by the v3 builder is posed by its own kinematics; a lifted 2.5D mechanism by its model
-  return l.model ? hybridPoser(legacy, kin) : kin;
+  if (!l.meta.kin) return staticPoser;
+  return kinPoser(new Kinematics(l.meta.kin as unknown as KinLib), controls, l.lifts);
 }
 
 async function load(id: string): Promise<Loaded> {
@@ -82,11 +75,10 @@ async function load(id: string): Promise<Loaded> {
     const t0 = performance.now();
     const s = await setupInline(blob);
     const setupMs = performance.now() - t0;
-    const model = meta.lifted !== false && models[id] ? await models[id]!() : null;
     const axes: Record<string, Vec3> = {};
     for (const j of meta.kin?.joints ?? []) if (Array.isArray(j.axis) && j.axis.length >= 3) axes[j.id] = [j.axis[0] as number, j.axis[1] as number, j.axis[2] as number];
-    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, model, z: s.pkg.bounds.z1, id, lifts: s.pkg.lifts }), teaching: meta.teaching, axes, ...(id === "fx3-ghost" ? { items: ghostItems } : {}), info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
-    return { scene, meta, model, setupMs };
+    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, id, lifts: s.pkg.lifts }), teaching: meta.teaching, axes, ...(id === "fx3-ghost" ? { items: ghostItems } : {}), info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
+    return { scene, meta, setupMs };
   })();
   cache.set(id, p);
   return p;
@@ -121,7 +113,7 @@ async function session(id: string, o: Draw3Options): Promise<{ sess: Session3; s
   const b0 = performance.now();
   const sess = createSession3(canvas, l.scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
   const bakeMs = performance.now() - b0;
-  if (o.controls) sess.setPoser(poserFor({ meta: l.meta, model: l.model, z: l.scene.pkg.bounds.z1, id, lifts: l.scene.pkg.lifts }, o.controls));
+  if (o.controls) sess.setPoser(poserFor({ meta: l.meta, id, lifts: l.scene.pkg.lifts }, o.controls));
   return { sess, scene: sess.scene, setupMs: l.setupMs, bakeMs };
 }
 

@@ -82,9 +82,6 @@ export const NUTS: Record<number, { s: number; m: number }> = {
   8: { s: 13, m: 8 }, 10: { s: 16, m: 10 },
 };
 
-/** Thin jam nuts DIN 439: heights (widths across flats as NUTS). */
-export const JAM_NUTS: Record<number, { m: number }> = { 3: { m: 1.8 }, 4: { m: 2.2 }, 5: { m: 2.7 }, 6: { m: 3.2 }, 8: { m: 4 } };
-
 /** Plain washers ISO 7089: outside Ø and thickness. */
 export const WASHERS: Record<number, { D: number; h: number }> = {
   2: { D: 5, h: 0.3 }, 2.5: { D: 6, h: 0.5 }, 3: { D: 7, h: 0.5 }, 4: { D: 9, h: 0.8 }, 5: { D: 10, h: 1 }, 6: { D: 12, h: 1.6 },
@@ -149,15 +146,11 @@ export const KEYS: readonly { over: number; upTo: number; b: number; h: number; 
 ];
 export const keyFor = (d: number) => (d <= 8 ? null : (KEYS.find((k) => d > k.over && d <= k.upTo) ?? KEYS[KEYS.length - 1]!));
 
-/** Shaft Ø series (R2). */
-export const SHAFTS = [6, 8, 10, 12] as const;
-
 /** GT2 timing pulleys: teeth, pitch Ø, outside Ø, flange Ø. Belt 6 mm wide, 1.38 thick. */
 export const PULLEYS: Record<16 | 32, { T: number; pd: number; od: number; fd: number }> = {
   16: { T: 16, pd: 10.19, od: 9.68, fd: 14 },
   32: { T: 32, pd: 20.37, od: 19.86, fd: 24 },
 };
-export const BELT = { width: 6, thick: 1.38 };
 
 /** Compression springs: wire Ø, outside Ø, free length, rate N/mm. */
 export const SPRINGS: readonly { wire: number; D: number; L0: number; rate: number }[] = [
@@ -175,9 +168,6 @@ export const SENSOR = { w: 12, l: 25, h: 10, slot: 5, depth: 8, vane: 1 };
 
 /** Standoffs: Ø10 hex-free round, with an Ø6 h7 spigot when the plate holds a bearing (A6). */
 export const STANDOFF = { D: 10, M: 5, spigotD: 6, spigotH: 3 };
-
-/** Dowel pins ISO 8734, h6. */
-export const DOWELS = [3, 4] as const;
 
 /** Brushless pancake outrunner (V1) and the brushed alternative. */
 export const MOTORS = {

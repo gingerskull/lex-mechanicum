@@ -1,10 +1,6 @@
 // What the renderer asks of a mechanism's kinematics, whatever produced them: where each solid's body is at cycle phase u
-// (a 4 x 4 matrix from the body's local frame to the world, column-major), and where a named point is. Two adapters: the
-// kinematic library of a record's `kin` block (src/kin), and today's 2.5D model, for the lifted pilots while both engines
-// live on the branch. A controls object overrides settings for a ghost trace (SD23).
-import { frameAxis } from "../../core/axis";
-import { poseOf } from "../../model/pose";
-import type { MechanismModel } from "../../model/types";
+// (a 4 x 4 matrix from the body's local frame to the world, column-major), and where a named point is: the kinematic
+// library of a record's `kin` block (src/kin). A controls object overrides settings for a ghost trace (SD23).
 import { Kinematics, anchorAt, handStroke } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
@@ -72,8 +68,6 @@ const rawPoint = (P: { points: Map<string, Vec3>; bodies: Map<string, Xf> }, n: 
 
 /** How far a teaching point is carried onto its body's top face at most, mm: a deep stack of slabs, no more. */
 const LIFT_REACH = 40;
-
-const m4 = (X: Vec3, Y: Vec3, Z: Vec3, T: Vec3): Mat4 => [X[0], X[1], X[2], 0, Y[0], Y[1], Y[2], 0, Z[0], Z[1], Z[2], 0, T[0], T[1], T[2], 1];
 
 /** A kin body pose (reference configuration to now) as a matrix. */
 function fromXf(X: Xf): Mat4 {
@@ -282,85 +276,5 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   };
 }
 
-/** The axis conventions of today's model: a part's 2D pose (x, y, angle) is in the plane normal to its axis. */
-export function planeMatrix(axis: "x" | "y" | "z" | "p", pose: [number, number, number], frame?: { o: Vec3; u: Vec3; v: Vec3 }): Mat4 {
-  const [px, py, a] = pose;
-  const c = Math.cos(a), s = Math.sin(a);
-  if (axis === "p" && frame) {
-    const f = frame;
-    const Z = frameAxis(f);
-    return m4([c * f.u[0] + s * f.v[0], c * f.u[1] + s * f.v[1], c * f.u[2] + s * f.v[2]], [-s * f.u[0] + c * f.v[0], -s * f.u[1] + c * f.v[1], -s * f.u[2] + c * f.v[2]], Z, [f.o[0] + px * f.u[0] + py * f.v[0], f.o[1] + px * f.u[1] + py * f.v[1], f.o[2] + px * f.u[2] + py * f.v[2]]);
-  }
-  if (axis === "x") return m4([0, c, s], [0, -s, c], [1, 0, 0], [0, px, py]);
-  if (axis === "y") return m4([c, 0, s], [-s, 0, c], [0, 1, 0], [px, 0, py]);
-  return m4([c, s, 0], [-s, c, 0], [0, 0, 1], [px, py, 0]);
-}
-
-/**
- * Today's model as a poser, for the lifted pilots. `z` is the height the model's 2D points are drawn at (a trace rides
- * at the top of the stack). A solid's frame holds its placement in the body's plane (src/solids/lift.ts), so the matrix
- * is the body's 2D pose carried into the world by the solid's own axis.
- */
-export function legacyPoser(model: MechanismModel, z: number): Poser {
-  const parts = new Map(model.parts.map((p) => [p.id, p]));
-  let at = NaN;
-  let S: ReturnType<MechanismModel["solve"]> | null = null;
-  const solved = (u: number) => {
-    if (u !== at || !S) {
-      S = model.solve(u);
-      at = u;
-    }
-    return S;
-  };
-  return {
-    period: Math.PI * 2,
-    place: (s, u) => {
-      const part = parts.get(s.body);
-      if (!part) return ID4;
-      const S2 = solved(u);
-      const q = poseOf(part, S2);
-      if (!q) return ID4;
-      const axis = s.legacyAxis ?? "z";
-      const f = axis === "p" && s.posedBy ? S2.frames?.[s.posedBy] : undefined;
-      return planeMatrix(axis, q, f);
-    },
-    point: (u, id) => {
-      const p = solved(u).pts[id];
-      return p ? [p[0], p[1], z] : null;
-    },
-    span: (u, a, b) => {
-      const P = solved(u).pts;
-      const A = P[a];
-      const B = P[b];
-      return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1]) : null;
-    },
-  };
-}
-
-/**
- * Bodies from one poser, points from another: today's model places the lifted pilots' solids while a record's kinematic
- * block, where it solves, gives the named points the teaching layers use. A point the second poser cannot give comes from
- * the first.
- */
-export function hybridPoser(bodies: Poser, points: Poser): Poser {
-  const safe = <T>(f: () => T | null): T | null => {
-    try {
-      return f();
-    } catch {
-      return null;
-    }
-  };
-  return {
-    period: bodies.period,
-    place: (s, u) => bodies.place(s, u),
-    point: (u, id, ctl) => safe(() => points.point(u, id, ctl)) ?? (ctl ? null : bodies.point(u, id)),
-    span: (u, a, b) => bodies.span(u, a, b) ?? safe(() => points.span(u, a, b)),
-    ...(points.body ? { body: (u: number, id: string, ctl?: Controls) => safe(() => points.body!(u, id, ctl)) } : {}),
-    ...(points.sweep ? { sweep: (pt: string, r?: [number, number], br?: string[]) => safe(() => points.sweep!(pt, r, br)) } : {}),
-    ...(points.rawPoint ? { rawPoint: (u: number, id: string) => safe(() => points.rawPoint!(u, id)) } : {}),
-    ...(points.phaseOf ? { phaseOf: (o: string, st: "max" | "min") => safe(() => points.phaseOf!(o, st)) } : {}),
-  };
-}
-
-/** A poser of nothing moving (a fixture of static solids, a package drawn without its model). */
+/** A poser of nothing moving (a fixture of static solids, a package drawn without its kinematics). */
 export const staticPoser: Poser = { period: Math.PI * 2, place: () => ID4, point: () => null, span: () => null };

@@ -44,7 +44,6 @@ export type MarkKind = (typeof MARK_KINDS)[number];
 export const EFFECTS = [
   "grain", // paper tooth
   "wallShade", // stepped ink shade on side walls
-  "innerSilhouettes", // silhouette lines on slices below the top slice
   "fullDpr", // device pixel ratio above 1
   "rolePatterns", // role surface patterns
   "hiddenLines", // dashed copies of covered edges

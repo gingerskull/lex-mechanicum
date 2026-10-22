@@ -1,10 +1,10 @@
-// npx tsx tools/shot3.ts <id> [--view record|PLAN|FRONT|SIDE|ISOMETRIC|DIMETRIC|"AUX O2"|"VIEW 30 40"|<view id>] [--theme dark|light]
+// npx tsx tools/shot3.ts (npm run shot --) <id> [--view record|PLAN|FRONT|SIDE|ISOMETRIC|DIMETRIC|"AUX O2"|"VIEW 30 40"|<view id>] [--theme dark|light]
 //   [--explode 0] [--detail full] [--u 1.1] [--w 1393] [--h 870] [--dpr 1.5] [--card] [--params a=1,b=2]
 //   [--select name=option] [--drivers speed=120] [out.png]
 // Draws one frame of a mechanism with the 3D renderer, in local Chrome (tools/chrome3.ts), to a PNG.
 // --set [dir] draws the set of standard Q4 instead: the record's default view, PLAN, FRONT, SIDE and ISOMETRIC, every
 // section and detail view of the record, and the full explode, each on both sheets, with the overlays on, into
-// dist/shots3/<id> (or dir). tools/shot forwards a mechanism rebuilt on engine v3 here.
+// dist/shots3/<id> (or dir).
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

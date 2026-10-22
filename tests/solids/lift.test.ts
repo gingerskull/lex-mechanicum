@@ -1,4 +1,4 @@
-// The 2.5D bridge: a lifted solid is the same outline, extruded over its z range, placed by its pose.
+// The primitives lifted to Solid3: a lifted solid is the same outline, extruded over its z range, placed by its pose.
 import { describe, expect, it } from "vitest";
 import { solid } from "../../src/hardware/solid";
 import { liftSolid } from "../../src/solids/lift";

@@ -1,7 +1,7 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.3
+version: 3.4
 date: 2026-10-22
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
@@ -146,8 +146,7 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 8. **Paper tooth** over the drawing.
 9. **Traces:** ghost paths, teaching traces with ticks, the comet, phantom positions, construction overlays, explode
    trail lines, the joint highlight callout (SD12, SD21 to SD24).
-10. **Sheet frame**, zone marks, title block (detail stage only), with the view name and the detail dial position, and
-    the 3D stamp during the transition (SS13).
+10. **Sheet frame**, zone marks, title block (detail stage only), with the view name and the detail dial position.
 11. **Overlays:** forces, velocity, angles, labels.
 
 ## Requirements
@@ -204,7 +203,7 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. |
 | SS11 | **Motion on the page is minimal:** short colour and border transitions (≤ .2 s). The only continuous motion is the mechanisms themselves. |
 | SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer, and under it, centred, the set's mark faded in the sheet's ink (`--mark`). The favicon is the same mark in the ink of the sheet that matches the browser's scheme. |
-| SS13 | **Transition stamp.** While both engines are on main, a page or card drawn by the v3 engine carries a visible 3D stamp: in the title block of its stage and on its library card. It leaves with the old engine at cut-over. |
+| SS13 | **No engine mark.** One engine draws every page and card, so neither the title block nor a library card marks the engine that drew it. The 3D stamp of the transition left with the 2.5D engine at cut-over. |
 
 ---
 
@@ -290,8 +289,6 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.majorAlpha` | 0.14 | 0..1 |
 | `draft.grid.minorWidth` | 0.5 | px |
 | `draft.grid.majorWidth` | 0.8 | px |
-| `draft.gpu.samples` | 8 | antialiasing samples per pixel |
-| `draft.gpu.samplesDense` | 4 | coarse pointer or device pixel ratio of 2 and more |
 | `draft.card.detail` | `B` | detail dial position of a card drawing (DL): sharp, with wall shading |
 | `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
 | `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
@@ -433,7 +430,6 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.centre.width` | 0.6 | px |
 | `draft.centre.alpha` | 0.5 | 0..1 |
 | `draft.centre.overshoot` | 6 | px past the head |
-| `draft.centre.maxTilt` | 60 | degrees, hidden at and above this tilt |
 | `draft.centre.endOnDeg` | 8 | degrees, an axis this close to the view direction is drawn as a centre cross (3D renderer) |
 | `draft.centre.cross` | 6 | px, half length of the centre cross seen end-on (3D renderer) |
 | `draft.centre.minScale` | 0.8 | px per mm, hidden when the drawing is smaller than this |
@@ -449,7 +445,6 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.dims.labelPaper` | 0.95 | 0..1, paper alpha of the knock-out |
 | `draft.dims.labelGain` | 0.25 | added to alpha for the label text (capped at 1) |
 | `draft.dims.minDepthPx` | 40 | px, depth label only when the projected depth is at least this |
-| `draft.dims.minCos` | 0.2 | dimensions drawn only when cos(tilt) is above this |
 | `draft.sheet.inset` | 10 | px, outer border from the canvas edge |
 | `draft.sheet.innerOffset` | 4 | px, inner border inside the outer one |
 | `draft.sheet.outer.width` | 1 | px, 0..1 |
@@ -476,12 +471,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.sheet.titleKeyY` | 5 | px, key baseline from the row top |
 | `draft.sheet.titleValueX` | 40 | px, value inset |
 | `draft.sheet.titleValueMargin` | 44 | px, value truncated to the cell width less this |
-| `draft.sheet.planTilt` | 8 | degrees, VIEW reads PLAN at or below this |
-| `draft.sheet.elevationTilt` | 80 | degrees, VIEW reads ELEVATION at or above this; also the side view of the detail ladder |
-| `draft.sheet.defaultTilt` | 28 | degrees, the view when none is given |
-| `draft.sheet.stamp.text` | `3D` | the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha |
-| `draft.sheet.stamp.width` | 0.8 | the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha |
-| `draft.sheet.stamp.alpha` | 0.85 | the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha |
+| `draft.sheet.elevationTilt` | 80 | degrees, the side view of the detail ladder at or above this tilt |
 | `draft.overlays.forces.color` | `accent` |  |
 | `draft.overlays.forces.alpha` | 1 |  |
 | `draft.overlays.forcesWarn.color` | `warn` |  |
@@ -496,15 +486,11 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.border.alpha` | 0.35 | label panel hairline |
 | `draft.overlays.width` | 1.6 | px, force and velocity arrows |
 | `draft.overlays.arrow` | 10 | px, force arrowhead |
-| `draft.overlays.arrowSmall` | 9 | px, axial and spin arrowheads |
 | `draft.overlays.arrowDim` | 7 | px, dimension arrowheads |
 | `draft.overlays.shortLine` | 70 | px, a construction line shorter than this carries its label past its far end |
 | `draft.overlays.shortGap` | 8 | px, gap from that end to the label |
 | `draft.overlays.arrowAngle` | 0.42 | radians, arrowhead half-angle |
-| `draft.overlays.axialDash` | [5, 4] | px |
-| `draft.overlays.axialOvershoot` | 14 | px past each end |
 | `draft.overlays.angleR` | 22 | mm, default angle arc radius |
-| `draft.overlays.spinR` | 24 | mm, default spin arc radius |
 | `draft.overlays.angleGuide.width` | 1 | px, 0..1, px, factor on radius |
 | `draft.overlays.angleGuide.alpha` | 0.55 | px, 0..1, px, factor on radius |
 | `draft.overlays.angleGuide.dash` | [3, 3] | px, 0..1, px, factor on radius |
@@ -588,10 +574,6 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 <!-- style-form:start (generated, do not edit) -->
 | Knob | Value | Unit and use |
 |---|---|---|
-| `form.base.cornerR` | 12 | mm, plan corner radius of every base plate (true circular arcs) |
-| `form.base.margin` | 16 | mm, clearance from the swept envelope to the plate edge |
-| `form.base.footR` | 6.5 | mm, rubber foot radius; feet sit on the corner-arc centres |
-| `form.base.mountHoleR` | 2.8 | mm, counterbored mounting hole radius at each corner centre |
 | `form.chamfer.scale` | 1.5 | factor |
 | `form.chamfer.plate` | 0.8 | mm |
 | `form.chamfer.standoff` | 0.6 | mm |
@@ -600,12 +582,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `form.chamfer.head` | 0.45 | mm |
 | `form.chamfer.button` | 0.6 | mm |
 | `form.chamfer.csk` | 0 | mm, countersunk heads get none |
-| `form.thread.show` | true | helix lines on threaded shanks |
-| `form.thread.minPitchPx` | 2.4 | CSS px, drawn pitch floor: real pitch or this, whichever is coarser |
 | `form.thread.pitch` | function (see source) | mm, ISO coarse pitch for Ø d mm |
-| `form.fasteners.shanks` | true | every screw head gets its threaded shank into the part it fastens (stage 3) |
-| `form.fasteners.holes` | true | every plate a shank passes gets a clearance hole, tapped where it ends |
-| `form.fasteners.clearance` | 0.3 | mm, radial clearance of a through hole |
 | `form.explode.gap` | 11 | mm per explode level at full explode |
 | `form.explode.clear` | 0.5 | levels, how far a screw backs out past the topmost part it passes |
 <!-- style-form:end -->
@@ -619,7 +596,7 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 |---|---|---|---|
 | A | Paper grain, bearing balls and cages, motor internals | kinds: bearingBalls, bearingCage, motorInternal; effects: grain |  |
 | B | Manufacturing marks | marks: chamfer, boreEntry, headFlute, hexSocket, knurl, keyway, thread | atSide: skip |
-| C | Wall shading, inner-slice silhouettes, deep depth layers | effects: wallShade, innerSilhouettes, deepLayers |  |
+| C | Wall shading, deep depth layers | effects: wallShade, deepLayers |  |
 | D | Stack hardware inside a joint | kinds: spacer, washer, thrustWasher, waveWasher, sleeve, shim, circlipInternal | whenExplode: draw |
 | E | Service and sensing parts, timing marks | kinds: nipple, felt, wiper, flag, sensor, terminalBlock, cableClip, lead; marks: oilSink, timing |  |
 | F | Role surface patterns | effects: rolePatterns |  |
@@ -676,6 +653,11 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 
 ## Changelog
 
+- **3.4 (2026-10-22).** Cut-over: the 2.5D renderer is gone and the 3D stamp leaves the title block and the library
+  cards; no page or card marks its engine [SS13, SITE]. The knobs only the 2.5D renderer and build read leave Part VI
+  (the stamp, `draft.gpu`, the centreline and dimension tilt limits, the plan and default tilts, the axial and spin
+  overlay knobs, `form.base`, `form.fasteners`, the drawn thread pitch floor), and rung C no longer lists the slice
+  silhouettes, an effect the depth renderer never had [SD18, STYLE].
 - **3.3 (2026-10-22).** The sheet switch shows one cog, turned 180° on Blueprint and as drawn on Drafting, in place of the
   sun and moon; its name and tooltip read "Switch to Blueprint" / "Switch to Drafting" (SS7).
 - **3.2 (2026-10-22).** The library's bar has a Sort button beside Filters with a menu of orders, New by default,

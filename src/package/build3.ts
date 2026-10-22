@@ -1,11 +1,9 @@
-// Build-time packaging of a mechanism rebuilt on engine v3 (Node only): the record built by the hardware builder, every
-// solid meshed by Manifold and checked (D11), the traces sampled from the record's kin block, and the shapes packed.
-// The 2.5D route (build2.ts) lifts a v1 build; this one has no model: poses come from the record's own kinematics.
+// Build-time packaging (Node only, standard R4): the record built by the hardware builder, every solid meshed by
+// Manifold and checked (D11), the traces sampled from the record's kin block, and the shapes packed as package v2.
 import type { CatalogRecord } from "../catalog/schema";
 import { buildAssembly, type Assembly, type Polish } from "../builder";
 import { makePoseSource } from "../builder/poses";
 import { xfMat } from "../builder/sweeps";
-import type { Joint } from "../rules/types";
 import type { Kin } from "../kin/types";
 import { xf } from "../kin/math";
 import { checkMesh, type SolidReport } from "../solids/check";
@@ -13,9 +11,8 @@ import { mat4 } from "../solids/frame";
 import { cleanProfile, manifold, meshOf } from "../solids/manifold";
 import { quantise } from "../solids/quantise";
 import type { Solid3 } from "../solids/types";
-import type { Sampled } from "../model/sample";
-import type { Package2 } from "./format2";
-import { pack2 } from "./pack2";
+import type { Joint, Package2 } from "./format2";
+import { pack2, type Sampled } from "./pack2";
 import { parseHeader, readAudit } from "../audit/sheet";
 
 export interface Built3 {

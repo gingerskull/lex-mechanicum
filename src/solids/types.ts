@@ -99,7 +99,7 @@ export interface Solid3 {
   body: string;
   /** Placement on the body. */
   frame: Frame;
-  /** When the body's pose is a solved frame (src/core/axis.ts Frame3), its key: the part is posed by it every phase. */
+  /** When the body's pose is a solved frame, its key: the part is posed by it every phase. */
   posedBy?: string;
   profile: Profile;
   op: Op;
@@ -142,8 +142,8 @@ export interface Solid3 {
   reach?: { to: Vec3; end: 0 | 1 };
   flags: { inset?: boolean; accent?: boolean; faint?: boolean; isBase?: boolean; headTop?: boolean; seeThrough?: boolean };
   /**
-   * Lifted 2.5D solids only (src/solids/lift.ts): the plane convention of the body's 2D pose when the part's axis is
-   * x, y or posed (src/core/axis.ts). A solid the new builders make has none; its frame says everything.
+   * Lifted hardware primitives only (src/solids/lift.ts): the plane convention of a primitive made on an x, y or posed
+   * axis (src/core/axis.ts). A solid the builders make natively has none; its frame says everything.
    */
   legacyAxis?: "x" | "y" | "p";
   /** Sizes of round parts and free text for the audit. */

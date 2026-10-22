@@ -1,7 +1,7 @@
 // The pilots through the whole v3 path: every solid meshes in Manifold, the browser's tessellation of the shipped shapes
 // is as sound and as big as Manifold's, and the browser setup returns the same arrays on every run.
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildPackage2, type Built2 } from "../../src/package/build2";
+import { buildPackage, type Built } from "../../src/package/build";
 import { encode2 } from "../../src/package/format2";
 import { checkMesh } from "../../src/solids/check";
 import { manifold, meshOf } from "../../src/solids/manifold";
@@ -13,12 +13,12 @@ import { setupForWorker, setupInline } from "../../src/solids/setup";
 import { volume } from "../../src/solids/tessellate";
 
 const PILOTS = ["four-bar", "spur-gears", "bevel-gears", "helical-gears", "worm-drive"];
-const built: Record<string, Built2> = {};
+const built: Record<string, Built> = {};
 let M: Awaited<ReturnType<typeof manifold>>;
 
 beforeAll(async () => {
   M = await manifold();
-  for (const id of PILOTS) built[id] = await buildPackage2(id);
+  for (const id of PILOTS) built[id] = await buildPackage(id);
 }, 180_000);
 
 describe.each(PILOTS)("%s", (id) => {

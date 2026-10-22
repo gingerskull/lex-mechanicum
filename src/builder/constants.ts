@@ -1,6 +1,5 @@
 // Sizes the builder shares. The slab pitch is the plate thickness plus the gap an inner-race spacer or a thrust washer
-// leaves between two plates on one axis; the values are the 2.5D engine's LAYER and THICK, which the hand layers
-// of the audited mechanisms were measured in.
+// leaves between two plates on one axis; the hand-set layers of the first builds were measured in the same values.
 /** Plate thickness, mm. */
 export const THICK = 6;
 /** Distance from one slab of a stack to the next, mm. */

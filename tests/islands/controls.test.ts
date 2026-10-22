@@ -1,10 +1,8 @@
-// What a v3 stage offers from a record (SS5, T14): the sliders and choices of `teaching.controls`, the section and detail
-// buttons of `teaching.views`, and which mechanisms the site draws with the v3 engine (SS13).
-import { afterEach, describe, expect, it } from "vitest";
+// What a stage offers from a record (SS5, T14): the sliders and choices of `teaching.controls`, and the section and detail
+// buttons of `teaching.views`.
+import { describe, expect, it } from "vitest";
 import { recordById } from "../../src/catalog";
 import { controlsOf, viewButtons } from "../../site/src/data";
-import { drawnBy3 } from "../../site/src/drawn";
-import { allIds, engineOf } from "../../src/checks/engine";
 
 const rec = (id: string) => recordById(id)!;
 
@@ -45,29 +43,5 @@ describe("the stage's controls from a record", () => {
     expect(viewButtons(rec("worm-drive"))).toEqual([{ id: "A-A", kind: "section" }]);
     expect(viewButtons(rec("lever-escapement"))).toEqual([{ id: "stones", kind: "detail" }]);
     expect(viewButtons(rec("four-bar"))).toEqual([]);
-  });
-});
-
-describe("which mechanisms the site draws with the v3 engine", () => {
-  const was = process.env.SITE_V3;
-  afterEach(() => {
-    if (was === undefined) delete process.env.SITE_V3;
-    else process.env.SITE_V3 = was;
-  });
-
-  it("draws none by default, the listed ones on request, and all with 'all'", () => {
-    delete process.env.SITE_V3;
-    // a mechanism audited at 3.0 (the pilots) is always drawn by v3; the others only on request
-    expect(drawnBy3("four-bar")).toBe(true);
-    // three mechanisms still on the 2.5D engine (the rebuild moves them over one batch at a time)
-    const [a, b, c] = allIds().filter((id) => engineOf(id) === "2.5D");
-    if (!a || !b || !c) return;
-    expect(drawnBy3(a)).toBe(false);
-    process.env.SITE_V3 = `${a}, ${b}`;
-    expect(drawnBy3(a)).toBe(true);
-    expect(drawnBy3(b)).toBe(true);
-    expect(drawnBy3(c)).toBe(false);
-    process.env.SITE_V3 = "all";
-    expect(drawnBy3(c)).toBe(true);
   });
 });

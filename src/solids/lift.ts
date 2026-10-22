@@ -1,8 +1,7 @@
-// A bridge for the pilots while both engines live on the branch: today's 2.5D solids (an outline with a z range on a
-// body) lifted to Solid3. Every lifted solid is a plain extrusion of its outline, so the whole assembly ships as
-// profiles; the new builders (E5) make revolves, sweeps and booleans natively. A lifted solid keeps the legacy plane
-// convention of its body (`legacyAxis`) because the body's 2D pose is in that plane; it goes when the cut-over removes
-// the 2.5D engine.
+// The hardware primitives (src/hardware: an outline with a z range on a body) as Solid3, for the builder's `place`
+// (src/builder/frames.ts), which carries them onto a joint frame. Every lifted solid is a plain extrusion of its outline;
+// the builders make revolves, sweeps and booleans natively. A primitive made on an x, y or posed axis keeps that plane
+// convention (`legacyAxis`).
 import { TAU } from "../core/geom";
 import type { Solid } from "../hardware/solid";
 import { atPose } from "./frame";
@@ -12,7 +11,7 @@ import type { Op, Solid3 } from "./types";
 /** A helical solid turns its outline when it winds at most a quarter turn; further it carries thread marks (a screw). */
 const twisted = (s: Solid): boolean => s.helix !== undefined && Math.abs((TAU * (s.z1 - s.z0)) / s.helix) <= Math.PI / 2;
 
-/** Today's solid as a v3 solid. */
+/** A primitive's solid as a v3 solid. */
 export function liftSolid(s: Solid): Solid3 {
   const h = s.z1 - s.z0;
   const turn = twisted(s) ? (360 * h) / s.helix! : 0;
@@ -59,5 +58,3 @@ export function liftSolid(s: Solid): Solid3 {
   if (s.D !== undefined) out.D = s.D;
   return out;
 }
-
-export const liftAll = (solids: readonly Solid[]): Solid3[] => solids.map(liftSolid);

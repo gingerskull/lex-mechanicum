@@ -1,5 +1,5 @@
-// Browser-side image helpers shared by the drawing pages of both renderers (tools/draw-page, tools/draw3-page): compare two
-// images and lay images out on a sheet. Used through the pages by tools/chrome.ts and tools/chrome3.ts.
+// Browser-side image helpers of the drawing page (tools/draw3-page): compare two images and lay images out on a sheet.
+// Used through the page by tools/chrome3.ts.
 
 /** Pixels of two images (data URLs, same size) whose channels differ by more than `tolerance` of 255. */
 export async function differ(a: string, b: string, tolerance: number): Promise<number> {

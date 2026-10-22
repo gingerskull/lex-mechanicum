@@ -1,21 +1,21 @@
-// Which engine a mechanism is on, and the result cache of the 3D checks.
+// The registry (a mechanism is a record audited at 3.0 or later), and the result cache of the 3D checks.
 import { mkdtempSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { allIds, auditedStandard, engineOf, isKnown, V3_STANDARD } from "../../src/checks/engine";
 import { compareVersions } from "../../src/audit/sheet";
+import { loadCatalog } from "../../src/catalog";
 import { cacheKey, check3d, PROFILES } from "../../src/checks/run";
-import { mechanisms } from "../../src/mechanisms";
+import { allIds, auditedStandard, isBuilt, isKnown, V3_STANDARD } from "../../src/mechanisms";
 import { pin, plate, slidingPlacer } from "../fixtures/clash3";
 
-describe("engineOf", () => {
-  it("puts every registered mechanism on the 2.5D engine until its audit is at 3.0 or later (S6)", () => {
-    for (const id of Object.keys(mechanisms)) {
-      const v = auditedStandard(id);
-      expect(engineOf(id), id).toBe(v && compareVersions(v, V3_STANDARD) >= 0 ? "v3" : "2.5D");
-    }
-    expect(allIds()).toEqual(expect.arrayContaining(Object.keys(mechanisms)));
+describe("the registry", () => {
+  it("registers every record whose audit is at 3.0 or later, in catalogue order", () => {
+    const ids = allIds();
+    expect(ids.length).toBeGreaterThan(0);
+    for (const id of ids) expect(compareVersions(auditedStandard(id)!, V3_STANDARD), id).toBeGreaterThanOrEqual(0);
+    const order = loadCatalog().mechanisms.map((r) => r.id).filter(isBuilt);
+    expect(ids).toEqual(order);
     expect(isKnown("four-bar")).toBe(true);
     expect(isKnown("no-such-mechanism")).toBe(false);
   });
@@ -23,7 +23,7 @@ describe("engineOf", () => {
 
 describe("check3d and its cache", () => {
   const solids = [plate("a", "ground", [0, 0, 100, 100], 0, 5), plate("b", "mover", [120, 0, 220, 100], 3, 8), pin("p", "mover", 160, 50, 5, 0, 20)];
-  const src = { id: "fx-cache", engine: "v3" as const, solids, placer: slidingPlacer(["mover"], 130), contact: [] };
+  const src = { id: "fx-cache", solids, placer: slidingPlacer(["mover"], 130), contact: [] };
 
   it("keys on the solids, the poses and the profile", () => {
     const k = cacheKey(src, PROFILES.ci);

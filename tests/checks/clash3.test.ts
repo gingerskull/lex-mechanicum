@@ -3,8 +3,7 @@
 import { describe, expect, it } from "vitest";
 import { CLASH_TOL, clearance3 } from "../../src/checks/clash3";
 import { check3d } from "../../src/checks/run";
-import { legacySourceOf } from "../../src/checks/source";
-import { injectedCoupler, pin, plate, slidingPlacer, spinningPlacer } from "../fixtures/clash3";
+import { fourBar, injectedCoupler, pin, plate, slidingPlacer, spinningPlacer } from "../fixtures/clash3";
 
 describe("clearance3 on synthetic solids", () => {
   it("reports the depth of a plate pushed into another as its overlap", async () => {
@@ -64,13 +63,14 @@ describe("clearance3 on synthetic solids", () => {
 
 describe("the injected-clash coupler (spike #197)", () => {
   it("the four-bar is clear as built", async () => {
-    const src = await legacySourceOf("four-bar");
+    const src = await fourBar();
     const r = await check3d(src, "ci", { cache: false });
     expect(r.clash.clashes).toEqual([]);
   }, 60_000);
 
-  it("finds the coupler moved 5 mm into the cranks' plane", async () => {
-    const src = await injectedCoupler("coupler", -5);
+  it("finds the coupler moved down into the cranks' plane", async () => {
+    // the coupler's slab is 14 mm over the cranks' (both 6 mm thick): 12 mm down it overlaps them by 4 mm
+    const src = await injectedCoupler("coupler", -12);
     const r = await check3d(src, "ci", { cache: false });
     const pairs = r.clash.clashes.map((c) => [c.a, c.b].sort().join(" x "));
     expect(pairs).toContain("coupler x crank");

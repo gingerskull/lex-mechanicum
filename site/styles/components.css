@@ -401,17 +401,6 @@
   align-content: center;
   text-align: right;
 }
-/* the transition stamp of the v3 engine (SS13): a small framed mark beside the sheet number and in the page header */
-.stamp3d {
-  display: inline-block;
-  font: 600 10px / 1.5 var(--font-mono);
-  letter-spacing: 0.08em;
-  color: var(--ink);
-  border: 1px solid currentColor;
-  padding: 0 4px;
-  margin-left: 8px;
-  vertical-align: 1px;
-}
 .card .meta {
   font: 500 10.5px var(--font-mono);
   letter-spacing: 0.06em;

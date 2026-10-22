@@ -3,9 +3,7 @@
 import pkg from "../../package.json";
 import { loadCatalog, recordById, type CatalogRecord } from "../../src/catalog";
 import type { Kin, Teaching } from "../../src/catalog/kin";
-import { allIds } from "../../src/checks/engine";
-import { mechanisms } from "../../src/mechanisms";
-import { drawnBy3 } from "./drawn";
+import { allIds } from "../../src/mechanisms";
 import { originKey, type Sortable } from "./sort";
 
 export const VERSION = pkg.version;
@@ -18,7 +16,7 @@ export interface Sheet {
   rec: CatalogRecord;
 }
 
-/** Registered mechanisms in catalogue order (family, level, name), numbered MX-01, MX-02 ...: the 2.5D registry and the mechanisms rebuilt on engine v3. */
+/** Registered mechanisms in catalogue order (family, level, name), numbered MX-01, MX-02 ... */
 const KNOWN = new Set(allIds());
 export const SHEETS: Sheet[] = loadCatalog()
   .mechanisms.filter((r) => KNOWN.has(r.id))
@@ -41,11 +39,11 @@ function originOf(r: CatalogRecord): number | undefined {
 /** What the library's orders read from a sheet (site/src/sort.ts). */
 export const sortableOf = (s: Sheet): Sortable => ({ no: s.n, name: s.rec.name, added: addedOf(s.rec), origin: originOf(s.rec) });
 
-/** The drive line of the at-a-glance facts (P3, V5), from the model's input kind. */
-export async function driveOf(id: string): Promise<string> {
-  // a mechanism on engine v3 has no 2.5D model: its record's first driver says
+/** The drive line of the at-a-glance facts (P3, V5), from the record's first driver. */
+export function driveOf(id: string): string {
   const kin = (recordById(id) as { kin?: Kin } | undefined)?.kin;
-  const k = mechanisms[id] ? (await mechanisms[id]!()).model.input.kind : (kin?.drivers[0]?.kind === "oscillating" ? "oscillating" : kin?.drivers[0]?.kind === "linear" ? "linear" : kin?.drivers[0]?.kind === "manual" ? "manual" : "rotary");
+  const d = kin?.drivers[0]?.kind;
+  const k = d === "oscillating" || d === "linear" || d === "manual" ? d : "rotary";
   if (k === "manual") return "Hand operated";
   return `Motorised: brushless pancake motor, ${k === "rotary" ? "GT2 belt 32:16 to the input" : k === "oscillating" ? "crank and link swinging the input" : "belt carriage on the input slide"}`;
 }
@@ -61,9 +59,6 @@ export const FACETS: { key: string; label: string; of: (r: CatalogRecord) => str
 ];
 
 export const recordOf = (id: string) => recordById(id)!;
-
-/** True when the stage and the card of a sheet are drawn by the v3 engine (and carry the 3D stamp). */
-export const is3 = (id: string): boolean => drawnBy3(id);
 
 /** One control of a v3 stage, from the record's `teaching.controls` (T14): a slider or a choice, and where its value goes. */
 export interface StageControl {

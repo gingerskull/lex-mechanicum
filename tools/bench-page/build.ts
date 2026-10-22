@@ -1,4 +1,4 @@
-// Builds the bench page as a static folder and runs it in local Chrome (tools/bench.ts --page and --v2).
+// Builds the bench page as a static folder and runs it in local Chrome (tools/bench.ts).
 import { copyFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
@@ -8,8 +8,7 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { chromium } from "playwright-core";
 import { recordById } from "../../src/catalog";
-import { buildAnyPackage } from "../../src/package/any";
-import { encode } from "../../src/package/format";
+import { buildPackage } from "../../src/package/build";
 import { encode2 } from "../../src/package/format2";
 import { FONT_FILES } from "../tokens-css";
 
@@ -28,7 +27,7 @@ button{font:inherit;padding:8px 16px}pre{white-space:pre-wrap;word-break:break-w
 `;
 };
 
-/** Builds the page folder: scripts, fonts and the v1 and v2 packages of `ids`. Returns the folder. */
+/** Builds the page folder: scripts, fonts, and the packages and record blocks of `ids`. Returns the folder. */
 export async function buildPage(out: string, ids: string[]): Promise<string> {
   mkdirSync(join(out, "packages"), { recursive: true });
   mkdirSync(join(out, "fonts"), { recursive: true });
@@ -46,10 +45,8 @@ export async function buildPage(out: string, ids: string[]): Promise<string> {
   });
   for (const f of FONT_FILES) copyFileSync(join(dirname(require.resolve(`@fontsource/${f.slug}/package.json`)), "files", `${f.slug}-latin-${f.weight}-normal.woff2`), join(out, "fonts", f.file));
   for (const id of ids) {
-    const b = await buildAnyPackage(id);
+    const b = await buildPackage(id);
     writeFileSync(join(out, "packages", `${id}.mx2`), await encode2(b.pkg));
-    // a mechanism rebuilt on engine v3 has no 2.5D package to set beside it
-    if (b.v1) writeFileSync(join(out, "packages", `${id}.mxp`), await encode(b.v1));
     const rec = recordById(id) as unknown as { name?: string; kin?: unknown; teaching?: unknown } | undefined;
     writeFileSync(join(out, "meta", `${id}.json`), JSON.stringify({ name: rec?.name ?? id, teaching: rec?.teaching ?? null, kin: rec?.kin ?? null }));
   }

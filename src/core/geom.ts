@@ -71,25 +71,6 @@ export const slot = (x0: number, x1: number, y: number, h: number): Vec2[] => ro
 export const dBore = (r: number): Vec2[] => circle(r, 0, 0, 28).map(([x, y]): Vec2 => [Math.min(x, r * 0.68), y]);
 export const ring = (r: number, x = 0, y = 0): Vec2[] => circle(r, x, y, 48);
 
-/** Continuous-corner rectangle (superellipse corners). */
-export function squircle(x0: number, y0: number, x1: number, y1: number, r: number): Vec2[] {
-  r = Math.min(r, (x1 - x0) / 2, (y1 - y0) / 2);
-  const pts: Vec2[] = [];
-  const corners: [number, number, number][] = [
-    [x1 - r, y0 + r, -Math.PI / 2],
-    [x1 - r, y1 - r, 0],
-    [x0 + r, y1 - r, Math.PI / 2],
-    [x0 + r, y0 + r, Math.PI],
-  ];
-  for (const [cx, cy, a0] of corners)
-    for (let i = 0; i <= 14; i++) {
-      const t = a0 + ((i / 14) * Math.PI) / 2;
-      const c = Math.cos(t);
-      const s = Math.sin(t);
-      pts.push([cx + r * Math.sign(c) * Math.pow(Math.abs(c), 0.62), cy + r * Math.sign(s) * Math.pow(Math.abs(s), 0.62)]);
-    }
-  return pts;
-}
 
 /**
  * Involute gear outline, 20° pressure angle. Tooth k is centred on angle k·2π/z. ad and de are the addendum and

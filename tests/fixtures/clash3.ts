@@ -1,6 +1,7 @@
 // Fixtures of the 3D clearance check (A15): small synthetic solids with a placer, and the spike's injected-clash coupler.
 import type { Placer } from "../../src/checks/clash3";
-import { legacySourceOf, type CheckSource } from "../../src/checks/source";
+import { recordSource, type CheckSource } from "../../src/checks/source";
+import { loadV3 } from "../../src/mechanisms";
 import { atPose, mat4, type Mat4 } from "../../src/solids/frame";
 import { extrudeOp } from "../../src/solids/tessellate";
 import type { Solid3 } from "../../src/solids/types";
@@ -45,9 +46,15 @@ export function slidingPlacer(moving: string[], travel = 10): Placer {
   };
 }
 
-/** The four-bar of the library with one solid moved along its own z: the spike's injected clash (#197). */
-export async function injectedCoupler(solid = "coupler", dz = -5): Promise<CheckSource> {
-  const src = await legacySourceOf("four-bar");
+/** The four-bar of the library as built, with its polish. */
+export async function fourBar(): Promise<CheckSource> {
+  const { record, polish } = await loadV3("four-bar");
+  return recordSource(record as never, polish ? { polish } : {});
+}
+
+/** The four-bar of the library with one solid moved along z: the spike's injected clash (#197). */
+export async function injectedCoupler(solid = "coupler", dz = -12): Promise<CheckSource> {
+  const src = await fourBar();
   const s = src.solids.find((x) => x.id === solid)!;
   s.frame = { ...s.frame, o: [s.frame.o[0], s.frame.o[1], s.frame.o[2] + dz] };
   return src;

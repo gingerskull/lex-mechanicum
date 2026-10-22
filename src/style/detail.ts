@@ -33,8 +33,8 @@ export const DETAIL: Rung[] = [
   },
   {
     id: "C",
-    name: "Wall shading, inner-slice silhouettes, deep depth layers",
-    drops: { effects: ["wallShade", "innerSilhouettes", "deepLayers"] },
+    name: "Wall shading, deep depth layers",
+    drops: { effects: ["wallShade", "deepLayers"] },
   },
   {
     id: "D",

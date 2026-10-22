@@ -23,7 +23,7 @@
     "check": "npm run typecheck && npm run lint && npm run test && npm run conformance",
     "prepare": "git config core.hooksPath .githooks || true",
     "docs:tables": "tsx tools/standard-table.ts && tsx tools/style-table.ts",
-    "shot": "tsx tools/shot.ts",
+    "shot": "tsx tools/shot3.ts",
     "thumbs": "tsx tools/thumbs.ts",
     "bench": "tsx tools/bench.ts",
     "bench:page": "tsx tools/bench.ts --page",

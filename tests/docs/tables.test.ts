@@ -1,6 +1,5 @@
 // The generated doc tables match the code: the standard's AUTO table and the style reference's Part VI.
 import { readFileSync } from "node:fs";
-import { allIds, engineOf } from "../../src/checks/engine";
 import { describe, expect, it } from "vitest";
 import { STANDARD, standardDoc } from "../../tools/standard-table";
 import { STYLE_REF, styleDoc } from "../../tools/style-table";
@@ -21,12 +20,9 @@ describe("audit template", () => {
   const block = tpl.slice(tpl.indexOf("```markdown"), tpl.indexOf("```\n", tpl.indexOf("```markdown") + 3));
   const heads = (t: string) => [...t.matchAll(/^## (.+)$/gm)].map((m) => m[1]);
 
-  it("has the sections a 2.5D sheet writes, in the same order, plus the 3.0 Supports section", () => {
-    // a sheet still on the 2.5D engine (the rebuild moves the mechanisms over one batch at a time)
-    const id = allIds().find((x) => engineOf(x) === "2.5D");
-    if (!id) return;
-    const sheet = readFileSync(new URL(`../../src/mechanisms/${id}/audit.md`, import.meta.url), "utf8");
-    expect(heads(block).filter((h) => h !== "Supports")).toEqual(heads(sheet));
+  it("has the sections the generator writes, in the same order", () => {
+    const sheet = readFileSync(new URL(`../../src/mechanisms/four-bar/audit.md`, import.meta.url), "utf8");
+    expect(heads(block)).toEqual(heads(sheet));
   });
 
   it("has the `teaching:` line under the header and the kit, block, support and stack columns (S2, A20, A21)", () => {

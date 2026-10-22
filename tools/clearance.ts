@@ -1,24 +1,16 @@
-// npx tsx tools/clearance.ts <id | all | changed> [--2d | --3d | --v3 | --both] [--ci | --full] [--no-cache] [--inject <solid>,<dz>]
-// A15, A12 and M6 over the full cycle (standard Q2). Two engines live side by side until the cut-over:
-//   --2d   the 2.5D mechanism's own check on its outlines (default for a mechanism audited below 3.0);
-//   --3d   the same mechanism's solids lifted to 3D and tested with Manifold, penetration depth against 0.1 mm,
-//          with the hand `allow` exemptions flagged unnecessary when the pair never overlaps (the transition view);
-//   --v3   a mechanism rebuilt from its record v3 (default for a mechanism audited at 3.0 or later);
-//   --both the 2.5D check and the lifted 3D check.
-// --ci samples 8 phases and skips the `allow` audit; --full (the default) samples 72. Results are cached on the solids
-// and poses (dist/cache/checks3); --no-cache recomputes. --inject moves one solid along its local z by dz mm, to see a
-// clash found. Exits non-zero on a clash, clamp or edge-distance fault, or (full profile) an unnecessary `allow`.
-// `changed` is the pre-push selection (the workflow's check table): the mechanisms whose folder changed since the branch's
-// upstream, and every mechanism when code outside src/mechanisms changed; a 2.5D mechanism gets its own cheap check, one
-// rebuilt on engine v3 the full 72-phase 3D check, which the CI profile only samples.
+// npx tsx tools/clearance.ts <id | all | changed> [--ci | --full] [--no-cache] [--inject <solid>,<dz>]
+// A15, A12 and M6 over the full cycle (standard Q2): the mechanism built from its record v3 by the hardware builder, its
+// solids tested in 3D with Manifold, penetration depth against 0.1 mm, with the hand `allow` exemptions flagged
+// unnecessary when the pair never overlaps. --ci samples 8 phases and skips the `allow` audit; --full (the default)
+// samples 72. Results are cached on the solids and poses (dist/cache/checks3); --no-cache recomputes. --inject moves one
+// solid along its local z by dz mm, to see a clash found. Exits non-zero on a clash, clamp or edge-distance fault, or
+// (full profile) an unnecessary `allow`.
+// `changed` is the pre-push selection (the workflow's check table): the mechanisms whose folder or record changed since the
+// branch's upstream, and every mechanism when code outside src/mechanisms changed; each gets the full 72-phase check,
+// which the CI profile only samples.
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { assemble } from "../src/assemble";
-import type { Polish } from "../src/assemble/api";
-import { clampCheck, edgeCheck } from "../src/assemble/clamp";
-import { clearance } from "../src/assemble/clearance";
-import { allIds, engineOf, isKnown, loadV3, clashLines, check3d, legacySourceOf, recordSource, unnecessaryLines, type CheckSource } from "../src/checks";
-import { mechanisms } from "../src/mechanisms";
+import { allIds, isBuilt, isKnown, loadV3, clashLines, check3d, recordSource, unnecessaryLines, type CheckSource } from "../src/checks";
 
 export interface Report {
   lines: string[];
@@ -26,26 +18,7 @@ export interface Report {
   faults: number;
 }
 
-/** The 2.5D check, as before. */
-export async function report(id: string): Promise<Report> {
-  const entry = await mechanisms[id]!();
-  const a = assemble(entry.model, undefined, entry.polish ? { polish: entry.polish as Polish } : {});
-  const clashes = clearance(entry.model, a);
-  const clamp = clampCheck(entry.model, a);
-  const edges = edgeCheck(a);
-  const lines = [
-    `${id}: ${a.solids.length} solids, ${a.joints.length} joints, rules ${a.ms.auto.toFixed(0)} ms, polish ${a.ms.polish.toFixed(0)} ms (2.5D engine)`,
-    `clearance: ${clashes.length} clash${clashes.length === 1 ? "" : "es"}`,
-    ...clashes.slice(0, 30).map((c) => `  ${c.a} x ${c.b}: ${c.depth.toFixed(2)} mm at u ${c.u.toFixed(2)}`),
-    `clamp: ${clamp.length ? clamp.length + " fault(s)" : "clean"}`,
-    ...clamp.map((s) => `  ${s}`),
-    `edge distance: ${edges.length ? edges.length + " finding(s)" : "clean"}`,
-    ...edges.map((s) => `  ${s}`),
-  ];
-  return { lines, clashes: clashes.length, faults: clamp.length + edges.length };
-}
-
-/** The 3D check of a source (lifted or native). */
+/** The 3D check of a source. */
 export async function report3(id: string, src: CheckSource, o: { profile: "ci" | "full"; cache: boolean; inject?: [string, number] }): Promise<Report> {
   if (o.inject) {
     const [sid, dz] = o.inject;
@@ -58,10 +31,10 @@ export async function report3(id: string, src: CheckSource, o: { profile: "ci" |
   const clashes = clashLines(r);
   const unnecessary = unnecessaryLines(r);
   const lines = [
-    `${id}: ${r.clash.stats.solids} solids, ${r.clash.stats.pairs} moving pairs, ${r.clash.stats.intersections} intersections over ${r.clash.stats.phases} phases, ${r.clash.stats.ms.toFixed(0)} ms${r.cached ? " (cached)" : ""} (${src.engine}, ${r.profile})`,
+    `${id}: ${r.clash.stats.solids} solids, ${r.clash.stats.pairs} moving pairs, ${r.clash.stats.intersections} intersections over ${r.clash.stats.phases} phases, ${r.clash.stats.ms.toFixed(0)} ms${r.cached ? " (cached)" : ""} (${r.profile})`,
     `clearance (3D): ${clashes.length} clash${clashes.length === 1 ? "" : "es"}`,
     ...r.clash.clashes.slice(0, 30).map((c) => `  ${c.a} x ${c.b}: ${c.depth.toFixed(2)} mm (${c.volume.toFixed(1)} mm³) at u ${c.u.toFixed(2)}`),
-    r.profile === "full" ? `hand allow: ${r.clash.allows.length} named, ${unnecessary.length} unnecessary${unnecessary.length ? "" : ""}` : "hand allow: not audited at the ci profile",
+    r.profile === "full" ? `hand allow: ${r.clash.allows.length} named, ${unnecessary.length} unnecessary` : "hand allow: not audited at the ci profile",
     ...unnecessary.slice(0, 12).map((s) => `  unnecessary: ${s}`),
     `clamp (3D): ${r.clamp.length ? r.clamp.length + " fault(s)" : "clean"}`,
     ...r.clamp.map((s) => `  ${s}`),
@@ -92,9 +65,9 @@ export function changedIds(base?: string): string[] {
     const m = /^src\/mechanisms\/([a-z0-9-]+)\//.exec(f);
     if (m) ids.add(m[1]!);
     else if (/^(src|tools)\//.test(f) || f === "package.json") return allIds();
-    else if (f.startsWith("data/catalog/")) allIds().filter((id) => engineOf(id) === "v3").forEach((id) => ids.add(id));
+    else if (f.startsWith("data/catalog/")) allIds().forEach((id) => ids.add(id));
   }
-  return [...ids].filter(isKnown);
+  return [...ids].filter(isBuilt);
 }
 
 async function main() {
@@ -113,24 +86,10 @@ async function main() {
       process.exitCode = 1;
       return;
     }
-    const mode = flags.has("--both") ? "both" : flags.has("--3d") ? "3d" : flags.has("--2d") ? "2d" : flags.has("--v3") ? "v3" : engineOf(id) === "v3" ? "v3" : "2d";
-    if (mode === "2d" || mode === "both") {
-      const r = await report(id);
-      console.log(r.lines.join("\n"));
-      bad += r.clashes + r.faults;
-    }
-    if (mode === "3d" || mode === "both") {
-      const r = await report3(id, await legacySourceOf(id), { profile, cache: !flags.has("--no-cache"), ...(inject ? { inject } : {}) });
-      console.log(r.lines.join("\n"));
-      // the lifted view informs: a transition finding in a mechanism the old engine passes is reported, and fails only a rebuilt one
-      if (mode === "3d") bad += r.clashes + r.faults;
-    }
-    if (mode === "v3") {
-      const { record, polish } = await loadV3(id);
-      const r = await report3(id, await recordSource(record as never, polish ? { polish } : {}), { profile, cache: !flags.has("--no-cache"), ...(inject ? { inject } : {}) });
-      console.log(r.lines.join("\n"));
-      bad += r.clashes + r.faults;
-    }
+    const { record, polish } = await loadV3(id);
+    const r = await report3(id, await recordSource(record as never, polish ? { polish } : {}), { profile, cache: !flags.has("--no-cache"), ...(inject ? { inject } : {}) });
+    console.log(r.lines.join("\n"));
+    bad += r.clashes + r.faults;
   }
   if (bad) process.exitCode = 1;
 }

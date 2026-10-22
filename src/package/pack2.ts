@@ -2,16 +2,27 @@
 // an operation; a boolean result (features, or a hand-made mesh) becomes a quantised mesh shape, from the `meshOf`
 // callback (Manifold, src/solids/manifold.ts) so this module stays free of it. Solids with the same shape share one.
 import type { Vec2 } from "../core/geom";
-import type { Sampled } from "../model/sample";
-import type { Joint } from "../rules/types";
 import { rounded } from "../solids/frame";
 import { checkMesh } from "../solids/check";
 import { quantise } from "../solids/quantise";
 import { capOf, cleanRing, dropCollinear, orient, tessellate } from "../solids/tessellate";
 import { isPlain, type MeshData, type Op, type Profile, type Solid3, type Vec3 } from "../solids/types";
-import { gridFor, type PackageBounds } from "./format";
-import { FLAG3, attachConveys, type Flag3, type PackedSolid3, type Package2, type Shape2 } from "./format2";
+import { FLAG3, attachConveys, gridFor, type Flag3, type Joint, type PackageBounds, type PackedSolid3, type Package2, type Shape2 } from "./format2";
 import type { ConveyPath } from "../solids/convey";
+
+/** The motion sampled over one cycle, as the package carries it. */
+export interface Sampled {
+  /** Samples per cycle. */
+  n: number;
+  /** The traced points over one cycle, n points each. */
+  traces: Record<string, Vec2[]>;
+  /** Largest speed of each velocity point, mm per radian of phase. */
+  vmax: Record<string, number>;
+  /** Swept envelope of every part and trace over the cycle. */
+  coreBounds: { minX: number; minY: number; maxX: number; maxY: number };
+  /** The plot function at 181 phases from 0 to 2π, or null without a plot. */
+  plotData: number[] | null;
+}
 
 export interface Pack2Input {
   id: string;
@@ -120,7 +131,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     let flags = 0;
     for (const f of FIELD_FLAGS) if (s.flags[f]) flags |= FLAG3[f];
     if (s.deform) flags |= FLAG3.deform;
-    const p: PackedSolid3 = { id: s.id, name: s.name, kind: s.kind, role: s.role, body: s.body, fr: rounded(s.frame), shape: shapeOf(s), ex: s.ex, detail: s.detail, flags };
+    const p: PackedSolid3 = { id: s.id, name: s.name, kind: s.kind, role: s.role, body: s.body, fr: rounded(s.frame), shape: shapeOf(s), ex: s.ex + 0, detail: s.detail, flags };
     if (s.joints.length) p.joints = [...s.joints];
     if (s.group !== undefined) p.group = s.group;
     if (s.motion) p.motion = s.motion;

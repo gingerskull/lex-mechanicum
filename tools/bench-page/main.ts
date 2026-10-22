@@ -6,22 +6,17 @@
 //   frames     at plan, 28 degrees, side and explode 70 degrees, and at 28 degrees for every dial position: the mean
 //              interval of animation frames ("paced"), the mean of draw plus a one-pixel read-back ("gpu": what the
 //              frame costs when the display's rate is not the limit), and the median script time of the draw call.
-//   today      the same views through today's renderer (package v1), when asked.
 //
-// The v2 frames are drawn by the 3D renderer (src/render/v3) on today's model's poses (the lifted pilots) with the record's
-// teaching layers. Everything is a median of the runs.
-import { models } from "../../src/mechanisms/models";
-import { loadPackage } from "../../src/package/loader";
+// The frames are drawn by the 3D renderer (src/render/v3), posed by the record's kinematics, with its teaching layers.
+// Everything is a median of the runs.
 import { browserFactory } from "../../src/render/canvas";
 import type { Dial } from "../../src/render/detail";
-import { defaultView, type DrawView } from "../../src/render/draft";
-import { createSession } from "../../src/render/session";
 import { setupInWorker, setupInline } from "../../src/solids/setup";
 import { DETAIL } from "../../src/style/detail";
 import { Kinematics } from "../../src/kin/compose";
 import type { Kin as KinLib } from "../../src/kin/types";
 import { gpu3 } from "../../src/render/v3/gpu";
-import { hybridPoser, kinPoser, legacyPoser, staticPoser } from "../../src/render/v3/poser";
+import { kinPoser, staticPoser } from "../../src/render/v3/poser";
 import { createSession3, recordDrawView, type DrawView3 } from "../../src/render/v3/session";
 import type { Meta } from "../draw3-page/main";
 
@@ -40,7 +35,6 @@ export interface Opts {
   w: number;
   h: number;
   dpr: number;
-  today: boolean;
   worker: boolean;
 }
 
@@ -51,7 +45,7 @@ interface Timing {
 }
 interface Row {
   id: string;
-  kb: { v1: number; v2: number };
+  kb: number;
   solids: number;
   shapes: number;
   triangles: number;
@@ -62,7 +56,6 @@ interface Row {
   dial: Record<string, Timing>;
   draws: number;
   instances: number;
-  today?: { setup: number; views: Record<string, number>; dial: Record<string, number>; cpu: Record<string, number> };
 }
 export interface Report {
   /** Context and shader creation, once per page (milliseconds). */
@@ -74,11 +67,6 @@ export interface Report {
 
 /** The page's one context cost (shader compile and link), ms. */
 let shared: { ms: number } | null = null;
-
-interface Hosts {
-  gpu: HTMLElement;
-  today: HTMLElement;
-}
 
 const med = (v: number[]) => [...v].sort((a, b) => a - b)[Math.floor(v.length / 2)] ?? 0;
 const r2 = (x: number) => Math.round(x * 100) / 100;
@@ -136,11 +124,8 @@ function canvasIn(host: HTMLElement): HTMLCanvasElement {
   return c;
 }
 
-async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): Promise<Row> {
-  // a mechanism rebuilt on engine v3 has no 2.5D model and no v1 package: posed by its record alone
-  const model = models[id] ? await models[id]!() : null;
+async function one(id: string, o: Opts, host: HTMLElement, log: (s: string) => void): Promise<Row> {
   const blob2 = await bytes(`packages/${id}.mx2`);
-  const blob1 = model ? await bytes(`packages/${id}.mxp`) : null;
   const meta = (await (await fetch(`meta/${id}.json?v=${stamp()}`)).json()) as Meta;
   const dials: Dial[] = ["full", ...DETAIL.map((r) => r.id)];
   const setups: Row["setup"][] = [];
@@ -152,9 +137,8 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     log(`${id}: run ${run + 1} of ${o.runs}, setup`);
     const s = await setupInline(blob2.slice());
     const g0 = performance.now();
-    const canvas = canvasIn(host.gpu);
-    const legacy = model ? legacyPoser(model, s.pkg.bounds.z1) : staticPoser;
-    const poser = meta.kin ? hybridPoser(legacy, kinPoser(new Kinematics(meta.kin as unknown as KinLib))) : legacy;
+    const canvas = canvasIn(host);
+    const poser = meta.kin ? kinPoser(new Kinematics(meta.kin as unknown as KinLib), undefined, s.pkg.lifts) : staticPoser;
     const scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser, teaching: meta.teaching, info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
     const sess = createSession3(canvas, scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
     const viewOf = (v: StandInView): DrawView3 => recordDrawView(scene, { state: { orient: { yaw: 0, tilt: v.tilt }, explode: v.explode }, detail: v.detail });
@@ -181,7 +165,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
   const field = (k: keyof Row["setup"]) => r2(med(setups.map((x) => x[k])));
   const row: Row = {
     id,
-    kb: { v1: blob1 ? r2(blob1.length / 1024) : 0, v2: r2(blob2.length / 1024) },
+    kb: r2(blob2.length / 1024),
     solids: counts.solids,
     shapes: counts.shapes,
     triangles: counts.triangles,
@@ -193,36 +177,7 @@ async function one(id: string, o: Opts, host: Hosts, log: (s: string) => void): 
     instances: counts.instances,
   };
   if (workers.length) row.worker = { wall: r2(med(workers)) };
-  if (o.today && model) row.today = await todays(id, o, host.today, log);
   return row;
-}
-
-async function todays(id: string, o: Opts, host: HTMLElement, log: (s: string) => void): Promise<NonNullable<Row["today"]>> {
-  log(`${id}: today's renderer`);
-  const [m, pkg] = await Promise.all([models[id]!(), loadPackage(`packages/${id}.mxp?v=${stamp()}`)]);
-  const setup: number[] = [];
-  const views: Record<string, number[]> = {};
-  const cpus: Record<string, number[]> = {};
-  const dial: Record<string, number[]> = {};
-  const base = (v: Partial<DrawView>): DrawView => ({ ...defaultView(), dims: true, sheet: { title: id, no: `MX-${id.toUpperCase()}` }, overlays: { paths: true }, ...v });
-  for (let run = 0; run < o.runs; run++) {
-    const canvas = canvasIn(host);
-    canvas.style.width = `${o.w}px`;
-    canvas.style.height = `${o.h}px`;
-    const t0 = performance.now();
-    const sess = createSession(canvas, pkg, m, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
-    sess.draw(1, base({}));
-    setup.push(performance.now() - t0);
-    for (const [k, v] of VIEWS) {
-      const t = await timeFrames((u) => sess.draw(u, base(v)), () => undefined, o.frames);
-      (views[k] ??= []).push(t.paced);
-      (cpus[k] ??= []).push(t.cpu);
-    }
-    for (const d of ["full", ...DETAIL.map((r) => r.id)] as Dial[]) (dial[d] ??= []).push((await timeFrames((u) => sess.draw(u, base({ tilt: 28, detail: d })), () => undefined, Math.max(10, o.frames >> 1))).paced);
-    sess.dispose();
-  }
-  const pick = (r: Record<string, number[]>) => Object.fromEntries(Object.entries(r).map(([k, v]) => [k, r2(med(v))]));
-  return { setup: r2(med(setup)), views: pick(views), cpu: pick(cpus), dial: pick(dial) };
 }
 
 /** The targets of standard R6 in ms: a desktop frame, a mid-range phone frame, setup. */
@@ -234,20 +189,16 @@ export const SETUP_TARGET = 20;
 export function markdown(r: Report): string {
   const L: string[] = [];
   const d = r.device;
-  L.push(`## Bench, package v2`, ``, `${String(d.userAgent)}`, `GPU ${String(d.gpu)}, ${String(d.cores)} cores, ${String(d.memoryGB)} GB, screen ${String(d.screen)}, DPR ${String(d.dpr)}`, `Stage ${r.opts.w} x ${r.opts.h} CSS px at DPR ${r.opts.dpr}; ${r.opts.runs} runs, ${r.opts.frames} frames per view; medians. v2 frames are drawn by the 3D renderer.`, ``);
+  L.push(`## Bench, package v2`, ``, `${String(d.userAgent)}`, `GPU ${String(d.gpu)}, ${String(d.cores)} cores, ${String(d.memoryGB)} GB, screen ${String(d.screen)}, DPR ${String(d.dpr)}`, `Stage ${r.opts.w} x ${r.opts.h} CSS px at DPR ${r.opts.dpr}; ${r.opts.runs} runs, ${r.opts.frames} frames per view; medians. Frames are drawn by the 3D renderer.`, ``);
   L.push(`Setup, ms. GPU is buffers, sizing and the first frame on the page's shared context; the context and both shader programs were made once, in ${r.contextMs} ms.`, ``);
-  L.push(`Setup, ms (decode / tessellate / edges / GPU / total):`, ``, `| Mechanism | v1 KB | v2 KB | solids | shapes | triangles | edges | decode | tessellate (caps) | edges | GPU | total | worker wall | via worker (wall + GPU) |`, `|---|---|---|---|---|---|---|---|---|---|---|---|---|---|`);
-  for (const x of r.rows) L.push(`| ${x.id} | ${x.kb.v1} | ${x.kb.v2} | ${x.solids} | ${x.shapes} | ${x.triangles} | ${x.edges} | ${x.setup.decode} | ${x.setup.tessellate} (${x.setup.caps}) | ${x.setup.edges} | ${x.setup.gpu} | ${x.setup.total} | ${x.worker?.wall ?? ""} | ${x.worker ? r2(x.worker.wall + x.setup.gpu) : ""} |`);
+  L.push(`Setup, ms (decode / tessellate / edges / GPU / total):`, ``, `| Mechanism | KB | solids | shapes | triangles | edges | decode | tessellate (caps) | edges | GPU | total | worker wall | via worker (wall + GPU) |`, `|---|---|---|---|---|---|---|---|---|---|---|---|---|`);
+  for (const x of r.rows) L.push(`| ${x.id} | ${x.kb} | ${x.solids} | ${x.shapes} | ${x.triangles} | ${x.edges} | ${x.setup.decode} | ${x.setup.tessellate} (${x.setup.caps}) | ${x.setup.edges} | ${x.setup.gpu} | ${x.setup.total} | ${x.worker?.wall ?? ""} | ${x.worker ? r2(x.worker.wall + x.setup.gpu) : ""} |`);
   const vs = VIEWS.map(([k]) => k);
   L.push(``, `Frames per view, ms (paced / gpu wait / script):`, ``, `| Mechanism | ${vs.join(" | ")} |`, `|---|${vs.map(() => "---").join("|")}|`);
   for (const x of r.rows) L.push(`| ${x.id} | ${vs.map((k) => `${x.views[k]?.paced} / ${x.views[k]?.gpu} / ${x.views[k]?.cpu}`).join(" | ")} |`);
   const ds = Object.keys(r.rows[0]?.dial ?? {});
   L.push(``, `Frame at 28° by dial position, ms (paced / gpu wait):`, ``, `| Mechanism | ${ds.join(" | ")} |`, `|---|${ds.map(() => "---").join("|")}|`);
   for (const x of r.rows) L.push(`| ${x.id} | ${ds.map((k) => `${x.dial[k]?.paced} / ${x.dial[k]?.gpu}`).join(" | ")} |`);
-  if (r.rows.some((x) => x.today)) {
-    L.push(``, `Today's renderer (package v1), paced ms:`, ``, `| Mechanism | setup | ${vs.join(" | ")} | script at 28° |`, `|---|---|${vs.map(() => "---").join("|")}|---|`);
-    for (const x of r.rows) if (x.today) L.push(`| ${x.id} | ${x.today.setup} | ${vs.map((k) => x.today!.views[k]).join(" | ")} | ${x.today.cpu["28"]} |`);
-  }
   // R6: over the target is a flag to look at, never a failure
   const flags: string[] = [];
   for (const x of r.rows) {
@@ -263,9 +214,7 @@ export function markdown(r: Report): string {
 
 export async function run(o: Opts, host: HTMLElement, log: (s: string) => void = () => undefined): Promise<Report> {
   const rows: Row[] = [];
-  const hosts: Hosts = { gpu: document.createElement("div"), today: document.createElement("div") };
-  host.replaceChildren(hosts.gpu, hosts.today);
-  for (const id of o.ids) rows.push(await one(id, o, hosts, log));
+  for (const id of o.ids) rows.push(await one(id, o, host, log));
   return { contextMs: r2(shared?.ms ?? 0), device: device(), opts: o, rows };
 }
 
@@ -284,7 +233,6 @@ if (ui) {
     <fieldset><legend>Mechanisms</legend>${ids.map((i) => `<label><input type="checkbox" name="id" value="${i}" checked> ${i}</label>`).join(" ")}</fieldset>
     <label>Runs <input id="runs" type="number" value="${num("runs", 3)}" min="1" max="9" style="width:3em"></label>
     <label>Frames <input id="frames" type="number" value="${num("frames", 30)}" min="10" max="200" style="width:4em"></label>
-    <label><input id="today" type="checkbox" checked> also today's renderer</label>
     <label><input id="worker" type="checkbox" checked> also in a worker</label>
     <p><button id="go">Run</button> <button id="copy" disabled>Copy results</button> <span id="log"></span></p>
     <pre id="out"></pre>
@@ -301,7 +249,6 @@ if (ui) {
       w: num("w", wide),
       h: num("h", Math.round(wide * 0.62)),
       dpr: num("dpr", Math.min(window.devicePixelRatio, 3)),
-      today: $<HTMLInputElement>("today").checked,
       worker: $<HTMLInputElement>("worker").checked,
     };
     run(o, $("stage"), (s) => ($("log").textContent = s)).then(

@@ -1,4 +1,4 @@
-// The placement solver (A18): every axial position of the bodies, in place of layers, `dz` and `twin`.
+// The placement solver (A18): every axial position of the bodies, solved from the joints, never set by hand.
 //
 // Bodies whose planes are parallel form a family and are stacked in slabs along their normal. Two bodies may share a
 // slab when their outlines keep apart over the whole cycle (A10); bodies that touch by design (a gear mesh, a belt, a

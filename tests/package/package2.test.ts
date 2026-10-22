@@ -1,13 +1,11 @@
-// Package v2 (standard R4, D10): the pilots ship as profiles at today's size, boolean results and generators as
-// quantised meshes, identical hardware once; decode(encode(p)) equals p and the bytes are the same on every build.
+// Package v2 (standard R4, D10): plain solids ship as profiles, boolean results and generators as quantised meshes,
+// identical hardware once; decode(encode(p)) equals p and the bytes are the same on every build.
 import { createHash } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
 import { circle } from "../../src/core/geom";
-import type { Sampled } from "../../src/model/sample";
-import { buildPackage2, type Built2 } from "../../src/package/build2";
-import { encode } from "../../src/package/format";
+import { buildPackage, type Built } from "../../src/package/build";
 import { decode2, encode2, FLAG3, hasFlag3, type Package2 } from "../../src/package/format2";
-import { pack2 } from "../../src/package/pack2";
+import { pack2, type Sampled } from "../../src/package/pack2";
 import { checkMesh } from "../../src/solids/check";
 import { atPose } from "../../src/solids/frame";
 import { manifold, meshOf } from "../../src/solids/manifold";
@@ -16,15 +14,13 @@ import { extrudeOp, revolveOp } from "../../src/solids/tessellate";
 import type { Profile, Solid3 } from "../../src/solids/types";
 
 const PILOTS = ["four-bar", "spur-gears", "bevel-gears"];
-const built: Record<string, Built2> = {};
+const built: Record<string, Built> = {};
 const blobs: Record<string, Uint8Array> = {};
-const v1: Record<string, number> = {};
 
 beforeAll(async () => {
   for (const id of PILOTS) {
-    built[id] = await buildPackage2(id);
+    built[id] = await buildPackage(id);
     blobs[id] = await encode2(built[id]!.pkg);
-    v1[id] = (await encode(built[id]!.built.pkg)).length;
   }
 }, 120_000);
 
@@ -50,35 +46,32 @@ const same = (a: Package2, b: Package2) => {
 };
 
 describe("pilot packages", () => {
-  it.each(PILOTS)("%s: every solid meshes, is sound, and the package is within 1.5x of v1", (id) => {
+  it.each(PILOTS)("%s: every solid meshes and is sound", (id) => {
     const b = built[id]!;
     expect(b.failed).toEqual([]);
     expect(b.reports.filter((r) => !r.report.ok).map((r) => `${r.id}: ${r.report.issues.join("; ")}`)).toEqual([]);
-    expect(blobs[id]!.length).toBeLessThanOrEqual(1.5 * v1[id]!);
   });
 
   it.each(PILOTS)("%s: decode(encode(p)) is p, and identical hardware is one shape", async (id) => {
     const b = built[id]!;
     same(b.pkg, await decode2(blobs[id]!));
     expect(b.pkg.shapes.length).toBeLessThan(b.pkg.solids.length);
-    // plain extrusions ship as profiles: no meshes
-    expect(b.pkg.shapes.filter((s) => s.mesh).length).toBe(0);
   });
 
   it("gives the same bytes on a second build", async () => {
-    const again = await encode2((await buildPackage2("four-bar")).pkg);
+    const again = await encode2((await buildPackage("four-bar")).pkg);
     expect(createHash("sha256").update(again).digest("hex")).toBe(createHash("sha256").update(blobs["four-bar"]!).digest("hex"));
   });
 
   it("keeps what the renderer reads on every solid", () => {
     const b = built["four-bar"]!;
-    b.built.assembly.solids.forEach((s, i) => {
+    b.solids.forEach((s, i) => {
       const p = b.pkg.solids[i]!;
       expect(p.id).toBe(s.id);
       expect(p.detail).toBe(s.detail);
-      expect(p.ex).toBe(s.ex);
-      expect(hasFlag3(p, "isBase")).toBe(!!s.isBase);
-      expect(p.flags & FLAG3.accent ? true : false).toBe(!!s.accent);
+      expect(p.ex).toBe(s.ex + 0);
+      expect(hasFlag3(p, "isBase")).toBe(!!s.flags.isBase);
+      expect(p.flags & FLAG3.accent ? true : false).toBe(!!s.flags.accent);
     });
   });
 });

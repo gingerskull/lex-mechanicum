@@ -51,12 +51,6 @@ export const DRAFT = {
 
   // Library cards (SS1): the thumbnail and the hover animation draw a small sheet, so they leave out detail nobody sees
   // and thin the two bold outlines. Used only for a view with `card` set; the mechanism page is untouched.
-  // The GPU solids pass: antialiasing samples per pixel, fewer on a phone or a dense screen, where a pixel is smaller.
-  gpu: {
-    samples: 8, // antialiasing samples per pixel
-    samplesDense: 4, // coarse pointer or device pixel ratio of 2 and more
-  },
-
   card: {
     detail: "B" as const, // detail dial position of a card drawing (DL): sharp, with wall shading
     plateTopFactor: 0.7, // factor on lines.plateTop on a card
@@ -210,7 +204,6 @@ export const DRAFT = {
     width: 0.6, // px
     alpha: 0.5, // 0..1
     overshoot: 6, // px past the head
-    maxTilt: 60, // degrees, hidden at and above this tilt
     endOnDeg: 8, // degrees, an axis this close to the view direction is drawn as a centre cross (3D renderer)
     cross: 6, // px, half length of the centre cross seen end-on (3D renderer)
     minScale: 0.8, // px per mm, hidden when the drawing is smaller than this
@@ -230,7 +223,6 @@ export const DRAFT = {
     labelPaper: 0.95, // 0..1, paper alpha of the knock-out
     labelGain: 0.25, // added to alpha for the label text (capped at 1)
     minDepthPx: 40, // px, depth label only when the projected depth is at least this
-    minCos: 0.2, // dimensions drawn only when cos(tilt) is above this
   },
 
   // Sheet frame, zones and title block (SD10), detail stage only.
@@ -258,10 +250,7 @@ export const DRAFT = {
     titleKeyY: 5, // px, key baseline from the row top
     titleValueX: 40, // px, value inset
     titleValueMargin: 44, // px, value truncated to the cell width less this
-    planTilt: 8, // degrees, VIEW reads PLAN at or below this
-    elevationTilt: 80, // degrees, VIEW reads ELEVATION at or above this; also the side view of the detail ladder
-    defaultTilt: 28, // degrees, the view when none is given
-    stamp: { text: "3D", width: 0.8, alpha: 0.85 }, // the transition stamp in the title block (SS13): its lettering, hairline px, ink alpha
+    elevationTilt: 80, // degrees, the side view of the detail ladder at or above this tilt
   },
 
   // Overlays (SD14): colours by token name, never changing the drawing beneath.
@@ -274,15 +263,11 @@ export const DRAFT = {
     border: { color: "ink", alpha: 0.35 }, // label panel hairline
     width: 1.6, // px, force and velocity arrows
     arrow: 10, // px, force arrowhead
-    arrowSmall: 9, // px, axial and spin arrowheads
     arrowDim: 7, // px, dimension arrowheads
     shortLine: 70, // px, a construction line shorter than this carries its label past its far end
     shortGap: 8, // px, gap from that end to the label
     arrowAngle: 0.42, // radians, arrowhead half-angle
-    axialDash: [5, 4] as const, // px
-    axialOvershoot: 14, // px past each end
     angleR: 22, // mm, default angle arc radius
-    spinR: 24, // mm, default spin arc radius
     angleGuide: { width: 1, alpha: 0.55, dash: [3, 3] as const, reach: 1.5 }, // px, 0..1, px, factor on radius
     angleArc: 1.8, // px
     bend: { width: 1.4, zoneAlpha: 0.35, ticks: 5 }, // px, 0..1, count: a flexure's bent centreline and stress zone ticks

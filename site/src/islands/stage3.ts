@@ -1,4 +1,4 @@
-// The stage of a mechanism drawn by the v3 engine (SS5, SS13): the transport of the 2.5D stage, and the camera (drag to
+// The stage of a mechanism (SS5): the transport (play, scrub, speed), and the camera (drag to
 // orbit, the named views, the record's own view, tilt), the section and detail views the record declares, explode, the
 // detail dial (adaptive per DL4) and the record's own controls (T14). Playback honours the record's time map (SD27): the
 // scrubber and the plot stay on the true input. The setup runs in a worker, the shaders build while the data downloads,
@@ -183,7 +183,6 @@ async function main(box: HTMLElement) {
   /** Frames are drawn at the coarsest dial until the page is idle (R9). */
   let warm = true;
   let warmQueued = false;
-  const zTop = L.scene.pkg.bounds.z1;
   const ctl: Ctl = { params: {}, design: {}, select: {}, drivers: {} };
   let good: Ctl = JSON.parse(JSON.stringify(ctl));
 
@@ -200,9 +199,8 @@ async function main(box: HTMLElement) {
 
   // the output plot
   const plotCanvas = document.getElementById("plot") as HTMLCanvasElement | null;
-  // a lifted 2.5D mechanism carries its plot in the package; a record's is sampled from its kinematics
-  const packed = L.scene.pkg.plot ? { data: Array.from(L.scene.pkg.plot), unit: L.model?.plot?.unit ?? "", more: [] } : null;
-  let series = plotCanvas ? (packed ?? plotSeries(E, L)) : null;
+  // sampled from the record's kinematics
+  let series = plotCanvas ? plotSeries(E, L) : null;
   const plot = plotCanvas && series ? E.makeCard(plotCanvas, E.browserFactory) : null;
   const plotSize = () => {
     if (!plot || !plotCanvas) return;
@@ -237,7 +235,7 @@ async function main(box: HTMLElement) {
   sess.onRestored = () => (dirty = true);
   const applyControls = () => {
     ctlDirty = false;
-    sess.setPoser(poserFor(E, { kinematics: L.kinematics, model: L.model, z: zTop, lifts: L.scene.pkg.lifts }, ctl as never));
+    sess.setPoser(poserFor(E, { kinematics: L.kinematics, lifts: L.scene.pkg.lifts }, ctl as never));
     dirty = true;
   };
   let note = 0;

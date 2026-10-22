@@ -1,6 +1,7 @@
-// Local Chrome for the 3D renderer's tools: bundles the drawing page (tools/draw3-page), serves it with the Plex faces,
-// the v2 packages built from the current code and the records' teaching and kin blocks, and opens it in headless Chrome on
-// the real GPU with the frame-rate cap off. Nothing draws in Node. Uses the installed Chrome (playwright-core).
+// Local Chrome for every tool that draws: bundles the drawing page (tools/draw3-page), serves it with the Plex faces, the
+// v2 packages built from the current code and the records' teaching and kin blocks, and opens it in headless Chrome on the
+// real GPU with the frame-rate cap off. Nothing draws in Node. Uses the installed Chrome (playwright-core, channel
+// "chrome"); no browser download.
 import { createServer, type Server } from "node:http";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -9,9 +10,8 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { chromium, type Browser, type Page } from "playwright-core";
 import { recordById } from "../src/catalog";
-import { engineOf } from "../src/checks/engine";
 import { ghostTeaching } from "../tests/fixtures/ghost3";
-import { buildAnyPackage } from "../src/package/any";
+import { buildPackage } from "../src/package/build";
 import { encode2 } from "../src/package/format2";
 import type { Bench3, Draw3Options, Draw3Page, ImageOut, Meta } from "./draw3-page/main";
 import { FONT_FILES } from "./tokens-css";
@@ -58,7 +58,7 @@ function serve(js: string): Promise<{ server: Server; port: number }> {
     if (m) {
       const id = m[1]!;
       // fixture scenes (tests/fixtures/scene3.ts) are packed like mechanisms
-      const built = () => (id.startsWith("fx3-") ? import("../tests/fixtures/scene3").then((m) => encode2(m.pkg3(m.fixtures3[id]!).pkg)) : buildAnyPackage(id).then((b) => encode2(b.pkg)));
+      const built = () => (id.startsWith("fx3-") ? import("../tests/fixtures/scene3").then((m) => encode2(m.pkg3(m.fixtures3[id]!).pkg)) : buildPackage(id).then((b) => encode2(b.pkg)));
       if (!packages.has(id)) packages.set(id, built());
       packages.get(id)!.then((b) => send("application/octet-stream", b), (e: unknown) => fail(500, e));
       return;
@@ -68,7 +68,7 @@ function serve(js: string): Promise<{ server: Server; port: number }> {
       if (meta[1]!.startsWith("fx3-")) return send("application/json", JSON.stringify({ name: "Fixture", teaching: meta[1] === "fx3-ghost" ? ghostTeaching : null, kin: null } satisfies Meta));
       const rec = recordById(meta[1]!) as unknown as { name?: string; kin?: Meta["kin"]; teaching?: Meta["teaching"] } | undefined;
       if (!rec) return fail(404);
-      return send("application/json", JSON.stringify({ name: rec.name ?? meta[1]!, teaching: rec.teaching ?? null, kin: rec.kin ?? null, lifted: engineOf(meta[1]!) !== "v3" } satisfies Meta));
+      return send("application/json", JSON.stringify({ name: rec.name ?? meta[1]!, teaching: rec.teaching ?? null, kin: rec.kin ?? null } satisfies Meta));
     }
     fail(404);
   });

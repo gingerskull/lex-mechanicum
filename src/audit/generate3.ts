@@ -1,8 +1,9 @@
-// The audit generator for a mechanism rebuilt on engine v3 (standard 11, 3.0): built from the catalogue record v3 and the
-// hardware builder's assembly, with the 3D checks. Same sheet as the 2.5D generator writes, plus the `teaching:` line
+// The audit generator (standard 1 step 2, section 11): a mechanism built from its catalogue record v3 by the hardware
+// builder, with the 3D checks, written as its audit sheet. One row per requirement id parsed from the standard; evidence
+// for everything a tool can collect; a status only where a tool decides it outright, `?` elsewhere. The `teaching:` line
 // under the header, the kit and the block of each joint, the K1 residual and the claim table (T9) in the tool-decided
 // rows, and a Supports section for the support router (A19) and the see-through stage (T10 to T12). Judged rows, hand
-// cells and hand sections of an earlier sheet survive regeneration, as in the 2.5D generator.
+// cells and hand sections of an earlier sheet survive regeneration.
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type { Assembly } from "../builder";
@@ -14,11 +15,10 @@ import { encode2 } from "../package/format2";
 import { check3d, clashLines, unnecessaryLines, type Result3 } from "../checks/run";
 import { checkRecord, type RecordReport } from "../checks/record";
 import { recordSource } from "../checks/source";
-import { loadV3 } from "../checks/engine";
+import { loadV3 } from "../mechanisms";
 import type { Kin } from "../kin/types";
 import { RUNG_ORDER, rungOf, type RungId } from "../style/detail";
 import type { Solid3 } from "../solids/types";
-import { describeServers, FUNCTIONS, kb, plural, TOOL_DECIDED } from "./generate";
 import {
   deferLine,
   escapeCell,
@@ -36,7 +36,35 @@ import {
   type Requirement,
 } from "./sheet";
 
+export const FUNCTIONS = ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"] as const;
 const FN_TITLES = ["locate", "retain", "torque", "thrust", "limit", "hold", "adjust", "lube", "timing", "protect"];
+
+/**
+ * Rows whose status a tool decides outright: always regenerated, never kept from an earlier sheet (standard 11). K5 is
+ * retired in 3.0 and has no row; K1, K11, T9 and D11 are decided from the record v3 and its solids.
+ */
+export const TOOL_DECIDED = new Set(["P1", "K1", "K2", "K11", "T9", "D11", "A12", "A15", "M6", "R7", "Q1", "Q2"]);
+
+export const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : /(s|sh|ch)$/.test(w) ? "es" : "s"}`;
+export const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
+
+/** Describes the solids serving one function at one joint: named items with their count. */
+export function describeServers(ids: string[], byId: Map<string, Pick<Solid3, "name" | "kind">>): string {
+  const groups: { label: string; kind: string; n: number }[] = [];
+  for (const id of ids) {
+    const s = byId.get(id);
+    if (!s) continue;
+    // an unnamed solid is a further item of the last listed set of its kind
+    const last = [...groups].reverse().find((g) => g.kind === s.kind);
+    if (!s.name && last) last.n++;
+    else {
+      const same = groups.find((g) => g.label === (s.name || s.kind));
+      if (same) same.n++;
+      else groups.push({ label: s.name || s.kind, kind: s.kind, n: 1 });
+    }
+  }
+  return groups.map((g) => (g.n > 1 ? `${g.n} x ${g.label}` : g.label)).join("; ");
+}
 
 /** Everything the v3 sheet is written from. */
 export interface AuditInput3 {
@@ -314,7 +342,7 @@ export async function generateAudit3(id: string, opts: { existing?: string | nul
   const existing = opts.existing === undefined ? readAudit(id) : opts.existing;
   const files: Record<string, number> = { "audit.md": 0 };
   try {
-    // the v3 polish is polish3.ts while the 2.5D polish.ts lives on beside it until the cut-over
+    // the polish is polish3.ts (the polish API v3); the sheet's row keeps its name polish.ts
     const f = join(ROOT, "src", "mechanisms", id, "polish3.ts");
     files["polish.ts"] = statSync(f).size;
     files["polish.lines"] = readFileSync(f, "utf8").split(/\r?\n/).filter((l) => l.trim() && !l.trim().startsWith("//")).length;

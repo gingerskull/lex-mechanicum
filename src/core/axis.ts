@@ -1,95 +1,11 @@
-// The out-of-plane axis of a part or a solid (decision #86, option 1: a planar model with declared axes). A solid is an
-// outline in the plane normal to its axis, extruded along it. The axis is z of the base (the default: a plate lying on
-// the base), or x or y (a shaft in plan, a disc standing on edge). The solver's 2D points are read in each part's own
-// plane:
+// The axis a hardware primitive is made on (src/hardware): z of the base (the default: a plate lying on the base), or x
+// or y (a shaft in plan, a disc standing on edge). Its outline lies in the plane normal to the axis:
 //
-//   axis z: local (u, v) -> world (x, y), the extent along the axis is z (today's case);
+//   axis z: local (u, v) -> world (x, y), the extent along the axis is z;
 //   axis x: local (u, v) -> world (y, z), the extent along the axis is x;
 //   axis y: local (u, v) -> world (x, z), the extent along the axis is y.
 //
-// So v is always up (z) for an axis in plan, and an angle about a y axis turns from x toward z.
-import type { Vec2 } from "./geom";
+// The builder carries every primitive onto its joint's frame (src/builder/frames.ts), so most are made on z.
 
 export type Axis = "z" | "x" | "y";
 export type Vec3 = [number, number, number];
-/** An axis-aligned box in world mm: x0, y0, z0, x1, y1, z1. */
-export type Box3 = [number, number, number, number, number, number];
-
-/** True for an axis other than z: the part or solid stands out of the plan plane. */
-export const isOut = (axis: Axis | "p" | undefined): axis is "x" | "y" => axis === "x" || axis === "y";
-
-/** World point of a point (p, q) in the plane of `axis` at `w` along it. */
-export function toWorld(axis: Axis | undefined, [p, q]: Vec2, w: number): Vec3 {
-  if (axis === "x") return [w, p, q];
-  if (axis === "y") return [p, w, q];
-  return [p, q, w];
-}
-
-/** The unit vector of an axis in world coordinates. */
-export const axisVec = (axis: Axis | undefined): Vec3 => (axis === "x" ? [1, 0, 0] : axis === "y" ? [0, 1, 0] : [0, 0, 1]);
-
-/** The world box of an outline already posed in its plane, extruded from w0 to w1 along `axis`. */
-export function boxOf(axis: Axis | undefined, P: Vec2[], w0: number, w1: number): Box3 {
-  let p0 = Infinity;
-  let q0 = Infinity;
-  let p1 = -Infinity;
-  let q1 = -Infinity;
-  for (const [p, q] of P) {
-    if (p < p0) p0 = p;
-    if (p > p1) p1 = p;
-    if (q < q0) q0 = q;
-    if (q > q1) q1 = q;
-  }
-  if (axis === "x") return [w0, p0, q0, w1, p1, q1];
-  if (axis === "y") return [p0, w0, q0, p1, w1, q1];
-  return [p0, q0, w0, p1, q1, w1];
-}
-
-/** How far two boxes overlap: the smallest overlap over the three directions, mm (≤ 0 when they are apart). */
-export function boxOverlap(a: Box3, b: Box3): number {
-  return Math.min(Math.min(a[3], b[3]) - Math.max(a[0], b[0]), Math.min(a[4], b[4]) - Math.max(a[1], b[1]), Math.min(a[5], b[5]) - Math.max(a[2], b[2]));
-}
-
-/**
- * A posed axis: a frame read from the solved state, for a member whose axis is none of x, y, z (a universal
- * joint's cross, a swash plate). Its plane is spanned by u and v (unit, orthogonal) through the origin o; its axis is
- * u x v. A point (p, q) of the plane at w along the axis is o + p u + q v + w (u x v).
- */
-export interface Frame3 {
-  o: Vec3;
-  u: Vec3;
-  v: Vec3;
-}
-
-export const cross3 = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-
-/** A posed frame's axis, u x v. */
-export const frameAxis = (f: Frame3): Vec3 => cross3(f.u, f.v);
-
-/** The world point of (p, q) at w along a posed frame's axis. */
-export function framePoint(f: Frame3, [p, q]: Vec2, w: number): Vec3 {
-  const W = frameAxis(f);
-  return [f.o[0] + p * f.u[0] + q * f.v[0] + w * W[0], f.o[1] + p * f.u[1] + q * f.v[1] + w * W[1], f.o[2] + p * f.u[2] + q * f.v[2] + w * W[2]];
-}
-
-/** The world box of an outline in a posed frame's plane, from w0 to w1 along its axis. */
-export function frameBox(f: Frame3, P: Vec2[], w0: number, w1: number): Box3 {
-  const B: Box3 = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
-  for (const q of P)
-    for (const w of [w0, w1]) {
-      const X = framePoint(f, q, w);
-      for (let k = 0; k < 3; k++) {
-        B[k] = Math.min(B[k]!, X[k]!);
-        B[k + 3] = Math.max(B[k + 3]!, X[k]!);
-      }
-    }
-  return B;
-}
-
-/** The plan (x, y) corners of a box, for envelopes and base sizing. */
-export const planCorners = (b: Box3): Vec2[] => [
-  [b[0], b[1]],
-  [b[3], b[1]],
-  [b[3], b[4]],
-  [b[0], b[4]],
-];

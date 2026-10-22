@@ -1,4 +1,4 @@
-// Loading a v3 mechanism for the stage and the cards: the package v2 set up in a worker (decode, tessellate, edges and the
+// Loading a mechanism for the stage and the cards: the package v2 set up in a worker (decode, tessellate, edges and the
 // bake into the GPU's arrays, R9), the record's blocks, and the poser. Browser only.
 import { url } from "../url";
 type Engine = typeof import("./engine3");
@@ -8,15 +8,12 @@ export interface Meta {
   name: string;
   teaching: import("../../../src/catalog/kin").Teaching | null;
   kin: import("../../../src/catalog/kin").Kin | null;
-  /** True when a 2.5D mechanism is drawn on the v3 stage lifted (before its rebuild): its model poses the bodies. */
-  lifted: boolean;
 }
 
 export interface Loaded {
   scene: import("../../../src/render/v3/scene").Scene;
   meta: Meta;
   kinematics: import("../../../src/kin/compose").Kinematics | null;
-  model: import("../../../src/model/types").MechanismModel | null;
   /** Milliseconds: the worker's wall time, or the inline setup. */
   setupMs: number;
 }
@@ -58,10 +55,9 @@ export async function load3(E: Engine, id: string, f: ReturnType<typeof fetchAll
   const [blob, meta] = await Promise.all([f.blob, f.meta]);
   const s = await setup(E, blob);
   const kinematics = meta.kin ? new E.Kinematics(meta.kin as unknown as import("../../../src/kin/types").Kin) : null;
-  const model = meta.lifted && E.models[id] ? await E.models[id]!() : null;
   const axes: Record<string, [number, number, number]> = {};
   for (const j of meta.kin?.joints ?? []) if (Array.isArray(j.axis) && j.axis.length >= 3) axes[j.id] = [j.axis[0]!, j.axis[1]!, j.axis[2]!];
-  const poser = poserFor(E, { kinematics, model, z: s.pkg.bounds.z1, lifts: s.pkg.lifts });
+  const poser = poserFor(E, { kinematics, lifts: s.pkg.lifts });
   const scene: import("../../../src/render/v3/scene").Scene = {
     pkg: s.pkg,
     meshes: s.meshes,
@@ -72,11 +68,10 @@ export async function load3(E: Engine, id: string, f: ReturnType<typeof fetchAll
     axes,
     info: { title, no },
   };
-  return { scene, meta, kinematics, model, setupMs: s.wall };
+  return { scene, meta, kinematics, setupMs: s.wall };
 }
 
 /** The poser of the loaded mechanism at the given control settings. */
-export function poserFor(E: Engine, l: Pick<Loaded, "kinematics" | "model"> & { z: number; lifts?: Record<string, [number, number, number, number]> }, controls?: import("../../../src/kin/types").Controls) {
-  const legacy = l.model ? E.legacyPoser(l.model, l.z) : E.staticPoser;
-  return l.kinematics ? (l.model ? E.hybridPoser(legacy, E.kinPoser(l.kinematics, controls)) : E.kinPoser(l.kinematics, controls, l.lifts)) : legacy;
+export function poserFor(E: Engine, l: Pick<Loaded, "kinematics"> & { lifts?: Record<string, [number, number, number, number]> }, controls?: import("../../../src/kin/types").Controls) {
+  return l.kinematics ? E.kinPoser(l.kinematics, controls, l.lifts) : E.staticPoser;
 }

@@ -1,26 +1,21 @@
-// The stage in a real browser (SS5, SS7, SS13), local only: `npm run test:e2e` (builds the site with four-bar, bevel-gears
-// and oscillating-cylinder on the v3 stage, then runs this). A 2.5D page and a v3 page both work; the v3 stage orbits, snaps
-// to the named views, takes the record's section view and controls, honours the dial, keeps the page's scroll on a phone
-// until Orbit is on; the 3D stamp shows on v3 pages and cards only; a browser without WebGL2 gets the still. The sheet
-// switch names the sheet it switches to and turns its cog half a turn per sheet.
+// The stage in a real browser (SS5, SS7), local only: `npm run test:e2e` (builds the site, then runs this). The stage
+// opens in the record's view and plays, orbits, snaps to the named views, takes the record's section view and controls,
+// honours the dial, keeps the page's scroll on a phone until Orbit is on; a browser without WebGL2 gets the still. The
+// sheet switch names the sheet it switches to and turns its cog half a turn per sheet.
 import { existsSync, readFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { extname, join } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { allIds, engineOf } from "../../src/checks/engine";
 
 const OUT = join("dist", "site");
 const TYPES: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".woff2": "font/woff2" };
-const V3 = ["four-bar", "bevel-gears", "oscillating-cylinder", "universal-joint"];
-// a page still on the 2.5D engine (the rebuild moves the mechanisms over one batch at a time)
-const V1 = allIds().find((id) => engineOf(id) === "2.5D") ?? "spur-gears";
 
 let server: Server;
 let base = "";
 let browser: Browser;
 beforeAll(async () => {
-  if (!existsSync(join(OUT, "packages", "four-bar.mx2"))) throw new Error("build the site with SITE_V3=four-bar,bevel-gears,oscillating-cylinder first (npm run test:e2e does)");
+  if (!existsSync(join(OUT, "packages", "four-bar.mx2"))) throw new Error("build the site first (npm run test:e2e does)");
   server = createServer((q, r) => {
     let p = decodeURIComponent(new URL(q.url ?? "/", "http://x").pathname);
     if (p.endsWith("/")) p += "index.html";
@@ -75,27 +70,12 @@ const drag = async (page: Page, dx: number, dy: number) => {
   await page.mouse.up();
 };
 
-describe("a 2.5D page and a v3 page", () => {
-  it("keeps today's stage on a 2.5D mechanism: no stamp, its tilt slider and play work", async () => {
-    const ctx = await desktop();
-    const { page, errors } = await open(ctx, "/mechanisms/" + V1 + "/");
-    await page.waitForFunction(() => document.getElementById("scrubv")?.textContent !== "63°", null, { timeout: 30_000 });
-    expect(await page.locator(".stamp3d").count()).toBe(0);
-    expect(await page.locator(".stagebox").getAttribute("data-engine")).toBeNull();
-    expect(await page.locator("#presets").count()).toBe(0);
-    await page.locator("#play").click();
-    expect(await page.locator("#play").getAttribute("aria-pressed")).toBe("false");
-    await page.locator("#tilt").fill("0");
-    expect(await page.locator("#tiltv").textContent()).toBe("Plan");
-    expect(errors).toEqual([]);
-    await ctx.close();
-  });
-
-  it("opens a v3 page in the record's view with the stamp, and plays it", async () => {
+describe("a mechanism page", () => {
+  it("opens in the record's view, without the transition stamp, and plays", async () => {
     const ctx = await desktop();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
     await ready(page);
-    expect(await page.locator(".stamp3d").count()).toBe(1);
+    expect(await page.locator(".stamp3d").count()).toBe(0);
     expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
     expect(await page.locator('#presets button[data-view="PLAN"]').getAttribute("aria-pressed")).toBe("true");
     const a = await stageShot(page);
@@ -105,7 +85,7 @@ describe("a 2.5D page and a v3 page", () => {
     await ctx.close();
   });
 
-  it("draws the output plot beside a v3 stage", async () => {
+  it("draws the output plot beside the stage", async () => {
     const ctx = await desktop();
     for (const id of ["four-bar", "oscillating-cylinder"]) {
       const { page, errors } = await open(ctx, "/mechanisms/" + id + "/");
@@ -124,13 +104,11 @@ describe("a 2.5D page and a v3 page", () => {
     await ctx.close();
   });
 
-  it("shows the stamp on the library cards of v3 mechanisms only", async () => {
+  it("shows no transition stamp on the library cards", async () => {
     const ctx = await desktop();
     const { page } = await open(ctx, "/");
-    for (const id of V3) expect(await page.locator('.card[data-id="' + id + '"] .stamp3d').count(), id).toBe(1);
-    expect(await page.locator('.card[data-id="' + V1 + '"] .stamp3d').count()).toBe(0);
-    // every mechanism on engine v3 carries it, not only the ones sampled above
-    expect(await page.locator(".stamp3d").count()).toBe(allIds().filter((id) => engineOf(id) === "v3").length);
+    expect(await page.locator(".card").count()).toBeGreaterThan(0);
+    expect(await page.locator(".stamp3d").count()).toBe(0);
     await ctx.close();
   });
 });
@@ -160,10 +138,10 @@ describe("the sheet switch", () => {
 });
 
 describe("library cards", () => {
-  it("animate a v3 card with the v3 renderer on hover, and a 2.5D card with today's", async () => {
+  it("animate a card on hover from its package", async () => {
     const ctx = await desktop();
     const { page, errors } = await open(ctx, "/");
-    for (const id of ["four-bar", V1]) {
+    for (const id of ["four-bar", "spur-gears"]) {
       const card = page.locator('.card[data-id="' + id + '"]');
       await card.scrollIntoViewIfNeeded();
       await card.hover();
@@ -172,13 +150,13 @@ describe("library cards", () => {
     }
     const loaded = await page.evaluate(() => performance.getEntriesByType("resource").map((e) => e.name));
     expect(loaded.some((n) => n.endsWith("/packages/four-bar.mx2"))).toBe(true);
-    expect(loaded.some((n) => n.endsWith("/packages/four-bar.mxp"))).toBe(false);
+    expect(loaded.some((n) => n.endsWith("/packages/spur-gears.mx2"))).toBe(true);
     expect(errors).toEqual([]);
     await ctx.close();
   });
 });
 
-describe("the v3 stage on a desktop", () => {
+describe("the stage on a desktop", () => {
   it("orbits by drag, names the view it lands on, and resets", async () => {
     const ctx = await desktop();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
@@ -275,7 +253,7 @@ describe("the v3 stage on a desktop", () => {
   });
 });
 
-describe("the v3 stage on a phone", () => {
+describe("the stage on a phone", () => {
   it("lets a finger scroll the page, turns the drawing sideways, and orbits freely once Orbit is on", async () => {
     const ctx = await phone();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");

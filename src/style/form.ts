@@ -7,12 +7,6 @@ const ISO_COARSE: readonly (readonly [number, number])[] = [
 ];
 
 export const FORM = {
-  base: {
-    cornerR: 12, // mm, plan corner radius of every base plate (true circular arcs)
-    margin: 16, // mm, clearance from the swept envelope to the plate edge
-    footR: 6.5, // mm, rubber foot radius; feet sit on the corner-arc centres
-    mountHoleR: 2.8, // mm, counterbored mounting hole radius at each corner centre
-  },
   // Edge break drawn just inside every top-face edge, mm per part kind; `scale` multiplies them all.
   chamfer: {
     scale: 1.5, // factor
@@ -25,14 +19,7 @@ export const FORM = {
     csk: 0, // mm, countersunk heads get none
   },
   thread: {
-    show: true, // helix lines on threaded shanks
-    minPitchPx: 2.4, // CSS px, drawn pitch floor: real pitch or this, whichever is coarser
     pitch: (d: number): number => ISO_COARSE.find(([n]) => d <= n + 0.25)?.[1] ?? 2.5, // mm, ISO coarse pitch for Ø d mm
-  },
-  fasteners: {
-    shanks: true, // every screw head gets its threaded shank into the part it fastens (stage 3)
-    holes: true, // every plate a shank passes gets a clearance hole, tapped where it ends
-    clearance: 0.3, // mm, radial clearance of a through hole
   },
   explode: {
     gap: 11, // mm per explode level at full explode
