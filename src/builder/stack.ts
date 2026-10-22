@@ -266,8 +266,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       const lo = fb.b || !fb.m.keyed ? fb.z0 : fb.m.w0;
       if (lo - (tw + 1) > SPACER_MIN) L.add(H.spacer(`${id}-sp0`, d + 0.2, fb.b ? innerRingD(fb.b) : d + 3, { z0: tw + 1, z1: lo, body: turn }));
     } else {
-      // hung from its bridge: a circlip under the first part keeps it up
-      grooves.push(first.w0 - 4 + 0.6);
+      // hung from its bridge: a circlip under the first part keeps it up; the axle ends just under it, clear of a part
+      // that passes beneath (A12)
+      shaftSpec.z0 = first.w0 - 2.5;
+      grooves.push(first.w0 - 2.5 + 0.6);
     }
     // a live shaft hung from its bridge (named so by the record) turns in the bridge's bushing, no housing in the base
     if (support === "housing" || (live && spec.base && support !== "hung")) {
