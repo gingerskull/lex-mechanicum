@@ -128,7 +128,8 @@ describe("a 2.5D page and a v3 page", () => {
     const { page } = await open(ctx, "/");
     for (const id of V3) expect(await page.locator('.card[data-id="' + id + '"] .stamp3d').count(), id).toBe(1);
     expect(await page.locator('.card[data-id="' + V1 + '"] .stamp3d').count()).toBe(0);
-    expect(await page.locator(".stamp3d").count()).toBe(V3.length);
+    // every mechanism on engine v3 carries it, not only the ones sampled above
+    expect(await page.locator(".stamp3d").count()).toBe(allIds().filter((id) => engineOf(id) === "v3").length);
     await ctx.close();
   });
 });
