@@ -143,7 +143,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
-    if (key === "kind" || key === "mode" || key === "form" || key === "shape") return;
+    if (key === "kind" || key === "mode" || key === "form" || key === "shape" || key === "plane" || key === "law") return;
     // a parameter expression (src/kin/expr.ts) is fine when every name in it is known
     if (isStr(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);

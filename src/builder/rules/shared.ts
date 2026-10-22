@@ -198,9 +198,13 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
   if (!ctx.base || !axle) return;
-  // H.shaft starts at its low end, the free one: the axle's frame origin is that end, its z the shaft's axis
-  const out: Vec3 = v3.mul(v3.unit(axle.frame.z as Vec3), -1);
-  const end = axle.frame.o as Vec3;
+  // H.shaft starts at its low end: the axle's frame origin is that end, its z the shaft's axis. The drive takes that end,
+  // unless it faces the eye in the default view (a front elevation looking at the low end): then the far end
+  const zA = v3.unit(axle.frame.z as Vec3);
+  const far = v3.dot(zA, ctx.viewDir()) > 0.5;
+  const hA = axle.op.op === "extrude" ? axle.op.h : 0;
+  const out: Vec3 = far ? zA : v3.mul(zA, -1);
+  const end = far ? v3.add(axle.frame.o as Vec3, v3.mul(zA, hA)) : (axle.frame.o as Vec3);
   const shaftBody = axle.body;
   const S: Vec3 = v3.add(end, v3.mul(out, -6)); // the pulley's centre, 6 mm in from the end
   const up: Vec3 = [0, 0, 1];
@@ -271,9 +275,10 @@ export const drive: Rule = {
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary"),
+  // a rotary input, or an oscillating one (the same motor and belt, the motor reversing through the stroke: a servo)
+  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary" || d.kind === "oscillating"),
   apply(ctx) {
-    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
+    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary") ?? ctx.kin.drivers.find((d) => d.kind === "oscillating");
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
@@ -354,7 +359,7 @@ export const drive: Rule = {
     const tb = polar(M, 36, dir);
     ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
     ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));
-    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: "Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base${drv?.kind === "oscillating" ? ", run as a servo that reverses through the stroke" : ""}, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
     void LEVER_WALL;
   },
 };

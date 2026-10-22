@@ -162,7 +162,7 @@ export function meshOf(M: Wasm, s: Pick<Solid3, "id" | "profile" | "op" | "featu
       }
     }
     for (const f of s.features ?? []) {
-      const sh = shapeOf(M, f.profile, f.op, s.id);
+      const sh: Shape = f.mesh ? { body: fromMesh(M, f.mesh, s.id), cutters: [] } : shapeOf(M, f.profile, f.op, s.id);
       live.push(sh.body, ...sh.cutters);
       let part = keep(sh.body.asOriginal());
       const cut = f.mode === "cut";

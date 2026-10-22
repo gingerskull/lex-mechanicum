@@ -20,6 +20,8 @@ export interface KinBody {
   frame?: Frame; // pose of the body's own frame in the reference configuration; default: its `at` joint, else the world
   /** n-fold rotational symmetry about its axis (a wheel's slots, a gear's teeth z): the cycle repeats modulo 2π/n (K2). */
   symmetry?: number;
+  /** The body moves by instant drops (an escapement's wheel): its points may jump between samples by design. */
+  drops?: boolean;
   /** Bodies this one lies above in its stack (a rod pinned down onto blocks that run in a plate's grooves): a placement hint. */
   above?: string[];
 }
@@ -76,7 +78,7 @@ export interface KinJoint {
   // flexure
   neck?: Record<string, unknown>;
   // cam-contact: the cam's schedule (spans in degrees), lift, base (or prime) radius, offset and its angle at the reference
-  cam?: { schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string }[]; lift: Num; rb: Num; e?: Num; theta0?: Num };
+  cam?: { schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string }[]; lift: Num; rb: Num; e?: Num; theta0?: Num; /** "barrel": the follower runs along the cam's axis at the pitch radius rb (a barrel cam's groove). */ form?: "plate" | "barrel" };
   /** The joint is engaged only while this driver is inside [lo, hi] degrees (mod 360): a Geneva pin in its slot. */
   active?: { driver: string; lo: number; hi: number };
 }
