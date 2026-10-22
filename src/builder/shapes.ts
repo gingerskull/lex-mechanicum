@@ -138,7 +138,21 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       if (typeof shape.cone === "number") {
         // a straight bevel gear: Tredgold's back-cone teeth at the outer end, tapering toward the apex over the face
         const bv = bevel(z, m, shape.cone * D2R, num(shape.face, 0) || undefined);
-        return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
+        const outer = bevelOutline(z, m, bv.delta);
+        if (typeof shape.spiral === "number" && shape.spiral !== 0) {
+          // a spiral bevel or hypoid gear: the back-cone teeth lofted toward the apex, shrinking along the pitch cone and
+          // turning by the spiral angle along the face (left hand clockwise going in); the bore is the stack's
+          const rMean = ((z * m) / 2) * (1 - (1 - bv.inner) / 2);
+          const turn = ((bv.b * Math.tan(shape.spiral * D2R)) / rMean) * (shape.hand === "left" ? -1 : 1);
+          const n = Math.max(6, Math.ceil(Math.abs(turn) / (4 * D2R)));
+          const loft: LoftSection[] = Array.from({ length: n }, (_, i) => {
+            const t = (i + 1) / n;
+            const s = 1 - t * (1 - bv.inner);
+            return { z: t * bv.axial, outer: rot(outer, t * turn).map(([x, y]): Vec2 => [x * s, y * s]), holes: [] };
+          });
+          return { profile: { outer, holes: [] }, thick: bv.axial, approx: false, scaleTop: bv.inner, loft, exact: true };
+        }
+        return { profile: { outer, holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
       }
       if (shape.form === "worm" || shape.form === "worm wheel") return wormShape(shape, z, m);
       // a non-circular gear: teeth along its own pitch curve (the gear it drives is cut conjugate to it, conjugate.ts)

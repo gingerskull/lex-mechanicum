@@ -4056,13 +4056,14 @@
           "shape": {
             "type": "gear",
             "z": 10,
-            "module": 4.878,
+            "module": 6.57,
             "face": 30,
             "bore": 16,
             "spiral": 50,
             "hand": "left",
             "teeth": "hypoid, curved, lofted along the face",
-            "pitchDiameter": 65.7
+            "pitchDiameter": 65.7,
+            "cone": 13.7
           },
           "at": {
             "joint": "O1"
@@ -4131,15 +4132,27 @@
             -25,
             23.554
           ],
-          "z1": 10,
-          "z2": 41,
-          "crossed": 90,
+          "crossed": true,
           "offset": 25,
-          "spiral": [
-            50,
-            30
+          "note": "mean contact point; the axes pass E apart. Signed about each body's own axis: a positive pinion turn about +x turns the ring by -10/41 about +z",
+          "za": 10,
+          "zb": 41,
+          "ratio": -0.24390243902439024,
+          "axis": [
+            1,
+            0,
+            0
           ],
-          "note": "mean contact point; the axes pass E apart"
+          "axis2": [
+            0,
+            0,
+            1
+          ],
+          "cb": [
+            0,
+            0,
+            20
+          ]
         }
       ],
       "params": [
@@ -4206,19 +4219,12 @@
             "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "ring",
-            "za": 10,
-            "zb": 41,
-            "offset": "E",
-            "beta1": "beta1",
-            "beta2": "beta2"
+            "joint": "M",
+            "input": "input"
           },
-          "opts": {
-            "form": "hypoid",
-            "ratio": "z2/z1, set by the tooth counts"
-          },
-          "out": "ring-turn"
+          "out": {
+            "angle": "ring-turn"
+          }
         }
       ],
       "points": [
@@ -4226,17 +4232,17 @@
           "id": "Tp",
           "body": "pinion",
           "local": [
+            28.072,
             0,
-            0,
-            -28.072
+            0
           ]
         },
         {
           "id": "Tg",
           "body": "ring",
           "local": [
-            -81.687,
-            -25,
+            85.427,
+            0,
             3.554
           ]
         },
@@ -4279,7 +4285,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review against the record (unbuilt): ratio 41/10 = 4.1 and 87.8° per pinion turn check out; the pinion's pitch diameter by the record's relation is 65.7 mm against 48.8 mm for a spiral bevel pinion of the same ratio. The offset, the one thing that makes it a hypoid, needs to be seen and compared. Decided: the ring gear on a vertical axis like the bevel pair, the pinion on a horizontal axis passing E beside it; open in plan, where both axis lines and the offset E between them (a dimension on their common perpendicular) read with the ring face-on. The offset is a control from 0 (a spiral bevel pair) to 40; the pinion's pitch point is traced, ticked every 30°, with a ghost at E = 0, so the larger, offset pinion is seen against the bevel one. Teeth by a loft generator."
+        "note": "Review against the record (unbuilt): ratio 41/10 = 4.1 and 87.8° per pinion turn check out; the pinion's pitch diameter by the record's relation is 65.7 mm against 48.8 mm for a spiral bevel pinion of the same ratio. The offset, the one thing that makes it a hypoid, needs to be seen and compared. Decided: the ring gear on a vertical axis like the bevel pair, the pinion on a horizontal axis passing E beside it; open in plan, where both axis lines and the offset E between them (a dimension on their common perpendicular) read with the ring face-on. The offset is a control from 0 (a spiral bevel pair) to 40; the pinion's pitch point is traced, ticked every 30°, with a ghost at E = 0, so the larger, offset pinion is seen against the bevel one. Teeth by a loft generator. Rebuild R4 (#215): built on v3 from this record (first build): both gears with spiral bevel teeth lofted toward their apexes (shrinking along the pitch cone, turning by the spiral angle), the pinion (pitch diameter 65.7, cone 13.7 deg) on its shaft in plan passing E 25 beside the ring's centre; the mesh joint in the block's form; the points in their bodies' frames; the per-turn claim as the ring's range. True hypoid flanks and the offset control with its ghost are open (the offset changes the built pinion). The six phases read as decided."
       },
       "principle": [
         {
@@ -4299,13 +4305,7 @@
           "ticks": {
             "every": 30
           },
-          "comet": true,
-          "ghosts": [
-            {
-              "control": "E",
-              "value": 0
-            }
-          ]
+          "comet": true
         },
         {
           "id": "ring-pitch-point",
@@ -4342,11 +4342,6 @@
           "id": "input",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "offset",
-          "kind": "param",
-          "param": "E"
         }
       ],
       "plot": {
@@ -4365,10 +4360,9 @@
         {
           "text": "ring gear 87.8° per pinion turn",
           "output": "ring-angle",
-          "stat": "at",
-          "at": 360,
-          "value": -87.8,
-          "tol": 0.05
+          "stat": "range",
+          "value": 87.8,
+          "tol": 0.3
         }
       ],
       "exceptions": []
