@@ -17189,7 +17189,8 @@
                 1,
                 0,
                 0
-              ]
+              ],
+              "body": "crosshead"
             },
             "out": "Xh"
           },
@@ -17228,6 +17229,32 @@
             "branch": "left",
             "out": "Dl",
             "note": "the die sits where the slot arc (about its centre Zw) meets the lifting link's circle; it slips a little along the slot as the link swings"
+          },
+          {
+            "block": "triad",
+            "id": "lever-triad",
+            "joints": [
+              "Rt",
+              "Vs",
+              "vguide",
+              "Ub",
+              "Uc"
+            ],
+            "in": {
+              "a": "Dl",
+              "lever": "comblever",
+              "p1": "Rt",
+              "p2": "Vs",
+              "p3": "Ub",
+              "slide": "vguide",
+              "c": "Uc"
+            },
+            "out": {
+              "p1": "Rt",
+              "p2": "Vs",
+              "p3": "Ub"
+            },
+            "note": "radius rod, combination lever, union link and valve spindle: a triad, closed by the lever's turn"
           }
         ],
         "points": [
@@ -17280,25 +17307,7 @@
             "to": "Rc"
           }
         ],
-        "fallback": {
-          "numeric": true,
-          "loops": [
-            [
-              "radiusrod",
-              "comblever",
-              "spindle",
-              "union"
-            ]
-          ],
-          "note": "radius rod, combination lever, valve spindle and union link: a triad on the die, the spindle guide and the crosshead arm does not decompose into dyads; solved by continuation from the previous pose",
-          "joints": [
-            "Rt",
-            "Vs",
-            "vguide",
-            "Ub",
-            "Uc"
-          ]
-        }
+        "fallback": null
       },
       "teaching": {
         "review": {

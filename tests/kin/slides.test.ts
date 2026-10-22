@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { checkClaims, type Claim } from "../../src/checks/claims";
 import { Kinematics, jointResidual, resolveJoint, xf } from "../../src/kin";
 import type { Kin } from "../../src/kin/types";
+import { recordById } from "../../src/catalog";
 
 const ground = { id: "ground", role: "ground", shape: { type: "plate", rect: [100, 100] } };
 const crank = (r: number) => ({ id: "crank", role: "driver", shape: { type: "link", length: r }, at: { joint: "O" } });
@@ -112,6 +113,22 @@ describe("crank and slide forms", () => {
     const j = resolveJoint({ id: "s", type: "pin-in-slot", a: "p", b: "l", at: [100, 0, 0], axis: [0, 0, 1], slot: { arc: { center: [0, 0, 0], radius: 100 } } } as never, (v) => Number(v), (v) => (v as number[]).map(Number) as [number, number, number]);
     expect(jointResidual(j, xf.id(), xf.id())[0]).toBeCloseTo(0, 12);
     expect(jointResidual(j, xf.trans([5, 0, 0]), xf.id())[0]).toBeCloseTo(5, 12);
+  });
+});
+
+describe("triad", () => {
+  it("closes the radius rod, combination lever, union link and spindle of a valve gear at every die setting", () => {
+    const kin = recordById("walschaerts-valve-gear")!.kin as unknown as Kin;
+    const K = new Kinematics(kin);
+    for (const die of [1, 0.8, 0, -1])
+      for (const u of [0, 0.7, 2.1, 3.3, 4.9]) {
+        const P = K.pose(u, { drivers: { die } });
+        expect(P.fallback).toEqual([]);
+        for (const j of K.joints({ drivers: { die } }).filter((r) => ["Rt", "Vs", "vguide", "Ub", "Uc"].includes(r.joint.id))) {
+          const res = jointResidual(j, P.bodies.get(j.joint.a)!, P.bodies.get(j.joint.b)!);
+          expect(Math.hypot(...res), `${j.joint.id} at die ${die}, u ${u}`).toBeLessThan(1e-9);
+        }
+      }
   });
 });
 
