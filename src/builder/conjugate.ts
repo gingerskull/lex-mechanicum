@@ -74,7 +74,7 @@ export function noncircularOutline(c: PitchCurve, z: number, n = 24 * z): { oute
     const q: Vec2 = [P[k]![0] + f * (P[k + 1]![0] - P[k]![0]), P[k]![1] + f * (P[k + 1]![1] - P[k]![1])];
     const t: Vec2 = [P[k + 1]![0] - P[k]![0], P[k + 1]![1] - P[k]![1]];
     const tl = Math.hypot(t[0], t[1]) || 1;
-    let x = si - p * Math.round(si / p);
+    const x = si - p * Math.round(si / p);
     const h = Math.max(-1.25 * m, Math.min(m, (p / 4 - Math.abs(x)) / tan));
     void x;
     out.push([q[0] + (h * t[1]) / tl, q[1] - (h * t[0]) / tl]);

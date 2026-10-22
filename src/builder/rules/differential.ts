@@ -3,7 +3,6 @@
 // and the spider runs on it in a bronze bushing, a thrust washer at its back face against the cage (J3, F2, F4).
 import { H } from "../../hardware/primitives";
 import { type Vec3, v3 } from "../../kin/math";
-import type { BuildCtx } from "../ctx";
 import { frameAlong } from "../frames";
 import { Local, titleOf } from "../lib";
 import type { Rule } from "./types";
