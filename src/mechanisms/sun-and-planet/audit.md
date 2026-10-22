@@ -1,169 +1,219 @@
 # Audit: Sun and planet gear (sun-and-planet)
-standard: 2.6 · date: 2026-10-19 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
+teaching: tweak · decisions in the record
 
 ## Summary
-PASS 111 · FAIL 0 · N/A 10 · open: none
+PASS 149 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.6 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #111 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | DATA · catalogue validator clean (tests/catalog) |
-| P3 | PASS | DATA / SITE · ratio step-up (2 turns per orbit with equal gears), parallel axes, continuous non-uniform output, backdrivable, other names, family, motion, level, dof 1, motorised drive: all in the record |
-| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | DATA · motion, forces, benefits, limits; two uses with one line each |
-| P6 | PASS | DATA · Wikipedia, FIRGELLI and Princeton; a Boulton and Watt video, a Science Museum photo page, an animation; real world: three YouTube videos of the 1785 Boulton and Watt engine at the Powerhouse Museum and of a model beam engine, checked live through YouTube oEmbed (titles match); the titles cannot show that the gear is on screen: look at them when convenient |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts besides names, notes and build rules (engineering record, not on the page); lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · solve(): the retainer turns with the orbit angle u, the beam rocks -23.8° to +23.5° (the catalogue's about ±24°), the planet turns with the rod, the sun turns 2u minus the rod angle plus half a tooth; the record says two turns per orbit with equal gears and a ripple from the rod tilt |
-| P10 | PASS | HAND · paths of the rod's upper end and the planet centre, velocity of both, the connecting rod force, the output spin, the beam angle, a plot of the sun angle over the orbit |
-| P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
-| K1 | PASS | HAND · pitch circles, tooth profiles, the retainer's 72 mm, the beam's 180 and the rod's 240 are the model's; the hub sleeve, screws, stops and marks are fitted round them (check: max link error 1.1e-13 mm) (check: max link error 1.1e-13 mm) |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · only the part family: links, gears, discs, caps; fixed or at placement with spin |
-| K4 | PASS | HAND · roles driver (beam), output (sun, flywheel), link (rod, retainer, planet), pin; accent only on the input cap pOb |
-| K5 | PASS | HAND · flywheel layer -2, retainer -1, sun, planet and beam layer 0 (beam plated 8 mm up), rod layer 1 (plated 4 mm up, clear of the sun hub and the shaft end); check clean: no INTERFERE, OVERLAP or WARN (check: no INTERFERE, OVERLAP or WARN) |
-| K6 | PASS | DATA · m 3 for the catalogue's 5 (all lengths 0.6): zs 24, zp 24, c 72, beam 180, rod 240, 20°. Deliberate differences, commented in model.ts: the ground distance is 300, not the catalogue's (360 is not a crank-rocker); the orbit angle is the cycle phase; a flywheel disc is added; the planet drawn involute down to the base circle |
-| K7 | PASS | HAND · input oscillating on the beam (input oscillating on beam) |
-| D1 | PASS | HAND · involute teeth on sun and planet, keyed sun bore, tapered links with boss rings, a spoked flywheel, in the one family of forms |
-| D2 | PASS | HAND · the retainer and rod are tapered links, the rod's end boss big enough to carry the hub screws; the flywheel keeps its mass in the rim on six spokes |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets (screenshots) |
-| D4 | PASS | AUTO · feet and corner holes concentric with the base corner arcs (fired: base (1 solid), feet (4 solids)) |
-| D5 | N/A | AUTO / HAND · no bridge: the rod and the retainer sweep over the sun and the planet, so nothing fixed can span them; both pivots are held from the base by housings |
-| D6 | PASS | HAND / STYLE · stops, screws and the drive read quieter than the gears; the rod is see-through over the mesh |
-| D7 | PASS | HAND · gears, links and flywheel carry only load shape and marks; the richness is in the shafts, bearings, circlips, screws, stops and marks |
-| A1 | PASS | AUTO · pOb J2, pOs J2, pB J3, pP J3, mesh-planet-sun J6 (pOb J2, pOs J2, pB J3, pP J3, mesh-planet-sun J6; fired: classify (no solids)) |
-| A2 | PASS | AUTO · pOb and pOs live shafts (the input beam is keyed, the sun and flywheel are keyed to pOs); pB and pP shoulder bolt joints; the mesh gets mesh hardware (pOb J2, pOs J2, pB J3, pP J3, mesh-planet-sun J6) |
-| A3 | PASS | AUTO · 6800 on the Ø10 shafts in both housings; F688 and F698 on the Ø8 bolts and in the retainer on its shaft (fired: classify (no solids)) |
-| A4 | PASS | AUTO · stepped keyed shafts with circlip grooves; shoulder bolts with undercut (fired: j1-dead-axle (no solids)) |
-| A5 | PASS | AUTO · feather keys 3 x 3 on the Ø10 beam shaft and on the sun shaft (flywheel and sun) (fired: j2-live-shaft (64 solids)) |
-| A6 | N/A | AUTO · no fixed plate floating above the base: both pivots are housings under the base (fired: standoffs (no solids)) |
-| A7 | PASS | AUTO · 8 mm base, counterbored corners, feet, front scale, clearance hole for every live shaft (fired: base (1 solid), feet (4 solids)) |
-| A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 (fired: fasteners (stage 3)) |
-| A9 | PASS | AUTO / HAND · pP and pB shoulder bolts through the stack: the bolt at P runs through the retainer, planet, hub sleeve and rod; the sun shaft carries the retainer and the sun between its housing bearings and the top circlip; nothing overhangs but the shaft end, which stays under the rod (single support, 6 mm over the sun hub), the one open point of this build (fired: j2-straddle (no solids)) |
-| A10 | PASS | HAND · sun and planet in one plane, the retainer under them, the rod and beam above, the flywheel under all; nothing stacked only to clear |
-| A11 | PASS | AUTO / HAND · rod load: bolt, retainer, sun shaft, housing, base; beam load: key, shaft, housing, base (fired: j1-dead-axle (no solids)) |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · the batch issue (#215) holds only this mechanism's decisions; plan and status in #202 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site build) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in rebuild batch R4 (#215): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | PASS | DATA · catalogue validator clean |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no prose in a polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states about the motion is a claim and agrees (T9) |
+| P10 | PASS | HAND · the planet's centre P traced, ticks every 30 deg of orbit, and the beam end B; a mark on the sun traced; the arc of the rod about the retainer and the line of centres; plots of sun angle and sun speed |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 2.3e-13 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 2 blocks (dyad, gear-mesh); no numeric fallback · composed from the block library (dyad for the rod and beam, gear-mesh with the planet on a moving centre: the rod's turn from its two pins, the retainer as carrier); no fallback, no one-off model |
+| K4 | PASS | HAND · the retainer (the orbit) drives with the accent on its shaft; the sun is the output; the beam rocks |
+| K6 | PASS | DATA · module 5, sun and planet 24 teeth: orbit radius 120; beam 300 on a pivot at (-300, 400), 500 mm from the sun's shaft; rod 400 |
+| K7 | PASS | DATA · drivers orbit (rotary) · input kind declared with its driven joint (the orbit drives the cycle, as the record allows) |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one rotary driver; the tooth-count and branch design choices are not offered (parts built for 24/24) |
+| K10 | PASS | AUTO / DATA · one closure (rod and beam) and the mesh on a moving centre; the planet fixed to the rod |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
+| T2 | PASS | HAND · review before the build and again on the six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · principle parts declared; drawn whole, in depth order |
+| T4 | PASS | DATA · fired: trace-marks (no solids) · the planet's centre traced with ticks every 30 deg of orbit, the beam end traced; a mark engraved on the sun counts its two turns per orbit |
+| T5 | PASS | DATA · the arc of the rod about the retainer and the line of centres sun-planet |
+| T6 | PASS | HAND / DATA · the planet does not turn on its pin: it rides fixed to the rod and drives the sun round twice per orbit, its speed swinging 1.68 to 2.33 as the rod tilts |
+| T7 | PASS | DATA · PLAN, where the beam, the rod, the planet, the sun and the retainer show |
+| T8 | N/A | DATA · the principle lies in plain view, no section needed |
+| T9 | PASS | AUTO / DATA · claim table: 4 ok, 0 off, 0 uncheckable of 4 |
+| T10 | PASS | AUTO · 2 solids drawn see-through: B-bolt-wsh, B-bolt-head · nothing static covers the gears: the beam pivot's bridge stands far off |
+| T11 | PASS | AUTO · 1 support routed, 0 moved off a sweep · the beam pivot's bridge first choice, off every sweep |
+| T12 | PASS | HAND · 13 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · nothing goes by in a blink |
+| T14 | PASS | HAND / DATA · the orbit (input); no other control (K9) |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · involute sun and planet, module 5; the planet fixed under the rod's end; a flywheel disc under the sun |
+| D2 | PASS | HAND · material where the teeth carry; links tapered to their bosses |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · one bridge over the beam's pivot; the sun's housing under the base; motor flange |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
+| D9 | N/A | AUTO / HAND · no member changes shape |
+| D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
+| D11 | PASS | AUTO · SOLID: 0 of 130 solids unsound |
+| D7 | PASS | HAND · gears plain; richness in the stacks |
+| A1 | PASS | AUTO · M J6, B J3, P J3, Os J2, Ob J1, Ob-beam-stops stops, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · M J6, B J3, P J3, Os J2, Ob J1, Ob-beam-stops stops, drive drive · the retainer keyed to the driven live shaft (J2), the sun and its flywheel turning free on it in bearings; rod, beam and retainer pins as shoulder bolts (J3); the beam's pivot a dead axle (J1) under a bridge; the mesh J6 |
+| A3 | PASS | AUTO · fired: classify (6 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them |
+| A4 | PASS | AUTO · fired: j1-dead-axle (27 solids), axial stack builder · stepped shafts with shoulders, grooves, flats and chamfered ends (H.shaft) |
+| A5 | PASS | AUTO · fired: j2-live-shaft (36 solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
+| A6 | N/A | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · no slide and no floating plate |
+| A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base 8 mm under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (11 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | PASS | AUTO / HAND · fired: placement solver · the shaft held from below, its end held by a washer and screw: the rod passes over it |
+| A10 | PASS | HAND · fired: placement (12 solids), placement solver · flywheel, sun and planet, retainer and beam, rod on top: the rod passes over the shaft end, the retainer above the gears, the planet fixed under the rod two slabs down |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (27 solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes, sets counted (150 solids, 69 unnamed (further items of a listed set)) |
-| A14 | PASS | HAND · stops 2° beyond the beam's swing, outside the rod's and the retainer's sweeps; clearance 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · a note and a badge on every joint, five build rules (5 build rules; no note: none; no badge: none) |
-| A17 | PASS | HAND · housings and shafts from below, flywheel, retainer, sun with key and hub, planet and rod with the hub sleeve and four screws, bolt at P, beam on its shaft with the bolt at B, stops; every screw reachable, bearings pressed out past their circlips |
-| E1 | PASS | AUTO · one level per solid (every solid has one explode level; levels -8 to 4.5) |
-| E2 | PASS | AUTO · screws, shafts and bought units are groups (36 rigid groups; fired: explode) |
-| E3 | PASS | AUTO · screws leave along their axis to the head side, nuts the other way (screenshots at 28° and 70°) (fired: explode) |
-| E4 | PASS | HAND · bolt heads, rod and beam go furthest up, sun and planet in the middle, retainer and flywheel below: reverse of assembly |
-| E5 | PASS | AUTO · bearings and circlips stay in their parts (fired: explode) |
-| E6 | PASS | AUTO · motor with its bracket, bearings whole (fired: explode) |
-| E7 | PASS | AUTO · spacers midway (fired: explode) |
-| E8 | PASS | AUTO · keyed parts keep their order on the shaft (fired: explode) |
-| E9 | PASS | HAND · looked at full explode at 28° and 70°, both sheets: nothing inside another part, nothing leaves the frame |
-| J1 | N/A | AUTO · no dead axle: both ground pivots carry a keyed part (J2) (fired: j1-dead-axle (no solids)) |
-| J2 | PASS | AUTO · beam: housing, keyed shaft, drive lever below the base; sun shaft: housing with two bearings, sleeve, wave washer, keyed flywheel and sun, the retainer on its own bearing, end circlip (fired: j2-live-shaft (64 solids), j2-straddle (no solids)) |
-| J3 | PASS | AUTO · pB: shoulder bolt threaded into the beam, bearing in the rod; pP: shoulder bolt threaded into the retainer, bearing in the planet, hub sleeve, rod bolted to the planet (fired: j3-moving-pin (30 solids)) |
-| J4 | N/A | AUTO · no such joint here (fired: j4-slot-roller (no solids)) |
-| J5 | N/A | AUTO · no such joint here (fired: j5-slide (no solids)) |
-| J6 | PASS | AUTO · planet-sun: hub with set screw on the keyed sun, eccentric bushing under the sun shaft's housing, marks on the planet tooth and the sun gap (fired: j6-mesh (2 solids)) |
-| J7 | N/A | AUTO · no such joint here (fired: j7-cam (no solids)) |
-| J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension (fired: j8-belt (no solids)) |
-| F1 | PASS | AUTO · both housings dowelled; shoulders of the bolts in reamed holes (served at pOb, pOs; fired: j2-live-shaft (64 solids)) |
-| F2 | PASS | AUTO · housing bearings on circlips; the retainer's bearing on internal circlips and the stack; planet bearing circlipped; end circlip; bolt heads (served at pOb, pOs, pB, pP; fired: j2-live-shaft (64 solids)) |
-| F3 | PASS | AUTO · feather keys and hub set screw on the sun and the flywheel, a key on the beam; the retainer turns free on its bearing; the planet is bolted to the rod (served at pOb, pOs, mesh-planet-sun; fired: j2-live-shaft (64 solids)) |
-| F4 | PASS | AUTO / HAND · bronze thrust washers on both shafts, wave washers in the housings; straight teeth carry no axial thrust (served at pOb, pOs; fired: j2-live-shaft (64 solids)) |
-| F5 | PASS | AUTO / HAND · H.stops pair 2° beyond each end of the beam's rocking (rule skips an oscillating input; with the drive off the beam could over-travel) (served at pOb; fired: j5-slide (no solids), stops (no solids)) |
-| F6 | N/A | AUTO / HAND · driven through the mesh; no rest position to hold (served at no joint; fired: j7-cam (no solids)) |
-| F7 | PASS | AUTO / HAND · eccentric bushing under the sun shaft's housing sets the backlash; belt tension at the motor mount; the retainer's length fixes the centre distance (served at pOs, mesh-planet-sun; fired: j6-mesh (2 solids), j5-slide (no solids)) |
-| F8 | PASS | AUTO · open teeth greased at assembly; bearings sealed or shielded (served at no joint; fired: lubrication (no solids)) |
-| F9 | PASS | AUTO / HAND · match marks on the planet tooth and the sun gap (rule); the beam's swing engraved on the base with an index line on the beam (polish) (served at pOb, mesh-planet-sun; fired: timing-marks (no solids)) |
-| F10 | PASS | AUTO / HAND · pulley flanges, home flag, fork sensor; no slip clutch (none planned) (served at drive; fired: drive (33 solids)) |
-| M1 | PASS | AUTO · edge breaks on every top face (fired: hardware primitives) |
-| M2 | PASS | HAND · the gears are small and solid; the flywheel is a rim on six spokes (mass in the rim, filleted); the links are tapered, no extra mass |
-| M3 | PASS | AUTO · bore entry chamfers on every seat and through hole (fired: j3-moving-pin (30 solids), hardware primitives) |
-| M4 | PASS | AUTO / HAND · counterbored base corners and housing screws; button heads on the hub screws need no seat (fired: base (1 solid), fasteners (stage 3)) |
-| M5 | N/A | AUTO / HAND · no pockets or windows (fired: hardware primitives) |
+| A13 | PASS | AUTO / HAND · 130 solids, 68 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps; details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 7 joint notes; no note: none; no badge: M · a note per joint; build rules: the retainer keyed to the driven shaft, the sun free on it; the planet fixed to the rod through the P pin, the retainer between them |
+| A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
+| A18 | PASS | AUTO · placement: 4 slabs in the tallest stack (54.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver; a level may stand more than one slab from its part |
+| A19 | PASS | AUTO · 1 support routed (0 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: none · the beam pivot's bridge first choice; least gap 1.5 mm |
+| A20 | PASS | AUTO · support per joint: Ob bridge · one axial stack builder with its support selector |
+| A21 | PASS | AUTO · kit per joint: M J6, B J3, P J3, Os J2, Ob J1, Ob-beam-stops stops, drive drive |
+| A22 | PASS | AUTO · fired: stops (8 solids), adjustable-length (no solids), cable-clip (2 solids) · stops on the beam's swing; cable clip |
+| E1 | PASS | AUTO · every solid has one explode level; levels -4.5 to 6 · one level per solid, nothing stretches |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable in ISOMETRIC on both sheets, nothing leaves the frame |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | PASS | AUTO · fired: trunnion (no solids), j1-dead-axle (27 solids) · the beam's pivot: dead axle under a bridge, bearing in the beam's boss |
+| J2 | PASS | AUTO · fired: j2-live-shaft (36 solids) · the central shaft: housing under the base, the retainer keyed, the sun and the flywheel on bearings, the end held by a washer and screw |
+| J3 | PASS | AUTO · fired: j3-moving-pin (22 solids), cross-bearings (no solids), ring-hub (no solids) · P and B: shoulder bolts through the rod's ends, bearings in the retainer and the beam |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J5 | N/A | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) · no slide |
+| J6 | PASS | AUTO · fired: j6-mesh (1 solid), ring-carrier (no solids), ring-rollers (no solids) · the mesh: eccentric bushing for the centre distance, timing marks at the mesh |
+| J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids) · no shaft in plan |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at Os, Ob; fired: j2-live-shaft (36 solids), j10-shaft-in-plan (no solids), ring-carrier (no solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
+| F2 | PASS | AUTO · served at B, P, Os, Ob; fired: j2-live-shaft (36 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), ring-carrier (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F3 | PASS | AUTO · served at B, P, Os; fired: j2-live-shaft (36 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
+| F4 | PASS | AUTO / HAND · served at P, Os, Ob; fired: j9-crossed-mesh (no solids), j2-live-shaft (36 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
+| F5 | PASS | AUTO / HAND · served at Ob-beam-stops; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (8 solids) · stop pins at both ends of the beam's swing |
+| F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
+| F7 | PASS | AUTO / HAND · served at M; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · eccentric bushing sets the centre distance and backlash |
+| F8 | PASS | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (1 solid) · sealed bearings need none; open contacts oiled or greased where they occur |
+| F9 | PASS | AUTO / HAND · served at M; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), timing-marks (2 solids) · timing marks at the mesh |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) · home flag and fork sensor on the input (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · bosses round every loaded hole |
+| M3 | PASS | AUTO · fired: j3-moving-pin (22 solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (11 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | N/A | HAND · no bracket or plate with a loaded inside corner: the links are tapered bars |
-| M8 | PASS | AUTO · thread undercut on the shoulder bolts and axles (fired: j1-dead-axle (no solids)) |
-| M9 | PASS | AUTO / HAND · planet bolt M6 into 6 mm of steel (retainer), hub screws M3 into 4 mm of steel planet beyond 1 d; housing screws as the rule (fired: j1-dead-axle (no solids)) |
-| M10 | PASS | AUTO / HAND · steel gears with induction-hardened teeth, steel flywheel and shafts, aluminium links and base, bronze washers (150 of 150 solids name a material) |
-| M11 | PASS | AUTO · centre holes and chamfered ends on the shafts (fired: j1-dead-axle (no solids), hardware primitives) |
-| M12 | PASS | HAND · every head reachable: hub screws from above, set screws from the side; bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw, nyloc where a nut, set screws low strength (52 threaded, 0 without a locking method) |
-| M14 | N/A | AUTO / HAND · no sliding wear surface: the rollers turn in bearings, teeth are hardened (fired: j4-slot-roller (no solids)) |
-| V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 (fired: drive (33 solids)) |
-| V2 | PASS | AUTO · one-piece bracket, flange screws up into the base (fired: drive (33 solids)) |
-| V3 | PASS | AUTO / HAND · belt and pulleys clear of feet and housing; clearance 0 (fired: drive (33 solids)) |
-| V4 | PASS | AUTO · flanges, set screws, slotted mount (fired: j8-belt (no solids)) |
-| V5 | PASS | AUTO · oscillating: motor, short crank and link swinging a lever on the beam's shaft through the modelled range (the beam's own swing, -23.8° to +23.5°) (fired: drive (33 solids)) |
-| V6 | PASS | AUTO · home flag, fork sensor, leads to the terminal block, P-clip (fired: drive (33 solids)) |
-| L1 | PASS | STYLE · lint-style clean |
-| L2 | PASS | HAND · model and polish carry geometry, roles, marks and materials only |
-| L3 | PASS | HAND · beam driver, sun and flywheel output, rod, retainer and planet link, hardware hw |
-| L4 | PASS | HAND / STYLE · accent on the input cap only |
-| L5 | PASS | AUTO / HAND · screws, bearings and spacers are real solids in real holes; the rod is drawn see-through over the mesh (fired: see-through) |
-| L6 | PASS | AUTO · depth order right at plan, 28°, side and explode in both sheets |
-| L7 | PASS | STYLE · tilt 0° to 88°, no shear |
-| L8 | PASS | AUTO / HAND · match marks and tapped-hole rings are marks |
-| R1 | PASS | HAND · the polish reuses H.tube, H.screw, H.stops, H.spokes; no inline standard part |
-| R2 | PASS | HAND · threads M3, M5, M6; shafts Ø10 and Ø8 bolts; two bearing sizes (threads M3, M4, M5, M6; joint Ø 8, 10; bearings 6800-2RS (10x19x5), F6800ZZ (10x19x5), F688ZZ (8x16x5), F698ZZ (8x19x6)) |
-| R3 | PASS | AUTO · housing, bridge and drive from their subassemblies (fired: hardware primitives) |
-| R4 | PASS | AUTO · package built at build time (package 26.5 KB) |
-| R5 | PASS | HAND · states only what differs; polish about 1 ms |
-| R6 | PASS | FLAG · FLAG: browser bench 2026-10-19: plan 2.65, 28° 2.48, side 2.18, explode 2.44 ms at full detail; setup 9.1 ms; under the 8 ms target at every dial position |
-| R7 | PASS | HAND · model.ts + polish.ts 10.5 KB |
-| R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung (60 of 150 solids on a dropping rung) |
-| DL2 | PASS | HAND · default dial full (model detail full) |
-| DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
-| DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
-| DL5 | PASS | FLAG · FLAG: rung counts and frame times in the detail ladder below |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | PASS | AUTO · fired: j1-dead-axle (27 solids) · thread undercuts on stepped shafts |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (27 solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 124 of 130 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (27 solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 17 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
+| V1 | PASS | AUTO · fired: drive (26 solids) · pancake motor on the input, belted to the input shaft |
+| V2 | PASS | AUTO · fired: drive (26 solids) · one bracket for the motor |
+| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
+| V5 | PASS | AUTO · fired: drive (26 solids) · rotary input: belt to the input pulley |
+| V6 | PASS | AUTO · fired: drive (26 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records and polish carry no look |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (2 solids) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (no solids) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | N/A | AUTO / DATA · no section or detail view declared |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 25.9 KB · package v2 written at build time |
+| R5 | PASS | HAND · no polish; nothing sampled by hand |
+| R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 51 of 130 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 26.5 KB; site build not checked here · package written; site build left to CI |
-| Q4 | PASS | local: tools/shot · plan, 28°, side, explode at 28° and 70°, both sheets, overlays on, all looked at; attach to #111 |
-| Q5 | PASS | local: tools/bench · browser bench run; flags under Verification |
-| Q6 | PASS | · every row judged |
-| Q7 | PASS | · conformance: sun-and-planet at 2.6, pass |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 25.9 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · dist/shots3/sun-and-planet: record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench3 run (desktop) |
+| Q6 | PASS | every row judged |
+| Q7 | PASS | at 3.0 |
+| Q8 | PASS | teaching review: tweak (2026-10-20); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pOb | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | 2 x Stop bumper, neoprene sleeve Ø12 | – driven by the drive link | – nothing to adjust here | – sealed bearings | Base plate; Beam | – see drive |
-| pOs | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 3 x Internal circlip DIN 472, Ø19; Bearing F6800ZZ (10x19x5); External circlip DIN 471, Ø10; Shaft collar 10x20, set screw | Feather key 3 x 3 x 6 (DIN 6885); Feather key 3 x 3 x 7 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – turns fully | – driven through the mesh | Eccentric bushing Ø26, 0.3 mm offset bore Ø12, flanged | – sealed bearings | – the marks are on the mesh | – see drive |
-| pB | J3 | – the shoulder sits in a reamed hole | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | – turns free on its bearing | – shim washer under the head sets the end-shake | – the beam's stops limit it | – driven | – nothing to adjust here | – sealed bearings | – no phase | – nothing to protect |
-| pP | J3 | – the shoulder sits in a reamed hole in the retainer | Internal circlip DIN 472, Ø19; Bearing F698ZZ (8x19x6); head | Hub sleeve and four M3 screws fix the rod to the planet | – shim washer under the head sets the end-shake | – turns fully | – driven | – the retainer's length sets the centre distance | – sealed bearing | – the marks are on the mesh | – nothing to protect |
-| mesh-planet-sun | J6 | – located by the shafts and the retainer | – nothing to retain | Gear hub Ø22, set screw M3 on the key; Set screw M3 (DIN 916), threadlocked | – straight teeth, no thrust | – turns fully | – driven through the mesh | Eccentric bushing Ø26, 0.3 mm offset bore Ø12, flanged | – open teeth greased at assembly | Planet gear, 24 teeth, fixed to the rod; Sun gear, 24 teeth | – see drive |
-| drive | drive | – | – | – | – | – | – | – | – | – | Home flag on the drive crank; 3 x Fork sensor, slotted optical, 5 mm gap |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| M | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Rod; Sun | none |
+| B | J3 | gear-mesh | – | – | none | Shoulder bolt Ø12 x 16, M10 (ISO 7379) | Shoulder bolt Ø12 x 16, M10 (ISO 7379) | none | none | none | none | none | none | none |
+| P | J3 | dyad | – | – | none | Shoulder bolt Ø12 x 25, M10 (ISO 7379) | Shoulder bolt Ø12 x 25, M10 (ISO 7379) | Inner-race spacer 12.2x15.1 | none | none | none | none | none | none |
+| Os | J2 | – | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø24; 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the retainer on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 8 (DIN 6885) | 2 x Inner-race spacer 12.2x16.2; Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| Ob | J1 | dyad | bridge | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
+| Ob-beam-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| Ob-bridge | Ob | bridge | first choice | 1.5 | – | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| planet and rod | two separate parts, each with a bearing from the rule | one bearing (the planet's), a hub sleeve and four M3 screws fix the rod to the planet; the rod's bearing and circlip dropped | the planet must not turn relative to the rod (J3, A9) |
-| rod and beam heights | rod layer 1, beam layer 2 | rod plated 4 mm up, the beam on layer 0 plated 8 mm up | the rod clears the sun hub and shaft end; the long spacers the stack needed are gone (K1: heights only) |
-| sun key | body sun, clashes with the shaft (body flywheel) | allow-list on the key for the shaft's segments | the key sits in the shaft's keyway; both turn with the sun |
-| beam stops | skipped by the rule (the drive limits the input) | H.stops pair 2° beyond the swing | F5 with the drive off |
+| the central shaft | every gear on a live shaft keyed | the retainer keyed, the sun and its flywheel on bearings | they turn at different rates on one axis (one shaft keys only the bodies that turn together) |
+| the rod's planet | a separate body on a pin | a level of the rod (a gear fixed on its end), under the rod | the planet does not turn on the rod; it meshes in the sun's slab |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 16 | 0 | 2.28 |
-| DL-B | 0 | 227 | 1.78 |
-| DL-C | 0 | 0 | 1.84 |
-| DL-D | 25 | 0 | 1.67 |
-| DL-E | 8 | 2 | 1.48 |
-| DL-F | 0 | 0 | 1.56 |
-| DL-G | 0 | 0 | 1.35 |
-| DL-H | 11 | 0 | 1.44 |
-| never | 90 | 211 | 2.61 (full) |
+| DL-A | 17 | 0 | – |
+| DL-B | 0 | 204 | – |
+| DL-C | 0 | 0 | 1.11 |
+| DL-D | 18 | 0 | – |
+| DL-E | 8 | 3 | – |
+| DL-F | 0 | 0 | – |
+| DL-G | 0 | 0 | 1.12 |
+| DL-H | 8 | 0 | – |
+| never | 79 | 273 | 1.01 (full) |
 
 ## Promotion candidates
-- The sun key with the keyed flywheel on the same shaft needs the allow-list by hand: the J2 rule should put every key of a shaft in the shaft's body, or give each keyed part's key the shaft's allow-list.
-- Three mechanisms now need the same hand-built oscillating-input stops and swing scale (Watt, Chebyshev, Ackermann, double-rocker, sun-and-planet): promote the F5 stops and the F9 scale to rules.
+None left: a gear fixed on a link's end, a flywheel level under a gear and a shaft that keys only what turns together are rules of the builder.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.5 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets, drawn in local Chrome to dist/shots/sun-and-planet/ (plan, 28° and the explode looked at) · bench: browser, DPR 1.5, 2026-10-19; plan 2.65 ms, 28° 2.48 ms, side 2.18 ms, explode 70° 2.44 ms at full detail, 8 ms held at every dial (R6)
+check: clean · K1 residual: 2.3e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.9 KB
+screenshots: dist/shots3/sun-and-planet (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 1.01 ms full, 1.11 at C, 1.12 at G; phone by David)

@@ -94,11 +94,15 @@
             0,
             0
           ],
-          "z": [
-            14,
-            28
+          "ratio": -0.5,
+          "za": 14,
+          "zb": 28,
+          "cb": [
+            84,
+            0,
+            0
           ],
-          "ratio": -0.5
+          "note": "pitch point; signed about each body's own axis"
         }
       ],
       "params": [
@@ -165,20 +169,15 @@
           "block": "gear-mesh",
           "id": "mesh",
           "joints": [
-            "M",
-            "O2"
+            "O2",
+            "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "gear",
-            "za": "z1",
-            "zb": "z2",
-            "module": "m"
+            "joint": "M",
+            "input": "input"
           },
-          "out": "gear-angle",
-          "opts": {
-            "external": true,
-            "phase": 6.429
+          "out": {
+            "angle": "gear-turn"
           }
         }
       ],
@@ -248,7 +247,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The pair reads as the textbook figure: two pitch circles rolling at the pitch point, the gear turning the other way at half speed. Marks on both pitch circles with ticks every 30 degrees of input show equal arcs at the pitch line, which is why the ratio is the tooth ratio; the line of action is drawn at the 20 degree pressure angle."
+        "note": "Applies the 2026-10-19 review (keep). The pair reads as the textbook figure: two pitch circles rolling at the pitch point, the gear turning the other way at half speed. Marks on both pitch circles with ticks every 30 degrees of input show equal arcs at the pitch line, which is why the ratio is the tooth ratio; the line of action is drawn at the 20 degree pressure angle. Rebuild R4 (#215): built on v3 from this record; the six phases of the finished build read as decided (the bridges over both gears drawn see-through, moved off the pitch point); the tooth-count choices are not offered as controls, the parts are built for 14/28."
       },
       "principle": [
         {
@@ -384,8 +383,7 @@
               {
                 "z": 12,
                 "module": 3,
-                "face": 8,
-                "dz": 10
+                "face": 8
               }
             ]
           },
@@ -467,11 +465,14 @@
             0,
             0
           ],
-          "z": [
-            12,
-            36
-          ],
-          "ratio": -0.3333333333333333
+          "ratio": -0.3333333333333333,
+          "za": 12,
+          "zb": 36,
+          "cb": [
+            72,
+            0,
+            0
+          ]
         },
         {
           "id": "M2",
@@ -483,12 +484,15 @@
             15.893,
             10
           ],
-          "z": [
-            12,
-            36
-          ],
           "ratio": -0.3333333333333333,
-          "note": "the cluster's 12-tooth pinion, one layer up"
+          "note": "the cluster's 12-tooth level, one slab up",
+          "za": 12,
+          "zb": 36,
+          "cb": [
+            105.802,
+            63.572,
+            10
+          ]
         }
       ],
       "params": [
@@ -568,42 +572,30 @@
           "block": "gear-mesh",
           "id": "stage1",
           "joints": [
-            "M1",
-            "B"
+            "B",
+            "M1"
           ],
           "in": {
-            "a": "a",
-            "b": "cluster",
-            "za": "za",
-            "zb": "zb",
-            "module": "m"
+            "joint": "M1",
+            "input": "input"
           },
-          "out": "cluster-angle",
-          "opts": {
-            "external": true,
-            "phase": 185
+          "out": {
+            "angle": "cluster-turn"
           }
         },
         {
           "block": "gear-mesh",
           "id": "stage2",
           "joints": [
-            "M2",
-            "D"
+            "D",
+            "M2"
           ],
           "in": {
-            "a": "cluster",
-            "b": "d",
-            "za": "zc",
-            "zb": "zd",
-            "angle": "cluster-angle",
-            "module": "m"
+            "joint": "M2",
+            "input": "cluster-turn"
           },
-          "out": "d-angle",
-          "opts": {
-            "external": true,
-            "line": 62,
-            "phase": 206
+          "out": {
+            "angle": "d-turn"
           }
         }
       ],
@@ -652,7 +644,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). Two 3:1 stages on a shared shaft read clearly, the second one layer above the first. Equal-time ticks every 45 degrees on a mark of the input pinion and of the output gear make the 9:1 visible: eight ticks round a full circle against eight ticks inside 40 degrees, both turning the same way."
+        "note": "Applies the 2026-10-19 review (keep). Two 3:1 stages on a shared shaft read clearly, the second one layer above the first. Equal-time ticks every 45 degrees on a mark of the input pinion and of the output gear make the 9:1 visible: eight ticks round a full circle against eight ticks inside 40 degrees, both turning the same way. Rebuild R4 (#215): built on v3 from this record; the cluster is one body with two keyed levels (36 and 12 teeth), its 12-tooth level one slab up meshing with the output; the six phases of the finished build read as decided; the tooth-count choices are not offered as controls, the parts are built for 12/36 twice."
       },
       "principle": [
         {
@@ -788,6 +780,13 @@
           },
           "at": {
             "joint": "S"
+          },
+          "frame": {
+            "origin": [
+              6.283,
+              -32,
+              0
+            ]
           }
         }
       ],
@@ -838,12 +837,14 @@
             -32,
             0
           ],
-          "z": [
-            16
-          ],
-          "rack": true,
-          "ratio": 32,
-          "note": "rack: travel mm per radian of pinion = pitch radius"
+          "note": "rack: the rack slides along +x by the pitch radius (32 mm) per radian of pinion",
+          "radiusA": 32,
+          "za": 16,
+          "axis2": [
+            1,
+            0,
+            0
+          ]
         }
       ],
       "params": [
@@ -902,19 +903,15 @@
           "block": "gear-mesh",
           "id": "mesh",
           "joints": [
-            "M",
-            "S"
+            "S",
+            "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "rack",
-            "za": "z",
-            "module": "m"
+            "joint": "M",
+            "input": "input"
           },
-          "out": "rack-x",
-          "opts": {
-            "rack": true,
-            "offset": 6.283
+          "out": {
+            "travel": "rack-x"
           }
         }
       ],
@@ -986,7 +983,7 @@
       "outputs": [
         {
           "id": "rack-travel",
-          "of": "rack-mark",
+          "of": "rack",
           "kind": "position",
           "unit": "mm"
         },
@@ -1003,7 +1000,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The pinion swings 150 degrees each way and the rack slides 167.6 mm. A mark on the pinion's pitch circle and one on the rack's pitch line, both ticked every 30 degrees of input, show the same 16.8 mm per tick: the pitch circle rolls on the pitch line without slip. The line of action at 20 degrees is drawn through the pitch point."
+        "note": "Applies the 2026-10-19 review (keep). The pinion swings 150 degrees each way and the rack slides 167.6 mm. A mark on the pinion's pitch circle and one on the rack's pitch line, both ticked every 30 degrees of input, show the same 16.8 mm per tick: the pitch circle rolls on the pitch line without slip. The line of action at 20 degrees is drawn through the pitch point. Rebuild R4 (#215): built on v3 from this record; the rack is toothed on its pitch line and guided from its back (its toothed side open for the pinion); the pinion's 300 deg swing is driven by the belt drive with a reversing motor; the six phases of the finished build read as decided; the tooth-count choice is not offered as a control, the parts are built for 16 teeth."
       },
       "principle": [
         {
@@ -1184,12 +1181,16 @@
             0,
             0
           ],
-          "z": [
-            18,
-            40
-          ],
           "ratio": 0.45,
-          "internal": true
+          "internal": true,
+          "za": 18,
+          "zb": 40,
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "note": "pitch point; an internal mesh: both centres on one side of it, so both turn the same way"
         }
       ],
       "params": [
@@ -1255,20 +1256,15 @@
           "block": "gear-mesh",
           "id": "mesh",
           "joints": [
-            "M",
-            "O2"
+            "O2",
+            "M"
           ],
           "in": {
-            "a": "pinion",
-            "b": "ring",
-            "za": "z1",
-            "zb": "z2",
-            "module": "m"
+            "joint": "M",
+            "input": "input"
           },
-          "out": "ring-angle",
-          "opts": {
-            "internal": true,
-            "phase": 0
+          "out": {
+            "angle": "ring-turn"
           }
         }
       ],
@@ -1338,7 +1334,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep) and issue #215: a mark on the ring so its slow turn in the same direction reads. Marks on both pitch circles, ticked every 30 degrees of input, cover equal arcs; the line of centres shows both centres on the same side of the pitch point, which is why both turn the same way, the ring at 0.45 of the pinion."
+        "note": "Applies the 2026-10-19 review (keep) and issue #215: a mark on the ring so its slow turn in the same direction reads. Marks on both pitch circles, ticked every 30 degrees of input, cover equal arcs; the line of centres shows both centres on the same side of the pitch point, which is why both turn the same way, the ring at 0.45 of the pinion. Rebuild R4 (#215): built on v3 from this record; the ring, open in the middle where the pinion runs, rides on three flanged carrier rollers round its rim instead of a centre shaft; the ring's mark is engraved on it and traced; the six phases of the finished build read as decided; the tooth-count choices are not offered as controls, the parts are built for 18/40."
       },
       "principle": [
         {
@@ -1491,11 +1487,10 @@
             "arms": 3,
             "radius": 48,
             "boss": [
-              18,
-              10
+              16,
+              11
             ],
-            "plates": 2,
-            "gap": 14
+            "thickness": 6
           },
           "at": {
             "joint": "Oc"
@@ -1585,7 +1580,7 @@
           "at": [
             0,
             0,
-            0
+            20
           ],
           "axis": [
             0,
@@ -1651,10 +1646,9 @@
             0,
             0
           ],
-          "z": [
-            13,
-            11
-          ]
+          "za": 13,
+          "zb": 11,
+          "carrier": "carrier"
         },
         {
           "id": "SP1",
@@ -1666,10 +1660,9 @@
             22.517,
             0
           ],
-          "z": [
-            13,
-            11
-          ]
+          "za": 13,
+          "zb": 11,
+          "carrier": "carrier"
         },
         {
           "id": "SP2",
@@ -1681,10 +1674,9 @@
             -22.517,
             0
           ],
-          "z": [
-            13,
-            11
-          ]
+          "za": 13,
+          "zb": 11,
+          "carrier": "carrier"
         },
         {
           "id": "PR0",
@@ -1696,11 +1688,10 @@
             0,
             0
           ],
-          "z": [
-            11,
-            35
-          ],
-          "internal": true
+          "internal": true,
+          "za": 11,
+          "zb": 35,
+          "carrier": "carrier"
         },
         {
           "id": "PR1",
@@ -1712,11 +1703,10 @@
             60.622,
             0
           ],
-          "z": [
-            11,
-            35
-          ],
-          "internal": true
+          "internal": true,
+          "za": 11,
+          "zb": 35,
+          "carrier": "carrier"
         },
         {
           "id": "PR2",
@@ -1728,11 +1718,10 @@
             -60.622,
             0
           ],
-          "z": [
-            11,
-            35
-          ],
-          "internal": true
+          "internal": true,
+          "za": 11,
+          "zb": 35,
+          "carrier": "carrier"
         }
       ],
       "params": [
@@ -1794,10 +1783,10 @@
           "kind": "rotary",
           "range": [
             0,
-            1329.231
+            1329.2307692307693
           ],
           "default": 0,
-          "cycle": 1329.231,
+          "cycle": 1329.2307692307693,
           "note": "one cycle is one carrier turn (48/13 sun turns), after which the train looks the same"
         },
         {
@@ -1829,25 +1818,56 @@
             "PR2"
           ],
           "in": {
-            "sun": "sun",
-            "ring": "ring",
-            "carrier": "carrier",
-            "planets": [
-              "planet0",
-              "planet1",
-              "planet2"
+            "zs": 13,
+            "zr": 35,
+            "zp": 11,
+            "center": [
+              0,
+              0,
+              0
             ],
-            "zs": "zs",
-            "zp": "zp",
-            "zr": "zr"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "sun": "input",
+            "ring": "ring-hold",
+            "bodies": {
+              "sun": "sun",
+              "ring": "ring",
+              "carrier": "carrier"
+            },
+            "planets": [
+              {
+                "body": "planet0",
+                "center": [
+                  48,
+                  0,
+                  0
+                ]
+              },
+              {
+                "body": "planet1",
+                "center": [
+                  -24,
+                  41.569,
+                  0
+                ]
+              },
+              {
+                "body": "planet2",
+                "center": [
+                  -24,
+                  -41.569,
+                  0
+                ]
+              }
+            ]
           },
-          "out": [
-            "carrier-angle",
-            "planet-angle"
-          ],
-          "opts": {
-            "relation": "(ws - wc)/(wr - wc) = -zr/zs",
-            "planetPhase": "from the ring mesh at each planet's carrier angle"
+          "out": {
+            "carrier": "carrier-turn",
+            "spin": "planet-spin-v"
           }
         }
       ],
@@ -1871,7 +1891,7 @@
         },
         {
           "id": "planet-spin",
-          "of": "C0",
+          "of": "planet-spin-v",
           "kind": "angle",
           "unit": "deg"
         },
@@ -1887,7 +1907,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (tweak) and issue #215: trace a point on planet 0, on its pitch circle, instead of the planet centre, which only draws a plain circle. That point draws the hypocycloid of a 22 mm circle rolling inside the 70 mm ring pitch circle, with cusps where it touches the held ring and stops: the planet visibly rolls on the ring while the carrier turns once per 3.69 sun turns. The ring is a second driver, held at 0 by default, so the two-input Willis relation can be shown by hand."
+        "note": "Applies the 2026-10-19 review (tweak) and issue #215: trace a point on planet 0, on its pitch circle, instead of the planet centre, which only draws a plain circle. That point draws the hypocycloid of a 22 mm circle rolling inside the 70 mm ring pitch circle, with cusps where it touches the held ring and stops: the planet visibly rolls on the ring while the carrier turns once per 3.69 sun turns. The ring is a second driver, held at 0 by default, so the two-input Willis relation can be shown by hand. Rebuild R4 (#215): built on v3 from this record; the carrier is a three-arm spider on its own axle above the planets (its ground joint declared at its own height, 20 mm up, so the sun's input shaft below and the carrier's axle above are separate), hung from a bridge whose posts stand outside the ring; the ring runs on three carrier rollers, with a knob and an index plunger for its manual hold; the planets' turn on their pins is the willis block's spin; the six phases of the finished build read as decided. Tooth and planet counts are not offered as controls."
       },
       "principle": [
         {
@@ -2043,9 +2063,7 @@
               20,
               8
             ],
-            "plates": 2,
-            "gap": 26,
-            "note": "one carrier outline holding a short and a long pinion pin per set"
+            "note": "one carrier spider under the gears, on a bearing on the small sun's shaft, holding a short and a long pinion pin per set"
           },
           "at": {
             "joint": "Jc"
@@ -2114,9 +2132,18 @@
             "type": "gear",
             "z": 24,
             "module": 2,
-            "face": 22,
+            "face": 10,
             "bore": 8,
-            "note": "one gear twice the face width: the lower half meshes the short pinion, the upper half the large sun and the ring"
+            "cluster": [
+              {
+                "z": 24,
+                "module": 2,
+                "face": 10,
+                "bore": 8,
+                "joined": true
+              }
+            ],
+            "note": "one long pinion through two slabs: the lower half meshes the short pinion, the upper half the large sun and the ring"
           },
           "at": {
             "joint": "JL0"
@@ -2129,9 +2156,18 @@
             "type": "gear",
             "z": 24,
             "module": 2,
-            "face": 22,
+            "face": 10,
             "bore": 8,
-            "note": "one gear twice the face width: the lower half meshes the short pinion, the upper half the large sun and the ring"
+            "cluster": [
+              {
+                "z": 24,
+                "module": 2,
+                "face": 10,
+                "bore": 8,
+                "joined": true
+              }
+            ],
+            "note": "one long pinion through two slabs: the lower half meshes the short pinion, the upper half the large sun and the ring"
           },
           "at": {
             "joint": "JL1"
@@ -2144,9 +2180,18 @@
             "type": "gear",
             "z": 24,
             "module": 2,
-            "face": 22,
+            "face": 10,
             "bore": 8,
-            "note": "one gear twice the face width: the lower half meshes the short pinion, the upper half the large sun and the ring"
+            "cluster": [
+              {
+                "z": 24,
+                "module": 2,
+                "face": 10,
+                "bore": 8,
+                "joined": true
+              }
+            ],
+            "note": "one long pinion through two slabs: the lower half meshes the short pinion, the upper half the large sun and the ring"
           },
           "at": {
             "joint": "JL2"
@@ -2324,10 +2369,9 @@
             0,
             0
           ],
-          "z": [
-            30,
-            18
-          ]
+          "za": 30,
+          "zb": 18,
+          "carrier": "carrier"
         },
         {
           "id": "M1_1",
@@ -2339,10 +2383,9 @@
             25.981,
             0
           ],
-          "z": [
-            30,
-            18
-          ]
+          "za": 30,
+          "zb": 18,
+          "carrier": "carrier"
         },
         {
           "id": "M1_2",
@@ -2354,10 +2397,9 @@
             -25.981,
             0
           ],
-          "z": [
-            30,
-            18
-          ]
+          "za": 30,
+          "zb": 18,
+          "carrier": "carrier"
         },
         {
           "id": "M2_0",
@@ -2369,10 +2411,9 @@
             17.878,
             0
           ],
-          "z": [
-            18,
-            24
-          ]
+          "za": 18,
+          "zb": 24,
+          "carrier": "carrier"
         },
         {
           "id": "M2_1",
@@ -2384,10 +2425,9 @@
             30.821,
             0
           ],
-          "z": [
-            18,
-            24
-          ]
+          "za": 18,
+          "zb": 24,
+          "carrier": "carrier"
         },
         {
           "id": "M2_2",
@@ -2399,10 +2439,9 @@
             -48.699,
             0
           ],
-          "z": [
-            18,
-            24
-          ]
+          "za": 18,
+          "zb": 24,
+          "carrier": "carrier"
         },
         {
           "id": "M3_0",
@@ -2414,10 +2453,12 @@
             25.03,
             12
           ],
-          "z": [
-            24,
-            36
-          ]
+          "za": 24,
+          "zb": 36,
+          "carrier": "carrier",
+          "level": {
+            "long0": 1
+          }
         },
         {
           "id": "M3_1",
@@ -2429,10 +2470,12 @@
             9.894,
             12
           ],
-          "z": [
-            24,
-            36
-          ]
+          "za": 24,
+          "zb": 36,
+          "carrier": "carrier",
+          "level": {
+            "long1": 1
+          }
         },
         {
           "id": "M3_2",
@@ -2444,10 +2487,12 @@
             -34.923,
             12
           ],
-          "z": [
-            24,
-            36
-          ]
+          "za": 24,
+          "zb": 36,
+          "carrier": "carrier",
+          "level": {
+            "long2": 1
+          }
         },
         {
           "id": "M4_0",
@@ -2459,11 +2504,13 @@
             58.403,
             12
           ],
-          "z": [
-            24,
-            84
-          ],
-          "internal": true
+          "internal": true,
+          "za": 24,
+          "zb": 84,
+          "carrier": "carrier",
+          "level": {
+            "long0": 1
+          }
         },
         {
           "id": "M4_1",
@@ -2475,11 +2522,13 @@
             23.085,
             12
           ],
-          "z": [
-            24,
-            84
-          ],
-          "internal": true
+          "internal": true,
+          "za": 24,
+          "zb": 84,
+          "carrier": "carrier",
+          "level": {
+            "long1": 1
+          }
         },
         {
           "id": "M4_2",
@@ -2491,11 +2540,13 @@
             -81.488,
             12
           ],
-          "z": [
-            24,
-            84
-          ],
-          "internal": true
+          "internal": true,
+          "za": 24,
+          "zb": 84,
+          "carrier": "carrier",
+          "level": {
+            "long2": 1
+          }
         }
       ],
       "params": [
@@ -2593,8 +2644,7 @@
             360
           ],
           "default": 0,
-          "joint_by": "input-member",
-          "note": "the input member's joint: the small sun, or the large sun (Jsl) in reverse"
+          "note": "the input member turns: the small sun, or the large sun in reverse (the gear block turns the member the selector names); the gear selector sets the cycle"
         },
         {
           "id": "gear",
@@ -2642,7 +2692,7 @@
       ],
       "solve": [
         {
-          "block": "willis",
+          "block": "ravigneaux",
           "id": "train",
           "joints": [
             "Jsl",
@@ -2668,45 +2718,67 @@
             "M4_2"
           ],
           "in": {
-            "sunS": "sunS",
-            "sunL": "sunL",
-            "carrier": "carrier",
-            "ring": "ring",
-            "short": [
-              "short0",
-              "short1",
-              "short2"
+            "zSs": 30,
+            "zSl": 36,
+            "zPs": 18,
+            "zPl": 24,
+            "zR": 84,
+            "center": [
+              0,
+              0,
+              0
             ],
-            "long": [
-              "long0",
-              "long1",
-              "long2"
+            "axis": [
+              0,
+              0,
+              1
             ],
-            "Ss": "Ss",
-            "Sl": "Sl",
-            "Ps": "Ps",
-            "Pl": "Pl",
-            "R": "R",
             "input": "input",
             "inputMember": "input-member",
             "held": "held-member",
-            "locked": "locked"
-          },
-          "out": [
-            "carrier-angle",
-            "ring-angle",
-            "sunL-angle",
-            "sunS-angle",
-            "short-spin",
-            "long-spin"
-          ],
-          "opts": {
-            "relations": [
-              "(wR - wc)/(wSl - wc) = -Sl/R",
-              "(wR - wc)/(wSs - wc) = +Ss/R"
+            "locked": "locked",
+            "bodies": {
+              "sunS": "sunS",
+              "sunL": "sunL",
+              "carrier": "carrier",
+              "ring": "ring"
+            },
+            "short": [
+              {
+                "body": "short0",
+                "joint": "JS0"
+              },
+              {
+                "body": "short1",
+                "joint": "JS1"
+              },
+              {
+                "body": "short2",
+                "joint": "JS2"
+              }
             ],
-            "held": "angle 0",
-            "locked": "the two members share one angle"
+            "long": [
+              {
+                "body": "long0",
+                "joint": "JL0"
+              },
+              {
+                "body": "long1",
+                "joint": "JL1"
+              },
+              {
+                "body": "long2",
+                "joint": "JL2"
+              }
+            ]
+          },
+          "out": {
+            "carrier": "carrier-turn",
+            "ring": "ring-turn",
+            "sunL": "sunL-turn",
+            "sunS": "sunS-turn",
+            "short": "short-spin-v",
+            "long": "long-spin-v"
           }
         }
       ],
@@ -2742,7 +2814,7 @@
         },
         {
           "id": "long-spin",
-          "of": "JL0",
+          "of": "long-spin-v",
           "kind": "angle",
           "unit": "deg"
         },
@@ -3000,7 +3072,7 @@
               "module": 5,
               "face": 14,
               "at": "P",
-              "note": "the planet is fixed to the rod's lower end"
+              "below": true
             }
           },
           "at": {
@@ -3017,10 +3089,8 @@
             "face": 14,
             "bore": 16,
             "disc": {
-              "radius": 130,
-              "thickness": 16,
-              "dz": -24,
-              "note": "flywheel on the sun shaft"
+              "radius": 100,
+              "thickness": 12
             }
           },
           "at": {
@@ -3066,8 +3136,8 @@
           "a": "beam",
           "b": "rod",
           "at": [
-            -0.578,
-            381.394,
+            -0.5775548382523823,
+            381.393567419835,
             0
           ],
           "axis": [
@@ -3134,10 +3204,15 @@
             0,
             0
           ],
-          "z": [
-            24,
-            24
-          ]
+          "za": 24,
+          "zb": 24,
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "carrier": "retainer",
+          "note": "the planet is fixed to the rod's end: the sun turns by the orbit plus the ratio times the rod's turn relative to the retainer"
         }
       ],
       "params": [
@@ -3210,10 +3285,11 @@
         {
           "id": "branch",
           "options": [
-            "beam-level",
-            "beam-hanging"
+            "beam-hanging",
+            "beam-level"
           ],
-          "value": "beam-level"
+          "value": "beam-level",
+          "note": "the dyad's root: beam-level is the right-hand closure of rod and beam seen from above"
         }
       ],
       "drivers": [
@@ -3248,27 +3324,36 @@
           "out": "B"
         },
         {
-          "block": "willis",
+          "block": "gear-mesh",
           "id": "sun-planet",
           "joints": [
             "M",
             "Os"
           ],
           "in": {
-            "carrier": "retainer",
-            "planet": "rod",
-            "sun": "sun",
-            "zs": "zs",
-            "zp": "zp"
+            "joint": "M",
+            "line": [
+              "P",
+              "B"
+            ],
+            "carrier": "orbit"
           },
-          "out": "sun-angle",
-          "opts": {
-            "relation": "(ws - wc)/(wp - wc) = -zp/zs; the planet turns with the rod",
-            "phase": 7.5
+          "out": {
+            "angle": "sun-turn"
           }
         }
       ],
-      "points": [],
+      "points": [
+        {
+          "id": "sun-mark",
+          "body": "sun",
+          "local": [
+            110,
+            0,
+            0
+          ]
+        }
+      ],
       "outputs": [
         {
           "id": "sun-angle",
@@ -3294,7 +3379,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (tweak) and issue #215: the retaining link that holds the planet in mesh is drawn on top, and a mark on the sun lets the two turns per orbit be counted. Built at the record's scale (module 5, orbit 120, beam 300, rod 400); the beam pivot is moved to 500 mm from the sun shaft so the retainer turns fully while the beam rocks 47.3 degrees. The rod tilts as it moves, so the sun's speed swings between 1.68 and 2.33 times the orbit speed: the speed-ratio plot shows it."
+        "note": "Applies the 2026-10-19 review (tweak) and issue #215: the retaining link that holds the planet in mesh is drawn on top, and a mark on the sun lets the two turns per orbit be counted. Built at the record's scale (module 5, orbit 120, beam 300, rod 400); the beam pivot is moved to 500 mm from the sun shaft so the retainer turns fully while the beam rocks 47.3 degrees. The rod tilts as it moves, so the sun's speed swings between 1.68 and 2.33 times the orbit speed: the speed-ratio plot shows it. Rebuild R4 (#215): built on v3 from this record: the planet a gear fixed under the rod's end, the sun's speed from the rod's own turn and the orbit (the gear-mesh block with the planet on a moving centre), a flywheel disc (radius 100, so it passes under the P pin) under the sun; the retainer keyed to the driven shaft above the gears, the sun free on it, the rod on top passing over the shaft end. Record fixes: the rod-beam branch option order (beam-level is the root that reproduces B), B given exactly, a mark on the sun. The six phases of the finished build read as decided."
       },
       "principle": [
         {
@@ -3322,6 +3407,10 @@
         {
           "id": "beam-end",
           "point": "B"
+        },
+        {
+          "id": "sun-mark",
+          "point": "sun-mark"
         }
       ],
       "overlays": [
@@ -3415,7 +3504,7 @@
             "frame": {
               "origin": [
                 0,
-                40,
+                -40,
                 -110
               ]
             }
@@ -3443,23 +3532,20 @@
             "type": "gear",
             "z": 41,
             "module": 4.878,
-            "face": 26,
+            "face": 18,
             "cone": 76.293,
-            "bore": 30,
-            "case": {
-              "type": "cage",
-              "radius": 52,
-              "length": 90,
-              "pin": {
-                "axis": [
-                  0,
-                  0,
-                  1
-                ],
-                "diameter": 14
-              }
-            },
-            "note": "the ring gear bolted to the case that carries the cross-pin"
+            "bore": 120,
+            "note": "the ring gear, bolted to the case's cage that carries the cross-pin",
+            "facing": -1,
+            "backFace": 24.39,
+            "cage": {
+              "from": -42,
+              "to": 30.4,
+              "half": 54,
+              "wall": 6,
+              "thickness": 10,
+              "reach": 72
+            }
           },
           "at": {
             "joint": "Oc"
@@ -3474,7 +3560,8 @@
             "module": 4,
             "face": 14,
             "bore": 14,
-            "cone": 32.005
+            "cone": 32.005,
+            "facing": -1
           },
           "at": {
             "joint": "Os0"
@@ -3504,7 +3591,8 @@
             "module": 4,
             "face": 14,
             "bore": 16,
-            "cone": 57.995
+            "cone": 57.995,
+            "backFace": -20
           },
           "at": {
             "joint": "OL"
@@ -3519,7 +3607,9 @@
             "module": 4,
             "face": 14,
             "bore": 16,
-            "cone": 57.995
+            "cone": 57.995,
+            "facing": -1,
+            "backFace": 20
           },
           "at": {
             "joint": "OR"
@@ -3534,7 +3624,7 @@
           "b": "pinion",
           "at": [
             0,
-            100,
+            -100,
             0
           ],
           "axis": [
@@ -3597,7 +3687,7 @@
           "a": "case",
           "b": "sideL",
           "at": [
-            -20,
+            0,
             0,
             0
           ],
@@ -3613,7 +3703,7 @@
           "a": "case",
           "b": "sideR",
           "at": [
-            20,
+            0,
             0,
             0
           ],
@@ -3630,14 +3720,29 @@
           "b": "case",
           "at": [
             24.39,
-            100,
+            -100,
             0
           ],
-          "z": [
-            10,
-            41
+          "crossed": true,
+          "za": 10,
+          "zb": 41,
+          "ratio": 0.24390243902439024,
+          "axis": [
+            0,
+            1,
+            0
           ],
-          "crossed": 90
+          "axis2": [
+            1,
+            0,
+            0
+          ],
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "note": "the pinion on the ring gear, the case's; a positive pinion turn about +y turns the case by +10/41 about +x"
         },
         {
           "id": "M0L",
@@ -3649,11 +3754,26 @@
             0,
             32
           ],
-          "z": [
-            10,
-            16
+          "crossed": true,
+          "za": 10,
+          "zb": 16,
+          "ratio": 0.625,
+          "axis": [
+            0,
+            0,
+            1
           ],
-          "crossed": 90
+          "axis2": [
+            1,
+            0,
+            0
+          ],
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "carrier": "case"
         },
         {
           "id": "M0R",
@@ -3665,11 +3785,26 @@
             0,
             32
           ],
-          "z": [
-            10,
-            16
+          "crossed": true,
+          "za": 10,
+          "zb": 16,
+          "ratio": -0.625,
+          "axis": [
+            0,
+            0,
+            1
           ],
-          "crossed": 90
+          "axis2": [
+            1,
+            0,
+            0
+          ],
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "carrier": "case"
         },
         {
           "id": "M1L",
@@ -3681,11 +3816,26 @@
             0,
             -32
           ],
-          "z": [
-            10,
-            16
+          "crossed": true,
+          "za": 10,
+          "zb": 16,
+          "ratio": 0.625,
+          "axis": [
+            0,
+            0,
+            -1
           ],
-          "crossed": 90
+          "axis2": [
+            1,
+            0,
+            0
+          ],
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "carrier": "case"
         },
         {
           "id": "M1R",
@@ -3697,11 +3847,26 @@
             0,
             -32
           ],
-          "z": [
-            10,
-            16
+          "crossed": true,
+          "za": 10,
+          "zb": 16,
+          "ratio": -0.625,
+          "axis": [
+            0,
+            0,
+            -1
           ],
-          "crossed": 90
+          "axis2": [
+            1,
+            0,
+            0
+          ],
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "carrier": "case"
         }
       ],
       "params": [
@@ -3784,12 +3949,12 @@
           "joint": "OL",
           "kind": "rotary",
           "range": [
-            -360,
-            360
+            -180,
+            180
           ],
           "default": 0,
-          "rate": "split",
-          "note": "the second input: the left side gear's angle relative to the case, split times the case angle"
+          "note": "the second input: the left side gear's turn relative to the case, split times the case's turn per cycle (its rate, a param)",
+          "rate": "split"
         }
       ],
       "solve": [
@@ -3797,24 +3962,19 @@
           "block": "gear-mesh",
           "id": "final-drive",
           "joints": [
-            "Mpr",
-            "Oc"
+            "Oc",
+            "Mpr"
           ],
           "in": {
-            "a": "pinion",
-            "b": "case",
-            "za": "z_pinion",
-            "zb": "z_ring",
-            "module": "m-ring"
+            "joint": "Mpr",
+            "input": "input"
           },
-          "out": "case-angle",
-          "opts": {
-            "bevel": true,
-            "crossed": 90
+          "out": {
+            "angle": "case-turn"
           }
         },
         {
-          "block": "willis",
+          "block": "bevel-diff",
           "id": "spider-train",
           "joints": [
             "OR",
@@ -3826,26 +3986,35 @@
             "M1R"
           ],
           "in": {
-            "carrier": "case",
-            "carrierAngle": "case-angle",
-            "left": "sideL",
-            "right": "sideR",
-            "spiders": [
-              "spider0",
-              "spider1"
-            ],
+            "case": "case",
             "difference": "difference",
-            "zs": "z_side",
-            "zp": "z_spider"
+            "sides": {
+              "left": [
+                "sideL",
+                "OL"
+              ],
+              "right": [
+                "sideR",
+                "OR"
+              ]
+            },
+            "spiders": [
+              {
+                "body": "spider0",
+                "joint": "Os0"
+              },
+              {
+                "body": "spider1",
+                "joint": "Os1"
+              }
+            ],
+            "zs": 16,
+            "zp": 10
           },
-          "out": [
-            "left-angle",
-            "right-angle",
-            "spider-angle"
-          ],
-          "opts": {
-            "relation": "(wL - wc)/(wR - wc) = -1; spider spin relative to the case = (wL - wc) z_side / z_spider",
-            "bevel": true
+          "out": {
+            "left": "left-rel",
+            "right": "right-rel",
+            "spin": "spider-spin-v"
           }
         }
       ],
@@ -3856,7 +4025,7 @@
           "local": [
             0,
             32,
-            0
+            -20
           ]
         },
         {
@@ -3865,7 +4034,7 @@
           "local": [
             0,
             32,
-            0
+            20
           ]
         },
         {
@@ -3891,7 +4060,7 @@
           "body": "ground",
           "local": [
             0,
-            190,
+            -190,
             0
           ]
         },
@@ -3908,18 +4077,18 @@
           "id": "pin-top",
           "body": "case",
           "local": [
+            52,
             0,
-            0,
-            52
+            0
           ]
         },
         {
           "id": "pin-bottom",
           "body": "case",
           "local": [
+            -52,
             0,
-            0,
-            -52
+            0
           ]
         }
       ],
@@ -3944,7 +4113,7 @@
         },
         {
           "id": "spider-spin",
-          "of": "Os0",
+          "of": "spider-spin-v",
           "kind": "angle",
           "unit": "deg"
         }
@@ -3955,7 +4124,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms."
+        "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms. Rebuild R4 (#215): built on v3 from this record (first build): the pinion turns the case through the ring gear, a bevel-diff block turns the side gears plus and minus the difference relative to the case and spins the spiders on the cage's cross-pin; the second driver's speed follows the split param (claims at split 0 and -1 checked at those settings). Record fixes: the meshes in the block's form (signed ratios, axes, the case as carrier of the spider meshes), the pinion moved to the other side of the case (its shaft's free end away from the case takes the drive, and the case then turns +10/41 as claimed), bevels facing down where their apex lies below their frame, the side gears' revolutes at the case's centre (they run on its shaft), the ring's face 18 (it clears the right side gear along the shaft), the axis overlays as lines. The six phases and the section read as decided."
       },
       "principle": [
         {
@@ -3994,21 +4163,21 @@
       "overlays": [
         {
           "id": "side-axis",
-          "kind": "axis-line",
+          "kind": "line",
           "from": "side-axis-l",
           "to": "side-axis-r",
           "label": "SIDE GEAR AXIS"
         },
         {
           "id": "pinion-axis",
-          "kind": "axis-line",
+          "kind": "line",
           "from": "apex",
           "to": "pinion-axis-end",
           "label": "PINION AXIS"
         },
         {
           "id": "cross-pin",
-          "kind": "axis-line",
+          "kind": "line",
           "from": "pin-top",
           "to": "pin-bottom",
           "label": "CROSS-PIN"

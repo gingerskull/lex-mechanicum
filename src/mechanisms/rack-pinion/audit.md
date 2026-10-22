@@ -1,170 +1,216 @@
 # Audit: Rack and pinion (rack-pinion)
-standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 112 · FAIL 0 · N/A 9 · open: none
+PASS 149 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.3 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · issue #35 holds the mechanism-specific points only |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | DATA · npm run catalog: vocabularies OK |
-| P3 | PASS | DATA / SITE · facts come from the record; drive reads motorised (rotary input kind) |
-| P4 | PASS | DATA · tags grouped Function, Property, Application with keywords |
-| P5 | PASS | DATA · explain (motion, forces, benefits, limits) and four real-world uses present |
-| P6 | PASS | DATA · Wikipedia, Cornell KMODDL and SDP/SI references; photo page and video in media; two YouTube real-world videos added (Pilatus Railway cab ride, Avid CNC gantry on rack and pinion), found by search, confirmed to exist by oEmbed, checked by title and channel only (not watched in full) |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts beyond part and joint names and notes (engineering record) |
-| P8 | PASS | SITE · no parts list or joint sections on the page; notes and rules live in the audit record |
-| P9 | PASS | HAND · explain says the pinion swings and the rack moves pitch radius times the angle, 83.8 mm each way: matches solve() (x = p/2 + 32 θ, ±150°) and the plot |
-| P10 | PASS | HAND · overlays checked in the plan screenshot: path of the rack (first path, comet), rack velocity, tooth force along the line of action (flips with the swing direction), 20° pressure angle, plot of rack travel |
-| P11 | PASS | DATA · record prose unchanged in this pass; plain language, mm and degrees |
-| K1 | PASS | HAND · pitch radius 32, pitch line y = -32, half pitch phasing from model.ts; the polish adds hardware only; check link error 0 |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · P.gear, P.rack, P.cap only |
-| K4 | PASS | HAND · roles driver (pinion), output (rack), pin; accent on the input cap pO only |
-| K5 | PASS | HAND · pinion and rack share layer 0 (they mesh in one plane); ground pivot cap layer -1 radius 7; check clean |
-| K6 | PASS | DATA · z 16, m 4, rp 32, p 12.566, 20°, ±150°, 17 teeth (k -8 to 8), half pitch offset: as the build spec. Deviation, commented in model.ts: the input kind is declared rotary (a reversing servo through the belt) where the spec says oscillating; see K7 |
-| K7 | PASS | HAND · input rotary on the pinion. The spec says oscillating, but the oscillating drive (crank and link, V5) cannot give a 300° swing: the link would have to cross the shaft (clash with the housing parts, and a lever tip circling the shaft). A reversing servo through the standard belt gives exactly the modelled swing. Decision for the owner, listed in the issue |
-| D1 | PASS | HAND · true involute pinion with keyed bore, rack from P.rack, plain bars and plates in the one family of forms |
-| D2 | PASS | HAND · material where the load runs: pinion and rack are solid at 7 mm; guide bars, keepers and stops are plain load-driven bars |
-| D3 | PASS | STYLE · roles by surface pattern (driver stipple, output hatching, ground bars plain) |
-| D4 | PASS | AUTO · base and feet from the rules |
-| D5 | PASS | AUTO / HAND · the pinion bridge is H.bridge on two spigoted Ø10 posts |
-| D6 | PASS | HAND / STYLE · screenshots: supporting hardware quieter than the rack and pinion, nothing distracts |
-| D7 | PASS | HAND · rack, pinion, bars and base are plain; the richness is in gib, keeper, wipers, stops, roller, bridge and bearings |
-| A1 | PASS | AUTO · pO J2, mesh J6 (rack form) classified; the slide and the backing roller are not found by the rules (rack guide, see variants), so the polish adds them as joints rack-slide (J5) and rack-yoke (J4) |
-| A2 | PASS | AUTO · pO live shaft; mesh hardware; slide and roller built by hand |
-| A3 | PASS | AUTO · Ø10 shaft, 6800 bearings in the housing, 6800 floating in the bridge |
-| A4 | PASS | AUTO · the live shaft is a stepped profile with grooves, key seat, chamfers; no dead axle on this mechanism |
-| A5 | PASS | AUTO · Ø10 shaft, 3 x 3 feather key, hub with set screws |
-| A6 | PASS | AUTO · the bridge posts are Ø10 standoffs screwed from both sides with spigots. No plate floats on standoffs and no J5 rail exists, so the risers of A6 do not apply: guide bars and bed bear on the base over their whole length, screwed; the bed and rear guide bars dowelled |
-| A7 | PASS | AUTO · 8 mm base, counterbored corner holes, rubber feet, engraved path of the rack pitch line, scale, clearance hole for the live shaft |
-| A8 | PASS | AUTO · stage 3 fasteners: every screw has its shank, clearance holes through keepers, bars and bed, tapped in the base |
-| A9 | PASS | AUTO / HAND · pinion straddle mounted (floating flanged bearing in a bridge on the side away from the rack): the straddle rule skips rack meshes, so the polish calls it (AUTO-TODO, promotion candidate). The rack is guided on both sides |
-| A10 | PASS | HAND · pinion and rack in one plane, guides in one plane with the rack, keepers one level above; nothing stacked only to clear something |
-| A11 | PASS | AUTO / HAND · pinion: tooth force into the shaft, then bearings, housing, base; separating force into the backing roller, its stud and the base; rack load through the bed into the base. Housing, bridge, guides screwed and dowelled |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · the batch issue (#215) holds only this mechanism's decisions; plan and status in #202 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site build) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in rebuild batch R4 (#215): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | PASS | DATA · catalogue validator clean |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no prose in a polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states about the motion is a claim and agrees (T9) |
+| P10 | PASS | HAND · marks on the pinion's pitch circle and the rack's pitch line, ticks every 30 deg; pitch circle, pitch line and the 20 deg line of action; plot of rack travel |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 4.3e-15 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 1 block (gear-mesh); no numeric fallback · composed from the block library (gear-mesh, rack form: travel = pitch radius x angle); no fallback, no one-off model |
+| K4 | PASS | HAND · pinion driver with the accent on its shaft, rack output |
+| K6 | PASS | DATA · module 4, 16 teeth: pitch radius 32, 32 mm of rack per radian, 0.559 mm per degree |
+| K7 | PASS | DATA · drivers input (oscillating) · oscillating driver ±150 deg declared with its driven joint |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one oscillating driver; the tooth-count design choice is not offered as a control (parts built for 16 teeth) |
+| K10 | PASS | AUTO / DATA · one closure; the rack mesh declared with the pitch radius and the slide's axis |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
+| T2 | PASS | HAND · review before the build and again on the six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · principle parts declared; drawn whole, in depth order |
+| T4 | PASS | DATA · fired: trace-marks (2 solids) · a mark on the pinion's pitch circle and one on the rack's pitch line, ticks every 30 deg: equal 16.8 mm steps on both |
+| T5 | PASS | DATA · the pitch circle, the pitch line and the line of action through the pitch point |
+| T6 | PASS | HAND / DATA · the pitch circle rolls on the pitch line without slip: the two tick rows match tick for tick |
+| T7 | PASS | DATA · PLAN, where the pitch circle and the pitch line show true |
+| T8 | N/A | DATA · the principle lies in plain view, no section needed |
+| T9 | PASS | AUTO / DATA · claim table: 2 ok, 0 off, 0 uncheckable of 2 |
+| T10 | PASS | AUTO · 0 solids drawn see-through · the bridge over the pinion drawn see-through with its stack (A19); the rack's toothed side has no rail over it |
+| T11 | PASS | AUTO · 1 support routed, 1 moved off a sweep · the pinion's bridge moved off the mesh; the rack's guides kept to its back |
+| T12 | PASS | HAND · 16 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · nothing goes by in a blink |
+| T14 | PASS | HAND / DATA · the input; no other control (K9) |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · involute pinion, module 4; a straight-flanked 20 deg rack on the same pitch |
+| D2 | PASS | HAND · material where the teeth carry; plain gear discs on keyed hubs |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · one bridge over the pinion on two posts; the rack's gibbed rail, way and keeper; the motor flange and the drive's gear sector on its post under the base |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
+| D9 | N/A | AUTO / HAND · no member changes shape |
+| D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
+| D11 | PASS | AUTO · SOLID: 0 of 117 solids unsound |
+| D7 | PASS | HAND · gears plain; richness in the stacks |
+| A1 | PASS | AUTO · M J6, O J2, S J5, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · M J6, O J2, S J5, drive drive · pinion on a live shaft (J2) straddled by a bridge; rack on a slide (J5) guided from its back; parallel mesh J6 |
+| A3 | PASS | AUTO · fired: classify (3 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them |
+| A4 | PASS | AUTO · fired: j1-dead-axle (no solids), axial stack builder · stepped shafts with shoulders, grooves, flats and chamfered ends (H.shaft) |
+| A5 | PASS | AUTO · fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
+| A6 | PASS | AUTO · fired: j5-slide (25 solids), j13-compliant (no solids), standoffs (no solids) · the rack on a gibbed rail under a keeper and a hardened strip on a ground way under its back half; its toothed side open |
+| A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base 8 mm under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (23 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | PASS | AUTO / HAND · fired: placement solver · pinion straddle mounted (housing under, bridge over) |
+| A10 | PASS | HAND · fired: placement (4 solids), placement solver · pinion and rack on one slab; nothing stacked to clear |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · names with real sizes (6800, 624, M3 to M5, DIN 916, DIN 6885); the unnamed solids are further items of a listed set |
-| A14 | PASS | HAND · stops 1.5 mm past the rack ends at full travel; front guard bars 0.5 mm off the tooth tips; roller 0.1 mm off the back face; bridge above the pinion; clearance tool 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · joint notes and badges for pO, rack-slide, rack-yoke; five build rules |
-| A17 | PASS | HAND · order: base, housing, shaft and pinion, bed, rack, guide bars, gibs, keepers (clamping the gibs), wipers, stops, roller on its eccentric, bridge. Every screw reachable from the top, pressed bearings pull from the housing and bridge |
-| E1 | PASS | AUTO · every solid one explode level |
-| E2 | PASS | AUTO · screws and the stud move as one body (checked at full explode) |
-| E3 | PASS | AUTO · screws lift out along their axes (screenshots at 28 and 70 degrees) |
-| E4 | PASS | HAND · levels follow the order of A17: bed under the rack, keepers and bridge above it, screws furthest |
-| E5 | PASS | AUTO · bearings and dowels stay in their parts |
-| E6 | PASS | AUTO · motor and bracket move as one |
-| E7 | PASS | AUTO · spacers midway |
-| E8 | PASS | AUTO · keyed parts keep their order on the shaft |
-| E9 | PASS | HAND · screenshots at 100 percent, 28 and 70 degrees: nothing inside another part, nothing leaves the frame |
-| J1 | N/A | AUTO · no dead axle on this mechanism |
-| J2 | PASS | AUTO · pO: housing cartridge, keyed shaft, circlips, thrust washer, wave washer, home flag; straddled by the bridge |
-| J3 | N/A | AUTO · no moving pins |
-| J4 | N/A | AUTO · no pin in a slot. The backing roller (rack-yoke) is a track roller on an eccentric stud built by hand; it runs on the rack back face, so it has no wear strips or felt |
-| J5 | PASS | HAND · built by hand because the slide rule needs rails either side of the slider and the pinion sits on the rack tooth side; built as the rule builds a slide (v2.4): bed strip (hardened, replaceable), rear guide bars as the dowelled reference, a bronze gib against the rack's back face clamped under each keeper by its two screws, a felt wiper at each end of the guide, grease nipple, front guard bars (screwed only), an end stop with a pad at each end |
-| J6 | PASS | AUTO · hubs with key and set screws, timing marks at the mesh; no eccentric on the pinion shaft (rack form): the backlash adjuster is the roller on its eccentric stud |
-| J7 | N/A | AUTO · no cam |
-| J8 | PASS | AUTO · drive belt: flanged pulleys, slotted mount |
-| F1 | PASS | AUTO / HAND · dowels in housing and bridge posts; bed and both rear guide bars have two dowels; the front guard bars are not a bearing face and are screwed only |
-| F2 | PASS | AUTO / HAND · circlips and retainers on the shaft and bearings; keepers hold the rack down; roller stud screw and spacers retain the roller |
-| F3 | PASS | AUTO · feather key and set-screw hub on the pinion |
-| F4 | PASS | AUTO / HAND · thrust washer under the pinion, wave washer; roller between spacers |
-| F5 | PASS | AUTO / HAND · hard stops with neoprene pads 1.5 mm past each rack end. The pinion is limited by the drive and by the rack stops (the stops rule skips the input) |
-| F6 | N/A | AUTO / HAND · positive tooth drive, no rest position to hold |
-| F7 | PASS | AUTO / HAND · backlash: the roller on an eccentric flange; guide play: a bronze gib a side, set against the rack and clamped under the keeper; belt tension slot |
-| F8 | PASS | AUTO · open mesh greased through a felt wiper at each end of the guide and a nipple on the right keeper; sealed bearings need none |
-| F9 | PASS | AUTO / HAND · match marks on the pinion tooth and the rack gap at the mesh |
-| F10 | PASS | AUTO · home flag and fork sensor, pulley flanges, leads to the terminal block |
-| M1 | PASS | AUTO · edge breaks |
-| M2 | N/A | HAND · the pinion is small (root radius 27, shaft hub radius 14): no room for spokes with the walls the standard asks for; the rack is a plain bar |
-| M3 | PASS | AUTO · bore entry chamfers on bearing seats |
-| M4 | PASS | AUTO / HAND · counterbored holes in the base and housing; countersunk heads flush in the bed and keepers (countersinks drawn) |
-| M5 | N/A | AUTO / HAND · no pockets or windows built |
+| A13 | PASS | AUTO / HAND · 102 solids, 55 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps; details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 4 joint notes; no note: none; no badge: M, S · a note per joint; build rules: the rack guided from its back, the pinion holds it against the gib, which sets the mesh |
+| A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
+| A18 | PASS | AUTO · placement: 1 slabs in the tallest stack (14.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver |
+| A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O-bridge · bridge first choice, moved off the mesh; least gap 1.5 mm |
+| A20 | PASS | AUTO · support per joint: O bridge · one axial stack builder with its support selector; the slide kit for the rack |
+| A21 | PASS | AUTO · kit per joint: M J6, O J2, S J5, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · end stops at both ends of the rack's travel (J5); no swing stops: the drive positions the pinion |
+| E1 | PASS | AUTO · every solid has one explode level; levels -4.5 to 4.5 · one level per solid, nothing stretches |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable in ISOMETRIC on both sheets, nothing leaves the frame |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | N/A | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) · no dead axle |
+| J2 | PASS | AUTO · fired: j2-live-shaft (43 solids) · pinion shaft: housing, keyed with a clamp hub, bridge over the top, the drive pulley below |
+| J3 | N/A | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), ring-hub (no solids) · no moving revolute |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J5 | PASS | AUTO · fired: piston-bore (no solids), j5-slide (25 solids), tongue-slot (no solids) · rack slide: gibbed rail under a keeper, wear strip on a way, wipers on both ends, grease nipple, end stops with pads |
+| J6 | PASS | AUTO · fired: j6-mesh (1 solid), ring-rollers (no solids) · parallel mesh: eccentric bushing for the pinion's centre distance, timing marks at the mesh |
+| J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids) · no shaft in plan |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at O, S; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
+| F2 | PASS | AUTO · served at O, S; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F3 | PASS | AUTO · served at O; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
+| F4 | PASS | AUTO / HAND · served at O; fired: j9-crossed-mesh (no solids), j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
+| F5 | PASS | AUTO / HAND · served at S; fired: j5-slide (25 solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · end stop blocks with neoprene pads past both ends of the rack's travel |
+| F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
+| F7 | PASS | AUTO / HAND · served at M, S; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), j5-slide (25 solids), j12-flexible (no solids), adjustable-length (no solids) · eccentric bushing at the pinion; the gib sets the rack against it |
+| F8 | PASS | AUTO · served at S; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (1 solid) · sealed bearings need none; open contacts oiled or greased where they occur |
+| F9 | PASS | AUTO / HAND · served at M; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), timing-marks (1 solid) · timing marks at the mesh |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) · home flag and fork sensor on the input (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · bosses round every loaded hole |
+| M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (23 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | N/A | HAND · no bracket with an inside corner |
-| M8 | N/A | AUTO · no shoulder with a thread |
-| M9 | PASS | AUTO / HAND · ISO coarse threads; screw lengths from the standard series, engagement into the 8 mm base |
-| M10 | PASS | AUTO / HAND · every solid names a material (steel C45 guides, bronze gib, hardened bed, neoprene pads) |
-| M11 | PASS | AUTO · turned-part marks on the shaft |
-| M12 | PASS | HAND · every screw from above: the keeper screws hold keeper, gib and bar; bearings pull out of housing and bridge |
-| M13 | PASS | AUTO / HAND · locking on every threaded fastener (threadlocker; the gibs are held by the keepers' clamp, no gib screws) |
-| M14 | PASS | AUTO / HAND · bed strip and gib are separate replaceable hard parts where the rack slides; no slots or cams here |
-| V1 | PASS | AUTO · pancake motor under the base, GT2 belt 32:16 |
-| V2 | PASS | AUTO · one-piece bracket |
-| V3 | PASS | AUTO / HAND · belt clear; the drive rule placed the cable clip over the motor bracket flange (edge distance fault), so the polish moves it along the lead |
-| V4 | PASS | AUTO · pulley flanges, set screws, tension slot |
-| V5 | PASS | AUTO · rotary kind: belt to the input pulley (see K7) |
-| V6 | PASS | AUTO · home flag, fork sensor, terminal block, cable clip |
-| L1 | PASS | STYLE · npm run lint clean; no look values in the mechanism |
-| L2 | PASS | HAND · the model and the polish carry geometry, roles, materials, marks and accent only |
-| L3 | PASS | HAND · roles right: pinion driver, rack output, guides ground, bearings |
-| L4 | PASS | HAND / STYLE · accent on the input shaft ring and the traced path and forces only |
-| L5 | PASS | AUTO / HAND · see-through stage fired; the mesh stays in view in plan and at 28 degrees (the bridge arms point away from the rack) |
-| L6 | PASS | AUTO · depth order correct at 28, 70 and 88 degrees in the screenshots |
-| L7 | PASS | STYLE · tilt 0 to 88 |
-| L8 | PASS | AUTO / HAND · chain lines, dimensions, engraved scale and path |
-| R1 | PASS | HAND · primitives and subassemblies throughout; the guide solids are plain rectangles from H.plate, H.gib, H.wiper, H.stop. |
-| R2 | PASS | HAND · screws M3, M4, M5, Ø10 shaft, bearings 6800 and 624 from the table, dowels Ø3, standoffs Ø10 |
-| R3 | PASS | AUTO · housing, bridge, drive and sensor are single subassemblies |
-| R4 | PASS | AUTO · package 23.7 KB |
-| R5 | PASS | HAND · polish 25 ms, no sampling in the polish |
-| R6 | PASS | FLAG · Node CPU bench, DPR 1.5: 268 ms at 28 degrees at full detail (spur gears in the same tool: 360 ms), 37 ms at dial H; not comparable with the browser figures of other audits. Browser bench not run in this session |
-| R7 | PASS | HAND · model.ts + polish.ts 15.4 KB |
-| R8 | PASS | AUTO / SITE · site draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid on a rung; no hand moves up the ladder |
-| DL2 | PASS | HAND · default dial position full |
-| DL3 | PASS | AUTO · table-driven |
-| DL4 | PASS | SITE · site behaviour |
-| DL5 | PASS | FLAG · rung counts and Node frame times in the ladder below |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 100 of 102 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 16 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | PASS | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · the hardened wear strip under the rack is the replaceable wear part |
+| V1 | PASS | AUTO · fired: drive (26 solids) · pancake motor under the base; a crank and link swing a 60T gear sector that turns a 20T pinion on the input shaft 3 times as far |
+| V2 | PASS | AUTO · fired: drive (26 solids) · one bracket for the motor |
+| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · crank, link and gear sector clear of feet and housings (A15) |
+| V4 | N/A | AUTO · fired: j8-belt (no solids) · no belt: the drive is a crank, a link and a gear sector |
+| V5 | PASS | AUTO · fired: drive (26 solids) · oscillating input over 180 deg: a crank and link swing a gear sector that steps the swing up 3:1 to the input's 300 deg, dead centres at the ends of the swing |
+| V6 | PASS | AUTO · fired: drive (26 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records and polish carry no look |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (no solids) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (2 solids) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | N/A | AUTO / DATA · no section or detail view declared |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 19.5 KB · package v2 written at build time |
+| R5 | PASS | HAND · no polish; nothing sampled by hand |
+| R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 38 of 102 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 23.7 KB; npm run build builds the page |
-| Q4 | PASS | plan, 28, side, full explode at 28 and 70 degrees, both sheets, overlays on: all looked at |
-| Q5 | PASS | tools/bench run (Node, see R6 and the ladder) |
-| Q6 | PASS | every requirement judged; ten-function table filled for every joint |
-| Q7 | PASS | tools/conformance at 2.3 |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 19.5 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · dist/shots3/rack-pinion: record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench3 run (desktop) |
+| Q6 | PASS | every row judged |
+| Q7 | PASS | at 3.0 |
+| Q8 | PASS | teaching review: keep (2026-10-20); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pO | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 3 x Internal circlip DIN 472, Ø19; External circlip DIN 471, Ø10; Socket head M5 x 10 (ISO 4762), into the shaft end; Bearing F6800ZZ (10x19x5), floating | Feather key 3 x 3 x 7 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – the drive limits the pinion; the rack stops (rack-slide) end the travel | – positive tooth drive, no rest position | – backlash is set at the backing roller (rack-yoke) | – sealed bearings | – marks sit at the mesh (mesh-rack-pinion) | – the sensor belongs to the drive (drive) |
-| mesh-rack-pinion | J6 | – the shaft locates the pinion; the guide locates the rack | – circlips on the shaft (pO); keepers on the rack (rack-slide) | Gear hub Ø22, set screw M3 on the key; Set screw M3 (DIN 916), threadlocked | – thrust washer under the pinion (pO) | – the rack stops (rack-slide) | – positive tooth drive | Eccentric flange of the backing roller (rack-yoke) | Felt wipers and grease nipple (rack-slide) | Rack, 17 teeth; Pinion, 16 teeth | – limited by the drive |
-| drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO) | Pulley hub, 2 x M3 set screws at 90° on the keyed shaft | – motor bearings | – the motor reverses; the rack stops end the travel | – motor holds when powered | bracket | – belt runs dry | – marks sit at the mesh | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
-| pO-bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – spigot in a slot takes the hole tolerance | – static | – static | – static |
-| rack-slide | J5 | Bed strip, hardened and ground, 2 mm, screwed to the base; 2 x Rear guide bar, ground steel, screwed and dowelled | 2 x Keeper plate, holds the rack down | – nothing turns | – the rack runs on its bed, no thrust | 2 x End stop block, hardened; 2 x Stop pad, neoprene 2 mm | – positive tooth drive, nothing to hold | 2 x Gib strip 3 x 9, bronze, against the rack's back face, clamped under the keeper | 2 x wiper; Grease nipple M6 (DIN 71412) | – the match marks are at the mesh | – the drive limits the rack |
-| rack-yoke | J4 | – the stud is screwed into the base; the flange is clamped by two screws | spacer | – the roller turns freely | Inner-race spacer 4.2x6 | – the roller is no limit | – the roller bears on the rack with no rest position | Eccentric flange Ø18, 0.5 mm offset bore Ø4, arc slots, index line | – sealed roller; the rack back face is wiped by the gib wipers | – no phase | – none needed |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| M | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Pinion; Rack | none |
+| O | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 13 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| S | J5 | – | – | – | 2 x Dowel pin Ø3 h6, gibbed rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 393.2, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| drive | drive | – | – | – | none | External circlip DIN 471, Ø12; 2 x External circlip DIN 471, Ø4 | Feather key 4 x 4 x 9 (DIN 6885) | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| O-bridge | O | bridge | moved | 1.5 | pinion | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| input kind | oscillating: motor, crank and link on a lever | rotary: reversing servo through the belt (model.ts) | a 300 degree swing cannot come from a crank and link: the link crosses the shaft and clashed with the housing parts (3 clashes) |
-| pO shaft top | no bridge: the straddle rule leaves rack meshes out | straddle(ctx, pO) called from the polish | nothing sweeps over the pinion; the bridge stands on the side away from the rack |
-| rack guide | no J5: the slide rule needs twin rails round the slider | hand-built guide, in the rule's layout: bed, rear bars, gibs clamped under keepers, wipers, nipple, front guard bars, stops | the pinion sits on the rack's tooth side; every J5 line of the canonical build is present |
-| backing roller | none | 624 track roller on an eccentric flange stud behind the rack | takes the separating force and sets the backlash (F7); no eccentric on the pinion shaft for a rack |
-| drive cable clip | clip over the motor bracket flange (edge distance fault) | clip moved along the lead | rule bug, worked around in the polish |
-| pinion | solid web | solid web, no spokes | M2: too small for windows (N/A) |
+| S (rack slide) | rails on both sides of the slider | gibbed rail, keeper and a wear strip on a way, all on the rack's back | the toothed side stays open for the pinion; promoted to the slide kit (a rack is guided from its back) |
+| drive | oscillating input: crank and link (V5) | the belt drive with a reversing motor | a 300 deg swing is beyond a crank and link; promoted to the drive rule (oscillating over 180 deg) |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 8 | 0 | 205.5 |
-| DL-B | 0 | 158 | 225.9 |
-| DL-C | 0 | 0 | 56.6 |
-| DL-D | 10 | 0 | 52.7 |
-| DL-E | 11 | 2 | 51.3 |
-| DL-F | 0 | 0 | 49.1 |
-| DL-G | 0 | 0 | 43.7 |
-| DL-H | 22 | 0 | 37.6 |
-| never | 100 | 145 | 286.9 (full) |
+| DL-A | 5 | 0 | – |
+| DL-B | 0 | 143 | – |
+| DL-C | 0 | 0 | 1.05 |
+| DL-D | 5 | 0 | – |
+| DL-E | 16 | 3 | – |
+| DL-F | 0 | 0 | – |
+| DL-G | 0 | 0 | 1.06 |
+| DL-H | 23 | 0 | – |
+| never | 68 | 153 | 0.93 (full) |
 
 ## Promotion candidates
-None yet.
+None left: the toothed rack outline, the rack guided from its back and the reversing belt drive for a swing over 180 deg are rules of the builder.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.4 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets (attached to #35) · baselines: tests/visual/__baselines__/rack-pinion-* · bench: Node CPU canvas, DPR 1.5, 2026-10-18; 28° frame 268 ms at full detail (spur gears in the same tool 360 ms), 37.6 ms at dial H (flag, R6)
+check: clean · K1 residual: 4.3e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.5 KB
+screenshots: dist/shots3/rack-pinion (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.93 ms full, 1.05 at C, 1.06 at G; phone by David)

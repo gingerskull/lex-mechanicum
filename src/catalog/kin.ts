@@ -17,8 +17,8 @@ export const KIN_VOCAB = {
   driver: ["rotary", "oscillating", "linear", "manual", "select"],
   block: [
     "dyad", "slider-dyad", "triad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
-    "flexure", "escapement", "reeve", "variator", "integrator", "five-bar", "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet",
-    "one-way", "escape", "verge",
+    "flexure", "escapement", "follow", "wave", "bevel-diff", "ravigneaux", "reeve", "variator", "integrator", "five-bar",
+    "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet", "one-way", "escape", "verge",
     // couplings and spatial linkages (R6)
     "sarrus", "cross-slide", "parallel-cranks", "plane-slide", "rzeppa", "conical-pendulum",
   ],

@@ -12,7 +12,8 @@ import type { Kin } from "../kin/types";
 import { HEADROOM, LATERAL, PITCH, RAIL_ZONE, SLAB_GAP, SLIDE_ROOM, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
 import { edgeDist, inside, pointDist, ringDist } from "./planar";
-import type { BodyGeom } from "./shapes";
+import { inside as insidePoly } from "../core/poly";
+import { type BodyGeom, levelId, meshLevel } from "./shapes";
 import type { JointInfo, Site } from "./sites";
 
 export interface Sampled {
@@ -82,12 +83,24 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
   // a body no joint reaches stands at its own frame (a fixed plate, a port face): it takes no slab
   const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
   const ids = [...geoms.keys()].filter((id) => joined.has(id));
+  // a compound gear's further levels are placed as bodies of their own, each one slab above the last (`#k`)
+  const level = new Map<string, { body: string; k: number }>();
+  for (const id of ids) (geoms.get(id)!.levels ?? []).forEach((_, i) => level.set(levelId(id, i + 1), { body: id, k: i + 1 }));
+  const geomOf = (id: string): BodyGeom => {
+    const l = level.get(id);
+    if (!l) return geoms.get(id)!;
+    const g = geoms.get(l.body)!;
+    const L = g.levels![l.k - 1]!;
+    return { ...g, id, profile: L.profile, thick: L.thick, plan: undefined, levels: undefined };
+  };
+  const bodyOf = (id: string): string => level.get(id)?.body ?? id;
+  ids.push(...level.keys());
   // families by normal
   const famOf = new Map<string, number>();
   const famFrames: Frame[] = [];
   const famIds: string[][] = [];
   for (const id of ids) {
-    const g = geoms.get(id)!;
+    const g = geomOf(id);
     let k = famFrames.findIndex((f) => parallel(f.z, g.frame.z));
     if (k < 0) {
       k = famFrames.length;
@@ -100,7 +113,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
   // origin of a family on its lowest declared plane
   famFrames.forEach((f, k) => {
     let lo = Infinity;
-    for (const id of famIds[k]!) lo = Math.min(lo, planeCoords(f, geoms.get(id)!.frame.o).w);
+    for (const id of famIds[k]!) lo = Math.min(lo, planeCoords(f, geomOf(id).frame.o).w);
     f.o = fromPlane(f, [0, 0], lo);
   });
 
@@ -128,8 +141,12 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || j.kit === "eccentric" || inSlot || blank;
       if (!planar || !parent.has(j.a) || !parent.has(j.b)) continue;
       if (j.joint.crossed) continue;
-      contact.add(pairKey(j.a, j.b));
-      parent.set(find(j.a), find(j.b));
+      // a mesh with a compound gear meets the level whose tooth count it gives
+      const ja = t === "gear-mesh" ? levelId(j.a, meshLevel(geoms.get(j.a), j.joint)) : j.a;
+      const jb = t === "gear-mesh" ? levelId(j.b, meshLevel(geoms.get(j.b), j.joint)) : j.b;
+      if (!parent.has(ja) || !parent.has(jb)) continue;
+      contact.add(pairKey(ja, jb));
+      parent.set(find(ja), find(jb));
     }
     const nodes = new Map<string, Node>();
     for (const id of fid) {
@@ -146,11 +163,14 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const rings = new Map<string, Vec2[][]>();
     const holeRings = new Map<string, Vec2[][][]>();
     for (const id of fid) {
-      const g = geoms.get(id)!;
-      const xs = sampled.xfs.get(id) ?? [];
+      const g = geomOf(id);
+      const xs = sampled.xfs.get(bodyOf(id)) ?? [];
       rings.set(id, sampleIdx.map((i) => outlineAt(g, xs[i] ?? xf.id(), fam)));
       if (g.profile.holes.length) holeRings.set(id, sampleIdx.map((i) => g.profile.holes.map((h) => outlineAt({ ...g, plan: h }, xs[i] ?? xf.id(), fam))));
     }
+    // a part that stays inside another's bore (a disc on its eccentric) is no clash
+    const within = (inner: Vec2[], hs: Vec2[][] | undefined): boolean => !!hs && hs.some((h) => inner.every((q) => insidePoly(h, q) && edgeDist(h, q[0], q[1]) > LATERAL));
+    const nested = (A: string, B: string, i: number): boolean => within(rings.get(A)![i]!, holeRings.get(B)?.[i]) || within(rings.get(B)![i]!, holeRings.get(A)?.[i]);
 
     // clash graph between nodes
     const clash: boolean[][] = Array.from({ length: N }, () => new Array<boolean>(N).fill(false));
@@ -161,7 +181,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         if (contact.has(pairKey(A, B)) || nodeOf(A) === nodeOf(B)) continue;
         let hit = false;
         for (const i of sampleIdx) {
-          if (ringDist(rings.get(A)![i]!, rings.get(B)![i]!, LATERAL) <= LATERAL) {
+          if (ringDist(rings.get(A)![i]!, rings.get(B)![i]!, LATERAL) <= LATERAL && !nested(A, B, i)) {
             hit = true;
             break;
           }
@@ -200,8 +220,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     }
     // bodies on one pin site share its column: they clash even when a boss is missing
     const famSites = sites.filter((s) => parallel(s.axis, fam.z) && s.bodies.some((b) => parent.has(b)));
+    // a level is on a site when the site's pin goes through it (a gear on a link's end is on that end's pin only)
+    const withLevels = (s: Site): string[] => [...s.bodies, ...[...level].filter(([q, l]) => s.bodies.includes(l.body) && insidePoly(geomOf(q).profile.outer, planeCoords(geoms.get(l.body)!.frame, s.at).uv)).map(([q]) => q)];
     for (const s of famSites) {
-      const inFam = s.bodies.filter((b) => parent.has(b));
+      const inFam = withLevels(s).filter((b) => parent.has(b));
       for (let a = 0; a < inFam.length; a++)
         for (let b = a + 1; b < inFam.length; b++) {
           const i = idx.get(nodeOf(inFam[a]!))!;
@@ -219,11 +241,11 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     }
     const siteCs: SiteC[] = [];
     for (const s of famSites) {
-      const members = [...new Set(s.bodies.filter((b) => parent.has(b)).map((b) => idx.get(nodeOf(b))!))];
+      const members = [...new Set(withLevels(s).filter((b) => parent.has(b)).map((b) => idx.get(nodeOf(b))!))];
       if (!members.length) continue;
       const passers = new Set<number>();
       for (const id of fid) {
-        if (s.bodies.includes(id)) continue;
+        if (s.bodies.includes(bodyOf(id))) continue;
         const n = idx.get(nodeOf(id))!;
         if (members.includes(n)) continue;
         for (const i of sampleIdx) {
@@ -258,7 +280,26 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       }
     }
     // thickness of each node (a slab is as high as the thickest body in it)
-    const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geoms.get(id)!.thick)));
+    const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geomOf(id).thick)));
+    // each level over the last level on its side of the part (or under it, for a level that stands below); a part of
+    // another body may lie between (the retainer between a sun-and-planet's rod and the planet fixed under it)
+    const levelAbove: [number, number, number, number][] = [];
+    for (const [q, l] of level) {
+      if (!parent.has(q)) continue;
+      const Ls = geoms.get(l.body)!.levels!;
+      const below = !!Ls[l.k - 1]!.below;
+      let prev = 0;
+      for (let i = l.k - 1; i >= 1; i--)
+        if (!!Ls[i - 1]!.below === below) {
+          prev = i;
+          break;
+        }
+      const under = idx.get(nodeOf(levelId(l.body, prev)));
+      const me = idx.get(nodeOf(q));
+      if (under !== undefined && me !== undefined) levelAbove.push([under, me, below ? -1 : 1, Ls[l.k - 1]!.joined ? 1 : 0]);
+    }
+    // a joined level is one piece with the level under it: the very next slab, nothing between
+    const levelsOk = (assign: number[]): boolean => levelAbove.every(([u, m, d, j]) => assign[u]! < 0 || assign[m]! < 0 || (j ? (assign[m]! - assign[u]!) * d === 1 : (assign[m]! - assign[u]!) * d >= 1));
 
     // bodies the record lays above others: [upper node, lower node]
     const aboves: [number, number][] = [];
@@ -271,6 +312,13 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     type Best = { assign: number[]; cost: number[] };
     // sliders on the ground run on rails on the base: they want the lowest slab, with what drives them above (J5)
     const grounded = [...new Set(kin.joints.filter((j) => j.type === "prismatic" && (j.a === "ground" || j.b === "ground")).map((j) => (j.a === "ground" ? j.b : j.a)).filter((b) => fid.includes(b)).map((b) => idx.get(nodeOf(b))!))];
+    // where nothing else decides, a body the record declares lower goes lower (an output flange under its disc)
+    const declared = nodeIds.map((r) => Math.min(...nodes.get(r)!.ids.map((id) => planeCoords(fam, geomOf(id).frame.o).w)));
+    const disorder = (assign: number[]): number => {
+      let n = 0;
+      for (let u = 0; u < N; u++) for (let v = 0; v < N; v++) if (declared[u]! < declared[v]! - 0.5 && assign[u]! > assign[v]!) n++;
+      return n;
+    };
     const limit = N;
     let budget = 1_500_000;
     // strict: every passer on one side of its pin; relaxed: a pin with parts passing on both sides is allowed (it needs a
@@ -289,7 +337,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           // a fixed pin held from a bridge only (something passes under it) is the last resort
           const hung = siteCs.reduce((t, c) => t + (c.site.fixed && c.passers.some((p) => assign[p]! < Math.min(...c.members.map((m) => assign[m]!))) ? 1 : 0), 0);
           const raised = grounded.reduce((t, n) => t + assign[n]!, 0);
-          const cost = [spacers, hung, raised, -picks.length];
+          const cost = [spacers, hung, raised, -picks.length, disorder(assign)];
           const f = found;
           const d = f ? cost.findIndex((c, i) => c !== f.cost[i]) : -1;
           const less = !f || (d >= 0 && cost[d]! < f.cost[d]!);
@@ -303,10 +351,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           for (let s = 0; s < h; s++) {
             if (clash[v]!.some((c, u) => c && assign[u] === s)) continue;
             assign[v] = s;
-            if (orderOk(assign) && (relax || passOk(assign, siteCs))) dfs(k + 1);
+            if (levelsOk(assign) && orderOk(assign) && (relax || passOk(assign, siteCs))) dfs(k + 1);
             assign[v] = -1;
             const f = found as Best | null;
-            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] === 0 && f.cost[3]! <= -clevisCap(siteCs)) return;
+            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] === 0 && f.cost[3]! <= -clevisCap(siteCs) && f.cost[4] === 0) return;
           }
         };
         dfs(0);
@@ -437,8 +485,10 @@ function sidesOk(assign: number[], cs: SiteConstraint[]): boolean {
     const lo = Math.min(...c.members.map((x) => assign[x]!));
     const above = c.passers.map((p) => assign[p]! > lo);
     if (above.some((a) => a) && above.some((a) => !a)) return false;
-    // a live shaft stands on its housing behind the base: nothing may pass between the base and its first part
-    if (c.site.fixed && c.site.live && above.some((a) => !a)) return false;
+    // a live shaft stands on its housing behind the base: nothing may pass between the base and its first part (one whose
+    // axis below is another stack's, with everything under it, is hung from a bridge: a large sun over a small one)
+    if (c.site.fixed && c.site.live && !c.site.axisBelow && above.some((a) => !a)) return false;
+    if (c.site.fixed && c.site.live && c.site.axisBelow && above.some((a) => a)) return false;
 
   }
   return true;

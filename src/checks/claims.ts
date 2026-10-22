@@ -207,7 +207,8 @@ function evaluate(S: Series, c: Claim, rotary: boolean, other?: number[]): numbe
       const xlo = Math.min(...x);
       const xhi = Math.max(...x);
       // a value inside the input's range is a driver value, else a cycle angle
-      const inRange = target >= xlo - 1e-9 && target <= xhi + 1e-9 && xhi - xlo < 359.5;
+      // (a full turn of input is ambiguous at its ends: 360 is 0; a range of several turns is not)
+      const inRange = target >= xlo - 1e-9 && target <= xhi + 1e-9 && Math.abs(xhi - xlo - 360) > 0.5;
       const key = inRange ? x : u;
       const at = inRange ? target : ((target % 360) + 360) % 360;
       let best = -1;
@@ -312,6 +313,18 @@ export function checkClaims(
     return hit;
   };
   const rotary = K.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual")?.kind === "rotary";
+  // a claim that holds at a setting of the params (`setting: { split: 0 }`) or of a selector (`setting: { gear: "2nd" }`)
+  // is checked on the motion at that setting
+  const settingOf = (claim: Claim): { params: Record<string, number>; select: Record<string, string> } | undefined => {
+    const setting = claim.setting as Record<string, number | string> | undefined;
+    if (!setting || typeof setting !== "object") return undefined;
+    const ctl: { params: Record<string, number>; select: Record<string, string> } = { params: {}, select: {} };
+    for (const [k, v] of Object.entries(setting)) {
+      if (K.kin.drivers.some((d) => d.id === k && d.kind === "select")) ctl.select[k] = String(v);
+      else ctl.params[k] = Number(v);
+    }
+    return ctl;
+  };
   // a claim `over` a driver sweeps that driver across its range with the cycle at its start (a speed control)
   const swept = new Map<string, Pose[] | string>();
   const sweep = (id: string): Pose[] | string => {
@@ -325,10 +338,12 @@ export function checkClaims(
     }
   };
   return claims.map((claim): ClaimResult => {
-    const ctl = claim.when ? opts.controlsOf?.(claim.when) : undefined;
-    if (claim.when && !ctl) return { claim, status: "uncheckable", why: `no control ${claim.when.control}` };
+    const when = claim.when ? opts.controlsOf?.(claim.when) : undefined;
+    if (claim.when && !when) return { claim, status: "uncheckable", why: `no control ${claim.when.control}` };
+    const set = settingOf(claim);
+    const ctl = set ? { ...when, params: { ...when?.params, ...set.params }, select: { ...when?.select, ...set.select } } : when;
     const poses = posesAt(ctl);
-    if (typeof poses === "string") return { claim, status: "uncheckable", why: poses };
+    if (typeof poses === "string") return { claim, status: "uncheckable", why: set ? `${poses} (at its setting)` : poses };
     let P: Pose[] | string = poses;
     if (claim.over) {
       if (!swept.has(claim.over)) swept.set(claim.over, sweep(claim.over));

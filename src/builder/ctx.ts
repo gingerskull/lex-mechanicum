@@ -12,6 +12,7 @@ import type { Setup } from "../kin/compose";
 import type { Kin } from "../kin/types";
 import type { Vec3, Xf } from "../kin/math";
 import { xf } from "../kin/math";
+import { cutConjugates } from "./conjugate";
 import { manifold } from "../solids/manifold";
 import type { Solid3 } from "../solids/types";
 import { moveFrame, type Frame } from "./frames";
@@ -88,6 +89,8 @@ export interface BuildCtx {
   parts: Map<string, Solid3>;
   /** A clevis's second half. */
   twins: Map<string, Solid3>;
+  /** A compound gear's further toothed levels, by body (bores not cut yet). */
+  levels: Map<string, Solid3[]>;
   /** Hinge lugs by site: parts of a body whose plane is not square to the hinge (rules/lugs). */
   lugs: Map<string, Solid3[]>;
   bores: Map<string, Bore[]>;
@@ -140,6 +143,8 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
   const geoms = bodyGeoms(kin, S);
   const { joints, sites } = classifyJoints(kin, S);
   const n = opts.samples ?? (source.route === "numeric" ? SAMPLES_NUMERIC : SAMPLES);
+  // a non-circular mesh's driven gear is cut conjugate to its driver over the cycle
+  cutConjugates(M, K, kin, geoms, opts.controls);
   const sampled = sampleBodies(K, kin, n, opts.controls, geoms);
   armPoses(kin, sampled.xfs);
   const placement = solvePlacement(kin, geoms, sampled, joints, sites);
@@ -169,6 +174,7 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
     principle,
     parts: new Map(),
     twins: new Map(),
+    levels: new Map(),
     lugs: new Map(),
     bores: new Map(),
     baseHoles: [],
@@ -223,3 +229,6 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
 
 /** A solid's frame in world coordinates after `X` (used for the pose of a body at a sample). */
 export const posed = (s: Solid3, X: Xf): Frame => moveFrame(s.frame, X);
+
+/** Every body's own solids not yet among the solids: parts, clevis twins and compound-gear levels. */
+export const ownParts = (ctx: BuildCtx): Solid3[] => [...ctx.parts.values(), ...ctx.twins.values(), ...[...ctx.levels.values()].flat()];

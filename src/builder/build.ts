@@ -49,8 +49,17 @@ export async function buildAssembly(rec: RecordLike, opts: BuildOpts & { rules?:
 /** The bodies' own parts join the solids, with their bores. */
 function finalize(ctx: BuildCtx): void {
   ctx.rule = "placement";
+  // a loft's sections take the holes cut into its profile since (its bore, a ring's index holes), section for section
+  for (const p of ctx.parts.values()) {
+    if (p.op.op !== "loft") continue;
+    const own = p.op.sections[0]!.holes.length;
+    const extra = p.profile.holes.slice(own);
+    if (!extra.length) continue;
+    p.op = { op: "loft", sections: p.op.sections.map((s, i) => (i === 0 ? { z: s.z, outer: p.profile.outer, holes: p.profile.holes } : { z: s.z, outer: s.outer, holes: [...s.holes, ...extra] })) };
+  }
   for (const p of ctx.parts.values()) ctx.add(p);
   for (const t of ctx.twins.values()) ctx.add(t);
+  for (const l of ctx.levels.values()) ctx.add(l);
   ctx.rule = "polish";
 }
 
@@ -62,6 +71,7 @@ function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
   const lifts: Assembly["lifts"] = {};
   for (const [b, [, s]] of ctx.placement.slab) {
     slabOf[b] = s;
+    if (ctx.geoms.get(b)?.levels && b.includes("#")) continue;
     const r = ctx.extent(b);
     // a bevel gear stands where its cone says, so its points are drawn where the kinematics put them
     if (!r || ctx.geoms.get(b)?.exact || realBody(ctx.kin, b) !== b) continue;

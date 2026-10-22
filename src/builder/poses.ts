@@ -22,8 +22,10 @@ const PHASES = [0, 1.3, 2.9, 4.4, 5.8];
 function dropUnusableSlots(kin: Kin, notes: string[]): Kin {
   const joints = kin.joints.map((j) => {
     if (j.type !== "pin-in-slot" || !j.slot) return j;
-    const s = j.slot as unknown as { from?: unknown; to?: unknown };
+    const s = j.slot as unknown as { from?: unknown; to?: unknown; path?: unknown; center?: unknown };
     if (Array.isArray(s.from) && Array.isArray(s.to)) return j;
+    // a round hole with its centre: the residual reads it (the pin's centre at a radius from the hole's)
+    if (s.path === "circle" && Array.isArray(s.center)) return j;
     notes.push(`joint ${j.id}: slot given as a path, not a line; the pin is left to the other joints`);
     const { slot: _s, ...rest } = j;
     void _s;
@@ -32,10 +34,21 @@ function dropUnusableSlots(kin: Kin, notes: string[]): Kin {
   return { ...kin, joints };
 }
 
-/** A body no joint reaches stands where it is (a fixed plate): it is left out of the solving. */
+/**
+ * A body no joint reaches stands where it is (a fixed plate): it is left out of the solving, unless a block poses it (a
+ * flexspline's segments, which the wave block carries round the oval) or a point rides it.
+ */
 const solvable = (kin: Kin): Kin => {
   const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
-  return { ...kin, bodies: kin.bodies.filter((b) => b.id === "ground" || joined.has(b.id)) };
+  const named = new Set<string>();
+  const walk = (v: unknown): void => {
+    if (typeof v === "string") named.add(v);
+    else if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+  };
+  for (const s of kin.solve) walk(s.in);
+  for (const p of kin.points ?? []) named.add(p.body);
+  return { ...kin, bodies: kin.bodies.filter((b) => b.id === "ground" || joined.has(b.id) || named.has(b.id)) };
 };
 
 function tryPoses(kin: Kin, controls?: Controls): Kinematics {

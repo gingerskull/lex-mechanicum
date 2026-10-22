@@ -68,7 +68,8 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
   const chosen = new Map<Solid3, Profile | null>();
   for (const s of a.solids) {
     if (!candidate(s)) continue;
-    const keepAll = !!(s.stretch || s.deform);
+    // a loft's sections are matched point for point with its profile: it keeps every point too
+    const keepAll = !!(s.stretch || s.deform || s.op.op === "loft");
     const snapped = snapP(raw(s), keepAll);
     const op = snapOp(s.op);
     let pick: Profile | null = sound(snapped, op) ? snapped : null;

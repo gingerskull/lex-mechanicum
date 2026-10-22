@@ -4,7 +4,7 @@
 import { circle } from "../../core/geom";
 import { inside } from "../../core/poly";
 import type { Solid3 } from "../../solids/types";
-import type { BuildCtx } from "../ctx";
+import { ownParts, type BuildCtx } from "../ctx";
 import { canon, fromPlane, parallel, planeCoords, type Frame } from "../frames";
 import { type Member, titleOf } from "../lib";
 import { bossRadius } from "./core";
@@ -37,16 +37,20 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
     const joint = site.joints.find((j) => ctx.kin.joints.find((q) => q.id === j && (q.a === b || q.b === b)));
     const R = joint ? bossRadius(ctx, b, joint) : 8;
     const upper = ctx.solids.find((s) => s.id === `${b}-cheek` && s.body === b);
-    for (const part of [ctx.parts.get(b), ctx.twins.get(b), upper]) {
+    const lv = ctx.levels.get(b) ?? [];
+    const parts: [Solid3 | undefined, string, boolean][] = [[ctx.parts.get(b), b, false], [ctx.twins.get(b), b, false], [upper, b, false], ...lv.map((p, k): [Solid3, string, boolean] => [p, `${b}#${k + 1}`, true])];
+    for (const [part, key, level] of parts) {
       if (!part) continue;
-      // a plate of a two-plate body takes part in the stacks of the pins it reaches
       const uv = planeCoords(part.frame, site.at).uv;
-      if (upper && (!inside(part.profile.outer, uv) || part.profile.holes.some((h) => inside(h, uv)))) continue;
-      const slab = ctx.extent(b);
+      // a level is a member where the pin goes through it (a gear on a link's end only on that end's pin)
+      if (level && !inside(part.profile.outer, uv)) continue;
+      // a plate of a two-plate body takes part in the stacks of the pins it reaches
+      if (!level && upper && (!inside(part.profile.outer, uv) || part.profile.holes.some((h) => inside(h, uv)))) continue;
+      const slab = ctx.extent(key);
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
       // the twin's second half sits in its own slab
       const w = (part.frame.o[0] - frame.o[0]) * frame.z[0] + (part.frame.o[1] - frame.o[1]) * frame.z[1] + (part.frame.o[2] - frame.o[2]) * frame.z[2];
-      const thick = part.op.op === "extrude" ? part.op.h : 6;
+      const thick = part.op.op === "extrude" ? part.op.h : part.op.op === "loft" ? Math.max(...part.op.sections.map((x) => x.z)) : 6;
       out.push({ solid: part.id, body: b, w0: w, w1: w + thick, R, keyed: keyedIds.has(b), shim: ctx.shim.get(b) ?? 0, name: part.name });
     }
   }
@@ -79,12 +83,22 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
     if (ctx.kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === b || j.b === b))) out.add(b);
   }
   if (!out.size && site.bodies[0]) out.add(site.bodies[0]);
+  // one shaft turns only the bodies that turn together: the driven one (else the first) is keyed, a body that turns at
+  // another rate on the same axis (a sun-and-planet's retainer on the sun's shaft) runs free on it in bearings
+  // the body a driver turns against the ground (a driver between two moving bodies, a differential's second input, does
+  // not turn the shaft)
+  const first = [...out].find((b) => site.joints.some((j) => driver.has(j) && ctx.kin.joints.some((q) => q.id === j && (q.a === b || q.b === b) && (q.a === "ground" || q.b === "ground")))) ?? [...out][0];
+  if (first) {
+    const xa = ctx.sampled.xfs.get(first) ?? [];
+    const same = (b: string) => (ctx.sampled.xfs.get(b) ?? []).every((X, i) => X.R.every((v, k) => Math.abs(v - (xa[i]?.R[k] ?? NaN)) < 1e-6));
+    for (const b of [...out]) if (b !== first && !same(b)) out.delete(b);
+  }
   return out;
 }
 
 /** A bore in a part, at the world point of the axis, as a clockwise hole in its profile. */
 export function cutBore(ctx: BuildCtx, solidId: string, at: readonly number[], r: number): void {
-  const part = [...ctx.parts.values(), ...ctx.twins.values(), ...[...ctx.lugs.values()].flat()].find((p) => p.id === solidId);
+  const part = [...ownParts(ctx), ...[...ctx.lugs.values()].flat()].find((p) => p.id === solidId);
   if (!part) return;
   const uv = planeCoords(part.frame, [at[0]!, at[1]!, at[2]!]).uv;
   part.profile.holes.push(circle(r, uv[0], uv[1], Math.max(24, Math.round(r * 5))).reverse());
@@ -135,6 +149,7 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     base,
     held: site.fixed ? held : "both",
     input: !!driver && site.joints.includes(driver.joint ?? ""),
+    axisTakenBelow: !!site.axisBelow,
     straddle,
     eccentric: ctx.eccentric.has(site.id),
     ...(grooved ? { flush: true } : {}),

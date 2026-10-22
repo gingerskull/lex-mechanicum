@@ -28,6 +28,8 @@ export interface BlockCtx {
   xf(body: string): Xf;
   setXf(body: string, X: Xf): void;
   setPt(name: string, p: Vec3): void;
+  /** The current value of a design choice (a selector option may set it). */
+  choice(name: string): string | undefined;
   /** Store a named scalar (degrees or mm) for later blocks and outputs. */
   setVal(name: string, v: number): void;
   /** `now` minus its value in the reference pose: 0 in the reference pose itself. `key` is unique within the step. */

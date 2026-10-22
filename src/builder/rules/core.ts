@@ -8,6 +8,9 @@ import { extrudeOp, revolveOp } from "../../solids/tessellate";
 import type { Solid3 } from "../../solids/types";
 import { type BuildCtx } from "../ctx";
 import { BASE_GAP, BASE_T } from "../constants";
+
+/** Room under a ring gear's rim for its carrier rollers' lower flanges and posts (ring-carrier), mm. */
+const RING_ROOM = 9;
 import { fromPlane, place, planeCoords } from "../frames";
 import { titleOf } from "../lib";
 import { edgeDist } from "../planar";
@@ -28,7 +31,8 @@ export const classify: Rule = {
     for (const j of ctx.joints) (ctx.fired.classify ??= []).push(`${j.id}:${j.kit}`);
     for (const b of ctx.kin.bodies) {
       if (b.id === "ground") continue;
-      if (!ctx.joints.some((j) => j.a === b.id || j.b === b.id)) ctx.issues.push(`body ${b.id} has no joint`);
+      // a body with a frame of its own and no joint is fixed there (a plate) or carried by a block (a flexspline's segment)
+      if (!ctx.joints.some((j) => j.a === b.id || j.b === b.id) && !(b.frame && typeof b.frame === "object")) ctx.issues.push(`body ${b.id} has no joint`);
     }
     const approx = [...ctx.geoms.values()].filter((g) => g.approx).map((g) => g.id);
     if (approx.length) ctx.issues.push(`outline is a stand-in until the pilots give it a profile: ${approx.join(", ")}`);
@@ -92,7 +96,7 @@ export const placement: Rule = {
         body: id,
         frame,
         profile: g.part ? { outer: [...g.part.profile.outer], holes: g.part.profile.holes.map((h) => [...h]) } : { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: g.part ? g.part.op : g.revolve ? revolveOp(g.profile) : extrudeOp(g.upper ? (g.upper.lower ?? g.thick - g.upper.h) : g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
+        op: g.part ? g.part.op : g.revolve ? revolveOp(g.profile) : g.loft ? { op: "loft", sections: [{ z: 0, outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) }, ...g.loft] } : extrudeOp(g.upper ? (g.upper.lower ?? g.thick - g.upper.h) : g.thick, { ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}) }),
         ...(g.features?.length ? { features: g.features } : {}),
         marks,
         ex: 0,
@@ -102,6 +106,17 @@ export const placement: Rule = {
       };
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
+      // a compound gear's further levels, each on its own slab above the part (keyed to the same shaft)
+      (g.levels ?? []).forEach((L, i) => {
+        const r = ctx.extent(`${id}#${i + 1}`);
+        if (!r) return;
+        // a joined level runs down to the top of the part under it, one piece through the gap (a long pinion)
+        const w = L.joined && slab ? Math.min(r.w0, slab.w0 + g.thick) : r.w0;
+        const lo = fromPlane(r.frame, planeCoords(r.frame, g.frame.o).uv, w);
+        const lv: Solid3 = { ...part, id: L.z ? `${id}-z${L.z}${L.joined ? "-upper" : ""}` : `${id}-disc`, name: L.z ? `${titleOf(id)}, ${L.joined ? "upper half" : `${L.z}-tooth ${String(g.shape.type) === "link" ? "gear fixed on it" : "level"}`}` : `${titleOf(id)}, flywheel disc`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick + r.w0 - w), marks: [], joints: [...part.joints] };
+        ctx.levels.set(id, [...(ctx.levels.get(id) ?? []), lv]);
+        (ctx.fired.placement ??= []).push(lv.id);
+      });
       // a slotted upper cheek on the solid lower one
       if (g.upper) {
         const lift = g.upper.lift ?? g.thick - g.upper.h;
@@ -157,6 +172,12 @@ export const base: Rule = {
       // the drive's pulley on an input shaft in plan carries a home flag round with it: the base stays clear of its sweep
       const input = ctx.kin.drivers.some((d) => d.joint && s.joints.includes(d.joint) && d.kind !== "select");
       if (input && Math.abs(s.axis[2]) < 0.1) top = Math.min(top, s.at[2] - (PULLEYS[32].fd / 2 + 1 + SENSOR.depth - 1.5) - 2);
+    }
+    // a ring on carrier rollers needs room under its rim for the rollers' lower flanges and their posts
+    for (const j of ctx.joints) {
+      if (j.kit !== "ring-carrier") continue;
+      const ring = ctx.parts.get(j.a === "ground" ? j.b : j.a);
+      if (ring) top = Math.min(top, ring.frame.o[2] - RING_ROOM);
     }
     ctx.base = { top, bottom: top - BASE_T, outline: [] };
     (ctx.fired.base ??= []).push(`level ${top.toFixed(1)}`);

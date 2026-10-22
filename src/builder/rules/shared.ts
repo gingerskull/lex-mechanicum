@@ -132,9 +132,15 @@ export const stops: Rule = {
 
 // ---------------------------------------------------------------------------------------------------- standoffs (A6)
 
-/** A body no joint reaches: a fixed plate that has to stand on the base (A6); a cover over another body's level rests on
- * the housing round it instead (covers, below). */
-const isFixedPlate = (ctx: BuildCtx, id: string): boolean => id !== "ground" && ctx.parts.has(id) && !ctx.kin.joints.some((j) => j.a === id || j.b === id) && ctx.geoms.get(id)?.level?.part !== "above";
+/** A body no joint reaches and nothing moves (a block may carry a jointless body round: a flexspline's segment): a fixed
+ * plate that has to stand on the base (A6); a cover over another body's level rests on the housing round it instead
+ * (covers, below). */
+const isFixedPlate = (ctx: BuildCtx, id: string): boolean =>
+  id !== "ground" &&
+  ctx.parts.has(id) &&
+  !ctx.kin.joints.some((j) => j.a === id || j.b === id) &&
+  ctx.geoms.get(id)?.level?.part !== "above" &&
+  !(ctx.sampled.xfs.get(id) ?? []).some((X) => X.t.some((v) => Math.abs(v) > 1e-6) || X.R.some((v, k) => Math.abs(v - (k % 4 === 0 ? 1 : 0)) > 1e-9));
 
 /** True when a point lies in the sweep of the plate's own body (the post is under the plate it holds). */
 const insideOwn = (body: string, ctx: BuildCtx, p: Vec2): boolean => {
@@ -443,8 +449,14 @@ export const drive: Rule = {
     const st = ctx.stacks.get(site.id)!;
     const bb = ctx.base.bottom;
     const S: Vec2 = [site.at[0], site.at[1]];
-    const pz = bb - 28;
-    if (st.w0 + (ctx.stacks.get(site.id) ? 0 : 0) > pz - 2 - 0) {
+    // the belt plane under the base, and under the shaft's housing where a tall stack hangs it lower
+    const housing = ctx.get(`${site.id}-housing`);
+    const hz = housing ? Math.min(...worldPoints(ctx.M, housing).map((p) => p[2])) : bb;
+    const pz = Math.min(bb - 28, hz - 7);
+    // the shaft's own low end, in the world (the stack's frame stands on its family's plane, not at z 0)
+    const axle = ctx.get(`${site.id}-axle`);
+    const low = axle ? Math.min(...worldPoints(ctx.M, axle).map((p) => p[2])) : st.w0;
+    if (low > pz - 2) {
       // the shaft does not reach the belt plane (no housing): the drive is not built
       ctx.issues.push(`drive: the live shaft ${site.id} does not reach below the base`);
     }
@@ -454,11 +466,14 @@ export const drive: Rule = {
     // parts' plan boxes, a moving part's over its travel; the flange is 58 mm square about the motor), and its flange's
     // edge clear of the input housing's screws (a hole there would leave no wall); the next best angle when it is not
     const taken = secondDriveBoxes(ctx);
-    const screws = st.solids.filter((x) => x.id.startsWith(`${site.id}-hsc`) && x.kind === "head").map((x): Vec2 => [x.frame.o[0], x.frame.o[1]]);
+    // (and its dowels: their holes run through the flange too)
+    const screws = st.solids.filter((x) => (x.id.startsWith(`${site.id}-hsc`) && x.kind === "head") || (x.id.startsWith(`${site.id}-hdw`) && x.kind === "dowel")).map((x): Vec2 => [x.frame.o[0], x.frame.o[1]]);
+    // (and a screw's hole inside the flange keeps its wall to the motor's bore: Ø3 hole, 1.5 mm wall)
     const edgeOk = (m: Vec2) =>
       screws.every(([x, y]) => {
         const d = Math.max(Math.abs(x - m[0]), Math.abs(y - m[1]));
-        return d < 29 - 4 || d > 29 + 2;
+        const bore = Math.hypot(x - m[0], y - m[1]) - (MOTORS.pancake.R - 2);
+        return (d < 29 - 4 && (bore > 1.5 + 1.5 + 0.1 || bore < -(1.5 + 1.5 + 0.1))) || d > 29 + 2;
       });
     const cands = Array.from({ length: 12 }, (_, k) => polar(S, C, (k / 12) * TAU))
       .filter((m) => !taken.some((b) => m[0] + 32 > b[0] && m[0] - 32 < b[2] && m[1] + 32 > b[1] && m[1] - 32 < b[3]))
@@ -807,8 +822,11 @@ export const seeThrough: Rule = {
     const principle = [...ctx.principle].map((b) => ({ b, sweep: ctx.sweeps.of(b) })).filter((p): p is { b: string; sweep: NonNullable<typeof p.sweep> } => !!p.sweep);
     if (!principle.length) return;
     const proj = principle.map((p) => ({ b: p.b, cs: p.sweep.project(dir), c: centroidDepth(ctx, p.b, dir) }));
+    // a ring pin a lobed disc rolls on is a principle part, though fixed: drawn whole (pin-ring)
+    const ringPins = new Set(ctx.joints.filter((j) => j.kit === "pin-ring").map((j) => j.id));
     for (const s of ctx.solids) {
       if (ctx.principle.has(s.body) || s.flags.isBase || s.kind === "foot") continue;
+      if ((s.kind === "roller" || s.kind === "dowel") && s.joints.some((j) => ringPins.has(j))) continue;
       // what a loop carries round, or a drive turns with the cycle, moves: it is not a support that stands over the principle
       if (s.convey || s.spin) continue;
       if (ctx.parts.get(s.body)?.id === s.id) continue;
@@ -832,6 +850,20 @@ export const seeThrough: Rule = {
       }
     }
     proj.forEach((p) => p.cs.delete());
+    // a principle gear that covers a smaller one on its own axis is drawn see-through too, never removed (a large sun
+    // over a small one)
+    const gears = [...ctx.principle].map((b) => ({ b, g: ctx.geoms.get(b), part: ctx.parts.get(b) })).filter((x) => x.g && x.part && String(x.g.shape.type) === "gear" && parallel(x.g.frame.z, dir));
+    const reach = (x: (typeof gears)[number]) => Math.max(...x.g!.profile.outer.map((q) => Math.hypot(q[0], q[1])));
+    const depth = (x: (typeof gears)[number]) => v3.dot(x.part!.frame.o, dir);
+    for (const A of gears)
+      for (const B of gears) {
+        if (A === B || reach(A) <= reach(B) || depth(A) >= depth(B)) continue;
+        const off = v3.sub(B.g!.frame.o, A.g!.frame.o);
+        if (v3.len(v3.sub(off, v3.mul(dir, v3.dot(off, dir)))) > 0.5) continue;
+        A.part!.flags.seeThrough = true;
+        ctx.covers.set(A.part!.id, [...new Set([...(ctx.covers.get(A.part!.id) ?? []), B.b])]);
+        (ctx.fired["see-through"] ??= []).push(A.part!.id);
+      }
   },
 };
 

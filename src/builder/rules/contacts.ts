@@ -339,7 +339,12 @@ const j5 = contactRule({
     // a body that reaches past its block on one side (a crosshead's arm) runs there on its riser's lip alone: a rail
     // would stand in the arm's way. The gibbed rail and its keeper go on the other side.
     const full = extentIn(ctx, c, slider, true);
-    const armSide = full[3] > e[3] + 1 ? 1 : full[2] < e[2] - 1 ? -1 : 0;
+    // a rack is guided from its back: its toothed side stays open for the pinion (no rail there), which holds it against
+    // the gibbed rail on the other side
+    const rack = String(ctx.kin.bodies.find((b) => b.id === slider)?.shape?.type) === "rack";
+    const meshAt = rack ? ctx.kin.joints.find((j) => j.type === "gear-mesh" && (j.a === slider || j.b === slider)) : undefined;
+    const teeth = meshAt ? Math.sign(planeCoords(c.frame, ctx.S.joints.get(meshAt.id)!.at).uv[1] - planeCoords(c.frame, c.at).uv[1] - (e[2] + e[3]) / 2) : 0;
+    const armSide = teeth || (full[3] > e[3] + 1 ? 1 : full[2] < e[2] - 1 ? -1 : 0);
     const gs = armSide > 0 ? -1 : armSide < 0 ? 1 : -1;
     const rs = -gs;
     const railOff = (s: number) => 3.5 + 0.5 + (s === gs ? gap : 0);
@@ -394,11 +399,22 @@ const j5 = contactRule({
         L.add(H.plate(`${id}-rail${k}`, railRect(s, a, b), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
         ways.push(`${id}-rail${k}`);
       }
-      if (risen) {
+      // a rack's toothed side stays open down to the base: the pinion runs there
+      if (risen && !(teeth && s === armSide)) {
         const [ra, rb] = riserEnds.get(s)!;
         L.add(H.plate(`${id}-riser${k}`, riserRect(s, ra, rb), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
         ways.push(`${id}-riser${k}`);
       }
+    }
+    // a rack rides on a hardened strip on a ground way under its back half instead (M14)
+    if (teeth) {
+      const [ra, rb] = risen ? riserEnds.get(gs)! : span(gs);
+      const ya = out(gs, -1.5);
+      const yb = (e[2] + e[3]) / 2;
+      const strip = roundRect(ra + 4, Math.min(ya, yb), rb - 4, Math.max(ya, yb), 1);
+      if (w0 - baseTop > 2) L.add(H.plate(`${id}-way`, strip, { body: hostBody, kind: "plate", role: "ground", name: "Way under the rack's back, ground", z0: baseTop, z1: w0 - 1.5, mat: "Steel C45, ground" }));
+      L.add(H.wearStrip(`${id}-strip`, strip, { body: hostBody, z0: w0 - 1.5, z1: w0, name: "Wear strip under the rack, hardened" }));
+      ways.push(`${id}-strip`);
     }
     // gib on the gibbed side, between the slider and its rail (F7)
     L.add(H.gib(`${id}-gib`, Math.max(10, run - 20), { body: hostBody, at: [g0 + Math.min(10, run / 4), out(gs, gap / 2 + 0.5), 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
@@ -416,11 +432,13 @@ const j5 = contactRule({
       L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + KT + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + KT, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
     }
     // dowels: the reference rail to the base, or the riser alone where an arm runs over that side
-    const [d0, d1] = risen ? riserEnds.get(rs)! : span(rs);
-    const dy = out(rs, rs === armSide ? 3 : railOff(rs));
+    // (a rack's go in its gibbed rail, its only rail)
+    const ds = teeth ? gs : rs;
+    const [d0, d1] = risen ? riserEnds.get(ds)! : span(ds);
+    const dy = out(ds, ds === armSide ? 3 : railOff(ds));
     // (recessed under the riser's top where the arm runs over it)
-    const dz1 = rs === armSide ? w0 - 0.5 : w0 + rh;
-    for (const [k, x] of [[0, d0 + 4], [1, d1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, dy, 0], z0: baseTop, z1: dz1, ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 h6, ${rs === armSide ? "riser" : "reference rail"} to base`, qty: 2 }) }));
+    const dz1 = ds === armSide ? w0 - 0.5 : w0 + rh;
+    for (const [k, x] of [[0, d0 + 4], [1, d1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, dy, 0], z0: baseTop, z1: dz1, ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 h6, ${teeth ? "gibbed rail" : ds === armSide ? "riser" : "reference rail"} to base`, qty: 2 }) }));
     // wipers at both ends of the slider where they clear, and a grease nipple (F8)
     const sb = bodyOf(ctx, slider);
     const wipers: string[] = [];
@@ -460,10 +478,14 @@ const j5 = contactRule({
     const part = ctx.parts.get(slider);
     if (part) part.slides = [...(part.slides ?? []), ...ways];
     const stopText = stops.length === 2 ? "an end stop with a pad at each end" : stops.length ? "an end stop with a pad at one end" : "no end stops, as the rod drives the slider and other parts sweep past both ends";
-    const guide = armSide ? "on the lips of two ground risers, a gibbed rail under a keeper on the side away from its arm (the arm runs over the other riser)" : "on the lips of two ground risers, between a dowelled reference rail and a gibbed rail under a keeper";
+    const guide = teeth
+      ? "guided from its back: a gibbed rail under a keeper on a ground riser, and a hardened strip on a way under its back half; its toothed side stays open and the pinion holds it against the gib, which sets the mesh"
+      : armSide
+        ? "on the lips of two ground risers, a gibbed rail under a keeper on the side away from its arm (the arm runs over the other riser)"
+        : "on the lips of two ground risers, between a dowelled reference rail and a gibbed rail under a keeper";
     return {
-      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: stops, F7: [`${id}-gib`], F8: [...wipers, ...(nx ? [`${id}-nip`] : [])] },
-      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider ${guide}; ${wipers.length === 2 ? "wipers at both ends" : wipers.length ? "a wiper at the free end" : "no wipers (parts sweep close past both ends)"}, ${nx ? "a grease nipple" : "an oil hole in the keeper (no room for a nipple under the parts that sweep over it)"}; ${stopText} of the ${(trv[1] - trv[0]).toFixed(0)} mm travel.`,
+      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: stops, F7: [`${id}-gib`], F8: [...wipers, ...(nx ? [`${id}-nip`] : [])], ...(teeth ? { M14: [`${id}-strip`] } : {}) },
+      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm ${teeth ? "rack" : "slider"} ${guide}; ${wipers.length === 2 ? "wipers at both ends" : wipers.length ? "a wiper at the free end" : "no wipers (parts sweep close past both ends)"}, ${nx ? "a grease nipple" : "an oil hole in the keeper (no room for a nipple under the parts that sweep over it)"}; ${stopText} of the ${(trv[1] - trv[0]).toFixed(0)} mm travel.`,
     };
   },
 });

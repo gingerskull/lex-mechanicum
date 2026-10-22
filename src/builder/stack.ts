@@ -11,7 +11,7 @@ import { SHOULDER_BOLTS, circlipExt, circlipInt, headD, headH, innerRingD, keyFo
 import { housingBearing } from "../hardware/sub/housing";
 import type { Solid3 } from "../solids/types";
 import type { BuildCtx } from "./ctx";
-import { type Frame, parallel } from "./frames";
+import { type Frame, fromPlane, parallel } from "./frames";
 import { Local, fitBore, half, type Fit, type Member } from "./lib";
 import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
@@ -39,6 +39,8 @@ export interface StackSpec {
   input?: boolean;
   /** Force a support instead of letting the selector choose. */
   support?: SupportKind;
+  /** Another stack holds the same axis under this one (a large sun's shaft over the small sun's): no housing below. */
+  axisTakenBelow?: boolean;
   /** A live gear or pulley shaft with nothing over it is straddle mounted (A9). */
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
@@ -85,9 +87,12 @@ const SPACER_MIN = 0.5;
 const BEAM_GAP = 3;
 
 /** The support selector (A20). */
-export function selectSupport(spec: Pick<StackSpec, "kind" | "held" | "straddle" | "base" | "frame">): SupportKind {
+export function selectSupport(spec: Pick<StackSpec, "kind" | "held" | "straddle" | "base" | "frame" | "axisTakenBelow">): SupportKind {
   if (spec.kind === "moving") return "stub";
   if (!spec.base || !parallel(spec.frame.z, UP)) return "pillow";
+  // a live shaft whose axis below is another stack's, with parts passing under it, runs in its bridge alone (a large
+  // sun over a small one)
+  if (spec.kind === "live" && spec.held === "bridge" && spec.axisTakenBelow) return "hung";
   if (spec.kind === "live") return spec.straddle && spec.held !== "base" ? "bridge" : "housing";
   if (spec.held === "base") return "stub";
   if (spec.held === "bridge") return "hung";
@@ -127,7 +132,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const seats: Seat[] = members.map((m, i) => {
     const b = clamped(m) ? null : (fit.bearing[i] ?? null);
     if (clamped(m)) return { m, b: null, z0: m.w0, z1: m.w1 };
-    if (m.keyed && !moving) return { m, b: null, z0: m.w0 - (isBevel(m) ? (m.shim ?? 0) : 0), z1: m.w1 };
+    if (m.keyed && !moving) {
+      const down = (ctx.geoms.get(m.body)?.scaleTop ?? 1) > 1;
+      return { m, b: null, z0: m.w0 - (isBevel(m) && !down ? (m.shim ?? 0) : 0), z1: m.w1 + (isBevel(m) && down ? (m.shim ?? 0) : 0) };
+    }
     const B = b ? b.B : Math.min(6, m.w1 - m.w0);
     const c = (m.w0 + m.w1) / 2;
     const z0 = half(c - B / 2);
@@ -204,7 +212,9 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const sh = s.m.shim ?? 0;
     if (ownHub(s.m)) return;
     if (isBevel(s.m)) {
-      if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm at the back face, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: s.m.w0 - sh, z1: s.m.w0, body: s.m.body, inset: true }));
+      // the back face is the gear's low end, or its high end when its apex lies below it
+      const down = (ctx.geoms.get(s.m.body)?.scaleTop ?? 1) > 1;
+      if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm at the back face, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: down ? s.m.w1 : s.m.w0 - sh, z1: down ? s.m.w1 + sh : s.m.w0, body: s.m.body, inset: true }));
       return;
     }
     if (sh > 0) L.add(H.solid(`${nm}-shim`, { name: `Shim pack ${sh} mm, sets the mounting distance`, kind: "shim", role: "hw", mat: "Steel shim stock", outer: circle(hubD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.1, 0, 0, 24)], z0: s.m.w1, z1: s.m.w1 + sh, body: s.m.body, inset: true }));
@@ -258,9 +268,11 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const fromBase = support !== "hung" && support !== "pillow" && spec.base !== null;
 
   if (support === "pillow") {
-    // a part set along its shaft by a control (a friction wheel's radius) reaches the ends of its range
-    const lo = Math.min(...L.list.map((x) => x.z0), first.w0, spec.reach?.[0] ?? Infinity);
-    const hi = Math.max(...L.list.map((x) => x.z1), zTop, spec.reach?.[1] ?? -Infinity);
+    // the blocks stand clear of the members and of a cage of theirs the shaft runs through (a case's); a part set along
+    // its shaft by a control (a friction wheel's radius) reaches the ends of its range
+    const span = piecesSpan(ctx, spec);
+    const lo = Math.min(...L.list.map((x) => x.z0), first.w0, span[0], spec.reach?.[0] ?? Infinity);
+    const hi = Math.max(...L.list.map((x) => x.z1), zTop, span[1], spec.reach?.[1] ?? -Infinity);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
     const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, far: !!spec.reach, ...(spec.side ? { side: spec.side } : {}) });
@@ -323,13 +335,17 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       serve("F1", `${id}-hdw0`, `${id}-hdw1`);
       serve("F4", `${id}-hww`);
     }
-    if (support === "bridge" || support === "hung") {
-      const o = spec.frame.o;
+    // a bridge over the stack, where a pair of posts clears the sweeps; a live shaft in its housing does without one
+    // when none does (the parts round it sweep the whole plan), and says so
+    const o = spec.frame.o;
+    const route = support === "bridge" || support === "hung" ? routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom: o[2] + zTop + BEAM_GAP, baseTop: spec.baseTopWorld ?? o[2] + bt }) : null;
+    if ((support === "bridge" || support === "hung") && !route) {
+      if (!(live && spec.base)) throw new Error(`${id}: no pair of posts clears the sweeps for a bridge`);
+      notes.push("no pair of posts clears the sweeps for a bridge: the shaft is held in its housing alone");
+    }
+    if (route) {
       const baseTopW = spec.baseTopWorld ?? o[2] + bt;
       const baseBotW = o[2] + bb;
-      const minBottom = o[2] + zTop + BEAM_GAP;
-      const route = routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom, baseTop: baseTopW });
-      if (!route) throw new Error(`${id}: no pair of posts clears the sweeps for a bridge`);
       const beamBot = route.bottom - o[2];
       const beamTop = route.top - o[2];
       const hole = (circleBushing(d) / 2) + 0.05;
@@ -344,7 +360,14 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       L.add(H.bushing(`${id}-bb`, d, circleBushing(d), { body: "ground", z0: beamBot, z1: beamTop }));
       // a dead axle's clip bears on the bushing; a live shaft is located in its housing, so its clip only stands guard,
       // clear of the fixed beam by the sweep margin (A12, A14)
-      const cz = beamTop + (live ? MIN_GAP + 0.1 : 0.3);
+      // a live shaft hung from the bridge alone over another stack's axis bears on it through a thrust washer under its
+      // clip (A12)
+      const hungLive = live && support === "hung" && !!spec.axisTakenBelow;
+      if (hungLive) {
+        L.add(H.thrustWasher(`${id}-btw`, d + 0.2, d + 8, { body: "ground", z0: beamTop, z1: beamTop + 1 }));
+        serve("F4", `${id}-btw`);
+      }
+      const cz = beamTop + (hungLive ? 1.3 : live ? MIN_GAP + 0.1 : 0.3);
       grooves.push(cz);
       L.add(H.circlip(`${id}-ecl`, d, { z0: cz, z1: cz + ce.s, body: turn }));
       serve("F1", `${id}-bridge`);
@@ -358,7 +381,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       L.add(H.screw(`${id}-es`, "csk", M, 2 * M + wh, { body: turn, face: top.w1 + wh, dir: -1 }));
       serve("F2", `${id}-ew`, `${id}-es`);
       shaftSpec.z1 = top.w1;
-    } else if (support !== "housing" || !spec.straddle) {
+    } else if (support !== "housing" || !spec.straddle || !route) {
       const clZ = zTop + 0.3;
       grooves.push(clZ);
       L.add(H.circlip(`${id}-ecl`, d, { z0: clZ, z1: clZ + ce.s, body: turn }));
@@ -446,3 +469,26 @@ const circleBushing = (d: number): number => d + 4;
 
 export type { Solid };
 export { housingBearing };
+
+/** The range along a stack's axis of its members' cages (a differential case's), [Infinity, -Infinity] if none. */
+function piecesSpan(ctx: BuildCtx, spec: StackSpec): [number, number] {
+  let lo = Infinity;
+  let hi = -Infinity;
+  const z = spec.frame.z;
+  const o = spec.frame.o;
+  for (const m of spec.members) {
+    // a cage the shaft runs through (a differential's case); a yoke's arms end at its own bar, off the shaft
+    const g = ctx.geoms.get(m.body);
+    if (!g?.shape.cage) continue;
+    for (const pc of g.pieces ?? []) {
+      for (const q of pc.profile.outer)
+        for (const w of [0, pc.h]) {
+          const p = fromPlane(pc.frame, q, w);
+          const t = (p[0] - o[0]) * z[0] + (p[1] - o[1]) * z[1] + (p[2] - o[2]) * z[2];
+          lo = Math.min(lo, t);
+          hi = Math.max(hi, t);
+        }
+    }
+  }
+  return [lo, hi];
+}

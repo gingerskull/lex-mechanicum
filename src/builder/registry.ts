@@ -10,6 +10,9 @@ import { crossBearings } from "./rules/cross";
 import { lugs, posts } from "./rules/lugs";
 import { wheels } from "./rules/wheels";
 import { pistonBore, trunnion } from "./rules/cylinder";
+import { ringCarrier } from "./rules/ring";
+import { eccentricBearing, pinHole, pinRing } from "./rules/cycloid";
+import { spiderPin } from "./rules/differential";
 import { ballSocket } from "./rules/slipper";
 import { j11 } from "./screws";
 import { j13 } from "./compliant";
@@ -49,6 +52,11 @@ export const rules: Rule[] = [
   crossBearings,
   trunnion,
   pistonBore,
+  ringCarrier,
+  eccentricBearing,
+  pinRing,
+  pinHole,
+  spiderPin,
   ballSocket,
   byId("j4-slot-roller"),
   byId("pin-lobe"),

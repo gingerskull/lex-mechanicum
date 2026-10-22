@@ -134,8 +134,8 @@ in degrees, applied x then y then z, default none); points and axes given "in a 
 | `joints` | Declared, with a 3D origin and axis: `id`, `type`, `a`, `b` (bodies), `at` (point or position), `axis`, `limits` `[lo, hi]` where it has them. **Types:** `revolute`, `prismatic`, `cylindrical`, `screw` (`lead`, `hand`, `ball`), `pin-in-slot` (the slot's body and path), `gear-mesh` (`ratio` or the two bodies' tooth counts; `crossed` axes angle, `offset` for hypoid), `cam-contact` (follower kind: roller, flat, knife), `belt` (a `flexible` member: `belt`, `chain`, `rope`, `cvt`), `rolling`, `spherical`, `universal`, `planar`, `flexure` (neck, width, length, thickness). Every joint belongs to exactly one block of `solve`, or to `fallback`. |
 | `params` | Named dimensions: `id`, `value`, `unit`, `min`, `max` (the **ranges** used by controls and by the validator), `note`. |
 | `design` | Discrete **design choices** that change the build but not the motion law: tooth counts, which arrangement, which side a part is on. `options` and the chosen `value`. |
-| `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`; a `manual` driver that gives them is a hand stroke, worked through that range by the cycle and built with no motor. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params. |
-| `solve` | The composition: a list of block instances in solve order. A **block** is one of `dyad`, `slider-dyad`, `five-bar`, `gear-mesh`, `willis`, `hooke`, `homokinetic`, `bennett`, `cam`, `screw`, `convey`, `flexure`, `escapement`, `lerp`, `line-crossing`, `target-path`; `in` names the bodies, points and params it reads; `out` names the points and angles it produces; `branch` names the design choice that picks its root. Block inputs and outputs are the only names later blocks may read. |
+| `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`; a `manual` driver that gives them is a hand stroke, worked through that range by the cycle and built with no motor. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params; in the record form an option is `{ id, set, cycle }`: `set` gives design choices (the input member, the held member) and `cycle` the input degrees after which the motion repeats at that option (it replaces the rotary driver's range). The selector's `default` is an option's id. |
+| `solve` | The composition: a list of block instances in solve order. A **block** is one of `dyad`, `slider-dyad`, `five-bar`, `gear-mesh`, `willis`, `hooke`, `homokinetic`, `bennett`, `cam`, `screw`, `convey`, `flexure`, `escapement`, `lerp`, `line-crossing`, `target-path`, `ravigneaux`; `in` names the bodies, points and params it reads; `out` names the points and angles it produces; `branch` names the design choice that picks its root. Block inputs and outputs are the only names later blocks may read. |
 | `points` | Named points: a body and a local position. Every point a trace, overlay, dimension or plot uses is here (standard K12). |
 | `outputs` | Quantities read off: `id`, `of` (a body or point), `kind` (`angle`, `position`, `speed-ratio`, `path`), `unit`. Plots and claims read these. |
 | `fallback` | `null`, or `{ "numeric": true, "loops": [...] }` when a loop does not decompose into blocks. The audit names it; K1 verifies it. |
@@ -209,6 +209,15 @@ yoke): `a` the pin, `p`, `d`; out the slotted body's point on the slide. `dyad` 
 `a`, posed by its turn, so a later block can read that body's other points; its `branch` is a design choice, one of its
 options, or a plain `left` / `right` of a to b. A block's `in` may be an expression of names (`"-input"`). A block's
 `out` may be keyed (`{ "angle": "gear-turn" }`).
+`ravigneaux` solves a set of two suns, short and long pinions on one carrier and a ring: `zSs`, `zSl`, `zPs`, `zPl`, `zR`,
+`center`, `axis`, `input` (the input member's angle), `inputMember`, `held` and `locked` (design choices a selector sets:
+a member's name, `"none"`, or two members joined by `+`), `bodies` { sunS, sunL, carrier, ring } and `short`, `long`
+([{ body, joint }]); out { sunS, sunL, carrier, ring, short, long }.
+
+**A gear through two planes.** A `gear`'s `cluster` level with `joined: true` is one piece with the gear under it, in the
+very next slab (a long pinion: its lower half meshes one gear, its upper half others). Where two levels have the same
+tooth count, a mesh joint names the level it meets: `level: { <body>: 1 }`.
+
 `lerp` (`a`, `b`, `t`) makes the point a + t (b − a): a scissor bar's far pin. `line-crossing` (`a1`, `a2`, `b1`, `b2`,
 optional `sum`) makes the point where two lines cross; where they run together it is the point on the first line whose
 distances to `a1` and `b1` add up to `sum` (an antiparallelogram's change points). `target-path` (`shape`

@@ -153,7 +153,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isStr(v) && !known.has(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
-  // what the blocks produce: a construction point (a crossing of two lines) may be traced and read like a named point
+  // what the blocks produce: a construction point (a crossing of two lines) may be traced and read like a named point,
+  // and an output may read a value a block solves (a planet's turn on its pin)
   const made = new Set<string>();
   for (const s of kin.solve) {
     const by = s.id;

@@ -6,7 +6,7 @@ import { BLOCKS } from "./registry";
 import { D2R, R2D, TAU, type Mat3, type Vec3, fitXf, m3, v3, wrapPi, xf, type Xf } from "./math";
 import { solveNumeric } from "./numeric";
 import { resolveJoint, type ResolvedJoint } from "./residual";
-import type { Controls, Kin, KinBody, KinDriver, KinJoint, Pose, SolveStep } from "./types";
+import type { Controls, Kin, KinBody, KinDriver, KinJoint, Pose, SelectorOptionSpec, SolveStep } from "./types";
 
 type Mode = "ref" | "track" | "normal" | "probe";
 
@@ -55,6 +55,8 @@ export interface Setup {
   stateful: string[];
   tablesReady: boolean;
   driverControls: Record<string, number>;
+  /** A selector option's cycle (input degrees per cycle), which replaces the cycle driver's range span. */
+  cycle?: number;
   /** Warm start of the numeric fallback and the driver values it belongs to. */
   fbWarm?: { poses: Map<string, Xf>; vals: Record<string, number> };
   /** Reference-pose block values (for outputs). */
@@ -73,8 +75,25 @@ const key = (c?: Controls): string =>
 
 const joinPlain = (v: unknown): string => String(v);
 
+/**
+ * The chosen option of a selector driver: named by the controls, else the driver's default, else its first. Options are
+ * a list of `{ id, ... }` (the record form) or a map by id.
+ */
+export function selectorOption(d: KinDriver, chosen?: string): SelectorOptionSpec | undefined {
+  const o = d.options;
+  if (!o) return undefined;
+  const list: (SelectorOptionSpec & { id?: string })[] = Array.isArray(o) ? o : Object.entries(o).map(([id, v]) => ({ id, ...v }));
+  // a selector's default in the record is the id of one of its options
+  const def: unknown = (d as { default?: unknown }).default;
+  const want = chosen ?? d.value ?? (typeof def === "string" ? def : undefined);
+  return list.find((x) => x.id === want) ?? list[0];
+}
+
 /** A hand-worked driver that gives the ends of its stroke (lo, hi): the cycle works it through them, and no motor drives it. */
 export const handStroke = (d: KinDriver): boolean => d.kind === "manual" && typeof d.lo === "number" && typeof d.hi === "number";
+
+/** A driver the cycle sets through a block (`cycle: { from }`), read back off the pose. */
+const setByCycle = (d: KinDriver): boolean => typeof d.cycle === "object" && d.cycle !== null;
 
 /** A driver the cycle moves: a rotary, oscillating or linear input, or a hand stroke. */
 export const cycleDriven = (d: KinDriver): boolean => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || handStroke(d);
@@ -115,22 +134,22 @@ export class Kinematics {
     const designs = new Map<string, string>();
     for (const d of kin.design ?? []) designs.set(d.id, d.value);
     for (const [id, v] of Object.entries(controls?.design ?? {})) designs.set(id, v);
+    let cycle: number | undefined;
     for (const d of kin.drivers) {
       if (d.kind !== "select" || !d.options) continue;
-      // options keyed by name, or (the record spec's form) a list of { id, params, drivers }
-      const list = Array.isArray(d.options) ? (d.options as { id: string; params?: Record<string, number>; drivers?: Record<string, number> }[]) : null;
-      const names = list ? list.map((o) => o.id) : Object.keys(d.options);
-      const choice = controls?.select?.[d.id] ?? d.value ?? (typeof (d.default as unknown) === "string" ? (d.default as unknown as string) : undefined) ?? names[0];
-      const opt = choice ? (list ? list.find((o) => o.id === choice) : (d.options as Record<string, { params?: Record<string, number>; drivers?: Record<string, number> }>)[choice]) : undefined;
+      const opt = selectorOption(d, controls?.select?.[d.id]);
       for (const [id, v] of Object.entries(opt?.params ?? {})) params.set(id, v);
       for (const [id, v] of Object.entries(opt?.drivers ?? {})) held.set(id, v);
+      // the record form: an option sets design choices (`set`) and the cycle it repeats after (input degrees)
+      for (const [id, v] of Object.entries(opt?.set ?? {})) if (controls?.design?.[id] === undefined) designs.set(id, String(v));
+      if (typeof opt?.cycle === "number") cycle = opt.cycle;
     }
     for (const [id, v] of Object.entries(controls?.params ?? {})) params.set(id, v);
     const drv = (controls as { drivers?: Record<string, number> } | undefined)?.drivers ?? {};
     const defaults = new Map<string, number>();
-    for (const d of kin.drivers) defaults.set(d.id, drv[d.id] ?? d.default ?? 0);
+    for (const d of kin.drivers) if (d.kind !== "select") defaults.set(d.id, drv[d.id] ?? (typeof d.default === "number" ? d.default : 0));
     const refDefaults = new Map<string, number>();
-    for (const d of kin.drivers) refDefaults.set(d.id, d.default ?? 0);
+    for (const d of kin.drivers) if (d.kind !== "select") refDefaults.set(d.id, typeof d.default === "number" ? d.default : 0);
     for (const [id, v] of held) defaults.set(id, v);
 
     const num = (v: unknown): number => {
@@ -170,6 +189,7 @@ export class Kinematics {
       stateful: [],
       tablesReady: false,
       driverControls: drv,
+      cycle,
       recording: null,
     };
   }
@@ -185,17 +205,19 @@ export class Kinematics {
   driverValues(u: number, controls?: Controls): Record<string, number> {
     const s = this.setup(controls);
     const out: Record<string, number> = {};
+    const scrub = this.kin.drivers.find((d) => d.kind === "rotary");
     for (const d of this.kin.drivers) {
+      if (d.kind === "select") continue;
       const held = s.held.get(d.id);
       const def = s.defaults.get(d.id) ?? 0;
       if (held !== undefined) {
         out[d.id] = held;
         continue;
       }
-      const speed = d.speed ?? 1;
+      const speed = d.rate !== undefined ? evalExpr(d.rate, (n) => s.params.get(n)) : (d.speed ?? 1);
       const ph = (d.phase ?? 0) * D2R;
       if (d.kind === "rotary") {
-        const span = d.range ? d.range[1] - d.range[0] : 360;
+        const span = d === scrub && s.cycle !== undefined ? s.cycle : d.range ? d.range[1] - d.range[0] : 360;
         out[d.id] = def + ((speed * u + ph) * R2D * span) / 360;
       } else if (d.kind === "oscillating" || d.kind === "linear" || handStroke(d)) {
         const lo = d.lo ?? d.range?.[0] ?? def;
@@ -278,7 +300,7 @@ export class Kinematics {
 
   defaultValues(s: Setup): Record<string, number> {
     const v: Record<string, number> = {};
-    for (const d of this.kin.drivers) v[d.id] = s.defaults.get(d.id) ?? 0;
+    for (const d of this.kin.drivers) if (d.kind !== "select") v[d.id] = s.defaults.get(d.id) ?? 0;
     return v;
   }
 
@@ -440,7 +462,7 @@ class Run implements BlockCtx {
   // ---- drivers: each rotates or slides the driven body of its joint relative to the driven joint's first body
   drive(): void {
     // a driver the cycle sets through a block (a path the tip follows, inverse kinematics) is not applied here
-    const pending = this.k.kin.drivers.filter((d) => d.joint && d.kind !== "select" && !d.cycle);
+    const pending = this.k.kin.drivers.filter((d) => d.joint && d.kind !== "select" && !setByCycle(d));
     for (let guard = 0; pending.length && guard < 8; guard++) {
       for (let i = pending.length - 1; i >= 0; i--) {
         const d = pending[i]!;
@@ -531,6 +553,9 @@ class Run implements BlockCtx {
   }
   setPt(name: string, p: Vec3): void {
     this.pts.set(name, p);
+  }
+  choice(name: string): string | undefined {
+    return this.s.designs.get(name);
   }
   setVal(name: string, v: number): void {
     this.vals[name] = v;
@@ -633,6 +658,11 @@ class Run implements BlockCtx {
         if (this.xfs.has(other)) guide = this.xfs.get(other);
       }
       if (j.type === "revolute" && !hint) hint = r.axis;
+      // a pin in a slot: the pin's centre is a point of the pin's body (a), where a block put it
+      if (j.type === "pin-in-slot" && j.a === body && this.pts.has(j.id)) {
+        add(r.at, this.pts.get(j.id)!);
+        continue;
+      }
       if (!point.has(j.type)) continue;
       const other = j.a === body ? j.b : j.a;
       // a hinge to a posed body that has turned its axis (a spinning spindle's hinge): the axis as that body carries it
@@ -710,7 +740,7 @@ class Run implements BlockCtx {
   /** A driver the cycle sets through a block reads its value off the solved pose: its default plus its joint's turn. */
   readCycleDrivers(): void {
     for (const d of this.k.kin.drivers) {
-      if (!d.cycle || !d.joint) continue;
+      if (!setByCycle(d) || !d.joint) continue;
       const r = this.s.joints.get(d.joint);
       if (!r) continue;
       const Xa = this.xfs.get(r.joint.a) ?? xf.id();
@@ -777,10 +807,10 @@ class Run implements BlockCtx {
   }
 
   private output(kind: string, of: string, points: Map<string, Vec3>, axis?: string | Vec3, relativeTo?: string): number | Vec3 | undefined {
-    // a value a block gives (a chain's speed over its peak), whatever the kind it is read as; but a speed ratio of a
-    // value is its rate per unit of the input, from the series of the value (checks/claims.ts; a double Cardan's
-    // centre shaft turn)
-    if (kind !== "speed-ratio" && of in this.vals && !this.xfs.has(of) && !points.has(of) && !this.s.joints.has(of)) return this.vals[of];
+    // a value a block solved or gives (a planet's spin, a contact's distance, a chain's speed over its peak), whatever the
+    // kind it is read as; but a speed ratio of a value is its rate per unit of the input, from the series of the value
+    // (checks/claims.ts; a double Cardan's centre shaft turn)
+    if (kind !== "path" && kind !== "speed-ratio" && of in this.vals && !this.xfs.has(of) && !this.k._bodies.has(of) && !points.has(of) && !this.s.joints.has(of)) return this.vals[of];
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);

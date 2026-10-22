@@ -283,6 +283,11 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `cross-bearings` | J3, F2, F8 |
 | `trunnion` | J1, F2, F4, F6 |
 | `piston-bore` | J5, M14 |
+| `ring-carrier` | J6, F1, F2 |
+| `eccentric-bearing` | J3, F2 |
+| `pin-ring` | J6, F1, F2 |
+| `pin-hole` | J4, M14 |
+| `spider-pin` | J3, F2, F4 |
 | `ball-socket` | J3, J7, F8 |
 | `j4-slot-roller` | J4, M14 |
 | `pin-lobe` | J4, M14 |

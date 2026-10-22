@@ -172,6 +172,7 @@ export class Sweeps {
     if (p) out.push(p);
     const t = this.ctx.twins.get(body);
     if (t) out.push(t);
+    out.push(...(this.ctx.levels.get(body) ?? []));
     // a drive part posed from its input (V5) is not carried by any body
     for (const s of this.ctx.solids) if (s.body === body && !s.drive) out.push(s);
     return out;
@@ -327,10 +328,12 @@ export class Sweeps {
   /** Bodies that move (a pose that differs from the reference at some sample). */
   moving(): string[] {
     const out: string[] = [];
+    // a body on a joint that the cycle leaves still (a ring held by a second driver) can still be turned: it counts
+    const joined = new Set(this.ctx.kin.joints.flatMap((j) => [j.a, j.b]));
     for (const [id, xs] of this.ctx.sampled.xfs) {
       if (id === "ground") continue;
       const moves = xs.some((X) => X.t.some((v) => Math.abs(v) > 1e-6) || X.R.some((v, k) => Math.abs(v - (k % 4 === 0 ? 1 : 0)) > 1e-9));
-      if (moves) out.push(id);
+      if (moves || joined.has(id)) out.push(id);
     }
     return out;
   }

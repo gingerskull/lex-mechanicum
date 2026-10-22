@@ -76,7 +76,7 @@ export interface KinJoint {
   carrier?: string;
   radiusA?: Num; // pitch radius of a (for a rack: the pinion's), mm
   radiusB?: Num;
-  ncg?: { kind: "ellipse"; e: Num; phase?: Num };
+  ncg?: { kind: "ellipse"; e: Num; phase?: Num; a?: Num };
   ca?: Vec; // optional axis points whose distance the mesh keeps constant
   cb?: Vec;
   // pin-in-slot: a carries the pin (at), b carries the slot, given by two points in the reference configuration
@@ -86,6 +86,10 @@ export interface KinJoint {
     /** n equal slots about the wheel axis through `center` (a Geneva wheel): the pin may be in any of them */
     repeat?: number;
     center?: Vec;
+    /** A round hole (`path: "circle"`) the pin's centre runs round at `radius` about `center` (a cycloidal output pin). */
+    path?: string;
+    radius?: Num;
+    body?: string;
     /** A curved slot instead: an arc about `center` (reference world) of `radius` (an expansion link). */
     arc?: { center: Vec; radius: Num; from?: Num; to?: Num };
   };
@@ -124,17 +128,34 @@ export interface KinDriver {
   hi?: number;
   /** Rotary and oscillating: turns per cycle (default 1; an integer keeps K2) and a phase offset, degrees. */
   speed?: number;
+  /** Turns per cycle relative to the range as a param expression, in place of `speed` (a differential's second input at a split). */
+  rate?: string;
   phase?: number;
   /**
    * Joint motion per unit of the driver's value (degrees or mm per unit, default 1): a driver read in its own units, a
    * die position from -1 to +1 that turns a reverse arm 20 degrees per unit.
    */
   scale?: number;
-  /** A selector's named options, each setting values of other drivers and params. */
-  options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }> | { id: string; drivers?: Record<string, number>; params?: Record<string, number> }[];
+  /**
+   * A selector's named options (a list of `{ id, ... }`, or a map by id), each setting values of other drivers, params
+   * and design choices (`set`), and the cycle the motion repeats after at that option (input degrees).
+   */
+  options?:
+    | Record<string, SelectorOptionSpec>
+    | (SelectorOptionSpec & { id: string })[];
   value?: string; // a selector's current option
-  /** Set by the cycle through a block (a target path and inverse kinematics), not applied as a joint motion. */
-  cycle?: { from?: string; note?: string };
+  /**
+   * Set by the cycle through a block (a target path and inverse kinematics), not applied as a joint motion; a number is
+   * only the input degrees after which the motion repeats (a planetary's carrier turn), noted in the record.
+   */
+  cycle?: { from?: string; note?: string } | number;
+}
+
+export interface SelectorOptionSpec {
+  drivers?: Record<string, number>;
+  params?: Record<string, number>;
+  set?: Record<string, string | number>;
+  cycle?: number;
 }
 
 export interface SolveStep {

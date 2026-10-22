@@ -16,7 +16,7 @@ export interface ResolvedJoint {
   axis2?: Vec3;
   pinA?: Vec3;
   pinB?: Vec3;
-  slot?: { from: Vec3; to: Vec3; repeat?: number; center?: Vec3; arc?: { center: Vec3; radius: number } };
+  slot?: { from: Vec3; to: Vec3; repeat?: number; center?: Vec3; circle?: number; arc?: { center: Vec3; radius: number } };
   ca?: Vec3;
   cb?: Vec3;
   num: (v: unknown) => number;
@@ -97,6 +97,11 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
       break;
     }
     case "pin-in-slot": {
+      if (r.slot?.circle !== undefined && r.slot.center) {
+        // a pin running round a round hole: its centre stays at the radius from the hole's centre
+        out.push(v3.dist(xf.apply(Xa, r.at), xf.apply(Xb, r.slot.center)) - r.slot.circle);
+        break;
+      }
       if (!wrapped(j, driverValue) || !r.slot) break;
       const pin = xf.apply(Xa, r.at);
       if (r.slot.arc) {
@@ -177,7 +182,14 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
   const ax = r.axis;
   const ax2 = r.axis2 ?? r.axis;
   if (j.type === "gear-mesh") {
-    const dC = s.c0 && s.c1 ? turn(s.c0, s.c1, ax) : 0;
+    // a mesh carried round by a carrier is checked in the carrier's frame (a planet's mesh, a differential's spiders on
+    // a case that turns about another axis)
+    if (s.c0 && s.c1) {
+      const i0 = xf.inv(s.c0);
+      const i1 = xf.inv(s.c1);
+      s = { a0: xf.mul(i0, s.a0), a1: xf.mul(i1, s.a1), b0: xf.mul(i0, s.b0), b1: xf.mul(i1, s.b1) };
+    }
+    const dC = 0;
     const dA = turn(s.a0, s.a1, ax) - dC;
     if (j.radiusA !== undefined && j.radiusB === undefined && j.zb === undefined && j.ratio === undefined && !j.ncg) {
       // rack: b's origin travels along axis2 by r Δθa
@@ -258,8 +270,10 @@ export function resolveJoint(j: KinJoint, num: (v: unknown) => number, vec: (v: 
     pinA: j.pinA ? unit(vec(j.pinA)) : undefined,
     pinB: j.pinB ? unit(vec(j.pinB)) : undefined,
     slot: j.slot
-      ? j.slot.arc
-        ? { from: vec(j.slot.arc.center), to: vec(j.slot.arc.center), arc: { center: vec(j.slot.arc.center), radius: num(j.slot.arc.radius) } }
+      ? j.slot.path === "circle"
+        ? { from: [0, 0, 0], to: [0, 0, 0], center: j.slot.center ? vec(j.slot.center) : undefined, circle: num(j.slot.radius) }
+        : j.slot.arc
+          ? { from: vec(j.slot.arc.center), to: vec(j.slot.arc.center), arc: { center: vec(j.slot.arc.center), radius: num(j.slot.arc.radius) } }
         : { from: vec(j.slot.from), to: vec(j.slot.to), repeat: j.slot.repeat, center: j.slot.center ? vec(j.slot.center) : undefined }
       : undefined,
     ca: j.ca ? vec(j.ca) : undefined,

@@ -101,6 +101,27 @@ export function worm(m: number, z1: number, z2: number, q: number): Worm {
   return { p, lead: z1 * p, d1, d2, gamma, a: (m * (q + z2)) / 2, ratio: z1 / z2, wheelLead: (Math.PI * d2) / Math.tan(gamma) };
 }
 
+/**
+ * The section of a worm square to its axis (an Archimedean worm: straight 20° flanks in its axial section), as a polar
+ * outline of n points: the radius at angle θ is the axial profile's radius at x = θ lead / 2π, with a tooth centred on
+ * θ = 0 for each start. Turned by 2π x / lead along the axis (right hand counter-clockwise), it sweeps the thread.
+ */
+export function wormSection(m: number, starts: number, d1: number, n = 96): Vec2[] {
+  const p = Math.PI * m;
+  const rp = d1 / 2;
+  const ra = rp + m;
+  const rf = rp - 1.25 * m;
+  const t = Math.tan(ALPHA);
+  const lead = starts * p;
+  return Array.from({ length: n }, (_, i): Vec2 => {
+    const th = (i * 2 * Math.PI) / n;
+    let x = (th * lead) / (2 * Math.PI);
+    x = x - p * Math.round(x / p);
+    const r = Math.max(rf, Math.min(ra, rp + (p / 4 - Math.abs(x)) / t));
+    return [r * Math.cos(th), r * Math.sin(th)];
+  });
+}
+
 // --- helical gears -------------------------------------------------------------------------------------------------
 
 /** Transverse module mt = mn / cos β. */
