@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.37.0, Graia — 2026-10-22
+
+- True 3D engine (standard 3.0, style reference 3.0): every mechanism is built from its catalogue record v3 (a `kin`
+  block and a `teaching` block) through closed-form kinematic blocks checked by a loop-closure residual, a hardware
+  builder (joint kits, axial stacks, a support router, a placement solver) and solids built by Manifold at build time,
+  shipped as package v2 (`.mx2`). Clearance is penetration depth in 3D; the drafting renderer works by depth buffer
+  with a free orthographic camera, section and detail views, traces, construction overlays and a time map.
+- All 89 mechanisms rebuilt from scratch on the new engine in seven batches, the 20 still open among them; each passes
+  its audit at standard 3.x with its teaching review, record, audit sheet and thumbnails.
+- Rules (standard 3.1 to 3.7): wheels on stub axles; the crank-and-link drive for every oscillating input, with a gear
+  step-up for a wide swing, a belt-driven carriage for a linear input and a knob for a hand-worked one; a reversing
+  motor through the in-plan belt drive for a screw run back and forth; a drive on a shaft in plan placed where it
+  clears the sweeps; kits for cams, screws, compliant blanks, belts, chains, ropes, CVTs, friction contacts,
+  eccentrics, dies, hubs, covers, ball sockets and gears (compound, helical, herringbone, worm, spiral bevel,
+  non-circular, ring on carrier rollers, cycloidal pin ring, differential spiders); the clamp check also reads probe
+  phases off the profile's grid.
+- Standard 3.8 groups every requirement under sixteen numbered laws, checked by a test.
+- Cut-over (standard 3.9, style reference 3.4): the 2.5D engine, v1 packages, the per-mechanism models and polishes,
+  the engine switch and the 3D stamp are gone. Site JavaScript drops from 185.7 to 84.9 KB gzipped, of which a
+  mechanism page loads 81.9 KB; the visual baselines are redrawn by the 3D renderer.
+- Site (style reference 3.1 to 3.3): a warmer README and subheading that name education; a Sort button beside
+  Filters, New by default and kept in the address; "No pattern found" for an empty search and a 404 page (sheet
+  ST-404); the mark split into favicon and footer mark; the sheet switch is one cog, turned on Blueprint.
+- Catalogue: every record carries the mechanism's origin date.
+- Releases take a codename from `data/release-names.json` through `npm run release`, shown beside the version in the
+  footer; this is the first.
+
 ## 0.36.0 — 2026-10-20
 
 - Worm drive added to standard 2.14: module 3, single start, 30:1, the worm on a shaft in plan between two pillow
