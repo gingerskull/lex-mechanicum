@@ -287,6 +287,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `ring-hub` | J3, F2 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
+| `j12-other` | J12, F7 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
 | `strap-sheave` | J12, F1, F2, A11 |
 | `j11-screw` | J11, J10, F2, F3, F4, F5, F8 |
