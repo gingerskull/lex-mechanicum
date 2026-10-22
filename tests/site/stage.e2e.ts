@@ -7,11 +7,13 @@ import { createServer, type Server } from "node:http";
 import { extname, join } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { allIds, engineOf } from "../../src/checks/engine";
 
 const OUT = join("dist", "site");
 const TYPES: Record<string, string> = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".webp": "image/webp", ".woff2": "font/woff2" };
 const V3 = ["four-bar", "bevel-gears", "oscillating-cylinder", "universal-joint"];
-const V1 = "slider-crank";
+// a page still on the 2.5D engine (the rebuild moves the mechanisms over one batch at a time)
+const V1 = allIds().find((id) => engineOf(id) === "2.5D") ?? "spur-gears";
 
 let server: Server;
 let base = "";
@@ -126,7 +128,8 @@ describe("a 2.5D page and a v3 page", () => {
     const { page } = await open(ctx, "/");
     for (const id of V3) expect(await page.locator('.card[data-id="' + id + '"] .stamp3d').count(), id).toBe(1);
     expect(await page.locator('.card[data-id="' + V1 + '"] .stamp3d').count()).toBe(0);
-    expect(await page.locator(".stamp3d").count()).toBe(V3.length);
+    // every mechanism on engine v3 carries it, not only the ones sampled above
+    expect(await page.locator(".stamp3d").count()).toBe(allIds().filter((id) => engineOf(id) === "v3").length);
     await ctx.close();
   });
 });

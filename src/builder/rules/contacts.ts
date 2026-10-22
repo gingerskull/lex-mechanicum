@@ -4,7 +4,7 @@
 // groove cam. Each builds its canonical hardware in the contact's own frame from the declared joint.
 import { circle, roundRect, type Vec2 } from "../../core/geom";
 import { H } from "../../hardware/primitives";
-import { BEARINGS, circlipExt } from "../../hardware/tables";
+import { BEARINGS, NIPPLES, circlipExt } from "../../hardware/tables";
 import { planeCoords } from "../frames";
 import { fromPlane } from "../frames";
 import type { BuildCtx, JointNote } from "../ctx";
@@ -17,7 +17,9 @@ import { Local } from "../lib";
 import type { Rule } from "./types";
 import { v3, type Vec3 } from "../../kin/math";
 import { anchorName } from "../../kin/compose";
+import type { Solid3 } from "../../solids/types";
 import { Local as LocalFrame } from "../lib";
+import { worldManifold } from "../sweeps";
 
 interface KitBuild {
   (ctx: BuildCtx, c: Contact, L: Local): { serves?: Record<string, string[]>; note: string; badge?: [string, "ok" | "warn"] } | void;
@@ -159,9 +161,12 @@ const grooveCam = contactRule({
 // ------------------------------------------------------------------------------------------------ J5
 
 /** Extent of a body's part in a contact's frame: [x0, x1, y0, y1]. */
-function extentIn(ctx: BuildCtx, c: Contact, body: string): [number, number, number, number] {
+function extentIn(ctx: BuildCtx, c: Contact, body: string, whole = false): [number, number, number, number] {
   const part = ctx.parts.get(body);
   if (!part) return [-20, 20, -10, 10];
+  // a body that is more than its sliding block (a crosshead with an arm) names the block: [length, width] about the joint
+  const blk = (ctx.kin.bodies.find((b) => b.id === body)?.shape as { slider?: unknown } | undefined)?.slider;
+  if (!whole && Array.isArray(blk) && blk.length >= 2) return [-Number(blk[0]) / 2, Number(blk[0]) / 2, -Number(blk[1]) / 2, Number(blk[1]) / 2];
   const p0 = planeCoords(c.frame, c.at).uv;
   const pts = part.profile.outer.map((q) => planeCoords(c.frame, fromPlane(part.frame, q, 0)).uv);
   const xs = pts.map((q) => q[0] - p0[0]);
@@ -183,6 +188,56 @@ function sleeveOnShaft(ctx: BuildCtx, c: Contact, slider: string, host: string):
   return {
     note: `${titleOf(c.id)}: ${titleOf(slider)} slides on the Ø${d} ${titleOf(host)} in a bronze bushing; it turns with the shaft because its links ride the shaft's arms.`,
     serves: { F2: [`${c.id}-bush`] },
+  };
+}
+
+/** True when every one of the solids clears the sweeps of the given bodies by the least gap. */
+function clearOf(ctx: BuildCtx, solids: Solid3[], bodies: string[]): boolean {
+  for (const s of solids) {
+    const m = worldManifold(ctx.M, s);
+    const g = ctx.sweeps.gap(m, bodies, MIN_GAP + 1);
+    m.delete();
+    if (g < MIN_GAP) return false;
+  }
+  return true;
+}
+
+/**
+ * A block sliding in a slot of a moving link (the swinging lever of a crank-shaper or a Whitworth gear): the slot is the
+ * guide, cut over the block's run with room for a hardened wear strip in each wall.
+ */
+function blockInSlot(ctx: BuildCtx, c: Contact, L: Local, slider: string, host: string, e: [number, number, number, number], run: [number, number]): ReturnType<KitBuild> {
+  const id = c.id;
+  const sw = (e[3] - e[2]) / 2 + 0.2 + 1.5;
+  const x0 = run[0] + e[0];
+  const x1 = run[1] + e[1];
+  const part = ctx.parts.get(host);
+  if (part) {
+    // a slot the link's own shape drew on the run gives way to the one cut here
+    const p0 = planeCoords(c.frame, c.at).uv;
+    const onRun = (h: Vec2[]) => {
+      const q = h.reduce<Vec2>((a, b) => [a[0] + b[0] / h.length, a[1] + b[1] / h.length], [0, 0]);
+      const w = planeCoords(c.frame, fromPlane(part.frame, q, 0)).uv;
+      const u = w[0] - p0[0];
+      const v = w[1] - p0[1];
+      return u > x0 - 2 && u < x1 + 2 && Math.abs(v) < sw;
+    };
+    part.profile.holes = part.profile.holes.filter((h) => !onRun(h));
+    cutRing(ctx, c, part.id, stadium(x0, x1, sw));
+  }
+  const ext = ctx.extent(host);
+  const zb: [number, number] = c.zb ?? (ext ? [ext.w0, ext.w1] : [-3, 3]);
+  const strips: string[] = [];
+  for (const [k, y] of [[0, sw - 0.75], [1, -(sw - 0.75)]] as const) {
+    const wall: Vec2[] = [[x0, y - 0.75], [x1, y - 0.75], [x1, y + 0.75], [x0, y + 0.75]];
+    L.add(H.wearStrip(`${id}-wear${k}`, wall, { body: host, z0: zb[0] + 0.5, z1: zb[1] - 0.5, ...(k ? { name: "" } : { qty: 2 }) }));
+    strips.push(`${id}-wear${k}`);
+  }
+  const blk = ctx.parts.get(slider);
+  if (blk) blk.slides = [...(blk.slides ?? []), ...strips, ...(part ? [part.id] : [])];
+  return {
+    serves: { M14: strips },
+    note: `${titleOf(id)}: the block slides in the link's slot over its ${(c.run[1] - c.run[0]).toFixed(0)} mm run, on a hardened wear strip in each wall; the slot is the guide, so nothing is fixed to the base.`,
   };
 }
 
@@ -253,92 +308,184 @@ const j5 = contactRule({
     if (host !== "ground" && String(ctx.kin.bodies.find((b) => b.id === host)?.shape?.type) === "shaft") return sleeveOnShaft(ctx, c, slider, host);
     if (String(ctx.geoms.get(slider)?.shape.type) === "shaft") return stemGuide(ctx, c, id, slider);
     const e = extentIn(ctx, c, slider);
+    // the contact's run is a's travel against b: the slider's own travel when it is a, reversed when it is b
+    const trv: [number, number] = slider === c.a ? c.run : [-c.run[1], -c.run[0]];
+    if (host !== "ground" && ctx.parts.has(host)) return blockInSlot(ctx, c, L, slider, host, e, trv);
     // a slider whose part reaches past its guide (a cam follower's stem down to its roller) is held over its `guide`
     // only ([x0, x1] along its own frame x): rails, stops and wipers stay on that length, off what the rest reaches over
-    const g = guideIn(ctx, c, slider);
-    const reachLo = g ? e[0] < g[0] - 0.5 : false;
-    const reachHi = g ? e[1] > g[1] + 0.5 : false;
-    if (g) [e[0], e[1]] = [Math.max(e[0], g[0]), Math.min(e[1], g[1])];
-    // the contact's run is a's travel against b: the slider's own travel when it is a, reversed when it is b
-    const run: [number, number] = slider === c.a ? c.run : [-c.run[1], -c.run[0]];
+    const gd = guideIn(ctx, c, slider);
+    const reachLo = gd ? e[0] < gd[0] - 0.5 : false;
+    const reachHi = gd ? e[1] > gd[1] + 0.5 : false;
+    if (gd) [e[0], e[1]] = [Math.max(e[0], gd[0]), Math.min(e[1], gd[1])];
     const zs = ctx.extent(slider);
     if (!zs) return;
     const w0 = zs.w0;
-    const w1 = zs.w1;
+    // the slider's own thickness: its slab may be taller (a split part beside it)
+    const sp = ctx.parts.get(slider);
+    const w1 = sp && sp.op.op === "extrude" ? Math.min(zs.w1, w0 + sp.op.h) : zs.w1;
     const Ls = e[1] - e[0];
-    const Ws = e[3] - e[2];
-    // the rails run past the travel far enough for the wipers and an end stop clear of them at each end
-    const x0 = run[0] + e[0] - 16;
-    const x1 = run[1] + e[1] + 16;
-    // a rack is guided from its back: its toothed side stays open for the pinion, which holds it against the gibbed rail
+    const hostBody = bodyOf(ctx, host);
+    // the rails stand flush with the slider's top and a thin keeper laps it, so a part pinned over the slider passes clear
+    const rh = w1 - w0;
+    const KT = 2;
+    const gap = 3;
+    const others = ctx.sweeps.moving().filter((m) => m !== slider);
+    const baseTop = baseZ(ctx, c);
+    const lo = trv[0] + e[0];
+    const hi = trv[1] + e[1];
+    // a side of the slide, +1 or -1 across it: the slider's edge there and a distance out from it
+    const edge = (s: number) => (s > 0 ? e[3] : e[2]);
+    const out = (s: number, d: number) => edge(s) + s * d;
+    // a body that reaches past its block on one side (a crosshead's arm) runs there on its riser's lip alone: a rail
+    // would stand in the arm's way. The gibbed rail and its keeper go on the other side.
+    const full = extentIn(ctx, c, slider, true);
+    // a rack is guided from its back: its toothed side stays open for the pinion (no rail there), which holds it against
+    // the gibbed rail on the other side
     const rack = String(ctx.kin.bodies.find((b) => b.id === slider)?.shape?.type) === "rack";
     const meshAt = rack ? ctx.kin.joints.find((j) => j.type === "gear-mesh" && (j.a === slider || j.b === slider)) : undefined;
-    const p0 = planeCoords(c.frame, c.at).uv;
-    const teeth = meshAt ? Math.sign(planeCoords(c.frame, ctx.S.joints.get(meshAt.id)!.at).uv[1] - p0[1] - (e[2] + e[3]) / 2) : 0;
-    // the gibbed side (1) is the one away from the teeth: mirror the build when the teeth face -y
-    const flip = teeth < 0 ? -1 : 1;
-    const ey = (k: 2 | 3): number => (flip > 0 ? e[k] : -e[k === 2 ? 3 : 2]);
-    const Y = (y: number): number => flip * y;
-    const hostBody = bodyOf(ctx, host);
-    const rh = w1 - w0 + 1.5;
-    const gap = 3;
+    const teeth = meshAt ? Math.sign(planeCoords(c.frame, ctx.S.joints.get(meshAt.id)!.at).uv[1] - planeCoords(c.frame, c.at).uv[1] - (e[2] + e[3]) / 2) : 0;
+    const armSide = teeth || (full[3] > e[3] + 1 ? 1 : full[2] < e[2] - 1 ? -1 : 0);
+    const gs = armSide > 0 ? -1 : armSide < 0 ? 1 : -1;
+    const rs = -gs;
+    const railOff = (s: number) => 3.5 + 0.5 + (s === gs ? gap : 0);
+    const sides = [rs, gs].filter((s) => s !== armSide);
+    const railRect = (s: number, a: number, b: number) => roundRect(a, Math.min(out(s, railOff(s) - 3.5), out(s, railOff(s) + 3.5)), b, Math.max(out(s, railOff(s) - 3.5), out(s, railOff(s) + 3.5)), 3.5);
+    // a riser runs under its rail (or under the slider's edge alone) and laps 1 mm under the slider, the way it runs on
+    const riserRect = (s: number, a: number, b: number) => {
+      const y0 = out(s, -1);
+      const y1 = out(s, s === armSide ? 4.5 : railOff(s) + 6);
+      return roundRect(a, Math.min(y0, y1), b, Math.max(y0, y1), 1);
+    };
+    const one = (make: (T: Local) => void): Solid3[] => {
+      const T = localAt(ctx, c);
+      make(T);
+      return T.out();
+    };
+    const railFor = (s: number, a: number, b: number) => one((T) => T.add(H.plate(`${id}-rail`, railRect(s, a, b), { body: hostBody, kind: "plate", role: "ground", z0: w0, z1: w0 + rh })));
+    const riserFor = (s: number, a: number, b: number) => one((T) => T.add(H.plate(`${id}-riser`, riserRect(s, a, b), { body: hostBody, kind: "plate", role: "ground", z0: baseTop, z1: w0 })));
+    const risen = w0 - baseTop > 0.5;
+    // the rails run 10 mm past the slider's travel at each end, less where another part sweeps by (a crank turning past
+    // the near end), down to half a slider short of its extreme (it overhangs the ways there), each side on its own;
+    // judged on a slider's length of the rail's end as it would be built
+    const margins = [10, 7, 4, 2, 0, -Ls / 8, -Ls / 4, -Ls / 3, -Ls / 2];
+    const chunk = Math.max(12, Ls);
+    const railEnds = new Map<number, [number, number]>();
+    for (const s of sides) {
+      const a = margins.find((m) => clearOf(ctx, railFor(s, lo - m, lo - m + chunk), others));
+      const b = margins.find((m) => clearOf(ctx, railFor(s, hi + m - chunk, hi + m), others));
+      railEnds.set(s, [lo - (a ?? margins[margins.length - 1]!), hi + (b ?? margins[margins.length - 1]!)]);
+    }
+    const span = (s: number): [number, number] => railEnds.get(s) ?? [lo - 4, hi + 4];
+    // a riser keeps at least 20 mm under its rail (the rail cantilevers past it toward a sweep)
+    const riserEnds = new Map<number, [number, number]>();
+    for (const s of [rs, gs]) {
+      const [a, b] = span(s);
+      const steps = [0, 3, 6, 10, 15, 20, 30, 40, 55, 70, 90, 120];
+      const cut = (from: number, dir: 1 | -1, limit: number) => steps.filter((d) => d <= limit).find((d) => clearOf(ctx, riserFor(s, dir > 0 ? from + d : from - d - 4, dir > 0 ? from + d + 4 : from - d), others));
+      const da = cut(a, 1, b - a - 20) ?? 0;
+      const db = cut(b, -1, b - a - 20 - da) ?? 0;
+      riserEnds.set(s, [a + da, b - db]);
+    }
+    const [g0, g1] = span(gs);
+    const run = g1 - g0;
+    const x0 = Math.max(...sides.map((s) => span(s)[0]));
+    const x1 = Math.min(...sides.map((s) => span(s)[1]));
     // the reference rail (plain, dowelled) and the gibbed rail with its keeper (F1, F2, F7)
-    const yr = Ws / 2 + 3.5;
-    const sideY: [number, number][] = [[0, Y(ey(3) + 3.5 + 0.5)], [1, Y(ey(2) - 3.5 - 0.5 - gap)]];
-    const mk = (k: number, y: number): Vec2[] => roundRect(x0, y - 3.5, x1, y + 3.5, 3.5);
-    void yr;
-    const baseTop = baseZ(ctx, c);
-    // a rack rides on a hardened strip under its back half instead of a rail on its toothed side
+    const ways: string[] = [];
+    for (const s of [rs, gs]) {
+      const k = s === rs ? 0 : 1;
+      if (s !== armSide) {
+        const [a, b] = span(s);
+        L.add(H.plate(`${id}-rail${k}`, railRect(s, a, b), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
+        ways.push(`${id}-rail${k}`);
+      }
+      // a rack's toothed side stays open down to the base: the pinion runs there
+      if (risen && !(teeth && s === armSide)) {
+        const [ra, rb] = riserEnds.get(s)!;
+        L.add(H.plate(`${id}-riser${k}`, riserRect(s, ra, rb), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
+        ways.push(`${id}-riser${k}`);
+      }
+    }
+    // a rack rides on a hardened strip on a ground way under its back half instead (M14)
     if (teeth) {
-      const ya = Y(ey(2) + 1);
-      const yb = Y(ey(2) + Math.min(Ws / 2, 14));
-      const strip = roundRect(x0 + 8, Math.min(ya, yb), x1 - 8, Math.max(ya, yb), 1);
+      const [ra, rb] = risen ? riserEnds.get(gs)! : span(gs);
+      const ya = out(gs, -1.5);
+      const yb = (e[2] + e[3]) / 2;
+      const strip = roundRect(ra + 4, Math.min(ya, yb), rb - 4, Math.max(ya, yb), 1);
       if (w0 - baseTop > 2) L.add(H.plate(`${id}-way`, strip, { body: hostBody, kind: "plate", role: "ground", name: "Way under the rack's back, ground", z0: baseTop, z1: w0 - 1.5, mat: "Steel C45, ground" }));
       L.add(H.wearStrip(`${id}-strip`, strip, { body: hostBody, z0: w0 - 1.5, z1: w0, name: "Wear strip under the rack, hardened" }));
-    }
-    for (const [k, y] of sideY) {
-      if (teeth && k === 0) continue;
-      L.add(H.plate(`${id}-rail${k}`, mk(k, y), { body: hostBody, kind: "plate", role: "ground", name: k ? "Gibbed slide rail" : "Reference slide rail, dowelled", z0: w0, z1: w0 + rh, joints: [id], mat: "Steel C45, ground" }));
-      // a ground riser along the straight run (A6)
-      // flush with the rail's inner edge, wider outboard: nothing of it under the slider
-      if (w0 - baseTop > 0.5) L.add(H.plate(`${id}-riser${k}`, k ? roundRect(x0, y - 6, x1, y + 3.5, 1) : roundRect(x0, y - 3.5, x1, y + 6, 1), { body: hostBody, kind: "plate", role: "ground", name: "Ground steel riser", z0: baseTop, z1: w0, mat: "Steel C45, ground" }));
+      ways.push(`${id}-strip`);
     }
     // gib on the gibbed side, between the slider and its rail (F7)
-    L.add(H.gib(`${id}-gib`, x1 - x0 - 20, { body: hostBody, at: [x0 + 10, Y(ey(2) - gap / 2 - 0.5), 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
+    L.add(H.gib(`${id}-gib`, Math.max(10, run - 20), { body: hostBody, at: [g0 + Math.min(10, run / 4), out(gs, gap / 2 + 0.5), 0], z0: w0 + 0.5, z1: w1 - 0.5 }));
     // keeper plate over the gibbed rail, lapping the slider (F2)
-    const ky = Y(ey(2) - 3.5 - 0.5 - gap);
-    L.add(H.plate(`${id}-keeper`, roundRect(x0 + 8, Math.min(ky - 5 * flip, ky + 9 * flip), x1 - 8, Math.max(ky - 5 * flip, ky + 9 * flip), 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + 3, mat: "Aluminium 6061-T6, anodised" }));
-    const nScrew = Math.max(2, Math.ceil((x1 - x0 - 16) / 100) + 1);
+    const ky = out(gs, railOff(gs));
+    const kA = out(gs, railOff(gs) + 5);
+    const kB = out(gs, -2);
+    L.add(H.plate(`${id}-keeper`, roundRect(g0 + 8, Math.min(kA, kB), g1 - 8, Math.max(kA, kB), 1), { body: hostBody, kind: "plate", role: "ground", name: "Keeper plate, laps the slider", z0: w0 + rh, z1: w0 + rh + KT, mat: "Aluminium 6061-T6, anodised" }));
+    ways.push(`${id}-gib`, `${id}-keeper`);
+    // the keeper's screws go down through the gibbed rail and its riser into the base
+    const [s0, s1] = risen ? riserEnds.get(gs)! : [g0, g1];
+    const nScrew = Math.max(2, Math.ceil((s1 - s0 - 16) / 100) + 1);
     for (let k = 0; k < nScrew; k++) {
-      const x = x0 + 12 + ((x1 - x0 - 24) * k) / (nScrew - 1);
-      L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + 3 + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + 3, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
+      const x = s1 - s0 < 24 ? (s0 + s1) / 2 + (k ? 4 : -4) : s0 + 6 + ((s1 - s0 - 12) * k) / (nScrew - 1);
+      L.add(H.screw(`${id}-sc${k}`, "csk", 3, rh + KT + 4 + Math.max(0, w0 - baseTop), { body: hostBody, at: [x, ky, 0], face: w0 + rh + KT, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
     }
-    // the dowels locate the reference rail, or the gibbed rail of a rack (its only rail)
-    const dy = teeth ? sideY[1]![1] : e[3] + 4;
-    for (const [k, x] of [[0, x0 + 4], [1, x1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, dy, 0], z0: baseTop, z1: w0 + rh, ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 h6, ${teeth ? "gibbed" : "reference"} rail to base`, qty: 2 }) }));
-    // wipers at both ends of the slider and a grease nipple on the keeper (F8)
+    // dowels: the reference rail to the base, or the riser alone where an arm runs over that side
+    // (a rack's go in its gibbed rail, its only rail)
+    const ds = teeth ? gs : rs;
+    const [d0, d1] = risen ? riserEnds.get(ds)! : span(ds);
+    const dy = out(ds, ds === armSide ? 3 : railOff(ds));
+    // (recessed under the riser's top where the arm runs over it)
+    const dz1 = ds === armSide ? w0 - 0.5 : w0 + rh;
+    for (const [k, x] of [[0, d0 + 4], [1, d1 - 4]] as const) L.add(H.dowel(`${id}-dw${k}`, 3, { body: hostBody, at: [x, dy, 0], z0: baseTop, z1: dz1, ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 h6, ${teeth ? "gibbed rail" : ds === armSide ? "riser" : "reference rail"} to base`, qty: 2 }) }));
+    // wipers at both ends of the slider where they clear, and a grease nipple (F8)
     const sb = bodyOf(ctx, slider);
-    // the wipers ride the slider, which is built where it stands in the reference configuration
-    for (const [k, x] of [[0, e[0] - 3], [1, e[1] + 1]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    // the nipple stands at the keeper's end, past the slider's travel, out of the way of parts that sweep over the slide
-    L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [x0 + 14, ky, 0], z0: w0 + rh + 3, z1: w0 + rh + 3 + 9 }));
-    // one end stop block with a neoprene pad just past each end of the travel (F5)
+    const wipers: string[] = [];
+    // at the slider's two ends, where it stands at the reference (the contact's origin), riding it
+    for (const [k, x] of [[0, e[0] - 3], [1, e[1] + 1]] as const) {
+      const wip = H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(wipers.length ? { name: "", qty: 0 } : { qty: 2 }) });
+      // a wiper rides the slider: judged against the others' sweeps as the slider carries it
+      if (!clearOf(ctx, one((T) => T.add(wip)), others.filter((m) => m !== sb))) continue;
+      L.add(wip);
+      wipers.push(`${id}-wip${k}`);
+    }
+    // the nipple where nothing sweeps over it: on the keeper mid run, else nearer an end, else on the reference rail
+    const nipAt = ([x, y, z]: [number, number, number]) => H.nipple(`${id}-nip`, { body: hostBody, at: [x, y, 0], z0: z, z1: z + 9 });
+    const along = [0.5, 0.25, 0.75, 0.1, 0.9].map((f) => g0 + 12 + (run - 24) * f);
+    const spots: [number, number, number][] = [
+      ...along.map((x): [number, number, number] => [x, ky, w0 + rh + KT]),
+      ...(rs !== armSide ? along.map((x): [number, number, number] => [x, out(rs, railOff(rs)), w0 + rh]) : []),
+    ];
+    const nx = spots.find((q) => clearOf(ctx, one((T) => T.add(nipAt(q))), others));
+    if (nx) L.add(nipAt(nx));
+    // an end stop block with a neoprene pad past each end of the travel, where there is room beyond the slider's wipers
+    // and it clears every other part (F5); a slider its rod drives never over-travels, so an end without room keeps none
     const stops: string[] = [];
     for (const [k, x, s] of [[0, x0 + 1, 1], [1, x1 - 1, -1]] as const) {
-      // no stop across an end the part reaches out of
+      // no stop across an end the part reaches out of (past its guide)
       if ((k === 0 && reachLo) || (k === 1 && reachHi)) continue;
+      const room = s > 0 ? lo - 3 - x0 : x1 - (hi + 3);
+      if (room < 9) continue;
       const sx = x - s * 4;
-      const n = reachLo || reachHi ? 1 : 2;
-      const named = !stops.length;
-      L.add(H.stop(`${id}-stop${k}`, roundRect(Math.min(x, x - s * 8), e[2] - 4, Math.max(x, x - s * 8), e[3] + 4, 1), { body: hostBody, z0: w0, z1: w1 + 2, ...(named ? { qty: n } : { name: "", qty: 0 }) }));
-      L.add(H.bumper(`${id}-pad${k}`, 3, 8, { body: hostBody, at: [sx + s * 6, 0, 0], z0: w0 + 1, z1: w0 + 3, ...(named ? { qty: n } : { name: "", qty: 0 }) }));
+      const T = localAt(ctx, c);
+      T.add(H.stop(`${id}-stop${k}`, roundRect(Math.min(x, x - s * 8), e[2] - 4, Math.max(x, x - s * 8), e[3] + 4, 1), { body: hostBody, z0: w0, z1: w1 + 2, ...(stops.length ? { name: "", qty: 0 } : { qty: 2 }) }));
+      T.add(H.bumper(`${id}-pad${k}`, 3, 8, { body: hostBody, at: [sx + s * 6, 0, 0], z0: w0 + 1, z1: w0 + 3, ...(stops.length ? { name: "", qty: 0 } : { qty: 2 }) }));
+      if (!clearOf(ctx, T.out(), others)) continue;
+      L.add(...T.list);
       stops.push(`${id}-stop${k}`);
     }
+    const part = ctx.parts.get(slider);
+    if (part) part.slides = [...(part.slides ?? []), ...ways];
+    const stopText = stops.length === 2 ? "an end stop with a pad at each end" : stops.length ? "an end stop with a pad at one end" : "no end stops, as the rod drives the slider and other parts sweep past both ends";
+    const guide = teeth
+      ? "guided from its back: a gibbed rail under a keeper on a ground riser, and a hardened strip on a way under its back half; its toothed side stays open and the pinion holds it against the gib, which sets the mesh"
+      : armSide
+        ? "on the lips of two ground risers, a gibbed rail under a keeper on the side away from its arm (the arm runs over the other riser)"
+        : "on the lips of two ground risers, between a dowelled reference rail and a gibbed rail under a keeper";
     return {
-      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: stops, F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`], ...(teeth ? { M14: [`${id}-strip`] } : {}) },
-      note: teeth
-        ? `${titleOf(id)}: ${Ls.toFixed(0)} mm rack guided from its back: a gibbed rail under a keeper and a hardened strip under its back half; its toothed side stays open, the pinion holds it against the gib, which sets the mesh; wipers, a grease nipple and an end stop with a pad at each end of the ${(run[1] - run[0]).toFixed(0)} mm travel.`
-        : `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on a dowelled reference rail and a gibbed rail under a keeper; wipers, a grease nipple and an end stop with a pad at each end of the ${(run[1] - run[0]).toFixed(0)} mm travel.`,
+      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: stops, F7: [`${id}-gib`], F8: [...wipers, ...(nx ? [`${id}-nip`] : [])], ...(teeth ? { M14: [`${id}-strip`] } : {}) },
+      note: `${titleOf(id)}: ${Ls.toFixed(0)} mm ${teeth ? "rack" : "slider"} ${guide}; ${wipers.length === 2 ? "wipers at both ends" : wipers.length ? "a wiper at the free end" : "no wipers (parts sweep close past both ends)"}, ${nx ? "a grease nipple" : "an oil hole in the keeper (no room for a nipple under the parts that sweep over it)"}; ${stopText} of the ${(trv[1] - trv[0]).toFixed(0)} mm travel.`,
     };
   },
 });
@@ -370,10 +517,14 @@ const j6 = contactRule({
   skip: (ji) => ji.joint.type === "rolling" && ji.joint.ratio !== undefined,
   build(ctx, c) {
     const marked = [c.a, c.b].filter((b) => timingMark(ctx, b, c.at));
-    // the backlash eccentric goes under the housing of the second gear's live shaft (F7)
-    const s = siteOf(ctx, c.b) ?? siteOf(ctx, c.a);
+    // a gear on a fixed hub sets the backlash by its hub, slid on slotted holes in the base; else the backlash eccentric
+    // goes under the housing of the second gear's live shaft (F7)
+    const hubbed = ctx.joints.find((q) => q.kit === "hub" && [q.a, q.b].some((x) => x === c.a || x === c.b));
+    const s = hubbed ? undefined : (siteOf(ctx, c.b) ?? siteOf(ctx, c.a));
     if (s && s.live) ctx.eccentric.add(s.id);
-    return { serves: { F9: marked, F7: s ? [`${s.id}-ecc`] : [] }, note: `${titleOf(c.id)}: parallel mesh; timing marks on ${marked.join(" and ") || "the gears"}${s ? `; eccentric housing on ${s.id} sets the backlash` : ""}.` };
+    const F7 = hubbed ? [`${hubbed.id}-hub`] : s ? [`${s.id}-ecc`] : [];
+    const how = hubbed ? `; the hub at ${hubbed.id} slides on slotted holes to set the backlash` : s ? `; eccentric housing on ${s.id} sets the backlash` : "";
+    return { serves: { F9: marked, F7 }, note: `${titleOf(c.id)}: parallel mesh; timing marks on ${marked.join(" and ") || "the gears"}${how}.` };
   },
 });
 
@@ -673,7 +824,126 @@ const ringRollers = contactRule({
   },
 });
 
-export const contactRules: Rule[] = [j6, j9, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave];
+// ------------------------------------------------------------------------------------------------ eccentric
+
+/**
+ * A sheave turning in its strap (an eccentric): the strap's bore lined with a split bronze liner on the sheave's rim, a
+ * cheek ring screwed to the sheave's top face lapping the strap, which its pin at the far end locates the other way
+ * (F2), an oil nipple on the strap's ring (F8). The journal is the sheave itself, so there is no pin.
+ */
+const eccentric = contactRule({
+  id: "eccentric",
+  ids: ["J3", "F2", "F8", "M14"],
+  fixture: "eccentric-sheave",
+  kits: ["eccentric"],
+  build(ctx, c, L) {
+    const id = c.id;
+    const rec = c.ji.joint as unknown as { radius: number };
+    const R = rec.radius;
+    const sheave = ctx.kin.bodies.find((b) => b.id === c.a)?.shape?.type === "disc" ? c.a : c.b;
+    const strap = sheave === c.a ? c.b : c.a;
+    const zs = ctx.extent(sheave);
+    const zt0 = ctx.extent(strap);
+    // a strap with a plate of its own on top (a rotor's gear ring) runs on the eccentric with its lower plate
+    const tg = ctx.geoms.get(strap);
+    const zt = zt0 && tg?.upper ? { ...zt0, w1: zt0.w1 - tg.upper.h } : zt0;
+    const z0 = Math.min(zs?.w0 ?? -4, zt?.w0 ?? -4);
+    // the sheave's own plate: its slab may be taller (a rotor's gear ring stands over it)
+    const sp = ctx.parts.get(sheave);
+    const zsTop = zs && sp && sp.op.op === "extrude" ? zs.w0 + sp.op.h : (zs?.w1 ?? 4);
+    const z1 = Math.max(zsTop, zt?.w1 ?? 4);
+    const bore = ((ctx.kin.bodies.find((b) => b.id === strap)?.shape as { bore?: number } | undefined)?.bore ?? R + 2);
+    L.add(H.bushing(`${id}-liner`, 2 * R + 0.1, 2 * bore, { body: bodyOf(ctx, strap), z0: (zt?.w0 ?? z0) + 0.3, z1: (zt?.w1 ?? z1) - 0.3, name: `Split bronze liner ${2 * R}x${2 * bore}, in the strap round the sheave` }));
+    const lap = bore + 2;
+    L.add(H.washer(`${id}-cheek`, 2 * R - 10, 2 * lap, { body: bodyOf(ctx, sheave), z0: z1 + 0.3, z1: z1 + 2.3, name: `Cheek ring ${2 * R - 10}x${2 * lap}, screwed to the sheave, laps the strap` }));
+    // the nipple on the strap's ring, outside the cheek ring, on the side away from the rod; a strap with a plate on top
+    // of it is oiled through the shaft instead
+    const nip = !tg?.upper;
+    if (nip) L.add(H.nipple(`${id}-nip`, { body: bodyOf(ctx, strap), at: [-(lap + NIPPLES.s / 2 + 2), 0, 0], z0: zt?.w1 ?? z1, z1: (zt?.w1 ?? z1) + 9 }));
+    const part = ctx.parts.get(strap);
+    if (part) part.slides = [...(part.slides ?? []), `${id}-cheek`];
+    return {
+      serves: { F2: [`${id}-cheek`], F8: nip ? [`${id}-nip`] : [], M14: [`${id}-liner`] },
+      note: `${titleOf(id)}: the Ø${2 * R} eccentric turns in its strap on a split bronze liner (the replaceable wear part); a cheek ring on the eccentric's top face laps the strap, ${nip ? "whose pin at the rod end locates it the other way; an oil nipple on the strap's ring feeds the liner" : "whose own gear ring keeps it in mesh the other way; oil comes up through the shaft"}.`,
+    };
+  },
+});
+
+// ------------------------------------------------------------------------------------------------ die
+
+/**
+ * A die in a curved link's slot (an expansion link): a bronze die, round so it sits any way in the curve, on a hardened
+ * stud pressed into the pin carrier, running in the slotted upper cheek over the solid lower one (M14: the die is the
+ * wear part).
+ */
+const die = contactRule({
+  id: "die",
+  ids: ["J4", "M14"],
+  fixture: "walschaerts-valve-gear",
+  kits: ["die"],
+  build(ctx, c, L) {
+    const id = c.id;
+    const g = ctx.geoms.get(c.b);
+    const zl = ctx.extent(c.b);
+    const za = ctx.extent(c.a);
+    if (!g?.upper || !zl || !za) return { note: `${titleOf(id)}: pin in a curved slot.` };
+    const sa = (g.shape.profile as { slotArc?: { width?: number } }).slotArc ?? {};
+    const D = (sa.width ?? 15) - 0.4;
+    const z0 = zl.w1 - g.upper.h + 0.3;
+    const z1 = zl.w1 - 0.3;
+    // a pin through the same point (the lifting link's on the radius rod) carries the die on a spigot down from its
+    // lowest part; else a stud pressed into the pin carrier does
+    const site = ctx.sites.find((s) => !s.fixed && v3.dist(s.at, c.at) < 0.05);
+    const lowest = site ? site.bodies.map((b) => ({ b, e: ctx.extent(b) })).filter((x) => x.e).sort((x, y) => x.e!.w0 - y.e!.w0)[0] : undefined;
+    const carrier = lowest ? lowest.b : bodyOf(ctx, c.a);
+    const top = lowest ? lowest.e!.w0 : za.w0 + Math.min(6, za.w1 - za.w0 - 1);
+    L.add(H.roller(`${id}-die`, 6, D, { body: carrier, z0, z1, name: `Die, bronze, Ø${+D.toFixed(1)}, runs in the link's slot` }));
+    L.add(H.shaft(`${id}-stud`, { d: 6, z0: z0 - 0.2, z1: top }, { body: carrier, name: lowest ? "Die spigot Ø6, screwed into the pin below its lowest part" : "Die stud Ø6, hardened, pressed into the pin carrier" }));
+    return { serves: { M14: [`${id}-die`] }, note: `${titleOf(id)}: a round bronze die on a hardened stud runs in the link's curved slot, in the upper cheek over the solid lower one that carries the trunnion; the die is the replaceable wear part.` };
+  },
+});
+
+// ------------------------------------------------------------------------------------------------ hub
+
+/**
+ * A part that turns on a fixed hub (a bull gear round the pivot of the lever it drives): the hub a post of the radius
+ * the joint gives, screwed to the base, the part on a split bronze liner round it, a cap ring screwed on the hub's top
+ * lapping the part (F2). Another pivot may stand inside the hub: the cap is a ring round it.
+ */
+const hub = contactRule({
+  id: "hub",
+  ids: ["J1", "F1", "F2", "M14"],
+  fixture: "whitworth",
+  kits: ["hub"],
+  build(ctx, c, L) {
+    const id = c.id;
+    const R = (c.ji.joint as unknown as { radius: number }).radius;
+    const part = c.a === "ground" ? c.b : c.a;
+    const ze = ctx.extent(part);
+    const pp = ctx.parts.get(part);
+    if (!ze || !pp || !ctx.base) return { note: `${titleOf(id)}: a part on a fixed hub.` };
+    const top = ze.w0 + (pp.op.op === "extrude" ? pp.op.h : ze.w1 - ze.w0);
+    const baseTop = baseZ(ctx, c);
+    const bore = (ctx.kin.bodies.find((b) => b.id === part)?.shape as { bore?: number } | undefined)?.bore;
+    const rb = bore ? bore / 2 : R + 2;
+    L.add(H.plate(`${id}-hub`, circle(R, 0, 0, 96), { body: "ground", kind: "housing", role: "ground", name: `Fixed hub Ø${2 * R}, screwed to the base`, z0: baseTop, z1: top - 0.3, mat: "Steel C45, ground" }));
+    L.add(H.bushing(`${id}-liner`, 2 * R + 0.1, 2 * rb, { body: bodyOf(ctx, part), z0: ze.w0 + 0.3, z1: top - 0.3, name: `Split bronze liner ${2 * R}x${2 * rb}, in the part round the hub` }));
+    const ri = R - 3;
+    L.add(H.plate(`${id}-cap`, circle(rb + 2, 0, 0, 96), { body: "ground", kind: "plate", role: "ground", name: `Cap ring Ø${2 * (rb + 2)}, screwed on the hub, laps the part`, z0: top + 0.3, z1: top + 2.3, holes: [circle(ri, 0, 0, 64).reverse()], mat: "Steel, hardened" }));
+    for (let k = 0; k < 3; k++) {
+      const a = Math.PI / 6 + (k * 2 * Math.PI) / 3;
+      L.add(H.screw(`${id}-sc${k}`, "csk", 3, 8, { body: "ground", at: [(R - 1.5) * Math.cos(a), (R - 1.5) * Math.sin(a), 0], face: top + 2.3, dir: -1, ...(k ? { name: "", qty: 0 } : { qty: 3 }) }));
+    }
+    const pt = ctx.parts.get(part);
+    if (pt) pt.slides = [...(pt.slides ?? []), `${id}-cap`, `${id}-hub`];
+    return {
+      serves: { F1: [`${id}-hub`], F2: [`${id}-cap`], M14: [`${id}-liner`] },
+      note: `${titleOf(id)}: the part turns on a fixed hub Ø${2 * R} screwed to the base through slotted holes (it slides to set a mesh's backlash), on a split bronze liner (the wear part); a cap ring on the hub's top laps it; a pivot that stands inside it rises through the hub.`,
+    };
+  },
+});
+
+export const contactRules: Rule[] = [eccentric, die, hub, j6, j9, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave];
 
 void MIN_GAP;
 void ringOffsets;

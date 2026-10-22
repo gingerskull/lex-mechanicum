@@ -1,4 +1,6 @@
 // The output plot (SD15): output against input over one cycle, from the package's 181 samples, with the current phase.
+// Further curves share the axes: the same output at the settings the viewer has not selected (ghosts, dashed fine, the
+// family of curves a record asks for), and a further output in the same unit (dashed).
 import { TAU } from "../core/geom";
 import { DRAFT } from "../style/draft";
 import { font, rgba as paint, type ResolvedTheme } from "../style/theme";
@@ -6,7 +8,13 @@ import type { Card } from "./canvas";
 
 const PL = DRAFT.plot;
 
-export function drawPlot(card: Card, T: ResolvedTheme, data: ArrayLike<number>, u: number, unit: string): void {
+/** A further curve of the plot: a ghost (another setting) or a second output. */
+export interface PlotCurve {
+  data: ArrayLike<number>;
+  ghost: boolean;
+}
+
+export function drawPlot(card: Card, T: ResolvedTheme, data: ArrayLike<number>, u: number, unit: string, more: PlotCurve[] = []): void {
   const ctx = card.ctx;
   const { w, h } = card;
   const m = PL.margin;
@@ -15,10 +23,11 @@ export function drawPlot(card: Card, T: ResolvedTheme, data: ArrayLike<number>, 
   const n = data.length;
   let lo = Infinity;
   let hi = -Infinity;
-  for (let i = 0; i < n; i++) {
-    lo = Math.min(lo, data[i]!);
-    hi = Math.max(hi, data[i]!);
-  }
+  for (const d of [data, ...more.map((c) => c.data)])
+    for (let i = 0; i < d.length; i++) {
+      lo = Math.min(lo, d[i]!);
+      hi = Math.max(hi, d[i]!);
+    }
   const pad = (hi - lo || 1) * PL.pad;
   lo -= pad;
   hi += pad;
@@ -63,6 +72,18 @@ export function drawPlot(card: Card, T: ResolvedTheme, data: ArrayLike<number>, 
   ctx.strokeStyle = paint(T.ink, PL.hatch.alpha);
   ctx.stroke();
   ctx.restore();
+  // the further curves under the main one
+  for (const c of more) {
+    const k = c.ghost ? PL.ghost : PL.second;
+    const Xc = (i: number) => m.left + ((w - m.left - m.right) * i) / (c.data.length - 1);
+    ctx.beginPath();
+    for (let i = 0; i < c.data.length; i++) (i ? ctx.lineTo : ctx.moveTo).call(ctx, Xc(i), Y(c.data[i]!));
+    ctx.setLineDash([...k.dash]);
+    ctx.lineWidth = k.width;
+    ctx.strokeStyle = paint(T.ink, k.alpha);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
   ctx.beginPath();
   for (let i = 0; i < n; i++) (i ? ctx.lineTo : ctx.moveTo).call(ctx, X(i), Y(data[i]!));
   ctx.lineWidth = PL.curve.width;

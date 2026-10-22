@@ -71,7 +71,17 @@ export async function checkRecord(rec: Rec, opts: { samples?: number; solids?: S
   const claims = ((rec.teaching as { claims?: Claim[] } | undefined)?.claims ?? []) as Claim[];
   if (claims.length && !K) out.claims = claims.map((claim) => ({ claim, status: "uncheckable" as const, why: "the composition is not available" }));
   if (claims.length && K) {
-    out.claims = checkClaims(K, claims, kin.outputs ?? [], { samples: opts.samples ? Math.min(opts.samples, 720) : 720 });
+    const controls = ((rec.teaching as { controls?: { id: string; kind: string; [k: string]: unknown }[] } | undefined)?.controls ?? []);
+    const controlsOf = (w: { control: string; value: unknown }) => {
+      const c = controls.find((x) => x.id === w.control);
+      if (!c) return undefined;
+      const to = (k: string) => (typeof c[k] === "string" ? (c[k] as string) : c.id);
+      if (c.kind === "param") return { params: { [to("param")]: Number(w.value) } };
+      if (c.kind === "design") return { design: { [to("design")]: String(w.value) } };
+      if (c.kind === "selector") return { select: { [to("selector")]: String(w.value) } };
+      return { drivers: { [to("driver")]: Number(w.value) } };
+    };
+    out.claims = checkClaims(K, claims, kin.outputs ?? [], { samples: opts.samples ? Math.min(opts.samples, 720) : 720, controlsOf });
     for (const r of out.claims) if (r.status === "off") findings.push({ type: "CLAIM", detail: `"${r.claim.text}": ${r.claim.output} ${r.claim.stat} is ${r.got!.toFixed(3)}, the record says ${r.claim.value} ± ${r.claim.tol}` });
   }
   // D11

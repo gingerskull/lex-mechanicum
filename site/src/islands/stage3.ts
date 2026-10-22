@@ -26,24 +26,65 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 type Vec3 = [number, number, number];
 type Ctl = { params: Record<string, number>; design: Record<string, string | number>; select: Record<string, string>; drivers: Record<string, number> };
 
-/** The output plot's samples over one cycle at the given controls, from the record's kinematics (the v2 package carries none). */
-function plotSeries(E: Engine, L: Pick<Loaded, "meta" | "kinematics">, ctl?: Ctl): { data: number[]; unit: string } | null {
-  const t = L.meta.teaching;
-  const p = t ? (Array.isArray(t.plot) ? t.plot[0] : t.plot) : null;
-  if (!p || !L.kinematics) return null;
+/** One output's samples over one cycle at the given controls, from the record's kinematics; null where it does not solve. */
+function sampleOutput(K: NonNullable<Loaded["kinematics"]>, y: string, ctl?: Ctl): number[] | null {
   const data: number[] = [];
   try {
     for (let i = 0; i <= 180; i++) {
-      const v = L.kinematics.pose((i / 180) * TAU, ctl as never).outputs[p.y];
+      const v = K.pose((i / 180) * TAU, ctl as never).outputs[y];
       if (typeof v !== "number") return null;
       data.push(v);
     }
   } catch {
     return null;
   }
-  const unit = L.meta.kin?.outputs.find((o) => o.id === p.y)?.unit ?? "";
+  return data;
+}
+
+/** The settings with one of the record's controls set to a value (a ghost curve's). */
+function ghostCtl(t: NonNullable<Loaded["meta"]["teaching"]>, base: Ctl | undefined, id: string, value: unknown): Ctl {
+  const c: Ctl = base ? (JSON.parse(JSON.stringify(base)) as Ctl) : { params: {}, design: {}, select: {}, drivers: {} };
+  const k = t.controls.find((x) => x.id === id) as ({ id: string; kind: string; [k: string]: unknown }) | undefined;
+  const key = (f: string) => (typeof k?.[f] === "string" ? (k[f] as string) : id);
+  if (k?.kind === "param") c.params[key("param")] = Number(value);
+  else if (k?.kind === "design") c.design[key("design")] = String(value);
+  else if (k?.kind === "selector") c.select[key("selector")] = String(value);
+  else c.drivers[key("driver")] = Number(value);
+  return c;
+}
+
+/**
+ * The output plot over one cycle at the given controls, from the record's kinematics (the v2 package carries none): the
+ * record's first plot, its ghosts (the same output at the settings it names: a family of curves), and the record's
+ * further plots that share its unit and its range.
+ */
+function plotSeries(E: Engine, L: Pick<Loaded, "meta" | "kinematics">, ctl?: Ctl): { data: number[]; unit: string; more: { data: number[]; ghost: boolean }[] } | null {
+  const t = L.meta.teaching;
+  const plots = (t ? (Array.isArray(t.plot) ? t.plot : t.plot ? [t.plot] : []) : []) as { y: string; ghosts?: { control: string; value: unknown }[] }[];
+  const p = plots[0];
+  const K = L.kinematics;
+  if (!t || !p || !K) return null;
+  const data = sampleOutput(K, p.y, ctl);
+  if (!data) return null;
+  const unitOf = (y: string) => L.meta.kin?.outputs.find((o) => o.id === y)?.unit ?? "";
+  const unit = unitOf(p.y);
+  const more: { data: number[]; ghost: boolean }[] = [];
+  for (const g of p.ghosts ?? []) {
+    const d = sampleOutput(K, p.y, ghostCtl(t, ctl, g.control, g.value));
+    if (d) more.push({ data: d, ghost: true });
+  }
+  // (where its range overlaps the first's: a curve far off it would only squash the first)
+  const lo = Math.min(...data);
+  const hi = Math.max(...data);
+  for (const q of plots.slice(1)) {
+    if (unitOf(q.y) !== unit) continue;
+    const d = sampleOutput(K, q.y, ctl);
+    if (!d) continue;
+    const overlap = Math.min(hi, Math.max(...d)) - Math.max(lo, Math.min(...d));
+    if (overlap > 0.5 * Math.min(hi - lo, Math.max(...d) - Math.min(...d))) more.push({ data: d, ghost: false });
+  }
   void E;
-  return { data, unit: unit === "deg" ? "°" : unit ? ` ${unit}` : "" };
+  return { data, unit: unit === "deg" ? "°" : unit ? ` ${unit}` : "", more };
 }
 
 /** Without WebGL2: the still for each sheet in place of the canvas, the controls off, and the plot drawn once. */
@@ -73,7 +114,7 @@ async function still(box: HTMLElement) {
   const draw = () => {
     const r = plotCanvas.getBoundingClientRect();
     E.sizeCard(plot, r.width, r.height, Math.min(2, E.pixelRatio()));
-    E.drawPlot(plot, E.theme(E.pageTheme()), series.data, (63 / 360) * TAU, series.unit);
+    E.drawPlot(plot, E.theme(E.pageTheme()), series.data, (63 / 360) * TAU, series.unit, series.more);
   };
   draw();
   window.addEventListener("themechange", draw);
@@ -160,7 +201,7 @@ async function main(box: HTMLElement) {
   // the output plot
   const plotCanvas = document.getElementById("plot") as HTMLCanvasElement | null;
   // a lifted 2.5D mechanism carries its plot in the package; a record's is sampled from its kinematics
-  const packed = L.scene.pkg.plot ? { data: Array.from(L.scene.pkg.plot), unit: L.model?.plot?.unit ?? "" } : null;
+  const packed = L.scene.pkg.plot ? { data: Array.from(L.scene.pkg.plot), unit: L.model?.plot?.unit ?? "", more: [] } : null;
   let series = plotCanvas ? (packed ?? plotSeries(E, L)) : null;
   const plot = plotCanvas && series ? E.makeCard(plotCanvas, E.browserFactory) : null;
   const plotSize = () => {
@@ -220,7 +261,7 @@ async function main(box: HTMLElement) {
     }
     good = JSON.parse(JSON.stringify(ctl));
     const ms = performance.now() - t0;
-    if (plot && series) E.drawPlot(plot, E.theme(E.pageTheme()), series.data, s.u, series.unit);
+    if (plot && series) E.drawPlot(plot, E.theme(E.pageTheme()), series.data, s.u, series.unit, series.more);
     if (!warm && s.auto && s.playing && autoStep(s, ms, sess.stats?.gpuLagMs ?? 0, LADDER.length - 1)) showDial();
     const deg = Math.round((((s.u % TAU) + TAU) % TAU) / TAU * 360) % 360;
     $<HTMLInputElement>("scrub").value = String(deg);

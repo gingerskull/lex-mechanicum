@@ -6,15 +6,20 @@
 //   at                     the output where the input has the claim's `at` value: a driver value (degrees or mm) when
 //                          it lies in the input's range, else a cycle angle in degrees;
 //   phase                  the cycle angle, degrees, where the output reaches its max or min (`of`) or a dwell's start
-//                          or end (`feature`);
+//                          or end (`feature`); with `from` and `to` (max, min) the cycle degrees from the one extreme
+//                          forward to the other (a stroke); with `against` (another output) the lag of the output's
+//                          first harmonic behind that one's, degrees, signed in ±180;
+//   time-ratio             a reciprocating output's slow stroke over its quick one, the cycle degrees between its
+//                          extremes (a quick-return's time ratio);
 //   dwell                  the longest span of the cycle, degrees, in which the output stays within `band` (default
 //                          one thousandth of its range).
 // A path's `range` is its extent, the longest chord between two of its points.
-// A claim `over` a driver (a speed control) takes its statistic over that driver's range instead of the cycle. Outputs
-// the library does not compute are reported as uncheckable, never as a mismatch.
+// A claim `over` a driver (a speed control) takes its statistic over that driver's range instead of the cycle.
+// A claim with `when` ({ control, value }) holds at that setting of one of the record's controls (a die position).
+// Outputs the library does not compute are reported as uncheckable, never as a mismatch.
 import type { Kinematics } from "../kin/compose";
 import { xf } from "../kin/math";
-import type { Pose } from "../kin/types";
+import type { Controls, Pose } from "../kin/types";
 
 export interface Claim {
   text: string;
@@ -27,6 +32,11 @@ export interface Claim {
   feature?: string;
   band?: number | [number, number];
   over?: string;
+  from?: string;
+  to?: string;
+  against?: string;
+  input?: number;
+  when?: { control: string; value: unknown };
   /** The window of the input's values (a rotary input's degrees may wrap past 360) the statistic is taken over. */
   span?: [number, number];
   /** The statistic is taken on the absolute value. */
@@ -164,7 +174,7 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
 
 const angleOf = (p: Pose, id: string): number | undefined => (typeof p.outputs[id] === "number" ? (p.outputs[id] as number) : p.values[id]);
 
-function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
+function evaluate(S: Series, c: Claim, rotary: boolean, other?: number[]): number | string {
   const { y, u, x } = S;
   const n = y.length;
   const lo = Math.min(...y);
@@ -192,8 +202,8 @@ function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
       return sxx ? sxy / sxx : "input does not move";
     }
     case "at": {
-      if (c.at === undefined) return y[0]!;
-      const target = c.at;
+      if (c.at === undefined && c.input === undefined) return y[0]!;
+      const target = (c.at ?? c.input)!;
       const xlo = Math.min(...x);
       const xhi = Math.max(...x);
       // a value inside the input's range is a driver value, else a cycle angle
@@ -218,6 +228,24 @@ function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
       return Math.abs(dk) > 1e-12 && Math.sign(dk) === Math.sign(at - key[best]!) ? y[best]! + ((y[j]! - y[best]!) * (at - key[best]!)) / dk : y[best]!;
     }
     case "phase": {
+      if (c.from && c.to) {
+        const iOf = (e: string) => (e === "min" ? y.indexOf(lo) : y.indexOf(hi));
+        return ((((iOf(c.to) - iOf(c.from)) % n) + n) % n) * (360 / n);
+      }
+      if (c.against) {
+        if (!other) return `no output ${c.against}`;
+        const ph = (v: number[]) => {
+          let a = 0;
+          let b = 0;
+          v.forEach((q, k) => {
+            a += q * Math.cos((u[k]! * Math.PI) / 180);
+            b += q * Math.sin((u[k]! * Math.PI) / 180);
+          });
+          return (Math.atan2(b, a) * 180) / Math.PI;
+        };
+        const d = ph(y) - ph(other);
+        return d - 360 * Math.round(d / 360);
+      }
       if (c.feature && /dwell/.test(c.feature)) {
         const d = longestDwell(y, typeof c.band === "number" ? c.band : (hi - lo) * 1e-3);
         if (d.len === 0) return "no dwell";
@@ -225,6 +253,14 @@ function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
       }
       const want = c.of === "min" ? lo : hi;
       return u[y.findIndex((v) => Math.abs(v - want) < 1e-9 * (1 + Math.abs(want)))]!;
+    }
+    case "time-ratio": {
+      const a = y.indexOf(hi);
+      const b = y.indexOf(lo);
+      const there = ((((b - a) % n) + n) % n) || n;
+      const back = n - there;
+      if (!back) return "no stroke";
+      return Math.max(there, back) / Math.min(there, back);
     }
     case "dwell": {
       // a band [lo, hi]: the longest stretch of the cycle with the output inside it (a port open while the swing is
@@ -250,30 +286,44 @@ function evaluate(S: Series, c: Claim, rotary: boolean): number | string {
   }
 }
 
-/** The claim table: every claim against the motion of `K`, over `samples` phases (default 720). */
-export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: string; of: string; kind: string }[], opts: { samples?: number } = {}): ClaimResult[] {
+/**
+ * The claim table: every claim against the motion of `K`, over `samples` phases (default 720). `controlsOf` turns a
+ * claim's `when` into control settings (the record's teaching controls); a claim with a `when` it cannot read is
+ * uncheckable.
+ */
+export function checkClaims(
+  K: Kinematics,
+  claims: Claim[],
+  outputs: { id: string; of: string; kind: string }[],
+  opts: { samples?: number; controlsOf?: (when: { control: string; value: unknown }) => Controls | undefined } = {},
+): ClaimResult[] {
   const n = opts.samples ?? 720;
-  let poses: Pose[];
-  try {
-    poses = Array.from({ length: n }, (_, i) => K.pose((i / n) * Math.PI * 2));
-  } catch (e) {
-    return claims.map((claim) => ({ claim, status: "uncheckable", why: `does not solve: ${(e as Error).message}` }));
-  }
+  const runs = new Map<string, Pose[] | string>();
+  const posesAt = (ctl: Controls | undefined): Pose[] | string => {
+    const key = JSON.stringify(ctl ?? null);
+    let hit = runs.get(key);
+    if (!hit) {
+      try {
+        hit = Array.from({ length: n }, (_, i) => K.pose((i / n) * Math.PI * 2, ctl));
+      } catch (e) {
+        hit = `does not solve: ${(e as Error).message}`;
+      }
+      runs.set(key, hit);
+    }
+    return hit;
+  };
   const rotary = K.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual")?.kind === "rotary";
   // a claim that holds at a setting of the params (`setting: { split: 0 }`) or of a selector (`setting: { gear: "2nd" }`)
   // is checked on the motion at that setting
-  const at = new Map<string, Pose[]>();
-  const posesFor = (claim: Claim): Pose[] => {
+  const settingOf = (claim: Claim): { params: Record<string, number>; select: Record<string, string> } | undefined => {
     const setting = claim.setting as Record<string, number | string> | undefined;
-    if (!setting || typeof setting !== "object") return poses;
-    const key = JSON.stringify(setting);
+    if (!setting || typeof setting !== "object") return undefined;
     const ctl: { params: Record<string, number>; select: Record<string, string> } = { params: {}, select: {} };
     for (const [k, v] of Object.entries(setting)) {
       if (K.kin.drivers.some((d) => d.id === k && d.kind === "select")) ctl.select[k] = String(v);
       else ctl.params[k] = Number(v);
     }
-    if (!at.has(key)) at.set(key, Array.from({ length: n }, (_, i) => K.pose((i / n) * Math.PI * 2, ctl)));
-    return at.get(key)!;
+    return ctl;
   };
   // a claim `over` a driver sweeps that driver across its range with the cycle at its start (a speed control)
   const swept = new Map<string, Pose[] | string>();
@@ -288,17 +338,17 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
     }
   };
   return claims.map((claim): ClaimResult => {
-    let P: Pose[] | string;
+    const when = claim.when ? opts.controlsOf?.(claim.when) : undefined;
+    if (claim.when && !when) return { claim, status: "uncheckable", why: `no control ${claim.when.control}` };
+    const set = settingOf(claim);
+    const ctl = set ? { ...when, params: { ...when?.params, ...set.params }, select: { ...when?.select, ...set.select } } : when;
+    const poses = posesAt(ctl);
+    if (typeof poses === "string") return { claim, status: "uncheckable", why: set ? `${poses} (at its setting)` : poses };
+    let P: Pose[] | string = poses;
     if (claim.over) {
       if (!swept.has(claim.over)) swept.set(claim.over, sweep(claim.over));
       P = swept.get(claim.over)!;
       if (typeof P === "string") return { claim, status: "uncheckable", why: P };
-    } else {
-      try {
-        P = posesFor(claim);
-      } catch (e) {
-        return { claim, status: "uncheckable", why: `does not solve at its setting: ${(e as Error).message}` };
-      }
     }
     // a path's range is its extent: the longest chord between two of its points (an orbit's diameter)
     const po = outputs.find((q) => q.id === claim.output);
@@ -311,9 +361,14 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
     }
     const S = seriesOf(K, claim, outputs, P);
     if (typeof S === "string") return { claim, status: "uncheckable", why: S };
-    const v = evaluate(S, claim, rotary);
+    let other: number[] | undefined;
+    if (claim.against) {
+      const O = seriesOf(K, { ...claim, output: claim.against }, outputs, P);
+      if (typeof O === "string") return { claim, status: "uncheckable", why: O };
+      other = O.y;
+    }
+    const v = evaluate(S, claim, rotary, other);
     if (typeof v === "string") return { claim, status: "uncheckable", why: v };
     return { claim, status: Math.abs(v - claim.value) <= claim.tol ? "ok" : "off", got: v };
   });
 }
-

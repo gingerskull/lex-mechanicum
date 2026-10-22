@@ -13,7 +13,7 @@ export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
   "cross-pin", "trunnion", "piston-bore", "ring-carrier", "eccentric-bearing", "pin-ring", "pin-hole", "spider-pin",
-  "ball-socket", "slipper", "sphere-fit", "ball-cage",
+  "ball-socket", "slipper", "sphere-fit", "eccentric", "die", "hub", "ball-cage",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -43,6 +43,8 @@ export interface Site {
   live: boolean;
   /** A driver turns one of its joints (the drive is under the base, so its shaft stands on the base). */
   driven?: boolean;
+  /** Another fixed site holds the same axis under this one (a large sun's shaft over the small sun's). */
+  axisBelow?: boolean;
   kit: "J1" | "J2" | "J3" | "J10";
   /** The axis is not the base normal: a shaft in plan or a tilted one (J10). */
   inPlan: boolean;
@@ -97,6 +99,9 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (!ground && j.type === "spherical" && [a, b].some((x) => x?.shape?.type === "cage") && [a, b].some((x) => x?.shape?.type === "race" || x?.shape?.type === "bell")) return "sphere-fit";
       // a ball end in a slipper's socket (a swash plate's piston)
       if (!ground && j.type === "spherical" && (a?.shape?.ball || b?.shape?.ball)) return "ball-socket";
+      // a journal as large as a disc is not a pin: a sheave turning in its strap (an eccentric), or a part turning on a
+      // fixed hub that carries other pivots (a bull gear round its lever's pivot)
+      if (j.type === "revolute" && typeof rec.radius === "number" && rec.radius > 12) return ground ? "hub" : "eccentric";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
       return parallel(axis, UP) ? "J1" : "J10";
     }
@@ -113,6 +118,7 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       const s = text(j.slot) + text(rec.slot);
       if (/fork/i.test(s) || /fork/i.test(text(rec.note))) return "fork-pin";
       if (/groove/i.test(s)) return "groove-cam";
+      if (j.slot?.arc) return "die";
       return "J4";
     }
     case "gear-mesh":
@@ -184,6 +190,7 @@ export function classifyJoints(kin: Kin, S: Setup): { joints: JointInfo[]; sites
     s.driven = s.joints.some((id) => driven.has(id));
     s.live = s.fixed && (s.driven || s.bodies.some(keyedBody));
     s.kit = s.fixed ? (s.inPlan ? "J10" : s.live ? "J2" : "J1") : "J3";
+    s.axisBelow = s.fixed && sites.some((q) => q !== s && q.fixed && parallel(q.axis, s.axis) && Math.hypot(q.at[0] - s.at[0], q.at[1] - s.at[1]) < 0.5 && q.at[2] < s.at[2] - 0.5);
     // a body that is its own shaft, its ends turned to journals (an integrator's cylinder): src/builder/integrator.ts
     if (s.fixed && s.bodies.some((b) => journalled(kin.bodies.find((q) => q.id === b)))) s.owner = "J10";
     // a variator's shaft is built with its sheave halves (src/builder/cvt.ts)

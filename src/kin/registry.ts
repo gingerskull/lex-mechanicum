@@ -38,20 +38,33 @@ const str = (v: unknown, what: string): string => {
 const spin = (c: BlockCtx, body: string, center: Vec3, axis: Vec3, ang: number): void => c.setXf(body, xf.rotAbout(center, axis, ang));
 
 /**
- * dyad (RRR). in: a, b (points), ra, rb (lengths: the link from a, the link from b), n (plane normal, default +z).
+ * dyad (RRR). in: a, b (points), ra, rb (lengths: the link from a, the link from b), n (plane normal, default +z),
+ * body (optional: the link from a, posed here by its turn about a, so a later block can read its other points).
  * out: the point closing both links. branch picks the side (+1: left of a→b seen from +n).
  */
 const dyad: BlockFn = (c, s) => {
   const i = s.in ?? {};
-  const sol = dyadRRR(c.vec(i.a), c.vec(i.b), c.num(i.ra), c.num(i.rb), i.n ? c.vec(i.n) : [0, 0, 1]);
+  const n: Vec3 = i.n ? c.vec(i.n) : [0, 0, 1];
+  const a = c.vec(i.a);
+  const sol = dyadRRR(a, c.vec(i.b), c.num(i.ra), c.num(i.rb), n);
   const k = c.root(sol.roots, sol.h);
   outPoint(c, s, sol.roots[k]);
+  if (typeof i.body === "string") {
+    const a0 = c.refVec(i.a);
+    const p0 = c.refPt(outName(s) ?? "");
+    const nn = v3.unit(n);
+    const ang = (d: Vec3) => Math.atan2(v3.dot(nn, v3.cross([1, 0, 0], d)), v3.dot([1, 0, 0], d));
+    const dAng = ang(v3.sub(sol.roots[k], a)) - ang(v3.sub(p0, a0));
+    c.setXf(i.body, xf.mul(xf.trans(v3.sub(a, a0)), xf.rotAbout(a0, nn, dAng)));
+  }
 };
 
 /**
  * slider-dyad. in.kind "rrp": a (pivot), r (link length), p, d (a point and direction of the slide). out: the point;
  * out.s: the slide coordinate. branch: +1 far along d, −1 near.
  * in.kind "rpr": a (slot link pivot), p (the pin's point), body (the slotted link, optional), n. out.angle, out.dist (deg, mm).
+ * in.kind "rpp": a (the pin), p, d (a point and direction of the slide; the slot is square to it). out: the slotted
+ * body's point on the slide; out.s: the slide coordinate.
  */
 const sliderDyad: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -61,6 +74,19 @@ const sliderDyad: BlockFn = (c, s) => {
     const k = c.root(sol.points, sol.h);
     outPoint(c, s, sol.points[k], typeof s.out === "string" ? "" : "p");
     outVal(c, s, sol.s[k], "s");
+    // the slide's body, posed by its travel, so a later block can read its other points (a crosshead's arm)
+    const on = outName(s, typeof s.out === "string" ? "" : "p");
+    if (typeof i.body === "string" && on) c.setXf(i.body, xf.trans(v3.sub(sol.points[k], c.refPt(on))));
+    return;
+  }
+  if (kind === "rpp") {
+    // a pin in a straight slot square to the slide (Scotch yoke): the slotted body's point on the slide is the pin's
+    // projection on it, x = r cos θ exactly
+    const p0 = c.vec(i.p);
+    const d = v3.unit(c.vec(i.d));
+    const t = v3.dot(v3.sub(c.vec(i.a), p0), d);
+    outPoint(c, s, v3.add(p0, v3.mul(d, t)), typeof s.out === "string" ? "" : "p");
+    outVal(c, s, t, "s");
     return;
   }
   if (kind === "rpr") {
@@ -77,6 +103,82 @@ const sliderDyad: BlockFn = (c, s) => {
     return;
   }
   throw new KinError(`slider-dyad kind ${kind}`);
+};
+
+/**
+ * triad (an Assur group of class III: a ternary lever on three binary links). in: a (a point), ra (the link from a to
+ * the lever's first pin p1; default its reference length), lever (body), p1, p2, p3 (the lever's three pins, joint
+ * names), slide (a prismatic joint to the ground that the second pin runs along), c (a point), rc (the link from the
+ * third pin to c; default its reference length), n (plane normal). For a trial turn of the lever the first link and the
+ * slide close in closed form (a circle and a line, on the reference's side); the turn that closes the third link is
+ * found by a scan and bisection, the root nearest the reference turn taken. out { p1, p2, p3 }; the lever is posed. A
+ * Walschaerts radius rod, combination lever, union link and valve spindle.
+ */
+const triad: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const nz = v3.unit(i.n ? c.vec(i.n) : [0, 0, 1]);
+  const A = c.vec(i.a);
+  const A0 = c.refVec(i.a);
+  const C = c.vec(i.c);
+  const P1 = c.jointAt(str(i.p1, "triad.p1"));
+  const P2 = c.jointAt(str(i.p2, "triad.p2"));
+  const P3 = c.jointAt(str(i.p3, "triad.p3"));
+  // the links' lengths as the joints give them, unless the record names them
+  const ra = i.ra !== undefined ? c.num(i.ra) : v3.dist(A0, P1);
+  const rc = i.rc !== undefined ? c.num(i.rc) : v3.dist(P3, c.refVec(i.c));
+  const sl = str(i.slide, "triad.slide");
+  const L0 = c.jointAt(sl);
+  const d = v3.unit(c.jointAxis(sl));
+  const nn = v3.unit(v3.cross(nz, d));
+  const v2 = v3.sub(P2, P1);
+  const v3_ = v3.sub(P3, P1);
+  const rot = (u: Vec3, a: number): Vec3 => xf.dir(xf.rotAbout([0, 0, 0], nz, a), u);
+  // the first pin on the circle about a and on the line its second pin's slide puts it on, the reference's side
+  const foot = (a: Vec3, k: number) => v3.add(a, v3.mul(nn, k - v3.dot(nn, a)));
+  const k0 = v3.dot(nn, L0) - v3.dot(nn, v2);
+  const side = Math.sign(v3.dot(d, v3.sub(P1, foot(A0, k0)))) || 1;
+  const first = (dl: number): Vec3 | null => {
+    const k = v3.dot(nn, L0) - v3.dot(nn, rot(v2, dl));
+    const F = foot(A, k);
+    const t = v3.dist(F, A);
+    if (t > ra) return null;
+    return v3.add(F, v3.mul(d, side * Math.sqrt(ra * ra - t * t)));
+  };
+  const g = (dl: number): number | null => {
+    const X = first(dl);
+    return X ? v3.dist(v3.add(X, rot(v3_, dl)), C) - rc : null;
+  };
+  // the closing turn nearest the reference: scan outward from 0, then bisect
+  const step = Math.PI / 180;
+  let root: number | null = null;
+  for (let k = 0; k < 180 && root === null; k++)
+    for (const sg of [1, -1]) {
+      const x0 = sg * k * step;
+      const x1 = sg * (k + 1) * step;
+      const g0 = g(x0);
+      const g1 = g(x1);
+      if (g0 === null || g1 === null || Math.sign(g0) === Math.sign(g1)) continue;
+      let lo = x0;
+      let hi = x1;
+      let glo = g0;
+      for (let it = 0; it < 80; it++) {
+        const m = (lo + hi) / 2;
+        const gm = g(m)!;
+        if (Math.sign(gm) === Math.sign(glo)) {
+          lo = m;
+          glo = gm;
+        } else hi = m;
+      }
+      root = (lo + hi) / 2;
+      break;
+    }
+  if (root === null) throw new KinError(`triad ${s.id}: the links cannot close`);
+  const X = first(root)!;
+  const out = (s.out ?? {}) as Record<string, string>;
+  if (out.p1) c.setPt(out.p1, X);
+  if (out.p2) c.setPt(out.p2, v3.add(X, rot(v2, root)));
+  if (out.p3) c.setPt(out.p3, v3.add(X, rot(v3_, root)));
+  if (typeof i.lever === "string") c.setXf(i.lever, xf.mul(xf.trans(v3.sub(X, P1)), xf.rotAbout(P1, nz, root)));
 };
 
 /**
@@ -1401,6 +1503,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   dyad,
   "slider-dyad": sliderDyad,
   "five-bar": fiveBar,
+  triad,
   hooke,
   homokinetic,
   bennett,

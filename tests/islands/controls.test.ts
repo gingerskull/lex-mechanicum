@@ -4,12 +4,17 @@ import { afterEach, describe, expect, it } from "vitest";
 import { recordById } from "../../src/catalog";
 import { controlsOf, viewButtons } from "../../site/src/data";
 import { drawnBy3 } from "../../site/src/drawn";
+import { allIds, engineOf } from "../../src/checks/engine";
 
 const rec = (id: string) => recordById(id)!;
 
 describe("the stage's controls from a record", () => {
   it("gives a design choice its options and its default", () => {
-    const c = controlsOf(rec("drag-link-quick-return"));
+    // the drag link keeps its assembly as a design choice; a control on it is added here (the built page drops it,
+    // as the parts are built for one assembly)
+    const r = rec("drag-link-quick-return");
+    const t = r.teaching!;
+    const c = controlsOf({ ...r, teaching: { ...t, controls: [...t.controls, { id: "assembly", kind: "design", design: "branch" }] } } as typeof r);
     const a = c.find((x) => x.key === "branch")!;
     expect(a.type).toBe("choice");
     expect(a.target).toBe("design");
@@ -54,12 +59,15 @@ describe("which mechanisms the site draws with the v3 engine", () => {
     delete process.env.SITE_V3;
     // a mechanism audited at 3.0 (the pilots) is always drawn by v3; the others only on request
     expect(drawnBy3("four-bar")).toBe(true);
-    expect(drawnBy3("slider-crank")).toBe(false);
-    process.env.SITE_V3 = "slider-crank, scotch-yoke";
-    expect(drawnBy3("slider-crank")).toBe(true);
-    expect(drawnBy3("scotch-yoke")).toBe(true);
-    expect(drawnBy3("crank-shaper")).toBe(false);
+    // three mechanisms still on the 2.5D engine (the rebuild moves them over one batch at a time)
+    const [a, b, c] = allIds().filter((id) => engineOf(id) === "2.5D");
+    if (!a || !b || !c) return;
+    expect(drawnBy3(a)).toBe(false);
+    process.env.SITE_V3 = `${a}, ${b}`;
+    expect(drawnBy3(a)).toBe(true);
+    expect(drawnBy3(b)).toBe(true);
+    expect(drawnBy3(c)).toBe(false);
     process.env.SITE_V3 = "all";
-    expect(drawnBy3("crank-shaper")).toBe(true);
+    expect(drawnBy3(c)).toBe(true);
   });
 });

@@ -16,7 +16,7 @@ export interface ResolvedJoint {
   axis2?: Vec3;
   pinA?: Vec3;
   pinB?: Vec3;
-  slot?: { from: Vec3; to: Vec3; repeat?: number; center?: Vec3; circle?: number };
+  slot?: { from: Vec3; to: Vec3; repeat?: number; center?: Vec3; circle?: number; arc?: { center: Vec3; radius: number } };
   ca?: Vec3;
   cb?: Vec3;
   num: (v: unknown) => number;
@@ -104,6 +104,12 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
       }
       if (!wrapped(j, driverValue) || !r.slot) break;
       const pin = xf.apply(Xa, r.at);
+      if (r.slot.arc) {
+        // a curved slot: the pin stays at the arc's radius from its centre, in the plane of the joint's axis
+        const c = xf.apply(Xb, r.slot.arc.center);
+        out.push(v3.len(v3.perp(v3.sub(pin, c), bx)) - r.slot.arc.radius);
+        break;
+      }
       let best: Vec3 | null = null;
       const n = r.slot.repeat ?? 1;
       for (let k = 0; k < n; k++) {
@@ -266,6 +272,8 @@ export function resolveJoint(j: KinJoint, num: (v: unknown) => number, vec: (v: 
     slot: j.slot
       ? j.slot.path === "circle"
         ? { from: [0, 0, 0], to: [0, 0, 0], center: j.slot.center ? vec(j.slot.center) : undefined, circle: num(j.slot.radius) }
+        : j.slot.arc
+          ? { from: vec(j.slot.arc.center), to: vec(j.slot.arc.center), arc: { center: vec(j.slot.arc.center), radius: num(j.slot.arc.radius) } }
         : { from: vec(j.slot.from), to: vec(j.slot.to), repeat: j.slot.repeat, center: j.slot.center ? vec(j.slot.center) : undefined }
       : undefined,
     ca: j.ca ? vec(j.ca) : undefined,

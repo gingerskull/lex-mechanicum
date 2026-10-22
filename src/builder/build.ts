@@ -2,6 +2,7 @@
 // bodies, builds every joint from its kit, routes the supports against the swept volumes, and gives every solid the frame
 // of the body it rides. Build time, Node only.
 import type { Solid3 } from "../solids/types";
+import { realBody } from "./arms";
 import { createCtx, type RecordLike, type BuildCtx, type BuildOpts, type JointNote, type RouteLog } from "./ctx";
 import { applyPolish, type Polish, type PolishApi } from "./polish";
 import { rules, runRules } from "./registry";
@@ -63,6 +64,8 @@ function finalize(ctx: BuildCtx): void {
 }
 
 function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
+  // an outboard arm's solids ride its body (src/builder/arms.ts)
+  for (const s of ctx.solids) s.body = realBody(ctx.kin, s.body);
   const solids = ctx.solids;
   const slabOf: Record<string, number> = {};
   const lifts: Assembly["lifts"] = {};
@@ -71,7 +74,7 @@ function assemble(ctx: BuildCtx, polish?: PolishApi["log"]): Assembly {
     if (ctx.geoms.get(b)?.levels && b.includes("#")) continue;
     const r = ctx.extent(b);
     // a bevel gear stands where its cone says, so its points are drawn where the kinematics put them
-    if (!r || ctx.geoms.get(b)?.exact) continue;
+    if (!r || ctx.geoms.get(b)?.exact || realBody(ctx.kin, b) !== b) continue;
     const n = r.frame.z;
     const o = r.frame.o;
     lifts[b] = [n[0], n[1], n[2], n[0] * o[0] + n[1] * o[1] + n[2] * o[2] + r.w1];

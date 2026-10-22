@@ -47,6 +47,8 @@ export interface Setup {
   bodyFrame: Map<string, Xf>;
   refPts: Map<string, Vec3>;
   defaults: Map<string, number>;
+  /** The drivers' record defaults: the reference configuration the joints are given in, whatever the controls hold. */
+  refDefaults: Map<string, number>;
   refVals: Map<string, number>;
   trackers: Map<string, Tracker>;
   tables: Map<string, BranchTable>;
@@ -146,6 +148,8 @@ export class Kinematics {
     const drv = (controls as { drivers?: Record<string, number> } | undefined)?.drivers ?? {};
     const defaults = new Map<string, number>();
     for (const d of kin.drivers) if (d.kind !== "select") defaults.set(d.id, drv[d.id] ?? (typeof d.default === "number" ? d.default : 0));
+    const refDefaults = new Map<string, number>();
+    for (const d of kin.drivers) if (d.kind !== "select") refDefaults.set(d.id, typeof d.default === "number" ? d.default : 0);
     for (const [id, v] of held) defaults.set(id, v);
 
     const num = (v: unknown): number => {
@@ -178,6 +182,7 @@ export class Kinematics {
       bodyFrame,
       refPts,
       defaults,
+      refDefaults,
       refVals: new Map(),
       trackers: new Map(),
       tables: new Map(),
@@ -283,7 +288,14 @@ export class Kinematics {
   /** The reference pose: every driver at its default; every body at the identity. */
   referencePose(controls?: Controls): Pose {
     const s = this.setup(controls);
-    return this.run(s, 0, this.defaultValues(s), "ref").pose;
+    return this.run(s, 0, this.refValues(s), "ref").pose;
+  }
+
+  /** Driver values of the reference configuration (the record's defaults). */
+  refValues(s: Setup): Record<string, number> {
+    const v: Record<string, number> = {};
+    for (const d of this.kin.drivers) v[d.id] = s.refDefaults.get(d.id) ?? 0;
+    return v;
   }
 
   defaultValues(s: Setup): Record<string, number> {
@@ -301,7 +313,7 @@ export class Kinematics {
     const warm = s.fbWarm;
     if (!warm || dist(warm.vals, vals) > step) {
       // continue from the reference pose along a straight path in driver space
-      const v0 = this.defaultValues(s);
+      const v0 = this.refValues(s);
       const m = Math.min(720, Math.max(1, Math.ceil(dist(v0, vals) / step)));
       let w: Map<string, Xf> | undefined;
       for (let i = 1; i <= m; i++) {
@@ -324,7 +336,7 @@ export class Kinematics {
 
   private ensureTables(s: Setup): void {
     if (s.tablesReady) return;
-    const v0 = this.defaultValues(s);
+    const v0 = this.refValues(s);
     // reference run: finds the stateful blocks and the declared closures
     s.trackers.clear();
     s.stateful = [];
@@ -404,6 +416,7 @@ export class Kinematics {
     declared = false,
   ): { pose: Pose; hs: Map<string, number>; fb?: Map<string, Xf> } {
     const run = new Run(this, s, u, vals, mode, declared);
+    for (const b of this.kin.bodies) if (b.fixed) run.xfs.set(b.id, xf.id());
     run.drive();
     for (const step of this.kin.solve) run.runStep(step);
     run.resolveBodies(fb ?? { unknown: new Set((this.kin.fallback?.loops ?? []).flat()) });
@@ -457,7 +470,7 @@ class Run implements BlockCtx {
         if (!r) throw new KinError(`driver ${d.id}: unknown joint ${d.joint}`);
         const a = this.xfs.get(r.joint.a);
         if (!a) continue;
-        const dv = (this.vals[d.id] ?? 0) - (this.s.defaults.get(d.id) ?? 0);
+        const dv = ((this.vals[d.id] ?? 0) - (this.s.refDefaults.get(d.id) ?? 0)) * (d.scale ?? 1);
         this.xfs.set(r.joint.b, xf.mul(a, driverMotion(r, d, dv)));
         pending.splice(i, 1);
       }
@@ -752,8 +765,8 @@ class Run implements BlockCtx {
     for (const o of this.k.kin.outputs ?? []) {
       // a scalar a block wrote under the output's own id (a cam's pressure angle) is read as it stands
       const own = (o.kind === "angle" || o.kind === "position") && !o.from && o.id in this.vals ? this.vals[o.id] : undefined;
-      let v = own ?? (o.from && o.to ? this.between(o.of, o.from, o.to, points) : o.from ? this.distance(o.of, o.from, points) : this.output(o.kind, o.of, points, o.axis));
-      if (Array.isArray(v) && o.axis && o.kind === "position") v = v3.dot(v, v3.unit(o.axis));
+      let v = own ?? (o.from && o.to ? this.between(o.of, o.from, o.to, points) : o.from ? this.distance(o.of, o.from, points) : this.output(o.kind, o.of, points, o.axis, o.relativeTo));
+      if (Array.isArray(v) && Array.isArray(o.axis) && o.kind === "position") v = v3.dot(v, v3.unit(o.axis));
       if (typeof v === "number" && o.kind === "angle" && o.absolute && !(o.from && o.to)) v += this.refDirection(o.of);
       if (typeof v === "number" && o.datum !== undefined) v -= o.datum;
       if (v !== undefined) outputs[o.id] = v;
@@ -793,7 +806,7 @@ class Run implements BlockCtx {
     return Math.atan2(v3.len(v3.cross(u, w)), v3.dot(u, w)) * R2D;
   }
 
-  private output(kind: string, of: string, points: Map<string, Vec3>, axis?: Vec3): number | Vec3 | undefined {
+  private output(kind: string, of: string, points: Map<string, Vec3>, axis?: string | Vec3, relativeTo?: string): number | Vec3 | undefined {
     // a value a block solved or gives (a planet's spin, a contact's distance, a chain's speed over its peak), whatever the
     // kind it is read as; but a speed ratio of a value is its rate per unit of the input, from the series of the value
     // (checks/claims.ts; a double Cardan's centre shaft turn)
@@ -807,7 +820,17 @@ class Run implements BlockCtx {
         return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));
       }
     }
-    if (kind === "position" && axis && points.has(of)) return v3.dot(points.get(of)!, v3.unit(axis));
+    // the named forms: a component, or a distance from a point (an axis given as a vector is a projection, below)
+    const named = typeof axis === "string" && /^-?[xyz]$|^radius$/.test(axis) ? axis : undefined;
+    if (kind === "position" && points.has(of) && (named || (relativeTo && axis === undefined))) {
+      const p = points.get(of)!;
+      const q = relativeTo ? points.get(relativeTo) : ([0, 0, 0] as Vec3);
+      if (!q) return undefined;
+      const k = named && named !== "radius" ? "xyz".indexOf(named.replace("-", "")) : -1;
+      if (k >= 0) return (named!.startsWith("-") ? -1 : 1) * (p[k]! - (relativeTo ? q[k]! : 0));
+      return v3.dist(p, q);
+    }
+    if (kind === "position" && Array.isArray(axis) && points.has(of)) return v3.dot(points.get(of)!, v3.unit(axis));
     if (kind === "path" || (kind === "position" && points.has(of))) return points.get(of);
     if (kind === "angle") {
       if (of in this.vals) return this.vals[of];

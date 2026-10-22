@@ -36,12 +36,17 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
   for (const b of site.bodies) {
     const joint = site.joints.find((j) => ctx.kin.joints.find((q) => q.id === j && (q.a === b || q.b === b)));
     const R = joint ? bossRadius(ctx, b, joint) : 8;
+    const upper = ctx.solids.find((s) => s.id === `${b}-cheek` && s.body === b);
     const lv = ctx.levels.get(b) ?? [];
-    for (const [k, part] of [ctx.parts.get(b), ctx.twins.get(b), ...lv].entries()) {
+    const parts: [Solid3 | undefined, string, boolean][] = [[ctx.parts.get(b), b, false], [ctx.twins.get(b), b, false], [upper, b, false], ...lv.map((p, k): [Solid3, string, boolean] => [p, `${b}#${k + 1}`, true])];
+    for (const [part, key, level] of parts) {
       if (!part) continue;
+      const uv = planeCoords(part.frame, site.at).uv;
       // a level is a member where the pin goes through it (a gear on a link's end only on that end's pin)
-      if (k >= 2 && !inside(part.profile.outer, planeCoords(part.frame, site.at).uv)) continue;
-      const slab = ctx.extent(k >= 2 ? `${b}#${k - 1}` : b);
+      if (level && !inside(part.profile.outer, uv)) continue;
+      // a plate of a two-plate body takes part in the stacks of the pins it reaches
+      if (!level && upper && (!inside(part.profile.outer, uv) || part.profile.holes.some((h) => inside(h, uv)))) continue;
+      const slab = ctx.extent(key);
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
       // the twin's second half sits in its own slab
       const w = (part.frame.o[0] - frame.o[0]) * frame.z[0] + (part.frame.o[1] - frame.o[1]) * frame.z[1] + (part.frame.o[2] - frame.o[2]) * frame.z[2];
@@ -127,7 +132,13 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   const alongUp = parallel(frame.z, UP);
   const base = alongUp && ctx.base ? { top: ctx.base.top - frame.o[2], bottom: ctx.base.bottom - frame.o[2] } : null;
   const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual" || d.kind === "oscillating");
-  const held = ctx.placement.held.get(site.id) ?? "both";
+  // a fixed pin under a grooved link (an expansion link's trunnion) stands on the base only: its axle ends in the solid
+  // lower cheek, under the groove the die runs in
+  const grooved = site.fixed && site.bodies.some((b) => ctx.geoms.get(b)?.upper);
+  // a fixed plate placed over the pin (a stationary gear, a side cover over a rotor) leaves no room above its stack:
+  // the pin is held from the base and ends flush
+  const covered = site.fixed && [...ctx.geoms.values()].some((g) => g.level && g.level.part !== "lower" && g.level.part !== "all" && inside(g.profile.outer, planeCoords(g.frame, site.at).uv));
+  const held = grooved || covered ? "base" : (ctx.placement.held.get(site.id) ?? "both");
   const straddle = site.live && alongUp && held !== "base" && [...keyedIds].some((b) => ["gear", "pulley", "sprocket"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)));
   const spec: StackSpec = {
     id: site.id,
@@ -138,9 +149,13 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     base,
     held: site.fixed ? held : "both",
     input: !!driver && site.joints.includes(driver.joint ?? ""),
-    axisTakenBelow: ctx.sites.some((q) => q !== site && q.fixed && parallel(q.axis, site.axis) && Math.hypot(q.at[0] - site.at[0], q.at[1] - site.at[1]) < 0.5 && q.at[2] < site.at[2] - 0.5),
+    axisTakenBelow: !!site.axisBelow,
     straddle,
     eccentric: ctx.eccentric.has(site.id),
+    ...(grooved ? { flush: true } : {}),
+    ...(site.live && ctx.kin.drivers.some((d) => d.kind === "manual" && d.joint && site.joints.includes(d.joint)) ? { hold: true } : {}),
+    // a part split in two plates round a gap (its upper plate lifted clear of the lower) is carried between them
+    ...(site.fixed && members.length === 2 && members[0]!.body === members[1]!.body && ctx.geoms.get(members[0]!.body)?.upper?.lift !== undefined ? { between: true } : {}),
     baseTopWorld: ctx.base?.top ?? 0,
   };
   // a member set along the shaft by a param control (shape.slide { param, along, offset }) reaches its whole range

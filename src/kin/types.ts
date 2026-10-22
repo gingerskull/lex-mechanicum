@@ -21,7 +21,10 @@ export interface KinBody {
   shape?: Record<string, unknown>;
   at?: { joint?: string; point?: string; frame?: Frame };
   frame?: Frame; // pose of the body's own frame in the reference configuration; default: its `at` joint, else the world
-  /** Fixed to the ground although it has joints of its own: a ground link drawn as a link (a Bennett loop's fourth link). */
+  /**
+   * Fixed to the ground although joints name it: it never moves and counts as ground (a ground link drawn as a link,
+   * as a Bennett loop's fourth link; a stationary gear in mesh).
+   */
   fixed?: boolean;
   /** n-fold rotational symmetry about its axis (a wheel's slots, a gear's teeth z): the cycle repeats modulo 2π/n (K2). */
   symmetry?: number;
@@ -87,6 +90,8 @@ export interface KinJoint {
     path?: string;
     radius?: Num;
     body?: string;
+    /** A curved slot instead: an arc about `center` (reference world) of `radius` (an expansion link). */
+    arc?: { center: Vec; radius: Num; from?: Num; to?: Num };
   };
   // cam-contact: the pitch radius of the cam as a function of its angle, and the follower kind
   follower?: "roller" | "flat" | "knife";
@@ -126,6 +131,11 @@ export interface KinDriver {
   /** Turns per cycle relative to the range as a param expression, in place of `speed` (a differential's second input at a split). */
   rate?: string;
   phase?: number;
+  /**
+   * Joint motion per unit of the driver's value (degrees or mm per unit, default 1): a driver read in its own units, a
+   * die position from -1 to +1 that turns a reverse arm 20 degrees per unit.
+   */
+  scale?: number;
   /**
    * A selector's named options (a list of `{ id, ... }`, or a map by id), each setting values of other drivers, params
    * and design choices (`set`), and the cycle the motion repeats after at that option (input degrees).
@@ -172,8 +182,14 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
-  /** A point's position projected on this direction (world mm), instead of the point itself: a coordinate along a slide. */
-  axis?: [number, number, number];
+  /**
+   * A point's position as one number: its world `x`, `y` or `z` (negated with a minus, a mirrored part read the same way
+   * round), or its distance (`radius`) from the point `relativeTo` (the world origin without one); or, given as a
+   * direction (world mm), the point's position projected on it (a coordinate along a slide). Without an axis, a point
+   * with `relativeTo` gives the distance between the two.
+   */
+  axis?: "x" | "y" | "z" | "-x" | "-y" | "-z" | "radius" | [number, number, number];
+  relativeTo?: string;
   /** A value subtracted from a scalar output (mm or degrees): a height above a line, a datum. */
   datum?: number;
   /** An angle measured from the world x axis (the link's own direction) instead of from the reference pose. */

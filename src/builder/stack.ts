@@ -4,6 +4,7 @@
 // joint and a tilted one. A support selector chooses housing, pillow block, bridge, or a stub or hung axle from where
 // the sweeps leave room and what the load needs; the router (src/builder/router.ts) places the support.
 import { circle, roundRect } from "../core/geom";
+import { realBody } from "./arms";
 import { H } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { SHOULDER_BOLTS, circlipExt, circlipInt, headD, headH, innerRingD, keyFor, shoulderLength, threadFor, type Bearing } from "../hardware/tables";
@@ -44,12 +45,21 @@ export interface StackSpec {
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
   eccentric?: boolean;
+  /** The axle ends flush in its top part, its clip recessed (a groove runs over it: an expansion link's trunnion). */
+  flush?: boolean;
+  /** A manual driver sets the shaft (a die position): it is held at its setting under the housing (F6). */
+  hold?: boolean;
   /** The axial range a member set along the shaft by a control reaches (its slide), for where the blocks go. */
   reach?: [number, number];
   /** A shaft in plan held from one side only (both pillow blocks): +1 along the axis, −1 against it. */
   side?: 1 | -1;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
+  /**
+   * A fixed pin whose part is split in two plates with a gap between (an output crank whose pivot every other part
+   * sweeps over or under): a live shaft keyed to both plates turns in a bushing in a bridge that runs in the gap.
+   */
+  between?: boolean;
 }
 
 export interface StackResult {
@@ -97,6 +107,7 @@ interface Seat {
 }
 
 export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
+  if (spec.between) return betweenStack(ctx, spec);
   const members = [...spec.members].sort((a, b) => a.w0 - b.w0);
   const fit = fitBore(members);
   const { d } = fit;
@@ -116,8 +127,11 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const isBevel = (m: Member) => ctx.geoms.get(m.body)?.scaleTop !== undefined;
   // a part with a hub of its own (a yoke) is keyed in its own bore and takes no clamp hub
   const ownHub = (m: Member) => !!ctx.geoms.get(m.body)?.exact && !isBevel(m);
+  const anchorBody = realBody(ctx.kin, members[0]!.body);
+  const clamped = (m: Member) => moving && m !== members[0] && realBody(ctx.kin, m.body) === anchorBody;
   const seats: Seat[] = members.map((m, i) => {
-    const b = fit.bearing[i] ?? null;
+    const b = clamped(m) ? null : (fit.bearing[i] ?? null);
+    if (clamped(m)) return { m, b: null, z0: m.w0, z1: m.w1 };
     if (m.keyed && !moving) {
       const down = (ctx.geoms.get(m.body)?.scaleTop ?? 1) > 1;
       return { m, b: null, z0: m.w0 - (isBevel(m) && !down ? (m.shim ?? 0) : 0), z1: m.w1 + (isBevel(m) && down ? (m.shim ?? 0) : 0) };
@@ -151,6 +165,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
         L.add(H.circlip(`${nm}-cl`, s.b.D, { internal: true, body: s.m.body, z0: s.z0 - c.s, z1: s.z0 }));
         serve("F2", `${nm}-cl`);
       }
+    } else if (clamped(s.m)) {
+      // fixed on the pin's end, clamped under the head: bored to the pin, no bearing
+      bores.push({ solid: s.m.solid, r: d / 2 + 0.05 });
+      notes.push(`${s.m.name}: fixed on the pin's end, clamped under its head`);
     } else if (!s.m.keyed || moving) {
       const D = d + 3;
       L.add(H.bushing(`${nm}-bush`, d, D, { body: s.m.body, z0: s.m.w0, z1: s.m.w1 }));
@@ -306,6 +324,13 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     if (support === "housing" || (live && spec.base && (support !== "hung" || spec.input))) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
       shaftSpec.z0 = h.bottom - 18;
+      if (spec.hold) {
+        // a split clamp collar under the housing, its thumb screw holding the shaft where the setting puts it (F6)
+        const cz = h.bottom - 12;
+        L.add(H.collar(`${id}-hold`, d, d + 12, { body: "ground", z0: cz, z1: cz + 8, name: `Split clamp collar ${d}x${d + 12} with a thumb screw: holds the setting` }));
+        L.add(H.screw(`${id}-hold-sc`, "button", 4, d / 2 + 8, { body: "ground", at: [d / 2 + 6, 0, 0], face: cz + 4, dir: 1, name: "Thumb screw M4, clamps the collar", qty: 1 }));
+        serve("F6", `${id}-hold`);
+      }
       serve("F2", `${id}-hcl0`, `${id}-hcl1`);
       serve("F1", `${id}-hdw0`, `${id}-hdw1`);
       serve("F4", `${id}-hww`);
@@ -361,7 +386,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       grooves.push(clZ);
       L.add(H.circlip(`${id}-ecl`, d, { z0: clZ, z1: clZ + ce.s, body: turn }));
       serve("F2", `${id}-ecl`);
-      shaftSpec.z1 = clZ + ce.s + 1.5;
+      shaftSpec.z1 = clZ + ce.s + (spec.flush ? 0.1 : 1.5);
     }
     name = live ? `Live shaft Ø${d}, ${kf ? `keyed (feather key ${kf.b}x${kf.h})` : "D-flat"}` : `Dead axle Ø${d}, shouldered, M${threadFor(d)} end`;
     if (live) {
@@ -383,6 +408,60 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const w1 = Math.max(...Lc.list.map((x) => x.z1), top ?? -Infinity);
     return { solids: [...Lc.out(), ...more], d, fit, support: sup, bores, w0, w1, serves, notes, ...(br ? { bridge: br } : {}), ...(stub ? { farStub: stub } : {}) };
   }
+}
+
+/** A live shaft keyed to the two plates of a split part, turning in a bushing in a bridge in the gap between them. */
+function betweenStack(ctx: BuildCtx, spec: StackSpec): StackResult {
+  const members = [...spec.members].sort((a, b) => a.w0 - b.w0);
+  const lo = members[0]!;
+  const hi = members[members.length - 1]!;
+  const fit = fitBore(members);
+  const d = Math.max(8, fit.d);
+  const id = spec.id;
+  const L = new Local(spec.frame, { joints: spec.joints });
+  const o = spec.frame.o;
+  const serves: Record<string, string[]> = {};
+  const serve = (f: string, ...ids: string[]) => ((serves[f] ??= []).push(...ids));
+  const baseTop = ctx.base?.top ?? o[2] + lo.w0 - 10;
+  const baseBot = ctx.base?.bottom ?? baseTop - 8;
+  const route = routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom: o[2] + lo.w1 + MIN_GAP + 1, baseTop, below: o[2] + hi.w0 - MIN_GAP - 1 });
+  if (!route) throw new Error(`${id}: no bridge fits between the two plates`);
+  const b0 = route.bottom - o[2];
+  const b1 = route.top - o[2];
+  const bushD = circleBushing(d);
+  const extra = bridgeSolids(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], route, hole: bushD / 2 + 0.05, baseTop, baseBottom: baseBot, joints: spec.joints });
+  const turn = lo.body;
+  L.add(H.bushing(`${id}-bb`, d, bushD, { body: "ground", z0: b0, z1: b1, name: `Bronze bushing ${d}x${bushD}, in the bridge` }));
+  // bronze thrust washers each side of the beam locate the shaft; spacers on the shaft fill to the plates
+  L.add(H.thrustWasher(`${id}-tw0`, d + 0.2, d + 8, { body: "ground", z0: b0 - 1, z1: b0 }));
+  L.add(H.thrustWasher(`${id}-tw1`, d + 0.2, d + 8, { body: "ground", z0: b1, z1: b1 + 1, name: "" }));
+  if (b0 - 1 - lo.w1 > SPACER_MIN) L.add(H.spacer(`${id}-sp0`, d + 0.2, d + 4, { body: turn, z0: lo.w1, z1: b0 - 1 }));
+  if (hi.w0 - (b1 + 1) > SPACER_MIN) L.add(H.spacer(`${id}-sp1`, d + 0.2, d + 4, { body: turn, z0: b1 + 1, z1: hi.w0 }));
+  serve("F4", `${id}-tw0`, `${id}-tw1`);
+  // the shaft ends flush in both plates, each held by an end washer and a countersunk screw (F2, F3: D-flat in both)
+  const M = d >= 10 ? 5 : d >= 8 ? 4 : 3;
+  const wh = 1.5;
+  L.add(H.washer(`${id}-ew0`, M + 0.4, d + 8, { body: turn, z0: hi.w1, z1: hi.w1 + wh, name: `End washer ${M + 0.4}x${d + 8}, holds the arms on the shaft`, qty: 2 }));
+  L.add(H.screw(`${id}-es0`, "csk", M, 2 * M + wh, { body: turn, face: hi.w1 + wh, dir: -1, qty: 2 }));
+  L.add(H.washer(`${id}-ew1`, M + 0.4, d + 8, { body: turn, z0: lo.w0 - wh, z1: lo.w0, name: "" }));
+  L.add(H.screw(`${id}-es1`, "csk", M, 2 * M + wh, { body: turn, face: lo.w0 - wh, dir: 1, name: "", qty: 0 }));
+  serve("F2", `${id}-ew0`, `${id}-es0`, `${id}-ew1`, `${id}-es1`);
+  L.add(H.shaft(`${id}-shaft`, { d, z0: lo.w0, z1: hi.w1, flat: true }, { name: `Live shaft Ø${d}, D-flat in both arms, in a bushing in the bridge between them`, body: turn }));
+  serve("F3", `${id}-shaft`);
+  serve("F1", `${id}-bridge`);
+  for (const x of L.list) if (!x.joints.length) x.joints = [...spec.joints];
+  return {
+    solids: [...L.out(), ...extra],
+    d,
+    fit,
+    support: "bridge",
+    bores: members.map((m) => ({ solid: m.solid, r: d / 2 + 0.05 })),
+    w0: lo.w0 - wh,
+    w1: hi.w1 + wh,
+    serves,
+    notes: [`a live shaft keyed to both plates turns in a bushing in a bridge between them: the other parts sweep over and under the pivot`],
+    bridge: { id: `${id}-bridge`, route },
+  };
 }
 
 /** Outside Ø of the bushing a bridge's boss carries for an axle of Ø d. */

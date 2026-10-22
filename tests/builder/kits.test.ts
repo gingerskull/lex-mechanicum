@@ -28,7 +28,7 @@ describe("joint kits", () => {
     J1: "four-bar", J2: "four-bar", J3: "four-bar", J4: "kin:geneva", J5: "kin:sliderCrank", J6: "kin:gearPair", J7: "kin:camFollower",
     J8: "kin:beltDrive", J9: "kin:crossedMesh", J10: "kin:universalJoint", J11: "lead-screw", J12: "chain-drive", "ball-cage": "ball-disc-integrator", J13: "kin:flexureHinge",
     pallet: "kin:escapement", "fork-pin": "kin:fork", "pawl-tooth": "kin:ratchet", "pin-lobe": "kin:pinLobe", "tongue-slot": "kin:tongueSlot",
-    "ring-hub": "kin:ringHub", "ring-rollers": "kin:ringRollers", "strap-sheave": "kin:rope", "groove-cam": "kin:grooveCam", "cross-pin": "universal-joint", trunnion: "oscillating-cylinder", "piston-bore": "oscillating-cylinder", "ball-socket": "swash-plate", slipper: "swash-plate", "sphere-fit": "rzeppa-cv-joint",
+    "ring-hub": "kin:ringHub", "ring-rollers": "kin:ringRollers", "strap-sheave": "kin:rope", "groove-cam": "kin:grooveCam", "cross-pin": "universal-joint", trunnion: "oscillating-cylinder", "piston-bore": "oscillating-cylinder", "eccentric": "eccentric-sheave", die: "walschaerts-valve-gear", hub: "whitworth", "ball-socket": "swash-plate", slipper: "swash-plate", "sphere-fit": "rzeppa-cv-joint",
     "ring-carrier": "internal-gear-pair",
     "eccentric-bearing": "cycloidal-drive",
     "pin-ring": "cycloidal-drive",
