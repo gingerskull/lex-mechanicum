@@ -30,7 +30,8 @@ export const classify: Rule = {
     for (const j of ctx.joints) (ctx.fired.classify ??= []).push(`${j.id}:${j.kit}`);
     for (const b of ctx.kin.bodies) {
       if (b.id === "ground") continue;
-      if (!ctx.joints.some((j) => j.a === b.id || j.b === b.id)) ctx.issues.push(`body ${b.id} has no joint`);
+      // a body with a frame of its own and no joint is fixed there (a plate) or carried by a block (a flexspline's segment)
+      if (!ctx.joints.some((j) => j.a === b.id || j.b === b.id) && !(b.frame && typeof b.frame === "object")) ctx.issues.push(`body ${b.id} has no joint`);
     }
     const approx = [...ctx.geoms.values()].filter((g) => g.approx).map((g) => g.id);
     if (approx.length) ctx.issues.push(`outline is a stand-in until the pilots give it a profile: ${approx.join(", ")}`);

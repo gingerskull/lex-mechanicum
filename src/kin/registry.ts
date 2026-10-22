@@ -553,6 +553,55 @@ const follow: BlockFn = (c, s) => {
   outVal(c, s, a * R2D, "angle");
 };
 
+/**
+ * wave. A flexspline bent into an oval by its wave generator, as z rigid segments (one tooth and its piece of rim each,
+ * built undeformed at angle 2πk/z). in: input (the wave generator's angle, deg), turn (the flexspline's turn, deg, from
+ * its mesh), segments [bodies, k = 0..z-1], r (pitch radius at rest), w0 (radial bend at the long axis), center, axis,
+ * longAxis (its angle at the reference, deg). The segments are built bent as at the reference (flexTooth with w0).
+ * Segment k's material angle is 2πk/z + turn; it moves out by w = w0 cos 2(φ - input), along its radius, and tilts with
+ * the oval's slope. out: the bend at segment 0 (mm).
+ */
+const wave: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const segs = (i.segments as string[] | undefined) ?? [];
+  const z = segs.length;
+  const r = c.num(i.r);
+  const w0 = c.num(i.w0);
+  const th = c.rad(i.input);
+  const psi = c.rad(i.turn);
+  const o = c.vec(i.center ?? [0, 0, 0]);
+  const axis = v3.unit(c.vec(i.axis ?? [0, 0, 1]));
+  const ex: Vec3 = Math.abs(axis[2]) > 0.9 ? [1, 0, 0] : [0, 0, 1];
+  const e1 = v3.unit(v3.sub(ex, v3.mul(axis, v3.dot(ex, axis))));
+  const e2 = v3.cross(axis, e1);
+  const at = (rad: number, a: number): Vec3 => v3.add(o, v3.add(v3.mul(e1, rad * Math.cos(a)), v3.mul(e2, rad * Math.sin(a))));
+  // the input and the turn are measured from the reference, where the long axis lies at angle th0 (deg, default 0)
+  const th0 = c.num(i.longAxis ?? 0) * D2R;
+  const pose = (k: number, thA: number, psiA: number): Xf => {
+    const pk = (k * 2 * Math.PI) / z;
+    // an inextensible rim slides along itself as it bends: v = -(w0/2) sin 2(φ - th), so the teeth keep their pitch
+    const phi0 = pk + psiA;
+    const phi = phi0 - (w0 / 2) * Math.sin(2 * (phi0 - thA)) / r;
+    const w = w0 * Math.cos(2 * (phi0 - thA));
+    // the oval's slope dr/dφ: its tangent leans from the circle's by -atan(r'/r)
+    const slope = -2 * w0 * Math.sin(2 * (phi0 - thA));
+    const rho = psiA - Math.atan2(slope, r + w);
+    // the segment turned by rho about the centre, then its pitch point carried out to the bent radius
+    const turned = xf.rotAbout(o, axis, rho);
+    const from = xf.apply(turned, at(r, pk));
+    return xf.mul(xf.trans(v3.sub(at(r + w, phi), from)), turned);
+  };
+  let bend0 = 0;
+  const dth = c.delta("in", th);
+  const dpsi = c.delta("turn", psi);
+  segs.forEach((b, k) => {
+    // the segments are built bent as at the reference: their pose is from there
+    c.setXf(b, xf.mul(pose(k, th0 + dth, dpsi), xf.inv(pose(k, th0, 0))));
+    if (k === 0) bend0 = w0 * Math.cos(2 * (dpsi - dth));
+  });
+  outVal(c, s, bend0, "bend");
+};
+
 void sideOf;
 void angleFrom;
 
@@ -573,4 +622,5 @@ export const BLOCKS: Record<string, BlockFn> = {
   escapement: escapementBlock,
   indexer,
   follow,
+  wave,
 };

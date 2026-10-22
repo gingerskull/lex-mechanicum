@@ -34,10 +34,21 @@ function dropUnusableSlots(kin: Kin, notes: string[]): Kin {
   return { ...kin, joints };
 }
 
-/** A body no joint reaches stands where it is (a fixed plate): it is left out of the solving. */
+/**
+ * A body no joint reaches stands where it is (a fixed plate): it is left out of the solving, unless a block poses it (a
+ * flexspline's segments, which the wave block carries round the oval) or a point rides it.
+ */
 const solvable = (kin: Kin): Kin => {
   const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
-  return { ...kin, bodies: kin.bodies.filter((b) => b.id === "ground" || joined.has(b.id)) };
+  const named = new Set<string>();
+  const walk = (v: unknown): void => {
+    if (typeof v === "string") named.add(v);
+    else if (Array.isArray(v)) v.forEach(walk);
+    else if (v && typeof v === "object") Object.values(v).forEach(walk);
+  };
+  for (const s of kin.solve) walk(s.in);
+  for (const p of kin.points ?? []) named.add(p.body);
+  return { ...kin, bodies: kin.bodies.filter((b) => b.id === "ground" || joined.has(b.id) || named.has(b.id)) };
 };
 
 function tryPoses(kin: Kin, controls?: Controls): Kinematics {

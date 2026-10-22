@@ -123,7 +123,9 @@ export const stops: Rule = {
 // ---------------------------------------------------------------------------------------------------- standoffs (A6)
 
 /** A body no joint reaches: a fixed plate that has to stand on the base (A6). */
-const isFixedPlate = (ctx: BuildCtx, id: string): boolean => id !== "ground" && ctx.parts.has(id) && !ctx.kin.joints.some((j) => j.a === id || j.b === id);
+/** A body no joint reaches and nothing moves (a block may carry a jointless body round: a flexspline's segment). */
+const isFixedPlate = (ctx: BuildCtx, id: string): boolean =>
+  id !== "ground" && ctx.parts.has(id) && !ctx.kin.joints.some((j) => j.a === id || j.b === id) && !(ctx.sampled.xfs.get(id) ?? []).some((X) => X.t.some((v) => Math.abs(v) > 1e-6) || X.R.some((v, k) => Math.abs(v - (k % 4 === 0 ? 1 : 0)) > 1e-9));
 
 /** True when a point lies in the sweep of the plate's own body (the post is under the plate it holds). */
 const insideOwn = (body: string, ctx: BuildCtx, p: Vec2): boolean => {
@@ -287,7 +289,10 @@ export const drive: Rule = {
     const housing = ctx.get(`${site.id}-housing`);
     const hz = housing ? Math.min(...worldPoints(ctx.M, housing).map((p) => p[2])) : bb;
     const pz = Math.min(bb - 28, hz - 7);
-    if (st.w0 + (ctx.stacks.get(site.id) ? 0 : 0) > pz - 2 - 0) {
+    // the shaft's own low end, in the world (the stack's frame stands on its family's plane, not at z 0)
+    const axle = ctx.get(`${site.id}-axle`);
+    const low = axle ? Math.min(...worldPoints(ctx.M, axle).map((p) => p[2])) : st.w0;
+    if (low > pz - 2) {
       // the shaft does not reach the belt plane (no housing): the drive is not built
       ctx.issues.push(`drive: the live shaft ${site.id} does not reach below the base`);
     }

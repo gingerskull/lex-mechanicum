@@ -2630,22 +2630,40 @@
           "id": "ground",
           "role": "ground",
           "shape": {
-            "type": "ringGear",
-            "z": 32,
-            "module": 2,
-            "face": 12,
-            "addendum": 0.8,
-            "rim": 46,
-            "note": "the rigid circular spline, fixed in the housing"
+            "type": "plate",
+            "rect": [
+              160,
+              160
+            ]
           },
           "at": {
             "frame": {
               "origin": [
                 0,
                 0,
-                0
+                -40
               ]
             }
+          }
+        },
+        {
+          "id": "spline",
+          "role": "frame",
+          "shape": {
+            "type": "ringGear",
+            "z": 32,
+            "module": 2,
+            "face": 12,
+            "addendum": 0.7,
+            "rim": 54,
+            "note": "the rigid circular spline, fixed"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
           }
         },
         {
@@ -2657,36 +2675,944 @@
             "thickness": 10,
             "profile": {
               "ellipse": [
-                28.5,
-                24.5
+                28.4,
+                24.4
               ],
-              "note": "outer race of the thin wave-generator bearing; the elliptical cam inside it 3 mm smaller"
+              "note": "the wave generator: an elliptical cam in a thin bearing, its outer race the oval the flexspline rides"
             },
-            "bore": 10
+            "bore": 10,
+            "exact": true
           },
           "at": {
             "joint": "Ow"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
           }
         },
         {
           "id": "flexspline",
           "role": "output",
           "shape": {
-            "type": "gear",
-            "z": 30,
-            "module": 2,
-            "face": 12,
-            "addendum": 0.8,
-            "bore": 26.5,
-            "flexible": true,
-            "cup": {
-              "length": 30,
-              "wall": 0.8
-            },
-            "note": "thin toothed cup; its rim takes the wave generator's shape"
+            "type": "disc",
+            "radius": 22,
+            "thickness": 4,
+            "exact": true,
+            "note": "the flexspline's cup bottom, on bearings on the input shaft; its rim and teeth are the segments"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              -30
+            ]
           },
           "at": {
             "joint": "Of"
+          }
+        },
+        {
+          "id": "fs0",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 0,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs1",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 1,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs2",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 2,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs3",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 3,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs4",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 4,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs5",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 5,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs6",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 6,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs7",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 7,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs8",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 8,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs9",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 9,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs10",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 10,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs11",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 11,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs12",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 12,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs13",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 13,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs14",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 14,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs15",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 15,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs16",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 16,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs17",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 17,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs18",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 18,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs19",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 19,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs20",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 20,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs21",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 21,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs22",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 22,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs23",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 23,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs24",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 24,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs25",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 25,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs26",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 26,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs27",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 27,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs28",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 28,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "fs29",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "thickness": 12,
+            "profile": {
+              "flexTooth": {
+                "z": 30,
+                "module": 2,
+                "addendum": 0.7,
+                "inner": 26.6,
+                "k": 29,
+                "w0": 2,
+                "wall": {
+                  "length": 25.5,
+                  "thickness": 0.8
+                }
+              }
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
           }
         }
       ],
@@ -2715,30 +3641,35 @@
           "at": [
             0,
             0,
-            -30
+            0
           ],
           "axis": [
             0,
             0,
             1
           ],
-          "note": "the cup's bottom, on the output bearing"
+          "note": "the cup on bearings on the input shaft, under the teeth"
         },
         {
           "id": "M",
           "type": "gear-mesh",
-          "a": "flexspline",
-          "b": "ground",
+          "a": "ground",
+          "b": "flexspline",
           "at": [
             32,
             0,
             0
           ],
-          "z1": 30,
-          "z2": 32,
+          "za": 32,
+          "zb": 30,
           "internal": true,
-          "zones": 2,
-          "note": "engaged at both ends of the wave generator's long axis"
+          "cb": [
+            0,
+            0,
+            0
+          ],
+          "carrier": "wave_gen",
+          "note": "engaged at both ends of the wave generator's long axis with the rigid spline (a fixed body, the ground's); relative to the wave generator the flexspline turns 32/30 of the spline's turn, so it creeps back two teeth per input turn"
         }
       ],
       "params": [
@@ -2760,7 +3691,7 @@
         },
         {
           "id": "ha",
-          "value": 0.8,
+          "value": 0.7,
           "unit": "coefficient",
           "min": 0.6,
           "max": 1,
@@ -2793,53 +3724,81 @@
           "kind": "rotary",
           "range": [
             0,
-            360
+            5400
           ],
-          "default": 0
+          "default": 0,
+          "note": "one cycle is one flexspline turn, 15 input turns: every segment is then back where it started"
         }
       ],
       "solve": [
         {
-          "block": "flexure",
-          "id": "wave",
-          "in": {
-            "generator": "wave_gen",
-            "body": "flexspline",
-            "w0": "w0"
-          },
-          "opts": {
-            "lobes": 2,
-            "shape": "w(phi) = w0 cos 2(phi - th_in), radial, on the flexspline's rim; points on the flexspline are given undeformed and moved by it"
-          },
-          "out": "flex-shape"
-        },
-        {
-          "block": "willis",
+          "block": "gear-mesh",
           "id": "train",
           "joints": [
             "Of",
             "M"
           ],
           "in": {
-            "carrier": "wave_gen",
-            "planet": "flexspline",
-            "ring": "ground",
-            "zp": "Zf",
-            "shape": "flex-shape"
+            "joint": "M",
+            "carrier": "input"
           },
-          "opts": {
-            "zr": "Zf + 2",
-            "note": "ring fixed: flexspline turns -(Zc - Zf)/Zf of the input"
+          "out": {
+            "angle": "flex-turn"
+          }
+        },
+        {
+          "block": "wave",
+          "id": "wave",
+          "joints": [],
+          "in": {
+            "input": "input",
+            "turn": "flex-turn",
+            "segments": [
+              "fs0",
+              "fs1",
+              "fs2",
+              "fs3",
+              "fs4",
+              "fs5",
+              "fs6",
+              "fs7",
+              "fs8",
+              "fs9",
+              "fs10",
+              "fs11",
+              "fs12",
+              "fs13",
+              "fs14",
+              "fs15",
+              "fs16",
+              "fs17",
+              "fs18",
+              "fs19",
+              "fs20",
+              "fs21",
+              "fs22",
+              "fs23",
+              "fs24",
+              "fs25",
+              "fs26",
+              "fs27",
+              "fs28",
+              "fs29"
+            ],
+            "r": 30,
+            "w0": "w0"
           },
-          "out": "flexspline-turn"
+          "out": {
+            "bend": "bend0"
+          }
         }
       ],
       "points": [
         {
           "id": "Mk",
-          "body": "flexspline",
+          "body": "fs0",
           "local": [
-            30,
+            32,
             0,
             0
           ]
@@ -2848,7 +3807,7 @@
           "id": "Wa",
           "body": "wave_gen",
           "local": [
-            28.5,
+            28.4,
             0,
             0
           ]
@@ -2857,7 +3816,7 @@
           "id": "Wb",
           "body": "wave_gen",
           "local": [
-            -28.5,
+            -28.4,
             0,
             0
           ]
@@ -2888,7 +3847,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option."
+        "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option. Rebuild R4 (#215): built on v3 from this record (first build): the flexspline is its cup bottom on the input shaft plus 30 rigid segments (a tooth, its piece of rim and its wall strip each) carried round the oval by a wave block (radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself, which keeps the teeth in phase); the rigid spline a fixed body on two posts; addendum 0.7 m on both and the flexspline's teeth thinned 8%, so the teeth clear everywhere (checked tooth by tooth over the cycle); one cycle is one flexspline turn (15 input turns). The tooth-count choice is not offered (it changes the built teeth). The six phases of the finished build read as decided."
       },
       "principle": [
         {
@@ -2898,7 +3857,97 @@
           "body": "flexspline"
         },
         {
-          "body": "ground"
+          "body": "spline"
+        },
+        {
+          "body": "fs0"
+        },
+        {
+          "body": "fs1"
+        },
+        {
+          "body": "fs2"
+        },
+        {
+          "body": "fs3"
+        },
+        {
+          "body": "fs4"
+        },
+        {
+          "body": "fs5"
+        },
+        {
+          "body": "fs6"
+        },
+        {
+          "body": "fs7"
+        },
+        {
+          "body": "fs8"
+        },
+        {
+          "body": "fs9"
+        },
+        {
+          "body": "fs10"
+        },
+        {
+          "body": "fs11"
+        },
+        {
+          "body": "fs12"
+        },
+        {
+          "body": "fs13"
+        },
+        {
+          "body": "fs14"
+        },
+        {
+          "body": "fs15"
+        },
+        {
+          "body": "fs16"
+        },
+        {
+          "body": "fs17"
+        },
+        {
+          "body": "fs18"
+        },
+        {
+          "body": "fs19"
+        },
+        {
+          "body": "fs20"
+        },
+        {
+          "body": "fs21"
+        },
+        {
+          "body": "fs22"
+        },
+        {
+          "body": "fs23"
+        },
+        {
+          "body": "fs24"
+        },
+        {
+          "body": "fs25"
+        },
+        {
+          "body": "fs26"
+        },
+        {
+          "body": "fs27"
+        },
+        {
+          "body": "fs28"
+        },
+        {
+          "body": "fs29"
         },
         {
           "point": "Mk"
@@ -2935,12 +3984,6 @@
           "center": "Ow",
           "radius": 32,
           "label": "RIGID SPLINE PITCH CIRCLE"
-        },
-        {
-          "id": "bend",
-          "kind": "bend",
-          "point": "Mk",
-          "label": "FLEXSPLINE BENT INTO AN OVAL"
         }
       ],
       "view": "PLAN",
@@ -2949,11 +3992,6 @@
           "id": "input",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "teeth",
-          "kind": "design",
-          "design": "Zf"
         }
       ],
       "plot": {
@@ -2966,9 +4004,9 @@
           "text": "each wave generator turn shifts the flexspline back by two teeth, 24°",
           "output": "flexspline-angle",
           "stat": "at",
-          "at": 360,
           "value": -24,
-          "tol": 0.05
+          "tol": 0.05,
+          "at": 360
         },
         {
           "text": "the flexspline turns once, backwards, per 15 input turns (15:1)",
