@@ -681,13 +681,13 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       }
       if (through) {
         // the arc a point sweeps about the centre over the cycle: its extreme angles about the plane's normal (z)
-        const poser = A.rt.scene.poser;
+        // (from the point's cached path: sampling it each frame costs a pose per sample)
         const r = len(sub(through, c));
         const angs: number[] = [];
         let prev = 0;
-        for (let k = 0; k < 120; k++) {
-          const p = poser.point((k / 120) * poser.period, typeof o.through === "string" ? o.through : "");
-          if (!p) continue;
+        const path = typeof o.through === "string" ? pathOf(A, o.through) : null;
+        for (let k = 0; path && k < path.length; k += 3) {
+          const p: Vec3 = [path[k]!, path[k + 1]!, path[k + 2]!];
           let a = Math.atan2(p[1] - c[1], p[0] - c[0]);
           if (angs.length) {
             while (a - prev > Math.PI) a -= TAU;
