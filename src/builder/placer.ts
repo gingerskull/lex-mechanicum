@@ -182,6 +182,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       site: Site;
       members: number[];
       passers: number[];
+      between?: boolean;
     }
     const siteCs: SiteC[] = [];
     for (const s of famSites) {
@@ -205,7 +206,9 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           }
         }
       }
-      siteCs.push({ site: s, members, passers: [...passers] });
+      // a fixed pivot of a part split round a gap is carried between its plates: parts may pass it on both sides
+      const between = s.fixed && s.bodies.length === 1 && geoms.get(s.bodies[0]!)?.upper?.lift !== undefined;
+      siteCs.push({ site: s, members, passers: [...passers], ...(between ? { between } : {}) });
     }
 
     // order between slabs: [u, v] puts u over v. A die rides in its link's groove from above, so its pin carrier lies
@@ -358,6 +361,8 @@ interface SiteConstraint {
   site: Site;
   members: number[];
   passers: number[];
+  /** Carried between the plates of a split part: passed on both sides by design. */
+  between?: boolean;
 }
 
 /** No passer inside the stack range of its site (checked on what is assigned so far). */
@@ -378,7 +383,7 @@ function passOk(assign: number[], cs: SiteConstraint[]): boolean {
 /** All passers of a site on one side of it. */
 function sidesOk(assign: number[], cs: SiteConstraint[]): boolean {
   for (const c of cs) {
-    if (!c.passers.length) continue;
+    if (!c.passers.length || c.between) continue;
     const lo = Math.min(...c.members.map((x) => assign[x]!));
     const above = c.passers.map((p) => assign[p]! > lo);
     if (above.some((a) => a) && above.some((a) => !a)) return false;
