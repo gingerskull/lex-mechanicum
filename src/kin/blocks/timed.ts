@@ -148,3 +148,157 @@ export function simulateEscapement(spec: EscapementSpec, steps = 3600): { at: (u
   };
   return { at, table };
 }
+
+export interface StarSpec {
+  /** Teeth, tip and root radii; the star's tips stand at `tip0` + k·360/n degrees (counter-clockwise) at rest. */
+  n: number;
+  tip: number;
+  root: number;
+  tip0: number;
+  /** Star centre relative to the driver's centre, mm; the finger's radius and pin radius; its angle at rest (deg). */
+  c: [number, number];
+  rf: number;
+  pin: number;
+  finger0: number;
+  /** The jumper: pivot (relative to the driver's centre), arm, roller radius, and the arm's swing (deg from the world x). */
+  jumper: [number, number];
+  swing: [number, number];
+  arm: number;
+  roller: number;
+  /** Driver degrees over which the jumper snaps the star from the crest to the next gap. */
+  snap: number;
+}
+
+/** The star's outline (straight flanks from each tip to the roots half a pitch either side), turned clockwise by ψ. */
+export function starOutline(s: StarSpec, psi: number): [number, number][] {
+  const out: [number, number][] = [];
+  const p = TAU / s.n;
+  for (let k = 0; k < s.n; k++) {
+    const a = (s.tip0 * Math.PI) / 180 + k * p - psi;
+    out.push([s.c[0] + s.tip * Math.cos(a), s.c[1] + s.tip * Math.sin(a)]);
+    out.push([s.c[0] + s.root * Math.cos(a + p / 2), s.c[1] + s.root * Math.sin(a + p / 2)]);
+  }
+  return out;
+}
+
+/** Signed distance of a point to a closed polygon: positive outside. */
+export function polyDist(poly: [number, number][], x: number, y: number): number {
+  let d = Infinity;
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [ax, ay] = poly[j]!;
+    const [bx, by] = poly[i]!;
+    const ex = bx - ax;
+    const ey = by - ay;
+    const t = Math.max(0, Math.min(1, ((x - ax) * ex + (y - ay) * ey) / (ex * ex + ey * ey)));
+    d = Math.min(d, Math.hypot(x - ax - t * ex, y - ay - t * ey));
+    if (ay > y !== by > y && x < ((bx - ax) * (y - ay)) / (by - ay) + ax) inside = !inside;
+  }
+  return inside ? -d : d;
+}
+
+/**
+ * Star wheel with a jumper, by stepping the driver through one turn (counter-clockwise from its rest angle). The finger
+ * (a pin of radius `pin` on radius `rf`) pushes the star clockwise by contact with a flank; once a tooth's tip reaches the
+ * jumper's crest the jumper snaps the star on to the next gap over `snap` degrees of driver (cycloidal, never behind the
+ * finger); otherwise the jumper holds it. The jumper's roller rides the star's outline, pressed toward it by its spring.
+ * Returns tables over the driver angle (degrees, one per `step`) of the star's turn ψ (deg, clockwise), the finger's push
+ * alone (deg), and the jumper's angle about its pivot (deg, counter-clockwise, from its rest).
+ */
+export function simulateStar(s: StarSpec, step = 0.05): { star: Float64Array; push: Float64Array; jumper: Float64Array; step: number; crest: number } {
+  const n = Math.round(360 / step);
+  const star = new Float64Array(n + 1);
+  const push = new Float64Array(n + 1);
+  const jumper = new Float64Array(n + 1);
+  const pitch = 360 / s.n;
+  const pen = (psi: number, th: number) => {
+    const a = ((s.finger0 + th) * Math.PI) / 180;
+    return polyDist(starOutline(s, (psi * Math.PI) / 180), s.rf * Math.cos(a), s.rf * Math.sin(a)) - s.pin;
+  };
+  // the finger alone: the least turn at which the pin no longer cuts into the star, never going back
+  const pushed = (psi0: number, th: number): number => {
+    if (pen(psi0, th) >= 0) return psi0;
+    // the first clear turn ahead, in small steps (the pin may cut into two flanks), then bisected
+    let lo = psi0;
+    let hi = psi0;
+    while (hi < psi0 + pitch && pen(hi, th) < 0) {
+      lo = hi;
+      hi += 0.25;
+    }
+    if (pen(hi, th) < 0) throw new Error(`star wheel: the finger jams at driver ${th.toFixed(2)}`);
+    for (let k = 0; k < 60; k++) {
+      const m = (lo + hi) / 2;
+      if (pen(m, th) >= 0) hi = m;
+      else lo = m;
+    }
+    return hi;
+  };
+  // the jumper's roller: over the arm's swing (`swing`, deg about the pivot, from the world x), the angle that brings the
+  // roller nearest the star's centre while it stays outside the outline: where its spring holds it
+  const J = s.jumper;
+  const [g0, g1] = s.swing.map((v) => (v * Math.PI) / 180) as [number, number];
+  const roll = (psi: number): number => {
+    const poly = starOutline(s, (psi * Math.PI) / 180);
+    const at = (a: number): [number, number] => [J[0] + s.arm * Math.cos(a), J[1] + s.arm * Math.sin(a)];
+    const d = (a: number) => polyDist(poly, ...at(a)) - s.roller;
+    const r = (a: number) => Math.hypot(at(a)[0] - s.c[0], at(a)[1] - s.c[1]);
+    const N = 400;
+    let best = NaN;
+    let bestR = Infinity;
+    for (let k = 0; k <= N; k++) {
+      const a = g0 + ((g1 - g0) * k) / N;
+      if (d(a) >= 0 && r(a) < bestR) {
+        bestR = r(a);
+        best = a;
+      }
+    }
+    if (!Number.isFinite(best)) throw new Error("star wheel: the jumper's roller finds no place on the star");
+    // refine toward the infeasible neighbour, where the roller touches
+    const h = (g1 - g0) / N;
+    for (const dir of [1, -1]) {
+      const b = best + dir * h;
+      if ((dir > 0 ? b > g1 : b < g0) || d(b) >= 0) continue;
+      let lo = best;
+      let hi = b;
+      for (let k = 0; k < 50; k++) {
+        const m = (lo + hi) / 2;
+        if (d(m) >= 0) lo = m;
+        else hi = m;
+      }
+      if (r(lo) < bestR) {
+        best = lo;
+        bestR = r(lo);
+      }
+    }
+    return best;
+  };
+  let psi = 0;
+  let fing = 0;
+  let snapAt = -1;
+  let crest = NaN;
+  let base = 0;
+  for (let i = 0; i <= n; i++) {
+    const th = i * step;
+    fing = pushed(fing, th);
+    if (snapAt < 0 && fing - base >= pitch / 2) {
+      snapAt = th;
+      crest = th;
+    }
+    if (snapAt >= 0 && Number.isFinite(snapAt)) {
+      const x = Math.min(1, (th - snapAt) / s.snap);
+      const law = base + pitch / 2 + (pitch / 2) * (x - Math.sin(TAU * x) / TAU);
+      psi = Math.max(psi, law, fing);
+      if (x >= 1) {
+        base += pitch;
+        psi = base;
+        snapAt = Infinity;
+      }
+    } else psi = Math.max(psi, fing);
+    star[i] = psi;
+    push[i] = fing;
+    jumper[i] = roll(psi);
+  }
+  const j0 = jumper[0]!;
+  for (let i = 0; i <= n; i++) jumper[i] = ((jumper[i]! - j0) * 180) / Math.PI;
+  return { star, push, jumper, step, crest };
+}

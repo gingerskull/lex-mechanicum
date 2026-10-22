@@ -9,7 +9,7 @@ import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from 
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
 import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
-import { genevaAngle, genevaInternalAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
+import { genevaAngle, genevaInternalAngle, simulateEscapement, simulateStar, type EscapementSpec, type StarSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
   const o = step.out;
@@ -498,6 +498,51 @@ const rockerBlock: BlockFn = (c, s) => {
   }
 };
 
+const starCache = new Map<string, ReturnType<typeof simulateStar>>();
+
+/**
+ * star (a star wheel driven by a finger, held and snapped by a jumper): in: input (the driver's angle, deg), driver (its
+ * ground joint), star and jumper (bodies), starJoint and jumperJoint (their ground revolutes), n, tip, root, tip0 (deg,
+ * a tip's angle at rest), rf (finger radius), pin (its contact radius), finger0 (deg, the finger's angle at rest), arm,
+ * roller, swing ([deg, deg] the arm's range about its pivot), snap (deg of driver). The star turns clockwise (seen from
+ * +z) by ψ; the jumper rides it. out {star, push, jumper}: ψ (deg), the finger's push alone (deg), the jumper's turn (deg,
+ * counter-clockwise).
+ */
+const starBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const O = c.jointAt(str(i.driver, "star.driver"));
+  const sj = str(i.starJoint, "star.starJoint");
+  const jj = str(i.jumperJoint, "star.jumperJoint");
+  const C = c.jointAt(sj);
+  const J = c.jointAt(jj);
+  const spec: StarSpec = {
+    n: c.num(i.n), tip: c.num(i.tip), root: c.num(i.root), tip0: c.num(i.tip0),
+    c: [C[0] - O[0], C[1] - O[1]], rf: c.num(i.rf), pin: c.num(i.pin), finger0: c.num(i.finger0),
+    jumper: [J[0] - O[0], J[1] - O[1]], swing: (i.swing as number[]).map((v) => c.num(v)) as [number, number],
+    arm: c.num(i.arm), roller: c.num(i.roller), snap: c.num(i.snap),
+  };
+  const key = JSON.stringify(spec);
+  let sim = starCache.get(key);
+  if (!sim) {
+    sim = simulateStar(spec);
+    starCache.set(key, sim);
+  }
+  const th = c.delta("in", c.num(i.input));
+  const x = ((((th % 360) + 360) % 360) / sim.step);
+  const k = Math.min(sim.star.length - 2, Math.floor(x));
+  const f = x - k;
+  const lerp = (t: Float64Array) => t[k]! + (t[k + 1]! - t[k]!) * f;
+  const turns = Math.floor(th / 360);
+  const pitch = 360 / spec.n;
+  const psi = lerp(sim.star) + turns * pitch;
+  const jum = lerp(sim.jumper);
+  spin(c, str(i.star, "star.star"), C, [0, 0, 1], -psi * D2R);
+  spin(c, str(i.jumper, "star.jumper"), J, [0, 0, 1], jum * D2R);
+  outVal(c, s, psi, "star");
+  outVal(c, s, lerp(sim.push), "push");
+  outVal(c, s, jum, "jumper");
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -581,6 +626,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   willis: willisBlock,
   cam: camBlock,
   rocker: rockerBlock,
+  star: starBlock,
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,

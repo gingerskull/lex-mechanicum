@@ -8,6 +8,7 @@ import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import { Kinematics, bodyFrameOf, type Setup } from "../kin/compose";
 import { xf } from "../kin/math";
+import { starOutline, type StarSpec } from "../kin/blocks/timed";
 import { type Vec3, m3, v3 } from "../kin/math";
 import type { Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
@@ -140,6 +141,11 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "intermittentDriven": {
       const part = type === "intermittentDriver" ? intermittentDriver(shape, gearOutline) : intermittentDriven(shape, gearOutline);
       return { profile: part.profile, thick: part.thick, approx: false, features: part.features };
+    }
+    case "star": {
+      // a star wheel: straight flanks from each tip to the roots half a pitch either side (src/kin starOutline)
+      const outer = starOutline({ n: num(shape.n, 10), tip: num(shape.tip, 20), root: num(shape.root, 12), tip0: num(shape.tip0, 0), c: [0, 0] } as StarSpec, 0);
+      return { profile: { outer, holes: [circle(num(shape.bore, 6) / 2, 0, 0, 24).reverse()] }, thick: num(shape.thickness, 6), approx: false };
     }
     case "genevaWheel":
     case "genevaCrank": {
