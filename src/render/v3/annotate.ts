@@ -657,7 +657,8 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       if (from && to && (o.fromPose || o.toPose)) {
         // an arc on the circle a point runs on, between two of its poses (the cut and return of a crank): turning
         // counter-clockwise about +z unless `sweep` is "cw"
-        const r = len(sub(from, c));
+        // (the in-plane radius: the point stands on its part's top face, above the centre's level)
+        const r = Math.hypot(from[0] - c[0], from[1] - c[1]);
         const a0 = Math.atan2(from[1] - c[1], from[0] - c[0]);
         let a1 = Math.atan2(to[1] - c[1], to[0] - c[0]);
         if (o.sweep === "cw") while (a1 > a0) a1 -= TAU;
