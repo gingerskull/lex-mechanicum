@@ -138,9 +138,9 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | V1 | PASS | AUTO · fired: drive (32 solids) · brushless pancake motor Ø50 x 18 under the base; the oscillating input is motorised through a crank and link (V5) |
 | V2 | PASS | AUTO · fired: drive (32 solids) · one flange for the motor, screwed up into the base from inside; nothing of the drive shows on top of the base |
 | V3 | PASS | AUTO / HAND · fired: drive (32 solids) · motor, flange, crank, link and lever laid out clear of the feet, the housings and the base hardware (A15: 0 clashes over 72 phases) |
-| V4 | PASS | AUTO · fired: j8-belt (no solids) · no belt in an oscillating drive; drive detail: crank clamped on the motor shaft's flat, bushings in the link, circlips on both pins, lever keyed and set-screwed on the input shaft |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · no belt in an oscillating drive; drive detail: crank clamped on the motor shaft's flat, bushings in the link, circlips on both pins, lever keyed or set-screwed on the input shaft |
 | V5 | PASS | AUTO · fired: drive (32 solids) · oscillating: the motor turns a 8.6 mm crank, a 44.7 mm link swings a lever keyed on the input shaft's low end through exactly the modelled 62.9° (dead centres at the ends of the swing); the crank belongs to the drive |
-| V6 | PASS | AUTO · fired: drive (32 solids), cable-clip (5 solids) · home flag on the input lever's hub, fork sensor on a post under the base, motor and sensor leads to a terminal block, cable clips under the base |
+| V6 | PASS | AUTO · fired: drive (32 solids), cable-clip (5 solids) · home flag on the input lever's hub, fork sensor on a post, motor and sensor leads to a terminal block, cable clips |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
 | L3 | PASS | HAND · roles right on every solid (both sheets) |
@@ -154,7 +154,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 22.3 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 22.5 KB · package v2 written at build time |
 | R5 | PASS | HAND · the polish states only exceptions, no sampling |
 | R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -169,7 +169,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | PASS | package v2 written, 22.3 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q3 | PASS | package v2 written, 22.5 KB; site build not checked here · package v2 written; site builds (npm run build) |
 | Q4 | PASS | local: tools/shot · dist/shots3/<id>: record view, PLAN, FRONT, SIDE, ISOMETRIC, full explode, both sheets |
 | Q5 | PASS | local: tools/bench · tools/bench run: dist/bench/report-v2.md |
 | Q6 | PASS | every row judged |
@@ -181,7 +181,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | A | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | B | J3 | – | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| O2 | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 10 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 5 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | O4 | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | O2-rocker-in-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | O4-rocker-out-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
@@ -213,5 +213,5 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.3 KB
+check: clean · K1 residual: 4.3e-14 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.5 KB
 screenshots: dist/shots3/double-rocker (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)
