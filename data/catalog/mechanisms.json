@@ -12486,7 +12486,7 @@
           {
             "id": "handle",
             "joint": "O",
-            "kind": "oscillating",
+            "kind": "manual",
             "range": [
               -70,
               3
@@ -12574,7 +12574,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and the issue's decision to add a workpiece block at the pad, which the plunger meets at the toggle (engine hardware). The plunger is traced with equal-time ticks every 5 degrees of handle, which bunch near the dead-centre line: the plunger almost stops while the handle still turns, which is the force gain. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep, with the workpiece block. The handle is an oscillating hand lever over -70 to +3 degrees (a manual driver never moves in the cycle). The plunger carries an adjustable spindle with a pad that meets the workpiece at dead centre; the slide's front end stop is dropped because the linkage limits the travel there (polish exception)."
+          "note": "Applies the 2026-10-19 review (keep) and the issue's decision to add a workpiece block at the pad, which the plunger meets at the toggle (engine hardware). The plunger is traced with equal-time ticks every 5 degrees of handle, which bunch near the dead-centre line: the plunger almost stops while the handle still turns, which is the force gain. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep, with the workpiece block. The handle is a hand lever worked over -70 to +3 degrees: a manual driver whose lo and hi give the hand's stroke, which the cycle works through; no motor (standard V5, the toggle clamp playbook), a knob on the handle and the stop past dead centre. The plunger carries an adjustable spindle with a pad that meets the workpiece at dead centre; the slide's front end stop is dropped because the linkage limits the travel there (polish exception)."
         },
         "principle": [
           {

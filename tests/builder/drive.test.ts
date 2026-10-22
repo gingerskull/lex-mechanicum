@@ -24,7 +24,9 @@ const get = (ctx: BuildCtx, id: string): Solid3 => {
   if (!s) throw new Error(`no solid ${id}`);
   return s;
 };
-const flat = (a: Vec3, b: Vec3): number => Math.hypot(a[0] - b[0], a[1] - b[1]);
+/** Distance in the plane normal to the drive's axis. */
+let axis: Vec3 = [0, 0, 1];
+const flat = (a: Vec3, b: Vec3): number => v3.len(v3.perp(v3.sub(a, b), axis));
 
 /** The crank and the link at 72 phases: the crank throw and the link length kept, one turn of the crank per cycle. */
 function crankAndLink(ctx: BuildCtx): void {
@@ -33,18 +35,23 @@ function crankAndLink(ctx: BuildCtx): void {
   expect(crank.part).toBe("crank");
   expect(link.part).toBe("link");
   const end = get(ctx, "drive-link-b1");
+  axis = crank.axis;
+  // the link's far pin rides the input's lever, or a step-up's sector
+  const lever = (X: ReturnType<typeof xf.id>, u: number) => (crank.step ? driveXf({ ...crank, part: "sector" }, X, u) : X);
   let turn = 0;
   let prev = NaN;
   for (let k = 0; k <= 72; k++) {
     const u = (k / 72) * Math.PI * 2;
     const X = ctx.K.pose(u).bodies.get(crank.input)!;
-    const T = xf.apply(X, crank.tip);
+    const T = xf.apply(lever(X, u), crank.tip);
     const C = xf.apply(driveXf(crank, X, u), crank.pin);
     expect(flat(C, crank.motor)).toBeCloseTo(crank.r, 6);
     expect(flat(C, T)).toBeCloseTo(crank.L, 6);
     // the link's far bushing stays on the lever's pin
     expect(flat(xf.apply(driveXf(link, X, u), end.frame.o), T)).toBeLessThan(1e-6);
-    const a = Math.atan2(C[1] - crank.motor[1], C[0] - crank.motor[0]);
+    const e = v3.unit(v3.perp(v3.sub(crank.pin, crank.motor), axis));
+    const f = v3.cross(axis, e);
+    const a = Math.atan2(v3.dot(v3.sub(C, crank.motor), f), v3.dot(v3.sub(C, crank.motor), e));
     if (k) {
       let d = a - prev;
       while (d > Math.PI) d -= 2 * Math.PI;
@@ -56,7 +63,7 @@ function crankAndLink(ctx: BuildCtx): void {
   expect(Math.abs(turn)).toBeCloseTo(2 * Math.PI, 3);
   // a dead centre at each end of the swing (u = 0 and u = π: the driver at its range's ends)
   for (const u of [0, Math.PI]) {
-    const T = xf.apply(ctx.K.pose(u).bodies.get(crank.input)!, crank.tip);
+    const T = xf.apply(lever(ctx.K.pose(u).bodies.get(crank.input)!, u), crank.tip);
     const D = flat(T, crank.motor);
     expect(Math.min(Math.abs(D - (crank.L + crank.r)), Math.abs(D - (crank.L - crank.r)))).toBeLessThan(1e-6);
   }
@@ -85,9 +92,42 @@ describe("drive: oscillating input on a shaft", () => {
   });
 });
 
+describe("drive: oscillating input, wider swings and shafts in plan", () => {
+  it("steps a swing wider than a crank and link can give through a gear sector meshed with a pinion on the input", async () => {
+    const ctx = await build("lever-escapement");
+    expect(ctx.issues.filter((i) => i.startsWith("drive"))).toEqual([]);
+    const crank = get(ctx, "drive-crank").drive!;
+    expect(crank.step?.ratio).toBeGreaterThan(1);
+    expect(get(ctx, "drive-sector").drive?.part).toBe("sector");
+    expect(get(ctx, "drive-pinion").body).toBe(crank.input);
+    // the sector turns against the pinion by the ratio
+    for (let k = 0; k < 72; k++) {
+      const u = (k / 72) * Math.PI * 2;
+      const P = ctx.K.pose(u);
+      // only where the input's turn reads without wrapping
+      if (Math.abs(P.values.input! - crank.step!.def) > 120) continue;
+      const X = P.bodies.get(crank.input)!;
+      const input = xf.angleAbout(X, crank.axis);
+      const sector = xf.angleAbout(driveXf({ ...crank, part: "sector" }, X, u), crank.axis);
+      expect(sector * crank.step!.ratio + input).toBeCloseTo(0, 6);
+    }
+    crankAndLink(ctx);
+  });
+
+  it("drives a shaft in plan from a motor on an angle bracket, its axis along the shaft", async () => {
+    const ctx = await build("anchor-escapement");
+    expect(ctx.issues.filter((i) => i.startsWith("drive"))).toEqual([]);
+    const crank = get(ctx, "drive-crank").drive!;
+    expect(Math.abs(crank.axis[2])).toBeLessThan(1e-9);
+    for (const id of ["drive-bracket", "drive-bracket-foot", "drive-motor", "drive-lever", "drive-sensor-post"]) get(ctx, id);
+    crankAndLink(ctx);
+  });
+});
+
 describe("drive: oscillating compliant lever (J13)", () => {
   it("drives a pin in the lever's tip through an arc slot in the base, the motor on the line of the tip's chord", async () => {
     const ctx = await build("kin:compliantLever");
+    axis = [0, 0, 1];
     expect(ctx.issues.filter((i) => i.startsWith("drive"))).toEqual([]);
     const crank = get(ctx, "drive-crank").drive!;
     expect(get(ctx, "drive-tip-pin").body).toBe(crank.input);
@@ -134,6 +174,16 @@ describe("drive: linear input", () => {
 });
 
 describe("drive: manual input", () => {
+  it("works a hand stroke (a manual driver with lo and hi) through its range, with a knob and no motor", async () => {
+    const ctx = await build("toggle-clamp");
+    const d = ctx.kin.drivers.find((x) => x.id === "handle")!;
+    expect(d.kind).toBe("manual");
+    expect(ctx.K.pose(0).values.handle).toBeCloseTo(d.lo!, 6);
+    expect(ctx.K.pose(Math.PI).values.handle).toBeCloseTo(d.hi!, 6);
+    expect(ctx.solids.some((s) => s.kind === "motor")).toBe(false);
+    expect(get(ctx, "drive-knob").body).toBe("handle");
+  });
+
   it("builds no motor for a hand-worked input, a knob on each input instead", async () => {
     const ctx = await build("five-bar");
     expect(ctx.solids.some((s) => s.kind === "motor")).toBe(false);

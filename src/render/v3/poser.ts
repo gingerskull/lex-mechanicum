@@ -5,7 +5,7 @@
 import { frameAxis } from "../../core/axis";
 import { poseOf } from "../../model/pose";
 import type { MechanismModel } from "../../model/types";
-import { Kinematics, anchorAt } from "../../kin/compose";
+import { Kinematics, anchorAt, handStroke } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
 import { fiveBarFK } from "../../kin/blocks/linkage";
@@ -151,7 +151,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       return X ? fromXf(X) : null;
     },
     sweep: (point, range, branches) => {
-      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
+      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating" || handStroke(x));
       if (!d) return null;
       const lo = range?.[0] ?? d.range?.[0] ?? 0;
       const hi = range?.[1] ?? d.range?.[1] ?? 360;
