@@ -41,6 +41,13 @@ describe("mergeSources", () => {
     expect(problems).toEqual(['rw2.json: b waives unknown "x"']);
   });
 
+  it("sets the origin from an origin patch file", () => {
+    const origin = { date: "1781-10-25", precision: "day", note: "patent" };
+    const { records, problems } = mergeSources([...files, { name: "origin.json", json: { c: { origin } } }]);
+    expect(problems).toEqual([]);
+    expect(records[2]!.origin).toEqual(origin);
+  });
+
   it("does not change its input", () => {
     const before = JSON.stringify(files);
     mergeSources(files);

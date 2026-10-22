@@ -74,7 +74,8 @@ Use plain prose in text fields (no em-dashes; use commas or "to"). Units: mm, de
   "examples": [ { "use": "short real-world use", "detail": "where/how, 1 sentence" } ],
   "references": [ { "title": "...", "url": "https://...", "kind": "ONE of wikipedia|textbook|kmoddl|paper|standard|patent|museum|engineering-guide|calculator" } ],
   "media": [ { "title": "...", "url": "https://...", "kind": "ONE of video|photos|animation|interactive" } ],
-  "related": ["ids of related mechanisms (from the master list below)"]
+  "related": ["ids of related mechanisms (from the master list below)"],
+  "origin": { "date": "1781-10-25", "precision": "day | year | period", "note": "what the date is. Source: https://..." }
 }
 ```
 
@@ -350,6 +351,20 @@ prose. Anything a number in that prose depends on is a `teaching.claims` entry. 
 - The vocabularies of the facets are unchanged. The new vocabularies are the joint types, block names, shape types,
   overlay kinds and view names above.
 
+## Origin date
+
+`origin` is the date of the mechanism's invention, its first patent or the earliest verifiable use or description,
+whichever is earliest and can be found. It lives in the patch file `sources/origin.json` (keyed by id, `{ "origin":
+{...} }`), which `npm run catalog` merges into each record; the validator fails a record without one.
+
+- `date`: `YYYY-MM-DD` with a four-digit year. Years before the year 1 are negative (`-0250-12-16` is in 250 BC);
+  there is no year 0.
+- `precision`: `day` when the full date is known; `year` when only the year is known; `period` when only a period is
+  known (for example "3rd century BC"), with a best-guess year in it. For `year` and `period` the month and day come
+  from the id (`fillDate` in `src/catalog/origin.ts`), so a rerun gives the same date and the validator can check it.
+- `note`: what the date is and its source URL, or "Best guess:" and why where nothing solid was found. A `period`
+  note names the period.
+
 ## LINKS MUST BE REAL
 
 Every URL must come from a WebSearch result or a page you successfully fetched with WebFetch in this session.
@@ -399,6 +414,8 @@ APPLICATION (1-4): Automotive, Machine tools, Robotics, Clocks & watches, Packag
   Agriculture, Printing & textiles, Film & optics, Steam & engines, Railways, Toys & kinetic art, Medical,
   Consumer products, Construction & lifting, Marine, Instruments, Energy, Education
 
+PRECISION (origin.precision): day, year, period
+
 ## Master list (ids, for "related")
 
 four-bar, slider-crank, scotch-yoke, oscillating-cylinder, double-crank, double-rocker, parallelogram-linkage,
@@ -430,6 +447,6 @@ the validator rejects any other link here. Each video is found by search and con
 answers with the title) before it is added. Where nothing solid is found the list stays empty and the page shows no
 "In the real world" section: no video is better than a wrong one.
 Patch files sources/rw*.json (and gap*.json) are merged by `npm run catalog` (tools/catalog.ts): their `media`,
-`references` and `real_world` entries are added by URL. Where research found fewer media or references than the
+`references` and `real_world` entries are added by URL; sources/origin.json sets `origin` (see "Origin date"). Where research found fewer media or references than the
 minimum allows, the patch entry says so with `"waive": ["media"]` (or `"references"`) and a `note`; the validator
 then skips that count for the record.

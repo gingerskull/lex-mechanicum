@@ -23,6 +23,10 @@ describe("the real catalogue", () => {
     }
   });
 
+  it("gives every record an origin date from sources/origin.json", () => {
+    for (const r of catalog.mechanisms) expect(r.origin?.date, r.id).toMatch(/^-?\d{4}-\d{2}-\d{2}$/);
+  });
+
   it("matches the committed mechanisms.json byte for byte (run npm run catalog if not)", () => {
     expect(serializeCatalog(catalog)).toBe(committed);
   });

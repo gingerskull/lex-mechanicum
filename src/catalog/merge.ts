@@ -1,4 +1,4 @@
-import { WAIVABLE, type CatalogRecord, type Waivable } from "./schema";
+import { WAIVABLE, type CatalogRecord, type Origin, type Waivable } from "./schema";
 
 export interface SourceFile {
   name: string;
@@ -6,7 +6,7 @@ export interface SourceFile {
 }
 
 const BATCH = /^b\d+\.json$/;
-const PATCH = /^(gap|rw|v3).*\.json$/;
+const PATCH = /^(gap|rw|v3|origin).*\.json$/;
 const V3_PATCH = /^v3.*\.json$/;
 const PATCH_KEYS = ["media", "references", "real_world"] as const;
 
@@ -15,8 +15,9 @@ const isObject = (x: unknown): x is Record<string, unknown> => typeof x === "obj
 
 /**
  * Merges the catalogue sources into one record list. Batch files (`b*.json`, arrays of records) are concatenated in
- * name order; patch files (`gap*.json`, `rw*.json`, objects keyed by id) add `media`, `references` and `real_world`
- * entries whose URL the record does not have yet, and may `waive` minimum counts research could not meet. `related` keeps known ids only and `motion.label` is derived.
+ * name order; patch files (`gap*.json`, `rw*.json`, `origin*.json`, objects keyed by id) add `media`, `references` and
+ * `real_world` entries whose URL the record does not have yet, may `waive` minimum counts research could not meet, and
+ * set the `origin` date. `related` keeps known ids only and `motion.label` is derived.
  * Problems are reported, never thrown. Shapes inside records are checked by `validate`.
  */
 /** Replaces an existing value at a dotted path (`explain.motion`, `motion.axes`); false when the path is missing. */
@@ -78,6 +79,7 @@ export function mergeSources(files: SourceFile[]): { records: CatalogRecord[]; p
         const list = (r[key] ??= []) as { url: string }[];
         for (const x of add as { url: string }[]) if (!list.some((y) => y.url === x.url)) list.push(x);
       }
+      if (patch.origin !== undefined) r.origin = patch.origin as Origin;
       if (patch.waive !== undefined) {
         const waive = Array.isArray(patch.waive) ? (patch.waive as unknown[]) : [patch.waive];
         for (const w of waive) {
