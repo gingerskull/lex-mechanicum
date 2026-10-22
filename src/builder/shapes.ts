@@ -7,7 +7,7 @@ import { bevel, bevelOutline } from "../core/spatial";
 import type { Kin, KinBody } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
-import type { Profile } from "../solids/types";
+import type { Feature, Profile } from "../solids/types";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 import { spokes } from "../hardware/primitives";
@@ -35,7 +35,11 @@ export interface BodyGeom {
    */
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
-  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; revolve?: boolean }[];
+  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; revolve?: boolean; features?: Feature[] }[];
+  /** The own part is a solid of revolution about the frame's z (a ball, a cage), its profile in (r, z). */
+  revolve?: boolean;
+  /** Cuts and additions to the own part (a cage's windows), in its frame. */
+  features?: Feature[];
   /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
   plan?: Vec2[];
 }
@@ -190,7 +194,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // partner, a governor's arm beside the spindle head), instead of a slab of the placement solver
     const axial = typeof shape.axial === "number" ? shape.axial : undefined;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(axial !== undefined ? { exact: { offset: axial } } : g.exact || fixed ? { exact: { offset: 0 } } : {}) };
-    out.set(b.id, withBars(withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? spatialLink(S, geom) ?? geom)));
+    out.set(b.id, withBars(withBall(universal(kin, S, b, geom) ?? cylinder(b, geom) ?? spatialLink(S, geom) ?? spherical(kin, S, b, geom) ?? geom)));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -427,4 +431,104 @@ function withBars(g: BodyGeom): BodyGeom {
     return { id: `${g.id}-bar${k}`, name: "", frame: { o: v3.add(g.frame.o, v3.mul(g.frame.z, z0)), x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: z1 - z0 };
   });
   return { ...g, pieces: [...(g.pieces ?? []), ...pieces] };
+}
+
+/** Points of an arc in (r, z) about (0, zc), radius R, from angle a0 to a1 (radians, from the +r axis toward +z). */
+function arcRZ(R: number, zc: number, a0: number, a1: number, n = 24): Vec2[] {
+  return Array.from({ length: n + 1 }, (_, i) => {
+    const a = a0 + ((a1 - a0) * i) / n;
+    return [Math.max(0, R * Math.cos(a)), zc + R * Math.sin(a)] as Vec2;
+  });
+}
+
+/** A ball's swept track in a race or bell: a tube along a meridian arc of radius rp about the centre, in the body's frame. */
+function grooveCut(sJ: number, rp: number, rb: number, phase: number, span: number): Feature {
+  const path: Vec3[] = [];
+  const c = Math.cos(phase * D2R);
+  const s = Math.sin(phase * D2R);
+  for (let i = 0; i <= 24; i++) {
+    const a = -span + (2 * span * i) / 24;
+    const r = rp * Math.cos(a);
+    path.push([r * c, r * s, sJ + rp * Math.sin(a)]);
+  }
+  return { mode: "cut", profile: { outer: circle(rb, 0, 0, 24), holes: [] }, op: { op: "sweep", path }, frame: { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] } };
+}
+
+/**
+ * The parts of a ball-and-groove constant-velocity joint (a Rzeppa), all solids of revolution about the body's axis:
+ * `ball` (diameter), `race` (the inner race: a spherical band of `sphere` radius, `width` wide, with `grooves` meridian
+ * grooves for balls of `ballDiameter` on a pitch radius `pitch`, at `phases` about its axis from its frame's x, on a
+ * keyed hub), `bell` (the outer race: a cup whose spherical cavity of `sphere` radius holds the cage, grooved likewise),
+ * and `cage` (a spherical band between `inner` and `outer`, `width` wide, with a window at each ball it holds). `center`
+ * names the joint at the joint's centre.
+ */
+function spherical(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const sh = g.shape;
+  const type = String(sh.type);
+  if (!["ball", "race", "bell", "cage"].includes(type)) return null;
+  if (type === "ball") return { ...g, profile: ballProfile(num(sh.diameter, 16) / 2, 32), thick: 0, revolve: true, exact: { offset: 0 }, approx: false };
+  const cj = typeof sh.center === "string" ? S.joints.get(sh.center) : undefined;
+  const J = cj?.at ?? g.frame.o;
+  const sJ = v3.dot(v3.sub(J, g.frame.o), g.frame.z);
+  const rb = num(sh.ballDiameter, 16) / 2 + 0.2;
+  const rp = num(sh.pitch, 25);
+  const phases = (Array.isArray(sh.phases) ? sh.phases : []) as number[];
+  if (type === "cage") {
+    const ri = num(sh.inner, 24.5);
+    const ro = num(sh.outer, 32.5);
+    const w = num(sh.width, 22) / 2;
+    const ai = Math.asin(w / ri);
+    const ao = Math.asin(w / ro);
+    const outer: Vec2[] = [...arcRZ(ro, 0, -ao, ao), ...arcRZ(ri, 0, ai, -ai)];
+    // a window at each ball the cage holds (its planar joints), through the band
+    const [ww, wh] = pair(sh.window, [18, 16.4]);
+    const features: Feature[] = kin.joints
+      .filter((j) => (j.a === b.id || j.b === b.id) && j.type === "planar")
+      .map((j) => {
+        const p = v3.sub(S.joints.get(j.id)!.at, g.frame.o);
+        const yv = v3.cross(g.frame.z, g.frame.x);
+        const u = v3.unit([v3.dot(p, g.frame.x), v3.dot(p, yv), 0]);
+        return { mode: "cut" as const, profile: { outer: roundRect(-wh / 2, -ww / 2, wh / 2, ww / 2, 2), holes: [] }, op: { op: "extrude" as const, h: ro + 6 - (ri - 6), steps: 1 }, frame: { o: v3.mul(u, ri - 6), x: [0, 0, 1] as Vec3, z: u } };
+      });
+    return { ...g, profile: { outer, holes: [] }, thick: 0, revolve: true, features, exact: { offset: 0 }, approx: false };
+  }
+  const R = num(sh.sphere, type === "race" ? 24 : 33);
+  const grooves = phases.map((ph) => grooveCut(sJ, rp, rb, ph, 45 * D2R));
+  const hubR = num(sh.hub, 13);
+  const hubL = 14;
+  if (type === "race") {
+    const w = num(sh.width, 24) / 2;
+    const a = Math.asin(w / R);
+    const band: Vec2[] = [[0, sJ - w], ...arcRZ(R, sJ, -a, a), [0, sJ + w]];
+    // the hub sits behind the band, toward the frame's origin (the race's own shaft end)
+    const dir = sJ >= 0 ? 1 : -1;
+    const h0 = sJ - dir * (w + hubL);
+    return {
+      ...g,
+      profile: { outer: circle(hubR, 0, 0, 36), holes: [] },
+      thick: hubL,
+      exact: { offset: Math.min(h0, h0 + dir * hubL) },
+      approx: false,
+      pieces: [{ id: `${b.id}-race`, name: "", frame: { o: g.frame.o, x: g.frame.x, z: g.frame.z }, profile: { outer: band, holes: [] }, h: 0, revolve: true, features: grooves }],
+    };
+  }
+  // the bell: its mouth toward the inner race (toward the frame's... the side away from its own shaft), its back closed
+  const Ro = num(sh.outer, 42);
+  const dir = sJ <= 0 ? 1 : -1; // from the centre toward the bell's back (its shaft)
+  const mouth = num(sh.mouth, 16);
+  const back = num(sh.back, 22);
+  const zM = sJ - dir * mouth;
+  const zB = sJ + dir * (back + 8);
+  const aM = -Math.asin(mouth / R);
+  const aB = Math.asin(back / R);
+  const cav = arcRZ(R, 0, aB, aM).map(([r, z]): Vec2 => [r, sJ + dir * (z - 0)]);
+  const outer: Vec2[] = [[Ro, zM], [Ro, zB], [0, zB], [0, sJ + dir * back], ...cav];
+  return {
+    ...g,
+    profile: { outer: circle(hubR + 1, 0, 0, 36), holes: [] },
+    thick: hubL,
+    exact: { offset: Math.min(zB, zB + dir * hubL) },
+    approx: false,
+    pieces: [{ id: `${b.id}-bell`, name: "", frame: { o: g.frame.o, x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: 0, revolve: true, features: grooves }],
+  };
 }

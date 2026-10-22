@@ -5,7 +5,7 @@ export const KIN_VOCAB = {
   bodyRole: ["ground", "driver", "link", "output", "slider", "gear", "cam", "follower", "pawl", "spring", "belt", "frame"],
   shape: [
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
-    "rope", "cage", "cross", "tracer", "cylinder", "piston", "custom", "spatial-link",
+    "rope", "cage", "cross", "tracer", "cylinder", "piston", "custom", "spatial-link", "ball", "race", "bell",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [

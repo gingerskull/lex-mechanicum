@@ -77,6 +77,7 @@ export const KITS: Record<KitId, Kit> = {
   trunnion: mk("trunnion", "Cylinder trunnion in a port face", ["J1"], ["slider-dyad"], "trunnion", ["shaft", "bushing", "thrustWasher", "spring", "nut", "washer"], own, pinZone("the port face")),
   "piston-bore": mk("piston-bore", "Piston in its bore", ["J5"], ["slider-dyad"], "piston-bore", ["wearStrip"], own, pinZone("the bore")),
   "ball-socket": mk("ball-socket", "Ball end in a socket", ["J3"], ["plane-slide"], "ball-socket", ["bushing"], own, pinZone("the ball")),
+  "sphere-fit": mk("sphere-fit", "Spherical fit of a cage", ["J3"], ["rzeppa"], "ball-socket", ["bushing"], own, pinZone("the spherical fit")),
   slipper: mk("slipper", "Slipper on a plate face", ["J7"], ["plane-slide"], "ball-socket", ["bushing"], own, pinZone("the slipper face")),
   "groove-cam": mk("groove-cam", "Groove cam", ["J7"], ["cam"], "groove-cam", ["roller", "shaft", "wearStrip", "felt"], normalOf, runZone("the roller in the groove")),
 };

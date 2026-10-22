@@ -2621,11 +2621,21 @@
           "role": "driver",
           "accent": true,
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "spherical band of radius 24, 30 mm wide, with 6 meridian grooves for 16 mm balls, on a 20 mm shaft 100 mm long",
-            "grooves": 6,
-            "sphere": 24
+            "type": "race",
+            "center": "F1",
+            "sphere": 24,
+            "width": 24,
+            "pitch": 25,
+            "ballDiameter": 16,
+            "phases": [
+              90,
+              150,
+              210,
+              270,
+              330,
+              30
+            ],
+            "hub": 13
           },
           "at": {
             "joint": "B1"
@@ -2636,11 +2646,21 @@
           "id": "outer",
           "role": "output",
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "bell with an inner sphere of radius 33 and 6 meridian grooves, on a 24 mm shaft 100 mm long",
-            "grooves": 6,
-            "sphere": 33
+            "type": "bell",
+            "center": "F2",
+            "sphere": 33,
+            "outer": 42,
+            "pitch": 25,
+            "ballDiameter": 16,
+            "phases": [
+              90,
+              150,
+              210,
+              270,
+              330,
+              30
+            ],
+            "hub": 14
           },
           "at": {
             "joint": "B2"
@@ -2655,10 +2675,9 @@
             "inner": 24.5,
             "outer": 32.5,
             "width": 22,
-            "windows": 6,
             "window": [
-              17,
-              16
+              18,
+              16.4
             ]
           },
           "frame": {
@@ -2683,9 +2702,7 @@
           "id": "ball-1",
           "role": "link",
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "sphere of diameter 16",
+            "type": "ball",
             "diameter": 16
           },
           "frame": {
@@ -2710,9 +2727,7 @@
           "id": "ball-2",
           "role": "link",
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "sphere of diameter 16",
+            "type": "ball",
             "diameter": 16
           },
           "frame": {
@@ -2737,9 +2752,7 @@
           "id": "ball-3",
           "role": "link",
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "sphere of diameter 16",
+            "type": "ball",
             "diameter": 16
           },
           "frame": {
@@ -2764,9 +2777,7 @@
           "id": "ball-4",
           "role": "link",
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "sphere of diameter 16",
+            "type": "ball",
             "diameter": 16
           },
           "frame": {
@@ -2791,9 +2802,7 @@
           "id": "ball-5",
           "role": "link",
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "sphere of diameter 16",
+            "type": "ball",
             "diameter": 16
           },
           "frame": {
@@ -2818,9 +2827,7 @@
           "id": "ball-6",
           "role": "link",
           "shape": {
-            "type": "custom",
-            "op": "revolve",
-            "profile": "sphere of diameter 16",
+            "type": "ball",
             "diameter": 16
           },
           "frame": {
@@ -3383,7 +3390,10 @@
           "tol": 0.05
         }
       ],
-      "exceptions": []
+      "exceptions": [],
+      "seeThrough": [
+        "outer"
+      ]
     },
     "edit": {
       "topology.notes": "ground, inner race with shaft, outer race (bell) with shaft, cage, 6 balls; each ball contacts an inner groove, an outer groove and a cage window (18 higher pairs); cage to races are spherical sliding fits. The joint count (Kutzbach, 20) is not the mobility: each ball contact is counted as a point contact, while the groove holds the ball centre on a line, and each ball's spin is an idle freedom; the six balls with the two spherical fits overconstrain the cage. The true mobility is 1, solved in closed form by the homokinetic block.",

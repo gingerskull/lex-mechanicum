@@ -11,7 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore", "ball-socket", "slipper",
+  "cross-pin", "trunnion", "piston-bore", "ball-socket", "slipper", "sphere-fit",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -69,6 +69,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (ground && j.type === "revolute" && (a?.shape?.type === "cylinder" || b?.shape?.type === "cylinder")) return "trunnion";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
       if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
+      // a cage's spherical faces on a race and in a bell (a constant-velocity joint)
+      if (!ground && j.type === "spherical" && [a, b].some((x) => x?.shape?.type === "cage") && [a, b].some((x) => x?.shape?.type === "race" || x?.shape?.type === "bell")) return "sphere-fit";
       // a ball end in a slipper's socket (a swash plate's piston)
       if (!ground && j.type === "spherical" && (a?.shape?.ball || b?.shape?.ball)) return "ball-socket";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
