@@ -1944,7 +1944,10 @@
             "face": 20,
             "helix": 5.71,
             "hand": "right",
-            "throat": true,
+            "throat": {
+              "centre": 60,
+              "radius": 12
+            },
             "bore": 14.4
           },
           "at": {
@@ -1995,11 +1998,26 @@
             -45,
             20
           ],
-          "z1": 1,
-          "z2": 30,
-          "crossed": 90,
-          "form": "worm",
-          "note": "the wheel's mid-plane on the worm's axis"
+          "crossed": true,
+          "note": "the wheel's mid-plane on the worm's axis; signed about each body's own axis: a positive worm turn about +x turns the wheel by -1/30 about +z",
+          "za": 1,
+          "zb": 30,
+          "ratio": -0.03333333333333333,
+          "axis2": [
+            0,
+            0,
+            1
+          ],
+          "cb": [
+            0,
+            0,
+            20
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
         }
       ],
       "params": [
@@ -2092,18 +2110,12 @@
             "M"
           ],
           "in": {
-            "a": "worm",
-            "b": "wheel",
-            "za": "starts",
-            "zb": 30,
-            "m": "m",
-            "q": "q"
+            "joint": "M",
+            "input": "input"
           },
-          "opts": {
-            "form": "worm",
-            "hand": "right"
-          },
-          "out": "wheel-turn"
+          "out": {
+            "angle": "wheel-turn"
+          }
         }
       ],
       "points": [
@@ -2111,8 +2123,8 @@
           "id": "Tw",
           "body": "wheel",
           "local": [
+            45,
             0,
-            -45,
             0
           ]
         },
@@ -2146,7 +2158,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review of the 0.36.0 build (six phases, wheel 12° per worm turn, ratio 1/30 exact, lead angle 5.71°, centre distance 60): the motion is right, but the text's self-locking did not follow from its own numbers (lead angle 5.71° is above the 3.65° friction angle of mu 0.06); it holds at rest, where mu is about 0.12 (7.28°), and the text now says so and why the lock fails under vibration. Decided (issue #215): open in the auxiliary view down the worm's axis, where the worm is end-on, the wheel's axis a line 60 mm away and the throated rim wraps the worm, so the crossing without meeting reads; a section on the wheel's mid-plane, where the thread works on the teeth like a rack; a pitch point traced on the worm (seen whole in the default view) and one on the wheel, ticked every 90° of worm, so one worm turn moves the wheel one tooth. A design control gives two starts: 15:1 and no lock."
+        "note": "Review of the 0.36.0 build (six phases, wheel 12° per worm turn, ratio 1/30 exact, lead angle 5.71°, centre distance 60): the motion is right, but the text's self-locking did not follow from its own numbers (lead angle 5.71° is above the 3.65° friction angle of mu 0.06); it holds at rest, where mu is about 0.12 (7.28°), and the text now says so and why the lock fails under vibration. Decided (issue #215): open in the auxiliary view down the worm's axis, where the worm is end-on, the wheel's axis a line 60 mm away and the throated rim wraps the worm, so the crossing without meeting reads; a section on the wheel's mid-plane, where the thread works on the teeth like a rack; a pitch point traced on the worm (seen whole in the default view) and one on the wheel, ticked every 90° of worm, so one worm turn moves the wheel one tooth. A design control gives two starts: 15:1 and no lock. Rebuild R4 (#215): built on v3 from this record: an Archimedean worm (its square section turned along the lead, a loft) and a throated wheel (teeth at the lead angle reaching round the worm, a loft), the worm's axis on the wheel's mid-plane; the mesh joint in the block's form (axis, axis2, ratio -1/30); the wheel's point in its own frame; the claim of one tooth per worm turn read as the wheel's range over a turn. The starts control is not offered (it changes the built worm and wheel). The six phases and the section read as decided."
       },
       "principle": [
         {
@@ -2226,11 +2238,6 @@
           "id": "input",
           "kind": "driver",
           "driver": "input"
-        },
-        {
-          "id": "starts",
-          "kind": "design",
-          "design": "starts"
         }
       ],
       "plot": {
@@ -2249,9 +2256,8 @@
         {
           "text": "each worm turn advances the wheel by one tooth (12°)",
           "output": "wheel-angle",
-          "stat": "at",
-          "at": 360,
-          "value": -12,
+          "stat": "range",
+          "value": 12,
           "tol": 0.05
         }
       ],

@@ -3,7 +3,7 @@
 // written in the joint's own coordinates (z along the axis) and placed on the axis frame, so the same code serves a z
 // joint and a tilted one. A support selector chooses housing, pillow block, bridge, or a stub or hung axle from where
 // the sweeps leave room and what the load needs; the router (src/builder/router.ts) places the support.
-import { circle } from "../core/geom";
+import { circle, roundRect } from "../core/geom";
 import { H } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { SHOULDER_BOLTS, circlipExt, circlipInt, headD, headH, innerRingD, keyFor, shoulderLength, threadFor, type Bearing } from "../hardware/tables";
@@ -164,7 +164,11 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   keyedSeats.forEach((s, i) => {
     const nm = `${id}-k${i}`;
     if (kf) {
-      L.add(H.key(`${nm}-key`, kf.b, Math.max(8, s.m.w1 - s.m.w0 + 4), { body: s.m.body, at: [d / 2 - kf.t1 + kf.h / 2 - 0.4, 0, 0], z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kf.h }));
+      // the key lies along the shaft in its keyway: its section (h radial by b across) on the stack's plane, its length
+      // along the axis through the keyed part
+      const kL = Math.max(8, s.m.w1 - s.m.w0 - 1);
+      const kx = d / 2 - kf.t1 + kf.h / 2;
+      L.add(H.key(`${nm}-key`, kf.b, kL, { body: s.m.body, outer: roundRect(kx - kf.h / 2, -kf.b / 2, kx + kf.h / 2, kf.b / 2, 0.4), z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kL }));
       serve("F3", `${nm}-key`);
     }
     if (endHeld) return;

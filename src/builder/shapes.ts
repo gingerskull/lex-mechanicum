@@ -3,7 +3,7 @@
 // whose shape is a profile of its own (cam, cage, cross, custom) gets the disc or box that holds its joints, flagged
 // `approx`, until the pilots (P) and the rebuild (R) give it a profile of its own.
 import { D2R, TAU, capsule, circle, gearOutline, rackOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
-import { bevel, bevelOutline } from "../core/spatial";
+import { bevel, bevelOutline, wormSection } from "../core/spatial";
 import type { Kin, KinBody, KinJoint } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, v3 } from "../kin/math";
@@ -78,7 +78,7 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean; exactOffset?: number } {
   const g = outlineOf0(shape, role, pins);
   // holes the record names on a disc or a plate ([x, y, r] in the body's frame): a port face's ports
   if (Array.isArray(shape.holes) && (shape.type === "disc" || shape.type === "plate"))
@@ -86,7 +86,7 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
   return g;
 }
 
-function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean } {
+function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean; exactOffset?: number } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -138,6 +138,7 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
         const bv = bevel(z, m, shape.cone * D2R, num(shape.face, 0) || undefined);
         return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
       }
+      if (shape.form === "worm" || shape.form === "worm wheel") return wormShape(shape, z, m);
       if (typeof shape.helix === "number" && shape.helix !== 0 && Array.isArray(shape.hand)) {
         // a herringbone (double-helical) gear: two halves of opposite hand meeting in a V across a relief groove cut to
         // the root circle; a loft of sections every few millimetres so each half's twist stays true
@@ -151,8 +152,8 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
         const t = (sense * w * Math.tan(beta)) / rp;
         const base = gearOutline(z, mt);
         const rf = rp - 1.25 * mt - 0.4;
-        // a loft's hole rings wind clockwise
-        const bore = [hole(num(shape.bore, 6) / 2).reverse()];
+        // the bore is the stack's, cut into every section
+        const bore: Vec2[][] = [];
         const ring = (a: number, groove = false): Vec2[] =>
           rot(base, a).map(([x, y]): Vec2 => {
             const r = Math.hypot(x, y);
@@ -238,7 +239,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.loft ? { loft: g.loft } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.loft ? { loft: g.loft } : {}), ...(g.exact || fixed ? { exact: { offset: g.exactOffset ?? 0 } } : {}) };
     const levels = clusterLevels(shape, pins);
     if (levels.length) geom.levels = levels;
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
@@ -320,6 +321,42 @@ export function meshLevel(g: BodyGeom | undefined, j: { a: string; b: string; za
 
 /** The placer's name for a body's k-th cluster level. */
 export const levelId = (body: string, k: number): string => (k ? `${body}#${k}` : body);
+
+/**
+ * A worm (`form: "worm"`, `z` starts, `module` axial, `pitchDiameter`, `face` its length) or its wheel
+ * (`form: "worm wheel"`, `z` teeth, `helix` the worm's lead angle, `throat: { centre, radius }` the worm's axis distance
+ * and the throat's radius about it), both as lofts centred on their joint: the worm's square section turned by its lead
+ * along its length (right hand counter-clockwise), the wheel's teeth turned by the lead angle across its face and
+ * reaching up round the worm in the throat. Their bores are the stack's, cut into every section.
+ */
+function wormShape(shape: Record<string, unknown>, z: number, m: number): { profile: Profile; thick: number; approx: boolean; loft: LoftSection[]; exact: boolean; exactOffset: number } {
+  const sense = shape.hand === "left" ? -1 : 1;
+  const L = num(shape.face, 20);
+  const sections: LoftSection[] = [];
+  if (shape.form === "worm") {
+    const d1 = num(shape.pitchDiameter, 10 * m);
+    const lead = Math.PI * m * z;
+    const s0 = wormSection(m, z, d1, 72);
+    const turn = (sense * 2 * Math.PI * L) / lead;
+    const n = Math.max(2, Math.ceil(Math.abs(turn) / (12 * D2R)));
+    for (let i = 1; i <= n; i++) sections.push({ z: (L * i) / n, outer: rot(s0, (turn * i) / n), holes: [] });
+    return { profile: { outer: s0, holes: [] }, thick: L, approx: false, loft: sections, exact: true, exactOffset: -L / 2 };
+  }
+  const rp = (z * m) / 2;
+  const lam = num(shape.helix, 5) * D2R;
+  const th = (shape.throat ?? {}) as Record<string, unknown>;
+  const a = num(th.centre, 0);
+  const R = num(th.radius, 0);
+  const n = Math.max(4, Math.round(L));
+  const ring = (dz: number): Vec2[] => {
+    // the tips follow the throat round the worm: higher toward the faces, up to 1.6 modules
+    const rt = a > 0 && R > Math.abs(dz) ? a - Math.sqrt(R * R - dz * dz) : rp + m;
+    const ad = Math.max(1, Math.min(1.6, (rt - rp) / m));
+    return rot(gearOutline(z, m, ad), (sense * dz * Math.tan(lam)) / rp);
+  };
+  for (let i = 1; i <= n; i++) sections.push({ z: (L * i) / n, outer: ring((L * i) / n - L / 2), holes: [] });
+  return { profile: { outer: ring(-L / 2), holes: [] }, thick: L, approx: false, loft: sections, exact: true, exactOffset: -L / 2 };
+}
 
 /** Angle wrapped into [-h, h) for a period 2h. */
 const wrapTo = (a: number, h: number): number => a - 2 * h * Math.floor((a + h) / (2 * h));

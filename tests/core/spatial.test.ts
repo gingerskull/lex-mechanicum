@@ -18,6 +18,7 @@ import {
   transversePressure,
   trapezoidal,
   travel,
+  wormSection,
   twist,
   worm,
 } from "../../src/core/spatial";
@@ -129,5 +130,17 @@ describe("screws", () => {
     expect(t.d2).toBeCloseTo(5.350, 3);
     expect(t.d3).toBeCloseTo(4.773, 3);
     expect(t.D1).toBeCloseTo(4.917, 3);
+  });
+
+  it("wormSection: an Archimedean worm's square section, tip on its tooth's centre, root opposite (m 3, one start, d1 30)", () => {
+    const pts = wormSection(3, 1, 30, 96);
+    const r = pts.map(([x, y]) => Math.hypot(x, y));
+    expect(r[0]).toBeCloseTo(18, 9);
+    expect(r[48]).toBeCloseTo(11.25, 9);
+    expect(Math.max(...r)).toBeCloseTo(18, 9);
+    expect(Math.min(...r)).toBeCloseTo(11.25, 9);
+    // the flanks: 20 deg in the axial section, 6.75 mm deep, so each spans 6.75 tan 20 of the 9.42 mm lead
+    const ramp = r.filter((x) => x > 11.26 && x < 17.99).length / 2;
+    expect(ramp / 96).toBeCloseTo((6.75 * Math.tan(20 * D2R)) / (Math.PI * 3), 1);
   });
 });

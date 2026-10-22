@@ -48,6 +48,14 @@ export async function buildAssembly(rec: RecordLike, opts: BuildOpts & { rules?:
 /** The bodies' own parts join the solids, with their bores. */
 function finalize(ctx: BuildCtx): void {
   ctx.rule = "placement";
+  // a loft's sections take the holes cut into its profile since (its bore, a ring's index holes), section for section
+  for (const p of ctx.parts.values()) {
+    if (p.op.op !== "loft") continue;
+    const own = p.op.sections[0]!.holes.length;
+    const extra = p.profile.holes.slice(own);
+    if (!extra.length) continue;
+    p.op = { op: "loft", sections: p.op.sections.map((s, i) => (i === 0 ? { z: s.z, outer: p.profile.outer, holes: p.profile.holes } : { z: s.z, outer: s.outer, holes: [...s.holes, ...extra] })) };
+  }
   for (const p of ctx.parts.values()) ctx.add(p);
   for (const t of ctx.twins.values()) ctx.add(t);
   for (const l of ctx.levels.values()) ctx.add(l);
