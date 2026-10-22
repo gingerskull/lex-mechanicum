@@ -564,7 +564,9 @@ const pawlTooth = contactRule({
   build(ctx, c) {
     const id = c.id;
     const pawl = [c.a, c.b].find((b) => { const r = ctx.kin.bodies.find((q) => q.id === b)?.role; return r === "pawl" || r === "spring"; }) ?? c.a;
-    const pivot = ctx.joints.find((j) => j.joint.type === "revolute" && (j.a === pawl || j.b === pawl) && (j.a === "ground" || j.b === "ground"));
+    // the pawl's pivot: on the ground (a holding pawl, a jumper) or on the body that carries it (a driving pawl on a lever)
+    const pivot = ctx.joints.find((j) => j.joint.type === "revolute" && (j.a === pawl || j.b === pawl) && ![c.a, c.b].includes(j.a === pawl ? j.b : j.a));
+    const carrier = pivot ? (pivot.a === pawl ? pivot.b : pivot.a) : "ground";
     const ex = ctx.extent(pawl);
     if (!pivot || !ex) return { note: `${titleOf(id)}: pawl on a tooth.` };
     const z = pivot.axis;
@@ -576,7 +578,7 @@ const pawlTooth = contactRule({
     const d = stack?.d ?? 4;
     // the coil sits on the pawl's boss, round the pin's head
     const D = d + 9;
-    L.add(H.spring(`${id}-spring`, "torsion", { body: "ground", D, wire: 0.8, z0: top + 0.3, z1: top + 3.3, name: `Torsion spring Ø${D}, wire 0.8: holds the pawl on the teeth` }));
+    L.add(H.spring(`${id}-spring`, "torsion", { body: carrier, D, wire: 0.8, z0: top + 0.3, z1: top + 3.3, name: `Torsion spring Ø${D}, wire 0.8: holds the pawl on the teeth` }));
     ctx.add(L.out());
     return { serves: { F6: [`${id}-spring`] }, note: `${titleOf(id)}: pawl on a tooth; a torsion spring round its pivot holds it on the teeth.` };
   },

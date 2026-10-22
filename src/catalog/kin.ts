@@ -5,7 +5,7 @@ export const KIN_VOCAB = {
   bodyRole: ["ground", "driver", "link", "output", "slider", "gear", "cam", "follower", "pawl", "spring", "belt", "frame"],
   shape: [
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
-    "rope", "cage", "cross", "tracer", "cylinder", "piston", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star",
+    "rope", "cage", "cross", "tracer", "cylinder", "piston", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
@@ -16,7 +16,7 @@ export const KIN_VOCAB = {
   driver: ["rotary", "oscillating", "linear", "manual", "select"],
   block: [
     "dyad", "slider-dyad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
-    "flexure", "escapement", "rocker", "indexer", "star",
+    "flexure", "escapement", "rocker", "indexer", "star", "ratchet",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

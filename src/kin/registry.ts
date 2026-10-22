@@ -9,7 +9,7 @@ import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from 
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
 import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
-import { genevaAngle, genevaInternalAngle, simulateEscapement, simulateStar, type EscapementSpec, type StarSpec } from "./blocks/timed";
+import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscapement, simulateStar, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
   const o = step.out;
@@ -543,6 +543,47 @@ const starBlock: BlockFn = (c, s) => {
   outVal(c, s, jum, "jumper");
 };
 
+/**
+ * ratchet (a lever ratchet with a driving pawl on the lever and a holding pawl on the ground): in: input (the lever's
+ * angle, deg, an oscillating driver from `lo`), lo, lost (deg of lost motion before the pawl meets a face), wheel (body),
+ * wheelJoint, the sawtooth (n, root, tip, face, back, tip0: see blocks/timed sawOutline), pawls ([{ body, joint (its
+ * pivot), tip (a point at its tip at rest), carrier (the body its pivot rides, "ground" or the lever), carrierJoint,
+ * swing (deg either side of its line at rest) }]). The wheel steps one pitch per forward stroke; each pawl rides the teeth
+ * where its spring holds it. out {wheel}: the wheel's turn (deg).
+ */
+const ratchetBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const spec: RatchetSpec = { n: c.num(i.n), root: c.num(i.root), tip: c.num(i.tip), face: c.num(i.face), back: c.num(i.back), tip0: c.num(i.tip0) };
+  const W = c.jointAt(str(i.wheelJoint, "ratchet.wheelJoint"));
+  const lever = c.num(i.input);
+  const lo = c.num(i.lo);
+  const pitch = 360 / spec.n;
+  // the driver's own phase (deg): the cycle may start part way through the stroke
+  const ph = c.num(i.phase ?? 0) * D2R;
+  const turn = (u: number, lv: number) => ratchetWheel(u + ph, lv, lo, c.num(i.lost), pitch) - ratchetWheel(ph, lo, lo, c.num(i.lost), pitch);
+  const w = c.delta("wheel", turn(c.u, lever) * D2R);
+  spin(c, str(i.wheel, "ratchet.wheel"), W, [0, 0, 1], w);
+  outVal(c, s, w * R2D, "wheel");
+  const local = (p: Vec3): [number, number] => [p[0] - W[0], p[1] - W[1]];
+  for (const pw of (i.pawls as Record<string, unknown>[] | undefined) ?? []) {
+    const body = str(pw.body, "ratchet.pawls.body");
+    const jp = str(pw.joint, "ratchet.pawls.joint");
+    const P0 = c.jointAt(jp);
+    const T0 = c.refPt(str(pw.tip, "ratchet.pawls.tip"));
+    const arm = Math.hypot(T0[0] - P0[0], T0[1] - P0[1]);
+    const line0 = Math.atan2(T0[1] - P0[1], T0[0] - P0[0]);
+    const carrier = (pw.carrier as string | undefined) ?? "ground";
+    const Xc = carrier === "ground" ? xf.id() : c.xf(carrier);
+    const P = xf.apply(Xc, P0);
+    const cTurn = carrier === "ground" ? 0 : xf.angleAbout(Xc, [0, 0, 1]);
+    const sw = c.num(pw.swing ?? 25);
+    const ride = (ww: number, pv: [number, number], base: number) => rideAngle(sawOutline(spec, ww), pv, arm, 0, [(base - sw * D2R) * R2D, (base + sw * D2R) * R2D], [0, 0]);
+    const a = ride(w, local(P), line0 + cTurn);
+    // the record's tip point is where the tip rests at the reference, so the reference pose is the identity
+    c.setXf(body, xf.mul(xf.rotAbout(P, [0, 0, 1], a - line0 - cTurn), Xc));
+  }
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -627,6 +668,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   cam: camBlock,
   rocker: rockerBlock,
   star: starBlock,
+  ratchet: ratchetBlock,
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,

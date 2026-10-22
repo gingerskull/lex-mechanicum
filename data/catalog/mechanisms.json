@@ -60381,19 +60381,14 @@
               "rect": [
                 180,
                 200
-              ],
-              "center": [
-                10,
-                30,
-                -10
               ]
             },
             "at": {
               "frame": {
                 "origin": [
-                  0,
-                  0,
-                  0
+                  -90,
+                  -70,
+                  -10
                 ]
               }
             }
@@ -60401,22 +60396,24 @@
           {
             "id": "wheel",
             "role": "output",
+            "symmetry": 12,
             "shape": {
-              "type": "custom",
-              "op": "extrude",
+              "type": "ratchetWheel",
+              "n": 12,
+              "root": 50,
+              "tip": 62,
+              "face": 3,
+              "back": 27,
+              "tip0": 29.24,
               "thickness": 8,
-              "profile": {
-                "kind": "sawtooth",
-                "teeth": 12,
-                "root": 50,
-                "tip": 62,
-                "faceSpan": 3,
-                "backSpan": 27,
-                "note": "steep face over 3 degrees of wheel angle, back slope over the other 27"
-              }
+              "bore": 12
             },
-            "at": {
-              "joint": "OW"
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
             }
           },
           {
@@ -60426,10 +60423,9 @@
               "type": "link",
               "length": 128,
               "boss": [
-                12,
+                14,
                 8
-              ],
-              "plates": 2
+              ]
             },
             "at": {
               "joint": "OL"
@@ -60439,16 +60435,187 @@
             "id": "pawl",
             "role": "pawl",
             "shape": {
-              "type": "custom",
-              "op": "extrude",
-              "thickness": 8,
-              "profile": {
-                "kind": "pawl",
-                "length": 56,
-                "boss": 9,
-                "bevel": 32,
-                "note": "solid beak: a round boss, a full arm bowed outside the tip circle, a finger whose front edge lies along the steep face"
-              }
+              "type": "plate",
+              "exact": true,
+              "fillet": 0.6,
+              "outline": [
+                [
+                  56,
+                  0
+                ],
+                [
+                  59.031,
+                  -13.595
+                ],
+                [
+                  59.128,
+                  -15.092
+                ],
+                [
+                  59.225,
+                  -16.588
+                ],
+                [
+                  59.322,
+                  -18.085
+                ],
+                [
+                  59.419,
+                  -19.582
+                ],
+                [
+                  59.516,
+                  -21.079
+                ],
+                [
+                  59.612,
+                  -22.576
+                ],
+                [
+                  54.159,
+                  -23.566
+                ],
+                [
+                  48.587,
+                  -24.15
+                ],
+                [
+                  42.924,
+                  -24.315
+                ],
+                [
+                  37.205,
+                  -24.051
+                ],
+                [
+                  31.461,
+                  -23.351
+                ],
+                [
+                  25.726,
+                  -22.209
+                ],
+                [
+                  20.033,
+                  -20.624
+                ],
+                [
+                  14.419,
+                  -18.595
+                ],
+                [
+                  8.916,
+                  -16.126
+                ],
+                [
+                  3.56,
+                  -13.222
+                ],
+                [
+                  -1.615,
+                  -9.892
+                ],
+                [
+                  -6.574,
+                  -6.147
+                ],
+                [
+                  -7.941,
+                  -4.236
+                ],
+                [
+                  -8.767,
+                  -2.036
+                ],
+                [
+                  -8.995,
+                  0.302
+                ],
+                [
+                  -8.61,
+                  2.62
+                ],
+                [
+                  -7.639,
+                  4.759
+                ],
+                [
+                  -6.147,
+                  6.574
+                ],
+                [
+                  -4.236,
+                  7.941
+                ],
+                [
+                  -2.036,
+                  8.767
+                ],
+                [
+                  0.302,
+                  8.995
+                ],
+                [
+                  2.62,
+                  8.61
+                ],
+                [
+                  4.759,
+                  7.639
+                ],
+                [
+                  6.574,
+                  6.147
+                ],
+                [
+                  9.311,
+                  3.419
+                ],
+                [
+                  12.202,
+                  0.857
+                ],
+                [
+                  15.237,
+                  -1.531
+                ],
+                [
+                  18.392,
+                  -3.757
+                ],
+                [
+                  21.672,
+                  -5.793
+                ],
+                [
+                  25.065,
+                  -7.635
+                ],
+                [
+                  28.561,
+                  -9.275
+                ],
+                [
+                  32.146,
+                  -10.708
+                ],
+                [
+                  35.809,
+                  -11.928
+                ],
+                [
+                  39.537,
+                  -12.933
+                ],
+                [
+                  43.317,
+                  -13.717
+                ],
+                [
+                  47.137,
+                  -14.28
+                ]
+              ]
             },
             "at": {
               "joint": "D"
@@ -60458,15 +60625,187 @@
             "id": "holdPawl",
             "role": "pawl",
             "shape": {
-              "type": "custom",
-              "op": "extrude",
-              "thickness": 8,
-              "profile": {
-                "kind": "pawl",
-                "length": 56,
-                "boss": 9,
-                "bevel": 32
-              }
+              "type": "plate",
+              "exact": true,
+              "fillet": 0.6,
+              "outline": [
+                [
+                  56,
+                  0
+                ],
+                [
+                  58.725,
+                  -14.934
+                ],
+                [
+                  58.789,
+                  -16.433
+                ],
+                [
+                  58.852,
+                  -17.932
+                ],
+                [
+                  58.915,
+                  -19.43
+                ],
+                [
+                  58.978,
+                  -20.929
+                ],
+                [
+                  59.041,
+                  -22.428
+                ],
+                [
+                  59.104,
+                  -23.926
+                ],
+                [
+                  53.629,
+                  -24.794
+                ],
+                [
+                  48.042,
+                  -25.252
+                ],
+                [
+                  42.376,
+                  -25.289
+                ],
+                [
+                  36.662,
+                  -24.896
+                ],
+                [
+                  30.934,
+                  -24.065
+                ],
+                [
+                  25.224,
+                  -22.794
+                ],
+                [
+                  19.567,
+                  -21.079
+                ],
+                [
+                  13.998,
+                  -18.923
+                ],
+                [
+                  8.551,
+                  -16.328
+                ],
+                [
+                  3.261,
+                  -13.302
+                ],
+                [
+                  -1.838,
+                  -9.854
+                ],
+                [
+                  -6.712,
+                  -5.995
+                ],
+                [
+                  -8.035,
+                  -4.054
+                ],
+                [
+                  -8.811,
+                  -1.836
+                ],
+                [
+                  -8.986,
+                  0.507
+                ],
+                [
+                  -8.548,
+                  2.815
+                ],
+                [
+                  -7.528,
+                  4.932
+                ],
+                [
+                  -5.995,
+                  6.712
+                ],
+                [
+                  -4.054,
+                  8.035
+                ],
+                [
+                  -1.836,
+                  8.811
+                ],
+                [
+                  0.507,
+                  8.986
+                ],
+                [
+                  2.815,
+                  8.548
+                ],
+                [
+                  4.932,
+                  7.528
+                ],
+                [
+                  6.712,
+                  5.995
+                ],
+                [
+                  9.388,
+                  3.205
+                ],
+                [
+                  12.221,
+                  0.576
+                ],
+                [
+                  15.202,
+                  -1.881
+                ],
+                [
+                  18.307,
+                  -4.178
+                ],
+                [
+                  21.541,
+                  -6.289
+                ],
+                [
+                  24.894,
+                  -8.208
+                ],
+                [
+                  28.352,
+                  -9.927
+                ],
+                [
+                  31.906,
+                  -11.441
+                ],
+                [
+                  35.541,
+                  -12.745
+                ],
+                [
+                  39.247,
+                  -13.833
+                ],
+                [
+                  43.01,
+                  -14.703
+                ],
+                [
+                  46.818,
+                  -15.352
+                ]
+              ]
             },
             "at": {
               "joint": "H"
@@ -60508,7 +60847,8 @@
             "limits": [
               62,
               98
-            ]
+            ],
+            "note": "the lever swings on the wheel's own axis"
           },
           {
             "id": "D",
@@ -60516,8 +60856,8 @@
             "a": "lever",
             "b": "pawl",
             "at": [
-              35.24,
-              66.28,
+              35.2432302,
+              66.2828758,
               0
             ],
             "axis": [
@@ -60532,31 +60872,53 @@
             "a": "ground",
             "b": "holdPawl",
             "at": [
-              63.66,
-              -39.78,
+              69.603692,
+              -28.121717,
               0
             ],
             "axis": [
               0,
               0,
               1
-            ]
+            ],
+            "support": "stub",
+            "note": "at -22 degrees on the pawl radius, so the holding pawl seats at a root at rest (the review's -32 left it 10 degrees up a back slope)"
           },
           {
             "id": "T1",
             "type": "cam-contact",
             "a": "pawl",
             "b": "wheel",
-            "at": "TD",
-            "follower": "knife"
+            "at": [
+              -17.7297281,
+              48.1206709,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "follower": "knife",
+            "note": "the driving pawl's tip; 6 degrees up a back slope at rest (the lost motion)"
           },
           {
             "id": "T2",
             "type": "cam-contact",
             "a": "holdPawl",
             "b": "wheel",
-            "at": "TH",
-            "follower": "knife"
+            "at": [
+              44.8537614,
+              22.1121455,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "follower": "knife",
+            "note": "the holding pawl's tip, seated at a root"
           }
         ],
         "params": [
@@ -60613,68 +60975,55 @@
             ],
             "lo": 62,
             "hi": 98,
-            "default": 62
+            "default": 62,
+            "phase": 48.19,
+            "note": "the cycle starts as the pawl meets a face, after the 6 degrees of lost motion"
           }
         ],
         "solve": [
           {
-            "block": "cam",
+            "block": "ratchet",
             "id": "index",
             "joints": [
               "OW",
-              "T1"
-            ],
-            "in": {
-              "cam": "wheel",
-              "lever": "lever",
-              "pawl": "pawl",
-              "root": "rRoot",
-              "tip": "rTip",
-              "Lp": "Lp",
-              "Rp": "Rp"
-            },
-            "opts": {
-              "law": "push one pitch on the forward stroke after 6 degrees of lost motion, hold on the return",
-              "teeth": 12
-            },
-            "out": "wheel-turn"
-          },
-          {
-            "block": "cam",
-            "id": "drive-pawl",
-            "joints": [
-              "D"
-            ],
-            "in": {
-              "cam": "wheel",
-              "angle": "wheel-turn",
-              "follower": "pawl",
-              "pivot": "D",
-              "length": "Lp"
-            },
-            "opts": {
-              "follower": "oscillating knife on a moving pivot, sprung onto the wheel"
-            },
-            "out": "pawl-angle"
-          },
-          {
-            "block": "cam",
-            "id": "hold-pawl",
-            "joints": [
+              "D",
               "H",
+              "T1",
               "T2"
             ],
             "in": {
-              "cam": "wheel",
-              "angle": "wheel-turn",
-              "follower": "holdPawl",
-              "pivot": "H",
-              "length": "Lp"
+              "input": "input",
+              "lo": 62,
+              "lost": 6,
+              "phase": 48.19,
+              "wheel": "wheel",
+              "wheelJoint": "OW",
+              "n": 12,
+              "root": "rRoot",
+              "tip": "rTip",
+              "face": 3,
+              "back": 27,
+              "tip0": 29.24,
+              "pawls": [
+                {
+                  "body": "pawl",
+                  "joint": "D",
+                  "tip": "TD",
+                  "carrier": "lever",
+                  "swing": 25
+                },
+                {
+                  "body": "holdPawl",
+                  "joint": "H",
+                  "tip": "TH",
+                  "carrier": "ground",
+                  "swing": 25
+                }
+              ]
             },
-            "opts": {
-              "follower": "oscillating knife, sprung onto the wheel"
-            },
-            "out": "hold-angle"
+            "out": {
+              "wheel": "wheel-angle"
+            }
           }
         ],
         "points": [
@@ -60749,7 +61098,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep): lever, both pawls and the sawtooth wheel read in plan, the wheel steps one tooth per stroke and stays on the return while the holding pawl clicks over the teeth. Solider pawl shapes are a build matter. The root circle and the pawl line, tangent to it at engagement, are drawn as construction."
+          "note": "Applies the 2026-10-19 review (keep): lever, both pawls and the sawtooth wheel read in plan, the wheel steps one tooth per stroke and stays on the return while the holding pawl clicks over the teeth. Solider pawl shapes are a build matter. The root circle and the pawl line, tangent to it at engagement, are drawn as construction. Rebuild R5 (#216): built on v3. A new library block `ratchet` steps the wheel one pitch per forward stroke after 6 degrees of lost motion and holds it on the return; both pawls ride the sawtooth where their springs hold them (the shared ride solver). The holding pawl's pivot moved from -32 to -22 degrees on the same radius: at -32 its tip rested 10 degrees up a back slope and never seated; now it seats at a root. Solider pawls: a round boss, a full arm and a pointed beak; torsion springs round the pivots."
         },
         "principle": [
           {
@@ -60835,7 +61184,8 @@
             "output": "wheel-angle",
             "stat": "dwell",
             "value": 228.2,
-            "tol": 0.5
+            "tol": 1,
+            "band": 1e-9
           }
         ],
         "exceptions": []

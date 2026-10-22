@@ -233,45 +233,8 @@ export function simulateStar(s: StarSpec, step = 0.05): { star: Float64Array; pu
     }
     return hi;
   };
-  // the jumper's roller: over the arm's swing (`swing`, deg about the pivot, from the world x), the angle that brings the
-  // roller nearest the star's centre while it stays outside the outline: where its spring holds it
-  const J = s.jumper;
-  const [g0, g1] = s.swing.map((v) => (v * Math.PI) / 180) as [number, number];
-  const roll = (psi: number): number => {
-    const poly = starOutline(s, (psi * Math.PI) / 180);
-    const at = (a: number): [number, number] => [J[0] + s.arm * Math.cos(a), J[1] + s.arm * Math.sin(a)];
-    const d = (a: number) => polyDist(poly, ...at(a)) - s.roller;
-    const r = (a: number) => Math.hypot(at(a)[0] - s.c[0], at(a)[1] - s.c[1]);
-    const N = 400;
-    let best = NaN;
-    let bestR = Infinity;
-    for (let k = 0; k <= N; k++) {
-      const a = g0 + ((g1 - g0) * k) / N;
-      if (d(a) >= 0 && r(a) < bestR) {
-        bestR = r(a);
-        best = a;
-      }
-    }
-    if (!Number.isFinite(best)) throw new Error("star wheel: the jumper's roller finds no place on the star");
-    // refine toward the infeasible neighbour, where the roller touches
-    const h = (g1 - g0) / N;
-    for (const dir of [1, -1]) {
-      const b = best + dir * h;
-      if ((dir > 0 ? b > g1 : b < g0) || d(b) >= 0) continue;
-      let lo = best;
-      let hi = b;
-      for (let k = 0; k < 50; k++) {
-        const m = (lo + hi) / 2;
-        if (d(m) >= 0) lo = m;
-        else hi = m;
-      }
-      if (r(lo) < bestR) {
-        best = lo;
-        bestR = r(lo);
-      }
-    }
-    return best;
-  };
+  // the jumper's roller rides the star where its spring holds it
+  const roll = (psi: number): number => rideAngle(starOutline(s, (psi * Math.PI) / 180), s.jumper, s.arm, s.roller, s.swing, s.c);
   let psi = 0;
   let fing = 0;
   let snapAt = -1;
@@ -301,4 +264,84 @@ export function simulateStar(s: StarSpec, step = 0.05): { star: Float64Array; pu
   const j0 = jumper[0]!;
   for (let i = 0; i <= n; i++) jumper[i] = ((jumper[i]! - j0) * 180) / Math.PI;
   return { star, push, jumper, step, crest };
+}
+
+/**
+ * Where a sprung arm (a jumper, a pawl) rests on an outline: over its swing (`swing`, deg about the pivot from the world
+ * x), the angle (radians) that brings its roller (radius `roller`, 0 for a knife edge) nearest the outline's `centre`
+ * while it stays outside the outline: the spring presses it in until it touches.
+ */
+export function rideAngle(poly: [number, number][], pivot: readonly [number, number] | readonly number[], arm: number, roller: number, swing: readonly number[], centre: readonly number[]): number {
+  const g0 = (swing[0]! * Math.PI) / 180;
+  const g1 = (swing[1]! * Math.PI) / 180;
+  const at = (a: number): [number, number] => [pivot[0]! + arm * Math.cos(a), pivot[1]! + arm * Math.sin(a)];
+  const d = (a: number) => polyDist(poly, ...at(a)) - roller;
+  const r = (a: number) => Math.hypot(at(a)[0] - centre[0]!, at(a)[1] - centre[1]!);
+  const N = 400;
+  let best = NaN;
+  let bestR = Infinity;
+  for (let k = 0; k <= N; k++) {
+    const a = g0 + ((g1 - g0) * k) / N;
+    if (d(a) >= -1e-9 && r(a) < bestR) {
+      bestR = r(a);
+      best = a;
+    }
+  }
+  if (!Number.isFinite(best)) throw new Error("an arm finds no place on its outline within its swing");
+  // refine toward the infeasible neighbour, where it touches
+  const h = (g1 - g0) / N;
+  for (const dir of [1, -1]) {
+    const b = best + dir * h;
+    if ((dir > 0 ? b > g1 : b < g0) || d(b) >= 0) continue;
+    let lo = best;
+    let hi = b;
+    for (let k = 0; k < 50; k++) {
+      const m = (lo + hi) / 2;
+      if (d(m) >= 0) lo = m;
+      else hi = m;
+    }
+    if (r(lo) < bestR) {
+      best = lo;
+      bestR = r(lo);
+    }
+  }
+  return best;
+}
+
+export interface RatchetSpec {
+  n: number;
+  root: number;
+  tip: number;
+  /** The steep face's and the back slope's spans, deg; a tip at `tip0` + k·360/n at rest. */
+  face: number;
+  back: number;
+  tip0: number;
+}
+
+/**
+ * A ratchet wheel's sawtooth outline about the origin, turned counter-clockwise by w (rad): each tooth rises over its
+ * steep face (counter-clockwise, from the root at tip − face to the tip) and falls over its back slope to the next root.
+ */
+export function sawOutline(s: RatchetSpec, w: number): [number, number][] {
+  const out: [number, number][] = [];
+  const p = TAU / s.n;
+  const D = Math.PI / 180;
+  for (let k = 0; k < s.n; k++) {
+    const t = s.tip0 * D + k * p + w;
+    out.push([s.root * Math.cos(t - s.face * D), s.root * Math.sin(t - s.face * D)]);
+    out.push([s.tip * Math.cos(t), s.tip * Math.sin(t)]);
+  }
+  return out;
+}
+
+/**
+ * The wheel of a lever ratchet, over a cycle of the lever (u from 0 to 2π: forward from its low end for u < π, back for
+ * u >= π): after `lost` degrees of lost motion the driving pawl pushes the wheel with the lever, one pitch per stroke;
+ * on the return the wheel rests. Degrees.
+ */
+export function ratchetWheel(u: number, lever: number, lo: number, lost: number, pitch: number): number {
+  const turns = Math.floor(u / TAU);
+  const v = u - turns * TAU;
+  const step = v < Math.PI ? Math.max(0, Math.min(pitch, lever - lo - lost)) : pitch;
+  return turns * pitch + step;
 }
