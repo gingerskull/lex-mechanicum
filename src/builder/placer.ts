@@ -117,8 +117,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
     for (const j of joints) {
       const t = j.joint.type;
-      // (a sheave in its strap, and a block that slides in a moving part's slot, run in that part's plane)
-      const inSlot = t === "prismatic" && j.kit === "J5" && j.a !== "ground" && j.b !== "ground";
+      // (a sheave in its strap, and a block that slides in a moving part's slot, run in that part's plane; a collar on a
+      // turning shaft or a stem in its guide slides along an axis, not in a plane, as the J5 kit builds them)
+      const shaftOf = (b: string) => String(kin.bodies.find((q) => q.id === b)?.shape?.type) === "shaft";
+      const inSlot = t === "prismatic" && j.kit === "J5" && j.a !== "ground" && j.b !== "ground" && !shaftOf(j.a) && !shaftOf(j.b);
       // one compliant blank lies in one plane: its flexures, and the axial give of its pseudo-rigid beams
       const flex = (b: string) => kin.joints.some((q) => q.type === "flexure" && (q.a === b || q.b === b));
       const blank = t === "flexure" || (t === "prismatic" && flex(j.a) && flex(j.b));
