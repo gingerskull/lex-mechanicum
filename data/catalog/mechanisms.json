@@ -2011,7 +2011,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and issue #214. The off-centre disc reads as a crank once the line O-E is drawn and E's small circle is traced: the throw is e, so the travel is 2e. The eccentricity is a control so the link between e and the travel can be tried."
+          "note": "Applies the 2026-10-19 review (keep) and issue #214. The off-centre disc reads as a crank once the line O-E is drawn and E's small circle is traced: the throw is e, so the travel is 2e. The eccentricity was to be a control so the link between e and the travel can be tried; the sheave is built for e = 12, and the control waits on solids that rebuild under a param control."
         },
         "principle": [
           {
@@ -5936,7 +5936,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and issue #214. Kept as the in-line slider-crank, l/r = 3.14 so the uneven slider motion shows. Equal-time ticks on B show the slider covering the far half of the stroke in 161.7 degrees of crank and the near half in 198.3. The rod length is a control so a shorter rod makes the unevenness grow."
+          "note": "Applies the 2026-10-19 review (keep) and issue #214. Kept as the in-line slider-crank, l/r = 3.14 so the uneven slider motion shows. Equal-time ticks on B show the slider covering the far half of the stroke in 161.7 degrees of crank and the near half in 198.3. The rod length was to be a control so a shorter rod makes the unevenness grow; the rod is built at l = 110, and the control waits on solids that rebuild under a param control."
         },
         "principle": [
           {
@@ -23879,7 +23879,7 @@
           {
             "id": "inner-dead-centre",
             "kind": "line",
-            "from": "O",
+            "from": "A",
             "to": "B",
             "pose": {
               "output": "slider-x",
