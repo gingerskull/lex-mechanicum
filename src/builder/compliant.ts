@@ -407,10 +407,11 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
     const ext = ctx.extent(body);
     return ext ? v3.dot(v3.add(ext.frame.o, v3.mul(ext.frame.z, ext.w1)), UP) : ref[2];
   })();
-  D.add(H.shaft(`drive-pin`, { d: pinD, z0: bb - 8, z1: partTop }, { body, at: [px, py, 0], name: `Drive pin Ø${pinD}, pressed into the ${titleOf(body).toLowerCase()}` }));
+  D.add(H.shaft(`drive-pin`, { d: pinD, z0: bb - 8.5, z1: partTop }, { body, at: [px, py, 0], name: `Drive pin Ø${pinD}, pressed into the ${titleOf(body).toLowerCase()}` }));
   // the yoke: clamped on the pin's end, its slot square to the run over the crank's circle
-  const yz0 = bb - 7;
-  const yz1 = bb - 3;
+  // the yoke runs under the lead's clips (bb - 3.2) with clearance
+  const yz0 = bb - 7.5;
+  const yz1 = bb - 3.5;
   const slotHalf = r + pinD / 2 + 1.5;
   const yoke = ccw([[px - 6, py + 6], [px - 6, cy - slotHalf - 5], [px + 6, cy - slotHalf - 5], [px + 6, py + 6]].map(([a, b]): Vec2 => [a!, b!]));
   // a swinging yoke tilts with its part: the slot's clearance takes the tilt over the crank pin's run along it
@@ -440,10 +441,12 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
   D.add(H.shaft(`drive-shaft`, { d: mot.shaft, z0: mz1, z1: cz1 }, { at: [cx, cy, 0], name: `Motor shaft Ø${mot.shaft}` }));
   const plateZ1 = mz0;
   const plateZ0 = mz0 - 4;
-  D.add(H.plate(`drive-plate`, roundRect(cx - mot.R - 14, cy - mot.R - 4, cx + mot.R + 14, cy + mot.R + 4, 4), { kind: "bracket", role: "ground", name: "Motor plate, hung from the base on two standoffs", z0: plateZ0, z1: plateZ1, mat: "Aluminium 6061-T6, anodised" }));
+  // the standoffs stand clear of the yoke's sweep (a long stroke's yoke runs past the motor)
+  const soR = Math.max(mot.R + 8, r + 6 + SENSOR.depth + 0.5 + 6.5);
+  D.add(H.plate(`drive-plate`, roundRect(cx - soR - 6, cy - mot.R - 4, cx + soR + 6, cy + mot.R + 4, 4), { kind: "bracket", role: "ground", name: "Motor plate, hung from the base on two standoffs", z0: plateZ0, z1: plateZ1, mat: "Aluminium 6061-T6, anodised" }));
   for (const [k, s] of [[0, -1], [1, 1]] as const) {
-    D.add(H.standoff(`drive-so${k}`, { at: [cx + s * (mot.R + 8), cy, 0], z0: plateZ1, z1: bb, ...(k ? { name: "" } : {}) }));
-    D.add(H.screw(`drive-sos${k}`, "socket", 5, 10, { at: [cx + s * (mot.R + 8), cy, 0], face: plateZ0, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    D.add(H.standoff(`drive-so${k}`, { at: [cx + s * soR, cy, 0], z0: plateZ1, z1: bb, ...(k ? { name: "" } : {}) }));
+    D.add(H.screw(`drive-sos${k}`, "socket", 5, 10, { at: [cx + s * soR, cy, 0], face: plateZ0, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
   }
   // the fork sensor straddling the flag, on the plate; terminals and a lead under the base
   const sa = Math.atan2(qy - cy, qx - cx) + Math.PI;
@@ -458,7 +461,7 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
   D.add(H.solid(`drive-sensor-back`, { name: "", kind: "sensor", role: "hw", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: fz - SENSOR.slot / 2, z1: fz + SENSOR.slot / 2, group: "drive-sensor" }));
   const post: Vec2 = [cx + (mouth + SENSOR.l - 5) * Math.cos(sa), cy + (mouth + SENSOR.l - 5) * Math.sin(sa)];
   D.add(H.standoff(`drive-sensor-post`, { at: [post[0], post[1], 0], z0: fz + SENSOR.h / 2, z1: bb, name: "Standoff Ø10 under the base, carries the sensor" }));
-  const tb: Vec2 = [cx, cy - mot.R - 16];
+  const tb: Vec2 = [cx, cy - Math.max(mot.R + 16, slotHalf + 18)];
   D.add(H.terminalBlock(`drive-terminals`, 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb }));
   D.add(H.lead(`drive-lead`, [[cx, cy - mot.R + 2], [cx + 3, cy - mot.R - 6], tb], { z0: bb - 2.2, z1: bb - 1.2 }));
   const solids = D.out();

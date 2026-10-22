@@ -55,8 +55,10 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
     const other = kj.a === "ground" ? kj.b : kj.b === "ground" ? kj.a : null;
     if (other && driver.has(j)) out.add(other);
   }
+  const sheave = (b: string) => ctx.kin.joints.some((j) => j.type === "belt" && (j as unknown as Record<string, unknown>).flexible === "rope" && (j.a === b || j.b === b));
   for (const b of site.bodies) {
     const body = ctx.kin.bodies.find((q) => q.id === b);
+    if (sheave(b)) continue;
     if (body && KEYED.has(String(body.shape?.type))) out.add(b);
     if (ctx.kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === b || j.b === b))) out.add(b);
   }

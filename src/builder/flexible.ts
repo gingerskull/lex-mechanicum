@@ -13,7 +13,7 @@ import type { KinJoint } from "../kin/types";
 import { along, distOf, pathLength, type ConveyPath } from "../solids/convey";
 import type { Solid3 } from "../solids/types";
 import type { BuildCtx } from "./ctx";
-import type { Frame } from "./frames";
+import { place, type Frame } from "./frames";
 import { Local, titleOf } from "./lib";
 import type { Rule } from "./rules/types";
 import { worldPoints } from "./sweeps";
@@ -317,6 +317,221 @@ function buildChain(ctx: BuildCtx, j: KinJoint): void {
   });
 }
 
+
+/**
+ * A rope reeved over sheaves (J12, a block and tackle): each part a stretched member between its two points (D9), in the
+ * plane of the sheaves it runs between (a part crossing from one sheave's plane to another's runs midway); each sheave a
+ * core under the rope with a flange either side (the groove); the rope's wraps fixed arcs in the grooves on the side away
+ * from the other block; the dead end on a becket pin with a thimble in a post on the base (F1, F2); the hook on a swivel
+ * under the lower block (F3); a guard round each sheave whose centre stands still keeps the rope in its groove (F2).
+ */
+function buildRope(ctx: BuildCtx, ropes: KinJoint[]): void {
+  if (!ctx.base) return;
+  const out: Solid3[] = [];
+  const sheaves = new Set<string>();
+  for (const j of ropes) for (const b of [j.a, j.b]) if (ctx.geoms.get(b)?.shape.type === "pulley") sheaves.add(b);
+  const midZ = (b: string): number | null => {
+    const z = zRange(ctx, b);
+    return z ? (z[0] + z[1]) / 2 : null;
+  };
+  const rr = (j: KinJoint) => num((j as unknown as Record<string, unknown>).rope, 3.2) / 2;
+  const centre = (b: string): Vec3 => ctx.geoms.get(b)!.frame.o;
+  const pointOf = (id: string): Vec3 | null => ctx.S.refPts.get(id) ?? null;
+  const rope = (id: string, name: string, a: Vec3, b: Vec3, z: number, r: number, ends: [string, string], body: string): Solid3 => {
+    const ring = circle(r, 0, 0, 16);
+    // ends at their sheaves' heights (a part crossing between planes slants): built in the frame it is stretched in;
+    // ends given flat run at the height of the planes they join
+    const flat = a[2] === 0 && b[2] === 0;
+    const x = v3.unit(flat ? v3.sub([b[0], b[1], 0], [a[0], a[1], 0]) : v3.sub(b, a));
+    const up = v3.unit(v3.sub(UP, v3.mul(x, v3.dot(UP, x))));
+    return { id, name, role: "hw", kind: "belt", body, frame: { o: flat ? [a[0], a[1], z] : a, x, z: up }, profile: { outer: ring, holes: [] }, op: { op: "sweep", path: [[0, 0, 0], [1, 0, 0]] }, marks: [], ex: 0, joints: [], detail: "never", flags: {}, mat: "Polyester rope, braided", stretch: ends };
+  };
+  // the sheaves: a core under the rope, a flange each side of it
+  for (const s of sheaves) {
+    const g = ctx.geoms.get(s)!;
+    const part = ctx.parts.get(s);
+    const z = zRange(ctx, s);
+    if (!part || !z) continue;
+    const RS = num(g.shape.diameter, 60) / 2;
+    const RP = num(g.shape.pitchDiameter, 56.8) / 2;
+    const r0 = ropes.reduce((m, j) => Math.max(m, rr(j)), 1.6);
+    const core = RP - r0 - 0.2;
+    part.profile = { outer: circle(core, 0, 0, 72), holes: part.profile.holes };
+    part.name = `${titleOf(s)}, ${2 * RS} mm, grooved for the rope`;
+    const t = Math.min(1.5, (z[1] - z[0] - 2 * r0 - 0.6) / 2);
+    const L = new Local({ o: [g.frame.o[0], g.frame.o[1], 0], x: [1, 0, 0], z: UP }, { joints: [] });
+    for (const [k, a, b] of [[0, z[0], z[0] + t], [1, z[1] - t, z[1]]] as const)
+      L.add(H.solid(`${s}-flange${k}`, { name: "", kind: "part", role: "link", mat: "Aluminium 6061-T6, anodised", outer: circle(RS, 0, 0, 72), holes: [circle(core - 0.01, 0, 0, 72).reverse()], z0: a, z1: b, body: s, group: s }));
+    // an index mark on the top flange, so the turns can be counted
+    const fl = L.list[L.list.length - 1]!;
+    fl.marks.push({ kind: "index", pts: [[RS - 4, 0], [RS - 0.6, 0]] });
+    out.push(...L.out());
+  }
+  // the parts
+  const zOfPart = (j: KinJoint): number => {
+    const zs = [j.a, j.b].map((b) => (sheaves.has(b) ? midZ(b) : null)).filter((x): x is number => x !== null);
+    return zs.reduce((a, b) => a + b, 0) / Math.max(1, zs.length);
+  };
+  for (const j of ropes) {
+    const ends = (j as unknown as Record<string, unknown>).ends as [string, string] | undefined;
+    if (!ends) continue;
+    const a = pointOf(ends[0]);
+    const b = pointOf(ends[1]);
+    if (!a || !b) continue;
+    const z = zOfPart(j);
+    const body = ctx.kin.points?.find((p) => p.id === ends[0])?.body ?? "ground";
+    out.push(rope(`${j.id}-rope`, `Rope, ${titleOf(j.id).toLowerCase()}, Ø${2 * rr(j)} braided polyester`, a, b, z, rr(j), ends, body));
+  }
+  // a rope's end on a moving body (the fall on its carriage): clamped between two jaws on the body's top face, the lower
+  // jaw a post standing from it, so the rope runs in over whatever the body's slide carries at its ends (F1)
+  for (const j of ropes) {
+    const ends = (j as unknown as Record<string, unknown>).ends as [string, string] | undefined;
+    if (!ends) continue;
+    ends.forEach((e, k) => {
+      const pt = ctx.kin.points?.find((p) => p.id === e);
+      const P = pointOf(e);
+      const Q = pointOf(ends[1 - k]!);
+      if (!pt || !P || !Q || pt.body === "ground" || sheaves.has(k ? j.b : j.a)) return;
+      const part = ctx.parts.get(pt.body);
+      if (!part || part.op.op !== "extrude") return;
+      const d = v3.unit([Q[0] - P[0], Q[1] - P[1], 0]);
+      const L = new Local({ o: [P[0], P[1], 0], x: d, z: UP }, { joints: [j.id] });
+      const zE = P[2];
+      const r = rr(j);
+      const body = pt.body;
+      // the jaws stand on the body's own top face
+      const top = part.frame.o[2] + part.op.h;
+      if (zE - r - 0.3 - top < 1) ctx.issues.push(`${j.id}: the rope's end ${e} is ${(zE - top).toFixed(1)} mm over its body's top: no room for the clamp's lower jaw`);
+      L.add(H.solid(`${e}-jaw0`, { name: "Rope clamp: a post on the carriage and a jaw screwed down on the rope's end", kind: "part", role: "link", mat: "Steel, zinc plated", outer: roundRect(-4, -6, 10, 6, 2), z0: top, z1: zE - r - 0.3, body, group: `${e}-clamp` }));
+      L.add(H.solid(`${e}-jaw1`, { name: "", kind: "part", role: "link", mat: "Steel, zinc plated", outer: roundRect(-4, -6, 10, 6, 2), z0: zE + r + 0.3, z1: zE + r + 3.3, body, group: `${e}-clamp` }));
+      for (const [n, y] of [[0, -4], [1, 4]] as const) L.add(H.screw(`${e}-js${n}`, "socket", 3, zE + r + 3.3 - top + 4, { body, at: [3, y, 0], face: zE + r + 3.3, dir: -1, ...(n ? { name: "", qty: 0 } : { qty: 2, name: "Socket screw M3, the jaw down on the rope and the post to the carriage" }) }));
+      out.push(...L.out());
+    });
+  }
+  // the wraps: on each sheave, from where one part leaves to where the next arrives, round the far side
+  for (const s of sheaves) {
+    const c = centre(s);
+    const g = ctx.geoms.get(s)!;
+    const RP = num(g.shape.pitchDiameter, 56.8) / 2;
+    const touching: Vec3[] = [];
+    let toward: Vec3 = [0, 0, 0];
+    for (const j of ropes) {
+      const ends = (j as unknown as Record<string, unknown>).ends as [string, string] | undefined;
+      if (!ends || (j.a !== s && j.b !== s)) continue;
+      ends.forEach((e, k) => {
+        const p = pointOf(e);
+        const other = pointOf(ends[1 - k]!);
+        if (p && other && Math.abs(Math.hypot(p[0] - c[0], p[1] - c[1]) - RP) < 1.5) {
+          touching.push(p);
+          toward = v3.add(toward, v3.unit([other[0] - p[0], other[1] - p[1], 0]));
+        }
+      });
+    }
+    if (touching.length < 2) continue;
+    // the parts leave toward their other ends: the wrap is on the far side
+    const away = v3.mul(v3.unit(toward), -1);
+    const angs = touching.slice(0, 2).map((p) => Math.atan2(p[1] - c[1], p[0] - c[0]));
+    const mid = Math.atan2(away[1], away[0]);
+    // the arc from the first angle to the second that passes the far side
+    let a0 = angs[0]!;
+    let a1 = angs[1]!;
+    const within = (x: number, lo: number, hi: number) => {
+      let t = x - lo;
+      while (t < 0) t += TAU;
+      while (t >= TAU) t -= TAU;
+      return t <= ((hi - lo) % TAU + TAU) % TAU;
+    };
+    if (!within(mid, a0, a1)) [a0, a1] = [a1, a0];
+    while (a1 < a0) a1 += TAU;
+    const z = midZ(s)!;
+    const r = ropes.reduce((m, j) => Math.max(m, rr(j)), 1.6);
+    const path: Vec3[] = [];
+    for (let k = 0; k <= 24; k++) {
+      const t = a0 + ((a1 - a0) * k) / 24;
+      path.push([RP * Math.cos(t), RP * Math.sin(t), 0]);
+    }
+    // the wrap rides what carries the sheave's pin (the lower block, or the ground)
+    const rev = ctx.kin.joints.find((q) => q.type === "revolute" && (q.a === s || q.b === s));
+    const carrier = rev ? (rev.a === s ? rev.b : rev.a) : "ground";
+    out.push({ id: `${s}-wrap`, name: "", role: "hw", kind: "belt", body: carrier, frame: { o: [c[0], c[1], z], x: [1, 0, 0], z: UP }, profile: { outer: circle(r, 0, 0, 16), holes: [] }, op: { op: "sweep", path }, marks: [], ex: 0, joints: [], detail: "never", flags: {}, mat: "Polyester rope, braided" });
+    // a guard round the far side of a sheave that stands still, keeping the rope in its groove
+    if (carrier === "ground") {
+      const RS = num(g.shape.diameter, 60) / 2;
+      const ring: Vec2[] = [];
+      for (let k = 0; k <= 24; k++) ring.push([(RS + 1) * Math.cos(a0 + 0.2 + ((a1 - a0 - 0.4) * k) / 24), (RS + 1) * Math.sin(a0 + 0.2 + ((a1 - a0 - 0.4) * k) / 24)]);
+      for (let k = 24; k >= 0; k--) ring.push([(RS + 3) * Math.cos(a0 + 0.2 + ((a1 - a0 - 0.4) * k) / 24), (RS + 3) * Math.sin(a0 + 0.2 + ((a1 - a0 - 0.4) * k) / 24)]);
+      const zr = zRange(ctx, s)!;
+      out.push({ ...place({ o: [c[0], c[1], 0], x: [1, 0, 0], z: UP }, H.plate(`${s}-guard`, ring, { kind: "bracket", role: "ground", name: "Rope guard round the sheave, keeps the rope in its groove", z0: zr[0], z1: zr[1], mat: "Steel, zinc plated" }))[0]! });
+    }
+  }
+  ctx.add(out);
+}
+
+
+/**
+ * The load's guide (a prismatic joint declared `rod`: a tackle's lower block on its load line): a hook block on a swivel
+ * under the lower block (F3), bushed on a ground rod along the load line that stands out of a block screwed and dowelled
+ * to the base past the hook's travel (F1, F2); the hook block's bushing is the rod's slide.
+ */
+function buildLoadRod(ctx: BuildCtx, j: KinJoint): void {
+  const body = j.a === "ground" ? j.b : j.a;
+  const g = ctx.geoms.get(body);
+  const part = ctx.parts.get(body);
+  const ext = ctx.extent(body);
+  const hook = ctx.kin.points?.find((p) => p.body === body && p.id === "hook");
+  if (!g || !part || !ext || !ctx.base || !hook) return;
+  const axis = v3.unit((j.axis as Vec3 | undefined) ?? [0, 1, 0]);
+  const H0 = ctx.S.refPts.get("hook")!;
+  const along = (ctx.sampled.xfs.get(body) ?? []).map((X) => v3.dot(X.t, axis));
+  const lo = Math.min(0, ...along);
+  const hi = Math.max(0, ...along);
+  const z0 = v3.dot(v3.add(ext.frame.o, v3.mul(ext.frame.z, ext.w0)), UP);
+  const z1 = v3.dot(v3.add(ext.frame.o, v3.mul(ext.frame.z, ext.w1)), UP);
+  const zc = (z0 + z1) / 2;
+  const F: Frame = { o: [H0[0], H0[1], 0], x: axis, z: UP };
+  const L = new Local(F, { joints: [j.id] });
+  // the hook block: on a swivel at the lower block's hook point, reaching sideways to its eye, bushed on the rod, which
+  // runs beside the block along the load's line, clear of it over the whole travel
+  const eyeL = 8;
+  const side = -30;
+  const rodD = 6;
+  const bushD = rodD + 3;
+  const eyeD = bushD + 4;
+  const eyeLen = 20;
+  const sg = Math.sign(side);
+  // the arm, from the swivel to the eye's side
+  L.add(H.plate(`${j.id}-hook`, H.window([[0, 0], [-eyeL, side - sg * (bushD / 2 + 5)]], 4.5), { body, kind: "part", role: "output", name: "Hook block on a swivel, its eye bushed on the guide rod (the load's eye)", z0, z1, mat: "Steel C45, forged" }));
+  L.add(H.solid(`${j.id}-swivel`, { name: "Swivel pin Ø6, the hook turns on it", kind: "shaft", role: "hw", mat: "Steel 42CrMo4", outer: circle(3, 0, 0, 20), z0: z0 - 1, z1: z1 + 1, body }));
+  // the rod: from just past the eye at the top of the travel down to its block on the base
+  const top = -eyeL + hi + 12;
+  const bot = -eyeL + lo - 40;
+  const lat = v3.cross(UP, axis);
+  const rodAt: Vec3 = v3.add([H0[0], H0[1], zc], v3.mul(lat, side));
+  // the eye: a boss along the rod, the bushing pressed in, part of the hook block
+  const E = new Local({ o: v3.add(rodAt, v3.mul(axis, -eyeL - eyeLen / 2)), x: UP, z: axis }, { joints: [j.id] });
+  E.add(H.solid(`${j.id}-eye`, { name: "", kind: "part", role: "output", mat: "Steel C45, forged", outer: circle(eyeD / 2, 0, 0, 32), holes: [circle(bushD / 2, 0, 0, 32).reverse()], z0: 0, z1: eyeLen, body, group: `${j.id}-hook` }));
+  E.add(H.bushing(`${j.id}-bush`, rodD, bushD, { body, z0: 0, z1: eyeLen, name: `Bronze bushing ${rodD} x ${bushD}, runs on the guide rod` }));
+  // a round rod along the axis: a solid of its own frame, its z along the axis
+  const R = new Local({ o: v3.add(rodAt, v3.mul(axis, bot)), x: UP, z: axis }, { joints: [j.id] });
+  R.add(H.shaft(`${j.id}-rod`, { d: rodD, z0: 0, z1: top - bot }, { name: `Guide rod Ø${rodD}, ground, on the load's line` }));
+  // the rod's block on the base: the rod pressed in and pinned
+  const bt = ctx.base.top;
+  const B = new Local({ o: [0, 0, 0], x: [1, 0, 0], z: UP }, { joints: [j.id] });
+  const P0 = v3.add([rodAt[0], rodAt[1], 0], v3.mul(axis, bot + 12));
+  const e = axis;
+  const f = v3.cross(UP, e);
+  const corner = (u: number, w: number): Vec2 => [P0[0] + e[0] * u + f[0] * w, P0[1] + e[1] * u + f[1] * w];
+  B.add(H.plate(`${j.id}-rodblock`, [corner(-12, -11), corner(12, -11), corner(12, 11), corner(-12, 11)], { kind: "bracket", role: "ground", name: "Rod block, screwed and dowelled to the base, the rod pressed in", z0: bt, z1: zc + rodD / 2 + 5, mat: "Steel C45" }));
+  for (const [k, u] of [[0, -6], [1, 6]] as const) {
+    const c = corner(u, 7);
+    const d = corner(u, -7);
+    B.add(H.screw(`${j.id}-rbs${k}`, "socket", 4, 10, { at: [c[0], c[1], 0], face: bt - 8, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    B.add(H.dowel(`${j.id}-rbd${k}`, 4, { at: [d[0], d[1], 0], z0: bt - 5, z1: bt + 6, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø4 h6, rod block to base", qty: 2 }) }));
+  }
+  ctx.add([...L.out(), ...E.out(), ...R.out(), ...B.out()]);
+  ctx.note({ id: j.id, kit: "J5", at: ctx.S.joints.get(j.id)!.at, title: `J5 · ${titleOf(j.id)}`, note: `${titleOf(j.id)}: the lower block hangs on its rope parts; its hook block, on a swivel under it (F3), runs on a ground rod along the load's line in a bronze bushing, so the load rises straight; the rod stands out of a block screwed and dowelled to the base past the hook's travel (F1, F2).`, badge: ["load guided on its line", "ok"], serves: { F1: [`${j.id}-rbd0`], F3: [`${j.id}-swivel`] } });
+}
+
 /** The flexible members this rule builds: a timing belt or a roller chain between two wheels. */
 export const builds = (j: KinJoint): boolean => j.type === "belt" && ["belt", "chain"].includes(String((j as unknown as Record<string, unknown>).flexible)) && j.a !== "ground" && j.b !== "ground";
 
@@ -325,12 +540,15 @@ export const j12: Rule = {
   tier: "AUTO",
   ids: ["J12", "J8", "A11", "F2", "F3", "F6", "F7", "F8", "F10"],
   fixture: "belt-drive",
-  applies: (ctx) => ctx.kin.joints.some(builds),
+  applies: (ctx) => ctx.kin.joints.some((j) => builds(j) || (j.type === "belt" && (j as unknown as Record<string, unknown>).flexible === "rope")),
   apply(ctx) {
     for (const j of ctx.kin.joints.filter(builds)) {
       if ((j as unknown as Record<string, unknown>).flexible === "chain") buildChain(ctx, j);
       else buildTimingBelt(ctx, j);
     }
+    const ropes = ctx.kin.joints.filter((j) => j.type === "belt" && (j as unknown as Record<string, unknown>).flexible === "rope");
+    if (ropes.length) buildRope(ctx, ropes);
+    for (const j of ctx.kin.joints) if (j.type === "prismatic" && (j as unknown as Record<string, unknown>).rod) buildLoadRod(ctx, j);
     // the base drops under what the loop carries below its wheels (a chain's lower plates)
     if (ctx.base) {
       let low = Infinity;

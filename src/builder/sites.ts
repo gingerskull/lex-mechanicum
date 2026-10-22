@@ -137,11 +137,15 @@ export function classifyJoints(kin: Kin, S: Setup): { joints: JointInfo[]; sites
       else if (!s.bodies.includes(id)) s.bodies.push(id);
     }
   }
+  // a rope's sheave turns free on its pin (each at its own speed): it is not keyed
+  const ropeSheave = (j: KinJoint) => (j as unknown as Record<string, unknown>).flexible === "rope";
+  const sheaveOnly = (id: string) => kin.joints.some((j) => j.type === "belt" && ropeSheave(j) && (j.a === id || j.b === id));
   const keyedBody = (id: string) => {
     const b = kin.bodies.find((q) => q.id === id);
     if (!b) return false;
+    if (sheaveOnly(id)) return false;
     if (KEYED.has(String(b.shape?.type))) return true;
-    return kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === id || j.b === id));
+    return kin.joints.some((j) => (j.type === "gear-mesh" || (j.type === "belt" && !ropeSheave(j)) || j.type === "screw") && (j.a === id || j.b === id));
   };
   for (const s of sites) {
     s.inPlan = !parallel(s.axis, UP);

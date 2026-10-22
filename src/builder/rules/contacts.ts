@@ -127,6 +127,8 @@ const j5 = contactRule({
   ids: ["J5", "F5", "F7", "A6"],
   fixture: "kin:sliderCrank",
   kits: ["J5"],
+  // a load's guide rod (a tackle's hook on its line) is built with the rope (src/builder/flexible.ts)
+  skip: (ji) => !!(ji.joint as unknown as Record<string, unknown>).rod,
   build(ctx, c, L) {
     const id = c.id;
     const slider = c.a === "ground" ? c.b : c.a;
@@ -296,13 +298,15 @@ function idler(ctx: BuildCtx, c: Contact, L: Local, what: string): ReturnType<Ki
 
 const j8 = contactRule({ id: "j8-belt", ids: ["J8", "V4"], fixture: "kin:beltDrive", kits: ["J8"], build: (ctx, c, L) => idler(ctx, c, L, "belt") });
 // a timing belt between two pulleys is built by src/builder/flexible.ts
-const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:chainDrive", kits: ["J12"], skip: (ji) => ["belt", "chain"].includes(String((ji.joint as unknown as Record<string, unknown>).flexible)) && ji.a !== "ground" && ji.b !== "ground", build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
+const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:cableLoop", kits: ["J12"], skip: (ji) => ["belt", "chain", "rope"].includes(String((ji.joint as unknown as Record<string, unknown>).flexible)), build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
 
 const strapSheave = contactRule({
   id: "strap-sheave",
   ids: ["J12", "F1", "F2", "A11"],
   fixture: "kin:rope",
   kits: ["strap-sheave"],
+  // a rope reeved over sheaves is built by src/builder/flexible.ts
+  skip: (ji) => String((ji.joint as unknown as Record<string, unknown>).flexible) === "rope" && !!(ji.joint as unknown as Record<string, unknown>).ends,
   build(ctx, c, L) {
     const id = c.id;
     const z = mid(c.za, mid(c.zb));

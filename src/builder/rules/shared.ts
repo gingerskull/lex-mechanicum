@@ -64,6 +64,8 @@ export const stops: Rule = {
         const g = ctx.geoms.get(b);
         const ext = ctx.extent(b);
         if (!g || !ext || g.exact) continue;
+        // a wheel (a sheave, a pulley, a disc) turns as far as its rope or belt takes it: nothing stops it
+        if (["pulley", "sprocket", "disc", "gear"].includes(String(g.shape.type))) continue;
         const sw = swingOf(ctx, b, s.axis);
         // only a part that swings (a rocker, a lever) gets stops; a crank, or a gear that turns on through the cycle,
         // turns past them

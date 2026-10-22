@@ -236,7 +236,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const hi = Math.max(...L.list.map((x) => x.z1), zTop, spec.reach?.[1] ?? -Infinity);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
-    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });
+    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, far: !!spec.reach });
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
     shaftSpec.z1 = p.shaft[1] + (live ? 12 : 0);

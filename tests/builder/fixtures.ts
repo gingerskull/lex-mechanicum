@@ -30,6 +30,8 @@ const MAKERS: Record<string, Maker> = {
   crossedMesh: () => rec("crossedMesh", withJoint(F.gearPair(), "M", { crossed: true })),
   pinLobe: () => rec("pinLobe", withBody(F.camFollower(), "cam", { role: "star" })),
   chainDrive: () => rec("chainDrive", withJoint(F.beltDrive(), "B", { flexible: "chain" })),
+  // a flexible member that is neither a timing belt, a chain nor a rope: the generic idler (j12-other)
+  cableLoop: () => rec("cableLoop", withJoint(F.beltDrive(), "B", { flexible: "cable" })),
   rope: () => rec("rope", withJoint(withJoint(F.beltDrive(), "B", { flexible: "rope" }), "B", { a: "ground" })),
   // the Geneva wheel's pin in a fork: a pin-in-slot whose slot is a fork's
   fork: () => {

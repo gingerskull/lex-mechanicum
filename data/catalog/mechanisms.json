@@ -53326,7 +53326,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "upper block, plane A"
             },
             "at": {
               "joint": "U-A"
@@ -53340,7 +53341,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "upper block, plane B"
             },
             "at": {
               "joint": "U-B"
@@ -53351,21 +53353,25 @@
             "role": "output",
             "shape": {
               "type": "plate",
-              "rect": [
-                24,
-                78
-              ],
-              "hook": {
-                "at": [
+              "outline": [
+                [
                   0,
-                  -56,
-                  0
+                  12
+                ],
+                [
+                  0,
+                  -44
                 ]
-              },
-              "note": "lower block cheeks carrying both sheave pins and the hook"
+              ],
+              "boss": 12,
+              "note": "lower block: cheeks carrying both sheaves' pin and the hook"
             },
-            "at": {
-              "joint": "guide"
+            "frame": {
+              "origin": [
+                8,
+                -135,
+                0
+              ]
             }
           },
           {
@@ -53376,7 +53382,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "lower block, plane A"
             },
             "at": {
               "joint": "L-A"
@@ -53390,7 +53397,8 @@
               "diameter": 60,
               "pitchDiameter": 56.8,
               "bore": 10,
-              "face": 8
+              "face": 9,
+              "note": "lower block, plane B"
             },
             "at": {
               "joint": "L-B"
@@ -53400,12 +53408,26 @@
             "id": "carriage",
             "role": "driver",
             "shape": {
-              "type": "slider",
-              "length": 30,
-              "width": 20
+              "type": "plate",
+              "outline": [
+                [
+                  0,
+                  8
+                ],
+                [
+                  0,
+                  -22
+                ]
+              ],
+              "boss": 10,
+              "note": "the fall's carriage, the fall's end clamped on it"
             },
-            "at": {
-              "joint": "fall-slide"
+            "frame": {
+              "origin": [
+                -28.4,
+                -205,
+                0
+              ]
             }
           }
         ],
@@ -53418,7 +53440,7 @@
             "at": [
               0,
               0,
-              10
+              0
             ],
             "axis": [
               0,
@@ -53434,7 +53456,7 @@
             "at": [
               0,
               0,
-              30
+              0
             ],
             "axis": [
               0,
@@ -53460,7 +53482,9 @@
             "limits": [
               0,
               40.1
-            ]
+            ],
+            "rod": true,
+            "note": "the load's line: the hook block runs on a guide rod along it"
           },
           {
             "id": "L-A",
@@ -53470,7 +53494,7 @@
             "at": [
               8,
               -135,
-              10
+              0
             ],
             "axis": [
               0,
@@ -53486,7 +53510,7 @@
             "at": [
               8,
               -135,
-              30
+              0
             ],
             "axis": [
               0,
@@ -53501,8 +53525,8 @@
             "b": "carriage",
             "at": [
               -28.4,
-              -170,
-              30
+              -205,
+              0
             ],
             "axis": [
               0,
@@ -53525,20 +53549,12 @@
               -52,
               10
             ],
-            "span": [
-              [
-                -20.4,
-                -52,
-                10
-              ],
-              [
-                -20.4,
-                -135,
-                10
-              ]
-            ],
             "rope": 3.2,
-            "note": "standing part from the becket (dead end) down to lower sheave A"
+            "note": "standing part from the becket (dead end) down to lower sheave A",
+            "ends": [
+              "dead",
+              "LAl"
+            ]
           },
           {
             "id": "part-2",
@@ -53551,19 +53567,11 @@
               -133.32,
               10
             ],
-            "span": [
-              [
-                36.35,
-                -133.32,
-                10
-              ],
-              [
-                28.35,
-                1.68,
-                10
-              ]
-            ],
-            "rope": 3.2
+            "rope": 3.2,
+            "ends": [
+              "LAr",
+              "UAr"
+            ]
           },
           {
             "id": "part-3",
@@ -53576,20 +53584,13 @@
               -1.68,
               20
             ],
-            "span": [
-              [
-                -28.35,
-                -1.68,
-                20
-              ],
-              [
-                -20.35,
-                -136.68,
-                20
-              ]
-            ],
             "rope": 3.2,
-            "note": "crosses from plane A to plane B between the sheaves"
+            "note": "crosses from plane A to plane B between the sheaves",
+            "ends": [
+              "UAl",
+              "LBl"
+            ],
+            "crossed": true
           },
           {
             "id": "part-4",
@@ -53602,19 +53603,11 @@
               -133.32,
               30
             ],
-            "span": [
-              [
-                36.35,
-                -133.32,
-                30
-              ],
-              [
-                28.35,
-                1.68,
-                30
-              ]
-            ],
-            "rope": 3.2
+            "rope": 3.2,
+            "ends": [
+              "LBr",
+              "UBr"
+            ]
           },
           {
             "id": "fall",
@@ -53627,20 +53620,12 @@
               0,
               30
             ],
-            "span": [
-              [
-                -28.4,
-                0,
-                30
-              ],
-              [
-                -28.4,
-                -170,
-                30
-              ]
-            ],
             "rope": 3.2,
-            "note": "the fall, hauled by the carriage"
+            "note": "the fall, hauled by the carriage",
+            "ends": [
+              "UBl",
+              "fallEnd"
+            ]
           }
         ],
         "params": [
@@ -53703,12 +53688,15 @@
               0,
               160
             ],
-            "default": 0
+            "default": 0,
+            "lo": 0,
+            "hi": 160,
+            "pin": "haulPin"
           }
         ],
         "solve": [
           {
-            "block": "new:reeve",
+            "block": "reeve",
             "id": "reeve",
             "joints": [
               "guide",
@@ -53724,30 +53712,128 @@
             ],
             "in": {
               "fall": "haul",
-              "parts": "n",
-              "pitch": "RP",
-              "fleet": "DX",
-              "spacing": "D0",
-              "deadEnd": "dead-y"
-            },
-            "out": [
-              "rise",
-              "sheave-turns"
-            ],
-            "opts": {
-              "order": [
-                "part-1",
-                "part-2",
-                "part-3",
-                "part-4",
-                "fall"
+              "D0": "D0",
+              "DX": "DX",
+              "slanted": 3,
+              "RP": "RP",
+              "block": "block",
+              "axis": [
+                0,
+                1,
+                0
               ],
-              "rope": "length conserved: haul = (D0 - D) + 3 (hypot(DX, D0) - hypot(DX, D)), D the pin spacing",
-              "sheaves": "each sheave turns by the rope paid past it over RP: lower A 1x, upper A 2x, lower B 3x, upper B 4x the load's travel"
+              "sheaves": [
+                {
+                  "body": "sheave-LA",
+                  "center": "L-A",
+                  "k": 0,
+                  "moving": true
+                },
+                {
+                  "body": "sheave-UA",
+                  "center": "U-A",
+                  "k": 1
+                },
+                {
+                  "body": "sheave-LB",
+                  "center": "L-B",
+                  "k": 2,
+                  "moving": true
+                },
+                {
+                  "body": "sheave-UB",
+                  "center": "U-B",
+                  "k": 3
+                }
+              ]
+            },
+            "out": {
+              "rise": "rise"
             }
           }
         ],
         "points": [
+          {
+            "id": "dead",
+            "body": "ground",
+            "local": [
+              -20.4,
+              -52,
+              4.5
+            ]
+          },
+          {
+            "id": "UAr",
+            "body": "ground",
+            "local": [
+              28.35,
+              1.68,
+              4.5
+            ]
+          },
+          {
+            "id": "UAl",
+            "body": "ground",
+            "local": [
+              -28.35,
+              -1.68,
+              4.5
+            ]
+          },
+          {
+            "id": "UBr",
+            "body": "ground",
+            "local": [
+              28.35,
+              1.68,
+              17.5
+            ]
+          },
+          {
+            "id": "UBl",
+            "body": "ground",
+            "local": [
+              -28.4,
+              0,
+              17.5
+            ]
+          },
+          {
+            "id": "LAl",
+            "body": "block",
+            "local": [
+              -28.4,
+              0,
+              4.5
+            ]
+          },
+          {
+            "id": "LAr",
+            "body": "block",
+            "local": [
+              28.35,
+              1.68,
+              4.5
+            ]
+          },
+          {
+            "id": "LBl",
+            "body": "block",
+            "local": [
+              -28.35,
+              -1.68,
+              17.5
+            ]
+          },
+          {
+            "id": "LBr",
+            "body": "block",
+            "local": [
+              28.35,
+              1.68,
+              17.5
+            ]
+          },
           {
             "id": "hook",
             "body": "block",
@@ -53758,47 +53844,20 @@
             ]
           },
           {
-            "id": "fall-end",
+            "id": "fallEnd",
             "body": "carriage",
             "local": [
               0,
-              0,
-              0
+              4,
+              26
             ]
           },
           {
-            "id": "mark-UA",
-            "body": "sheave-UA",
+            "id": "haulPin",
+            "body": "carriage",
             "local": [
               0,
-              26,
-              0
-            ]
-          },
-          {
-            "id": "mark-UB",
-            "body": "sheave-UB",
-            "local": [
-              0,
-              26,
-              0
-            ]
-          },
-          {
-            "id": "mark-LA",
-            "body": "sheave-LA",
-            "local": [
-              0,
-              26,
-              0
-            ]
-          },
-          {
-            "id": "mark-LB",
-            "body": "sheave-LB",
-            "local": [
-              0,
-              26,
+              -10,
               0
             ]
           }
@@ -53808,11 +53867,16 @@
             "id": "rise",
             "of": "hook",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "hauled",
-            "of": "fall-end",
+            "of": "fall-slide",
             "kind": "position",
             "unit": "mm"
           },
@@ -53869,7 +53933,7 @@
             "point": "hook"
           },
           {
-            "point": "fall-end"
+            "point": "fallEnd"
           }
         ],
         "traces": [
@@ -53883,7 +53947,7 @@
           },
           {
             "id": "fall-path",
-            "point": "fall-end",
+            "point": "fallEnd",
             "ticks": {
               "every": 20
             }
@@ -53900,7 +53964,12 @@
           {
             "id": "load-line",
             "kind": "axis-line",
-            "through": "guide",
+            "at": "guide",
+            "axis": [
+              0,
+              1,
+              0
+            ],
             "label": "LOAD LINE"
           }
         ],
