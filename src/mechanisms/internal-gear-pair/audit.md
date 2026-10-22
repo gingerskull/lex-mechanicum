@@ -1,5 +1,5 @@
 # Audit: Internal gear pair (internal-gear-pair)
-standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
@@ -73,7 +73,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | A5 | PASS | AUTO · fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
 | A6 | N/A | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · no slide and no floating plate |
 | A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base 8 mm under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
-| A8 | PASS | AUTO · fired: fasteners (15 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A8 | PASS | AUTO · fired: fasteners (9 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
 | A9 | PASS | AUTO / HAND · fired: placement solver · pinion straddle mounted; the ring carried at three points round its rim |
 | A10 | PASS | HAND · fired: placement (4 solids), placement solver · pinion and ring on one slab; nothing stacked to clear |
 | A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
@@ -100,10 +100,10 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
 | J1 | N/A | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) · no dead axle (the ring's rollers turn on shoulder screws, part of the ring-carrier kit) |
 | J2 | PASS | AUTO · fired: j2-live-shaft (43 solids) · pinion shaft: housing, keyed with a clamp hub, bridge over the top, the drive pulley below |
-| J3 | N/A | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), ring-hub (no solids) · no moving revolute |
-| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J3 | N/A | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), eccentric-bearing (no solids), ring-hub (no solids) · no moving revolute |
+| J4 | N/A | AUTO · fired: pin-hole (no solids), j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
 | J5 | N/A | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) · no slide |
-| J6 | PASS | AUTO · fired: j6-mesh (1 solid), ring-carrier (24 solids), ring-rollers (no solids) · internal mesh: eccentric bushing for the pinion's centre distance, timing marks at the mesh; the ring on three carrier rollers (ring-carrier kit) |
+| J6 | PASS | AUTO · fired: j6-mesh (1 solid), ring-carrier (24 solids), pin-ring (no solids), ring-rollers (no solids) · internal mesh: eccentric bushing for the pinion's centre distance, timing marks at the mesh; the ring on three carrier rollers (ring-carrier kit) |
 | J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
 | J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
 | J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
@@ -111,8 +111,8 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
-| F1 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), ring-carrier (24 solids), strap-sheave (no solids), j13-compliant (no solids) · housing and bridge dowelled; the ring located by its three roller studs in posts on the base |
-| F2 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), ring-carrier (24 solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; the ring held axially by the rollers' flanges above and below its rim |
+| F1 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), ring-carrier (24 solids), pin-ring (no solids), strap-sheave (no solids), j13-compliant (no solids) · housing and bridge dowelled; the ring located by its three roller studs in posts on the base |
+| F2 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), ring-carrier (24 solids), eccentric-bearing (no solids), pin-ring (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; the ring held axially by the rollers' flanges above and below its rim |
 | F3 | PASS | AUTO · served at O1; fired: j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
 | F4 | PASS | AUTO / HAND · served at O1; fired: j9-crossed-mesh (no solids), j2-live-shaft (43 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · the gears turn continuously |
@@ -124,7 +124,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
 | M2 | PASS | HAND · bosses round every loaded hole |
 | M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
-| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (15 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (9 solids) · counterbores and countersinks for heads (base, csk, housings) |
 | M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
 | M7 | N/A | HAND · no bracket corner turns a load |
@@ -134,7 +134,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
 | M13 | PASS | AUTO / HAND · 17 threaded · threadlocker or nyloc on every threaded fastener |
-| M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
+| M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), pin-hole (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · no sliding contact needing a liner |
 | V1 | PASS | AUTO · fired: drive (26 solids) · pancake motor on the input, belted to the input shaft |
 | V2 | PASS | AUTO · fired: drive (26 solids) · one bracket for the motor |
 | V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
@@ -154,7 +154,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | R1 | PASS | HAND · every standard part from the primitives and kits |
 | R2 | PASS | HAND · standard sizes only |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
-| R4 | PASS | AUTO · package v2 24.2 KB · package v2 written at build time |
+| R4 | PASS | AUTO · package v2 23.1 KB · package v2 written at build time |
 | R5 | PASS | HAND · no polish; nothing sampled by hand |
 | R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -169,7 +169,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | PASS | package v2 written, 24.2 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q3 | PASS | package v2 written, 23.1 KB; site build not checked here · package v2 written; site builds (npm run build) |
 | Q4 | PASS | local: tools/shot · dist/shots3/internal-gear-pair: record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
 | Q5 | PASS | local: tools/bench · tools/bench3 run (desktop) |
 | Q6 | PASS | every row judged |
@@ -180,7 +180,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Pinion; Ring | none |
-| O1 | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 14 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O1 | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 9 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | O2 | ring-carrier | – | – | – | Standoff Ø10, M5 | Roller flange, under the rim; Roller flange, over the rim | none | none | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
@@ -211,5 +211,5 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 None left: the ring on carrier rollers (ring-carrier) is a kit of the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.2 KB
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.1 KB
 screenshots: dist/shots3/internal-gear-pair (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 1.00 ms full, 1.34 at C, 1.18 at G; phone by David)
