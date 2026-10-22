@@ -156,12 +156,17 @@ and the hardware builder read the same way (`bodyFrameOf` in `src/kin/compose.ts
   mobility count.
 
 **Positions and axes** may be parameter expressions (`["60*cos(beta)", "60*sin(beta)", 55]`), so a `param` control moves
-the geometry; the drawing carries every built solid from its built frame to the new one.
+the geometry; the drawing carries every built solid from its built frame to the new one. A point's `local` coordinates and a block's
+inputs may be expressions too (`["L+p", 0, 0]`, `"-input"`). A body may name the bodies it lies `above` in its stack (a rod
+pinned down onto blocks): a hint the placement solver keeps.
 
 **Outputs.** An `angle` of a body is its turn about its joint to the ground (else its first joint). An `angle` with `from`
 and `to` points is the angle at `of` between the rays to them (a transmission angle); one with `minus` is that output less
 another angle output, wrapped to ±180° (a lead or lag). A `position` of a prismatic joint is its slide. A `speed-ratio`
-of a body is read from its angle output.
+of a body is read from its angle output. A `position` of a point with an `axis` is its projection on that direction; one with `from` (and no `to`) is
+its distance from that point; `datum` is subtracted from any scalar output. An `angle` with `absolute: true` is measured
+from the world x axis (the link's own direction) instead of from the reference pose. A `speed-ratio` of a point is its
+speed per unit of input, or with `unit: "%"` its speed as a share of its mean over the cycle.
 
 **Shapes the builder places where the joints put them** (not on a slab): a bevel `gear` (with `cone`, its pitch cone
 half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a universal joint's yoke) and a `cross`
@@ -174,7 +179,8 @@ second gear's axis, `cb` its centre). `hooke` reads either a `universal` joint o
 `slider-dyad` with `kind: "rpr"` is the swinging block: `a` the slotted body's pivot, `p` the pin, `body` the slotted body;
 a body joined to it by a prismatic joint keeps its turn. A block's `out` may be keyed (`{ "angle": "gear-turn" }`).
 
-**Claims.** A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
+**Claims.** `span: [a, b]` takes the statistic over the input values in that window (a rotary input's degrees, which may
+wrap past 360); `abs: true` takes it on the absolute value. A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
 open while the swing is in a range); with a number it is the longest stretch the output holds within that much.
 
 ### `teaching`
