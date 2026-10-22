@@ -17,12 +17,10 @@ with a short, plain explanation.
 
 ## What's in it
 
-70 of the 89 mechanisms in our catalogue are drawn so far, and we add more as we go. You'll find linkages and
+All 89 mechanisms in our catalogue are drawn, and we add more as we go. You'll find linkages and
 straight-line linkages, gears, cams, indexing drives, couplings, belt and chain drives, escapements, ratchets and a
 couple of mechanisms that bend instead of pivot. Each one has its own explanation, tags, examples and references.
 They come from the same record as the drawing, so the text and the drawing always describe the same thing.
-
-We're moving the library to a new 3D engine. Sheets marked **3D** are already drawn by it, and the rest will follow.
 
 ![The Geneva drive on the Blueprint sheet, tilted and partly exploded so the drive pin, the slotted wheel and the hardware stack under it come apart](docs/images/geneva-exploded.png)
 
@@ -64,10 +62,10 @@ order, so a link shows someone else exactly what you see.
 
 ## How it's made
 
-Each mechanism starts from its kinematics alone. A rules engine then adds the hardware a real build would need:
-bearings sized to the load, shafts and what holds them in place, bridges over the pivots, stops, lubrication,
-fasteners and a drive. Every build is checked for clashes over its whole cycle before it's drawn. The site is
-static: each page loads one small package, and your browser draws it with WebGL2.
+Each mechanism starts from its kinematics alone, in its catalogue record. A hardware builder then adds the parts a
+real build would need, as true 3D solids: bearings sized to the load, shafts and what holds them in place, bridges
+over the pivots, stops, lubrication, fasteners and a drive. Every build is checked for clashes in 3D over its whole
+cycle before it's drawn. The site is static: each page loads one small package, and your browser draws it with WebGL2.
 
 If you'd like to help, the details are in [docs/architecture.md](docs/architecture.md),
 [docs/mechanism-standard.md](docs/mechanism-standard.md), [docs/style-reference.md](docs/style-reference.md) and
