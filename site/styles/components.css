@@ -189,7 +189,7 @@
 .sortmenu button[aria-checked="true"] svg {
   visibility: visible;
 }
-/* the sheet switch: one square button showing the sheet it switches to */
+/* the sheet switch: one square button with the cog, turned per sheet */
 .themebtn {
   flex: none;
   display: inline-grid;
@@ -218,9 +218,9 @@
   width: 17px;
   height: 17px;
 }
-:root:not([data-theme="light"]) .themebtn .to-dark,
-:root[data-theme="light"] .themebtn .to-light {
-  display: none;
+/* the cog as drawn on Drafting, turned half a turn on Blueprint (no transition, SS11) */
+:root:not([data-theme="light"]) .themebtn svg {
+  transform: rotate(180deg);
 }
 .badge {
   font: 600 10px / 1 var(--font-mono);

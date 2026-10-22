@@ -127,6 +127,20 @@ describe("site build", () => {
     expect(pre).toBeLessThan(html.indexOf('class="dlayout"'));
   });
 
+  it("draws the sheet switch as one cog in the sheet's ink, on the library and a mechanism page (SS7)", () => {
+    for (const f of ["index.html", join("mechanisms", Object.keys(mechanisms)[0]!, "index.html")]) {
+      const btns = [...read(f).matchAll(/<button[^>]*class="themebtn"[^>]*>([\s\S]*?)<\/button>/g)];
+      expect(btns.length, f).toBeGreaterThan(0);
+      for (const [, inner] of btns) {
+        expect(inner!.match(/<svg/g), f).toHaveLength(1);
+        expect(inner, f).toMatch(/<svg[^>]*viewBox="0 0 16 16"[^>]*fill="currentColor"/);
+        // the ring and the half disc, as drawn
+        expect(inner!.match(/<path/g), f).toHaveLength(2);
+        expect(inner, f).toContain('d="M35.52,35.52v-16.35');
+      }
+    }
+  });
+
   it("shows the release line in the footer: the laws, the codename once the release has one, the version", () => {
     const html = read("index.html");
     const version: string = JSON.parse(readFileSync("package.json", "utf8")).version;
