@@ -92,7 +92,10 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   const u = poses.map((_, i) => (i / n) * 360);
   const x = poses.map((p) => p.values[drv.id] ?? NaN);
   let y: number[];
-  if (o.kind === "speed-ratio") {
+  if (o.kind === "speed-ratio" && poses.every((p) => typeof p.outputs[o.id] === "number")) {
+    // computed with the pose (src/kin/compose.ts)
+    y = poses.map((p) => p.outputs[o.id] as number);
+  } else if (o.kind === "speed-ratio") {
     // the turn of the output body per turn of the input, from the series of its angle
     // the angle of `of`: an output or value of that name, else the body's own angle output
     const via = outputs.find((q) => q.of === o.of && q.kind === "angle")?.id;

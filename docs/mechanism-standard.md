@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.0
+version: 3.1
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -269,6 +269,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `lugs` | A1, A2 |
 | `base` | A7, D4, M4 |
 | `posts` | A7, F1 |
+| `wheels` | D1, F2 |
 | `j6-mesh` | J6, F7, F9 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
 | `tongue-slot` | J5, F8, M14 |
@@ -729,6 +730,27 @@ oscillating cylinder, locomotive drive, Walschaerts, Wankel, toggle clamp)
   arms lie along the two yokes' pins.
 - Teaching: discs and hubs see-through so tongues, slots and index marks show; the disc-centre orbit as a full circle;
   parts of one role told apart by pattern (T16); a bend or phase control (T14); a section through a cage.
+- Blocks of their own: cross-slide (Oldham), parallel-cranks (Schmidt), rzeppa (cage in the bisecting plane, balls where
+  it meets the grooves), Hooke with a free centre shaft (double Cardan). An output shaft that cannot come up through the
+  input side hangs from a bridge (`support` on its joint); parallel discs and links are placed by the record with room
+  for the pins' hardware between levels; a phase between two forks is a collar clamped on the tube, so the control turns
+  it as built. Raised index arrows stay opaque on see-through rings; a Rzeppa's races, bell and cage are revolves with
+  swept grooves and cut windows.
+
+**Spatial linkages** (Sarrus, Bennett, swash plate, centrifugal governor)
+- Blocks: sarrus (two limbs in planes at 90 degrees), bennett from its four joints (closed form, overconstrained),
+  plane-slide (sliders whose line meets a plane a turning body carries: the tilt frame), conical-pendulum (arms where a
+  speed balances them, a manual speed driver). Kits: J3 on the hinges, J10 or J2 on the ground hinges, piston-bore,
+  ball-socket and slipper for a swash plate, a collar sliding on a turning shaft (J5).
+- A part whose plane is not square to its hinge meets it through a lug (`lugs`), a member of the hinge's stack; hinge
+  leaves, arms and plates are placed by the record (`axial`). Links between skew hinges are spatial links: a knuckle on
+  each hinge and a bar between, the knuckles set apart along the hinges where the loop passes through crossed poses
+  (Bennett), a pin turned end for end where a link sweeps past its head.
+- A plate tilted on a shaft is its own body pinned at the tilt, so a swash angle control turns it; a cylinder block is a
+  fixed body on posts with lined bores; the governor's link pins sit on the sleeve's lugs off the spindle axis.
+- Teaching: the hinge axes as axis lines (the skew, the right angle between Sarrus limbs), the straight line of a
+  Sarrus plate, a swash plate's section through a piston, a governor's speed as its control with ghosts at its ends.
+- An oscillating input under 180 degrees has no drive yet (V5's crank and link): deferred with a reason.
 
 **Spatial gears** (bevel, hypoid, worm, helical, herringbone, crossed helical)
 - Blocks: gear mesh on crossed axes. Kits: J9 on every crossed mesh, J10 on a shaft in plan, J2 for the rest. The
@@ -860,6 +882,8 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.1 (2026-10-22).** Rebuild batch R1 (planar linkages): a body's `shape.wheel` is built as a wheel on a stub
+  axle in an upright tube, by the new `wheels` rule [D1, F2, AUTO].
 - **3.0 (2026-10-20).** True 3D parts and a record-driven build; the 2.5D engine is replaced at cut-over. The pipeline
   is catalogue record v3 (a `kin` block and a `teaching` block), closed-form kinematic blocks verified by a loop-closure
   residual, a hardware builder (joint kits, one axial stack builder, a support router, a placement solver), true 3D

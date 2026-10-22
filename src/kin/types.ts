@@ -113,6 +113,8 @@ export interface KinDriver {
   /** A selector's named options, each setting values of other drivers and params. */
   options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }> | { id: string; drivers?: Record<string, number>; params?: Record<string, number> }[];
   value?: string; // a selector's current option
+  /** Set by the cycle through a block (a target path and inverse kinematics), not applied as a joint motion. */
+  cycle?: { from?: string; note?: string };
 }
 
 export interface SolveStep {
@@ -139,8 +141,10 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
-  /** A position read as one number: its component along this world direction, or along this joint's axis. */
-  along?: Vec | string;
+  /** A point's position read along this direction (world mm): the coordinate of a plunger pin along its slide. */
+  axis?: [number, number, number];
+  /** A speed ratio of the point `of` over the point `over` (their speeds), instead of a body's turn per input. */
+  over?: string;
 }
 
 export interface Kin {

@@ -27,7 +27,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build (E2, #204) and again on six phases of the finished build (teaching: line) |
-| K1 | PASS | AUTO · K1 residual 8.9e-15 (tolerance 1e-9) over 360 samples, reference 2.2e-16 |
+| K1 | PASS | AUTO · K1 residual 8.9e-15 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 3 blocks (conical-pendulum, slider-dyad); no numeric fallback · composed from the block library; no fallback, no one-off model |
 | K4 | PASS | HAND · spindle driver with the accent, sleeve output; arms with balls and links |

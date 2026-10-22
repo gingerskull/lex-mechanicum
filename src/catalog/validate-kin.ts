@@ -35,6 +35,9 @@ export function mobility(kin: Kin, plane: "Planar" | "Spatial"): number | undefi
 const VIEW_VERTICES = /^VIEW -?\d+(\.\d+)? -?\d+(\.\d+)?$/;
 
 /** Checks the `kin` and `teaching` blocks of one record against the record spec. Returns lines, `<id>: <what>`. */
+/** The functions a parameter expression may call (src/kin/expr.ts). */
+const EXPR_FNS = new Set(["sin", "cos", "tan", "sqrt", "abs"]);
+
 export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean }): string[] {
   const problems: string[] = [];
   const say = (what: string) => problems.push(`${r.id}: ${what}`);
@@ -144,14 +147,13 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isObj(v)) return Object.entries(v).forEach(([k, x]) => (k === "out" ? undefined : resolveIn(x, by, key)));
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
-    if (key === "kind" || key === "mode" || key === "form") return;
-    // an expression over known names ("90 - input"): every name in it known
-    if (isStr(v) && !known.has(v) && /[-+*/^() ]/.test(v)) {
-      const names = (v.match(/[A-Za-z_][A-Za-z0-9_-]*/g) ?? []).filter((n) => !["sin", "cos", "tan", "sqrt", "abs", "asin", "acos", "atan"].includes(n));
-      if (names.every((n) => known.has(n))) return;
-    }
+    if (key === "kind" || key === "mode" || key === "form" || key === "shape") return;
+    // a parameter expression (src/kin/expr.ts) is fine when every name in it is known
+    if (isStr(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
+  // what the blocks produce: a construction point (a crossing of two lines) may be traced and read like a named point
+  const made = new Set<string>();
   for (const s of kin.solve) {
     const by = s.id;
     if (!KIN_VOCAB.block.includes(s.block as never) && !/^new:[a-z][a-z0-9-]*$/.test(String(s.block))) {
@@ -162,7 +164,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     // a name, a list of names, or the block's keyed outputs ({ angle: "gear-turn" }, as src/kin/registry reads them)
     const outs = typeof s.out === "string" ? [s.out] : isObj(s.out) && !Array.isArray(s.out) ? Object.values(s.out) : arr(s.out);
     if (!outs.length || !outs.every(isStr)) say(`solve ${by}: out must name what the block produces`);
-    for (const o of outs as string[]) known.add(o);
+    for (const o of outs as string[]) {
+      known.add(o);
+      made.add(o);
+    }
     if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch)) say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);
     for (const j of arr(s.joints) as string[]) claim(j, `solve ${by}`);
   }
@@ -179,16 +184,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (!bodies.has(p.body)) say(`point ${p.id}: body "${String(p.body)}" is not a body`);
     if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every(isNum))) say(`point ${p.id}: local must be [x, y, z]`);
   }
-  // values a solve step writes (its `out` names), which an output may read: a centre yoke's turn
-  const values = new Set<string>();
-  for (const st of kin.solve as { out?: unknown }[]) {
-    const out = st.out;
-    if (typeof out === "string") values.add(out);
-    else if (out && typeof out === "object" && !Array.isArray(out)) for (const v of Object.values(out)) if (typeof v === "string") values.add(v);
-  }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);
-    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !values.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or block value`);
+    // an angle output may read a driver's own value (absolute, in the driver's units)
+    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !made.has(o.of) && !(o.kind === "angle" && drivers.has(o.of))) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or (for an angle) driver`);
   }
 
   // mobility (K11)
@@ -210,7 +209,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   }
 
   const pointish = (name: string, v: unknown, where: string) => {
-    if (!isStr(v) || !(points.has(v) || joints.has(v) || bodies.has(v))) say(`${where}: ${name} "${String(v)}" is not a named point, joint or body`);
+    if (!isStr(v) || !(points.has(v) || joints.has(v) || bodies.has(v) || made.has(v))) say(`${where}: ${name} "${String(v)}" is not a named point, joint or body`);
   };
 
   if (!Array.isArray(t.principle) || !t.principle.length) say("teaching.principle must list the principle bodies and points (T3)");
@@ -234,7 +233,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (!isStr(ref) || !set.has(ref)) say(`control ${String(c.id)}: ${kind} "${String(ref)}" is not a ${kind === "param" || kind === "design" ? kind : "driver"} of kin`);
     else controlled.add(ref);
   }
-  for (const d of kin.drivers) if (!controlled.has(d.id)) say(`driver ${d.id} has no control (T14)`);
+  // a driver the cycle sets through a block (a path the tip follows) is the scrubber itself: no control of its own
+  for (const d of kin.drivers) if (!controlled.has(d.id) && !isObj((d as { cycle?: unknown }).cycle)) say(`driver ${d.id} has no control (T14)`);
 
   ids("teaching.traces", arr(t.traces));
   for (const tr of arr(t.traces) as Obj[]) {

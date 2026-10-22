@@ -110,7 +110,12 @@ export const stops: Rule = {
         const n = Math.floor((sw.range * 180) / Math.PI / 5);
         for (let q = 0; q <= n; q++) {
           const a = dir + sw.lo + (q * 5 * Math.PI) / 180;
-          ticks.push([polar(pivot, reach * 0.92, a), polar(pivot, reach * 0.92 + (q % 2 ? 2.2 : 3.6), a)]);
+          // ticks are worked out in the lever's plane and engraved on the base, whose frame is the world's
+          const w = (uv: [number, number]): [number, number] => {
+            const p = fromPlane(ext.frame, uv, 0);
+            return [p[0], p[1]];
+          };
+          ticks.push([w(polar(pivot, reach * 0.92, a)), w(polar(pivot, reach * 0.92 + (q % 2 ? 2.2 : 3.6), a))]);
         }
         for (const t of ticks) ctx.baseMarks.push({ kind: "scale", pts: t });
         ctx.note({ id: `${s.id}-${b}-stops`, kit: "stops", at: s.at, title: `Stops · ${b}`, note: `${b} swings ${((sw.range * 180) / Math.PI).toFixed(1)}°; hardened stop pins at 70 % of its reach, a fifth of the half swing past each end; swing scale engraved on the base.`, serves: { F5: placed }, badge: placed.length ? ["stopped both ends", "ok"] : ["no stop fits", "warn"] });

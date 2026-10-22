@@ -7,9 +7,9 @@
 // held: a stub axle when something passes over it, a hung one when something passes under it. The solver finds the
 // fewest slabs, then the fewest empty slots inside a stack, then the most clevises that fit without a new slab (A9).
 import type { Vec2 } from "../core/geom";
-import { v3, xf, type Xf } from "../kin/math";
+import { v3, xf, type Vec3, type Xf } from "../kin/math";
 import type { Kin } from "../kin/types";
-import { HEADROOM, LATERAL, PITCH, SLAB_GAP, THREAD_ROOM } from "./constants";
+import { HEADROOM, LATERAL, PITCH, RAIL_ZONE, SLAB_GAP, SLIDE_ROOM, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
 import { pointDist, ringDist } from "./planar";
 import type { BodyGeom } from "./shapes";
@@ -161,6 +161,32 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         }
       }
     }
+    // a slider on the ground runs between rails, a gib and end stops that stand beside and past its travel (J5): a body
+    // that sweeps over that zone cannot share the slider's slab
+    for (const j of kin.joints) {
+      if (j.type !== "prismatic" || (j.a !== "ground" && j.b !== "ground")) continue;
+      const sl = j.a === "ground" ? j.b : j.a;
+      if (!fid.includes(sl)) continue;
+      const ax = planeCoords(fam, v3.add(fam.o, (j.axis as number[]).map(Number) as Vec3)).uv;
+      const L = Math.hypot(ax[0], ax[1]);
+      if (L < 1e-6) continue;
+      const dx = ax[0] / L, dy = ax[1] / L;
+      let s0 = Infinity, s1 = -Infinity, t0 = Infinity, t1 = -Infinity;
+      for (const ring of rings.get(sl)!)
+        for (const [x, y] of ring) {
+          const sv = x * dx + y * dy, tv = -x * dy + y * dx;
+          s0 = Math.min(s0, sv); s1 = Math.max(s1, sv); t0 = Math.min(t0, tv); t1 = Math.max(t1, tv);
+        }
+      const [S0, S1, T0, T1] = [s0 - RAIL_ZONE.along, s1 + RAIL_ZONE.along, t0 - RAIL_ZONE.across, t1 + RAIL_ZONE.across];
+      const zone: Vec2[] = [[S0, T0], [S1, T0], [S1, T1], [S0, T1]].map(([sv, tv]) => [sv! * dx - tv! * dy, sv! * dy + tv! * dx]);
+      for (const id of fid) {
+        if (id === sl || nodeOf(id) === nodeOf(sl) || kin.joints.some((q) => (q.a === id && q.b === sl) || (q.b === id && q.a === sl))) continue;
+        if (sampleIdx.some((i) => ringDist(zone, rings.get(id)![i]!, LATERAL) <= LATERAL)) {
+          const a = idx.get(nodeOf(id))!, b = idx.get(nodeOf(sl))!;
+          clash[a]![b] = clash[b]![a] = true;
+        }
+      }
+    }
     // bodies on one pin site share its column: they clash even when a boss is missing
     const famSites = sites.filter((s) => parallel(s.axis, fam.z) && s.bodies.some((b) => parent.has(b)));
     for (const s of famSites) {
@@ -208,7 +234,9 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);
     const lb = Math.max(1, cliqueBound(clash));
-    type Best = { assign: number[]; cost: [number, number, number] };
+    type Best = { assign: number[]; cost: number[] };
+    // sliders on the ground run on rails on the base: they want the lowest slab, with what drives them above (J5)
+    const grounded = [...new Set(kin.joints.filter((j) => j.type === "prismatic" && (j.a === "ground" || j.b === "ground")).map((j) => (j.a === "ground" ? j.b : j.a)).filter((b) => fid.includes(b)).map((b) => idx.get(nodeOf(b))!))];
     const limit = N;
     let budget = 1_500_000;
     // strict: every passer on one side of its pin; relaxed: a pin with parts passing on both sides is allowed (it needs a
@@ -226,9 +254,11 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           const picks = clevisPicks(assign, siteCs, clash, h, nodeIds, nodes);
           // a fixed pin held from a bridge only (something passes under it) is the last resort
           const hung = siteCs.reduce((t, c) => t + (c.site.fixed && c.passers.some((p) => assign[p]! < Math.min(...c.members.map((m) => assign[m]!))) ? 1 : 0), 0);
-          const cost: [number, number, number] = [spacers, hung, -picks.length];
+          const raised = grounded.reduce((t, n) => t + assign[n]!, 0);
+          const cost = [spacers, hung, raised, -picks.length];
           const f = found;
-          const less = !f || cost[0] < f.cost[0] || (cost[0] === f.cost[0] && (cost[1] < f.cost[1] || (cost[1] === f.cost[1] && cost[2] < f.cost[2])));
+          const d = f ? cost.findIndex((c, i) => c !== f.cost[i]) : -1;
+          const less = !f || (d >= 0 && cost[d]! < f.cost[d]!);
           if (less) found = { assign: assign.slice(), cost };
         };
         const dfs = (k: number): void => {
@@ -242,7 +272,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
             if (relax || passOk(assign, siteCs)) dfs(k + 1);
             assign[v] = -1;
             const f = found as Best | null;
-            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] <= -clevisCap(siteCs)) return;
+            if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] === 0 && f.cost[3]! <= -clevisCap(siteCs)) return;
           }
         };
         dfs(0);
@@ -279,6 +309,16 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       // a moving pin's thread end runs under its first part: a plate right under it needs the thread's length
       const low = Math.min(...c.members.map((m) => assign[m]!));
       if (!c.site.fixed && low > 0 && c.passers.some((p) => assign[p] === low - 1)) gapAfter[low - 1] = Math.max(gapAfter[low - 1]!, THREAD_ROOM);
+    }
+    // a slider on the ground runs between rails and under a keeper that stand above its top (J5): the slab above it
+    // keeps clear of them
+    for (const j of kin.joints) {
+      if (j.type !== "prismatic" || (j.a !== "ground" && j.b !== "ground")) continue;
+      const sl = j.a === "ground" ? j.b : j.a;
+      const n = idx.get(nodeOf(sl));
+      if (n === undefined || !fid.includes(sl)) continue;
+      const sk = assign[n]!;
+      if (sk + 1 < slabs) gapAfter[sk] = Math.max(gapAfter[sk]!, SLIDE_ROOM);
     }
     const w0: number[] = [];
     let w = 0;

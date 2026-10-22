@@ -213,10 +213,10 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.51 |
 | DL-G | 0 | 0 | 1.48 |
 | DL-H | 12 | 0 | 1.47 |
-| never | 75 | 106 | 1.45 |
+| never | 75 | 105 | 1.45 |
 
 ## Promotion candidates
 Promoted in this pass: the `ball`, `race`, `bell` and `cage` shapes (revolves with swept grooves and cut windows), the sphere-fit kit, the `rzeppa` block.
 
 ## Verification
-check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 110.4 KB
+check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.0 KB

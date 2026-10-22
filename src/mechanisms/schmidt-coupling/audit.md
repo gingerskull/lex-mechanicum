@@ -64,7 +64,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 196 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 199 solids unsound |
 | D7 | PASS | HAND · rings and links plain; richness in the pins' stacks |
 | A1 | PASS | AUTO · PA1 J3, PA2 J3, PA3 J3, QA1 J3, QA2 J3, QA3 J3, QB1 J3, QB2 J3, QB3 J3, PB1 J3, PB2 J3, PB3 J3, O1 J2, O3 J2, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · PA1 J3, PA2 J3, PA3 J3, QA1 J3, QA2 J3, QA3 J3, QB1 J3, QB2 J3, QB3 J3, PB1 J3, PB2 J3, PB3 J3, O1 J2, O3 J2, drive drive · input and output live shafts (J2), twelve moving pins (J3) |
@@ -218,10 +218,10 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | 1.72 |
 | DL-G | 0 | 0 | 1.6 |
 | DL-H | 5 | 0 | 1.7 |
-| never | 124 | 276 | 1.68 |
+| never | 127 | 276 | 1.68 |
 
 ## Promotion candidates
 Promoted in this pass: ring discs (`ring: { inner, spokes, hub }`), engraved index marks (`indexMark`), a second link set's own pattern (`set: "B"` drawn as link2), the `parallel-cranks` block.
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.8 KB
+check: clean · K1 residual: 4.3e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.0 KB

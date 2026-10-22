@@ -1299,7 +1299,7 @@
           "kind": "position",
           "unit": "mm",
           "note": "distance of C from the shaft line O1 O3",
-          "along": [
+          "axis": [
             0,
             1,
             0
@@ -3210,7 +3210,7 @@
           "kind": "position",
           "unit": "mm",
           "note": "ball 1 centre along the input axis, from J",
-          "along": [
+          "axis": [
             1,
             0,
             0
@@ -4342,60 +4342,60 @@
           "of": "head-1",
           "kind": "position",
           "unit": "mm",
-          "along": [
+          "note": "ball centre along the shaft axis",
+          "axis": [
             1,
             0,
             0
-          ],
-          "note": "ball centre along the shaft axis"
+          ]
         },
         {
           "id": "piston-2-x",
           "of": "head-2",
           "kind": "position",
           "unit": "mm",
-          "along": [
+          "note": "ball centre along the shaft axis",
+          "axis": [
             1,
             0,
             0
-          ],
-          "note": "ball centre along the shaft axis"
+          ]
         },
         {
           "id": "piston-3-x",
           "of": "head-3",
           "kind": "position",
           "unit": "mm",
-          "along": [
+          "note": "ball centre along the shaft axis",
+          "axis": [
             1,
             0,
             0
-          ],
-          "note": "ball centre along the shaft axis"
+          ]
         },
         {
           "id": "piston-4-x",
           "of": "head-4",
           "kind": "position",
           "unit": "mm",
-          "along": [
+          "note": "ball centre along the shaft axis",
+          "axis": [
             1,
             0,
             0
-          ],
-          "note": "ball centre along the shaft axis"
+          ]
         },
         {
           "id": "piston-5-x",
           "of": "head-5",
           "kind": "position",
           "unit": "mm",
-          "along": [
+          "note": "ball centre along the shaft axis",
+          "axis": [
             1,
             0,
             0
-          ],
-          "note": "ball centre along the shaft axis"
+          ]
         }
       ],
       "fallback": null
@@ -4923,7 +4923,7 @@
           "kind": "position",
           "unit": "mm",
           "note": "height above the base",
-          "along": [
+          "axis": [
             0,
             0,
             1
@@ -4935,7 +4935,7 @@
           "kind": "position",
           "unit": "mm",
           "note": "horizontal distance of the plate centre from the vertical through the base centre, along limb 1's plane",
-          "along": [
+          "axis": [
             1,
             0,
             0
@@ -6006,7 +6006,7 @@
           "kind": "position",
           "unit": "mm",
           "note": "height above the base",
-          "along": [
+          "axis": [
             0,
             0,
             1
@@ -6018,7 +6018,7 @@
           "kind": "position",
           "unit": "mm",
           "note": "height above the base",
-          "along": [
+          "axis": [
             0,
             0,
             1

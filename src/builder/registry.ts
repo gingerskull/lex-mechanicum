@@ -8,6 +8,7 @@ import { drive, explode, fasteners, feet, headroom, locking, lubrication, materi
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
 import { lugs, posts } from "./rules/lugs";
+import { wheels } from "./rules/wheels";
 import { pistonBore, trunnion } from "./rules/cylinder";
 import { ballSocket } from "./rules/slipper";
 import type { Rule } from "./rules/types";
@@ -26,6 +27,7 @@ export const rules: Rule[] = [
   lugs,
   base,
   posts,
+  wheels,
   byId("j6-mesh"),
   byId("j9-crossed-mesh"),
   // a tongue's slot hardware turns with its hub: built before the stacks, so a bridge is routed clear of it

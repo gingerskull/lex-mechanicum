@@ -209,10 +209,10 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | DL-F | 0 | 0 | 1.61 |
 | DL-G | 0 | 0 | 1.69 |
 | DL-H | 12 | 0 | 1.73 |
-| never | 104 | 185 | 1.76 |
+| never | 104 | 183 | 1.76 |
 
 ## Promotion candidates
 Promoted in this pass: the Hooke block with a shaft that has no ground joint (`shafts`), body frames given by axes (`frame: { z, x }`) so a control can turn them.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.7 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.8 KB
