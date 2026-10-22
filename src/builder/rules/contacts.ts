@@ -131,7 +131,11 @@ const j5 = contactRule({
   // a sheave half sliding on its shaft and the shift fork's carriage are built by the CVT kit (src/builder/cvt.ts)
   skip: (ji, ctx) => {
     const r = ji.joint as unknown as Record<string, unknown>;
-    const fork = [ji.a, ji.b].some((b) => (ctx.kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined)?.type === "fork");
+    // (and an integrator's carriage by its kit, src/builder/integrator.ts)
+    const fork = [ji.a, ji.b].some((b) => {
+      const sh = ctx.kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined;
+      return sh?.type === "fork" || (sh?.type === "slider" && !!sh.cage);
+    });
     return !!r.rod || !!r.spline || fork;
   },
   build(ctx, c, L) {

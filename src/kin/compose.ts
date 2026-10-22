@@ -470,6 +470,9 @@ class Run implements BlockCtx {
   driver(id: string): KinDriver | undefined {
     return this.k.kin.drivers.find((d) => d.id === id);
   }
+  driverAt(id: string, u: number): number {
+    return this.k.driverValues(u, this.s.controls)[id] ?? 0;
+  }
   design(id: string): string | undefined {
     return this.s.designs.get(id);
   }

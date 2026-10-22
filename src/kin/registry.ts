@@ -623,6 +623,67 @@ const variatorBlock: BlockFn = (c, s) => {
   outVal(c, s, off / 2, "offset");
 };
 
+/**
+ * integrator (a ball-and-disc integrator). in: disc and x (drivers: the disc's angle, deg, and the ball's radius on it, mm,
+ * the carriage's travel), rc (the output cylinder's radius), rb (the ball's), ball (body) and centre (the joint at its
+ * centre, on the carriage), spinAxis (the ball's spin axis: the carriage's travel), cylinder (body) and cylJoint (its
+ * ground revolute). The ball rolls on the disc at radius x and drives the cylinder: θc = (1/rc) ∫ x dθd over the
+ * drivers' laws from the reference to this phase, so it holds for any setting of either.
+ * out { angle, spin }: the cylinder's and the ball's turns (deg).
+ */
+/**
+ * ∫ x dθd from the reference to phase u (θd in radians): in closed form for a rotary disc and a carriage held or on its
+ * cosine law (each checked against the drivers' values), else by Simpson's rule.
+ */
+function integral(c: BlockCtx, dId: string, xId: string, u: number): number {
+  const dd = c.driver(dId);
+  const dx = c.driver(xId);
+  const a = (c.driverAt(dId, 1) - c.driverAt(dId, 0)) * D2R;
+  const x0 = c.driverAt(xId, 0.3);
+  const x1 = c.driverAt(xId, 1.1);
+  if (dd?.kind === "rotary" && dx && Math.abs(c.driverAt(dId, 2) - c.driverAt(dId, 0) - 2 * (a / D2R)) < 1e-9) {
+    if (Math.abs(x1 - x0) < 1e-12 && Math.abs(c.driverAt(xId, 2.7) - x0) < 1e-12) return a * x0 * u;
+    if (dx.kind === "linear" || dx.kind === "oscillating") {
+      const lo = dx.lo ?? dx.range?.[0] ?? 0;
+      const hi = dx.hi ?? dx.range?.[1] ?? 0;
+      const sp = dx.speed ?? 1;
+      const ph = (dx.phase ?? 0) * D2R;
+      const m = (lo + hi) / 2;
+      const A = (hi - lo) / 2;
+      const law = (v: number) => m - A * Math.cos(sp * v + ph);
+      if (Math.abs(law(0.3) - x0) < 1e-9 && Math.abs(law(1.1) - x1) < 1e-9) return a * (m * u - (A / sp) * (Math.sin(sp * u + ph) - Math.sin(ph)));
+    }
+  }
+  const n = 2 * Math.max(1, Math.ceil((Math.abs(u) / TAU) * 200));
+  const h = u / n;
+  const th = (v: number) => c.driverAt(dId, v) * D2R;
+  const f = (v: number) => c.driverAt(xId, v) * ((th(v + 1e-5) - th(v - 1e-5)) / 2e-5);
+  let sum = f(0) + f(u);
+  for (let k = 1; k < n; k++) sum += (k % 2 ? 4 : 2) * f(k * h);
+  return (sum * h) / 3;
+}
+
+const integratorBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const dId = str(i.disc, "integrator.disc");
+  const xId = str(i.x, "integrator.x");
+  const rc = c.num(i.rc);
+  const rb = c.num(i.rb);
+  const u = c.u;
+  const theta = u === 0 ? 0 : integral(c, dId, xId, u) / rc;
+  const dTheta = c.delta("theta", theta);
+  const phi = (dTheta * rc) / rb;
+  const cj = str(i.cylJoint, "integrator.cylJoint");
+  if (typeof i.cylinder === "string") c.setXf(i.cylinder, xf.rotAbout(c.jointAt(cj), c.jointAxis(cj), dTheta));
+  if (typeof i.ball === "string" && typeof i.centre === "string") {
+    const ref = c.refVec(i.centre);
+    const now = c.vec(i.centre);
+    c.setXf(i.ball, xf.mul(xf.trans(v3.sub(now, ref)), xf.rotAbout(ref, v3.unit(c.vec(i.spinAxis ?? [0, 1, 0])), phi)));
+  }
+  outVal(c, s, dTheta * R2D, "angle");
+  outVal(c, s, phi * R2D, "spin");
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -690,6 +751,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   flexure: flexureBlock,
   reeve: reeveBlock,
   variator: variatorBlock,
+  integrator: integratorBlock,
   escapement: escapementBlock,
   indexer,
 };

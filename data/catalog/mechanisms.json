@@ -56301,10 +56301,10 @@
             "shape": {
               "type": "plate",
               "rect": [
-                200,
-                170
+                240,
+                200
               ],
-              "note": "frame carrying the disc bearing, the carriage rail and the cylinder bearings"
+              "note": "frame carrying the disc's shaft, the carriage's rail and the cylinder's blocks"
             },
             "at": {
               "frame": {
@@ -56323,7 +56323,7 @@
               "type": "disc",
               "radius": 60,
               "thickness": 8,
-              "note": "the joint is on the face"
+              "note": "steel, face ground: the ball rolls on its top face at z 20"
             },
             "at": {
               "joint": "Od"
@@ -56342,10 +56342,18 @@
                   "below",
                   "toward the cylinder"
                 ]
-              }
+              },
+              "reach": 90
             },
             "at": {
               "joint": "slide"
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                26
+              ]
             }
           },
           {
@@ -56357,7 +56365,7 @@
               "profile": {
                 "circle": 6
               },
-              "note": "steel ball 12 mm"
+              "note": "steel ball 12 mm, held in the carriage's cage"
             },
             "at": {
               "joint": "cage"
@@ -56367,12 +56375,24 @@
             "id": "cylinder",
             "role": "output",
             "shape": {
-              "type": "shaft",
-              "diameter": 30,
-              "length": 100
+              "type": "disc",
+              "radius": 15,
+              "thickness": 100,
+              "note": "the output cylinder, hardened and ground, parallel to the carriage's travel",
+              "exact": true,
+              "journal": 12
             },
-            "at": {
-              "joint": "Oc"
+            "frame": {
+              "origin": [
+                14.85,
+                50,
+                40.85
+              ],
+              "rot": [
+                90,
+                0,
+                0
+              ]
             }
           }
         ],
@@ -56385,13 +56405,14 @@
             "at": [
               0,
               0,
-              20
+              12
             ],
             "axis": [
               0,
               0,
               1
-            ]
+            ],
+            "note": "the disc's top face at z 20"
           },
           {
             "id": "slide",
@@ -56450,7 +56471,9 @@
               0,
               0,
               20
-            ]
+            ],
+            "integrator": true,
+            "note": "the ball on the disc's face at radius x: it spins at ω x / rb about the travel"
           },
           {
             "id": "cyl-contact",
@@ -56461,7 +56484,9 @@
               4.24,
               0,
               30.24
-            ]
+            ],
+            "integrator": true,
+            "note": "the ball on the cylinder at 45°: the cylinder turns at ω x / rc"
           }
         ],
         "params": [
@@ -56519,49 +56544,42 @@
               40
             ],
             "default": 0,
-            "follows": {
-              "driver": "disc",
-              "law": "x = A sin(disc angle)"
-            }
+            "lo": -40,
+            "hi": 40,
+            "phase": 90,
+            "note": "by default x = 40 sin(disc angle): a quarter turn ahead of a cosine sweep",
+            "pin": "P",
+            "yokeSide": -1
           }
         ],
         "solve": [
           {
-            "block": "gear-mesh",
-            "id": "disc-ball",
+            "block": "integrator",
+            "id": "integral",
             "joints": [
               "disc-contact",
-              "cage"
-            ],
-            "in": {
-              "a": "disc",
-              "b": "ball",
-              "ra": "carriage",
-              "rb": "rb"
-            },
-            "out": "ball-spin",
-            "opts": {
-              "contact": "ball rolling on the disc face at radius x, the carriage position",
-              "note": "ball turns about an axis parallel to the carriage travel at omega_d x / rb"
-            }
-          },
-          {
-            "block": "gear-mesh",
-            "id": "ball-cylinder",
-            "joints": [
               "cyl-contact",
+              "cage",
               "Oc"
             ],
             "in": {
-              "a": "ball",
-              "b": "cylinder",
-              "ra": "rb",
-              "rb": "rc"
+              "disc": "disc",
+              "x": "carriage",
+              "rc": "rc",
+              "rb": "rb",
+              "ball": "ball",
+              "centre": "cage",
+              "spinAxis": [
+                0,
+                1,
+                0
+              ],
+              "cylinder": "cylinder",
+              "cylJoint": "Oc"
             },
-            "out": "theta-c",
-            "opts": {
-              "contact": "rolling, ball on cylinder at 45°",
-              "result": "theta_c = (1/rc) integral of x d(theta_d)"
+            "out": {
+              "angle": "theta-c",
+              "spin": "ball-spin"
             }
           }
         ],
@@ -56576,12 +56594,39 @@
             ]
           },
           {
+            "id": "C",
+            "body": "carriage",
+            "local": [
+              0,
+              0,
+              -6
+            ]
+          },
+          {
+            "id": "D0",
+            "body": "ground",
+            "local": [
+              0,
+              0,
+              20
+            ]
+          },
+          {
             "id": "cyl-mark",
             "body": "cylinder",
             "local": [
               0,
+              15,
+              50
+            ]
+          },
+          {
+            "id": "P",
+            "body": "carriage",
+            "local": [
+              -91,
               0,
-              15
+              -14
             ]
           }
         ],
@@ -56596,7 +56641,12 @@
             "id": "carriage-x",
             "of": "B",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "speed-ratio",
@@ -56626,10 +56676,7 @@
             "body": "carriage"
           },
           {
-            "point": "disc-contact"
-          },
-          {
-            "point": "cyl-contact"
+            "point": "C"
           }
         ],
         "traces": [
@@ -56653,14 +56700,19 @@
           {
             "id": "integrand",
             "kind": "dimension",
-            "from": "Od",
-            "to": "disc-contact",
+            "from": "D0",
+            "to": "C",
             "label": "INTEGRAND x"
           },
           {
             "id": "output-axis",
             "kind": "axis-line",
-            "through": "Oc",
+            "at": "Oc",
+            "axis": [
+              0,
+              -1,
+              0
+            ],
             "label": "OUTPUT AXIS"
           }
         ],

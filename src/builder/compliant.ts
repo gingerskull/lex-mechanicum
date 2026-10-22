@@ -386,7 +386,9 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
   // its throw (a part that swings carries its slot on a smaller radius than its pin)
   const pinR = Math.hypot(...v3.sub(P1, P0).slice(0, 2) as [number, number]) / 2;
   const off = pinR + 9;
-  const S = v3.add(ref, v3.mul(f, -off));
+  // the slot's side of the pin (`yokeSide` -1 puts it on the other side, away from what stands under the base there)
+  const sg = (d as { yokeSide?: number }).yokeSide === -1 ? -1 : 1;
+  const S = v3.add(ref, v3.mul(f, -off * sg));
   const S0 = xf.apply(X0, S);
   const S1 = xf.apply(X1, S);
   const r = Math.hypot(S1[0] - S0[0], S1[1] - S0[1]) / 2;
@@ -394,7 +396,9 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
   const bb = ctx.base.bottom;
   const bt = ctx.base.top;
   const u0 = refPhase(d);
-  const j = ["drive"];
+  // a second drive (the disc's motor already under the base) takes ids of its own
+  const P = ctx.get("drive-motor") ? "drive2" : "drive";
+  const j = [P];
   // the frame of the drive under the base: x along the run, z up
   const Fd: Frame = { o: [0, 0, 0], x: e, z: UP };
   const at2 = (p: Vec3): [number, number] => [v3.dot(p, e), v3.dot(p, f)];
@@ -407,46 +411,47 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
     const ext = ctx.extent(body);
     return ext ? v3.dot(v3.add(ext.frame.o, v3.mul(ext.frame.z, ext.w1)), UP) : ref[2];
   })();
-  D.add(H.shaft(`drive-pin`, { d: pinD, z0: bb - 8.5, z1: partTop }, { body, at: [px, py, 0], name: `Drive pin Ø${pinD}, pressed into the ${titleOf(body).toLowerCase()}` }));
+  D.add(H.shaft(`${P}-pin`, { d: pinD, z0: bb - 8.5, z1: partTop }, { body, at: [px, py, 0], name: `Drive pin Ø${pinD}, pressed into the ${titleOf(body).toLowerCase()}` }));
   // the yoke: clamped on the pin's end, its slot square to the run over the crank's circle
   // the yoke runs under the lead's clips (bb - 3.2) with clearance
   const yz0 = bb - 7.5;
   const yz1 = bb - 3.5;
   const slotHalf = r + pinD / 2 + 1.5;
-  const yoke = ccw([[px - 6, py + 6], [px - 6, cy - slotHalf - 5], [px + 6, cy - slotHalf - 5], [px + 6, py + 6]].map(([a, b]): Vec2 => [a!, b!]));
+  const yoke = ccw([[px - 6, py + 6 * sg], [px - 6, cy - sg * (slotHalf + 5)], [px + 6, cy - sg * (slotHalf + 5)], [px + 6, py + 6 * sg]].map(([a, b]): Vec2 => [a!, b!]));
   // a swinging yoke tilts with its part: the slot's clearance takes the tilt over the crank pin's run along it
   const c = 0.1 + r * Math.abs(Math.sin(((hi - lo) / 2) * (Math.PI / 180))) * (d.kind === "linear" ? 0 : 1);
   const [sx] = at2(S);
   const slotRing = ccw([[sx - pinD / 2 - c, cy - slotHalf], [sx + pinD / 2 + c, cy - slotHalf], [sx + pinD / 2 + c, cy + slotHalf], [sx - pinD / 2 - c, cy + slotHalf]]).reverse();
-  D.add(H.plate(`drive-yoke`, yoke, { body, kind: "plate", role: "driver", name: "Slotted yoke, clamped on the drive pin (Scotch yoke)", z0: yz0, z1: yz1, holes: [circle(pinD / 2, px, py, 20).reverse(), slotRing], mat: "Steel C45, slot hardened" }));
+  D.add(H.plate(`${P}-yoke`, yoke, { body, kind: "plate", role: "driver", name: "Slotted yoke, clamped on the drive pin (Scotch yoke)", z0: yz0, z1: yz1, holes: [circle(pinD / 2, px, py, 20).reverse(), slotRing], mat: "Steel C45, slot hardened" }));
   void cx;
   // the crank: a disc on the gear motor's shaft, its pin in the yoke's slot at radius r
   const mot = MOTORS.pancake;
   const cz0 = yz0 - 6;
   const cz1 = yz0 - 1.5;
   const crankAt: Vec3 = [C[0], C[1], 0];
-  const spin = { at: crankAt, axis: UP, u0 };
+  // the driver's phase: the crank stands that much further round at the cycle's start
+  const spin = { at: crankAt, axis: UP, u0: u0 - (d.phase ?? 0) * (Math.PI / 180) };
   // the crank pin at the reference: the cosine law puts it at e = -r cos u0 from the centre, turned about z
   const pinAt: Vec3 = v3.add(C, v3.add(v3.mul(e, -r * Math.cos(u0)), v3.mul(f, -r * Math.sin(u0))));
   const [qx, qy] = at2(pinAt);
-  D.add(H.solid(`drive-crank`, { name: `Crank disc Ø${2 * r + 12}, throw ${r.toFixed(2)}, on the gear motor's shaft`, kind: "pulley", role: "driver", mat: "Steel C45", outer: circle(r + 6, cx, cy, 36), holes: [circle(mot.shaft / 2, cx, cy, 16).reverse()], z0: cz0, z1: cz1 }));
-  D.add(H.shaft(`drive-crank-pin`, { d: pinD, z0: cz1 - 1, z1: yz1 - 0.5 }, { at: [qx, qy, 0], name: `Crank pin Ø${pinD}, hardened, runs in the yoke's slot` }));
-  D.add(H.flag(`drive-flag`, r + 6, r + 6 + SENSOR.depth - 1.5 + 2, Math.atan2(qy - cy, qx - cx) + Math.PI, { at: [cx, cy, 0], z0: cz0 - 1, z1: cz0 - 1 + SENSOR.vane }));
-  const spun = D.list.filter((s) => s.id.startsWith("drive-crank") || s.id === "drive-flag");
+  D.add(H.solid(`${P}-crank`, { name: `Crank disc Ø${2 * r + 12}, throw ${r.toFixed(2)}, on the gear motor's shaft`, kind: "pulley", role: "driver", mat: "Steel C45", outer: circle(r + 6, cx, cy, 36), holes: [circle(mot.shaft / 2, cx, cy, 16).reverse()], z0: cz0, z1: cz1 }));
+  D.add(H.shaft(`${P}-crank-pin`, { d: pinD, z0: cz1 - 1, z1: yz1 - 0.5 }, { at: [qx, qy, 0], name: `Crank pin Ø${pinD}, hardened, runs in the yoke's slot` }));
+  D.add(H.flag(`${P}-flag`, r + 6, r + 6 + SENSOR.depth - 1.5 + 2, Math.atan2(qy - cy, qx - cx) + Math.PI, { at: [cx, cy, 0], z0: cz0 - 1, z1: cz0 - 1 + SENSOR.vane }));
+  const spun = D.list.filter((s) => s.id.startsWith(`${P}-crank`) || s.id === `${P}-flag`);
   // the motor under the crank, on a plate hung from the base on two standoffs
   const mz1 = cz0 - 3;
   const mz0 = mz1 - mot.H;
-  D.add(H.solid(`drive-motor`, { name: `Gear motor Ø${2 * mot.R} x ${mot.H}, one turn per cycle, 24 V`, kind: "motor", role: "hw", mat: "Aluminium housing", outer: circle(mot.R, cx, cy, 48), z0: mz0, z1: mz1 }));
-  D.add(H.solid(`drive-motor-core`, { name: "", kind: "motorInternal", role: "hw", outer: circle(mot.R - 4, cx, cy, 36), z0: mz0 + 3, z1: mz1 - 3, faint: true, inset: true }));
-  D.add(H.shaft(`drive-shaft`, { d: mot.shaft, z0: mz1, z1: cz1 }, { at: [cx, cy, 0], name: `Motor shaft Ø${mot.shaft}` }));
+  D.add(H.solid(`${P}-motor`, { name: `Gear motor Ø${2 * mot.R} x ${mot.H}, one turn per cycle, 24 V`, kind: "motor", role: "hw", mat: "Aluminium housing", outer: circle(mot.R, cx, cy, 48), z0: mz0, z1: mz1 }));
+  D.add(H.solid(`${P}-motor-core`, { name: "", kind: "motorInternal", role: "hw", outer: circle(mot.R - 4, cx, cy, 36), z0: mz0 + 3, z1: mz1 - 3, faint: true, inset: true }));
+  D.add(H.shaft(`${P}-shaft`, { d: mot.shaft, z0: mz1, z1: cz1 }, { at: [cx, cy, 0], name: `Motor shaft Ø${mot.shaft}` }));
   const plateZ1 = mz0;
   const plateZ0 = mz0 - 4;
   // the standoffs stand clear of the yoke's sweep (a long stroke's yoke runs past the motor)
   const soR = Math.max(mot.R + 8, r + 6 + SENSOR.depth + 0.5 + 6.5);
-  D.add(H.plate(`drive-plate`, roundRect(cx - soR - 6, cy - mot.R - 4, cx + soR + 6, cy + mot.R + 4, 4), { kind: "bracket", role: "ground", name: "Motor plate, hung from the base on two standoffs", z0: plateZ0, z1: plateZ1, mat: "Aluminium 6061-T6, anodised" }));
+  D.add(H.plate(`${P}-plate`, roundRect(cx - soR - 6, cy - mot.R - 4, cx + soR + 6, cy + mot.R + 4, 4), { kind: "bracket", role: "ground", name: "Motor plate, hung from the base on two standoffs", z0: plateZ0, z1: plateZ1, mat: "Aluminium 6061-T6, anodised" }));
   for (const [k, s] of [[0, -1], [1, 1]] as const) {
-    D.add(H.standoff(`drive-so${k}`, { at: [cx + s * soR, cy, 0], z0: plateZ1, z1: bb, ...(k ? { name: "" } : {}) }));
-    D.add(H.screw(`drive-sos${k}`, "socket", 5, 10, { at: [cx + s * soR, cy, 0], face: plateZ0, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    D.add(H.standoff(`${P}-so${k}`, { at: [cx + s * soR, cy, 0], z0: plateZ1, z1: bb, ...(k ? { name: "" } : {}) }));
+    D.add(H.screw(`${P}-sos${k}`, "socket", 5, 10, { at: [cx + s * soR, cy, 0], face: plateZ0, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
   }
   // the fork sensor straddling the flag, on the plate; terminals and a lead under the base
   const sa = Math.atan2(qy - cy, qx - cx) + Math.PI;
@@ -456,14 +461,14 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
     return ccw([[r0, -w], [r1, -w], [r1, w], [r0, w]].map(([a, b]): Vec2 => [cx + a! * c - b! * sn, cy + a! * sn + b! * c]));
   };
   const fz = cz0 - 1 + SENSOR.vane / 2;
-  D.add(H.solid(`drive-sensor`, { name: `Fork sensor, slotted optical, ${SENSOR.slot} mm gap`, kind: "sensor", role: "hw", mat: "PBT housing", outer: box(mouth, mouth + SENSOR.l), z0: fz - SENSOR.h / 2, z1: fz - SENSOR.slot / 2, group: "drive-sensor" }));
-  D.add(H.solid(`drive-sensor-jaw`, { name: "", kind: "sensor", role: "hw", outer: box(mouth, mouth + SENSOR.l), z0: fz + SENSOR.slot / 2, z1: fz + SENSOR.h / 2, group: "drive-sensor" }));
-  D.add(H.solid(`drive-sensor-back`, { name: "", kind: "sensor", role: "hw", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: fz - SENSOR.slot / 2, z1: fz + SENSOR.slot / 2, group: "drive-sensor" }));
+  D.add(H.solid(`${P}-sensor`, { name: `Fork sensor, slotted optical, ${SENSOR.slot} mm gap`, kind: "sensor", role: "hw", mat: "PBT housing", outer: box(mouth, mouth + SENSOR.l), z0: fz - SENSOR.h / 2, z1: fz - SENSOR.slot / 2, group: `${P}-sensor` }));
+  D.add(H.solid(`${P}-sensor-jaw`, { name: "", kind: "sensor", role: "hw", outer: box(mouth, mouth + SENSOR.l), z0: fz + SENSOR.slot / 2, z1: fz + SENSOR.h / 2, group: `${P}-sensor` }));
+  D.add(H.solid(`${P}-sensor-back`, { name: "", kind: "sensor", role: "hw", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: fz - SENSOR.slot / 2, z1: fz + SENSOR.slot / 2, group: `${P}-sensor` }));
   const post: Vec2 = [cx + (mouth + SENSOR.l - 5) * Math.cos(sa), cy + (mouth + SENSOR.l - 5) * Math.sin(sa)];
-  D.add(H.standoff(`drive-sensor-post`, { at: [post[0], post[1], 0], z0: fz + SENSOR.h / 2, z1: bb, name: "Standoff Ø10 under the base, carries the sensor" }));
-  const tb: Vec2 = [cx, cy - Math.max(mot.R + 16, slotHalf + 18)];
-  D.add(H.terminalBlock(`drive-terminals`, 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb }));
-  D.add(H.lead(`drive-lead`, [[cx, cy - mot.R + 2], [cx + 3, cy - mot.R - 6], tb], { z0: bb - 2.2, z1: bb - 1.2 }));
+  D.add(H.standoff(`${P}-sensor-post`, { at: [post[0], post[1], 0], z0: fz + SENSOR.h / 2, z1: bb, name: "Standoff Ø10 under the base, carries the sensor" }));
+  const tb: Vec2 = [cx, cy - sg * Math.max(mot.R + 16, slotHalf + 18)];
+  D.add(H.terminalBlock(`${P}-terminals`, 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb }));
+  D.add(H.lead(`${P}-lead`, [[cx, cy - sg * (mot.R - 2)], [cx + 3, cy - sg * (mot.R + 6)], tb], { z0: bb - 2.2, z1: bb - 1.2 }));
   const solids = D.out();
   for (const s of solids) if (spun.some((q) => q.id === s.id)) s.spin = spin;
   ctx.add(solids);
@@ -489,12 +494,12 @@ function buildYoke(ctx: BuildCtx, d: KinDriver & { pin: string }): void {
   void bt;
   void fromPlane;
   ctx.note({
-    id: "drive",
+    id: P,
     kit: "drive",
     at: [C[0], C[1], bb],
     title: "Drive",
     note: `A pin pressed into the ${titleOf(body).toLowerCase()} runs down through a slot in the base to a slotted yoke; a crank of ${r.toFixed(2)} mm throw on a gear motor that makes one turn per cycle drives the yoke (a Scotch yoke: the slide follows the driver's cosine law exactly). The motor hangs from the base on a plate and two standoffs; a home flag on the crank disc, a fork sensor on a standoff, terminals and a lead under the base.`,
-    serves: { F10: ["drive-flag", "drive-sensor"] },
+    serves: { F10: [`${P}-flag`, `${P}-sensor`] },
     badge: ["motor driven", "ok"],
   });
 }

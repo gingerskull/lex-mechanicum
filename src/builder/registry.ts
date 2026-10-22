@@ -12,6 +12,7 @@ import { j11 } from "./screws";
 import { j13, yokeDrive } from "./compliant";
 import { j12 } from "./flexible";
 import { cvt } from "./cvt";
+import { integrator } from "./integrator";
 import { friction } from "./friction";
 import type { Rule } from "./rules/types";
 
@@ -33,6 +34,7 @@ export const rules: Rule[] = [
   // a belt or chain loop first: the stacks' bridges are routed clear of what it carries round
   j12,
   cvt,
+  integrator,
   j3,
   j2,
   j10,

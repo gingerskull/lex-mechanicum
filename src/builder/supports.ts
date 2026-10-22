@@ -154,6 +154,7 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
   const tryAt = (wb: number): boolean => {
     const g = blockGeom(ctx, { id: `${o.id}-t`, f: o.frame, d: o.d, live: o.live, wb, baseTop: o.baseTop, first: false });
     const c = clearance(ctx, geomList(g));
+    if (process.env.PBDBG && c < MIN_GAP) { const m = worldManifold(ctx.M, geomList(g)[0]!); console.log("PB", o.id, wb.toFixed(1), geomList(g)[0]!.id, ctx.sweeps.moving().map((b) => `${b}:${ctx.sweeps.gap(m, [b], 5).toFixed(1)}`).join(" ")); m.delete(); }
     return c >= MIN_GAP;
   };
   const below: number[] = [];
@@ -182,6 +183,7 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
     // both on the one side that clears, one block width apart
     const side = below.length ? -1 : 1;
     const w0 = (below[0] ?? above[0])!;
+    if (w0 === undefined && process.env.PBDBG) return pillowBlocks(ctx, { ...o, lo: o.lo - 1000, hi: o.hi + 1000 });
     if (w0 === undefined) throw new Error(`${o.id}: no place for a pillow block clears the sweeps`);
     const step = W + 4;
     w = side < 0 ? [w0, w0 - step] : [w0, w0 + step];

@@ -12,6 +12,7 @@ import type { Op, Profile } from "../solids/types";
 import { nutGeom, screwGeom } from "./screws";
 import { flexureGeom } from "./compliant";
 import { forkGeom, sheaveGeom } from "./cvt";
+import { ballGeom, carriageGeom } from "./integrator";
 import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 
@@ -203,7 +204,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
       const rev = js.find((r) => r.joint.type === "revolute" && (r.joint.a === "ground" || r.joint.b === "ground"));
       if (rev && Math.abs(Math.abs(v3.dot(v3.unit(rev.axis), frame.z)) - 1) < 1e-6 && v3.len(v3.cross(v3.sub(frame.o, rev.at), v3.unit(rev.axis))) < 1e-6) geom.axisym = true;
     }
-    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? sheaveGeom(kin, S, b, geom) ?? forkGeom(kin, S, b, geom) ?? geom);
+    out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? sheaveGeom(kin, S, b, geom) ?? forkGeom(kin, S, b, geom) ?? ballGeom(b, geom) ?? carriageGeom(kin, b, geom) ?? exactGeom(b, geom));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -361,3 +362,8 @@ function cylinder(b: KinBody, g: BodyGeom): BodyGeom | null {
 }
 
 const rot = (pts: Vec2[], a: number): Vec2[] => pts.map(([x, y]): Vec2 => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)]);
+
+/** A body whose shape says `exact`: it stands at its own frame (its part from there along its z), not on a slab. */
+function exactGeom(b: KinBody, g: BodyGeom): BodyGeom {
+  return (b.shape as Record<string, unknown> | undefined)?.exact === true ? { ...g, exact: { offset: 0 } } : g;
+}

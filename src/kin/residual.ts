@@ -186,6 +186,9 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const tb1 = tb0 + turn(s.b0, s.b1, ax2);
     return chainAdvance(ta1, za, p, pa) - chainAdvance(ta0, za, p, pa) - (chainAdvance(tb1, zb, p, pb) - chainAdvance(tb0, zb, p, pb));
   }
+  // an integrator's rolling contacts: the integrator block keeps θc = (1/rc) ∫ x dθd, a relation over the whole motion
+  // that no single step's poses state exactly (the claims check its closed form)
+  if (j.type === "rolling" && jr.integrator) return null;
   if (j.type === "belt" && jr.flexible === "cvt") {
     // a variator's belt: wheel 2 runs at the radius that keeps the belt's length, and turns r1/r2 times wheel 1
     const r1 = n(j.radiusA);
