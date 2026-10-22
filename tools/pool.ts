@@ -65,7 +65,8 @@ export async function runPool<T, R>(task: (x: T) => Promise<R>, module: string, 
       const start = () => {
         const child = fork(worker, [], { serialization: "advanced", stdio: ["ignore", "inherit", "inherit", "ipc"] });
         live.add(child);
-        let task = -1;
+        // the item the child is working on, -1 when idle
+        let busy = -1;
         const give = () => {
           if (failed || next >= items.length) {
             live.delete(child);
@@ -73,14 +74,15 @@ export async function runPool<T, R>(task: (x: T) => Promise<R>, module: string, 
             if (--running === 0 && !failed) resolve();
             return;
           }
-          task = next++;
-          child.send({ i: task, url, fn, arg: items[task] });
+          busy = next++;
+          child.send({ i: busy, url, fn, arg: items[busy] });
         };
+        child.on("error", fail);
         child.on("message", (m: Reply) => {
           if (!m.ok) return fail(new Error(m.error));
           out[m.i] = m.value as R;
           done[m.i] = true;
-          task = -1;
+          busy = -1;
           try {
             flush();
           } catch (e) {
@@ -93,7 +95,7 @@ export async function runPool<T, R>(task: (x: T) => Promise<R>, module: string, 
           } else give();
         });
         child.on("exit", (code) => {
-          if (task >= 0) fail(new Error(`a pool process stopped (${code}) on item ${task}`));
+          if (busy >= 0) fail(new Error(`a pool process stopped (${code}) on item ${busy}`));
         });
         give();
       };
