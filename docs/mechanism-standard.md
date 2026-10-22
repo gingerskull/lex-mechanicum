@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.7
+version: 3.8
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -917,6 +917,9 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.8 (2026-10-22).** The sixteen laws: the standard grouped into sixteen numbered rules, each naming the sections
+  and requirement ids it covers; every requirement id falls under exactly one law, checked by a test. No requirement
+  changes [S1, DATA].
 - **3.7 (2026-10-22).** Rebuild batch R4 (gears). J6 gear kits: compound gears and joined levels (a long pinion
   through two planes); helical, herringbone, worm, spiral bevel and non-circular teeth; a rack guided from its back; a
   ring gear on carrier rollers (`ring-carrier`); a cycloidal disc on ring pins (`pin-ring`) with output pins in
