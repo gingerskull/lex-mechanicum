@@ -12,6 +12,7 @@
 // `over: "speed"` style claims over another driver, and outputs the library does not compute, are reported as
 // uncheckable, never as a mismatch.
 import type { Kinematics } from "../kin/compose";
+import { xf } from "../kin/math";
 import type { Pose } from "../kin/types";
 
 export interface Claim {
@@ -25,6 +26,10 @@ export interface Claim {
   feature?: string;
   band?: number | [number, number];
   over?: string;
+  /** The window of the input's values (a rotary input's degrees may wrap past 360) the statistic is taken over. */
+  span?: [number, number];
+  /** The statistic is taken on the absolute value. */
+  abs?: boolean;
   [k: string]: unknown;
 }
 
@@ -93,11 +98,38 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   const u = poses.map((_, i) => (i / n) * 360);
   const x = poses.map((p) => p.values[drv.id] ?? NaN);
   let y: number[];
-  if (o.kind === "speed-ratio") {
+  if (o.kind === "speed-ratio" && poses.every((p) => typeof p.outputs[o.id] === "number")) {
+    // computed with the pose (src/kin/compose.ts)
+    y = poses.map((p) => p.outputs[o.id] as number);
+  } else if (o.kind === "speed-ratio" && poses.every((p) => p.points.has(o.of)) && !K.kin.bodies.some((b) => b.id === o.of)) {
+    // a point's speed: per unit of input (P's speed over a slider's), or with unit "%" as a share of its mean speed over
+    // the cycle (a tip that slows on its straight)
+    // a rotary input wraps by its span at the end of the cycle; the step across the wrap is the step before it
+    const wrap = drv.kind === "rotary" ? (drv.range ? drv.range[1] - drv.range[0] : 360) : 0;
+    const step = (i: number, j: number) => {
+      const a = poses[i]!.points.get(o.of)!;
+      const b = poses[j]!.points.get(o.of)!;
+      let dx = x[j]! - x[i]!;
+      if (wrap) dx -= wrap * Math.round(dx / wrap);
+      return Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) / Math.abs(dx);
+    };
+    // centred, or one-sided where an oscillating input turns back (its centred step is zero)
+    const sp = poses.map((_, i) => {
+      const c = step((i + n - 1) % n, (i + 1) % n);
+      return Number.isFinite(c) ? c : step(i, (i + 1) % n);
+    });
+    const mean = sp.reduce((a, b) => a + b, 0) / n;
+    y = (o as { unit?: string }).unit === "%" ? sp.map((v) => (100 * v) / mean) : sp;
+  } else if (o.kind === "speed-ratio") {
     // the turn of the output body per turn of the input, from the series of its angle
-    // the angle of `of`: an output or value of that name, else the body's own angle output
+    // the angle of `of`: an output or value of that name, else the body's own angle output, else the body's turn
     const via = outputs.find((q) => q.of === o.of && q.kind === "angle")?.id;
-    const angle = poses.map((p) => angleOf(p, o.of) ?? (via ? angleOf(p, via) : undefined));
+    const axis = K.joints().find((j) => j.joint.a === o.of || j.joint.b === o.of)?.axis;
+    const turn = (p: Pose): number | undefined => {
+      const X = p.bodies.get(o.of);
+      return X && axis ? xf.angleAbout(X, axis) * (180 / Math.PI) : undefined;
+    };
+    const angle = poses.map((p) => angleOf(p, o.of) ?? (via ? angleOf(p, via) : turn(p)));
     if (angle.some((a) => a === undefined)) return `output ${o.id}: no angle of ${o.of}`;
     const a = unwrap(angle as number[]);
     const xs = unwrap(x);
@@ -114,6 +146,19 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
     if (o.kind === "angle") y = unwrap(y);
   }
   if (y.some((v) => !Number.isFinite(v))) return `output ${o.id} is not finite`;
+  if (claim.abs) y = y.map(Math.abs);
+  const span = claim.span as [number, number] | undefined;
+  if (span) {
+    // only the samples whose input value lies in the window: for a rotary input in degrees, which may wrap past 360
+    const [a, b] = span;
+    const inside = (d: number) => {
+      if (drv.kind !== "rotary") return d >= a - 1e-9 && d <= b + 1e-9;
+      const t = (((d - a) % 360) + 360) % 360;
+      return t <= b - a + 1e-9;
+    };
+    const keep = x.map(inside);
+    return { u: u.filter((_, i) => keep[i]), x: x.filter((_, i) => keep[i]), y: y.filter((_, i) => keep[i]) };
+  }
   return { u, x, y };
 }
 

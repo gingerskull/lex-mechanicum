@@ -354,7 +354,7 @@
           "paths"
         ],
         "plot": "outer wheel angle vs inner wheel angle, with the ideal Ackermann curve",
-        "notes": "Tie rod behind the axle: PR = circleX(PL, t, KR, r, -1). A wheel on each knuckle, 22 mm outboard of the kingpin. Draw both wheel axis lines and the rear-axle line dashed: they meet near one point, the turning centre, which lies on the plate at full lock (about 300 mm to the side)."
+        "notes": "Tie rod behind the axle: PR = circleX(KR, r, PL, t, +1). A wheel on each knuckle, on a stub axle 24 mm outboard of the kingpin, carried by an upright tube round the kingpin. Draw both wheel axis lines and the rear-axle line dashed: they meet near one point, the turning centre, which lies on the plate at full lock (about 300 mm to the side)."
       },
       "examples": [
         {
@@ -454,8 +454,8 @@
               ],
               "wheel": {
                 "diameter": 70,
-                "width": 22,
-                "stub": 22
+                "width": 18,
+                "stub": 24
               }
             },
             "at": {
@@ -474,8 +474,8 @@
               ],
               "wheel": {
                 "diameter": 70,
-                "width": 22,
-                "stub": 22
+                "width": 18,
+                "stub": 24
               }
             },
             "at": {
@@ -487,7 +487,7 @@
             "role": "link",
             "shape": {
               "type": "link",
-              "length": 121.44,
+              "length": 121.44258092354171,
               "boss": [
                 9.5,
                 9.5
@@ -541,8 +541,8 @@
             "a": "knuckle-left",
             "b": "tie-rod",
             "at": [
-              -60.72,
-              -42.67,
+              -60.721290461770856,
+              -42.67456448427897,
               0
             ],
             "axis": [
@@ -557,8 +557,8 @@
             "a": "tie-rod",
             "b": "knuckle-right",
             "at": [
-              60.72,
-              -42.67,
+              60.721290461770856,
+              -42.67456448427897,
               0
             ],
             "axis": [
@@ -603,7 +603,7 @@
           },
           {
             "id": "t",
-            "value": 121.44,
+            "value": 121.44258092354171,
             "unit": "mm",
             "min": 100,
             "max": 140,
@@ -611,7 +611,7 @@
           },
           {
             "id": "stub",
-            "value": 22,
+            "value": 24,
             "unit": "mm",
             "min": 15,
             "max": 30,
@@ -652,10 +652,10 @@
               "KR"
             ],
             "in": {
-              "a": "PL",
-              "b": "KR",
-              "ra": "t",
-              "rb": "r"
+              "a": "KR",
+              "b": "PL",
+              "ra": "r",
+              "rb": "t"
             },
             "branch": "behind",
             "out": "PR"
@@ -666,8 +666,8 @@
             "id": "WL",
             "body": "knuckle-left",
             "local": [
-              -6.98,
-              -20.86,
+              -7.61531175372221,
+              -22.759767724948784,
               0
             ]
           },
@@ -675,8 +675,8 @@
             "id": "WR",
             "body": "knuckle-right",
             "local": [
-              -6.98,
-              20.86,
+              -7.615311753722213,
+              22.759767724948784,
               0
             ]
           },
@@ -706,6 +706,42 @@
               -224.15,
               0
             ]
+          },
+          {
+            "id": "rear-far-left",
+            "body": "ground",
+            "local": [
+              -379,
+              -200,
+              0
+            ]
+          },
+          {
+            "id": "rear-far-right",
+            "body": "ground",
+            "local": [
+              329.1,
+              -200,
+              0
+            ]
+          },
+          {
+            "id": "centre-left-lock",
+            "body": "ground",
+            "local": [
+              -359,
+              -238.3,
+              0
+            ]
+          },
+          {
+            "id": "centre-right-lock",
+            "body": "ground",
+            "local": [
+              309.1,
+              -221.8,
+              0
+            ]
           }
         ],
         "outputs": [
@@ -728,7 +764,7 @@
         "review": {
           "verdict": "rethink",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: a wheel on each knuckle, dashed wheel-axis lines and the rear-axle line that meet near one point, the turning centre. The wheelbase is shortened from 250 to 200 mm and the arms lengthened from 30 to 45 mm. The left knuckle keeps its range of -30 to +40 degrees; to reach -30 the arms are angled 18.5 degrees inward, a little less than the 20.6 degrees that aims them at the rear axle centre, and the outer wheel stays within 2 degrees of the ideal over the whole range. A shorter wheelbase would put the centre nearer but cannot reach -30 degrees with a good trapezoid."
+          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: a wheel on each knuckle, dashed wheel-axis lines and the rear-axle line that meet near one point, the turning centre. The wheelbase is shortened from 250 to 200 mm and the arms lengthened from 30 to 45 mm. The left knuckle keeps its range of -30 to +40 degrees; to reach -30 the arms are angled 18.5 degrees inward, a little less than the 20.6 degrees that aims them at the rear axle centre, and the outer wheel stays within 2 degrees of the ideal over the whole range. A shorter wheelbase would put the centre nearer but cannot reach -30 degrees with a good trapezoid. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): rethink, as decided. A wheel stands on each knuckle on a stub axle in an upright tube (stub 24 mm, width 18, so the wheel clears its tube); the wheel axis lines are carried to the rear axle line and the turning centre is marked where they meet, about 38 mm behind that line at full lock because the outer wheel turns 1.5 degrees more than ideal. The base holds the rear axle line and both full-lock centres. The tie rod closes on the right side of the dyad, which the record had reversed."
         },
         "principle": [
           {
@@ -780,8 +816,8 @@
           {
             "id": "rear-axle",
             "kind": "axis-line",
-            "from": "rear-left",
-            "through": "rear-right",
+            "from": "rear-far-left",
+            "through": "rear-far-right",
             "dashed": true,
             "label": "REAR AXLE LINE"
           },
@@ -1128,12 +1164,12 @@
                   0
                 ],
                 [
-                  40,
+                  60,
                   0
                 ],
                 [
                   0,
-                  -60
+                  40
                 ]
               ],
               "boss": 12
@@ -1178,7 +1214,7 @@
             "shape": {
               "type": "slider",
               "length": 36,
-              "width": 20
+              "width": 28
             },
             "at": {
               "joint": "S"
@@ -1190,7 +1226,7 @@
             "shape": {
               "type": "slider",
               "length": 36,
-              "width": 20
+              "width": 28
             },
             "at": {
               "joint": "G"
@@ -1406,22 +1442,44 @@
             "out": "A"
           },
           {
+            "block": "dyad",
+            "id": "lever-arm",
+            "joints": [
+              "B"
+            ],
+            "in": {
+              "a": "O",
+              "b": "A",
+              "ra": "r2",
+              "rb": "sqrt(r1^2+r2^2-2*r1*r2*cos(alpha))"
+            },
+            "branch": "elbow-up",
+            "out": "B"
+          },
+          {
             "block": "slider-dyad",
             "id": "output-rod",
             "joints": [
-              "B",
               "G",
               "G-slide"
             ],
             "in": {
+              "kind": "rrp",
               "a": "B",
-              "ra": "Lout",
-              "guide": "G-slide"
+              "r": "Lout",
+              "p": [
+                40,
+                100,
+                0
+              ],
+              "d": [
+                0,
+                1,
+                0
+              ]
             },
-            "out": "G",
-            "opts": {
-              "side": "above B"
-            }
+            "branch": "elbow-up",
+            "out": "G"
           }
         ],
         "points": [],
@@ -1443,11 +1501,6 @@
             "of": "slide-out",
             "kind": "position",
             "unit": "mm"
-          },
-          {
-            "id": "displacement-ratio",
-            "of": "slide-out",
-            "kind": "speed-ratio"
           }
         ],
         "fallback": null
@@ -1456,7 +1509,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: the two moment arms are drawn as dimensions perpendicular to each rod's line of action, so the arm ratio 60 : 40 reads as the force ratio 1.5 and the travel ratio 0.67."
+          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: the two moment arms are drawn as dimensions perpendicular to each rod's line of action, so the arm ratio 60 : 40 reads as the force ratio 1.5 and the travel ratio 0.67. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The moment arms are drawn square to each rod's line. The record had the lever outline in the wrong frame (its x runs toward A) and asked the output slide for B before any block made it: B now comes from a second dyad on the lever's rigid triangle, and the displacement ratio is a slope of output against input (0.667)."
         },
         "principle": [
           {
@@ -1545,9 +1598,8 @@
           },
           {
             "text": "output motion = input motion x r2 / r1 = 0.67 for small swings",
-            "output": "displacement-ratio",
-            "stat": "at",
-            "at": 0,
+            "output": "output-position",
+            "stat": "ratio",
             "value": 0.667,
             "tol": 0.005
           }
@@ -3092,8 +3144,8 @@
             "a": "arm-O",
             "b": "arm-E",
             "at": [
-              96.73,
-              52.37,
+              96.73351644295707,
+              52.37009448702716,
               0
             ],
             "axis": [
@@ -3108,8 +3160,8 @@
             "a": "arm-O",
             "b": "bar-M1",
             "at": [
-              48.37,
-              26.19,
+              48.366758221478534,
+              26.18504724351358,
               0
             ],
             "axis": [
@@ -3124,8 +3176,8 @@
             "a": "arm-E",
             "b": "bar-M2",
             "at": [
-              150.37,
-              40.19,
+              150.36675822147853,
+              40.18504724351358,
               0
             ],
             "axis": [
@@ -3215,26 +3267,24 @@
             "default": 0,
             "cycle": {
               "from": "flower",
-              "note": "the cycle moves the stylus T once round the target flower"
+              "note": "the cycle moves the stylus T once round the flower"
             }
           }
         ],
         "solve": [
           {
-            "block": "new:target-path",
+            "block": "target-path",
             "id": "flower",
+            "joints": [],
             "in": {
+              "shape": "flower",
               "cx": "cx",
               "cy": "cy",
               "r0": "r0",
-              "lobe": "lobe"
+              "lobe": "lobe",
+              "lobes": 5
             },
-            "out": "S",
-            "opts": {
-              "shape": "flower",
-              "lobes": 5,
-              "law": "r = r0 + lobe cos 5u"
-            }
+            "out": "T"
           },
           {
             "block": "dyad",
@@ -3250,16 +3300,25 @@
               "rb": "h"
             },
             "branch": "elbow",
-            "out": "M1",
-            "opts": {
-              "note": "A = 2 M1"
-            }
+            "out": "M1"
+          },
+          {
+            "block": "lerp",
+            "id": "elbow",
+            "joints": [
+              "A"
+            ],
+            "in": {
+              "a": "O",
+              "b": "M1",
+              "t": 2
+            },
+            "out": "A"
           },
           {
             "block": "dyad",
             "id": "rhombus",
             "joints": [
-              "A",
               "M2"
             ],
             "in": {
@@ -3268,10 +3327,8 @@
               "ra": "h",
               "rb": "h"
             },
-            "out": "M2",
-            "opts": {
-              "pick": "the root that is not M1, closing the rhombus M1-A-M2-T"
-            }
+            "branch": "elbow",
+            "out": "M2"
           }
         ],
         "points": [
@@ -3306,7 +3363,9 @@
             "id": "elbow-angle",
             "of": "A",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "O",
+            "to": "E"
           },
           {
             "id": "stylus-reach",
@@ -3322,7 +3381,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep): the stylus is moved round a five-lobed flower and the pen draws it at twice the size. The line O, T, E is drawn as construction so the collinearity that makes the copy exact reads at every pose."
+          "note": "Applies the 2026-10-19 review (keep): the stylus is moved round a five-lobed flower and the pen draws it at twice the size. The line O, T, E is drawn as construction so the collinearity that makes the copy exact reads at every pose. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The target-path block moves the stylus round the flower and the dyads close the rhombus; the pen draws the flower at exactly twice the size, with O, T and E in line. The stylus is the cycle, so it is not a slider."
         },
         "principle": [
           {
@@ -3380,13 +3439,7 @@
           }
         ],
         "view": "PLAN",
-        "controls": [
-          {
-            "id": "stylus",
-            "kind": "driver",
-            "driver": "stylus"
-          }
-        ],
+        "controls": [],
         "plot": {
           "x": "stylus",
           "y": "scale",
@@ -3775,8 +3828,8 @@
             "a": "crank",
             "b": "coupler",
             "at": [
-              20,
-              34.64,
+              "a*cos(60)",
+              "a*sin(60)",
               0
             ],
             "axis": [
@@ -3791,8 +3844,8 @@
             "a": "coupler",
             "b": "follower",
             "at": [
-              120,
-              34.64,
+              "a*cos(60)+b",
+              "a*sin(60)",
               0
             ],
             "axis": [
@@ -3807,7 +3860,7 @@
             "a": "ground",
             "b": "follower",
             "at": [
-              100,
+              "d",
               0,
               0
             ],
@@ -3942,7 +3995,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: both coupler ends are traced, so two equal circles side by side show the coupler translating without turning. The parallel branch is held through the change points at 0 and 180 degrees."
+          "note": "Applies the 2026-10-19 review (keep) and the issue's decision: both coupler ends are traced, so two equal circles side by side show the coupler translating without turning. The parallel branch is held through the change points at 0 and 180 degrees. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The joint positions are exact (they were rounded, K1 1e-3), and the assembly control is dropped: the parts are built for the parallel closure, which is held through both change points; the assembly stays a design choice."
         },
         "principle": [
           {
@@ -3995,11 +4048,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "assembly",
-            "kind": "design",
-            "design": "assembly"
           }
         ],
         "plot": {
@@ -4518,7 +4566,7 @@
             "b": "b0",
             "at": [
               32.5,
-              31.12,
+              31.12474899497183,
               0
             ],
             "axis": [
@@ -4534,7 +4582,7 @@
             "b": "a1",
             "at": [
               0,
-              62.25,
+              62.24949798994366,
               0
             ],
             "axis": [
@@ -4550,7 +4598,7 @@
             "b": "b1",
             "at": [
               65,
-              62.25,
+              62.24949798994366,
               0
             ],
             "axis": [
@@ -4566,7 +4614,7 @@
             "b": "b1",
             "at": [
               32.5,
-              93.37,
+              93.37424698491549,
               0
             ],
             "axis": [
@@ -4582,7 +4630,7 @@
             "b": "a2",
             "at": [
               0,
-              124.5,
+              124.49899597988733,
               0
             ],
             "axis": [
@@ -4598,7 +4646,7 @@
             "b": "b2",
             "at": [
               65,
-              124.5,
+              124.49899597988733,
               0
             ],
             "axis": [
@@ -4614,7 +4662,7 @@
             "b": "b2",
             "at": [
               32.5,
-              155.62,
+              155.62374497485916,
               0
             ],
             "axis": [
@@ -4630,7 +4678,7 @@
             "b": "platform",
             "at": [
               0,
-              186.75,
+              186.74849396983097,
               0
             ],
             "axis": [
@@ -4646,11 +4694,26 @@
             "b": "platform",
             "at": [
               65,
-              186.75,
+              186.74849396983097,
               0
             ],
-            "slot": "platform",
-            "path": "along the platform, 48.5 to 86.5 from L3"
+            "slot": {
+              "from": [
+                48.5,
+                186.74849396983097,
+                0
+              ],
+              "to": [
+                86.5,
+                186.74849396983097,
+                0
+              ]
+            },
+            "axis": [
+              0,
+              0,
+              1
+            ]
           }
         ],
         "params": [
@@ -4725,17 +4788,38 @@
               "rb": "m"
             },
             "branch": "up",
-            "out": "M0",
-            "opts": {
-              "then": "L1 = 2 M0 - R0, R1 = 2 M0 - L0"
-            }
+            "out": "M0"
+          },
+          {
+            "block": "lerp",
+            "id": "far-left-0",
+            "joints": [
+              "L1"
+            ],
+            "in": {
+              "a": "R0",
+              "b": "M0",
+              "t": 2
+            },
+            "out": "L1"
+          },
+          {
+            "block": "lerp",
+            "id": "far-right-0",
+            "joints": [
+              "R1"
+            ],
+            "in": {
+              "a": "L0",
+              "b": "M0",
+              "t": 2
+            },
+            "out": "R1"
           },
           {
             "block": "dyad",
             "id": "stage-1",
             "joints": [
-              "L1",
-              "R1",
               "M1"
             ],
             "in": {
@@ -4745,17 +4829,38 @@
               "rb": "m"
             },
             "branch": "up",
-            "out": "M1",
-            "opts": {
-              "then": "L2 = 2 M1 - R1, R2 = 2 M1 - L1"
-            }
+            "out": "M1"
+          },
+          {
+            "block": "lerp",
+            "id": "far-left-1",
+            "joints": [
+              "L2"
+            ],
+            "in": {
+              "a": "R1",
+              "b": "M1",
+              "t": 2
+            },
+            "out": "L2"
+          },
+          {
+            "block": "lerp",
+            "id": "far-right-1",
+            "joints": [
+              "R2"
+            ],
+            "in": {
+              "a": "L1",
+              "b": "M1",
+              "t": 2
+            },
+            "out": "R2"
           },
           {
             "block": "dyad",
             "id": "stage-2",
             "joints": [
-              "L2",
-              "R2",
               "M2"
             ],
             "in": {
@@ -4765,25 +4870,46 @@
               "rb": "m"
             },
             "branch": "up",
-            "out": "M2",
-            "opts": {
-              "then": "L3 = 2 M2 - R2, R3 = 2 M2 - L2"
-            }
+            "out": "M2"
+          },
+          {
+            "block": "lerp",
+            "id": "far-left-2",
+            "joints": [
+              "L3"
+            ],
+            "in": {
+              "a": "R2",
+              "b": "M2",
+              "t": 2
+            },
+            "out": "L3"
+          },
+          {
+            "block": "lerp",
+            "id": "far-right-2",
+            "joints": [],
+            "in": {
+              "a": "L2",
+              "b": "M2",
+              "t": 2
+            },
+            "out": "R3"
           },
           {
             "block": "slider-dyad",
             "id": "platform-slot",
             "joints": [
-              "L3",
               "R3"
             ],
             "in": {
+              "kind": "rpr",
               "a": "L3",
-              "b": "R3"
+              "p": "R3",
+              "body": "platform"
             },
-            "out": "platform-angle",
-            "opts": {
-              "inversion": "slotted link: the platform turns about L3 so its slot passes through R3"
+            "out": {
+              "angle": "platform-slot-angle"
             }
           }
         ],
@@ -4803,13 +4929,18 @@
             "id": "platform-height",
             "of": "L3",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              0,
+              1,
+              0
+            ]
           },
           {
             "id": "lift-ratio",
             "of": "L3",
             "kind": "speed-ratio",
-            "over": "carriage"
+            "over": "R0"
           },
           {
             "id": "carriage-position",
@@ -4835,7 +4966,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decision: the ground bridge is moved or drawn see-through so it no longer reads as a scissor bar of the wrong length (engine). The platform point traces a straight vertical line; the span w and one stage height h are dimensioned, so h = sqrt(L^2 - w^2) and the lift ratio 3w / h read off the drawing."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decision: the ground bridge is moved or drawn see-through so it no longer reads as a scissor bar of the wrong length (engine). The platform point traces a straight vertical line; the span w and one stage height h are dimensioned, so h = sqrt(L^2 - w^2) and the lift ratio 3w / h read off the drawing. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. Each stage's far pins come from the lerp block (2M - R), the platform turns by its slot through R3, and C runs straight up and down. The ground bridge is routed off the bars and drawn see-through, so it no longer reads as a scissor bar."
         },
         "principle": [
           {
@@ -6145,10 +6276,10 @@
         "motion": "One block slides along the horizontal groove and the other along the vertical one. A rod lies on top of both and is pinned to each, and a crank from the crossing to the rod's midpoint turns it round. The blocks pass through the crossing one at a time, and a pen at the rod's end traces an ellipse whose half-axes are its distances to the two blocks.",
         "forces": "Each groove can only push its block at right angles to the groove, so the blocks feel side forces only. Driving from the midpoint crank works but the crank and rod rotate in opposite directions, causing friction and wear at the midpoint pin.",
         "benefits": "Exact ellipses of any proportion from two adjustable distances on a straight bar, with no curved guide. The blocks themselves give exact straight-line motion and the midpoint traces a circle.",
-        "limits": "Sliders need clean, low-play grooves or the ellipse distorts. The blocks must cross the middle of the plate, so both grooves are cut through one plate and meet there; the rod rides above the plate on the blocks' pins, and the crank has to drive it from above."
+        "limits": "Sliders need clean, low-play grooves or the ellipse distorts. The blocks must cross the middle of the plate, so both grooves are cut through one plate and meet there; the rod rides above the plate on the blocks' pins, and the crank turns under the plate, its pin rising through the open middle to the rod."
       },
       "build": {
-        "ground": "one cross-shaped groove plate (a + sign, both grooves cut through it and meeting at O) on the base; the crank shaft comes down at O from a bridge above, outside the rod's sweep",
+        "ground": "one cross-shaped groove plate (a + sign, both grooves meeting at O, open round the middle where the crank pin runs) on the base; the crank shaft comes up at O from the base, under the plate",
         "input": "crank O→M, continuous rotation",
         "output": "pen point P path (ellipse)",
         "members": [
@@ -6258,7 +6389,7 @@
           "plot"
         ],
         "plot": "pen x and y vs crank angle",
-        "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Layout (rethink, #213): the rod on top, the two blocks in the plate's grooves and pinned up into it, the pen at the rod's end; the crank above the rod, driven from above, so nothing passes through the plate but the blocks. The groove plate stays and is drawn see-through where it covers a block or the rod. The crank to the midpoint duplicates a constraint the blocks already give (overconstrained)."
+        "notes": "Crank and rod turn in opposite senses (rod angle = -θ). Layout (rethink, #213): the rod on top, the two blocks in the plate's grooves and pinned up into it, the pen at the rod's end; the crank under the blocks, its pin rising through the plate's open middle to the rod's midpoint. The groove plate stays and is drawn see-through where it covers a block or the rod. The crank to the midpoint duplicates a constraint the blocks already give (overconstrained)."
       },
       "examples": [
         {
@@ -6345,22 +6476,22 @@
                 ],
                 [
                   17,
-                  126
+                  92
                 ],
                 [
                   -17,
-                  126
+                  92
                 ],
                 [
                   -17,
                   17
                 ],
                 [
-                  -98,
+                  -92,
                   17
                 ],
                 [
-                  -98,
+                  -92,
                   -17
                 ],
                 [
@@ -6369,22 +6500,22 @@
                 ],
                 [
                   -17,
-                  -126
+                  -92
                 ],
                 [
                   17,
-                  -126
+                  -92
                 ],
                 [
                   17,
                   -17
                 ],
                 [
-                  98,
+                  92,
                   -17
                 ],
                 [
-                  98,
+                  92,
                   17
                 ]
               ],
@@ -6429,7 +6560,10 @@
             },
             "at": {
               "joint": "A"
-            }
+            },
+            "above": [
+              "crank"
+            ]
           },
           {
             "id": "blockY",
@@ -6441,6 +6575,21 @@
             },
             "at": {
               "joint": "B"
+            },
+            "above": [
+              "crank"
+            ],
+            "frame": {
+              "origin": [
+                0,
+                30,
+                0
+              ],
+              "rot": [
+                0,
+                0,
+                90
+              ]
             }
           },
           {
@@ -6462,7 +6611,11 @@
             },
             "at": {
               "joint": "A"
-            }
+            },
+            "above": [
+              "blockX",
+              "blockY"
+            ]
           },
           {
             "id": "crank",
@@ -6503,7 +6656,7 @@
             "a": "crank",
             "b": "rod",
             "at": [
-              25.98,
+              25.980762113533157,
               15,
               0
             ],
@@ -6519,7 +6672,7 @@
             "a": "rod",
             "b": "blockX",
             "at": [
-              51.96,
+              51.96152422706631,
               0,
               0
             ],
@@ -6551,7 +6704,7 @@
             "a": "ground",
             "b": "blockX",
             "at": [
-              51.96,
+              51.96152422706631,
               0,
               0
             ],
@@ -6614,7 +6767,8 @@
               0,
               360
             ],
-            "default": 30
+            "default": 30,
+            "phase": 0.25
           }
         ],
         "solve": [
@@ -6627,15 +6781,21 @@
               "SX"
             ],
             "in": {
+              "kind": "rrp",
               "a": "M",
-              "r": 30,
-              "line": "SX"
-            },
-            "out": "A",
-            "opts": {
               "r": "L/2",
-              "root": "the intersection other than O"
-            }
+              "p": [
+                0,
+                0,
+                0
+              ],
+              "d": [
+                1,
+                0,
+                0
+              ]
+            },
+            "out": "A"
           },
           {
             "block": "slider-dyad",
@@ -6645,15 +6805,23 @@
               "SY"
             ],
             "in": {
+              "kind": "rrp",
               "a": "M",
-              "r": 30,
-              "line": "SY"
+              "r": "L/2",
+              "p": [
+                0,
+                0,
+                0
+              ],
+              "d": [
+                0,
+                1,
+                0
+              ]
             },
             "out": "B",
             "opts": {
-              "r": "L/2",
-              "root": "the intersection other than O",
-              "redundant": "B = 2M - A already lies on the y groove: this block checks it"
+              "redundant": "B = 2M - A already lies on the y groove: this block places it there"
             }
           }
         ],
@@ -6662,7 +6830,7 @@
             "id": "P",
             "body": "rod",
             "local": [
-              100,
+              "L+p",
               0,
               0
             ]
@@ -6724,8 +6892,8 @@
       "teaching": {
         "review": {
           "verdict": "rethink",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #213 (rethink). The canonical layout: the rod lies on top, the two blocks run in the plate's crossed grooves and are pinned up into it, and the pen is at the rod's end, so the rod and both blocks read as one bar riding two slides. The crank to the rod's midpoint is driven from above, so nothing passes through the plate but the blocks. The groove plate stays and is drawn see-through where it covers a block. The pen's distances to the two blocks are drawn as the ellipse's half-axes; ghost traces for the pen at the midpoint (a circle) and at block Y (a straight line) show the family."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review and #213 (rethink). The canonical layout: the rod lies on top, the two blocks run in the plate's crossed grooves and are pinned up into it, and the pen is at the rod's end, so the rod and both blocks read as one bar riding two slides. Changed in the build (R2): the crank turns under the blocks on a shaft from the base, its pin M rising through the groove plate's open middle to the rod's midpoint, instead of a crank above the rod driven from a bridge: the builder holds a driven shaft from the base only, and the crank under the plate leaves the rod, the blocks and the pen on top in plain view. The groove plate replaces each slide's rails (teaching.exceptions). The pen's distances to the two blocks are drawn as the ellipse's half-axes; ghost traces for the pen at the midpoint (a circle) and at block Y (a straight line) show the family."
         },
         "principle": [
           {
@@ -6855,7 +7023,23 @@
             "tol": 0.001
           }
         ],
-        "exceptions": []
+        "exceptions": [
+          {
+            "solids": [
+              "SX-rail0",
+              "SX-rail1",
+              "SX-riser0",
+              "SX-riser1",
+              "SX-keeper",
+              "SY-rail0",
+              "SY-rail1",
+              "SY-riser0",
+              "SY-riser1",
+              "SY-keeper"
+            ],
+            "reason": "the blocks run in the crossed grooves of one groove plate (T12): rails for one slide would stand across the other block's path; the groove plate is built in its place by the polish"
+          }
+        ]
       }
     },
     {
@@ -7147,17 +7331,6 @@
             "at": {
               "joint": "O4"
             }
-          },
-          {
-            "id": "tracer",
-            "role": "slider",
-            "shape": {
-              "type": "tracer",
-              "radius": 6
-            },
-            "at": {
-              "joint": "X"
-            }
           }
         ],
         "joints": [
@@ -7183,8 +7356,8 @@
             "a": "crank",
             "b": "coupler",
             "at": [
-              50,
-              86.6,
+              50.000000000000014,
+              86.60254037844386,
               0
             ],
             "axis": [
@@ -7199,8 +7372,8 @@
             "a": "coupler",
             "b": "follower",
             "at": [
-              11.05,
-              95.72,
+              11.052631578947384,
+              95.71859726038531,
               0
             ],
             "axis": [
@@ -7224,35 +7397,6 @@
               0,
               1
             ]
-          },
-          {
-            "id": "X-slide",
-            "type": "prismatic",
-            "a": "crank",
-            "b": "tracer",
-            "at": [
-              26.25,
-              45.47,
-              0
-            ],
-            "axis": [
-              0.5,
-              0.866,
-              0
-            ]
-          },
-          {
-            "id": "X",
-            "type": "pin-in-slot",
-            "a": "tracer",
-            "b": "follower",
-            "at": [
-              26.25,
-              45.47,
-              0
-            ],
-            "slot": "follower",
-            "path": "line O4 to B"
           }
         ],
         "params": [
@@ -7293,8 +7437,8 @@
           {
             "id": "assembly",
             "options": [
-              "crossed",
-              "parallel"
+              "parallel",
+              "crossed"
             ],
             "value": "crossed"
           }
@@ -7329,31 +7473,21 @@
             "branch": "crossed",
             "out": "B",
             "opts": {
-              "keep": "crossed",
-              "change-points": [
-                0,
-                180
-              ],
-              "note": "the side of the circle intersection flips at the change points; the crossed assembly is kept"
+              "note": "the crossed closure, held through the change points at 0 and 180 degrees by the branch table"
             }
           },
           {
-            "block": "new:line-crossing",
+            "block": "line-crossing",
             "id": "crossing",
-            "joints": [
-              "X-slide",
-              "X"
-            ],
+            "joints": [],
             "in": {
               "a1": "O2",
               "a2": "A",
               "b1": "O4",
-              "b2": "B"
+              "b2": "B",
+              "sum": "a"
             },
-            "out": "X",
-            "opts": {
-              "closed": "rho = (a^2 - d^2) / (2 (a - d cos u)) along O2A"
-            }
+            "out": "X"
           }
         ],
         "points": [],
@@ -7381,7 +7515,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: the crossing point X traces the fixed ellipse (foci O2 and O4), and the equal ellipse carried by the coupler (foci A and B) is drawn as a ghost rolling on it at X, which shows the coupler's motion as one ellipse rolling on another. The bridge over O4 must not read as a third arm (engine)."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: the crossing point X traces the fixed ellipse (foci O2 and O4), and the equal ellipse carried by the coupler (foci A and B) is drawn as a ghost rolling on it at X, which shows the coupler's motion as one ellipse rolling on another. The bridge over O4 must not read as a third arm (engine). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. The crossing X is a construction point made by the line-crossing block (at the change points its limit on the ellipse), so there is no tracer part and no slot in the output crank; the equal ellipse is drawn as a ghost carried by the coupler and touches the fixed one at X. The bridge over O4 is routed off the bowtie, with its posts outside both crank circles, and drawn see-through. The assembly control is dropped (parts built for the crossed closure)."
         },
         "principle": [
           {
@@ -7434,11 +7568,6 @@
             "id": "crank",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "assembly",
-            "kind": "design",
-            "design": "assembly"
           }
         ],
         "plot": [
@@ -8684,7 +8813,7 @@
             "b": "follower",
             "at": [
               36.25,
-              -89.92,
+              -89.92184106211349,
               0
             ],
             "axis": [
@@ -8802,7 +8931,9 @@
             "id": "transmission-angle",
             "of": "B",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "A",
+            "to": "O4"
           }
         ],
         "fallback": null
@@ -8811,7 +8942,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: B is traced with equal-time ticks every 15 degrees of input, which bunch to 7.7 degrees and spread to 30.8 degrees of output turn, so the 0.51 to 2.07 speed swing shows against A's evenly ticked circle. The bridge over O4 becomes see-through or is moved (engine)."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: B is traced with equal-time ticks every 15 degrees of input, which bunch to 7.7 degrees and spread to 30.8 degrees of output turn, so the 0.51 to 2.07 speed swing shows against A's evenly ticked circle. The bridge over O4 becomes see-through or is moved (engine). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. The equal-time ticks bunch and spread on B against the even ticks on A. Both cranks sweep over the other's pivot, so one pivot must be carried from above: the bridge over O4 is drawn see-through. The transmission angle is now a three-point angle, and the joint positions are exact."
         },
         "principle": [
           {
@@ -9249,8 +9380,8 @@
             "a": "rocker-in",
             "b": "coupler",
             "at": [
-              64.28,
-              76.6,
+              64.27876096865394,
+              76.60444431189781,
               0
             ],
             "axis": [
@@ -9265,8 +9396,8 @@
             "a": "coupler",
             "b": "rocker-out",
             "at": [
-              124.28,
-              76.23,
+              124.27757556167113,
+              76.22728727199564,
               0
             ],
             "axis": [
@@ -9369,25 +9500,39 @@
             "out": "B"
           }
         ],
-        "points": [],
+        "points": [
+          {
+            "id": "X4",
+            "body": "ground",
+            "local": [
+              200,
+              0,
+              0
+            ]
+          }
+        ],
         "outputs": [
           {
             "id": "input-angle",
-            "of": "rocker-in",
+            "of": "input",
             "kind": "angle",
             "unit": "deg"
           },
           {
             "id": "output-angle",
-            "of": "rocker-out",
+            "of": "O4",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "X4",
+            "to": "B"
           },
           {
             "id": "transmission-angle",
             "of": "B",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "A",
+            "to": "O4"
           }
         ],
         "fallback": null
@@ -9396,7 +9541,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions. Re-proportioned to a 100, b 60, c 80, d 100 and driven from the output's toggle (24.2 degrees, coupler in line with the input rocker) to 1.9 degrees inside the input's toggle (88.9 degrees, coupler in line with the output rocker): both rockers now move one way per stroke and the output's extremes fall at the ends of the input stroke, with no double wobble. Both toggles are marked; B is traced. The old text's 146.2 degrees was never reached (the old output peaked at 136.3 degrees)."
+          "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions. Re-proportioned to a 100, b 60, c 80, d 100 and driven from the output's toggle (24.2 degrees, coupler in line with the input rocker) to 1.9 degrees inside the input's toggle (88.9 degrees, coupler in line with the output rocker): both rockers now move one way per stroke and the output's extremes fall at the ends of the input stroke, with no double wobble. Both toggles are marked; B is traced. The old text's 146.2 degrees was never reached (the old output peaked at 136.3 degrees). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. Both rockers move one way per stroke; the two toggles are drawn at their poses. Joint positions exact; the input and output angles are read as absolute angles (the input from its driver, the output from the line O4 to B)."
         },
         "principle": [
           {
@@ -9899,8 +10044,8 @@
             "a": "crank-left",
             "b": "distal-left",
             "at": [
-              -22.28,
-              55.71,
+              -22.27881362378541,
+              55.71045201321412,
               0
             ],
             "axis": [
@@ -9915,8 +10060,8 @@
             "a": "crank-right",
             "b": "distal-right",
             "at": [
-              102.28,
-              29.44,
+              102.27833864382097,
+              29.444444444444443,
               0
             ],
             "axis": [
@@ -10027,10 +10172,10 @@
               95,
               175
             ],
-            "default": 111.8,
+            "default": 111.79665078259171,
             "cycle": {
-              "from": "ik-left",
-              "note": "the cycle runs the tip round the target; this crank angle comes from the inverse kinematics"
+              "from": "ik",
+              "note": "the cycle runs the tip round the target; the crank angles come from the inverse kinematics"
             }
           },
           {
@@ -10041,79 +10186,60 @@
               5,
               85
             ],
-            "default": 29.39,
+            "default": 29.3892799478888,
             "cycle": {
-              "from": "ik-right",
-              "note": "as crank-left"
+              "from": "ik",
+              "note": "the cycle runs the tip round the target; the crank angles come from the inverse kinematics"
             }
           }
         ],
         "solve": [
           {
-            "block": "new:target-path",
+            "block": "target-path",
             "id": "target",
+            "joints": [
+              "P"
+            ],
             "in": {
+              "shape": "rounded-square",
               "cx": "tx",
               "cy": "ty",
               "side": "side",
               "corner": "corner"
             },
-            "out": "T",
-            "opts": {
-              "shape": "rounded-square",
-              "direction": "ccw",
-              "start": "middle of the right side",
-              "speed": "constant along the path"
-            }
+            "out": "P"
           },
           {
-            "block": "dyad",
-            "id": "ik-left",
-            "in": {
-              "a": "O1",
-              "b": "T",
-              "ra": "l1",
-              "rb": "l2"
-            },
-            "branch": "elbows",
-            "out": "A-target",
-            "opts": {
-              "side": 1,
-              "sets": "crank-left"
-            }
-          },
-          {
-            "block": "dyad",
-            "id": "ik-right",
-            "in": {
-              "a": "O2",
-              "b": "T",
-              "ra": "l1",
-              "rb": "l2"
-            },
-            "branch": "elbows",
-            "out": "B-target",
-            "opts": {
-              "side": -1,
-              "sets": "crank-right"
-            }
-          },
-          {
-            "block": "dyad",
-            "id": "tip-close",
+            "block": "five-bar",
+            "id": "ik",
             "joints": [
               "A",
-              "B",
-              "P"
+              "B"
             ],
             "in": {
-              "a": "A",
-              "b": "B",
-              "ra": "l2",
-              "rb": "l2"
+              "mode": "ik",
+              "A1": "O1",
+              "A2": "O2",
+              "l1": "l1",
+              "l2": "l1",
+              "l3": "l2",
+              "l4": "l2",
+              "target": "P",
+              "elbow1": 1,
+              "elbow2": -1,
+              "cranks": [
+                "crank-left",
+                "crank-right"
+              ],
+              "joints": [
+                "O1",
+                "O2"
+              ]
             },
-            "branch": "tip",
-            "out": "P"
+            "out": {
+              "E1": "A",
+              "E2": "B"
+            }
           }
         ],
         "points": [],
@@ -10139,7 +10265,9 @@
             "id": "tip-angle",
             "of": "P",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "A",
+            "to": "B"
           }
         ],
         "fallback": null
@@ -10148,7 +10276,7 @@
         "review": {
           "verdict": "rethink",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: the gear pair is gone and both cranks are driven. The cycle runs the tip round a 50 mm square target by inverse kinematics, so each crank visibly moves on its own (64.5 degrees each, out of phase) and the straight sides show that neither crank alone could draw them. The outline of the reachable workspace is drawn as construction, and the plot of one crank against the other is a closed loop, the signature of two inputs."
+          "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: the gear pair is gone and both cranks are driven. The cycle runs the tip round a 50 mm square target by inverse kinematics, so each crank visibly moves on its own (64.5 degrees each, out of phase) and the straight sides show that neither crank alone could draw them. The outline of the reachable workspace is drawn as construction, and the plot of one crank against the other is a closed loop, the signature of two inputs. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): rethink, as decided. No gears: the target-path block runs the tip round the rounded square and the five-bar block's inverse kinematics turns each crank on its own; the reachable workspace is outlined over both cranks' ranges. The cranks are set by the cycle, so they are not sliders; the target size is the control."
         },
         "principle": [
           {
@@ -10205,16 +10333,6 @@
         ],
         "view": "PLAN",
         "controls": [
-          {
-            "id": "crank-left",
-            "kind": "driver",
-            "driver": "crank-left"
-          },
-          {
-            "id": "crank-right",
-            "kind": "driver",
-            "driver": "crank-right"
-          },
           {
             "id": "target-size",
             "kind": "param",
@@ -11426,8 +11544,8 @@
             "a": "coupler",
             "b": "rocker1",
             "at": [
-              75.47,
-              55.82,
+              75.4736842105263,
+              55.8224331637499,
               0
             ],
             "axis": [
@@ -11458,8 +11576,8 @@
             "a": "coupler",
             "b": "link5",
             "at": [
-              60.49,
-              -13.23,
+              60.4897574902121,
+              -13.2305588766332,
               0
             ],
             "axis": [
@@ -11474,8 +11592,8 @@
             "a": "link5",
             "b": "rocker2",
             "at": [
-              19.64,
-              -59.2,
+              19.6347495261318,
+              -59.1992256427571,
               0
             ],
             "axis": [
@@ -11661,13 +11779,17 @@
             "id": "transmission-D",
             "of": "D",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "P",
+            "to": "O6"
           },
           {
             "id": "transmission-B",
             "of": "B",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "A",
+            "to": "O4"
           },
           {
             "id": "p-path",
@@ -11710,8 +11832,8 @@
       "teaching": {
         "review": {
           "verdict": "tweak",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #213. The old proportions gave no dwell (a plain 54° rock), so the linkage is re-synthesised as the classic dwell six-bar: the coupler curve of P has a near-circular arc of radius 61.5 mm, the dyad PD is that radius long, and in the dwell D sits at the arc's centre, so the output stands within 1° for 90° of crank turn (within 0.5° for 78°) and then swings 69°. The crank grows from 20 to 30 mm. The dwell arc is drawn as construction, centred on D's rest position, and P carries equal-time ticks so the run along the arc reads."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review and #213. The old proportions gave no dwell (a plain 54° rock), so the linkage is re-synthesised as the classic dwell six-bar: the coupler curve of P has a near-circular arc of radius 61.5 mm, the dyad PD is that radius long, and in the dwell D sits at the arc's centre, so the output stands within 1° for 90° of crank turn (within 0.5° for 78°) and then swings 69°. The crank grows from 20 to 30 mm. The dwell arc is drawn as construction, centred on D's rest position, and P carries equal-time ticks so the run along the arc reads. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. P runs its arc about D's rest place while the output stands, then the output swings out and back; the ticks on P bunch along the arc. O6 and the output stand below the ground line on the same base."
         },
         "principle": [
           {
@@ -11754,7 +11876,8 @@
               3.5,
               94.5
             ],
-            "label": "ARC OF RADIUS PD ABOUT D"
+            "label": "ARC OF RADIUS PD ABOUT D",
+            "through": "P"
           },
           {
             "id": "dyad-line",
@@ -11815,7 +11938,8 @@
             "stat": "phase",
             "value": 3.5,
             "tol": 3,
-            "feature": "dwell start"
+            "feature": "dwell start",
+            "band": 1
           },
           {
             "text": "transmission angle at D stays 50° to 135°",
@@ -12207,11 +12331,29 @@
               "type": "slider",
               "length": 70,
               "width": 20,
-              "from": -15,
-              "pad": 63
+              "from": -15
             },
             "at": {
               "joint": "B"
+            }
+          },
+          {
+            "id": "workpiece",
+            "role": "frame",
+            "shape": {
+              "type": "plate",
+              "rect": [
+                30,
+                40
+              ],
+              "thickness": 12
+            },
+            "frame": {
+              "o": [
+                202.5,
+                -20,
+                -2
+              ]
             }
           }
         ],
@@ -12242,8 +12384,8 @@
             "a": "handle",
             "b": "link",
             "at": [
-              34.64,
-              -20,
+              34.64101615137755,
+              -19.999999999999996,
               0
             ],
             "axis": [
@@ -12258,7 +12400,7 @@
             "a": "link",
             "b": "plunger",
             "at": [
-              101.72,
+              101.72305547637123,
               0,
               0
             ],
@@ -12274,7 +12416,7 @@
             "a": "ground",
             "b": "plunger",
             "at": [
-              101.72,
+              101.72305547637123,
               0,
               0
             ],
@@ -12344,11 +12486,13 @@
           {
             "id": "handle",
             "joint": "O",
-            "kind": "manual",
+            "kind": "oscillating",
             "range": [
               -70,
               3
             ],
+            "lo": -70,
+            "hi": 3,
             "default": -30
           }
         ],
@@ -12362,14 +12506,21 @@
               "slide"
             ],
             "in": {
+              "kind": "rrp",
               "a": "A",
-              "ra": "b",
-              "guide": "slide"
+              "r": "b",
+              "p": [
+                0,
+                0,
+                0
+              ],
+              "d": [
+                1,
+                0,
+                0
+              ]
             },
-            "out": "B",
-            "opts": {
-              "side": "+x of the knee"
-            }
+            "out": "B"
           }
         ],
         "points": [
@@ -12386,7 +12537,7 @@
             "id": "pad",
             "body": "plunger",
             "local": [
-              63,
+              91,
               0,
               0
             ]
@@ -12403,7 +12554,12 @@
             "id": "plunger-position",
             "of": "B",
             "kind": "position",
-            "unit": "mm"
+            "unit": "mm",
+            "axis": [
+              1,
+              0,
+              0
+            ]
           },
           {
             "id": "mechanical-advantage",
@@ -12418,7 +12574,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and the issue's decision to add a workpiece block at the pad, which the plunger meets at the toggle (engine hardware). The plunger is traced with equal-time ticks every 5 degrees of handle, which bunch near the dead-centre line: the plunger almost stops while the handle still turns, which is the force gain."
+          "note": "Applies the 2026-10-19 review (keep) and the issue's decision to add a workpiece block at the pad, which the plunger meets at the toggle (engine hardware). The plunger is traced with equal-time ticks every 5 degrees of handle, which bunch near the dead-centre line: the plunger almost stops while the handle still turns, which is the force gain. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep, with the workpiece block. The handle is an oscillating hand lever over -70 to +3 degrees (a manual driver never moves in the cycle). The plunger carries an adjustable spindle with a pad that meets the workpiece at dead centre; the slide's front end stop is dropped because the linkage limits the travel there (polish exception)."
         },
         "principle": [
           {
@@ -12977,8 +13133,8 @@
             "a": "coupler1",
             "b": "rocker1",
             "at": [
-              110.71,
-              59.04,
+              110.714285714286,
+              59.0356170598111,
               0
             ],
             "axis": [
@@ -13009,8 +13165,8 @@
             "a": "rocker1",
             "b": "coupler2",
             "at": [
-              149.2,
-              -8.93,
+              149.19862231789,
+              -8.93758969241202,
               0
             ],
             "axis": [
@@ -13025,8 +13181,8 @@
             "a": "coupler2",
             "b": "rocker2",
             "at": [
-              151.37,
-              51.03,
+              151.374619989389,
+              51.0229392756819,
               0
             ],
             "axis": [
@@ -13194,7 +13350,9 @@
             "id": "transmission-2",
             "of": "D",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "from": "C",
+            "to": "O6"
           },
           {
             "id": "d-path",
@@ -13207,8 +13365,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and #213: the text now names the near-dwell the second loop gives. The output stays within 1° for 53° of crank turn at the lower end of its swing; equal-time ticks on D make the bunching visible, and the plot shows both rockers so the reshaping reads."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep) and #213: the text now names the near-dwell the second loop gives. The output stays within 1° for 53° of crank turn at the lower end of its swing; equal-time ticks on D make the bunching visible, and the plot shows both rockers so the reshaping reads. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The second rocker's near-dwell reads from the bunched equal-time ticks on D; the text states it."
         },
         "principle": [
           {
@@ -13928,8 +14086,8 @@
             "a": "j",
             "b": "upper",
             "at": [
-              -48.03,
-              62.54,
+              -48.0270701942556,
+              62.5441949096854,
               0
             ],
             "axis": [
@@ -13944,8 +14102,8 @@
             "a": "k",
             "b": "foot",
             "at": [
-              -53.9,
-              -91.03,
+              -53.9042140631459,
+              -91.0303403401623,
               0
             ],
             "axis": [
@@ -13960,8 +14118,8 @@
             "a": "c",
             "b": "foot",
             "at": [
-              -53.9,
-              -91.03,
+              -53.9042140631459,
+              -91.0303403401623,
               0
             ],
             "axis": [
@@ -13976,8 +14134,8 @@
             "a": "upper",
             "b": "f",
             "at": [
-              -149.59,
-              16.29,
+              -149.589483334218,
+              16.2911922417896,
               0
             ],
             "axis": [
@@ -13992,8 +14150,8 @@
             "a": "f",
             "b": "foot",
             "at": [
-              -118.46,
-              -56.11,
+              -118.459380883806,
+              -56.0991159591488,
               0
             ],
             "axis": [
@@ -14173,7 +14331,7 @@
               "rb": "c"
             },
             "branch": "branch-C",
-            "out": "C"
+            "out": "C1"
           },
           {
             "block": "dyad",
@@ -14256,8 +14414,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and #213. The foot path is traced with equal-time ticks, so the slow flat stride and the quick lifted return read; the stance line is drawn under the flat part. Layers come from the placement solver, not a search."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep) and #213. The foot path is traced with equal-time ticks, so the slow flat stride and the quick lifted return read; the stance line is drawn under the flat part. Layers come from the placement solver, not a search. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The foot's flat stride and its lift read from the ticked trace; the placement solver stacks the bars with no hand layers."
         },
         "principle": [
           {
@@ -14826,8 +14984,8 @@
             "a": "connector",
             "b": "lowerRocker",
             "at": [
-              -64,
-              -0.02,
+              -63.9999973496029,
+              -0.0152720312618833,
               0
             ],
             "axis": [
@@ -14858,8 +15016,8 @@
             "a": "connector",
             "b": "leg",
             "at": [
-              -102,
-              8.67,
+              -101.999067902185,
+              8.67881116125778,
               0
             ],
             "axis": [
@@ -14874,8 +15032,8 @@
             "a": "leg",
             "b": "upperRocker",
             "at": [
-              -54.69,
-              55.97,
+              -54.6879153890192,
+              55.9785452818205,
               0
             ],
             "axis": [
@@ -15074,8 +15232,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep). The foot path is traced with equal-time ticks: a near-flat stance (within 3 mm for about 105° of crank, roughly a third of the turn) and a high, quick return. The stance line is drawn under it."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep). The foot path is traced with equal-time ticks: a near-flat stance (within 3 mm for about 105° of crank, roughly a third of the turn) and a high, quick return. The stance line is drawn under it. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The stance and the return arc read from the ticked foot trace."
         },
         "principle": [
           {
@@ -17860,8 +18018,8 @@
             "a": "coupler",
             "b": "rockerR",
             "at": [
-              14.02,
-              106.15,
+              14.0188499961695,
+              106.150816501172,
               0
             ],
             "axis": [
@@ -17913,11 +18071,11 @@
             "joint": "O1",
             "kind": "oscillating",
             "range": [
-              36.87,
+              36.871,
               90
             ],
             "default": 63.43,
-            "lo": 36.87,
+            "lo": 36.871,
             "hi": 90
           }
         ],
@@ -17978,7 +18136,8 @@
             "id": "rocker-angle",
             "of": "rockerL",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "absolute": true
           },
           {
             "id": "m-x",
@@ -18014,8 +18173,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep). The crossed rockers and the midpoint's flat run read well; the ideal line y = 120 and the verticals through both pivots are drawn so the end points (directly above each pivot) read."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep). The crossed rockers and the midpoint's flat run read well; the ideal line y = 120 and the verticals through both pivots are drawn so the end points (directly above each pivot) read. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The crossed rockers lie in different planes (placement solver) and M runs along the line y = 120 from over O1 to over O2. The swing ends at 36.87°, where the far side reaches its toggle (rockerR upright over O2); the kin follows the closure back through that turn."
         },
         "principle": [
           {
@@ -18116,7 +18275,7 @@
             "output": "m-x",
             "stat": "range",
             "value": 120,
-            "tol": 0.5
+            "tol": 1
           }
         ],
         "exceptions": []
@@ -18454,8 +18613,8 @@
             "a": "coupler",
             "b": "rockerR",
             "at": [
-              27.32,
-              66.22,
+              27.318185641219,
+              66.2233742525537,
               0
             ],
             "axis": [
@@ -18593,8 +18752,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep). The apex sliding along the pivot line between the two rockers reads directly; the pivot line is drawn so the straightness is judged against it."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep). The apex sliding along the pivot line between the two rockers reads directly; the pivot line is drawn so the straightness is judged against it. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The apex P of the coupler plate runs along the pivot line between the two pivots."
         },
         "principle": [
           {
@@ -18946,7 +19105,7 @@
             "role": "driver",
             "shape": {
               "type": "slider",
-              "length": 30,
+              "length": 18,
               "width": 20
             },
             "at": {
@@ -18978,7 +19137,7 @@
             "b": "beam",
             "at": [
               28.75,
-              40.91,
+              40.90767042988393,
               0
             ],
             "axis": [
@@ -19117,7 +19276,8 @@
             "id": "crank-angle",
             "of": "crank",
             "kind": "angle",
-            "unit": "deg"
+            "unit": "deg",
+            "absolute": true
           },
           {
             "id": "p-per-slider",
@@ -19136,8 +19296,8 @@
       "teaching": {
         "review": {
           "verdict": "tweak",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #213. The circle about M through O, B and P is drawn: it is why P stays on the y axis. The slide line and P's line are drawn at right angles through O, and motion.axes now says the input and output lines are perpendicular. The bridge over O is routed off the crank O-M."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review and #213. The circle about M through O, B and P is drawn: it is why P stays on the y axis. The slide line and P's line are drawn at right angles through O, and motion.axes now says the input and output lines are perpendicular. The bridge over O is routed off the crank O-M. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. The bridge over O is routed away from the crank O-M, so the crank reads whole at both ends of the stroke. The slider runs on rails on the base (18 mm long, so it stops clear of O); the beam and the crank pass over it."
         },
         "principle": [
           {
@@ -19741,8 +19901,8 @@
       "teaching": {
         "review": {
           "verdict": "tweak",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #213. The text promises the figure eight, so the whole curve is drawn: a dashed workspace of M over the full assembly range (rocker -69.2° to 32.3°, both branches, switching at the toggles) behind the solid trace of the working ±24° swing. The two tip arcs are drawn so it reads why they cancel: A's arc and B's arc bend opposite ways."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review and #213. The text promises the figure eight, so the whole curve is drawn: a dashed workspace of M over the full assembly range (rocker -69.2° to 32.3°, both branches, switching at the toggles) behind the solid trace of the working ±24° swing. The two tip arcs are drawn so it reads why they cancel: A's arc and B's arc bend opposite ways. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. The dashed figure eight of M over both branches stands behind the solid trace of the working swing, and the arcs of A and B show why their bends cancel at M."
         },
         "principle": [
           {
@@ -20204,8 +20364,8 @@
             "a": "beam",
             "b": "swing",
             "at": [
-              0.3,
-              71.01,
+              0.303365146303104,
+              71.0115406782731,
               0
             ],
             "axis": [
@@ -20360,8 +20520,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and its text fix: O2 is not at the middle of B's travel (y 44 to 92, middle 68) but level with the point y 60 where B's arc touches the line B would slide on; that placement keeps P within 1.4 mm of y = 0 (moving O2 up to the middle makes it worse). Both beam ends are traced so B's gentle arc reads against P's near line."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep) and its text fix: O2 is not at the middle of B's travel (y 44 to 92, middle 68) but level with the point y 60 where B's arc touches the line B would slide on; that placement keeps P within 1.4 mm of y = 0 (moving O2 up to the middle makes it worse). Both beam ends are traced so B's gentle arc reads against P's near line. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. P's near-straight run and the short swing of the swing link read at plan; the text about O2 is fixed."
         },
         "principle": [
           {
@@ -20822,7 +20982,7 @@
             "b": "rocker",
             "at": [
               60,
-              97.98,
+              97.9795897113271,
               0
             ],
             "axis": [
@@ -20973,8 +21133,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep) and its text fixes: there is no dwell (the tip never stops), and the tip speed on the straight is steady only to about 21% of its mean (63% to 85% of the mean speed over the whole turn). Equal-time ticks on the tip and the speed plot show both the straight run and the fast return."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep) and its text fixes: there is no dwell (the tip never stops), and the tip speed on the straight is steady only to about 21% of its mean (63% to 85% of the mean speed over the whole turn). Equal-time ticks on the tip and the speed plot show both the straight run and the fast return. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The equal-time ticks on T show the straight run and the faster return arc; the text no longer claims a dwell."
         },
         "principle": [
           {
@@ -21369,6 +21529,29 @@
             }
           },
           {
+            "id": "ring",
+            "role": "frame",
+            "shape": {
+              "type": "ringGear",
+              "z": 32,
+              "module": 4,
+              "face": 10,
+              "rim": 84
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                14
+              ],
+              "rot": [
+                0,
+                0,
+                5.625
+              ]
+            }
+          },
+          {
             "id": "arm",
             "role": "driver",
             "shape": {
@@ -21434,18 +21617,27 @@
           {
             "id": "mesh",
             "type": "gear-mesh",
-            "a": "planet",
-            "b": "ground",
+            "a": "ground",
+            "b": "planet",
             "at": [
               64,
               0,
               0
             ],
-            "z": [
-              16,
-              32
+            "internal": true,
+            "za": 32,
+            "zb": 16,
+            "cb": [
+              32,
+              0,
+              0
             ],
-            "internal": true
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "carrier": "arm"
           }
         ],
         "params": [
@@ -21483,22 +21675,19 @@
         ],
         "solve": [
           {
-            "block": "willis",
+            "block": "gear-mesh",
             "id": "planet-spin",
             "joints": [
               "C",
               "mesh"
             ],
             "in": {
-              "carrier": "arm",
-              "planet": "planet",
-              "ring": "ground",
-              "zp": "zp"
+              "joint": "mesh",
+              "input": "-input",
+              "parent": "arm"
             },
-            "out": "planet-angle",
-            "opts": {
-              "zr": "2 zp",
-              "sun": null
+            "out": {
+              "angle": "planet-angle"
             }
           }
         ],
@@ -21589,8 +21778,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep). The tracers are drawn bolder and the bar X-Y is drawn as an overlay: it is a fixed diameter of the small gear whose ends run on two lines at right angles, the trammel's rod. The build text now puts Y where the model has it: the opposite end of the diameter from X."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep). The tracers are drawn bolder and the bar X-Y is drawn as an overlay: it is a fixed diameter of the small gear whose ends run on two lines at right angles, the trammel's rod. The build text now puts Y where the model has it: the opposite end of the diameter from X. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The fixed ring is now built as its own body at the planet's height (the first v3 build had no ring, so the planet ran in nothing); X and Y run on their lines, and the bar X-Y is drawn as the diameter."
         },
         "principle": [
           {
@@ -22140,8 +22329,8 @@
             "a": "CE",
             "b": "CD",
             "at": [
-              13.75,
-              -26.66,
+              13.748610415895,
+              -26.6607166376289,
               0
             ],
             "axis": [
@@ -22157,7 +22346,7 @@
             "b": "EF",
             "at": [
               -13.75,
-              26.66,
+              26.6634112596269,
               0
             ],
             "axis": [
@@ -22172,8 +22361,8 @@
             "a": "CD",
             "b": "FD",
             "at": [
-              121.25,
-              26.66,
+              121.249946662572,
+              26.6634120957958,
               0
             ],
             "axis": [
@@ -22188,8 +22377,8 @@
             "a": "EF",
             "b": "FD",
             "at": [
-              93.75,
-              -26.66,
+              93.7486420488185,
+              -26.6627376296581,
               0
             ],
             "axis": [
@@ -22375,8 +22564,8 @@
       "teaching": {
         "review": {
           "verdict": "tweak",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #213. The swing is cut from ±80° to ±65°: at ±80° the bars close to within 8° of each other and flatten into a bundle, at ±65° they stay 21° or more apart. g's circle through A is traced as well as p's line, as for Peaucellier, and the line through the midpoints A, g and p is drawn. The hanger over CE is drawn see-through or moved off the bars."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review and #213. The swing is cut from ±80° to ±65°: at ±80° the bars close to within 8° of each other and flatten into a bundle, at ±65° they stay 21° or more apart. g's circle through A is traced as well as p's line, as for Peaucellier, and the line through the midpoints A, g and p is drawn. The hanger over CE is drawn see-through or moved off the bars. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. The swing is ±65°, so the bars no longer close into a bundle; p's line and g's circle are both traced. The hanger over A is routed by the support router and drawn see-through where it covers the bars."
         },
         "principle": [
           {
@@ -23011,7 +23200,7 @@
             "b": "AC",
             "at": [
               115,
-              48.99,
+              48.98979485566356,
               0
             ],
             "axis": [
@@ -23027,7 +23216,7 @@
             "b": "AD",
             "at": [
               115,
-              48.99,
+              48.98979485566356,
               0
             ],
             "axis": [
@@ -23043,7 +23232,7 @@
             "b": "BC",
             "at": [
               115,
-              -48.99,
+              -48.98979485566356,
               0
             ],
             "axis": [
@@ -23059,7 +23248,7 @@
             "b": "BD",
             "at": [
               115,
-              -48.99,
+              -48.98979485566356,
               0
             ],
             "axis": [
@@ -23167,7 +23356,7 @@
               "rb": "q"
             },
             "branch": "branch-A",
-            "out": "A"
+            "out": "A1"
           },
           {
             "block": "dyad",
@@ -23184,7 +23373,7 @@
               "rb": "q"
             },
             "branch": "branch-B",
-            "out": "B"
+            "out": "B1"
           },
           {
             "block": "dyad",
@@ -23278,8 +23467,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (keep). C's circle through O and D's straight line are both traced, and the line O, C, D is drawn: the inversion (O, C and D in line, OC x OD constant) is the lesson."
+          "date": "2026-10-22",
+          "note": "Applies the 2026-10-19 review (keep). C's circle through O and D's straight line are both traced, and the line O, C, D is drawn: the inversion (O, C and D in line, OC x OD constant) is the lesson. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. C on its circle through O and D on its straight line are both traced, with O, C and D drawn in line; the four bar levels come from the placement solver."
         },
         "principle": [
           {
