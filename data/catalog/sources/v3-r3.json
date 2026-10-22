@@ -5545,12 +5545,12 @@
                 }
               }
             },
-            "thick": 16,
+            "thick": 16.5,
             "level": {
               "with": "rotor",
               "part": "all"
             },
-            "note": "the housing block round the rotor, its bore the epitrochoid the apexes trace"
+            "note": "the housing block round the rotor, its bore the epitrochoid the apexes trace; 0.5 thicker than the rotor, so the side cover on it clears the rotor"
           },
           "frame": {
             "origin": [

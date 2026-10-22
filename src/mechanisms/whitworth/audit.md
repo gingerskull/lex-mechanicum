@@ -154,7 +154,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | R1 | ? | HAND |
 | R2 | ? | HAND |
 | R3 | ? | AUTO · fired: hardware primitives |
-| R4 | ? | AUTO · package v2 29.4 KB |
+| R4 | ? | AUTO · package v2 29.6 KB |
 | R5 | ? | HAND |
 | R6 | ? | FLAG |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -169,7 +169,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | DL5 | ? | FLAG |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | ? | package v2 written, 29.4 KB; site build not checked here |
+| Q3 | ? | package v2 written, 29.6 KB; site build not checked here |
 | Q4 | ? | local: tools/shot |
 | Q5 | ? | local: tools/bench |
 | Q6 | ? |  |
@@ -209,11 +209,11 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | DL-F | 0 | 0 | ? |
 | DL-G | 0 | 0 | ? |
 | DL-H | 8 | 0 | ? |
-| never | 83 | 172 | ? |
+| never | 83 | 173 | ? |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 3.4e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 29.4 KB
+check: clean · K1 residual: 3.4e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 29.6 KB
 screenshots: ? · bench: ?

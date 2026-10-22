@@ -4,7 +4,7 @@ import type { BuildCtx } from "./ctx";
 import { contactRules } from "./rules/contacts";
 import { base, classify, placement } from "./rules/core";
 import { adjustableLength, cableClip } from "./rules/fixes";
-import { drive, explode, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
+import { covers, drive, explode, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
 import { pistonBore, trunnion } from "./rules/cylinder";
@@ -55,6 +55,7 @@ export const rules: Rule[] = [
   adjustableLength,
   cableClip,
   standoffs,
+  covers,
   feet,
   lubrication,
   timingMarks,

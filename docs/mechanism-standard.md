@@ -300,6 +300,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `adjustable-length` | F7, A22 |
 | `cable-clip` | A22, V6 |
 | `standoffs` | A6 |
+| `covers` | F1, F2, F7 |
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
 | `timing-marks` | F9 |
