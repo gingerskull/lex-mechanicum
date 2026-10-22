@@ -135,7 +135,7 @@ in degrees, applied x then y then z, default none); points and axes given "in a 
 | `params` | Named dimensions: `id`, `value`, `unit`, `min`, `max` (the **ranges** used by controls and by the validator), `note`. |
 | `design` | Discrete **design choices** that change the build but not the motion law: tooth counts, which arrangement, which side a part is on. `options` and the chosen `value`. |
 | `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params. |
-| `solve` | The composition: a list of block instances in solve order. A **block** is one of `dyad`, `slider-dyad`, `gear-mesh`, `willis`, `hooke`, `homokinetic`, `bennett`, `cam`, `screw`, `convey`, `flexure`, `escapement`; `in` names the bodies, points and params it reads; `out` names the points and angles it produces; `branch` names the design choice that picks its root. Block inputs and outputs are the only names later blocks may read. |
+| `solve` | The composition: a list of block instances in solve order. A **block** is one of `dyad`, `slider-dyad`, `five-bar`, `gear-mesh`, `willis`, `hooke`, `homokinetic`, `bennett`, `cam`, `screw`, `convey`, `flexure`, `escapement`, `lerp`, `line-crossing`, `target-path`; `in` names the bodies, points and params it reads; `out` names the points and angles it produces; `branch` names the design choice that picks its root. Block inputs and outputs are the only names later blocks may read. |
 | `points` | Named points: a body and a local position. Every point a trace, overlay, dimension or plot uses is here (standard K12). |
 | `outputs` | Quantities read off: `id`, `of` (a body or point), `kind` (`angle`, `position`, `speed-ratio`, `path`), `unit`. Plots and claims read these. |
 | `fallback` | `null`, or `{ "numeric": true, "loops": [...] }` when a loop does not decompose into blocks. The audit names it; K1 verifies it. |
@@ -162,11 +162,15 @@ pinned down onto blocks): a hint the placement solver keeps.
 
 **Outputs.** An `angle` of a body is its turn about its joint to the ground (else its first joint). An `angle` with `from`
 and `to` points is the angle at `of` between the rays to them (a transmission angle); one with `minus` is that output less
-another angle output, wrapped to ±180° (a lead or lag). A `position` of a prismatic joint is its slide. A `speed-ratio`
-of a body is read from its angle output. A `position` of a point with an `axis` is its projection on that direction; one with `from` (and no `to`) is
-its distance from that point; `datum` is subtracted from any scalar output. An `angle` with `absolute: true` is measured
-from the world x axis (the link's own direction) instead of from the reference pose. A `speed-ratio` of a point is its
-speed per unit of input, or with `unit: "%"` its speed as a share of its mean over the cycle.
+another angle output, wrapped to ±180° (a lead or lag). An `angle` whose `of` is a driver reads that driver's value
+(absolute). A `position` of a prismatic joint is its slide; of a point, with `axis: [x, y, z]`, its coordinate along that
+direction; of a point with `from` (and no `to`), its distance from that point. A `speed-ratio` is computed with the pose:
+a body's turn per unit of the primary driver, or with `over` (a point) the speed of the point `of` over the speed of
+`over` (a mechanical advantage, a scale). A point a block makes (a crossing, a target) may be traced and read like a
+named point. `datum` is
+subtracted from any scalar output. An `angle` with `absolute: true` is measured from the world x axis (the link's own
+direction) instead of from the reference pose. A `speed-ratio` of a point with no `over` is its speed per unit of input,
+or with `unit: "%"` its speed as a share of its mean over the cycle (the claim checker reads it off the poses).
 
 **Shapes the builder places where the joints put them** (not on a slab): a bevel `gear` (with `cone`, its pitch cone
 half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a universal joint's yoke) and a `cross`
@@ -178,6 +182,16 @@ second gear's axis, `cb` its centre). `hooke` reads either a `universal` joint o
 `{ input, cross, joints: { in, out, a, b } }`: the two shafts' ground revolutes and the two yoke pins into the cross.
 `slider-dyad` with `kind: "rpr"` is the swinging block: `a` the slotted body's pivot, `p` the pin, `body` the slotted body;
 a body joined to it by a prismatic joint keeps its turn. A block's `out` may be keyed (`{ "angle": "gear-turn" }`).
+`lerp` (`a`, `b`, `t`) makes the point a + t (b − a): a scissor bar's far pin. `line-crossing` (`a1`, `a2`, `b1`, `b2`,
+optional `sum`) makes the point where two lines cross; where they run together it is the point on the first line whose
+distances to `a1` and `b1` add up to `sum` (an antiparallelogram's change points). `target-path` (`shape`
+`rounded-square` with `cx`, `cy`, `side`, `corner`, or `flower` with `cx`, `cy`, `r0`, `lobe`, `lobes`) moves a point
+once round a closed curve per cycle, from the cycle phase; the linkage follows it by inverse kinematics (`five-bar` with
+`mode: "ik"`, dyads). A driver with `cycle: { from }` is set by the cycle through such a block: it is not applied as a
+joint motion, its value is read back off the pose, and it needs no control. Block inputs may be parameter expressions.
+A body's `shape` may carry a `wheel` ({ diameter, width, stub }): a wheel on a stub axle along the line from its pivot to
+the body's point at the stub's distance (a steering knuckle). A `slider` may start at `from` along its x. Every point the
+record names on the ground lies on the base.
 
 **Claims.** `span: [a, b]` takes the statistic over the input values in that window (a rotary input's degrees, which may
 wrap past 360); `abs: true` takes it on the absolute value. A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
@@ -206,7 +220,7 @@ open while the swing is in a range); with a number it is the longest stretch the
 | `review` | The teaching review's verdict (`keep`, `tweak`, `rethink`), the date, and a note on what was decided (standard T2). The audit's `teaching:` line repeats the verdict. |
 | `principle` | The bodies and points that carry the principle (T3). They are drawn on top and whole; the visibility rule (T10 to T12) protects them. |
 | `traces` | Teaching traces: a named `point`, optional `ticks` (every n degrees of input, equal time), `ghosts` for settings not selected (`control` and `value`), and `comet: true` on the first. A trace can be a point on a moving body (a point on a planet). |
-| `overlays` | Construction overlays: `kind` is `line` (through two named points), `arc`, `circle`, `chord`, `dimension` (a moment arm, a length), `axis-line`, `workspace` (an outline traced by a named point over a range) or `bend` (a flexure's state). Each names its points and a short mechanics-only `label`. |
+| `overlays` | Construction overlays: `kind` is `line` (through two named points), `arc`, `circle`, `chord`, `dimension` (a moment arm, a length), `axis-line`, `workspace` (an outline traced by a named point over a range) or `bend` (a flexure's state). Each names its points and a short mechanics-only `label`. A `line` with `pose: { driver, value }` is drawn with that driver held at the value (a toggle, an aim line at neutral). A `dimension` with `line: [P, Q]` runs from its point square to that line (a moment arm) and reads in plan; a dimension's number is the true distance of the kinematic points. An `axis-line` with `from` and `through` is a line through two points, carried on to where it meets the line `extend` names or to a circle's meeting point; a `circle` with `meet: [line, line]` stands where those lines cross (a turning centre). A `workspace` with `frame: <body>` is the point's path seen from that body, carried by it (a rolling centrode, drawn as a ghost); with `over: [driver, driver]` it is the outline a five-bar's tip reaches over both drivers' ranges. |
 | `view` | The default named view (T7): `PLAN`, `FRONT`, `SIDE`, `ISOMETRIC`, `DIMETRIC`, `AUX <joint-id>`, or `VIEW az el` in degrees. |
 | `views` | Section and detail views (T8): `kind` `section` (a cut `plane` of origin and normal) or `detail` (a window `center` and `scale`); `highlight` names bodies or points to draw with the highlight. |
 | `controls` | The controls the page shows (T14): `kind` `driver`, `param`, `design` or `selector`, and the id it maps to. A mechanism's controls are only these. |

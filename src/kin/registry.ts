@@ -3,7 +3,7 @@
 // listed above it.
 import { type BlockFn, type BlockCtx, KinError } from "./ctx";
 import { type SolveStep } from "./types";
-import { D2R, type Vec3, m3, v3, xf, R2D } from "./math";
+import { D2R, TAU, type Vec3, m3, v3, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
@@ -488,6 +488,92 @@ const indexer: BlockFn = (c, s) => {
   outVal(c, s, d * R2D, "angle");
 };
 
+/**
+ * lerp. in: a, b (points), t (a number): out = a + t (b − a), a point on the line through two others (a scissor bar's
+ * far pin, 2 M − R, from its near pin and its middle pin).
+ */
+const lerp: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const a = c.vec(i.a);
+  outPoint(c, s, v3.add(a, v3.mul(v3.sub(c.vec(i.b), a), c.num(i.t))));
+};
+
+/**
+ * line-crossing. in: a1, a2 (two points of one line), b1, b2 (of the other), n (plane normal, default +z), sum
+ * (optional). out: where the lines cross in that plane (the crossing of an antiparallelogram's bars, an instant
+ * centre). Where the lines run together (an antiparallelogram's change points) the crossing is the limit: the point
+ * on the line a1→a2 whose distances to a1 and b1 add up to `sum` (the ellipse with foci a1 and b1); without `sum`
+ * parallel lines do not cross and the block fails there.
+ */
+const lineCrossing: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const n = v3.unit(i.n ? c.vec(i.n) : [0, 0, 1]);
+  const p = c.vec(i.a1);
+  const d = v3.perp(v3.sub(c.vec(i.a2), p), n);
+  const q = c.vec(i.b1);
+  const e = v3.perp(v3.sub(c.vec(i.b2), q), n);
+  const den = v3.dot(v3.cross(d, e), n);
+  if (Math.abs(den) > 1e-6 * v3.len(d) * v3.len(e)) {
+    const t = v3.dot(v3.cross(v3.sub(q, p), e), n) / den;
+    outPoint(c, s, v3.add(p, v3.mul(d, t)));
+    return;
+  }
+  if (i.sum === undefined) throw new KinError(`line-crossing ${s.id}: the lines are parallel`);
+  // on the ray p + rho u: rho + |p + rho u - q| = L gives rho = (L^2 - |q - p|^2) / (2 (L - u.(q - p)))
+  const L = c.num(i.sum);
+  const u = v3.unit(d);
+  const w = v3.perp(v3.sub(q, p), n);
+  const rho = (L * L - v3.dot(w, w)) / (2 * (L - v3.dot(u, w)));
+  outPoint(c, s, v3.add(p, v3.mul(u, rho)));
+};
+
+/**
+ * target-path. A point that goes once round a closed curve per cycle, from the cycle phase itself: the target a tip or a
+ * stylus follows, the linkage closing on it by inverse kinematics. in.shape "rounded-square": cx, cy (centre), side,
+ * corner (radius), at constant speed along the outline, counter-clockwise from the middle of the right side; "flower":
+ * cx, cy, r0, lobe, lobes (default 5): r = r0 + lobe cos(lobes u) at the polar angle u. n (plane normal) is +z.
+ */
+const targetPath: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const cx = c.num(i.cx), cy = c.num(i.cy);
+  const u = ((c.u % TAU) + TAU) % TAU;
+  if (i.shape === "flower") {
+    const r = c.num(i.r0) + c.num(i.lobe) * Math.cos(c.num(i.lobes ?? 5) * u);
+    outPoint(c, s, [cx + r * Math.cos(u), cy + r * Math.sin(u), 0]);
+    return;
+  }
+  if (i.shape !== "rounded-square") throw new KinError(`target-path ${s.id}: unknown shape ${String(i.shape)}`);
+  outPoint(c, s, roundedSquareAt(cx, cy, c.num(i.side), c.num(i.corner), u / TAU));
+};
+
+/** A point at the fraction f of the way round a rounded square, counter-clockwise from the middle of its right side. */
+export function roundedSquareAt(cx: number, cy: number, side: number, corner: number, f: number): Vec3 {
+  const h = side / 2;
+  const st = side - 2 * corner;
+  const arc = (Math.PI / 2) * corner;
+  const total = 4 * (st + arc);
+  let L = ((((f % 1) + 1) % 1) * total + st / 2) % total; // from the bottom of the right side's straight run
+  // four sides in turn: right (up), top (left), left (down), bottom (right); each a straight run then a corner
+  const dirs: [number, number][] = [[0, 1], [-1, 0], [0, -1], [1, 0]];
+  const starts: [number, number][] = [[h, -h + corner], [h - corner, h], [-h, h - corner], [-h + corner, -h]];
+  for (let k = 0; k < 4; k++) {
+    const [dx, dy] = dirs[k]!;
+    const [sx, sy] = starts[k]!;
+    if (L <= st) return [cx + sx + dx * L, cy + sy + dy * L, 0];
+    L -= st;
+    if (L <= arc || k === 3) {
+      // the corner's centre is inward of the run's end; it turns a quarter, counter-clockwise
+      const ex = sx + dx * st, ey = sy + dy * st;
+      const ox = ex - dy * corner, oy = ey + dx * corner;
+      const a0 = Math.atan2(ey - oy, ex - ox);
+      const a = a0 + Math.min(L, arc) / corner;
+      return [cx + ox + corner * Math.cos(a), cy + oy + corner * Math.sin(a), 0];
+    }
+    L -= arc;
+  }
+  return [cx + h, cy, 0];
+}
+
 void sideOf;
 void angleFrom;
 
@@ -507,4 +593,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   flexure: flexureBlock,
   escapement: escapementBlock,
   indexer,
+  lerp,
+  "line-crossing": lineCrossing,
+  "target-path": targetPath,
 };

@@ -110,6 +110,8 @@ export interface KinDriver {
   /** A selector's named options, each setting values of other drivers and params. */
   options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }>;
   value?: string; // a selector's current option
+  /** Set by the cycle through a block (a target path and inverse kinematics), not applied as a joint motion. */
+  cycle?: { from?: string; note?: string };
 }
 
 export interface SolveStep {
@@ -136,12 +138,14 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
-  /** A point's position projected on this direction (mm), instead of the point itself. */
+  /** A point's position projected on this direction (world mm), instead of the point itself: a coordinate along a slide. */
   axis?: [number, number, number];
   /** A value subtracted from a scalar output (mm or degrees): a height above a line, a datum. */
   datum?: number;
   /** An angle measured from the world x axis (the link's own direction) instead of from the reference pose. */
   absolute?: boolean;
+  /** A speed ratio of the point `of` over the point `over` (their speeds), instead of a body's turn per input. */
+  over?: string;
 }
 
 export interface Kin {

@@ -8,6 +8,7 @@ import type { MechanismModel } from "../../model/types";
 import { Kinematics } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
+import { fiveBarFK } from "../../kin/blocks/linkage";
 
 /** A joint's frame: at its point, z along its axis, x the world up (or x) made square to it. */
 function jointFrame(at: Vec3, axis: Vec3): Xf {
@@ -35,6 +36,14 @@ export interface Poser {
   point(u: number, id: string, ctl?: Controls): Vec3 | null;
   /** The distance of its two points at phase u (mm). */
   span(u: number, a: string, b: string): number | null;
+  /** The true distance of two kinematic points at phase u (mm), before any is lifted onto a part's top face: what a dimension reads. */
+  measure?(u: number, a: string, b: string): number | null;
+  /** A named point with drivers held at given values (degrees or mm): an overlay drawn at a fixed pose, such as a toggle. */
+  pointAt?(values: Record<string, number>, id: string): Vec3 | null;
+  /** A body's pose at phase u (reference to now): a curve carried by a moving body (a rolling centrode). */
+  bodyAt?(u: number, body: string): Xf | null;
+  /** The outline a five-bar's tip reaches over the ranges of its two cranks' drivers (a workspace, T5); null if none. */
+  area?(point: string, drivers: [string, string]): Vec3[] | null;
   /**
    * The path of a named point over a range of the input (degrees or mm; the whole input range when omitted), one polyline
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
@@ -152,6 +161,56 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       const P = pose(u);
       const A = lifted(P, a);
       const B = lifted(P, b);
+      return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
+    },
+    bodyAt: (u, body) => pose(u).bodies.get(body) ?? null,
+    area: (point, drivers) => {
+      const step = k.kin.solve.find((q) => q.block === "five-bar");
+      const ds = drivers.map((id) => k.kin.drivers.find((d) => d.id === id));
+      if (!step || !ds[0]?.range || !ds[1]?.range) return null;
+      const S = k.setup(controls);
+      const i = step.in ?? {};
+      const at = (v: unknown): Vec3 | undefined => (typeof v === "string" ? S.joints.get(v)?.at : undefined);
+      const num = (v: unknown): number => (typeof v === "number" ? v : S.params.get(String(v)) ?? NaN);
+      const A1 = at(i.A1), A2 = at(i.A2);
+      if (!A1 || !A2) return null;
+      const g = { A1, A2, l1: num(i.l1), l2: num(i.l2), l3: num(i.l3), l4: num(i.l4) };
+      // the tip's branch and height as drawn now
+      const P = pose(0);
+      const now = P.points.get(point);
+      const lift = lifted(P, point);
+      if (!now || !lift) return null;
+      const th = (d: (typeof ds)[number]) => ((P.values[d!.id] ?? 0) * Math.PI) / 180;
+      const side: 1 | -1 = v3.dist(fiveBarFK(g, th(ds[0]), th(ds[1]), 1).P, now) < v3.dist(fiveBarFK(g, th(ds[0]), th(ds[1]), -1).P, now) ? 1 : -1;
+      const dz = lift[2] - now[2];
+      const [r1, r2] = [ds[0].range, ds[1].range];
+      const out: Vec3[] = [];
+      const n = 60;
+      const edge = (f: (t: number) => [number, number]) => {
+        for (let q = 0; q <= n; q++) {
+          const [a, b] = f(q / n);
+          const sol = fiveBarFK(g, (a * Math.PI) / 180, (b * Math.PI) / 180, side);
+          if (sol.h > 0) out.push([sol.P[0], sol.P[1], sol.P[2] + dz]);
+        }
+      };
+      const lerp = (r: [number, number], t: number) => r[0] + (r[1] - r[0]) * t;
+      edge((t) => [lerp(r1, t), r2[0]]);
+      edge((t) => [r1[1], lerp(r2, t)]);
+      edge((t) => [lerp(r1, 1 - t), r2[1]]);
+      edge((t) => [r1[0], lerp(r2, 1 - t)]);
+      return out.length ? out : null;
+    },
+    pointAt: (values, id) => {
+      try {
+        return lifted(k.poseAt(values, controls), id);
+      } catch {
+        return null;
+      }
+    },
+    measure: (u, a, b) => {
+      const P = pose(u);
+      const A = P.points.get(a);
+      const B = P.points.get(b);
       return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
     },
   };

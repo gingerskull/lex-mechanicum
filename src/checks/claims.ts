@@ -98,7 +98,10 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   const u = poses.map((_, i) => (i / n) * 360);
   const x = poses.map((p) => p.values[drv.id] ?? NaN);
   let y: number[];
-  if (o.kind === "speed-ratio" && poses.every((p) => p.points.has(o.of)) && !K.kin.bodies.some((b) => b.id === o.of)) {
+  if (o.kind === "speed-ratio" && poses.every((p) => typeof p.outputs[o.id] === "number")) {
+    // computed with the pose (src/kin/compose.ts)
+    y = poses.map((p) => p.outputs[o.id] as number);
+  } else if (o.kind === "speed-ratio" && poses.every((p) => p.points.has(o.of)) && !K.kin.bodies.some((b) => b.id === o.of)) {
     // a point's speed: per unit of input (P's speed over a slider's), or with unit "%" as a share of its mean speed over
     // the cycle (a tip that slows on its straight)
     // a rotary input wraps by its span at the end of the cycle; the step across the wrap is the step before it
