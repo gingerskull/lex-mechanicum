@@ -292,7 +292,8 @@ export const drive: Rule = {
       ctx.issues.push(`drive: the live shaft ${site.id} does not reach below the base`);
     }
     const others = ctx.sites.filter((q) => q !== site && q.fixed).map((q) => [q.at[0], q.at[1]] as Vec2);
-    const C = 46;
+    // the motor's square flange (half-width 29) stays clear of the shaft's housing (radius 19) in any direction
+    const C = 50;
     let M: Vec2 | null = null;
     let best = -1;
     for (let k = 0; k < 12; k++) {

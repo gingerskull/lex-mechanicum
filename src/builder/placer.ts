@@ -223,7 +223,8 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
 
     // thickness of each node (a slab is as high as the thickest body in it)
     const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geomOf(id).thick)));
-    // each level one slab over the last level on its side of the part (or under it, for a level that stands below)
+    // each level over the last level on its side of the part (or under it, for a level that stands below); a part of
+    // another body may lie between (the retainer between a sun-and-planet's rod and the planet fixed under it)
     const above: [number, number, number][] = [];
     for (const [q, l] of level) {
       if (!parent.has(q)) continue;
@@ -239,7 +240,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       const me = idx.get(nodeOf(q));
       if (under !== undefined && me !== undefined) above.push([under, me, below ? -1 : 1]);
     }
-    const levelsOk = (assign: number[]): boolean => above.every(([u, m, d]) => assign[u]! < 0 || assign[m]! < 0 || assign[m] === assign[u]! + d);
+    const levelsOk = (assign: number[]): boolean => above.every(([u, m, d]) => assign[u]! < 0 || assign[m]! < 0 || (assign[m]! - assign[u]!) * d >= 1);
 
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);

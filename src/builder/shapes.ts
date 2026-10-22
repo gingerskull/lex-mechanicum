@@ -175,7 +175,8 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
         const mt = shape.modules === "transverse" ? m : m / Math.cos(beta);
         const b = num(shape.face, 10);
         const turn = ((b * Math.tan(beta)) / ((z * mt) / 2)) * (shape.hand === "left" ? -1 : 1);
-        return { profile: { outer: gearOutline(z, mt), holes: [hole(bore / 2)] }, thick: b, approx: false, twist: turn / D2R, exact: true };
+        // centred on its joint (a crossed pair meets at mid-face), else standing on it
+        return { profile: { outer: gearOutline(z, mt), holes: [hole(bore / 2)] }, thick: b, approx: false, twist: turn / D2R, exact: true, ...(shape.centred === true ? { exactOffset: -b / 2 } : {}) };
       }
       return { profile: { outer: gearOutline(z, m), holes: [hole(bore / 2)] }, thick: num(shape.face, 10), approx: false };
     }
@@ -300,7 +301,7 @@ function clusterLevels(shape: Record<string, unknown>, pins: { joint: string; uv
     const l = shape.gear as Record<string, unknown>;
     const c = pins.find((p) => p.joint === l.at)?.uv ?? ([0, 0] as Vec2);
     const z = num(l.z, 20);
-    out.push({ z, center: c, profile: { outer: gearOutline(z, num(l.module, 2)).map(([x, y]): Vec2 => [x + c[0], y + c[1]]), holes: [] }, thick: num(l.face, 10) });
+    out.push({ z, center: c, profile: { outer: gearOutline(z, num(l.module, 2)).map(([x, y]): Vec2 => [x + c[0], y + c[1]]), holes: [] }, thick: num(l.face, 10), ...(l.below === true ? { below: true } : {}) });
   }
   if (type === "gear" && shape.disc && typeof shape.disc === "object") {
     const d = shape.disc as Record<string, unknown>;

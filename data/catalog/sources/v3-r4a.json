@@ -3019,7 +3019,8 @@
               "z": 24,
               "module": 5,
               "face": 14,
-              "at": "P"
+              "at": "P",
+              "below": true
             }
           },
           "at": {
@@ -3036,7 +3037,7 @@
             "face": 14,
             "bore": 16,
             "disc": {
-              "radius": 130,
+              "radius": 100,
               "thickness": 12
             }
           },
@@ -3326,7 +3327,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (tweak) and issue #215: the retaining link that holds the planet in mesh is drawn on top, and a mark on the sun lets the two turns per orbit be counted. Built at the record's scale (module 5, orbit 120, beam 300, rod 400); the beam pivot is moved to 500 mm from the sun shaft so the retainer turns fully while the beam rocks 47.3 degrees. The rod tilts as it moves, so the sun's speed swings between 1.68 and 2.33 times the orbit speed: the speed-ratio plot shows it."
+        "note": "Applies the 2026-10-19 review (tweak) and issue #215: the retaining link that holds the planet in mesh is drawn on top, and a mark on the sun lets the two turns per orbit be counted. Built at the record's scale (module 5, orbit 120, beam 300, rod 400); the beam pivot is moved to 500 mm from the sun shaft so the retainer turns fully while the beam rocks 47.3 degrees. The rod tilts as it moves, so the sun's speed swings between 1.68 and 2.33 times the orbit speed: the speed-ratio plot shows it. Rebuild R4 (#215): built on v3 from this record: the planet a gear fixed under the rod's end, the sun's speed from the rod's own turn and the orbit (the gear-mesh block with the planet on a moving centre), a flywheel disc (radius 100, so it passes under the P pin) under the sun; the retainer keyed to the driven shaft above the gears, the sun free on it, the rod on top passing over the shaft end. Record fixes: the rod-beam branch option order (beam-level is the root that reproduces B), B given exactly, a mark on the sun. The six phases of the finished build read as decided."
       },
       "principle": [
         {

@@ -30985,7 +30985,8 @@
                 "z": 24,
                 "module": 5,
                 "face": 14,
-                "at": "P"
+                "at": "P",
+                "below": true
               }
             },
             "at": {
@@ -31002,7 +31003,7 @@
               "face": 14,
               "bore": 16,
               "disc": {
-                "radius": 130,
+                "radius": 100,
                 "thickness": 12
               }
             },
@@ -31292,7 +31293,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and issue #215: the retaining link that holds the planet in mesh is drawn on top, and a mark on the sun lets the two turns per orbit be counted. Built at the record's scale (module 5, orbit 120, beam 300, rod 400); the beam pivot is moved to 500 mm from the sun shaft so the retainer turns fully while the beam rocks 47.3 degrees. The rod tilts as it moves, so the sun's speed swings between 1.68 and 2.33 times the orbit speed: the speed-ratio plot shows it."
+          "note": "Applies the 2026-10-19 review (tweak) and issue #215: the retaining link that holds the planet in mesh is drawn on top, and a mark on the sun lets the two turns per orbit be counted. Built at the record's scale (module 5, orbit 120, beam 300, rod 400); the beam pivot is moved to 500 mm from the sun shaft so the retainer turns fully while the beam rocks 47.3 degrees. The rod tilts as it moves, so the sun's speed swings between 1.68 and 2.33 times the orbit speed: the speed-ratio plot shows it. Rebuild R4 (#215): built on v3 from this record: the planet a gear fixed under the rod's end, the sun's speed from the rod's own turn and the orbit (the gear-mesh block with the planet on a moving centre), a flywheel disc (radius 100, so it passes under the P pin) under the sun; the retainer keyed to the driven shaft above the gears, the sun free on it, the rod on top passing over the shaft end. Record fixes: the rod-beam branch option order (beam-level is the root that reproduces B), B given exactly, a mark on the sun. The six phases of the finished build read as decided."
         },
         "principle": [
           {
@@ -32267,7 +32268,8 @@
               "face": 30,
               "helix": 45,
               "hand": "right",
-              "bore": 10
+              "bore": 10,
+              "centred": true
             },
             "at": {
               "joint": "O1"
@@ -32284,7 +32286,8 @@
               "face": 20,
               "helix": 45,
               "hand": "right",
-              "bore": 12
+              "bore": 12,
+              "centred": true
             },
             "at": {
               "joint": "O2"
@@ -32334,18 +32337,26 @@
               -50.912,
               45
             ],
-            "z1": 12,
-            "z2": 24,
-            "crossed": 90,
-            "hand": [
-              "right",
-              "right"
+            "crossed": true,
+            "note": "point contact; the teeth of both lie along the same line there. Signed about each body own axis: a positive turn of gear 1 about +x turns gear 2 by -0.5 about +z",
+            "za": 12,
+            "zb": 24,
+            "ratio": -0.5,
+            "axis": [
+              1,
+              0,
+              0
             ],
-            "helix": [
-              45,
+            "axis2": [
+              0,
+              0,
+              1
+            ],
+            "cb": [
+              0,
+              0,
               45
-            ],
-            "note": "point contact; the teeth of both lie along the same line there"
+            ]
           }
         ],
         "params": [
@@ -32404,19 +32415,12 @@
               "M"
             ],
             "in": {
-              "a": "gear1",
-              "b": "gear2",
-              "za": 12,
-              "zb": 24,
-              "mn": "mn",
-              "beta1": "beta1",
-              "sigma": "Sigma"
+              "joint": "M",
+              "input": "input"
             },
-            "opts": {
-              "form": "crossed helical",
-              "ratio": "z1/z2, whatever the helix split"
-            },
-            "out": "gear2-turn"
+            "out": {
+              "angle": "gear2-turn"
+            }
           }
         ],
         "points": [
@@ -32433,8 +32437,8 @@
             "id": "T2",
             "body": "gear2",
             "local": [
+              50.912,
               0,
-              -50.912,
               0
             ]
           },
@@ -32477,7 +32481,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Review against the record (unbuilt): ratio z2/z1 = 2, centre distance 76.37 and the 45° + 45° split check out. The record's lesson that the ratio is set by tooth counts, not diameters, needs a way to see it. Decided: gear 2 on a vertical axis, gear 1 on a crossing axis in front of it, the same layout as the worm drive; open in isometric; both axis lines and the centre distance between them on their common perpendicular; the shared tooth direction at the contact as a construction line. The helix angle of gear 1 is a control (30° to 60°, gear 2 takes the rest of 90°): the diameters and centre distance change, the ratio does not. A pitch point traced on gear 2, ticked every 30° of input, with ghosts at 30° and 60°: three circles of different size, each with twelve ticks over half a turn."
+          "note": "Review against the record (unbuilt): ratio z2/z1 = 2, centre distance 76.37 and the 45° + 45° split check out. The record's lesson that the ratio is set by tooth counts, not diameters, needs a way to see it. Decided: gear 2 on a vertical axis, gear 1 on a crossing axis in front of it, the same layout as the worm drive; open in isometric; both axis lines and the centre distance between them on their common perpendicular; the shared tooth direction at the contact as a construction line. The helix angle of gear 1 is a control (30° to 60°, gear 2 takes the rest of 90°): the diameters and centre distance change, the ratio does not. A pitch point traced on gear 2, ticked every 30° of input, with ghosts at 30° and 60°: three circles of different size, each with twelve ticks over half a turn. Rebuild R4 (#215): built on v3 from this record (first build): both gears helical, right hand at 45 deg, placed by their joints and centred on the contact; gear 1 on its shaft in plan in front of gear 2; the mesh joint in the block's form; gear 2's point in its own frame. The helix-split control and its ghosts are not offered (the split changes the built gears). The six phases of the finished build read as decided."
         },
         "principle": [
           {
@@ -32497,17 +32501,7 @@
             "ticks": {
               "every": 30
             },
-            "comet": true,
-            "ghosts": [
-              {
-                "control": "beta1",
-                "value": 30
-              },
-              {
-                "control": "beta1",
-                "value": 60
-              }
-            ]
+            "comet": true
           },
           {
             "id": "gear1-pitch-point",
@@ -32551,11 +32545,6 @@
             "id": "input",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "helix-split",
-            "kind": "param",
-            "param": "beta1"
           }
         ],
         "plot": {
