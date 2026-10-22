@@ -40,6 +40,12 @@ export interface BlockCtx {
    * pass through a double root stays on the analytic branch.
    */
   root(roots: [number[], number[]], h: number): 0 | 1;
+  /** A driver of the record, by id. */
+  driver(id: string): import("./types").KinDriver | undefined;
+  /** A driver's value (degrees or mm) at another cycle phase, at the current controls (a block that integrates). */
+  driverAt(id: string, u: number): number;
+  /** The chosen value of a design choice (its default, or the controls' setting). */
+  design(id: string): string | undefined;
   /** The design choice or literal `branch` of the step as a side, +1 or −1. */
   declaredSide(): 1 | -1;
   /** Mark that this pose used the numeric fallback. */

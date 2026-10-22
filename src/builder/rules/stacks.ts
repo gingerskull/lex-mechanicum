@@ -59,8 +59,10 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
     const other = kj.a === "ground" ? kj.b : kj.b === "ground" ? kj.a : null;
     if (other && driver.has(j)) out.add(other);
   }
+  const sheave = (b: string) => ctx.kin.joints.some((j) => j.type === "belt" && (j as unknown as Record<string, unknown>).flexible === "rope" && (j.a === b || j.b === b));
   for (const b of site.bodies) {
     const body = ctx.kin.bodies.find((q) => q.id === b);
+    if (sheave(b)) continue;
     if (body && KEYED.has(String(body.shape?.type))) out.add(b);
     if (ctx.kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === b || j.b === b))) out.add(b);
   }
@@ -126,6 +128,17 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     eccentric: ctx.eccentric.has(site.id),
     baseTopWorld: ctx.base?.top ?? 0,
   };
+  // a member set along the shaft by a param control (shape.slide { param, along, offset }) reaches its whole range
+  for (const m of members) {
+    const sh = ctx.geoms.get(m.body)?.shape;
+    const sl = sh?.slide as { param?: string; along?: number[] } | undefined;
+    const par = sl?.param ? ctx.kin.params?.find((q) => q.id === sl.param) : undefined;
+    if (!par || par.min === undefined || par.max === undefined) continue;
+    const k = Array.isArray(sl!.along) ? Math.sign((sl!.along[0] ?? 0) * frame.z[0] + (sl!.along[1] ?? 0) * frame.z[1] + (sl!.along[2] ?? 0) * frame.z[2]) || 1 : 1;
+    const d0 = k * (par.min - par.value);
+    const d1 = k * (par.max - par.value);
+    spec.reach = [Math.min(spec.reach?.[0] ?? Infinity, m.w0 + Math.min(d0, d1)), Math.max(spec.reach?.[1] ?? -Infinity, m.w1 + Math.max(d0, d1))];
+  }
   // a support the record asks for on one of the site's joints (a crank held from above, past what turns under it)
   const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: SupportKind } | undefined)?.support).find(Boolean);
   if (asked) spec.support = asked;
@@ -169,9 +182,9 @@ function siteRule(kit: "J1" | "J2" | "J10" | "J3"): Rule {
     tier: "AUTO",
     ids: def.ids,
     fixture: def.fixture,
-    applies: (ctx) => ctx.sites.some((s) => s.kit === kit),
+    applies: (ctx) => ctx.sites.some((s) => s.kit === kit && !s.owner),
     apply(ctx) {
-      for (const s of ctx.sites.filter((q) => q.kit === kit)) buildSite(ctx, s);
+      for (const s of ctx.sites.filter((q) => q.kit === kit && !q.owner)) buildSite(ctx, s);
     },
   };
 }

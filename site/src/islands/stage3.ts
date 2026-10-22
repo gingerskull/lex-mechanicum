@@ -118,7 +118,7 @@ async function main(box: HTMLElement) {
   const axisOf = (j: string): Vec3 | null => L.scene.axes?.[j] ?? null;
   const base: ViewState = E.defaultView(teaching, axisOf);
   const rviews = E.viewsOf(teaching, axisOf);
-  const tm = E.timeMap(teaching?.timeMap ? { span: teaching.timeMap.span, slow: teaching.timeMap.slow } : undefined);
+  const tm = E.timeMap(teaching?.timeMap ? { ...(teaching.timeMap.span ? { span: teaching.timeMap.span } : {}), ...(teaching.timeMap.spans ? { spans: teaching.timeMap.spans } : {}), slow: teaching.timeMap.slow } : undefined);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const LADDER: Dial[] = ["full", ...E.DETAIL.map((r) => r.id).filter((x) => x !== "H")];
 

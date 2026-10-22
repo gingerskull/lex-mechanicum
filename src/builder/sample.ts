@@ -44,6 +44,8 @@ export function sampleBodies(K: Kinematics, kin: Kin, n: number, controls?: Cont
   // the far points of each outline stand for the part
   const probes = new Map<string, Vec3[]>();
   for (const [id, g] of geoms) {
+    // a body of revolution turning on its own axis (a screw) moves no point of its outline off where it was
+    if (g.axisym) continue;
     const world = g.profile.outer.map((q) => fromPlane(g.frame, q, 0));
     const c = world.reduce((a, p) => v3.add(a, p), [0, 0, 0] as Vec3);
     const cen = v3.mul(c, 1 / world.length);

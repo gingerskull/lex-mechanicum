@@ -65,6 +65,8 @@ export const stops: Rule = {
         const g = ctx.geoms.get(b);
         const ext = ctx.extent(b);
         if (!g || !ext || g.exact) continue;
+        // a wheel (a sheave, a pulley, a disc) turns as far as its rope or belt takes it: nothing stops it
+        if (["pulley", "sprocket", "disc", "gear"].includes(String(g.shape.type))) continue;
         const sw = swingOf(ctx, b, s.axis);
         // only a part that swings (a rocker, a lever) gets stops; a crank, or a gear that turns on through the cycle,
         // turns past them
@@ -200,18 +202,28 @@ export const standoffs: Rule = {
 function driveInPlan(ctx: BuildCtx, site: Site): void {
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
-  if (!ctx.base || !axle) return;
+  if (!ctx.base || (!axle && !st.end)) return;
   // H.shaft starts at its low end: the axle's frame origin is that end, its z the shaft's axis. The drive takes that end,
-  // unless it faces the eye in the default view (a front elevation looking at the low end): then the far end
-  const zA = v3.unit(axle.frame.z as Vec3);
-  const hA = axle.op.op === "extrude" ? axle.op.h : 0;
-  // ... and only when that far end is free: no part the shaft carries stands within a pulley's reach of it (a
-  // differential's pinion on its shaft's high end)
-  const farFree = [...ctx.parts.values()].every((p) => p.body !== axle.body || v3.dot(v3.sub(p.frame.o as Vec3, axle.frame.o as Vec3), zA) < hA - 30);
-  const far = v3.dot(zA, ctx.viewDir()) > 0.5 && farFree;
-  const out: Vec3 = far ? zA : v3.mul(zA, -1);
-  const end = far ? v3.add(axle.frame.o as Vec3, v3.mul(zA, hA)) : (axle.frame.o as Vec3);
-  const shaftBody = axle.body;
+  // unless it faces the eye in the default view (a front elevation looking at the low end) and is free: then the far
+  // end. A shaft built by its own kit (a screw, a variator's shaft) names the end itself
+  let out: Vec3;
+  let end: Vec3;
+  let shaftBody: string;
+  if (st.end) {
+    out = v3.unit(st.end.out);
+    end = st.end.at;
+    shaftBody = st.end.body;
+  } else {
+    const zA = v3.unit(axle!.frame.z as Vec3);
+    const hA = axle!.op.op === "extrude" ? axle!.op.h : 0;
+    // the far end is free when no part the shaft carries stands within a pulley's reach of it (a differential's pinion
+    // on its shaft's high end)
+    const farFree = [...ctx.parts.values()].every((p) => p.body !== axle!.body || v3.dot(v3.sub(p.frame.o as Vec3, axle!.frame.o as Vec3), zA) < hA - 30);
+    const far = v3.dot(zA, ctx.viewDir()) > 0.5 && farFree;
+    out = far ? zA : v3.mul(zA, -1);
+    end = far ? v3.add(axle!.frame.o as Vec3, v3.mul(zA, hA)) : (axle!.frame.o as Vec3);
+    shaftBody = axle!.body;
+  }
   const S: Vec3 = v3.add(end, v3.mul(out, -6)); // the pulley's centre, 6 mm in from the end
   const up: Vec3 = [0, 0, 1];
   const lat = v3.unit(v3.cross(up, out));
@@ -273,7 +285,61 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   const tb: [number, number, number] = [w1 + mot.H + 14, Mc[0], 0];
   ctx.add(place(FF, H.terminalBlock("drive-terminals", 4, { at: tb, z0: 0, z1: 6, joints: j })));
   ctx.add(place(FF, H.lead("drive-lead", [[w1 + mot.H, Mc[0]], [w1 + mot.H + 6, Mc[0] + sg * 4], [tb[0], tb[1]]], { z0: 0, z1: 1, joints: j })));
-  ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+  ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: (ctx.kin.drivers.some((d) => d.kind === "oscillating" && beltDriven(d)) ? "Reversing drive (the input turns several turns each way): " : "") + "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+}
+
+/**
+ * A driver the belt drive serves: a rotary input, or an oscillating one that turns its shaft more than a turn each way
+ * (a screw's input: the motor reverses, V5's crank and link cannot swing a shaft through several turns).
+ */
+const beltDriven = (d: { kind: string; lo?: number; hi?: number; range?: [number, number] }): boolean => {
+  if (d.kind === "rotary") return true;
+  if (d.kind !== "oscillating") return false;
+  const lo = d.lo ?? d.range?.[0] ?? 0;
+  const hi = d.hi ?? d.range?.[1] ?? 0;
+  return Math.abs(hi - lo) > 360;
+};
+
+/** Plan boxes [x0, y0, x1, y1] of a second drive's parts under the base, each moving one's over the cycle. */
+function secondDriveBoxes(ctx: BuildCtx): [number, number, number, number][] {
+  const out: [number, number, number, number][] = [];
+  for (const q of ctx.solids) {
+    if (!q.id.startsWith("drive2")) continue;
+    const pts = worldPoints(ctx.M, q);
+    const xs: number[] = [];
+    const ys: number[] = [];
+    const moves = q.body !== "ground" ? (ctx.sampled.xfs.get(q.body) ?? []) : [];
+    for (const X of moves.length ? moves : [null])
+      for (const p of pts) {
+        xs.push(p[0] + (X ? X.t[0] : 0));
+        ys.push(p[1] + (X ? X.t[1] : 0));
+      }
+    out.push([Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]);
+  }
+  return out;
+}
+
+/**
+ * Builds a drive as a second one beside the first: what it adds (solids, base holes, its note) is renamed from drive-* to
+ * drive2-*, so the first drive, built after it, keeps its own ids.
+ */
+function secondDrive(ctx: BuildCtx, build: () => void): void {
+  const n0 = ctx.solids.length;
+  const h0 = ctx.baseHoles.length;
+  const k0 = ctx.notes.length;
+  build();
+  const re = (x: string) => x.replace(/^drive(?=-|$)/, "drive2");
+  for (const q of ctx.solids.slice(n0)) {
+    q.id = re(q.id);
+    if (q.group) q.group = re(q.group);
+    q.joints = q.joints.map(re);
+  }
+  for (const h of ctx.baseHoles.slice(h0)) h.joint = re(h.joint);
+  for (const nt of ctx.notes.slice(k0)) {
+    nt.id = re(nt.id);
+    nt.title = nt.title.replace(/^Drive/, "Drive 2");
+    if (nt.serves) for (const f of Object.keys(nt.serves) as (keyof typeof nt.serves)[]) nt.serves[f] = nt.serves[f]!.map(re);
+  }
 }
 
 export const drive: Rule = {
@@ -283,11 +349,21 @@ export const drive: Rule = {
   fixture: "four-bar",
   applies: (ctx) => (ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary")) || ctx.kin.drivers.some((d) => d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"),
   apply(ctx) {
-    // an oscillating or a linear input has its own drive (rules/drive.ts); a rotary one is belted to its shaft
-    const other = ctx.kin.drivers.some((d) => d.kind === "rotary") ? undefined : ctx.kin.drivers.find((d) => d.kind === "oscillating" || d.kind === "linear");
-    if (other) return other.kind === "oscillating" ? oscillatingDrive(ctx, other) : linearDrive(ctx, other);
-    if (!ctx.kin.drivers.some((d) => d.kind === "rotary")) return manualDrive(ctx);
-    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
+    // an oscillating or a linear input has its own drive (rules/drive.ts); a rotary one is belted to its shaft. An input
+    // that turns a shaft in plan more than a turn each way (a screw's) is belted the same way, the motor reversing: V5's
+    // crank and link cannot swing it through several turns, and its step-up sector is for a shaft on the base normal
+    // (the one exception to V5's oscillating form)
+    const reversing = (d: (typeof ctx.kin.drivers)[number]) => d.kind === "oscillating" && beltDriven(d) && ctx.sites.some((s) => s.inPlan && s.joints.includes(d.joint ?? ""));
+    const rotary = ctx.kin.drivers.find((d) => d.kind === "rotary" || reversing(d));
+    const extra = ctx.kin.drivers.filter((d) => (d.kind === "oscillating" && !reversing(d)) || d.kind === "linear");
+    if (!rotary) {
+      const other = extra[0];
+      if (other) return other.kind === "oscillating" ? oscillatingDrive(ctx, other) : linearDrive(ctx, other);
+      return manualDrive(ctx);
+    }
+    // a second input beside a rotary one (an integrator's carriage beside its disc): its own V5 drive, ids drive2-*
+    for (const o of extra) secondDrive(ctx, () => (o.kind === "oscillating" ? oscillatingDrive(ctx, o) : linearDrive(ctx, o)));
+    const drv = rotary;
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
@@ -311,9 +387,13 @@ export const drive: Rule = {
     const C = 50;
     let M: Vec2 | null = null;
     let best = -1;
+    // a second drive already under the base (drive2-*): its parts' plan boxes, a moving part's over its travel
+    const taken = secondDriveBoxes(ctx);
     for (let k = 0; k < 12; k++) {
       const a = (k / 12) * TAU;
       const m = polar(S, C, a);
+      // the flange is 58 mm square about the motor
+      if (taken.some((b) => m[0] + 32 > b[0] && m[0] - 32 < b[2] && m[1] + 32 > b[1] && m[1] - 32 < b[3])) continue;
       const clear = Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999);
       if (clear > best) {
         best = clear;
@@ -658,6 +738,8 @@ export const seeThrough: Rule = {
     for (const s of ctx.solids) {
       if (ctx.principle.has(s.body) || s.flags.isBase || s.kind === "foot") continue;
       if ((s.kind === "roller" || s.kind === "dowel") && s.joints.some((j) => ringPins.has(j))) continue;
+      // what a loop carries round, or a drive turns with the cycle, moves: it is not a support that stands over the principle
+      if (s.convey || s.spin) continue;
       if (ctx.parts.get(s.body)?.id === s.id) continue;
       const m = worldManifold(ctx.M, s);
       const sp = projectAlong(m, dir);

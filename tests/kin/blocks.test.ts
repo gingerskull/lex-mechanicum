@@ -435,6 +435,14 @@ describe("time map and expressions", () => {
     const dtOut = m.tOf(40 * D) - m.tOf(0);
     expect(dtIn / dtOut).toBeCloseTo(3, 9);
   });
+  it("slows several spans alike (a snap there and back)", () => {
+    const m = timeMap({ spans: [[160, 168], [340, 348]], slow: 4 });
+    for (const t of [0, 0.2, 0.45, 0.6, 0.95]) expect(m.tOf(m.uOf(t))).toBeCloseTo(t, 9);
+    const a = m.tOf(168 * D) - m.tOf(160 * D);
+    const b = m.tOf(348 * D) - m.tOf(340 * D);
+    expect(a).toBeCloseTo(b, 9);
+    expect(a / (m.tOf(8 * D) - m.tOf(0))).toBeCloseTo(4, 9);
+  });
   it("handles a span that wraps past 360", () => {
     const m = timeMap({ span: [340, 20], slow: 2 });
     for (const t of [0, 0.2, 0.6, 0.95]) expect(m.tOf(m.uOf(t))).toBeCloseTo(t, 9);

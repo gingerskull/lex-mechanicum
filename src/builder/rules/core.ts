@@ -3,6 +3,7 @@ import { circle, roundRect, type Vec2 } from "../../core/geom";
 import { rungOf } from "../../style/detail";
 import { H } from "../../hardware/primitives";
 import { pillowRise } from "../../hardware/sub/pillow";
+import { PULLEYS, SENSOR } from "../../hardware/tables";
 import { extrudeOp } from "../../solids/tessellate";
 import type { Solid3 } from "../../solids/types";
 import { type BuildCtx } from "../ctx";
@@ -64,7 +65,7 @@ export const placement: Rule = {
       const role = BODY_ROLE[body.role] ?? "link";
       const frame = { o, x: g.frame.x, z: g.exact ? g.frame.z : fam.z };
       // a boss ring round each pin the part carries (a joint off the part, a slide's line, has none)
-      const marks = g.pins.filter((p) => inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
+      const marks = g.part ? [] : g.pins.filter((p) => inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
       const part: Solid3 = {
         id,
         name: titleOf(id),
@@ -72,8 +73,8 @@ export const placement: Rule = {
         kind: "part",
         body: id,
         frame,
-        profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: g.loft ? { op: "loft", sections: [{ z: 0, outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) }, ...g.loft] } : extrudeOp(g.thick, { ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}) }),
+        profile: g.part ? { outer: [...g.part.profile.outer], holes: g.part.profile.holes.map((h) => [...h]) } : { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
+        op: g.part ? g.part.op : g.loft ? { op: "loft", sections: [{ z: 0, outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) }, ...g.loft] } : extrudeOp(g.thick, { ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}) }),
         ...(g.features?.length ? { features: g.features } : {}),
         marks,
         ex: 0,
@@ -95,7 +96,7 @@ export const placement: Rule = {
         (ctx.fired.placement ??= []).push(lv.id);
       });
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? extrudeOp(pc.h), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);
@@ -141,6 +142,9 @@ export const base: Rule = {
       const reach = 60;
       const zAt = Math.min(s.at[2] - reach * Math.abs(s.axis[2]), s.at[2] + reach * Math.abs(s.axis[2]));
       top = Math.min(top, zAt - pillowRise(10));
+      // the drive's pulley on an input shaft in plan carries a home flag round with it: the base stays clear of its sweep
+      const input = ctx.kin.drivers.some((d) => d.joint && s.joints.includes(d.joint) && d.kind !== "select");
+      if (input && Math.abs(s.axis[2]) < 0.1) top = Math.min(top, s.at[2] - (PULLEYS[32].fd / 2 + 1 + SENSOR.depth - 1.5) - 2);
     }
     // a ring on carrier rollers needs room under its rim for the rollers' lower flanges and their posts
     for (const j of ctx.joints) {

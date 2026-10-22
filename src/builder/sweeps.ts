@@ -225,6 +225,11 @@ export class Sweeps {
     if (hit && hit.key === key) return hit.volume;
     hit?.volume.delete();
     const M = this.ctx.M;
+    const spun = this.revolved(body, solids);
+    if (spun) {
+      this.cache.set(body, { key, volume: spun });
+      return spun;
+    }
     // the vertices of everything the body carries, in world reference coordinates, in clusters of solids that touch: a
     // shaft the body turns is hulled on its own, and a clip over a bridge apart from a hub under it, so the hull of a body
     // never fills a fixed plate its parts pass through or straddle
@@ -256,6 +261,68 @@ export class Sweeps {
     const volume = new Swept(M, hulls);
     this.cache.set(body, { key, volume });
     return volume;
+  }
+
+  /**
+   * The sweep of a body of revolution that only turns on its own axis and slides along it (a screw): each cluster of what
+   * it carries revolved about the axis, its radius the greatest at each station along it, stretched over the slide.
+   * Null for any other body, or when a sample leaves the axis.
+   */
+  private revolved(body: string, solids: Solid3[]): Swept | null {
+    const g = this.ctx.geoms.get(body);
+    if (!g?.axisym) return null;
+    const o = g.frame.o;
+    const z = v3.unit(g.frame.z);
+    let d0 = 0;
+    let d1 = 0;
+    for (const X of this.ctx.sampled.xfs.get(body) ?? []) {
+      const q = xf.apply(X, o);
+      const d = v3.sub(q, o);
+      const along = v3.dot(d, z);
+      if (v3.len(v3.sub(d, v3.mul(z, along))) > 1e-6 || v3.len(v3.sub(xf.dir(X, z), z)) > 1e-6) return null;
+      d0 = Math.min(d0, along);
+      d1 = Math.max(d1, along);
+    }
+    const M = this.ctx.M;
+    const each = clusters(solids.map((sol) => ({ shaft: sol.kind === "shaft", pts: worldPoints(M, sol) })));
+    const frame: Mat4 = mat4({ o, x: v3.unit(g.frame.x), z });
+    const STEP = 0.5;
+    const out: Mf[] = [];
+    for (const q of each) {
+      let s0 = Infinity;
+      let s1 = -Infinity;
+      const sr = q.map((p) => {
+        const d = v3.sub(p, o);
+        const s = v3.dot(d, z);
+        s0 = Math.min(s0, s);
+        s1 = Math.max(s1, s);
+        return [s, v3.len(v3.sub(d, v3.mul(z, s)))] as const;
+      });
+      const n = Math.max(1, Math.ceil((s1 - s0) / STEP));
+      const bins = new Array<number>(n + 1).fill(0);
+      for (const [s, r] of sr) {
+        const k = Math.min(n, Math.max(0, Math.floor((s - s0) / STEP)));
+        bins[k] = Math.max(bins[k]!, r);
+      }
+      // stretched over the slide: the envelope at a station is the greatest radius within the slide behind it
+      const m = n + Math.ceil((d1 - d0) / STEP);
+      const env: number[] = [];
+      for (let k = 0; k <= m; k++) {
+        let r = 0;
+        for (let j = Math.max(0, k - Math.ceil((d1 - d0) / STEP)); j <= Math.min(n, k); j++) r = Math.max(r, bins[j]!);
+        env.push(r + 0.05);
+      }
+      const base = s0 + d0;
+      const pts: [number, number][] = [[0, base]];
+      env.forEach((r, k) => pts.push([r, base + k * STEP], [r, base + (k + 1) * STEP]));
+      pts.push([0, base + (m + 1) * STEP]);
+      const cs = new M.CrossSection([pts], "NonZero");
+      const rv = M.Manifold.revolve(cs, 48, 360);
+      cs.delete();
+      out.push(rv.transform(frame));
+      rv.delete();
+    }
+    return out.length ? new Swept(M, out) : null;
   }
 
   /** Bodies that move (a pose that differs from the reference at some sample). */
