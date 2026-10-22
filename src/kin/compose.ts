@@ -635,7 +635,8 @@ class Run implements BlockCtx {
       const p = points.get(of)!;
       const q = relativeTo ? points.get(relativeTo) : ([0, 0, 0] as Vec3);
       if (!q) return undefined;
-      if (axis === "x" || axis === "y" || axis === "z") return p["xyz".indexOf(axis)]! - (relativeTo ? q["xyz".indexOf(axis)]! : 0);
+      const k = axis && axis !== "radius" ? "xyz".indexOf(axis.replace("-", "")) : -1;
+      if (k >= 0) return (axis!.startsWith("-") ? -1 : 1) * (p[k]! - (relativeTo ? q[k]! : 0));
       return v3.dist(p, q);
     }
     if (kind === "path" || (kind === "position" && points.has(of))) return points.get(of);

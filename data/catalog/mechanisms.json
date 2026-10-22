@@ -16000,6 +16000,14 @@
             "kind": "position",
             "unit": "mm",
             "relativeTo": "Bt"
+          },
+          {
+            "id": "displacer-depth",
+            "of": "Bt",
+            "kind": "position",
+            "unit": "mm",
+            "axis": "-y",
+            "note": "the displacer yoke read the other way round (its distance below the gears), so both pistons plot on one scale"
           }
         ],
         "fallback": null
@@ -16093,8 +16101,8 @@
           },
           {
             "x": "input",
-            "y": "displacer-y",
-            "label": "DISPLACER POSITION"
+            "y": "displacer-depth",
+            "label": "DISPLACER, MIRRORED"
           }
         ],
         "claims": [

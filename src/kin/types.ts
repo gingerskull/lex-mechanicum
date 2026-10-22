@@ -150,10 +150,11 @@ export interface KinOutput {
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
   /**
-   * A point's position as one number: its world `x`, `y` or `z`, or its distance (`radius`) from the point `relativeTo`
+   * A point's position as one number: its world `x`, `y` or `z` (negated with a minus, a mirrored part read the same way
+   * round), or its distance (`radius`) from the point `relativeTo`
    * (the world origin without one). Without an axis, a point with `relativeTo` gives the distance between the two.
    */
-  axis?: "x" | "y" | "z" | "radius";
+  axis?: "x" | "y" | "z" | "-x" | "-y" | "-z" | "radius";
   relativeTo?: string;
 }
 

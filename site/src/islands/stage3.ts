@@ -56,7 +56,7 @@ function ghostCtl(t: NonNullable<Loaded["meta"]["teaching"]>, base: Ctl | undefi
 /**
  * The output plot over one cycle at the given controls, from the record's kinematics (the v2 package carries none): the
  * record's first plot, its ghosts (the same output at the settings it names: a family of curves), and the record's
- * further plots that share its unit.
+ * further plots that share its unit and its range.
  */
 function plotSeries(E: Engine, L: Pick<Loaded, "meta" | "kinematics">, ctl?: Ctl): { data: number[]; unit: string; more: { data: number[]; ghost: boolean }[] } | null {
   const t = L.meta.teaching;
@@ -73,10 +73,15 @@ function plotSeries(E: Engine, L: Pick<Loaded, "meta" | "kinematics">, ctl?: Ctl
     const d = sampleOutput(K, p.y, ghostCtl(t, ctl, g.control, g.value));
     if (d) more.push({ data: d, ghost: true });
   }
+  // (where its range overlaps the first's: a curve far off it would only squash the first)
+  const lo = Math.min(...data);
+  const hi = Math.max(...data);
   for (const q of plots.slice(1)) {
     if (unitOf(q.y) !== unit) continue;
     const d = sampleOutput(K, q.y, ctl);
-    if (d) more.push({ data: d, ghost: false });
+    if (!d) continue;
+    const overlap = Math.min(hi, Math.max(...d)) - Math.max(lo, Math.min(...d));
+    if (overlap > 0.5 * Math.min(hi - lo, Math.max(...d) - Math.min(...d))) more.push({ data: d, ghost: false });
   }
   void E;
   return { data, unit: unit === "deg" ? "°" : unit ? ` ${unit}` : "", more };

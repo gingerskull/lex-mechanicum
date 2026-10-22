@@ -41,7 +41,7 @@ function offsetCrank(): Kin {
     drivers: [input],
     solve: [{ block: "slider-dyad", id: "rod", in: { kind: "rrp", a: "A", r: "l", p: [0, 40, 0], d: [1, 0, 0] }, out: "B" }],
     points: [{ id: "L", body: "ground", local: [0, 40, 0] }],
-    outputs: [{ id: "x", of: "B", kind: "position", axis: "x" }, { id: "lean", of: "B", from: "A", to: "L", kind: "angle" }, { id: "gap", of: "B", kind: "position", relativeTo: "A" }],
+    outputs: [{ id: "x", of: "B", kind: "position", axis: "x" }, { id: "lean", of: "B", from: "A", to: "L", kind: "angle" }, { id: "gap", of: "B", kind: "position", relativeTo: "A" }, { id: "down", of: "B", kind: "position", axis: "-y" }],
   } as unknown as Kin;
 }
 
@@ -63,6 +63,7 @@ describe("crank and slide forms", () => {
     const A = P.points.get("A")!;
     expect(P.outputs.x).toBeCloseTo(B[0], 12);
     expect(P.outputs.gap).toBeCloseTo(90, 9);
+    expect(P.outputs.down).toBeCloseTo(-B[1], 12);
     expect(Math.hypot(B[0] - A[0], B[1] - A[1])).toBeCloseTo(90, 9);
   });
 
