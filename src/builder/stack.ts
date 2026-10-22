@@ -43,6 +43,8 @@ export interface StackSpec {
   eccentric?: boolean;
   /** The axle ends flush in its top part, its clip recessed (a groove runs over it: an expansion link's trunnion). */
   flush?: boolean;
+  /** A manual driver sets the shaft (a die position): it is held at its setting under the housing (F6). */
+  hold?: boolean;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
   /**
@@ -288,6 +290,13 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     if (support === "housing" || (live && spec.base)) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
       shaftSpec.z0 = h.bottom - 18;
+      if (spec.hold) {
+        // a split clamp collar under the housing, its thumb screw holding the shaft where the setting puts it (F6)
+        const cz = h.bottom - 12;
+        L.add(H.collar(`${id}-hold`, d, d + 12, { body: "ground", z0: cz, z1: cz + 8, name: `Split clamp collar ${d}x${d + 12} with a thumb screw: holds the setting` }));
+        L.add(H.screw(`${id}-hold-sc`, "button", 4, d / 2 + 8, { body: "ground", at: [d / 2 + 6, 0, 0], face: cz + 4, dir: 1, name: "Thumb screw M4, clamps the collar", qty: 1 }));
+        serve("F6", `${id}-hold`);
+      }
       serve("F2", `${id}-hcl0`, `${id}-hcl1`);
       serve("F1", `${id}-hdw0`, `${id}-hdw1`);
       serve("F4", `${id}-hww`);

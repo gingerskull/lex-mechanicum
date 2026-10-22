@@ -121,6 +121,7 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     straddle,
     eccentric: ctx.eccentric.has(site.id),
     ...(grooved ? { flush: true } : {}),
+    ...(site.live && ctx.kin.drivers.some((d) => d.kind === "manual" && d.joint && site.joints.includes(d.joint)) ? { hold: true } : {}),
     // a part split in two plates round a gap (its upper plate lifted clear of the lower) is carried between them
     ...(site.fixed && members.length === 2 && members[0]!.body === members[1]!.body && ctx.geoms.get(members[0]!.body)?.upper?.lift !== undefined ? { between: true } : {}),
     baseTopWorld: ctx.base?.top ?? 0,

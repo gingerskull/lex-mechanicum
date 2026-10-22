@@ -114,7 +114,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const L = num(shape.length, far);
       const w = num(shape.width, 22);
       const sl = Array.isArray(shape.slot) ? pair(shape.slot, [L * 0.3, L * 0.7]) : [L * 0.25, L * 0.25 + num(shape.slot, L * 0.4)];
-      return { profile: { outer: roundedPoly([[0, 0], [L, 0]], w / 2), holes: [slot(sl[0]!, sl[1]!, 0, num(shape.slotWidth, 12) / 2)] }, thick: THICK, approx: false };
+      // an arm back past the pivot (a slotted lever whose rod pin is behind its pivot)
+      const back = -num(shape.arm, 0);
+      return { profile: { outer: roundedPoly([[back, 0], [L, 0]], w / 2), holes: [slot(sl[0]!, sl[1]!, 0, num(shape.slotWidth, 12) / 2)] }, thick: THICK, approx: false };
     }
     case "slider": {
       const L = num(shape.length, 36);

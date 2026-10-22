@@ -1,5 +1,5 @@
 # Audit: Wankel rotary engine (wankel)
-standard: 3.0 · date: 2026-10-21 · result: open · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: open · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
@@ -49,7 +49,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | T9 | PASS | AUTO / DATA · claim table: 3 ok, 0 off, 0 uncheckable of 3 |
 | T10 | ? | AUTO · 0 solids drawn see-through |
 | T11 | ? | AUTO · 0 supports routed, 0 moved off a sweep |
-| T12 | PASS | HAND · 8 support solids; dropped by the polish: none |
+| T12 | PASS | HAND · 12 support solids; dropped by the polish: none |
 | T13 | ? | DATA |
 | T14 | ? | HAND / DATA |
 | T15 | ? | HAND |
@@ -64,31 +64,31 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | D8 | ? | AUTO / HAND |
 | D9 | ? | AUTO / HAND |
 | D10 | ? | AUTO |
-| D11 | PASS | AUTO · SOLID: 0 of 69 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 86 solids unsound |
 | D7 | ? | HAND |
-| A1 | ? | AUTO · mesh J6, E J3, O J2, drive drive |
-| A2 | ? | AUTO · mesh J6, E J3, O J2, drive drive |
+| A1 | ? | AUTO · mesh J6, O J2, E eccentric, drive drive |
+| A2 | ? | AUTO · mesh J6, O J2, E eccentric, drive drive |
 | A3 | ? | AUTO · fired: classify (3 solids), axial stack builder |
 | A4 | ? | AUTO · fired: j1-dead-axle (no solids), axial stack builder |
 | A5 | ? | AUTO · fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), axial stack builder |
-| A6 | ? | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) |
+| A6 | ? | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (24 solids) |
 | A7 | ? | AUTO · fired: base (3 solids), feet (4 solids) |
-| A8 | ? | AUTO · fired: fasteners (4 solids) |
+| A8 | ? | AUTO · fired: fasteners (8 solids) |
 | A9 | ? | AUTO / HAND · fired: placement solver |
-| A10 | ? | HAND · fired: placement (4 solids), placement solver |
+| A10 | ? | HAND · fired: placement (11 solids), placement solver |
 | A11 | ? | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | ? | AUTO / HAND · 69 solids, 36 unnamed (further items of a listed set) |
+| A13 | ? | AUTO / HAND · 86 solids, 45 unnamed (further items of a listed set) |
 | A14 | ? | AUTO / HAND · fired: support router |
-| A15 | PASS | AUTO · clearance in 3D over 8 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
-| A16 | ? | HAND · 4 joint notes; no note: none; no badge: mesh |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | ? | HAND · 4 joint notes; no note: none; no badge: mesh, E |
 | A17 | ? | HAND |
-| A18 | ? | AUTO · placement: 2 slabs in the tallest stack (20.0 mm), 0 clevises; stack per joint in the Joints table |
+| A18 | ? | AUTO · placement: 1 slabs in the tallest stack (16.0 mm), 0 clevises; stack per joint in the Joints table |
 | A19 | ? | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none |
 | A20 | ? | AUTO · support per joint: none |
-| A21 | PASS | AUTO · kit per joint: mesh J6, E J3, O J2, drive drive |
+| A21 | PASS | AUTO · kit per joint: mesh J6, O J2, E eccentric, drive drive |
 | A22 | ? | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) |
-| E1 | ? | AUTO · every solid has one explode level; levels -4 to 1.5 |
+| E1 | ? | AUTO · every solid has one explode level; levels -4 to 2 |
 | E2 | ? | AUTO · fired: explode (1 solid) |
 | E3 | ? | AUTO · fired: explode (1 solid) |
 | E4 | ? | HAND |
@@ -98,10 +98,10 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | E8 | ? | AUTO · fired: explode (1 solid) |
 | E9 | ? | HAND |
 | E10 | ? | AUTO · fired: explode (1 solid) |
-| J1 | ? | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) |
+| J1 | ? | AUTO · fired: trunnion (no solids), hub (no solids), j1-dead-axle (no solids) |
 | J2 | ? | AUTO · fired: j2-live-shaft (25 solids) |
-| J3 | ? | AUTO · fired: j3-moving-pin (9 solids), cross-bearings (no solids), ring-hub (no solids) |
-| J4 | ? | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) |
+| J3 | ? | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), ring-hub (no solids), eccentric (3 solids) |
+| J4 | ? | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids), die (no solids) |
 | J5 | ? | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) |
 | J6 | ? | AUTO · fired: j6-mesh (1 solid), ring-rollers (no solids) |
 | J7 | ? | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) |
@@ -111,30 +111,30 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | J12 | ? | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) |
 | J13 | ? | AUTO · fired: j13-compliant (no solids) |
 | J11 | ? | AUTO · fired: j11-screw (no solids) |
-| F1 | ? | AUTO · served at O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) |
-| F2 | ? | AUTO · served at E, O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
-| F3 | ? | AUTO · served at E, O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
+| F1 | ? | AUTO · served at O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F2 | ? | AUTO · served at O, E; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (3 solids), hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) |
+| F3 | ? | AUTO · served at O; fired: j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) |
 | F4 | ? | AUTO / HAND · served at O; fired: j9-crossed-mesh (no solids), j2-live-shaft (25 solids), j10-shaft-in-plan (no solids), trunnion (no solids) |
 | F5 | ? | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) |
 | F6 | ? | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) |
 | F7 | ? | AUTO / HAND · served at no joint; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) |
-| F8 | ? | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) |
+| F8 | ? | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), eccentric (3 solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) |
 | F9 | ? | AUTO / HAND · served at mesh; fired: j6-mesh (1 solid), j9-crossed-mesh (no solids), timing-marks (1 solid) |
 | F10 | ? | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) |
 | M1 | ? | AUTO · fired: hardware primitives |
 | M2 | ? | HAND |
-| M3 | ? | AUTO · fired: j3-moving-pin (9 solids), hardware primitives |
-| M4 | ? | AUTO / HAND · fired: base (3 solids), fasteners (4 solids) |
+| M3 | ? | AUTO · fired: j3-moving-pin (no solids), hardware primitives |
+| M4 | ? | AUTO / HAND · fired: base (3 solids), fasteners (8 solids) |
 | M5 | ? | AUTO / HAND · fired: hardware primitives |
 | M6 | PASS | AUTO · edge distance and walls clean |
 | M7 | ? | HAND |
 | M8 | ? | AUTO · fired: j1-dead-axle (no solids) |
 | M9 | ? | AUTO / HAND · fired: j1-dead-axle (no solids) |
-| M10 | ? | AUTO / HAND · 67 of 69 solids name a material |
+| M10 | ? | AUTO / HAND · 81 of 86 solids name a material |
 | M11 | ? | AUTO · fired: j1-dead-axle (no solids), hardware primitives |
 | M12 | ? | HAND |
-| M13 | ? | AUTO / HAND · 9 threaded |
-| M14 | ? | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) |
+| M13 | ? | AUTO / HAND · 16 threaded |
+| M14 | ? | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids), eccentric (3 solids), die (no solids), hub (no solids) |
 | V1 | ? | AUTO · fired: drive (26 solids) |
 | V2 | ? | AUTO · fired: drive (26 solids) |
 | V3 | ? | AUTO / HAND · fired: drive (26 solids) |
@@ -154,14 +154,14 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | R1 | ? | HAND |
 | R2 | ? | HAND |
 | R3 | ? | AUTO · fired: hardware primitives |
-| R4 | ? | AUTO · package v2 16.3 KB |
+| R4 | ? | AUTO · package v2 23.4 KB |
 | R5 | ? | HAND |
 | R6 | ? | FLAG |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
 | R8 | ? | AUTO / SITE |
 | R9 | ? | AUTO / SITE |
 | R10 | ? | FLAG |
-| DL1 | ? | AUTO / HAND · 25 of 69 solids on a dropping rung |
+| DL1 | ? | AUTO / HAND · 22 of 86 solids on a dropping rung |
 | DL2 | ? | HAND |
 | DL3 | ? | AUTO |
 | DL4 | ? | SITE |
@@ -169,7 +169,7 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 | DL5 | ? | FLAG |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
-| Q3 | ? | package v2 written, 16.3 KB; site build not checked here |
+| Q3 | ? | package v2 written, 23.4 KB; site build not checked here |
 | Q4 | ? | local: tools/shot |
 | Q5 | ? | local: tools/bench |
 | Q6 | ? |  |
@@ -179,9 +179,9 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| mesh | J6 | gear-mesh | – | – | none | none | none | none | none | none | none | none | Rotor | none |
-| E | J3 | – | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the shaft on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| mesh | J6 | gear-mesh | – | – | none | none | none | none | none | none | none | none | Stator; Rotor | none |
+| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; End washer 5.4x18, holds the shaft on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 3 x 3 x 12 (DIN 6885) | Thrust washer 10.2x18, bronze; Wave washer 14.5x18.8, spring steel | none | none | none | none | none | none |
+| E | eccentric | – | – | – | none | Cheek ring 42x60, screwed to the sheave, laps the strap | none | none | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -195,19 +195,19 @@ PASS 14 · FAIL 0 · N/A 0 · open: 153 unjudged
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 7 | 0 | ? |
-| DL-B | 0 | 139 | ? |
+| DL-A | 5 | 0 | ? |
+| DL-B | 0 | 119 | ? |
 | DL-C | 0 | 0 | ? |
-| DL-D | 8 | 0 | ? |
-| DL-E | 8 | 1 | ? |
+| DL-D | 7 | 0 | ? |
+| DL-E | 8 | 2 | ? |
 | DL-F | 0 | 0 | ? |
 | DL-G | 0 | 0 | ? |
 | DL-H | 2 | 0 | ? |
-| never | 44 | 89 | ? |
+| never | 64 | 107 | ? |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.3 KB
+check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.4 KB
 screenshots: ? · bench: ?
