@@ -217,3 +217,4 @@ Promoted in this pass: the `spatial-link` shape, the Bennett block from its four
 
 ## Verification
 check: clean · K1 residual: 4.0e-12 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.0 KB
+screenshots: dist/shots3/bennett-linkage (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

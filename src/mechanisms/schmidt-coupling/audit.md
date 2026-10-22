@@ -225,3 +225,4 @@ Promoted in this pass: ring discs (`ring: { inner, spokes, hub }`), engraved ind
 
 ## Verification
 check: clean · K1 residual: 4.3e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.0 KB
+screenshots: dist/shots3/schmidt-coupling (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

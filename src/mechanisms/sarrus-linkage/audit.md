@@ -217,3 +217,4 @@ Promoted in this pass: hinge lugs (`lugs` on a shape, the lugs rule), record-pla
 
 ## Verification
 check: clean · K1 residual: 4.3e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 11.1 KB
+screenshots: dist/shots3/sarrus-linkage (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

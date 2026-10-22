@@ -220,3 +220,4 @@ Promoted in this pass: the `ball`, `race`, `bell` and `cage` shapes (revolves wi
 
 ## Verification
 check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.0 KB
+screenshots: dist/shots3/rzeppa-cv-joint (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

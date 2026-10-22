@@ -226,3 +226,4 @@ Promoted in this pass: the `plane-slide` block (the tilt frame), plunger pistons
 
 ## Verification
 check: clean · K1 residual: 1.9e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.7 KB
+screenshots: dist/shots3/swash-plate (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

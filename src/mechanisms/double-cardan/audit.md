@@ -216,3 +216,4 @@ Promoted in this pass: the Hooke block with a shaft that has no ground joint (`s
 
 ## Verification
 check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.8 KB
+screenshots: dist/shots3/double-cardan (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)
