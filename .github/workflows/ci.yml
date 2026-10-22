@@ -50,7 +50,8 @@ jobs:
     # Scheduled and manual runs skip "What changed" and always check.
     if: always() && (github.event_name != 'pull_request' || needs.changes.outputs.code == 'true')
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    # the 3D build: every mechanism's solids are built and checked from its record
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -66,7 +67,8 @@ jobs:
     # Scheduled and manual runs skip "What changed" and always build.
     if: always() && (github.event_name != 'pull_request' || needs.changes.outputs.site == 'true')
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    # every mechanism's package is built from its record
+    timeout-minutes: 50
     env:
       ASTRO_TELEMETRY_DISABLED: 1
     steps:
