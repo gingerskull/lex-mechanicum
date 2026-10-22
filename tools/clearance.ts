@@ -103,7 +103,7 @@ async function main() {
   }
   let bad = 0;
   const jobs = ids.map((id): Job => ({ id, profile, cache: !flags.has("--no-cache"), ...(inject ? { inject } : {}) }));
-  await runPool<Job, Report>(fileURLToPath(import.meta.url), "clearanceOne", jobs, {
+  await runPool(clearanceOne, fileURLToPath(import.meta.url), jobs, {
     each: (r) => {
       console.log(r.lines.join("\n"));
       bad += r.clashes + r.faults;

@@ -24,7 +24,7 @@ export async function conformanceOne(id: string): Promise<{ line: string; failed
 async function main() {
   const report = conformance();
   const ids = report.mechanisms.map((m) => m.id);
-  const results = await runPool<string, { line: string; failed: boolean }>(fileURLToPath(import.meta.url), "conformanceOne", ids);
+  const results = await runPool(conformanceOne, fileURLToPath(import.meta.url), ids);
   const checks: Record<string, string> = Object.fromEntries(ids.map((id, i) => [id, results[i]!.line]));
   console.log(formatReport(report, checks).join("\n"));
   if (report.failing.length) console.error(`behind the standard without a deferral, or without a teaching line: ${report.failing.join(", ")}`);

@@ -15,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
+import { builtBytes } from "../src/package/built";
 import type { ThemeKey } from "../src/style/tokens";
 import { openChrome3, type Draw3Options } from "./chrome3";
 import { runPool } from "./pool";
@@ -79,7 +80,7 @@ export async function fingerprints(ids = allIds(), packages?: Map<string, Uint8A
   const src = await sources();
   const view = hash(JSON.stringify([THUMB, thumbView("dark"), STILL, stillView("dark"), QUALITY]));
   const todo = ids.filter((id) => !packages?.has(id));
-  const made = await runPool<string, Uint8Array>(join(root, "src", "package", "built.ts"), "builtBytes", todo);
+  const made = await runPool(builtBytes, join(root, "src", "package", "built.ts"), todo);
   const out: Manifest = {};
   for (const id of ids) {
     const bytes = packages?.get(id) ?? made[todo.indexOf(id)]!;

@@ -13,6 +13,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
+import { builtBytes } from "../src/package/built";
 import { copyBrand } from "./brand";
 import { runPool } from "./pool";
 import { checkThumbs, imagesOf, THUMBS_DIR } from "./thumbs";
@@ -35,7 +36,7 @@ export async function siteAssets(ids = allIds()): Promise<void> {
   mkdirSync(join(pub, "packages"), { recursive: true });
   mkdirSync(join(pub, "meta"), { recursive: true });
   const packages = new Map<string, Uint8Array>();
-  const bytes = await runPool<string, Uint8Array>(fileURLToPath(new URL("../src/package/built.ts", import.meta.url)), "builtBytes", ids);
+  const bytes = await runPool(builtBytes, fileURLToPath(new URL("../src/package/built.ts", import.meta.url)), ids);
   for (const [i, id] of ids.entries()) {
     const v2 = bytes[i]!;
     packages.set(id, v2);

@@ -27,12 +27,14 @@ interface Reply {
 }
 
 /**
- * Calls the export `fn` of `module` (a path or file URL) once per item, in child processes, and gives the results in item
- * order; `each` sees every result as soon as it and all before it are in. A failed task fails the pool.
+ * Calls `task`, an export of `module` (a path or file URL), once per item, in child processes, and gives the results in
+ * item order; `each` sees every result as soon as it and all before it are in. A failed task fails the pool. With one
+ * process the task runs here.
  */
-export async function runPool<T, R>(module: string, fn: string, items: T[], o: { jobs?: number; each?: (r: R, i: number) => void } = {}): Promise<R[]> {
+export async function runPool<T, R>(task: (x: T) => Promise<R>, module: string, items: T[], o: { jobs?: number; each?: (r: R, i: number) => void } = {}): Promise<R[]> {
   if (!items.length) return [];
   const url = module.startsWith("file:") ? module : pathToFileURL(module).href;
+  const fn = task.name;
   const jobs = o.jobs ?? poolSize(items.length);
   const out = new Array<R>(items.length);
   const done = new Array<boolean>(items.length).fill(false);
@@ -41,9 +43,8 @@ export async function runPool<T, R>(module: string, fn: string, items: T[], o: {
     for (; flushed < items.length && done[flushed]; flushed++) o.each?.(out[flushed]!, flushed);
   };
   if (jobs <= 1) {
-    const f = (await import(url))[fn] as (x: T) => Promise<R>;
     for (let i = 0; i < items.length; i++) {
-      out[i] = await f(items[i]!);
+      out[i] = await task(items[i]!);
       done[i] = true;
       flush();
     }
