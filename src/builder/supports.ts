@@ -147,7 +147,7 @@ const geomList = (g: BlockGeom): Solid3[] => [g.foot, g.ped, g.boss];
  * where something sweeps past its far end; each routed against the sweeps (A19). The nearer end's block locates a live
  * shaft, the other floats (F2, F4).
  */
-export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: number; live: boolean; lo: number; hi: number; baseTop: number; joints: string[] }): PillowOut {
+export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: number; live: boolean; lo: number; hi: number; baseTop: number; joints: string[]; side?: 1 | -1 }): PillowOut {
   const W = pillowWidth(o.d, o.live);
   // a live shaft's locating block carries a 4 mm collar on each face: the gap to the parts leaves room for it
   const gap = o.live ? 8 : 3;
@@ -159,13 +159,13 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
   const below: number[] = [];
   const above: number[] = [];
   let tried = 0;
-  for (let k = 0; k < 30 && below.length < 2; k++) {
+  for (let k = 0; k < 30 && below.length < 2 && o.side !== 1; k++) {
     const wb = o.lo - W / 2 - gap - 2 * k;
     tried++;
     if (tryAt(wb)) below.push(wb);
     if (below.length === 1) break;
   }
-  for (let k = 0; k < 30 && above.length < 2; k++) {
+  for (let k = 0; k < 30 && above.length < 2 && o.side !== -1; k++) {
     const wb = o.hi + W / 2 + gap + 2 * k;
     tried++;
     if (tryAt(wb)) above.push(wb);

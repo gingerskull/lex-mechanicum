@@ -345,3 +345,104 @@ export function ratchetWheel(u: number, lever: number, lo: number, lost: number,
   const step = v < Math.PI ? Math.max(0, Math.min(pitch, lever - lo - lost)) : pitch;
   return turns * pitch + step;
 }
+
+/** A polygon turned by a about a centre. */
+const turnPoly = (poly: readonly (readonly [number, number])[], c: readonly [number, number], a: number): [number, number][] => {
+  const cs = Math.cos(a);
+  const sn = Math.sin(a);
+  return poly.map(([x, y]) => [c[0] + (x - c[0]) * cs - (y - c[1]) * sn, c[1] + (x - c[0]) * sn + (y - c[1]) * cs]);
+};
+
+/** How far two polygons overlap (mm, 0 when apart): the deepest vertex of either inside the other. */
+export function overlapDepth(a: [number, number][], b: [number, number][]): number {
+  let d = 0;
+  for (const [x, y] of a) d = Math.max(d, -polyDist(b, x, y));
+  for (const [x, y] of b) d = Math.max(d, -polyDist(a, x, y));
+  return d;
+}
+
+export interface EscapeGeometry {
+  /** The escape wheel's outline about its centre `wc` at rest (2D, the escapement's plane), turning positive forward. */
+  wheel: [number, number][];
+  wc: [number, number];
+  /** The pallets' outlines at rest and the arbor `ac` they turn about. */
+  pallets: [number, number][][];
+  ac: [number, number];
+  /** Teeth: the wheel's pitch is 2π/n. */
+  n: number;
+  /** The wheel's sense of turn: +1 counter-clockwise in the plane's (x, y). */
+  sense: 1 | -1;
+}
+
+/**
+ * A geometric escapement, time-stepped: the pallets swing as `pallet(u)` (radians about the arbor, u the cycle phase);
+ * the wheel is urged forward by its train and goes forward until a tooth meets a pallet (an instant drop), and is pushed
+ * back where a pallet moves into a tooth (the recoil). Run until periodic; returns the wheel's angle (radians, forward
+ * positive) over one cycle in `steps` samples, its advance per cycle, and the recoil of the beat each sample lies in.
+ */
+export function simulateEscape(g: EscapeGeometry, pallet: (u: number) => number, steps = 1440): { wheel: Float64Array; recoil: Float64Array; advance: number; beats: number[]; recoils: number[] } {
+  const pitch = TAU / g.n;
+  const tol = 1e-4;
+  const free = (w: number, p: number) => {
+    const wp = turnPoly(g.wheel, g.wc, g.sense * w);
+    return g.pallets.every((pl) => overlapDepth(wp, turnPoly(pl, g.ac, p)) <= tol);
+  };
+  const settle = (w: number, p: number): number => {
+    if (!free(w, p)) {
+      // a pallet moved into a tooth: back the wheel off until it is clear (recoil)
+      let lo = w;
+      let hi = w;
+      let k = 0;
+      while (!free(lo, p) && k++ < 400) lo -= 0.0005;
+      for (let i = 0; i < 40; i++) {
+        const m = (lo + hi) / 2;
+        if (free(m, p)) lo = m;
+        else hi = m;
+      }
+      return lo;
+    }
+    // urged forward: on until a tooth meets a pallet (the drop is instant)
+    let lo = w;
+    let hi = w + 0.002;
+    let k = 0;
+    while (free(hi, p) && k++ < 2 * pitch / 0.002) {
+      lo = hi;
+      hi += 0.002;
+    }
+    for (let i = 0; i < 40; i++) {
+      const m = (lo + hi) / 2;
+      if (free(m, p)) lo = m;
+      else hi = m;
+    }
+    return lo;
+  };
+  let w = settle(0, pallet(0));
+  const cycles = 3;
+  const wheel = new Float64Array(steps + 1);
+  for (let c = 0; c < cycles; c++) {
+    for (let i = 0; i <= steps; i++) {
+      const u = (i / steps) * TAU;
+      w = settle(w, pallet(u));
+      if (c === cycles - 1) wheel[i] = w;
+    }
+  }
+  const advance = wheel[steps]! - wheel[0]!;
+  // per beat (half cycle): the wheel's net step, and its recoil (its peak after the drop less where it ends)
+  const half = steps / 2;
+  const beats: number[] = [];
+  const recoils: number[] = [];
+  const recoil = new Float64Array(steps + 1);
+  for (const [a, b] of [[0, half], [half, steps]] as const) {
+    let peak = -Infinity;
+    let rc = 0;
+    for (let i = a; i <= b; i++) {
+      peak = Math.max(peak, wheel[i]!);
+      rc = Math.max(rc, peak - wheel[i]!);
+    }
+    beats.push(wheel[b]! - wheel[a]!);
+    recoils.push(rc);
+    for (let i = a; i <= b; i++) recoil[i] = rc;
+  }
+  void pitch;
+  return { wheel, recoil, advance, beats, recoils };
+}

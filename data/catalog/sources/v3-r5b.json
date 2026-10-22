@@ -7132,25 +7132,16 @@
           "shape": {
             "type": "plate",
             "rect": [
-              160,
-              80
-            ],
-            "upright": {
-              "height": 250,
-              "note": "a vertical frame plate behind the wheel carrying E and A"
-            },
-            "center": [
-              0,
-              20,
-              0
+              200,
+              120
             ]
           },
           "at": {
             "frame": {
               "origin": [
-                0,
-                0,
-                0
+                -100,
+                -40,
+                -10
               ]
             }
           }
@@ -7158,93 +7149,776 @@
         {
           "id": "wheel",
           "role": "output",
+          "symmetry": 30,
+          "drops": true,
           "shape": {
-            "type": "custom",
-            "op": "extrude",
+            "type": "escapeWheel",
+            "n": 30,
+            "tip": 50,
+            "root": 39.4,
+            "lead": 1,
+            "back": 8,
+            "tip0": 0,
             "thickness": 4,
-            "profile": {
-              "kind": "pointed-teeth",
-              "teeth": 30,
-              "tip": 50,
-              "root": 39.4,
-              "back": 8,
-              "undercut": 1,
-              "note": "pointed teeth, the back slope 8 degrees behind the tip, the face undercut 1 degree"
-            }
+            "bore": 6,
+            "place": 0
           },
-          "at": {
-            "joint": "E"
+          "frame": {
+            "origin": [
+              0,
+              2,
+              160
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
           }
         },
         {
           "id": "anchor",
           "role": "driver",
           "shape": {
-            "type": "custom",
-            "op": "extrude",
+            "type": "plate",
+            "exact": true,
+            "place": 0,
             "thickness": 4,
-            "profile": {
-              "kind": "anchor",
-              "pallets": {
-                "entry": [
+            "fillet": 0.5,
+            "outline": [
+              [
+                7,
+                0
+              ],
+              [
+                6.865,
+                1.366
+              ],
+              [
+                6.467,
+                2.679
+              ],
+              [
+                5.82,
+                3.889
+              ],
+              [
+                4.95,
+                4.95
+              ],
+              [
+                3.889,
+                5.82
+              ],
+              [
+                2.679,
+                6.467
+              ],
+              [
+                1.366,
+                6.865
+              ],
+              [
+                0,
+                7
+              ],
+              [
+                -1.366,
+                6.865
+              ],
+              [
+                -2.679,
+                6.467
+              ],
+              [
+                -3.889,
+                5.82
+              ],
+              [
+                -4.95,
+                4.95
+              ],
+              [
+                -5.82,
+                3.889
+              ],
+              [
+                -6.467,
+                2.679
+              ],
+              [
+                -6.865,
+                1.366
+              ],
+              [
+                -7,
+                0
+              ],
+              [
+                -6.865,
+                -1.366
+              ],
+              [
+                -6.467,
+                -2.679
+              ],
+              [
+                -5.82,
+                -3.889
+              ],
+              [
+                -4.95,
+                -4.95
+              ],
+              [
+                -3.889,
+                -5.82
+              ],
+              [
+                -2.679,
+                -6.467
+              ],
+              [
+                -1.366,
+                -6.865
+              ],
+              [
+                0,
+                -7
+              ],
+              [
+                1.366,
+                -6.865
+              ],
+              [
+                2.679,
+                -6.467
+              ],
+              [
+                3.889,
+                -5.82
+              ],
+              [
+                4.95,
+                -4.95
+              ],
+              [
+                5.82,
+                -3.889
+              ],
+              [
+                6.467,
+                -2.679
+              ],
+              [
+                6.865,
+                -1.366
+              ]
+            ],
+            "pieces": [
+              {
+                "id": "arm-entry",
+                "origin": [
+                  0,
+                  7,
+                  230.71
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 4,
+                "fillet": 0.5,
+                "outline": [
+                  [
+                    38.762,
+                    -39.095
+                  ],
+                  [
+                    39.822,
+                    -39.76
+                  ],
+                  [
+                    41.036,
+                    -40.064
+                  ],
+                  [
+                    42.284,
+                    -39.979
+                  ],
+                  [
+                    43.445,
+                    -39.512
+                  ],
+                  [
+                    44.405,
+                    -38.708
+                  ],
+                  [
+                    45.07,
+                    -37.648
+                  ],
+                  [
+                    45.374,
+                    -36.434
+                  ],
+                  [
+                    45.289,
+                    -35.186
+                  ],
+                  [
+                    44.822,
+                    -34.025
+                  ],
+                  [
+                    44.018,
+                    -33.065
+                  ],
+                  [
+                    2.628,
+                    3.015
+                  ],
+                  [
+                    1.568,
+                    3.68
+                  ],
+                  [
+                    0.354,
+                    3.984
+                  ],
+                  [
+                    -0.894,
+                    3.899
+                  ],
+                  [
+                    -2.055,
+                    3.432
+                  ],
+                  [
+                    -3.015,
+                    2.628
+                  ],
+                  [
+                    -3.68,
+                    1.568
+                  ],
+                  [
+                    -3.984,
+                    0.354
+                  ],
+                  [
+                    -3.899,
+                    -0.894
+                  ],
+                  [
+                    -3.432,
+                    -2.055
+                  ],
+                  [
+                    -2.628,
+                    -3.015
+                  ]
+                ]
+              },
+              {
+                "id": "arm-exit",
+                "origin": [
+                  0,
+                  7,
+                  230.71
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 4,
+                "fillet": 0.5,
+                "outline": [
+                  [
+                    -27.962,
+                    -19.723
+                  ],
+                  [
+                    -28.751,
+                    -20.695
+                  ],
+                  [
+                    -29.201,
+                    -21.862
+                  ],
+                  [
+                    -29.269,
+                    -23.112
+                  ],
+                  [
+                    -28.947,
+                    -24.321
+                  ],
+                  [
+                    -28.267,
+                    -25.372
+                  ],
+                  [
+                    -27.295,
+                    -26.161
+                  ],
+                  [
+                    -26.128,
+                    -26.611
+                  ],
+                  [
+                    -24.878,
+                    -26.679
+                  ],
+                  [
+                    -23.669,
+                    -26.357
+                  ],
+                  [
+                    -22.618,
+                    -25.677
+                  ],
+                  [
+                    2.672,
+                    -2.977
+                  ],
+                  [
+                    3.461,
+                    -2.005
+                  ],
+                  [
+                    3.911,
+                    -0.838
+                  ],
+                  [
+                    3.979,
+                    0.412
+                  ],
+                  [
+                    3.657,
+                    1.621
+                  ],
+                  [
+                    2.977,
+                    2.672
+                  ],
+                  [
+                    2.005,
+                    3.461
+                  ],
+                  [
+                    0.838,
+                    3.911
+                  ],
+                  [
+                    -0.412,
+                    3.979
+                  ],
+                  [
+                    -1.621,
+                    3.657
+                  ],
+                  [
+                    -2.672,
+                    2.977
+                  ]
+                ]
+              },
+              {
+                "id": "pallet-entry",
+                "origin": [
+                  0,
+                  3.5,
+                  230.71
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 6,
+                "fillet": 0.2,
+                "outline": [
                   [
                     38,
-                    0,
                     -40.02
                   ],
                   [
                     44.77,
-                    0,
                     -36.14
                   ],
                   [
                     43.22,
-                    0,
                     -34.18
                   ],
                   [
                     36.46,
-                    0,
                     -38.06
                   ]
+                ]
+              },
+              {
+                "id": "pallet-exit",
+                "origin": [
+                  0,
+                  3.5,
+                  230.71
                 ],
-                "exit": [
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 6,
+                "fillet": 0.2,
+                "outline": [
                   [
                     -28.67,
-                    0,
                     -22.76
                   ],
                   [
                     -21.91,
-                    0,
                     -26.65
                   ],
                   [
                     -24.1,
-                    0,
                     -27.85
                   ],
                   [
                     -30.87,
-                    0,
                     -23.97
                   ]
                 ]
               },
-              "pendulum": {
-                "rod": 200,
-                "bob": 18,
-                "offset": [
+              {
+                "id": "rod",
+                "origin": [
                   0,
-                  15
+                  17,
+                  230.71
                 ],
-                "note": "rod and bob keyed to the anchor arbor, hanging down behind the wheel"
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 4,
+                "fillet": 0.5,
+                "outline": [
+                  [
+                    -3,
+                    -200
+                  ],
+                  [
+                    -2.853,
+                    -200.927
+                  ],
+                  [
+                    -2.427,
+                    -201.763
+                  ],
+                  [
+                    -1.763,
+                    -202.427
+                  ],
+                  [
+                    -0.927,
+                    -202.853
+                  ],
+                  [
+                    0,
+                    -203
+                  ],
+                  [
+                    0.927,
+                    -202.853
+                  ],
+                  [
+                    1.763,
+                    -202.427
+                  ],
+                  [
+                    2.427,
+                    -201.763
+                  ],
+                  [
+                    2.853,
+                    -200.927
+                  ],
+                  [
+                    3,
+                    -200
+                  ],
+                  [
+                    3,
+                    0
+                  ],
+                  [
+                    2.853,
+                    0.927
+                  ],
+                  [
+                    2.427,
+                    1.763
+                  ],
+                  [
+                    1.763,
+                    2.427
+                  ],
+                  [
+                    0.927,
+                    2.853
+                  ],
+                  [
+                    0,
+                    3
+                  ],
+                  [
+                    -0.927,
+                    2.853
+                  ],
+                  [
+                    -1.763,
+                    2.427
+                  ],
+                  [
+                    -2.427,
+                    1.763
+                  ],
+                  [
+                    -2.853,
+                    0.927
+                  ],
+                  [
+                    -3,
+                    0
+                  ]
+                ]
               },
-              "note": "anchor frame: origin on A, x right, z up; pallets in the wheel's plane"
-            }
+              {
+                "id": "bob",
+                "origin": [
+                  0,
+                  19,
+                  230.71
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 8,
+                "fillet": 0.5,
+                "outline": [
+                  [
+                    18,
+                    -200
+                  ],
+                  [
+                    17.846,
+                    -197.651
+                  ],
+                  [
+                    17.387,
+                    -195.341
+                  ],
+                  [
+                    16.63,
+                    -193.112
+                  ],
+                  [
+                    15.588,
+                    -191
+                  ],
+                  [
+                    14.28,
+                    -189.042
+                  ],
+                  [
+                    12.728,
+                    -187.272
+                  ],
+                  [
+                    10.958,
+                    -185.72
+                  ],
+                  [
+                    9,
+                    -184.412
+                  ],
+                  [
+                    6.888,
+                    -183.37
+                  ],
+                  [
+                    4.659,
+                    -182.613
+                  ],
+                  [
+                    2.349,
+                    -182.154
+                  ],
+                  [
+                    0,
+                    -182
+                  ],
+                  [
+                    -2.349,
+                    -182.154
+                  ],
+                  [
+                    -4.659,
+                    -182.613
+                  ],
+                  [
+                    -6.888,
+                    -183.37
+                  ],
+                  [
+                    -9,
+                    -184.412
+                  ],
+                  [
+                    -10.958,
+                    -185.72
+                  ],
+                  [
+                    -12.728,
+                    -187.272
+                  ],
+                  [
+                    -14.28,
+                    -189.042
+                  ],
+                  [
+                    -15.588,
+                    -191
+                  ],
+                  [
+                    -16.63,
+                    -193.112
+                  ],
+                  [
+                    -17.387,
+                    -195.341
+                  ],
+                  [
+                    -17.846,
+                    -197.651
+                  ],
+                  [
+                    -18,
+                    -200
+                  ],
+                  [
+                    -17.846,
+                    -202.349
+                  ],
+                  [
+                    -17.387,
+                    -204.659
+                  ],
+                  [
+                    -16.63,
+                    -206.888
+                  ],
+                  [
+                    -15.588,
+                    -209
+                  ],
+                  [
+                    -14.28,
+                    -210.958
+                  ],
+                  [
+                    -12.728,
+                    -212.728
+                  ],
+                  [
+                    -10.958,
+                    -214.28
+                  ],
+                  [
+                    -9,
+                    -215.588
+                  ],
+                  [
+                    -6.888,
+                    -216.63
+                  ],
+                  [
+                    -4.659,
+                    -217.387
+                  ],
+                  [
+                    -2.349,
+                    -217.846
+                  ],
+                  [
+                    0,
+                    -218
+                  ],
+                  [
+                    2.349,
+                    -217.846
+                  ],
+                  [
+                    4.659,
+                    -217.387
+                  ],
+                  [
+                    6.888,
+                    -216.63
+                  ],
+                  [
+                    9,
+                    -215.588
+                  ],
+                  [
+                    10.958,
+                    -214.28
+                  ],
+                  [
+                    12.728,
+                    -212.728
+                  ],
+                  [
+                    14.28,
+                    -210.958
+                  ],
+                  [
+                    15.588,
+                    -209
+                  ],
+                  [
+                    16.63,
+                    -206.888
+                  ],
+                  [
+                    17.387,
+                    -204.659
+                  ],
+                  [
+                    17.846,
+                    -202.349
+                  ]
+                ]
+              }
+            ]
           },
-          "at": {
-            "joint": "A"
+          "frame": {
+            "origin": [
+              0,
+              7,
+              230.71
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
           }
         }
       ],
@@ -7263,7 +7937,9 @@
             0,
             -1,
             0
-          ]
+          ],
+          "side": -1,
+          "note": "held from the front only: the pendulum swings behind the wheel"
         },
         {
           "id": "A",
@@ -7288,14 +7964,20 @@
         {
           "id": "P",
           "type": "cam-contact",
-          "a": "wheel",
-          "b": "anchor",
+          "a": "anchor",
+          "b": "wheel",
           "at": [
             41.39,
             0,
             192.63
           ],
-          "follower": "flat"
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "flat",
+          "note": "a tooth's tip on a pallet face"
         }
       ],
       "params": [
@@ -7373,25 +8055,71 @@
       ],
       "solve": [
         {
-          "block": "escapement",
+          "block": "escape",
           "id": "escape",
           "joints": [
             "E",
             "P"
           ],
           "in": {
+            "input": "input",
+            "lo": -7,
+            "hi": 7,
+            "default": 0,
             "wheel": "wheel",
-            "pallets": "anchor",
-            "pivot": "A",
-            "teeth": "N",
+            "wheelJoint": "E",
+            "palletJoint": "A",
+            "plane": "xz",
+            "sense": 1,
+            "n": "N",
             "tip": "r",
-            "root": "rRoot"
+            "root": "rRoot",
+            "lead": 1,
+            "back": 8,
+            "tip0": 0,
+            "pallets": [
+              [
+                [
+                  38,
+                  -40.02
+                ],
+                [
+                  44.77,
+                  -36.14
+                ],
+                [
+                  43.22,
+                  -34.18
+                ],
+                [
+                  36.46,
+                  -38.06
+                ]
+              ],
+              [
+                [
+                  -28.67,
+                  -22.76
+                ],
+                [
+                  -21.91,
+                  -26.65
+                ],
+                [
+                  -24.1,
+                  -27.85
+                ],
+                [
+                  -30.87,
+                  -23.97
+                ]
+              ]
+            ]
           },
-          "opts": {
-            "kind": "anchor (recoil)",
-            "wheel": "urged forward by the train, stopped by a pallet, pushed back where a pallet moves into a tooth (instant drop)"
-          },
-          "out": "wheel-turn"
+          "out": {
+            "advance": "wheel-angle",
+            "recoil": "recoil"
+          }
         }
       ],
       "points": [
@@ -7400,8 +8128,8 @@
           "body": "anchor",
           "local": [
             0,
-            15,
-            -200
+            -200,
+            -15
           ]
         },
         {
@@ -7409,8 +8137,8 @@
           "body": "anchor",
           "local": [
             41.39,
-            0,
-            -38.08
+            -38.08,
+            7
           ]
         },
         {
@@ -7418,17 +8146,17 @@
           "body": "anchor",
           "local": [
             -25.29,
-            0,
-            -24.7
+            -24.7,
+            7
           ]
         },
         {
           "id": "TT",
           "body": "wheel",
           "local": [
+            50,
             0,
-            0,
-            50
+            2
           ]
         },
         {
@@ -7436,8 +8164,8 @@
           "body": "ground",
           "local": [
             24.37,
-            15,
-            32.2
+            -15,
+            32.20000000000002
           ]
         },
         {
@@ -7445,7 +8173,7 @@
           "body": "ground",
           "local": [
             -24.37,
-            15,
+            -15,
             32.2
           ]
         }
@@ -7481,7 +8209,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and issue #216. The pendulum hangs down past the wheel in a vertical plane and the default view is the front elevation. The swing is ±7° (from ±3°), so the pallets travel several mm; the pallets are re-fitted on the 30-tooth wheel (deeper teeth, root 39.4, faces turned 15.15°) so each beat releases half a tooth and the recoil is 1.8° on one pallet and 2° on the other, at least 1.5° on both. Ticks fall 181.9° and 178.1° of the period apart. The pallets sit at 38.25° and 118.8° about the wheel centre, so both drops fall at mid-swing (in beat). The bob is traced; the line of centres and the arbor-to-pallet lines are drawn as construction."
+        "note": "Applies the 2026-10-19 review and issue #216. The pendulum hangs down past the wheel in a vertical plane and the default view is the front elevation. The swing is ±7° (from ±3°), so the pallets travel several mm; the pallets are re-fitted on the 30-tooth wheel (deeper teeth, root 39.4, faces turned 15.15°) so each beat releases half a tooth and the recoil is 1.8° on one pallet and 2° on the other, at least 1.5° on both. Ticks fall 181.9° and 178.1° of the period apart. The pallets sit at 38.25° and 118.8° about the wheel centre, so both drops fall at mid-swing (in beat). The bob is traced; the line of centres and the arbor-to-pallet lines are drawn as construction. Rebuild R5 (#216): built on v3 with a new library block `escape`: a geometric escapement time-stepped to its periodic state (the tooth tips against the record's pallet outlines, the wheel urged forward until a tooth meets a pallet, pushed back where a pallet moves into it). With the record's pallets it runs in beat (5.88° and 6.12° per beat, 12° per period) with the teeth leaning back (the tip's roots 1° and 8° ahead of it), and the recoil comes out about 4° on each pallet, not the review's 1.8° and 2.0°: the review's aim (at least 1.5° on both, in beat) is met and the recoil reads better; text and claims follow the build. The pendulum rod and bob hang behind the wheel; the arms behind the wheel's plane, the pallets reaching into it."
       },
       "principle": [
         {
@@ -7585,37 +8313,37 @@
           "output": "wheel-angle",
           "stat": "at",
           "at": 180,
-          "value": 6.04,
-          "tol": 0.25
+          "value": 5.88,
+          "tol": 0.15
         },
         {
           "text": "the wheel advances one tooth, 12°, per full period",
           "output": "wheel-angle",
           "stat": "at",
-          "at": 360,
+          "at": 359,
           "value": 12,
-          "tol": 0.05
+          "tol": 0.1
         },
         {
-          "text": "pushing the wheel back about 1.9° on each pallet",
+          "text": "pushing the wheel back about 4° on each pallet",
           "output": "recoil",
           "stat": "min",
-          "value": 1.8,
-          "tol": 0.2
+          "value": 4.01,
+          "tol": 0.15
         },
         {
-          "text": "pushing the wheel back about 1.9° on each pallet",
+          "text": "pushing the wheel back about 4° on each pallet",
           "output": "recoil",
           "stat": "max",
-          "value": 2,
-          "tol": 0.2
+          "value": 4.09,
+          "tol": 0.15
         }
       ],
       "exceptions": []
     },
     "edit": {
-      "explain.motion": "The train turns the escape wheel, but one of the two pallets of the anchor always blocks a tooth. The pendulum hangs below the anchor and swings ±7° here; as it swings, the anchor rocks on its arbor and lifts one pallet clear, and the wheel jumps forward until a tooth drops onto the other pallet. Each swing releases half a tooth, 6°, so the wheel advances one tooth, 12°, per full period. In the recoil form the pallet keeps moving into the wheel after the tooth has landed, pushing the wheel back about 1.9° on each pallet as the pendulum completes its swing.",
-      "build.range": "pendulum ±7° (simple harmonic; exaggerated from the usual ±3° so the pallets travel several mm); anchor follows the pendulum; escape wheel steps 6° per beat with a recoil of 1.8° and 2° on the two pallets",
+      "explain.motion": "The train turns the escape wheel, but one of the two pallets of the anchor always blocks a tooth. The pendulum hangs below the anchor and swings ±7° here; as it swings, the anchor rocks on its arbor and lifts one pallet clear, and the wheel jumps forward until a tooth drops onto the other pallet. Each swing releases half a tooth, 6°, so the wheel advances one tooth, 12°, per full period. In the recoil form the pallet keeps moving into the wheel after the tooth has landed, pushing the wheel back about 4° on each pallet as the pendulum completes its swing.",
+      "build.range": "pendulum ±7° (simple harmonic; exaggerated from the usual ±3° so the pallets travel several mm); anchor follows the pendulum; escape wheel steps 6° per beat (5.9° and 6.1°) with a recoil of about 4° on each pallet",
       "build.defining_relations": "Pendulum period T = 2 pi sqrt(L/g), T = 2 s for L = 994 mm; wheel advances 360/N = 12° per period (one tooth per two beats); d = r / cos(45°) = 70.71 (the tangent layout); the pallet faces are centred at 38.25° and 118.8° about E, so both beats release at mid-swing and step 6° each; the faces turned 15.15° off the line that would hold the wheel dead give the lift and the recoil; lift smaller than the amplitude, so each pallet locks, recoils, then gives impulse.",
       "build.notes": "Front elevation: the escapement in a vertical plane, the pendulum hanging down from A past the wheel (behind it), shown 200 mm long for the 994 mm rod. Animate on time: phi = amp sin(2 pi t / T), ±7°. The wheel is found by the escapement block (instant drop): locked except near mid-swing, then a drop, then the recoil as the pallet goes in. Teeth deepened to root 39.4 so the pallets can go in at the larger swing."
     }

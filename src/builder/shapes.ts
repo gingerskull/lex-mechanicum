@@ -153,6 +153,17 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const outer = sawOutline({ n: num(shape.n, 12), root: num(shape.root, 50), tip: num(shape.tip, 62), face: num(shape.face, 3), back: num(shape.back, 27), tip0: num(shape.tip0, 0) }, 0);
       return { profile: { outer, holes: [circle(num(shape.bore, 12) / 2, 0, 0, 28).reverse()] }, thick: num(shape.thickness, 8), approx: false };
     }
+    case "escapeWheel": {
+      // an escape wheel's pointed teeth: each tip with its two roots `lead` and `back` degrees from it (src/kin escape)
+      const n = num(shape.n, 30);
+      const outer: Vec2[] = [];
+      for (let k = 0; k < n; k++) {
+        const a = (num(shape.tip0, 0) + (360 / n) * k) * D2R;
+        for (const [r, b] of [[num(shape.root, 40), a + num(shape.lead, 1) * D2R], [num(shape.tip, 50), a], [num(shape.root, 40), a + num(shape.back, 8) * D2R]] as const) outer.push([r * Math.cos(b), r * Math.sin(b)]);
+      }
+      const ring = area(outer) < 0 ? outer.reverse() : outer;
+      return { profile: { outer: ring, holes: [circle(num(shape.bore, 6) / 2, 0, 0, 24).reverse()] }, thick: num(shape.thickness, 4), approx: false };
+    }
     case "star": {
       // a star wheel: straight flanks from each tip to the roots half a pitch either side (src/kin starOutline)
       const outer = starOutline({ n: num(shape.n, 10), tip: num(shape.tip, 20), root: num(shape.root, 12), tip0: num(shape.tip0, 0), c: [0, 0] } as StarSpec, 0);

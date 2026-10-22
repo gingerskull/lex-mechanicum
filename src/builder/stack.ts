@@ -41,6 +41,8 @@ export interface StackSpec {
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
   eccentric?: boolean;
+  /** A shaft in plan held from one side only (both pillow blocks): +1 along the axis, −1 against it. */
+  side?: 1 | -1;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
 }
@@ -231,7 +233,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const hi = Math.max(...L.list.map((x) => x.z1), zTop);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
-    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });
+    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, ...(spec.side ? { side: spec.side } : {}) });
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
     // the drive's pulley goes on the end facing away from the default view (rules/shared.ts driveInPlan)

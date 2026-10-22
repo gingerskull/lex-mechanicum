@@ -9,7 +9,7 @@ import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from 
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
 import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
-import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscapement, simulateStar, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
+import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscape, simulateEscapement, simulateStar, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
   const o = step.out;
@@ -620,6 +620,65 @@ const oneWay: BlockFn = (c, s) => {
   }
 };
 
+const escapeCache = new Map<string, ReturnType<typeof simulateEscape>>();
+
+/**
+ * escape (a geometric escapement in a plane: anchor, lever): the pallets swing with the oscillating driver of their arbor
+ * (`lo` to `hi` deg over the cycle, `default` at the reference); the escape wheel, urged forward by its train, goes on
+ * until a tooth meets a pallet and is pushed back where a pallet moves into a tooth (blocks/timed simulateEscape).
+ * in: input (the pallets' angle, deg), lo, hi, default, wheel (body), wheelJoint, palletJoint, plane ("xz" or "xy": the
+ * escapement's plane, its 2D axes), sense (+1: the wheel goes forward counter-clockwise in the plane), the wheel's teeth
+ * (n, tip, root, lead and back: the tip's two roots, deg from the tip, positive ahead), tip0 (deg), pallets (outlines,
+ * [u, v] in the plane relative to the arbor at the reference). out {advance, recoil}: the wheel's turn since the cycle's
+ * start and the recoil of the current beat (deg).
+ */
+const escapeBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const E = c.jointAt(str(i.wheelJoint, "escape.wheelJoint"));
+  const Aj = str(i.palletJoint, "escape.palletJoint");
+  const A = c.jointAt(Aj);
+  const plane = (i.plane as string | undefined) ?? "xy";
+  const P2 = (p: Vec3): [number, number] => (plane === "xz" ? [p[0], p[2]] : [p[0], p[1]]);
+  const n = c.num(i.n);
+  const D = Math.PI / 180;
+  const tip0 = c.num(i.tip0 ?? 0);
+  const wc = P2(E);
+  const wheel: [number, number][] = [];
+  for (let k = 0; k < n; k++) {
+    const a = (tip0 + (360 / n) * k) * D;
+    for (const [r, b] of [[c.num(i.root), a + c.num(i.lead) * D], [c.num(i.tip), a], [c.num(i.root), a + c.num(i.back) * D]] as const) wheel.push([wc[0] + r * Math.cos(b), wc[1] + r * Math.sin(b)]);
+  }
+  const ac = P2(A);
+  const pallets = ((i.pallets as number[][][] | undefined) ?? []).map((pl) => pl.map((q): [number, number] => [ac[0] + q[0]!, ac[1] + q[1]!]));
+  const lo = c.num(i.lo);
+  const hi = c.num(i.hi);
+  const def = c.num(i.default ?? 0);
+  const sense = (c.num(i.sense ?? 1) >= 0 ? 1 : -1) as 1 | -1;
+  const spec = { wheel, wc, pallets, ac, n, sense };
+  const key = JSON.stringify([spec, lo, hi, def]);
+  let sim = escapeCache.get(key);
+  if (!sim) {
+    // the pallets' angle relative to the reference, as the oscillating driver runs (deg → rad)
+    sim = simulateEscape(spec, (u) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D);
+    escapeCache.set(key, sim);
+  }
+  const N = sim.wheel.length - 1;
+  // the reference (every driver at its default) is where the swing first passes the default
+  const input = c.num(i.input);
+  const uRef = Math.acos(Math.max(-1, Math.min(1, (lo + hi - 2 * def) / (hi - lo))));
+  const u = c.u === 0 && Math.abs(input - def) < 1e-12 && Math.abs(def - lo) > 1e-12 ? uRef : c.u;
+  const turns = Math.floor(u / TAU);
+  const f = ((u - turns * TAU) / TAU) * N;
+  const k = Math.min(N - 1, Math.floor(f));
+  const t = f - k;
+  const w = sim.wheel[k]! + (sim.wheel[k + 1]! - sim.wheel[k]!) * t + turns * sim.advance;
+  const d = c.delta("wheel", w);
+  // the wheel's axis: its plane's normal, the sense of the 2D turn (xz: about −y; xy: about +z)
+  spin(c, str(i.wheel, "escape.wheel"), E, plane === "xz" ? [0, -1, 0] : [0, 0, 1], sense * d);
+  outVal(c, s, (w - sim.wheel[0]!) * R2D, "advance");
+  outVal(c, s, sim.recoil[k]! * R2D, "recoil");
+};
+
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
 
 /**
@@ -706,6 +765,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   star: starBlock,
   ratchet: ratchetBlock,
   "one-way": oneWay,
+  escape: escapeBlock,
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,

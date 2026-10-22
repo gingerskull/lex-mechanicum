@@ -143,7 +143,15 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
     }
     scale = v3.dist(lo, hi) || 1;
   }
-  const ids = first ? [...first.points.keys()] : [];
+  // a body that moves by instant drops (an escapement's wheel, `drops: true`) jumps by design: its points are not checked
+  const dropping = new Set(k.kin.bodies.filter((b) => (b as { drops?: boolean }).drops).map((b) => b.id));
+  const onDropping = (id: string) => {
+    const p = k.kin.points?.find((q) => q.id === id);
+    if (p) return dropping.has(p.body);
+    const j = k.kin.joints.find((q) => q.id === id);
+    return !!j && (dropping.has(j.a) || dropping.has(j.b));
+  };
+  const ids = first ? [...first.points.keys()].filter((id) => !onDropping(id)) : [];
   for (const id of ids) {
     const steps: number[] = [];
     for (let i = 0; i < N; i++) {
