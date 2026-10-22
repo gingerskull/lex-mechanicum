@@ -86,8 +86,10 @@ export const placement: Rule = {
       (g.levels ?? []).forEach((L, i) => {
         const r = ctx.extent(`${id}#${i + 1}`);
         if (!r) return;
-        const lo = fromPlane(r.frame, planeCoords(r.frame, g.frame.o).uv, r.w0);
-        const lv: Solid3 = { ...part, id: L.z ? `${id}-z${L.z}` : `${id}-disc`, name: L.z ? `${titleOf(id)}, ${L.z}-tooth ${String(g.shape.type) === "link" ? "gear fixed on it" : "level"}` : `${titleOf(id)}, flywheel disc`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick), marks: [], joints: [...part.joints] };
+        // a joined level runs down to the top of the part under it, one piece through the gap (a long pinion)
+        const w = L.joined && slab ? Math.min(r.w0, slab.w0 + g.thick) : r.w0;
+        const lo = fromPlane(r.frame, planeCoords(r.frame, g.frame.o).uv, w);
+        const lv: Solid3 = { ...part, id: L.z ? `${id}-z${L.z}${L.joined ? "-upper" : ""}` : `${id}-disc`, name: L.z ? `${titleOf(id)}, ${L.joined ? "upper half" : `${L.z}-tooth ${String(g.shape.type) === "link" ? "gear fixed on it" : "level"}`}` : `${titleOf(id)}, flywheel disc`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick + r.w0 - w), marks: [], joints: [...part.joints] };
         ctx.levels.set(id, [...(ctx.levels.get(id) ?? []), lv]);
         (ctx.fired.placement ??= []).push(lv.id);
       });

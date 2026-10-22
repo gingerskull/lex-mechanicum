@@ -237,7 +237,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geomOf(id).thick)));
     // each level over the last level on its side of the part (or under it, for a level that stands below); a part of
     // another body may lie between (the retainer between a sun-and-planet's rod and the planet fixed under it)
-    const above: [number, number, number][] = [];
+    const above: [number, number, number, number][] = [];
     for (const [q, l] of level) {
       if (!parent.has(q)) continue;
       const Ls = geoms.get(l.body)!.levels!;
@@ -250,9 +250,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         }
       const under = idx.get(nodeOf(levelId(l.body, prev)));
       const me = idx.get(nodeOf(q));
-      if (under !== undefined && me !== undefined) above.push([under, me, below ? -1 : 1]);
+      if (under !== undefined && me !== undefined) above.push([under, me, below ? -1 : 1, Ls[l.k - 1]!.joined ? 1 : 0]);
     }
-    const levelsOk = (assign: number[]): boolean => above.every(([u, m, d]) => assign[u]! < 0 || assign[m]! < 0 || (assign[m]! - assign[u]!) * d >= 1);
+    // a joined level is one piece with the level under it: the very next slab, nothing between
+    const levelsOk = (assign: number[]): boolean => above.every(([u, m, d, j]) => assign[u]! < 0 || assign[m]! < 0 || (j ? (assign[m]! - assign[u]!) * d === 1 : (assign[m]! - assign[u]!) * d >= 1));
 
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);
@@ -417,8 +418,10 @@ function sidesOk(assign: number[], cs: SiteConstraint[]): boolean {
     const lo = Math.min(...c.members.map((x) => assign[x]!));
     const above = c.passers.map((p) => assign[p]! > lo);
     if (above.some((a) => a) && above.some((a) => !a)) return false;
-    // a live shaft stands on its housing behind the base: nothing may pass between the base and its first part
-    if (c.site.fixed && c.site.live && above.some((a) => !a)) return false;
+    // a driven shaft stands on its housing behind the base: nothing may pass between the base and its first part (an
+    // undriven live shaft with everything under it is hung from a bridge: a large sun over a small one)
+    if (c.site.fixed && c.site.live && (c.site.driven ?? true) && above.some((a) => !a)) return false;
+    if (c.site.fixed && c.site.live && !(c.site.driven ?? true) && above.some((a) => a)) return false;
 
   }
   return true;

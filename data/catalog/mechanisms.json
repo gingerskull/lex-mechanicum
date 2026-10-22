@@ -38456,9 +38456,7 @@
                 20,
                 8
               ],
-              "plates": 2,
-              "gap": 26,
-              "note": "one carrier outline holding a short and a long pinion pin per set"
+              "note": "one carrier spider under the gears, on a bearing on the small sun's shaft, holding a short and a long pinion pin per set"
             },
             "at": {
               "joint": "Jc"
@@ -38527,9 +38525,18 @@
               "type": "gear",
               "z": 24,
               "module": 2,
-              "face": 22,
+              "face": 10,
               "bore": 8,
-              "note": "one gear twice the face width: the lower half meshes the short pinion, the upper half the large sun and the ring"
+              "cluster": [
+                {
+                  "z": 24,
+                  "module": 2,
+                  "face": 10,
+                  "bore": 8,
+                  "joined": true
+                }
+              ],
+              "note": "one long pinion through two slabs: the lower half meshes the short pinion, the upper half the large sun and the ring"
             },
             "at": {
               "joint": "JL0"
@@ -38542,9 +38549,18 @@
               "type": "gear",
               "z": 24,
               "module": 2,
-              "face": 22,
+              "face": 10,
               "bore": 8,
-              "note": "one gear twice the face width: the lower half meshes the short pinion, the upper half the large sun and the ring"
+              "cluster": [
+                {
+                  "z": 24,
+                  "module": 2,
+                  "face": 10,
+                  "bore": 8,
+                  "joined": true
+                }
+              ],
+              "note": "one long pinion through two slabs: the lower half meshes the short pinion, the upper half the large sun and the ring"
             },
             "at": {
               "joint": "JL1"
@@ -38557,9 +38573,18 @@
               "type": "gear",
               "z": 24,
               "module": 2,
-              "face": 22,
+              "face": 10,
               "bore": 8,
-              "note": "one gear twice the face width: the lower half meshes the short pinion, the upper half the large sun and the ring"
+              "cluster": [
+                {
+                  "z": 24,
+                  "module": 2,
+                  "face": 10,
+                  "bore": 8,
+                  "joined": true
+                }
+              ],
+              "note": "one long pinion through two slabs: the lower half meshes the short pinion, the upper half the large sun and the ring"
             },
             "at": {
               "joint": "JL2"
@@ -38737,10 +38762,9 @@
               0,
               0
             ],
-            "z": [
-              30,
-              18
-            ]
+            "za": 30,
+            "zb": 18,
+            "carrier": "carrier"
           },
           {
             "id": "M1_1",
@@ -38752,10 +38776,9 @@
               25.981,
               0
             ],
-            "z": [
-              30,
-              18
-            ]
+            "za": 30,
+            "zb": 18,
+            "carrier": "carrier"
           },
           {
             "id": "M1_2",
@@ -38767,10 +38790,9 @@
               -25.981,
               0
             ],
-            "z": [
-              30,
-              18
-            ]
+            "za": 30,
+            "zb": 18,
+            "carrier": "carrier"
           },
           {
             "id": "M2_0",
@@ -38782,10 +38804,9 @@
               17.878,
               0
             ],
-            "z": [
-              18,
-              24
-            ]
+            "za": 18,
+            "zb": 24,
+            "carrier": "carrier"
           },
           {
             "id": "M2_1",
@@ -38797,10 +38818,9 @@
               30.821,
               0
             ],
-            "z": [
-              18,
-              24
-            ]
+            "za": 18,
+            "zb": 24,
+            "carrier": "carrier"
           },
           {
             "id": "M2_2",
@@ -38812,10 +38832,9 @@
               -48.699,
               0
             ],
-            "z": [
-              18,
-              24
-            ]
+            "za": 18,
+            "zb": 24,
+            "carrier": "carrier"
           },
           {
             "id": "M3_0",
@@ -38827,10 +38846,12 @@
               25.03,
               12
             ],
-            "z": [
-              24,
-              36
-            ]
+            "za": 24,
+            "zb": 36,
+            "carrier": "carrier",
+            "level": {
+              "long0": 1
+            }
           },
           {
             "id": "M3_1",
@@ -38842,10 +38863,12 @@
               9.894,
               12
             ],
-            "z": [
-              24,
-              36
-            ]
+            "za": 24,
+            "zb": 36,
+            "carrier": "carrier",
+            "level": {
+              "long1": 1
+            }
           },
           {
             "id": "M3_2",
@@ -38857,10 +38880,12 @@
               -34.923,
               12
             ],
-            "z": [
-              24,
-              36
-            ]
+            "za": 24,
+            "zb": 36,
+            "carrier": "carrier",
+            "level": {
+              "long2": 1
+            }
           },
           {
             "id": "M4_0",
@@ -38872,11 +38897,13 @@
               58.403,
               12
             ],
-            "z": [
-              24,
-              84
-            ],
-            "internal": true
+            "internal": true,
+            "za": 24,
+            "zb": 84,
+            "carrier": "carrier",
+            "level": {
+              "long0": 1
+            }
           },
           {
             "id": "M4_1",
@@ -38888,11 +38915,13 @@
               23.085,
               12
             ],
-            "z": [
-              24,
-              84
-            ],
-            "internal": true
+            "internal": true,
+            "za": 24,
+            "zb": 84,
+            "carrier": "carrier",
+            "level": {
+              "long1": 1
+            }
           },
           {
             "id": "M4_2",
@@ -38904,11 +38933,13 @@
               -81.488,
               12
             ],
-            "z": [
-              24,
-              84
-            ],
-            "internal": true
+            "internal": true,
+            "za": 24,
+            "zb": 84,
+            "carrier": "carrier",
+            "level": {
+              "long2": 1
+            }
           }
         ],
         "params": [
@@ -39006,8 +39037,7 @@
               360
             ],
             "default": 0,
-            "joint_by": "input-member",
-            "note": "the input member's joint: the small sun, or the large sun (Jsl) in reverse"
+            "note": "the input member turns: the small sun, or the large sun in reverse (the gear block turns the member the selector names); the gear selector sets the cycle"
           },
           {
             "id": "gear",
@@ -39055,7 +39085,7 @@
         ],
         "solve": [
           {
-            "block": "willis",
+            "block": "ravigneaux",
             "id": "train",
             "joints": [
               "Jsl",
@@ -39081,45 +39111,67 @@
               "M4_2"
             ],
             "in": {
-              "sunS": "sunS",
-              "sunL": "sunL",
-              "carrier": "carrier",
-              "ring": "ring",
-              "short": [
-                "short0",
-                "short1",
-                "short2"
+              "zSs": 30,
+              "zSl": 36,
+              "zPs": 18,
+              "zPl": 24,
+              "zR": 84,
+              "center": [
+                0,
+                0,
+                0
               ],
-              "long": [
-                "long0",
-                "long1",
-                "long2"
+              "axis": [
+                0,
+                0,
+                1
               ],
-              "Ss": "Ss",
-              "Sl": "Sl",
-              "Ps": "Ps",
-              "Pl": "Pl",
-              "R": "R",
               "input": "input",
               "inputMember": "input-member",
               "held": "held-member",
-              "locked": "locked"
-            },
-            "out": [
-              "carrier-angle",
-              "ring-angle",
-              "sunL-angle",
-              "sunS-angle",
-              "short-spin",
-              "long-spin"
-            ],
-            "opts": {
-              "relations": [
-                "(wR - wc)/(wSl - wc) = -Sl/R",
-                "(wR - wc)/(wSs - wc) = +Ss/R"
+              "locked": "locked",
+              "bodies": {
+                "sunS": "sunS",
+                "sunL": "sunL",
+                "carrier": "carrier",
+                "ring": "ring"
+              },
+              "short": [
+                {
+                  "body": "short0",
+                  "joint": "JS0"
+                },
+                {
+                  "body": "short1",
+                  "joint": "JS1"
+                },
+                {
+                  "body": "short2",
+                  "joint": "JS2"
+                }
               ],
-              "held": "angle 0",
-              "locked": "the two members share one angle"
+              "long": [
+                {
+                  "body": "long0",
+                  "joint": "JL0"
+                },
+                {
+                  "body": "long1",
+                  "joint": "JL1"
+                },
+                {
+                  "body": "long2",
+                  "joint": "JL2"
+                }
+              ]
+            },
+            "out": {
+              "carrier": "carrier-turn",
+              "ring": "ring-turn",
+              "sunL": "sunL-turn",
+              "sunS": "sunS-turn",
+              "short": "short-spin-v",
+              "long": "long-spin-v"
             }
           }
         ],
@@ -39155,7 +39207,7 @@
           },
           {
             "id": "long-spin",
-            "of": "JL0",
+            "of": "long-spin-v",
             "kind": "angle",
             "unit": "deg"
           },

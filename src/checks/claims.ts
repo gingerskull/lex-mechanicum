@@ -218,10 +218,16 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
   // a claim that holds at a setting of the params (`setting: { split: 0 }`) is checked on the motion at that setting
   const at = new Map<string, Pose[]>();
   const posesFor = (claim: Claim): Pose[] => {
-    const setting = claim.setting as Record<string, number> | undefined;
+    const setting = claim.setting as Record<string, number | string> | undefined;
     if (!setting || typeof setting !== "object") return poses;
     const key = JSON.stringify(setting);
-    if (!at.has(key)) at.set(key, Array.from({ length: n }, (_, i) => K.pose((i / n) * Math.PI * 2, { params: setting })));
+    // a setting names params, or a selector's option (`setting: { gear: "2nd" }`)
+    const ctl: { params: Record<string, number>; select: Record<string, string> } = { params: {}, select: {} };
+    for (const [k, v] of Object.entries(setting)) {
+      if (K.kin.drivers.some((d) => d.id === k && d.kind === "select")) ctl.select[k] = String(v);
+      else ctl.params[k] = Number(v);
+    }
+    if (!at.has(key)) at.set(key, Array.from({ length: n }, (_, i) => K.pose((i / n) * Math.PI * 2, ctl)));
     return at.get(key)!;
   };
   return claims.map((claim): ClaimResult => {

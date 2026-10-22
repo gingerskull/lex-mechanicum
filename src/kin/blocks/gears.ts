@@ -72,3 +72,71 @@ export function willis(spec: WillisSpec, known: Partial<Record<WillisPort, numbe
   const planet = spec.zp ? carrier - (spec.zs / spec.zp) * (sun! - carrier) : null;
   return { sun: sun!, ring: ring!, carrier, planet };
 }
+
+export type RavigneauxMember = "sunS" | "sunL" | "carrier" | "ring";
+
+export interface RavigneauxSpec {
+  /** Teeth: small sun, large sun, short pinion, long pinion, ring. */
+  zSs: number;
+  zSl: number;
+  zPs: number;
+  zPl: number;
+  zR: number;
+}
+
+/**
+ * A Ravigneaux set (two suns, short and long pinions on one carrier, one ring) has two degrees of freedom:
+ * (ωR − ωc) = +zSs/zR (ωSs − ωc) (small sun, short, long, ring) and (ωR − ωc) = −zSl/zR (ωSl − ωc) (large sun, long,
+ * ring). The input member turns `input`; one member is held (angle 0), or two are locked (one angle). Returns every
+ * member's angle and the pinions' turns on their own pins (relative to the carrier).
+ */
+export function ravigneaux(
+  spec: RavigneauxSpec,
+  input: number,
+  inputMember: RavigneauxMember,
+  held: RavigneauxMember | null,
+  locked: [RavigneauxMember, RavigneauxMember] | null,
+): Record<RavigneauxMember, number> & { short: number; long: number } {
+  const ks = spec.zSs / spec.zR;
+  const kl = -spec.zSl / spec.zR;
+  // unknowns [Ss, Sl, c, R]: two Willis rows, the input row and a hold or lock row
+  const A: number[][] = [
+    [-ks, 0, ks - 1, 1],
+    [0, -kl, kl - 1, 1],
+  ];
+  const b = [0, 0];
+  const idx: Record<RavigneauxMember, number> = { sunS: 0, sunL: 1, carrier: 2, ring: 3 };
+  const row = (m: RavigneauxMember): number[] => [0, 1, 2, 3].map((k) => (k === idx[m] ? 1 : 0));
+  A.push(row(inputMember));
+  b.push(input);
+  if (locked) {
+    const r = row(locked[0]);
+    r[idx[locked[1]]] = -1;
+    A.push(r);
+  } else if (held) A.push(row(held));
+  else throw new Error("ravigneaux needs a held member or a lock");
+  b.push(0);
+  const x = solve4(A, b);
+  const [sunS, sunL, carrier, ring] = x as [number, number, number, number];
+  const short = -(spec.zSs / spec.zPs) * (sunS - carrier);
+  const long = -(spec.zPs / spec.zPl) * short;
+  return { sunS, sunL, carrier, ring, short, long };
+}
+
+/** Gaussian elimination with partial pivoting for a small square system. */
+function solve4(A: number[][], b: number[]): number[] {
+  const n = b.length;
+  const M = A.map((r, i) => [...r, b[i]!]);
+  for (let c = 0; c < n; c++) {
+    let p = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(M[r]![c]!) > Math.abs(M[p]![c]!)) p = r;
+    if (Math.abs(M[p]![c]!) < 1e-12) throw new Error("ravigneaux: the held or locked members leave the set free");
+    [M[c], M[p]] = [M[p]!, M[c]!];
+    for (let r = 0; r < n; r++) {
+      if (r === c) continue;
+      const f = M[r]![c]! / M[c]![c]!;
+      for (let k = c; k <= n; k++) M[r]![k]! -= f * M[c]![k]!;
+    }
+  }
+  return M.map((r, i) => r[n]! / r[i]!);
+}

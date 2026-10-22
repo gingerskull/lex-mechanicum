@@ -6,7 +6,7 @@ import { type SolveStep } from "./types";
 import { D2R, type Vec3, m3, v3, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
-import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
+import { ellipticalAngle, meshRatio, ravigneaux, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
 import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
 import { genevaAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
@@ -390,6 +390,44 @@ const willisBlock: BlockFn = (c, s) => {
   }
 };
 
+/**
+ * ravigneaux. A compound planetary set with two suns, short and long pinions on one carrier and a ring (see `ravigneaux`
+ * in blocks/gears). in: zSs, zSl, zPs, zPl, zR (teeth), center, axis (the common axis), input (the input member's
+ * angle, deg), inputMember, held, locked (design choices: a member's name; held "none"; locked "none" or "a+b"),
+ * bodies { sunS, sunL, carrier, ring }, short and long [{ body, joint }] (each pinion on its pin, joints to the carrier).
+ * out { sunS, sunL, carrier, ring, short, long }: the members' angles and the pinions' turns on their pins (deg).
+ */
+const ravigneauxBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const members = ["sunS", "sunL", "carrier", "ring"] as const;
+  type M = (typeof members)[number];
+  const member = (v: string | undefined, what: string): M => {
+    if (!members.includes(v as M)) throw new KinError(`${s.id}: ${what} "${String(v)}" is not sunS, sunL, carrier or ring`);
+    return v as M;
+  };
+  const pick = (k: string): string | undefined => (typeof i[k] === "string" ? (c.choice(i[k]) ?? (i[k] as string)) : undefined);
+  const inputMember = member(pick("inputMember"), "input member");
+  const heldName = pick("held");
+  const lockName = pick("locked");
+  const held = heldName && heldName !== "none" ? member(heldName, "held member") : null;
+  const lock = lockName && lockName !== "none" ? (lockName.split("+").map((m) => member(m, "locked member")) as [M, M]) : null;
+  const spec = { zSs: c.num(i.zSs), zSl: c.num(i.zSl), zPs: c.num(i.zPs), zPl: c.num(i.zPl), zR: c.num(i.zR) };
+  const w = ravigneaux(spec, c.delta("in", c.rad(i.input)), inputMember, lock ? null : held, lock);
+  const centre = c.vec(i.center);
+  const axis = v3.unit(c.vec(i.axis));
+  const bodies = (i.bodies as Record<string, string> | undefined) ?? {};
+  for (const k of members) {
+    const b = bodies[k];
+    if (b) spin(c, b, centre, axis, w[k]);
+    outVal(c, s, w[k] * R2D, k);
+  }
+  const C = xf.rotAbout(centre, axis, w.carrier);
+  for (const set of ["short", "long"] as const) {
+    for (const p of (i[set] as { body: string; joint: string }[] | undefined) ?? []) c.setXf(p.body, xf.mul(C, xf.rotAbout(c.refVec(p.joint), axis, w[set])));
+    outVal(c, s, w[set] * R2D, set);
+  }
+};
+
 const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" ? l : "cycloidal");
 
 /**
@@ -640,6 +678,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   sarrus,
   "gear-mesh": gearMesh,
   willis: willisBlock,
+  ravigneaux: ravigneauxBlock,
   cam: camBlock,
   screw: screwBlock,
   convey: conveyBlock,

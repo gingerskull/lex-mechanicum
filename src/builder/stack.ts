@@ -36,6 +36,8 @@ export interface StackSpec {
   input?: boolean;
   /** Force a support instead of letting the selector choose. */
   support?: SupportKind;
+  /** A driver turns the stack (its drive is under the base). */
+  driven?: boolean;
   /** A live gear or pulley shaft with nothing over it is straddle mounted (A9). */
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
@@ -65,9 +67,11 @@ const SPACER_MIN = 0.5;
 const BEAM_GAP = 3;
 
 /** The support selector (A20). */
-export function selectSupport(spec: Pick<StackSpec, "kind" | "held" | "straddle" | "base" | "frame">): SupportKind {
+export function selectSupport(spec: Pick<StackSpec, "kind" | "held" | "straddle" | "base" | "frame" | "driven">): SupportKind {
   if (spec.kind === "moving") return "stub";
   if (!spec.base || !parallel(spec.frame.z, UP)) return "pillow";
+  // an undriven live shaft with parts passing under it runs in its bridge alone (a large sun over a small one)
+  if (spec.kind === "live" && spec.held === "bridge" && spec.driven === false) return "hung";
   if (spec.kind === "live") return spec.straddle && spec.held !== "base" ? "bridge" : "housing";
   if (spec.held === "base") return "stub";
   if (spec.held === "bridge") return "hung";
@@ -280,7 +284,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       // hung from its bridge: a circlip under the first part keeps it up
       grooves.push(first.w0 - 4 + 0.6);
     }
-    if (support === "housing" || (live && spec.base)) {
+    if (support === "housing" || (live && spec.base && support !== "hung")) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
       shaftSpec.z0 = h.bottom - 18;
       serve("F2", `${id}-hcl0`, `${id}-hcl1`);
@@ -312,7 +316,13 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       L.add(H.bushing(`${id}-bb`, d, circleBushing(d), { body: "ground", z0: beamBot, z1: beamTop }));
       // a dead axle's clip bears on the bushing; a live shaft is located in its housing, so its clip only stands guard,
       // clear of the fixed beam by the sweep margin (A12, A14)
-      const cz = beamTop + (live ? MIN_GAP + 0.1 : 0.3);
+      // a live shaft hung from the bridge alone bears on it through a thrust washer under its clip (A12)
+      const hungLive = live && support === "hung";
+      if (hungLive) {
+        L.add(H.thrustWasher(`${id}-btw`, d + 0.2, d + 8, { body: "ground", z0: beamTop, z1: beamTop + 1 }));
+        serve("F4", `${id}-btw`);
+      }
+      const cz = beamTop + (hungLive ? 1.3 : live ? MIN_GAP + 0.1 : 0.3);
       grooves.push(cz);
       L.add(H.circlip(`${id}-ecl`, d, { z0: cz, z1: cz + ce.s, body: turn }));
       serve("F1", `${id}-bridge`);

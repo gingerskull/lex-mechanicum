@@ -134,7 +134,7 @@ in degrees, applied x then y then z, default none); points and axes given "in a 
 | `joints` | Declared, with a 3D origin and axis: `id`, `type`, `a`, `b` (bodies), `at` (point or position), `axis`, `limits` `[lo, hi]` where it has them. **Types:** `revolute`, `prismatic`, `cylindrical`, `screw` (`lead`, `hand`, `ball`), `pin-in-slot` (the slot's body and path), `gear-mesh` (`ratio` or the two bodies' tooth counts; `crossed` axes angle, `offset` for hypoid), `cam-contact` (follower kind: roller, flat, knife), `belt` (a `flexible` member: `belt`, `chain`, `rope`, `cvt`), `rolling`, `spherical`, `universal`, `planar`, `flexure` (neck, width, length, thickness). Every joint belongs to exactly one block of `solve`, or to `fallback`. |
 | `params` | Named dimensions: `id`, `value`, `unit`, `min`, `max` (the **ranges** used by controls and by the validator), `note`. |
 | `design` | Discrete **design choices** that change the build but not the motion law: tooth counts, which arrangement, which side a part is on. `options` and the chosen `value`. |
-| `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params. |
+| `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params; in the record form an option is `{ id, set, cycle }`: `set` gives design choices (the input member, the held member) and `cycle` the input degrees after which the motion repeats at that option (it replaces the rotary driver's range). The selector's `default` is an option's id. |
 | `solve` | The composition: a list of block instances in solve order. A **block** is one of `dyad`, `slider-dyad`, `gear-mesh`, `willis`, `hooke`, `homokinetic`, `bennett`, `cam`, `screw`, `convey`, `flexure`, `escapement`; `in` names the bodies, points and params it reads; `out` names the points and angles it produces; `branch` names the design choice that picks its root. Block inputs and outputs are the only names later blocks may read. |
 | `points` | Named points: a body and a local position. Every point a trace, overlay, dimension or plot uses is here (standard K12). |
 | `outputs` | Quantities read off: `id`, `of` (a body or point), `kind` (`angle`, `position`, `speed-ratio`, `path`), `unit`. Plots and claims read these. |
@@ -173,6 +173,14 @@ second gear's axis, `cb` its centre). `hooke` reads either a `universal` joint o
 `{ input, cross, joints: { in, out, a, b } }`: the two shafts' ground revolutes and the two yoke pins into the cross.
 `slider-dyad` with `kind: "rpr"` is the swinging block: `a` the slotted body's pivot, `p` the pin, `body` the slotted body;
 a body joined to it by a prismatic joint keeps its turn. A block's `out` may be keyed (`{ "angle": "gear-turn" }`).
+`ravigneaux` solves a set of two suns, short and long pinions on one carrier and a ring: `zSs`, `zSl`, `zPs`, `zPl`, `zR`,
+`center`, `axis`, `input` (the input member's angle), `inputMember`, `held` and `locked` (design choices a selector sets:
+a member's name, `"none"`, or two members joined by `+`), `bodies` { sunS, sunL, carrier, ring } and `short`, `long`
+([{ body, joint }]); out { sunS, sunL, carrier, ring, short, long }.
+
+**A gear through two planes.** A `gear`'s `cluster` level with `joined: true` is one piece with the gear under it, in the
+very next slab (a long pinion: its lower half meshes one gear, its upper half others). Where two levels have the same
+tooth count, a mesh joint names the level it meets: `level: { <body>: 1 }`.
 
 **Claims.** A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
 open while the swing is in a range); with a number it is the longest stretch the output holds within that much.

@@ -109,16 +109,29 @@ export interface KinDriver {
   joint?: string;
   kind: "rotary" | "oscillating" | "linear" | "manual" | "select";
   range?: [number, number];
-  default?: number;
+  /** A selector's default is the id of one of its options. */
+  default?: number | string;
   lo?: number;
   hi?: number;
   /** Rotary and oscillating: turns per cycle (default 1; an integer keeps K2) and a phase offset, degrees. */
   /** Turns per cycle relative to the range, or a param expression (a differential's second input at a split). */
   speed?: number | string;
   phase?: number;
-  /** A selector's named options, each setting values of other drivers and params. */
-  options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }>;
+  /**
+   * A selector's named options (a list of `{ id, ... }`, or a map by id), each setting values of other drivers, params
+   * and design choices (`set`), and the cycle the motion repeats after at that option (input degrees).
+   */
+  options?:
+    | Record<string, SelectorOptionSpec>
+    | (SelectorOptionSpec & { id: string })[];
   value?: string; // a selector's current option
+}
+
+export interface SelectorOptionSpec {
+  drivers?: Record<string, number>;
+  params?: Record<string, number>;
+  set?: Record<string, string | number>;
+  cycle?: number;
 }
 
 export interface SolveStep {

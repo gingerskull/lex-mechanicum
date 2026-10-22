@@ -669,6 +669,20 @@ export const seeThrough: Rule = {
       }
     }
     proj.forEach((p) => p.cs.delete());
+    // a principle gear that covers a smaller one on its own axis is drawn see-through too, never removed (a large sun
+    // over a small one)
+    const gears = [...ctx.principle].map((b) => ({ b, g: ctx.geoms.get(b), part: ctx.parts.get(b) })).filter((x) => x.g && x.part && String(x.g.shape.type) === "gear" && parallel(x.g.frame.z, dir));
+    const reach = (x: (typeof gears)[number]) => Math.max(...x.g!.profile.outer.map((q) => Math.hypot(q[0], q[1])));
+    const depth = (x: (typeof gears)[number]) => v3.dot(x.part!.frame.o, dir);
+    for (const A of gears)
+      for (const B of gears) {
+        if (A === B || reach(A) <= reach(B) || depth(A) >= depth(B)) continue;
+        const off = v3.sub(B.g!.frame.o, A.g!.frame.o);
+        if (v3.len(v3.sub(off, v3.mul(dir, v3.dot(off, dir)))) > 0.5) continue;
+        A.part!.flags.seeThrough = true;
+        ctx.covers.set(A.part!.id, [...new Set([...(ctx.covers.get(A.part!.id) ?? []), B.b])]);
+        (ctx.fired["see-through"] ??= []).push(A.part!.id);
+      }
   },
 };
 

@@ -39,6 +39,8 @@ export interface Site {
   fixed: boolean;
   /** A fixed pin that drives: the input, or one that turns a keyed part (A2). */
   live: boolean;
+  /** A driver turns one of its joints (the drive is under the base, so its shaft stands on the base). */
+  driven?: boolean;
   kit: "J1" | "J2" | "J3" | "J10";
   /** The axis is not the base normal: a shaft in plan or a tilted one (J10). */
   inPlan: boolean;
@@ -157,7 +159,8 @@ export function classifyJoints(kin: Kin, S: Setup): { joints: JointInfo[]; sites
   };
   for (const s of sites) {
     s.inPlan = !parallel(s.axis, UP);
-    s.live = s.fixed && (s.joints.some((id) => driven.has(id)) || s.bodies.some(keyedBody));
+    s.driven = s.joints.some((id) => driven.has(id));
+    s.live = s.fixed && (s.driven || s.bodies.some(keyedBody));
     s.kit = s.fixed ? (s.inPlan ? "J10" : s.live ? "J2" : "J1") : "J3";
     for (const id of s.joints) joints.find((q) => q.id === id)!.kit = s.kit;
   }

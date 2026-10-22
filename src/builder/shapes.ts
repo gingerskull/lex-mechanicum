@@ -24,6 +24,8 @@ export interface Level {
   thick: number;
   center?: Vec2;
   below?: boolean;
+  /** The level runs down to the part under it as one piece (a long pinion through two slabs). */
+  joined?: boolean;
 }
 
 export interface BodyGeom {
@@ -375,7 +377,7 @@ function clusterLevels(shape: Record<string, unknown>, pins: { joint: string; uv
   if (type === "gear" && Array.isArray(shape.cluster))
     for (const l of shape.cluster as Record<string, unknown>[]) {
       const z = num(l.z, 12);
-      out.push({ z, profile: { outer: gearOutline(z, num(l.module, num(shape.module, 2))), holes: [circle(num(l.bore, num(shape.bore, 6)) / 2, 0, 0, 28)] }, thick: num(l.face, num(shape.face, 10)) });
+      out.push({ z, profile: { outer: gearOutline(z, num(l.module, num(shape.module, 2))), holes: [circle(num(l.bore, num(shape.bore, 6)) / 2, 0, 0, 28)] }, thick: num(l.face, num(shape.face, 10)), ...(l.joined === true ? { joined: true } : {}) });
     }
   if (type === "link" && shape.gear && typeof shape.gear === "object") {
     const l = shape.gear as Record<string, unknown>;
@@ -391,9 +393,14 @@ function clusterLevels(shape: Record<string, unknown>, pins: { joint: string; uv
   return out;
 }
 
-/** Which level of a body a mesh joint reaches: 0 its own part, k its k-th cluster level (by the tooth count the joint gives it). */
-export function meshLevel(g: BodyGeom | undefined, j: { a: string; b: string; za?: unknown; zb?: unknown }): number {
+/**
+ * Which level of a body a mesh joint reaches: 0 its own part, k its k-th cluster level (by the tooth count the joint
+ * gives it, or the joint's `level` for the body where two levels have the same count: a long pinion).
+ */
+export function meshLevel(g: BodyGeom | undefined, j: { a: string; b: string; za?: unknown; zb?: unknown; level?: unknown }): number {
   if (!g?.levels?.length) return 0;
+  const named = j.level && typeof j.level === "object" ? (j.level as Record<string, unknown>)[g.id] : undefined;
+  if (typeof named === "number" && named >= 0 && named <= g.levels.length) return named;
   const z = g.id === j.a ? j.za : g.id === j.b ? j.zb : undefined;
   if (typeof z !== "number" || z === num(g.shape.z, 20)) return 0;
   const k = g.levels.findIndex((l) => l.z > 0 && l.z === z);

@@ -122,6 +122,7 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     base,
     held: site.fixed ? held : "both",
     input: !!driver && site.joints.includes(driver.joint ?? ""),
+    driven: site.driven ?? true,
     straddle,
     eccentric: ctx.eccentric.has(site.id),
     baseTopWorld: ctx.base?.top ?? 0,
