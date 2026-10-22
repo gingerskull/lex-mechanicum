@@ -245,7 +245,6 @@ export function pillowBlocks(ctx: BuildCtx, o: { id: string; frame: Frame; d: nu
         x.delete();
         pr.delete();
       }
-      pp.delete();
     }
     m.forEach((q) => q.delete());
   });
