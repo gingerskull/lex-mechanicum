@@ -59,6 +59,8 @@ export interface Feature {
   profile: Profile;
   op: Op;
   frame: Frame;
+  /** A closed generator mesh used instead of the profile and op (a barrel cam's groove cutter, made from the law). */
+  mesh?: MeshData;
 }
 
 /** The three face tags a mesh carries. A hole wall is a wall made by a hole or a cut. */

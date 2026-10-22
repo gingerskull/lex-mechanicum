@@ -705,7 +705,9 @@ class Run implements BlockCtx {
     for (const [id, p] of this.pts) if (!points.has(id)) points.set(id, p);
     const outputs: Pose["outputs"] = {};
     for (const o of this.k.kin.outputs ?? []) {
-      let v = o.from && o.to ? this.between(o.of, o.from, o.to, points) : o.from ? this.distance(o.of, o.from, points) : this.output(o.kind, o.of, points, o.axis);
+      // a scalar a block wrote under the output's own id (a cam's pressure angle) is read as it stands
+      const own = (o.kind === "angle" || o.kind === "position") && !o.from && o.id in this.vals ? this.vals[o.id] : undefined;
+      let v = own ?? (o.from && o.to ? this.between(o.of, o.from, o.to, points) : o.from ? this.distance(o.of, o.from, points) : this.output(o.kind, o.of, points, o.axis));
       if (Array.isArray(v) && o.axis && o.kind === "position") v = v3.dot(v, v3.unit(o.axis));
       if (typeof v === "number" && o.kind === "angle" && o.absolute && !(o.from && o.to)) v += this.refDirection(o.of);
       if (typeof v === "number" && o.datum !== undefined) v -= o.datum;
@@ -889,6 +891,20 @@ export function bodyFrameOf(b: KinBody, list: KinJoint[], joints: Map<string, Re
   const y = v3.cross(z, x);
   return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: at.at };
 }
+
+/**
+ * A point a kit pins to a body without a name in the record (a spring's end on a follower, its seat on the ground):
+ * `@<body>:<x>:<y>:<z>`, the point's world coordinates in the reference configuration, carried by the body's pose.
+ */
+export function anchorAt(name: string, bodies: Map<string, Xf>): Vec3 | null {
+  const m = /^@([^:]+):(-?[\d.e+-]+):(-?[\d.e+-]+):(-?[\d.e+-]+)$/.exec(name);
+  if (!m) return null;
+  const X = m[1] === "ground" ? xf.id() : bodies.get(m[1]!);
+  return X ? xf.apply(X, [Number(m[2]), Number(m[3]), Number(m[4])]) : null;
+}
+
+/** The anchor name of a world reference point on a body (src/kin anchorAt). */
+export const anchorName = (body: string, p: readonly number[]): string => `@${body}:${p.map((v) => +v.toFixed(3)).join(":")}`;
 
 /** An axis with a fixed sign: its largest component positive, so parallel axes compare equal. */
 export function canonAxis(a: Vec3): Vec3 {

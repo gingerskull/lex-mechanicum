@@ -93,6 +93,65 @@ export function controlFor(t: Teaching | null, id: string, value: unknown): Cont
   }
 }
 
+/** The inverse of a rigid 4 x 4 (column-major): [Rᵀ | −Rᵀt]. */
+const invRigid = (m: ArrayLike<number>): number[] => {
+  const t: Vec3 = [m[12]!, m[13]!, m[14]!];
+  const r = (i: number, j: number) => m[j * 4 + i]!;
+  const o = [r(0, 0), r(0, 1), r(0, 2), 0, r(1, 0), r(1, 1), r(1, 2), 0, r(2, 0), r(2, 1), r(2, 2), 0, 0, 0, 0, 1];
+  o[12] = -(o[0]! * t[0] + o[4]! * t[1] + o[8]! * t[2]);
+  o[13] = -(o[1]! * t[0] + o[5]! * t[1] + o[9]! * t[2]);
+  o[14] = -(o[2]! * t[0] + o[6]! * t[1] + o[10]! * t[2]);
+  return o;
+};
+
+/**
+ * The path of a named point over one cycle as the body `frame` sees it, drawn where that body is at phase u (a cam's
+ * pitch curve turns with the cam): each sample is carried back by the body's pose at its own phase, then forward by the
+ * pose at u. Null without the body's poses.
+ */
+export function framedPath(A: Ann, point: string, frame: string): Float32Array | null {
+  const poser = A.rt.scene.poser;
+  if (!poser.body) return null;
+  const key = `${point}@${frame}`;
+  let local = A.cache.paths.get(key);
+  if (!local) {
+    local = new Float32Array(SAMPLES * 3);
+    for (let k = 0; k < SAMPLES; k++) {
+      const u = (k / SAMPLES) * poser.period;
+      const p = poser.point(u, point);
+      const M = poser.body(u, frame);
+      if (!p || !M) {
+        local = new Float32Array(0);
+        break;
+      }
+      local.set(applyMat(invRigid(M), p), k * 3);
+    }
+    A.cache.paths.set(key, local);
+  }
+  const Mu = poser.body(A.u, frame);
+  if (!local.length || !Mu) return null;
+  const out = new Float32Array(local.length);
+  for (let k = 0; k < local.length; k += 3) out.set(applyMat(Mu, [local[k]!, local[k + 1]!, local[k + 2]!]), k);
+  return out;
+}
+
+/** The path's sample nearest a fraction of the cycle. */
+const sampleAt = (path: Float32Array, f: number): Vec3 | null => {
+  const n = path.length / 3;
+  if (!n) return null;
+  const k = Math.round(f * n) % n;
+  return [path[k * 3]!, path[k * 3 + 1]!, path[k * 3 + 2]!];
+};
+
+/** A projected path whose last sample is far from its first (more than four times its mean step): it does not close. */
+const isOpen = (pts: [number, number][]): boolean => {
+  const n = pts.length;
+  if (n < 3) return true;
+  let sum = 0;
+  for (let k = 1; k < n; k++) sum += Math.hypot(pts[k]![0] - pts[k - 1]![0], pts[k]![1] - pts[k - 1]![1]);
+  return Math.hypot(pts[0]![0] - pts[n - 1]![0], pts[0]![1] - pts[n - 1]![1]) > (4 * sum) / (n - 1) + 1;
+};
+
 const pathPts = (A: Ann, path: Float32Array): [number, number][] => {
   const out: [number, number][] = [];
   for (let k = 0; k < path.length; k += 3) out.push(P(A, [path[k]!, path[k + 1]!, path[k + 2]!]));
@@ -359,13 +418,15 @@ export function traces(A: Ann, f: TraceFlags): void {
   }
   if (f.traces) {
     t.traces.forEach((tr, i) => {
-      const path = pathOf(A, tr.point);
+      const path = tr.frame ? framedPath(A, tr.point, tr.frame) : pathOf(A, tr.point);
       if (!path) return;
       const pts = pathPts(A, path);
       ctx.setLineDash([...SP.dash]);
       ctx.lineWidth = SP.width;
       ctx.strokeStyle = paint(T[SP.color], SP.alpha * (i ? SP.otherGain : 1));
-      stroke(ctx, pts, true);
+      // a path that does not close over a cycle (an indexing wheel's mark moves on a step each turn) is drawn open
+      const open = isOpen(pts);
+      stroke(ctx, pts, !open);
       ctx.setLineDash([]);
       if (f.ticks && tr.ticks?.every) {
         const n = Math.max(1, Math.floor(360 / tr.ticks.every));
@@ -374,7 +435,8 @@ export function traces(A: Ann, f: TraceFlags): void {
         ctx.strokeStyle = paint(T.ink, DRAFT.tick.alpha);
         ctx.beginPath();
         for (let k = 0; k < n; k++) {
-          const p = poser.point((k / n) * poser.period, tr.point);
+          // in a body's frame, the tick is the path's sample at that phase (the path is already carried to now)
+          const p = tr.frame ? sampleAt(path, k / n) : poser.point((k / n) * poser.period, tr.point);
           if (!p) continue;
           const [x, y] = P(A, p);
           ctx.moveTo(x - h, y - h); ctx.lineTo(x + h, y + h);
@@ -387,6 +449,7 @@ export function traces(A: Ann, f: TraceFlags): void {
         const idx = Math.round(((((u % TAU) + TAU) % TAU) / TAU) * N);
         const L = Math.min(SP.cometSamples, N >> 1);
         for (let k = 0; k < L; k++) {
+          if (open && idx - k - 1 < 0) break;
           const a = pts[(idx - k - 1 + 10 * N) % N]!;
           const b = pts[(idx - k + 10 * N) % N]!;
           ctx.beginPath();
@@ -540,6 +603,18 @@ function arcPts(c: Vec3, e0: Vec3, n: Vec3, r: number, a0: number, a1: number, s
   return out;
 }
 
+/**
+ * The plane of a circle or ranged arc: its `normal`, else the axis of the joint it is centred on (a circle about a shaft in
+ * front elevation lies in that shaft's plane), else z; x is the world x made square to the normal (the world y where the
+ * normal is x).
+ */
+function planeOf(A: Ann, o: Record<string, unknown>): { n: Vec3; e0: Vec3 } {
+  const ax = Array.isArray(o.normal) ? (o.normal as Vec3) : typeof o.center === "string" ? A.rt.scene.axes?.[o.center] : undefined;
+  const n = unit(ax ?? [0, 0, 1]);
+  const h: Vec3 = Math.abs(n[0]) > 0.9 ? [0, 1, 0] : [1, 0, 0];
+  return { n, e0: unit(sub(h, mul(n, dot(h, n)))) };
+}
+
 const worldNormal = (a: Vec3, b: Vec3, c: Vec3): Vec3 => {
   const n = cross(sub(a, c), sub(b, c));
   return len(n) < 1e-6 ? [0, 0, 1] : unit(n);
@@ -657,13 +732,30 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const c = o.meet !== undefined ? meetOf(A, o.meet) : pointOf(A, o.center);
       const r = typeof o.radius === "number" ? o.radius : null;
       if (!c || r === null) return;
-      poly(arcPts(c, [1, 0, 0], [0, 0, 1], r, 0, TAU), true);
-      tag(add(c, [r, 0, 0]), 18, 0);
+      const { n, e0 } = planeOf(A, o);
+      poly(arcPts(c, e0, n, r, 0, TAU), true);
+      tag(add(c, mul(e0, r)), 18, 0);
       return;
     }
     case "arc": {
       const c = pointOf(A, o.center);
       if (!c) return;
+      if (typeof o.radius === "number" && Array.isArray(o.range)) {
+        // an arc over a range of angles (degrees from the plane's x, about its normal), turning with the body `frame`
+        const { n, e0 } = planeOf(A, o);
+        const [a0, a1] = (o.range as number[]).map((x) => x * (Math.PI / 180));
+        let pts = arcPts(c, e0, n, o.radius, a0!, a1!);
+        const M = typeof o.frame === "string" ? A.rt.scene.poser.body?.(A.u, o.frame) : null;
+        if (M) {
+          const M0 = A.rt.scene.poser.body?.(A.u, o.frame as string);
+          // the centre is where the body's joint is now; the arc is laid out in the reference and carried by the pose
+          const cRef = applyMat(invRigid(M0!), c);
+          pts = arcPts(cRef, e0, n, o.radius, a0!, a1!).map((p) => applyMat(M, p));
+        }
+        poly(pts);
+        tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
+        return;
+      }
       const from = pointOf(A, o.from), to = pointOf(A, o.to), through = pointOf(A, o.through);
       if (from && to) {
         const n = worldNormal(from, to, c);

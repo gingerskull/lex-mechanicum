@@ -3,7 +3,7 @@
 // written in the joint's own coordinates (z along the axis) and placed on the axis frame, so the same code serves a z
 // joint and a tilted one. A support selector chooses housing, pillow block, bridge, or a stub or hung axle from where
 // the sweeps leave room and what the load needs; the router (src/builder/router.ts) places the support.
-import { circle } from "../core/geom";
+import { circle, roundRect } from "../core/geom";
 import { H } from "../hardware/primitives";
 import type { Solid } from "../hardware/solid";
 import { SHOULDER_BOLTS, circlipExt, circlipInt, headD, headH, innerRingD, keyFor, shoulderLength, threadFor, type Bearing } from "../hardware/tables";
@@ -15,6 +15,7 @@ import { Local, fitBore, half, type Fit, type Member } from "./lib";
 import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
 import { MIN_GAP } from "./constants";
+import { v3 } from "../kin/math";
 import { liveHousing, pillowBlocks } from "./supports";
 
 export type SupportKind = "housing" | "pillow" | "bridge" | "stub" | "hung";
@@ -40,6 +41,8 @@ export interface StackSpec {
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
   eccentric?: boolean;
+  /** A shaft in plan held from one side only (both pillow blocks): +1 along the axis, −1 against it. */
+  side?: 1 | -1;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
 }
@@ -59,6 +62,8 @@ export interface StackResult {
   notes: string[];
   /** Where the bridge's beam is and what it covers; the bridge's id. */
   bridge?: { id: string; route: BridgeRoute };
+  /** The length added to a live input shaft's far end for a drive there (rules/shared.ts driveInPlan), mm. */
+  farStub?: number;
 }
 
 const SPACER_MIN = 0.5;
@@ -164,7 +169,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   keyedSeats.forEach((s, i) => {
     const nm = `${id}-k${i}`;
     if (kf) {
-      L.add(H.key(`${nm}-key`, kf.b, Math.max(8, s.m.w1 - s.m.w0 + 4), { body: s.m.body, at: [d / 2 - kf.t1 + kf.h / 2 - 0.4, 0, 0], z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kf.h }));
+      // the key runs along the shaft through the keyed part: its b x h section in the plane, its length along the axis
+      const kl = Math.max(4, s.m.w1 - s.m.w0 - 1);
+      const kr = d / 2 - kf.t1 + kf.h / 2 - 0.4;
+      L.add(H.key(`${nm}-key`, kf.b, kl, { body: s.m.body, outer: roundRect(kr - kf.h / 2, -kf.b / 2, kr + kf.h / 2, kf.b / 2, 0.4), z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kl }));
       serve("F3", `${nm}-key`);
     }
     if (endHeld) return;
@@ -223,6 +231,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const shaftId = `${id}-axle`;
   let name: string;
   let bridge: StackResult["bridge"];
+  let farStub = 0;
   const fromBase = support !== "hung" && support !== "pillow" && spec.base !== null;
 
   if (support === "pillow") {
@@ -230,10 +239,12 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const hi = Math.max(...L.list.map((x) => x.z1), zTop);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
-    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });
+    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, ...(spec.side ? { side: spec.side } : {}) });
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
-    shaftSpec.z1 = p.shaft[1] + (live ? 12 : 0);
+    // the drive's pulley goes on the end facing away from the default view (rules/shared.ts driveInPlan)
+    farStub = live && spec.input && v3.dot(spec.frame.z, ctx.viewDir()) > 0.5 ? 6 : 0;
+    shaftSpec.z1 = p.shaft[1] + (live ? 12 + farStub : 0);
     // a part overhung past both blocks is held on the shaft's end by a washer and a countersunk screw (J10, F2)
     const top = members[members.length - 1]!;
     if (live && Math.max(...p.w) < top.w0) {
@@ -243,6 +254,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       L.add(H.screw(`${id}-es`, "csk", M, 2 * M + wh, { body: turn, face: top.w1 + wh, dir: -1 }));
       serve("F2", `${id}-ew`, `${id}-es`);
       shaftSpec.z1 = top.w1;
+      farStub = 0;
     }
     ctx.routes.push({ support: `${id}-pb`, site: id, kind: "pillow", tried: p.tried, moved: p.moved, covers: p.covers, gap: p.gap });
     for (const [f, ids] of Object.entries(p.serves)) serve(f, ...ids);
@@ -333,13 +345,13 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   L.add(sh);
   if (live && spec.input) sh[sh.length - 1]!.accent = true;
   if (!live) serve("F1", shaftId);
-  return done(L, support, undefined, extra, bridge);
+  return done(L, support, undefined, extra, bridge, farStub);
 
-  function done(Lc: Local, sup: SupportKind, top?: number, more: Solid3[] = [], br?: StackResult["bridge"]): StackResult {
+  function done(Lc: Local, sup: SupportKind, top?: number, more: Solid3[] = [], br?: StackResult["bridge"], stub = 0): StackResult {
     for (const x of Lc.list) if (!x.joints.length) x.joints = [...spec.joints];
     const w0 = Math.min(...Lc.list.map((x) => x.z0));
     const w1 = Math.max(...Lc.list.map((x) => x.z1), top ?? -Infinity);
-    return { solids: [...Lc.out(), ...more], d, fit, support: sup, bores, w0, w1, serves, notes, ...(br ? { bridge: br } : {}) };
+    return { solids: [...Lc.out(), ...more], d, fit, support: sup, bores, w0, w1, serves, notes, ...(br ? { bridge: br } : {}), ...(stub ? { farStub: stub } : {}) };
   }
 }
 

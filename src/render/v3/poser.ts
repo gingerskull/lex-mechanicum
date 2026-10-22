@@ -5,7 +5,7 @@
 import { frameAxis } from "../../core/axis";
 import { poseOf } from "../../model/pose";
 import type { MechanismModel } from "../../model/types";
-import { Kinematics } from "../../kin/compose";
+import { Kinematics, anchorAt } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
 import { fiveBarFK } from "../../kin/blocks/linkage";
@@ -49,9 +49,14 @@ export interface Poser {
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
    */
   sweep?(point: string, range?: [number, number], branches?: string[]): Vec3[][] | null;
+  /** A body's pose at phase u (reference configuration to now) as a matrix: a trace or arc drawn in a moving body's frame. */
+  body?(u: number, id: string, ctl?: Controls): Mat4 | null;
 }
 
 export const ID4: Mat4 = mat4(IDENTITY);
+
+/** How far a teaching point is carried onto its body's top face at most, mm: a deep stack of slabs, no more. */
+const LIFT_REACH = 40;
 
 const m4 = (X: Vec3, Y: Vec3, Z: Vec3, T: Vec3): Mat4 => [X[0], X[1], X[2], 0, Y[0], Y[1], Y[2], 0, Z[0], Z[1], Z[2], 0, T[0], T[1], T[2], 1];
 
@@ -79,13 +84,15 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   }
   const lifted = (P: ReturnType<Kinematics["pose"]>, id: string, ctl?: Controls): Vec3 | null => {
     const p = P.points.get(id);
-    if (!p) return null;
+    if (!p) return id.startsWith("@") ? anchorAt(id, P.bodies) : null;
     const b = rideOf.get(id);
     const X = b ? P.bodies.get(b) : undefined;
     const ref = b ? k.setup(ctl ? { ...controls, ...ctl } : controls).refPts.get(id) : undefined;
     if (!b || !X || !ref) return p;
     const [nx, ny, nz, t] = lifts![b]!;
     const d = t - (nx * ref[0] + ny * ref[1] + nz * ref[2]);
+    // a point far off the body's face is not on it (a roller's centre up on a slide's upright): drawn where it is
+    if (Math.abs(d) > LIFT_REACH) return p;
     const R = X.R;
     const v: Vec3 = [nx * d, ny * d, nz * d];
     return [p[0] + R[0] * v[0] + R[1] * v[1] + R[2] * v[2], p[1] + R[3] * v[0] + R[4] * v[1] + R[5] * v[2], p[2] + R[6] * v[0] + R[7] * v[1] + R[8] * v[2]];
@@ -136,6 +143,10 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       return fromXf(D ? xf.mul(X, D) : X);
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
+    body: (u, id, ctl) => {
+      const X = id === "ground" ? xf.id() : pose(u, ctl).bodies.get(id);
+      return X ? fromXf(X) : null;
+    },
     sweep: (point, range, branches) => {
       const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
       if (!d) return null;
@@ -289,6 +300,7 @@ export function hybridPoser(bodies: Poser, points: Poser): Poser {
     place: (s, u) => bodies.place(s, u),
     point: (u, id, ctl) => safe(() => points.point(u, id, ctl)) ?? (ctl ? null : bodies.point(u, id)),
     span: (u, a, b) => bodies.span(u, a, b) ?? safe(() => points.span(u, a, b)),
+    ...(points.body ? { body: (u: number, id: string, ctl?: Controls) => safe(() => points.body!(u, id, ctl)) } : {}),
     ...(points.sweep ? { sweep: (pt: string, r?: [number, number], br?: string[]) => safe(() => points.sweep!(pt, r, br)) } : {}),
   };
 }

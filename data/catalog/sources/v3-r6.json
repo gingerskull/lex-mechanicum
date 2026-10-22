@@ -31,7 +31,7 @@
             "type": "disc",
             "radius": 58,
             "thickness": 8,
-            "axial": 0,
+            "place": 0,
             "bars": [
               {
                 "from": [
@@ -80,7 +80,7 @@
             "type": "disc",
             "radius": 30,
             "thickness": 5,
-            "axial": 17,
+            "place": 17,
             "bars": [
               {
                 "from": [
@@ -142,7 +142,7 @@
             "type": "disc",
             "radius": 58,
             "thickness": 8,
-            "axial": 34,
+            "place": 34,
             "bars": [
               {
                 "from": [
@@ -622,7 +622,7 @@
                 48
               ]
             },
-            "axial": 0
+            "place": 0
           },
           "at": {
             "joint": "O1"
@@ -657,7 +657,7 @@
               8
             ],
             "thickness": 6,
-            "axial": 14
+            "place": 14
           },
           "at": {
             "joint": "PA1"
@@ -675,7 +675,7 @@
               8
             ],
             "thickness": 6,
-            "axial": 14
+            "place": 14
           },
           "at": {
             "joint": "PA2"
@@ -693,7 +693,7 @@
               8
             ],
             "thickness": 6,
-            "axial": 14
+            "place": 14
           },
           "at": {
             "joint": "PA3"
@@ -715,7 +715,7 @@
                 48
               ]
             },
-            "axial": 28
+            "place": 28
           },
           "frame": {
             "o": [
@@ -747,7 +747,7 @@
               8
             ],
             "thickness": 6,
-            "axial": 42
+            "place": 42
           },
           "at": {
             "joint": "QB1"
@@ -765,7 +765,7 @@
               8
             ],
             "thickness": 6,
-            "axial": 42
+            "place": 42
           },
           "at": {
             "joint": "QB2"
@@ -783,7 +783,7 @@
               8
             ],
             "thickness": 6,
-            "axial": 42
+            "place": 42
           },
           "at": {
             "joint": "QB3"
@@ -808,7 +808,7 @@
                 48
               ]
             },
-            "axial": 56
+            "place": 56
           },
           "at": {
             "joint": "O3"
@@ -2873,7 +2873,8 @@
             1,
             0,
             0
-          ]
+          ],
+          "side": -1
         },
         {
           "id": "B2",
@@ -3442,7 +3443,7 @@
             "type": "disc",
             "radius": 58,
             "thickness": 40,
-            "axial": 0,
+            "place": 0,
             "holes": [
               [
                 0,
@@ -3521,7 +3522,7 @@
             "type": "shaft",
             "diameter": 14,
             "length": 200,
-            "axial": -60
+            "place": -60
           },
           "at": {
             "joint": "S"
@@ -3535,7 +3536,7 @@
             "radius": 58,
             "thickness": 8,
             "bore": 20,
-            "axial": 0
+            "place": 0
           },
           "frame": {
             "o": [
@@ -3562,7 +3563,7 @@
             "type": "shaft",
             "diameter": 12,
             "length": 44,
-            "axial": 0,
+            "place": 0,
             "plunger": true,
             "ball": {
               "diameter": 14
@@ -3593,7 +3594,7 @@
             "type": "disc",
             "radius": 9,
             "thickness": 4,
-            "axial": 0
+            "place": 0
           },
           "frame": {
             "o": [
@@ -3620,7 +3621,7 @@
             "type": "shaft",
             "diameter": 12,
             "length": 44,
-            "axial": 0,
+            "place": 0,
             "plunger": true,
             "ball": {
               "diameter": 14
@@ -3651,7 +3652,7 @@
             "type": "disc",
             "radius": 9,
             "thickness": 4,
-            "axial": 0
+            "place": 0
           },
           "frame": {
             "o": [
@@ -3678,7 +3679,7 @@
             "type": "shaft",
             "diameter": 12,
             "length": 44,
-            "axial": 0,
+            "place": 0,
             "plunger": true,
             "ball": {
               "diameter": 14
@@ -3709,7 +3710,7 @@
             "type": "disc",
             "radius": 9,
             "thickness": 4,
-            "axial": 0
+            "place": 0
           },
           "frame": {
             "o": [
@@ -3736,7 +3737,7 @@
             "type": "shaft",
             "diameter": 12,
             "length": 44,
-            "axial": 0,
+            "place": 0,
             "plunger": true,
             "ball": {
               "diameter": 14
@@ -3767,7 +3768,7 @@
             "type": "disc",
             "radius": 9,
             "thickness": 4,
-            "axial": 0
+            "place": 0
           },
           "frame": {
             "o": [
@@ -3794,7 +3795,7 @@
             "type": "shaft",
             "diameter": 12,
             "length": 44,
-            "axial": 0,
+            "place": 0,
             "plunger": true,
             "ball": {
               "diameter": 14
@@ -3825,7 +3826,7 @@
             "type": "disc",
             "radius": 9,
             "thickness": 4,
-            "axial": 0
+            "place": 0
           },
           "frame": {
             "o": [
@@ -4597,7 +4598,7 @@
               7
             ],
             "thickness": 19,
-            "axial": -20
+            "place": -20
           },
           "at": {
             "joint": "H1"
@@ -4614,7 +4615,7 @@
               7
             ],
             "thickness": 19,
-            "axial": 1
+            "place": 1
           },
           "at": {
             "joint": "K1"
@@ -4631,7 +4632,7 @@
               7
             ],
             "thickness": 19,
-            "axial": -20
+            "place": -20
           },
           "at": {
             "joint": "H2"
@@ -4648,7 +4649,7 @@
               7
             ],
             "thickness": 19,
-            "axial": 1
+            "place": 1
           },
           "at": {
             "joint": "K2"
@@ -5566,7 +5567,7 @@
               6
             ],
             "thickness": 6,
-            "axial": 9,
+            "place": 9,
             "ball": {
               "diameter": 36
             }
@@ -5586,7 +5587,7 @@
               6
             ],
             "thickness": 6,
-            "axial": -15,
+            "place": -15,
             "ball": {
               "diameter": 36
             }
@@ -5606,7 +5607,7 @@
               6
             ],
             "thickness": 5,
-            "axial": 15.5
+            "place": 15.5
           },
           "at": {
             "joint": "ML"
@@ -5623,7 +5624,7 @@
               6
             ],
             "thickness": 5,
-            "axial": -20.5
+            "place": -20.5
           },
           "at": {
             "joint": "MR"
@@ -5637,7 +5638,7 @@
             "radius": 13,
             "thickness": 24,
             "bore": 16,
-            "axial": -12,
+            "place": -12,
             "lugs": [
               {
                 "joint": "QL",

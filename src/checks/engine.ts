@@ -19,7 +19,11 @@ export function auditedStandard(id: string): string | null {
   return (text && parseHeader(text)?.standard) || null;
 }
 
+/** Ids drawn and checked on v3 before their audit says so (a pass in progress): `MDB_V3=a,b` in the environment. */
+const trial = (): string[] => (typeof process !== "undefined" ? (process.env.MDB_V3 ?? "").split(",").filter(Boolean) : []);
+
 export function engineOf(id: string): Engine {
+  if (trial().includes(id)) return "v3";
   const v = auditedStandard(id);
   return v && compareVersions(v, V3_STANDARD) >= 0 ? "v3" : "2.5D";
 }

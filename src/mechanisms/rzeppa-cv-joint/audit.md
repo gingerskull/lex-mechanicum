@@ -179,7 +179,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| B1 | J10 | rzeppa | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x20, holds the inner on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 4 x 4 x 18 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
+| B1 | J10 | rzeppa | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x20, holds the inner on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 4 x 4 x 13 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
 | B2 | J10 | rzeppa | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base; Dead shaft Ø12, clamped in two pillow blocks | Internal circlip DIN 472, Ø24; 2 x Set screw M4 on a flat, clamps the dead shaft (F2, F3) | none | none | none | none | none | none | none | none |
 | F1 | sphere-fit | rzeppa | – | – | none | none | none | none | none | none | none | none | none | none |
 | F2 | sphere-fit | – | – | – | none | none | none | none | none | none | none | none | none | none |
@@ -219,5 +219,5 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 Promoted in this pass: the `ball`, `race`, `bell` and `cage` shapes (revolves with swept grooves and cut windows), the sphere-fit kit, the `rzeppa` block.
 
 ## Verification
-check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.0 KB
+check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.1 KB
 screenshots: dist/shots3/rzeppa-cv-joint (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

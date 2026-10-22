@@ -181,8 +181,8 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | T1 | tongue-slot | cross-slide | – | – | none | none | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
 | T2 | tongue-slot | – | – | – | none | none | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
-| O1 | J2 | cross-slide | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the hub in on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 12 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| O2 | J2 | cross-slide | hung (moved) | – | Bridge over the pivot, on two spigoted posts | External circlip DIN 471, Ø12 | Feather key 4 x 4 x 12 (DIN 6885) | none | none | none | none | none | none | none |
+| O1 | J2 | cross-slide | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the hub in on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 7 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | J2 | cross-slide | hung (moved) | – | Bridge over the pivot, on two spigoted posts | External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7 (DIN 6885) | none | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -214,5 +214,5 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 Promoted in this pass: record-named see-through principle parts (`teaching.seeThrough`), record-named supports (`support` on a joint), `bars` on a part's face, the tongue-slot kit reading its slot (`slot: { width, length }`), the `cross-slide` block.
 
 ## Verification
-check: clean · K1 residual: 3.0e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.2 KB
+check: clean · K1 residual: 3.0e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.3 KB
 screenshots: dist/shots3/oldham-coupling (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

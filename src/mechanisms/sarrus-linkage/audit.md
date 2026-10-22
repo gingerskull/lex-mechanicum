@@ -1,10 +1,10 @@
 # Audit: Sarrus linkage (sarrus-linkage)
 standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
-defer: V1, V2, V3, V5, V6, F5, F10 · the v3 drive rule builds no crank-and-link drive for an oscillating swing under 180 deg yet (V5), a gap shared with R1 and R4: an engine follow-up of #217
+defer: V5, F5 · the swing is driven by the interim reversing servo of standard 3.2; the crank-and-link drive of V5, being built in its own session, bounds it kinematically, and F5 is judged with it
 
 ## Summary
-PASS 138 · FAIL 0 · N/A 29 · open: none
+PASS 144 · FAIL 0 · N/A 23 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -65,7 +65,7 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 106 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 138 solids unsound |
 | D7 | PASS | HAND · leaves and plates plain; richness in the stacks |
 | A1 | PASS | AUTO · K1 J3, T1 J3, K2 J3, T2 J3, H1 J10, H2 J10 · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · K1 J3, T1 J3, K2 J3, T2 J3, H1 J10, H2 J10 · the base hinges as shafts in plan in pillow blocks (J10); knees and top hinges moving pins (J3) through the leaves and the plate's lugs |
@@ -88,7 +88,7 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 | A19 | PASS | AUTO · 2 supports routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: H1-pb, H2-pb · blocks routed, least gap 1.5 mm, see-through where they cover the input yoke |
 | A20 | PASS | AUTO · support per joint: H1 pillow, H2 pillow · one axial stack builder with its support selector |
 | A21 | PASS | AUTO · kit per joint: K1 J3, T1 J3, K2 J3, T2 J3, H1 J10, H2 J10 |
-| A22 | N/A | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (no solids) · nothing to fit: the stops and the cable clip come with the deferred drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · no hand fixes; the cable clip by its rule; stops wait on the crank-and-link drive (F5) |
 | E1 | PASS | AUTO · every solid has one explode level; levels -4 to 1.5 · one level per solid, nothing stretches |
 | E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
 | E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
@@ -116,12 +116,12 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 | F2 | PASS | AUTO · served at K1, T1, K2, T2, H1, H2; fired: wheels (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
 | F3 | PASS | AUTO · served at K1, T1, K2, T2; fired: j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
 | F4 | PASS | AUTO / HAND · served at H1; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (54 solids), trunnion (no solids) · thrust washers where a part turns free axially |
-| F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
+| F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · deferred (header): the swing is driven by the interim reversing servo of 3.2, which holds it only while powered; the crank and link of V5 (being built) bound it to the modelled range, and F5 is judged with them |
 | F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
 | F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · no exact length or mesh to adjust |
 | F8 | PASS | AUTO · served at no joint; fired: tongue-slot (no solids), cross-bearings (no solids), ball-socket (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) · sealed bearings; bronze bushings and liners oil-impregnated |
 | F9 | PASS | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (1 solid) · zero line on the input and on the base (timing marks) |
-| F10 | N/A | AUTO / HAND · served at no joint; fired: j12-flexible (no solids), drive (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (30 solids) · home flag and fork sensor on the input (drive) |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
 | M2 | PASS | HAND · bosses round every bore |
 | M3 | PASS | AUTO · fired: j3-moving-pin (40 solids), hardware primitives · bore entry chamfers |
@@ -136,12 +136,12 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
 | M13 | PASS | AUTO / HAND · 12 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | N/A | AUTO / HAND · fired: tongue-slot (no solids), piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids) · no sliding contact needing a liner |
-| V1 | N/A | AUTO · fired: drive (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
-| V2 | N/A | AUTO · fired: drive (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
-| V3 | N/A | AUTO / HAND · fired: drive (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
+| V1 | PASS | AUTO · fired: drive (30 solids) · pancake motor beside limb 1's base hinge shaft, belted to its free end; run as a servo through the swing (interim, 3.2) |
+| V2 | PASS | AUTO · fired: drive (30 solids) · one angle bracket: upright and foot |
+| V3 | PASS | AUTO / HAND · fired: drive (30 solids) · belt and pulleys clear of feet and housings (A15) |
 | V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
-| V5 | N/A | AUTO · fired: drive (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
-| V6 | N/A | AUTO · fired: drive (no solids), cable-clip (no solids) · deferred (header): the v3 drive rule builds no crank-and-link drive for a swing under 180 deg yet (V5), a gap shared with R1 and R4 |
+| V5 | N/A | AUTO · fired: drive (30 solids) · deferred (header): the swing is driven by the interim reversing servo of 3.2, which holds it only while powered; the crank and link of V5 (being built) bound it to the modelled range, and F5 is judged with them |
+| V6 | PASS | AUTO · fired: drive (30 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
 | L3 | PASS | HAND · roles right on every solid (both sheets) |
@@ -186,6 +186,7 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 | T2 | J3 | – | – | – | none | Internal circlip DIN 472, Ø11; Shoulder bolt Ø5 x 25, M4 (ISO 7379) | Shoulder bolt Ø5 x 25, M4 (ISO 7379) | none | none | none | none | none | none | none |
 | H1 | J10 | sarrus | pillow | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø11 | none | 2 x Shaft collar 5x13, set screw | none | none | none | none | none | none |
 | H2 | J10 | sarrus | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base; Dead shaft Ø5, clamped in two pillow blocks | Internal circlip DIN 472, Ø11; 2 x Set screw M4 on a flat, clamps the dead shaft (F2, F3) | none | none | none | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -202,19 +203,19 @@ PASS 138 · FAIL 0 · N/A 29 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 14 | 0 | 2.07 |
-| DL-B | 0 | 262 | 2.3 |
+| DL-A | 15 | 0 | 2.07 |
+| DL-B | 0 | 356 | 2.3 |
 | DL-C | 0 | 0 | 2.37 |
 | DL-D | 15 | 0 | 2.38 |
-| DL-E | 0 | 0 | 2.22 |
+| DL-E | 8 | 0 | 2.22 |
 | DL-F | 0 | 0 | 2.37 |
 | DL-G | 0 | 0 | 2.31 |
 | DL-H | 12 | 0 | 1.93 |
-| never | 65 | 146 | 2.26 |
+| never | 88 | 152 | 2.26 |
 
 ## Promotion candidates
 Promoted in this pass: hinge lugs (`lugs` on a shape, the lugs rule), record-placed parts (`axial`), a link's `thickness`.
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 11.1 KB
+check: clean · K1 residual: 4.3e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 15.0 KB
 screenshots: dist/shots3/sarrus-linkage (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

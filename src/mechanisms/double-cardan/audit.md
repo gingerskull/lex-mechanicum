@@ -179,8 +179,8 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| B1 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x18, holds the yoke in on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 3 x 3 x 18 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
-| B2 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 18 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
+| B1 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x18, holds the yoke in on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
+| B2 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
 | C1a | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
 | C1b | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
 | C2a | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | cross-2-nip | none | none |

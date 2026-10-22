@@ -110,7 +110,7 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   if (!members.length) return null;
   const alongUp = parallel(frame.z, UP);
   const base = alongUp && ctx.base ? { top: ctx.base.top - frame.o[2], bottom: ctx.base.bottom - frame.o[2] } : null;
-  const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual");
+  const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual" || d.kind === "oscillating");
   const held = ctx.placement.held.get(site.id) ?? "both";
   const straddle = site.live && alongUp && held !== "base" && [...keyedIds].some((b) => ["gear", "pulley", "sprocket"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)));
   const spec: StackSpec = {
@@ -126,10 +126,13 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     eccentric: ctx.eccentric.has(site.id),
     baseTopWorld: ctx.base?.top ?? 0,
   };
-  // the record may name the support of a fixed site (`support` on one of its joints): an Oldham coupling's output hub,
-  // whose shaft cannot come up through the input side, hangs from a bridge
-  const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: string } | undefined)?.support).find((x) => !!x);
-  if (asked === "hung" || asked === "bridge" || asked === "stub" || asked === "housing" || asked === "pillow") spec.support = asked;
+  // a support the record asks for on one of the site's joints (a crank held from above, past what turns under it; an
+  // Oldham coupling's output hub, whose shaft cannot come up through the input side, hangs from a bridge)
+  const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: SupportKind } | undefined)?.support).find(Boolean);
+  if (asked) spec.support = asked;
+  // both pillow blocks on one side of what the shaft carries (`side` on its joint: +1 along the axis, −1 against it)
+  const side = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { side?: number } | undefined)?.side).find((v) => v === 1 || v === -1);
+  if (side) spec.side = side as 1 | -1;
   const r = axialStack(ctx, spec);
   ctx.add(r.solids);
   ctx.stacks.set(site.id, r);

@@ -15,7 +15,9 @@ import { titleOf } from "../lib";
 import type { KitId } from "../sites";
 import { Local } from "../lib";
 import type { Rule } from "./types";
-import { v3 } from "../../kin/math";
+import { v3, type Vec3 } from "../../kin/math";
+import { anchorName } from "../../kin/compose";
+import { Local as LocalFrame } from "../lib";
 
 interface KitBuild {
   (ctx: BuildCtx, c: Contact, L: Local): { serves?: Record<string, string[]>; note: string; badge?: [string, "ok" | "warn"] } | void;
@@ -86,6 +88,8 @@ function rollerInSlot(ctx: BuildCtx, c: Contact, L: Local, what: string): Return
   const carrier = bodyOf(ctx, c.a);
   L.add(H.shaft(`${id}-stud`, { d, z0: lo, z1: hi }, { body: carrier, name: `Stud Ø${d} x ${+(hi - lo).toFixed(1)}, pressed into the pin carrier` }));
   L.add(H.roller(`${id}-roller`, d, D, { body: carrier, z0: zc - rw / 2, z1: zc + rw / 2 }));
+  // a wheel that carries its own slots (a Geneva wheel, cut from the record's numbers) needs only the roller and its stud
+  if (String(ctx.geoms.get(c.b)?.shape.type ?? "").startsWith("geneva")) return { serves: {}, note: `${titleOf(id)}: ${what}; Ø${D} track roller on a Ø${d} stud pressed into the crank, running in the wheel's own slots.` };
   const sw = (D + 0.4) / 2 + 1.5;
   const relief = 4;
   const x0 = c.run[0] - relief;
@@ -107,7 +111,48 @@ function rollerInSlot(ctx: BuildCtx, c: Contact, L: Local, what: string): Return
 
 const j4 = contactRule({ id: "j4-slot-roller", ids: ["J4", "M14"], fixture: "kin:geneva", kits: ["J4"], build: (ctx, c, L) => rollerInSlot(ctx, c, L, "pin in a slot") });
 const pinLobe = contactRule({ id: "pin-lobe", ids: ["J4", "M14"], fixture: "kin:pinLobe", kits: ["pin-lobe"], build: (ctx, c, L) => rollerInSlot(ctx, c, L, "pin and lobe") });
-const grooveCam = contactRule({ id: "groove-cam", ids: ["J7", "M14"], fixture: "kin:grooveCam", kits: ["groove-cam"], build: (ctx, c, L) => rollerInSlot(ctx, c, L, "roller in a groove") });
+/**
+ * A groove cam. Where the cam's own shape carries its groove (a face-groove or barrel cam, cut by the builder from the
+ * joint's law) and the record carries the roller, the kit adds what the groove needs: a felt oiler on the follower beside
+ * the roller (F8) and a zero line on the cam (F9); the groove holds the follower both ways, so no spring (F6). Otherwise
+ * it is a roller in a slot cut in the other body.
+ */
+const grooveCam = contactRule({
+  id: "groove-cam",
+  ids: ["J7", "M14"],
+  fixture: "kin:grooveCam",
+  kits: ["groove-cam"],
+  build(ctx, c, L) {
+    const camBody = [c.a, c.b].find((b) => { const sh = ctx.geoms.get(b)?.shape; return String(sh?.type) === "cam" && (sh?.form === "face-groove" || sh?.form === "barrel"); });
+    if (!camBody) return rollerInSlot(ctx, c, L, "roller in a groove");
+    const roller = camBody === c.a ? c.b : c.a;
+    const rg = ctx.geoms.get(roller);
+    const rr = Number(rg?.shape.radius ?? 5);
+    // the body the roller's pin is in: the follower that carries the oiler
+    const pinJ = ctx.kin.joints.find((j) => j.type === "revolute" && (j.a === roller || j.b === roller));
+    const carrier = pinJ ? (pinJ.a === roller ? pinJ.b : pinJ.a) : roller;
+    const exC = ctx.extent(carrier);
+    const serves: Record<string, string[]> = {};
+    if (rg && exC) {
+      // a felt wick on the follower's underside dipping toward the groove, beside the roller, clear of the walls' tops
+      const Lw = new LocalFrame({ o: rg.frame.o, x: rg.frame.x, z: rg.frame.z }, { joints: [c.id] });
+      const zc = v3.dot(v3.sub(fromPlane(exC.frame, [0, 0], exC.w0), rg.frame.o), rg.frame.z);
+      Lw.add(H.felt(`${c.id}-oil`, [[-2, rr + 1.5], [2, rr + 1.5], [2, rr + 4.5], [-2, rr + 4.5]], { body: carrier, z0: zc - 0.8, z1: zc, name: "Felt oiler over the groove, oil-soaked wool felt" }));
+      ctx.add(Lw.out());
+      serves.F8 = [`${c.id}-oil`];
+    }
+    const part = ctx.parts.get(camBody);
+    if (part) {
+      const p = planeCoords(part.frame, c.at).uv;
+      const L0 = Math.hypot(p[0], p[1]) || 1;
+      const r0 = Number(ctx.geoms.get(camBody)?.shape.bore ?? 10) / 2 + 5;
+      part.marks.push({ kind: "timing", pts: [[(p[0] / L0) * r0, (p[1] / L0) * r0], [(p[0] / L0) * (L0 - rr - 3), (p[1] / L0) * (L0 - rr - 3)]] });
+      serves.F9 = [camBody];
+    }
+    void L;
+    return { serves, note: `${titleOf(c.id)}: roller in the cam's own groove (form-closed, so no spring); felt oiler over the groove; zero line on the cam.` };
+  },
+});
 
 // ------------------------------------------------------------------------------------------------ J5
 
@@ -139,6 +184,49 @@ function sleeveOnShaft(ctx: BuildCtx, c: Contact, slider: string, host: string):
   };
 }
 
+/**
+ * A stem that slides along its own axis (a `shaft` on a prismatic joint, a desmodromic's follower): a bronze bushing in a
+ * guide block round the stem, the block on four standoffs from the base, clear of what the stem carries. The block
+ * stands at the stem's `guide` ([z0, z1] along its axis from its frame origin), else at the middle of its free length.
+ */
+function stemGuide(ctx: BuildCtx, c: Contact, id: string, stem: string): ReturnType<KitBuild> {
+  const g = ctx.geoms.get(stem)!;
+  const ax = g.frame.z;
+  const d = Number(g.shape.diameter ?? 8);
+  const gv = Array.isArray(g.shape.guide) ? (g.shape.guide as number[]) : null;
+  const place = Number(g.shape.place ?? 0);
+  const len = Number(g.shape.length ?? 60);
+  const [z0, z1] = gv ? [gv[0]!, gv[1]!] : [place + len * 0.3, place + len * 0.55];
+  const Lg = new LocalFrame({ o: g.frame.o, x: g.frame.x, z: ax }, { joints: [id] });
+  const D = d + 6;
+  const half = Number(g.shape.guideHalf ?? 25);
+  Lg.add(H.bushing(`${id}-bush`, d + 0.05, D, { body: "ground", z0, z1, name: `Guide bushing ${d}x${D}x${z1 - z0}, sintered bronze, oil-impregnated` }));
+  Lg.add(H.plate(`${id}-block`, roundRect(-half, -half, half, half, 4), { body: "ground", kind: "plate", role: "ground", name: "Guide block, bored for the bushing", z0: z0 + 2, z1: z1 - 2, holes: [circle(D / 2 + 0.05, 0, 0, 36)], mat: "Aluminium 6061-T6, anodised", joints: [id] }));
+  const baseTop = ctx.base ? ctx.base.top - g.frame.o[2] : -4;
+  const legs: string[] = [];
+  for (const [k, x, y] of [[0, -1, -1], [1, 1, -1], [2, 1, 1], [3, -1, 1]] as const) {
+    Lg.add(H.standoff(`${id}-leg${k}`, { body: "ground", at: [x * (half - 6), y * (half - 6), 0], z0: baseTop, z1: z0 + 2, ...(k ? { name: "", qty: 0 } : { qty: 4, name: "Standoff Ø10, M5, carries the guide block" }) }));
+    legs.push(`${id}-leg${k}`);
+  }
+  ctx.add(Lg.out());
+  void c;
+  return { serves: { F1: legs, F8: [`${id}-bush`] }, note: `${titleOf(id)}: the stem in an oil-impregnated bronze bushing, in a guide block on four standoffs from the base.` };
+}
+
+/**
+ * A slider's declared guide length (`shape.guide` [s0, s1], mm along the slide's own axis from the body's frame origin)
+ * in a contact's frame, or null.
+ */
+function guideIn(ctx: BuildCtx, c: Contact, body: string): [number, number] | null {
+  const gd = ctx.geoms.get(body);
+  const gv = gd?.shape.guide;
+  if (!gd || !Array.isArray(gv) || gv.length < 2) return null;
+  const ax = c.ji.r.axis;
+  const p0 = planeCoords(c.frame, c.at).uv;
+  const xs = [Number(gv[0]), Number(gv[1])].map((x) => planeCoords(c.frame, v3.add(gd.frame.o, v3.mul(ax, x))).uv[0] - p0[0]);
+  return [Math.min(...xs), Math.max(...xs)];
+}
+
 const j5 = contactRule({
   id: "j5-slide",
   ids: ["J5", "F5", "F7", "A6"],
@@ -150,7 +238,14 @@ const j5 = contactRule({
     const host = slider === c.a ? c.b : c.a;
     // a collar sliding on a turning shaft (a governor's sleeve): the shaft is its guide, a bushing in its bore
     if (host !== "ground" && String(ctx.kin.bodies.find((b) => b.id === host)?.shape?.type) === "shaft") return sleeveOnShaft(ctx, c, slider, host);
+    if (String(ctx.geoms.get(slider)?.shape.type) === "shaft") return stemGuide(ctx, c, id, slider);
     const e = extentIn(ctx, c, slider);
+    // a slider whose part reaches past its guide (a cam follower's stem down to its roller) is held over its `guide`
+    // only ([x0, x1] along its own frame x): rails, stops and wipers stay on that length, off what the rest reaches over
+    const g = guideIn(ctx, c, slider);
+    const reachLo = g ? e[0] < g[0] - 0.5 : false;
+    const reachHi = g ? e[1] > g[1] + 0.5 : false;
+    if (g) [e[0], e[1]] = [Math.max(e[0], g[0]), Math.min(e[1], g[1])];
     // the contact's run is a's travel against b: the slider's own travel when it is a, reversed when it is b
     const run: [number, number] = slider === c.a ? c.run : [-c.run[1], -c.run[0]];
     const zs = ctx.extent(slider);
@@ -195,13 +290,19 @@ const j5 = contactRule({
     // the nipple stands at the keeper's end, past the slider's travel, out of the way of parts that sweep over the slide
     L.add(H.nipple(`${id}-nip`, { body: hostBody, at: [x0 + 14, ky, 0], z0: w0 + rh + 3, z1: w0 + rh + 3 + 9 }));
     // one end stop block with a neoprene pad just past each end of the travel (F5)
+    const stops: string[] = [];
     for (const [k, x, s] of [[0, x0 + 1, 1], [1, x1 - 1, -1]] as const) {
+      // no stop across an end the part reaches out of
+      if ((k === 0 && reachLo) || (k === 1 && reachHi)) continue;
       const sx = x - s * 4;
-      L.add(H.stop(`${id}-stop${k}`, roundRect(Math.min(x, x - s * 8), e[2] - 4, Math.max(x, x - s * 8), e[3] + 4, 1), { body: hostBody, z0: w0, z1: w1 + 2, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-      L.add(H.bumper(`${id}-pad${k}`, 3, 8, { body: hostBody, at: [sx + s * 6, 0, 0], z0: w0 + 1, z1: w0 + 3, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+      const n = reachLo || reachHi ? 1 : 2;
+      const named = !stops.length;
+      L.add(H.stop(`${id}-stop${k}`, roundRect(Math.min(x, x - s * 8), e[2] - 4, Math.max(x, x - s * 8), e[3] + 4, 1), { body: hostBody, z0: w0, z1: w1 + 2, ...(named ? { qty: n } : { name: "", qty: 0 }) }));
+      L.add(H.bumper(`${id}-pad${k}`, 3, 8, { body: hostBody, at: [sx + s * 6, 0, 0], z0: w0 + 1, z1: w0 + 3, ...(named ? { qty: n } : { name: "", qty: 0 }) }));
+      stops.push(`${id}-stop${k}`);
     }
     return {
-      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: [`${id}-stop0`, `${id}-stop1`], F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`] },
+      serves: { F1: [`${id}-dw0`, `${id}-dw1`], F2: [`${id}-keeper`], F5: stops, F7: [`${id}-gib`], F8: [`${id}-wip0`, `${id}-nip`] },
       note: `${titleOf(id)}: ${Ls.toFixed(0)} mm slider on a dowelled reference rail and a gibbed rail under a keeper; wipers, a grease nipple and an end stop with a pad at each end of the ${(run[1] - run[0]).toFixed(0)} mm travel.`,
     };
   },
@@ -257,25 +358,95 @@ const j9 = contactRule({
 
 // ------------------------------------------------------------------------------------------------ J7 and cams
 
-const camBuild: KitBuild = (ctx, c, L) => {
+/**
+ * J7: a cam and its follower. The record's roller (a disc body on a pin in the follower) is the roller, so the kit adds
+ * none; a translating follower gets its return spring (F6), a compression spring stretched between a pin on the
+ * follower's far end and a post past the guide's end stop, above the slide, pushing the follower onto the cam; a felt
+ * oiler rides the follower behind the roller (F8); a zero line is engraved on the cam from its hub to its base circle
+ * (F9). A swinging follower is held on its cam by its own linkage or by a form-closed partner and takes no spring.
+ */
+const camBuild: KitBuild = (ctx, c) => {
   const id = c.id;
-  const follower = ctx.kin.bodies.find((b) => b.id === c.b)?.role === "follower" || ctx.kin.bodies.find((b) => b.id === c.a)?.role === "cam" ? c.b : c.a;
-  const cam = follower === c.a ? c.b : c.a;
-  const fb = bodyOf(ctx, follower);
-  const z = mid(ctx.extent(follower) ? [ctx.extent(follower)!.w0, ctx.extent(follower)!.w1] : null, mid(c.za, mid(c.zb)));
-  const d = 5;
-  const D = 13;
-  L.add(H.roller(`${id}-roller`, d, D, { body: fb, z0: z - 2, z1: z + 2 }));
-  L.add(H.shaft(`${id}-stud`, { d, z0: z - 4, z1: z + 4.5 }, { body: fb, name: `Follower stud Ø${d}` }));
-  // a return spring on a seat with a preload screw along the follower's run (F6)
-  const k = c.run[1] - c.run[0] > 1 ? 1 : 1;
-  const far = c.run[1] + D / 2 + 6;
-  L.add(H.spring(`${id}-spring`, "compression", { body: fb, at: [far + 8, 0, 0], z0: z - 3, z1: z + 3 }));
-  L.add(H.plate(`${id}-seat`, roundRect(far + 14, -6, far + 20, 6, 1), { body: "ground", kind: "bracket", role: "ground", name: "Spring seat with preload screw", z0: z - 6, z1: z + 6 }));
-  L.add(H.felt(`${id}-oil`, [[-2, D / 2 + 2], [2, D / 2 + 2], [2, D / 2 + 5], [-2, D / 2 + 5]], { body: "ground", z0: z - 2, z1: z + 2 }));
-  const zero = timingMark(ctx, cam, c.at);
-  void k;
-  return { serves: { F6: [`${id}-spring`, `${id}-seat`], F8: [`${id}-oil`], F9: zero ? [cam] : [] }, note: `${titleOf(id)}: roller follower on a stud; return spring on a seat with a preload screw; felt oiler on the track; zero line on the cam.` };
+  const isCam = (b: string) => String(ctx.geoms.get(b)?.shape.type) === "cam";
+  // a rocker's nose on a follower (a desmodromic's opening finger on the stem's end): the rocker's own stack holds it
+  if (!isCam(c.a) && !isCam(c.b)) return { serves: {}, note: `${titleOf(id)}: a rocker's nose on the follower; nothing to add, the rocker's pivot and the follower's guide hold both.` };
+  const cam = isCam(c.b) ? c.b : c.a;
+  const other = cam === c.a ? c.b : c.a;
+  const camG = ctx.geoms.get(cam);
+  const up = c.frame.z;
+  const serves: Record<string, string[]> = {};
+  const notes: string[] = [];
+  // the translating follower: the other body, or the body it rides on a pin, on a prismatic joint to the ground
+  const carriers = [other, ...ctx.kin.joints.filter((j) => j.type === "revolute" && (j.a === other || j.b === other)).map((j) => (j.a === other ? j.b : j.a))];
+  const slide = ctx.kin.joints.find((j) => j.type === "prismatic" && (j.a === "ground" || j.b === "ground") && carriers.includes(j.a === "ground" ? j.b : j.a));
+  const F = slide ? (slide.a === "ground" ? slide.b : slide.a) : null;
+  const partF = F ? ctx.parts.get(F) : undefined;
+  const exF = F ? ctx.extent(F) : null;
+  if (F && slide && partF && exF && camG) {
+    const r = ctx.joints.find((q) => q.id === slide.id)!.r;
+    const centre = camG.frame.o;
+    const away = v3.dot(v3.sub(c.at, centre), r.axis) >= 0 ? 1 : -1;
+    const d = v3.unit(v3.mul(v3.perp(r.axis, up), away));
+    const o = v3.sub(c.at, v3.mul(up, v3.dot(v3.sub(c.at, c.frame.o), up)));
+    const Lf = new LocalFrame({ o, x: d, z: up }, { joints: [id] });
+    const xOf = (p: readonly number[]) => v3.dot(v3.sub([p[0]!, p[1]!, p[2]!], o), d);
+    const pts = partF.profile.outer.map((q) => fromPlane(partF.frame, q, 0));
+    const far = Math.max(...pts.map(xOf));
+    const top = v3.dot(v3.sub(fromPlane(exF.frame, [0, 0], exF.w1), o), up);
+    // the stroke: the slide's limits, else how far the follower moves along its axis over the cycle
+    const along = ctx.sampled.us.map((_, i) => v3.dot(ctx.xfOf(F, i).t, d));
+    const travel = Math.max(1, slide.limits ? Math.abs(slide.limits[1] - slide.limits[0]) : Math.max(...along) - Math.min(...along));
+    const Ds = 6;
+    const zs0 = top + 3;
+    const zs1 = zs0 + Ds;
+    const xa = far - 6;
+    const xb = far + travel + 18;
+    const baseTop = ctx.base ? ctx.base.top - o[2] : baseZ(ctx, c);
+    {
+      Lf.add(H.shaft(`${id}-spin`, { d: 4, z0: top - 0.5, z1: zs1 + 1 }, { body: F, at: [xa, 0, 0], name: "Spring pin Ø4, pressed into the follower" }));
+      Lf.add(H.standoff(`${id}-post`, { body: "ground", at: [xb, 0, 0], z0: baseTop, z1: zs1 + 1, name: "Spring post Ø8 on the base, M4" }));
+    }
+    // the spring at unit length along the follower's axis, stretched from the pin to the post each frame (D9)
+    // from the pin's face to the post's (pin Ø4, post Ø8)
+    const aW = v3.add(o, v3.add(v3.mul(d, xa + 2.5), v3.mul(up, (zs0 + zs1) / 2)));
+    const bW = v3.add(o, v3.add(v3.mul(d, xb - 5.5), v3.mul(up, (zs0 + zs1) / 2)));
+    const coil = H.spring(`${id}-spring`, "compression", { body: F, D: Ds, z0: zs0, z1: zs1, name: `Compression spring Ø${Ds}, wire 0.8: holds the follower on the cam` });
+    coil.outer = [[0, -Ds / 2], [1, -Ds / 2], [1, Ds / 2], [0, Ds / 2]];
+    coil.holes = [];
+    coil.marks = [{ kind: "boss", pts: Array.from({ length: 13 }, (_, k): [number, number] => [k / 12, (k % 2 ? 1 : -1) * (Ds / 2 - 0.6)]) }];
+    coil.at = [xa + 2.5, 0, 0];
+    coil.stretch = [anchorName(F, aW), anchorName("ground", bW)];
+    Lf.add(coil);
+    // the felt oiler behind the roller, on the follower (F8)
+    const rr = Number(ctx.geoms.get(other)?.shape.radius ?? 0);
+    const exO = ctx.extent(other);
+    if (rr > 0 && exO) {
+      const z0 = v3.dot(v3.sub(fromPlane(exO.frame, [0, 0], exO.w0), o), up);
+      const z1 = v3.dot(v3.sub(fromPlane(exO.frame, [0, 0], exO.w1), o), up);
+      Lf.add(H.felt(`${id}-oil`, [[rr + 0.6, -3], [rr + 3.6, -3], [rr + 3.6, 3], [rr + 0.6, 3]], { body: F, z0: z0 + 1, z1: z1 - 1, name: "Felt oiler on the roller, oil-soaked wool felt" }));
+      serves.F8 = [`${id}-oil`];
+    } else if (!rr) {
+      // a flat face: a felt pad on the foot beside the stem keeps the face oiled
+      Lf.add(H.felt(`${id}-oil`, [[1, 9], [7, 9], [7, 15], [1, 15]], { body: F, z0: top, z1: top + 3, name: "Felt oiler on the follower's foot, oil-soaked wool felt" }));
+      serves.F8 = [`${id}-oil`];
+    }
+    ctx.add(Lf.out());
+    serves.F6 = [`${id}-spring`, `${id}-post`, `${id}-spin`];
+    notes.push(`a compression spring between a pin on the follower and a post past the guide holds the follower on the cam (${travel.toFixed(0)} mm stroke)`);
+  } else notes.push("the follower is held on the cam by its own linkage or a form-closed partner");
+  // the zero line on the cam, from its hub to its base circle, toward the follower at the reference (F9)
+  const part = ctx.parts.get(cam);
+  if (part && camG) {
+    const p = planeCoords(part.frame, c.at).uv;
+    const rIn = Number(camG.shape.bore ?? 8) / 2 + 5;
+    const rOut = Math.min(...part.profile.outer.map(([x, y]) => Math.hypot(x, y))) - 2;
+    const L0 = Math.hypot(p[0], p[1]) || 1;
+    if (rOut > rIn) {
+      part.marks.push({ kind: "timing", pts: [[(p[0] / L0) * rIn, (p[1] / L0) * rIn], [(p[0] / L0) * rOut, (p[1] / L0) * rOut]] });
+      serves.F9 = [cam];
+    }
+  }
+  return { serves, note: `${titleOf(id)}: ${other === F ? "follower" : "roller follower on its pin"}; ${notes.join("; ")}; felt oiler; zero line on the cam.` };
 };
 const j7 = contactRule({ id: "j7-cam", ids: ["J7", "F6"], fixture: "kin:camFollower", kits: ["J7"], build: camBuild });
 
@@ -406,19 +577,35 @@ const forkPin = contactRule({
   },
 });
 
+/**
+ * A pawl (or a jumper) on a tooth: a torsion spring coiled round the pawl's own pivot, above the pawl, one leg on a pin in
+ * the base and the other on the pawl, holds it onto the teeth (F6); it stays inside the base whatever the pawl does.
+ */
 const pawlTooth = contactRule({
   id: "pawl-tooth",
   ids: ["J7", "F6", "F5"],
   fixture: "kin:ratchet",
   kits: ["pawl-tooth"],
-  build(ctx, c, L) {
+  build(ctx, c) {
     const id = c.id;
-    const pawl = c.a;
-    const z0 = ctx.extent(pawl)?.w0 ?? 0;
-    const z1 = ctx.extent(pawl)?.w1 ?? z0 + 6;
-    L.add(H.spring(`${id}-spring`, "leaf", { body: "ground", at: [-8, 8, 0], z0: z1 + 0.5, z1: z1 + 1.5, name: "Pawl spring, leaf, screwed down" }));
-    L.add(H.screw(`${id}-sc`, "button", 3, 8, { body: "ground", at: [-12, 8, 0], face: z1 + 1.5, dir: -1, name: "Screw M3, holds the pawl spring" }));
-    return { serves: { F6: [`${id}-spring`] }, note: `${titleOf(id)}: pawl on a tooth; a screwed-down leaf spring seats the pawl.` };
+    const pawl = [c.a, c.b].find((b) => { const r = ctx.kin.bodies.find((q) => q.id === b)?.role; return r === "pawl" || r === "spring"; }) ?? c.a;
+    // the pawl's pivot: on the ground (a holding pawl, a jumper) or on the body that carries it (a driving pawl on a lever)
+    const pivot = ctx.joints.find((j) => j.joint.type === "revolute" && (j.a === pawl || j.b === pawl) && ![c.a, c.b].includes(j.a === pawl ? j.b : j.a));
+    const carrier = pivot ? (pivot.a === pawl ? pivot.b : pivot.a) : "ground";
+    const ex = ctx.extent(pawl);
+    if (!pivot || !ex) return { note: `${titleOf(id)}: pawl on a tooth.` };
+    const z = pivot.axis;
+    // the top of the pawl's own part where it stands (a part placed by its joint is not on a slab)
+    const part = ctx.parts.get(pawl);
+    const top = part && part.op.op === "extrude" ? v3.dot(v3.sub(part.frame.o as Vec3, pivot.at), z) + part.op.h : v3.dot(v3.sub(fromPlane(ex.frame, [0, 0], ex.w1), pivot.at), z);
+    const L = new LocalFrame({ o: pivot.at, x: [1, 0, 0], z }, { joints: [id] });
+    const stack = ctx.stacks.get(pivot.site ?? pivot.id);
+    const d = stack?.d ?? 4;
+    // the coil sits on the pawl's boss, round the pin's head
+    const D = d + 9;
+    L.add(H.spring(`${id}-spring`, "torsion", { body: carrier, D, wire: 0.8, z0: top + 0.3, z1: top + 3.3, name: `Torsion spring Ø${D}, wire 0.8: holds the pawl on the teeth` }));
+    ctx.add(L.out());
+    return { serves: { F6: [`${id}-spring`] }, note: `${titleOf(id)}: pawl on a tooth; a torsion spring round its pivot holds it on the teeth.` };
   },
 });
 

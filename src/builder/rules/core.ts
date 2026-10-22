@@ -83,7 +83,7 @@ export const placement: Rule = {
         frame,
         profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
         op: g.revolve ? revolveOp(g.profile) : extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
-        ...(g.features ? { features: g.features } : {}),
+        ...(g.features?.length ? { features: g.features } : {}),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),
@@ -93,7 +93,7 @@ export const placement: Rule = {
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h), ...(pc.features ? { features: pc.features } : {}), marks: [], joints: [...part.joints] });
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);
