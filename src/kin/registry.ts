@@ -9,7 +9,7 @@ import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from 
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
 import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance } from "./blocks/members";
-import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscape, simulateEscapement, simulateStar, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
+import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscape, simulateEscapement, simulateStar, simulateVerge, type VergeSpec, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
   const o = step.out;
@@ -706,6 +706,52 @@ const escapeBlock: BlockFn = (c, s) => {
   }
   outVal(c, s, (w - sim.wheel[0]!) * R2D, "advance");
   outVal(c, s, sim.recoil[k]! * R2D, "recoil");
+  outVal(c, s, w * R2D, "phase");
+};
+
+const vergeCache = new Map<string, ReturnType<typeof simulateVerge>>();
+
+/**
+ * verge (a crown wheel and a verge with two flag pallets): in: input (the foliot's angle, deg, an oscillating driver: lo,
+ * hi, default), wheel (body), wheelJoint (its revolute, axis along y, the crown's rim face in the plane through it, the
+ * teeth pointing toward −y), vergeJoint (the staff's, axis z), n, R, h, back (deg), upper and lower (the pallets'
+ * directions at foliot 0, deg from +x about +z), from, to, width (the pallets' reach and width), sense. out {advance,
+ * recoil} (deg).
+ */
+const vergeBlock: BlockFn = (c, s) => {
+  const i = s.in ?? {};
+  const C = c.jointAt(str(i.wheelJoint, "verge.wheelJoint"));
+  const V = c.jointAt(str(i.vergeJoint, "verge.vergeJoint"));
+  const D = Math.PI / 180;
+  const sense = (c.num(i.sense ?? 1) >= 0 ? 1 : -1) as 1 | -1;
+  const spec: VergeSpec = {
+    n: c.num(i.n), R: c.num(i.R), h: c.num(i.h), back: c.num(i.back) * D,
+    staff: [V[0] - C[0], V[1] - C[1]], upper: c.num(i.upper) * D, lower: c.num(i.lower) * D,
+    from: c.num(i.from), to: c.num(i.to), width: c.num(i.width), sense,
+  };
+  const lo = c.num(i.lo);
+  const hi = c.num(i.hi);
+  const def = c.num(i.default ?? 0);
+  const key = JSON.stringify([spec, lo, hi, def]);
+  let sim = vergeCache.get(key);
+  if (!sim) {
+    sim = simulateVerge(spec, (u) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D);
+    vergeCache.set(key, sim);
+  }
+  const N = sim.wheel.length - 1;
+  const input = c.num(i.input);
+  const uRef = Math.acos(Math.max(-1, Math.min(1, (lo + hi - 2 * def) / (hi - lo))));
+  const u = c.u === 0 && Math.abs(input - def) < 1e-12 && Math.abs(def - lo) > 1e-12 ? uRef : c.u;
+  const turns = Math.floor(u / TAU);
+  const f = ((u - turns * TAU) / TAU) * N;
+  const k = Math.min(N - 1, Math.floor(f));
+  const w = sim.wheel[k]! + (sim.wheel[k + 1]! - sim.wheel[k]!) * (f - k) + turns * sim.advance;
+  // the crown turns about +y: its top teeth move toward +x for a positive turn
+  spin(c, str(i.wheel, "verge.wheel"), C, [0, 1, 0], sense * c.delta("wheel", w));
+  outVal(c, s, (w - sim.wheel[0]!) * R2D, "advance");
+  outVal(c, s, sim.recoil[k]! * R2D, "recoil");
+  // the wheel's absolute angle in the simulation (the drawn wheel's teeth stand at its value at the reference)
+  outVal(c, s, w * R2D, "phase");
 };
 
 const escapementCache = new Map<string, ReturnType<typeof simulateEscapement>>();
@@ -795,6 +841,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   ratchet: ratchetBlock,
   "one-way": oneWay,
   escape: escapeBlock,
+  verge: vergeBlock,
   screw: screwBlock,
   convey: conveyBlock,
   flexure: flexureBlock,

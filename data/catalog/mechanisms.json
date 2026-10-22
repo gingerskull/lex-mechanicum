@@ -58092,7 +58092,8 @@
               "root": 39.4,
               "lead": 1,
               "back": 8,
-              "tip0": 0,
+              "tip0": 2.2474,
+              "phaseNote": "the simulated wheel phase at the reference, 26.2474 deg, mod one pitch",
               "thickness": 4,
               "bore": 6,
               "place": 0
@@ -60376,7 +60377,8 @@
                   -0.58
                 ]
               ],
-              "tip0": 0,
+              "tip0": 23.6602,
+              "phaseNote": "the simulated wheel phase at the reference, 47.6602 deg, mod one pitch",
               "thickness": 4,
               "bore": 6,
               "place": 0

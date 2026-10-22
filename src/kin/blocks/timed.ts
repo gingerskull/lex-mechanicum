@@ -406,50 +406,59 @@ export interface EscapeGeometry {
  * positive) over one cycle in `steps` samples, its advance per cycle, and the recoil of the beat each sample lies in.
  */
 export function simulateEscape(g: EscapeGeometry, pallet: (u: number) => number, steps = 1440, rate = Infinity): { wheel: Float64Array; recoil: Float64Array; advance: number; beats: number[]; recoils: number[] } {
-  const pitch = TAU / g.n;
   const tol = 1e-4;
-  const free = (w: number, p: number) => {
+  const free = (w: number, u: number) => {
     const wp = turnPoly(g.wheel, g.wc, g.sense * w);
+    const p = pallet(u);
     return g.pallets.every((pl) => overlapDepth(wp, turnPoly(pl, g.ac, p)) <= tol);
   };
+  return stepEscape(free, TAU / g.n, steps, rate);
+}
+
+/**
+ * The stepping of any escapement (planar or a verge's crown): `free(w, u)` says whether the wheel at angle w (forward
+ * positive) is clear of the pallets at cycle phase u. Each step the wheel is pushed back if a pallet moved into it, else
+ * goes forward (at most `rate` radians per radian of cycle) until it meets a pallet; run three cycles, the last kept.
+ */
+export function stepEscape(free: (w: number, u: number) => boolean, pitch: number, steps = 1440, rate = Infinity): { wheel: Float64Array; recoil: Float64Array; advance: number; beats: number[]; recoils: number[] } {
   const cap = (rate * TAU) / steps;
-  const settle = (w: number, p: number): number => {
-    if (!free(w, p)) {
+  const settle = (w: number, u: number): number => {
+    if (!free(w, u)) {
       // a pallet moved into a tooth: back the wheel off until it is clear (recoil)
       let lo = w;
       let hi = w;
       let k = 0;
-      while (!free(lo, p) && k++ < 400) lo -= 0.0005;
+      while (!free(lo, u) && k++ < 400) lo -= 0.0005;
       for (let i = 0; i < 40; i++) {
         const m = (lo + hi) / 2;
-        if (free(m, p)) lo = m;
+        if (free(m, u)) lo = m;
         else hi = m;
       }
       return lo;
     }
-    // urged forward: on until a tooth meets a pallet (the drop is instant)
+    // urged forward: on until a tooth meets a pallet (the drop is instant, or limited by `rate`)
     let lo = w;
     let hi = w + Math.min(0.002, cap);
     let k = 0;
-    while (free(hi, p) && k++ < 2 * pitch / 0.002) {
+    while (free(hi, u) && k++ < (2 * pitch) / 0.002) {
       lo = hi;
       if (hi - w >= cap) return Math.min(hi, w + cap);
       hi += 0.002;
     }
     for (let i = 0; i < 40; i++) {
       const m = (lo + hi) / 2;
-      if (free(m, p)) lo = m;
+      if (free(m, u)) lo = m;
       else hi = m;
     }
     return lo;
   };
-  let w = settle(0, pallet(0));
+  let w = settle(0, 0);
   const cycles = 3;
   const wheel = new Float64Array(steps + 1);
   for (let c = 0; c < cycles; c++) {
     for (let i = 0; i <= steps; i++) {
       const u = (i / steps) * TAU;
-      w = settle(w, pallet(u));
+      w = settle(w, u);
       if (c === cycles - 1) wheel[i] = w;
     }
   }
@@ -470,6 +479,53 @@ export function simulateEscape(g: EscapeGeometry, pallet: (u: number) => number,
     recoils.push(rc);
     for (let i = a; i <= b; i++) recoil[i] = rc;
   }
-  void pitch;
   return { wheel, recoil, advance, beats, recoils };
+}
+
+export interface VergeSpec {
+  /** Crown: teeth, radius to the tips, tooth height along the axis, the back slope's span (rad); its centre (x, z). */
+  n: number;
+  R: number;
+  h: number;
+  back: number;
+  /** The crown's axis is y, its rim face at y = 0 (in the spec's frame), the teeth pointing toward −y. */
+  staff: [number, number];
+  /** The two flag pallets: their directions at foliot 0 (rad from +x, about +z), reach from and to the staff's axis, width. */
+  upper: number;
+  lower: number;
+  from: number;
+  to: number;
+  width: number;
+  /** The wheel's sense: +1 when its top teeth move toward +x. */
+  sense: 1 | -1;
+}
+
+/**
+ * A verge escapement, stepped like the planar ones: near the crown's top the teeth cross the upper pallet's plane, near
+ * its bottom the lower one's, moving the other way; each row is tested in its pallet's horizontal plane (the tooth a
+ * triangle of its steep leading face and its back slope, in x and y). `foliot(u)` is the staff's turn (rad).
+ */
+export function simulateVerge(v: VergeSpec, foliot: (u: number) => number, steps = 1440) {
+  const flag = (beta: number): [number, number][] => {
+    const c = Math.cos(beta);
+    const s = Math.sin(beta);
+    const nx = -s * (v.width / 2);
+    const ny = c * (v.width / 2);
+    const S = v.staff;
+    return [[S[0] + v.from * c - nx, S[1] + v.from * s - ny], [S[0] + v.to * c - nx, S[1] + v.to * s - ny], [S[0] + v.to * c + nx, S[1] + v.to * s + ny], [S[0] + v.from * c + nx, S[1] + v.from * s + ny]];
+  };
+  const free = (w: number, u: number) => {
+    const th = foliot(u);
+    const up = flag(v.upper + th);
+    const lo = flag(v.lower + th);
+    for (let k = 0; k < v.n; k++) {
+      const a = (k * TAU) / v.n + v.sense * w;
+      const c = Math.cos(a);
+      if (Math.abs(c) < 0.85) continue;
+      const tri: [number, number][] = [[v.R * Math.sin(a), -v.h], [v.R * Math.sin(a), 0], [v.R * Math.sin(a - v.sense * v.back), 0]];
+      if (overlapDepth(tri, c > 0 ? up : lo) > 1e-4) return false;
+    }
+    return true;
+  };
+  return stepEscape(free, TAU / v.n, steps);
 }
