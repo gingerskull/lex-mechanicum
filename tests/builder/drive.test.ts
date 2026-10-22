@@ -134,8 +134,11 @@ describe("drive: linear input", () => {
 });
 
 describe("drive: manual input", () => {
-  it("builds no motor for a hand-worked input", async () => {
+  it("builds no motor for a hand-worked input, a knob on each input instead", async () => {
     const ctx = await build("five-bar");
     expect(ctx.solids.some((s) => s.kind === "motor")).toBe(false);
+    const inputs = ctx.kin.drivers.filter((d) => d.kind === "manual").map((d) => ctx.kin.joints.find((j) => j.id === d.joint)!).map((j) => (j.a === "ground" ? j.b : j.a));
+    expect(inputs.map((b, n) => get(ctx, `drive-knob${n}`).body)).toEqual(inputs);
+    expect(ctx.notes.find((n) => n.id === "drive")?.badge).toEqual(["hand operated", "ok"]);
   });
 });

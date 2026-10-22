@@ -18,7 +18,7 @@ import { lowestZ } from "./core";
 import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 import type { Site } from "../sites";
-import { linearDrive, oscillatingDrive } from "./drive";
+import { linearDrive, manualDrive, oscillatingDrive } from "./drive";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
@@ -272,11 +272,12 @@ export const drive: Rule = {
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  applies: (ctx) => (ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary")) || ctx.kin.drivers.some((d) => d.kind === "oscillating" || d.kind === "linear"),
+  applies: (ctx) => (ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary")) || ctx.kin.drivers.some((d) => d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"),
   apply(ctx) {
     // an oscillating or a linear input has its own drive (rules/drive.ts); a rotary one is belted to its shaft
     const other = ctx.kin.drivers.some((d) => d.kind === "rotary") ? undefined : ctx.kin.drivers.find((d) => d.kind === "oscillating" || d.kind === "linear");
     if (other) return other.kind === "oscillating" ? oscillatingDrive(ctx, other) : linearDrive(ctx, other);
+    if (!ctx.kin.drivers.some((d) => d.kind === "rotary")) return manualDrive(ctx);
     const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);

@@ -17,10 +17,10 @@ import type { KinDriver } from "../../kin/types";
 import { crankPin, driveSide, type DriveMotion } from "../../solids/drive";
 import { MIN_GAP } from "../constants";
 import type { BuildCtx } from "../ctx";
-import { parallel, place, type Frame } from "../frames";
+import { fromPlane, parallel, place, type Frame } from "../frames";
 import { pointDist, ringDist } from "../planar";
 import { UP } from "../sites";
-import { worldPoints } from "../sweeps";
+import { worldManifold, worldPoints } from "../sweeps";
 import { cutBore } from "./stacks";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
@@ -651,3 +651,59 @@ export function linearDrive(ctx: BuildCtx, drv: KinDriver): void {
   });
 }
 
+
+// ------------------------------------------------------------------------------------------------ manual
+
+/**
+ * A hand-worked input (V5 `manual`): no motor; a knob on a shoulder screw on the input part, where it clears every other
+ * part's sweep, toward the part's far end. The stops at the ends of a swing are the stops rule's (F5); the page says
+ * hand operated.
+ */
+export function manualDrive(ctx: BuildCtx): void {
+  const manual = ctx.kin.drivers.filter((d) => d.kind === "manual" && d.joint);
+  manual.forEach((drv, n) => {
+    const jt = ctx.joints.find((q) => q.id === drv.joint);
+    if (!jt) return;
+    const placed = [jt.a, jt.b].filter((b) => b !== "ground" && ctx.parts.has(b)).some((body) => {
+      const part = ctx.parts.get(body)!;
+      const pts = worldPoints(ctx.M, part);
+      const top = Math.max(...pts.map((p) => p[2]));
+      const J0 = xy(jt.at);
+      const far = pts.reduce((q, p) => (d2(xy(p), J0) > d2(xy(q), J0) ? p : q), pts[0]!);
+      const reach = d2(xy(far), J0);
+      const a = ang2(J0, xy(far));
+      // away from the part's joints, whose heads stand on its top face
+      const pins = ctx.joints.filter((q) => q.a === body || q.b === body).map((q) => xy(q.at));
+      const others = ctx.sweeps.moving().filter((b) => b !== body);
+      // on a crank, toward its far end; on a moving pin (a stylus), as near the pin as its head allows
+      const at = jt.a === "ground" || jt.b === "ground" ? [0.85, 0.7, 0.55, 0.4, 0.25].map((f) => f * reach) : [14, 18, 24, 30, 40].filter((s) => s < reach);
+      for (const s of at)
+        for (const da of [0, 0.25, -0.25]) {
+          const p = add2(J0, dir2(a + da), s);
+          if (pts.length && pins.some((q) => d2(q, p) < 12)) continue;
+          if (!onPart(part, p)) continue;
+          const id = manual.length > 1 ? `drive-knob${n}` : "drive-knob";
+          const knob = place(UPF, H.solid(id, { body, name: "Handle knob Ø12, phenolic, on a shoulder screw M4", kind: "part", role: "hw", mat: "Phenolic, black", outer: circle(6, p[0], p[1], 24), z0: top + 2, z1: top + 14, joints: [...J, jt.id] }));
+          const m = worldManifold(ctx.M, knob[0]!);
+          const g = ctx.sweeps.gap(m, others, MIN_GAP + 1);
+          m.delete();
+          if (g < MIN_GAP) continue;
+          ctx.add(knob);
+          ctx.add(place(UPF, H.tube(`${id}-sleeve`, 4, 6, { body, at: at3(p), name: "Shoulder screw M4, the knob's axle", z0: top, z1: top + 2, joints: [...J, jt.id] })));
+          return true;
+        }
+      return false;
+    });
+    if (!placed) ctx.issues.push(`drive: no place for a knob on the hand-worked input ${drv.id} clears the other parts`);
+  });
+  ctx.note({ id: "drive", kit: "drive", at: manual[0] ? (ctx.joints.find((q) => q.id === manual[0]!.joint)?.at ?? [0, 0, 0]) : [0, 0, 0], title: "Drive · hand operated", note: "Hand operated: no motor; a knob on a shoulder screw on each hand-worked input, its range limited by the stops at the ends of its swing where it has ends.", serves: {}, badge: ["hand operated", "ok"] });
+}
+
+/** True when the world point p lies on the part's outline in plan (its frame's plane is the base plane's). */
+function onPart(part: { frame: Frame; profile: { outer: Vec2[] } }, p: Vec2): boolean {
+  const ring = part.profile.outer.map((q): Vec2 => {
+    const w = fromPlane(part.frame, q, 0);
+    return [w[0], w[1]];
+  });
+  return pointDist(ring, p[0], p[1]) === 0 && ring.every((q) => d2(q, p) >= 4);
+}
