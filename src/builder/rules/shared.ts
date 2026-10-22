@@ -279,17 +279,17 @@ export const drive: Rule = {
     }
     const others = ctx.sites.filter((q) => q !== site && q.fixed).map((q) => [q.at[0], q.at[1]] as Vec2);
     const C = 46;
-    let M: Vec2 | null = null;
-    let best = -1;
-    for (let k = 0; k < 12; k++) {
-      const a = (k / 12) * TAU;
-      const m = polar(S, C, a);
-      const clear = Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999);
-      if (clear > best) {
-        best = clear;
-        M = m;
-      }
-    }
+    // the motor where it is farthest from the other fixed pins, its flange's edge clear of the input housing's screws
+    // (a hole there would leave no wall); the next best angle when it is not
+    const screws = st.solids.filter((x) => x.id.startsWith(`${site.id}-hsc`) && x.kind === "head").map((x): Vec2 => [x.frame.o[0], x.frame.o[1]]);
+    const edgeOk = (m: Vec2) =>
+      screws.every(([x, y]) => {
+        const d = Math.max(Math.abs(x - m[0]), Math.abs(y - m[1]));
+        return d < 29 - 4 || d > 29 + 2;
+      });
+    const cands = Array.from({ length: 12 }, (_, k) => polar(S, C, (k / 12) * TAU)).map((m) => ({ m, clear: Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999) }));
+    cands.sort((p, q) => q.clear - p.clear);
+    const M: Vec2 | null = (cands.find((x) => edgeOk(x.m)) ?? cands[0])?.m ?? null;
     if (!M) return;
     const mot = MOTORS.pancake;
     const mTop = bb - 3;

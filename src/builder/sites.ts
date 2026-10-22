@@ -11,7 +11,7 @@ import { canon, parallel } from "./frames";
 export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
-  "cross-pin", "trunnion", "piston-bore", "eccentric",
+  "cross-pin", "trunnion", "piston-bore", "eccentric", "die",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -81,6 +81,7 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       const s = text(j.slot) + text(rec.slot);
       if (/fork/i.test(s) || /fork/i.test(text(rec.note))) return "fork-pin";
       if (/groove/i.test(s)) return "groove-cam";
+      if (j.slot?.arc) return "die";
       return "J4";
     }
     case "gear-mesh":

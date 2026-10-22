@@ -96,7 +96,10 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   const alongUp = parallel(frame.z, UP);
   const base = alongUp && ctx.base ? { top: ctx.base.top - frame.o[2], bottom: ctx.base.bottom - frame.o[2] } : null;
   const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual");
-  const held = ctx.placement.held.get(site.id) ?? "both";
+  // a fixed pin under a grooved link (an expansion link's trunnion) stands on the base only: its axle ends in the solid
+  // lower cheek, under the groove the die runs in
+  const grooved = site.fixed && site.bodies.some((b) => ctx.geoms.get(b)?.upper);
+  const held = grooved ? "base" : (ctx.placement.held.get(site.id) ?? "both");
   const straddle = site.live && alongUp && held !== "base" && [...keyedIds].some((b) => ["gear", "pulley", "sprocket"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)));
   const spec: StackSpec = {
     id: site.id,
@@ -109,6 +112,7 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     input: !!driver && site.joints.includes(driver.joint ?? ""),
     straddle,
     eccentric: ctx.eccentric.has(site.id),
+    ...(grooved ? { flush: true } : {}),
     baseTopWorld: ctx.base?.top ?? 0,
   };
   const r = axialStack(ctx, spec);

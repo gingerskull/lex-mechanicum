@@ -69,7 +69,7 @@ export const placement: Rule = {
         body: id,
         frame,
         profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
+        op: extrudeOp(g.upper ? g.thick - g.upper.h : g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),
@@ -78,6 +78,11 @@ export const placement: Rule = {
       };
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
+      // a slotted upper cheek on the solid lower one
+      if (g.upper) {
+        const lift = g.thick - g.upper.h;
+        ctx.add({ ...part, id: `${id}-cheek`, name: `${titleOf(id)}, slotted upper cheek`, frame: { ...frame, o: v3.add(o, v3.mul(frame.z, lift)) }, profile: { outer: [...g.upper.profile.outer], holes: g.upper.profile.holes.map((h) => [...h]) }, op: extrudeOp(g.upper.h), marks: [], joints: [...part.joints] });
+      }
       for (const pc of g.pieces ?? [])
         ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });
     }

@@ -40,6 +40,8 @@ export interface StackSpec {
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
   eccentric?: boolean;
+  /** The axle ends flush in its top part, its clip recessed (a groove runs over it: an expansion link's trunnion). */
+  flush?: boolean;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
 }
@@ -316,7 +318,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       grooves.push(clZ);
       L.add(H.circlip(`${id}-ecl`, d, { z0: clZ, z1: clZ + ce.s, body: turn }));
       serve("F2", `${id}-ecl`);
-      shaftSpec.z1 = clZ + ce.s + 1.5;
+      shaftSpec.z1 = clZ + ce.s + (spec.flush ? 0.1 : 1.5);
     }
     name = live ? `Live shaft Ø${d}, ${kf ? `keyed (feather key ${kf.b}x${kf.h})` : "D-flat"}` : `Dead axle Ø${d}, shouldered, M${threadFor(d)} end`;
     if (live) {
