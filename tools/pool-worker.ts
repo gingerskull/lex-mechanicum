@@ -6,6 +6,9 @@ interface Task {
   arg: unknown;
 }
 
+// a pool that stops (its tool failed or was stopped) takes its children with it
+process.on("disconnect", () => process.exit(0));
+
 process.on("message", async (t: Task) => {
   const rss = () => process.memoryUsage().rss;
   try {

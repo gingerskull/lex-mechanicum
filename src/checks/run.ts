@@ -1,10 +1,12 @@
 // The 3D checks of one mechanism as the tools and tests run them (A15, A12, M6), with the two profiles of the CI budget:
 // `ci` samples few phases and skips the hand `allow` audit, `full` is the 72 phases of the pre-push hook and the audit
 // sheet. A result is cached on disk under a key that covers everything the check reads (the solids, their poses at
-// the sampled phases, the profile and the tool version), so an unchanged mechanism costs the hash only.
+// the sampled phases, the profile) and the checks' own code, so an unchanged mechanism costs the hash only.
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { buildSync } from "esbuild";
 import { ROOT } from "../audit/sheet";
 import { clampCheck3, edgeCheck3 } from "./clamp3";
 import { clearance3, type ClashReport } from "./clash3";
@@ -25,8 +27,24 @@ export const PROFILES: Record<Profile3["name"], Profile3> = {
   full: { name: "full", phases: 72, clampPhases: 12, allowCheck: true },
 };
 
-/** Bump when a check changes what it reports, so stale cache entries are never read. */
+/** Bump to drop every cached result (a change to the checks' code drops them by itself: see `checksCode`). */
 export const CHECKS_VERSION = 3;
+
+let code: string | null = null;
+/**
+ * A hash of the checks' own code: every source file this module imports (the clash and clamp checks, the solids'
+ * geometry) as the bundler finds them, and the Manifold version, so a change to any of them is never served a result
+ * cached before it.
+ */
+export function checksCode(): string {
+  if (code) return code;
+  const r = buildSync({ entryPoints: [fileURLToPath(import.meta.url)], bundle: true, platform: "node", format: "esm", write: false, metafile: true, absWorkingDir: ROOT, external: ["manifold-3d", "esbuild"], logLevel: "silent" });
+  const h = createHash("sha256");
+  for (const f of Object.keys(r.metafile.inputs).sort()) h.update(`${f.replace(/\\/g, "/")}\n${readFileSync(join(ROOT, f), "utf8").replace(/\r\n/g, "\n")}\n`);
+  const mf = join(ROOT, "node_modules", "manifold-3d", "package.json");
+  h.update(existsSync(mf) ? (JSON.parse(readFileSync(mf, "utf8")) as { version: string }).version : "");
+  return (code = h.digest("hex").slice(0, 16));
+}
 
 export interface Result3 {
   profile: Profile3["name"];
@@ -39,10 +57,10 @@ export interface Result3 {
 
 export const CACHE_DIR = process.env.CHECK_CACHE_DIR ?? join(ROOT, "dist", "cache", "checks3");
 
-/** The key of a check: a hash of the solids, their poses at the phases the profile samples, and the profile. */
+/** The key of a check: a hash of the solids, their poses at the phases the profile samples, the profile and the checks' code. */
 export function cacheKey(src: CheckSource, p: Profile3): string {
   const h = createHash("sha256");
-  h.update(`v${CHECKS_VERSION}|${p.name}|${p.phases}|${p.clampPhases}|${p.allowCheck}\n`);
+  h.update(`v${CHECKS_VERSION}|${checksCode()}|${p.name}|${p.phases}|${p.clampPhases}|${p.allowCheck}\n`);
   const r = (x: number) => Math.round(x * 1e5) / 1e5;
   h.update(
     JSON.stringify(src.solids, (k, v) => (typeof v === "number" ? r(v) : ArrayBuffer.isView(v) ? Array.from(v as unknown as ArrayLike<number>, r) : v)),

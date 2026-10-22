@@ -194,9 +194,13 @@ describe("teaching layers", () => {
   });
 });
 
+// the four-bar's package, built once for the tests that read it
+let built: ReturnType<typeof buildPackage> | null = null;
+const fourBar = () => (built ??= buildPackage("four-bar"));
+
 describe("posers", () => {
   it("the record's kinematic block places the four-bar's solids: the crank turns a radian a radian and the ground stays", async () => {
-    const b = await buildPackage("four-bar");
+    const b = await fourBar();
     const rec = recordById("four-bar") as unknown as { kin: Kin };
     const P = kinPoser(new Kinematics(rec.kin), undefined, b.pkg.lifts);
     const crank = b.pkg.solids.find((s) => s.body === "crank")!;
@@ -225,7 +229,7 @@ describe("posers", () => {
   });
 
   it("sets up a package in Node as the browser does (decode, tessellate, edges)", async () => {
-    const b = await buildPackage("four-bar");
+    const b = await fourBar();
     const s = await setupInline(await encode2(b.pkg));
     expect(s.meshes.length).toBe(b.pkg.shapes.length);
     const rec = recordById("four-bar") as unknown as { kin: Kin };

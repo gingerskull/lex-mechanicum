@@ -5,8 +5,15 @@ import { buildWithContext } from "../../src/builder/build";
 import type { BuildCtx } from "../../src/builder/ctx";
 import { recordById } from "../../src/catalog";
 
-const ctxs: BuildCtx[] = [];
-afterAll(() => ctxs.forEach((c) => c.dispose()));
+// a record two tests read is built once
+const built = new Map<string, Promise<BuildCtx>>();
+const build = (id: string) => {
+  if (!built.has(id)) built.set(id, buildWithContext(recordById(id)!).then(({ ctx }) => ctx));
+  return built.get(id)!;
+};
+afterAll(async () => {
+  for (const c of built.values()) (await c).dispose();
+});
 
 /** The layers the hand set and the clevis twins it declared, in the models these mechanisms were first built from. */
 const HAND = { "jansen-linkage": { layers: 3, clevis: 0 }, "stephenson-six-bar": { layers: 3, clevis: 0 } } as const;
@@ -14,8 +21,7 @@ const HAND = { "jansen-linkage": { layers: 3, clevis: 0 }, "stephenson-six-bar":
 describe("placement solver", () => {
   for (const [id, h] of Object.entries(HAND)) {
     it(`${id}: no more slabs than the hand layers, no fewer clevises`, async () => {
-      const { ctx } = await buildWithContext(recordById(id)!);
-      ctxs.push(ctx);
+      const ctx = await build(id);
       expect(ctx.placement.height).toBeLessThanOrEqual(h.layers);
       expect(ctx.placement.clevis.length).toBeGreaterThanOrEqual(h.clevis);
       expect(ctx.placement.conflicts).toEqual([]);
@@ -23,8 +29,7 @@ describe("placement solver", () => {
   }
 
   it("keeps parts that meet apart and lets parts that never meet share a slab (A10)", async () => {
-    const { ctx } = await buildWithContext(recordById("jansen-linkage")!);
-    ctxs.push(ctx);
+    const ctx = await build("jansen-linkage");
     const slab = (b: string) => ctx.placement.slab.get(b)![1];
     // the crank, the upper triangle and the foot never meet: one plane; the bars that pass over them are in the next
     expect(slab("crank")).toBe(slab("upper"));
@@ -34,8 +39,7 @@ describe("placement solver", () => {
   });
 
   it("stacks a compound gear's levels one slab apart, each meshing at its own level", async () => {
-    const { ctx } = await buildWithContext(recordById("gear-train")!);
-    ctxs.push(ctx);
+    const ctx = await build("gear-train");
     const slab = (b: string) => ctx.placement.slab.get(b)![1];
     // the cluster's 36 teeth mesh with the input in one slab, its 12-tooth level with the output in the next
     expect(slab("cluster#1")).toBe(slab("cluster") + 1);
@@ -47,8 +51,7 @@ describe("placement solver", () => {
   });
 
   it("builds a joined level as one piece with the level under it, and hangs an undriven live shaft from its bridge", async () => {
-    const { ctx } = await buildWithContext(recordById("ravigneaux")!);
-    ctxs.push(ctx);
+    const ctx = await build("ravigneaux");
     const slab = (b: string) => ctx.placement.slab.get(b)![1];
     // the long pinion meshes the short pinion and small sun in one slab and the large sun and ring in the next, nothing
     // between; the carrier spider under them

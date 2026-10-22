@@ -38,7 +38,7 @@ export async function runPool<T, R>(module: string, fn: string, items: T[], o: {
   const done = new Array<boolean>(items.length).fill(false);
   let flushed = 0;
   const flush = () => {
-    while (flushed < items.length && done[flushed]) o.each?.(out[flushed]!, flushed++);
+    for (; flushed < items.length && done[flushed]; flushed++) o.each?.(out[flushed]!, flushed);
   };
   if (jobs <= 1) {
     const f = (await import(url))[fn] as (x: T) => Promise<R>;
