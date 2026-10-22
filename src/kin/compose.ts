@@ -609,6 +609,8 @@ class Run implements BlockCtx {
   }
 
   private output(kind: string, of: string, points: Map<string, Vec3>): number | Vec3 | undefined {
+    // a value a block solved (a planet's spin, a contact's distance) is read as it is
+    if (kind !== "path" && of in this.vals && !this.s.joints.has(of) && !this.k._bodies.has(of)) return this.vals[of];
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);

@@ -11,6 +11,7 @@ import type { Setup } from "../kin/compose";
 import type { Kin } from "../kin/types";
 import type { Vec3, Xf } from "../kin/math";
 import { xf } from "../kin/math";
+import { cutConjugates } from "./conjugate";
 import { manifold } from "../solids/manifold";
 import type { Solid3 } from "../solids/types";
 import { moveFrame, type Frame } from "./frames";
@@ -137,6 +138,8 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
   const geoms = bodyGeoms(kin, S);
   const { joints, sites } = classifyJoints(kin, S);
   const n = opts.samples ?? (source.route === "numeric" ? SAMPLES_NUMERIC : SAMPLES);
+  // a non-circular mesh's driven gear is cut conjugate to its driver over the cycle
+  cutConjugates(M, K, kin, geoms, opts.controls);
   const sampled = sampleBodies(K, kin, n, opts.controls, geoms);
   const placement = solvePlacement(kin, geoms, sampled, joints, sites);
   const principle = new Set<string>();

@@ -10,6 +10,7 @@ import { type Vec3, v3 } from "../kin/math";
 import type { LoftSection, Profile } from "../solids/types";
 import { canon, frameAlong, fromPlane, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
+import { noncircularOutline, pitchOf } from "./conjugate";
 
 /**
  * A further level of a body, in a slab of its own: a compound gear's next gear (a `gear` with `cluster`), a gear fixed
@@ -139,6 +140,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
         return { profile: { outer: bevelOutline(z, m, bv.delta), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true };
       }
       if (shape.form === "worm" || shape.form === "worm wheel") return wormShape(shape, z, m);
+      // a non-circular gear: teeth along its own pitch curve (the gear it drives is cut conjugate to it, conjugate.ts)
+      const pc = pitchOf(shape);
+      if (pc) return { profile: { outer: noncircularOutline(pc, z).outer, holes: [hole(bore / 2)] }, thick: num(shape.face, 10), approx: false };
       if (typeof shape.helix === "number" && shape.helix !== 0 && Array.isArray(shape.hand)) {
         // a herringbone (double-helical) gear: two halves of opposite hand meeting in a V across a relief groove cut to
         // the root circle; a loft of sections every few millimetres so each half's twist stays true

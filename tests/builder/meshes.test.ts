@@ -10,8 +10,8 @@ const ctxs: BuildCtx[] = [];
 afterAll(() => ctxs.forEach((c) => c.dispose()));
 
 describe("mesh phasing", () => {
-  // a train of several meshes (gear train, planetary), an internal mesh, a rack, a gear on a moving centre
-  for (const id of ["spur-gears", "gear-train", "rack-pinion", "internal-gear-pair", "planetary"]) {
+  // a train of several meshes (gear train, planetary), an internal mesh, a rack, a gear on a moving centre, a non-circular pair cut conjugate
+  for (const id of ["spur-gears", "gear-train", "rack-pinion", "internal-gear-pair", "planetary", "non-circular-gears"]) {
     it(`${id}: teeth in the gaps at every sample`, async () => {
       const { ctx } = await buildWithContext(recordById(id)!);
       ctxs.push(ctx);

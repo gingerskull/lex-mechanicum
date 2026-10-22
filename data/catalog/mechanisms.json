@@ -35764,7 +35764,8 @@
                 "curve": "ellipse",
                 "a": 40,
                 "e": 0.5,
-                "pivot": "focus"
+                "pivot": "focus",
+                "perihelion": 180
               }
             },
             "at": {
@@ -35784,9 +35785,9 @@
                 "curve": "ellipse",
                 "a": 40,
                 "e": 0.5,
-                "pivot": "focus"
-              },
-              "phase": "half a pitch, a tooth of one meets a gap of the other on the line of centres"
+                "pivot": "focus",
+                "perihelion": 0
+              }
             },
             "at": {
               "joint": "F2"
@@ -35836,10 +35837,25 @@
               0,
               0
             ],
-            "z1": 20,
-            "z2": 20,
-            "pitch": "ellipse",
-            "note": "the contact stays on the line of centres F1-F2, r1 + r2 = 2a"
+            "note": "the contact stays on the line of centres F1-F2, r1 + r2 = 2a; at phase 0 the driver's long radius meets the driven gear's short one",
+            "za": 20,
+            "zb": 20,
+            "ncg": {
+              "kind": "ellipse",
+              "e": 0.5,
+              "a": 40,
+              "phase": 0
+            },
+            "cb": [
+              80,
+              0,
+              0
+            ],
+            "ca": [
+              0,
+              0,
+              0
+            ]
           }
         ],
         "params": [
@@ -35917,21 +35933,14 @@
               "M"
             ],
             "in": {
-              "a": "gear1",
-              "b": "gear2",
-              "za": "z",
-              "zb": "z",
-              "semi": "a",
-              "ecc": "e"
+              "joint": "M",
+              "input": "input"
             },
-            "opts": {
-              "pitch": "ellipse about a focus",
-              "relation": "tan(th2/2) = -((1+e)/(1-e)) tan(th1/2)"
-            },
-            "out": [
-              "gear2-turn",
-              "contact"
-            ]
+            "out": {
+              "angle": "gear2-turn",
+              "contact": "contact-r1",
+              "point": "M"
+            }
           }
         ],
         "points": [
@@ -35969,7 +35978,7 @@
           },
           {
             "id": "contact",
-            "of": "M",
+            "of": "contact-r1",
             "kind": "position",
             "unit": "mm"
           }
@@ -35980,7 +35989,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and issue #215: e from 0.3 to 0.5, so the ellipses read as ellipses and the speed swings from a third to three times the input; 20 coarser teeth instead of 26; the speed-ratio plot the record promises beside the output angle. Equal-time ticks on a point of each gear show steady input against uneven output, and the line of centres with r1 and r2 dimensioned shows why: the contact slides along it and the ratio is r1/r2."
+          "note": "Applies the 2026-10-19 review and issue #215: e from 0.3 to 0.5, so the ellipses read as ellipses and the speed swings from a third to three times the input; 20 coarser teeth instead of 26; the speed-ratio plot the record promises beside the output angle. Equal-time ticks on a point of each gear show steady input against uneven output, and the line of centres with r1 and r2 dimensioned shows why: the contact slides along it and the ratio is r1/r2. Rebuild R4 (#215): built on v3 from this record: teeth spaced equally along each pitch ellipse, the driven gear cut as the envelope of the driver's teeth over the cycle (conjugate, as decided); the mesh joint in the block's form (ncg with e, a and phase 0 where the driver's long radius meets the driven gear's short one, ca and cb), the contact point and its distance as the block's outs so r1 and r2 stay on the line of centres. The eccentricity control is not offered (it changes the built gears). The six phases of the finished build read as decided."
         },
         "principle": [
           {
@@ -36039,11 +36048,6 @@
             "id": "input",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "eccentricity",
-            "kind": "param",
-            "param": "e"
           }
         ],
         "plot": [

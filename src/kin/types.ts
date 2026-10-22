@@ -64,7 +64,7 @@ export interface KinJoint {
   carrier?: string;
   radiusA?: Num; // pitch radius of a (for a rack: the pinion's), mm
   radiusB?: Num;
-  ncg?: { kind: "ellipse"; e: Num; phase?: Num };
+  ncg?: { kind: "ellipse"; e: Num; phase?: Num; a?: Num };
   ca?: Vec; // optional axis points whose distance the mesh keeps constant
   cb?: Vec;
   // pin-in-slot: a carries the pin (at), b carries the slot, given by two points in the reference configuration

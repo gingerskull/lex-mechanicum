@@ -274,7 +274,8 @@ const sarrus: BlockFn = (c, s) => {
 };
 
 /**
- * gear-mesh. in: joint (a `gear-mesh` joint: za/zb or ratio, internal, crossed/sign, radiusA for a rack, ncg), input (a
+ * gear-mesh. in: joint (a `gear-mesh` joint: za/zb or ratio, internal, crossed/sign, radiusA for a rack, ncg { e, phase,
+ * a }: out contact, the driver's pitch radius at the contact), input (a
  * value: body a's angle, deg), ref (b's angle in the reference configuration, default 0), parent (a body whose pose
  * carries b's centre, for a planet), shaft b's axis is joint.axis2 or joint.axis. out: b's angle (deg) or rack travel (mm).
  * A gear a on a moving centre (a planet fixed to a rod, the sun-and-planet gear): `line` [p, q], two points of body a
@@ -298,6 +299,19 @@ const gearMesh: BlockFn = (c, s) => {
   } else {
     dB = gearDelta(c, j, dA);
     X = xf.rotAbout(c.vec(j.cb ?? j.at), axisB, dB);
+  }
+  if (j.ncg && j.ncg.a !== undefined) {
+    // the contact on the line of centres: the driver's pitch radius there (the ellipse about its focus; at phase 0 its
+    // long radius meets the driven gear's short one, as ellipticalAngle counts it)
+    const e = c.num(j.ncg.e);
+    const ph = c.num(j.ncg.phase ?? 0) * D2R + dA;
+    const r1 = (c.num(j.ncg.a) * (1 - e * e)) / (1 - e * Math.cos(ph));
+    outVal(c, s, r1, "contact");
+    // and the contact point itself, on the line of centres ca-cb (out.point: the mesh joint's name keeps it there)
+    if (j.ca !== undefined && j.cb !== undefined) {
+      const ca = c.vec(j.ca);
+      outPoint(c, s, v3.add(ca, v3.mul(v3.unit(v3.sub(c.vec(j.cb), ca)), r1)), "point");
+    }
   }
   const parent = i.parent as string | undefined;
   c.setXf(j.b, parent && c.has(parent) ? xf.mul(c.xf(parent), X) : X);
