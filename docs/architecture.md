@@ -45,7 +45,9 @@ src/builder/                     engine v3's hardware builder, beside the 2.5D e
                                  v3 and the rules registry that the standard's AUTO table is generated from. Bodies a joint
                                  fixes in space (a bevel gear on its cone, a universal joint's yokes and cross, a swinging
                                  cylinder and its piston, a fixed port face) are placed where the joints put them, not on a
-                                 slab; their kits are cross-pin, trunnion and piston-bore beside J1 to J13
+                                 slab; their kits are cross-pin, trunnion and piston-bore beside J1 to J13, with eccentric (a sheave
+                                 in its strap), hub (a part on a fixed hub), die (a die in a curved link) and the covers rule; arms.ts
+                                 makes an outboard arm (a return crank on a crank pin's end) a body of its own for the build
 src/assemble/                    assemble(model): rules -> polish(A, H) -> fasteners -> headroom -> see-through ->
                                  explode; the polish API; solid poses; clearance, clamp and edge-distance checks
 src/package/                     the package format (pack, encode, decode), the loader, buildPackage (Node)

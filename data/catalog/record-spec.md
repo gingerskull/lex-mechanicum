@@ -159,9 +159,32 @@ and the hardware builder read the same way (`bodyFrameOf` in `src/kin/compose.ts
 the geometry; the drawing carries every built solid from its built frame to the new one.
 
 **Outputs.** An `angle` of a body is its turn about its joint to the ground (else its first joint). An `angle` with `from`
-and `to` points is the angle at `of` between the rays to them (a transmission angle); one with `minus` is that output less
-another angle output, wrapped to ±180° (a lead or lag). A `position` of a prismatic joint is its slide. A `speed-ratio`
-of a body is read from its angle output.
+and `to` points is the angle at `of` between the rays to them (a transmission angle, a rod's obliquity from a point on
+the slide line); one with `minus` is that output less another angle output, wrapped to ±180° (a lead or lag). A
+`position` of a prismatic joint is its slide. A `position` of a point with `axis` `x`, `y` or `z` (or `-x`, `-y`, `-z`,
+a mirrored part read the same way round) is that component, with `axis: "radius"` its distance from `relativeTo` (the
+origin without one), and with `relativeTo` alone the distance between the two points. A `speed-ratio` of a body is read
+from its angle output.
+
+**Drivers.** The reference configuration (the joints' positions) is the drivers' `default`s; a control that holds a
+driver at another value moves its joint from there. `scale` is the joint's motion per unit of the driver's value (a die
+position from -1 to +1 that turns a reverse arm -20° per unit: `scale: -20`).
+
+**Bodies.** `fixed: true` fixes a body that a joint names (a stationary gear in mesh): it never moves and counts as
+ground. A shape's `level: { with, part, gap }` places a body at another body's slab: its `lower` or `upper` plate, `all`
+of it, or `above` it (an engine's housing round its rotor, its side cover, a stationary gear in the rotor's gear ring).
+`link` may carry `bore` (a ring round a sheave with a slim rod: an eccentric strap) or `upper` ({ length, boss, angle,
+gap }: a second arm on the same hub `gap` above, an output crank split round a bridge), and `arm` ({ at, joints, boss }:
+an outboard arm fixed on the pin `at`, carrying `joints`, on a slab of its own: a return crank on a main crank pin's
+end). `slotLink` may carry `arm` (a length back past its pivot). `plate` with `rect` and `center` is centred on that
+point of its frame. `slider` lies along its prismatic joint; a body that is more than its sliding block names the block
+with `slider: [length, width]`. `custom` profiles: `slotArc` (a curved slotted link of two cheeks: { center, radius,
+from, to, width, wall } and `foot`), `rotor` with `internalGear` (a rotary engine's rotor) and `housing` with `bore`
+(its epitrochoid housing).
+
+**Joints.** A revolute with a journal `radius` (over 12) is an eccentric between two moving parts (the sheave in its
+strap) or, to the ground, a fixed hub the part turns on. A `pin-in-slot` slot is `from`/`to` (straight) or `arc` ({ center,
+radius }: a curved slot, the die kit).
 
 **Shapes the builder places where the joints put them** (not on a slab): a bevel `gear` (with `cone`, its pitch cone
 half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a universal joint's yoke) and a `cross`
@@ -172,10 +195,19 @@ half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a unive
 second gear's axis, `cb` its centre). `hooke` reads either a `universal` joint or, with the cross as a body,
 `{ input, cross, joints: { in, out, a, b } }`: the two shafts' ground revolutes and the two yoke pins into the cross.
 `slider-dyad` with `kind: "rpr"` is the swinging block: `a` the slotted body's pivot, `p` the pin, `body` the slotted body;
-a body joined to it by a prismatic joint keeps its turn. A block's `out` may be keyed (`{ "angle": "gear-turn" }`).
+a body joined to it by a prismatic joint keeps its turn. `kind: "rrp"` (the default) is a link and a slide: `a`, `r`, `p`
+and `d` (a point and direction of the slide). `kind: "rpp"` is a pin in a straight slot square to the slide (a Scotch
+yoke): `a` the pin, `p`, `d`; out the slotted body's point on the slide. `dyad` may name the `body` of its link from
+`a`, posed by its turn, so a later block can read that body's other points; its `branch` is a design choice, one of its
+options, or a plain `left` / `right` of a to b. A block's `in` may be an expression of names (`"-input"`). A block's
+`out` may be keyed (`{ "angle": "gear-turn" }`).
 
 **Claims.** A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
 open while the swing is in a range); with a number it is the longest stretch the output holds within that much.
+`time-ratio` is a reciprocating output's slow stroke over its quick one. `phase` with `from` and `to` (`max`, `min`) is
+the cycle degrees from the one extreme forward to the other; with `against` (another output) the lag of the output's
+first harmonic behind that one's, signed. `at` takes `at` or `input`. `when: { control, value }` checks the claim at
+that setting of one of the teaching controls (a die position).
 
 ### `teaching`
 
@@ -200,13 +232,13 @@ open while the swing is in a range); with a number it is the longest stretch the
 | `review` | The teaching review's verdict (`keep`, `tweak`, `rethink`), the date, and a note on what was decided (standard T2). The audit's `teaching:` line repeats the verdict. |
 | `principle` | The bodies and points that carry the principle (T3). They are drawn on top and whole; the visibility rule (T10 to T12) protects them. |
 | `traces` | Teaching traces: a named `point`, optional `ticks` (every n degrees of input, equal time), `ghosts` for settings not selected (`control` and `value`), and `comet: true` on the first. A trace can be a point on a moving body (a point on a planet). |
-| `overlays` | Construction overlays: `kind` is `line` (through two named points), `arc`, `circle`, `chord`, `dimension` (a moment arm, a length), `axis-line`, `workspace` (an outline traced by a named point over a range) or `bend` (a flexure's state). Each names its points and a short mechanics-only `label`. |
+| `overlays` | Construction overlays: `kind` is `line` (through two named points), `arc`, `circle`, `chord`, `dimension` (a moment arm, a length), `axis-line`, `workspace` (an outline traced by a named point over a range) or `bend` (a flexure's state). Each names its points and a short mechanics-only `label`. A posed overlay is drawn where an output reaches an extreme: `pose: { output, stat: "max" \| "min" }` for all its points, `fromPose` / `toPose` for each end (a dead-centre line, a stroke dimension); an `arc` with both runs on its point's own circle (`sweep: "cw"` or counter-clockwise: a cut or return arc). A `dimension` may measure one `component` (`x`, `y`, `z`: an offset) and reads the kinematic points' true distance. |
 | `view` | The default named view (T7): `PLAN`, `FRONT`, `SIDE`, `ISOMETRIC`, `DIMETRIC`, `AUX <joint-id>`, or `VIEW az el` in degrees. |
 | `views` | Section and detail views (T8): `kind` `section` (a cut `plane` of origin and normal) or `detail` (a window `center` and `scale`); `highlight` names bodies or points to draw with the highlight. |
 | `controls` | The controls the page shows (T14): `kind` `driver`, `param`, `design` or `selector`, and the id it maps to. A mechanism's controls are only these. |
 | `timeMap` | A playback rate near a feature (T13): the `span` of input degrees and the `slow` factor. It never changes `solve`. |
-| `plot` | What the side panel plots: `x`, `y` (output ids) and a label; several settings may be listed for a family of curves. |
-| `claims` | Every number the explanation states, with the `output` and `stat` (`range`, `max`, `min`, `mean`, `ratio`, `phase`, `dwell`, `at`) it comes from, the stated `value` and a tolerance (standard T9). `text` is the sentence it supports. |
+| `plot` | What the side panel plots: `x`, `y` (output ids) and a label, or a list: the first is the plot, `ghosts` on it draw the same output at other control settings (a family of curves), and a further entry in the same unit and range is drawn with it. |
+| `claims` | Every number the explanation states, with the `output` and `stat` (`range`, `max`, `min`, `mean`, `ratio`, `time-ratio`, `phase`, `dwell`, `at`) it comes from, the stated `value` and a tolerance (standard T9). `text` is the sentence it supports. |
 | `exceptions` | The rare individual cases where a different construction is used instead of seeing through or moving a support (T12), each with its reason; the decision is made in the mechanism's issue. |
 
 Teaching strings (labels, trace names, captions) state the mechanism, never its use (T15). Real-world context belongs
