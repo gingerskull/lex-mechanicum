@@ -5492,28 +5492,16 @@
           "id": "ground",
           "role": "ground",
           "shape": {
-            "type": "custom",
-            "op": "extrude",
-            "profile": {
-              "housing": {
-                "rect": [
-                  296,
-                  236
-                ],
-                "corner": 22
-              },
-              "bore": {
-                "epitrochoid": {
-                  "R": 103,
-                  "e": 15
-                }
-              },
-              "fixedGear": {
-                "z": 30,
-                "module": 2
-              }
-            },
-            "thick": 80
+            "type": "plate",
+            "rect": [
+              330,
+              290
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "z": -8
           },
           "at": {
             "frame": {
@@ -5526,16 +5514,82 @@
           }
         },
         {
+          "id": "housing",
+          "role": "frame",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "profile": {
+              "housing": {
+                "rect": [
+                  300,
+                  268
+                ],
+                "corner": 22
+              },
+              "bore": {
+                "epitrochoid": {
+                  "R": 103,
+                  "e": 15
+                }
+              }
+            },
+            "thick": 16,
+            "level": {
+              "with": "rotor",
+              "part": "all"
+            },
+            "note": "the housing block round the rotor, its bore the epitrochoid the apexes trace"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "cover",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              300,
+              268
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "thickness": 5,
+            "level": {
+              "with": "rotor",
+              "part": "above",
+              "gap": 0.5
+            },
+            "note": "the side cover over the housing; it carries the stationary gear"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
           "id": "shaft",
           "role": "driver",
           "shape": {
-            "type": "link",
-            "length": 15,
-            "boss": [
-              21,
-              21
+            "type": "disc",
+            "radius": 26,
+            "center": [
+              15,
+              0
             ],
-            "journal": 16
+            "thickness": 8,
+            "note": "the eccentric shaft: its eccentric, a journal of radius 26 about E, keyed on the shaft at O"
           },
           "at": {
             "joint": "O"
@@ -5550,21 +5604,45 @@
             "profile": {
               "rotor": {
                 "apexRadius": 102.6,
-                "flank": 1.25
+                "flank": 1.25,
+                "bore": 28
               },
               "internalGear": {
                 "z": 45,
-                "module": 2
-              },
-              "web": {
-                "hub": 24,
-                "arms": 3
+                "module": 2,
+                "rim": 56
               }
             },
-            "thick": 10
+            "thick": 16,
+            "note": "the rotor: its web on the eccentric underneath, its internal gear ring on top"
           },
           "at": {
             "joint": "E"
+          }
+        },
+        {
+          "id": "stator",
+          "role": "gear",
+          "fixed": true,
+          "shape": {
+            "type": "gear",
+            "z": 30,
+            "module": 2,
+            "face": 5.9,
+            "bore": 14,
+            "level": {
+              "with": "rotor",
+              "part": "upper",
+              "gap": 2.6
+            },
+            "note": "the stationary gear, fixed under the side cover, inside the rotor gear ring"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
           }
         }
       ],
@@ -5599,12 +5677,14 @@
             0,
             0,
             1
-          ]
+          ],
+          "radius": 26,
+          "note": "the rotor turns on the eccentric, a journal of radius 26 about E"
         },
         {
           "id": "mesh",
           "type": "gear-mesh",
-          "a": "ground",
+          "a": "stator",
           "b": "rotor",
           "at": [
             -30,

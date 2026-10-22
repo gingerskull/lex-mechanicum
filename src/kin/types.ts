@@ -20,6 +20,8 @@ export interface KinBody {
   frame?: Frame; // pose of the body's own frame in the reference configuration; default: its `at` joint, else the world
   /** n-fold rotational symmetry about its axis (a wheel's slots, a gear's teeth z): the cycle repeats modulo 2π/n (K2). */
   symmetry?: number;
+  /** Fixed to the ground though a joint names it (a stationary gear in mesh): it never moves, and counts as ground. */
+  fixed?: boolean;
 }
 
 export type JointType =

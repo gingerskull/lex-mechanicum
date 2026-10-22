@@ -23,7 +23,8 @@ export function mobility(kin: Kin, plane: "Planar" | "Spatial"): number | undefi
   const per = plane === "Planar" ? 3 : 6;
   // a body no joint reaches is fixed where it stands (a port face, a fixed plate): it is part of the ground
   const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
-  let m = per * (kin.bodies.filter((b) => b.id !== "ground" && joined.has(b.id)).length);
+  // so is a body declared fixed (a stationary gear in mesh)
+  let m = per * (kin.bodies.filter((b) => b.id !== "ground" && joined.has(b.id) && !(b as { fixed?: boolean }).fixed).length);
   for (const j of kin.joints) {
     const f = FREEDOM[plane][j.type];
     if (f === undefined) return undefined;

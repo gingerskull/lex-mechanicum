@@ -333,6 +333,7 @@ export class Kinematics {
     declared = false,
   ): { pose: Pose; hs: Map<string, number>; fb?: Map<string, Xf> } {
     const run = new Run(this, s, u, vals, mode, declared);
+    for (const b of this.kin.bodies) if (b.fixed) run.xfs.set(b.id, xf.id());
     run.drive();
     for (const step of this.kin.solve) run.runStep(step);
     run.resolveBodies(fb ?? { unknown: new Set((this.kin.fallback?.loops ?? []).flat()) });

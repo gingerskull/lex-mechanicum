@@ -39,7 +39,13 @@ export interface BodyGeom {
    * A second plate on top of the part, `h` of the body's thickness (a slotted link's upper cheek over a solid lower one,
    * so a die runs in a groove and a trunnion can stand under it): the part is the lower plate.
    */
-  upper?: { profile: Profile; h: number };
+  upper?: { profile: Profile; h: number; name?: string };
+  /**
+   * Placed at another body's slab rather than one of its own (a stationary gear in the rotor's gear ring, an engine's
+   * housing round its rotor, its side cover over it): `part` "lower", "upper" (that body's upper plate), "all" or
+   * "above" it, `gap` mm further along the normal.
+   */
+  level?: { with: string; part: "lower" | "upper" | "all" | "above"; gap?: number };
 }
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -139,6 +145,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       return { profile: { outer: circle(d / 2, 0, 0, 24), holes: [] }, thick: num(shape.length, 40), approx: false };
     }
     case "custom": {
+      const pr = (shape.profile ?? {}) as Record<string, Record<string, unknown> | undefined>;
+      if (pr.rotor) return rotorOf(pr.rotor, pr.internalGear, num(shape.thick, 16));
+      if (pr.housing) return { profile: housingOf(pr.housing, pr.bore), thick: num(shape.thick, 16), approx: false };
       const sa = (shape.profile as { slotArc?: Record<string, unknown> } | undefined)?.slotArc;
       if (sa) {
         const g = linkArc(sa, (shape.profile as { foot?: unknown }).foot, num(shape.thick, 10));
@@ -193,9 +202,10 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
       const ang = Math.atan2(d[1] - o[1], d[0] - o[0]);
       if (Math.abs(Math.sin(ang)) > 1e-6) g.profile = { outer: rot(g.profile.outer, ang), holes: g.profile.holes.map((h) => rot(h, ang)) };
     }
-    // a body no joint reaches stands at its own frame
-    const fixed = !js.length && !!F;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.upper ? { upper: g.upper } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    // a body no joint reaches stands at its own frame, unless it is placed at another body's level
+    const lv = shape.level as BodyGeom["level"] | undefined;
+    const fixed = !js.length && !!F && !lv;
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.upper ? { upper: g.upper } : {}), ...(lv ? { level: lv } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
@@ -359,7 +369,7 @@ function cylinder(b: KinBody, g: BodyGeom): BodyGeom | null {
  * `width` wide with a `wall` either side, round-ended; an ear out to the `foot` pin. Two cheeks: the lower one solid,
  * carrying the trunnion, the upper one slotted for the die, so the die runs in a groove over the trunnion.
  */
-function linkArc(sa: Record<string, unknown>, foot: unknown, thick: number): { profile: Profile; thick: number; upper: { profile: Profile; h: number } } {
+function linkArc(sa: Record<string, unknown>, foot: unknown, thick: number): { profile: Profile; thick: number; upper: { profile: Profile; h: number; name?: string } } {
   const [cx, cy] = pair(sa.center, [180, 0]);
   const R = num(sa.radius, 180);
   const w = num(sa.width, 15) / 2;
@@ -407,7 +417,64 @@ function linkArc(sa: Record<string, unknown>, foot: unknown, thick: number): { p
   const slotHole = band(R - w, R + w, false).reverse();
   // the lower cheek the thicker: it takes the trunnion's bearing and the clip recessed above it
   const h = Math.floor(thick * 0.45);
-  return { profile: { outer, holes: [] }, thick, upper: { profile: { outer: band(R - w - wall, R + w + wall, false), holes: [slotHole] }, h } };
+  return { profile: { outer, holes: [] }, thick, upper: { profile: { outer: band(R - w - wall, R + w + wall, false), holes: [slotHole] }, h, name: "slotted upper cheek" } };
+}
+
+/**
+ * A rotary engine's rotor about its centre (the frame origin): three apexes at `apexRadius`, the first on the frame's x,
+ * each flank an arc about the opposite apex's side, `flank` times the apex-to-apex distance in radius (1 is the
+ * Reuleaux triangle, larger is flatter), bored for its eccentric (`bore`, radius). Its internal gear ring stands on it as
+ * an upper plate: `internalGear` { z, module, rim } about the centre, half the rotor's thickness.
+ */
+function rotorOf(r: Record<string, unknown>, ig: Record<string, unknown> | undefined, thick: number): { profile: Profile; thick: number; approx: boolean; upper?: { profile: Profile; h: number; name?: string } } {
+  const R = num(r.apexRadius, 102.6);
+  const side = R * Math.sqrt(3);
+  const rho = num(r.flank, 1.25) * side;
+  const outer: Vec2[] = [];
+  for (let k = 0; k < 3; k++) {
+    const a = (k * TAU) / 3;
+    const b = ((k + 1) * TAU) / 3;
+    const A: Vec2 = [R * Math.cos(a), R * Math.sin(a)];
+    const B: Vec2 = [R * Math.cos(b), R * Math.sin(b)];
+    // the arc's centre on the far side of the rotor centre from the flank's middle
+    const m: Vec2 = [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
+    const ml = Math.hypot(m[0], m[1]);
+    const d = Math.sqrt(rho * rho - (side / 2) ** 2);
+    const c: Vec2 = [(-m[0] / ml) * (d - ml), (-m[1] / ml) * (d - ml)];
+    const t0 = Math.atan2(A[1] - c[1], A[0] - c[0]);
+    let t1 = Math.atan2(B[1] - c[1], B[0] - c[0]);
+    while (t1 < t0) t1 += TAU;
+    for (let i = 0; i < 40; i++) {
+      const t = t0 + ((t1 - t0) * i) / 40;
+      outer.push([c[0] + rho * Math.cos(t), c[1] + rho * Math.sin(t)]);
+    }
+  }
+  const bore = num(r.bore, 28);
+  const holes = [circle(bore, 0, 0, 96).reverse()];
+  if (!ig) return { profile: { outer, holes }, thick, approx: false };
+  const z = num(ig.z, 45);
+  const m = num(ig.module, 2);
+  const rim = num(ig.rim, (z * m) / 2 + 9);
+  const h = Math.floor(thick / 2);
+  return { profile: { outer, holes }, thick, approx: false, upper: { profile: { outer: circle(rim, 0, 0, 96), holes: [gearOutline(z, m, 1.25, 1).reverse()] }, h, name: `internal gear ring, ${z} teeth` } };
+}
+
+/**
+ * A rotary engine's housing about the shaft (the frame origin): a block `rect` [w, h] with corners of `corner`, its bore
+ * the epitrochoid the apexes trace, x = R cos b - e cos 3b, y = R sin b - e sin 3b, opened `clear` mm (the apex seals'
+ * running clearance is the rotor's).
+ */
+function housingOf(h: Record<string, unknown>, bore: Record<string, unknown> | undefined): Profile {
+  const [w, ht] = pair(h.rect, [296, 236]);
+  const ep = (bore?.epitrochoid ?? {}) as Record<string, unknown>;
+  const R = num(ep.R, 103);
+  const e = num(ep.e, 15);
+  const hole: Vec2[] = [];
+  for (let k = 0; k < 360; k++) {
+    const b = (k * TAU) / 360;
+    hole.push([R * Math.cos(b) - e * Math.cos(3 * b), R * Math.sin(b) - e * Math.sin(3 * b)]);
+  }
+  return { outer: roundRect(-w / 2, -ht / 2, w / 2, ht / 2, num(h.corner, 22)), holes: [hole.reverse()] };
 }
 
 /** A ring of radius r0 at the origin with a rod of half width r1 to a round end at L along x (counter-clockwise). */

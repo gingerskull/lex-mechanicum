@@ -51,11 +51,20 @@ export const placement: Rule = {
   apply(ctx) {
     for (const [id, g] of ctx.geoms) {
       const slab = ctx.extent(id);
-      if (!slab && !g.exact) continue;
-      const fam = slab?.frame ?? g.frame;
+      if (!slab && !g.exact && !g.level) continue;
+      const fam = slab?.frame ?? (g.level ? ctx.extent(g.level.with)?.frame : undefined) ?? g.frame;
       // a body that stands where its joints put it (a bevel gear on its pitch cone, a yoke and a cross on their centre)
       // is placed there, wherever a slab would put it
-      const o = g.exact || !slab ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact?.offset ?? 0)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      let o = g.exact || !slab ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact?.offset ?? 0)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      // a body at another body's level: its lower or upper plate, all of it, or above it
+      const lv = g.level;
+      const host = lv ? ctx.extent(lv.with) : undefined;
+      const hg = lv ? ctx.geoms.get(lv.with) : undefined;
+      if (lv && host && hg) {
+        const lowerH = hg.upper ? hg.thick - hg.upper.h : hg.thick;
+        const w = host.w0 + (lv.part === "upper" ? lowerH : lv.part === "above" ? hg.thick : 0) + (lv.gap ?? 0);
+        o = fromPlane(host.frame, planeCoords(host.frame, g.frame.o).uv, w);
+      }
       const body = ctx.kin.bodies.find((b) => b.id === id)!;
       const role = BODY_ROLE[body.role] ?? "link";
       const frame = { o, x: g.frame.x, z: g.exact ? g.frame.z : fam.z };
@@ -81,7 +90,7 @@ export const placement: Rule = {
       // a slotted upper cheek on the solid lower one
       if (g.upper) {
         const lift = g.thick - g.upper.h;
-        ctx.add({ ...part, id: `${id}-cheek`, name: `${titleOf(id)}, slotted upper cheek`, frame: { ...frame, o: v3.add(o, v3.mul(frame.z, lift)) }, profile: { outer: [...g.upper.profile.outer], holes: g.upper.profile.holes.map((h) => [...h]) }, op: extrudeOp(g.upper.h), marks: [], joints: [...part.joints] });
+        ctx.add({ ...part, id: `${id}-cheek`, name: `${titleOf(id)}, ${g.upper.name ?? "upper plate"}`, frame: { ...frame, o: v3.add(o, v3.mul(frame.z, lift)) }, profile: { outer: [...g.upper.profile.outer], holes: g.upper.profile.holes.map((h) => [...h]) }, op: extrudeOp(g.upper.h), marks: [], joints: [...part.joints] });
       }
       for (const pc of g.pieces ?? [])
         ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });

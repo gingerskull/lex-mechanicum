@@ -2,6 +2,7 @@
 // Each rule reads the sites of its kit, hands every site to the one stack builder with the members the placement
 // solver set, and records the hardware, the bores it needs and the engineering note (A16).
 import { circle } from "../../core/geom";
+import { inside } from "../../core/poly";
 import type { Solid3 } from "../../solids/types";
 import type { BuildCtx } from "../ctx";
 import { fromPlane, parallel, planeCoords, type Frame } from "../frames";
@@ -99,7 +100,10 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   // a fixed pin under a grooved link (an expansion link's trunnion) stands on the base only: its axle ends in the solid
   // lower cheek, under the groove the die runs in
   const grooved = site.fixed && site.bodies.some((b) => ctx.geoms.get(b)?.upper);
-  const held = grooved ? "base" : (ctx.placement.held.get(site.id) ?? "both");
+  // a fixed plate placed over the pin (a stationary gear, a side cover over a rotor) leaves no room above its stack:
+  // the pin is held from the base and ends flush
+  const covered = site.fixed && [...ctx.geoms.values()].some((g) => g.level && g.level.part !== "lower" && g.level.part !== "all" && inside(g.profile.outer, planeCoords(g.frame, site.at).uv));
+  const held = grooved || covered ? "base" : (ctx.placement.held.get(site.id) ?? "both");
   const straddle = site.live && alongUp && held !== "base" && [...keyedIds].some((b) => ["gear", "pulley", "sprocket"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)));
   const spec: StackSpec = {
     id: site.id,
