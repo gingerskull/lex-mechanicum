@@ -114,7 +114,7 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = 
     place(s, u) {
       const X = s.body === "ground" ? xf.id() : (posed(u).get(s.body) ?? xf.id());
       const B = xfMat(X);
-      const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0)) as Mat4) : B;
+      const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0, s.convey.s1)) as Mat4) : B;
       return mul(C, mat4(s.frame));
     },
     // a stretched member (a spring between two points): its length at the phase

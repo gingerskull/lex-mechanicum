@@ -269,6 +269,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `base` | A7, D4, M4 |
 | `j6-mesh` | J6, F7, F9 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
+| `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
 | `j3-moving-pin` | J3, A12, M3 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
@@ -288,7 +289,6 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
 | `j12-other` | J12, F7 |
-| `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
 | `strap-sheave` | J12, F1, F2, A11 |
 | `j11-screw` | J11, J10, F2, F3, F4, F5, F8 |
 | `j13-compliant` | J13, A6, F1, F2, F5 |

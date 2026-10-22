@@ -8,7 +8,7 @@ import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkag
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, pressureAngle } from "./blocks/cam";
-import { differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance, vonMises } from "./blocks/members";
+import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, screwAdvance, vonMises } from "./blocks/members";
 import { genevaAngle, simulateEscapement, type EscapementSpec } from "./blocks/timed";
 
 function outName(step: SolveStep, key?: string): string | undefined {
@@ -421,6 +421,20 @@ const conveyBlock: BlockFn = (c, s) => {
   const jid = str(i.joint, "convey.joint");
   const j = c.joint(jid);
   const d = c.delta("in", c.rad(i.input));
+  if (i.mode === "chain") {
+    // a roller chain on the sprockets' pitch polygons (chordal action): the joint gives za, zb, pitch and the seated
+    // rollers' phases (deg); the travel is the chain's advance, the driven sprocket turns to take it up
+    const jr = j as unknown as Record<string, unknown>;
+    const za = c.num(j.za), zb = c.num(j.zb), p = c.num(jr.pitch);
+    const pa = c.num(jr.phaseA ?? 0) * D2R, pb = c.num(jr.phaseB ?? 0) * D2R;
+    const t = chainAdvance(d, za, p, pa) - chainAdvance(0, za, p, pa);
+    const dB = chainTurn(chainAdvance(0, zb, p, pb) + t, zb, p, pb);
+    if (typeof i.driven === "string") spin(c, i.driven, c.vec(i.drivenCenter ?? j.at), c.jointAxis(jid), dB);
+    outVal(c, s, dB * R2D, "angle");
+    outVal(c, s, t, "travel");
+    outVal(c, s, chainSpeed(d, za, pa), "speed");
+    return;
+  }
   const ra = c.num(j.radiusA);
   const rb = c.num(j.radiusB ?? j.radiusA);
   const path = { C: c.num(i.C), r: c.num(i.r) };

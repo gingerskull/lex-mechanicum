@@ -14,6 +14,26 @@ export interface ConveyPath {
   carrier: string;
   /** A direction the solid's frame keeps as near as it can to its own z (a planar path's normal); default world z. */
   up?: Vec3;
+  /**
+   * The travel is not measured along the path but in a coordinate of its own (a chain's links, which wrap a sprocket on
+   * its seat circle, a little longer than their pitch): breakpoints `c` of that coordinate (from 0 to the loop's whole
+   * length in it) and the path distance `d` at each, linear between.
+   */
+  map?: { c: number[]; d: number[] };
+}
+
+/** The path distance of a place given in the path's travel coordinate. */
+export function distOf(p: ConveyPath, c: number): number {
+  const m = p.map;
+  if (!m) return c;
+  const C = m.c[m.c.length - 1]!;
+  const L = m.d[m.d.length - 1]!;
+  const turns = Math.floor(c / C);
+  const x = c - turns * C;
+  let k = 0;
+  while (k < m.c.length - 2 && m.c[k + 1]! <= x) k++;
+  const f = (x - m.c[k]!) / (m.c[k + 1]! - m.c[k]! || 1);
+  return turns * L + m.d[k]! + f * (m.d[k + 1]! - m.d[k]!);
 }
 
 interface Cum {
@@ -108,6 +128,22 @@ export function turnMatrix(at: Vec3, axis: Vec3, a: number): number[] {
 }
 
 /** The move of a solid placed at `s0` on the path to where a travel carries it, in the carrier's frame (column-major). */
-export function conveyMatrix(p: ConveyPath, s0: number, travel: number): number[] {
-  return mul4(frameAt(p, s0 + travel), inv(frameAt(p, s0)));
+export function conveyMatrix(p: ConveyPath, s0: number, travel: number, s1?: number): number[] {
+  if (s1 !== undefined) return mul4(linkFrame(p, s0 + travel, s1 + travel), inv(linkFrame(p, s0, s1)));
+  return mul4(frameAt(p, distOf(p, s0 + travel)), inv(frameAt(p, distOf(p, s0))));
+}
+
+/** A rigid link between two places on the path (a chain's plate between two rollers): at the first, x toward the second. */
+function linkFrame(p: ConveyPath, s0: number, s1: number): number[] {
+  const a = along(p, distOf(p, s0)).o;
+  const b = along(p, distOf(p, s1)).o;
+  const l = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) || 1;
+  const t: Vec3 = [(b[0] - a[0]) / l, (b[1] - a[1]) / l, (b[2] - a[2]) / l];
+  const u = p.up ?? [0, 0, 1];
+  const k = u[0] * t[0] + u[1] * t[1] + u[2] * t[2];
+  let z: Vec3 = [u[0] - k * t[0], u[1] - k * t[1], u[2] - k * t[2]];
+  const lz = Math.hypot(z[0], z[1], z[2]) || 1;
+  z = [z[0] / lz, z[1] / lz, z[2] / lz];
+  const y: Vec3 = [z[1] * t[2] - z[2] * t[1], z[2] * t[0] - z[0] * t[2], z[0] * t[1] - z[1] * t[0]];
+  return [t[0], t[1], t[2], 0, y[0], y[1], y[2], 0, z[0], z[1], z[2], 0, a[0], a[1], a[2], 1];
 }

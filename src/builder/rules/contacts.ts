@@ -294,7 +294,7 @@ function idler(ctx: BuildCtx, c: Contact, L: Local, what: string): ReturnType<Ki
 
 const j8 = contactRule({ id: "j8-belt", ids: ["J8", "V4"], fixture: "kin:beltDrive", kits: ["J8"], build: (ctx, c, L) => idler(ctx, c, L, "belt") });
 // a timing belt between two pulleys is built by src/builder/flexible.ts
-const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:chainDrive", kits: ["J12"], skip: (ji) => (ji.joint as unknown as Record<string, unknown>).flexible === "belt" && ji.a !== "ground" && ji.b !== "ground", build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
+const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:chainDrive", kits: ["J12"], skip: (ji) => ["belt", "chain"].includes(String((ji.joint as unknown as Record<string, unknown>).flexible)) && ji.a !== "ground" && ji.b !== "ground", build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
 
 const strapSheave = contactRule({
   id: "strap-sheave",

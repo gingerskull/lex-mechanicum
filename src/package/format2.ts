@@ -61,7 +61,7 @@ export interface PackedSolid3 {
   reach?: { to: Vec3; end: 0 | 1 };
   legacyAxis?: "x" | "y" | "p";
   /** A conveyed solid: index into `Package2.conveys` and its place on the path; `path` is attached on reading. */
-  cv?: { p: number; s0: number; path?: ConveyPath };
+  cv?: { p: number; s0: number; s1?: number; path?: ConveyPath };
   /** A drive part turning with the cycle (Solid3.spin). */
   spin?: { at: Vec3; axis: Vec3; u0: number };
   flags: number;

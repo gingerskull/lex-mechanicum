@@ -1034,7 +1034,8 @@
       "pitch": 12.7,
       "roller": 8.5,
       "standard": "ISO 606 08B",
-      "bore": 12
+      "bore": 12,
+      "face": 7
      },
      "at": {
       "joint": "O1"
@@ -1049,7 +1050,8 @@
       "pitch": 12.7,
       "roller": 8.5,
       "standard": "ISO 606 08B",
-      "bore": 14.4
+      "bore": 14.4,
+      "face": 7
      },
      "at": {
       "joint": "O2"
@@ -1079,7 +1081,7 @@
      "a": "ground",
      "b": "driven",
      "at": [
-      248.46,
+      248.976692,
       0,
       0
      ],
@@ -1104,7 +1106,11 @@
      "pitch": 12.7,
      "roller": 8.5,
      "standard": "ISO 606 08B",
-     "note": "upper span runs onto the driver (counter-clockwise): tight side; lower span slack"
+     "note": "upper span runs onto the driver (counter-clockwise): tight side; lower span slack",
+     "za": 15,
+     "zb": 30,
+     "phaseA": 0,
+     "phaseB": 5.5157
     }
    ],
    "params": [
@@ -1126,7 +1132,7 @@
     },
     {
      "id": "C",
-     "value": 248.46,
+     "value": 248.976692,
      "unit": "mm",
      "min": 240,
      "max": 256,
@@ -1149,27 +1155,24 @@
    "solve": [
     {
      "block": "convey",
-     "id": "chain",
+     "id": "chain-advance",
      "joints": [
       "chain",
       "O2"
      ],
      "in": {
-      "driver": "driver",
+      "mode": "chain",
+      "joint": "chain",
+      "input": "input",
+      "C": "C",
+      "r": 30.541813,
       "driven": "driven",
-      "za": 15,
-      "zb": 30,
-      "pitch": "p",
-      "links": "N"
+      "drivenCenter": "O2"
      },
-     "out": [
-      "theta2",
-      "v-chain"
-     ],
-     "opts": {
-      "seat": "pitch polygon",
-      "chordal": true,
-      "note": "rollers seat on each sprocket's pitch polygon; the tight span is a straight run of whole pitches between the last seated roller on each sprocket, so the chain speed and the driven speed ripple once per tooth; on average theta2 = theta1 z1/z2"
+     "out": {
+      "angle": "driven-turn",
+      "travel": "chain-travel",
+      "speed": "chain-v"
      }
     }
    ],
@@ -1178,7 +1181,7 @@
      "id": "rim1",
      "body": "driver",
      "local": [
-      30.54,
+      30.541813,
       0,
       0
      ]
@@ -1187,7 +1190,7 @@
      "id": "rim2",
      "body": "driven",
      "local": [
-      60.75,
+      60.749004,
       0,
       0
      ]
@@ -1243,8 +1246,9 @@
     },
     {
      "id": "chain-speed",
-     "of": "chain",
-     "kind": "speed-ratio"
+     "of": "chain-v",
+     "kind": "position",
+     "unit": "of peak"
     }
    ],
    "fallback": null
@@ -1335,7 +1339,7 @@
      "output": "driven-angle",
      "stat": "range",
      "value": 180,
-     "tol": 0.1
+     "tol": 0.5
     },
     {
      "text": "ratio = z2/z1 (30/15 = 2:1 default)",

@@ -617,6 +617,8 @@ class Run implements BlockCtx {
   }
 
   private output(kind: string, of: string, points: Map<string, Vec3>): number | Vec3 | undefined {
+    // a value a block gives (a chain's speed over its peak), whatever the kind it is read as
+    if (of in this.vals && !this.xfs.has(of) && !points.has(of) && !this.s.joints.has(of)) return this.vals[of];
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);

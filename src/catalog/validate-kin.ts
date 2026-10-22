@@ -172,7 +172,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);
-    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point or joint`);
+    // a value a solve block gives (out) may be read as an output too
+    if (!bodies.has(o.of) && !points.has(o.of) && !joints.has(o.of) && !known.has(o.of)) say(`output ${o.id}: of "${String(o.of)}" is not a body, point, joint or block output`);
   }
 
   // mobility (K11)

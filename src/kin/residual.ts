@@ -5,7 +5,7 @@ import { evalExpr } from "./expr";
 import type { KinJoint } from "./types";
 import { ellipticalAngle, meshRatio } from "./blocks/gears";
 import { type CamSchedule, camMotion, type CamLaw } from "./blocks/cam";
-import { screwAdvance } from "./blocks/members";
+import { chainAdvance, screwAdvance } from "./blocks/members";
 import { reflection, bisectorNormal } from "./blocks/spatial";
 
 /** A joint with its numbers and vectors evaluated (parameters bound) and its reference geometry in world coordinates. */
@@ -174,6 +174,17 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     if (j.ncg) return null; // the pitch curve is checked at the sample angles, see verify
     const ratio = j.ratio !== undefined ? n(j.ratio) : meshRatio({ za: n(j.za), zb: n(j.zb), internal: j.internal, sign: j.crossed ? ((j.hand === "left" ? -1 : 1) as 1 | -1) : undefined });
     return wrapPi(turn(s.b0, s.b1, ax2) - dC - ratio * dA);
+  }
+  const jr = j as unknown as Record<string, unknown>;
+  if (j.type === "belt" && jr.flexible === "chain" && j.za !== undefined && jr.pitch !== undefined) {
+    // a chain on its pitch polygons: the advance the driver gives equals the advance the driven takes (chordal action)
+    const za = n(j.za), zb = n(j.zb), p = n(jr.pitch);
+    const pa = n(jr.phaseA ?? 0) * D2R, pb = n(jr.phaseB ?? 0) * D2R;
+    const ta0 = xf.angleAbout(s.a0, ax);
+    const tb0 = xf.angleAbout(s.b0, ax2);
+    const ta1 = ta0 + turn(s.a0, s.a1, ax);
+    const tb1 = tb0 + turn(s.b0, s.b1, ax2);
+    return chainAdvance(ta1, za, p, pa) - chainAdvance(ta0, za, p, pa) - (chainAdvance(tb1, zb, p, pb) - chainAdvance(tb0, zb, p, pb));
   }
   if (j.type === "belt" || j.type === "rolling") {
     const dA = turn(s.a0, s.a1, ax);

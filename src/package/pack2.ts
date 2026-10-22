@@ -136,7 +136,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     if (s.convey) {
       let k = conveys.indexOf(s.convey.path);
       if (k < 0) k = conveys.push(s.convey.path) - 1;
-      p.cv = { p: k, s0: +s.convey.s0.toFixed(3) };
+      p.cv = { p: k, s0: +s.convey.s0.toFixed(3), ...(s.convey.s1 !== undefined ? { s1: +s.convey.s1.toFixed(3) } : {}) };
     }
     return p;
   });
@@ -161,7 +161,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
   if (sampled.plotData) pkg.plot = Float32Array.from(sampled.plotData);
   if (a.lifts && Object.keys(a.lifts).length) pkg.lifts = structuredClone(a.lifts);
   if (conveys.length) {
-    pkg.conveys = conveys.map((c) => ({ ...c, pts: c.pts.map((q): Vec3 => [+q[0].toFixed(3), +q[1].toFixed(3), +q[2].toFixed(3)]) }));
+    pkg.conveys = conveys.map((c) => ({ ...c, pts: c.pts.map((q): Vec3 => [+q[0].toFixed(3), +q[1].toFixed(3), +q[2].toFixed(3)]), ...(c.map ? { map: { c: c.map.c.map((v) => +v.toFixed(4)), d: c.map.d.map((v) => +v.toFixed(4)) } } : {}) }));
     attachConveys(pkg);
   }
   return pkg;

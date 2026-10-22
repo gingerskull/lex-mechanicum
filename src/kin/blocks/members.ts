@@ -90,3 +90,32 @@ export function vonMises(o: { L0: number; theta0: number; ka: number; ks: number
   };
   return { F, q, yFold, qFold, solve, rest: o.L0 * Math.sin(o.theta0) };
 }
+
+/**
+ * A roller chain on a sprocket's pitch polygon (chordal action): the chain's advance, in pitches of p, for a turn θ of a
+ * sprocket of z teeth whose seated roller stands φ ahead of the span's foot. Within each tooth the seated roller swings
+ * through the span's direction, so the chain moves R sin of its angle from the span's normal (R the polygon's
+ * circumradius) and a pitch per tooth on the whole: its speed falls to cos(π/z) of its peak once per tooth.
+ */
+export function chainAdvance(theta: number, z: number, p: number, phi = 0): number {
+  const d = TAU / z;
+  const R = p / (2 * Math.sin(Math.PI / z));
+  const x = theta + phi;
+  const k = Math.round(x / d);
+  return p * k + R * Math.sin(x - k * d);
+}
+
+/** The sprocket turn that gives a chain advance s (the inverse of chainAdvance). */
+export function chainTurn(s: number, z: number, p: number, phi = 0): number {
+  const d = TAU / z;
+  const R = p / (2 * Math.sin(Math.PI / z));
+  const k = Math.round(s / p);
+  return k * d + Math.asin(Math.max(-1, Math.min(1, (s - p * k) / R))) - phi;
+}
+
+/** The chain's speed over its peak at a turn θ: cos of the seated roller's angle from the span's normal. */
+export function chainSpeed(theta: number, z: number, phi = 0): number {
+  const d = TAU / z;
+  const x = theta + phi;
+  return Math.cos(x - Math.round(x / d) * d);
+}

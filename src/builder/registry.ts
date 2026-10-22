@@ -27,6 +27,8 @@ export const rules: Rule[] = [
   base,
   byId("j6-mesh"),
   byId("j9-crossed-mesh"),
+  // a belt or chain loop first: the stacks' bridges are routed clear of what it carries round
+  j12,
   j3,
   j2,
   j10,
@@ -46,7 +48,6 @@ export const rules: Rule[] = [
   byId("ring-rollers"),
   byId("j8-belt"),
   byId("j12-other"),
-  j12,
   byId("strap-sheave"),
   j11,
   j13,

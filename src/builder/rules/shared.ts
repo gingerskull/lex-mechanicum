@@ -638,6 +638,8 @@ export const seeThrough: Rule = {
     const proj = principle.map((p) => ({ b: p.b, cs: p.sweep.project(dir), c: centroidDepth(ctx, p.b, dir) }));
     for (const s of ctx.solids) {
       if (ctx.principle.has(s.body) || s.flags.isBase || s.kind === "foot") continue;
+      // what a loop carries round, or a drive turns with the cycle, moves: it is not a support that stands over the principle
+      if (s.convey || s.spin) continue;
       if (ctx.parts.get(s.body)?.id === s.id) continue;
       const m = worldManifold(ctx.M, s);
       const sp = projectAlong(m, dir);
