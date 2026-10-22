@@ -7,7 +7,7 @@ import { MOTORS, PULLEYS, SENSOR, STANDOFF } from "../../hardware/tables";
 import { cleanProfile } from "../../solids/manifold";
 import type { Solid3 } from "../../solids/types";
 import { type Vec3, v3, wrapPi, xf } from "../../kin/math";
-import type { BuildCtx, JointNote } from "../ctx";
+import type { BuildCtx } from "../ctx";
 import { LEVER_WALL, MIN_GAP, PITCH } from "../constants";
 import { canon, fromPlane, parallel, place, planeCoords, type Frame } from "../frames";
 import { pointDist } from "../planar";
@@ -18,6 +18,7 @@ import { lowestZ } from "./core";
 import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 import type { Site } from "../sites";
+import { linearDrive, manualDrive, onFreeEnd, oscillatingDrive } from "./drive";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
@@ -64,6 +65,8 @@ export const stops: Rule = {
         const g = ctx.geoms.get(b);
         const ext = ctx.extent(b);
         if (!g || !ext || g.exact) continue;
+        // a wheel (a sheave, a pulley, a disc) turns as far as its rope or belt takes it: nothing stops it
+        if (["pulley", "sprocket", "disc", "gear"].includes(String(g.shape.type))) continue;
         const sw = swingOf(ctx, b, s.axis);
         // only a part that swings (a rocker, a lever) gets stops; a crank, or a gear that turns on through the cycle,
         // turns past them
@@ -191,52 +194,42 @@ export const standoffs: Rule = {
 /**
  * A rotary input on a shaft in plan (V1, V2, V5): the motor beside the shaft, its face screwed to the upright of one
  * angle bracket whose foot is screwed to the base top, belted in the plane across the shaft to a pulley on the shaft's
- * free end (its low end, past its pillow blocks, or its far end, below); the home flag on that pulley and the fork
- * sensor on the upright (V6, F10); terminals and a lead on the base top.
+ * free end (its low end, past its pillow blocks, or its far end: onFreeEnd); the home flag on that pulley and the fork
+ * sensor on the upright (V6, F10); terminals and a lead on the base top. Built in the pulley's plane: u across the shaft,
+ * v up, w outward along it.
  */
 function driveInPlan(ctx: BuildCtx, site: Site): void {
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
-  if (!ctx.base || !axle) return;
-  // H.shaft starts at its low end: the axle's frame origin is that end, its z the shaft's axis. The drive takes that end,
-  // unless it faces the eye in the default view (a front elevation looking at the low end): then the far end, when the
-  // drive built there keeps clear of the moving parts' sweeps (not where a link is overhung on the shaft's end, or where
-  // a part comes down over it). Else the low end, and the far end's stub goes back to its length with no drive there.
-  if (v3.dot(v3.unit(axle.frame.z as Vec3), ctx.viewDir()) > 0.5) {
-    const trial: Solid3[] = [];
-    const note = driveInPlanAt(ctx, site, axle, true, trial);
-    if (clearance(ctx, trial.filter((s) => s.body !== axle.body), () => true) > 0) {
-      ctx.add(trial);
-      ctx.note(note);
-      return;
-    }
-    if (st.farStub && axle.op.op === "extrude") {
-      axle.op = { ...axle.op, h: axle.op.h - st.farStub };
-      ctx.sweeps.touch([axle.body]);
-    }
-  }
-  const solids: Solid3[] = [];
-  const note = driveInPlanAt(ctx, site, axle, false, solids);
-  ctx.add(solids);
-  ctx.note(note);
+  if (!ctx.base || (!axle && !st.end)) return;
+  onFreeEnd(ctx, site.id, (far) => driveInPlanAt(ctx, site, far));
 }
 
-/** The drive of a shaft in plan on its low end or its far end, into `into`. Built in the pulley's plane: u across the
- * shaft, v up, w outward along it. */
-function driveInPlanAt(ctx: BuildCtx, site: Site, axle: Solid3, far: boolean, into: Solid3[]): JointNote {
+/** The drive of a shaft in plan on its low end or its far end. A shaft built by its own kit (a screw, a variator's shaft)
+ * names the end itself. */
+function driveInPlanAt(ctx: BuildCtx, site: Site, far: boolean): void {
   const st = ctx.stacks.get(site.id)!;
-  const base = ctx.base!;
-  const add = (s: Solid3[]) => void into.push(...s);
-  const zA = v3.unit(axle.frame.z as Vec3);
-  const hA = axle.op.op === "extrude" ? axle.op.h : 0;
-  const out: Vec3 = far ? zA : v3.mul(zA, -1);
-  const end = far ? v3.add(axle.frame.o as Vec3, v3.mul(zA, hA)) : (axle.frame.o as Vec3);
-  const shaftBody = axle.body;
+  const axle = ctx.get(`${site.id}-axle`);
+  if (!ctx.base || (!axle && !st.end)) return;
+  let out: Vec3;
+  let end: Vec3;
+  let shaftBody: string;
+  if (st.end) {
+    out = v3.unit(st.end.out);
+    end = st.end.at;
+    shaftBody = st.end.body;
+  } else {
+    const zA = v3.unit(axle!.frame.z as Vec3);
+    const hA = axle!.op.op === "extrude" ? axle!.op.h : 0;
+    out = far ? zA : v3.mul(zA, -1);
+    end = far ? v3.add(axle!.frame.o as Vec3, v3.mul(zA, hA)) : (axle!.frame.o as Vec3);
+    shaftBody = axle!.body;
+  }
   const S: Vec3 = v3.add(end, v3.mul(out, -6)); // the pulley's centre, 6 mm in from the end
   const up: Vec3 = [0, 0, 1];
   const lat = v3.unit(v3.cross(up, out));
   const PF: Frame = { o: S, x: lat, z: out };
-  const h = S[2] - base.top;
+  const h = S[2] - ctx.base.top;
   const mot = MOTORS.pancake;
   const C = 46;
   // the motor on the side with more room, away from the other fixed sites
@@ -256,15 +249,15 @@ function driveInPlanAt(ctx: BuildCtx, site: Site, axle: Solid3, far: boolean, in
   const big = PULLEYS[32];
   const pulley = (id: string, c: Vec2, p: (typeof PULLEYS)[16], bore: number, body: string) => {
     const hole = () => [circle(bore / 2 + 0.05, c[0], c[1], 24).reverse()];
-    add(place(PF, H.solid(id, { name: `GT2 timing pulley ${p.T}T`, kind: "pulley", role: "hw", mat: "Aluminium 6061-T6", outer: circle(p.od / 2, c[0], c[1], 36), holes: hole(), z0: -3, z1: 3, joints: j, body })));
-    add(place(PF, H.solid(`${id}-fl0`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: hole(), z0: -4, z1: -3, joints: j, body })));
-    add(place(PF, H.solid(`${id}-fl1`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: hole(), z0: 3, z1: 4, joints: j, body })));
+    ctx.add(place(PF, H.solid(id, { name: `GT2 timing pulley ${p.T}T`, kind: "pulley", role: "hw", mat: "Aluminium 6061-T6", outer: circle(p.od / 2, c[0], c[1], 36), holes: hole(), z0: -3, z1: 3, joints: j, body })));
+    ctx.add(place(PF, H.solid(`${id}-fl0`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: hole(), z0: -4, z1: -3, joints: j, body })));
+    ctx.add(place(PF, H.solid(`${id}-fl1`, { name: "", kind: "pulley", role: "hw", outer: circle(p.fd / 2, c[0], c[1], 36), holes: hole(), z0: 3, z1: 4, joints: j, body })));
   };
   pulley("drive-pulley-shaft", [0, 0], big, st.d, shaftBody);
   pulley("drive-pulley-motor", Mc, small, mot.shaft, "ground");
   const ring = H.hullOf([[0, 0, big.pd / 2 + 0.7], [Mc[0], Mc[1], small.pd / 2 + 0.7]]);
   const inner = H.hullOf([[0, 0, big.pd / 2 - 0.7], [Mc[0], Mc[1], small.pd / 2 - 0.7]]);
-  add(place(PF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: -3, z1: 3, joints: j })));
+  ctx.add(place(PF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: -3, z1: 3, joints: j })));
   // the angle bracket: an upright past the shaft's end, which the motor's face is screwed to, on a foot on the base
   const w0 = 11;
   const w1 = w0 + 4;
@@ -272,33 +265,87 @@ function driveInPlanAt(ctx: BuildCtx, site: Site, axle: Solid3, far: boolean, in
   const lo = Math.min(-8, Mc[0] - 29, Mc[0] + 29);
   const hi = Math.max(8, Mc[0] - 29, Mc[0] + 29);
   const vTop = Math.max(vm + 29, mouth + SENSOR.l + 2);
-  add(place(PF, H.plate("drive-bracket", roundRect(lo, -h + foot, hi, vTop, 3), { name: "Motor bracket, one piece: an upright on a foot, slotted for the belt's tension", kind: "bracket", role: "ground", z0: w0, z1: w1, holes: [circle(mot.R - 8, Mc[0], Mc[1], 36).reverse()], mat: "Aluminium 6061-T6, anodised", joints: j })));
+  ctx.add(place(PF, H.plate("drive-bracket", roundRect(lo, -h + foot, hi, vTop, 3), { name: "Motor bracket, one piece: an upright on a foot, slotted for the belt's tension", kind: "bracket", role: "ground", z0: w0, z1: w1, holes: [circle(mot.R - 8, Mc[0], Mc[1], 36).reverse()], mat: "Aluminium 6061-T6, anodised", joints: j })));
   // the foot's frame: x outward along the shaft, z up, so y = z x x = up x out = lat and a point u across lies at y = u
-  const FF: Frame = { o: [S[0], S[1], base.top], x: out, z: up };
-  add(place(FF, H.plate("drive-bracket-foot", roundRect(w0, lo, w1 + mot.H + 6, hi, 3), { name: "", kind: "bracket", role: "ground", z0: 0, z1: foot, mat: "Aluminium 6061-T6, anodised", joints: j, group: "drive-bracket" })));
+  const FF: Frame = { o: [S[0], S[1], ctx.base.top], x: out, z: up };
+  ctx.add(place(FF, H.plate("drive-bracket-foot", roundRect(w0, lo, w1 + mot.H + 6, hi, 3), { name: "", kind: "bracket", role: "ground", z0: 0, z1: foot, mat: "Aluminium 6061-T6, anodised", joints: j, group: "drive-bracket" })));
   for (const [k, u] of [[0, Mc[0] - sg * 20], [1, Mc[0] + sg * 20]] as const)
-    add(place(FF, H.screw(`drive-ft${k}`, "socket", 4, foot + 8, { at: [w1 + mot.H + 1, u, 0], face: foot, dir: -1, ...(k ? { name: "", qty: 0 } : { qty: 2 }), joints: j })));
-  add(place(PF, H.solid("drive-motor", { name: mot.name, kind: "motor", role: "hw", mat: "Aluminium housing, neodymium rotor", outer: circle(mot.R, Mc[0], Mc[1], 48), z0: w1, z1: w1 + mot.H, joints: j })));
-  add(place(PF, H.solid("drive-motor-core", { name: "", kind: "motorInternal", role: "hw", outer: circle(mot.R - 4, Mc[0], Mc[1], 36), z0: w1 + 3, z1: w1 + mot.H - 3, faint: true, inset: true, joints: j })));
-  add(place(PF, H.shaft("drive-shaft", { d: mot.shaft, z0: -4, z1: w1 }, { name: `Motor shaft Ø${mot.shaft}`, at: [Mc[0], Mc[1], 0], joints: j })));
+    ctx.add(place(FF, H.screw(`drive-ft${k}`, "socket", 4, foot + 8, { at: [w1 + mot.H + 1, u, 0], face: foot, dir: -1, ...(k ? { name: "", qty: 0 } : { qty: 2 }), joints: j })));
+  ctx.add(place(PF, H.solid("drive-motor", { name: mot.name, kind: "motor", role: "hw", mat: "Aluminium housing, neodymium rotor", outer: circle(mot.R, Mc[0], Mc[1], 48), z0: w1, z1: w1 + mot.H, joints: j })));
+  ctx.add(place(PF, H.solid("drive-motor-core", { name: "", kind: "motorInternal", role: "hw", outer: circle(mot.R - 4, Mc[0], Mc[1], 36), z0: w1 + 3, z1: w1 + mot.H - 3, faint: true, inset: true, joints: j })));
+  ctx.add(place(PF, H.shaft("drive-shaft", { d: mot.shaft, z0: -4, z1: w1 }, { name: `Motor shaft Ø${mot.shaft}`, at: [Mc[0], Mc[1], 0], joints: j })));
   [[-15, -15], [15, -15], [15, 15], [-15, 15]].forEach(([du, dv], k) =>
-    add(place(PF, H.screw(`drive-fl${k}`, "socket", 3, 4 + 4.5, { at: [Mc[0] + du!, Mc[1] + dv!, 0], face: w0, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 4 }), joints: j }))),
+    ctx.add(place(PF, H.screw(`drive-fl${k}`, "socket", 3, 4 + 4.5, { at: [Mc[0] + du!, Mc[1] + dv!, 0], face: w0, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 4 }), joints: j }))),
   );
   // the home flag on the shaft pulley's outer flange, the fork straddling it, carried on the upright (V6, F10)
   const fz = 4;
-  add(place(PF, H.flag("drive-flag", big.pd / 2, mouth + SENSOR.depth - 1.5, Math.PI / 2, { at: [0, 0, 0], z0: fz, z1: fz + SENSOR.vane, joints: j, body: shaftBody })));
+  ctx.add(place(PF, H.flag("drive-flag", big.pd / 2, mouth + SENSOR.depth - 1.5, Math.PI / 2, { at: [0, 0, 0], z0: fz, z1: fz + SENSOR.vane, joints: j, body: shaftBody })));
   const gap0 = fz + SENSOR.vane / 2 - SENSOR.slot / 2;
   const gap1 = gap0 + SENSOR.slot;
   const box = (r0: number, r1: number): Vec2[] => [[-SENSOR.w / 2, r0], [SENSOR.w / 2, r0], [SENSOR.w / 2, r1], [-SENSOR.w / 2, r1]];
   const fork = { kind: "sensor" as const, role: "hw" as const, joints: j, group: "drive-sensor" };
-  add(place(PF, H.solid("drive-sensor", { ...fork, name: `Fork sensor, slotted optical, ${SENSOR.slot} mm gap`, mat: "PBT housing", outer: box(mouth, mouth + SENSOR.l), z0: gap0 - 3, z1: gap0 })));
-  add(place(PF, H.solid("drive-sensor-jaw", { ...fork, name: "", outer: box(mouth, mouth + SENSOR.l), z0: gap1, z1: w0 })));
-  add(place(PF, H.solid("drive-sensor-back", { ...fork, name: "", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: gap0, z1: gap1 })));
+  ctx.add(place(PF, H.solid("drive-sensor", { ...fork, name: `Fork sensor, slotted optical, ${SENSOR.slot} mm gap`, mat: "PBT housing", outer: box(mouth, mouth + SENSOR.l), z0: gap0 - 3, z1: gap0 })));
+  ctx.add(place(PF, H.solid("drive-sensor-jaw", { ...fork, name: "", outer: box(mouth, mouth + SENSOR.l), z0: gap1, z1: w0 })));
+  ctx.add(place(PF, H.solid("drive-sensor-back", { ...fork, name: "", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: gap0, z1: gap1 })));
   // terminals and a lead on the base top, past the motor
   const tb: [number, number, number] = [w1 + mot.H + 14, Mc[0], 0];
-  add(place(FF, H.terminalBlock("drive-terminals", 4, { at: tb, z0: 0, z1: 6, joints: j })));
-  add(place(FF, H.lead("drive-lead", [[w1 + mot.H, Mc[0]], [w1 + mot.H + 6, Mc[0] + sg * 4], [tb[0], tb[1]]], { z0: 0, z1: 1, joints: j })));
-  return { id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] };
+  ctx.add(place(FF, H.terminalBlock("drive-terminals", 4, { at: tb, z0: 0, z1: 6, joints: j })));
+  ctx.add(place(FF, H.lead("drive-lead", [[w1 + mot.H, Mc[0]], [w1 + mot.H + 6, Mc[0] + sg * 4], [tb[0], tb[1]]], { z0: 0, z1: 1, joints: j })));
+  ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: (ctx.kin.drivers.some((d) => d.kind === "oscillating" && beltDriven(d)) ? "Reversing drive (the input turns several turns each way): " : "") + "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+}
+
+/**
+ * A driver the belt drive serves: a rotary input, or an oscillating one that turns its shaft more than a turn each way
+ * (a screw's input: the motor reverses, V5's crank and link cannot swing a shaft through several turns).
+ */
+const beltDriven = (d: { kind: string; lo?: number; hi?: number; range?: [number, number] }): boolean => {
+  if (d.kind === "rotary") return true;
+  if (d.kind !== "oscillating") return false;
+  const lo = d.lo ?? d.range?.[0] ?? 0;
+  const hi = d.hi ?? d.range?.[1] ?? 0;
+  return Math.abs(hi - lo) > 360;
+};
+
+/** Plan boxes [x0, y0, x1, y1] of a second drive's parts under the base, each moving one's over the cycle. */
+function secondDriveBoxes(ctx: BuildCtx): [number, number, number, number][] {
+  const out: [number, number, number, number][] = [];
+  for (const q of ctx.solids) {
+    if (!q.id.startsWith("drive2")) continue;
+    const pts = worldPoints(ctx.M, q);
+    const xs: number[] = [];
+    const ys: number[] = [];
+    const moves = q.body !== "ground" ? (ctx.sampled.xfs.get(q.body) ?? []) : [];
+    for (const X of moves.length ? moves : [null])
+      for (const p of pts) {
+        xs.push(p[0] + (X ? X.t[0] : 0));
+        ys.push(p[1] + (X ? X.t[1] : 0));
+      }
+    out.push([Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]);
+  }
+  return out;
+}
+
+/**
+ * Builds a drive as a second one beside the first: what it adds (solids, base holes, its note) is renamed from drive-* to
+ * drive2-*, so the first drive, built after it, keeps its own ids.
+ */
+function secondDrive(ctx: BuildCtx, build: () => void): void {
+  const n0 = ctx.solids.length;
+  const h0 = ctx.baseHoles.length;
+  const k0 = ctx.notes.length;
+  build();
+  const re = (x: string) => x.replace(/^drive(?=-|$)/, "drive2");
+  for (const q of ctx.solids.slice(n0)) {
+    q.id = re(q.id);
+    if (q.group) q.group = re(q.group);
+    q.joints = q.joints.map(re);
+  }
+  for (const h of ctx.baseHoles.slice(h0)) h.joint = re(h.joint);
+  for (const nt of ctx.notes.slice(k0)) {
+    nt.id = re(nt.id);
+    nt.title = nt.title.replace(/^Drive/, "Drive 2");
+    if (nt.serves) for (const f of Object.keys(nt.serves) as (keyof typeof nt.serves)[]) nt.serves[f] = nt.serves[f]!.map(re);
+  }
 }
 
 export const drive: Rule = {
@@ -306,10 +353,23 @@ export const drive: Rule = {
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  // a rotary input, or an oscillating one (the same motor and belt, the motor reversing through the stroke: a servo)
-  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary" || d.kind === "oscillating"),
+  applies: (ctx) => (ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary")) || ctx.kin.drivers.some((d) => d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"),
   apply(ctx) {
-    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary") ?? ctx.kin.drivers.find((d) => d.kind === "oscillating");
+    // an oscillating or a linear input has its own drive (rules/drive.ts); a rotary one is belted to its shaft. An input
+    // that turns a shaft in plan more than a turn each way (a screw's) is belted the same way, the motor reversing: V5's
+    // crank and link cannot swing it through several turns, and its step-up sector is for a shaft on the base normal
+    // (the one exception to V5's oscillating form)
+    const reversing = (d: (typeof ctx.kin.drivers)[number]) => d.kind === "oscillating" && beltDriven(d) && ctx.sites.some((s) => s.inPlan && s.joints.includes(d.joint ?? ""));
+    const rotary = ctx.kin.drivers.find((d) => d.kind === "rotary" || reversing(d));
+    const extra = ctx.kin.drivers.filter((d) => (d.kind === "oscillating" && !reversing(d)) || d.kind === "linear");
+    if (!rotary) {
+      const other = extra[0];
+      if (other) return other.kind === "oscillating" ? oscillatingDrive(ctx, other) : linearDrive(ctx, other);
+      return manualDrive(ctx);
+    }
+    // a second input beside a rotary one (an integrator's carriage beside its disc): its own V5 drive, ids drive2-*
+    for (const o of extra) secondDrive(ctx, () => (o.kind === "oscillating" ? oscillatingDrive(ctx, o) : linearDrive(ctx, o)));
+    const drv = rotary;
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
@@ -326,9 +386,13 @@ export const drive: Rule = {
     const C = 46;
     let M: Vec2 | null = null;
     let best = -1;
+    // a second drive already under the base (drive2-*): its parts' plan boxes, a moving part's over its travel
+    const taken = secondDriveBoxes(ctx);
     for (let k = 0; k < 12; k++) {
       const a = (k / 12) * TAU;
       const m = polar(S, C, a);
+      // the flange is 58 mm square about the motor
+      if (taken.some((b) => m[0] + 32 > b[0] && m[0] - 32 < b[2] && m[1] + 32 > b[1] && m[1] - 32 < b[3])) continue;
       const clear = Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999);
       if (clear > best) {
         best = clear;
@@ -390,7 +454,7 @@ export const drive: Rule = {
     const tb = polar(M, 36, dir);
     ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
     ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));
-    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base${drv?.kind === "oscillating" ? ", run as a servo that reverses through the stroke" : ""}, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
     void LEVER_WALL;
   },
 };
@@ -679,6 +743,8 @@ export const seeThrough: Rule = {
     const proj = principle.map((p) => ({ b: p.b, cs: p.sweep.project(dir), c: centroidDepth(ctx, p.b, dir) }));
     for (const s of ctx.solids) {
       if (ctx.principle.has(s.body) || s.flags.isBase || s.kind === "foot") continue;
+      // what a loop carries round, or a drive turns with the cycle, moves: it is not a support that stands over the principle
+      if (s.convey || s.spin) continue;
       if (ctx.parts.get(s.body)?.id === s.id) continue;
       const m = worldManifold(ctx.M, s);
       const sp = projectAlong(m, dir);

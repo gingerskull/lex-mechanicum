@@ -90,8 +90,8 @@ export interface BuildCtx {
   /** Hinge lugs by site: parts of a body whose plane is not square to the hinge (rules/lugs). */
   lugs: Map<string, Solid3[]>;
   bores: Map<string, Bore[]>;
-  /** Holes the base needs, world xy and radius, with the joint that asked. */
-  baseHoles: { at: [number, number]; r: number; joint: string }[];
+  /** Holes the base needs, world xy and radius, with the joint that asked; `ring` gives a slot's own outline. */
+  baseHoles: { at: [number, number]; r: number; joint: string; ring?: [number, number][] }[];
   /** Marks engraved on the base top: swing scales, index lines (F5, F9). */
   baseMarks: { kind: "scale" | "index" | "engrave"; pts: [number, number][] }[];
   /** Backlash eccentrics a mesh asked for, by site id. */

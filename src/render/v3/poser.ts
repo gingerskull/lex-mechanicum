@@ -5,7 +5,7 @@
 import { frameAxis } from "../../core/axis";
 import { poseOf } from "../../model/pose";
 import type { MechanismModel } from "../../model/types";
-import { Kinematics, anchorAt } from "../../kin/compose";
+import { Kinematics, anchorAt, handStroke } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
 import { fiveBarFK } from "../../kin/blocks/linkage";
@@ -21,7 +21,9 @@ function jointFrame(at: Vec3, axis: Vec3): Xf {
 
 const moved = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
 void m3;
+import { driveXf } from "../../solids/drive";
 import { IDENTITY, mat4, type Mat4 } from "../../solids/frame";
+import { conveyMatrix, mul4, turnMatrix } from "../../solids/convey";
 import type { PackedSolid3 } from "../../package/format2";
 import type { Vec3 } from "../../solids/types";
 
@@ -36,6 +38,12 @@ export interface Poser {
   point(u: number, id: string, ctl?: Controls): Vec3 | null;
   /** The distance of its two points at phase u (mm). */
   span(u: number, a: string, b: string): number | null;
+  /** A value the kinematics solve (a block's output, a pitch radius) at phase u; null if unknown. */
+  value?(u: number, name: string, ctl?: Controls): number | null;
+  /** Two named points as solved at phase u (a stretched member's ends), world mm. */
+  ends?(u: number, a: string, b: string): [Vec3, Vec3] | null;
+  /** The same two points in the reference configuration (where the member was built). */
+  refEnds?(a: string, b: string): [Vec3, Vec3] | null;
   /** The true distance of two kinematic points at phase u (mm), before any is lifted onto a part's top face: what a dimension reads. */
   measure?(u: number, a: string, b: string): number | null;
   /** A named point with drivers held at given values (degrees or mm): an overlay drawn at a fixed pose, such as a toggle. */
@@ -54,6 +62,9 @@ export interface Poser {
 }
 
 export const ID4: Mat4 = mat4(IDENTITY);
+
+/** A point as solved (not lifted): a named kin point, or a kit's body anchor (@body:x:y:z). */
+const rawPoint = (P: { points: Map<string, Vec3>; bodies: Map<string, Xf> }, n: string): Vec3 | null => P.points.get(n) ?? (n.startsWith("@") ? anchorAt(n, P.bodies) : null);
 
 /** How far a teaching point is carried onto its body's top face at most, mm: a deep stack of slabs, no more. */
 const LIFT_REACH = 40;
@@ -137,18 +148,25 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   return {
     period: Math.PI * 2,
     place: (s, u) => {
+      // a drive part the record has no body for is posed from the input it swings
+      if (s.drive) return fromXf(driveXf(s.drive, pose(u).bodies.get(s.drive.input) ?? xf.id(), u));
       const X = s.body === "ground" ? xf.id() : pose(u).bodies.get(s.body);
       const D = shiftOf(s);
       if (!X) return ID4;
-      return fromXf(D ? xf.mul(X, D) : X);
+      const M = fromXf(D ? xf.mul(X, D) : X);
+      // a conveyed solid: carried along its path by the travel, in the frame of the body that carries the path
+      const cv = s.cv?.path;
+      if (s.spin) return mul4(M, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4;
+      return cv ? (mul4(M, conveyMatrix(cv, s.cv!.s0, pose(u).values[cv.key] ?? 0, s.cv!.s1, pose(u).values)) as Mat4) : M;
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
+    value: (u, name, ctl) => pose(u, ctl).values[name] ?? null,
     body: (u, id, ctl) => {
       const X = id === "ground" ? xf.id() : pose(u, ctl).bodies.get(id);
       return X ? fromXf(X) : null;
     },
     sweep: (point, range, branches) => {
-      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
+      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating" || handStroke(x));
       if (!d) return null;
       const lo = range?.[0] ?? d.range?.[0] ?? 0;
       const hi = range?.[1] ?? d.range?.[1] ?? 360;
@@ -168,10 +186,23 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       }
       return out.length ? out : null;
     },
+    refEnds: (a, b) => {
+      const P = k.referencePose(controls);
+      const A = rawPoint(P, a);
+      const B = rawPoint(P, b);
+      return A && B ? [A, B] : null;
+    },
+    ends: (u, a, b) => {
+      const P = pose(u);
+      const A = rawPoint(P, a);
+      const B = rawPoint(P, b);
+      return A && B ? [A, B] : null;
+    },
+    // a stretched member's length: its two points as solved (not lifted to the top faces the teaching layers draw on)
     span: (u, a, b) => {
       const P = pose(u);
-      const A = lifted(P, a);
-      const B = lifted(P, b);
+      const A = rawPoint(P, a);
+      const B = rawPoint(P, b);
       return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
     },
     bodyAt: (u, body) => pose(u).bodies.get(body) ?? null,

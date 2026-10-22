@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.2
+version: 3.4
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -271,8 +271,12 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `posts` | A7, F1 |
 | `wheels` | D1, F2 |
 | `j6-mesh` | J6, F7, F9 |
+| `friction-contact` | J6, F6, F7, M10 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
 | `tongue-slot` | J5, F8, M14 |
+| `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
+| `j12-cvt` | J12, J10, D9, F6, F7 |
+| `integrator-carriage` | J5, F1, F5 |
 | `j3-moving-pin` | J3, A12, M3 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
@@ -291,9 +295,9 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `ring-hub` | J3, F2 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
-| `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
+| `j12-other` | J12, F7 |
 | `strap-sheave` | J12, F1, F2, A11 |
-| `j11-screw` | J11, F3, F8 |
+| `j11-screw` | J11, J10, F2, F3, F4, F5, F8 |
 | `j13-compliant` | J13, A6, F1, F2, F5 |
 | `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
 | `stops` | F5, A22 |
@@ -520,7 +524,7 @@ definition, as long as they are readable.
 | V2 | **One solid bracket:** top flange against the base, floor for the motor, full-height window for the belt; flange screws go up into the base from inside; nothing shows on top of the base. A motor beside a shaft in plan stands on one angle bracket instead: an upright its face screws to and a foot screwed to the base top, both slotted for the belt's tension. | AUTO | side view |
 | V3 | Belt and pulleys clear of feet, housings and base hardware; where the belt passes under a post, its lower screw becomes a flush countersunk screw. | AUTO (rule) / HAND (motor position) | `tools/clearance` |
 | V4 | Drive detail: pulley flanges, set screws or clamp hub, belt tension slot, idler where needed (J8). | AUTO | screenshot |
-| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. A compliant joint's lever (J13) has no shaft: a pin pressed into its tip runs down through an arc slot in the base to the link, the rocker's pivot the joint's centre, the motor on the line of the tip's chord. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
+| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. A compliant joint's lever (J13) has no shaft: a pin pressed into its tip runs down through an arc slot in the base to the link, the rocker's pivot the joint's centre, the motor on the line of the tip's chord. An oscillating input that turns more than one turn on a shaft in plan (a lead screw run back and forth) is driven by a reversing motor through the in-plan belt drive on the shaft's free end, since a crank and link cannot swing a shaft through several turns. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
 | V6 | **Sensing and cabling:** home flag on the input and a fork sensor on the bracket or a post; motor and sensor leads to a terminal block on the base edge, one cable clip under the base (on the base top for a motor beside a shaft in plan). | AUTO | underside view |
 
 ---
@@ -730,27 +734,6 @@ oscillating cylinder, locomotive drive, Walschaerts, Wankel, toggle clamp)
   arms lie along the two yokes' pins.
 - Teaching: discs and hubs see-through so tongues, slots and index marks show; the disc-centre orbit as a full circle;
   parts of one role told apart by pattern (T16); a bend or phase control (T14); a section through a cage.
-- Blocks of their own: cross-slide (Oldham), parallel-cranks (Schmidt), rzeppa (cage in the bisecting plane, balls where
-  it meets the grooves), Hooke with a free centre shaft (double Cardan). An output shaft that cannot come up through the
-  input side hangs from a bridge (`support` on its joint); parallel discs and links are placed by the record with room
-  for the pins' hardware between levels; a phase between two forks is a collar clamped on the tube, so the control turns
-  it as built. Raised index arrows stay opaque on see-through rings; a Rzeppa's races, bell and cage are revolves with
-  swept grooves and cut windows.
-
-**Spatial linkages** (Sarrus, Bennett, swash plate, centrifugal governor)
-- Blocks: sarrus (two limbs in planes at 90 degrees), bennett from its four joints (closed form, overconstrained),
-  plane-slide (sliders whose line meets a plane a turning body carries: the tilt frame), conical-pendulum (arms where a
-  speed balances them, a manual speed driver). Kits: J3 on the hinges, J10 or J2 on the ground hinges, piston-bore,
-  ball-socket and slipper for a swash plate, a collar sliding on a turning shaft (J5).
-- A part whose plane is not square to its hinge meets it through a lug (`lugs`), a member of the hinge's stack; hinge
-  leaves, arms and plates are placed by the record (`axial`). Links between skew hinges are spatial links: a knuckle on
-  each hinge and a bar between, the knuckles set apart along the hinges where the loop passes through crossed poses
-  (Bennett), a pin turned end for end where a link sweeps past its head.
-- A plate tilted on a shaft is its own body pinned at the tilt, so a swash angle control turns it; a cylinder block is a
-  fixed body on posts with lined bores; the governor's link pins sit on the sleeve's lugs off the spindle axis.
-- Teaching: the hinge axes as axis lines (the skew, the right angle between Sarrus limbs), the straight line of a
-  Sarrus plate, a swash plate's section through a piston, a governor's speed as its control with ghosts at its ends.
-- An oscillating input under 180 degrees has no drive yet (V5's crank and link): deferred with a reason.
 
 **Spatial gears** (bevel, hypoid, worm, helical, herringbone, crossed helical)
 - Blocks: gear mesh on crossed axes. Kits: J9 on every crossed mesh, J10 on a shaft in plan, J2 for the rest. The
@@ -882,6 +865,24 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.4 (2026-10-22).** Rebuild batch R7 (screws, flexible and compliant members). An oscillating input of more than one
+  turn on a shaft in plan is driven by a reversing motor through the in-plan belt drive [V5, AUTO]; a mechanism with two
+  drivers gets a second drive beside the first, and a manual input whose body has a knob gets no second one [V5, V1,
+  AUTO]. `j11-screw`: a screw that is its own shaft, journals in pillow blocks, a bronze or ball nut with wipers and a
+  nipple, the nut's guide, a fixed nut and knob for a differential screw [J11, J10, F2, F3, F4, F5, F8, AUTO].
+  `j13-compliant`: a one-piece blank with notch flexures, pads, a window with stretched springs and shuttle stops [J13,
+  A6, F1, F2, F5, AUTO]. `j12-flexible`: a timing belt with conveyed teeth, a roller chain conveyed in links on its seat
+  circles, a rope reeved over two planes with stretched parts, wraps, guards and an end clamp, the load's guide rod [J12,
+  J8, A11, F2, F3, F6, F7, F8, F10, AUTO]; `j12-cvt`: revolved sheave halves, sliding keys, the output's spring, the
+  input's clamped shift fork, a push belt on a live loop [J12, J10, D9, F6, F7, AUTO]. `friction-contact`: a tyred wheel
+  on a disc, its setting clamped and read on a scale [J6, F6, F7, M10, AUTO]. `integrator-carriage`: a ball in a cage on
+  an arm, a carriage on a railed block with stops, a cylinder that is its own shaft [J5, F1, F5, AUTO].
+- **3.3 (2026-10-22).** The V5 crank-and-link drive replaces R5's interim reversing servo for every oscillating input.
+  The `drive` rule builds the lever on a live shaft, on a shaft in plan with the motor on an angle bracket, or by a pin
+  in a compliant lever's tip through an arc slot; a gear step-up (sector and pinion) where the swing is wider than a
+  crank and link can give; the linear drive (a belt loop, a carriage through a slot in the base, a tensioner); and a
+  knob on a hand-worked input. A `manual` driver with `lo` and `hi` is a hand stroke, cycled with no motor [V1, V2,
+  V3, V4, V5, V6, F10, K7, AUTO].
 - **3.2 (2026-10-22).** Rebuild batch R5 (cams, intermittent motion, escapements). The J7 cam kit takes the record's
   roller, a stretched return spring and an oiler; a groove cam carries its own groove; a pawl's spring sits on its
   carrier [J7, F6, F8, AUTO]. J5 slides are held over a declared guide, and a shaft slider gets a stem guide [J5,

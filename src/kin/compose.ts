@@ -71,6 +71,12 @@ const key = (c?: Controls): string =>
 
 const joinPlain = (v: unknown): string => String(v);
 
+/** A hand-worked driver that gives the ends of its stroke (lo, hi): the cycle works it through them, and no motor drives it. */
+export const handStroke = (d: KinDriver): boolean => d.kind === "manual" && typeof d.lo === "number" && typeof d.hi === "number";
+
+/** A driver the cycle moves: a rotary, oscillating or linear input, or a hand stroke. */
+export const cycleDriven = (d: KinDriver): boolean => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || handStroke(d);
+
 export class Kinematics {
   private setups = new Map<string, Setup>();
   private bodyIds: Set<string>;
@@ -186,7 +192,7 @@ export class Kinematics {
       if (d.kind === "rotary") {
         const span = d.range ? d.range[1] - d.range[0] : 360;
         out[d.id] = def + ((speed * u + ph) * R2D * span) / 360;
-      } else if (d.kind === "oscillating" || d.kind === "linear") {
+      } else if (d.kind === "oscillating" || d.kind === "linear" || handStroke(d)) {
         const lo = d.lo ?? d.range?.[0] ?? def;
         const hi = d.hi ?? d.range?.[1] ?? def;
         out[d.id] = lo + (hi - lo) * (0.5 - 0.5 * Math.cos(speed * u + ph));
@@ -214,7 +220,7 @@ export class Kinematics {
   private addRates(s: Setup, P: Pose, u: number, controls?: Controls): void {
     const rates = (this.kin.outputs ?? []).filter((o) => o.kind === "speed-ratio");
     if (!rates.length) return;
-    const drv = this.kin.drivers.find((d) => (d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear") && !s.held.has(d.id));
+    const drv = this.kin.drivers.find((d) => cycleDriven(d) && !s.held.has(d.id));
     const h = 1e-4;
     let Q: Pose;
     try {
@@ -526,6 +532,15 @@ class Run implements BlockCtx {
     if (ref === undefined) throw new KinError(`${this.step.id}: no reference value for ${key}`);
     return now - ref;
   }
+  driver(id: string): KinDriver | undefined {
+    return this.k.kin.drivers.find((d) => d.id === id);
+  }
+  driverAt(id: string, u: number): number {
+    return this.k.driverValues(u, this.s.controls)[id] ?? 0;
+  }
+  design(id: string): string | undefined {
+    return this.s.designs.get(id);
+  }
   declaredSide(): 1 | -1 {
     const b = this.step.branch;
     if (b === undefined) return 1;
@@ -749,10 +764,14 @@ class Run implements BlockCtx {
   }
 
   private output(kind: string, of: string, points: Map<string, Vec3>, axis?: Vec3): number | Vec3 | undefined {
+    // a value a block gives (a chain's speed over its peak), whatever the kind it is read as; but a speed ratio of a
+    // value is its rate per unit of the input, from the series of the value (checks/claims.ts; a double Cardan's
+    // centre shaft turn)
+    if (kind !== "speed-ratio" && of in this.vals && !this.xfs.has(of) && !points.has(of) && !this.s.joints.has(of)) return this.vals[of];
     if (kind === "position") {
       // a prismatic joint's position is its slide: how far its two bodies have moved apart along its axis
       const r = this.s.joints.get(of);
-      if (r && (r.joint.type === "prismatic" || r.joint.type === "cylindrical")) {
+      if (r && (r.joint.type === "prismatic" || r.joint.type === "cylindrical" || r.joint.type === "screw")) {
         const Xa = this.xfs.get(r.joint.a) ?? xf.id();
         const Xb = this.xfs.get(r.joint.b) ?? xf.id();
         return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));

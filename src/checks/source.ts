@@ -11,12 +11,14 @@ import { buildPackage } from "../package/build";
 import type { MechanismModel } from "../model/types";
 import { planeMatrix } from "../render/v3/poser";
 import { IDENTITY, mat4, type Mat4 } from "../solids/frame";
+import { driveXf } from "../solids/drive";
 import { liftAll } from "../solids/lift";
+import { conveyMatrix, mul4, stretchMatrix, turnMatrix } from "../solids/convey";
 import type { Solid3 } from "../solids/types";
 import type { RecordLike } from "../builder/ctx";
 import type { Kin } from "../kin/types";
-import type { Xf } from "../kin/math";
-import { v3, xf } from "../kin/math";
+import type { Vec3, Xf } from "../kin/math";
+import { xf } from "../kin/math";
 import { anchorAt } from "../kin/compose";
 import type { Placer } from "./clash3";
 
@@ -97,37 +99,49 @@ export async function legacySourceOf(id: string, opts: { polish?: boolean } = {}
 const CONTACT_JOINTS = new Set(["gear-mesh", "cam-contact", "belt", "rolling", "screw", "flexure"]);
 
 /** A record built by the hardware builder and posed by its own kinematic block. */
-export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = {}): Promise<CheckSource> {
+export async function recordSource(rec: RecordLike, opts: { polish?: Polish; controls?: Parameters<typeof makePoseSource>[1] } = {}): Promise<CheckSource> {
   const assembly3 = await buildAssembly(rec, opts.polish ? { polish: opts.polish } : {});
-  const src = makePoseSource(rec.kin as Kin);
+  // the solids are built at the record's defaults; `controls` poses them at another setting (a param control's range)
+  const src = makePoseSource(rec.kin as Kin, opts.controls);
   const K = src.K;
   let at = NaN;
-  let bodies: Map<string, Xf> | null = null;
-  const posed = (u: number) => {
-    if (u !== at || !bodies) {
-      bodies = K.pose(u).bodies;
+  let pz: ReturnType<typeof K.pose> | null = null;
+  const poseAt = (u: number) => {
+    if (u !== at || !pz) {
+      pz = K.pose(u, opts.controls);
       at = u;
     }
-    return bodies;
+    return pz;
   };
+  const posed = (u: number) => poseAt(u).bodies;
+  const refPose = K.referencePose();
+  // a stretched member's end: a named kin point, or a kit's body anchor (@body:x:y:z)
+  const endOf = (P: { points: Map<string, Vec3>; bodies: Map<string, Xf> }, n: string) => P.points.get(n) ?? anchorAt(n, P.bodies);
   const placer: Placer = {
     place(s, u) {
+      // the drive's crank and link are posed from the input (they have no body in the record)
+      if (s.drive) return mul(xfMat(driveXf(s.drive, posed(u).get(s.drive.input) ?? xf.id(), u)), mat4(s.frame));
+      if (s.stretch) {
+        const P = poseAt(u);
+        const a = endOf(P, s.stretch[0]);
+        const b = endOf(P, s.stretch[1]);
+        const a0 = endOf(refPose, s.stretch[0]);
+        const b0 = endOf(refPose, s.stretch[1]);
+        // the member's whole matrix, its length included (stretch() then gives 1)
+        if (a && b && a0 && b0) return stretchMatrix(a, b, a0, b0, mat4(s.frame)) as Mat4;
+      }
       const X = s.body === "ground" ? xf.id() : (posed(u).get(s.body) ?? xf.id());
-      return mul(xfMat(X), mat4(s.frame));
+      const B = xfMat(X);
+      const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0, s.convey.s1, poseAt(u).values)) as Mat4) : B;
+      return mul(C, mat4(s.frame));
     },
-    key: (s) => s.body,
-    // a stretched member spans its two points (named kin points, or a kit's body anchors)
-    stretch(s, u) {
-      const st = (s as Solid3).stretch;
-      if (!st) return 1;
-      const P = K.pose(u);
-      const a = P.points.get(st[0]) ?? anchorAt(st[0], P.bodies);
-      const b = P.points.get(st[1]) ?? anchorAt(st[1], P.bodies);
-      return a && b ? v3.dist(a, b) : 1;
-    },
+
+    // a conveyed solid moves along its path, not with its carrier
+    key: (s) => (s.drive ? `drive:${s.drive.part}` : s.convey ? `cv:${s.id}` : s.spin ? `spin:${s.spin.at.join(",")}` : s.body),
   };
   const kin = src.kin;
-  const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type)).map((j): [string, string] => [j.a, j.b]);
+  // a slide held by springs touches by design (a pseudo-rigid beam's two halves, a roller between springs in a window)
+  const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type) || (j.type === "prismatic" && (j as { spring?: unknown }).spring !== undefined)).map((j): [string, string] => [j.a, j.b]);
   // a gear no joint reaches is part of the ground (a fixed ring): a mesh with the ground is a mesh with it
   const fixedGears = kin.bodies.filter((b) => b.id !== "ground" && /gear|rack/i.test(String(b.shape?.type ?? "")) && !kin.joints.some((j) => j.a === b.id || j.b === b.id)).map((b) => b.id);
   for (const j of kin.joints) if (j.type === "gear-mesh" && (j.a === "ground" || j.b === "ground")) for (const g of fixedGears) contact.push([g, j.a === "ground" ? j.b : j.a]);

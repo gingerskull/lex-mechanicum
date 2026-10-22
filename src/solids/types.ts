@@ -7,6 +7,7 @@
 import type { Vec2 } from "../core/geom";
 import type { Vec3 } from "../core/axis";
 import type { Motion } from "../hardware/solid";
+import type { DriveMotion } from "./drive";
 import type { RungId } from "../style/detail";
 import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 
@@ -119,11 +120,20 @@ export interface Solid3 {
   slides?: string[];
   mat?: string;
   motion?: Motion;
+  /** A drive part the record has no body for (the oscillating drive's crank and link, V5): posed from its input. */
+  drive?: DriveMotion;
   closure?: "open" | "shield" | "seal";
   headKind?: "socket" | "button" | "csk";
   chamfer?: number;
   /** Nominal thread, the range of the drawn thread along the part's axis and its lead (a screw, a worm). */
   thread?: { m: number; z0: number; z1: number; lead?: number };
+  /** A conveyed solid (D9): carried along a closed path by a solved travel from its place `s0` on it (src/solids/convey.ts). */
+  convey?: { path: import("./convey").ConveyPath; s0: number; s1?: number };
+  /**
+   * A drive part that turns with the cycle itself (a crank on a gear motor that makes one turn per cycle): about the
+   * axis through `at` by u − u0, u0 the cycle phase of the reference configuration it was built in.
+   */
+  spin?: { at: Vec3; axis: Vec3; u0: number };
   /** A stretched member's two solved points: its unit-length profile spans them. */
   stretch?: [string, string];
   /** A deforming member: its profile is made again each frame from the solved state, same point count per ring. */

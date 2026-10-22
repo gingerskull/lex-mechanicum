@@ -12,7 +12,7 @@ import { MIN_GAP } from "../constants";
 import { clearance } from "../router";
 import { type Contact, contactOf, cutRing, freeSpot, localAt, mid, ringOffsets, stadium } from "../contact";
 import { titleOf } from "../lib";
-import type { KitId } from "../sites";
+import type { JointInfo, KitId } from "../sites";
 import { Local } from "../lib";
 import type { Rule } from "./types";
 import { v3, type Vec3 } from "../../kin/math";
@@ -29,6 +29,8 @@ interface KitDef {
   fixture: string;
   kits: KitId[];
   build: KitBuild;
+  /** Joints of the kit another rule builds. */
+  skip?: (ji: JointInfo, ctx: BuildCtx) => boolean;
 }
 
 const bodyOf = (ctx: BuildCtx, id: string): string => (ctx.parts.has(id) ? id : "ground");
@@ -43,9 +45,9 @@ function contactRule(def: KitDef): Rule {
     tier: "AUTO",
     ids: def.ids,
     fixture: def.fixture,
-    applies: (ctx) => ctx.joints.some((j) => def.kits.includes(j.kit)),
+    applies: (ctx) => ctx.joints.some((j) => def.kits.includes(j.kit) && !def.skip?.(j, ctx)),
     apply(ctx) {
-      for (const ji of ctx.joints.filter((j) => def.kits.includes(j.kit))) {
+      for (const ji of ctx.joints.filter((j) => def.kits.includes(j.kit) && !def.skip?.(j, ctx))) {
         const c = contactOf(ctx, ji);
         if (!c) {
           ctx.issues.push(`joint ${ji.id}: no body of it is stacked, kit ${ji.kit} not built`);
@@ -232,6 +234,17 @@ const j5 = contactRule({
   ids: ["J5", "F5", "F7", "A6"],
   fixture: "kin:sliderCrank",
   kits: ["J5"],
+  // a load's guide rod (a tackle's hook on its line) is built with the rope (src/builder/flexible.ts)
+  // a sheave half sliding on its shaft and the shift fork's carriage are built by the CVT kit (src/builder/cvt.ts)
+  skip: (ji, ctx) => {
+    const r = ji.joint as unknown as Record<string, unknown>;
+    // (and an integrator's carriage by its kit, src/builder/integrator.ts)
+    const fork = [ji.a, ji.b].some((b) => {
+      const sh = ctx.kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined;
+      return sh?.type === "fork" || (sh?.type === "slider" && !!sh.cage);
+    });
+    return !!r.rod || !!r.spline || fork;
+  },
   build(ctx, c, L) {
     const id = c.id;
     const slider = c.a === "ground" ? c.b : c.a;
@@ -331,6 +344,8 @@ const j6 = contactRule({
   ids: ["J6", "F7", "F9"],
   fixture: "kin:gearPair",
   kits: ["J6"],
+  // a friction pair (a rolling joint given by its ratio) is built by src/builder/friction.ts
+  skip: (ji) => ji.joint.type === "rolling" && ji.joint.ratio !== undefined,
   build(ctx, c) {
     const marked = [c.a, c.b].filter((b) => timingMark(ctx, b, c.at));
     // the backlash eccentric goes under the housing of the second gear's live shaft (F7)
@@ -484,13 +499,16 @@ function idler(ctx: BuildCtx, c: Contact, L: Local, what: string): ReturnType<Ki
 }
 
 const j8 = contactRule({ id: "j8-belt", ids: ["J8", "V4"], fixture: "kin:beltDrive", kits: ["J8"], build: (ctx, c, L) => idler(ctx, c, L, "belt") });
-const j12 = contactRule({ id: "j12-flexible", ids: ["J12", "J8", "A11", "F2", "F3", "F6", "F7", "F8", "F10"], fixture: "kin:chainDrive", kits: ["J12"], build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
+// a timing belt between two pulleys is built by src/builder/flexible.ts
+const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:cableLoop", kits: ["J12"], skip: (ji) => ["belt", "chain", "rope", "cvt"].includes(String((ji.joint as unknown as Record<string, unknown>).flexible)), build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
 
 const strapSheave = contactRule({
   id: "strap-sheave",
   ids: ["J12", "F1", "F2", "A11"],
   fixture: "kin:rope",
   kits: ["strap-sheave"],
+  // a rope reeved over sheaves is built by src/builder/flexible.ts
+  skip: (ji) => String((ji.joint as unknown as Record<string, unknown>).flexible) === "rope" && !!(ji.joint as unknown as Record<string, unknown>).ends,
   build(ctx, c, L) {
     const id = c.id;
     const z = mid(c.za, mid(c.zb));
@@ -501,49 +519,7 @@ const strapSheave = contactRule({
   },
 });
 
-// ------------------------------------------------------------------------------------------------ J11, J13
-
-const j11 = contactRule({
-  id: "j11-screw",
-  ids: ["J11", "F3", "F8"],
-  fixture: "kin:leadScrew",
-  kits: ["J11"],
-  build(ctx, c, L) {
-    const id = c.id;
-    const nut = ctx.kin.bodies.find((b) => b.id === c.b)?.role === "slider" || c.b !== "ground" ? c.b : c.a;
-    const z = mid(ctx.extent(nut) ? [ctx.extent(nut)!.w0, ctx.extent(nut)!.w1] : null, 0);
-    const d = 8;
-    L.add(H.collar(`${id}-nut`, d, d + 10, { body: bodyOf(ctx, nut), at: [0, 0, 0], z0: z - 10, z1: z + 10, name: `Flanged bronze nut Ø${d}, 20 long` }));
-    L.add(H.plate(`${id}-flange`, circle(d + 9, 0, 0, 40), { body: bodyOf(ctx, nut), kind: "plate", role: "ground", name: "Nut flange, screwed to the carriage", z0: z + 10, z1: z + 13, holes: [circle(d / 2 + 0.1, 0, 0, 24)] }));
-    for (const [k, x] of [[0, -11], [1, 11]] as const) L.add(H.wiper(`${id}-wip${k}`, [[x - 1, -(d + 4)], [x + 1, -(d + 4)], [x + 1, d + 4], [x - 1, d + 4]], { body: bodyOf(ctx, nut), z0: z - 12, z1: z - 10, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    return { serves: { F3: [`${id}-nut`], F8: [`${id}-wip0`] }, note: `${titleOf(id)}: flanged bronze nut on the carriage, a wiper at each end, anti-rotation from the carriage's slide.` };
-  },
-});
-
-const j13 = contactRule({
-  id: "j13-compliant",
-  ids: ["J13", "A6", "F1", "F2", "F5"],
-  fixture: "kin:flexureHinge",
-  kits: ["J13"],
-  build(ctx, c, L) {
-    const id = c.id;
-    const lever = c.a === "ground" ? c.b : c.a;
-    const e = extentIn(ctx, c, lever);
-    const reach = Math.max(Math.abs(e[0]), Math.abs(e[1]));
-    const z0 = ctx.extent(lever)?.w0 ?? 0;
-    const z1 = ctx.extent(lever)?.w1 ?? z0 + 6;
-    // stop pins each side at 70 % of the lever's reach, a fifth of the half swing past each end (F5)
-    const half = Math.max(0.05, (c.ra > 0 ? 0.25 : 0.2));
-    for (const [k, s] of [[0, 1], [1, -1]] as const) L.add(H.stop(`${id}-stop${k}`, circle(2.5, reach * 0.7, s * reach * (0.7 * half + 0.1), 16), { body: "ground", z0, z1: z1 + 1, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    // the blank clamped under a plate by two screws and two dowels (F1, F2)
-    L.add(H.plate(`${id}-clamp`, roundRect(-30, -14, -4, 14, 2), { body: "ground", kind: "plate", role: "ground", name: "Clamp plate over the blank's ground block", z0: z1, z1: z1 + 4 }));
-    for (const [k, y] of [[0, -8], [1, 8]] as const) {
-      L.add(H.screw(`${id}-sc${k}`, "socket", 3, 4 + 6 + 4, { body: "ground", at: [-17, y, 0], face: z1 + 4, dir: -1, ...(k ? { name: "", qty: 0 } : {}) }));
-      L.add(H.dowel(`${id}-dw${k}`, 3, { body: "ground", at: [-24, y, 0], z0: z0 - 2, z1: z1 + 2, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    }
-    return { serves: { F5: [`${id}-stop0`, `${id}-stop1`], F1: [`${id}-dw0`], F2: [`${id}-clamp`] }, note: `${titleOf(id)}: compliant neck drawn rigid; a hardened stop pin each side so the neck never leaves its elastic range; the blank clamped under a plate on two screws and two dowels.` };
-  },
-});
+// J11 is src/builder/screws.ts, J13 src/builder/compliant.ts
 
 // ------------------------------------------------------------------------------------------------ the missing kinds
 
@@ -675,7 +651,7 @@ const ringRollers = contactRule({
   },
 });
 
-export const contactRules: Rule[] = [j6, j9, j11, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave, j13];
+export const contactRules: Rule[] = [j6, j9, j4, pinLobe, grooveCam, j5, j7, pallet, forkPin, pawlTooth, tongueSlot, ringHub, ringRollers, j8, j12, strapSheave];
 
 void MIN_GAP;
 void ringOffsets;

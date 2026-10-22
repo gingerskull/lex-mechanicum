@@ -5,7 +5,7 @@ import { evalExpr } from "./expr";
 import type { KinJoint } from "./types";
 import { ellipticalAngle, meshRatio } from "./blocks/gears";
 import { type CamSchedule, camMotion, type CamLaw } from "./blocks/cam";
-import { screwAdvance } from "./blocks/members";
+import { chainAdvance, screwAdvance, variatorR2 } from "./blocks/members";
 import { reflection, bisectorNormal } from "./blocks/spatial";
 
 /** A joint with its numbers and vectors evaluated (parameters bound) and its reference geometry in world coordinates. */
@@ -182,6 +182,32 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const ratio = j.ratio !== undefined ? n(j.ratio) : meshRatio({ za: n(j.za), zb: n(j.zb), internal: j.internal, sign: j.crossed ? ((j.hand === "left" ? -1 : 1) as 1 | -1) : undefined });
     return wrapPi(turn(s.b0, s.b1, ax2) - dC - ratio * dA);
   }
+  const jr = j as unknown as Record<string, unknown>;
+  if (j.type === "belt" && jr.flexible === "chain" && j.za !== undefined && jr.pitch !== undefined) {
+    // a chain on its pitch polygons: the advance the driver gives equals the advance the driven takes (chordal action)
+    const za = n(j.za), zb = n(j.zb), p = n(jr.pitch);
+    const pa = n(jr.phaseA ?? 0) * D2R, pb = n(jr.phaseB ?? 0) * D2R;
+    const ta0 = xf.angleAbout(s.a0, ax);
+    const tb0 = xf.angleAbout(s.b0, ax2);
+    const ta1 = ta0 + turn(s.a0, s.a1, ax);
+    const tb1 = tb0 + turn(s.b0, s.b1, ax2);
+    return chainAdvance(ta1, za, p, pa) - chainAdvance(ta0, za, p, pa) - (chainAdvance(tb1, zb, p, pb) - chainAdvance(tb0, zb, p, pb));
+  }
+  // an integrator's rolling contacts: the integrator block keeps θc = (1/rc) ∫ x dθd, a relation over the whole motion
+  // that no single step's poses state exactly (the claims check its closed form)
+  if (j.type === "rolling" && jr.integrator) return null;
+  if (j.type === "belt" && jr.flexible === "cvt") {
+    // a variator's belt: wheel 2 runs at the radius that keeps the belt's length, and turns r1/r2 times wheel 1
+    const r1 = n(j.radiusA);
+    const r2 = variatorR2(r1, n(jr.C), n(jr.pitchLength));
+    return wrapPi(turn(s.b0, s.b1, ax2) - (r1 / r2) * turn(s.a0, s.a1, ax));
+  }
+  if ((j.type === "belt" || j.type === "rolling") && j.ratio !== undefined) {
+    // a friction pair given by its ratio (a wheel on a disc's face at a set radius): b turns ratio times a
+    return wrapPi(turn(s.b0, s.b1, ax2) - n(j.ratio) * turn(s.a0, s.a1, ax));
+  }
+  // a rope's part has no ratio of its own: the reeve block keeps the rope's length (K1 checks its sheaves' pins)
+  if (j.type === "belt" && jr.flexible === "rope") return null;
   if (j.type === "belt" || j.type === "rolling") {
     const dA = turn(s.a0, s.a1, ax);
     const ra = n(j.radiusA);
@@ -195,7 +221,9 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const pa0 = xf.apply(s.a0, r.at);
     const pa1 = xf.apply(s.a1, r.at);
     const adv = v3.dot(v3.sub(v3.sub(p1, pa1), v3.sub(p0, pa0)), ax);
-    const turnRel = turn(s.a0, s.a1, ax) - turn(s.b0, s.b1, ax); // the shaft's turn relative to the nut
+    // the helical law: b turns relative to a by Δθ about +axis and moves hand · lead · Δθ / 2π along it (right-hand:
+    // a right-hand screw turned positively in a held nut advances along +axis, so the nut moves back along it)
+    const turnRel = turn(s.b0, s.b1, ax) - turn(s.a0, s.a1, ax);
     return adv - screwAdvance(n(j.lead), turnRel, j.hand ?? "right");
   }
   return null;

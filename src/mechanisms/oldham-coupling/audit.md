@@ -214,5 +214,5 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 Promoted in this pass: record-named see-through principle parts (`teaching.seeThrough`), record-named supports (`support` on a joint), `bars` on a part's face, the tongue-slot kit reading its slot (`slot: { width, length }`), the `cross-slide` block.
 
 ## Verification
-check: clean · K1 residual: 3.0e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.3 KB
+check: clean · K1 residual: 3.0e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.4 KB
 screenshots: dist/shots3/oldham-coupling (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

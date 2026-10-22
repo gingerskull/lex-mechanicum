@@ -122,7 +122,7 @@ function extrudeLayers(p: Profile, op: Extrude): Layers {
 }
 
 /** The rotation-minimising frames (x, y, tangent) at each path point, seeded so profile y lies toward world z. */
-function pathFrames(path: readonly Vec3[], closed: boolean): { x: Vec3; y: Vec3; t: Vec3 }[] {
+export function pathFrames(path: readonly Vec3[], closed: boolean): { x: Vec3; y: Vec3; t: Vec3 }[] {
   const m = path.length;
   const T: Vec3[] = path.map((p, i) => {
     const a = closed ? path[(i + m - 1) % m]! : path[Math.max(0, i - 1)]!;

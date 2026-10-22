@@ -43,11 +43,11 @@ describe("blocks composed from fixtures, K1 verified over the cycle", () => {
     expect(Math.abs(k.pose(60 * D).values["pressure-angle"]!)).toBeGreaterThan(1);
   });
 
-  it("lead screw: nut advances lead per turn, K1 checks the screw's helix", () => {
+  it("lead screw: the nut moves a lead per turn, back along the axis for a right-hand screw; K1 checks the helix", () => {
     const k = new Kinematics(leadScrew());
     const r = verifyK1(k);
     expect(r.ok, rep(r)).toBe(true);
-    expect(k.pose(Math.PI).values["nut-travel"]).toBeCloseTo(8, 9);
+    expect(k.pose(Math.PI).values["nut-travel"]).toBeCloseTo(-8, 9);
   });
 
   it("Geneva: one index per turn, the pin is on the slot line while engaged", () => {

@@ -17,6 +17,7 @@ import { UP } from "./sites";
 import { MIN_GAP } from "./constants";
 import { v3 } from "../kin/math";
 import { liveHousing, pillowBlocks } from "./supports";
+import type { Vec3 } from "../kin/math";
 
 export type SupportKind = "housing" | "pillow" | "bridge" | "stub" | "hung";
 
@@ -41,6 +42,8 @@ export interface StackSpec {
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
   eccentric?: boolean;
+  /** The axial range a member set along the shaft by a control reaches (its slide), for where the blocks go. */
+  reach?: [number, number];
   /** A shaft in plan held from one side only (both pillow blocks): +1 along the axis, −1 against it. */
   side?: 1 | -1;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
@@ -64,6 +67,8 @@ export interface StackResult {
   bridge?: { id: string; route: BridgeRoute };
   /** The length added to a live input shaft's far end for a drive there (rules/shared.ts driveInPlan), mm. */
   farStub?: number;
+  /** A shaft in plan's free end for the drive (its end point, the outward direction and the body it turns with). */
+  end?: { at: Vec3; out: Vec3; body: string };
 }
 
 const SPACER_MIN = 0.5;
@@ -235,11 +240,12 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const fromBase = support !== "hung" && support !== "pillow" && spec.base !== null;
 
   if (support === "pillow") {
-    const lo = Math.min(...L.list.map((x) => x.z0), first.w0);
-    const hi = Math.max(...L.list.map((x) => x.z1), zTop);
+    // a part set along its shaft by a control (a friction wheel's radius) reaches the ends of its range
+    const lo = Math.min(...L.list.map((x) => x.z0), first.w0, spec.reach?.[0] ?? Infinity);
+    const hi = Math.max(...L.list.map((x) => x.z1), zTop, spec.reach?.[1] ?? -Infinity);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
-    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, ...(spec.side ? { side: spec.side } : {}) });
+    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, far: !!spec.reach, ...(spec.side ? { side: spec.side } : {}) });
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
     // the drive's pulley goes on the end facing away from the default view (rules/shared.ts driveInPlan)
@@ -283,8 +289,9 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       shaftSpec.z0 = first.w0 - 2.5;
       grooves.push(first.w0 - 2.5 + 0.6);
     }
-    // a live shaft hung from its bridge (named so by the record) turns in the bridge's bushing, no housing in the base
-    if (support === "housing" || (live && spec.base && support !== "hung")) {
+    // a live shaft hung from its bridge (named so by the record) turns in the bridge's bushing, no housing in the base,
+    // unless it is the input: the drive under the base takes its low end through the housing (an internal Geneva's crank)
+    if (support === "housing" || (live && spec.base && (support !== "hung" || spec.input))) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
       shaftSpec.z0 = h.bottom - 18;
       serve("F2", `${id}-hcl0`, `${id}-hcl1`);
