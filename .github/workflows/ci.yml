@@ -67,8 +67,8 @@ jobs:
     # Scheduled and manual runs skip "What changed" and always build.
     if: always() && (github.event_name != 'pull_request' || needs.changes.outputs.site == 'true')
     runs-on: ubuntu-latest
-    # every mechanism's package is built from its record
-    timeout-minutes: 50
+    # every mechanism's package is built from its record: about 18 min on the runner
+    timeout-minutes: 40
     env:
       ASTRO_TELEMETRY_DISABLED: 1
     steps:
