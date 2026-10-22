@@ -631,11 +631,13 @@ class Run implements BlockCtx {
         return v3.dot(v3.sub(xf.apply(Xa, r.at), xf.apply(Xb, r.at)), xf.dir(Xb, r.axis));
       }
     }
-    if (kind === "position" && points.has(of) && (axis || relativeTo)) {
+    // (only the named forms: an axis given as a vector elsewhere keeps the point's position)
+    const named = typeof axis === "string" && /^-?[xyz]$|^radius$/.test(axis);
+    if (kind === "position" && points.has(of) && (named || (relativeTo && axis === undefined))) {
       const p = points.get(of)!;
       const q = relativeTo ? points.get(relativeTo) : ([0, 0, 0] as Vec3);
       if (!q) return undefined;
-      const k = axis && axis !== "radius" ? "xyz".indexOf(axis.replace("-", "")) : -1;
+      const k = named && axis !== "radius" ? "xyz".indexOf(axis!.replace("-", "")) : -1;
       if (k >= 0) return (axis!.startsWith("-") ? -1 : 1) * (p[k]! - (relativeTo ? q[k]! : 0));
       return v3.dist(p, q);
     }
