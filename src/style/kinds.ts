@@ -2,7 +2,7 @@
 // what they make with these (standard DL1); the renderer asks the ladder whether to draw them.
 
 /** The roles of the part family. */
-export const PART_ROLES = ["driver", "link", "output", "ground", "pin", "trace"] as const;
+export const PART_ROLES = ["driver", "link", "link2", "output", "ground", "pin", "trace"] as const;
 export type Role = (typeof PART_ROLES)[number];
 
 /** Roles a solid may carry: a part role, or hardware and bearings added by the build. */

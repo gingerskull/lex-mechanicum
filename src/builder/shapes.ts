@@ -3,7 +3,7 @@
 // whose shape is a profile of its own (cam, cage, cross, custom) gets the disc or box that holds its joints, flagged
 // `approx`, until the pilots (P) and the rebuild (R) give it a profile of its own.
 import { D2R, TAU, area, capsule, circle, gearOutline, roundRect, roundedPoly, slot, taper, type Vec2 } from "../core/geom";
-import { filletPoly } from "../hardware/primitives";
+import { filletPoly, spokes } from "../hardware/primitives";
 import { bevel, bevelOutline } from "../core/spatial";
 import { hullOf } from "../hardware/primitives";
 import type { Kin, KinBody } from "../kin/types";
@@ -12,7 +12,7 @@ import { xf } from "../kin/math";
 import { lawRise, type CamLaw } from "../kin/blocks/cam";
 import { sawOutline, starOutline, type StarSpec } from "../kin/blocks/timed";
 import { type Vec3, m3, v3 } from "../kin/math";
-import type { Op, Profile } from "../solids/types";
+import type { Feature, Op, Profile } from "../solids/types";
 import { nutGeom, screwGeom } from "./screws";
 import { flexureGeom } from "./compliant";
 import { forkGeom, sheaveGeom } from "./cvt";
@@ -21,6 +21,8 @@ import { canon, frameAlong, planeCoords, xfFrame, type Frame } from "./frames";
 import { THICK } from "./constants";
 import { barrelGroove, camLawOf, flatCam, rollerCam } from "./cams";
 import { genevaCrank, genevaWheel, intermittentDriven, intermittentDriver } from "./indexers";
+
+const signedArea = (p: Vec2[]): number => p.reduce((a, q, i) => { const r = p[(i + 1) % p.length]!; return a + q[0] * r[1] - r[0] * q[1]; }, 0) / 2;
 
 export interface BodyGeom {
   id: string;
@@ -43,7 +45,9 @@ export interface BodyGeom {
    */
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
-  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; op?: Op; features?: import("../solids/types").Feature[] }[];
+  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; revolve?: boolean; op?: Op; features?: import("../solids/types").Feature[] }[];
+  /** The own part is a solid of revolution about the frame's z (a ball, a cage), its profile in (r, z). */
+  revolve?: boolean;
   /** The body's own part when it is not an extrusion of `profile` (a screw's core, revolved): its profile and operation. */
   part?: { profile: Profile; op: Op };
   /** A body of revolution about the axis it turns on (a screw): its sweep is a revolve, its samples need no probes. */
@@ -113,7 +117,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "link": {
       const L = num(shape.length, far);
       const [r0, r1] = pair(shape.boss, [8, 8]);
-      return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick: THICK, approx: false };
+      // a link the record places itself (`place`) takes its own thickness (a Sarrus leaf, a governor's arm)
+      const thick = typeof shape.place === "number" ? num(shape.thickness, THICK) : THICK;
+      return { profile: { outer: L > Math.abs(r0 - r1) + 1 ? taper(L, r0, r1) : circle(Math.max(r0, r1), 0, 0, 36), holes: [] }, thick, approx: false };
     }
     case "plate": {
       const pts = Array.isArray(shape.outline) ? (shape.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]) : null;
@@ -144,6 +150,15 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const r = num(shape.radius, 20);
       const c = pair(shape.center, [0, 0]);
       const bore = num(shape.bore, 0);
+      // a ring (`ring: { inner, spokes?, hub? }`): a rim, bare (a floating disc) or spoked to a hub on its shaft
+      const ring = shape.ring as { inner?: unknown; spokes?: unknown; hub?: unknown } | undefined;
+      if (ring && typeof ring === "object") {
+        const inner = num(ring.inner, r * 0.6);
+        const n = num(ring.spokes, 0);
+        const cw = (h: Vec2[]): Vec2[] => (signedArea(h) > 0 ? [...h].reverse() : h);
+        const holes = n > 0 ? [...spokes({ rIn: num(ring.hub, 14), rOut: inner, n, half: 5, fillet: 3 }).map(cw), ...(bore ? [hole(bore / 2)] : [])] : [circle(inner, 0, 0, Math.max(36, Math.round(inner * 3))).reverse()];
+        return { profile: { outer: circle(r, c[0], c[1], Math.max(36, Math.round(r * 3))), holes }, thick: num(shape.thickness, 8), approx: false };
+      }
       return { profile: { outer: circle(r, c[0], c[1], Math.max(36, Math.round(r * 3))), holes: bore ? [hole(bore / 2)] : [] }, thick: num(shape.thickness, 8), approx: false };
     }
     case "gear": {
@@ -209,6 +224,11 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const part = type === "genevaWheel" ? genevaWheel(shape) : genevaCrank(shape);
       return { profile: part.profile, thick: part.thick, approx: false, features: part.features };
     }
+    case "spatial-link": {
+      // a link between skew hinges (Bennett): its knuckle on its own hinge; the bar and the far knuckle come after
+      const span = pair(shape.span, [-5, 5]);
+      return { profile: { outer: circle(num(shape.knuckle, 9), 0, 0, 40), holes: [] }, thick: span[1] - span[0], approx: false };
+    }
     case "rack": {
       const L = num(shape.length, 120);
       const h = num(shape.height, 20);
@@ -261,9 +281,10 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     }
     const built =
       universal(kin, S, b, geom) ?? cylinder(b, geom) ?? plateCam(kin, S, b, geom) ?? ringWheel(geom) ?? crown(kin, S, b, geom) ?? vergeStaff(geom) ??
-      screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? sheaveGeom(kin, S, b, geom) ?? forkGeom(kin, S, b, geom) ?? ballGeom(b, geom) ?? carriageGeom(kin, b, geom) ?? geom;
+      screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? sheaveGeom(kin, S, b, geom) ?? forkGeom(kin, S, b, geom) ?? ballGeom(b, geom) ?? carriageGeom(kin, b, geom) ??
+      spatialLink(S, geom) ?? spherical(kin, S, b, geom) ?? geom;
     if (built.shape.rollers && typeof built.shape.rollers === "object") built.pieces = [...(built.pieces ?? []), ...turretRollers(built)];
-    out.set(b.id, withPieces(b, built));
+    out.set(b.id, withPieces(b, withIndex(withBars(withBall(built)))));
   }
   phaseMeshes(kin, S, out);
   return out;
@@ -753,4 +774,205 @@ function turretRollers(g: BodyGeom): NonNullable<BodyGeom["pieces"]> {
   }
   void Fy;
   return out;
+}
+
+/** A sphere's half profile for a revolve about its frame's z: radius r, centred on the frame's origin. */
+export function ballProfile(r: number, n = 24): Profile {
+  const pts: Vec2[] = [];
+  for (let i = 0; i <= n; i++) {
+    const t = (Math.PI * i) / n;
+    pts.push([Math.max(0, r * Math.sin(t)), -r * Math.cos(t)]);
+  }
+  return { outer: pts, holes: [] };
+}
+
+/**
+ * A link that ends in a ball (`ball: { diameter }`, a governor's flyweight): a sphere on the link's far end, centred in
+ * its thickness. Only for a part the record places itself (`place`), whose thickness is known here.
+ */
+function withBall(g: BodyGeom): BodyGeom {
+  const ball = g.shape.ball as { diameter?: unknown } | undefined;
+  const type = String(g.shape.type);
+  if (!ball || (type !== "link" && type !== "shaft") || !g.exact) return g;
+  const r = num(ball.diameter, 30) / 2;
+  // a link's ball on its far end, in its thickness; a shaft's (a plunger's ball end) on its start
+  const o = type === "shaft" ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact.offset)) : v3.add(g.frame.o, v3.add(v3.mul(g.frame.x, num(g.shape.length, 0)), v3.mul(g.frame.z, g.exact.offset + g.thick / 2)));
+  return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-ball`, name: type === "shaft" ? "" : `Flyweight ball Ø${2 * r}`, frame: { o, x: g.frame.x, z: g.frame.z }, profile: ballProfile(r), h: 0, revolve: true }] };
+}
+
+/**
+ * A link between two skew hinges (`spatial-link`, a Bennett linkage): a knuckle on each hinge, side by side with its
+ * neighbour's along the hinge (`span` on its own hinge, `far.span` on the other, both along the hinge's axis from the
+ * joint, its sign fixed as `canon`), and a round bar between the knuckles (`barAt`: where it leaves each, along its
+ * hinge; default the knuckles' middles). The far
+ * knuckle is a lug of the far hinge's stack (rules/lugs); the bar is a piece of the body.
+ */
+function spatialLink(S: Setup, g: BodyGeom): BodyGeom | null {
+  const sh = g.shape;
+  if (String(sh.type) !== "spatial-link") return null;
+  const span = pair(sh.span, [-5, 5]);
+  const far = (sh.far ?? {}) as { joint?: unknown; span?: unknown };
+  const fj = typeof far.joint === "string" ? S.joints.get(far.joint) : undefined;
+  if (!fj) return { ...g, exact: { offset: span[0] } };
+  const fs = pair(far.span, [-5, 5]);
+  // the bar leaves each knuckle at `bar.at` along the hinge (default the knuckle's middle): a long barrel can carry the
+  // bar well off the common normal, clear of the other links where the loop passes through a crossed pose
+  const at = (sh.barAt ?? []) as number[];
+  const a = v3.add(g.frame.o, v3.mul(g.frame.z, typeof at[0] === "number" ? at[0] : (span[0] + span[1]) / 2));
+  const b = v3.add(fj.at, v3.mul(canon(fj.axis), typeof at[1] === "number" ? at[1] : (fs[0] + fs[1]) / 2));
+  const z = v3.unit(v3.sub(b, a));
+  const rb = num(sh.bar, 6);
+  // the bar starts and ends in the knuckles' walls, clear of the pin bores
+  const rk = num(sh.knuckle, 9) - 1;
+  const a1 = v3.add(a, v3.mul(z, rk));
+  const L = v3.dist(a, b) - 2 * rk;
+  return {
+    ...g,
+    exact: { offset: span[0] },
+    pieces: [{ id: `${g.id}-bar`, name: "", frame: { o: a1, x: v3.unit(v3.perp(Math.abs(z[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0], z)), z }, profile: { outer: circle(rb, 0, 0, 28), holes: [] }, h: L }],
+  };
+}
+
+/**
+ * Straight bars standing on a part's face (`bars: [{ from: [x, y], to: [x, y], width, z: [z0, z1] }]`, in the body's
+ * frame, z from its origin): a hub's slot jaws, an Oldham disc's tongues. Pieces of the body.
+ */
+function withBars(g: BodyGeom): BodyGeom {
+  const bars = g.shape.bars as { from?: unknown; to?: unknown; width?: unknown; z?: unknown }[] | undefined;
+  if (!Array.isArray(bars) || !bars.length) return g;
+  const pieces = bars.map((b, k) => {
+    const [x0, y0] = pair(b.from, [0, 0]);
+    const [x1, y1] = pair(b.to, [10, 0]);
+    const [z0, z1] = pair(b.z, [0, 5]);
+    const w = num(b.width, 10) / 2;
+    const L = Math.hypot(x1 - x0, y1 - y0) || 1;
+    const nx = (-(y1 - y0) / L) * w;
+    const ny = ((x1 - x0) / L) * w;
+    const outer: Vec2[] = [[x0 + nx, y0 + ny], [x0 - nx, y0 - ny], [x1 - nx, y1 - ny], [x1 + nx, y1 + ny]];
+    const area = (outer[1]![0] - outer[0]![0]) * (outer[2]![1] - outer[0]![1]) - (outer[2]![0] - outer[0]![0]) * (outer[1]![1] - outer[0]![1]);
+    if (area < 0) outer.reverse();
+    return { id: `${g.id}-bar${k}`, name: "", frame: { o: v3.add(g.frame.o, v3.mul(g.frame.z, z0)), x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: z1 - z0 };
+  });
+  return { ...g, pieces: [...(g.pieces ?? []), ...pieces] };
+}
+
+/** Points of an arc in (r, z) about (0, zc), radius R, from angle a0 to a1 (radians, from the +r axis toward +z). */
+function arcRZ(R: number, zc: number, a0: number, a1: number, n = 12): Vec2[] {
+  return Array.from({ length: n + 1 }, (_, i) => {
+    const a = a0 + ((a1 - a0) * i) / n;
+    return [Math.max(0, R * Math.cos(a)), zc + R * Math.sin(a)] as Vec2;
+  });
+}
+
+/** A ball's swept track in a race or bell: a tube along a meridian arc of radius rp about the centre, in the body's frame. */
+function grooveCut(sJ: number, rp: number, rb: number, phase: number, span: number): Feature {
+  const path: Vec3[] = [];
+  const c = Math.cos(phase * D2R);
+  const s = Math.sin(phase * D2R);
+  // 16 steps keep the chord's sag under 0.05 mm on a 25 mm arc; an 18-sided tube keeps its inscribed radius over the
+  // ball's (rb is the ball's radius plus 0.2)
+  for (let i = 0; i <= 16; i++) {
+    const a = -span + (2 * span * i) / 16;
+    const r = rp * Math.cos(a);
+    path.push([r * c, r * s, sJ + rp * Math.sin(a)]);
+  }
+  return { mode: "cut", profile: { outer: circle(rb, 0, 0, 18), holes: [] }, op: { op: "sweep", path }, frame: { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] } };
+}
+
+/**
+ * The parts of a ball-and-groove constant-velocity joint (a Rzeppa), all solids of revolution about the body's axis:
+ * `ball` (diameter), `race` (the inner race: a spherical band of `sphere` radius, `width` wide, with `grooves` meridian
+ * grooves for balls of `ballDiameter` on a pitch radius `pitch`, at `phases` about its axis from its frame's x, on a
+ * keyed hub), `bell` (the outer race: a cup whose spherical cavity of `sphere` radius holds the cage, grooved likewise),
+ * and `cage` (a spherical band between `inner` and `outer`, `width` wide, with a window at each ball it holds). `center`
+ * names the joint at the joint's centre.
+ */
+function spherical(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const sh = g.shape;
+  const type = String(sh.type);
+  if (!["ball", "race", "bell", "cage"].includes(type)) return null;
+  if (type === "ball") return { ...g, profile: ballProfile(num(sh.diameter, 16) / 2, 32), thick: 0, revolve: true, exact: { offset: 0 }, approx: false };
+  const cj = typeof sh.center === "string" ? S.joints.get(sh.center) : undefined;
+  const J = cj?.at ?? g.frame.o;
+  const sJ = v3.dot(v3.sub(J, g.frame.o), g.frame.z);
+  const rb = num(sh.ballDiameter, 16) / 2 + 0.2;
+  const rp = num(sh.pitch, 25);
+  const phases = (Array.isArray(sh.phases) ? sh.phases : []) as number[];
+  if (type === "cage") {
+    const ri = num(sh.inner, 24.5);
+    const ro = num(sh.outer, 32.5);
+    const w = num(sh.width, 22) / 2;
+    const ai = Math.asin(w / ri);
+    const ao = Math.asin(w / ro);
+    const outer: Vec2[] = [...arcRZ(ro, 0, -ao, ao), ...arcRZ(ri, 0, ai, -ai)];
+    // a window at each ball the cage holds (its planar joints), through the band
+    const [ww, wh] = pair(sh.window, [18, 16.4]);
+    const features: Feature[] = kin.joints
+      .filter((j) => (j.a === b.id || j.b === b.id) && j.type === "planar")
+      .map((j) => {
+        const p = v3.sub(S.joints.get(j.id)!.at, g.frame.o);
+        const yv = v3.cross(g.frame.z, g.frame.x);
+        const u = v3.unit([v3.dot(p, g.frame.x), v3.dot(p, yv), 0]);
+        return { mode: "cut" as const, profile: { outer: roundRect(-wh / 2, -ww / 2, wh / 2, ww / 2, 2), holes: [] }, op: { op: "extrude" as const, h: ro + 6 - (ri - 6), steps: 1 }, frame: { o: v3.mul(u, ri - 6), x: [0, 0, 1] as Vec3, z: u } };
+      });
+    return { ...g, profile: { outer, holes: [] }, thick: 0, revolve: true, features, exact: { offset: 0 }, approx: false };
+  }
+  const R = num(sh.sphere, type === "race" ? 24 : 33);
+  const grooves = phases.map((ph) => grooveCut(sJ, rp, rb, ph, 45 * D2R));
+  const hubR = num(sh.hub, 13);
+  const hubL = 14;
+  if (type === "race") {
+    const w = num(sh.width, 24) / 2;
+    const a = Math.asin(w / R);
+    const band: Vec2[] = [[0, sJ - w], ...arcRZ(R, sJ, -a, a), [0, sJ + w]];
+    // the hub sits behind the band, toward the frame's origin (the race's own shaft end)
+    const dir = sJ >= 0 ? 1 : -1;
+    const h0 = sJ - dir * (w + hubL);
+    return {
+      ...g,
+      profile: { outer: circle(hubR, 0, 0, 36), holes: [] },
+      thick: hubL,
+      exact: { offset: Math.min(h0, h0 + dir * hubL) },
+      approx: false,
+      pieces: [{ id: `${b.id}-race`, name: "", frame: { o: g.frame.o, x: g.frame.x, z: g.frame.z }, profile: { outer: band, holes: [] }, h: 0, revolve: true, features: grooves }],
+    };
+  }
+  // the bell: its mouth toward the inner race (toward the frame's... the side away from its own shaft), its back closed
+  const Ro = num(sh.outer, 42);
+  const dir = sJ <= 0 ? 1 : -1; // from the centre toward the bell's back (its shaft)
+  const mouth = num(sh.mouth, 16);
+  const back = num(sh.back, 22);
+  const zM = sJ - dir * mouth;
+  const zB = sJ + dir * (back + 8);
+  const aM = -Math.asin(mouth / R);
+  const aB = Math.asin(back / R);
+  const cav = arcRZ(R, 0, aB, aM).map(([r, z]): Vec2 => [r, sJ + dir * (z - 0)]);
+  const outer: Vec2[] = [[Ro, zM], [Ro, zB], [0, zB], [0, sJ + dir * back], ...cav];
+  return {
+    ...g,
+    profile: { outer: circle(hubR + 1, 0, 0, 36), holes: [] },
+    thick: hubL,
+    exact: { offset: Math.min(zB, zB + dir * hubL) },
+    approx: false,
+    pieces: [{ id: `${b.id}-bell`, name: "", frame: { o: g.frame.o, x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: 0, revolve: true, features: grooves }],
+  };
+}
+
+/**
+ * An index mark (`indexMark: { at: [x, y] }`, a Schmidt coupling's discs) as a raised arrow on the part's top face,
+ * pointing out along the radius through `at`: one bold mark per part, so parts that keep their orientation show it. It
+ * stays opaque when its part is drawn see-through. Only on a part the record places itself (`place`).
+ */
+function withIndex(g: BodyGeom): BodyGeom {
+  const at = (g.shape.indexMark as { at?: number[] } | undefined)?.at;
+  if (!Array.isArray(at) || at.length < 2 || !g.exact) return g;
+  const L = Math.hypot(at[0]!, at[1]!) || 1;
+  const u: Vec2 = [at[0]! / L, at[1]! / L];
+  const v: Vec2 = [-u[1], u[0]];
+  const p = (s: number, w: number): Vec2 => [u[0] * s + v[0] * w, u[1] * s + v[1] * w];
+  // a shaft of 12 mm and a head of 8, 6 mm wide, ending at the mark's point
+  let outer: Vec2[] = [p(L - 20, -1.5), p(L - 8, -1.5), p(L - 8, -3.5), p(L, 0), p(L - 8, 3.5), p(L - 8, 1.5), p(L - 20, 1.5)];
+  if (signedArea(outer) < 0) outer = outer.reverse();
+  const o = v3.add(g.frame.o, v3.mul(g.frame.z, g.exact.offset + g.thick));
+  return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-index`, name: "Index arrow, raised", frame: { o, x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: 1.5 }] };
 }

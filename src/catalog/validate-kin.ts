@@ -121,7 +121,10 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
       if (!Array.isArray(d.options) || d.options.length < 2) say(`driver ${d.id}: a selector needs named options`);
       continue;
     }
-    if (d.joint === undefined || !joints.has(d.joint)) say(`driver ${d.id}: joint "${String(d.joint)}" is not a joint`);
+    // a manual driver with no joint moves nothing itself: a block reads its value (a governor's speed)
+    if (d.kind === "manual" && d.joint === undefined) {
+      // nothing to drive
+    } else if (d.joint === undefined || !joints.has(d.joint)) say(`driver ${d.id}: joint "${String(d.joint)}" is not a joint`);
     else driverJoints.add(d.joint);
     if (!(Array.isArray(d.range) && d.range.length === 2 && d.range.every(isNum) && d.range[0] < d.range[1])) say(`driver ${d.id}: range must be [lo, hi]`);
     else if (isNum(d.default) && (d.default < d.range[0] || d.default > d.range[1])) say(`driver ${d.id}: default ${d.default} outside its range`);
@@ -140,7 +143,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   };
   const resolveIn = (v: unknown, by: string, key: string) => {
     if (Array.isArray(v)) return v.forEach((x) => resolveIn(x, by, key));
-    if (isObj(v)) return Object.values(v).forEach((x) => resolveIn(x, by, key));
+    // a nested `out` names a value the block writes (a slider's slide), not an input
+    if (isObj(v)) return Object.entries(v).forEach(([k, x]) => (k === "out" ? undefined : resolveIn(x, by, key)));
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
     if (key === "kind" || key === "mode" || key === "form" || key === "shape" || key === "plane" || key === "law") return;
@@ -304,6 +308,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (!isNum(c.value)) say(`claim "${String(c.text)}": value must be a number`);
     if (!isNum(c.tol) || c.tol < 0) say(`claim "${String(c.text)}": tol must be a number >= 0`);
   }
+  if (t.seeThrough !== undefined) for (const b of arr(t.seeThrough)) if (!bodies.has(String(b))) say(`teaching.seeThrough: "${String(b)}" is not a body`);
   if (!Array.isArray(t.exceptions)) say("teaching.exceptions must be an array");
   for (const e of arr(t.exceptions) as Obj[]) if (!isStr(e.reason)) say("an exception needs a reason (T12)");
 

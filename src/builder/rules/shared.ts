@@ -18,7 +18,7 @@ import { lowestZ } from "./core";
 import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 import type { Site } from "../sites";
-import { linearDrive, manualDrive, oscillatingDrive } from "./drive";
+import { linearDrive, manualDrive, onFreeEnd, oscillatingDrive } from "./drive";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
@@ -194,16 +194,23 @@ export const standoffs: Rule = {
 /**
  * A rotary input on a shaft in plan (V1, V2, V5): the motor beside the shaft, its face screwed to the upright of one
  * angle bracket whose foot is screwed to the base top, belted in the plane across the shaft to a pulley on the shaft's
- * free end (its low end, past its pillow blocks); the home flag on that pulley and the fork sensor on the upright (V6,
- * F10); terminals and a lead on the base top. Built in the pulley's plane: u across the shaft, v up, w outward along it.
+ * free end (its low end, past its pillow blocks, or its far end: onFreeEnd); the home flag on that pulley and the fork
+ * sensor on the upright (V6, F10); terminals and a lead on the base top. Built in the pulley's plane: u across the shaft,
+ * v up, w outward along it.
  */
 function driveInPlan(ctx: BuildCtx, site: Site): void {
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
   if (!ctx.base || (!axle && !st.end)) return;
-  // H.shaft starts at its low end: the axle's frame origin is that end, its z the shaft's axis. The drive takes that end,
-  // unless it faces the eye in the default view (a front elevation looking at the low end): then the far end. A shaft
-  // built by its own kit (a screw, a variator's shaft) names the end itself
+  onFreeEnd(ctx, site.id, (far) => driveInPlanAt(ctx, site, far));
+}
+
+/** The drive of a shaft in plan on its low end or its far end. A shaft built by its own kit (a screw, a variator's shaft)
+ * names the end itself. */
+function driveInPlanAt(ctx: BuildCtx, site: Site, far: boolean): void {
+  const st = ctx.stacks.get(site.id)!;
+  const axle = ctx.get(`${site.id}-axle`);
+  if (!ctx.base || (!axle && !st.end)) return;
   let out: Vec3;
   let end: Vec3;
   let shaftBody: string;
@@ -213,7 +220,6 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
     shaftBody = st.end.body;
   } else {
     const zA = v3.unit(axle!.frame.z as Vec3);
-    const far = v3.dot(zA, ctx.viewDir()) > 0.5;
     const hA = axle!.op.op === "extrude" ? axle!.op.h : 0;
     out = far ? zA : v3.mul(zA, -1);
     end = far ? v3.add(axle!.frame.o as Vec3, v3.mul(zA, hA)) : (axle!.frame.o as Vec3);
@@ -229,9 +235,14 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   // the motor on the side with more room, away from the other fixed sites
   const others = ctx.sites.filter((q) => q !== site && q.fixed).map((q) => q.at as Vec3);
   const room = (sg: number) => Math.min(...others.map((o) => v3.dist(o, v3.add(S, v3.mul(lat, sg * C)))), 999);
-  const sg = room(1) >= room(-1) ? 1 : -1;
   const foot = 4;
   const vm = Math.max(0, mot.R + foot + 2 - h);
+  // the side whose motor keeps clear of the moving parts' sweeps, else the one with more room from the other sites
+  const motorAt = (side: number) => place(PF, H.solid("drive-motor-t", { name: "", kind: "motor", role: "hw", outer: circle(mot.R + 2, side * C, vm, 32), z0: 9, z1: 15 + mot.H, joints: ["drive"] }));
+  const gapOf = (side: number) => clearance(ctx, motorAt(side));
+  const g1 = gapOf(1);
+  const g2 = gapOf(-1);
+  const sg = g1 >= MIN_GAP && g2 >= MIN_GAP ? (room(1) >= room(-1) ? 1 : -1) : g1 >= g2 ? 1 : -1;
   const Mc: Vec2 = [sg * C, vm];
   const j = ["drive"];
   const small = PULLEYS[16];
@@ -595,7 +606,7 @@ export const materials: Rule = {
       if (s.mat) continue;
       if (s.kind === "part") {
         const shape = String(ctx.kin.bodies.find((b) => b.id === s.body)?.shape?.type);
-        s.mat = gearish.has(shape) ? "Steel C45, teeth induction-hardened" : s.role === "link" || s.role === "driver" || s.role === "output" ? "Steel C45, black oxide" : "Aluminium 6061-T6, anodised";
+        s.mat = gearish.has(shape) ? "Steel C45, teeth induction-hardened" : s.role === "link" || s.role === "link2" || s.role === "driver" || s.role === "output" ? "Steel C45, black oxide" : "Aluminium 6061-T6, anodised";
       } else s.mat = BY_KIND[s.kind] ?? "Steel";
       (ctx.fired.materials ??= []).push(s.id);
     }
@@ -717,6 +728,15 @@ export const seeThrough: Rule = {
   applies: (ctx) => ctx.principle.size > 0,
   apply() {},
   after(ctx) {
+    // principle parts the record asks to see through (T10, transparency first): an Oldham coupling's output hub, which
+    // would hide the disc, its tongues and the slots
+    const asked = new Set(((ctx.teaching as { seeThrough?: unknown } | undefined)?.seeThrough as string[] | undefined) ?? []);
+    for (const s of ctx.solids)
+      // an index arrow stays opaque on its see-through part: it is the mark that part is read by
+      if (asked.has(s.body) && !s.flags.seeThrough && !s.id.endsWith("-index")) {
+        s.flags.seeThrough = true;
+        (ctx.fired["see-through"] ??= []).push(s.id);
+      }
     const dir = ctx.viewDir();
     const principle = [...ctx.principle].map((b) => ({ b, sweep: ctx.sweeps.of(b) })).filter((p): p is { b: string; sweep: NonNullable<typeof p.sweep> } => !!p.sweep);
     if (!principle.length) return;

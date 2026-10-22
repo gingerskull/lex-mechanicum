@@ -10,6 +10,9 @@ export interface Frame {
   /** The record spec's name for `o`. */
   origin?: Vec;
   rot?: Vec; // degrees, x then y then z
+  /** Instead of rot: the frame's z axis and a direction its x is made square to (either may hold expressions). */
+  z?: Vec;
+  x?: Vec;
 }
 
 export interface KinBody {
@@ -18,6 +21,8 @@ export interface KinBody {
   shape?: Record<string, unknown>;
   at?: { joint?: string; point?: string; frame?: Frame };
   frame?: Frame; // pose of the body's own frame in the reference configuration; default: its `at` joint, else the world
+  /** Fixed to the ground although it has joints of its own: a ground link drawn as a link (a Bennett loop's fourth link). */
+  fixed?: boolean;
   /** n-fold rotational symmetry about its axis (a wheel's slots, a gear's teeth z): the cycle repeats modulo 2π/n (K2). */
   symmetry?: number;
   /** The body moves by instant drops (an escapement's wheel): its points may jump between samples by design. */
@@ -110,7 +115,7 @@ export interface KinDriver {
   speed?: number;
   phase?: number;
   /** A selector's named options, each setting values of other drivers and params. */
-  options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }>;
+  options?: Record<string, { drivers?: Record<string, number>; params?: Record<string, number> }> | { id: string; drivers?: Record<string, number>; params?: Record<string, number> }[];
   value?: string; // a selector's current option
   /** Set by the cycle through a block (a target path and inverse kinematics), not applied as a joint motion. */
   cycle?: { from?: string; note?: string };

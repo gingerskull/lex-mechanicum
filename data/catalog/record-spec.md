@@ -193,6 +193,42 @@ A body's `shape` may carry a `wheel` ({ diameter, width, stub }): a wheel on a s
 the body's point at the stub's distance (a steering knuckle). A `slider` may start at `from` along its x. Every point the
 record names on the ground lies on the base.
 
+**Couplings and spatial linkages (R6).**
+- *Body frames by axes:* a `frame` may give `z` (the axis) and `x` (made square to it), either as expressions, so a
+  control can turn the frame (a fork clamped at a phase angle). A body with `fixed: true` stands where it is although it
+  has joints (a cylinder block the pistons slide in).
+- *Placed by the record:* `place` (mm along the body's frame z, the field every shape may carry, below) puts the part
+  there instead of on a slab (a hinge leaf beside its partner, an arm beside a spindle head); such a `link` takes its
+  own `thickness`.
+- *Shape features:* `lugs: [{ joint, span: [w0, w1], r }]`, a hinge lug on the joint's axis joined by a web to a part
+  whose plane is not square to the hinge (a plate's edge hinge, a spindle head); `posts: [{ at: [x, y], top, r }]`,
+  columns from the base into a fixed body; `bars: [{ from, to, width, z: [z0, z1] }]`, straight bars on a part's face
+  (slot jaws, tongues; the slotted body names its `slot: { width, length }`); `ring: { inner, spokes, hub }` on a `disc`
+  (a rim, spoked to a hub or bare); `indexMark: { at: [x, y] }`, a raised arrow that stays opaque on a see-through part;
+  `ball: { diameter }` on a `link` (at its far end) or a `shaft` (at its start: a plunger's ball end); `plunger: true` on
+  a `shaft` that slides in a bore of a fixed body.
+- *Shapes:* `spatial-link` (a link between skew hinges: `knuckle` radius, `bar` radius, `span` on its own hinge,
+  `far: { joint, span }`, `barAt` where the bar leaves each knuckle along its hinge); `ball` (`diameter`); `race`
+  (`center` joint, `sphere`, `width`, `pitch`, `ballDiameter`, groove `phases` about its axis from its frame's x, `hub`);
+  `bell` (as the race, with `outer`, `mouth`, `back`); `cage` (`inner`, `outer`, `width`, `window`; a window at each ball
+  joined to it by a `planar` joint).
+- *Joints:* `support` (`hung`, `bridge`, `stub`, `housing`, `pillow`) names a fixed site's support where the selector
+  would choose one that cannot be built (an output shaft that cannot come up through the input side); `head: "-"`
+  turns a moving pin end for end. A body with `set: "B"` (a second set of like links) is drawn in a pattern of its own.
+- *Blocks:* `bennett` with only `joints` [j1..j4] (round the loop, j1 the driven ground joint) reads its lengths, twists
+  and reference angle from them; `hooke` takes `shafts: { in | out: { body, axis } }` for a shaft with no ground joint (a
+  centre yoke); `cross-slide` (`input`, `joints: { in, out }`, `slide`, `body`, `center`; out `orbit`); `parallel-cranks`
+  (`input`, `discs: [{ body, center }]`, `links: [{ body, pin, disc }]`; out `turn`); `plane-slide` (`plate`, `rides`,
+  `point`, `normal`, `pistons: [{ body, joint, at, out }]`, `shoes: [{ body, at }]`); `rzeppa` (`input`,
+  `joints: { in, out }`, `center`, `cage`, `balls: [{ body, phase }]`, `rp`; out `tilt`); `conical-pendulum` (`speed`, `l`,
+  `g`, `spindle`, `arms: [{ body, joint, down, tip }]`; out `angle`); `sarrus` (`l1`, `l2`, `input`, `theta0`, `top`,
+  `legs`). A manual driver with no `joint` moves nothing itself: a block reads its value (a governor's speed).
+- *Outputs:* an `angle` whose `of` is a joint is its hinge angle, from the direction body `a` arrives along to the one
+  body `b` leaves along (list a loop's joints round it); an output may read a block's value. A claim with `over` a
+  driver takes its statistic over that driver's range; a `path`'s `range` is its extent (an orbit's diameter).
+- *Teaching:* `seeThrough: [bodies]` draws those principle parts see-through on purpose (a hub that would hide the
+  disc and slots, a bell round a cage). Selector `options` are a list of `{ id, params, drivers }` with a `default`.
+
 **Claims.** `span: [a, b]` takes the statistic over the input values in that window (a rotary input's degrees, which may
 wrap past 360); `abs: true` takes it on the absolute value. A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
 open while the swing is in a range); with a number it is the longest stretch the output holds within that much.
@@ -250,6 +286,7 @@ in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 agains
 | `timeMap` | A playback rate near a feature (T13): the `span` of input degrees and the `slow` factor. It never changes `solve`. |
 | `plot` | What the side panel plots: `x`, `y` (output ids) and a label; several settings may be listed for a family of curves. |
 | `claims` | Every number the explanation states, with the `output` and `stat` (`range`, `max`, `min`, `mean`, `ratio`, `phase`, `dwell`, `at`) it comes from, the stated `value` and a tolerance (standard T9). `text` is the sentence it supports. |
+| `seeThrough` | Principle bodies drawn see-through on purpose (T10, transparency first): a part that would hide the principle behind it. |
 | `exceptions` | The rare individual cases where a different construction is used instead of seeing through or moving a support (T12), each with its reason; the decision is made in the mechanism's issue. |
 
 Teaching strings (labels, trace names, captions) state the mechanism, never its use (T15). Real-world context belongs

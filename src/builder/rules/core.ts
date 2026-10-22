@@ -4,7 +4,7 @@ import { rungOf } from "../../style/detail";
 import { H } from "../../hardware/primitives";
 import { pillowRise } from "../../hardware/sub/pillow";
 import { PULLEYS, SENSOR } from "../../hardware/tables";
-import { extrudeOp } from "../../solids/tessellate";
+import { extrudeOp, revolveOp } from "../../solids/tessellate";
 import type { Solid3 } from "../../solids/types";
 import { type BuildCtx } from "../ctx";
 import { BASE_GAP, BASE_T } from "../constants";
@@ -58,10 +58,23 @@ export const placement: Rule = {
       // is placed there, wherever a slab would put it
       const o = g.exact || !slab ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact?.offset ?? 0)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
       const body = ctx.kin.bodies.find((b) => b.id === id)!;
-      const role = BODY_ROLE[body.role] ?? "link";
+      // a second set of like links (`set: "B"`, a Schmidt coupling's) takes a pattern of its own (T16)
+      const set = (body as { set?: unknown }).set;
+      const role = BODY_ROLE[body.role] ?? (set !== undefined && set !== "A" ? "link2" : "link");
       const frame = { o, x: g.frame.x, z: g.exact ? g.frame.z : fam.z };
       // a boss ring round each pin the part carries (a joint off the part, a slide's line, has none)
-      const marks = g.part ? [] : g.pins.filter((p) => inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
+      const marks: Solid3["marks"] = g.part ? [] : g.pins.filter((p) => inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
+      // an index mark (`indexMark: { at: [x, y] }`): a bold radial arrow engraved on the part, so parts that keep the
+      // same orientation show it (a Schmidt coupling's three discs)
+      const im = (g.shape.indexMark as { at?: number[] } | undefined)?.at;
+      if (Array.isArray(im) && im.length >= 2) {
+        const L = Math.hypot(im[0]!, im[1]!) || 1;
+        const u: [number, number] = [im[0]! / L, im[1]! / L];
+        const v: [number, number] = [-u[1], u[0]];
+        const at = (s: number, w: number): [number, number] => [u[0] * s + v[0] * w, u[1] * s + v[1] * w];
+        for (const w of [-0.8, 0, 0.8]) marks.push({ kind: "index" as const, pts: [at(L - 14, w), at(L, w)] });
+        marks.push({ kind: "index" as const, pts: [at(L - 4, -3), at(L + 2, 0), at(L - 4, 3), at(L - 4, -3)] });
+      }
       const part: Solid3 = {
         id,
         name: titleOf(id),
@@ -70,7 +83,7 @@ export const placement: Rule = {
         body: id,
         frame,
         profile: g.part ? { outer: [...g.part.profile.outer], holes: g.part.profile.holes.map((h) => [...h]) } : { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: g.part ? g.part.op : extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
+        op: g.part ? g.part.op : g.revolve ? revolveOp(g.profile) : extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
         ...(g.features?.length ? { features: g.features } : {}),
         marks,
         ex: 0,
@@ -81,7 +94,7 @@ export const placement: Rule = {
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? extrudeOp(pc.h), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? (pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h)), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);

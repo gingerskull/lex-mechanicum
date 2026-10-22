@@ -3,13 +3,14 @@
 // listed above it.
 import { type BlockFn, type BlockCtx, KinError } from "./ctx";
 import { type SolveStep } from "./types";
-import { D2R, TAU, type Vec3, m3, v3, xf, R2D } from "./math";
+import { D2R, TAU, type Vec3, m3, v3, wrapPi, xf, R2D } from "./math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "./blocks/linkage";
 import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from "./blocks/spatial";
 import { ellipticalAngle, meshRatio, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, lawRise, pressureAngle } from "./blocks/cam";
 import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, reeve, screwAdvance, sheaveShift, variatorR2, vonMises } from "./blocks/members";
 import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscape, simulateEscapement, simulateStar, simulateVerge, type VergeSpec, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
+import { COUPLING_BLOCKS } from "./blocks/couplings";
 
 function outName(step: SolveStep, key?: string): string | undefined {
   const o = step.out;
@@ -153,17 +154,26 @@ const cols = (x: Vec3, y: Vec3, z: Vec3) => [x[0], y[0], z[0], x[1], y[1], z[1],
  * in: input (the input shaft's angle, deg, as a value name), cross (body), joints { in, out, a, b }: the input shaft's
  * ground revolute, the output shaft's, the input yoke's pin into the cross and the output yoke's (their axes the cross
  * arms, all four meeting at the cross centre). The output follows tan θ2 = tan θ1 / cos β, and the cross turns so its
- * arms stay on both yokes' pins.
+ * arms stay on both yokes' pins. A shaft with no ground joint of its own (the centre yoke of a double Cardan joint, held
+ * on its line by the crosses at both ends) is given instead as in.shafts.in or in.shafts.out: { body, axis }.
  */
 function hookeCross(c: BlockCtx, s: SolveStep): void {
   const i = s.in ?? {};
   const J = (i.joints ?? {}) as Record<string, unknown>;
-  const jIn = str(J.in, "hooke.joints.in");
-  const jOut = str(J.out, "hooke.joints.out");
+  const sh = (i.shafts ?? {}) as Record<string, { body?: unknown; axis?: unknown } | undefined>;
   const jA = str(J.a, "hooke.joints.a");
   const jB = str(J.b, "hooke.joints.b");
-  const a1 = c.jointAxis(jIn);
-  const a2 = c.jointAxis(jOut);
+  const shaft = (k: "in" | "out"): { body: string; axis: Vec3 } => {
+    const free = sh[k];
+    if (free) return { body: str(free.body, `hooke.shafts.${k}.body`), axis: v3.unit(c.vec(free.axis, `hooke.shafts.${k}.axis`)) };
+    const jid = str(J[k], `hooke.joints.${k}`);
+    const g = c.joint(jid);
+    return { body: g.a === "ground" ? g.b : g.a, axis: c.jointAxis(jid) };
+  };
+  const sIn = shaft("in");
+  const sOut = shaft("out");
+  const a1 = sIn.axis;
+  const a2 = sOut.axis;
   const pinA = c.jointAxis(jA);
   const pinB = c.jointAxis(jB);
   const centre = c.jointAt(jA);
@@ -173,10 +183,8 @@ function hookeCross(c: BlockCtx, s: SolveStep): void {
   const psi0 = Math.atan2(v3.dot(pinA, np), v3.dot(pinA, p1));
   const d1 = c.delta("in", c.rad(i.input));
   const d2 = beta < 1e-9 ? d1 : hookeAngle(psi0 + d1, beta) - hookeAngle(psi0, beta);
-  const bIn = c.joint(jIn);
-  const bOut = c.joint(jOut);
-  const shaftIn = bIn.a === "ground" ? bIn.b : bIn.a;
-  const shaftOut = bOut.a === "ground" ? bOut.b : bOut.a;
+  const shaftIn = sIn.body;
+  const shaftOut = sOut.body;
   const X1 = xf.rotAbout(centre, a1, d1);
   const X2 = xf.rotAbout(centre, a2, d2);
   c.setXf(shaftIn, X1);
@@ -215,6 +223,7 @@ const homokinetic: BlockFn = (c, s) => {
  */
 const bennett: BlockFn = (c, s) => {
   const i = s.in ?? {};
+  if (Array.isArray(i.joints) && i.a === undefined) return bennettByJoints(c, s);
   const a = c.num(i.a);
   const alpha = c.num(i.alpha) * D2R;
   const beta = c.num(i.beta) * D2R;
@@ -233,6 +242,46 @@ const bennett: BlockFn = (c, s) => {
 };
 
 import type { Xf } from "./math";
+
+/**
+ * bennett, with no a, b, α, β given: the geometry read from the four joints (in.joints [j1..j4] in loop order, j1 the driven
+ * ground joint): the link lengths and twists, the ground's DH frame and the reference input angle all come from the
+ * joints' reference positions and axes (all offsets zero: each joint sits at the feet of the common normals). The four
+ * twists must alternate (α β α β) and the lengths too, with Bennett's condition a sin β = b sin α. in.bodies [crank,
+ * coupler, rocker], else the body each pair of neighbouring joints shares. in.input: the driven joint's angle (deg).
+ */
+function bennettByJoints(c: BlockCtx, s: SolveStep): void {
+  const i = s.in ?? {};
+  const ids = (i.joints as unknown[]).map((j, k) => str(j, `bennett.joints[${k}]`));
+  if (ids.length !== 4) throw new KinError(`bennett ${s.id}: four joints`);
+  const J = ids.map((id) => c.jointAt(id));
+  const Z = ids.map((id) => c.jointAxis(id));
+  const X = J.map((p, k) => v3.unit(v3.sub(J[(k + 1) % 4]!, p)));
+  const len = J.map((p, k) => v3.dist(J[(k + 1) % 4]!, p));
+  const tw = Z.map((z, k) => angleFrom(Z[(k + 1) % 4]!, X[k]!, z));
+  const p = { a: len[0]!, b: len[1]!, alpha: tw[0]!, beta: tw[1]! };
+  const off = Math.max(Math.abs(len[2]! - p.a), Math.abs(len[3]! - p.b), Math.abs(wrapPi(tw[2]! - p.alpha)) * p.a, Math.abs(wrapPi(tw[3]! - p.beta)) * p.b, Math.abs(p.a * Math.sin(p.beta) - p.b * Math.sin(p.alpha)));
+  if (off > 1e-3) throw new KinError(`bennett ${s.id}: the joints do not make a Bennett linkage (off by ${off.toFixed(4)})`);
+  // the ground's DH frame at j1: z its axis, x along the ground link as it arrives (j4 to j1)
+  const x0 = X[3]!;
+  const z0 = Z[0]!;
+  const G: Xf = { R: cols(x0, v3.cross(z0, x0), z0), t: J[0]! };
+  const th0 = angleFrom(X[0]!, z0, x0);
+  const th = th0 + c.delta("in", c.rad(i.input));
+  const now = bennettFrames(p, th);
+  const ref = bennettFrames(p, th0);
+  const shared = (ja: string, jb: string): string | undefined => {
+    const A = c.joint(ja);
+    const B = c.joint(jb);
+    return [A.a, A.b].find((b) => b !== "ground" && (b === B.a || b === B.b));
+  };
+  const given = (i.bodies as string[] | undefined) ?? [];
+  const bodies = [given[0] ?? shared(ids[0]!, ids[1]!), given[1] ?? shared(ids[1]!, ids[2]!), given[2] ?? shared(ids[2]!, ids[3]!)];
+  const conj = (Xn: Xf, X0: Xf): Xf => xf.mul(G, xf.mul(Xn, xf.mul(xf.inv(X0), xf.inv(G))));
+  if (bodies[0]) c.setXf(bodies[0], conj(now.crank, ref.crank));
+  if (bodies[1]) c.setXf(bodies[1], conj(now.coupler, ref.coupler));
+  if (bodies[2]) c.setXf(bodies[2], conj(now.rocker, ref.rocker));
+}
 
 /** World pose of a Bennett linkage's DH ground frame, from in.origin and in.rot (degrees). */
 function bennettWorld(c: BlockCtx, i: Record<string, unknown>): Xf {
@@ -1196,6 +1245,7 @@ export const BLOCKS: Record<string, BlockFn> = {
   integrator: integratorBlock,
   escapement: escapementBlock,
   indexer,
+  ...COUPLING_BLOCKS,
   lerp,
   "line-crossing": lineCrossing,
   "target-path": targetPath,

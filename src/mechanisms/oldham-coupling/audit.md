@@ -1,181 +1,218 @@
 # Audit: Oldham coupling (oldham-coupling)
-standard: 2.5 · date: 2026-10-18 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
+teaching: rethink · decisions in the record
 
 ## Summary
-PASS 110 · FAIL 0 · N/A 11 · open: none
+PASS 146 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.3 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #30 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · SITE · the pass issue holds only this mechanism's decisions; plan and status in #217 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site build) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in batch R6 (#217): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
 | P2 | PASS | DATA · catalogue validator clean |
-| P3 | PASS | DATA / SITE · page shows ratio (unity, 1:1), axes (offset parallel), output character, backdrivable, other names, family, motion, level, dof and the motorised drive |
-| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | DATA · motion, forces, benefits, limits; four uses with one line each |
-| P6 | PASS | DATA · Wikipedia and a manufacturer data sheet; four videos and a photo page; the two real-world videos (Printrbot Go Z lead screw, CraftBot Z lead screw) checked by YouTube oEmbed: both exist and are titled for an Oldham coupler on a real printer; the footage itself was not watched, so what is on screen is not confirmed |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts; lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · explain read against solve(): output angle equals input angle; the disc centre runs a 28 mm circle twice per turn; each tongue strokes ±28 mm once per turn; the plot is the disc centre angle, a line of slope 2 |
-| P10 | PASS | HAND · disc centre path (comet) on the 28 mm circle, velocity at the disc centre, tongue force across the slot wall, input spin, input angle, disc centre angle plot |
-| P11 | PASS | DATA · plain, short sentences, no em dashes, mm and degrees |
-| K1 | PASS | HAND · check: link error 0 mm; slot widths, tongue sizes, e, R, Rm and the disc position are exported from model.ts; the polish relieves the slots behind the strips so the strip faces are the modelled 18 mm walls |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · disc, custom, cap; fixed and at placement; the hub plates, disc and tongues are twins so each rides one body |
-| K4 | PASS | HAND · roles driver (input hub), link (disc, tongues), output (output hub), pin; accent only on the input cap pO1 |
-| K5 | PASS | HAND · check clean. Heights are plated with `dz` to the stack the sliding faces need: back plate 0..6, slot plate 6..12, disc 12.5..18.5 with tongues 6.5..12.5 and 18.5..24.5, output slot plate 19..25, back plate 25..31 (0.5 mm running gaps). The input pin reaches no higher than the back plate so the rules do not take the slot plate for a slot joint |
-| K6 | PASS | DATA · e 28, R 68, Rm 50, ws 18, wr 16, Lt 48 as the catalogue; slot half-length e + Lt/2 + 1 = 53; the tongues have full-radius ends (a deliberate simplification of the 16 x 48 bar, so they sit concentric in the slot ends) |
-| K7 | PASS | HAND · input rotary on the input back plate |
-| D1 | PASS | HAND · hubs and disc plain plates; tongues as stadiums concentric with the slot ends; keyed bores; engraved ring marks |
-| D2 | PASS | HAND · material where the load runs: a 15 mm wall past each slot end; no windows on constant-speed plates |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets |
-| D4 | PASS | AUTO · base grown for the bridge posts; mounting holes and feet moved to the new corner arcs |
-| D5 | PASS | AUTO / HAND · output cartridge on H.bridge, two spigoted posts; hub slot plates on dowels and screws |
-| D6 | PASS | HAND / STYLE · strips, felts, dowels and the drive read quieter than the hubs and disc |
-| D7 | PASS | HAND · hubs, disc, bridge and base carry only load shape and manufacturing marks |
-| A1 | PASS | AUTO · pO1 J2; the output shaft O2 and the tongue joints T1, T2 are built by hand (see promotion candidates) |
-| A2 | PASS | AUTO · live input shaft at O1 |
-| A3 | PASS | AUTO · 6800-2RS on the Ø10 shafts, both cartridges; spacers in every gap |
-| A4 | PASS | AUTO · stepped keyed input shaft with end retainer; the output shaft through H.shaft with its keyway and flush end screw |
-| A5 | PASS | AUTO · feather key 3 x 3 on both Ø10 shafts |
-| A6 | PASS | AUTO · the bridge's standoffs Ø10, spigoted, screwed from both sides; no other fixed plate floats |
-| A7 | PASS | AUTO · 8 mm base 2 mm under the input hub, counterbored corners, feet, disc centre path engraved, front scale, clearance hole for the input shaft; grown 20 mm for the bridge posts |
-| A8 | PASS | AUTO · every head has its shank; holes cut by stage 3 |
-| A9 | PASS | HAND · no pin joint. Each hub is overhung on one cartridge of two bearings 10 mm apart: nothing can reach the far side of a hub, because the disc and the other hub fill it. One support per shaft, accepted |
-| A10 | PASS | HAND · one plane per sliding pair; nothing is stacked only to clear something |
-| A11 | PASS | HAND · key, back plate, dowels and screws, slot plate, wear strip, acetal tongue, disc, the other tongue, strip, slot plate, dowels and screws, back plate, key, output shaft, cartridge bearings, housing (screwed and dowelled), bridge, spigoted posts, base; the input side runs the same way down to its housing and the base |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no prose in the polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states is a claim and agrees (T9) |
+| P10 | PASS | HAND · disc centre traced with 15-degree ticks (30 deg apart on its orbit: twice shaft speed), the orbit circle of diameter e, the offset, the right angle at the centre, both slot lines; orbit angle and output angle plotted |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run against the record before the build (E2, #204) and again on six phases of the finished build (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 3.0e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 1 block (cross-slide); no numeric fallback · composed from the block library; no fallback, no one-off model |
+| K4 | PASS | HAND · input hub driver with the accent, output hub output, the disc a link |
+| K6 | PASS | DATA · the disc's centre is the foot of the perpendicular from the output axis to the input slot line (Thales): a circle of diameter e at twice shaft speed; ratio 1 |
+| K7 | PASS | DATA · drivers input (rotary) · input kind declared with its driven joint |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one rotary driver; the shaft offset fixed |
+| K10 | PASS | AUTO / DATA · closed forms, continuous over the cycle; no branch flips |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
+| T2 | PASS | HAND · review before the build and again on six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · principle parts declared; drawn whole, in depth order |
+| T4 | PASS | DATA · fired: trace-marks (1 solid) · the disc centre traced, ticks every 15 deg of input landing 30 deg apart on its orbit |
+| T5 | PASS | DATA · orbit circle (diameter e), offset dimension, right angle at C, input and output slot lines |
+| T6 | PASS | HAND / DATA · offset 28 mm: the orbit and the tongues' 56 mm strokes read at plan scale |
+| T7 | PASS | DATA · PLAN, square to both shafts, where the crossed slots and the orbit show |
+| T8 | N/A | DATA · the principle lies in plain view through the see-through output hub |
+| T9 | PASS | AUTO / DATA · claim table: 6 ok, 0 off, 0 uncheckable of 6 |
+| T10 | PASS | AUTO · 15 solids drawn see-through: hub-out-bar0, hub-out-bar1, T2-nip, T2-liner0, T2-liner1, O2-k0-key, O2-bb, O2-ecl · the output hub drawn see-through by the record (transparency first) so the disc, both tongues and both slots show; the output's bridge see-through where it covers them |
+| T11 | PASS | AUTO · 1 support routed, 1 moved off a sweep · the output hub's bridge routed off the sweeps |
+| T12 | PASS | HAND · 13 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · nothing goes by in a blink |
+| T14 | PASS | HAND / DATA · the input; the offset is fixed (no control asked) |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · fired: wheels (no solids) · hubs as discs carrying slot jaws; the disc as a plate with a tongue on each face, square to each other |
+| D2 | PASS | HAND · jaws and tongues of solid section; hubs' bosses round the bores |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · input shaft in a housing under the base, output shaft hung from a bridge |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
+| D9 | N/A | AUTO / HAND · no member changes shape |
+| D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
+| D11 | PASS | AUTO · SOLID: 0 of 94 solids unsound |
+| D7 | PASS | HAND · hubs, disc, jaws and tongues plain; richness in the liners, nipples and stacks |
+| A1 | PASS | AUTO · T1 tongue-slot, T2 tongue-slot, O1 J2, O2 J2, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · T1 tongue-slot, T2 tongue-slot, O1 J2, O2 J2, drive drive · input on a live shaft in a housing (J2); the output hub's shaft hung from a bridge, named by the record (it cannot come up through the input side); tongues in jawed slots |
+| A3 | PASS | AUTO · fired: classify (4 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them |
+| A4 | PASS | AUTO · fired: j1-dead-axle (no solids), axial stack builder · stepped shafts with shoulders, grooves, flats and chamfered ends (H.shaft) |
+| A5 | PASS | AUTO · fired: j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
+| A6 | N/A | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · no slide and no floating plate |
+| A7 | PASS | AUTO · fired: base (3 solids), posts (no solids), feet (4 solids) · base 8 mm under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (7 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | PASS | AUTO / HAND · fired: placement solver · each shaft in a housing or bridge bushing with its bearing; each tongue between two liners |
+| A10 | PASS | HAND · fired: placement (12 solids), placement solver · hubs and disc placed by the record (axial), three levels with room for the jaws and tongues |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · every solid named with catalogue sizes, sets counted |
-| A14 | PASS | HAND · bridge 1.0 mm over the output back plate; posts 3 mm outside both hub sweeps; tongue 1 mm clear of each wall and slot end; felts 0.2 mm off the tongue; clearance 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · a note and a badge on every joint, five build rules |
-| A17 | PASS | HAND · input housing and shaft with its back plate, key and end screw; slot plate on dowels and four screws; disc with tongues; output hub subassembly (shaft, key, end screw, back plate, slot plate) lowered with its tongue into the slot; bridge and cartridge over the shaft top onto the posts; thrust washer, spacer and collar last. The end screws are reached through the slots |
-| E1 | PASS | AUTO · one level per solid |
-| E2 | PASS | AUTO · screws, shafts and bought units are groups |
-| E3 | PASS | AUTO · screws leave along their axis to the head side |
-| E4 | PASS | HAND · level 0 back plate, 1 slot plate, 2 disc and tongues, 3 output slot plate, 4 output back plate and shaft, 5 bridge, 6 cartridge, 7 collar: the last fitted goes furthest |
-| E5 | PASS | AUTO · bearings, circlips, dowels stay in their parts |
-| E6 | PASS | AUTO · motor with its bracket, bearings whole |
-| E7 | PASS | AUTO · spacers and washers midway |
-| E8 | PASS | AUTO · back plate and key keep their order on each shaft |
-| E9 | PASS | HAND · readable at full explode at 28° and 70° in both sheets; nothing leaves the frame |
-| J1 | N/A | no dead axle |
-| J2 | PASS | AUTO / HAND · input: housing with two sealed bearings, sleeve, wave washer, circlips, screwed and dowelled; keyed shaft, pulley hub, end retainer, thrust washer, home flag. Output: the same cartridge turned over on the bridge (H.housing, mirrored in the polish), keyed shaft, thrust washer, spacer, collar with set screw |
-| J3 | N/A | no moving pin |
-| J4 | N/A | no pin in a slot: the tongue is a bar (T1, T2) |
-| J5 | N/A | the rule needs rails and a block; each tongue in its slot is built by hand to the same pattern (strips, felt, screws, hub fixing): promotion candidate |
-| J6 | N/A | no gear mesh |
-| J7 | N/A | no cam |
-| J8 | PASS | AUTO · flanged motor pulley, mount slotted for tension |
-| F1 | PASS | AUTO / HAND · input housing dowelled; slot plates dowelled to their back plates; cartridge dowelled to the bridge; bridge on spigots; the disc is located by its tongues |
-| F2 | PASS | AUTO / HAND · bearings held by circlips; input end retainer; output end screw, spacer and collar; the disc floats between the hubs, held by its 0.5 mm gaps |
-| F3 | PASS | AUTO / HAND · feather keys at both shafts; the tongue torque goes through the wear strips |
-| F4 | PASS | AUTO / HAND · bronze thrust washers under the input hub (on the base) and over the output hub (under the bridge), wave washers preloading both cartridges; the disc runs 0.5 mm clear of both hubs |
-| F5 | N/A | continuous rotation; nothing to limit |
-| F6 | N/A | driven; no rest position to hold |
-| F7 | N/A | the offset is set by the dowelled housing and bridge; the tongue fit is the ground strip face; backlash is a limit named in the record |
-| F8 | PASS | HAND · oil-soaked felt in the relieved wall of every slot, two per slot; sealed bearings |
-| F9 | PASS | HAND · a match line on each slot plate rim along its slot and on the disc rim along the input tongue: with the lines in a row the parts go back in phase |
-| F10 | PASS | AUTO / HAND · pulley flanges, home flag, fork sensor; the acetal disc is the torque fuse |
-| M1 | PASS | AUTO · edge breaks on every top face |
-| M2 | N/A | hubs and disc run at constant speed; no start, stop or reversal to lighten for |
-| M3 | PASS | AUTO · bore entry chamfers on every seat and through hole |
-| M4 | PASS | AUTO / HAND · counterbored housing screws and base corners, countersinks for the hub and strip screws |
-| M5 | PASS | AUTO / HAND · slots have full-radius ends; no pockets |
+| A13 | PASS | AUTO / HAND · 94 solids, 52 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 5 joint notes; no note: none; no badge: none · a note per joint; the output hub hung from its bridge (record), the slot liners on the jaws |
+| A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings and liners pullable through their bores |
+| A18 | PASS | AUTO · placement: 3 slabs in the tallest stack (33.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver; bodies on their cone or centre placed where the joints put them |
+| A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: O2-bridge · blocks routed, least gap 1.5 mm, see-through where they cover the input yoke |
+| A20 | PASS | AUTO · support per joint: O2 hung · one axial stack builder with its support selector |
+| A21 | PASS | AUTO · kit per joint: T1 tongue-slot, T2 tongue-slot, O1 J2, O2 J2, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · no stops (both shafts turn on); cable clip |
+| E1 | PASS | AUTO · every solid has one explode level; levels -4 to 6.5 · one level per solid, nothing stretches |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable in ISOMETRIC on both sheets, nothing leaves the frame |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | N/A | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) · no dead axle |
+| J2 | PASS | AUTO · fired: j2-live-shaft (46 solids) · input and output: live shafts, the input in a housing behind the base, the output hung from a bridge |
+| J3 | N/A | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), ball-socket (no solids), ring-hub (no solids) · no moving pin |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J5 | PASS | AUTO · fired: tongue-slot (8 solids), piston-bore (no solids), j5-slide (no solids) · tongue-slot kit: bronze liners on the jaws' faces, a grease nipple at a slot end |
+| J6 | N/A | AUTO · fired: j6-mesh (no solids), ring-rollers (no solids) · no parallel mesh |
+| J7 | N/A | AUTO · fired: ball-socket (no solids), groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids) · no shaft in plan |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at O1, O2; fired: posts (no solids), j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
+| F2 | PASS | AUTO · served at O1, O2; fired: wheels (no solids), j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F3 | PASS | AUTO · served at O1, O2; fired: j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
+| F4 | PASS | AUTO / HAND · served at O1; fired: j9-crossed-mesh (no solids), j2-live-shaft (46 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers where a part turns free axially |
+| F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · both shafts turn continuously |
+| F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · no rest position to hold: the drive positions every part |
+| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · no exact length or mesh to adjust |
+| F8 | PASS | AUTO · served at T1, T2; fired: tongue-slot (8 solids), cross-bearings (no solids), ball-socket (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (1 solid) · grease nipples into both slots; sealed bearings |
+| F9 | PASS | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (1 solid) · zero line on the input and on the base (timing marks) |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) · home flag and fork sensor on the input (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · bosses round every bore |
+| M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (7 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | PASS | HAND · the bridge crotch is filleted by H.bridge; no other bracket |
-| M8 | N/A | no shoulder bolt or axle |
-| M9 | PASS | AUTO / HAND · M2.5 4 mm into the aluminium plate (1.6 d), M2 strip screws 3 mm, cartridge screws M3 4.5 mm into the bridge (1.5 d); standard lengths |
-| M10 | PASS | AUTO / HAND · hard anodised aluminium hubs, acetal disc and tongues, hardened tool-steel strips, bronze washers, steel shafts |
-| M11 | PASS | AUTO · centre holes and chamfered ends on the shafts |
-| M12 | PASS | HAND · every head reachable; the end screws through the slots; bearings pressed out past their circlips |
-| M13 | PASS | AUTO / HAND · threadlocker on every screw and set screw |
-| M14 | PASS | HAND · hardened strips screwed into both slot walls, replaceable; the acetal tongue is the other wearing part |
-| V1 | PASS | AUTO · pancake outrunner Ø50 x 18 under the base, GT2 32:16 |
-| V2 | PASS | AUTO · one-piece bracket, flange screws up into the base |
-| V3 | PASS | AUTO / HAND · belt and pulleys clear of feet and housing; clearance 0 |
-| V4 | PASS | AUTO · flanges, set screws, slotted mount |
-| V5 | PASS | AUTO · rotary: belt to the input pulley |
-| V6 | PASS | AUTO · home flag, fork sensor, leads to the terminal block, one P-clip |
-| L1 | PASS | STYLE · lint-style clean |
-| L2 | PASS | HAND · the polish carries geometry, roles, marks and materials only |
-| L3 | PASS | HAND · hubs driver and output, disc and tongues link, bridge and posts ground, hardware hw |
-| L4 | PASS | HAND / STYLE · accent on the input only |
-| L5 | PASS | AUTO / HAND · screws, bearings and strips are real solids in real holes; the output back plate and the bridge are drawn see-through so the tongues' working zone stays in view |
-| L6 | PASS | AUTO · depth order right at plan, 28°, side and explode |
-| L7 | PASS | STYLE · tilt 0° to 88°, no shear |
-| L8 | PASS | AUTO / HAND · disc centre path and scale engraved; match lines are marks |
-| R1 | PASS | HAND · the polish uses H.bridge, H.housing (turned over), H.shaft, H.screw, H.wearStrip, H.felt; the strip lining and the slot plate fixing are written inline (promotion candidates); no standard part redrawn |
-| R2 | PASS | HAND · threads M2, M2.5, M3, M5; shafts Ø10; one bearing size 6800-2RS |
-| R3 | PASS | AUTO · housing, bridge and drive from their subassemblies |
-| R4 | PASS | AUTO · package built at build time |
-| R5 | PASS | HAND · states only what differs; no sampling of its own; polish about 50 ms, nearly all of it H.bridge's post search |
-| R6 | PASS | FLAG · Node bench at DPR 1.5, median of 24: plan 381, 28° 332, side 245, explode 198 ms at full detail; the other mechanisms measure 250 to 360 ms the same way, so nothing specific to this one; browser bench not run |
-| R7 | PASS | HAND · model.ts + polish.ts 18.4 KB |
-| R8 | PASS | AUTO / SITE · pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | AUTO / HAND · every solid and mark on a rung; the polish moves nothing |
-| DL2 | PASS | HAND · default dial full |
-| DL3 | PASS | AUTO · DL-D drawn when exploded, DL-B skipped at side elevation |
-| DL4 | PASS | SITE · adaptive dial and the detail entry in the title block |
-| DL5 | PASS | FLAG · rung counts and frame times in the detail ladder below |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 91 of 94 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 12 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | PASS | AUTO / HAND · fired: tongue-slot (8 solids), piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids) · bronze liners on the slot walls (wear parts) |
+| V1 | PASS | AUTO · fired: drive (26 solids) · pancake motor under the base, belted to the input shaft |
+| V2 | PASS | AUTO · fired: drive (26 solids) · one bracket under the base |
+| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
+| V5 | PASS | AUTO · fired: drive (26 solids) · rotary input: belt to the input pulley |
+| V6 | PASS | AUTO · fired: drive (26 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records and polish carry no look |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (13 solids) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (1 solid) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | N/A | AUTO / DATA · no section or detail view declared |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 17.2 KB · package v2 written at build time |
+| R5 | PASS | HAND · the polish states only exceptions, no sampling |
+| R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 30 of 94 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 21.1 KB; site build not run here |
-| Q4 | PASS | plan, 28°, side, full explode at 28° and 70°, both sheets, overlays on, all looked at; nothing clips |
-| Q5 | PASS | Node bench at DPR 1.5; no flag |
-| Q6 | PASS | every row judged |
-| Q7 | PASS | conformance: oldham-coupling at 2.3, pass |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 17.2 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · dist/shots3/<id> (and the batch's shot set): record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench3 run (desktop): frame times per view in the ladder above; the phone is measured by David |
+| Q6 | PASS |  |
+| Q7 | PASS |  |
+| Q8 | PASS | teaching review: rethink (2026-10-20); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pO1 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø19; Countersunk M5 x 12 (ISO 10642), into the shaft end, flush; Socket head M5 x 10 (ISO 4762), into the shaft end | Feather key 3 x 3 x 6 (DIN 6885) | Wave washer 14.5x18.8, spring steel; Thrust washer 10.2x16, bronze | – continuous rotation | – driven through the belt | – offset set by the dowelled housing | – sealed bearings | – match line on the slot plate rim (see T1) | – see drive |
-| drive | drive | – bracket screwed up into the base | – pulley hub set screws (pO1) | Pulley hub, 2 x M3 set screws at 90° | – motor bearings | – motor turns freely | – motor holds when powered | bracket | – belt runs dry | Home flag read by the fork sensor | Home flag, 1 mm steel vane; 3 x Fork sensor, slotted optical, 5 mm gap; Pulley flanges |
-| O2-bridge-post | post | 2 x spigot | – screwed from both sides | – static | – static | – static | – static | – static | – static | – static | – static |
-| O2 | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to bridge | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 6 (DIN 6885); Set screw M3 (DIN 916) | Wave washer 14.5x18.8, spring steel | – continuous rotation | – driven by the disc | – offset set by the dowelled housing and bridge | – sealed bearings | – match line on the slot plate rim (see T2) | – none needed; the disc is the torque fuse |
-| T1 | J5 | Hardened wear strips: their faces are the modelled 18 mm walls the tongue is located in | – the disc floats between the hubs on its 0.5 mm gaps | Hardened wear strips take the side force from the tongue | – the disc runs 0.5 mm clear of both hubs | – continuous rotation | – driven | – the tongue fit is the ground strip face | 2 x Felt oiler 10 x 2.3, oil-soaked wool felt, in the relieved wall | Input hub, slot plate; Floating disc | – the acetal disc is the torque fuse |
-| T2 | J5 | Hardened wear strips: their faces are the modelled 18 mm walls the tongue is located in | – the disc floats between the hubs on its 0.5 mm gaps | Hardened wear strips take the side force from the tongue | – the disc runs 0.5 mm clear of both hubs | – continuous rotation | – driven | – the tongue fit is the ground strip face | 2 x Felt oiler 10 x 2.3, oil-soaked wool felt, in the relieved wall | Output hub, slot plate; Floating disc | – the acetal disc is the torque fuse |
-| hubIn-fix | post | 2 x Dowel pin Ø4 x 8 h6, slot plate to back plate | – screws hold the plates together | 4 x Countersunk M2.5 x 10 (ISO 10642); 4 x shank; 2 x Dowel pin Ø4 x 8 h6, slot plate to back plate | – static | – static | – static | – static | – static | – static | – static |
-| hubOut-fix | post | 2 x Dowel pin Ø4 x 8 h6, slot plate to back plate | – screws hold the plates together | 4 x Countersunk M2.5 x 10 (ISO 10642); 4 x shank; 2 x Dowel pin Ø4 x 8 h6, slot plate to back plate | – static | – static | – static | – static | – static | – static | – static |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| T1 | tongue-slot | cross-slide | – | – | none | none | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
+| T2 | tongue-slot | – | – | – | none | none | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
+| O1 | J2 | cross-slide | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the hub in on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 7 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | J2 | cross-slide | hung (moved) | – | Bridge over the pivot, on two spigoted posts | External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7 (DIN 6885) | none | none | none | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| O2-bridge | O2 | hung | moved | 1.5 | hub-in, disc, hub-out | see-through |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| output shaft O2 | no pin declared at O2, so no joint; a live shaft would put the housing behind the base, under a shaft that cannot pass the input hub | second J2 cartridge, H.housing turned over onto a bridge over the stack, keyed shaft down into the output back plate | the shafts of a coupling meet from opposite sides; the output hub's plan area holds the input shaft's sweep and the other way round |
-| base | rounded rectangle 16 mm round the sweep | grown 20 mm to the right, mounting holes and feet moved with it | the bridge posts must stand outside both hub sweeps and inside the base |
-| hubs | one part each | back plate and slot plate, twins, fixed by dowels and four countersunk screws | a blind groove cannot be an extruded outline; the shaft would show in a through slot |
-| disc | one body | body with a tongue on each face, twins | the tongues sit in the hub plates' z range |
-| slot walls | bare 18 mm slot | slot relieved 1.5 mm behind hardened strips, felt in each wall | M14, F8 |
-| bridge, output back plate | opaque | drawn see-through | L5, the tongues' working zone |
-| disc, tongues | aluminium default | acetal | named torque fuse and low-friction faces |
+| O2 (output hub's shaft) | J2 live shaft in a housing behind the base | hung from a bridge (record: support hung) | the output's shaft cannot come up through the input hub and disc |
+| hubs and disc | parts on solver slabs | placed by the record (axial), jaws and tongues as bars | three levels with the jaws and tongues between them; the disc small enough that the input slot shows past it |
+| hub-out | drawn opaque (principle) | see-through (teaching.seeThrough) | it would hide the disc, both tongues and both slots (the review's rethink) |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 10 | 0 | 238.9 |
-| DL-B | 0 | 219 | 225.5 |
-| DL-C | 0 | 0 | 65.6 |
-| DL-D | 13 | 0 | 55.7 |
-| DL-E | 12 | 3 | 53.5 |
-| DL-F | 0 | 0 | 53.2 |
-| DL-G | 0 | 0 | 53.7 |
-| DL-H | 22 | 0 | 41.6 |
-| never | 125 | 123 | 357.7 (full) |
+| DL-A | 5 | 0 | 1.53 |
+| DL-B | 0 | 118 | 1.55 |
+| DL-C | 0 | 0 | 1.5 |
+| DL-D | 6 | 0 | 1.59 |
+| DL-E | 10 | 1 | 1.47 |
+| DL-F | 0 | 0 | 1.51 |
+| DL-G | 0 | 0 | 1.49 |
+| DL-H | 9 | 0 | 1.43 |
+| never | 64 | 92 | 1.52 |
 
 ## Promotion candidates
-Hand fixes that should become rules or primitives.
-
-- A shaft entering from above: a J2 cartridge on a bridge (H.housing turned over, spacer, collar, thrust washer under the bridge) as a rule for a keyed part with no room under the base. Done by mirroring the housing in the polish. Also useful for the Schmidt coupling and the universal joints.
-- A blind-groove hub: a slot plate on a back plate, fixed by dowels and countersunk screws (one primitive, with the plates as twins).
-- A tongue or bar in a slot as a joint type: relieved slot, hardened strips with their screws, felt in the wall (the T1, T2 code, a cousin of J4 and J5). The Scotch yoke and the elliptic trammel will want it.
-- `growBase` should move the feet and `H.bridge` should grow the base itself when no post place is left inside it.
-- A moving solid that covers a working zone (here a back plate over the tongue) drawn see-through by the see-through stage, instead of a flag set in the polish.
-
-Rule or tool findings, no change made here: `tools/check` reads a pin's layer range (layers) while the rules read its height in mm, so a slot plate plated into the next layer's height needs the pin kept low (see K5); `growBase` leaves the feet at the old corners (worked around by moving them in the polish).
+Promoted in this pass: record-named see-through principle parts (`teaching.seeThrough`), record-named supports (`support` on a joint), `bars` on a part's face, the tongue-slot kit reading its slot (`slot: { width, length }`), the `cross-slide` block.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.1 KB
-screenshots: plan, 28°, side, full explode at 28° and 70°, dark and light, overlays on (looked at; baselines in tests/visual/__baselines__) · bench: Node, DPR 1.5, 2026-10-18; plan 381, 28° 332, side 245, explode 198 ms at full detail; other mechanisms 250 to 360 ms the same way; browser bench not run
+check: clean · K1 residual: 3.0e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.4 KB
+screenshots: dist/shots3/oldham-coupling (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

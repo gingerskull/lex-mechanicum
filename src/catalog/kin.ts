@@ -6,6 +6,7 @@ export const KIN_VOCAB = {
   shape: [
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
     "rope", "cage", "cross", "tracer", "cylinder", "piston", "nut", "fork", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
+    "spatial-link", "ball", "race", "bell",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
@@ -18,6 +19,8 @@ export const KIN_VOCAB = {
     "dyad", "slider-dyad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
     "flexure", "escapement", "reeve", "variator", "integrator", "five-bar", "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet",
     "one-way", "escape", "verge",
+    // couplings and spatial linkages (R6)
+    "sarrus", "cross-slide", "parallel-cranks", "plane-slide", "rzeppa", "conical-pendulum",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;
@@ -128,4 +131,6 @@ export interface Teaching {
   plot: { x: string; y: string; label: string } | { x: string; y: string; label: string }[];
   claims: { text: string; output: string; stat: (typeof TEACHING_VOCAB.stat)[number]; value: number; tol: number }[];
   exceptions: { reason: string; [k: string]: unknown }[];
+  /** Principle bodies drawn see-through on purpose (T10): a part that would hide the principle behind it. */
+  seeThrough?: string[];
 }

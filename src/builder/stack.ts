@@ -65,6 +65,8 @@ export interface StackResult {
   notes: string[];
   /** Where the bridge's beam is and what it covers; the bridge's id. */
   bridge?: { id: string; route: BridgeRoute };
+  /** The length added to a live input shaft's far end for a drive there (rules/shared.ts driveInPlan), mm. */
+  farStub?: number;
   /** A shaft in plan's free end for the drive (its end point, the outward direction and the body it turns with). */
   end?: { at: Vec3; out: Vec3; body: string };
 }
@@ -234,6 +236,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const shaftId = `${id}-axle`;
   let name: string;
   let bridge: StackResult["bridge"];
+  let farStub = 0;
   const fromBase = support !== "hung" && support !== "pillow" && spec.base !== null;
 
   if (support === "pillow") {
@@ -246,7 +249,8 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
     // the drive's pulley goes on the end facing away from the default view (rules/shared.ts driveInPlan)
-    shaftSpec.z1 = p.shaft[1] + (live ? (spec.input && v3.dot(spec.frame.z, ctx.viewDir()) > 0.5 ? 18 : 12) : 0);
+    farStub = live && spec.input && v3.dot(spec.frame.z, ctx.viewDir()) > 0.5 ? 6 : 0;
+    shaftSpec.z1 = p.shaft[1] + (live ? 12 + farStub : 0);
     // a part overhung past both blocks is held on the shaft's end by a washer and a countersunk screw (J10, F2)
     const top = members[members.length - 1]!;
     if (live && Math.max(...p.w) < top.w0) {
@@ -256,6 +260,7 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       L.add(H.screw(`${id}-es`, "csk", M, 2 * M + wh, { body: turn, face: top.w1 + wh, dir: -1 }));
       serve("F2", `${id}-ew`, `${id}-es`);
       shaftSpec.z1 = top.w1;
+      farStub = 0;
     }
     ctx.routes.push({ support: `${id}-pb`, site: id, kind: "pillow", tried: p.tried, moved: p.moved, covers: p.covers, gap: p.gap });
     for (const [f, ids] of Object.entries(p.serves)) serve(f, ...ids);
@@ -284,7 +289,9 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       shaftSpec.z0 = first.w0 - 2.5;
       grooves.push(first.w0 - 2.5 + 0.6);
     }
-    if (support === "housing" || (live && spec.base)) {
+    // a live shaft hung from its bridge (named so by the record) turns in the bridge's bushing, no housing in the base,
+    // unless it is the input: the drive under the base takes its low end through the housing (an internal Geneva's crank)
+    if (support === "housing" || (live && spec.base && (support !== "hung" || spec.input))) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
       shaftSpec.z0 = h.bottom - 18;
       serve("F2", `${id}-hcl0`, `${id}-hcl1`);
@@ -345,13 +352,13 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   L.add(sh);
   if (live && spec.input) sh[sh.length - 1]!.accent = true;
   if (!live) serve("F1", shaftId);
-  return done(L, support, undefined, extra, bridge);
+  return done(L, support, undefined, extra, bridge, farStub);
 
-  function done(Lc: Local, sup: SupportKind, top?: number, more: Solid3[] = [], br?: StackResult["bridge"]): StackResult {
+  function done(Lc: Local, sup: SupportKind, top?: number, more: Solid3[] = [], br?: StackResult["bridge"], stub = 0): StackResult {
     for (const x of Lc.list) if (!x.joints.length) x.joints = [...spec.joints];
     const w0 = Math.min(...Lc.list.map((x) => x.z0));
     const w1 = Math.max(...Lc.list.map((x) => x.z1), top ?? -Infinity);
-    return { solids: [...Lc.out(), ...more], d, fit, support: sup, bores, w0, w1, serves, notes, ...(br ? { bridge: br } : {}) };
+    return { solids: [...Lc.out(), ...more], d, fit, support: sup, bores, w0, w1, serves, notes, ...(br ? { bridge: br } : {}), ...(stub ? { farStub: stub } : {}) };
   }
 }
 
