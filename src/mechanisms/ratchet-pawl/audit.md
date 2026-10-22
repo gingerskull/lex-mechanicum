@@ -180,7 +180,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | D | J3 | ratchet | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
-| OW | J2 | ratchet | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 10 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Inner-race spacer 12.2x16.2; Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| OW | J2 | ratchet | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 5 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Inner-race spacer 12.2x16.2; Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | T1 | pawl-tooth | – | – | – | none | none | none | none | none | Torsion spring Ø15, wire 0.8: holds the pawl on the teeth | none | none | none | none |
 | T2 | pawl-tooth | – | – | – | none | none | none | none | none | Torsion spring Ø13, wire 0.8: holds the pawl on the teeth | none | none | none | none |
 | H | J1 | ratchet | – | – | Dead axle Ø6, shouldered, M5 end | External circlip DIN 471, Ø6 | none | Thrust washer 6.2x14, bronze | none | none | none | none | none | none |
@@ -213,5 +213,5 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 None yet.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.7 KB
+check: clean · K1 residual: 2.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.8 KB
 screenshots: dist/shots3/ratchet-pawl (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

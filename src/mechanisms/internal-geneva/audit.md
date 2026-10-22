@@ -179,7 +179,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| O | J2 | driver | hung (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 12 (DIN 6885) | Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O | J2 | driver | hung (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7 (DIN 6885) | Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | S | J4 | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | L | J7 | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | W | J1 | – | – | – | Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
@@ -211,5 +211,5 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 None yet.
 
 ## Verification
-check: clean · K1 residual: 3.6e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 27.3 KB
+check: clean · K1 residual: 3.6e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 27.4 KB
 screenshots: dist/shots3/internal-geneva (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

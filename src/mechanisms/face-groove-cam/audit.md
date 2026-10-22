@@ -180,7 +180,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | F | J3 | – | – | – | none | Shoulder bolt Ø3 x 10, M2.5 (ISO 7379) | Shoulder bolt Ø3 x 10, M2.5 (ISO 7379) | none | none | none | none | none | none | none |
-| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 20 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 15 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | C | groove-cam | cam | – | – | none | none | none | none | none | none | none | Felt oiler over the groove, oil-soaked wool felt | Disc | none |
 | G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | Stop block | none | Gib strip 3 x 6 x 90, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -210,5 +210,5 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 None yet.
 
 ## Verification
-check: clean · K1 residual: 7.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 37.6 KB
+check: clean · K1 residual: 7.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 37.7 KB
 screenshots: dist/shots3/face-groove-cam (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

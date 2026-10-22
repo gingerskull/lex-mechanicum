@@ -180,7 +180,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | F | J3 | – | – | – | none | Shoulder bolt Ø5 x 4, M4 (ISO 7379) | Shoulder bolt Ø5 x 4, M4 (ISO 7379) | none | none | none | none | none | none | none |
-| O | J10 | driver | pillow | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø21 | Feather key 4 x 4 x 144 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
+| O | J10 | driver | pillow | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø21 | Feather key 4 x 4 x 139 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
 | C | groove-cam | cam | – | – | none | none | none | none | none | none | none | Felt oiler over the groove, oil-soaked wool felt | Drum | none |
 | G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 90, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
