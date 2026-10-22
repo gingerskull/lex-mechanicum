@@ -52,11 +52,20 @@ export const placement: Rule = {
   apply(ctx) {
     for (const [id, g] of ctx.geoms) {
       const slab = ctx.extent(id);
-      if (!slab && !g.exact) continue;
-      const fam = slab?.frame ?? g.frame;
+      if (!slab && !g.exact && !g.level) continue;
+      const fam = slab?.frame ?? (g.level ? ctx.extent(g.level.with)?.frame : undefined) ?? g.frame;
       // a body that stands where its joints put it (a bevel gear on its pitch cone, a yoke and a cross on their centre)
       // is placed there, wherever a slab would put it
-      const o = g.exact || !slab ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact?.offset ?? 0)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      let o = g.exact || !slab ? v3.add(g.frame.o, v3.mul(g.frame.z, g.exact?.offset ?? 0)) : fromPlane(fam, planeCoords(fam, g.frame.o).uv, slab.w0);
+      // a body at another body's level: its lower or upper plate, all of it, or above it
+      const lv = g.level;
+      const host = lv ? ctx.extent(lv.with) : undefined;
+      const hg = lv ? ctx.geoms.get(lv.with) : undefined;
+      if (lv && host && hg) {
+        const lowerH = hg.upper ? hg.thick - hg.upper.h : hg.thick;
+        const w = host.w0 + (lv.part === "upper" ? lowerH : lv.part === "above" ? hg.thick : 0) + (lv.gap ?? 0);
+        o = fromPlane(host.frame, planeCoords(host.frame, g.frame.o).uv, w);
+      }
       const body = ctx.kin.bodies.find((b) => b.id === id)!;
       // a second set of like links (`set: "B"`, a Schmidt coupling's) takes a pattern of its own (T16)
       const set = (body as { set?: unknown }).set;
@@ -83,7 +92,7 @@ export const placement: Rule = {
         body: id,
         frame,
         profile: g.part ? { outer: [...g.part.profile.outer], holes: g.part.profile.holes.map((h) => [...h]) } : { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
-        op: g.part ? g.part.op : g.revolve ? revolveOp(g.profile) : extrudeOp(g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
+        op: g.part ? g.part.op : g.revolve ? revolveOp(g.profile) : extrudeOp(g.upper ? (g.upper.lower ?? g.thick - g.upper.h) : g.thick, g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}),
         ...(g.features?.length ? { features: g.features } : {}),
         marks,
         ex: 0,
@@ -93,6 +102,11 @@ export const placement: Rule = {
       };
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
+      // a slotted upper cheek on the solid lower one
+      if (g.upper) {
+        const lift = g.upper.lift ?? g.thick - g.upper.h;
+        ctx.add({ ...part, id: `${id}-cheek`, name: `${titleOf(id)}, ${g.upper.name ?? "upper plate"}`, frame: { ...frame, o: v3.add(o, v3.mul(frame.z, lift)) }, profile: { outer: [...g.upper.profile.outer], holes: g.upper.profile.holes.map((h) => [...h]) }, op: extrudeOp(g.upper.h), marks: [], joints: [...part.joints] });
+      }
       for (const pc of g.pieces ?? [])
         ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? (pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h)), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
     }
@@ -170,7 +184,11 @@ export const base: Rule = {
       for (const p of worldPoints(ctx.M, s)) if (p[2] <= bs.top + 2) grow(p);
     }
     // the points the teaching names on the ground (a rear axle line, a turning centre) lie on the base
-    for (const p of ctx.kin.points ?? []) if (p.body === "ground") grow(p.local.map(Number));
+    // (where the kinematics put them: a coordinate may be an expression of the params)
+    for (const p of ctx.kin.points ?? []) {
+      const q = p.body === "ground" ? ctx.S.refPts.get(p.id) : undefined;
+      if (q) grow(q);
+    }
     for (const h of ctx.baseHoles) {
       grow([h.at[0] - h.r, h.at[1] - h.r]);
       grow([h.at[0] + h.r, h.at[1] + h.r]);

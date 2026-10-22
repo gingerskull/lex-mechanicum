@@ -683,28 +683,58 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
     label(text, x + dx, y + dy, ink, true);
   };
   const o = ov as Record<string, unknown>;
+  // a posed overlay is drawn where an output reaches an extreme (a dead centre, the ends of a stroke): `pose` for all
+  // its points, `fromPose` and `toPose` for its first and second
+  const posed = (ref: unknown, which?: unknown): Vec3 | null => {
+    const q = (which ?? o.pose) as { output?: string; stat?: string } | undefined;
+    if (!q?.output || (q.stat !== "max" && q.stat !== "min")) return pointOf(A, ref);
+    const u = A.rt.scene.poser.phaseOf?.(q.output, q.stat);
+    if (u === null || u === undefined || typeof ref !== "string") return pointOf(A, ref);
+    return A.rt.scene.poser.point(u, ref);
+  };
+  const fromPt = () => posed(o.from, o.fromPose);
+  const toPt = () => posed(o.to, o.toPose);
+  // the same point where the kinematics put it, for a true length: the drawn point rides the top of its part
+  const rawOf = (ref: unknown, which?: unknown): Vec3 | null => {
+    const P = A.rt.scene.poser;
+    if (typeof ref !== "string" || !P.rawPoint) return null;
+    const q = (which ?? o.pose) as { output?: string; stat?: string } | undefined;
+    const u = q?.output && (q.stat === "max" || q.stat === "min") ? (P.phaseOf?.(q.output, q.stat) ?? A.u) : A.u;
+    return P.rawPoint(u, ref);
+  };
   switch (ov.kind) {
     case "line":
     case "chord": {
-      // a line drawn at a fixed pose (a toggle, an aim line at neutral) holds its driver at that value
+      // a line drawn at a fixed pose (a toggle, an aim line at neutral) holds its driver at that value; one posed at an
+      // output's extreme (a dead centre) is drawn there
       const fixed = o.pose as { driver?: unknown; value?: unknown } | undefined;
-      const at = (ref: unknown) =>
-        fixed && typeof fixed.driver === "string" && typeof fixed.value === "number" && typeof ref === "string" && A.rt.scene.poser.pointAt
-          ? A.rt.scene.poser.pointAt({ [fixed.driver]: fixed.value }, ref)
-          : pointOf(A, ref);
-      const a = at(o.from), b = at(o.to);
+      const held = fixed && typeof fixed.driver === "string" && typeof fixed.value === "number" && A.rt.scene.poser.pointAt;
+      const at = (ref: unknown) => (typeof ref === "string" ? A.rt.scene.poser.pointAt!({ [fixed!.driver as string]: fixed!.value as number }, ref) : pointOf(A, ref));
+      const a = held ? at(o.from) : fromPt(), b = held ? at(o.to) : toPt();
       if (!a || !b) return;
       const ext = o.extend === true ? 0.25 : 0;
       const d = sub(b, a);
       poly([sub(a, mul(d, ext)), add(b, mul(d, ext))]);
-      tag(mul(add(a, b), 0.5));
+      // a line too short to carry its label (an eccentric's O-E) keeps it clear, past its far end
+      const [sx, sy] = P(A, a);
+      const [tx, ty] = P(A, b);
+      const sl = Math.hypot(tx - sx, ty - sy);
+      if (text && sl < O.shortLine) {
+        const ux = sl > 1e-6 ? (tx - sx) / sl : 1;
+        const uy = sl > 1e-6 ? (ty - sy) / sl : 0;
+        ctx.save();
+        ctx.font = font(DRAFT.type.overlaySmall);
+        const w = ctx.measureText(DRAFT.type.uppercase ? text.toUpperCase() : text).width / 2 + O.labelPadX + O.shortGap;
+        ctx.restore();
+        label(text, tx + ux * w, ty + uy * (O.labelHSmall / 2 + O.shortGap), ink, true);
+      } else tag(mul(add(a, b), 0.5));
       return;
     }
     case "dimension": {
-      const a = pointOf(A, o.from);
+      const a = fromPt();
       // a moment arm: from the point square to a line through two named points (the foot of the perpendicular, in plan)
       const ln = Array.isArray(o.line) && o.line.length === 2 ? [pointOf(A, o.line[0]), pointOf(A, o.line[1])] : null;
-      let b = ln ? null : pointOf(A, o.to);
+      let b = ln ? null : toPt();
       if (a && ln && ln[0] && ln[1]) {
         const d: Vec3 = [ln[1][0] - ln[0][0], ln[1][1] - ln[0][1], 0];
         const t = ((a[0] - ln[0][0]) * d[0] + (a[1] - ln[0][1]) * d[1]) / Math.max(1e-9, d[0] * d[0] + d[1] * d[1]);
@@ -714,6 +744,9 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         poly([add(ln[0], mul(sub(ln[1], ln[0]), lo)), add(ln[0], mul(sub(ln[1], ln[0]), hi))]);
       }
       if (!a || !b) return;
+      // one component of the span only (an offset measured square to a slide)
+      const k = typeof o.component === "string" ? "xyz".indexOf(o.component) : -1;
+      if (k >= 0) b = a.map((v, i) => (i === k ? b![i]! : v)) as Vec3;
       const p = P(A, a), q = P(A, b);
       ctx.save();
       ctx.fillStyle = ctx.strokeStyle;
@@ -726,7 +759,11 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       arrowHead(ctx, q, p, O.arrowDim);
       arrowHead(ctx, p, q, O.arrowDim);
       ctx.restore();
-      const m = ln ? Math.hypot(b[0] - a[0], b[1] - a[1]) : typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
+      // the true length: between the points where the kinematics put them (at their poses, one component if asked)
+      const ra = ln ? null : rawOf(o.from, o.fromPose);
+      let rb = ln ? null : rawOf(o.to, o.toPose);
+      if (ra && rb && k >= 0) rb = ra.map((v, i) => (i === k ? rb![i]! : v)) as Vec3;
+      const m = ln ? Math.hypot(b[0] - a[0], b[1] - a[1]) : ra && rb ? len(sub(rb, ra)) : typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
       if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
       return;
     }
@@ -763,7 +800,21 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
         return;
       }
-      const from = pointOf(A, o.from), to = pointOf(A, o.to), through = pointOf(A, o.through);
+      const from = fromPt(), to = toPt(), through = pointOf(A, o.through);
+      if (from && to && (o.fromPose || o.toPose)) {
+        // an arc on the circle a point runs on, between two of its poses (the cut and return of a crank): turning
+        // counter-clockwise about +z unless `sweep` is "cw"
+        // (the in-plane radius: the point stands on its part's top face, above the centre's level)
+        const r = Math.hypot(from[0] - c[0], from[1] - c[1]);
+        const a0 = Math.atan2(from[1] - c[1], from[0] - c[0]);
+        let a1 = Math.atan2(to[1] - c[1], to[0] - c[0]);
+        if (o.sweep === "cw") while (a1 > a0) a1 -= TAU;
+        else while (a1 < a0) a1 += TAU;
+        const pts = arcPts(c, [1, 0, 0], [0, 0, 1], r, a0, a1);
+        poly(pts);
+        tag(pts[32]!, 0, -10);
+        return;
+      }
       if (from && to) {
         const n = worldNormal(from, to, c);
         const e0 = unit(sub(from, c));
@@ -779,12 +830,15 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       if (through) {
         // the arc a point sweeps about the centre over the cycle: its extreme angles about the plane's normal (z)
         // (with `range`, only over those driver values: the stretch of a coupler curve that is a circular arc, at the
-        // arc's own `radius` when the record gives one)
+        // arc's own `radius` when the record gives one; else from the point's cached path, since sampling it each frame
+        // costs a pose per sample)
         const poser = A.rt.scene.poser;
         const r = typeof o.radius === "number" ? o.radius : len(sub(through, c));
         const name = typeof o.through === "string" ? o.through : "";
         const swept = Array.isArray(o.range) && poser.sweep ? poser.sweep(name, o.range as [number, number])?.[0] : undefined;
-        const samples = swept ?? Array.from({ length: 120 }, (_, k) => poser.point((k / 120) * poser.period, name));
+        const path = swept || !name ? null : pathOf(A, name);
+        const cached = path ? Array.from({ length: path.length / 3 }, (_, k): Vec3 => [path[3 * k]!, path[3 * k + 1]!, path[3 * k + 2]!]) : null;
+        const samples = swept ?? cached ?? Array.from({ length: 120 }, (_, k) => poser.point((k / 120) * poser.period, name));
         const angs: number[] = [];
         let prev = 0;
         for (const p of samples) {

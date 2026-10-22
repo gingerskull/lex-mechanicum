@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.5
+version: 3.6
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -293,6 +293,9 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `fork-pin` | J4, F2 |
 | `pawl-tooth` | J7, F6, F5 |
 | `ring-hub` | J3, F2 |
+| `eccentric` | J3, F2, F8, M14 |
+| `die` | J4, M14 |
+| `hub` | J1, F1, F2, M14 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
 | `j12-other` | J12, F7 |
@@ -305,6 +308,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `adjustable-length` | F7, A22 |
 | `cable-clip` | A22, V6 |
 | `standoffs` | A6 |
+| `covers` | F1, F2, F7 |
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
 | `timing-marks` | F9 |
@@ -717,6 +721,21 @@ oscillating cylinder, locomotive drive, Walschaerts, Wankel, toggle clamp)
 - Scotch yoke: slide block in the slot (M14 liners). Toggle clamp: `manual`, over-centre stop visible (F5), adjustable
   spindle with lock nut (F7), a workpiece block. Oscillating cylinder: pivot pin retained (F2); spring holding the port
   face (F6).
+- J5 on ground ways stands on risers from the base, so every part pinned to a slider lies over it (placement); its
+  rails stop short where a crank turns past their ends, a side whose part reaches past its block (a crosshead's arm)
+  keeps only its riser's lip. A block sliding in a moving part's slot (a crank-shaper's or Whitworth's lever) shares
+  that part's slab and runs on wear strips in the slot: the slot is the guide.
+- An eccentric (a revolute with a journal `radius`, sheave and strap) is a kit of its own: one slab, a split bronze liner,
+  a cheek ring, an oil nipple. A part turning on a fixed hub (a ground revolute with a `radius`: Whitworth's bull gear)
+  is the hub kit: hub post, liner, cap ring, slotted base holes for the backlash; a pivot inside the hub stands through it.
+- A curved slotted link (an expansion link) is two cheeks, the lower solid on its trunnion, the upper slotted, so its
+  die (the die kit, on the shared pin's spigot) runs in a groove over the trunnion; the die's carrier lies over the link.
+- When each pivot lies in the other part's sweep (a drag link with a rod over the output pivot), the output part is
+  split in two plates round a gap and its live shaft turns in a bushing in a bridge between them. A return crank fixed
+  on the outer end of a main crank pin is an outboard arm on a slab of its own, clamped in the pin's stack.
+- A rotary engine: rotor web underneath on its eccentric, its gear ring on top meshing with the stationary gear, which
+  hangs from the side cover through slotted holes (backlash, F7); housing and cover at the rotor's level; the cover is
+  drawn see-through (T10). A manual driver's shaft (a reverse arm's) is held at its setting by a clamp collar (F6).
 
 **Cam and escapement** (cam follower, flat-faced, face-groove, desmodromic, barrel cam, anchor, lever, verge)
 - Blocks: cam, escapement. Kit: J7 complete: return spring with seat and preload, guide bushing with circlip,
@@ -865,6 +884,13 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.6 (2026-10-22).** Rebuild batch R3 (cranks, sliders and quick-returns). J5 rails and risers are judged against
+  the other parts' sweeps; a crosshead arm sits on its riser's lip; a block in a moving part's slot runs on wear strips
+  in that slot [J5, A6, F5, F8, M14, AUTO]. New kits: `eccentric` (sheave in strap, liner, cheek ring, nipple) [J3,
+  F2, F8, M14, AUTO]; `die` (a die in an expansion link of two cheeks) [J4, M14, AUTO]; `hub` (a part on a fixed hub)
+  [J1, F1, F2, M14, AUTO]; `covers` (a side cover on its housing, a stationary gear hung under it with slotted holes
+  for backlash) [F1, F2, F7, AUTO]. A split part on a live shaft in a bridge between its plates, outboard arms, and a
+  manual driver's shaft held by a clamp collar [A20, F6, AUTO].
 - **3.5 (2026-10-22).** Rebuild batch R6 (couplings and spatial linkages), and a check fix from R7. A drive on a shaft
   in plan, belt or crank and link, takes the far end only where it clears the moving parts' sweeps, else the low end; a
   lever's fork sensor that cannot stand under a low shaft's hub goes beside it [V1, V5, V6, AUTO]. Lugs and posts rules;

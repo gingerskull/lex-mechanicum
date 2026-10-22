@@ -2,6 +2,7 @@
 // Each rule reads the sites of its kit, hands every site to the one stack builder with the members the placement
 // solver set, and records the hardware, the bores it needs and the engineering note (A16).
 import { circle } from "../../core/geom";
+import { inside } from "../../core/poly";
 import type { Solid3 } from "../../solids/types";
 import type { BuildCtx } from "../ctx";
 import { canon, fromPlane, parallel, planeCoords, type Frame } from "../frames";
@@ -35,8 +36,12 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
   for (const b of site.bodies) {
     const joint = site.joints.find((j) => ctx.kin.joints.find((q) => q.id === j && (q.a === b || q.b === b)));
     const R = joint ? bossRadius(ctx, b, joint) : 8;
-    for (const part of [ctx.parts.get(b), ctx.twins.get(b)]) {
+    const upper = ctx.solids.find((s) => s.id === `${b}-cheek` && s.body === b);
+    for (const part of [ctx.parts.get(b), ctx.twins.get(b), upper]) {
       if (!part) continue;
+      // a plate of a two-plate body takes part in the stacks of the pins it reaches
+      const uv = planeCoords(part.frame, site.at).uv;
+      if (upper && (!inside(part.profile.outer, uv) || part.profile.holes.some((h) => inside(h, uv)))) continue;
       const slab = ctx.extent(b);
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
       // the twin's second half sits in its own slab
@@ -113,7 +118,13 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   const alongUp = parallel(frame.z, UP);
   const base = alongUp && ctx.base ? { top: ctx.base.top - frame.o[2], bottom: ctx.base.bottom - frame.o[2] } : null;
   const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual" || d.kind === "oscillating");
-  const held = ctx.placement.held.get(site.id) ?? "both";
+  // a fixed pin under a grooved link (an expansion link's trunnion) stands on the base only: its axle ends in the solid
+  // lower cheek, under the groove the die runs in
+  const grooved = site.fixed && site.bodies.some((b) => ctx.geoms.get(b)?.upper);
+  // a fixed plate placed over the pin (a stationary gear, a side cover over a rotor) leaves no room above its stack:
+  // the pin is held from the base and ends flush
+  const covered = site.fixed && [...ctx.geoms.values()].some((g) => g.level && g.level.part !== "lower" && g.level.part !== "all" && inside(g.profile.outer, planeCoords(g.frame, site.at).uv));
+  const held = grooved || covered ? "base" : (ctx.placement.held.get(site.id) ?? "both");
   const straddle = site.live && alongUp && held !== "base" && [...keyedIds].some((b) => ["gear", "pulley", "sprocket"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)));
   const spec: StackSpec = {
     id: site.id,
@@ -126,6 +137,10 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     input: !!driver && site.joints.includes(driver.joint ?? ""),
     straddle,
     eccentric: ctx.eccentric.has(site.id),
+    ...(grooved ? { flush: true } : {}),
+    ...(site.live && ctx.kin.drivers.some((d) => d.kind === "manual" && d.joint && site.joints.includes(d.joint)) ? { hold: true } : {}),
+    // a part split in two plates round a gap (its upper plate lifted clear of the lower) is carried between them
+    ...(site.fixed && members.length === 2 && members[0]!.body === members[1]!.body && ctx.geoms.get(members[0]!.body)?.upper?.lift !== undefined ? { between: true } : {}),
     baseTopWorld: ctx.base?.top ?? 0,
   };
   // a member set along the shaft by a param control (shape.slide { param, along, offset }) reaches its whole range

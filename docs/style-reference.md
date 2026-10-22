@@ -497,6 +497,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.arrow` | 10 | px, force arrowhead |
 | `draft.overlays.arrowSmall` | 9 | px, axial and spin arrowheads |
 | `draft.overlays.arrowDim` | 7 | px, dimension arrowheads |
+| `draft.overlays.shortLine` | 70 | px, a construction line shorter than this carries its label past its far end |
+| `draft.overlays.shortGap` | 8 | px, gap from that end to the label |
 | `draft.overlays.arrowAngle` | 0.42 | radians, arrowhead half-angle |
 | `draft.overlays.axialDash` | [5, 4] | px |
 | `draft.overlays.axialOvershoot` | 14 | px past each end |
@@ -532,6 +534,12 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.plot.labelAlpha` | 0.5 | 0..1, axis tick labels |
 | `draft.plot.curve.width` | 1.6 | px, 0..1, ink |
 | `draft.plot.curve.alpha` | 0.95 | px, 0..1, ink |
+| `draft.plot.ghost.width` | 1 | px, 0..1, px: the same output at the settings not selected |
+| `draft.plot.ghost.alpha` | 0.45 | px, 0..1, px: the same output at the settings not selected |
+| `draft.plot.ghost.dash` | [3, 3] | px, 0..1, px: the same output at the settings not selected |
+| `draft.plot.second.width` | 1.2 | px, 0..1, px: a further output in the same unit |
+| `draft.plot.second.alpha` | 0.7 | px, 0..1, px: a further output in the same unit |
+| `draft.plot.second.dash` | [7, 3] | px, 0..1, px: a further output in the same unit |
 | `draft.plot.hatch.pitch` | 5 | px, px, 0..1, hatching under the curve |
 | `draft.plot.hatch.width` | 0.7 | px, px, 0..1, hatching under the curve |
 | `draft.plot.hatch.alpha` | 0.18 | px, px, 0..1, hatching under the curve |

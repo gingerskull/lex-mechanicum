@@ -1,174 +1,216 @@
 # Audit: Locomotive driving gear (locomotive-drive)
-standard: 2.3 · date: 2026-10-18 · result: pass · detail: full · pass: build
-defer: F7 · H.turnbuckle (2.5) could make a rod length adjustable; F7 passes on the gib and belt, judged again in its next pass
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 113 · FAIL 0 · N/A 8 · open: none
+PASS 147 · FAIL 0 · N/A 20 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | the standard carries version 2.3 and its changelog |
-| S2 | PASS | header with standard, date, result, detail, pass |
-| S3 | PASS | tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | #29 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | catalogue validator clean; record untouched |
-| P3 | PASS | ratio unity 1:1, axes, output character, backdrivable, other names, family, motion, level, dof and the motorised drive (linear input, belt carriage) |
-| P4 | PASS | tags grouped Function, Property, Application, keywords underneath |
-| P5 | PASS | motion, forces, benefits, limits; three uses with one line each |
-| P6 | PASS | Wikipedia pages and a photo page; three videos |
-| P7 | PASS | no prose in model.ts or polish.ts; lint-style clean |
-| P8 | PASS | no parts list, build or joint sections on the page |
-| P9 | PASS | explain matches solve(): stroke 34 mm (x -97 to -63), main rod angle up to 12.3°, coupled wheels 1:1, rods stay level |
-| P10 | PASS | crank pin path traced, velocity at the crosshead and the crank pin, main rod force line, wheel spin, rod angle, crosshead position plot |
-| P11 | PASS | catalogue prose unchanged: plain, short sentences, no em dashes |
-| K1 | PASS | link error 2.8e-14 mm; polish changes windows, hardware and heights only |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | disc (wheels), link, slider, rails, caps; at, between, fixed placement |
-| K4 | PASS | roles driver (crosshead), output (wheels), link, ground (rails), pin; accent on the crosshead pin pX only |
-| K5 | PASS | no INTERFERE, OVERLAP or WARN; wheels layer 0 (14 mm thick, dz -8), coupling rod layer 1, main rod layer 2, crosshead and guide bars layer 1; dz in model.ts |
-| K6 | PASS | R 34, axle spacing 80, crank pin 17, main rod 80, stroke 34: as the catalogue. Deviations, commented in model.ts: crosshead and guide bars sit 5 mm under their layer; the wheels are 14 mm thick so the axle end sits below the wheel face |
-| K7 | PASS | input linear on the crosshead |
-| D1 | PASS | wheels, tapered main rod, coupling rod, slider with square ends on two stadium guide bars |
-| D2 | PASS | rim, hub and four windows between spokes; bosses round the pins; main rod tapered to a larger big end |
-| D3 | PASS | roles told apart by pattern and tone in both sheets |
-| D4 | PASS | feet concentric with the corner arcs |
-| D5 | PASS | guide bars on ground risers; no bridges: the rods sweep over both axles (see A9) |
-| D6 | PASS | drive and slide hardware read quieter than wheels and rods |
-| D7 | PASS | wheels, rods, crosshead and base carry only load shape and manufacturing marks |
-| A1 | PASS | pW J1, pC and pX J3, slide J5 |
-| A2 | PASS | dead axles, shoulder bolts at C1, C2 and X, slide on the guide bars |
-| A3 | PASS | 6000-2RS on the Ø10 axles, F688ZZ on the Ø8 crank pins, F686ZZ on the Ø6 wrist pin |
-| A4 | PASS | stepped axles with shoulders, circlip groove and undercut threads |
-| A5 | N/A | no keyed part: the wheels turn on dead axles |
-| A6 | PASS | guide bars on a 15 mm ground steel riser each, two countersunk M3 each, the reference bar dowelled (v2.4) |
-| A7 | PASS | 8 mm base 2 mm under the wheels, counterbored corners, feet, engraved path, scale, slot for the belt carriage |
-| A8 | PASS | every head has its shank; holes cut by stage 3 |
-| A9 | PASS | see joint table: axles are single shear by necessity (both rods sweep over them); a bridge would stand above the rods with the axle through them. X is single shear with the main rod over the crosshead, shortest overhang. C1: pin held at the wheel and clamped by its head over the main rod |
-| A10 | PASS | crosshead and guide bars under the main rod; coupling rod 1.5 mm over the wheels; main rod 1.5 mm over the coupling rod |
-| A11 | PASS | axle to base with nyloc; crank pin through the wheel into the thick wheel; rails screwed and dowelled to the base. Axles held at the base only (stub axles) |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · the batch issue #214 holds only this mechanism's decisions; plan and status in #202 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site build) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in batch R3 (#214): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | PASS | DATA · catalogue validator clean |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states is a claim and agrees (T9) |
+| P10 | PASS | HAND · M traced with a comet (a crank-radius circle), C1 and C2 traced; the rod angle arc at X is short (the rod tilts at most 12°) and lies under the main rod, so its label reads more than the arc; plot of crosshead position |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run on the record (E2, #204) and again on the six phases of the finished build (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 6.8e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 2 blocks (dyad, slider-dyad); no numeric fallback · composed from the block library; no fallback, no one-off model |
+| K4 | PASS | HAND · wheel1 the driver with the accent, wheel2, coupling rod, main rod, crosshead on ways |
+| K6 | PASS | DATA · R 34, spacing 80, crank 17, main rod 80: stroke 34, wheels 1:1, coupling rod level as the defining relations say |
+| K7 | PASS | DATA · drivers input (rotary) · input kind declared with its driven joint |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one rotary driver on wheel1 (driven so the cycle passes the dead centres) |
+| K10 | PASS | AUTO / DATA · the declared closures, continuous over the cycle (no POSE JUMP) |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · the coupling rod stays level and its midpoint traces the crank circle: the parallelogram reads; mechanics only |
+| T2 | PASS | HAND · review before the build (E2) and again on the six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · both wheels, coupling rod, main rod, crosshead and M declared |
+| T4 | PASS | DATA · fired: trace-marks (1 solid) · M traced (a circle of crank radius), both crank pins traced |
+| T5 | PASS | DATA · the main rod's angle at the crosshead |
+| T6 | PASS | HAND / DATA · crank 17 on 34 wheels: the coupling rod's sweep is plain |
+| T7 | PASS | DATA · PLAN |
+| T8 | N/A | DATA · the principle reads in plan; no section or detail view declared |
+| T9 | PASS | AUTO / DATA · claim table: 3 ok, 0 off, 0 uncheckable of 3 |
+| T10 | PASS | AUTO · 1 solid drawn see-through: guide-keeper · the static solids over the principle in plan are drawn see-through (listed) |
+| T11 | N/A | AUTO · 0 supports routed, 0 moved off a sweep · no routed support near the principle |
+| T12 | PASS | HAND · 14 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · nothing goes by in a blink |
+| T14 | PASS | HAND / DATA · the crank driver |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart by hue |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · two wheel discs with crank pins, coupling and main rods, crosshead block on ways |
+| D2 | PASS | HAND · bosses round every pin |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · ways on ground risers |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
+| D9 | N/A | AUTO / HAND · no member changes shape |
+| D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
+| D11 | PASS | AUTO · SOLID: 0 of 134 solids unsound |
+| D7 | PASS | HAND · plain wheels and rods; richness in stacks and ways |
+| A1 | PASS | AUTO · C1 J3, C2 J3, X J3, W1 J2, W2 J2, guide J5, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · C1 J3, C2 J3, X J3, W1 J2, W2 J2, guide J5, drive drive · pins and shafts by kit and stack; slides by J5; the kits listed |
+| A3 | PASS | AUTO · fired: classify (7 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them, bushings or liners elsewhere |
+| A4 | PASS | AUTO · fired: j1-dead-axle (no solids), axial stack builder · stepped shafts with shoulders, grooves, flats and chamfered ends (H.shaft) |
+| A5 | PASS | AUTO · fired: j2-live-shaft (50 solids), j10-shaft-in-plan (no solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
+| A6 | PASS | AUTO · fired: j5-slide (16 solids), j13-compliant (no solids), standoffs (no solids) · ways on ground risers; fixed plates posted or screwed down |
+| A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (14 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | PASS | AUTO / HAND · fired: placement solver · crank pins single shear; wheels on live shafts |
+| A10 | PASS | HAND · fired: placement (10 solids), placement solver · wheels, coupling rod, main rod, crosshead on the ways under its pin |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · rods to pins to wheels to shafts to housings to base; crosshead to ways to base |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | every solid named with catalogue sizes |
-| A14 | PASS | belt clamp, sensor and lead clear of every sweep; clearance 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | a note and a badge on every joint, five build rules |
-| A17 | PASS | axle, bearing, wheel, circlips; rails on risers, gib, crosshead, keeper; coupling rod, then main rod on the crank pin; wrist pin last |
-| E1 | PASS | one level per solid |
-| E2 | PASS | screws, bolts, shafts and bought units are groups |
-| E3 | PASS | pins and keeper screws upward, drive screws downward |
-| E4 | PASS | main rod above coupling rod above wheel; the last part fitted goes furthest |
-| E5 | PASS | bearings and circlips stay in their parts |
-| E6 | PASS | motor with bracket, bearings whole |
-| E7 | PASS | spacers midway |
-| E8 | N/A | no keyed parts on a shaft |
-| E9 | PASS | readable at full explode at 28° and 70°; axles lift out of the wheels at level 1.5, below the rods' level |
-| J1 | PASS | wheels on stub axles: shoulder, sealed bearing between circlips, external circlip, bronze thrust washer, nyloc below the base. No bridge or oil sink (variant, see overrides) |
-| J2 | N/A | no live shaft: the input is the crosshead |
-| J3 | PASS | C1, C2 and X: shoulder bolts, bearings in the rods, inner-race spacers, threadlocker |
-| J4 | N/A | no pin in a slot |
-| J5 | PASS | guide bars (one the dowelled reference), a bronze gib clamped under the keeper by the other bar's screws, felt wipers, grease nipple, an end stop block with a pad at each end |
-| J6 | N/A | no gear mesh |
-| J7 | N/A | no cam |
-| J8 | PASS | flanged motor pulley, slotted tensioner arm on the idler, carriage clamped to the belt |
-| F1 | PASS | axle shoulders; guide bars dowelled to the base; no removable bearing plate |
-| F2 | PASS | circlips each side of the wheel bearings, external circlip on each axle, keeper holds the crosshead down |
-| F3 | N/A | no keyed part |
-| F4 | PASS | bronze thrust washer under each wheel on the base |
-| F5 | PASS | end stops with neoprene pads just past both ends of the stroke |
-| F6 | N/A | driven; no rest position to hold |
-| F7 | PASS | gib set on slotted holes and clamped under the keeper; belt tension on the slotted arm. The rod lengths are fixed (see promotion candidates) |
-| F8 | PASS | felt wipers and grease nipple on the slide; sealed bearings |
-| F9 | PASS | a timing mark on each wheel rim at the crank pin |
-| F10 | PASS | pulley flanges, home flag and fork sensor; no slip clutch: the stops are never touched in running |
-| M1 | PASS | edge breaks on every top face |
-| M2 | PASS | wheels carry hub, rim and four windows (two next to the crank pin left solid) |
-| M3 | PASS | bore entry chamfers on every seat and through hole |
-| M4 | PASS | counterbored housing screws and base corners, countersinks for keeper and rail screws |
-| M5 | PASS | wheel windows filleted R3 |
+| A13 | PASS | AUTO / HAND · 134 solids, 66 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps; details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 7 joint notes; no note: none; no badge: guide · a note per joint |
+| A17 | PASS | HAND · base, housings and wheels, coupling rod, main rod, ways, crosshead |
+| A18 | PASS | AUTO · placement: 3 slabs in the tallest stack (33.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver (order kept: a slider's partners over it, a die's carrier over its link) |
+| A19 | N/A | AUTO · 0 supports routed (0 moved), least gap - mm; still covering a principle part, drawn see-through: none · no routed support |
+| A20 | PASS | AUTO · support per joint: none · one axial stack builder with its support selector |
+| A21 | PASS | AUTO · kit per joint: C1 J3, C2 J3, X J3, W1 J2, W2 J2, guide J5, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · no rocker stops: every part is coupled and never over-travels; cable clip |
+| E1 | PASS | AUTO · every solid has one explode level; levels -4 to 3 · one level per solid, nothing stretches |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · main rod and keeper furthest (explode shots) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable in ISOMETRIC on both sheets, nothing leaves the frame |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | N/A | AUTO · fired: trunnion (no solids), hub (no solids), j1-dead-axle (no solids) · no fixed dead pivot |
+| J2 | PASS | AUTO · fired: j2-live-shaft (50 solids) · live shafts: housing, key or D-flat, part held on the shaft end where something sweeps over |
+| J3 | PASS | AUTO · fired: j3-moving-pin (31 solids), cross-bearings (no solids), ring-hub (no solids), eccentric (no solids) · moving pins: shoulder bolts with bearings or bushings; eccentrics on liners |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids), die (no solids) · no pin in a slot |
+| J5 | PASS | AUTO · fired: piston-bore (no solids), j5-slide (16 solids), tongue-slot (no solids) · slides: ways on risers with a gib under a keeper, wipers where they clear |
+| J6 | N/A | AUTO · fired: j6-mesh (no solids), ring-rollers (no solids) · no parallel mesh |
+| J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids) · no shaft in plan |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at W1, W2, guide; fired: j2-live-shaft (50 solids), j10-shaft-in-plan (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · housings, hubs, bridges and ways dowelled (Joints table) |
+| F2 | PASS | AUTO · served at C1, C2, X, W1, W2, guide; fired: j2-live-shaft (50 solids), j10-shaft-in-plan (no solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · every bearing retained; every part on a shaft or pin retained (Joints table) |
+| F3 | PASS | AUTO · served at C1, C2, X, W1, W2; fired: j2-live-shaft (50 solids), j10-shaft-in-plan (no solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
+| F4 | PASS | AUTO / HAND · served at C1, W1, W2; fired: j9-crossed-mesh (no solids), j2-live-shaft (50 solids), j10-shaft-in-plan (no solids), trunnion (no solids) · thrust washers and spacers locate every stack (Joints table) |
+| F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (16 solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · the rod drives the slider and the cranks turn round: nothing over-travels; no stop has room past the travel |
+| F6 | N/A | AUTO / HAND · served at no joint; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids), j12-flexible (no solids) · nothing is held by a spring or detent: every part is driven by its pin |
+| F7 | PASS | AUTO / HAND · served at guide; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (16 solids), j12-flexible (no solids), adjustable-length (no solids), covers (no solids) · gibs on the ways |
+| F8 | PASS | AUTO · served at guide; fired: cross-bearings (no solids), tongue-slot (no solids), eccentric (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) · grease nipples or oil holes on the ways, felt wipers; sealed bearings elsewhere |
+| F9 | PASS | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (1 solid) · zero line on the input and on the base (timing marks) |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (26 solids) · home flag and fork sensor on the input (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · bosses round every pin |
+| M3 | PASS | AUTO · fired: j3-moving-pin (31 solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (14 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | PASS | windows filleted; no sharp inside corner |
-| M8 | PASS | undercuts on every threaded shoulder |
-| M9 | PASS | pins into the steel wheel over full thickness; standard lengths |
-| M10 | PASS | cast steel wheels, steel rods, bronze crosshead and gib, hardened rails |
-| M11 | PASS | centre holes and chamfered ends on the axles |
-| M12 | PASS | every head reachable; bearings pressed out past their circlips |
-| M13 | PASS | threadlocker on every screw, nyloc on the axles; the gib is held by the keeper's clamp, no lock nuts |
-| M14 | PASS | hardened rails and bronze gib are the replaceable wear parts |
-| V1 | PASS | pancake outrunner Ø50 x 18 under the base, GT2 16T pulley, belt loop |
-| V2 | PASS | one-piece bracket, flange screws up into the base |
-| V3 | PASS | belt and pulleys clear of feet and axle nuts; clearance 0 |
-| V4 | PASS | pulley flanges, slotted tensioner arm |
-| V5 | PASS | linear: belt loop along the stroke, carriage clamped to the crosshead through a slot in the base (slot lengthened and carriage clamp added in the polish, see overrides), tensioner on the far pulley |
-| V6 | PASS | home flag on the carriage and a fork sensor added in the polish (the linear drive has none: promotion candidate), leads to the terminal block, one P-clip |
-| L1 | PASS | lint-style clean |
-| L2 | PASS | the polish carries geometry, roles, marks and materials only |
-| L3 | PASS | crosshead driver, wheels output, rods link, guide bars ground, hardware hw |
-| L4 | PASS | accent on the input (crosshead pin) only |
-| L5 | PASS | screws, bearings and axles are real solids in real holes |
-| L6 | PASS | depth order right at plan, 28°, side and explode |
-| L7 | PASS | tilt 0° to 88°, no shear |
-| L8 | PASS | engraved crank pin path, scale and timing marks are marks |
-| R1 | PASS | the polish reuses H.shaft, H.bearing, H.circlip, H.spokes, H.sensor, H.plate, H.screw, H.lead; no inline standard part |
-| R2 | PASS | threads M2.5, M3, M4, M5, M6, M8; joints Ø6, 8, 10; three bearing sizes |
-| R3 | PASS | drive and slide from their subassemblies |
-| R4 | PASS | package built at build time, 24 KB |
-| R5 | PASS | states only what differs; no sampling; polish about 3 ms |
-| R6 | PASS | Node CPU bench: plan 327, 28° 367, side 222, explode 222 ms at full detail; browser frame times not measured in this session (Node numbers rank views, not devices) |
-| R7 | PASS | HAND · model.ts + polish.ts 10.0 KB |
-| R8 | PASS | pre-rendered thumbnails; the stage draws on change only |
-| DL1 | PASS | every solid and mark on a rung; the polish moves nothing |
-| DL2 | PASS | default dial full |
-| DL3 | PASS | DL-D drawn when exploded, DL-B skipped at side elevation |
-| DL4 | PASS | adaptive dial and the detail entry in the title block |
-| DL5 | PASS | rung counts and frame times in the detail ladder below |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 129 of 134 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 17 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | PASS | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids), eccentric (no solids), die (no solids), hub (no solids) · gibs and wipers on the ways are the replaceable wear parts |
+| V1 | PASS | AUTO · fired: drive (26 solids) · brushless pancake motor, GT2 32:16 |
+| V2 | PASS | AUTO · fired: drive (26 solids) · one bracket for the motor |
+| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
+| V5 | PASS | AUTO · fired: drive (26 solids) · rotary input: belt to the input pulley |
+| V6 | PASS | AUTO · fired: drive (26 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records carry no look; no polish |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (1 solid) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (1 solid) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | N/A | AUTO / DATA · no section or detail view declared |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 20.8 KB · package v2 written at build time |
+| R5 | PASS | HAND · no polish |
+| R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 54 of 134 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 24.1 KB; site build and site tests run by CI |
-| Q4 | PASS | plan, 28°, side, explode at 28° and 70°, both sheets looked at; attached to #29 |
-| Q5 | PASS | Node CPU bench; flags under R6 |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 20.8 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · dist/shots3/<id>: record view, PLAN, FRONT, SIDE, ISOMETRIC, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench3 run (desktop) |
 | Q6 | PASS | every row judged |
-| Q7 | PASS | conformance: locomotive-drive at 2.3, pass |
+| Q7 | PASS | at 3.0 |
+| Q8 | PASS | teaching review: keep (2026-10-20); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pW1 | J1 | shaft | External circlip DIN 471, Ø10; 2 x Internal circlip DIN 472, Ø26 | none | Thrust washer 10.2x14, bronze | – held by the stub axle's thrust washer | – hub carries the load | – wheel turns freely | – sealed bearing, greased for life | Driving wheel | none |
-| pW2 | J1 | shaft | External circlip DIN 471, Ø10; 2 x Internal circlip DIN 472, Ø26 | none | Thrust washer 10.2x14, bronze | – held by the stub axle's thrust washer | – hub carries the load | – wheel turns freely | – sealed bearing, greased for life | Coupled wheel | none |
-| pC1 | J3 | none | 2 x Internal circlip DIN 472, Ø16; 2 x Bearing F688ZZ (8x16x5); head | none | none | none | none | none | none | none | none |
-| pC2 | J3 | none | Internal circlip DIN 472, Ø16; Bearing F688ZZ (8x16x5); head | none | none | none | none | none | none | none | none |
-| pX | J3 | none | Internal circlip DIN 472, Ø13; Bearing F686ZZ (6x13x5); head | none | none | none | none | none | none | none | none |
-| slide-crosshead | J5 | none | Keeper plate, holds the slider down | none | none | 2 x End stop block, hardened | none | Gib strip 77 x 7 x 2.3, bronze, slotted, clamped under the keeper | 2 x wiper; Grease nipple M6 (DIN 71412) | none | none |
-| guidea-seat | post | – not dowelled: the gib on it takes up the fit | none | none | none | none | none | none | none | none | none |
-| guideb-seat | post | 2 x Dowel pin Ø3 h6 (ISO 8734), rail to base | none | none | none | none | none | none | none | none | none |
-| drive | drive | none | none | none | none | none | none | Tensioner arm, slotted, 2 x M4 | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| C1 | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 35, M6 (ISO 7379) | Shoulder bolt Ø8 x 35, M6 (ISO 7379) | Inner-race spacer 8.2x10.8 | none | none | none | none | none | none |
+| C2 | J3 | – | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| X | J3 | – | – | – | none | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | none | none | none | none | none | none | none |
+| W1 | J2 | slider-dyad | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the wheel1 on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 7 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| W2 | J2 | dyad | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the wheel2 on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 7 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| guide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 60, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| pW1, pW2 axle top | shoulder bolt, bridge on two posts above every sweep, the axle running up through the rods | stub axle ending below the wheel face on an external circlip; the bridge, its posts and the sleeve removed; sealed bearing | A9, A11: both rods sweep over each axle, so a bridge above them puts the axle through the rods; the thick wheel recesses the axle end |
-| wheel1, wheel2 | plain disc | four windows, rim 5 mm, hub 19 mm, none within 12 mm of the crank pin; timing mark on the rim | M2, F9 |
-| drive carriage | clamped to the belt by overlapping it | carriage 0.2 mm over the belt, clamp plate and two M3 screws under it; base slot cut 5 mm longer each end | A15: the rules' slot was shorter than the carriage's travel |
-| base plate | outline from the mechanism's extent only | grown 14.5 mm to the left (x -150) to hold the tensioner arm (x -142 to -116, it stood 6.5 mm outside the plate) | review finding #61: the base must contain every part fixed to it |
-| drive sensor | none for a linear input | fork sensor on the home flag, lead routed round the motor | V6 |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 14 | 0 | 242.8 (Node CPU) |
-| DL-B | 0 | 134 | 222.2 |
-| DL-C | 0 | 0 | 70.5 |
-| DL-D | 24 | 0 | 55.2 |
-| DL-E | 11 | 2 | 57.5 |
-| DL-F | 0 | 0 | 115.3 |
-| DL-G | 0 | 0 | 101.2 |
-| DL-H | 11 | 0 | 47.5 |
-| never | 89 | 162 | 367.1 (full) |
+| DL-A | 17 | 0 | 1.53 |
+| DL-B | 0 | 242 | 1.6 |
+| DL-C | 0 | 0 | 1.55 |
+| DL-D | 19 | 0 | 1.56 |
+| DL-E | 11 | 0 | 1.64 |
+| DL-F | 0 | 0 | 1.6 |
+| DL-G | 0 | 0 | 1.51 |
+| DL-H | 7 | 0 | 1.56 |
+| never | 80 | 202 | 1.74 |
 
 ## Promotion candidates
-- J1 dead axle: when a moving part sweeps over the axle above the top part, the rule builds a bridge above every sweep and runs the axle up through the sweeping parts (clashes). It should finish the axle below the sweep on an external circlip with a sealed bearing, as done here by hand.
-- `P.rails` could take `dz`: here it is set by mapping over the returned parts.
+None left.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.1 KB
-screenshots: plan, 28°, side, explode at 28° and 70°, both sheets, overlays on, looked at (attached to #29) · bench: Node CPU, DPR 1.5, 2026-10-18; 28° frame 367 ms at full detail, 47 ms at dial H (flag, R6; browser numbers not measured)
+check: clean · K1 residual: 6.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.3 KB
+screenshots: dist/shots3/locomotive-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

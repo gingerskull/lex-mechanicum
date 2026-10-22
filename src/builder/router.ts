@@ -76,7 +76,7 @@ const prism = (M: Wasm, poly: readonly Vec2[], z0: number, z1: number): Mf => {
  * Routes a bridge over the pivot `over`: two posts on the base outside every sweep, a beam above everything that passes
  * under its footprint. Returns null only when no post pair exists within the search radius.
  */
-export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: number; minBottom: number; baseTop: number }): BridgeRoute | null {
+export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: number; minBottom: number; baseTop: number; below?: number }): BridgeRoute | null {
   const M = ctx.M;
   const zAll = ctx.sweeps.bounds()?.[5] ?? o.minBottom;
   const zTall = Math.max(zAll, o.minBottom) + 4;
@@ -158,7 +158,8 @@ export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: numb
   const pick = evals[0]!;
   {
     // the underside above everything that passes under the footprint, moving or fixed
-    const tall = prism(M, pick.footprint, o.baseTop, zTall + 30);
+    // (only what passes under the ceiling, when the beam runs under one)
+    const tall = prism(M, pick.footprint, o.baseTop, o.below ?? zTall + 30);
     let bottom = o.minBottom;
     for (const b of ctx.sweeps.moving()) {
       const t = ctx.sweeps.of(b)?.topWithin(tall);
@@ -172,6 +173,9 @@ export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: numb
     }
     tall.delete();
     pick.bottom = Math.ceil(bottom * 2) / 2;
+  }
+  if (o.below !== undefined && pick.bottom + BEAM_T > o.below) {
+    return null;
   }
   const first = best[0]!;
   const cover = [...ctx.principle].length ? pick.covers : [];

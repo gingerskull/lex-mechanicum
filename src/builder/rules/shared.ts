@@ -132,8 +132,9 @@ export const stops: Rule = {
 
 // ---------------------------------------------------------------------------------------------------- standoffs (A6)
 
-/** A body no joint reaches: a fixed plate that has to stand on the base (A6). */
-const isFixedPlate = (ctx: BuildCtx, id: string): boolean => id !== "ground" && ctx.parts.has(id) && !ctx.kin.joints.some((j) => j.a === id || j.b === id);
+/** A body no joint reaches: a fixed plate that has to stand on the base (A6); a cover over another body's level rests on
+ * the housing round it instead (covers, below). */
+const isFixedPlate = (ctx: BuildCtx, id: string): boolean => id !== "ground" && ctx.parts.has(id) && !ctx.kin.joints.some((j) => j.a === id || j.b === id) && ctx.geoms.get(id)?.level?.part !== "above";
 
 /** True when a point lies in the sweep of the plate's own body (the post is under the plate it holds). */
 const insideOwn = (body: string, ctx: BuildCtx, p: Vec2): boolean => {
@@ -181,10 +182,75 @@ export const standoffs: Rule = {
         const at: [number, number, number] = [inset[0], inset[1], 0];
         (ctx.fired.standoffs ??= []).push(`${b.id}-post${k}`);
         ctx.add(place(UPF, H.standoff(`${b.id}-post${k}`, { at, z0: base.top, z1, joints: [b.id], ...(k ? { name: "", qty: 0 } : { name: `Standoff Ø${STANDOFF.D} x ${+(z1 - base.top).toFixed(1)}, M${STANDOFF.M}`, qty: 2 }) })));
-        // a screw that something sweeps over is countersunk flush (A6)
-        ctx.add(place(UPF, H.screw(`${b.id}-post${k}-top`, inPlan(inset) ? "button" : "csk", STANDOFF.M, 6 + 1.5 * STANDOFF.M, { at, face: z1 + (part.op.op === "extrude" ? part.op.h : 6) - (inPlan(inset) ? 0 : 0.5), dir: -1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
+        // a screw that something sweeps over, or that a cover lies on, is countersunk flush (A6)
+        const covered = [...ctx.geoms.values()].some((q) => q.level?.part === "above" && q.level.with === ctx.geoms.get(b.id)?.level?.with);
+        ctx.add(place(UPF, H.screw(`${b.id}-post${k}-top`, inPlan(inset) && !covered ? "button" : "csk", STANDOFF.M, 6 + 1.5 * STANDOFF.M, { at, face: z1 + (part.op.op === "extrude" ? part.op.h : 6) - (inPlan(inset) && !covered ? 0 : 0.5), dir: -1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
         ctx.add(place(UPF, H.screw(`${b.id}-post${k}-bot`, "button", STANDOFF.M, base.top - base.bottom + 1.5 * STANDOFF.M, { at, face: base.bottom, dir: 1, ...(k ? { name: "", qty: 0 } : {}), joints: [b.id] })));
       });
+    }
+  },
+};
+
+// ---------------------------------------------------------------------------------------------------- covers (F1, F2, F7)
+
+const topOf = (s: Solid3): number => s.frame.o[2] + (s.op.op === "extrude" ? s.op.h : 0);
+
+/**
+ * Fixed bodies placed at another body's level (an engine's housing round its rotor, its side cover over it, a stationary
+ * gear under the cover): the cover is screwed and dowelled down onto the housing, and a fixed part under the cover is
+ * screwed and dowelled up into it, its screws in slotted holes in the cover so it can be slid to set a mesh's backlash
+ * (F1, F2, F7).
+ */
+export const covers: Rule = {
+  id: "covers",
+  tier: "AUTO",
+  ids: ["F1", "F2", "F7"],
+  fixture: "wankel",
+  applies: (ctx) => [...ctx.geoms.values()].some((g) => g.level?.part === "above"),
+  apply() {},
+  after(ctx) {
+    for (const [id, g] of ctx.geoms) {
+      if (g.level?.part !== "above") continue;
+      const cover = ctx.parts.get(id);
+      if (!cover) continue;
+      const ct = topOf(cover);
+      const cb = cover.frame.o[2];
+      const pts = cover.profile.outer.map((q) => planeCoords(UPF, fromPlane(cover.frame, q, 0)).uv);
+      const xs = pts.map((q) => q[0]);
+      const ys = pts.map((q) => q[1]);
+      const [x0, x1, y0, y1] = [Math.min(...xs) + 12, Math.max(...xs) - 12, Math.min(...ys) + 12, Math.max(...ys) - 12];
+      // onto the housing round the same body
+      const housing = [...ctx.geoms].find(([h, hg]) => h !== id && hg.level?.with === g.level!.with && hg.level?.part === "all");
+      if (housing) {
+        const hp = ctx.parts.get(housing[0]);
+        const hb = hp ? hp.frame.o[2] : cb - 10;
+        [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].forEach(([x, y], k) => {
+          ctx.add(place(UPF, H.screw(`${id}-sc${k}`, "csk", 5, ct - hb - 2, { at: [x!, y!, 0], face: ct, dir: -1, joints: [id], ...(k ? { name: "", qty: 0 } : { qty: 4 }) })));
+          (ctx.fired.covers ??= []).push(`${id}-sc${k}`);
+        });
+        [[x0 + 10, y0], [x1 - 10, y1]].forEach(([x, y], k) => ctx.add(place(UPF, H.dowel(`${id}-dw${k}`, 4, { at: [x!, y!, 0], z0: hb + 4, z1: ct - 1, joints: [id], ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø4 h6, ${id} to ${housing[0]}`, qty: 2 }) }))));
+      }
+      // a fixed part hung under the cover: screwed up into it through slotted holes, dowelled
+      for (const [f, fg] of ctx.geoms) {
+        const body = ctx.kin.bodies.find((b) => b.id === f) as { fixed?: boolean } | undefined;
+        if (!body?.fixed || !fg.level || fg.level.with !== g.level.with || fg.level.part === "above") continue;
+        const part = ctx.parts.get(f);
+        if (!part || Math.abs(topOf(part) - cb) > 0.6) continue;
+        const o = part.frame.o;
+        const rr = Math.min(...part.profile.outer.map((q) => Math.hypot(q[0], q[1]))) * 0.65;
+        const h = part.op.op === "extrude" ? part.op.h : 6;
+        for (let k = 0; k < 3; k++) {
+          const a = Math.PI / 2 + (k * 2 * Math.PI) / 3;
+          ctx.add(place(UPF, H.screw(`${f}-sc${k}`, "csk", 3, ct - cb + Math.min(6, h - 1), { at: [o[0] + rr * Math.cos(a), o[1] + rr * Math.sin(a), 0], face: ct, dir: -1, joints: [f], ...(k ? { name: "", qty: 0 } : { qty: 3, why: "through slotted holes in the cover: the part slides to set the mesh's backlash, then is clamped (F7)" }) })));
+          (ctx.fired.covers ??= []).push(`${f}-sc${k}`);
+        }
+        for (let k = 0; k < 2; k++) {
+          // between the screws
+          const a = Math.PI / 6 + (k * 2 * Math.PI) / 3;
+          ctx.add(place(UPF, H.dowel(`${f}-dw${k}`, 3, { at: [o[0] + rr * Math.cos(a), o[1] + rr * Math.sin(a), 0], z0: cb - Math.min(5, h - 1), z1: ct - 1, joints: [f], ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 h6, ${f} to the cover, fitted after the backlash is set`, qty: 2 }) })));
+        }
+        ctx.note({ id: `${f}-fix`, kit: "covers", at: o as Vec3, title: `Covers · ${f}`, note: `${f} hangs under ${id}: three countersunk screws down through slotted holes in the cover set the mesh's backlash, then two dowels fix it; ${id} is screwed and dowelled onto ${housing?.[0] ?? "its housing"}.`, serves: { F1: [`${f}-dw0`], F2: [`${f}-sc0`], F7: [`${f}-sc0`] } });
+      }
     }
   },
 };
@@ -384,21 +450,21 @@ export const drive: Rule = {
     }
     const others = ctx.sites.filter((q) => q !== site && q.fixed).map((q) => [q.at[0], q.at[1]] as Vec2);
     const C = 46;
-    let M: Vec2 | null = null;
-    let best = -1;
-    // a second drive already under the base (drive2-*): its parts' plan boxes, a moving part's over its travel
+    // the motor where it is farthest from the other fixed pins, off a second drive already under the base (drive2-*: its
+    // parts' plan boxes, a moving part's over its travel; the flange is 58 mm square about the motor), and its flange's
+    // edge clear of the input housing's screws (a hole there would leave no wall); the next best angle when it is not
     const taken = secondDriveBoxes(ctx);
-    for (let k = 0; k < 12; k++) {
-      const a = (k / 12) * TAU;
-      const m = polar(S, C, a);
-      // the flange is 58 mm square about the motor
-      if (taken.some((b) => m[0] + 32 > b[0] && m[0] - 32 < b[2] && m[1] + 32 > b[1] && m[1] - 32 < b[3])) continue;
-      const clear = Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999);
-      if (clear > best) {
-        best = clear;
-        M = m;
-      }
-    }
+    const screws = st.solids.filter((x) => x.id.startsWith(`${site.id}-hsc`) && x.kind === "head").map((x): Vec2 => [x.frame.o[0], x.frame.o[1]]);
+    const edgeOk = (m: Vec2) =>
+      screws.every(([x, y]) => {
+        const d = Math.max(Math.abs(x - m[0]), Math.abs(y - m[1]));
+        return d < 29 - 4 || d > 29 + 2;
+      });
+    const cands = Array.from({ length: 12 }, (_, k) => polar(S, C, (k / 12) * TAU))
+      .filter((m) => !taken.some((b) => m[0] + 32 > b[0] && m[0] - 32 < b[2] && m[1] + 32 > b[1] && m[1] - 32 < b[3]))
+      .map((m) => ({ m, clear: Math.min(...others.map((o) => Math.hypot(o[0] - m[0], o[1] - m[1])), 999) }));
+    cands.sort((p, q) => q.clear - p.clear);
+    const M: Vec2 | null = (cands.find((x) => edgeOk(x.m)) ?? cands[0])?.m ?? null;
     if (!M) return;
     const mot = MOTORS.pancake;
     const mTop = bb - 3;

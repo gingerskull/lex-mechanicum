@@ -11,7 +11,7 @@ import { v3, xf, type Vec3, type Xf } from "../kin/math";
 import type { Kin } from "../kin/types";
 import { HEADROOM, LATERAL, PITCH, RAIL_ZONE, SLAB_GAP, SLIDE_ROOM, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
-import { pointDist, ringDist } from "./planar";
+import { edgeDist, inside, pointDist, ringDist } from "./planar";
 import type { BodyGeom } from "./shapes";
 import type { JointInfo, Site } from "./sites";
 
@@ -117,11 +117,13 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
     for (const j of joints) {
       const t = j.joint.type;
+      // (a sheave in its strap, and a block that slides in a moving part's slot, run in that part's plane)
+      const inSlot = t === "prismatic" && j.kit === "J5" && j.a !== "ground" && j.b !== "ground";
       // one compliant blank lies in one plane: its flexures, and the axial give of its pseudo-rigid beams
       const flex = (b: string) => kin.joints.some((q) => q.type === "flexure" && (q.a === b || q.b === b));
       const blank = t === "flexure" || (t === "prismatic" && flex(j.a) && flex(j.b));
       // a rope part ties the sheaves it runs between to one plane, unless it crosses between planes (skipped below)
-      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || blank;
+      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || j.kit === "eccentric" || inSlot || blank;
       if (!planar || !parent.has(j.a) || !parent.has(j.b)) continue;
       if (j.joint.crossed) continue;
       contact.add(pairKey(j.a, j.b));
@@ -138,12 +140,14 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const N = nodeIds.length;
     const idx = new Map(nodeIds.map((r, i) => [r, i]));
 
-    // outlines per sample
+    // outlines per sample, and the holes of those that have them
     const rings = new Map<string, Vec2[][]>();
+    const holeRings = new Map<string, Vec2[][][]>();
     for (const id of fid) {
       const g = geoms.get(id)!;
       const xs = sampled.xfs.get(id) ?? [];
       rings.set(id, sampleIdx.map((i) => outlineAt(g, xs[i] ?? xf.id(), fam)));
+      if (g.profile.holes.length) holeRings.set(id, sampleIdx.map((i) => g.profile.holes.map((h) => outlineAt({ ...g, plan: h }, xs[i] ?? xf.id(), fam))));
     }
 
     // clash graph between nodes
@@ -209,6 +213,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       site: Site;
       members: number[];
       passers: number[];
+      between?: boolean;
     }
     const siteCs: SiteC[] = [];
     for (const s of famSites) {
@@ -224,22 +229,39 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           const carrier = s.bodies[0];
           const X = s.fixed || !carrier ? xf.id() : (sampled.xfs.get(carrier)?.[i] ?? xf.id());
           const p = planeCoords(fam, xf.apply(X, s.at)).uv;
-          if (pointDist(rings.get(id)![i]!, p[0], p[1]) < HEAD_R + LATERAL) {
+          // a pin that stands inside a part's bore (a fixed hub's pivot inside a gear turning on the hub) is not passed
+          const inBore = holeRings.get(id)?.[i]?.some((h) => inside(h, p[0], p[1]) && edgeDist(h, p[0], p[1]) >= HEAD_R + LATERAL);
+          if (!inBore && pointDist(rings.get(id)![i]!, p[0], p[1]) < HEAD_R + LATERAL) {
             passers.add(n);
             break;
           }
         }
       }
-      siteCs.push({ site: s, members, passers: [...passers] });
+      // a fixed pivot of a part split round a gap is carried between its plates: parts may pass it on both sides
+      const between = s.fixed && s.bodies.length === 1 && geoms.get(s.bodies[0]!)?.upper?.lift !== undefined;
+      siteCs.push({ site: s, members, passers: [...passers], ...(between ? { between } : {}) });
     }
 
+    // order between slabs: [u, v] puts u over v. A die rides in its link's groove from above, so its pin carrier lies
+    // over the slotted link; a slider on ground ways (J5) stands on risers from the base, so every part pinned to it
+    // lies over it
+    const above: [number, number][] = [];
+    for (const j of joints) {
+      if (j.kit === "die" && parent.has(j.a) && parent.has(j.b)) above.push([idx.get(nodeOf(j.a))!, idx.get(nodeOf(j.b))!]);
+      if (j.kit === "J5" && (j.a === "ground" || j.b === "ground")) {
+        const sl = j.a === "ground" ? j.b : j.a;
+        if (!parent.has(sl)) continue;
+        for (const st of famSites)
+          if (st.bodies.includes(sl)) for (const o of st.bodies) if (o !== sl && parent.has(o) && nodeOf(o) !== nodeOf(sl)) above.push([idx.get(nodeOf(o))!, idx.get(nodeOf(sl))!]);
+      }
+    }
     // thickness of each node (a slab is as high as the thickest body in it)
     const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geoms.get(id)!.thick)));
 
     // bodies the record lays above others: [upper node, lower node]
     const aboves: [number, number][] = [];
     for (const b of kin.bodies) for (const u of b.above ?? []) if (idx.has(nodeOf(b.id)) && idx.has(nodeOf(u))) aboves.push([idx.get(nodeOf(b.id))!, idx.get(nodeOf(u))!]);
-    const orderOk = (assign: number[]) => aboves.every(([a, b]) => assign[a]! < 0 || assign[b]! < 0 || assign[a]! > assign[b]!);
+    const orderOk = (assign: number[]) => [...above, ...aboves].every(([a, b]) => assign[a]! < 0 || assign[b]! < 0 || assign[a]! > assign[b]!);
 
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);
@@ -261,7 +283,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
             const s = c.members.map((m) => assign[m]!);
             return t + (Math.max(...s) - Math.min(...s) + 1 - new Set(s).size);
           }, 0);
-          const picks = clevisPicks(assign, siteCs, clash, h, nodeIds, nodes);
+          const picks = clevisPicks(assign, siteCs, clash, h, nodeIds, nodes, above);
           // a fixed pin held from a bridge only (something passes under it) is the last resort
           const hung = siteCs.reduce((t, c) => t + (c.site.fixed && c.passers.some((p) => assign[p]! < Math.min(...c.members.map((m) => assign[m]!))) ? 1 : 0), 0);
           const raised = grounded.reduce((t, n) => t + assign[n]!, 0);
@@ -338,7 +360,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     }
     placement.families.push({ frame: fam, bodies: fid, slabs, w0, h: hts });
     for (const id of fid) placement.slab.set(id, [k, assign[idx.get(nodeOf(id))!]!]);
-    for (const c of clevisPicks(assign, siteCs, clash, slabs, nodeIds, nodes)) {
+    for (const c of clevisPicks(assign, siteCs, clash, slabs, nodeIds, nodes, above)) {
       const host = nodes.get(nodeIds[c.host]!)!.ids[0]!;
       const twin = nodes.get(nodeIds[c.twin]!)!.ids[0]!;
       placement.clevis.push({ site: c.site, host, twin, slab: c.slab });
@@ -387,6 +409,8 @@ interface SiteConstraint {
   site: Site;
   members: number[];
   passers: number[];
+  /** Carried between the plates of a split part: passed on both sides by design. */
+  between?: boolean;
 }
 
 /** No passer inside the stack range of its site (checked on what is assigned so far). */
@@ -407,7 +431,7 @@ function passOk(assign: number[], cs: SiteConstraint[]): boolean {
 /** All passers of a site on one side of it. */
 function sidesOk(assign: number[], cs: SiteConstraint[]): boolean {
   for (const c of cs) {
-    if (!c.passers.length) continue;
+    if (!c.passers.length || c.between) continue;
     const lo = Math.min(...c.members.map((x) => assign[x]!));
     const above = c.passers.map((p) => assign[p]! > lo);
     if (above.some((a) => a) && above.some((a) => !a)) return false;
@@ -434,7 +458,7 @@ interface ClevisPick {
  */
 let twinnable: (id: string) => boolean = () => true;
 
-function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][], H: number, nodeIds: string[], nodes: Map<string, Node>): ClevisPick[] {
+function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][], H: number, nodeIds: string[], nodes: Map<string, Node>, above: [number, number][] = []): ClevisPick[] {
   const picks: ClevisPick[] = [];
   const twinned = new Set<number>();
   for (const c of cs) {
@@ -444,10 +468,14 @@ function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][],
       // only a link or a plate is built as a pair: a wheel (a sheave, a gear) is one part
       if (!nodes.get(nodeIds[twin]!)!.ids.every((id) => twinnable(id))) continue;
       if (twinned.has(twin) || Math.abs(assign[host]! - assign[twin]!) !== 1) continue;
+      // parts that run together in one plane (a mesh, a block in a slot) are never doubled
+      if ((nodes.get(nodeIds[twin]!)?.ids.length ?? 1) > 1) continue;
       const t = 2 * assign[host]! - assign[twin]!;
       if (t < 0 || t >= H) continue;
       // nothing already there meets the twin
       if (assign.some((s, u) => s === t && u !== twin && clash[twin]![u])) continue;
+      // the twin's second half keeps the order between slabs (over a slider it is pinned to, over a grooved link)
+      if (above.some(([u, v]) => (u === twin && t <= assign[v]!) || (v === twin && assign[u]! <= t))) continue;
       // the twin's second half is a member of every site the twin is in: no passer inside that stack
       const trial = assign.slice();
       const bad = cs.some((q) => {

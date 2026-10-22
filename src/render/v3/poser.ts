@@ -57,6 +57,10 @@ export interface Poser {
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
    */
   sweep?(point: string, range?: [number, number], branches?: string[]): Vec3[][] | null;
+  /** The cycle phase (radians) at which a kin output reaches its max or min; null where the poser has no such output. */
+  phaseOf?(output: string, stat: "max" | "min"): number | null;
+  /** A named point where the kinematics put it, not raised to the top face of its part (a dimension's true length). */
+  rawPoint?(u: number, id: string): Vec3 | null;
   /** A body's pose at phase u (reference configuration to now) as a matrix: a trace or arc drawn in a moving body's frame. */
   body?(u: number, id: string, ctl?: Controls): Mat4 | null;
 }
@@ -137,6 +141,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   };
   let at = NaN;
   let cached: ReturnType<Kinematics["pose"]> | null = null;
+  const phases = new Map<string, number | null>();
   const pose = (u: number, ctl?: Controls) => {
     if (ctl) return k.pose(u, { ...controls, ...ctl });
     if (u !== at || !cached) {
@@ -160,6 +165,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       return cv ? (mul4(M, conveyMatrix(cv, s.cv!.s0, pose(u).values[cv.key] ?? 0, s.cv!.s1, pose(u).values)) as Mat4) : M;
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
+    rawPoint: (u, id) => pose(u).points.get(id) ?? null,
     value: (u, name, ctl) => pose(u, ctl).values[name] ?? null,
     body: (u, id, ctl) => {
       const X = id === "ground" ? xf.id() : pose(u, ctl).bodies.get(id);
@@ -185,6 +191,24 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
         if (line.length) out.push(line);
       }
       return out.length ? out : null;
+    },
+    phaseOf: (output, stat) => {
+      const key = `${output}|${stat}`;
+      if (phases.has(key)) return phases.get(key)!;
+      let best: number | null = null;
+      let bv = stat === "max" ? -Infinity : Infinity;
+      const N = 720;
+      for (let i = 0; i < N; i++) {
+        const u = (i / N) * Math.PI * 2;
+        const v = k.pose(u, controls).outputs[output];
+        if (typeof v !== "number") break;
+        if (stat === "max" ? v > bv : v < bv) {
+          bv = v;
+          best = u;
+        }
+      }
+      phases.set(key, best);
+      return best;
     },
     refEnds: (a, b) => {
       const P = k.referencePose(controls);
@@ -333,6 +357,8 @@ export function hybridPoser(bodies: Poser, points: Poser): Poser {
     span: (u, a, b) => bodies.span(u, a, b) ?? safe(() => points.span(u, a, b)),
     ...(points.body ? { body: (u: number, id: string, ctl?: Controls) => safe(() => points.body!(u, id, ctl)) } : {}),
     ...(points.sweep ? { sweep: (pt: string, r?: [number, number], br?: string[]) => safe(() => points.sweep!(pt, r, br)) } : {}),
+    ...(points.rawPoint ? { rawPoint: (u: number, id: string) => safe(() => points.rawPoint!(u, id)) } : {}),
+    ...(points.phaseOf ? { phaseOf: (o: string, st: "max" | "min") => safe(() => points.phaseOf!(o, st)) } : {}),
   };
 }
 

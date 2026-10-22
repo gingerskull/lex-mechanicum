@@ -16,7 +16,7 @@ export const KIN_VOCAB = {
   flexible: ["belt", "chain", "rope", "cvt"],
   driver: ["rotary", "oscillating", "linear", "manual", "select"],
   block: [
-    "dyad", "slider-dyad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
+    "dyad", "slider-dyad", "triad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
     "flexure", "escapement", "reeve", "variator", "integrator", "five-bar", "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet",
     "one-way", "escape", "verge",
     // couplings and spatial linkages (R6)
@@ -31,7 +31,7 @@ export const TEACHING_VOCAB = {
   viewName: ["PLAN", "FRONT", "SIDE", "ISOMETRIC", "DIMETRIC"],
   viewKind: ["section", "detail"],
   control: ["driver", "param", "design", "selector"],
-  stat: ["range", "max", "min", "mean", "ratio", "phase", "dwell", "at"],
+  stat: ["range", "max", "min", "mean", "ratio", "time-ratio", "phase", "dwell", "at"],
 } as const;
 
 type Vec3 = [number, number, number] | [number, number];

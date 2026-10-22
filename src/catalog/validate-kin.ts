@@ -23,7 +23,8 @@ export function mobility(kin: Kin, plane: "Planar" | "Spatial"): number | undefi
   const per = plane === "Planar" ? 3 : 6;
   // a body no joint reaches is fixed where it stands (a port face, a fixed plate): it is part of the ground
   const joined = new Set(kin.joints.flatMap((j) => [j.a, j.b]));
-  let m = per * (kin.bodies.filter((b) => b.id !== "ground" && joined.has(b.id)).length);
+  // so is a body declared fixed (a stationary gear in mesh)
+  let m = per * (kin.bodies.filter((b) => b.id !== "ground" && joined.has(b.id) && !(b as { fixed?: boolean }).fixed).length);
   for (const j of kin.joints) {
     const f = FREEDOM[plane][j.type];
     if (f === undefined) return undefined;
@@ -148,8 +149,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (isNum(v) || typeof v === "boolean") return;
     // a block's option (slider-dyad kind "rpr", five-bar mode "ik") names no input
     if (key === "kind" || key === "mode" || key === "form" || key === "shape" || key === "plane" || key === "law") return;
-    // a parameter expression (src/kin/expr.ts) is fine when every name in it is known
-    if (isStr(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
+    // a name, or a parameter expression (src/kin/expr.ts: "-input", "2*e") whose every name is known
+    if (isStr(v) && !known.has(v) && /[-+*/^() ]/.test(v) && (v.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? []).every((n) => known.has(n) || EXPR_FNS.has(n))) return;
     if (!isStr(v) || !known.has(v)) say(`solve ${by}: in.${key} "${String(v)}" is not a body, point, param, joint, driver or earlier out`);
   };
   // what the blocks produce: a construction point (a crossing of two lines) may be traced and read like a named point
@@ -168,7 +169,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
       known.add(o);
       made.add(o);
     }
-    if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch)) say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);
+    // a design choice or one of its options, or a plain side of the closure where there is no real choice
+    if (s.branch !== undefined && !design.has(s.branch) && !options.has(s.branch) && s.branch !== "left" && s.branch !== "right") say(`solve ${by}: branch "${s.branch}" is not a design choice or one of its options`);
     for (const j of arr(s.joints) as string[]) claim(j, `solve ${by}`);
   }
   if (kin.fallback !== null) {

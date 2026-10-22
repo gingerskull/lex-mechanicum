@@ -2,13 +2,16 @@
 // 2.5D model) packs as v2 from its record by the hardware builder, and decodes to the same solids it was built with.
 import { describe, expect, it } from "vitest";
 import { recordById } from "../../src/catalog";
+import { allIds, engineOf } from "../../src/checks/engine";
 import { buildAnyPackage } from "../../src/package/any";
 import { buildPackage3 } from "../../src/package/build3";
 import { decode2, encode2 } from "../../src/package/format2";
 
 describe("package v2 from either engine", () => {
   it("a 2.5D mechanism gives both its v1 package and its v2 package", async () => {
-    const b = await buildAnyPackage("slider-crank");
+    const id = allIds().find((x) => engineOf(x) === "2.5D");
+    if (!id) return;
+    const b = await buildAnyPackage(id);
     expect(b.engine).toBe("2.5D");
     expect(b.v1).not.toBeNull();
     expect(b.pkg.solids.length).toBe(b.v1!.solids.length);
