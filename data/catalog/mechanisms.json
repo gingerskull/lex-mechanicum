@@ -59341,7 +59341,7 @@
         ]
       },
       "explain": {
-        "motion": "The crown wheel has saw teeth on its rim, pointing along its axis, and an odd tooth count, 15 here, so a tooth at the top faces a gap at the bottom. The verge is a vertical staff across the wheel face carrying two flag pallets set 95° apart, one at the top of the wheel and one at the bottom, where the teeth move in opposite directions. A top tooth pushes the upper pallet round until it slips off; by then the lower pallet has swung into the path of a bottom tooth, which stops the verge and drives it back. The foliot, a bar with two weights, swings ±45° and the wheel advances one tooth, 24°, per full swing, 12° per beat. After each tooth lands, the foliot's inertia carries the pallet on and pushes the wheel back about 5.6° (the recoil).",
+        "motion": "The crown wheel has saw teeth on its rim, pointing along its axis, and an odd tooth count, 15 here, so a tooth at the top faces a gap at the bottom. The verge is a vertical staff across the wheel face carrying two flag pallets set 95° apart, one at the top of the wheel and one at the bottom, where the teeth move in opposite directions. A top tooth pushes the upper pallet round until it slips off; by then the lower pallet has swung into the path of a bottom tooth, which stops the verge and drives it back. The foliot, a bar with two weights, swings ±45° and the wheel advances one tooth, 24°, per full swing, 12° per beat. After each tooth lands, the foliot's inertia carries the pallet on and pushes the wheel back about 4.7° (the recoil).",
         "forces": "The wheel is in contact with a pallet nearly all the time, so drive torque directly sets the swing speed: there is no free natural period in the foliot form. Recoil happens every beat as the foliot's inertia drives the wheel backwards.",
         "benefits": "Very simple and tolerant of crude workmanship, the first all-mechanical escapement. Works with a foliot, balance wheel or wide-swinging pendulum.",
         "limits": "Rate depends strongly on drive force and friction, so early clocks drifted by up to an hour or more a day. Large swing and constant recoil cause wear."
@@ -59437,7 +59437,7 @@
           }
         ],
         "defining_relations": "Odd tooth count so a tooth on the top meets the upper pallet while the bottom pallet faces a gap; wheel advances 360/N per full foliot cycle; swing amplitude about (180 - pallet angle) plus overswing, giving 80° to 100° total; rate rises with drive torque and falls as weights move outward (inertia).",
-        "range": "crown wheel advances 24° per foliot cycle, 12° per beat, with a recoil of about 5.6° each beat; foliot swings ±45°",
+        "range": "crown wheel advances 24° per foliot cycle, 12° per beat, with a recoil of about 4.7° each beat; foliot swings ±45°",
         "overlays": [
           "angles",
           "forces",
@@ -59538,82 +59538,88 @@
               "type": "plate",
               "rect": [
                 200,
-                120
-              ],
-              "posts": "a frame holding the wheel arbor and the verge bearings",
-              "center": [
-                0,
-                0,
-                -5
+                140
               ]
             },
             "at": {
               "frame": {
                 "origin": [
-                  0,
-                  0,
-                  0
+                  -100,
+                  -70,
+                  -10
                 ]
               }
             }
           },
           {
             "id": "crownWheel",
-            "role": "driver",
+            "role": "output",
+            "symmetry": 15,
+            "drops": true,
             "shape": {
-              "type": "custom",
-              "op": "extrude",
-              "profile": {
-                "kind": "crown",
-                "teeth": 15,
-                "radius": 40,
-                "rim": 5,
-                "toothHeight": 8,
-                "back": 12,
-                "note": "saw teeth on the rim pointing along the axis toward the verge (-y); the steep face leads"
-              }
+              "type": "crownWheel",
+              "n": 15,
+              "R": 40,
+              "rim": 5,
+              "h": 8,
+              "back": 12,
+              "thickness": 4,
+              "tip0": 19.8134
             },
-            "at": {
-              "joint": "C"
+            "frame": {
+              "origin": [
+                0,
+                0,
+                70
+              ],
+              "rot": [
+                -90,
+                0,
+                0
+              ]
             }
           },
           {
             "id": "verge",
-            "role": "output",
+            "role": "driver",
             "shape": {
-              "type": "custom",
-              "op": "extrude",
-              "profile": {
-                "kind": "verge",
-                "staff": {
-                  "diameter": 4,
-                  "from": -50,
-                  "to": 80
-                },
-                "upperPallet": {
+              "type": "verge",
+              "staff": {
+                "diameter": 8,
+                "from": -50,
+                "to": 80
+              },
+              "pallets": [
+                {
                   "at": 40,
-                  "length": 12,
+                  "angle": 42.5,
+                  "from": 3.5,
+                  "to": 12,
                   "height": 10,
-                  "thickness": 1.5,
-                  "angle": 47.5
+                  "thickness": 1.5
                 },
-                "lowerPallet": {
+                {
                   "at": -40,
-                  "length": 12,
+                  "angle": 137.5,
+                  "from": 3.5,
+                  "to": 12,
                   "height": 10,
-                  "thickness": 1.5,
-                  "angle": -47.5
-                },
-                "foliot": {
-                  "at": 80,
-                  "length": 160,
-                  "weights": 60
-                },
-                "note": "pallet angles from the +y direction toward +x, at foliot angle 0; the two pallets are 95 degrees apart"
+                  "thickness": 1.5
+                }
+              ],
+              "foliot": {
+                "at": 80,
+                "length": 160,
+                "weights": 60,
+                "weightR": 8
               }
             },
-            "at": {
-              "joint": "V"
+            "frame": {
+              "origin": [
+                0,
+                -14,
+                70
+              ]
             }
           }
         ],
@@ -59632,7 +59638,9 @@
               0,
               1,
               0
-            ]
+            ],
+            "side": 1,
+            "note": "the crown's arbor held from behind: the verge stands in front of its teeth"
           },
           {
             "id": "V",
@@ -59657,14 +59665,20 @@
           {
             "id": "P",
             "type": "cam-contact",
-            "a": "crownWheel",
-            "b": "verge",
+            "a": "verge",
+            "b": "crownWheel",
             "at": [
               8.85,
               -5.89,
               110
             ],
-            "follower": "flat"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "follower": "flat",
+            "note": "a top tooth on the upper pallet, a bottom tooth on the lower one"
           }
         ],
         "params": [
@@ -59758,28 +59772,35 @@
         ],
         "solve": [
           {
-            "block": "escapement",
+            "block": "verge",
             "id": "escape",
             "joints": [
               "C",
               "P"
             ],
             "in": {
+              "input": "input",
+              "lo": -45,
+              "hi": 45,
+              "default": 0,
               "wheel": "crownWheel",
-              "pallets": "verge",
-              "pivot": "V",
-              "teeth": "N",
-              "radius": "R",
-              "reach": "reach",
-              "lp": "lp",
-              "pal": "pal"
+              "wheelJoint": "C",
+              "vergeJoint": "V",
+              "n": "N",
+              "R": "R",
+              "h": "h",
+              "back": 12,
+              "upper": 42.5,
+              "lower": 137.5,
+              "from": 3.5,
+              "to": "lp",
+              "width": 1.5,
+              "sense": 1
             },
-            "opts": {
-              "kind": "verge",
-              "pallets": "the upper pallet on the top teeth, the lower on the bottom teeth, which move the other way",
-              "wheel": "urged forward by its train, stopped or pushed back by the pallets (instant drop)"
-            },
-            "out": "wheel-turn"
+            "out": {
+              "advance": "wheel-angle",
+              "recoil": "recoil"
+            }
           }
         ],
         "points": [
@@ -59807,16 +59828,16 @@
             "local": [
               60,
               0,
-              80
+              82
             ]
           },
           {
             "id": "TT",
             "body": "crownWheel",
             "local": [
-              0,
-              -8,
-              40
+              13.5583,
+              -37.6321,
+              -8
             ]
           },
           {
@@ -59887,7 +59908,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "New review against the record (unbuilt). The record's picture works: the wheel face toward the viewer and the verge vertical in front of it. Decided: an isometric default view so both pallet planes and the crown teeth read; two section views through the pallet planes, where a top tooth and a bottom tooth cross the verge in opposite directions; the foliot swing set to ±45°, inside the record's 80° to 100°; the verge axis 6 mm in front of the tooth tips. The recoil is the lesson and is large here: about 5.6° every beat, so the wheel visibly runs back. The verge axis meets the wheel axis, so the axes are perpendicular intersecting. Traced: a foliot weight and a tooth tip."
+          "note": "New review against the record (unbuilt). The record's picture works: the wheel face toward the viewer and the verge vertical in front of it. Decided: an isometric default view so both pallet planes and the crown teeth read; two section views through the pallet planes, where a top tooth and a bottom tooth cross the verge in opposite directions; the foliot swing set to ±45°, inside the record's 80° to 100°; the verge axis 6 mm in front of the tooth tips. The recoil is the lesson and is large here: about 5.6° every beat, so the wheel visibly runs back. The verge axis meets the wheel axis, so the axes are perpendicular intersecting. Traced: a foliot weight and a tooth tip. Rebuild R5 (#216): built on v3 with a new library block `verge` (the shared escape stepping): near the crown's top the teeth cross the upper pallet's plane, near its bottom the lower one's, moving the other way; each row is tested in its pallet's plane, the wheel urged forward and stopped or pushed back. 12° per beat, 24° per swing, in beat; the recoil comes out 4.7° each beat with this geometry (the review's 5.6° was its own simulation's; 4.8° with a slow wheel): text and claims follow the build. The crown's arbor is held from behind, the verge's staff from below, its foliot across the top."
         },
         "principle": [
           {
@@ -59924,15 +59945,25 @@
           {
             "id": "verge-axis",
             "kind": "axis-line",
-            "from": "V",
-            "to": "VT",
+            "at": "V",
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "length": 90,
             "label": "VERGE AXIS"
           },
           {
             "id": "wheel-axis",
             "kind": "axis-line",
-            "from": "C",
-            "to": "CB",
+            "at": "C",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "length": 60,
             "label": "WHEEL AXIS"
           },
           {
@@ -59962,7 +59993,7 @@
               ]
             },
             "highlight": [
-              "verge.upperPallet",
+              "verge",
               "crownWheel",
               "PU"
             ]
@@ -59983,7 +60014,7 @@
               ]
             },
             "highlight": [
-              "verge.lowerPallet",
+              "verge",
               "crownWheel",
               "PL"
             ]
@@ -60020,7 +60051,7 @@
             "text": "the wheel advances one tooth, 24°, per full swing",
             "output": "wheel-angle",
             "stat": "at",
-            "at": 360,
+            "at": 359,
             "value": 24,
             "tol": 0.1
           },
@@ -60033,18 +60064,18 @@
             "tol": 0.2
           },
           {
-            "text": "pushes the wheel back about 5.6° (the recoil)",
+            "text": "pushes the wheel back about 4.7° (the recoil)",
             "output": "recoil",
             "stat": "min",
-            "value": 5.6,
-            "tol": 0.3
+            "value": 4.69,
+            "tol": 0.2
           },
           {
-            "text": "pushes the wheel back about 5.6° (the recoil)",
+            "text": "pushes the wheel back about 4.7° (the recoil)",
             "output": "recoil",
             "stat": "max",
-            "value": 5.65,
-            "tol": 0.3
+            "value": 4.69,
+            "tol": 0.2
           }
         ],
         "exceptions": []
