@@ -135,6 +135,60 @@
   color: var(--paper);
   border-color: var(--ink);
 }
+/* Sort beside Filters (SS3): the button names the current order, its menu lists the orders with the current one
+   pressed and ticked */
+.sort {
+  position: relative;
+  display: flex;
+}
+.sortv {
+  opacity: 0.6;
+  white-space: nowrap;
+}
+.sortmenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 1;
+  display: grid;
+  gap: 2px;
+  min-width: 100%;
+  padding: 5px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+}
+.sortmenu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 13px 7px 9px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: 500 12px var(--font-mono);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+  color: var(--muted);
+  transition: color var(--size-transition);
+}
+.sortmenu button:hover {
+  color: var(--ink);
+}
+.sortmenu svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  visibility: hidden;
+}
+.sortmenu button[aria-checked="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.sortmenu button[aria-checked="true"] svg {
+  visibility: visible;
+}
 /* the sheet switch: one square button showing the sheet it switches to */
 .themebtn {
   flex: none;
@@ -406,6 +460,16 @@
   color: var(--muted);
   padding: 40px 0;
   text-align: center;
+}
+.empty h2 {
+  font: 700 26px / 1.1 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.empty p {
+  margin: 0;
 }
 
 /* the stage */

@@ -8,6 +8,7 @@ import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import { mechanisms } from "../../src/mechanisms";
 import { allIds } from "../../src/checks/engine";
+import { DEFAULT_ORDER, sortBy } from "../../site/src/sort";
 
 const OUT = join("dist", "site");
 const read = (f: string) => readFileSync(join(OUT, f), "utf8");
@@ -94,6 +95,27 @@ describe("site build", () => {
     expect(html).toMatch(/<button[^>]*id="qclear"[^>]*hidden/);
     expect(html).toMatch(/id="libbar"/);
     expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${allIds().length}</span>`));
+  });
+
+  it("puts Sort beside Filters, a menu of the orders with New checked, and the cards in the New order (SS3)", () => {
+    const html = read("index.html");
+    expect(html).toMatch(/<button[^>]*id="sbtn"[^>]*aria-haspopup="menu"[^>]*aria-expanded="false"/);
+    expect(html.indexOf('id="ftoggle"')).toBeLessThan(html.indexOf('id="sbtn"'));
+    expect(html).toMatch(/<div[^>]*id="sortmenu"[^>]*role="menu"[^>]*hidden/);
+    expect([...html.matchAll(/role="menuitemradio"[^>]*aria-checked="true"[^>]*data-sort="(\w+)"/g)].map((m) => m[1])).toEqual(["new"]);
+    const cards = [...html.matchAll(/<a class="card"[^>]*>/g)].map((m) => {
+      const attr = (k: string) => new RegExp(`${k}="([^"]*)"`).exec(m[0])?.[1];
+      return { id: attr("data-id")!, no: Number(attr("data-no")), name: "", added: attr("data-added") };
+    });
+    expect(cards.length).toBe(allIds().length);
+    expect(cards.map((c) => c.id)).toEqual(sortBy(cards, DEFAULT_ORDER).map((c) => c.id));
+  });
+
+  it("has a 404 page for a missing address, with the way back to the library", () => {
+    const html = read("404.html");
+    expect(html).toContain("<h1>Sheet ST-404</h1>");
+    expect(html).toContain("This sheet is not in the archive. Its pattern may be lost, or not yet recovered.");
+    expect(html).toMatch(/<a class="btn" href="\/"/);
   });
 
   it("gives the stage its view modes: the Wide toggle, full screen and the remembered mode set before paint", () => {

@@ -1,10 +1,15 @@
 # Mechanism Database
 
-**A library of mechanical mechanisms you can watch, turn and take apart.**
+**A library of mechanisms you can watch, turn and take apart, for a lesson, a build or plain curiosity.**
 
-Every mechanism here is drawn live as a working drawing of a real bench assembly: bearings in their bores, shafts
-with their keys and circlips, bridges, standoffs, a motor and its belt. Press play and it runs. Drag across it to
-turn it by hand, tilt it from plan to side view, or explode it to see how it goes together.
+Every mechanism here is drawn live as a working drawing of a real bench build. The bearings sit in their bores, the
+shafts have their keys and circlips, and most builds have a small motor and a belt to drive them. Press play and it
+runs. Drag across the drawing to turn it by hand, tilt it to see it from the side, or explode it to see how it goes
+together.
+
+It's for anyone who wants to see how a mechanism really works: students and teachers, makers planning a build, or
+anyone who has wondered what goes on inside a machine. It works well on a classroom screen, and every sheet comes
+with a short, plain explanation.
 
 **Open the library: https://gingerskull.github.io/mechanism-database/**
 
@@ -12,49 +17,59 @@ turn it by hand, tilt it from plan to side view, or explode it to see how it goe
 
 ## What's in it
 
-Four mechanisms are drawn so far: a four-bar linkage, a Geneva drive, a spur gear pair and a slider-crank. More are
-on the way. Each one comes from a catalogue of 89 mechanisms with its own explanation, tags, examples and
-references, so the drawing and the text describe the same thing.
+70 of the 89 mechanisms in our catalogue are drawn so far, and we add more as we go. You'll find linkages and
+straight-line linkages, gears, cams, indexing drives, couplings, belt and chain drives, escapements, ratchets and a
+couple of mechanisms that bend instead of pivot. Each one has its own explanation, tags, examples and references.
+They come from the same record as the drawing, so the text and the drawing always describe the same thing.
+
+We're moving the library to a new 3D engine. Sheets marked **3D** are already drawn by it, and the rest will follow.
 
 ![The Geneva drive on the Blueprint sheet, tilted and partly exploded so the drive pin, the slotted wheel and the hardware stack under it come apart](docs/images/geneva-exploded.png)
 
 ## Using a mechanism's page
 
-![A mechanism's page: the drawing with its controls on the left, the facts and the output plot on the right](docs/images/page.png)
+![A mechanism's page: the drawing and its controls on the left, the facts and the output plot on the right](docs/images/page.png)
 
 **The drawing and its controls**
 
 | Control | What it does |
 |---|---|
 | Play / pause | Runs the mechanism through its cycle. Space does the same while the drawing has focus. |
-| Cycle | Scrubs to any point in the cycle. You can also drag across the drawing, or use the arrow keys. |
+| Cycle | Moves to any point in the cycle. You can also drag across the drawing, or use the arrow keys. |
 | ½× 1× 2× | Playback speed. |
+| Wide, full screen | On a wide screen, Wide spreads the drawing across the page and puts the facts and the plot below it. Full screen gives the drawing the whole screen. |
 | View | Tilts the drawing from plan (straight down) to a side view. |
-| Explode | Pulls the assembly apart along its axis, layer by layer, so you can see what sits under what. |
-| Auto, Detail | On Auto, the drawing drops its finest detail by itself if your device can't keep up. Move the Detail slider to choose the level yourself. |
+| Explode | Pulls the assembly apart, layer by layer, so you can see what sits under what. |
+| Auto, Detail | On Auto, the drawing drops its finest detail by itself if your device can't keep up. Move the Detail slider to pick the level yourself. |
 | Paths, Velocity, Forces, Angles | Overlays: the paths the moving points trace, their velocity, the forces through the parts, and the angles that matter. |
-| Blueprint / Drafting | The sheet: white lines on blue, or pencil on paper. The site remembers your choice. |
+| Sheet switch | The square button next to the name. It swaps white lines on blue (Blueprint) for pencil on paper (Drafting), and the site remembers your choice. |
+
+A 3D sheet has a few more. You can orbit the drawing (drag it on a computer, or turn on Orbit on a phone), jump to a
+named view such as Plan, Front, Side or Iso, cut a section or open a detail where the sheet has one, and change the
+mechanism itself with its own sliders, like the bend of a universal joint.
 
 **Around the drawing**
 
 - **At a glance:** family, kind of motion, ratio, axes, whether it can be driven backwards, level, degrees of
-  freedom and how this build is driven. Family, motion and level link to the library filtered by them.
+  freedom and how this build is driven. Family, motion and level link to the library, filtered to match.
 - **The plot:** the output over one cycle, with a marker that follows the drawing.
-- **Tags:** what it does, its properties and where it is used, each a link to the mechanisms that share it.
+- **Tags:** what it does, its properties and where it's used. Each tag links to the mechanisms that share it.
 - **How it moves, Forces, Why use it, Limits:** a short explanation in four parts.
-- **Where you will find it** and **In the real world:** typical uses and real products that use it.
-- **References, photos, video and animations** for further reading.
+- **Where you will find it** and **In the real world:** typical uses, and real products that use it.
+- **References, photos, video and animations** if you want to read more.
 
-On the library page, search by name, use or tag, or open Filters to narrow the set by family, motion and more.
+On the library page you can search by name, use or tag. Filters narrows things down by family, motion and more, and
+Sort changes the order: newest first, by name or by sheet number. The page address keeps your filters, search and
+order, so a link shows someone else exactly what you see.
 
 ## How it's made
 
-Each mechanism starts from its kinematics alone. A rules engine then builds the hardware a real build would need:
-bearings sized to the load, shafts and their retention, bridges over the pivots, stops, lubrication, fasteners and a
-drive. Every build is checked for clashes over the whole cycle before it is drawn. The site is static: each page
-loads one small package and draws it in the browser with WebGL2.
+Each mechanism starts from its kinematics alone. A rules engine then adds the hardware a real build would need:
+bearings sized to the load, shafts and what holds them in place, bridges over the pivots, stops, lubrication,
+fasteners and a drive. Every build is checked for clashes over its whole cycle before it's drawn. The site is
+static: each page loads one small package, and your browser draws it with WebGL2.
 
-For contributors, the details are in [docs/architecture.md](docs/architecture.md),
+If you'd like to help, the details are in [docs/architecture.md](docs/architecture.md),
 [docs/mechanism-standard.md](docs/mechanism-standard.md), [docs/style-reference.md](docs/style-reference.md) and
 [docs/workflow.md](docs/workflow.md).
 
@@ -69,14 +84,14 @@ npm run shot <id>         draw one frame of a mechanism to a PNG (local Chrome)
 npm run thumbs            redraw the library thumbnails that are out of date
 ```
 
-Work is tracked on the project board (see [docs/workflow.md](docs/workflow.md)).
+We track the work on the project board (see [docs/workflow.md](docs/workflow.md)).
 
 ## Licence
 
 - **Code** (everything not listed below): MIT, see [LICENSE](LICENSE).
 - **Content**: the catalogue (`data/catalog/`), the documents and images in `docs/`, and the drawings the site
-  renders: Creative Commons Attribution-ShareAlike 4.0, see [LICENSE-CONTENT](LICENSE-CONTENT). Credit
+  renders: Creative Commons Attribution-ShareAlike 4.0, see [LICENSE-CONTENT](LICENSE-CONTENT). Please credit
   "Mechanism Database" with a link to this repository, and share adaptations under the same licence.
 
-Linked references, photos and videos belong to their owners and are not covered. The IBM Plex fonts the site ships are
-under the SIL Open Font License 1.1.
+Linked references, photos and videos belong to their owners and aren't covered. The IBM Plex fonts the site ships
+are under the SIL Open Font License 1.1.

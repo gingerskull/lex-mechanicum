@@ -80,8 +80,9 @@ src/mechanisms/<id>/polish3.ts   engine v3: the true exceptions to the builder (
 src/mechanisms/<id>/audit.md     conformance record
 src/mechanisms/models.ts         id -> lazy import of the model: all the browser loads
 src/mechanisms/index.ts          registry: the models plus a lazy import of each polish, for Node
-site/                            Astro: layout, pages (library, one page per mechanism), components, islands
-                                 (theme, filters, card, stage, engine), CSS on the generated tokens.css
+site/                            Astro: layout, pages (library, one page per mechanism, 404), components, islands
+                                 (theme, filters and the sort menu, card, stage, engine), the library's orders
+                                 (sort.ts), CSS on the generated tokens.css
 tools/                           command-line tools (below)
 site/thumbs/                     the committed card thumbnails and stage stills (WebP) and their fingerprint manifest
 tests/                           unit and fixture tests, per-mechanism checks, site build test, visual snapshots;
@@ -167,7 +168,7 @@ tests/                           unit and fixture tests, per-mechanism checks, s
 | `shot3 <id> [--view ...]`, `pilots3`, `bench3 [id ...]` | the 3D renderer in local Chrome (`tools/chrome3.ts`): one frame to a PNG in any named view, section, detail or explode; the acceptance shot set of the pilots and the teaching layers; frame times per view and dial position |
 | `bench [id ...]` (`npm run bench`) | the browser bench: frame times per view and dial position, draw counters, package size, rung counts (Q5, DL5); a mechanism on engine v3 (or `--v3`) runs the v2 page without today's renderer, with the flags of R6 |
 | `bench --page` (`npm run bench:page`), `bench --v2` | the package v2 bench: `--page` builds a static page (`dist/bench-page`) to publish and open on a phone, `--v2` runs it in local Chrome; setup split into decode, tessellate, edges and GPU, frames per view and dial position (R6, R10) |
-| `npm run test:e2e` (`tools/site-e2e.ts`) | builds the site with three mechanisms on the v3 stage (`SITE_V3`), then runs the stage's browser tests (desktop, phone, no WebGL2) in local Chrome |
+| `npm run test:e2e` (`tools/site-e2e.ts`) | builds the site with three mechanisms on the v3 stage (`SITE_V3`), then runs the browser tests of the stage (desktop, phone, no WebGL2) and the library (sort, empty search, 404) in local Chrome |
 | `compare [--shots --ref dir] [--cards] [--lose] [--v3]` | the renderer's look against reference images, card drawings per dial position, the lost-context check; `--v3` with the 3D renderer |
 | `tokens-css` (`npm run tokens`) | writes `site/styles/tokens.css` and its `@font-face` rules |
 | `site-assets` (in `prebuild`) | fonts and packages into `site/public`; checks the thumbnails' fingerprints and copies them (never draws) |
