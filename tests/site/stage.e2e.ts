@@ -1,7 +1,8 @@
-// The stage in a real browser (SS5, SS13), local only: `npm run test:e2e` (builds the site with four-bar, bevel-gears and
-// oscillating-cylinder on the v3 stage, then runs this). A 2.5D page and a v3 page both work; the v3 stage orbits, snaps to
-// the named views, takes the record's section view and controls, honours the dial, keeps the page's scroll on a phone
-// until Orbit is on; the 3D stamp shows on v3 pages and cards only; a browser without WebGL2 gets the still.
+// The stage in a real browser (SS5, SS7, SS13), local only: `npm run test:e2e` (builds the site with four-bar, bevel-gears
+// and oscillating-cylinder on the v3 stage, then runs this). A 2.5D page and a v3 page both work; the v3 stage orbits, snaps
+// to the named views, takes the record's section view and controls, honours the dial, keeps the page's scroll on a phone
+// until Orbit is on; the 3D stamp shows on v3 pages and cards only; a browser without WebGL2 gets the still. The sheet
+// switch names the sheet it switches to and turns its cog half a turn per sheet.
 import { existsSync, readFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
 import { extname, join } from "node:path";
@@ -127,6 +128,30 @@ describe("a 2.5D page and a v3 page", () => {
     for (const id of V3) expect(await page.locator('.card[data-id="' + id + '"] .stamp3d').count(), id).toBe(1);
     expect(await page.locator('.card[data-id="' + V1 + '"] .stamp3d').count()).toBe(0);
     expect(await page.locator(".stamp3d").count()).toBe(V3.length);
+    await ctx.close();
+  });
+});
+
+describe("the sheet switch", () => {
+  it("names the sheet it switches to and turns the cog half a turn per sheet (SS7)", async () => {
+    const ctx = await desktop();
+    const { page, errors } = await open(ctx, "/");
+    const btn = page.locator("[data-theme-toggle]").first();
+    const turn = () => btn.locator("svg").evaluate((e) => getComputedStyle(e).transform);
+    const sheet = () => page.evaluate(() => (document.documentElement.dataset.theme === "light" ? "light" : "dark"));
+    // the theme island names the button once it runs
+    await page.waitForFunction(() => document.querySelector("[data-theme-toggle]")?.getAttribute("aria-label") !== "Switch sheet");
+    expect(await sheet()).toBe("dark");
+    expect(await btn.getAttribute("aria-label")).toBe("Switch to Drafting");
+    expect(await btn.getAttribute("title")).toBe("Switch to Drafting");
+    // rotate(180deg), as computed: matrix(-1, 0, 0, -1, 0, 0) up to rounding
+    expect(await turn()).toMatch(/^matrix\(-1, [-\de.]+, [-\de.]+, -1, 0, 0\)$/);
+    await btn.click();
+    expect(await sheet()).toBe("light");
+    expect(await btn.getAttribute("aria-label")).toBe("Switch to Blueprint");
+    expect(await btn.getAttribute("title")).toBe("Switch to Blueprint");
+    expect(await turn()).toBe("none");
+    expect(errors).toEqual([]);
     await ctx.close();
   });
 });
