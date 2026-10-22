@@ -203,7 +203,7 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS9 | **Responsive:** works at phone width with a 16 px side gutter (respecting safe areas) and no horizontal scroll; the mechanism layout drops to one column under 1000 px; the set title block hides under 640 px. The stage has three view modes: standard; Wide (above 1000 px only, remembered: the stage across the layout, at a glance (two thirds) and the plot side by side below it, the facts in a wrapping row where a short fact never wraps and a long one is sized to run to about two lines); full screen, where a short landscape screen puts the same controls in a rail beside the drawing with upright sliders (top is more) inside the safe areas. |
 | SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. |
 | SS11 | **Motion on the page is minimal:** short colour and border transitions (≤ .2 s). The only continuous motion is the mechanisms themselves. |
-| SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer. |
+| SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer, and under it, centred, the set's mark faded in the sheet's ink (`--mark`). The favicon is the same mark in the ink of the sheet that matches the browser's scheme. |
 | SS13 | **Transition stamp.** While both engines are on main, a page or card drawn by the v3 engine carries a visible 3D stamp: in the title block of its stage and on its library card. It leaves with the old engine at cut-over. |
 
 ---
@@ -246,6 +246,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `--line-2` | 0.38 | 0.42 | frames |
 | `--surface` | 0.035 | 0.025 | faint panel fill |
 | `--surface-2` | 0.08 | 0.06 | hover / pressed panel fill |
+| `--mark` | 0.2 | 0.16 | the faded mark at the foot of every page |
 | `--grid-1` | 0.06 | 0.08 | page grid, alpha of `grid` |
 | `--grid-2` | 0.11 | 0.15 | page grid, alpha of `grid` |
 <!-- style-tiers:end -->
@@ -634,6 +635,7 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 | `tokens.size.bpWide` | 1000 | px, mechanism layout drops to one column below this |
 | `tokens.size.bpPhone` | 640 | px, phone layout below this |
 | `tokens.size.focusOffset` | 3 | px, focus outline offset (SS10) |
+| `tokens.size.mark` | 44 | px, side of the faded mark at the foot of every page |
 | `tokens.size.transition` | 0.2 | s, colour and border transitions (SS11) |
 | `tokens.size.stage` | `16 / 10` | aspect ratio of the stage |
 | `tokens.size.stagePhone` | `4 / 3` | stage under bpPhone, and the card drawing field |

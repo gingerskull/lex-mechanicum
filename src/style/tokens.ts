@@ -63,6 +63,7 @@ export const TOKENS = {
     line2: { dark: 0.38, light: 0.42 }, // frames
     surface: { dark: 0.035, light: 0.025 }, // faint panel fill
     surface2: { dark: 0.08, light: 0.06 }, // hover / pressed panel fill
+    mark: { dark: 0.2, light: 0.16 }, // the faded mark at the foot of every page
   } satisfies Record<string, PerTheme<number>>,
 
   // Page grid alphas: alpha of the grid colour (0..1) per sheet, minor and major lines.
@@ -115,6 +116,7 @@ export const TOKENS = {
     bpWide: 1000, // px, mechanism layout drops to one column below this
     bpPhone: 640, // px, phone layout below this
     focusOffset: 3, // px, focus outline offset (SS10)
+    mark: 44, // px, side of the faded mark at the foot of every page
     transition: 0.2, // s, colour and border transitions (SS11)
   },
 
