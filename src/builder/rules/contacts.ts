@@ -189,7 +189,9 @@ const j5 = contactRule({
     const zs = ctx.extent(slider);
     if (!zs) return;
     const w0 = zs.w0;
-    const w1 = zs.w1;
+    // the slider's own thickness: its slab may be taller (a split part beside it)
+    const sp = ctx.parts.get(slider);
+    const w1 = sp && sp.op.op === "extrude" ? Math.min(zs.w1, w0 + sp.op.h) : zs.w1;
     const Ls = e[1] - e[0];
     const hostBody = bodyOf(ctx, host);
     const rh = w1 - w0 + 1.5;
@@ -288,7 +290,8 @@ const j5 = contactRule({
     // wipers at both ends of the slider where they clear, and a grease nipple (F8)
     const sb = bodyOf(ctx, slider);
     const wipers: string[] = [];
-    for (const [k, x] of [[0, c.run[0] + e[0] - 3], [1, c.run[0] + e[1] + 1]] as const) {
+    // at the slider's two ends, where it stands at the reference (the contact's origin), riding it
+    for (const [k, x] of [[0, e[0] - 3], [1, e[1] + 1]] as const) {
       const wip = H.wiper(`${id}-wip${k}`, [[x, e[2]], [x + 2, e[2]], [x + 2, e[3]], [x, e[3]]], { body: sb, z0: w0 + 0.5, z1: w1 - 0.5, ...(wipers.length ? { name: "", qty: 0 } : { qty: 2 }) });
       // a wiper rides the slider: judged against the others' sweeps as the slider carries it
       if (!clearOf(ctx, one((T) => T.add(wip)), others.filter((m) => m !== sb))) continue;

@@ -39,7 +39,7 @@ export interface BodyGeom {
    * A second plate on top of the part, `h` of the body's thickness (a slotted link's upper cheek over a solid lower one,
    * so a die runs in a groove and a trunnion can stand under it): the part is the lower plate.
    */
-  upper?: { profile: Profile; h: number; name?: string };
+  upper?: { profile: Profile; h: number; name?: string; lift?: number; lower?: number };
   /**
    * Placed at another body's slab rather than one of its own (a stationary gear in the rotor's gear ring, an engine's
    * housing round its rotor, its side cover over it): `part` "lower", "upper" (that body's upper plate), "all" or
@@ -82,6 +82,17 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "link": {
       const L = num(shape.length, far);
       const [r0, r1] = pair(shape.boss, [8, 8]);
+      // a second arm on the same hub, `gap` above it (an output crank split round a bridge that carries its shaft)
+      const up = shape.upper as Record<string, unknown> | undefined;
+      if (up && typeof up === "object") {
+        const L2 = num(up.length, L);
+        const [q0, q1] = pair(up.boss, [r0, r1]);
+        const a = num(up.angle, 180) * D2R;
+        const gap = num(up.gap, 14);
+        const arm = rot(taper(L2, q0, q1), a);
+        const h2 = num(up.thick, THICK);
+        return { profile: { outer: taper(L, r0, r1), holes: [] }, thick: THICK + gap + h2, approx: false, upper: { profile: { outer: arm, holes: [] }, h: h2, lift: THICK + gap, lower: THICK, name: "upper arm" } };
+      }
       // a bore at its origin: an eccentric strap, a ring round its sheave with a slim rod to the far pin
       const bore = num(shape.bore, 0);
       if (bore > 0 && r0 > r1) return { profile: { outer: ringAndRod(L, r0, r1), holes: [circle(bore, 0, 0, 96).reverse()] }, thick: THICK, approx: false };

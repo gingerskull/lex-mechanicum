@@ -2450,12 +2450,27 @@
           "id": "crank",
           "role": "driver",
           "shape": {
-            "type": "link",
-            "length": 60,
-            "boss": [
-              12,
-              9.5
-            ]
+            "type": "plate",
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                60,
+                0
+              ],
+              [
+                -14,
+                11
+              ],
+              [
+                -14,
+                -11
+              ]
+            ],
+            "boss": 9.5,
+            "note": "the input crank with its counterweight lobe opposite the pin (M2)"
           },
           "at": {
             "joint": "O2"
@@ -2480,22 +2495,22 @@
           "id": "follower",
           "role": "output",
           "shape": {
-            "type": "plate",
-            "outline": [
-              [
-                0,
-                0
-              ],
-              [
-                60,
-                0
-              ],
-              [
-                -50,
-                0
-              ]
+            "type": "link",
+            "length": 60,
+            "boss": [
+              12,
+              9.5
             ],
-            "boss": 12
+            "upper": {
+              "length": 50,
+              "boss": [
+                12,
+                9
+              ],
+              "angle": 180,
+              "gap": 22
+            },
+            "note": "the output crank in two arms on one shaft, the arm to B below and the ram arm to D above, a bridge between them carrying the shaft"
           },
           "at": {
             "joint": "O4"

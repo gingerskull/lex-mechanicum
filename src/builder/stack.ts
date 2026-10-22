@@ -44,6 +44,11 @@ export interface StackSpec {
   flush?: boolean;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
+  /**
+   * A fixed pin whose part is split in two plates with a gap between (an output crank whose pivot every other part
+   * sweeps over or under): a live shaft keyed to both plates turns in a bushing in a bridge that runs in the gap.
+   */
+  between?: boolean;
 }
 
 export interface StackResult {
@@ -84,6 +89,7 @@ interface Seat {
 }
 
 export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
+  if (spec.between) return betweenStack(ctx, spec);
   const members = [...spec.members].sort((a, b) => a.w0 - b.w0);
   const fit = fitBore(members);
   const { d } = fit;
@@ -340,6 +346,60 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const w1 = Math.max(...Lc.list.map((x) => x.z1), top ?? -Infinity);
     return { solids: [...Lc.out(), ...more], d, fit, support: sup, bores, w0, w1, serves, notes, ...(br ? { bridge: br } : {}) };
   }
+}
+
+/** A live shaft keyed to the two plates of a split part, turning in a bushing in a bridge in the gap between them. */
+function betweenStack(ctx: BuildCtx, spec: StackSpec): StackResult {
+  const members = [...spec.members].sort((a, b) => a.w0 - b.w0);
+  const lo = members[0]!;
+  const hi = members[members.length - 1]!;
+  const fit = fitBore(members);
+  const d = Math.max(8, fit.d);
+  const id = spec.id;
+  const L = new Local(spec.frame, { joints: spec.joints });
+  const o = spec.frame.o;
+  const serves: Record<string, string[]> = {};
+  const serve = (f: string, ...ids: string[]) => ((serves[f] ??= []).push(...ids));
+  const baseTop = ctx.base?.top ?? o[2] + lo.w0 - 10;
+  const baseBot = ctx.base?.bottom ?? baseTop - 8;
+  const route = routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom: o[2] + lo.w1 + MIN_GAP + 1, baseTop, below: o[2] + hi.w0 - MIN_GAP - 1 });
+  if (!route) throw new Error(`${id}: no bridge fits between the two plates`);
+  const b0 = route.bottom - o[2];
+  const b1 = route.top - o[2];
+  const bushD = circleBushing(d);
+  const extra = bridgeSolids(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], route, hole: bushD / 2 + 0.05, baseTop, baseBottom: baseBot, joints: spec.joints });
+  const turn = lo.body;
+  L.add(H.bushing(`${id}-bb`, d, bushD, { body: "ground", z0: b0, z1: b1, name: `Bronze bushing ${d}x${bushD}, in the bridge` }));
+  // bronze thrust washers each side of the beam locate the shaft; spacers on the shaft fill to the plates
+  L.add(H.thrustWasher(`${id}-tw0`, d + 0.2, d + 8, { body: "ground", z0: b0 - 1, z1: b0 }));
+  L.add(H.thrustWasher(`${id}-tw1`, d + 0.2, d + 8, { body: "ground", z0: b1, z1: b1 + 1, name: "" }));
+  if (b0 - 1 - lo.w1 > SPACER_MIN) L.add(H.spacer(`${id}-sp0`, d + 0.2, d + 4, { body: turn, z0: lo.w1, z1: b0 - 1 }));
+  if (hi.w0 - (b1 + 1) > SPACER_MIN) L.add(H.spacer(`${id}-sp1`, d + 0.2, d + 4, { body: turn, z0: b1 + 1, z1: hi.w0 }));
+  serve("F4", `${id}-tw0`, `${id}-tw1`);
+  // the shaft ends flush in both plates, each held by an end washer and a countersunk screw (F2, F3: D-flat in both)
+  const M = d >= 10 ? 5 : d >= 8 ? 4 : 3;
+  const wh = 1.5;
+  L.add(H.washer(`${id}-ew0`, M + 0.4, d + 8, { body: turn, z0: hi.w1, z1: hi.w1 + wh, name: `End washer ${M + 0.4}x${d + 8}, holds the arms on the shaft`, qty: 2 }));
+  L.add(H.screw(`${id}-es0`, "csk", M, 2 * M + wh, { body: turn, face: hi.w1 + wh, dir: -1, qty: 2 }));
+  L.add(H.washer(`${id}-ew1`, M + 0.4, d + 8, { body: turn, z0: lo.w0 - wh, z1: lo.w0, name: "" }));
+  L.add(H.screw(`${id}-es1`, "csk", M, 2 * M + wh, { body: turn, face: lo.w0 - wh, dir: 1, name: "", qty: 0 }));
+  serve("F2", `${id}-ew0`, `${id}-es0`, `${id}-ew1`, `${id}-es1`);
+  L.add(H.shaft(`${id}-shaft`, { d, z0: lo.w0, z1: hi.w1, flat: true }, { name: `Live shaft Ø${d}, D-flat in both arms, in a bushing in the bridge between them`, body: turn }));
+  serve("F3", `${id}-shaft`);
+  serve("F1", `${id}-bridge`);
+  for (const x of L.list) if (!x.joints.length) x.joints = [...spec.joints];
+  return {
+    solids: [...L.out(), ...extra],
+    d,
+    fit,
+    support: "bridge",
+    bores: members.map((m) => ({ solid: m.solid, r: d / 2 + 0.05 })),
+    w0: lo.w0 - wh,
+    w1: hi.w1 + wh,
+    serves,
+    notes: [`a live shaft keyed to both plates turns in a bushing in a bridge between them: the other parts sweep over and under the pivot`],
+    bridge: { id: `${id}-bridge`, route },
+  };
 }
 
 /** Outside Ø of the bushing a bridge's boss carries for an axle of Ø d. */

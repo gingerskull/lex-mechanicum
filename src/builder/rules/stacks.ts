@@ -33,8 +33,12 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
   for (const b of site.bodies) {
     const joint = site.joints.find((j) => ctx.kin.joints.find((q) => q.id === j && (q.a === b || q.b === b)));
     const R = joint ? bossRadius(ctx, b, joint) : 8;
-    for (const part of [ctx.parts.get(b), ctx.twins.get(b)]) {
+    const upper = ctx.solids.find((s) => s.id === `${b}-cheek` && s.body === b);
+    for (const part of [ctx.parts.get(b), ctx.twins.get(b), upper]) {
       if (!part) continue;
+      // a plate of a two-plate body takes part in the stacks of the pins it reaches
+      const uv = planeCoords(part.frame, site.at).uv;
+      if (upper && (!inside(part.profile.outer, uv) || part.profile.holes.some((h) => inside(h, uv)))) continue;
       const slab = ctx.extent(b);
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
       // the twin's second half sits in its own slab
@@ -117,6 +121,8 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     straddle,
     eccentric: ctx.eccentric.has(site.id),
     ...(grooved ? { flush: true } : {}),
+    // a part split in two plates round a gap (its upper plate lifted clear of the lower) is carried between them
+    ...(site.fixed && members.length === 2 && members[0]!.body === members[1]!.body && ctx.geoms.get(members[0]!.body)?.upper?.lift !== undefined ? { between: true } : {}),
     baseTopWorld: ctx.base?.top ?? 0,
   };
   const r = axialStack(ctx, spec);
