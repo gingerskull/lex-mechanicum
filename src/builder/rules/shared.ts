@@ -18,6 +18,7 @@ import { lowestZ } from "./core";
 import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 import type { Site } from "../sites";
+import { linearDrive, manualDrive, oscillatingDrive } from "./drive";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
@@ -96,8 +97,10 @@ export const stops: Rule = {
             // the pin is judged against the other moving parts; the lever itself is meant to meet it
             const m = worldManifold(ctx.M, pin[0]!);
             const g2 = ctx.sweeps.gap(m, others, MIN_GAP + 1);
+            // and it clears the lever itself over the cycle (a plate lever's far corner sweeps past its edge line)
+            const g3 = g2 < MIN_GAP ? 0 : ctx.sweeps.gap(m, [b], 1);
             m.delete();
-            if (g2 < MIN_GAP) continue;
+            if (g2 < MIN_GAP || g3 < 0.5) continue;
             ctx.add(pin);
             ctx.add(place(UPF, H.screw(`${s.id}-${b}-stop${k}-sc`, "button", 4, 12, { at: [w[0], w[1], 0], face: ctx.base!.bottom, dir: 1, name: "", qty: 0, joints: [s.id] })));
             placed.push(pin[0]!.id);
@@ -110,7 +113,12 @@ export const stops: Rule = {
         const n = Math.floor((sw.range * 180) / Math.PI / 5);
         for (let q = 0; q <= n; q++) {
           const a = dir + sw.lo + (q * 5 * Math.PI) / 180;
-          ticks.push([polar(pivot, reach * 0.92, a), polar(pivot, reach * 0.92 + (q % 2 ? 2.2 : 3.6), a)]);
+          // ticks are worked out in the lever's plane and engraved on the base, whose frame is the world's
+          const w = (uv: [number, number]): [number, number] => {
+            const p = fromPlane(ext.frame, uv, 0);
+            return [p[0], p[1]];
+          };
+          ticks.push([w(polar(pivot, reach * 0.92, a)), w(polar(pivot, reach * 0.92 + (q % 2 ? 2.2 : 3.6), a))]);
         }
         for (const t of ticks) ctx.baseMarks.push({ kind: "scale", pts: t });
         ctx.note({ id: `${s.id}-${b}-stops`, kit: "stops", at: s.at, title: `Stops · ${b}`, note: `${b} swings ${((sw.range * 180) / Math.PI).toFixed(1)}°; hardened stop pins at 70 % of its reach, a fifth of the half swing past each end; swing scale engraved on the base.`, serves: { F5: placed }, badge: placed.length ? ["stopped both ends", "ok"] : ["no stop fits", "warn"] });
@@ -160,7 +168,9 @@ export const standoffs: Rule = {
       const clear3d = (p: Vec2): boolean => clearance(ctx, place(UPF, H.standoff("probe", { at: [p[0], p[1], 0], z0: base.top, z1 }))) >= MIN_GAP;
       const inPlan = (p: Vec2): boolean => swept.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + MIN_GAP || insideOwn(part.body, ctx, p));
       const free = (p: Vec2): boolean => (inPlan(p) || clear3d(p)) && fixed.every((f) => f.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + 1));
-      const cands = far.flatMap((p) => [0.18, 0.3, 0.45].map((k): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k])).filter(free);
+      // (last, nearer the edge: a ring's posts stand under its rim, outside what turns inside it)
+      const at = (k: number) => (p: Vec2): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k];
+      const cands = [...far.flatMap((p) => [0.18, 0.3, 0.45].map((k) => at(k)(p))), ...far.map(at(0.09))].filter(free);
       const a = cands[0];
       const bFar = a ? cands.find((p) => Math.hypot(p[0] - a[0], p[1] - a[1]) > 30) : undefined;
       if (!a || !bFar) {
@@ -191,9 +201,16 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
   if (!ctx.base || !axle) return;
-  // H.shaft starts at its low end, the free one: the axle's frame origin is that end, its z the shaft's axis
-  const out: Vec3 = v3.mul(v3.unit(axle.frame.z as Vec3), -1);
-  const end = axle.frame.o as Vec3;
+  // H.shaft starts at its low end: the axle's frame origin is that end, its z the shaft's axis. The drive takes that end,
+  // unless it faces the eye in the default view (a front elevation looking at the low end): then the far end
+  const zA = v3.unit(axle.frame.z as Vec3);
+  const hA = axle.op.op === "extrude" ? axle.op.h : 0;
+  // ... and only when that far end is free: no part the shaft carries stands within a pulley's reach of it (a
+  // differential's pinion on its shaft's high end)
+  const farFree = [...ctx.parts.values()].every((p) => p.body !== axle.body || v3.dot(v3.sub(p.frame.o as Vec3, axle.frame.o as Vec3), zA) < hA - 30);
+  const far = v3.dot(zA, ctx.viewDir()) > 0.5 && farFree;
+  const out: Vec3 = far ? zA : v3.mul(zA, -1);
+  const end = far ? v3.add(axle.frame.o as Vec3, v3.mul(zA, hA)) : (axle.frame.o as Vec3);
   const shaftBody = axle.body;
   const S: Vec3 = v3.add(end, v3.mul(out, -6)); // the pulley's centre, 6 mm in from the end
   const up: Vec3 = [0, 0, 1];
@@ -259,25 +276,18 @@ function driveInPlan(ctx: BuildCtx, site: Site): void {
   ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], S[2]], title: "Drive", note: "Brushless pancake motor beside the shaft in plan, its face screwed to the upright of a one-piece angle bracket whose foot is screwed to the base; GT2 16T to 32T belt across the shaft to a pulley on its free end; a home flag on the pulley read by a fork sensor on the upright; terminals and a lead on the base.", serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
 }
 
-/**
- * A driver the standard belt drive turns: a rotary input, or an oscillating one whose swing is more than a crank and
- * link can give (over 180°): the motor then reverses at each end of the swing (V5).
- */
-export const beltDriven = (d: { kind: string; range?: unknown; lo?: unknown; hi?: unknown }): boolean => {
-  if (d.kind === "rotary") return true;
-  if (d.kind !== "oscillating") return false;
-  const r = Array.isArray(d.range) ? (d.range as number[]) : [Number(d.lo), Number(d.hi)];
-  return Number.isFinite(r[0]) && Number.isFinite(r[1]) && Math.abs(r[1]! - r[0]!) > 180;
-};
-
 export const drive: Rule = {
   id: "drive",
   tier: "AUTO",
   ids: ["V1", "V2", "V3", "V5", "V6", "F10"],
   fixture: "four-bar",
-  applies: (ctx) => ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some(beltDriven),
+  applies: (ctx) => (ctx.sites.some((s) => s.fixed && s.live && ctx.stacks.has(s.id)) && ctx.kin.drivers.some((d) => d.kind === "rotary")) || ctx.kin.drivers.some((d) => d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"),
   apply(ctx) {
-    const drv = ctx.kin.drivers.find(beltDriven);
+    // an oscillating or a linear input has its own drive (rules/drive.ts); a rotary one is belted to its shaft
+    const other = ctx.kin.drivers.some((d) => d.kind === "rotary") ? undefined : ctx.kin.drivers.find((d) => d.kind === "oscillating" || d.kind === "linear");
+    if (other) return other.kind === "oscillating" ? oscillatingDrive(ctx, other) : linearDrive(ctx, other);
+    if (!ctx.kin.drivers.some((d) => d.kind === "rotary")) return manualDrive(ctx);
+    const drv = ctx.kin.drivers.find((d) => d.kind === "rotary");
     const inPlan = ctx.sites.find((s) => s.fixed && s.live && s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
     if (inPlan) return driveInPlan(ctx, inPlan);
     const site = ctx.sites.find((s) => s.fixed && s.live && !s.inPlan && ctx.stacks.has(s.id) && s.joints.includes(drv?.joint ?? ""));
@@ -365,7 +375,7 @@ export const drive: Rule = {
     const tb = polar(M, 36, dir);
     ctx.add(place(UPF, H.terminalBlock("drive-terminals", 4, { at: [tb[0], tb[1], 0], z0: bb - 6, z1: bb, joints: j })));
     ctx.add(place(UPF, H.lead("drive-lead", [M, [(M[0] + tb[0]) / 2 + 3, (M[1] + tb[1]) / 2 - 2], tb], { z0: bb - 2.2, z1: bb - 1.2, joints: j })));
-    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.${drv?.kind === "oscillating" ? " The input swings further than a crank and link can drive, so the motor reverses at each end of the swing, homed on the flag." : ""}`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
+    ctx.note({ id: "drive", kit: "drive", at: [S[0], S[1], 0], title: "Drive", note: `Brushless pancake motor in a flange screwed up into the base, GT2 16T to 32T closed belt in one plane under the base, a home flag on the shaft pulley and a fork sensor on a post, terminals and a lead.`, serves: { F10: ["drive-flag", "drive-sensor"] }, badge: ["motor driven", "ok"] });
     void LEVER_WALL;
   },
 };

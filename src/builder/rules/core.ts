@@ -74,6 +74,7 @@ export const placement: Rule = {
         frame,
         profile: { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
         op: g.loft ? { op: "loft", sections: [{ z: 0, outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) }, ...g.loft] } : extrudeOp(g.thick, { ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}) }),
+        ...(g.features?.length ? { features: g.features } : {}),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),
@@ -94,7 +95,7 @@ export const placement: Rule = {
         (ctx.fired.placement ??= []).push(lv.id);
       });
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), marks: [], joints: [...part.joints] });
+        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: extrudeOp(pc.h), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);
@@ -115,6 +116,13 @@ export function lowestZ(ctx: BuildCtx, below = Infinity): number {
   for (const s of ctx.solids) for (const p of worldPoints(ctx.M, s)) if (p[2] < z && p[2] < below) z = p[2];
   return z;
 }
+
+/** A hole ring turned clockwise, as the base's holes are. */
+const clockwise = (r: readonly (readonly [number, number])[]): Vec2[] => {
+  const a = r.reduce((s, p, i) => s + p[0] * r[(i + 1) % r.length]![1] - r[(i + 1) % r.length]![0] * p[1], 0);
+  const pts = r.map((p): Vec2 => [p[0], p[1]]);
+  return a > 0 ? pts.reverse() : pts;
+};
 
 export const base: Rule = {
   id: "base",
@@ -165,9 +173,12 @@ export const base: Rule = {
       if (!["standoff", "bridge", "housing", "plate", "foot", "bracket", "motor", "pulley", "belt", "sensor", "terminalBlock", "stop"].includes(s.kind)) continue;
       for (const p of worldPoints(ctx.M, s)) if (p[2] <= bs.top + 2) grow(p);
     }
+    // the points the teaching names on the ground (a rear axle line, a turning centre) lie on the base
+    for (const p of ctx.kin.points ?? []) if (p.body === "ground") grow(p.local.map(Number));
     for (const h of ctx.baseHoles) {
       grow([h.at[0] - h.r, h.at[1] - h.r]);
       grow([h.at[0] + h.r, h.at[1] + h.r]);
+      for (const p of h.ring ?? []) grow(p);
     }
     if (!isFinite(x0)) return;
     const m = 16;
@@ -177,7 +188,7 @@ export const base: Rule = {
     const corners: Vec2[] = [[x0 - m + inset, y0 - m + inset], [x1 + m - inset, y0 - m + inset], [x1 + m - inset, y1 + m - inset], [x0 - m + inset, y1 + m - inset]];
     const holes: Vec2[][] = [];
     for (const c of corners) holes.push(circle(2.75, c[0], c[1], 20).reverse());
-    for (const h of ctx.baseHoles) holes.push(circle(h.r, h.at[0], h.at[1], Math.max(20, Math.round(h.r * 4))).reverse());
+    for (const h of ctx.baseHoles) holes.push(h.ring ? clockwise(h.ring) : circle(h.r, h.at[0], h.at[1], Math.max(20, Math.round(h.r * 4))).reverse());
     // the 5 mm engraved scale along the front edge and the traced paths engraved (A7)
     const ticks: Vec2[][] = [];
     const sx0 = Math.ceil((x0 - m + 14) / 5) * 5;

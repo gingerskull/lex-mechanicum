@@ -5,7 +5,7 @@ export const KIN_VOCAB = {
   bodyRole: ["ground", "driver", "link", "output", "slider", "gear", "cam", "follower", "pawl", "spring", "belt", "frame"],
   shape: [
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
-    "rope", "cage", "cross", "tracer", "cylinder", "piston", "custom",
+    "rope", "cage", "cross", "tracer", "cylinder", "piston", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
@@ -16,7 +16,8 @@ export const KIN_VOCAB = {
   driver: ["rotary", "oscillating", "linear", "manual", "select"],
   block: [
     "dyad", "slider-dyad", "gear-mesh", "willis", "hooke", "homokinetic", "bennett", "cam", "screw", "convey",
-    "flexure", "escapement", "follow", "wave", "bevel-diff", "ravigneaux",
+    "flexure", "escapement", "follow", "wave", "bevel-diff", "ravigneaux", "five-bar", "lerp", "line-crossing",
+    "target-path", "rocker", "indexer", "star", "ratchet", "one-way", "escape", "verge",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;
@@ -118,7 +119,7 @@ export interface Kin {
 export interface Teaching {
   review: { verdict: (typeof TEACHING_VOCAB.verdict)[number]; date: string; note: string };
   principle: { body?: string; point?: string }[];
-  traces: { id: string; point: string; ticks?: { every: number }; ghosts?: { control: string; value: unknown }[]; comet?: boolean }[];
+  traces: { id: string; point: string; ticks?: { every: number }; ghosts?: { control: string; value: unknown }[]; comet?: boolean; /** Drawn in this body's frame (a cam's pitch curve turns with the cam). */ frame?: string }[];
   overlays: { id: string; kind: (typeof TEACHING_VOCAB.overlay)[number]; label?: string; [k: string]: unknown }[];
   view: string;
   views?: { id: string; kind: (typeof TEACHING_VOCAB.viewKind)[number]; highlight?: string[]; [k: string]: unknown }[];

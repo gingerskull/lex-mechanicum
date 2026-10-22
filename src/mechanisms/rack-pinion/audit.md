@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 150 · FAIL 0 · N/A 17 · open: none
+PASS 149 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -59,12 +59,12 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | D2 | PASS | HAND · material where the teeth carry; plain gear discs on keyed hubs |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
-| D5 | PASS | AUTO / HAND · one bridge over the pinion on two posts; the rack's gibbed rail, way and keeper; motor flange |
+| D5 | PASS | AUTO / HAND · one bridge over the pinion on two posts; the rack's gibbed rail, way and keeper; the motor flange and the drive's gear sector on its post under the base |
 | D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 102 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 117 solids unsound |
 | D7 | PASS | HAND · gears plain; richness in the stacks |
 | A1 | PASS | AUTO · M J6, O J2, S J5, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J6, O J2, S J5, drive drive · pinion on a live shaft (J2) straddled by a bridge; rack on a slide (J5) guided from its back; parallel mesh J6 |
@@ -105,7 +105,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | J5 | PASS | AUTO · fired: piston-bore (no solids), j5-slide (25 solids), tongue-slot (no solids) · rack slide: gibbed rail under a keeper, wear strip on a way, wipers on both ends, grease nipple, end stops with pads |
 | J6 | PASS | AUTO · fired: j6-mesh (1 solid), ring-rollers (no solids) · parallel mesh: eccentric bushing for the pinion's centre distance, timing marks at the mesh |
 | J7 | N/A | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no cam |
-| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt |
 | J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
 | J10 | N/A | AUTO · fired: j10-shaft-in-plan (no solids) · no shaft in plan |
 | J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
@@ -135,11 +135,11 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | M12 | PASS | HAND · every screw reachable by its key in the explode |
 | M13 | PASS | AUTO / HAND · 16 threaded · threadlocker or nyloc on every threaded fastener |
 | M14 | PASS | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (no solids), tongue-slot (no solids) · the hardened wear strip under the rack is the replaceable wear part |
-| V1 | PASS | AUTO · fired: drive (26 solids) · pancake motor under the base, belted to the pinion shaft |
+| V1 | PASS | AUTO · fired: drive (26 solids) · pancake motor under the base; a crank and link swing a 60T gear sector that turns a 20T pinion on the input shaft 3 times as far |
 | V2 | PASS | AUTO · fired: drive (26 solids) · one bracket for the motor |
-| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · belt and pulleys clear of feet and housings (A15) |
-| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
-| V5 | PASS | AUTO · fired: drive (26 solids) · oscillating input over 180 deg: no crank and link can swing it, so the belt drive turns it and the motor reverses at each end, homed on the flag |
+| V3 | PASS | AUTO / HAND · fired: drive (26 solids) · crank, link and gear sector clear of feet and housings (A15) |
+| V4 | N/A | AUTO · fired: j8-belt (no solids) · no belt: the drive is a crank, a link and a gear sector |
+| V5 | PASS | AUTO · fired: drive (26 solids) · oscillating input over 180 deg: a crank and link swing a gear sector that steps the swing up 3:1 to the input's 300 deg, dead centres at the ends of the swing |
 | V6 | PASS | AUTO · fired: drive (26 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
 | L1 | PASS | STYLE · STYLE: no look values in the record or polish |
 | L2 | PASS | HAND · records and polish carry no look |
@@ -180,9 +180,9 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Pinion; Rack | none |
-| O | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 18 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| S | J5 | – | – | – | 2 x Dowel pin Ø3 h6, gibbed rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 381.2, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
-| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+| O | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 13 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| S | J5 | – | – | – | 2 x Dowel pin Ø3 h6, gibbed rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 393.2, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| drive | drive | – | – | – | none | External circlip DIN 471, Ø12; 2 x External circlip DIN 471, Ø4 | Feather key 4 x 4 x 9 (DIN 6885) | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -199,18 +199,18 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 5 | 0 | – |
-| DL-B | 0 | 121 | – |
+| DL-B | 0 | 143 | – |
 | DL-C | 0 | 0 | 1.05 |
 | DL-D | 5 | 0 | – |
-| DL-E | 11 | 3 | – |
+| DL-E | 16 | 3 | – |
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.06 |
-| DL-H | 17 | 0 | – |
-| never | 64 | 145 | 0.93 (full) |
+| DL-H | 23 | 0 | – |
+| never | 68 | 153 | 0.93 (full) |
 
 ## Promotion candidates
 None left: the toothed rack outline, the rack guided from its back and the reversing belt drive for a swing over 180 deg are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 4.3e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.5 KB
+check: clean · K1 residual: 4.3e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.5 KB
 screenshots: dist/shots3/rack-pinion (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.93 ms full, 1.05 at C, 1.06 at G; phone by David)

@@ -26,3 +26,7 @@ export const HEADROOM = 8;
 export const SWEEP_STEP = 3;
 /** Gap under a moving pin's first part where a plate passes right under it: the bolt's thread end, mm. */
 export const THREAD_ROOM = 9;
+/** Gap above a slider on the ground: its rails stand 1.5 mm proud, the keeper 3 mm more, then the least gap (J5), mm. */
+export const SLIDE_ROOM = 1.5 + 3 + MIN_GAP + 1;
+/** How far a ground slider's rails, gib and end stops reach past its swept outline (J5), along the slide and across, mm. */
+export const RAIL_ZONE = { along: 24, across: 12 };

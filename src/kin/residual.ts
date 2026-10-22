@@ -29,7 +29,7 @@ function relative(Xa: Xf, Xb: Xf): Xf {
   return xf.mul(Xb, xf.inv(Xa));
 }
 
-function wrapped(joint: KinJoint, driverValue: (id: string) => number | undefined): boolean {
+export function wrapped(joint: KinJoint, driverValue: (id: string) => number | undefined): boolean {
   const a = joint.active;
   if (!a) return true;
   const v = driverValue(a.driver);
@@ -131,6 +131,13 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
       const tip = xf.apply(xf.inv(Xb), xf.apply(Xa, r.at));
       const centre = r.ca;
       const radial = v3.len(v3.perp(v3.sub(tip, centre), r.axis));
+      if (j.cam.form === "barrel") {
+        // a barrel cam: the roller stays at the pitch radius and moves along the axis by the law, from its reference place
+        const s0 = camMotion(sched, n(j.cam.theta0 ?? 0) * D2R).s;
+        const a0 = v3.dot(v3.sub(r.at, centre), r.axis);
+        out.push(radial - rb, v3.dot(v3.sub(tip, centre), r.axis) - (a0 + m.s - s0));
+        break;
+      }
       out.push(radial - Math.hypot(e, Math.sqrt(Math.max(0, rb * rb - e * e)) + m.s));
       break;
     }

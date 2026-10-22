@@ -20,6 +20,10 @@ export interface KinBody {
   frame?: Frame; // pose of the body's own frame in the reference configuration; default: its `at` joint, else the world
   /** n-fold rotational symmetry about its axis (a wheel's slots, a gear's teeth z): the cycle repeats modulo 2π/n (K2). */
   symmetry?: number;
+  /** The body moves by instant drops (an escapement's wheel): its points may jump between samples by design. */
+  drops?: boolean;
+  /** Bodies this one lies above in its stack (a rod pinned down onto blocks that run in a plate's grooves): a placement hint. */
+  above?: string[];
 }
 
 export type JointType =
@@ -84,7 +88,7 @@ export interface KinJoint {
   // flexure
   neck?: Record<string, unknown>;
   // cam-contact: the cam's schedule (spans in degrees), lift, base (or prime) radius, offset and its angle at the reference
-  cam?: { schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string }[]; lift: Num; rb: Num; e?: Num; theta0?: Num };
+  cam?: { schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string }[]; lift: Num; rb: Num; e?: Num; theta0?: Num; /** "barrel": the follower runs along the cam's axis at the pitch radius rb (a barrel cam's groove). */ form?: "plate" | "barrel" };
   /** The joint is engaged only while this driver is inside [lo, hi] degrees (mod 360): a Geneva pin in its slot. */
   active?: { driver: string; lo: number; hi: number };
 }
@@ -109,13 +113,13 @@ export interface KinDriver {
   joint?: string;
   kind: "rotary" | "oscillating" | "linear" | "manual" | "select";
   range?: [number, number];
-  /** A selector's default is the id of one of its options. */
-  default?: number | string;
+  default?: number;
   lo?: number;
   hi?: number;
   /** Rotary and oscillating: turns per cycle (default 1; an integer keeps K2) and a phase offset, degrees. */
-  /** Turns per cycle relative to the range, or a param expression (a differential's second input at a split). */
-  speed?: number | string;
+  speed?: number;
+  /** Turns per cycle relative to the range as a param expression, in place of `speed` (a differential's second input at a split). */
+  rate?: string;
   phase?: number;
   /**
    * A selector's named options (a list of `{ id, ... }`, or a map by id), each setting values of other drivers, params
@@ -125,6 +129,11 @@ export interface KinDriver {
     | Record<string, SelectorOptionSpec>
     | (SelectorOptionSpec & { id: string })[];
   value?: string; // a selector's current option
+  /**
+   * Set by the cycle through a block (a target path and inverse kinematics), not applied as a joint motion; a number is
+   * only the input degrees after which the motion repeats (a planetary's carrier turn), noted in the record.
+   */
+  cycle?: { from?: string; note?: string } | number;
 }
 
 export interface SelectorOptionSpec {
@@ -158,6 +167,14 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
+  /** A point's position projected on this direction (world mm), instead of the point itself: a coordinate along a slide. */
+  axis?: [number, number, number];
+  /** A value subtracted from a scalar output (mm or degrees): a height above a line, a datum. */
+  datum?: number;
+  /** An angle measured from the world x axis (the link's own direction) instead of from the reference pose. */
+  absolute?: boolean;
+  /** A speed ratio of the point `of` over the point `over` (their speeds), instead of a body's turn per input. */
+  over?: string;
 }
 
 export interface Kin {

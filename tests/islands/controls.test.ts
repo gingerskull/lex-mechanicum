@@ -58,8 +58,8 @@ describe("which mechanisms the site draws with the v3 engine", () => {
     process.env.SITE_V3 = "slider-crank, scotch-yoke";
     expect(drawnBy3("slider-crank")).toBe(true);
     expect(drawnBy3("scotch-yoke")).toBe(true);
-    expect(drawnBy3("spur-gears")).toBe(false);
+    expect(drawnBy3("crank-shaper")).toBe(false);
     process.env.SITE_V3 = "all";
-    expect(drawnBy3("spur-gears")).toBe(true);
+    expect(drawnBy3("crank-shaper")).toBe(true);
   });
 });

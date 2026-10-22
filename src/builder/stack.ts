@@ -15,6 +15,7 @@ import { Local, fitBore, half, type Fit, type Member } from "./lib";
 import { bridgeSolids, routeBridge, type BridgeRoute } from "./router";
 import { UP } from "./sites";
 import { MIN_GAP } from "./constants";
+import { v3 } from "../kin/math";
 import { liveHousing, pillowBlocks } from "./supports";
 
 export type SupportKind = "housing" | "pillow" | "bridge" | "stub" | "hung";
@@ -36,12 +37,14 @@ export interface StackSpec {
   input?: boolean;
   /** Force a support instead of letting the selector choose. */
   support?: SupportKind;
-  /** A driver turns the stack (its drive is under the base). */
-  driven?: boolean;
+  /** Another stack holds the same axis under this one (a large sun's shaft over the small sun's): no housing below. */
+  axisTakenBelow?: boolean;
   /** A live gear or pulley shaft with nothing over it is straddle mounted (A9). */
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
   eccentric?: boolean;
+  /** A shaft in plan held from one side only (both pillow blocks): +1 along the axis, −1 against it. */
+  side?: 1 | -1;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
 }
@@ -67,11 +70,12 @@ const SPACER_MIN = 0.5;
 const BEAM_GAP = 3;
 
 /** The support selector (A20). */
-export function selectSupport(spec: Pick<StackSpec, "kind" | "held" | "straddle" | "base" | "frame" | "driven">): SupportKind {
+export function selectSupport(spec: Pick<StackSpec, "kind" | "held" | "straddle" | "base" | "frame" | "axisTakenBelow">): SupportKind {
   if (spec.kind === "moving") return "stub";
   if (!spec.base || !parallel(spec.frame.z, UP)) return "pillow";
-  // an undriven live shaft with parts passing under it runs in its bridge alone (a large sun over a small one)
-  if (spec.kind === "live" && spec.held === "bridge" && spec.driven === false) return "hung";
+  // a live shaft whose axis below is another stack's, with parts passing under it, runs in its bridge alone (a large
+  // sun over a small one)
+  if (spec.kind === "live" && spec.held === "bridge" && spec.axisTakenBelow) return "hung";
   if (spec.kind === "live") return spec.straddle && spec.held !== "base" ? "bridge" : "housing";
   if (spec.held === "base") return "stub";
   if (spec.held === "bridge") return "hung";
@@ -171,11 +175,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   keyedSeats.forEach((s, i) => {
     const nm = `${id}-k${i}`;
     if (kf) {
-      // the key lies along the shaft in its keyway: its section (h radial by b across) on the stack's plane, its length
-      // along the axis through the keyed part
-      const kL = Math.max(8, s.m.w1 - s.m.w0 - 1);
-      const kx = d / 2 - kf.t1 + kf.h / 2;
-      L.add(H.key(`${nm}-key`, kf.b, kL, { body: s.m.body, outer: roundRect(kx - kf.h / 2, -kf.b / 2, kx + kf.h / 2, kf.b / 2, 0.4), z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kL }));
+      // the key runs along the shaft through the keyed part: its b x h section in the plane, its length along the axis
+      const kl = Math.max(4, s.m.w1 - s.m.w0 - 1);
+      const kr = d / 2 - kf.t1 + kf.h / 2 - 0.4;
+      L.add(H.key(`${nm}-key`, kf.b, kl, { body: s.m.body, outer: roundRect(kr - kf.h / 2, -kf.b / 2, kr + kf.h / 2, kf.b / 2, 0.4), z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kl }));
       serve("F3", `${nm}-key`);
     }
     if (endHeld) return;
@@ -245,10 +248,11 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
     const hi = Math.max(...L.list.map((x) => x.z1), zTop, span[1]);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
-    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });
+    const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints, ...(spec.side ? { side: spec.side } : {}) });
     extra.push(...p.solids);
     shaftSpec.z0 = p.shaft[0] - (live ? (spec.input ? 18 : 6) : 0);
-    shaftSpec.z1 = p.shaft[1] + (live ? 12 : 0);
+    // the drive's pulley goes on the end facing away from the default view (rules/shared.ts driveInPlan)
+    shaftSpec.z1 = p.shaft[1] + (live ? (spec.input && v3.dot(spec.frame.z, ctx.viewDir()) > 0.5 ? 18 : 12) : 0);
     // a part overhung past both blocks is held on the shaft's end by a washer and a countersunk screw (J10, F2)
     const top = members[members.length - 1]!;
     if (live && Math.max(...p.w) < top.w0) {
@@ -281,8 +285,10 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
       const lo = fb.b || !fb.m.keyed ? fb.z0 : fb.m.w0;
       if (lo - (tw + 1) > SPACER_MIN) L.add(H.spacer(`${id}-sp0`, d + 0.2, fb.b ? innerRingD(fb.b) : d + 3, { z0: tw + 1, z1: lo, body: turn }));
     } else {
-      // hung from its bridge: a circlip under the first part keeps it up
-      grooves.push(first.w0 - 4 + 0.6);
+      // hung from its bridge: a circlip under the first part keeps it up; the axle ends just under it, clear of a part
+      // that passes beneath (A12)
+      shaftSpec.z0 = first.w0 - 2.5;
+      grooves.push(first.w0 - 2.5 + 0.6);
     }
     if (support === "housing" || (live && spec.base && support !== "hung")) {
       const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
@@ -371,14 +377,17 @@ const circleBushing = (d: number): number => d + 4;
 export type { Solid };
 export { housingBearing };
 
-/** The range along a stack's axis of its members' further pieces (a differential case's cage), [Infinity, -Infinity] if none. */
+/** The range along a stack's axis of its members' cages (a differential case's), [Infinity, -Infinity] if none. */
 function piecesSpan(ctx: BuildCtx, spec: StackSpec): [number, number] {
   let lo = Infinity;
   let hi = -Infinity;
   const z = spec.frame.z;
   const o = spec.frame.o;
   for (const m of spec.members) {
-    for (const pc of ctx.geoms.get(m.body)?.pieces ?? []) {
+    // a cage the shaft runs through (a differential's case); a yoke's arms end at its own bar, off the shaft
+    const g = ctx.geoms.get(m.body);
+    if (!g?.shape.cage) continue;
+    for (const pc of g.pieces ?? []) {
       for (const q of pc.profile.outer)
         for (const w of [0, pc.h]) {
           const p = fromPlane(pc.frame, q, w);

@@ -5,4 +5,6 @@ import type { Polish } from "../builder";
 
 export const polishes3: Record<string, () => Promise<{ polish: Polish }>> = {
   "four-bar": () => import("./four-bar/polish3"),
+  "elliptic-trammel": () => import("./elliptic-trammel/polish3"),
+  "toggle-clamp": () => import("./toggle-clamp/polish3"),
 };

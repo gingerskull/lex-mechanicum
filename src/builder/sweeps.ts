@@ -173,7 +173,8 @@ export class Sweeps {
     const t = this.ctx.twins.get(body);
     if (t) out.push(t);
     out.push(...(this.ctx.levels.get(body) ?? []));
-    for (const s of this.ctx.solids) if (s.body === body) out.push(s);
+    // a drive part posed from its input (V5) is not carried by any body
+    for (const s of this.ctx.solids) if (s.body === body && !s.drive) out.push(s);
     return out;
   }
 

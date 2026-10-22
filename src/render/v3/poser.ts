@@ -5,9 +5,10 @@
 import { frameAxis } from "../../core/axis";
 import { poseOf } from "../../model/pose";
 import type { MechanismModel } from "../../model/types";
-import { Kinematics } from "../../kin/compose";
+import { Kinematics, anchorAt, handStroke } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
 import { m3, v3, xf, type Xf } from "../../kin/math";
+import { fiveBarFK } from "../../kin/blocks/linkage";
 
 /** A joint's frame: at its point, z along its axis, x the world up (or x) made square to it. */
 function jointFrame(at: Vec3, axis: Vec3): Xf {
@@ -20,6 +21,7 @@ function jointFrame(at: Vec3, axis: Vec3): Xf {
 
 const moved = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
 void m3;
+import { driveXf } from "../../solids/drive";
 import { IDENTITY, mat4, type Mat4 } from "../../solids/frame";
 import type { PackedSolid3 } from "../../package/format2";
 import type { Vec3 } from "../../solids/types";
@@ -35,14 +37,27 @@ export interface Poser {
   point(u: number, id: string, ctl?: Controls): Vec3 | null;
   /** The distance of its two points at phase u (mm). */
   span(u: number, a: string, b: string): number | null;
+  /** The true distance of two kinematic points at phase u (mm), before any is lifted onto a part's top face: what a dimension reads. */
+  measure?(u: number, a: string, b: string): number | null;
+  /** A named point with drivers held at given values (degrees or mm): an overlay drawn at a fixed pose, such as a toggle. */
+  pointAt?(values: Record<string, number>, id: string): Vec3 | null;
+  /** A body's pose at phase u (reference to now): a curve carried by a moving body (a rolling centrode). */
+  bodyAt?(u: number, body: string): Xf | null;
+  /** The outline a five-bar's tip reaches over the ranges of its two cranks' drivers (a workspace, T5); null if none. */
+  area?(point: string, drivers: [string, string]): Vec3[] | null;
   /**
    * The path of a named point over a range of the input (degrees or mm; the whole input range when omitted), one polyline
    * per branch of the assembly: a workspace outline (T5). Absent where the poser cannot sweep.
    */
   sweep?(point: string, range?: [number, number], branches?: string[]): Vec3[][] | null;
+  /** A body's pose at phase u (reference configuration to now) as a matrix: a trace or arc drawn in a moving body's frame. */
+  body?(u: number, id: string, ctl?: Controls): Mat4 | null;
 }
 
 export const ID4: Mat4 = mat4(IDENTITY);
+
+/** How far a teaching point is carried onto its body's top face at most, mm: a deep stack of slabs, no more. */
+const LIFT_REACH = 40;
 
 const m4 = (X: Vec3, Y: Vec3, Z: Vec3, T: Vec3): Mat4 => [X[0], X[1], X[2], 0, Y[0], Y[1], Y[2], 0, Z[0], Z[1], Z[2], 0, T[0], T[1], T[2], 1];
 
@@ -70,13 +85,15 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   }
   const lifted = (P: ReturnType<Kinematics["pose"]>, id: string, ctl?: Controls): Vec3 | null => {
     const p = P.points.get(id);
-    if (!p) return null;
+    if (!p) return id.startsWith("@") ? anchorAt(id, P.bodies) : null;
     const b = rideOf.get(id);
     const X = b ? P.bodies.get(b) : undefined;
     const ref = b ? k.setup(ctl ? { ...controls, ...ctl } : controls).refPts.get(id) : undefined;
     if (!b || !X || !ref) return p;
     const [nx, ny, nz, t] = lifts![b]!;
     const d = t - (nx * ref[0] + ny * ref[1] + nz * ref[2]);
+    // a point far off the body's face is not on it (a roller's centre up on a slide's upright): drawn where it is
+    if (Math.abs(d) > LIFT_REACH) return p;
     const R = X.R;
     const v: Vec3 = [nx * d, ny * d, nz * d];
     return [p[0] + R[0] * v[0] + R[1] * v[1] + R[2] * v[2], p[1] + R[3] * v[0] + R[4] * v[1] + R[5] * v[2], p[2] + R[6] * v[0] + R[7] * v[1] + R[8] * v[2]];
@@ -121,14 +138,20 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   return {
     period: Math.PI * 2,
     place: (s, u) => {
+      // a drive part the record has no body for is posed from the input it swings
+      if (s.drive) return fromXf(driveXf(s.drive, pose(u).bodies.get(s.drive.input) ?? xf.id(), u));
       const X = s.body === "ground" ? xf.id() : pose(u).bodies.get(s.body);
       const D = shiftOf(s);
       if (!X) return ID4;
       return fromXf(D ? xf.mul(X, D) : X);
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
+    body: (u, id, ctl) => {
+      const X = id === "ground" ? xf.id() : pose(u, ctl).bodies.get(id);
+      return X ? fromXf(X) : null;
+    },
     sweep: (point, range, branches) => {
-      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating");
+      const d = k.kin.drivers.find((x) => x.kind === "rotary" || x.kind === "oscillating" || handStroke(x));
       if (!d) return null;
       const lo = range?.[0] ?? d.range?.[0] ?? 0;
       const hi = range?.[1] ?? d.range?.[1] ?? 360;
@@ -152,6 +175,56 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
       const P = pose(u);
       const A = lifted(P, a);
       const B = lifted(P, b);
+      return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
+    },
+    bodyAt: (u, body) => pose(u).bodies.get(body) ?? null,
+    area: (point, drivers) => {
+      const step = k.kin.solve.find((q) => q.block === "five-bar");
+      const ds = drivers.map((id) => k.kin.drivers.find((d) => d.id === id));
+      if (!step || !ds[0]?.range || !ds[1]?.range) return null;
+      const S = k.setup(controls);
+      const i = step.in ?? {};
+      const at = (v: unknown): Vec3 | undefined => (typeof v === "string" ? S.joints.get(v)?.at : undefined);
+      const num = (v: unknown): number => (typeof v === "number" ? v : S.params.get(String(v)) ?? NaN);
+      const A1 = at(i.A1), A2 = at(i.A2);
+      if (!A1 || !A2) return null;
+      const g = { A1, A2, l1: num(i.l1), l2: num(i.l2), l3: num(i.l3), l4: num(i.l4) };
+      // the tip's branch and height as drawn now
+      const P = pose(0);
+      const now = P.points.get(point);
+      const lift = lifted(P, point);
+      if (!now || !lift) return null;
+      const th = (d: (typeof ds)[number]) => ((P.values[d!.id] ?? 0) * Math.PI) / 180;
+      const side: 1 | -1 = v3.dist(fiveBarFK(g, th(ds[0]), th(ds[1]), 1).P, now) < v3.dist(fiveBarFK(g, th(ds[0]), th(ds[1]), -1).P, now) ? 1 : -1;
+      const dz = lift[2] - now[2];
+      const [r1, r2] = [ds[0].range, ds[1].range];
+      const out: Vec3[] = [];
+      const n = 60;
+      const edge = (f: (t: number) => [number, number]) => {
+        for (let q = 0; q <= n; q++) {
+          const [a, b] = f(q / n);
+          const sol = fiveBarFK(g, (a * Math.PI) / 180, (b * Math.PI) / 180, side);
+          if (sol.h > 0) out.push([sol.P[0], sol.P[1], sol.P[2] + dz]);
+        }
+      };
+      const lerp = (r: [number, number], t: number) => r[0] + (r[1] - r[0]) * t;
+      edge((t) => [lerp(r1, t), r2[0]]);
+      edge((t) => [r1[1], lerp(r2, t)]);
+      edge((t) => [lerp(r1, 1 - t), r2[1]]);
+      edge((t) => [r1[0], lerp(r2, 1 - t)]);
+      return out.length ? out : null;
+    },
+    pointAt: (values, id) => {
+      try {
+        return lifted(k.poseAt(values, controls), id);
+      } catch {
+        return null;
+      }
+    },
+    measure: (u, a, b) => {
+      const P = pose(u);
+      const A = P.points.get(a);
+      const B = P.points.get(b);
       return A && B ? Math.hypot(B[0] - A[0], B[1] - A[1], B[2] - A[2]) : null;
     },
   };
@@ -230,6 +303,7 @@ export function hybridPoser(bodies: Poser, points: Poser): Poser {
     place: (s, u) => bodies.place(s, u),
     point: (u, id, ctl) => safe(() => points.point(u, id, ctl)) ?? (ctl ? null : bodies.point(u, id)),
     span: (u, a, b) => bodies.span(u, a, b) ?? safe(() => points.span(u, a, b)),
+    ...(points.body ? { body: (u: number, id: string, ctl?: Controls) => safe(() => points.body!(u, id, ctl)) } : {}),
     ...(points.sweep ? { sweep: (pt: string, r?: [number, number], br?: string[]) => safe(() => points.sweep!(pt, r, br)) } : {}),
   };
 }

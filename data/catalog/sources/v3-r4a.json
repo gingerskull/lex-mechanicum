@@ -3953,8 +3953,8 @@
             180
           ],
           "default": 0,
-          "note": "the second input: the left side gear's turn relative to the case, split times the case's turn per cycle",
-          "speed": "split"
+          "note": "the second input: the left side gear's turn relative to the case, split times the case's turn per cycle (its rate, a param)",
+          "rate": "split"
         }
       ],
       "solve": [
