@@ -20,6 +20,8 @@ export interface KinBody {
   frame?: Frame; // pose of the body's own frame in the reference configuration; default: its `at` joint, else the world
   /** n-fold rotational symmetry about its axis (a wheel's slots, a gear's teeth z): the cycle repeats modulo 2π/n (K2). */
   symmetry?: number;
+  /** Bodies this one lies above in its stack (a rod pinned down onto blocks that run in a plate's grooves): a placement hint. */
+  above?: string[];
 }
 
 export type JointType =
@@ -136,8 +138,12 @@ export interface KinOutput {
   to?: string;
   /** An angle less another angle output (degrees, wrapped to ±180): a lead or lag. */
   minus?: string;
-  /** A point's position read along this direction (world mm): the coordinate of a plunger pin along its slide. */
+  /** A point's position projected on this direction (world mm), instead of the point itself: a coordinate along a slide. */
   axis?: [number, number, number];
+  /** A value subtracted from a scalar output (mm or degrees): a height above a line, a datum. */
+  datum?: number;
+  /** An angle measured from the world x axis (the link's own direction) instead of from the reference pose. */
+  absolute?: boolean;
   /** A speed ratio of the point `of` over the point `over` (their speeds), instead of a body's turn per input. */
   over?: string;
 }

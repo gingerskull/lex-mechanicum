@@ -96,8 +96,10 @@ export const stops: Rule = {
             // the pin is judged against the other moving parts; the lever itself is meant to meet it
             const m = worldManifold(ctx.M, pin[0]!);
             const g2 = ctx.sweeps.gap(m, others, MIN_GAP + 1);
+            // and it clears the lever itself over the cycle (a plate lever's far corner sweeps past its edge line)
+            const g3 = g2 < MIN_GAP ? 0 : ctx.sweeps.gap(m, [b], 1);
             m.delete();
-            if (g2 < MIN_GAP) continue;
+            if (g2 < MIN_GAP || g3 < 0.5) continue;
             ctx.add(pin);
             ctx.add(place(UPF, H.screw(`${s.id}-${b}-stop${k}-sc`, "button", 4, 12, { at: [w[0], w[1], 0], face: ctx.base!.bottom, dir: 1, name: "", qty: 0, joints: [s.id] })));
             placed.push(pin[0]!.id);
@@ -163,7 +165,9 @@ export const standoffs: Rule = {
       const clear3d = (p: Vec2): boolean => clearance(ctx, place(UPF, H.standoff("probe", { at: [p[0], p[1], 0], z0: base.top, z1 }))) >= MIN_GAP;
       const inPlan = (p: Vec2): boolean => swept.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + MIN_GAP || insideOwn(part.body, ctx, p));
       const free = (p: Vec2): boolean => (inPlan(p) || clear3d(p)) && fixed.every((f) => f.every((r) => pointDist(r, p[0], p[1]) >= STANDOFF.D / 2 + 1));
-      const cands = far.flatMap((p) => [0.18, 0.3, 0.45].map((k): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k])).filter(free);
+      // (last, nearer the edge: a ring's posts stand under its rim, outside what turns inside it)
+      const at = (k: number) => (p: Vec2): Vec2 => [p[0] + (c[0] - p[0]) * k, p[1] + (c[1] - p[1]) * k];
+      const cands = [...far.flatMap((p) => [0.18, 0.3, 0.45].map((k) => at(k)(p))), ...far.map(at(0.09))].filter(free);
       const a = cands[0];
       const bFar = a ? cands.find((p) => Math.hypot(p[0] - a[0], p[1] - a[1]) > 30) : undefined;
       if (!a || !bFar) {

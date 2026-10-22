@@ -231,6 +231,11 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     // thickness of each node (a slab is as high as the thickest body in it)
     const thick = nodeIds.map((r) => Math.max(...nodes.get(r)!.ids.map((id) => geoms.get(id)!.thick)));
 
+    // bodies the record lays above others: [upper node, lower node]
+    const aboves: [number, number][] = [];
+    for (const b of kin.bodies) for (const u of b.above ?? []) if (idx.has(nodeOf(b.id)) && idx.has(nodeOf(u))) aboves.push([idx.get(nodeOf(b.id))!, idx.get(nodeOf(u))!]);
+    const orderOk = (assign: number[]) => aboves.every(([a, b]) => assign[a]! < 0 || assign[b]! < 0 || assign[a]! > assign[b]!);
+
     // ---- search
     const order = [...Array(N).keys()].sort((a, b) => clash[b]!.filter(Boolean).length - clash[a]!.filter(Boolean).length || a - b);
     const lb = Math.max(1, cliqueBound(clash));
@@ -269,7 +274,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           for (let s = 0; s < h; s++) {
             if (clash[v]!.some((c, u) => c && assign[u] === s)) continue;
             assign[v] = s;
-            if (relax || passOk(assign, siteCs)) dfs(k + 1);
+            if (orderOk(assign) && (relax || passOk(assign, siteCs))) dfs(k + 1);
             assign[v] = -1;
             const f = found as Best | null;
             if (f && f.cost[0] === 0 && f.cost[1] === 0 && f.cost[2] === 0 && f.cost[3]! <= -clevisCap(siteCs)) return;
@@ -293,7 +298,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         while (clash[v]!.some((c, u) => c && assign[u] === s)) s++;
         assign[v] = s;
       }
-      best = { assign, cost: [0, 0, 0] };
+      best = { assign, cost: [0, 0, 0, 0] };
       placement.conflicts.push(fid);
     }
     const assign = (best as { assign: number[] }).assign;

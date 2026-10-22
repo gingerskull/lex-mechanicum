@@ -156,7 +156,9 @@ and the hardware builder read the same way (`bodyFrameOf` in `src/kin/compose.ts
   mobility count.
 
 **Positions and axes** may be parameter expressions (`["60*cos(beta)", "60*sin(beta)", 55]`), so a `param` control moves
-the geometry; the drawing carries every built solid from its built frame to the new one.
+the geometry; the drawing carries every built solid from its built frame to the new one. A point's `local` coordinates and a block's
+inputs may be expressions too (`["L+p", 0, 0]`, `"-input"`). A body may name the bodies it lies `above` in its stack (a rod
+pinned down onto blocks): a hint the placement solver keeps.
 
 **Outputs.** An `angle` of a body is its turn about its joint to the ground (else its first joint). An `angle` with `from`
 and `to` points is the angle at `of` between the rays to them (a transmission angle); one with `minus` is that output less
@@ -165,7 +167,10 @@ another angle output, wrapped to ±180° (a lead or lag). An `angle` whose `of` 
 direction; of a point with `from` (and no `to`), its distance from that point. A `speed-ratio` is computed with the pose:
 a body's turn per unit of the primary driver, or with `over` (a point) the speed of the point `of` over the speed of
 `over` (a mechanical advantage, a scale). A point a block makes (a crossing, a target) may be traced and read like a
-named point.
+named point. `datum` is
+subtracted from any scalar output. An `angle` with `absolute: true` is measured from the world x axis (the link's own
+direction) instead of from the reference pose. A `speed-ratio` of a point with no `over` is its speed per unit of input,
+or with `unit: "%"` its speed as a share of its mean over the cycle (the claim checker reads it off the poses).
 
 **Shapes the builder places where the joints put them** (not on a slab): a bevel `gear` (with `cone`, its pitch cone
 half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a universal joint's yoke) and a `cross`
@@ -188,7 +193,8 @@ A body's `shape` may carry a `wheel` ({ diameter, width, stub }): a wheel on a s
 the body's point at the stub's distance (a steering knuckle). A `slider` may start at `from` along its x. Every point the
 record names on the ground lies on the base.
 
-**Claims.** A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
+**Claims.** `span: [a, b]` takes the statistic over the input values in that window (a rotary input's degrees, which may
+wrap past 360); `abs: true` takes it on the absolute value. A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
 open while the swing is in a range); with a number it is the longest stretch the output holds within that much.
 
 ### `teaching`

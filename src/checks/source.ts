@@ -118,6 +118,9 @@ export async function recordSource(rec: RecordLike, opts: { polish?: Polish } = 
   };
   const kin = src.kin;
   const contact = kin.joints.filter((j) => CONTACT_JOINTS.has(j.type)).map((j): [string, string] => [j.a, j.b]);
+  // a gear no joint reaches is part of the ground (a fixed ring): a mesh with the ground is a mesh with it
+  const fixedGears = kin.bodies.filter((b) => b.id !== "ground" && /gear|rack/i.test(String(b.shape?.type ?? "")) && !kin.joints.some((j) => j.a === b.id || j.b === b.id)).map((b) => b.id);
+  for (const j of kin.joints) if (j.type === "gear-mesh" && (j.a === "ground" || j.b === "ground")) for (const g of fixedGears) contact.push([g, j.a === "ground" ? j.b : j.a]);
   return { id: rec.id, engine: "v3", solids: assembly3.solids, placer, contact, assembly3, kin };
 }
 

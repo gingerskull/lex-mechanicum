@@ -49,7 +49,8 @@ export function dyadRRP(a: Vec3, r: number, p0: Vec3, d: Vec3): SliderDyadSoluti
   const dd = v3.unit(d);
   const t = v3.dot(v3.sub(a, p0), dd);
   const perp = v3.len(v3.perp(v3.sub(a, p0), dd));
-  const h2 = r * r - perp * perp;
+  // as a product, so a root near the double root (a trammel block passing the crossing) keeps its precision
+  const h2 = (r - perp) * (r + perp);
   const h = Math.sqrt(Math.max(0, h2));
   const s: [number, number] = [t + h, t - h];
   return { s, points: [v3.add(p0, v3.mul(dd, s[0])), v3.add(p0, v3.mul(dd, s[1]))], h2, h, reachable: h2 >= -1e-9 * (r * r + 1) };
