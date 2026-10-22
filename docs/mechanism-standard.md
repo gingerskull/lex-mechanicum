@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.6
+version: 3.7
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -889,6 +889,12 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.7 (2026-10-22).** Rebuild batch R4 (gears). J6 gear kits: compound gears and joined levels (a long pinion
+  through two planes); helical, herringbone, worm, spiral bevel and non-circular teeth; a rack guided from its back; a
+  ring gear on carrier rollers (`ring-carrier`); a cycloidal disc on ring pins (`pin-ring`) with output pins in
+  oversized holes (`pin-hole`, J4) on an eccentric bearing (`eccentric-bearing`, J3); a differential's spiders on the
+  case's cross-pin (`spider-pin`, J3, F4) [J6, J3, J4, F4, AUTO]. A live shaft hangs from its bridge where another
+  stack holds its axis below [J2, A20, AUTO]. A principle gear over a smaller one is drawn see-through [T10, AUTO].
 - **3.6 (2026-10-22).** Rebuild batch R3 (cranks, sliders and quick-returns). J5 rails and risers are judged against
   the other parts' sweeps; a crosshead arm sits on its riser's lip; a block in a moving part's slot runs on wear strips
   in that slot [J5, A6, F5, F8, M14, AUTO]. New kits: `eccentric` (sheave in strap, liner, cheek ring, nipple) [J3,
