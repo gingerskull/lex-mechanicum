@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.3
+version: 3.4
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -521,7 +521,7 @@ definition, as long as they are readable.
 | V2 | **One solid bracket:** top flange against the base, floor for the motor, full-height window for the belt; flange screws go up into the base from inside; nothing shows on top of the base. A motor beside a shaft in plan stands on one angle bracket instead: an upright its face screws to and a foot screwed to the base top, both slotted for the belt's tension. | AUTO | side view |
 | V3 | Belt and pulleys clear of feet, housings and base hardware; where the belt passes under a post, its lower screw becomes a flush countersunk screw. | AUTO (rule) / HAND (motor position) | `tools/clearance` |
 | V4 | Drive detail: pulley flanges, set screws or clamp hub, belt tension slot, idler where needed (J8). | AUTO | screenshot |
-| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. A compliant joint's lever (J13) has no shaft: a pin pressed into its tip runs down through an arc slot in the base to the link, the rocker's pivot the joint's centre, the motor on the line of the tip's chord. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
+| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. A compliant joint's lever (J13) has no shaft: a pin pressed into its tip runs down through an arc slot in the base to the link, the rocker's pivot the joint's centre, the motor on the line of the tip's chord. An oscillating input that turns more than one turn on a shaft in plan (a lead screw run back and forth) is driven by a reversing motor through the in-plan belt drive on the shaft's free end, since a crank and link cannot swing a shaft through several turns. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
 | V6 | **Sensing and cabling:** home flag on the input and a fork sensor on the bracket or a post; motor and sensor leads to a terminal block on the base edge, one cable clip under the base (on the base top for a motor beside a shaft in plan). | AUTO | underside view |
 
 ---
@@ -862,6 +862,18 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.4 (2026-10-22).** Rebuild batch R7 (screws, flexible and compliant members). An oscillating input of more than one
+  turn on a shaft in plan is driven by a reversing motor through the in-plan belt drive [V5, AUTO]; a mechanism with two
+  drivers gets a second drive beside the first, and a manual input whose body has a knob gets no second one [V5, V1,
+  AUTO]. `j11-screw`: a screw that is its own shaft, journals in pillow blocks, a bronze or ball nut with wipers and a
+  nipple, the nut's guide, a fixed nut and knob for a differential screw [J11, J10, F2, F3, F4, F5, F8, AUTO].
+  `j13-compliant`: a one-piece blank with notch flexures, pads, a window with stretched springs and shuttle stops [J13,
+  A6, F1, F2, F5, AUTO]. `j12-flexible`: a timing belt with conveyed teeth, a roller chain conveyed in links on its seat
+  circles, a rope reeved over two planes with stretched parts, wraps, guards and an end clamp, the load's guide rod [J12,
+  J8, A11, F2, F3, F6, F7, F8, F10, AUTO]; `j12-cvt`: revolved sheave halves, sliding keys, the output's spring, the
+  input's clamped shift fork, a push belt on a live loop [J12, J10, D9, F6, F7, AUTO]. `friction-contact`: a tyred wheel
+  on a disc, its setting clamped and read on a scale [J6, F6, F7, M10, AUTO]. `integrator-carriage`: a ball in a cage on
+  an arm, a carriage on a railed block with stops, a cylinder that is its own shaft [J5, F1, F5, AUTO].
 - **3.3 (2026-10-22).** The V5 crank-and-link drive replaces R5's interim reversing servo for every oscillating input.
   The `drive` rule builds the lever on a live shaft, on a shaft in plan with the motor on an angle bracket, or by a pin
   in a compliant lever's tip through an arc slot; a gear step-up (sector and pinion) where the swing is wider than a
