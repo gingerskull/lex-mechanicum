@@ -177,6 +177,29 @@ a body joined to it by a prismatic joint keeps its turn. A block's `out` may be 
 **Claims.** A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
 open while the swing is in a range); with a number it is the longest stretch the output holds within that much.
 
+**Cams, indexers and escapements.**
+- `cam` reads a joint carrying `cam` (`schedule`, `lift`, `rb`, `theta0`, `form: barrel` for a groove along a drum's
+  axis); `follower` may list the bodies the follower carries, `rr` or `flat: true` places the contact point (`out.contact`,
+  a point the record names on the cam), and a cam-contact joint whose `cam` sits on a prismatic joint drives a stem by
+  the law. Laws: cycloidal, harmonic, poly345, uniform, modsine.
+- `rocker` turns a rocker whose round nose sits on a translating follower (ψ = asin(s / arm)), with the pressure angle
+  at its shoe; `indexer` has `internal: true` (internal Geneva), `mode: "mutilated"` (window, ratio) and `mode: "cam"`
+  (law, index, step); `star`, `ratchet`, `one-way`, `escape` (planar: anchor, lever with a `fork`) and `verge` are the
+  timed blocks, each documented over its code in `src/kin/registry.ts`.
+- A joint with `active` (a driver window) is checked by K1 only while engaged, its motion relation too. A body with
+  `drops: true` moves by instant drops (an escape wheel): its points are not checked for jumps.
+- An output whose id a block wrote as a value is that value (a pressure angle, an advance).
+
+**Shapes the builder makes from a joint's law or the record's numbers.** `cam` (a plate cam: the roller's or the
+face's envelope; `form: face-groove`, `barrel`, `lobes` (conjugate lobes from shoe paths), `globoid` (a rib cut by the
+rollers' poses)), `genevaWheel`, `genevaCrank`, `intermittentDriver`, `intermittentDriven`, `star`, `ratchetWheel`,
+`escapeWheel` (pointed teeth or a `tooth` polygon; `tip0` the simulated phase at the reference), `crownWheel`, `verge`.
+Any shape may carry `place` (its part starts there along its frame's z, where the joints put it), `pieces` (more
+plates of the body, each with `origin`, `rot`, `thick`, `outline`, `holes`) and, on a plate, `exact` (its outline as
+drawn), `windows` (polygon holes) and `guide` ([s0, s1] along a slide's axis: the length its rails hold). A disc may
+carry `rollers` (a turret's radial rollers). A ground joint may ask for its `support` (`stub`, `hung`, ...) and a shaft
+in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 against).
+
 ### `teaching`
 
 ```json
