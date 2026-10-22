@@ -1,7 +1,8 @@
 // Part of prebuild: everything the static site serves that is generated, written into site/public (git-ignored).
 // - fonts/: the IBM Plex faces of tokens.css, latin subset, from the @fontsource packages (SF7, self-hosted);
 // - packages/<id>.mx2 and meta/<id>.json: every mechanism's package v2 (R4) and its record's name, teaching and kin
-//   blocks;
+//   blocks; a package conformance built from the same sources is read from the cache (src/package/built.ts), the
+//   others are built in a pool of processes (tools/pool.ts);
 // - thumbs/<id>-<theme>.webp and -still.webp: the card drawings and the stage's still, committed in site/thumbs (R8, SS1); their fingerprints are checked
 //   first, and a stale one fails the build with the command to run. Nothing is drawn here.
 // - favicon.svg, favicon-*.png, favicon.ico, apple-touch-icon.png, social.png: the mark's icons and the social card,
@@ -12,9 +13,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
-import { buildPackage } from "../src/package/build";
-import { encode2 } from "../src/package/format2";
 import { copyBrand } from "./brand";
+import { runPool } from "./pool";
 import { checkThumbs, imagesOf, THUMBS_DIR } from "./thumbs";
 import { FONT_FILES } from "./tokens-css";
 
@@ -35,8 +35,9 @@ export async function siteAssets(ids = allIds()): Promise<void> {
   mkdirSync(join(pub, "packages"), { recursive: true });
   mkdirSync(join(pub, "meta"), { recursive: true });
   const packages = new Map<string, Uint8Array>();
-  for (const id of ids) {
-    const v2 = await encode2((await buildPackage(id)).pkg);
+  const bytes = await runPool<string, Uint8Array>(fileURLToPath(new URL("../src/package/built.ts", import.meta.url)), "builtBytes", ids);
+  for (const [i, id] of ids.entries()) {
+    const v2 = bytes[i]!;
     packages.set(id, v2);
     writeFileSync(join(pub, "packages", `${id}.mx2`), v2);
     const rec = recordById(id) as unknown as { name?: string; kin?: unknown; teaching?: unknown } | undefined;

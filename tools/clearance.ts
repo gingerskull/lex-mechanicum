@@ -7,10 +7,13 @@
 // (full profile) an unnecessary `allow`.
 // `changed` is the pre-push selection (the workflow's check table): the mechanisms whose folder or record changed since the
 // branch's upstream, and every mechanism when code outside src/mechanisms changed; each gets the full 72-phase check,
-// which the CI profile only samples.
+// which the CI profile only samples. Each mechanism is built once (src/package/built.ts), in a pool of processes
+// (tools/pool.ts).
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { allIds, isBuilt, isKnown, loadV3, clashLines, check3d, recordSource, unnecessaryLines, type CheckSource } from "../src/checks";
+import { allIds, isBuilt, isKnown, clashLines, check3d, sourceOf, unnecessaryLines, type CheckSource } from "../src/checks";
+import { builtMechanism } from "../src/package/built";
+import { runPool } from "./pool";
 
 export interface Report {
   lines: string[];
@@ -42,6 +45,19 @@ export async function report3(id: string, src: CheckSource, o: { profile: "ci" |
     ...r.edges.map((s) => `  ${s}`),
   ];
   return { lines, clashes: clashes.length, faults: r.clamp.length + r.edges.length + (r.profile === "full" ? unnecessary.length : 0) };
+}
+
+interface Job {
+  id: string;
+  profile: "ci" | "full";
+  cache: boolean;
+  inject?: [string, number];
+}
+
+/** The 3D check of one mechanism, built once (a pool task). */
+export async function clearanceOne(j: Job): Promise<Report> {
+  const b = await builtMechanism(j.id);
+  return report3(j.id, sourceOf(b.record, b.assembly), { profile: j.profile, cache: j.cache, ...(j.inject ? { inject: j.inject } : {}) });
 }
 
 /** The mechanisms a push changes: see the header. */
@@ -79,18 +95,20 @@ async function main() {
   const ids = arg === "all" ? allIds() : arg === "changed" ? changedIds() : [arg];
   if (arg === "changed" && !ids.length) console.log("clearance: no mechanism changed");
   const profile = flags.has("--ci") ? "ci" : "full";
-  let bad = 0;
-  for (const id of ids) {
-    if (!isKnown(id)) {
-      console.error(`unknown mechanism ${id}`);
-      process.exitCode = 1;
-      return;
-    }
-    const { record, polish } = await loadV3(id);
-    const r = await report3(id, await recordSource(record as never, polish ? { polish } : {}), { profile, cache: !flags.has("--no-cache"), ...(inject ? { inject } : {}) });
-    console.log(r.lines.join("\n"));
-    bad += r.clashes + r.faults;
+  const unknown = ids.find((id) => !isKnown(id));
+  if (unknown) {
+    console.error(`unknown mechanism ${unknown}`);
+    process.exitCode = 1;
+    return;
   }
+  let bad = 0;
+  const jobs = ids.map((id): Job => ({ id, profile, cache: !flags.has("--no-cache"), ...(inject ? { inject } : {}) }));
+  await runPool<Job, Report>(fileURLToPath(import.meta.url), "clearanceOne", jobs, {
+    each: (r) => {
+      console.log(r.lines.join("\n"));
+      bad += r.clashes + r.faults;
+    },
+  });
   if (bad) process.exitCode = 1;
 }
 

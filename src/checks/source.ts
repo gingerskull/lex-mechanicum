@@ -34,7 +34,11 @@ const CONTACT_JOINTS = new Set(["gear-mesh", "cam-contact", "belt", "rolling", "
 
 /** A record built by the hardware builder and posed by its own kinematic block. */
 export async function recordSource(rec: RecordLike, opts: { polish?: Polish; controls?: Parameters<typeof makePoseSource>[1] } = {}): Promise<CheckSource> {
-  const assembly3 = await buildAssembly(rec, opts.polish ? { polish: opts.polish } : {});
+  return sourceOf(rec, await buildAssembly(rec, opts.polish ? { polish: opts.polish } : {}), opts);
+}
+
+/** The check source of an assembly already built from the record (its package is built from the same assembly). */
+export function sourceOf(rec: RecordLike, assembly3: Assembly3, opts: { controls?: Parameters<typeof makePoseSource>[1] } = {}): CheckSource {
   // the solids are built at the record's defaults; `controls` poses them at another setting (a param control's range)
   const src = makePoseSource(rec.kin as Kin, opts.controls);
   const K = src.K;

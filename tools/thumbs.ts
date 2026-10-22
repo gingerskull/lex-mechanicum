@@ -15,10 +15,9 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
-import { buildPackage } from "../src/package/build";
-import { encode2 } from "../src/package/format2";
 import type { ThemeKey } from "../src/style/tokens";
 import { openChrome3, type Draw3Options } from "./chrome3";
+import { runPool } from "./pool";
 
 export const THUMB = { w: 320, h: 240, dpr: 2, u: 1.1 };
 /** The still: the stage's opening frame (63° of the cycle, dimensions on) at dial A, since paper grain is noise that
@@ -72,13 +71,18 @@ async function sources(): Promise<{ renderer: string; style: string }> {
   return { renderer: of("renderer"), style: of("style") };
 }
 
-/** Each mechanism's fingerprint now. `packages` reuses package bytes already built (the site build has them). */
+/**
+ * Each mechanism's fingerprint now. `packages` reuses package bytes already built (the site build has them); the others
+ * come from the build cache or are built in a pool of processes (src/package/built.ts, tools/pool.ts).
+ */
 export async function fingerprints(ids = allIds(), packages?: Map<string, Uint8Array>): Promise<Manifest> {
   const src = await sources();
   const view = hash(JSON.stringify([THUMB, thumbView("dark"), STILL, stillView("dark"), QUALITY]));
+  const todo = ids.filter((id) => !packages?.has(id));
+  const made = await runPool<string, Uint8Array>(join(root, "src", "package", "built.ts"), "builtBytes", todo);
   const out: Manifest = {};
   for (const id of ids) {
-    const bytes = packages?.get(id) ?? (await encode2((await buildPackage(id)).pkg));
+    const bytes = packages?.get(id) ?? made[todo.indexOf(id)]!;
     const rec = recordById(id) as unknown as { kin?: unknown; teaching?: unknown } | undefined;
     const polish = join(root, "src", "mechanisms", id, "polish3.ts");
     const model = hash(JSON.stringify([rec?.kin ?? null, rec?.teaching ?? null]), existsSync(polish) ? readFileSync(polish, "utf8").replace(/\r\n/g, "\n") : "");
