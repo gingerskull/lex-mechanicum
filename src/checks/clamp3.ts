@@ -70,6 +70,9 @@ function patchOf(A: Mf, B: Mf, ma: Mat4): Vec3[] | null {
   return null;
 }
 
+/** Phases (radians) that no whole-number speed ratio maps onto the sampled grid's: they only decide what moves. */
+const PROBES = [0.7137, 2.0913, 4.3301];
+
 /** A12 over `n` phases: one sentence per pair. */
 export async function clampCheck3(solids: Solid3[], placer: Placer, n = 12): Promise<string[]> {
   const M = await manifold();
@@ -78,7 +81,10 @@ export async function clampCheck3(solids: Solid3[], placer: Placer, n = 12): Pro
   const mats: Mat4[][] = phases.map((u) => S.map((s) => withScale(placer.place(s, u), placer.stretch?.(s, u) ?? 1)));
   // a stretched member (a belt) changes length, not place: it is as fixed as its seat
   const rigid: Mat4[][] = phases.map((u) => S.map((s) => placer.place(s, u)));
-  const moving = S.map((_, i) => rigid.some((row) => !matClose(row[i]!, rigid[0]![i]!)));
+  // what moves is read at phases off the sampled grid as well: a part that turns a whole number of times between two
+  // sampled phases (a wheel at twice a disc's speed, sampled at 0 and π) stands at the same pose on the grid
+  const probes = PROBES.map((u) => S.map((s) => placer.place(s, u)));
+  const moving = S.map((_, i) => [...rigid, ...probes].some((row) => !matClose(row[i]!, rigid[0]![i]!)));
   const local: (Box | null)[] = S.map((s) => localBox(M, s));
   const base: (Mf | null | undefined)[] = S.map((_, i) => (local[i] ? undefined : null));
   const baseOf = (i: number): Mf | null => {
