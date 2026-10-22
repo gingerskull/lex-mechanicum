@@ -1,0 +1,4272 @@
+{
+  "cam-follower": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              150,
+              250
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                70,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "id": "cam",
+          "role": "driver",
+          "shape": {
+            "type": "cam",
+            "law": "cycloidal",
+            "rollerRadius": 8,
+            "thick": 10,
+            "bore": 10
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "follower",
+          "role": "follower",
+          "shape": {
+            "type": "plate",
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                105,
+                0
+              ]
+            ],
+            "boss": 5.5,
+            "guide": [
+              55,
+              105
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              38,
+              0
+            ],
+            "rot": [
+              0,
+              0,
+              90
+            ]
+          }
+        },
+        {
+          "id": "roller",
+          "role": "follower",
+          "shape": {
+            "type": "disc",
+            "radius": 8,
+            "thickness": 10
+          },
+          "at": {
+            "joint": "F"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "cam",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "G",
+          "type": "prismatic",
+          "a": "follower",
+          "b": "ground",
+          "at": [
+            0,
+            118,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "limits": [
+            0,
+            22
+          ]
+        },
+        {
+          "id": "F",
+          "type": "revolute",
+          "a": "follower",
+          "b": "roller",
+          "at": [
+            0,
+            38,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C",
+          "type": "cam-contact",
+          "a": "roller",
+          "b": "cam",
+          "at": [
+            0,
+            38,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "ca": [
+            0,
+            0,
+            0
+          ],
+          "follower": "roller",
+          "cam": {
+            "schedule": [
+              {
+                "kind": "rise",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "dwelltop"
+              },
+              {
+                "kind": "return",
+                "span": "return",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "360-rise-dwelltop-return"
+              }
+            ],
+            "lift": "h",
+            "rb": "rb+rr",
+            "theta0": 0
+          },
+          "note": "at is the roller centre on the prime circle; the cam's outline is the roller's envelope on the pitch curve"
+        }
+      ],
+      "params": [
+        {
+          "id": "rb",
+          "value": 30,
+          "unit": "mm",
+          "min": 20,
+          "max": 45,
+          "note": "base circle radius of the cam outline"
+        },
+        {
+          "id": "h",
+          "value": 22,
+          "unit": "mm",
+          "min": 10,
+          "max": 30,
+          "note": "rise (lift)"
+        },
+        {
+          "id": "rr",
+          "value": 8,
+          "unit": "mm",
+          "min": 5,
+          "max": 12,
+          "note": "roller radius"
+        },
+        {
+          "id": "rise",
+          "value": 120,
+          "unit": "deg",
+          "min": 60,
+          "max": 180,
+          "note": "rise angle"
+        },
+        {
+          "id": "dwelltop",
+          "value": 60,
+          "unit": "deg",
+          "min": 0,
+          "max": 120,
+          "note": "outer dwell"
+        },
+        {
+          "id": "return",
+          "value": 120,
+          "unit": "deg",
+          "min": 60,
+          "max": 180,
+          "note": "return angle; the inner dwell is the rest of the turn (60 by default)"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "cam",
+          "id": "lift",
+          "joints": [
+            "G",
+            "F",
+            "C"
+          ],
+          "in": {
+            "joint": "C",
+            "input": "input",
+            "follower": [
+              "follower",
+              "roller"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "rr": "rr"
+          },
+          "out": {
+            "s": "lift-s",
+            "pressure": "pressure-angle",
+            "contact": "K"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "Fd",
+          "body": "follower",
+          "local": [
+            -30,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "K",
+          "body": "cam",
+          "local": [
+            30,
+            0,
+            0
+          ],
+          "note": "the contact point; the cam block places it each pose"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "lift",
+          "of": "follower",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "pressure-angle",
+          "of": "C",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "pitch-curve",
+          "of": "F",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and #216. The old default had no dwell (cycloidal 180° up, 180° down), so it read as an eccentric. The default is now rise 120°, dwell 60°, return 120°, dwell 60°, h 22, cycloidal on both flanks: the cam reads as the displacement diagram wrapped round the base circle. The outline is the roller's envelope on the pitch curve, so the lift is exactly the law. The pressure angle peaks at 23.6° (the review's about 23°). Output character corrected from Harmonic to Dwell. The bridge off the cam face is hardware. Rebuild R5 (#216): built on v3 from this record. The cam's outline is made from the cam-contact joint's own law (the roller's envelope), so the build and the kinematics cannot differ. The lift, base-radius and motion-law controls are not offered: the cam is built at build time and a control cannot reshape it (as the pilots' tooth-count controls); the record keeps the design values. The stem is guided off the cam's sweep (shape.guide), so no rail or bridge lies over the cam; the cam is overhung on its live shaft in a housing under the base."
+      },
+      "principle": [
+        {
+          "body": "cam"
+        },
+        {
+          "body": "follower"
+        },
+        {
+          "body": "roller"
+        },
+        {
+          "point": "K"
+        }
+      ],
+      "traces": [
+        {
+          "id": "pitch-curve",
+          "point": "F",
+          "frame": "cam",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "base-circle",
+          "kind": "circle",
+          "center": "O",
+          "radius": 30,
+          "label": "BASE CIRCLE"
+        },
+        {
+          "id": "prime-circle",
+          "kind": "circle",
+          "center": "O",
+          "radius": 38,
+          "label": "PRIME CIRCLE"
+        },
+        {
+          "id": "dwell-outer",
+          "kind": "arc",
+          "center": "O",
+          "radius": 66,
+          "range": [
+            270,
+            330
+          ],
+          "frame": "cam",
+          "label": "DWELL"
+        },
+        {
+          "id": "dwell-inner",
+          "kind": "arc",
+          "center": "O",
+          "radius": 44,
+          "range": [
+            90,
+            150
+          ],
+          "frame": "cam",
+          "label": "DWELL"
+        },
+        {
+          "id": "normal",
+          "kind": "line",
+          "from": "K",
+          "to": "F",
+          "label": "CONTACT NORMAL"
+        },
+        {
+          "id": "pressure",
+          "kind": "arc",
+          "center": "F",
+          "from": "Fd",
+          "to": "K",
+          "label": "PRESSURE ANGLE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "cam",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "lift",
+          "label": "FOLLOWER LIFT"
+        },
+        {
+          "x": "input",
+          "y": "pressure-angle",
+          "label": "PRESSURE ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "the follower rises 22 mm",
+          "output": "lift",
+          "stat": "range",
+          "value": 22,
+          "tol": 0.05
+        },
+        {
+          "text": "rises 22 mm over 120° of cam turn",
+          "output": "lift",
+          "stat": "phase",
+          "of": "max",
+          "value": 120,
+          "tol": 0.5
+        },
+        {
+          "text": "dwells at the top for 60°, returns over 120° and dwells at the bottom for 60°",
+          "output": "lift",
+          "stat": "dwell",
+          "value": 60,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "Here it peaks at 23.6°",
+          "output": "pressure-angle",
+          "stat": "max",
+          "value": 23.6,
+          "tol": 0.3
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "As the cam turns, the roller rides its edge and the follower rises and falls along its guide. In this default the follower rises 22 mm over 120° of cam turn, dwells at the top for 60°, returns over 120° and dwells at the bottom for 60°, with the cycloidal law on the rise and the return. The cam is the displacement diagram wrapped round its base circle, so any timing can be drawn into the outline.",
+      "explain.forces": "The cam can only push along the contact normal through the roller centre. The pressure angle between that normal and the follower path decides how much of the push goes sideways into the guide. Here it peaks at 23.6°, part way up the rise and part way down the return; keep it under about 30°. A spring or gravity must hold the follower on the cam.",
+      "motion.output_character": [
+        "Reciprocating",
+        "Dwell"
+      ],
+      "ratio.typical": "stroke = rise h (22 mm by default) per cam turn, with 60° dwells at the top and the bottom",
+      "build.defining_relations": "Cycloidal law s = h(f - sin(2 pi f)/(2 pi)), f = theta/beta, on the 120° rise and the 120° return, with 60° dwells at the top and the bottom. The roller centre runs on the pitch curve r = rb + rr + s(theta); the cam outline is the roller's envelope (the pitch curve offset inward by rr), so the lift follows the law exactly. Pressure angle phi = atan(s'/(rb + rr + s)) for an in-line follower: 23.6° at most with the defaults (keep phi < 30°). The pitch curve is convex everywhere, its least radius of curvature 37.5 mm, well above rr, so the outline has no undercut.",
+      "build.range": "cam 360° continuous; follower lift 0 to 22 mm: rise 120°, dwell 60°, return 120°, dwell 60°",
+      "build.notes": "The outline is the envelope of the roller, so the roller centre follows the law exactly. The pressure-angle label turns red past 30°. Roller spin is passive. The cam turns counter-clockwise in plan.",
+      "topology.notes": "ground, cam, follower stem, roller; cam contact is the higher pair; counted mobility 2, because the roller's spin about its pin is a passive extra freedom"
+    }
+  },
+  "flat-faced-cam": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              150,
+              230
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                60,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "id": "cam",
+          "role": "driver",
+          "shape": {
+            "type": "cam",
+            "law": "cycloidal",
+            "thick": 10,
+            "bore": 10
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "follower",
+          "role": "follower",
+          "shape": {
+            "type": "plate",
+            "outline": [
+              [
+                -20,
+                0
+              ],
+              [
+                20,
+                0
+              ],
+              [
+                20,
+                8
+              ],
+              [
+                6,
+                8
+              ],
+              [
+                6,
+                100
+              ],
+              [
+                -6,
+                100
+              ],
+              [
+                -6,
+                8
+              ],
+              [
+                -20,
+                8
+              ]
+            ],
+            "guide": [
+              42,
+              100
+            ],
+            "exact": true
+          },
+          "frame": {
+            "origin": [
+              0,
+              30,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "cam",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "G",
+          "type": "prismatic",
+          "a": "follower",
+          "b": "ground",
+          "at": [
+            0,
+            101,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "limits": [
+            0,
+            15
+          ]
+        },
+        {
+          "id": "C",
+          "type": "cam-contact",
+          "a": "follower",
+          "b": "cam",
+          "at": [
+            0,
+            30,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "ca": [
+            0,
+            0,
+            0
+          ],
+          "follower": "flat",
+          "cam": {
+            "schedule": [
+              {
+                "kind": "rise",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "dwelltop"
+              },
+              {
+                "kind": "return",
+                "span": "return",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "360-rise-dwelltop-return"
+              }
+            ],
+            "lift": "h",
+            "rb": "rb",
+            "theta0": 0
+          },
+          "note": "at is the face's point on the follower's axis; the cam's outline is the envelope of the face's lines"
+        }
+      ],
+      "params": [
+        {
+          "id": "rb",
+          "value": 30,
+          "unit": "mm",
+          "min": 22,
+          "max": 45,
+          "note": "base circle radius"
+        },
+        {
+          "id": "h",
+          "value": 15,
+          "unit": "mm",
+          "min": 5,
+          "max": 20,
+          "note": "rise"
+        },
+        {
+          "id": "rise",
+          "value": 120,
+          "unit": "deg",
+          "min": 90,
+          "max": 180,
+          "note": "rise angle"
+        },
+        {
+          "id": "dwelltop",
+          "value": 60,
+          "unit": "deg",
+          "min": 0,
+          "max": 90,
+          "note": "outer dwell"
+        },
+        {
+          "id": "return",
+          "value": 120,
+          "unit": "deg",
+          "min": 90,
+          "max": 180,
+          "note": "return angle; the inner dwell is the rest of the turn"
+        },
+        {
+          "id": "face",
+          "value": 40,
+          "unit": "mm",
+          "min": 30,
+          "max": 60,
+          "note": "face width, more than twice the largest contact offset"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "cam",
+          "id": "lift",
+          "joints": [
+            "G",
+            "C"
+          ],
+          "in": {
+            "joint": "C",
+            "input": "input",
+            "follower": "follower",
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "flat": true
+          },
+          "out": {
+            "s": "lift-s",
+            "v": "contact-offset",
+            "contact": "K"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "Fc",
+          "body": "follower",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "K",
+          "body": "cam",
+          "local": [
+            30,
+            0,
+            0
+          ],
+          "note": "the contact point on the face; the cam block places it each pose"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "lift",
+          "of": "follower",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "contact-offset",
+          "of": "K",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "contact-path",
+          "of": "K",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Keeps the 2026-10-19 verdict: the contact point's sweep across the face reads well. Checked: lift 15 mm, 60° dwells, contact offset up to 14.32 mm inside the 20 mm half face. The defining relations' least radius of curvature was wrong (9.9 mm); rb + s + s'' is 22 mm at its least, so the cam is convex with margin. Text corrected. Rebuild R5 (#216): built on v3 from this record; the cam's outline is the envelope of the face's lines from the cam joint's own law. The lift and rise controls are not offered: the cam is built at build time and a control cannot reshape it; the record keeps the design values. The stem is guided off the cam's sweep (shape.guide)."
+      },
+      "principle": [
+        {
+          "body": "cam"
+        },
+        {
+          "body": "follower"
+        },
+        {
+          "point": "K"
+        }
+      ],
+      "traces": [
+        {
+          "id": "contact",
+          "point": "K",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "stroke-axis",
+          "kind": "axis-line",
+          "at": "O",
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "length": 110,
+          "label": "STROKE AXIS"
+        },
+        {
+          "id": "offset",
+          "kind": "dimension",
+          "from": "Fc",
+          "to": "K",
+          "label": "OFFSET = ds/dθ"
+        },
+        {
+          "id": "base-circle",
+          "kind": "circle",
+          "center": "O",
+          "radius": 30,
+          "label": "BASE CIRCLE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "cam",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "lift",
+          "label": "FOLLOWER LIFT"
+        },
+        {
+          "x": "input",
+          "y": "contact-offset",
+          "label": "CONTACT OFFSET ON THE FACE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "follower 0 to 15 mm lift",
+          "output": "lift",
+          "stat": "range",
+          "value": 15,
+          "tol": 0.05
+        },
+        {
+          "text": "rises cycloidally over 120°",
+          "output": "lift",
+          "stat": "phase",
+          "of": "max",
+          "value": 120,
+          "tol": 0.5
+        },
+        {
+          "text": "dwells 60°, returns over 120° and dwells 60°",
+          "output": "lift",
+          "stat": "dwell",
+          "value": 60,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "the contact slides up to 14.32 mm off the axis",
+          "output": "contact-offset",
+          "stat": "max",
+          "value": 14.32,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "build.defining_relations": "Cam profile point in cam frame: x = (rb + s) sin(theta) + s' cos(theta), y = (rb + s) cos(theta) - s' sin(theta). Contact offset on face = s' = ds/dtheta (max 2h/beta = 14.32 mm). Convexity: radius of curvature rho = rb + s + s'' > 0 everywhere (22 mm at its least with the defaults)."
+    }
+  },
+  "face-groove-cam": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              280,
+              180
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                55,
+                0,
+                -12
+              ]
+            }
+          }
+        },
+        {
+          "id": "disc",
+          "role": "driver",
+          "shape": {
+            "type": "cam",
+            "form": "face-groove",
+            "radius": 75,
+            "thick": 16,
+            "base": 35,
+            "law": "3-4-5 polynomial",
+            "lift": 20,
+            "rise": 120,
+            "dwellOuter": 60,
+            "return": 120,
+            "dwellInner": 60,
+            "groove": {
+              "width": 14.2,
+              "depth": 6,
+              "walls": "pitch curve offset by half the width"
+            },
+            "bore": 10,
+            "place": 0
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "follower",
+          "role": "follower",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "fillet": 1.5,
+            "place": 17.5,
+            "thickness": 7,
+            "guide": [
+              60,
+              130
+            ],
+            "outline": [
+              [
+                -4.6,
+                -4.6
+              ],
+              [
+                30,
+                -4.6
+              ],
+              [
+                40,
+                -10
+              ],
+              [
+                130,
+                -10
+              ],
+              [
+                130,
+                10
+              ],
+              [
+                40,
+                10
+              ],
+              [
+                30,
+                4.6
+              ],
+              [
+                -4.6,
+                4.6
+              ]
+            ]
+          },
+          "frame": {
+            "origin": [
+              35,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "roller",
+          "role": "follower",
+          "shape": {
+            "type": "disc",
+            "radius": 7,
+            "thickness": 5,
+            "place": 10.5
+          },
+          "at": {
+            "joint": "F"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "disc",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "G",
+          "type": "prismatic",
+          "a": "follower",
+          "b": "ground",
+          "at": [
+            130,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            0,
+            20
+          ]
+        },
+        {
+          "id": "F",
+          "type": "revolute",
+          "a": "follower",
+          "b": "roller",
+          "at": [
+            35,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C",
+          "type": "cam-contact",
+          "a": "roller",
+          "b": "disc",
+          "at": [
+            35,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "ca": [
+            0,
+            0,
+            0
+          ],
+          "follower": "roller",
+          "closure": "form",
+          "cam": {
+            "schedule": [
+              {
+                "kind": "rise",
+                "span": "rise",
+                "law": "poly345"
+              },
+              {
+                "kind": "dwell",
+                "span": "dwelltop"
+              },
+              {
+                "kind": "return",
+                "span": "return",
+                "law": "poly345"
+              },
+              {
+                "kind": "dwell",
+                "span": "360-rise-dwelltop-return"
+              }
+            ],
+            "lift": "h",
+            "rb": "rb",
+            "theta0": 0
+          },
+          "note": "at is the roller centre on the groove's centre line (the pitch curve); the groove is cut half its width each side of it"
+        }
+      ],
+      "params": [
+        {
+          "id": "rb",
+          "value": 35,
+          "unit": "mm",
+          "min": 25,
+          "max": 45,
+          "note": "base (pitch) circle radius of the groove centreline"
+        },
+        {
+          "id": "h",
+          "value": 20,
+          "unit": "mm",
+          "min": 10,
+          "max": 25,
+          "note": "rise"
+        },
+        {
+          "id": "rise",
+          "value": 120,
+          "unit": "deg",
+          "min": 90,
+          "max": 180,
+          "note": "rise angle"
+        },
+        {
+          "id": "dwelltop",
+          "value": 60,
+          "unit": "deg",
+          "min": 0,
+          "max": 90,
+          "note": "outer dwell"
+        },
+        {
+          "id": "return",
+          "value": 120,
+          "unit": "deg",
+          "min": 90,
+          "max": 180,
+          "note": "return angle; the inner dwell is the rest of the turn"
+        },
+        {
+          "id": "rr",
+          "value": 7,
+          "unit": "mm",
+          "min": 4,
+          "max": 9,
+          "note": "roller radius (groove 0.2 mm wider than the roller): 7 so the roller shows either side of the arm's tongue"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "cam",
+          "id": "track",
+          "joints": [
+            "G",
+            "F",
+            "C"
+          ],
+          "in": {
+            "joint": "C",
+            "input": "input",
+            "follower": [
+              "follower",
+              "roller"
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "rr": "rr"
+          },
+          "out": {
+            "s": "lift-s",
+            "pressure": "pressure-angle",
+            "contact": "K"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "Fo",
+          "body": "follower",
+          "local": [
+            -30,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "K",
+          "body": "disc",
+          "local": [
+            30,
+            0,
+            0
+          ],
+          "note": "the roller's contact on the groove's inner wall; the cam block places it each pose"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "lift",
+          "of": "follower",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "pressure-angle",
+          "of": "C",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "pitch-curve",
+          "of": "F",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and #216. The roller in its groove is the contact that shows form closure, so the arm ends in a fork round the roller (an exception, decided in #216) and the detail view highlights the wall that carries the load: the inner wall while the follower accelerates outward, the outer wall while it accelerates inward. The groove push is drawn along the groove normal, not sideways. Checked: lift 20 mm, 60° dwells, pressure angle 22.1° at most (the defining relations said about 24°; corrected). Rebuild R5 (#216): built on v3 from this record. The groove is cut into the disc's face by the builder from the cam joint's own law (its centre line is the pitch curve, half the width each side), so build and kinematics agree. The lift control is not offered (the groove is built at build time). The arm narrows to a tongue over the stud, narrower than the roller (see exceptions); the guide stands past the disc's rim. The per-phase loaded-wall highlight of the detail view is not drawn yet (the renderer has no highlightBy): the detail view highlights the roller and the disc."
+      },
+      "principle": [
+        {
+          "body": "disc"
+        },
+        {
+          "body": "roller"
+        },
+        {
+          "body": "follower"
+        },
+        {
+          "point": "F"
+        },
+        {
+          "point": "K"
+        }
+      ],
+      "traces": [
+        {
+          "id": "pitch-curve",
+          "point": "F",
+          "frame": "disc",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "groove-push",
+          "kind": "line",
+          "from": "K",
+          "to": "F",
+          "extend": true,
+          "label": "GROOVE PUSH, ALONG THE GROOVE NORMAL"
+        },
+        {
+          "id": "pressure",
+          "kind": "arc",
+          "center": "F",
+          "from": "Fo",
+          "to": "K",
+          "label": "PRESSURE ANGLE"
+        },
+        {
+          "id": "guide-axis",
+          "kind": "axis-line",
+          "at": "O",
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "length": 150,
+          "label": "RADIAL GUIDE"
+        }
+      ],
+      "view": "PLAN",
+      "views": [
+        {
+          "id": "groove",
+          "kind": "detail",
+          "center": [
+            45,
+            0,
+            14
+          ],
+          "scale": 3,
+          "highlight": [
+            "roller",
+            "disc"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "disc",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "lift",
+          "label": "FOLLOWER POSITION"
+        },
+        {
+          "x": "input",
+          "y": "pressure-angle",
+          "label": "PRESSURE ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "follower 0 to 20 mm radial travel",
+          "output": "lift",
+          "stat": "range",
+          "value": 20,
+          "tol": 0.05
+        },
+        {
+          "text": "The default track rises over 120°",
+          "output": "lift",
+          "stat": "phase",
+          "of": "max",
+          "value": 120,
+          "tol": 0.5
+        },
+        {
+          "text": "dwells 60°, returns over 120° and dwells 60°",
+          "output": "lift",
+          "stat": "dwell",
+          "value": 60,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "pressure angle 22.1° at most",
+          "output": "pressure-angle",
+          "stat": "max",
+          "value": 22.1,
+          "tol": 0.3
+        }
+      ],
+      "exceptions": [
+        {
+          "reason": "The follower arm narrows to a tongue over the roller's stud, narrower than the roller (the fork end decided in #216): the roller and both groove walls show either side of it in plan. The arm is a moving principle part; drawn see-through it would hide which wall carries the load.",
+          "body": "follower",
+          "construction": "a tongue narrower than the roller at the stud"
+        }
+      ]
+    },
+    "edit": {
+      "build.defining_relations": "Groove centreline (pitch curve) r = rb + s(theta). Groove walls are offset curves of the pitch curve by ±(groove_w/2). 3-4-5 law max velocity 1.875h/beta. Pressure angle phi = atan(s'/(rb + s)), 22.1° at most with defaults. The roller presses the inner wall while the follower accelerates outward and the outer wall while it accelerates inward.",
+      "topology.notes": "ground, grooved disc, radial follower slide, roller; groove gives form-closed cam contact; counted mobility 2, because the roller's spin about its pin is a passive extra freedom"
+    }
+  },
+  "desmodromic-cam": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              220,
+              90
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                -10,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "camshaft",
+          "role": "driver",
+          "shape": {
+            "type": "cam",
+            "form": "lobes",
+            "hub": 10,
+            "place": -24,
+            "length": 48,
+            "bore": 12,
+            "lobes": [
+              {
+                "id": "opening",
+                "shoe": "P1",
+                "radius": 8,
+                "from": -14,
+                "to": -6
+              },
+              {
+                "id": "closing",
+                "shoe": "P2",
+                "radius": 8,
+                "lash": 0.1,
+                "from": 6,
+                "to": 14
+              }
+            ]
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "rocker-open",
+          "role": "follower",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "place": 0,
+            "thickness": 8,
+            "fillet": 2,
+            "outline": [
+              [
+                -9,
+                -8
+              ],
+              [
+                0,
+                -10
+              ],
+              [
+                56,
+                -8
+              ],
+              [
+                72,
+                -5
+              ],
+              [
+                80,
+                -5
+              ],
+              [
+                84,
+                0
+              ],
+              [
+                80,
+                5
+              ],
+              [
+                64,
+                5
+              ],
+              [
+                56,
+                10
+              ],
+              [
+                0,
+                10
+              ],
+              [
+                -9,
+                8
+              ]
+            ],
+            "pieces": [
+              {
+                "id": "nose",
+                "origin": [
+                  24,
+                  4,
+                  134
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 10,
+                "outline": [
+                  [
+                    -5,
+                    0
+                  ],
+                  [
+                    -3.5,
+                    -3.5
+                  ],
+                  [
+                    0,
+                    -5
+                  ],
+                  [
+                    3.5,
+                    -3.5
+                  ],
+                  [
+                    5,
+                    0
+                  ],
+                  [
+                    3.5,
+                    3.5
+                  ],
+                  [
+                    0,
+                    5
+                  ],
+                  [
+                    -3.5,
+                    3.5
+                  ]
+                ]
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -56,
+              -6,
+              134
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "rocker-close",
+          "role": "follower",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "place": 0,
+            "thickness": 8,
+            "fillet": 2,
+            "outline": [
+              [
+                -9,
+                -8
+              ],
+              [
+                0,
+                -10
+              ],
+              [
+                40,
+                -6
+              ],
+              [
+                50,
+                -5
+              ],
+              [
+                54,
+                0
+              ],
+              [
+                50,
+                5
+              ],
+              [
+                12,
+                6
+              ],
+              [
+                -4,
+                46
+              ],
+              [
+                -12.1,
+                45.8
+              ],
+              [
+                -20,
+                40
+              ],
+              [
+                -20,
+                30
+              ],
+              [
+                -9,
+                8
+              ]
+            ],
+            "pieces": [
+              {
+                "id": "tine",
+                "origin": [
+                  24,
+                  -5,
+                  110
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 7,
+                "outline": [
+                  [
+                    -14,
+                    -5
+                  ],
+                  [
+                    0,
+                    -5
+                  ],
+                  [
+                    3.5,
+                    -3.5
+                  ],
+                  [
+                    5,
+                    0
+                  ],
+                  [
+                    3.5,
+                    3.5
+                  ],
+                  [
+                    0,
+                    5
+                  ],
+                  [
+                    -14,
+                    5
+                  ]
+                ]
+              },
+              {
+                "id": "bridge",
+                "origin": [
+                  10,
+                  -12,
+                  104
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "thick": 3,
+                "outline": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    4,
+                    0
+                  ],
+                  [
+                    4,
+                    26
+                  ],
+                  [
+                    0,
+                    26
+                  ]
+                ]
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -26,
+              14,
+              110
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "follower",
+          "role": "slider",
+          "shape": {
+            "type": "shaft",
+            "diameter": 7,
+            "length": 79,
+            "place": 50,
+            "pieces": [
+              {
+                "id": "collar",
+                "origin": [
+                  24,
+                  0,
+                  115
+                ],
+                "rot": [
+                  0,
+                  0,
+                  0
+                ],
+                "thick": 6,
+                "outline": [
+                  [
+                    9,
+                    0
+                  ],
+                  [
+                    6.4,
+                    6.4
+                  ],
+                  [
+                    0,
+                    9
+                  ],
+                  [
+                    -6.4,
+                    6.4
+                  ],
+                  [
+                    -9,
+                    0
+                  ],
+                  [
+                    -6.4,
+                    -6.4
+                  ],
+                  [
+                    0,
+                    -9
+                  ],
+                  [
+                    6.4,
+                    -6.4
+                  ]
+                ]
+              }
+            ],
+            "guide": [
+              62,
+              82
+            ],
+            "guideHalf": 14
+          },
+          "frame": {
+            "origin": [
+              24,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "camshaft",
+          "at": [
+            0,
+            0,
+            160
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "Q1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "rocker-open",
+          "at": [
+            -56,
+            -10,
+            134
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "Q2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "rocker-close",
+          "at": [
+            -26,
+            10,
+            110
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "G",
+          "type": "prismatic",
+          "a": "follower",
+          "b": "ground",
+          "at": [
+            24,
+            0,
+            80
+          ],
+          "axis": [
+            0,
+            0,
+            -1
+          ],
+          "limits": [
+            0,
+            12
+          ],
+          "cam": {
+            "schedule": [
+              {
+                "kind": "rise",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "return",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "360-2*rise"
+              }
+            ],
+            "lift": "h",
+            "rb": 1,
+            "theta0": 0
+          },
+          "note": "the stem's travel is the cam's law: down 12 over 90 degrees, up over 90, closed for 180"
+        },
+        {
+          "id": "C1",
+          "type": "cam-contact",
+          "a": "rocker-open",
+          "b": "camshaft",
+          "at": [
+            0,
+            -10,
+            142
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "round shoe",
+          "note": "the opening lobe is the envelope of the opening shoe"
+        },
+        {
+          "id": "C2",
+          "type": "cam-contact",
+          "a": "rocker-close",
+          "b": "camshaft",
+          "at": [
+            -30.38,
+            10,
+            150.28
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "round shoe",
+          "note": "the closing lobe is the envelope of the closing shoe, 0.1 mm lash"
+        },
+        {
+          "id": "T1",
+          "type": "cam-contact",
+          "a": "rocker-open",
+          "b": "follower",
+          "at": [
+            24,
+            0,
+            129
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "flat face",
+          "note": "the opening rocker's nose on the stem's end"
+        },
+        {
+          "id": "T2",
+          "type": "cam-contact",
+          "a": "rocker-close",
+          "b": "follower",
+          "at": [
+            24,
+            0,
+            115
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "flat face",
+          "note": "the closing fork under the collar"
+        }
+      ],
+      "params": [
+        {
+          "id": "h",
+          "value": 12,
+          "unit": "mm",
+          "min": 6,
+          "max": 14,
+          "note": "follower lift"
+        },
+        {
+          "id": "rise",
+          "value": 90,
+          "unit": "deg",
+          "min": 60,
+          "max": 120,
+          "note": "opening (rise) cam angle; the return is equal"
+        },
+        {
+          "id": "lash",
+          "value": 0.1,
+          "unit": "mm",
+          "min": 0.05,
+          "max": 0.3,
+          "note": "clearance at the closing shoe"
+        },
+        {
+          "id": "a1",
+          "value": 56,
+          "unit": "mm",
+          "min": 40,
+          "max": 70,
+          "note": "opening rocker, pivot to shoe"
+        },
+        {
+          "id": "b1",
+          "value": 80,
+          "unit": "mm",
+          "min": 60,
+          "max": 100,
+          "note": "opening rocker, pivot to nose"
+        },
+        {
+          "id": "b2",
+          "value": 50,
+          "unit": "mm",
+          "min": 40,
+          "max": 60,
+          "note": "closing rocker, pivot to fork"
+        },
+        {
+          "id": "a2",
+          "value": 39.7,
+          "unit": "mm",
+          "min": 30,
+          "max": 50,
+          "note": "closing rocker, pivot to shoe (on the tangent to the shoe circle)"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "cam",
+          "id": "law",
+          "joints": [
+            "G"
+          ],
+          "in": {
+            "joint": "G",
+            "input": "input",
+            "follower": "follower",
+            "axis": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "out": {
+            "s": "lift-s",
+            "v": "lift-v"
+          }
+        },
+        {
+          "block": "rocker",
+          "id": "opening",
+          "joints": [
+            "Q1",
+            "C1",
+            "T1"
+          ],
+          "in": {
+            "joint": "Q1",
+            "value": "lift-s",
+            "v": "lift-v",
+            "arm": "b1",
+            "sense": -1,
+            "shoe": "P1",
+            "cam": "O"
+          },
+          "out": {
+            "angle": "psi-open",
+            "pressure": "pressure-open"
+          }
+        },
+        {
+          "block": "rocker",
+          "id": "closing",
+          "joints": [
+            "Q2",
+            "C2",
+            "T2"
+          ],
+          "in": {
+            "joint": "Q2",
+            "value": "lift-s",
+            "v": "lift-v",
+            "arm": "b2",
+            "sense": -1,
+            "shoe": "P2",
+            "cam": "O"
+          },
+          "out": {
+            "angle": "psi-close",
+            "pressure": "pressure-close"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "P1",
+          "body": "rocker-open",
+          "local": [
+            56,
+            0,
+            -4
+          ]
+        },
+        {
+          "id": "N1",
+          "body": "rocker-open",
+          "local": [
+            80,
+            0,
+            -4
+          ]
+        },
+        {
+          "id": "P2",
+          "body": "rocker-close",
+          "local": [
+            -12.1,
+            37.81,
+            -4
+          ]
+        },
+        {
+          "id": "N2",
+          "body": "rocker-close",
+          "local": [
+            50,
+            0,
+            -4
+          ]
+        },
+        {
+          "id": "tip",
+          "body": "follower",
+          "local": [
+            0,
+            0,
+            129
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "lift",
+          "of": "follower",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "psi-open",
+          "of": "rocker-open",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "psi-close",
+          "of": "rocker-close",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "pressure-open",
+          "of": "C1",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "pressure-close",
+          "of": "C2",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "rethink",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and #216. Rebuilt in its true orientation and seen in front elevation: camshaft on top, the follower vertical below it, the opening finger pressing the stem's end down and the forked closing bell crank lifting the collar. The law is now rise 90°, return 90°, closed 180°, h 12 (was 60°, 60° and 10), so half the frames show it open. The lobes read as distinct: the opening lobe grows from 18 to 26.4 mm, the closing lobe shrinks from 31.9 to 22.4 mm over the same angles. The loaded rocker is the view highlight: opening rocker from 0° to 45° and from 135° to 180°, closing rocker from 45° to 135°. Keeping supports off the lobes and shoes is hardware work, not record data. Rebuild R5 (#216): built on v3. The stem's travel is the law (on its slide joint); each rocker follows from it by the rocker block (ψ = asin(s / arm), exact for a round nose level with its pivot), and each lobe is built as the envelope of its shoe's path in the camshaft's frame (the closing one with 0.1 mm lash), so the lobes are conjugate by construction. The pressure angles, measured between each shoe's path on its lobe and the shoe's own motion, are 24.4° and 29.8° (the review's 23.1° and 27.7° were estimates); the closing lobe sits near the 30° limit. The lift and rise controls are not offered (the lobes are built at build time). The per-phase loaded-rocker highlight waits on the renderer (highlightBy); the detail view highlights both rockers."
+      },
+      "principle": [
+        {
+          "body": "camshaft"
+        },
+        {
+          "body": "rocker-open"
+        },
+        {
+          "body": "rocker-close"
+        },
+        {
+          "body": "follower"
+        },
+        {
+          "point": "P1"
+        },
+        {
+          "point": "P2"
+        },
+        {
+          "point": "N1"
+        },
+        {
+          "point": "N2"
+        }
+      ],
+      "traces": [
+        {
+          "id": "opening-pitch",
+          "point": "P1",
+          "frame": "camshaft",
+          "comet": true
+        },
+        {
+          "id": "closing-pitch",
+          "point": "P2",
+          "frame": "camshaft"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "stroke-axis",
+          "kind": "axis-line",
+          "at": "tip",
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "length": 70,
+          "label": "STROKE AXIS"
+        },
+        {
+          "id": "rise",
+          "kind": "arc",
+          "center": "O",
+          "radius": 46,
+          "range": [
+            0,
+            90
+          ],
+          "frame": "camshaft",
+          "label": "RISE"
+        },
+        {
+          "id": "return",
+          "kind": "arc",
+          "center": "O",
+          "radius": 46,
+          "range": [
+            90,
+            180
+          ],
+          "frame": "camshaft",
+          "label": "RETURN"
+        },
+        {
+          "id": "open-push",
+          "kind": "line",
+          "from": "O",
+          "to": "P1",
+          "label": "OPENING PUSH"
+        },
+        {
+          "id": "close-push",
+          "kind": "line",
+          "from": "O",
+          "to": "P2",
+          "label": "CLOSING PUSH"
+        }
+      ],
+      "view": "FRONT",
+      "views": [
+        {
+          "id": "load",
+          "kind": "detail",
+          "center": [
+            0,
+            0,
+            140
+          ],
+          "scale": 1.6,
+          "highlight": [
+            "rocker-open",
+            "rocker-close"
+          ],
+          "highlightBy": {
+            "rocker-open": [
+              [
+                0,
+                45
+              ],
+              [
+                135,
+                180
+              ]
+            ],
+            "rocker-close": [
+              [
+                45,
+                135
+              ]
+            ]
+          },
+          "note": "the rocker that carries the follower: the opening rocker while it accelerates down or brakes on the way up, the closing rocker while it brakes on the way down or accelerates up"
+        }
+      ],
+      "controls": [
+        {
+          "id": "cam",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "lift",
+        "label": "FOLLOWER LIFT"
+      },
+      "claims": [
+        {
+          "text": "follower 0 to 12 mm lift",
+          "output": "lift",
+          "stat": "range",
+          "value": 12,
+          "tol": 0.05
+        },
+        {
+          "text": "full lift at 90° of cam",
+          "output": "lift",
+          "stat": "phase",
+          "of": "max",
+          "value": 90,
+          "tol": 0.5
+        },
+        {
+          "text": "closed for 180°",
+          "output": "lift",
+          "stat": "dwell",
+          "value": 180,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "the opening rocker swings 8.6°",
+          "output": "psi-open",
+          "stat": "range",
+          "value": 8.6,
+          "tol": 0.2
+        },
+        {
+          "text": "the closing rocker swings 13.9°",
+          "output": "psi-close",
+          "stat": "range",
+          "value": 13.9,
+          "tol": 0.2
+        },
+        {
+          "text": "pressure angle at most 24.4° on the opening lobe",
+          "output": "pressure-open",
+          "stat": "max",
+          "value": 24.4,
+          "tol": 0.3
+        },
+        {
+          "text": "pressure angle at most 29.8° on the closing lobe",
+          "output": "pressure-close",
+          "stat": "max",
+          "value": 29.8,
+          "tol": 0.3
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "ratio.typical": "lift 12 mm per cam turn: rise 90°, return 90°, closed 180°",
+      "build.ground": "head plate standing upright: camshaft O on top, rocker pivots Q1 and Q2 beside and below it, follower guide vertical below",
+      "build.defining_relations": "Lift y = s(theta), cycloidal, rise 90°, return 90°, closed 180°, h 12. Opening rocker: a finger pivoted at Q1, shoe 56 mm and nose 80 mm from the pivot, so psi1 = asin(y/80) (8.6° at full lift); its lobe is the envelope of the Ø16 shoe, radius 18 mm closed to 26.4 mm at full lift. Closing rocker: a bell crank pivoted at Q2, fork arm 50 mm level to the collar, cam arm 39.7 mm at 107.7° to it, on the tangent to the shoe circle; psi2 = asin(y/50) (13.9° at full lift); its lobe is the envelope of its shoe offset by the 0.1 mm lash, radius 31.9 mm closed to 22.4 mm at full lift. Both lobes are cut from the same law, so at every angle both shoes touch (conjugate): the opening lobe grows where the closing lobe shrinks. Pressure angles at most 24.4° (opening) and 29.8° (closing): the angle between each shoe's path on its lobe and the shoe's own motion.",
+      "build.range": "camshaft 360° continuous; follower 0 to 12 mm lift in 180° of cam, closed for 180°",
+      "build.notes": "Seen in front elevation. Highlight the rocker currently carrying the follower: the opening rocker from 0° to 45° and from 135° to 180° of cam, the closing rocker from 45° to 135°. Keep the lash visible but tiny. The two lobes lie side by side on the shaft and overlap in this view: tell them apart by pattern and stacking.",
+      "topology.notes": "ground, camshaft (opening and closing lobes), opening rocker, closing rocker, follower; cam-rocker and rocker-follower contacts; overconstrained on purpose (conjugate cams): counted mobility 0, the four contacts hold one motion"
+    }
+  },
+  "geneva": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              280,
+              200
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                55,
+                0,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "genevaCrank",
+            "lock": 50.56,
+            "relief": 82.98,
+            "c": 110,
+            "thickness": 8,
+            "place": 0,
+            "pieces": [
+              {
+                "id": "arm",
+                "origin": [
+                  0,
+                  0,
+                  9
+                ],
+                "thick": 6,
+                "fillet": 0.5,
+                "outline": [
+                  [
+                    -77.782,
+                    8
+                  ],
+                  [
+                    -80.254,
+                    7.608
+                  ],
+                  [
+                    -82.484,
+                    6.472
+                  ],
+                  [
+                    -84.254,
+                    4.702
+                  ],
+                  [
+                    -85.39,
+                    2.472
+                  ],
+                  [
+                    -85.782,
+                    0
+                  ],
+                  [
+                    -85.39,
+                    -2.472
+                  ],
+                  [
+                    -84.254,
+                    -4.702
+                  ],
+                  [
+                    -82.484,
+                    -6.472
+                  ],
+                  [
+                    -80.254,
+                    -7.608
+                  ],
+                  [
+                    -77.782,
+                    -8
+                  ],
+                  [
+                    0,
+                    -8
+                  ],
+                  [
+                    2.472,
+                    -7.608
+                  ],
+                  [
+                    4.702,
+                    -6.472
+                  ],
+                  [
+                    6.472,
+                    -4.702
+                  ],
+                  [
+                    7.608,
+                    -2.472
+                  ],
+                  [
+                    8,
+                    0
+                  ],
+                  [
+                    7.608,
+                    2.472
+                  ],
+                  [
+                    6.472,
+                    4.702
+                  ],
+                  [
+                    4.702,
+                    6.472
+                  ],
+                  [
+                    2.472,
+                    7.608
+                  ],
+                  [
+                    0,
+                    8
+                  ]
+                ]
+              }
+            ]
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "wheel",
+          "role": "output",
+          "symmetry": 4,
+          "shape": {
+            "type": "genevaWheel",
+            "n": 4,
+            "c": 110,
+            "hw": 6.7,
+            "tip": 79.98,
+            "slotEnd": 27.22,
+            "lock": 50.56,
+            "clear": 0.3,
+            "windowR": 7,
+            "windowAt": 52,
+            "thickness": 8,
+            "place": 0,
+            "bore": 12
+          },
+          "at": {
+            "joint": "W"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "W",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wheel",
+          "at": [
+            110,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "support": "stub"
+        },
+        {
+          "id": "S",
+          "type": "pin-in-slot",
+          "a": "crank",
+          "b": "wheel",
+          "at": [
+            -77.78174593052023,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "slot": {
+            "from": [
+              110,
+              0,
+              0
+            ],
+            "to": [
+              67.57359312880715,
+              42.42640687119285,
+              0
+            ],
+            "repeat": 4,
+            "center": [
+              110,
+              0,
+              0
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 135,
+            "hi": 225
+          },
+          "note": "the pin drives in a slot while the crank is within 45 degrees of the line of centres"
+        },
+        {
+          "id": "L",
+          "type": "cam-contact",
+          "a": "crank",
+          "b": "wheel",
+          "at": [
+            50.56,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "follower": "locking arc",
+          "note": "the locking disc in the wheel's concave arc holds it between indexes"
+        }
+      ],
+      "params": [
+        {
+          "id": "c",
+          "value": 110,
+          "unit": "mm",
+          "min": 80,
+          "max": 140,
+          "note": "centre distance; crank radius a = c sin(pi/n), slot mouth radius R = c cos(pi/n)"
+        },
+        {
+          "id": "pr",
+          "value": 5.5,
+          "unit": "mm",
+          "min": 4,
+          "max": 8,
+          "note": "pin (roller) radius"
+        },
+        {
+          "id": "hw",
+          "value": 7,
+          "unit": "mm",
+          "min": 5,
+          "max": 9,
+          "note": "slot half-width"
+        },
+        {
+          "id": "rl",
+          "value": 50.56,
+          "unit": "mm",
+          "min": 40,
+          "max": 60,
+          "note": "locking disc radius, 0.65 a"
+        }
+      ],
+      "design": [
+        {
+          "id": "slots",
+          "options": [
+            3,
+            4,
+            5,
+            6,
+            8
+          ],
+          "value": 4,
+          "note": "built with 4 slots"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "phase": 135,
+          "note": "the cycle starts as the pin enters a slot; the reference is mid-dwell"
+        }
+      ],
+      "solve": [
+        {
+          "block": "indexer",
+          "id": "index",
+          "joints": [
+            "W",
+            "S",
+            "L"
+          ],
+          "in": {
+            "n": 4,
+            "input": "input",
+            "phi0": -180,
+            "wheel": "wheel",
+            "center": [
+              110,
+              0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ]
+          },
+          "out": {
+            "angle": "wheel-turn"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "R",
+          "body": "crank",
+          "local": [
+            77.78174593052023,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "M",
+          "body": "wheel",
+          "local": [
+            66,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "wheel-angle",
+          "of": "wheel",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "wheel-speed",
+          "of": "wheel",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "pin-path",
+          "of": "R",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review and #216: a solid slotted wheel with clear concave locking arcs and smaller windows (not none), and the bar across the wheel see-through or moved, so the wheel no longer reads as a lattice. A point on the wheel is traced with equal-time ticks so the stop and go reads; the line of centres and the right angle of tangential entry are drawn. Checked: 90° step per crank turn, moving during 90° and resting 270°, peak wheel speed 2.41 times the crank's at mid-index. Rebuild R5 (#216): built on v3. The wheel is a solid slotted plate with four small round windows behind its locking arcs (M2: smaller windows, not none) and the slots and arcs cut from the record's numbers; the crank's locking disc and pin lie in the wheel's plane, its arm above the wheel; the wheel turns on a stub axle from the base, so no bar crosses it. The slot-count control is not offered (the wheel is built at build time); the record keeps the choice."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "wheel"
+        },
+        {
+          "point": "R"
+        },
+        {
+          "point": "L"
+        }
+      ],
+      "traces": [
+        {
+          "id": "wheel-mark",
+          "point": "M",
+          "ticks": {
+            "every": 10
+          },
+          "comet": true
+        },
+        {
+          "id": "pin",
+          "point": "R"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "centres",
+          "kind": "line",
+          "from": "O",
+          "to": "W",
+          "label": "LINE OF CENTRES"
+        },
+        {
+          "id": "entry",
+          "kind": "line",
+          "from": "W",
+          "to": "R",
+          "label": "SLOT LINE"
+        },
+        {
+          "id": "locking",
+          "kind": "arc",
+          "center": "O",
+          "radius": 50.56,
+          "label": "LOCKING ARC"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "wheel-angle",
+          "label": "WHEEL ANGLE"
+        },
+        {
+          "x": "input",
+          "y": "wheel-speed",
+          "label": "WHEEL SPEED / CRANK SPEED"
+        }
+      ],
+      "claims": [
+        {
+          "text": "steps a slotted wheel a quarter turn",
+          "output": "wheel-angle",
+          "stat": "range",
+          "value": 90,
+          "tol": 0.1
+        },
+        {
+          "text": "With 4 slots the wheel moves during 90° of crank rotation and rests for 270°",
+          "output": "wheel-angle",
+          "stat": "dwell",
+          "value": 270,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "peak wheel speed 2.41 times the crank's, at mid-index, turning the other way",
+          "output": "wheel-speed",
+          "stat": "min",
+          "value": -2.41,
+          "tol": 0.02
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "motion.output_character": [
+        "Intermittent",
+        "Dwell"
+      ],
+      "topology.notes": "ground, crank (arm with pin and locking disc), slotted wheel; pin-in-slot and locking arc contact alternate, so only one acts at a time; counted mobility 0 with both declared"
+    }
+  },
+  "internal-geneva": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              220,
+              220
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                -12
+              ]
+            }
+          }
+        },
+        {
+          "id": "wheel",
+          "role": "output",
+          "symmetry": 4,
+          "shape": {
+            "type": "genevaWheel",
+            "n": 4,
+            "c": 40,
+            "hw": 6.7,
+            "slotEnd": 28.28,
+            "slotRoot": 72.28,
+            "lock": 16,
+            "clear": 0.3,
+            "thickness": 8,
+            "place": 0,
+            "internal": {
+              "rimIn": 76,
+              "rimOut": 88
+            },
+            "web": 6
+          },
+          "at": {
+            "joint": "W"
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "genevaCrank",
+            "lock": 16,
+            "halfAngle": 70,
+            "thickness": 8,
+            "place": 0,
+            "pieces": [
+              {
+                "id": "arm",
+                "origin": [
+                  40,
+                  0,
+                  9
+                ],
+                "thick": 6,
+                "fillet": 0.5,
+                "outline": [
+                  [
+                    -28.284,
+                    7
+                  ],
+                  [
+                    -30.447,
+                    6.657
+                  ],
+                  [
+                    -32.399,
+                    5.663
+                  ],
+                  [
+                    -33.947,
+                    4.114
+                  ],
+                  [
+                    -34.942,
+                    2.163
+                  ],
+                  [
+                    -35.284,
+                    0
+                  ],
+                  [
+                    -34.942,
+                    -2.163
+                  ],
+                  [
+                    -33.947,
+                    -4.114
+                  ],
+                  [
+                    -32.399,
+                    -5.663
+                  ],
+                  [
+                    -30.447,
+                    -6.657
+                  ],
+                  [
+                    -28.284,
+                    -7
+                  ],
+                  [
+                    0,
+                    -7
+                  ],
+                  [
+                    2.163,
+                    -6.657
+                  ],
+                  [
+                    4.114,
+                    -5.663
+                  ],
+                  [
+                    5.663,
+                    -4.114
+                  ],
+                  [
+                    6.657,
+                    -2.163
+                  ],
+                  [
+                    7,
+                    0
+                  ],
+                  [
+                    6.657,
+                    2.163
+                  ],
+                  [
+                    5.663,
+                    4.114
+                  ],
+                  [
+                    4.114,
+                    5.663
+                  ],
+                  [
+                    2.163,
+                    6.657
+                  ],
+                  [
+                    0,
+                    7
+                  ]
+                ]
+              }
+            ]
+          },
+          "at": {
+            "joint": "O"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "W",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wheel",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "support": "stub"
+        },
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "support": "hung",
+          "note": "the crank is overhung from above: its shaft cannot cross the wheel"
+        },
+        {
+          "id": "S",
+          "type": "pin-in-slot",
+          "a": "crank",
+          "b": "wheel",
+          "at": [
+            11.715728752538098,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "slot": {
+            "from": [
+              0,
+              0,
+              0
+            ],
+            "to": [
+              42.42640687119285,
+              42.42640687119285,
+              0
+            ],
+            "repeat": 4,
+            "center": [
+              0,
+              0,
+              0
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 45,
+            "hi": 315
+          },
+          "note": "the pin drives while it is past the slots' mouths, 270 degrees of crank"
+        },
+        {
+          "id": "L",
+          "type": "cam-contact",
+          "a": "crank",
+          "b": "wheel",
+          "at": [
+            56,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "follower": "locking sector",
+          "note": "the locking sector in the wheel's concave arc holds it between indexes"
+        }
+      ],
+      "params": [
+        {
+          "id": "c",
+          "value": 40,
+          "unit": "mm",
+          "min": 30,
+          "max": 50,
+          "note": "centre distance W to O; crank radius a = c sin(pi/n)"
+        },
+        {
+          "id": "pr",
+          "value": 4,
+          "unit": "mm",
+          "min": 3,
+          "max": 6,
+          "note": "pin radius"
+        },
+        {
+          "id": "rs",
+          "value": 16,
+          "unit": "mm",
+          "min": 12,
+          "max": 20,
+          "note": "locking sector radius"
+        }
+      ],
+      "design": [
+        {
+          "id": "slots",
+          "options": [
+            4,
+            5,
+            6,
+            8
+          ],
+          "value": 4,
+          "note": "built with 4 slots"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "phase": 45,
+          "note": "the cycle starts as the pin enters a slot; the reference is mid-dwell"
+        }
+      ],
+      "solve": [
+        {
+          "block": "indexer",
+          "id": "index",
+          "joints": [
+            "W",
+            "S",
+            "L"
+          ],
+          "in": {
+            "n": 4,
+            "input": "input",
+            "phi0": -180,
+            "internal": true,
+            "wheel": "wheel",
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ]
+          },
+          "out": {
+            "angle": "wheel-turn"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "P",
+          "body": "crank",
+          "local": [
+            28.284271247461902,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "M",
+          "body": "wheel",
+          "local": [
+            -82,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "wheel-angle",
+          "of": "wheel",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "wheel-speed",
+          "of": "wheel",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "pin-path",
+          "of": "P",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Keeps the 2026-10-19 verdict and applies #216: the crank bridge is see-through so the locking sector shows during the dwell. Checked: the wheel turns the same way as the crank, moves during 270° of crank turn and rests 90°, 90° per index, peak speed 0.41 times the crank's (against 2.41 for the external Geneva). A mark on the rim is traced with equal-time ticks so the long gentle move reads. Rebuild R5 (#216): built on v3. The wheel is a slotted ring on a web below it, slots and concave locking arcs cut from the record's numbers; the crank's locking sector and the pin's roller lie in the ring's plane, its arm above, its shaft held from above (record support: hung) because no shaft can cross the wheel; the crank's bearing block over the top is drawn see-through where it covers the locking sector. The slot-count control is not offered (built at build time)."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "wheel"
+        },
+        {
+          "point": "P"
+        },
+        {
+          "point": "L"
+        }
+      ],
+      "traces": [
+        {
+          "id": "wheel-mark",
+          "point": "M",
+          "ticks": {
+            "every": 10
+          },
+          "comet": true
+        },
+        {
+          "id": "pin",
+          "point": "P"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "centres",
+          "kind": "line",
+          "from": "W",
+          "to": "O",
+          "label": "LINE OF CENTRES"
+        },
+        {
+          "id": "entry",
+          "kind": "line",
+          "from": "W",
+          "to": "P",
+          "label": "SLOT LINE"
+        },
+        {
+          "id": "locking",
+          "kind": "arc",
+          "center": "O",
+          "radius": 16,
+          "label": "LOCKING SECTOR"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "wheel-angle",
+          "label": "WHEEL ANGLE"
+        },
+        {
+          "x": "input",
+          "y": "wheel-speed",
+          "label": "WHEEL SPEED / CRANK SPEED"
+        }
+      ],
+      "claims": [
+        {
+          "text": "wheel steps 90° per crank turn",
+          "output": "wheel-angle",
+          "stat": "range",
+          "value": 90,
+          "tol": 0.1
+        },
+        {
+          "text": "drives the wheel the same way as the crank for 270° of crank rotation, then a locking cam on the crank holds the wheel for the remaining 90°",
+          "output": "wheel-angle",
+          "stat": "dwell",
+          "value": 90,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "the wheel turns the same way as the crank",
+          "output": "wheel-speed",
+          "stat": "min",
+          "value": 0,
+          "tol": 0.001
+        },
+        {
+          "text": "peak wheel speed 0.41 times the crank's",
+          "output": "wheel-speed",
+          "stat": "max",
+          "value": 0.41,
+          "tol": 0.01
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.notes": "ground, crank with pin and locking cam, internal slotted wheel; pin-in-slot and locking contact alternate, so only one acts at a time; counted mobility 0 with both declared"
+    }
+  },
+  "barrel-cam": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              260,
+              200
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                -20,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "id": "drum",
+          "role": "driver",
+          "shape": {
+            "type": "cam",
+            "form": "barrel",
+            "radius": 64,
+            "length": 140,
+            "pitchRadius": 60,
+            "law": "cycloidal",
+            "lift": 30,
+            "rise": 120,
+            "dwellOuter": 60,
+            "return": 120,
+            "dwellInner": 60,
+            "groove": {
+              "width": 14.1,
+              "depth": 8,
+              "centreline": "x = -15 + s(theta) at the pitch radius",
+              "make": "boolean: a tube of the groove's section carried round the drum on the law, subtracted from the cylinder"
+            },
+            "shaft": 16,
+            "bore": 16
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "slide",
+          "role": "follower",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -30,
+                -20
+              ],
+              [
+                30,
+                -20
+              ],
+              [
+                30,
+                20
+              ],
+              [
+                -30,
+                20
+              ]
+            ],
+            "fillet": 4,
+            "thickness": 8,
+            "pieces": [
+              {
+                "id": "upright",
+                "origin": [
+                  -15,
+                  -66,
+                  0
+                ],
+                "rot": [
+                  90,
+                  0,
+                  0
+                ],
+                "thick": 6,
+                "outline": [
+                  [
+                    -14,
+                    8
+                  ],
+                  [
+                    14,
+                    8
+                  ],
+                  [
+                    4.5,
+                    90
+                  ],
+                  [
+                    0,
+                    94.5
+                  ],
+                  [
+                    -4.5,
+                    90
+                  ]
+                ]
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -15,
+              -70,
+              0
+            ]
+          }
+        },
+        {
+          "id": "roller",
+          "role": "follower",
+          "shape": {
+            "type": "disc",
+            "radius": 7,
+            "thickness": 6,
+            "place": -3
+          },
+          "at": {
+            "joint": "F"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "drum",
+          "at": [
+            0,
+            0,
+            90
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "G",
+          "type": "prismatic",
+          "a": "slide",
+          "b": "ground",
+          "at": [
+            -15,
+            -70,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            0,
+            30
+          ]
+        },
+        {
+          "id": "F",
+          "type": "revolute",
+          "a": "slide",
+          "b": "roller",
+          "at": [
+            -15,
+            -60,
+            90
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "C",
+          "type": "cam-contact",
+          "a": "roller",
+          "b": "drum",
+          "at": [
+            -15,
+            -60,
+            90
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "ca": [
+            0,
+            0,
+            90
+          ],
+          "follower": "roller",
+          "closure": "form",
+          "cam": {
+            "form": "barrel",
+            "schedule": [
+              {
+                "kind": "rise",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "dwelltop"
+              },
+              {
+                "kind": "return",
+                "span": "rise",
+                "law": "cycloidal"
+              },
+              {
+                "kind": "dwell",
+                "span": "360-2*rise-dwelltop"
+              }
+            ],
+            "lift": "h",
+            "rb": "Rp",
+            "theta0": 0
+          },
+          "note": "at is the roller centre at the pitch radius Rp (mid-depth of the groove); the groove's centre line runs along the axis by the law"
+        }
+      ],
+      "params": [
+        {
+          "id": "h",
+          "value": 30,
+          "unit": "mm",
+          "min": 15,
+          "max": 50,
+          "note": "axial stroke"
+        },
+        {
+          "id": "Rp",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 80,
+          "note": "pitch radius (groove mid-depth)"
+        },
+        {
+          "id": "rise",
+          "value": 120,
+          "unit": "deg",
+          "min": 90,
+          "max": 170,
+          "note": "rise angle; the return is equal"
+        },
+        {
+          "id": "dwelltop",
+          "value": 60,
+          "unit": "deg",
+          "min": 10,
+          "max": 90,
+          "note": "dwell at the far end; the near-end dwell is the rest of the turn"
+        },
+        {
+          "id": "rr",
+          "value": 7,
+          "unit": "mm",
+          "min": 4,
+          "max": 9,
+          "note": "roller radius (groove 0.1 mm wider than the roller)"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "cam",
+          "id": "groove",
+          "joints": [
+            "G",
+            "F",
+            "C"
+          ],
+          "in": {
+            "joint": "C",
+            "input": "input",
+            "follower": [
+              "slide",
+              "roller"
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "rr": "rr"
+          },
+          "out": {
+            "s": "stroke-s",
+            "pressure": "pressure-angle",
+            "contact": "K"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "Fs",
+          "body": "slide",
+          "local": [
+            -30,
+            10,
+            90
+          ]
+        },
+        {
+          "id": "K",
+          "body": "drum",
+          "local": [
+            0,
+            0,
+            0
+          ],
+          "note": "the roller's contact on the groove wall; the cam block places it each pose"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "stroke",
+          "of": "slide",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "pressure-angle",
+          "of": "C",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "New review against the record (#216, unbuilt). The record's 20° dwells (160° rise, 160° return) would go by in a blink, and its 29.8° peak pressure angle sat on the 30° limit. Decided: rise 120°, dwell 60°, return 120°, dwell 60°, the cam family's timing, so the slide visibly stops at each end; stroke 30 mm on a 60 mm pitch radius, so the pressure angle peaks at 25.5°. Default view is front elevation with the roller on the near side, where the groove's slope under the roller is the pressure angle at true size. The groove is a boolean on the cylinder (a build kit). Rebuild R5 (#216): built on v3. The groove is cut by Manifold from the law: a tube of the groove's section carried round the drum and subtracted (D8). The slide runs on rails on the base under the drum and carries the roller's stud on an upright in front of the drum, narrower than the roller, so the roller in its groove shows in FRONT. Roller radius 7 (groove 14.1). The stroke and radius controls are not offered (the drum is built at build time)."
+      },
+      "principle": [
+        {
+          "body": "drum"
+        },
+        {
+          "body": "roller"
+        },
+        {
+          "body": "slide"
+        },
+        {
+          "point": "F"
+        },
+        {
+          "point": "K"
+        }
+      ],
+      "traces": [
+        {
+          "id": "roller",
+          "point": "F",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "drum-axis",
+          "kind": "axis-line",
+          "at": "O",
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "length": 110,
+          "label": "DRUM AXIS"
+        },
+        {
+          "id": "groove-slope",
+          "kind": "line",
+          "from": "K",
+          "to": "F",
+          "extend": true,
+          "label": "GROOVE NORMAL"
+        },
+        {
+          "id": "pressure",
+          "kind": "arc",
+          "center": "F",
+          "from": "Fs",
+          "to": "K",
+          "label": "PRESSURE ANGLE"
+        }
+      ],
+      "view": "FRONT",
+      "controls": [
+        {
+          "id": "drum",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "stroke",
+        "label": "SLIDE POSITION (THE UNROLLED GROOVE)"
+      },
+      "claims": [
+        {
+          "text": "The default groove rises 30 mm",
+          "output": "stroke",
+          "stat": "range",
+          "value": 30,
+          "tol": 0.05
+        },
+        {
+          "text": "rises 30 mm over 120°",
+          "output": "stroke",
+          "stat": "phase",
+          "of": "max",
+          "value": 120,
+          "tol": 0.5
+        },
+        {
+          "text": "dwells 60°, returns over 120° and dwells 60°",
+          "output": "stroke",
+          "stat": "dwell",
+          "value": 60,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "here Rp is 60 mm and phi peaks at 25.5°",
+          "output": "pressure-angle",
+          "stat": "max",
+          "value": 25.5,
+          "tol": 0.3
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "A groove cut around the drum surface wanders along the axis. A roller sitting in the groove is carried with it, so the follower slide moves parallel to the drum axis as the drum turns. The default groove rises 30 mm over 120°, dwells 60°, returns over 120° and dwells 60°.",
+      "explain.forces": "Groove walls push both ways, so no return spring is needed. The pressure angle is set by groove slope: tan(phi) = s'/Rp, where Rp is the pitch radius; a larger drum gives a gentler slope and lower side load. In this default, here Rp is 60 mm and phi peaks at 25.5°.",
+      "ratio.typical": "stroke = groove axial travel (30 mm by default) per drum turn",
+      "build.defining_relations": "z = s(theta), cycloidal s = h(f - sin(2 pi f)/(2 pi)) on a 120° rise and a 120° return, 60° dwells at each end. Groove slope ds/dx with x = Rp theta; pressure angle phi = atan(s'/Rp); max s' = 2h/beta = 28.6 mm/rad at Rp 60 gives phi max 25.5°.",
+      "build.range": "drum 360° continuous; slide 0 to 30 mm and back per turn, dwelling 60° at each end",
+      "build.notes": "Drum axis horizontal, roller on the near side in front elevation. The groove is a boolean: the roller's sweep along the pitch curve, cut from the cylinder, 0.1 mm wider than the roller. Shift drums use stepped dwell grooves instead.",
+      "topology.notes": "ground, drum, follower slide, roller; roller in groove is a form-closed cam contact; counted mobility 2, because the roller's spin about its pin is a passive extra freedom"
+    }
+  },
+  "roller-gear-indexer": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              240,
+              240
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                -120,
+                -150,
+                -10
+              ]
+            }
+          }
+        },
+        {
+          "id": "camshaft",
+          "role": "driver",
+          "shape": {
+            "type": "cam",
+            "form": "globoid",
+            "law": "modified sine",
+            "index": 120,
+            "step": 45,
+            "phi0": 240,
+            "blank": 46,
+            "length": 96,
+            "shaft": 20,
+            "clearance": 0.15,
+            "samples": 120
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "turret",
+          "role": "output",
+          "symmetry": 8,
+          "shape": {
+            "type": "disc",
+            "radius": 48,
+            "thickness": 14,
+            "bore": 16,
+            "place": -7,
+            "rollers": {
+              "n": 8,
+              "pitchRadius": 60,
+              "diameter": 20,
+              "length": 18,
+              "firstAt": 22.5
+            }
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              80
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "ground",
+          "b": "camshaft",
+          "at": [
+            0,
+            -100,
+            80
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "ground",
+          "b": "turret",
+          "at": [
+            0,
+            0,
+            80
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "support": "stub"
+        },
+        {
+          "id": "C1",
+          "type": "cam-contact",
+          "a": "camshaft",
+          "b": "turret",
+          "at": [
+            13.72,
+            -59.26,
+            80
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "follower": "flat",
+          "note": "a roller on the rib's flank"
+        },
+        {
+          "id": "C2",
+          "type": "cam-contact",
+          "a": "camshaft",
+          "b": "turret",
+          "at": [
+            -13.72,
+            -59.26,
+            80
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "follower": "flat",
+          "note": "the next roller on the rib's other flank (preloaded)"
+        }
+      ],
+      "params": [
+        {
+          "id": "C",
+          "value": 100,
+          "unit": "mm",
+          "min": 80,
+          "max": 130,
+          "note": "centre distance between the camshaft and turret axes"
+        },
+        {
+          "id": "Rp",
+          "value": 60,
+          "unit": "mm",
+          "min": 45,
+          "max": 80,
+          "note": "roller pitch radius on the turret"
+        },
+        {
+          "id": "rr",
+          "value": 10,
+          "unit": "mm",
+          "min": 6,
+          "max": 12,
+          "note": "roller radius"
+        },
+        {
+          "id": "index",
+          "value": 120,
+          "unit": "deg",
+          "min": 90,
+          "max": 180,
+          "note": "camshaft angle for one index; the dwell is the rest of the turn"
+        }
+      ],
+      "design": [
+        {
+          "id": "stations",
+          "options": [
+            6,
+            8,
+            12
+          ],
+          "value": 8,
+          "note": "built with 8 stations"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "A",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "phase": 120,
+          "note": "the cycle starts at the index; the reference is mid-dwell"
+        }
+      ],
+      "solve": [
+        {
+          "block": "indexer",
+          "id": "index",
+          "joints": [
+            "B",
+            "C1",
+            "C2"
+          ],
+          "in": {
+            "mode": "cam",
+            "law": "modsine",
+            "index": "index",
+            "step": 45,
+            "input": "input",
+            "phi0": 240,
+            "wheel": "turret",
+            "center": [
+              0,
+              0,
+              80
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ]
+          },
+          "out": {
+            "angle": "turret-angle"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "R1",
+          "body": "turret",
+          "local": [
+            22.96,
+            -55.43,
+            0
+          ]
+        },
+        {
+          "id": "R2",
+          "body": "turret",
+          "local": [
+            -22.96,
+            -55.43,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "turret-angle",
+          "of": "turret",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "turret-speed",
+          "of": "turret",
+          "kind": "speed-ratio"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "New review against the record (#216, unbuilt). The proportions teach: 45° steps are large, the 240° dwell is two thirds of the turn, so two of six frames move and four stand still, and the modified sine law gives a smooth start and stop (Cv 1.76, Ca 5.53; peak turret speed 0.66 times the camshaft's). The principle is where the rib changes from straight (locking two rollers) to twisted (driving them), so a detail view of the rib between the two rollers is declared and a roller is traced with equal-time ticks. Both axes are drawn: perpendicular and skew, 100 mm apart. Isometric default view shows the cam side-on and the turret in one picture. Rebuild R5 (#216): built on v3. The motion is the indexer block's cam mode with the modified sine (added to the cam laws): 45° per index in 120° of camshaft, dwell 240°, peak 0.66 of the camshaft's speed. The globoidal rib is cut by Manifold as the envelope of the rollers: a blank on the camshaft with every pose of the turret's rollers over a turn subtracted in the camshaft's frame, straight over the dwell and twisted over the index (D8). The index-angle and station controls are not offered (the rib is built at build time)."
+      },
+      "principle": [
+        {
+          "body": "camshaft"
+        },
+        {
+          "body": "turret"
+        },
+        {
+          "point": "R1"
+        },
+        {
+          "point": "R2"
+        }
+      ],
+      "traces": [
+        {
+          "id": "roller",
+          "point": "R1",
+          "ticks": {
+            "every": 10
+          },
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "cam-axis",
+          "kind": "axis-line",
+          "at": "A",
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "length": 80,
+          "label": "CAMSHAFT AXIS"
+        },
+        {
+          "id": "turret-axis",
+          "kind": "axis-line",
+          "at": "B",
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "length": 50,
+          "label": "TURRET AXIS"
+        },
+        {
+          "id": "centre-distance",
+          "kind": "dimension",
+          "from": "A",
+          "to": "B",
+          "label": "CENTRE DISTANCE"
+        }
+      ],
+      "view": "ISOMETRIC",
+      "views": [
+        {
+          "id": "rib",
+          "kind": "detail",
+          "center": [
+            0,
+            -60,
+            80
+          ],
+          "scale": 2.5,
+          "highlight": [
+            "camshaft",
+            "R1",
+            "R2"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "camshaft",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "turret-angle",
+          "label": "TURRET ANGLE"
+        },
+        {
+          "x": "input",
+          "y": "turret-speed",
+          "label": "TURRET SPEED / CAMSHAFT SPEED"
+        }
+      ],
+      "claims": [
+        {
+          "text": "45° per index (8 stops)",
+          "output": "turret-angle",
+          "stat": "range",
+          "value": 45,
+          "tol": 0.05
+        },
+        {
+          "text": "index in 120° of camshaft, dwell 240°",
+          "output": "turret-angle",
+          "stat": "dwell",
+          "value": 240,
+          "tol": 1,
+          "band": 1e-9
+        },
+        {
+          "text": "peak turret speed 0.66 times the camshaft's",
+          "output": "turret-speed",
+          "stat": "max",
+          "value": 0.66,
+          "tol": 0.01
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "build.notes": "Camshaft axis horizontal, turret axis vertical, perpendicular and skew at the centre distance. Two adjacent rollers straddle the rib in dwell; during index one roller leaves while the next enters. The rollers turn on their studs (passive, not modelled).",
+      "topology.notes": "ground, globoidal cam shaft, turret with radial rollers; two rollers in contact with the rib at all times (preloaded), so the pair is overconstrained on purpose: counted mobility 0, the two contacts hold one motion"
+    }
+  }
+}

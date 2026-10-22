@@ -3,17 +3,19 @@
 // hover. Only the last few cards keep a live session; older ones are freed. Reduced motion, or a browser without
 // WebGL2, keeps the images still.
 import { hasWebGL2 } from "../gl";
-import { url } from "../url";
-type Engine = typeof import("./engine");
+import { fetchAll, load3 } from "./load3";
+type Engine = typeof import("./engine3");
 
 let engine: Promise<Engine> | null = null;
-const load = () => (engine ??= import("./engine"));
+const load = () => (engine ??= import("./engine3"));
 // the phase of the pre-rendered thumbnail (tools/thumbs.ts, THUMB.u): every hover starts from it, so the swap never jumps
 const START_U = 1.1;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 interface Live {
-  sess: import("./engine").Session;
+  /** Draws the card's frame at phase u. */
+  draw(u: number): void;
+  dispose(): void;
   raf: number;
   u: number;
   t: number;
@@ -32,7 +34,7 @@ function keep(thumb: HTMLElement, L: Live) {
   for (const [t, old] of live) {
     if (live.size <= KEEP) break;
     if (old.running) continue;
-    old.sess.dispose();
+    old.dispose();
     live.delete(t);
   }
 }
@@ -49,11 +51,13 @@ async function start(card: HTMLAnchorElement) {
   // one session per card, however many enters arrive while it loads
   let made = making.get(thumb);
   if (!live.has(thumb) && !made) {
-    made = (async () => {
-      const [model, pkg] = await Promise.all([E.models[id]!(), E.loadPackage(url(`/packages/${id}.mxp`))]);
+    made = (async (): Promise<Live> => {
       const r = thumb.getBoundingClientRect();
-      const sess = E.createSession(canvas, pkg, model, { factory: E.browserFactory, w: r.width, h: r.height, dpr: E.pixelRatio() });
-      return { sess, raf: 0, u: START_U, t: performance.now(), running: false };
+      // the record's own view, no sheet (SD16), as its committed thumbnail is
+      const L = await load3(E, id, fetchAll(id), card.querySelector("h2")?.textContent ?? id, "");
+      const sess = E.createSession3(canvas, L.scene, { factory: E.browserFactory, w: r.width, h: r.height, dpr: E.pixelRatio() });
+      const view = () => E.recordDrawView(L.scene, { card: true, sheet: false, dims: false, theme: E.pageTheme() });
+      return { draw: (u) => sess.draw(u, view()), dispose: () => sess.dispose(), raf: 0, u: START_U, t: performance.now(), running: false };
     })();
     making.set(thumb, made);
   }
@@ -71,7 +75,7 @@ async function start(card: HTMLAnchorElement) {
   const frame = (now: number) => {
     it.u += ((now - it.t) / 1000) * (Math.PI / 3);
     it.t = now;
-    it.sess.draw(it.u, { ...E.cardView(), theme: E.pageTheme() });
+    it.draw(it.u);
     it.raf = requestAnimationFrame(frame);
   };
   cancelAnimationFrame(it.raf);

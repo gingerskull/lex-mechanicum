@@ -1,8 +1,11 @@
-// Search and facets on the library (SS3): any chip of a facet matches (or), every facet must match (and), and the
-// search matches name, other names, summary, tags and keywords. All data is on the cards; nothing is fetched. The
-// filters and search live in the page's URL as they change, and the state is kept for the tab when the page is left,
-// so a mechanism page's "Back to library" brings the library back as it was and its Previous and Next follow what it shows.
+// Search, facets and order on the library (SS3): any chip of a facet matches (or), every facet must match (and), the
+// search matches name, other names, summary, tags and keywords, and the cards are sorted in the order picked from the
+// Sort menu, which stays as filters change. All data is on the cards; nothing is fetched. The filters, search and order
+// live in the page's URL as they change, and the state is kept for the tab when the page is left, so a mechanism page's
+// "Back to library" brings the library back as it was and its Previous and Next follow what it shows.
 import { readLibrary, saveLibrary, takeReturn } from "../library";
+import { DEFAULT_ORDER, orderFrom, sortBy, type Order, type Sortable } from "../sort";
+import { sortMenu } from "./sortmenu";
 
 const cards = [...document.querySelectorAll<HTMLAnchorElement>(".card")];
 const q = document.getElementById("q") as HTMLInputElement | null;
@@ -15,6 +18,32 @@ const clear = document.getElementById("clear");
 const fclear = document.getElementById("fclear") as HTMLButtonElement | null;
 const empty = document.getElementById("empty");
 const chips = [...document.querySelectorAll<HTMLButtonElement>("#facets .chip")];
+const grid = document.getElementById("grid");
+const main = document.getElementById("library");
+const libbar = document.getElementById("libbar");
+
+// what the orders read from each card; the page comes in the default order
+const keys = new Map<HTMLElement, Sortable>(
+  cards.map((c) => [c, { no: Number(c.dataset.no), name: c.querySelector("h2")?.textContent ?? "", added: c.dataset.added, origin: c.dataset.origin ? Number(c.dataset.origin) : undefined }]),
+);
+let order: Order = DEFAULT_ORDER;
+let sorted = cards;
+// a new order starts from the top of the list: a page scrolled further down goes back to it
+const menu = sortMenu((next) => {
+  arrange(next);
+  apply();
+  if (!main) return;
+  const top = main.getBoundingClientRect().top + scrollY - (libbar?.offsetHeight ?? 0);
+  if (scrollY > top) scrollTo({ top });
+});
+
+/** Puts the cards in `next` order; the empty note stays after them. */
+function arrange(next: Order) {
+  order = next;
+  menu?.mark(next);
+  sorted = sortBy(cards, next, (c) => keys.get(c)!);
+  for (const c of sorted) grid?.insertBefore(c, empty);
+}
 
 function apply() {
   const on = chips.filter((c) => c.getAttribute("aria-pressed") === "true");
@@ -42,10 +71,11 @@ function apply() {
   if (fclear) fclear.disabled = on.length === 0 && words.length === 0;
   if (empty) empty.hidden = n > 0;
   if (qclear) qclear.hidden = !q?.value;
-  // the URL says what is shown: ?<facet>=<value>... and ?q=<words>
+  // the URL says what is shown: ?<facet>=<value>..., ?q=<words> and ?sort=<order> (not the default)
   const p = new URLSearchParams();
   for (const c of on) p.append(c.dataset.f!, c.dataset.v!);
   if (q?.value.trim()) p.set("q", q.value.trim());
+  if (order !== DEFAULT_ORDER) p.set("sort", order);
   const search = p.toString() ? `?${p.toString()}` : "";
   if (search !== location.search) history.replaceState(history.state, "", location.pathname + search + location.hash);
 }
@@ -78,19 +108,21 @@ q?.addEventListener("keydown", (e) => {
 });
 
 // once the bar sticks (the header above it has scrolled away), it carries the set's name and count
-const libbar = document.getElementById("libbar");
 const header = document.querySelector("header.top");
 if (libbar && header)
   new IntersectionObserver(([e]) => libbar.classList.toggle("stuck", !e?.isIntersecting), { rootMargin: "-1px 0px 0px 0px" }).observe(header);
+// clearing the filters also returns the order to the default
 const clearAll = () => {
   for (const c of chips) c.setAttribute("aria-pressed", "false");
   if (q) q.value = "";
+  if (order !== DEFAULT_ORDER) arrange(DEFAULT_ORDER);
   apply();
 };
 clear?.addEventListener("click", clearAll);
 fclear?.addEventListener("click", clearAll);
 
-// a link from a mechanism page's tags: ?<facet>=<value> presses that chip and opens the panel, ?q=<words> searches
+// a link from a mechanism page's tags: ?<facet>=<value> presses that chip and opens the panel, ?q=<words> searches;
+// a shared link's ?sort=<order> sorts the cards (an order the library does not offer leaves the default)
 const params = new URLSearchParams(location.search);
 let pressed = false;
 for (const c of chips)
@@ -103,13 +135,15 @@ if (pressed && toggle && panel) {
   panel.hidden = false;
 }
 if (q && params.has("q")) q.value = params.get("q")!;
-if (pressed || params.has("q")) apply();
+const asked = orderFrom(params.get("sort"), menu?.offered ?? []);
+if (asked !== DEFAULT_ORDER) arrange(asked);
+if (pressed || params.has("q") || params.has("sort")) apply();
 
 // leaving the page keeps its state for the way back; arriving by "Back to library" from a mechanism page shows that
 // mechanism's card (or, if the filters hide it, the place the library was left)
 addEventListener("pagehide", () => {
-  const list = cards.filter((c) => !c.hidden).map((c) => ({ id: c.dataset.id!, name: c.querySelector("h2")?.textContent ?? c.dataset.id! }));
-  saveLibrary({ href: location.pathname + location.search, y: scrollY, list, filtered: list.length < cards.length });
+  const list = sorted.filter((c) => !c.hidden).map((c) => ({ id: c.dataset.id!, name: c.querySelector("h2")?.textContent ?? c.dataset.id! }));
+  saveLibrary({ href: location.pathname + location.search, y: scrollY, list, custom: list.length < cards.length || order !== "sheet" });
 });
 const from = takeReturn();
 if (from) {

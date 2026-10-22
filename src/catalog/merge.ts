@@ -1,4 +1,4 @@
-import { WAIVABLE, type CatalogRecord, type Waivable } from "./schema";
+import { WAIVABLE, type CatalogRecord, type Origin, type Waivable } from "./schema";
 
 export interface SourceFile {
   name: string;
@@ -6,7 +6,8 @@ export interface SourceFile {
 }
 
 const BATCH = /^b\d+\.json$/;
-const PATCH = /^(gap|rw).*\.json$/;
+const PATCH = /^(gap|rw|v3|origin).*\.json$/;
+const V3_PATCH = /^v3.*\.json$/;
 const PATCH_KEYS = ["media", "references", "real_world"] as const;
 
 const byName = (a: SourceFile, b: SourceFile) => a.name.localeCompare(b.name, "en", { numeric: true });
@@ -14,10 +15,25 @@ const isObject = (x: unknown): x is Record<string, unknown> => typeof x === "obj
 
 /**
  * Merges the catalogue sources into one record list. Batch files (`b*.json`, arrays of records) are concatenated in
- * name order; patch files (`gap*.json`, `rw*.json`, objects keyed by id) add `media`, `references` and `real_world`
- * entries whose URL the record does not have yet, and may `waive` minimum counts research could not meet. `related` keeps known ids only and `motion.label` is derived.
+ * name order; patch files (`gap*.json`, `rw*.json`, `origin*.json`, objects keyed by id) add `media`, `references` and
+ * `real_world` entries whose URL the record does not have yet, may `waive` minimum counts research could not meet, and
+ * set the `origin` date. `related` keeps known ids only and `motion.label` is derived.
  * Problems are reported, never thrown. Shapes inside records are checked by `validate`.
  */
+/** Replaces an existing value at a dotted path (`explain.motion`, `motion.axes`); false when the path is missing. */
+function setPath(root: object, path: string, value: unknown): boolean {
+  const keys = path.split(".");
+  let cur: unknown = root;
+  for (const k of keys.slice(0, -1)) {
+    if (!isObject(cur) || !(k in cur)) return false;
+    cur = cur[k];
+  }
+  const last = keys[keys.length - 1]!;
+  if (!isObject(cur) || !(last in cur)) return false;
+  cur[last] = value;
+  return true;
+}
+
 export function mergeSources(files: SourceFile[]): { records: CatalogRecord[]; problems: string[] } {
   const problems: string[] = [];
   const records: CatalogRecord[] = [];
@@ -46,6 +62,13 @@ export function mergeSources(files: SourceFile[]): { records: CatalogRecord[]; p
         problems.push(`${f.name}: patch for ${id} is not an object`);
         continue;
       }
+      if (V3_PATCH.test(f.name)) {
+        for (const key of ["kin", "teaching"] as const) if (patch[key] !== undefined) (r as unknown as Record<string, unknown>)[key] = patch[key];
+        const edits = patch.edit;
+        if (edits !== undefined && !isObject(edits)) problems.push(`${f.name}: ${id}.edit is not an object of dotted paths`);
+        else for (const [path, value] of Object.entries(edits ?? {})) if (!setPath(r, path, value)) problems.push(`${f.name}: ${id}.edit path ${path} does not exist`);
+        continue;
+      }
       for (const key of PATCH_KEYS) {
         const add = patch[key];
         if (add === undefined) continue;
@@ -56,6 +79,7 @@ export function mergeSources(files: SourceFile[]): { records: CatalogRecord[]; p
         const list = (r[key] ??= []) as { url: string }[];
         for (const x of add as { url: string }[]) if (!list.some((y) => y.url === x.url)) list.push(x);
       }
+      if (patch.origin !== undefined) r.origin = patch.origin as Origin;
       if (patch.waive !== undefined) {
         const waive = Array.isArray(patch.waive) ? (patch.waive as unknown[]) : [patch.waive];
         for (const w of waive) {

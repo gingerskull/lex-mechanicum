@@ -1,0 +1,94 @@
+---
+// The stage of a mechanism (SS5): the transport (play, scrub, speed), then the camera (the
+// named views, the record's own, orbit and tilt), the section and detail views the record declares, explode, the detail
+// dial, and the record's own controls (T14): a slider for each parameter, a choice for each selector or design choice.
+import type { StageControl } from "../data";
+interface Props {
+  id: string;
+  no: string;
+  title: string;
+  controls: StageControl[];
+  views: { id: string; kind: "section" | "detail" }[];
+  timeMap: boolean;
+}
+const { id, no, title, controls, views, timeMap } = Astro.props;
+const overlays = [
+  ["paths", "Paths", true],
+  ["construction", "Construction", true],
+  ["velocity", "Velocity", false],
+  ["forces", "Forces", false],
+  ["angles", "Angles", false],
+] as const;
+const presets = [
+  ["PLAN", "Plan"],
+  ["FRONT", "Front"],
+  ["SIDE", "Side"],
+  ["ISOMETRIC", "Iso"],
+  ["DIMETRIC", "Dim"],
+] as const;
+---
+<div class="stagebox" data-id={id} data-no={no} data-title={title} data-engine="v3" data-timemap={timeMap ? "1" : undefined}>
+  <div class="stage"><canvas id="stage" role="img" aria-label={`${title}, live drawing`}></canvas></div>
+  <div class="controls">
+    <button class="play" id="play" type="button" aria-pressed="true" aria-label="Pause">
+      <svg viewBox="0 0 12 12" aria-hidden="true"><path id="playicon" d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor"></path></svg>
+    </button>
+    <label class="scrub"><span class="lbl">Cycle</span><input id="scrub" type="range" min="0" max="360" step="1" value="63" /><output id="scrubv">63°</output></label>
+    <div class="seg" role="group" aria-label="Speed" id="speed">
+      <button type="button" data-v="0.5" aria-pressed="false">½×</button><button type="button" data-v="1" aria-pressed="true">1×</button><button type="button" data-v="2" aria-pressed="false">2×</button>
+    </div>
+    <div class="views" role="group" aria-label="View">
+      <button class="btn" id="wide" type="button" aria-pressed="false" title="Wide: the drawing across the page, the panels below it">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8"></rect></svg>Wide
+      </button>
+      <button class="btn sq" id="full" type="button" aria-pressed="false" aria-label="Full screen" title="Full screen">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path id="fullicon" d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"></path></svg>
+      </button>
+    </div>
+  </div>
+  <div class="controls vx">
+    <div class="seg" role="group" aria-label="Named views" id="presets">
+      {presets.map(([k, label]) => <button type="button" data-view={k} aria-pressed="false">{label}</button>)}
+    </div>
+    <button class="btn" id="record-view" type="button" aria-pressed="false" title="The view the drawing opens in; also clears a section or detail">Reset view</button>
+    {views.length > 0 && (
+      <div class="seg" role="group" aria-label="Section and detail views" id="vviews">
+        {views.map((v) => <button type="button" data-rview={v.id} data-kind={v.kind} aria-pressed="false">{v.kind === "section" ? "Section" : "Detail"} {v.id}</button>)}
+      </div>
+    )}
+    <button class="btn" id="orbit" type="button" aria-pressed="false" title="Touch: drag the drawing to orbit it (the page does not scroll while it is on)">Orbit</button>
+  </div>
+  <div class="controls">
+    <label class="sl tilt"><span class="lbl">Tilt</span><input id="tilt" type="range" min="0" max="90" step="1" value="0" /><output id="tiltv">Plan</output></label>
+    <label class="sl explode"><span class="lbl">Explode</span><input id="explode" type="range" min="0" max="100" step="1" value="0" /><output id="explodev">0%</output></label>
+    <div class="dial">
+      <button class="btn" id="auto" type="button" aria-pressed="true" title="Drop detail on its own when the drawing is slow">Auto</button>
+      <label class="sl"><span class="lbl">Detail</span><input id="detail" type="range" min="0" max="7" step="1" value="7" /><output id="detailv">Full</output></label>
+    </div>
+  </div>
+  {controls.length > 0 && (
+    <div class="controls vc" role="group" aria-label="Mechanism controls">
+      {controls.map((c) =>
+        c.type === "range" ? (
+          <label class="sl rc" title={c.title}><span class="lbl">{c.label}</span><input type="range" data-ctl={c.id} data-target={c.target} data-key={c.key} min={c.min} max={c.max} step={c.step} value={c.value} /><output data-for={c.id} data-unit={c.unit ?? ""}>{c.value}{c.unit ? ` ${c.unit}` : ""}</output></label>
+        ) : (
+          <div class="rc choice" role="group" aria-label={c.label}>
+            <span class="lbl">{c.label}</span>
+            <div class="seg" data-ctl={c.id} data-target={c.target} data-key={c.key}>
+              {c.options!.map((o) => <button type="button" data-v={o.value} aria-pressed={o.value === c.value ? "true" : "false"}>{o.label}</button>)}
+            </div>
+          </div>
+        ),
+      )}
+    </div>
+  )}
+  <div class="ovl" role="group" aria-label="Overlays">
+    {overlays.map(([k, label, on]) => (
+      <button class="chip" type="button" data-o={k} aria-pressed={on ? "true" : "false"}><i></i>{label}</button>
+    ))}
+  </div>
+  <p class="stagenote" id="stage-err" hidden></p>
+</div>
+<script>
+  import "../islands/stage3";
+</script>

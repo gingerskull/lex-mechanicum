@@ -2,9 +2,11 @@
 // says, per mechanism, which standard it was audited at and which HAND changes came since. A mechanism behind a HAND
 // change fails until its audit is redone or the change is deferred in the sheet with a reason
 // (`defer: K7, V5 · <reason>`, or a standard version to defer all its HAND changes). AUTO and STYLE changes never
-// need a re-audit. A mechanism without an audit sheet yet is reported as not audited, not failed.
-import { mechanisms } from "../mechanisms";
+// need a re-audit. A mechanism without an audit sheet yet is reported as not audited, not failed. Every sheet must
+// carry the `teaching:` line (S2, T2).
+import { allIds } from "../mechanisms";
 import {
+  TEACHING_VERDICTS,
   changelog,
   compareVersions,
   parseHeader,
@@ -15,7 +17,7 @@ import {
   tableRows,
 } from "./sheet";
 
-export type Status = "current" | "deferred" | "behind" | "not audited" | "no header";
+export type Status = "current" | "deferred" | "behind" | "not audited" | "no header" | "no teaching";
 
 export interface MechanismConformance {
   id: string;
@@ -78,9 +80,11 @@ export function evaluate(standard: string, audits: Record<string, string | null>
     const uniq = (xs: string[]) => [...new Set(xs)];
     const deferred = uniq(hand.filter(deferredBy).map((x) => x.id));
     const behind = uniq(hand.filter((x) => !deferredBy(x)).map((x) => x.id));
+    // S2: a sheet records the teaching review's verdict
+    const noTeaching = !(TEACHING_VERDICTS as readonly string[]).includes(h.teaching);
     out.push({
       ...base,
-      status: behind.length ? "behind" : deferred.length ? "deferred" : "current",
+      status: noTeaching ? "no teaching" : behind.length ? "behind" : deferred.length ? "deferred" : "current",
       audited: h.standard,
       result: h.result,
       date: h.date,
@@ -89,17 +93,17 @@ export function evaluate(standard: string, audits: Record<string, string | null>
       behind,
     });
   }
-  return { standard: current, mechanisms: out, failing: out.filter((m) => m.status === "behind" || m.status === "no header").map((m) => m.id) };
+  return { standard: current, mechanisms: out, failing: out.filter((m) => m.status === "behind" || m.status === "no header" || m.status === "no teaching").map((m) => m.id) };
 }
 
 /** The report for every registered mechanism, from the files in the repository. */
 export function conformance(): Report {
-  return evaluate(readStandard(), Object.fromEntries(Object.keys(mechanisms).map((id) => [id, readAudit(id)])));
+  return evaluate(readStandard(), Object.fromEntries(allIds().map((id) => [id, readAudit(id)])));
 }
 
 /** The report as table lines. */
 export function formatReport(r: Report, checks: Record<string, string> = {}): string[] {
-  const head = ["mechanism", "audited", "result", "rows (pass/fail/na/?)", "HAND since", "status", ...(Object.keys(checks).length ? ["checks (K, A15, A12)"] : [])];
+  const head = ["mechanism", "audited", "result", "rows (pass/fail/na/?)", "HAND since", "status", ...(Object.keys(checks).length ? ["checks (K1, A15, A12)"] : [])];
   const body = r.mechanisms.map((m) => [
     m.id,
     m.audited ?? "-",

@@ -1,0 +1,228 @@
+// The kits built on the axial stack (A20): J1 dead axle, J2 live shaft, J10 shaft in plan (or tilted), J3 moving pin.
+// Each rule reads the sites of its kit, hands every site to the one stack builder with the members the placement
+// solver set, and records the hardware, the bores it needs and the engineering note (A16).
+import { circle } from "../../core/geom";
+import { inside } from "../../core/poly";
+import type { Solid3 } from "../../solids/types";
+import { ownParts, type BuildCtx } from "../ctx";
+import { canon, fromPlane, parallel, planeCoords, type Frame } from "../frames";
+import { type Member, titleOf } from "../lib";
+import { bossRadius } from "./core";
+import { axialStack, type StackResult, type StackSpec, type SupportKind } from "../stack";
+import { UP, type Site } from "../sites";
+import type { Rule } from "./types";
+
+const KEYED = new Set(["gear", "ringGear", "pulley", "sprocket", "cam", "disc", "rack", "shaft"]);
+
+/** The frame of a site's stack: on the axis at the origin plane of the family its bodies are stacked in. */
+export function siteFrame(ctx: BuildCtx, site: Site): Frame | null {
+  for (const b of site.bodies) {
+    const s = ctx.placement.slab.get(b);
+    if (!s) continue;
+    const fam = ctx.placement.families[s[0]]!.frame;
+    if (!parallel(fam.z, site.axis)) continue;
+    const uv = planeCoords(fam, site.at).uv;
+    return { o: fromPlane(fam, uv, 0), x: fam.x, z: fam.z };
+  }
+  // only hinge lugs on the axis (a spatial link's far knuckle): the stack stands on the site's own point
+  const lug = ctx.lugs.get(site.id)?.[0];
+  if (lug) return { o: [...site.at] as Frame["o"], x: lug.frame.x, z: canon(site.axis) };
+  return null;
+}
+
+/** The parts of a site's bodies on its axis, with the extents the placement gave them. */
+export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set<string>): Member[] {
+  const out: Member[] = [];
+  for (const b of site.bodies) {
+    const joint = site.joints.find((j) => ctx.kin.joints.find((q) => q.id === j && (q.a === b || q.b === b)));
+    const R = joint ? bossRadius(ctx, b, joint) : 8;
+    const upper = ctx.solids.find((s) => s.id === `${b}-cheek` && s.body === b);
+    const lv = ctx.levels.get(b) ?? [];
+    const parts: [Solid3 | undefined, string, boolean][] = [[ctx.parts.get(b), b, false], [ctx.twins.get(b), b, false], [upper, b, false], ...lv.map((p, k): [Solid3, string, boolean] => [p, `${b}#${k + 1}`, true])];
+    for (const [part, key, level] of parts) {
+      if (!part) continue;
+      const uv = planeCoords(part.frame, site.at).uv;
+      // a level is a member where the pin goes through it (a gear on a link's end only on that end's pin)
+      if (level && !inside(part.profile.outer, uv)) continue;
+      // a plate of a two-plate body takes part in the stacks of the pins it reaches
+      if (!level && upper && (!inside(part.profile.outer, uv) || part.profile.holes.some((h) => inside(h, uv)))) continue;
+      const slab = ctx.extent(key);
+      if (!slab || !parallel(slab.frame.z, frame.z)) continue;
+      // the twin's second half sits in its own slab
+      const w = (part.frame.o[0] - frame.o[0]) * frame.z[0] + (part.frame.o[1] - frame.o[1]) * frame.z[1] + (part.frame.o[2] - frame.o[2]) * frame.z[2];
+      const thick = part.op.op === "extrude" ? part.op.h : part.op.op === "loft" ? Math.max(...part.op.sections.map((x) => x.z)) : 6;
+      out.push({ solid: part.id, body: b, w0: w, w1: w + thick, R, keyed: keyedIds.has(b), shim: ctx.shim.get(b) ?? 0, name: part.name });
+    }
+  }
+  // hinge lugs of bodies whose plane is not square to the axis (rules/lugs)
+  for (const lug of ctx.lugs.get(site.id) ?? []) {
+    const w = (lug.frame.o[0] - frame.o[0]) * frame.z[0] + (lug.frame.o[1] - frame.o[1]) * frame.z[1] + (lug.frame.o[2] - frame.o[2]) * frame.z[2];
+    const h = lug.op.op === "extrude" ? lug.op.h : 6;
+    const sgn = lug.frame.z[0] * frame.z[0] + lug.frame.z[1] * frame.z[1] + lug.frame.z[2] * frame.z[2] < 0 ? -1 : 1;
+    const [a, b] = sgn > 0 ? [w, w + h] : [w - h, w];
+    out.push({ solid: lug.id, body: lug.body, w0: a, w1: b, R: 8, keyed: keyedIds.has(lug.body), shim: 0, name: titleOf(lug.body) });
+  }
+  return out.sort((a, c) => a.w0 - c.w0);
+}
+
+/** The bodies a live site's shaft turns (A2): the driven one, or any gear, pulley or cam on it. */
+function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
+  const out = new Set<string>();
+  if (!site.live) return out;
+  const driver = new Set(ctx.kin.drivers.map((d) => d.joint));
+  for (const j of site.joints) {
+    const kj = ctx.kin.joints.find((q) => q.id === j)!;
+    const other = kj.a === "ground" ? kj.b : kj.b === "ground" ? kj.a : null;
+    if (other && driver.has(j)) out.add(other);
+  }
+  const sheave = (b: string) => ctx.kin.joints.some((j) => j.type === "belt" && (j as unknown as Record<string, unknown>).flexible === "rope" && (j.a === b || j.b === b));
+  for (const b of site.bodies) {
+    const body = ctx.kin.bodies.find((q) => q.id === b);
+    if (sheave(b)) continue;
+    if (body && KEYED.has(String(body.shape?.type))) out.add(b);
+    if (ctx.kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === b || j.b === b))) out.add(b);
+  }
+  if (!out.size && site.bodies[0]) out.add(site.bodies[0]);
+  // one shaft turns only the bodies that turn together: the driven one (else the first) is keyed, a body that turns at
+  // another rate on the same axis (a sun-and-planet's retainer on the sun's shaft) runs free on it in bearings
+  // the body a driver turns against the ground (a driver between two moving bodies, a differential's second input, does
+  // not turn the shaft)
+  const first = [...out].find((b) => site.joints.some((j) => driver.has(j) && ctx.kin.joints.some((q) => q.id === j && (q.a === b || q.b === b) && (q.a === "ground" || q.b === "ground")))) ?? [...out][0];
+  if (first) {
+    const xa = ctx.sampled.xfs.get(first) ?? [];
+    const same = (b: string) => (ctx.sampled.xfs.get(b) ?? []).every((X, i) => X.R.every((v, k) => Math.abs(v - (xa[i]?.R[k] ?? NaN)) < 1e-6));
+    for (const b of [...out]) if (b !== first && !same(b)) out.delete(b);
+  }
+  return out;
+}
+
+/** A bore in a part, at the world point of the axis, as a clockwise hole in its profile. */
+export function cutBore(ctx: BuildCtx, solidId: string, at: readonly number[], r: number): void {
+  const part = [...ownParts(ctx), ...[...ctx.lugs.values()].flat()].find((p) => p.id === solidId);
+  if (!part) return;
+  const uv = planeCoords(part.frame, [at[0]!, at[1]!, at[2]!]).uv;
+  part.profile.holes.push(circle(r, uv[0], uv[1], Math.max(24, Math.round(r * 5))).reverse());
+}
+
+function describe(site: Site, r: StackResult, m: Member[]): string {
+  const shear: Record<SupportKind, string> = {
+    housing: "held in a housing behind the base",
+    pillow: "held in two pillow blocks on the base",
+    bridge: "held at both ends: the base and a bridge over the top",
+    stub: "held at one end only, because a part sweeps over its top",
+    hung: "hung from a bridge, because a part sweeps under it",
+  };
+  return `${titleOf(site.id)}: Ø${r.d} ${site.kit === "J3" ? "shoulder bolt" : site.live ? "live shaft" : "axle"} through ${m.length} part${m.length === 1 ? "" : "s"} (${m.map((x) => x.body).join(", ")}), ${shear[r.support]}.`;
+}
+
+/** Builds one site's stack and records everything it needs. */
+export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
+  const f0 = siteFrame(ctx, site);
+  // the record may turn a moving pin end for end (`head: "-"` on its joint): its head on the other side, where a part
+  // sweeps past the usual one (a Bennett loop's hinge)
+  const flip = !site.fixed && site.joints.some((j) => (ctx.kin.joints.find((q) => q.id === j) as { head?: string } | undefined)?.head === "-");
+  const frame = f0 && flip ? { o: f0.o, x: f0.x, z: [-f0.z[0], -f0.z[1], -f0.z[2]] as Frame["z"] } : f0;
+  if (!frame) {
+    ctx.issues.push(`site ${site.id}: no family of bodies stacked along its axis`);
+    return null;
+  }
+  const keyedIds = keyedBodies(ctx, site);
+  const members = membersOf(ctx, site, frame, keyedIds);
+  if (!members.length) return null;
+  const alongUp = parallel(frame.z, UP);
+  const base = alongUp && ctx.base ? { top: ctx.base.top - frame.o[2], bottom: ctx.base.bottom - frame.o[2] } : null;
+  const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual" || d.kind === "oscillating");
+  // a fixed pin under a grooved link (an expansion link's trunnion) stands on the base only: its axle ends in the solid
+  // lower cheek, under the groove the die runs in
+  const grooved = site.fixed && site.bodies.some((b) => ctx.geoms.get(b)?.upper);
+  // a fixed plate placed over the pin (a stationary gear, a side cover over a rotor) leaves no room above its stack:
+  // the pin is held from the base and ends flush
+  const covered = site.fixed && [...ctx.geoms.values()].some((g) => g.level && g.level.part !== "lower" && g.level.part !== "all" && inside(g.profile.outer, planeCoords(g.frame, site.at).uv));
+  const held = grooved || covered ? "base" : (ctx.placement.held.get(site.id) ?? "both");
+  const straddle = site.live && alongUp && held !== "base" && [...keyedIds].some((b) => ["gear", "pulley", "sprocket"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)));
+  const spec: StackSpec = {
+    id: site.id,
+    frame,
+    kind: !site.fixed ? "moving" : site.live ? "live" : "dead",
+    members,
+    joints: site.joints,
+    base,
+    held: site.fixed ? held : "both",
+    input: !!driver && site.joints.includes(driver.joint ?? ""),
+    axisTakenBelow: !!site.axisBelow,
+    straddle,
+    eccentric: ctx.eccentric.has(site.id),
+    ...(grooved ? { flush: true } : {}),
+    ...(site.live && ctx.kin.drivers.some((d) => d.kind === "manual" && d.joint && site.joints.includes(d.joint)) ? { hold: true } : {}),
+    // a part split in two plates round a gap (its upper plate lifted clear of the lower) is carried between them
+    ...(site.fixed && members.length === 2 && members[0]!.body === members[1]!.body && ctx.geoms.get(members[0]!.body)?.upper?.lift !== undefined ? { between: true } : {}),
+    baseTopWorld: ctx.base?.top ?? 0,
+  };
+  // a member set along the shaft by a param control (shape.slide { param, along, offset }) reaches its whole range
+  for (const m of members) {
+    const sh = ctx.geoms.get(m.body)?.shape;
+    const sl = sh?.slide as { param?: string; along?: number[] } | undefined;
+    const par = sl?.param ? ctx.kin.params?.find((q) => q.id === sl.param) : undefined;
+    if (!par || par.min === undefined || par.max === undefined) continue;
+    const k = Array.isArray(sl!.along) ? Math.sign((sl!.along[0] ?? 0) * frame.z[0] + (sl!.along[1] ?? 0) * frame.z[1] + (sl!.along[2] ?? 0) * frame.z[2]) || 1 : 1;
+    const d0 = k * (par.min - par.value);
+    const d1 = k * (par.max - par.value);
+    spec.reach = [Math.min(spec.reach?.[0] ?? Infinity, m.w0 + Math.min(d0, d1)), Math.max(spec.reach?.[1] ?? -Infinity, m.w1 + Math.max(d0, d1))];
+  }
+  // a support the record asks for on one of the site's joints (a crank held from above, past what turns under it; an
+  // Oldham coupling's output hub, whose shaft cannot come up through the input side, hangs from a bridge)
+  const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: SupportKind } | undefined)?.support).find(Boolean);
+  if (asked) spec.support = asked;
+  // both pillow blocks on one side of what the shaft carries (`side` on its joint: +1 along the axis, −1 against it)
+  const side = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { side?: number } | undefined)?.side).find((v) => v === 1 || v === -1);
+  if (side) spec.side = side as 1 | -1;
+  const r = axialStack(ctx, spec);
+  ctx.add(r.solids);
+  ctx.stacks.set(site.id, r);
+  const world = site.at;
+  for (const b of r.bores) cutBore(ctx, b.solid, [world[0], world[1], frame.o[2] + 0], b.r);
+  if (site.fixed && alongUp && (r.support === "stub" || r.support === "bridge" || r.support === "hung" || r.support === "housing")) {
+    ctx.baseHoles.push({ at: [world[0], world[1]], r: site.live ? r.d / 2 + 1.5 : r.d / 2 + 0.3, joint: site.id });
+  }
+  const shear = r.support === "stub" || r.support === "hung" ? "single" : "double";
+  const dbl = site.kit === "J3" ? (members.length >= 3 ? "double" : "single") : shear;
+  ctx.note({
+    id: site.id,
+    kit: site.kit,
+    at: site.at,
+    title: `${site.kit} · ${titleOf(site.id)}`,
+    note: describe(site, r, members),
+    badge: dbl === "double" ? ["double shear", "ok"] : ["single shear", "warn"],
+    d: r.d,
+    serves: r.serves,
+  });
+  return r;
+}
+
+const SITE_RULES: Record<string, { id: string; ids: string[]; fixture: string }> = {
+  J1: { id: "j1-dead-axle", ids: ["J1", "A4", "A11", "M8", "M9", "M11"], fixture: "four-bar" },
+  J2: { id: "j2-live-shaft", ids: ["J2", "A5", "F1", "F2", "F3", "F4"], fixture: "four-bar" },
+  J10: { id: "j10-shaft-in-plan", ids: ["J10", "A5", "F1", "F2", "F3", "F4"], fixture: "universal-joint" },
+  J3: { id: "j3-moving-pin", ids: ["J3", "A12", "M3"], fixture: "four-bar" },
+};
+
+function siteRule(kit: "J1" | "J2" | "J10" | "J3"): Rule {
+  const def = SITE_RULES[kit]!;
+  return {
+    id: def.id,
+    tier: "AUTO",
+    ids: def.ids,
+    fixture: def.fixture,
+    applies: (ctx) => ctx.sites.some((s) => s.kit === kit && !s.owner),
+    apply(ctx) {
+      for (const s of ctx.sites.filter((q) => q.kit === kit && !q.owner)) buildSite(ctx, s);
+    },
+  };
+}
+
+export const j3 = siteRule("J3");
+export const j2 = siteRule("J2");
+export const j10 = siteRule("J10");
+export const j1 = siteRule("J1");
+
+export type { Solid3 };

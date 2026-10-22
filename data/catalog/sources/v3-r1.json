@@ -1,0 +1,4874 @@
+{
+  "four-bar": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              140,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                50,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 40,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "coupler",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                120,
+                0
+              ],
+              [
+                54,
+                43
+              ]
+            ],
+            "boss": 11
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "rocker",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 80,
+            "boss": [
+              12,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O4"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "coupler",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "coupler",
+          "b": "rocker",
+          "at": [
+            136.666666666667,
+            71.1024300256718,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O4",
+          "type": "revolute",
+          "a": "ground",
+          "b": "rocker",
+          "at": [
+            100,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 40,
+          "unit": "mm",
+          "min": 20,
+          "max": 60,
+          "note": "crank length"
+        },
+        {
+          "id": "b",
+          "value": 120,
+          "unit": "mm",
+          "min": 90,
+          "max": 150,
+          "note": "coupler length A to B"
+        },
+        {
+          "id": "c",
+          "value": 80,
+          "unit": "mm",
+          "min": 60,
+          "max": 110,
+          "note": "rocker length"
+        },
+        {
+          "id": "d",
+          "value": 100,
+          "unit": "mm",
+          "min": 70,
+          "max": 130,
+          "note": "ground length O2 to O4"
+        },
+        {
+          "id": "cpx",
+          "value": 54,
+          "unit": "mm",
+          "min": 0,
+          "max": 120,
+          "note": "coupler point along AB"
+        },
+        {
+          "id": "cpy",
+          "value": 43,
+          "unit": "mm",
+          "min": -60,
+          "max": 60,
+          "note": "coupler point off the line AB"
+        }
+      ],
+      "design": [
+        {
+          "id": "branch",
+          "options": [
+            "elbow-up",
+            "elbow-down"
+          ],
+          "value": "elbow-up"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "coupler-rocker",
+          "joints": [
+            "A",
+            "B",
+            "O4"
+          ],
+          "in": {
+            "a": "A",
+            "b": "O4",
+            "ra": "b",
+            "rb": "c"
+          },
+          "branch": "elbow-up",
+          "out": "B"
+        }
+      ],
+      "points": [
+        {
+          "id": "Ap",
+          "body": "crank",
+          "local": [
+            40,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Bp",
+          "body": "rocker",
+          "local": [
+            80,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "C",
+          "body": "coupler",
+          "local": [
+            54,
+            43,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "rocker-angle",
+          "of": "rocker",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "transmission-angle",
+          "of": "B",
+          "from": "A",
+          "to": "O4",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "coupler-curve",
+          "of": "C",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-21",
+        "note": "Reads as the textbook crank-rocker: the full crank circle, the limited rocker arc and the coupler curve. Pilot (P), 2026-10-21: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The assembly-branch control is not offered, because the parts are built for the elbow-up closure and a control cannot rebuild them; the branch stays a declared design choice. The coupler point C is engraved on the coupler (trace mark)."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "coupler"
+        },
+        {
+          "body": "rocker"
+        },
+        {
+          "point": "C"
+        }
+      ],
+      "traces": [
+        {
+          "id": "coupler-point",
+          "point": "C",
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "transmission",
+          "kind": "arc",
+          "center": "B",
+          "from": "A",
+          "to": "O4",
+          "label": "TRANSMISSION ANGLE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "rocker-angle",
+        "label": "ROCKER ANGLE"
+      },
+      "claims": [
+        {
+          "text": "rocker swings 73.8°",
+          "output": "rocker-angle",
+          "stat": "range",
+          "value": 73.8,
+          "tol": 0.5
+        },
+        {
+          "text": "transmission angle runs from about 26° to 86°",
+          "output": "transmission-angle",
+          "stat": "min",
+          "value": 26,
+          "tol": 1
+        },
+        {
+          "text": "transmission angle runs from about 26° to 86°",
+          "output": "transmission-angle",
+          "stat": "max",
+          "value": 86,
+          "tol": 1
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "parallelogram-linkage": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              140,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                50,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 40,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "coupler",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "follower",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 40,
+            "boss": [
+              12,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O4"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "coupler",
+          "at": [
+            "a*cos(60)",
+            "a*sin(60)",
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "coupler",
+          "b": "follower",
+          "at": [
+            "a*cos(60)+b",
+            "a*sin(60)",
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O4",
+          "type": "revolute",
+          "a": "ground",
+          "b": "follower",
+          "at": [
+            "d",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 40,
+          "unit": "mm",
+          "min": 20,
+          "max": 60,
+          "note": "crank length, equals c"
+        },
+        {
+          "id": "b",
+          "value": 100,
+          "unit": "mm",
+          "min": 70,
+          "max": 130,
+          "note": "coupler length, equals d"
+        },
+        {
+          "id": "c",
+          "value": 40,
+          "unit": "mm",
+          "min": 20,
+          "max": 60,
+          "note": "follower length, equals a"
+        },
+        {
+          "id": "d",
+          "value": 100,
+          "unit": "mm",
+          "min": 70,
+          "max": 130,
+          "note": "ground length O2 to O4, equals b"
+        }
+      ],
+      "design": [
+        {
+          "id": "assembly",
+          "options": [
+            "parallel",
+            "crossed"
+          ],
+          "value": "parallel"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 60
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "coupler-follower",
+          "joints": [
+            "A",
+            "B",
+            "O4"
+          ],
+          "in": {
+            "a": "A",
+            "b": "O4",
+            "ra": "b",
+            "rb": "c"
+          },
+          "branch": "parallel",
+          "out": "B",
+          "opts": {
+            "keep": "parallel",
+            "rule": "B = A + (d, 0)",
+            "change-points": [
+              0,
+              180
+            ]
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "M",
+          "body": "coupler",
+          "local": [
+            50,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "follower-angle",
+          "of": "follower",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "coupler-angle",
+          "of": "coupler",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "follower",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "coupler-path",
+          "of": "M",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep) and the issue's decision: both coupler ends are traced, so two equal circles side by side show the coupler translating without turning. The parallel branch is held through the change points at 0 and 180 degrees. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The joint positions are exact (they were rounded, K1 1e-3), and the assembly control is dropped: the parts are built for the parallel closure, which is held through both change points; the assembly stays a design choice."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "coupler"
+        },
+        {
+          "body": "follower"
+        }
+      ],
+      "traces": [
+        {
+          "id": "coupler-end-A",
+          "point": "A",
+          "comet": true
+        },
+        {
+          "id": "coupler-end-B",
+          "point": "B"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "frame",
+          "kind": "line",
+          "from": "O2",
+          "to": "O4",
+          "label": "FRAME d = COUPLER b"
+        },
+        {
+          "id": "crank-a",
+          "kind": "dimension",
+          "from": "O2",
+          "to": "A",
+          "label": "a"
+        },
+        {
+          "id": "crank-c",
+          "kind": "dimension",
+          "from": "O4",
+          "to": "B",
+          "label": "c = a"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "follower-angle",
+        "label": "FOLLOWER ANGLE"
+      },
+      "claims": [
+        {
+          "text": "the coupler stays parallel to the frame",
+          "output": "coupler-angle",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        },
+        {
+          "text": "both cranks turn together at the same speed (1:1)",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.001
+        },
+        {
+          "text": "both cranks turn together at the same speed (1:1)",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.001
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "antiparallelogram": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              80,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                20,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "coupler",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 40,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "follower",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              12,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O4"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "coupler",
+          "at": [
+            50.000000000000014,
+            86.60254037844386,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "coupler",
+          "b": "follower",
+          "at": [
+            11.052631578947384,
+            95.71859726038531,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O4",
+          "type": "revolute",
+          "a": "ground",
+          "b": "follower",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 100,
+          "unit": "mm",
+          "min": 70,
+          "max": 140,
+          "note": "input crank, long, equals c"
+        },
+        {
+          "id": "b",
+          "value": 40,
+          "unit": "mm",
+          "min": 20,
+          "max": 60,
+          "note": "coupler, short, equals d"
+        },
+        {
+          "id": "c",
+          "value": 100,
+          "unit": "mm",
+          "min": 70,
+          "max": 140,
+          "note": "output crank, long, equals a"
+        },
+        {
+          "id": "d",
+          "value": 40,
+          "unit": "mm",
+          "min": 20,
+          "max": 60,
+          "note": "ground, short, equals b"
+        }
+      ],
+      "design": [
+        {
+          "id": "assembly",
+          "options": [
+            "parallel",
+            "crossed"
+          ],
+          "value": "crossed"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 60
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "coupler-follower",
+          "joints": [
+            "A",
+            "B",
+            "O4"
+          ],
+          "in": {
+            "a": "A",
+            "b": "O4",
+            "ra": "b",
+            "rb": "c"
+          },
+          "branch": "crossed",
+          "out": "B",
+          "opts": {
+            "note": "the crossed closure, held through the change points at 0 and 180 degrees by the branch table"
+          }
+        },
+        {
+          "block": "line-crossing",
+          "id": "crossing",
+          "joints": [],
+          "in": {
+            "a1": "O2",
+            "a2": "A",
+            "b1": "O4",
+            "b2": "B",
+            "sum": "a"
+          },
+          "out": "X"
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "follower-angle",
+          "of": "follower",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "follower",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "ellipse",
+          "of": "X",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: the crossing point X traces the fixed ellipse (foci O2 and O4), and the equal ellipse carried by the coupler (foci A and B) is drawn as a ghost rolling on it at X, which shows the coupler's motion as one ellipse rolling on another. The bridge over O4 must not read as a third arm (engine). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. The crossing X is a construction point made by the line-crossing block (at the change points its limit on the ellipse), so there is no tracer part and no slot in the output crank; the equal ellipse is drawn as a ghost carried by the coupler and touches the fixed one at X. The bridge over O4 is routed off the bowtie, with its posts outside both crank circles, and drawn see-through. The assembly control is dropped (parts built for the crossed closure)."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "coupler"
+        },
+        {
+          "body": "follower"
+        },
+        {
+          "point": "X"
+        }
+      ],
+      "traces": [
+        {
+          "id": "crossing-point",
+          "point": "X",
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "rolling-ellipse",
+          "kind": "workspace",
+          "point": "X",
+          "frame": "coupler",
+          "ghost": true,
+          "label": "EQUAL ELLIPSE ON THE COUPLER"
+        },
+        {
+          "id": "o2x",
+          "kind": "dimension",
+          "from": "O2",
+          "to": "X",
+          "label": "O2X"
+        },
+        {
+          "id": "o4x",
+          "kind": "dimension",
+          "from": "O4",
+          "to": "X",
+          "label": "O4X, O2X + O4X = a"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "speed-ratio",
+          "label": "OUTPUT SPEED / INPUT SPEED"
+        },
+        {
+          "x": "input",
+          "y": "follower-angle",
+          "label": "OUTPUT CRANK ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "speed ratio 0.43 to 2.33",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 0.43,
+          "tol": 0.01
+        },
+        {
+          "text": "speed ratio 0.43 to 2.33",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 2.33,
+          "tol": 0.01
+        },
+        {
+          "text": "both cranks make full turns in the same direction, 1:1 on average",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": 1,
+          "tol": 0.01
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "summary": "A crossed four-bar with opposite links equal: the two long cranks turn the same way at varying speeds, and the coupler rolls like one ellipse on another.",
+      "explain.motion": "The two long links cross like scissors. With the short link fixed, both long cranks make full turns in the same direction, one speeding up as the other slows. Their crossing point X stays on an ellipse whose foci are the fixed pivots, and an equal ellipse carried by the coupler, with foci at its pins, rolls on it at X like a pair of elliptical gears. The output speed is the input speed times O2X / O4X.",
+      "topology.notes": "two long crossed cranks, short coupler equal to the short frame; count includes ground. The kin adds a tracer at the crossing point (a slide on the input crank and a pin in the line of the output crank), which leaves the mobility at 1."
+    }
+  },
+  "double-crank": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              80,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                20,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 80,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "coupler",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "follower",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              12,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O4"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "coupler",
+          "at": [
+            80,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "coupler",
+          "b": "follower",
+          "at": [
+            36.25,
+            -89.92184106211349,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O4",
+          "type": "revolute",
+          "a": "ground",
+          "b": "follower",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 80,
+          "unit": "mm",
+          "min": 60,
+          "max": 100,
+          "note": "input crank"
+        },
+        {
+          "id": "b",
+          "value": 100,
+          "unit": "mm",
+          "min": 80,
+          "max": 130,
+          "note": "coupler"
+        },
+        {
+          "id": "c",
+          "value": 90,
+          "unit": "mm",
+          "min": 70,
+          "max": 120,
+          "note": "output crank"
+        },
+        {
+          "id": "d",
+          "value": 40,
+          "unit": "mm",
+          "min": 20,
+          "max": 50,
+          "note": "ground, the shortest link"
+        }
+      ],
+      "design": [
+        {
+          "id": "branch",
+          "options": [
+            "elbow-up",
+            "elbow-down"
+          ],
+          "value": "elbow-up"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "coupler-follower",
+          "joints": [
+            "A",
+            "B",
+            "O4"
+          ],
+          "in": {
+            "a": "A",
+            "b": "O4",
+            "ra": "b",
+            "rb": "c"
+          },
+          "branch": "elbow-up",
+          "out": "B"
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "follower-angle",
+          "of": "follower",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "speed-ratio",
+          "of": "follower",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "transmission-angle",
+          "of": "B",
+          "kind": "angle",
+          "unit": "deg",
+          "from": "A",
+          "to": "O4"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions: B is traced with equal-time ticks every 15 degrees of input, which bunch to 7.7 degrees and spread to 30.8 degrees of output turn, so the 0.51 to 2.07 speed swing shows against A's evenly ticked circle. The bridge over O4 becomes see-through or is moved (engine). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. The equal-time ticks bunch and spread on B against the even ticks on A. Both cranks sweep over the other's pivot, so one pivot must be carried from above: the bridge over O4 is drawn see-through. The transmission angle is now a three-point angle, and the joint positions are exact."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "coupler"
+        },
+        {
+          "body": "follower"
+        },
+        {
+          "point": "B"
+        }
+      ],
+      "traces": [
+        {
+          "id": "output-pin",
+          "point": "B",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "input-pin",
+          "point": "A",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "transmission",
+          "kind": "arc",
+          "center": "B",
+          "from": "A",
+          "to": "O4",
+          "label": "TRANSMISSION ANGLE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "speed-ratio",
+          "label": "OUTPUT SPEED / INPUT SPEED"
+        },
+        {
+          "x": "input",
+          "y": "follower-angle",
+          "label": "OUTPUT CRANK ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "output speed swings 0.51x to 2.07x input",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 0.51,
+          "tol": 0.01
+        },
+        {
+          "text": "output speed swings 0.51x to 2.07x input",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 2.07,
+          "tol": 0.01
+        },
+        {
+          "text": "the output crank goes round once per turn, 1:1 on average",
+          "output": "speed-ratio",
+          "stat": "mean",
+          "value": 1,
+          "tol": 0.01
+        },
+        {
+          "text": "transmission angle 24° to 78°",
+          "output": "transmission-angle",
+          "stat": "min",
+          "value": 23.56,
+          "tol": 0.5
+        },
+        {
+          "text": "transmission angle 24° to 78°",
+          "output": "transmission-angle",
+          "stat": "max",
+          "value": 78.14,
+          "tol": 0.5
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "double-rocker": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              140,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                50,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "rocker-in",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "coupler",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "rocker-out",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 80,
+            "boss": [
+              12,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O4"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "rocker-in",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "limits": [
+            11.48,
+            88.85
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "rocker-in",
+          "b": "coupler",
+          "at": [
+            64.27876096865394,
+            76.60444431189781,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "coupler",
+          "b": "rocker-out",
+          "at": [
+            124.27757556167113,
+            76.22728727199564,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O4",
+          "type": "revolute",
+          "a": "ground",
+          "b": "rocker-out",
+          "at": [
+            100,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 100,
+          "unit": "mm",
+          "min": 80,
+          "max": 120,
+          "note": "input rocker"
+        },
+        {
+          "id": "b",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 75,
+          "note": "coupler, the shortest link"
+        },
+        {
+          "id": "c",
+          "value": 80,
+          "unit": "mm",
+          "min": 60,
+          "max": 100,
+          "note": "output rocker"
+        },
+        {
+          "id": "d",
+          "value": 100,
+          "unit": "mm",
+          "min": 80,
+          "max": 120,
+          "note": "ground"
+        }
+      ],
+      "design": [
+        {
+          "id": "branch",
+          "options": [
+            "elbow-up",
+            "elbow-down"
+          ],
+          "value": "elbow-up"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "oscillating",
+          "range": [
+            12,
+            88.5
+          ],
+          "lo": 24.15,
+          "hi": 87,
+          "default": 50
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "coupler-rocker",
+          "joints": [
+            "A",
+            "B",
+            "O4"
+          ],
+          "in": {
+            "a": "A",
+            "b": "O4",
+            "ra": "b",
+            "rb": "c"
+          },
+          "branch": "elbow-up",
+          "out": "B"
+        }
+      ],
+      "points": [
+        {
+          "id": "X4",
+          "body": "ground",
+          "local": [
+            200,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "input-angle",
+          "of": "input",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "output-angle",
+          "of": "O4",
+          "kind": "angle",
+          "unit": "deg",
+          "from": "X4",
+          "to": "B"
+        },
+        {
+          "id": "transmission-angle",
+          "of": "B",
+          "kind": "angle",
+          "unit": "deg",
+          "from": "A",
+          "to": "O4"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and the issue's decisions. Re-proportioned to a 100, b 60, c 80, d 100 and driven from the output's toggle (24.2 degrees, coupler in line with the input rocker) to 1.9 degrees inside the input's toggle (88.9 degrees, coupler in line with the output rocker): both rockers now move one way per stroke and the output's extremes fall at the ends of the input stroke, with no double wobble. Both toggles are marked; B is traced. The old text's 146.2 degrees was never reached (the old output peaked at 136.3 degrees). R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. Both rockers move one way per stroke; the two toggles are drawn at their poses. Joint positions exact; the input and output angles are read as absolute angles (the input from its driver, the output from the line O4 to B)."
+      },
+      "principle": [
+        {
+          "body": "rocker-in"
+        },
+        {
+          "body": "coupler"
+        },
+        {
+          "body": "rocker-out"
+        },
+        {
+          "point": "B"
+        }
+      ],
+      "traces": [
+        {
+          "id": "output-pin",
+          "point": "B",
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "input-toggle",
+          "kind": "line",
+          "from": "O4",
+          "to": "A",
+          "pose": {
+            "driver": "input",
+            "value": 88.85
+          },
+          "label": "INPUT TOGGLE: COUPLER IN LINE WITH OUTPUT ROCKER"
+        },
+        {
+          "id": "output-toggle",
+          "kind": "line",
+          "from": "O2",
+          "to": "B",
+          "pose": {
+            "driver": "input",
+            "value": 24.15
+          },
+          "label": "OUTPUT TOGGLE: COUPLER IN LINE WITH INPUT ROCKER"
+        },
+        {
+          "id": "transmission",
+          "kind": "arc",
+          "center": "B",
+          "from": "A",
+          "to": "O4",
+          "label": "TRANSMISSION ANGLE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "output-angle",
+        "label": "OUTPUT ROCKER ANGLE"
+      },
+      "claims": [
+        {
+          "text": "the input swings 62.9° one way, from 24.2° to 87°, 1.9° inside the input toggle at 88.9°",
+          "output": "input-angle",
+          "stat": "range",
+          "value": 62.85,
+          "tol": 0.1
+        },
+        {
+          "text": "the input swings 62.9° one way, from 24.2° to 87°, 1.9° inside the input toggle at 88.9°",
+          "output": "input-angle",
+          "stat": "min",
+          "value": 24.15,
+          "tol": 0.1
+        },
+        {
+          "text": "the input swings 62.9° one way, from 24.2° to 87°, 1.9° inside the input toggle at 88.9°",
+          "output": "input-angle",
+          "stat": "max",
+          "value": 87,
+          "tol": 0.1
+        },
+        {
+          "text": "the output swings 69.6° one way, from 54.9° to 124.5°",
+          "output": "output-angle",
+          "stat": "range",
+          "value": 69.55,
+          "tol": 0.2
+        },
+        {
+          "text": "the output swings 69.6° one way, from 54.9° to 124.5°",
+          "output": "output-angle",
+          "stat": "min",
+          "value": 54.9,
+          "tol": 0.2
+        },
+        {
+          "text": "the output swings 69.6° one way, from 54.9° to 124.5°",
+          "output": "output-angle",
+          "stat": "max",
+          "value": 124.45,
+          "tol": 0.2
+        },
+        {
+          "text": "the transmission angle reaches 159°",
+          "output": "transmission-angle",
+          "stat": "max",
+          "value": 158.85,
+          "tol": 0.5
+        },
+        {
+          "text": "the transmission angle falls to 31° at the output toggle",
+          "output": "transmission-angle",
+          "stat": "min",
+          "value": 30.76,
+          "tol": 0.5
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "Both links pinned to the frame can only swing over limited arcs. The coupler is the shortest link and can turn fully relative to them, so each rocker stops at a toggle where the coupler lines up with the other one. Here the input is driven from 24.2° to 87°, a swing of 62.9°: at 24.2° the coupler is in line with the input rocker and the output stops at 54.9°, and at 87° the input is 1.9° short of its own toggle at 88.9°, where the coupler lines up with the output rocker. Between these ends both rockers move one way, and the output swings 69.6°, from 54.9° to 124.5°.",
+      "explain.forces": "The coupler carries push or pull only. Near the input's toggle the coupler comes into line with the output rocker: the transmission angle reaches 159° and the input cannot drive past 88.9°. At the output toggle the coupler is in line with the input rocker, the transmission angle falls to 31°, and a load on the output cannot turn the input back.",
+      "ratio.typical": "input swing 62.9° (24.2° to 87°) gives output swing 69.6° (54.9° to 124.5°) with defaults",
+      "build.defining_relations": "Grashof s + l <= p + q (60 + 100 = 160 <= 180) with the shortest link as coupler gives a Grashof double rocker. Input toggles where |O4A| = c ± b (11.5° and 88.9°); output toggle where |O2B| = a + b (output 54.9° at input 24.2°). B = circle(A, b) ∩ circle(O4, c).",
+      "build.range": "input rocker driven 24.2° to 87° (62.9°), from the output toggle to 1.9° inside the input toggle at 88.9°; output rocker 54.9° to 124.5° (69.6°), one way per input stroke",
+      "build.notes": "Drive the input from the output toggle (24.2°, coupler in line with the input rocker) to just inside the input toggle (88.9°, coupler in line with the output rocker). Between these two toggles both rockers move one way, so the output's extremes fall at the ends of the input stroke. Driven over the whole range between the input toggles (11.5° to 88.9°) the output would reverse partway through. Stay on one branch."
+    }
+  },
+  "bell-crank": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              240,
+              220
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                -50,
+                30,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "lever",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                60,
+                0
+              ],
+              [
+                0,
+                40
+              ]
+            ],
+            "boss": 12
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "rod-in",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 120,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "S"
+          }
+        },
+        {
+          "id": "rod-out",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "B"
+          }
+        },
+        {
+          "id": "carriage",
+          "role": "driver",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 28
+          },
+          "at": {
+            "joint": "S"
+          }
+        },
+        {
+          "id": "slide-out",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 28
+          },
+          "at": {
+            "joint": "G"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "lever",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "limits": [
+            -20,
+            20
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "lever",
+          "b": "rod-in",
+          "at": [
+            0,
+            -60,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "lever",
+          "b": "rod-out",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "S",
+          "type": "revolute",
+          "a": "rod-in",
+          "b": "carriage",
+          "at": [
+            -120,
+            -60,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "G",
+          "type": "revolute",
+          "a": "rod-out",
+          "b": "slide-out",
+          "at": [
+            40,
+            100,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "S-slide",
+          "type": "prismatic",
+          "a": "ground",
+          "b": "carriage",
+          "at": [
+            -120,
+            -60,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            -140.47,
+            -99.42
+          ]
+        },
+        {
+          "id": "G-slide",
+          "type": "prismatic",
+          "a": "ground",
+          "b": "slide-out",
+          "at": [
+            40,
+            100,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "limits": [
+            86.29,
+            113.65
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r1",
+          "value": 60,
+          "unit": "mm",
+          "min": 40,
+          "max": 80,
+          "note": "input arm OA"
+        },
+        {
+          "id": "r2",
+          "value": 40,
+          "unit": "mm",
+          "min": 25,
+          "max": 60,
+          "note": "output arm OB"
+        },
+        {
+          "id": "alpha",
+          "value": 90,
+          "unit": "deg",
+          "min": 60,
+          "max": 120,
+          "note": "angle between the arms"
+        },
+        {
+          "id": "Lin",
+          "value": 120,
+          "unit": "mm",
+          "min": 90,
+          "max": 160,
+          "note": "input rod S to A"
+        },
+        {
+          "id": "Lout",
+          "value": 100,
+          "unit": "mm",
+          "min": 80,
+          "max": 140,
+          "note": "output rod B to G"
+        }
+      ],
+      "design": [
+        {
+          "id": "branch",
+          "options": [
+            "elbow-up",
+            "elbow-down"
+          ],
+          "value": "elbow-up"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "S-slide",
+          "kind": "linear",
+          "range": [
+            -140.47,
+            -99.42
+          ],
+          "default": -120
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "lever-loop",
+          "joints": [
+            "O",
+            "A",
+            "S"
+          ],
+          "in": {
+            "a": "O",
+            "b": "S",
+            "ra": "r1",
+            "rb": "Lin"
+          },
+          "branch": "elbow-up",
+          "out": "A"
+        },
+        {
+          "block": "dyad",
+          "id": "lever-arm",
+          "joints": [
+            "B"
+          ],
+          "in": {
+            "a": "O",
+            "b": "A",
+            "ra": "r2",
+            "rb": "sqrt(r1^2+r2^2-2*r1*r2*cos(alpha))"
+          },
+          "branch": "elbow-up",
+          "out": "B"
+        },
+        {
+          "block": "slider-dyad",
+          "id": "output-rod",
+          "joints": [
+            "G",
+            "G-slide"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "B",
+            "r": "Lout",
+            "p": [
+              40,
+              100,
+              0
+            ],
+            "d": [
+              0,
+              1,
+              0
+            ]
+          },
+          "branch": "elbow-up",
+          "out": "G"
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "lever-angle",
+          "of": "lever",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "input-position",
+          "of": "carriage",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "output-position",
+          "of": "slide-out",
+          "kind": "position",
+          "unit": "mm"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep) and the issue's decision: the two moment arms are drawn as dimensions perpendicular to each rod's line of action, so the arm ratio 60 : 40 reads as the force ratio 1.5 and the travel ratio 0.67. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The moment arms are drawn square to each rod's line. The record had the lever outline in the wrong frame (its x runs toward A) and asked the output slide for B before any block made it: B now comes from a second dyad on the lever's rigid triangle, and the displacement ratio is a slope of output against input (0.667)."
+      },
+      "principle": [
+        {
+          "body": "lever"
+        },
+        {
+          "body": "rod-in"
+        },
+        {
+          "body": "rod-out"
+        },
+        {
+          "point": "A"
+        },
+        {
+          "point": "B"
+        }
+      ],
+      "traces": [
+        {
+          "id": "output-arm-end",
+          "point": "B",
+          "comet": true
+        },
+        {
+          "id": "input-arm-end",
+          "point": "A"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "arm-in",
+          "kind": "dimension",
+          "from": "O",
+          "line": [
+            "S",
+            "A"
+          ],
+          "label": "INPUT MOMENT ARM"
+        },
+        {
+          "id": "arm-out",
+          "kind": "dimension",
+          "from": "O",
+          "line": [
+            "B",
+            "G"
+          ],
+          "label": "OUTPUT MOMENT ARM"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "input",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "output-position",
+        "label": "OUTPUT ROD POSITION"
+      },
+      "claims": [
+        {
+          "text": "the lever oscillates ±20°",
+          "output": "lever-angle",
+          "stat": "range",
+          "value": 40,
+          "tol": 0.1
+        },
+        {
+          "text": "input rod moves about 41 mm",
+          "output": "input-position",
+          "stat": "range",
+          "value": 41.04,
+          "tol": 0.1
+        },
+        {
+          "text": "output rod moves about 27 mm",
+          "output": "output-position",
+          "stat": "range",
+          "value": 27.36,
+          "tol": 0.1
+        },
+        {
+          "text": "output motion = input motion x r2 / r1 = 0.67 for small swings",
+          "output": "output-position",
+          "stat": "ratio",
+          "value": 0.667,
+          "tol": 0.005
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.links": 6,
+      "topology.revolute": 5,
+      "topology.prismatic": 2,
+      "topology.notes": "ground, bell crank, input rod, output rod, input carriage and output slider, each slider on its own guide; count includes ground"
+    }
+  },
+  "five-bar": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              110,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                25,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank-left",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "crank-right",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "distal-left",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 80,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "distal-right",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 80,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "B"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank-left",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank-right",
+          "at": [
+            50,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank-left",
+          "b": "distal-left",
+          "at": [
+            -22.27881362378541,
+            55.71045201321412,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "crank-right",
+          "b": "distal-right",
+          "at": [
+            102.27833864382097,
+            29.444444444444443,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "P",
+          "type": "revolute",
+          "a": "distal-left",
+          "b": "distal-right",
+          "at": [
+            50,
+            90,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "d",
+          "value": 50,
+          "unit": "mm",
+          "min": 30,
+          "max": 80,
+          "note": "pivot spacing O1 to O2"
+        },
+        {
+          "id": "l1",
+          "value": 60,
+          "unit": "mm",
+          "min": 45,
+          "max": 80,
+          "note": "cranks"
+        },
+        {
+          "id": "l2",
+          "value": 80,
+          "unit": "mm",
+          "min": 60,
+          "max": 100,
+          "note": "distal arms"
+        },
+        {
+          "id": "tx",
+          "value": 25,
+          "unit": "mm",
+          "min": 0,
+          "max": 50,
+          "note": "target square centre x"
+        },
+        {
+          "id": "ty",
+          "value": 90,
+          "unit": "mm",
+          "min": 75,
+          "max": 105,
+          "note": "target square centre y"
+        },
+        {
+          "id": "side",
+          "value": 50,
+          "unit": "mm",
+          "min": 20,
+          "max": 60,
+          "note": "target square side"
+        },
+        {
+          "id": "corner",
+          "value": 8,
+          "unit": "mm",
+          "min": 2,
+          "max": 15,
+          "note": "target square corner radius"
+        }
+      ],
+      "design": [
+        {
+          "id": "elbows",
+          "options": [
+            "out",
+            "in"
+          ],
+          "value": "out"
+        },
+        {
+          "id": "tip",
+          "options": [
+            "up",
+            "down"
+          ],
+          "value": "up"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "crank-left",
+          "joint": "O1",
+          "kind": "manual",
+          "range": [
+            95,
+            175
+          ],
+          "default": 111.79665078259171,
+          "cycle": {
+            "from": "ik",
+            "note": "the cycle runs the tip round the target; the crank angles come from the inverse kinematics"
+          }
+        },
+        {
+          "id": "crank-right",
+          "joint": "O2",
+          "kind": "manual",
+          "range": [
+            5,
+            85
+          ],
+          "default": 29.3892799478888,
+          "cycle": {
+            "from": "ik",
+            "note": "the cycle runs the tip round the target; the crank angles come from the inverse kinematics"
+          }
+        }
+      ],
+      "solve": [
+        {
+          "block": "target-path",
+          "id": "target",
+          "joints": [
+            "P"
+          ],
+          "in": {
+            "shape": "rounded-square",
+            "cx": "tx",
+            "cy": "ty",
+            "side": "side",
+            "corner": "corner"
+          },
+          "out": "P"
+        },
+        {
+          "block": "five-bar",
+          "id": "ik",
+          "joints": [
+            "A",
+            "B"
+          ],
+          "in": {
+            "mode": "ik",
+            "A1": "O1",
+            "A2": "O2",
+            "l1": "l1",
+            "l2": "l1",
+            "l3": "l2",
+            "l4": "l2",
+            "target": "P",
+            "elbow1": 1,
+            "elbow2": -1,
+            "cranks": [
+              "crank-left",
+              "crank-right"
+            ],
+            "joints": [
+              "O1",
+              "O2"
+            ]
+          },
+          "out": {
+            "E1": "A",
+            "E2": "B"
+          }
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "tip-path",
+          "of": "P",
+          "kind": "path"
+        },
+        {
+          "id": "left-crank-angle",
+          "of": "crank-left",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "right-crank-angle",
+          "of": "crank-right",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "tip-angle",
+          "of": "P",
+          "kind": "angle",
+          "unit": "deg",
+          "from": "A",
+          "to": "B"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "rethink",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: the gear pair is gone and both cranks are driven. The cycle runs the tip round a 50 mm square target by inverse kinematics, so each crank visibly moves on its own (64.5 degrees each, out of phase) and the straight sides show that neither crank alone could draw them. The outline of the reachable workspace is drawn as construction, and the plot of one crank against the other is a closed loop, the signature of two inputs. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): rethink, as decided. No gears: the target-path block runs the tip round the rounded square and the five-bar block's inverse kinematics turns each crank on its own; the reachable workspace is outlined over both cranks' ranges. The cranks are set by the cycle, so they are not sliders; the target size is the control."
+      },
+      "principle": [
+        {
+          "body": "crank-left"
+        },
+        {
+          "body": "crank-right"
+        },
+        {
+          "body": "distal-left"
+        },
+        {
+          "body": "distal-right"
+        },
+        {
+          "point": "P"
+        }
+      ],
+      "traces": [
+        {
+          "id": "tip-trace",
+          "point": "P",
+          "comet": true
+        },
+        {
+          "id": "elbow-left",
+          "point": "A"
+        },
+        {
+          "id": "elbow-right",
+          "point": "B"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "workspace",
+          "kind": "workspace",
+          "point": "P",
+          "over": [
+            "crank-left",
+            "crank-right"
+          ],
+          "branch": "elbows out, tip up",
+          "label": "REACHABLE WORKSPACE"
+        },
+        {
+          "id": "tip-angle",
+          "kind": "arc",
+          "center": "P",
+          "from": "A",
+          "to": "B",
+          "label": "ANGLE AT THE TIP"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "target-size",
+          "kind": "param",
+          "param": "side"
+        }
+      ],
+      "plot": {
+        "x": "crank-left",
+        "y": "crank-right",
+        "label": "RIGHT CRANK AGAINST LEFT CRANK"
+      },
+      "claims": [
+        {
+          "text": "left crank 101.1° to 165.6°",
+          "output": "left-crank-angle",
+          "stat": "min",
+          "value": 101.1,
+          "tol": 0.2
+        },
+        {
+          "text": "left crank 101.1° to 165.6°",
+          "output": "left-crank-angle",
+          "stat": "max",
+          "value": 165.6,
+          "tol": 0.2
+        },
+        {
+          "text": "right crank 14.4° to 78.9°",
+          "output": "right-crank-angle",
+          "stat": "min",
+          "value": 14.4,
+          "tol": 0.2
+        },
+        {
+          "text": "right crank 14.4° to 78.9°",
+          "output": "right-crank-angle",
+          "stat": "max",
+          "value": 78.9,
+          "tol": 0.2
+        },
+        {
+          "text": "angle at the tip 78° to 135°",
+          "output": "tip-angle",
+          "stat": "min",
+          "value": 77.87,
+          "tol": 0.5
+        },
+        {
+          "text": "angle at the tip 78° to 135°",
+          "output": "tip-angle",
+          "stat": "max",
+          "value": 135.36,
+          "tol": 0.5
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.notes": "two grounded cranks, each driven on its own, no gears; count includes ground",
+      "build.range": "the tip runs round a 50 mm square target with 8 mm corner radii (x 0 to 50, y 65 to 115); left crank 101.1° to 165.6°, right crank 14.4° to 78.9° (64.5° each); angle at the tip 78° to 135°",
+      "build.notes": "Use the elbows-out, tip-up branch. Two independent inputs: the cycle runs the tip round the target at constant speed, and each crank angle comes from the triangle O, elbow, tip (inverse kinematics). Keep the target inside the workspace and away from poses where A, P and B line up or a crank lines up with its distal arm."
+    }
+  },
+  "pantograph": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              40,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "arm-O",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 110,
+            "boss": [
+              13,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "arm-E",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 110,
+            "boss": [
+              9.5,
+              9
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "bar-M1",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 55,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "M1"
+          }
+        },
+        {
+          "id": "bar-M2",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 55,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "T"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "arm-O",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "arm-O",
+          "b": "arm-E",
+          "at": [
+            96.73351644295707,
+            52.37009448702716,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M1",
+          "type": "revolute",
+          "a": "arm-O",
+          "b": "bar-M1",
+          "at": [
+            48.366758221478534,
+            26.18504724351358,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M2",
+          "type": "revolute",
+          "a": "arm-E",
+          "b": "bar-M2",
+          "at": [
+            150.36675822147853,
+            40.18504724351358,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "T",
+          "type": "revolute",
+          "a": "bar-M1",
+          "b": "bar-M2",
+          "at": [
+            102,
+            14,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "h",
+          "value": 55,
+          "unit": "mm",
+          "min": 40,
+          "max": 70,
+          "note": "half arm length and short bar length"
+        },
+        {
+          "id": "cx",
+          "value": 72,
+          "unit": "mm",
+          "min": 50,
+          "max": 90,
+          "note": "stylus path centre x"
+        },
+        {
+          "id": "cy",
+          "value": 14,
+          "unit": "mm",
+          "min": -10,
+          "max": 40,
+          "note": "stylus path centre y"
+        },
+        {
+          "id": "r0",
+          "value": 25,
+          "unit": "mm",
+          "min": 10,
+          "max": 30,
+          "note": "stylus path mean radius"
+        },
+        {
+          "id": "lobe",
+          "value": 5,
+          "unit": "mm",
+          "min": 0,
+          "max": 8,
+          "note": "depth of the five lobes"
+        }
+      ],
+      "design": [
+        {
+          "id": "elbow",
+          "options": [
+            "up",
+            "down"
+          ],
+          "value": "up"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "stylus",
+          "joint": "T",
+          "kind": "manual",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "cycle": {
+            "from": "flower",
+            "note": "the cycle moves the stylus T once round the flower"
+          }
+        }
+      ],
+      "solve": [
+        {
+          "block": "target-path",
+          "id": "flower",
+          "joints": [],
+          "in": {
+            "shape": "flower",
+            "cx": "cx",
+            "cy": "cy",
+            "r0": "r0",
+            "lobe": "lobe",
+            "lobes": 5
+          },
+          "out": "T"
+        },
+        {
+          "block": "dyad",
+          "id": "half-arm",
+          "joints": [
+            "O",
+            "M1"
+          ],
+          "in": {
+            "a": "O",
+            "b": "T",
+            "ra": "h",
+            "rb": "h"
+          },
+          "branch": "elbow",
+          "out": "M1"
+        },
+        {
+          "block": "lerp",
+          "id": "elbow",
+          "joints": [
+            "A"
+          ],
+          "in": {
+            "a": "O",
+            "b": "M1",
+            "t": 2
+          },
+          "out": "A"
+        },
+        {
+          "block": "dyad",
+          "id": "rhombus",
+          "joints": [
+            "M2"
+          ],
+          "in": {
+            "a": "A",
+            "b": "T",
+            "ra": "h",
+            "rb": "h"
+          },
+          "branch": "elbow",
+          "out": "M2"
+        }
+      ],
+      "points": [
+        {
+          "id": "E",
+          "body": "arm-E",
+          "local": [
+            110,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "pen-path",
+          "of": "E",
+          "kind": "path"
+        },
+        {
+          "id": "stylus-path",
+          "of": "T",
+          "kind": "path"
+        },
+        {
+          "id": "scale",
+          "of": "E",
+          "kind": "speed-ratio",
+          "over": "T"
+        },
+        {
+          "id": "elbow-angle",
+          "of": "A",
+          "kind": "angle",
+          "unit": "deg",
+          "from": "O",
+          "to": "E"
+        },
+        {
+          "id": "stylus-reach",
+          "of": "T",
+          "kind": "position",
+          "unit": "mm",
+          "from": "O"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep): the stylus is moved round a five-lobed flower and the pen draws it at twice the size. The line O, T, E is drawn as construction so the collinearity that makes the copy exact reads at every pose. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep. The target-path block moves the stylus round the flower and the dyads close the rhombus; the pen draws the flower at exactly twice the size, with O, T and E in line. The stylus is the cycle, so it is not a slider."
+      },
+      "principle": [
+        {
+          "body": "arm-O"
+        },
+        {
+          "body": "arm-E"
+        },
+        {
+          "body": "bar-M1"
+        },
+        {
+          "body": "bar-M2"
+        },
+        {
+          "point": "E"
+        },
+        {
+          "point": "T"
+        }
+      ],
+      "traces": [
+        {
+          "id": "pen",
+          "point": "E",
+          "comet": true
+        },
+        {
+          "id": "stylus",
+          "point": "T"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "line-OTE",
+          "kind": "line",
+          "from": "O",
+          "to": "E",
+          "through": "T",
+          "label": "O, T AND E IN LINE"
+        },
+        {
+          "id": "ot",
+          "kind": "dimension",
+          "from": "O",
+          "to": "T",
+          "label": "OT"
+        },
+        {
+          "id": "oe",
+          "kind": "dimension",
+          "from": "O",
+          "to": "E",
+          "label": "OE = 2 OT"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [],
+      "plot": {
+        "x": "stylus",
+        "y": "scale",
+        "label": "SCALE OE / OT"
+      },
+      "claims": [
+        {
+          "text": "the pen copies every path of the stylus at twice the size (2x)",
+          "output": "scale",
+          "stat": "min",
+          "value": 2,
+          "tol": 0.001
+        },
+        {
+          "text": "the pen copies every path of the stylus at twice the size (2x)",
+          "output": "scale",
+          "stat": "max",
+          "value": 2,
+          "tol": 0.001
+        },
+        {
+          "text": "elbow angle 50° to 139°",
+          "output": "elbow-angle",
+          "stat": "min",
+          "value": 50.06,
+          "tol": 0.5
+        },
+        {
+          "text": "elbow angle 50° to 139°",
+          "output": "elbow-angle",
+          "stat": "max",
+          "value": 138.94,
+          "tol": 0.5
+        },
+        {
+          "text": "|OT| from 46.5 to 103 mm",
+          "output": "stylus-reach",
+          "stat": "min",
+          "value": 46.54,
+          "tol": 0.2
+        },
+        {
+          "text": "|OT| from 46.5 to 103 mm",
+          "output": "stylus-reach",
+          "stat": "max",
+          "value": 103.01,
+          "tol": 0.2
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.revolute": 5,
+      "topology.notes": "two long arms and two short bars forming a parallelogram, plus ground; joints at the pivot O, the elbow A, the two midpoints M1 and M2 and the stylus T; the pen E is a point on arm A-E; count includes ground",
+      "build.range": "stylus traces a closed five-lobed flower with |OT| from 46.5 to 103 mm; the pen traces it at 2x; elbow angle 50° to 139°"
+    }
+  },
+  "toggle-clamp": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              260,
+              60
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                60,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "handle",
+          "role": "driver",
+          "shape": {
+            "type": "plate",
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                40,
+                0
+              ],
+              [
+                -91.76,
+                24.59
+              ]
+            ],
+            "boss": 9
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "link",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 70,
+            "boss": [
+              8.5,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "plunger",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 70,
+            "width": 20,
+            "from": -15
+          },
+          "at": {
+            "joint": "B"
+          }
+        },
+        {
+          "id": "workpiece",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              30,
+              40
+            ],
+            "thickness": 12
+          },
+          "frame": {
+            "o": [
+              202.5,
+              -20,
+              -2
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "handle",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "limits": [
+            -70,
+            3
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "handle",
+          "b": "link",
+          "at": [
+            34.64101615137755,
+            -19.999999999999996,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "link",
+          "b": "plunger",
+          "at": [
+            101.72305547637123,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "slide",
+          "type": "prismatic",
+          "a": "ground",
+          "b": "plunger",
+          "at": [
+            101.72305547637123,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            72.73,
+            110
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "a",
+          "value": 40,
+          "unit": "mm",
+          "min": 30,
+          "max": 50,
+          "note": "handle arm O to the knee A"
+        },
+        {
+          "id": "b",
+          "value": 70,
+          "unit": "mm",
+          "min": 55,
+          "max": 90,
+          "note": "toggle link A to B"
+        },
+        {
+          "id": "H",
+          "value": 95,
+          "unit": "mm",
+          "min": 70,
+          "max": 120,
+          "note": "grip radius"
+        },
+        {
+          "id": "g",
+          "value": 165,
+          "unit": "deg",
+          "min": 150,
+          "max": 180,
+          "note": "grip direction from the arm"
+        },
+        {
+          "id": "open",
+          "value": -70,
+          "unit": "deg",
+          "min": -80,
+          "max": -40,
+          "note": "handle open angle"
+        },
+        {
+          "id": "over",
+          "value": 3,
+          "unit": "deg",
+          "min": 1,
+          "max": 6,
+          "note": "over-centre angle past toggle, at the stop"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "handle",
+          "joint": "O",
+          "kind": "manual",
+          "range": [
+            -70,
+            3
+          ],
+          "lo": -70,
+          "hi": 3,
+          "default": -30
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "link-plunger",
+          "joints": [
+            "A",
+            "B",
+            "slide"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "A",
+            "r": "b",
+            "p": [
+              0,
+              0,
+              0
+            ],
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "B"
+        }
+      ],
+      "points": [
+        {
+          "id": "grip",
+          "body": "handle",
+          "local": [
+            -91.76,
+            24.59,
+            0
+          ]
+        },
+        {
+          "id": "pad",
+          "body": "plunger",
+          "local": [
+            91,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "handle-angle",
+          "of": "handle",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "plunger-position",
+          "of": "B",
+          "kind": "position",
+          "unit": "mm",
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "mechanical-advantage",
+          "of": "grip",
+          "kind": "speed-ratio",
+          "over": "B"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep) and the issue's decision to add a workpiece block at the pad, which the plunger meets at the toggle (engine hardware). The plunger is traced with equal-time ticks every 5 degrees of handle, which bunch near the dead-centre line: the plunger almost stops while the handle still turns, which is the force gain. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): keep, with the workpiece block. The handle is a hand lever worked over -70 to +3 degrees: a manual driver whose lo and hi give the hand's stroke, which the cycle works through; no motor (standard V5, the toggle clamp playbook), a knob on the handle and the stop past dead centre. The plunger carries an adjustable spindle with a pad that meets the workpiece at dead centre; the slide's front end stop is dropped because the linkage limits the travel there (polish exception)."
+      },
+      "principle": [
+        {
+          "body": "handle"
+        },
+        {
+          "body": "link"
+        },
+        {
+          "body": "plunger"
+        },
+        {
+          "point": "A"
+        }
+      ],
+      "traces": [
+        {
+          "id": "plunger-pin",
+          "point": "B",
+          "ticks": {
+            "every": 5
+          },
+          "comet": true
+        },
+        {
+          "id": "grip",
+          "point": "grip",
+          "ticks": {
+            "every": 5
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "dead-centre",
+          "kind": "line",
+          "from": "O",
+          "to": "B",
+          "label": "DEAD CENTRE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "handle",
+          "kind": "driver",
+          "driver": "handle"
+        }
+      ],
+      "plot": [
+        {
+          "x": "handle",
+          "y": "plunger-position",
+          "label": "PLUNGER POSITION"
+        },
+        {
+          "x": "handle",
+          "y": "mechanical-advantage",
+          "label": "MECHANICAL ADVANTAGE AT THE GRIP"
+        }
+      ],
+      "claims": [
+        {
+          "text": "handle swings 73° from -70° to +3°",
+          "output": "handle-angle",
+          "stat": "range",
+          "value": 73,
+          "tol": 0.1
+        },
+        {
+          "text": "plunger travels about 37 mm (B from 72.7 to 110 mm)",
+          "output": "plunger-position",
+          "stat": "range",
+          "value": 37.27,
+          "tol": 0.1
+        },
+        {
+          "text": "plunger travels about 37 mm (B from 72.7 to 110 mm)",
+          "output": "plunger-position",
+          "stat": "max",
+          "value": 110,
+          "tol": 0.05
+        },
+        {
+          "text": "about 9:1 at 10° before toggle",
+          "output": "mechanical-advantage",
+          "stat": "at",
+          "at": -10,
+          "value": 8.74,
+          "tol": 0.1
+        },
+        {
+          "text": "29:1 at 3° before toggle",
+          "output": "mechanical-advantage",
+          "stat": "at",
+          "at": -3,
+          "value": 28.89,
+          "tol": 0.2
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "ratio.typical": "mechanical advantage at the grip rises without limit toward toggle: about 9:1 at 10° before it, 29:1 at 3°"
+    }
+  },
+  "scissor-lift": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              140,
+              40
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                50,
+                0,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "carriage",
+          "role": "driver",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 20
+          },
+          "at": {
+            "joint": "R0"
+          }
+        },
+        {
+          "id": "a0",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              9.5,
+              9.5
+            ],
+            "mid": 45
+          },
+          "at": {
+            "joint": "L0"
+          }
+        },
+        {
+          "id": "a1",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              9.5,
+              9.5
+            ],
+            "mid": 45
+          },
+          "at": {
+            "joint": "L1"
+          }
+        },
+        {
+          "id": "a2",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              9.5,
+              9.5
+            ],
+            "mid": 45
+          },
+          "at": {
+            "joint": "L2"
+          }
+        },
+        {
+          "id": "b0",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              9.5,
+              9.5
+            ],
+            "mid": 45
+          },
+          "at": {
+            "joint": "R0"
+          }
+        },
+        {
+          "id": "b1",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              9.5,
+              9.5
+            ],
+            "mid": 45
+          },
+          "at": {
+            "joint": "R1"
+          }
+        },
+        {
+          "id": "b2",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              9.5,
+              9.5
+            ],
+            "mid": 45
+          },
+          "at": {
+            "joint": "R2"
+          }
+        },
+        {
+          "id": "platform",
+          "role": "output",
+          "shape": {
+            "type": "slotLink",
+            "length": 150,
+            "slot": [
+              48.5,
+              86.5
+            ],
+            "width": 22,
+            "slotWidth": 12
+          },
+          "at": {
+            "joint": "L3"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "L0",
+          "type": "revolute",
+          "a": "ground",
+          "b": "a0",
+          "at": [
+            0,
+            0.0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "R0",
+          "type": "revolute",
+          "a": "carriage",
+          "b": "b0",
+          "at": [
+            65,
+            0.0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "carriage-slide",
+          "type": "prismatic",
+          "a": "ground",
+          "b": "carriage",
+          "at": [
+            65,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            50,
+            85
+          ]
+        },
+        {
+          "id": "M0",
+          "type": "revolute",
+          "a": "a0",
+          "b": "b0",
+          "at": [
+            32.5,
+            31.12474899497183,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "L1",
+          "type": "revolute",
+          "a": "b0",
+          "b": "a1",
+          "at": [
+            0,
+            62.24949798994366,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "R1",
+          "type": "revolute",
+          "a": "a0",
+          "b": "b1",
+          "at": [
+            65,
+            62.24949798994366,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M1",
+          "type": "revolute",
+          "a": "a1",
+          "b": "b1",
+          "at": [
+            32.5,
+            93.37424698491549,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "L2",
+          "type": "revolute",
+          "a": "b1",
+          "b": "a2",
+          "at": [
+            0,
+            124.49899597988733,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "R2",
+          "type": "revolute",
+          "a": "a1",
+          "b": "b2",
+          "at": [
+            65,
+            124.49899597988733,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "M2",
+          "type": "revolute",
+          "a": "a2",
+          "b": "b2",
+          "at": [
+            32.5,
+            155.62374497485916,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "L3",
+          "type": "revolute",
+          "a": "b2",
+          "b": "platform",
+          "at": [
+            0,
+            186.74849396983097,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "R3",
+          "type": "pin-in-slot",
+          "a": "a2",
+          "b": "platform",
+          "at": [
+            65,
+            186.74849396983097,
+            0
+          ],
+          "slot": {
+            "from": [
+              48.5,
+              186.74849396983097,
+              0
+            ],
+            "to": [
+              86.5,
+              186.74849396983097,
+              0
+            ]
+          },
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "L",
+          "value": 90,
+          "unit": "mm",
+          "min": 60,
+          "max": 120,
+          "note": "bar length"
+        },
+        {
+          "id": "m",
+          "value": 45,
+          "unit": "mm",
+          "min": 30,
+          "max": 60,
+          "note": "middle pin from each bar end, L / 2"
+        },
+        {
+          "id": "n",
+          "value": 3,
+          "unit": "stages",
+          "min": 1,
+          "max": 5,
+          "note": "number of stages"
+        },
+        {
+          "id": "plat",
+          "value": 45,
+          "unit": "mm",
+          "min": 20,
+          "max": 100,
+          "note": "platform point C from L3"
+        }
+      ],
+      "design": [
+        {
+          "id": "branch",
+          "options": [
+            "up",
+            "down"
+          ],
+          "value": "up"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "carriage",
+          "joint": "carriage-slide",
+          "kind": "linear",
+          "range": [
+            50,
+            85
+          ],
+          "default": 65
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "stage-0",
+          "joints": [
+            "L0",
+            "R0",
+            "M0"
+          ],
+          "in": {
+            "a": "L0",
+            "b": "R0",
+            "ra": "m",
+            "rb": "m"
+          },
+          "branch": "up",
+          "out": "M0"
+        },
+        {
+          "block": "lerp",
+          "id": "far-left-0",
+          "joints": [
+            "L1"
+          ],
+          "in": {
+            "a": "R0",
+            "b": "M0",
+            "t": 2
+          },
+          "out": "L1"
+        },
+        {
+          "block": "lerp",
+          "id": "far-right-0",
+          "joints": [
+            "R1"
+          ],
+          "in": {
+            "a": "L0",
+            "b": "M0",
+            "t": 2
+          },
+          "out": "R1"
+        },
+        {
+          "block": "dyad",
+          "id": "stage-1",
+          "joints": [
+            "M1"
+          ],
+          "in": {
+            "a": "L1",
+            "b": "R1",
+            "ra": "m",
+            "rb": "m"
+          },
+          "branch": "up",
+          "out": "M1"
+        },
+        {
+          "block": "lerp",
+          "id": "far-left-1",
+          "joints": [
+            "L2"
+          ],
+          "in": {
+            "a": "R1",
+            "b": "M1",
+            "t": 2
+          },
+          "out": "L2"
+        },
+        {
+          "block": "lerp",
+          "id": "far-right-1",
+          "joints": [
+            "R2"
+          ],
+          "in": {
+            "a": "L1",
+            "b": "M1",
+            "t": 2
+          },
+          "out": "R2"
+        },
+        {
+          "block": "dyad",
+          "id": "stage-2",
+          "joints": [
+            "M2"
+          ],
+          "in": {
+            "a": "L2",
+            "b": "R2",
+            "ra": "m",
+            "rb": "m"
+          },
+          "branch": "up",
+          "out": "M2"
+        },
+        {
+          "block": "lerp",
+          "id": "far-left-2",
+          "joints": [
+            "L3"
+          ],
+          "in": {
+            "a": "R2",
+            "b": "M2",
+            "t": 2
+          },
+          "out": "L3"
+        },
+        {
+          "block": "lerp",
+          "id": "far-right-2",
+          "joints": [],
+          "in": {
+            "a": "L2",
+            "b": "M2",
+            "t": 2
+          },
+          "out": "R3"
+        },
+        {
+          "block": "slider-dyad",
+          "id": "platform-slot",
+          "joints": [
+            "R3"
+          ],
+          "in": {
+            "kind": "rpr",
+            "a": "L3",
+            "p": "R3",
+            "body": "platform"
+          },
+          "out": {
+            "angle": "platform-slot-angle"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "C",
+          "body": "platform",
+          "local": [
+            45,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "platform-height",
+          "of": "L3",
+          "kind": "position",
+          "unit": "mm",
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "lift-ratio",
+          "of": "L3",
+          "kind": "speed-ratio",
+          "over": "R0"
+        },
+        {
+          "id": "carriage-position",
+          "of": "carriage",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "platform-angle",
+          "of": "platform",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "platform-path",
+          "of": "C",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and the issue's decision: the ground bridge is moved or drawn see-through so it no longer reads as a scissor bar of the wrong length (engine). The platform point traces a straight vertical line; the span w and one stage height h are dimensioned, so h = sqrt(L^2 - w^2) and the lift ratio 3w / h read off the drawing. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): tweak, as decided. Each stage's far pins come from the lerp block (2M - R), the platform turns by its slot through R3, and C runs straight up and down. The ground bridge is routed off the bars and drawn see-through, so it no longer reads as a scissor bar."
+      },
+      "principle": [
+        {
+          "body": "a0"
+        },
+        {
+          "body": "b0"
+        },
+        {
+          "body": "a1"
+        },
+        {
+          "body": "b1"
+        },
+        {
+          "body": "a2"
+        },
+        {
+          "body": "b2"
+        },
+        {
+          "body": "platform"
+        },
+        {
+          "point": "C"
+        }
+      ],
+      "traces": [
+        {
+          "id": "platform-point",
+          "point": "C",
+          "comet": true
+        }
+      ],
+      "overlays": [
+        {
+          "id": "span",
+          "kind": "dimension",
+          "from": "L0",
+          "to": "R0",
+          "label": "SPAN w"
+        },
+        {
+          "id": "stage-height",
+          "kind": "dimension",
+          "from": "L0",
+          "to": "L1",
+          "label": "STAGE HEIGHT h"
+        },
+        {
+          "id": "level",
+          "kind": "line",
+          "from": "L3",
+          "to": "R3",
+          "label": "PLATFORM LEVEL"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "carriage",
+          "kind": "driver",
+          "driver": "carriage"
+        }
+      ],
+      "plot": [
+        {
+          "x": "carriage",
+          "y": "platform-height",
+          "label": "PLATFORM HEIGHT"
+        },
+        {
+          "x": "carriage",
+          "y": "lift-ratio",
+          "label": "LIFT PER MM OF CARRIAGE TRAVEL"
+        }
+      ],
+      "claims": [
+        {
+          "text": "carriage span 85 to 50 mm (35 mm travel)",
+          "output": "carriage-position",
+          "stat": "range",
+          "value": 35,
+          "tol": 0.05
+        },
+        {
+          "text": "platform height 88.7 to 224.5 mm",
+          "output": "platform-height",
+          "stat": "min",
+          "value": 88.74,
+          "tol": 0.1
+        },
+        {
+          "text": "platform height 88.7 to 224.5 mm",
+          "output": "platform-height",
+          "stat": "max",
+          "value": 224.5,
+          "tol": 0.1
+        },
+        {
+          "text": "lift per unit slider travel from about 2.0 (raised) to 8.6 (lowered)",
+          "output": "lift-ratio",
+          "stat": "min",
+          "value": 2,
+          "tol": 0.02
+        },
+        {
+          "text": "lift per unit slider travel from about 2.0 (raised) to 8.6 (lowered)",
+          "output": "lift-ratio",
+          "stat": "max",
+          "value": 8.62,
+          "tol": 0.02
+        },
+        {
+          "text": "the platform stays level",
+          "output": "platform-angle",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "topology.links": 9,
+      "topology.revolute": 10,
+      "topology.prismatic": 1,
+      "topology.higher_pairs": 1,
+      "topology.notes": "3 stages: 6 bars, ground, carriage and platform; the carriage slides on the ground; the platform is pinned at L3 and the pin R3 runs in its slot (the higher pair); count includes ground",
+      "build.range": "carriage span 85 to 50 mm (35 mm travel); stage height 29.6 to 74.8 mm; platform height 88.7 to 224.5 mm"
+    }
+  },
+  "ackermann-steering": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              700,
+              280
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                -90,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "knuckle-left",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 45,
+            "boss": [
+              13,
+              9.5
+            ],
+            "wheel": {
+              "diameter": 70,
+              "width": 18,
+              "stub": 24
+            }
+          },
+          "at": {
+            "joint": "KL"
+          }
+        },
+        {
+          "id": "knuckle-right",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 45,
+            "boss": [
+              12,
+              9.5
+            ],
+            "wheel": {
+              "diameter": 70,
+              "width": 18,
+              "stub": 24
+            }
+          },
+          "at": {
+            "joint": "KR"
+          }
+        },
+        {
+          "id": "tie-rod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 121.44258092354171,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "PL"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "KL",
+          "type": "revolute",
+          "a": "ground",
+          "b": "knuckle-left",
+          "at": [
+            -75,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "limits": [
+            -30,
+            40
+          ]
+        },
+        {
+          "id": "KR",
+          "type": "revolute",
+          "a": "ground",
+          "b": "knuckle-right",
+          "at": [
+            75,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PL",
+          "type": "revolute",
+          "a": "knuckle-left",
+          "b": "tie-rod",
+          "at": [
+            -60.721290461770856,
+            -42.67456448427897,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PR",
+          "type": "revolute",
+          "a": "tie-rod",
+          "b": "knuckle-right",
+          "at": [
+            60.721290461770856,
+            -42.67456448427897,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "w",
+          "value": 150,
+          "unit": "mm",
+          "min": 120,
+          "max": 180,
+          "note": "kingpin track"
+        },
+        {
+          "id": "L",
+          "value": 200,
+          "unit": "mm",
+          "min": 140,
+          "max": 260,
+          "note": "wheelbase, front axle to rear axle line"
+        },
+        {
+          "id": "r",
+          "value": 45,
+          "unit": "mm",
+          "min": 30,
+          "max": 60,
+          "note": "steering arm length"
+        },
+        {
+          "id": "beta",
+          "value": 18.5,
+          "unit": "deg",
+          "min": 10,
+          "max": 25,
+          "note": "arm angle inward of straight back"
+        },
+        {
+          "id": "t",
+          "value": 121.44258092354171,
+          "unit": "mm",
+          "min": 100,
+          "max": 140,
+          "note": "tie rod, w - 2 r sin(beta)"
+        },
+        {
+          "id": "stub",
+          "value": 24,
+          "unit": "mm",
+          "min": 15,
+          "max": 30,
+          "note": "wheel centre outboard of the kingpin"
+        }
+      ],
+      "design": [
+        {
+          "id": "branch",
+          "options": [
+            "behind",
+            "ahead"
+          ],
+          "value": "behind"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "steer",
+          "joint": "KL",
+          "kind": "oscillating",
+          "range": [
+            -30,
+            40
+          ],
+          "lo": -30,
+          "hi": 40,
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "tie-rod-loop",
+          "joints": [
+            "PL",
+            "PR",
+            "KR"
+          ],
+          "in": {
+            "a": "KR",
+            "b": "PL",
+            "ra": "r",
+            "rb": "t"
+          },
+          "branch": "behind",
+          "out": "PR"
+        }
+      ],
+      "points": [
+        {
+          "id": "WL",
+          "body": "knuckle-left",
+          "local": [
+            -7.61531175372221,
+            -22.759767724948784,
+            0
+          ]
+        },
+        {
+          "id": "WR",
+          "body": "knuckle-right",
+          "local": [
+            -7.615311753722213,
+            22.759767724948784,
+            0
+          ]
+        },
+        {
+          "id": "rear-left",
+          "body": "ground",
+          "local": [
+            -75,
+            -200,
+            0
+          ]
+        },
+        {
+          "id": "rear-right",
+          "body": "ground",
+          "local": [
+            75,
+            -200,
+            0
+          ]
+        },
+        {
+          "id": "aim",
+          "body": "ground",
+          "local": [
+            0,
+            -224.15,
+            0
+          ]
+        },
+        {
+          "id": "rear-far-left",
+          "body": "ground",
+          "local": [
+            -379.0,
+            -200,
+            0
+          ]
+        },
+        {
+          "id": "rear-far-right",
+          "body": "ground",
+          "local": [
+            329.1,
+            -200,
+            0
+          ]
+        },
+        {
+          "id": "centre-left-lock",
+          "body": "ground",
+          "local": [
+            -359.0,
+            -238.3,
+            0
+          ]
+        },
+        {
+          "id": "centre-right-lock",
+          "body": "ground",
+          "local": [
+            309.1,
+            -221.8,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "left-steer",
+          "of": "knuckle-left",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "right-steer",
+          "of": "knuckle-right",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "rethink",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (rethink) and the issue's decisions: a wheel on each knuckle, dashed wheel-axis lines and the rear-axle line that meet near one point, the turning centre. The wheelbase is shortened from 250 to 200 mm and the arms lengthened from 30 to 45 mm. The left knuckle keeps its range of -30 to +40 degrees; to reach -30 the arms are angled 18.5 degrees inward, a little less than the 20.6 degrees that aims them at the rear axle centre, and the outer wheel stays within 2 degrees of the ideal over the whole range. A shorter wheelbase would put the centre nearer but cannot reach -30 degrees with a good trapezoid. R1 (#212), 2026-10-22: reviewed again on the finished v3 build (six phases, PLAN and an angled view): rethink, as decided. A wheel stands on each knuckle on a stub axle in an upright tube (stub 24 mm, width 18, so the wheel clears its tube); the wheel axis lines are carried to the rear axle line and the turning centre is marked where they meet, about 38 mm behind that line at full lock because the outer wheel turns 1.5 degrees more than ideal. The base holds the rear axle line and both full-lock centres. The tie rod closes on the right side of the dyad, which the record had reversed."
+      },
+      "principle": [
+        {
+          "body": "knuckle-left"
+        },
+        {
+          "body": "knuckle-right"
+        },
+        {
+          "body": "tie-rod"
+        },
+        {
+          "point": "WL"
+        },
+        {
+          "point": "WR"
+        }
+      ],
+      "traces": [
+        {
+          "id": "left-arm-end",
+          "point": "PL",
+          "comet": true
+        },
+        {
+          "id": "right-arm-end",
+          "point": "PR"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "axis-left",
+          "kind": "axis-line",
+          "from": "KL",
+          "through": "WL",
+          "dashed": true,
+          "extend": "rear-axle",
+          "label": "LEFT WHEEL AXIS"
+        },
+        {
+          "id": "axis-right",
+          "kind": "axis-line",
+          "from": "KR",
+          "through": "WR",
+          "dashed": true,
+          "extend": "rear-axle",
+          "label": "RIGHT WHEEL AXIS"
+        },
+        {
+          "id": "rear-axle",
+          "kind": "axis-line",
+          "from": "rear-far-left",
+          "through": "rear-far-right",
+          "dashed": true,
+          "label": "REAR AXLE LINE"
+        },
+        {
+          "id": "turning-centre",
+          "kind": "circle",
+          "meet": [
+            "axis-left",
+            "axis-right",
+            "rear-axle"
+          ],
+          "radius": 4,
+          "label": "TURNING CENTRE"
+        },
+        {
+          "id": "arm-aim-left",
+          "kind": "line",
+          "from": "KL",
+          "to": "aim",
+          "pose": {
+            "driver": "steer",
+            "value": 0
+          },
+          "label": "ARMS AIM NEAR THE REAR AXLE CENTRE"
+        },
+        {
+          "id": "arm-aim-right",
+          "kind": "line",
+          "from": "KR",
+          "to": "aim",
+          "pose": {
+            "driver": "steer",
+            "value": 0
+          }
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "steer",
+          "kind": "driver",
+          "driver": "steer"
+        }
+      ],
+      "plot": {
+        "x": "steer",
+        "y": "right-steer",
+        "label": "RIGHT WHEEL ANGLE"
+      },
+      "claims": [
+        {
+          "text": "left wheel -30° to +40°",
+          "output": "left-steer",
+          "stat": "range",
+          "value": 70,
+          "tol": 0.1
+        },
+        {
+          "text": "outer wheel 28.8° at inner 40° (ideal 27.3°)",
+          "output": "right-steer",
+          "stat": "at",
+          "at": 40,
+          "value": 28.77,
+          "tol": 0.1
+        },
+        {
+          "text": "outer wheel 23.9° at inner 30° (ideal 21.9°), about 0.80 x inner",
+          "output": "right-steer",
+          "stat": "at",
+          "at": 30,
+          "value": 23.88,
+          "tol": 0.1
+        },
+        {
+          "text": "right wheel -43.5° to +28.8°",
+          "output": "right-steer",
+          "stat": "min",
+          "value": -43.45,
+          "tol": 0.1
+        },
+        {
+          "text": "right wheel -43.5° to +28.8°",
+          "output": "right-steer",
+          "stat": "max",
+          "value": 28.77,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "Each front wheel steers about its kingpin on a knuckle with a steering arm. The arms point inward, roughly at the centre of the rear axle, and are joined by a tie rod, forming a trapezoid. When one wheel steers, the tie rod turns the other wheel by a smaller angle on the outside of the turn, so the two wheel axis lines meet near one point on the rear axle line, the turning centre.",
+      "ratio.typical": "outer angle about 0.80 x inner angle at 30° (23.9° vs 30°)",
+      "build.ground": "front axle beam with kingpins KL (-75,0) and KR (75,0); rear axle line at y = -200",
+      "build.defining_relations": "Ideal Ackermann: cot(delta_outer) - cot(delta_inner) = w / L = 0.75. Arms angled inward by beta = 18.5°, a little less than atan((w/2)/L) = 20.6°, which would aim them at the rear axle centre, so the tie rod still reaches the -30° lock. Tie rod t = w - 2 r sin(beta) = 121.4 mm.",
+      "build.range": "left knuckle -30° to +40° (right turn to left turn); right knuckle -43.5° to +28.8°. Outer wheel 9.3°, 17.3°, 23.9°, 28.8° at inner 10°, 20°, 30°, 40° (ideal 8.9°, 16.0°, 21.9°, 27.3°)",
+      "build.notes": "Tie rod behind the axle: PR = circleX(KR, r, PL, t, +1). A wheel on each knuckle, on a stub axle 24 mm outboard of the kingpin, carried by an upright tube round the kingpin. Draw both wheel axis lines and the rear-axle line dashed: they meet near one point, the turning centre, which lies on the plate at full lock (about 300 mm to the side).",
+      "topology.notes": "four-bar: axle beam (ground), left knuckle with its wheel, tie rod, right knuckle with its wheel; count includes ground"
+    }
+  }
+}

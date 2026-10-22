@@ -1,38 +1,38 @@
 // The built site (npm run build, then npm run test:site): a page for every registered mechanism, no engine on the
-// library page until hover, and the JavaScript a mechanism page loads under 96 KB gzipped: its scripts, everything they
-// import (the engine included), and its own model, package excluded (R8, SS8). Other mechanisms' model chunks are
-// imported dynamically and never fetched by that page, so they are not counted; each stays under 4 KB instead.
-import { existsSync, readFileSync } from "node:fs";
+// library page until hover, and the JavaScript a mechanism page loads under 96 KB gzipped: its scripts and everything
+// they import, the engine and the setup worker included, package excluded (R8, SS8).
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
-import { mechanisms } from "../../src/mechanisms";
+import { allIds } from "../../src/mechanisms";
+import { DEFAULT_ORDER, sortBy } from "../../site/src/sort";
 
 const OUT = join("dist", "site");
 const read = (f: string) => readFileSync(join(OUT, f), "utf8");
 const scripts = (html: string) => [...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map((m) => m[1]!);
 
-/** A module and every chunk it imports statically or dynamically, by file name; `skip` leaves chunks out. */
-function closure(file: string, seen = new Set<string>(), skip: (f: string) => boolean = () => false): Set<string> {
+/** A module and every chunk it imports statically or dynamically, by file name. */
+function closure(file: string, seen = new Set<string>()): Set<string> {
   if (seen.has(file)) return seen;
   seen.add(file);
   const src = read(file);
-  for (const m of src.matchAll(/(?:import|from)\s*\(?\s*["'`](\.{1,2}\/[^"'`]+\.js)["'`]/g)) {
-    const f = join("_astro", m[1]!.replace(/^\.\//, "")).split("\\").join("/");
-    if (!skip(f)) closure(f, seen, skip);
-  }
+  for (const m of src.matchAll(/(?:import|from)\s*\(?\s*["'`](\.{1,2}\/[^"'`]+\.js)["'`]/g)) closure(join("_astro", m[1]!.replace(/^\.\//, "")).split("\\").join("/"), seen);
+  // a module worker the page starts (the stage's setup) is part of what the page loads
+  for (const m of src.matchAll(/new URL\(\s*[`"'][^`"']*?(_astro\/[^`"']+\.js)[`"']/g)) closure(m[1]!, seen);
   return seen;
 }
 
-/** A mechanism's model chunks: every lazily loaded model module. */
-const isModel = (f: string) => /(^|\/)model\.[\w-]+\.js$/.test(f);
+/** Every mechanism page in the build. */
+const pages = (): string[] => readdirSync(join(OUT, "mechanisms"));
 
 describe("site build", () => {
   it("has the library and a page for every registered mechanism", () => {
     expect(existsSync(join(OUT, "index.html"))).toBe(true);
-    for (const id of Object.keys(mechanisms)) {
+    for (const id of allIds()) {
       expect(existsSync(join(OUT, "mechanisms", id, "index.html")), id).toBe(true);
-      expect(existsSync(join(OUT, "packages", `${id}.mxp`)), id).toBe(true);
+      expect(existsSync(join(OUT, "packages", `${id}.mx2`)), id).toBe(true);
+      expect(existsSync(join(OUT, "meta", `${id}.json`)), id).toBe(true);
       expect(existsSync(join(OUT, "thumbs", `${id}-dark.webp`)), id).toBe(true);
     }
   });
@@ -47,18 +47,11 @@ describe("site build", () => {
     expect(html).not.toMatch(/engine\.[\w-]+\.js/);
   });
 
-  it("keeps the JavaScript a mechanism page loads under 96 KB gzipped, and every model chunk under 4 KB", () => {
-    const models = new Set<string>();
-    for (const id of Object.keys(mechanisms)) for (const src of scripts(read(join("mechanisms", id, "index.html")))) for (const f of closure(src.replace(/^\//, ""))) if (isModel(f)) models.add(f);
-    for (const f of models) expect(gzipSync(read(f)).byteLength, f).toBeLessThan(4 * 1024);
-    for (const id of Object.keys(mechanisms)) {
+  it("keeps the JavaScript a mechanism page loads under 96 KB gzipped, the setup worker counted", () => {
+    for (const id of pages()) {
       const files = new Set<string>();
-      for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files, isModel);
-      // the page's own model: the model chunk that defines its id
-      const q = "[\"'`]";
-      const own = [...models].filter((f) => new RegExp(`id:\\s*${q}${id}${q}`).test(read(f)));
-      expect(own.length, `${id}: its model chunk`).toBeGreaterThan(0);
-      for (const f of own) closure(f, files);
+      for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files);
+      expect([...files].some((f) => /edges-worker/.test(f)), id).toBe(true);
       const gz = [...files].reduce((n, f) => n + gzipSync(read(f)).byteLength, 0);
       expect(gz, `${id}: ${[...files].join(", ")}`).toBeLessThan(96 * 1024);
     }
@@ -66,7 +59,7 @@ describe("site build", () => {
 
   it("ships no polish, rule or hardware module to the browser (R4)", () => {
     const files = new Set<string>();
-    for (const id of Object.keys(mechanisms)) for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files);
+    for (const id of allIds()) for (const src of scripts(read(join("mechanisms", id, "index.html")))) closure(src.replace(/^\//, ""), files);
     const all = [...files].map((f) => read(f)).join("\n");
     // the engine chunk names every chunk it can load, dynamic imports included
     expect(all).not.toMatch(/polish\.[\w-]+\.js/);
@@ -77,11 +70,32 @@ describe("site build", () => {
     const html = read("index.html");
     expect(html).toMatch(/<button[^>]*id="qclear"[^>]*hidden/);
     expect(html).toMatch(/id="libbar"/);
-    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${Object.keys(mechanisms).length}</span>`));
+    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${allIds().length}</span>`));
+  });
+
+  it("puts Sort beside Filters, a menu of the orders with New checked, and the cards in the New order (SS3)", () => {
+    const html = read("index.html");
+    expect(html).toMatch(/<button[^>]*id="sbtn"[^>]*aria-haspopup="menu"[^>]*aria-expanded="false"/);
+    expect(html.indexOf('id="ftoggle"')).toBeLessThan(html.indexOf('id="sbtn"'));
+    expect(html).toMatch(/<div[^>]*id="sortmenu"[^>]*role="menu"[^>]*hidden/);
+    expect([...html.matchAll(/role="menuitemradio"[^>]*aria-checked="true"[^>]*data-sort="(\w+)"/g)].map((m) => m[1])).toEqual(["new"]);
+    const cards = [...html.matchAll(/<a class="card"[^>]*>/g)].map((m) => {
+      const attr = (k: string) => new RegExp(`${k}="([^"]*)"`).exec(m[0])?.[1];
+      return { id: attr("data-id")!, no: Number(attr("data-no")), name: "", added: attr("data-added") };
+    });
+    expect(cards.length).toBe(allIds().length);
+    expect(cards.map((c) => c.id)).toEqual(sortBy(cards, DEFAULT_ORDER).map((c) => c.id));
+  });
+
+  it("has a 404 page for a missing address, with the way back to the library", () => {
+    const html = read("404.html");
+    expect(html).toContain("<h1>Sheet ST-404</h1>");
+    expect(html).toContain("This sheet is not in the archive. Its pattern may be lost, or not yet recovered.");
+    expect(html).toMatch(/<a class="btn" href="\/"/);
   });
 
   it("gives the stage its view modes: the Wide toggle, full screen and the remembered mode set before paint", () => {
-    const html = read(join("mechanisms", Object.keys(mechanisms)[0]!, "index.html"));
+    const html = read(join("mechanisms", allIds()[0]!, "index.html"));
     expect(html).toMatch(/<button[^>]*id="wide"[^>]*aria-pressed="false"/);
     expect(html).toMatch(/<button[^>]*id="full"[^>]*aria-pressed="false"/);
     const pre = html.indexOf('localStorage.getItem("stage-view")');
@@ -89,8 +103,24 @@ describe("site build", () => {
     expect(pre).toBeLessThan(html.indexOf('class="dlayout"'));
   });
 
-  it("shows the version in the footer and no colour literals in the page CSS", () => {
+  it("draws the sheet switch as one cog in the sheet's ink, on the library and a mechanism page (SS7)", () => {
+    for (const f of ["index.html", join("mechanisms", allIds()[0]!, "index.html")]) {
+      const btns = [...read(f).matchAll(/<button[^>]*class="themebtn"[^>]*>([\s\S]*?)<\/button>/g)];
+      expect(btns.length, f).toBeGreaterThan(0);
+      for (const [, inner] of btns) {
+        expect(inner!.match(/<svg/g), f).toHaveLength(1);
+        expect(inner, f).toMatch(/<svg[^>]*viewBox="0 0 16 16"[^>]*fill="currentColor"/);
+        // the ring and the half disc, as drawn
+        expect(inner!.match(/<path/g), f).toHaveLength(2);
+        expect(inner, f).toContain('d="M35.52,35.52v-16.35');
+      }
+    }
+  });
+
+  it("shows the release line in the footer: the laws, the codename once the release has one, the version", () => {
     const html = read("index.html");
-    expect(html).toContain(`Version ${JSON.parse(readFileSync("package.json", "utf8")).version}`);
+    const version: string = JSON.parse(readFileSync("package.json", "utf8")).version;
+    const codename: string | undefined = JSON.parse(readFileSync("data/codenames.json", "utf8"))[version.split(".").slice(0, 2).join(".")];
+    expect(html).toContain(`<span>drawn under XVI laws · ${codename ? `${codename} · ` : ""}${version}</span>`);
   });
 });

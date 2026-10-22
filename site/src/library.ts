@@ -1,19 +1,19 @@
-// The library's state as the visitor left it (filters and search in its URL, the scroll position and the mechanisms it
-// shows), kept for the tab in sessionStorage: "Back to library" on a mechanism page returns to it, and Previous and Next step
-// through what it shows.
+// The library's state as the visitor left it (filters, search and order in its URL, the scroll position and the mechanisms
+// it shows), kept for the tab in sessionStorage: "Back to library" on a mechanism page returns to it, and Previous and Next
+// step through what it shows.
 import { url } from "./url";
 
 const KEY = "library";
 const RESTORE = "library-restore";
 
 export interface LibraryState {
-  /** Path and query of the library page, filters and search included. */
+  /** Path and query of the library page, filters, search and order included. */
   href: string;
   y: number;
   /** The mechanisms shown, in the library's order. */
   list: { id: string; name: string }[];
-  /** True when filters or a search narrow the list. */
-  filtered: boolean;
+  /** True when the list is not the catalogue's: filters or a search narrow it, or it is sorted other than by sheet number. */
+  custom: boolean;
 }
 
 const store = (): Storage | null => {

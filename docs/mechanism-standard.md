@@ -1,14 +1,14 @@
 # Mechanism standard
 
 ```
-version: 2.14
-date: 2026-10-20
-supersedes: 1.0 (the hand-off standard of 2026-10-16)
+version: 3.9
+date: 2026-10-22
+supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
 
 This is the one document that says what every mechanism in the library must be: its record and page content, its
-kinematic model, its part design, how it is built as a physical assembly, the mechanical detail it carries, its
-drive, how it is drawn, and how its detail is scaled for performance. Where this document and the code disagree on
+kinematic model, how well it teaches its principle, its part design, how it is built as a physical assembly, the
+mechanical detail it carries, its drive, how it is drawn, and how its detail is scaled for performance. Where this document and the code disagree on
 a rule, the document wins and the code is the bug. Where they disagree on a value (a size, a weight), the code's
 style or hardware table wins and the document is updated.
 
@@ -16,6 +16,28 @@ style or hardware table wins and the document is updated.
 must be located, held, carried, limited, adjusted, oiled, timed or protected. A mechanism here is complete when it
 would really work on a bench: not when it looks finished. Nothing is decorative; the big parts stay plain; the
 richness is in what makes the mechanism move and hold together.
+
+**The v3 pipeline.** A mechanism is no longer a hand-written model and polish. It is its **catalogue record v3**
+(`data/catalog`, spec in `data/catalog/record-spec.md`) with a structured `kin` block (bodies, joints with 3D axes,
+drivers, branch, points, outputs, design choices, ranges) and a `teaching` block (principle parts, traces, construction
+overlays, default view, controls, time map). From the record the pipeline runs:
+
+```
+record v3 → kinematic blocks (closed form, verified by a loop-closure residual)
+          → hardware builder (joint kits, axial stacks, support router, placement solver)
+          → polish (true exceptions only) → 3D solids (Manifold, Node, build time)
+          → 3D checks → package v2 (profiles and meshes) → depth-buffer drafting renderer → site stage
+```
+
+Parts are true 3D solids, the camera is free and orthographic, and sections, details and explodes along each joint
+axis are views of the same solids. The code layout is in `docs/architecture.md`; the look is in
+`docs/style-reference.md` (3.0).
+
+**The teaching test.** Every mechanism is also judged on one question: the motion and the mechanism must be easy to
+understand and good for teaching the principle, mechanics first, with no real-world usage context (the Walschaerts
+gear without the locomotive). How textbooks, 507 Mechanisms and common animations show it is a reference to compare
+against, not a requirement: an artistic interpretation is welcome when the principle reads at least as well. It is a
+review judgement, not a hard check (section 3a, T1).
 
 **One procedure for everything.** There is no separate "new mechanism" and "upgrade" workflow. An agent given a
 mechanism runs a **conformance pass** (section 1): generate the audit, fix what fails, verify, record. A mechanism
@@ -43,7 +65,37 @@ the polish, mark it in the audit, and list it under promotion candidates. The ru
 or an `H.*` primitive with a fixture test, then every mechanism's checks are rerun. That is a change of its own, never
 folded into a mechanism's conformance pass.
 
-Requirement ids (P1, K2, A9, J3, DL2 ...) are stable: audits, notes, issues and commit messages refer to them.
+Requirement ids (P1, K2, A9, J3, T1, DL2 ...) are stable: audits, notes, issues and commit messages refer to them.
+3.0 retires K5 (layers, `dz` and `twin` are gone; the placement solver, A18, sets every axial position) and replaces
+the text of D8, K1, K3, A15, L6 and L7; their ids stay. The ids of the plan's decisions are traced in Appendix C.
+
+---
+
+## The sixteen laws
+
+The standard in sixteen laws, numbered I to XVI. Every drawing in the library is drawn under all of them. A law names
+the sections and the requirement ids it groups; the requirements stay the rule, and audits, issues and commits go on
+citing their ids. Every requirement id falls under exactly one law, so a new requirement joins the range of its law
+(`tests/docs/laws.test.ts`).
+
+| Law | Rule | Sections | Requirements |
+|---|---|---|---|
+| I | **One procedure.** Every mechanism is made and kept by the conformance pass; the standard is versioned and each audit sheet records its pass. | 0, 1, 11 | S1 to S6 |
+| II | **The record is the source.** Facts, prose, tags and links come from the catalogue record v3, and the page reads them by id. | 2 | P1 to P13 |
+| III | **The kinematics are the truth.** Declared in `kin`, solved by the blocks, verified by the loop closure, and never changed by what is built round them. | 3 | K1 to K12 |
+| IV | **It teaches its principle.** Mechanics first: traces, overlays, views, controls and the time map chosen so the lesson reads, and the text matches the motion. | 3a | T1 to T9, T13 to T15 |
+| V | **The principle stays in sight.** What covers it is drawn see-through, supports move aside and are never removed, same-role parts differ by pattern, and depth order holds. | 3a | T10 to T12, T16, T17 |
+| VI | **One form language.** One element, one form, everywhere: shapes follow load, mounts are designed, the big parts stay plain. | 4 | D1 to D7 |
+| VII | **Parts are true solids.** A profile, an operation and a 3D frame; sound, and shipped by operation. | 4 | D8 to D11 |
+| VIII | **Built by the rules.** Every joint is built from its declared type by its kit; supports are routed and every axial position is set by the solver. | 5, 5.1, 5.2, 5b | A1 to A8, A18 to A22, J1 to J13 |
+| IX | **Every load has a path.** Double shear where the sweeps allow, stacks balanced, bearings clamped, hardware named, zero clashes, and it can be assembled and serviced. | 5.2 | A9 to A17 |
+| X | **Taken apart as it was built.** Nothing stretches; fasteners back out the way they went in, in reverse assembly order. | 5a | E1 to E10 |
+| XI | **Nothing is missing.** Every joint and part passes the ten functions; a detail is admitted only when it does a job and stays readable. | 6 | F1 to F10 |
+| XII | **Made, not modelled.** Edges broken, seats and undercuts cut, materials named, every thread locked: the evidence of manufacture. | 7 | M1 to M14 |
+| XIII | **Driven as it would be.** A standard prime mover by input kind, on one solid bracket, sensed and cabled. | 8 | V1 to V6 |
+| XIV | **One look, owned by the style.** Every look value is global: records carry none, roles carry it, one accent, and depth is right in every view. | 9 | L1 to L10 |
+| XV | **Light to load.** Reuse before drawing, small records and polishes, measured load and frame times, and detail scaled on the ladder, never the teaching. | 9a, 9b | R1 to R10, DL1 to DL6 |
+| XVI | **Proven before it is done.** Every check clean, the shots looked at, the audit judged and the mechanism at the current standard. | 10 | Q1 to Q8 |
 
 ---
 
@@ -51,34 +103,47 @@ Requirement ids (P1, K2, A9, J3, DL2 ...) are stable: audits, notes, issues and 
 
 | Id | Requirement | Tier |
 |---|---|---|
-| S1 | This document carries a `version` header and a changelog. Every changelog entry names the requirement ids it touches and its tier: **AUTO** or **STYLE** (code; every mechanism picks it up on rebuild), **HAND** (a mechanism meets it only when re-polished), **DATA**, **SITE**. | DATA |
-| S2 | Every mechanism's audit sheet (`src/mechanisms/<id>/audit.md`) starts with a header: `standard: <version>`, `date`, `result: pass | open`, `detail: full | <rung>`. It is the only per-mechanism record of conformance. | HAND |
-| S3 | `tools/conformance` reads every audit header and this changelog and reports, per mechanism: the audited version, the HAND changes since, the current check results (K, A15, A12). It runs as a test: a mechanism behind a HAND change fails until its audit is redone or the item is deferred in the report with a reason. AUTO and STYLE changes never require a re-audit; they rerun every mechanism's checks. | AUTO |
+| S1 | This document carries a `version` header and a changelog. Every changelog entry names the requirement ids it touches and its tier: **AUTO** or **STYLE** (code; every mechanism picks it up on rebuild), **HAND** (a mechanism meets it only when rebuilt or re-polished), **DATA**, **SITE**. | DATA |
+| S2 | Every mechanism's audit sheet (`src/mechanisms/<id>/audit.md`) starts with a header: `standard: <version>`, `date`, `result: pass | open`, `detail: full | <rung>`. It is the only per-mechanism record of conformance. From 3.0 the audit also records the teaching review's verdict (T2) on a `teaching:` line under the header. | HAND |
+| S3 | `tools/conformance` reads every audit header and this changelog and reports, per mechanism: the audited version, the HAND changes since, the current check results (K1 residual, A15, A12). It runs as a test: a mechanism behind a HAND change fails until its audit is redone or the item is deferred in the report with a reason. AUTO and STYLE changes never require a re-audit; they rerun every mechanism's checks. | AUTO |
 | S4 | Board issues hold mechanism-specific decisions and open items only, pointing at requirement ids. No requirement text, style values or rule descriptions live in issues. | SITE |
+| S5 | **No engine mark.** One engine draws the library, so a page and a library card carry no mark of the engine that drew them. The 3D stamp of the v3 plan's transition left at cut-over with the 2.5D engine, v1 packages and the old polishes. | SITE |
+| S6 | **A mechanism is a 3.0 build.** A registered mechanism is built from its record v3 and has an audit at 3.0 or later; it is held to every HAND change after its audited version (S3). A record without such an audit is not yet a mechanism: its first pass (section 1) writes one. | AUTO |
 
 ---
 
 ## 1. The conformance pass
 
-Run this for any mechanism, whatever state it is in.
+Run this for any mechanism, whatever state it is in. Every mechanism is built **from scratch** from its catalogue record
+v3, the shared blocks and kits, and the rules. An earlier build, polish or audit is at most a loose before/after
+comparison and never a template.
 
-1. **Locate.** `src/mechanisms/<id>/`: `model.ts` (kinematics), `polish.ts` (overrides and additions), `audit.md`.
-   If the folder does not exist, create the model from the catalogue entry (`data/catalog/mechanisms.json`, field
-   `build`: members, joints, params, defining relations, range, overlays, input). Start from the nearest existing
-   mechanism in the same family. Register nothing: the registry reads the folder.
-2. **Generate the audit.** `tools/audit <id>` assembles the mechanism and writes `audit.md` from the template
-   (section 11): one row per requirement with the evidence the tool can collect (check results, clearance, solid
-   lists, sizes), and the ten-function table per joint filled from the assembly (which component serves each
-   function, or "none"). Rows the tool cannot judge are left `?`.
-3. **Judge.** Replace every `?` with PASS, FAIL or N/A and one line of evidence or reason. For section 6 go through
-   every joint and every part.
-4. **Fix, in this order:** DATA and kinematics (P, K) → assembly structure (A, J) → explode (E) → part design (D) →
-   functional completeness (F) → manufacturing evidence (M) → drive (V) → detail levels (DL) → reuse and
-   performance (R). STYLE and SITE items are reported, not fixed in the record. Everything that is not global and not
+1. **Locate.** `data/catalog/sources` holds the record v3 (`kin` and `teaching` blocks, spec in
+   `data/catalog/record-spec.md`); `src/mechanisms/<id>/` holds `audit.md` and, only where the mechanism has true
+   exceptions to the rules, `polish.ts`. A mechanism that does not exist yet has a record and nothing else.
+2. **Teaching review of the record** (T2). Before building, answer "does this teach its principle well?" for the
+   mechanism as the record describes it: six phases drawn from the solved kinematics, the solve checks (strokes,
+   ratios, dwell, straightness), and the text read against the motion. A mechanism built after the original review
+   gets the same method here; so does every mechanism that lands later. Record the verdict and every decision in the
+   record's `teaching` block (principle parts, traces, overlays, view, controls, time map, changed parameters).
+3. **Build.** `tools/package <id>` runs the pipeline of the standard's introduction. Nothing is registered; the
+   registry reads the record and the folder.
+4. **Generate the audit.** `tools/audit <id>` writes `audit.md` from the template (section 11): one row per requirement
+   with the evidence the tool can collect (check results, clearance, solid lists, sizes, which kit and block served
+   which joint), and the ten-function table per joint. Rows the tool cannot judge are left `?`.
+5. **Judge.** Replace every `?` with PASS, FAIL or N/A and one line of evidence or reason. For section 6 go through
+   every joint and every part. For section 3a, look at the six phases again, now drawn with the finished build, and
+   compare against the verdict of step 2.
+6. **Fix, in this order:** DATA and kinematics (P, K) → teaching (T) → assembly structure (A, J) → explode (E) → part
+   design (D) → functional completeness (F) → manufacturing evidence (M) → drive (V) → detail levels (DL) → reuse and
+   performance (R). STYLE and SITE items are reported, not fixed in the record. A fix that belongs in a rule, a kit
+   or a block is made there (promotion), not in this mechanism's polish. Everything that is not global and not
    deferred with a reason gets fixed.
-5. **Verify** (section 10): every tool clean, screenshots at plan, 28°, side view and full explode in both sheets,
-   bench run.
-6. **Record.** Regenerate the audit (the tool keeps judged rows), finish it, set the header. List promotion candidates.
+7. **Verify** (section 10): every tool clean, screenshots in the named views, the section and detail views the record
+   declares, and full explode in both sheets, bench run.
+8. **Record.** Regenerate the audit (the tool keeps judged rows), finish it, set the header and the `teaching:` line.
+   List promotion candidates and the polish's exceptions with their reasons (R7). Before and after shots go in the
+   pull request, not in the audit.
 
 ---
 
@@ -90,36 +155,88 @@ from the catalogue entry with the same id.
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| P1 | The catalogue has a complete record for the id: `name, aka, family, level, summary, motion, ratio, dof, topology, backdrivable, tags, explain {motion, forces, benefits, limits}, build, examples, references, media`, and `real_world` (YouTube videos of real footage; may be empty). The folder has `model.ts`, `polish.ts`, `audit.md`. | DATA | `tools/check <id>` prints no `MISSING` |
+| P1 | The catalogue has a complete **record v3** for the id: `name, aka, family, level, summary, motion, ratio, dof, topology, backdrivable, tags, explain {motion, forces, benefits, limits}, build, kin, teaching, examples, references, media`, and `real_world` (YouTube videos of real footage; may be empty). The folder has `audit.md`, and `polish.ts` only where the mechanism has true exceptions to the rules (R7). | DATA | `tools/check <id>` prints no `MISSING` |
 | P2 | Facets use the controlled vocabularies of the record spec, exact spelling. | DATA | catalogue validator |
 | P3 | **At a glance:** ratio (kind, class, typical), axis relation, output character, backdrivable, other names, plus family, motion, level, dof, and the drive (motorised or hand operated, section 8). | DATA / SITE | page |
 | P4 | **Tags grouped** into Function, Property and Application, keywords underneath. | DATA | page |
 | P5 | **Explanation:** how it moves, forces, benefits, limits; then where you'll find it: 2 to 4 real-world uses, each with one line. | DATA | page |
 | P6 | **Links:** references (Wikipedia plus at least one hard source) and photos and video (at least one video of the real thing, one photo page). In the real world: YouTube videos of real products or machines at work, never animations or renders; none rather than a wrong one. Only URLs that were actually found. | DATA | page |
-| P7 | The page reads the catalogue by id at build time. No prose in `model.ts` or `polish.ts`. | SITE / HAND | lint: no text fields in records |
+| P7 | The page reads the catalogue by id at build time. No prose in `polish.ts`; the page's prose and the teaching labels come from the record. | SITE / HAND | lint: no text fields in polishes |
 | P8 | **Not on the page:** no parts list, no "how it is built" section, no joint sections. | SITE | page |
-| P9 | Explanation text matches what the code does (dwell, ratio, swing, stroke). | HAND | read `explain` against `solve()` and the plot |
-| P10 | Overlays are meaningful for this mechanism: traced `paths` (first gets the comet), `vel`, `forces`, `angles`, `plot` of output against input. | HAND | screenshots with overlays |
+| P9 | Explanation text matches what the code does (dwell, ratio, swing, stroke). The numbers it states are `teaching.claims`, checked by T9. | AUTO check / HAND | claim table; read `explain` against `solve()` and the plot |
+| P10 | Overlays are meaningful for this mechanism: teaching traces (T4), `vel`, `forces`, `angles`, construction overlays (T5), and a `plot` of output against input (or the plot the record names, such as speed ratio or several settings). | HAND | screenshots with overlays |
 | P11 | Prose: plain language, short sentences, no em dashes, mm and degrees. | DATA | read |
+| P12 | **Record v3 validates.** The `kin` block (bodies, joints with 3D axes, drivers, branch, points, outputs, design, ranges) and the `teaching` block (principle, traces, overlays, views, controls, time map, claims, exceptions) pass the schema and the cross-checks of the record spec: every joint's bodies exist, every point a trace or overlay names exists, every control maps to a driver or a design parameter. | DATA / AUTO (validator) | catalogue validator |
+| P13 | **The unbuilt and the late get the teaching review first.** A mechanism not yet built, and one that landed after the original review, passes the review of T2 against its record, with its decisions written into the record, before it is built or rebuilt. | HAND | `teaching:` line of the audit |
 
-Joint notes, badges and build rules (A16) are still written: they are the engineering record the audit reads and
-they explain the build to the next agent. They are not shown on the page.
+Joint notes, badges and build rules (A16) are still written, as part of the polish's reasons or the audit: they are the
+engineering record the audit reads and they explain the build to whoever works on it next. They are not shown on the page.
 
 ---
 
 ## 3. Kinematic model (K)
 
-The animated model is the truth. Everything else is built around it and may never change it.
+The kinematics are the truth. Everything else is built around them and may never change them. In 3.0 they are not
+hand-written: they are the record's `kin` block (bodies, joints, drivers, branch, points, outputs, design, ranges)
+composed from a library of closed-form blocks, with a numeric fallback and a generic verifier.
+
+| Block | Solves | Typical users |
+|---|---|---|
+| dyad | Two links closing on a point (circle-circle intersection, branch chosen) | four-bar and every planar linkage built of dyads |
+| slider dyad | A link and a slide closing on a point | slider-crank, trammel, Scott Russell |
+| gear mesh | Two bodies on parallel or crossed axes: ratio, phase, centre distance, hand | spur, helical, bevel, hypoid, worm, crossed helical, rack |
+| Willis train | Sun, ring, planets and carrier with several inputs and a selector | planetary, Ravigneaux, differential, sun-and-planet |
+| Hooke | Cardan joint: output angle from input angle and bend | universal joint, double Cardan |
+| homokinetic | Constant-velocity joint: the bisecting plane | Rzeppa |
+| Bennett | Overconstrained spatial four-bar, closed form | Bennett linkage |
+| cam | Follower from a motion law (rise, dwell, return, dwell) and the cam's profile, with the pressure angle | cams, barrel cam, face-groove cam, desmodromic |
+| screw | Helical pair: turn and advance at the lead, ball or lead | lead screw, ball screw, differential screw |
+| convey | Small rigid solids carried along a closed path by a travel | chain, belt teeth |
+| flexure | Pseudo-rigid-body model of a neck or a guided beam, with its bend state | flexure hinge, bistable compliant, harmonic drive |
+| escapement | Time-stepped engagement of a wheel and a pallet or fork, with drop and recoil | anchor, lever, verge |
+
+A block is added to the library only when no existing block, and no composition of them, solves the mechanism (K3).
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| K1 | **Kinematics exact.** Pin centres, link lengths, slot widths, gear meshes, cam and locking profiles come from `model.ts`. Styling, hardware and detail never alter a working surface or a centre. Layers and thicknesses may change; geometry may not. | HAND | diff of model geometry; `check` link error ~0 |
-| K2 | `solve(u)`: u is 0..2π per cycle, continuous, periodic, finite. Oscillating inputs use `osc(lo, hi)(u)`. | HAND | `check`: no NaN, periodicity none, no `POSE JUMP` |
-| K3 | Parts only from the part family (link, plate, cap, slider, rails, slotLink, gear, ringGear, rack, disc, custom, tracer). Placement by `fixed`, `between`, `at` or `poses`. | HAND | typecheck |
-| K4 | Roles `driver, link, output, ground, pin, trace`. The input shaft cap has `accent: true`, the only colour accent in the drawing. | HAND | code |
-| K5 | Layers integer, 10 mm apart, 6 mm thick; parts that cross are on different layers; a pin's `layer` is the lowest it joins and `span` the layers it passes. Ground pivots layer −1, radius 7; moving pins radius 5.5. | HAND | `check`: no `INTERFERE`, `OVERLAP`, `WARN` |
-| K6 | Dimensions and defining relations agree with the catalogue build spec (Geneva c = r / sin(π/n), Grashof, Hoekens ratios); where the site deliberately differs, a code comment says so. | DATA | compare |
-| K7 | **Input kind declared:** `input: "rotary" | "oscillating" | "linear" | "manual"`, with the input part named. The drive rule (section 8) and the stop rule (F5) read it. | HAND | typecheck |
+| K1 | **Kinematics exact, and verified.** Pin centres, link lengths, slot widths, gear meshes, cam and locking profiles come from the blocks. A generic loop-closure solver runs at build time on every model and its **residual** (the K1 residual) stays within the tolerance in `src/core`. The solver verifies; it never drives `solve(u)`. Styling, hardware and detail never alter a working surface or a centre. | AUTO | `tools/check`: residual in the report |
+| K2 | `solve(u)`: u is 0..2π per cycle, continuous, periodic, finite. Oscillating drivers use `osc(lo, hi)(u)`. At the default controls the cycle repeats: no control sweeps by itself (T14). | AUTO check | `tools/check`: no NaN, periodicity none, no `POSE JUMP` |
+| K3 | **Kinematics only from `kin`.** Bodies, joints and drivers composed from the block library. A loop that does not decompose uses the numeric fallback, continuing from the previous pose; the audit names it, and K1 checks it like any other. A mechanism that needs a joint or block the library lacks adds it to the library with a fixture (promotion), never as a one-off model. | AUTO / HAND | audit lists block per joint |
+| K4 | Roles `driver, link, output, ground, pin, trace`. The input shaft's body carries `accent: true`, the only colour accent in the drawing. | HAND | code |
+| K6 | Dimensions and defining relations agree with the record's `build.defining_relations` and `kin.design` (Geneva c = r / sin(π/n), Grashof, Hoekens ratios); where the record deliberately differs, its note says so. | DATA | compare |
+| K7 | **Input kind declared** for each driver: `"rotary" | "oscillating" | "linear" | "manual"`, with the driven body named. The drive rule (section 8) and the stop rule (F5) read it. | DATA | validator |
+| K8 | **Joints are declared, never inferred.** Every joint in `kin` names its type (revolute, prismatic, cylindrical, screw, gear mesh, pin-in-slot, cam contact, belt, spherical, universal ...), the two bodies, and its origin and axis in 3D, with limits where it has them. Classification (A1) reads these and nothing else. The catalogue's old `build.joints` list is retired. | AUTO (validator) / DATA | record validator |
+| K9 | **Drivers.** A mechanism has one or several drivers (a differential, a ball-disc integrator), each with a range and a default; a **selector** for discrete settings (a Ravigneaux gear, a Walschaerts die position class); and optionally a **time map** (T13). Every driver is a control (T14). | DATA | validator |
+| K10 | **Branch and design choices declared.** The assembly branch (which side a dyad closes) and the design choices (tooth counts, which arrangement) are in the record, with parameter ranges. The solved branch is continuous over the cycle; a branch flip is a `POSE JUMP`. | AUTO check / DATA | `tools/check` |
+| K11 | **Mobility accounted.** The mobility counted from `kin` equals the record's `dof`; an overconstrained mechanism (parallelogram, Sarrus, Bennett) says so and is solved in closed form. | AUTO | `tools/check` |
+| K12 | **Named points and outputs.** Every point a trace, overlay, plot or dimension refers to is named in `kin.points`; every quantity read off (slider position, output angle, tip path) is in `kin.outputs`. Nothing downstream recomputes geometry. | DATA | validator |
+
+---
+
+## 3a. Teaching (T)
+
+What turns a correct mechanism into one that teaches. These are judged in the pass of section 1 (steps 2 and 5), and
+recorded in the record's `teaching` block so the text, the parameters and the drawing cannot drift apart.
+
+| Id | Requirement | Tier | Verify |
+|---|---|---|---|
+| T1 | **The teaching test.** The motion and the mechanism must be easy to understand and good for teaching the principle: mechanics first, with no real-world usage context (the Walschaerts gear without the locomotive). How textbooks, 507 Mechanisms and common animations show it is a reference to compare against, **not a requirement**: artistic interpretation is welcome when the principle reads at least as well. It is a review judgement, never a hard check. | HAND | the review of T2 |
+| T2 | **A teaching review runs in every conformance pass**, before the build and again on the finished drawing, with a verdict of keep, tweak or rethink and every decision written into the record. The method: six phases drawn from the solved motion, the solve checks (strokes, ratios, dwell, straightness), and the text read against the motion (T9). Mechanisms that landed after the original review, and every later one, get the same method. | HAND | `teaching:` line of the audit |
+| T3 | **Principle parts are declared.** The record's `teaching.principle` lists the bodies and points that carry the principle. They are drawn on top, whole and in depth order, whatever hardware surrounds them (T10 to T12). | DATA | validator |
+| T4 | **Teaching traces** show the phenomenon: the point whose path is the principle (the cycloid of a planet point, both ends of a coupler, both crank circles, the full figure eight), with ticks at equal time where the speed variation is the lesson, and ghost paths for settings the viewer does not have selected. The first trace gets the comet. A wrong point traced is a teaching defect. | DATA | review |
+| T5 | **Construction overlays** carry the geometry a textbook figure draws as construction: dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, the chord that splits cut and return, a workspace outline, the line O–E of an eccentric. Each is a labelled element of `teaching.overlays` with the points it joins, drawn by the overlay rules (SD22 of the style reference). | DATA | review |
+| T6 | **The effect is large enough to see.** Parameters are chosen so the lesson is visible at the default size (a time ratio that differs from the plain slider-crank, a cam with real dwells, lobes deep enough that the wobble reads). Where the review changes a parameter, the change is made in the record and noted there. | DATA / HAND | six phases |
+| T7 | **A default named view** is declared for each mechanism (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ a joint, or VIEW az/el) and it is the one the principle reads in (a valve gear in front elevation, a worm down its axis). The site opens in it; the shot set always includes it. | DATA | `tools/shot` |
+| T8 | **Section and detail views** are declared where a principle lives inside a part or between small parts: a section through a port face or a nut, a detail of a sector. Each is a named entry of `teaching.views`, with its cut plane or window, and highlights the part that matters (the open port, the loaded rocker, the load-carrying groove wall). | DATA | `tools/shot` |
+| T9 | **The text matches the motion.** Every number the explanation states (stroke, ratio, swing, time ratio, dwell, tip-speed variation, phase lag, range) is listed in `teaching.claims` with the output it comes from and a tolerance, and checked against `solve()` at build time. | AUTO check / DATA | `tools/check`: claim table |
+| T10 | **Principle visibility, first: transparency.** Any static solid that covers a principle part in the current view is drawn see-through, automatically, at the view being drawn: not only for a mesh's pitch point or a slot's run (L5) but for every principle part. | AUTO | audit lists solids drawn see-through per view |
+| T11 | **Principle visibility, second: supports are moved.** The support router (A19) places posts, bridges, hangers and plates outside the principle's swept volume when it can. | AUTO | audit lists supports moved |
+| T12 | **Posts and plates are never removed** to uncover the principle. A different construction (a fork end, a part drawn underneath) is allowed only in rare, individual cases, decided in that mechanism's issue and recorded in `teaching.exceptions` with its reason. | HAND | audit: solid count of support parts unchanged |
+| T13 | **A time map** re-parametrises playback near a feature that would otherwise go by in a blink (an escapement's engagement, a snap). It changes the speed of the animation only, never the kinematics (K1) or the swing, and the plot's horizontal axis stays the true input. | DATA | `teaching.timeMap`, shots |
+| T14 | **Controls.** Every driver, selector and design parameter the lesson turns on is a declared control with range and default (a die position, a gear selector, a bend angle, the offset). A control never sweeps by itself: at fixed controls the cycle repeats (K2). Ghost traces show the settings that are not selected. | DATA / HAND | `teaching.controls` |
+| T15 | **Mechanics first.** The record's teaching strings (labels, trace names, overlay captions) state the mechanism, never its use. Real-world context lives only in `examples` and `real_world`. | HAND | read |
+| T16 | **Same-role parts are told apart by pattern and stacking, never by hue** (the Schmidt coupling's two link sets): a role pattern variant or an index mark, not a colour. | STYLE / HAND | theme switch |
+| T17 | **Principle parts are never drawn out of depth order.** No effect that favours them may break the depth buffer (SD1 of the style reference): visibility comes from T10 to T12, never from a depth bias. | AUTO | renderer test |
 
 ---
 
@@ -130,33 +247,38 @@ forms, reused everywhere.
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| D1 | **One element, one form, everywhere.** Link: tapered stadium sized to its bearings, engraved boss rings. Pivot: flush cap, ground larger. Slider and rail: link profile with square ends on two thin stadium rails. Slot link: stadium slot with walls as wide as the end radius. Gear: true involute teeth, plain web or hub and arms, keyed bore. Cam: profile with one engraved base circle, roller follower. Base plate: squircle slab, paths engraved, corner holes. Tapered links are part of the part family (`P.link` with boss radii), so the rules see the real outline. | HAND | screenshot against other mechanisms |
+| D1 | **One element, one form, everywhere.** Link: tapered stadium sized to its bearings, engraved boss rings. Pivot: flush cap, ground larger. Slider and rail: link profile with square ends on two thin stadium rails. Slot link: stadium slot with walls as wide as the end radius. Gear: true involute teeth, plain web or hub and arms, keyed bore. Cam: profile with one engraved base circle, roller follower. Base plate: squircle slab, paths engraved, corner holes. A tapered link is a profile with boss radii, so the rules and the checks see its real outline. | HAND | screenshot against other mechanisms |
 | D2 | Shapes follow load: material where the load runs, bosses round every pin, lightening windows only on big plates and inertia-critical parts. | HAND | review |
 | D3 | Roles told apart by surface pattern and tone, never hue. | STYLE | theme switch |
 | D4 | Consistent radii: base-plate corners from the form style; feet and corner standoffs concentric with the corner arcs. | AUTO | screenshot |
 | D5 | **Solid, designed mounts** over scattered standoffs: one bracket, bridge or post pair, shaped as a part. | HAND (shape) / AUTO (`H.bridge`) | review |
 | D6 | **Nothing cosmetic distracts.** Supporting elements read quieter than the mechanism but stay clearly visible. | HAND + STYLE | screenshots |
-| D8 | **Axis.** A part lies on the base plane (axis z, the default) or stands out of it on an x or y axis of the base: a shaft in plan, a disc on edge, a bevel pinion, a worm, a screw. Such a part declares `axis` and `along` (where it starts along the axis); its outline, its pose and the solved points that place it lie in the plane normal to the axis, and its extent along the axis takes the place of the z range. Joints between parts on different axes are only those that allow it (J9, J11), declared in the model (`meshes`, `screws`). A member whose axis is none of these, and may tilt as it turns (a universal joint's cross, a swash plate, a Rzeppa cage, a governor's arms, a Bennett link), declares axis `p` and a `frame`: its plane is posed each phase by the solved frame of that name (`solve(u).frames`: an origin and two unit directions). Solid modifiers give the forms along the axis: `taper` (a bevel gear's frustum, a cone, a CVT's sheave half, posed or not) and `helix` (a helical gear's teeth, a screw's thread, at its lead). A posed solid slides along its own axis with its frame (a CVT's sliding sheave half); one whose end `reach`es a point that stays (a spring on a seat) changes its length with the frame. | AUTO (z by default; `tools/check` reports `AXIS`) / HAND (where a mechanism needs an axis) | `tools/check` |
-| D9 | **Members that change shape**, cheapest first: a **stretched** part between two solved points, its outline given at unit length (a rope span, a spring); **conveyed** small rigid solids carried along a fixed closed path by a solved travel (chain rollers and links, belt teeth); a **deforming** outline from the solved state each frame, on any axis, posed too, always with the same point count per ring, its holes deforming with it where the part gives them (a flexspline, a CVT's V-belt band, whose inner and outer edges both change), for a few solids only. A flexure is drawn rigid; its bend and stress zone are a `bend` overlay. | AUTO (the placements; the bench counts deforming solids) / HAND (which a mechanism needs) | screenshot, bench |
+| D8 | **A part is a profile, an operation and a 3D frame.** Its outline (the profile, with its holes) is swept by one operation: **extrude** (a plate, a link, a rail), **revolve** (a shaft, a disc on edge, a cone), **sweep** (a helix, a thread, a rope groove, a chain path), or **loft** (a bevel or hypoid tooth, a tapered form), with a taper or twist where the operation allows. The 3D frame places the part: its origin and axes in the base's coordinates, fixed, or posed each phase by a solved body or frame. A part on an x or y axis, or on none (a universal joint's cross, a swash plate, a Rzeppa cage), is simply a part whose frame says so; no axis flag, no plane. Holes and grooves are subtractions; the solid is built by Manifold in Node at build time, watertight, with hole walls tagged. Layers, `dz` and `twin` do not exist. | AUTO (the builders, `tools/check` reports `SOLID`) / HAND (which operation a part needs) | `tools/check` |
+| D9 | **Members that change shape**, cheapest first: a **stretched** solid between two solved points, its profile given at unit length (a rope span, a spring); **conveyed** small rigid solids carried along a fixed closed path by a solved travel (chain rollers and links, belt teeth); a **deforming** profile regenerated each frame from the solved state, with the same point count per ring and its holes deforming with it (a flexspline, a CVT's V-belt band), extruded or revolved only, never boolean, for a few solids only. A flexure's neck is drawn rigid; its bend and stress zone are a `bend` overlay of the flexure block. | AUTO (the placements; the bench counts deforming solids) / HAND (which a mechanism needs) | screenshot, bench |
+| D10 | **Geometry is shipped by operation.** Package v2 carries the **profile and operation** for a plain extrusion or revolution (the browser turns it into triangles) and a **mesh** only for a boolean result (a bored gear, a grooved cylinder), quantised to 1/64 mm. A part that could be a profile is never shipped as a mesh. | AUTO | `tools/package`: sizes per kind |
+| D11 | **Solids are sound.** Every solid is a closed manifold of non-zero volume, every hole wall belongs to its hole, no part is a zero-thickness sheet. | AUTO check | `tools/check`: `SOLID` |
 | D7 | **The big parts stay plain.** Bars, plates, wheels, brackets and the base carry only load-driven shape (D2) and manufacturing evidence (section 7). All richness is in what makes the mechanism move and hold: shafts, bearings, clips, spacers, keys, screws, nuts, springs, stops, adjusters, oilers, marks, sensors. | HAND | review |
 
 ---
 
 ## 5. Assembly: how it is built (A)
 
-Every mechanism is drawn as the bench assembly it would really be. Three stages: the rules, the hand polish, the
+Every mechanism is drawn as the bench assembly it would really be. The hardware builder makes it: a **joint kit** per
+joint type, one **axial stack builder** that works along any joint axis with a **support selector**, a **support
+router** and a **placement solver**. Three stages: the builder and the rules, the polish (true exceptions only), the
 fasteners; then the rigid explode pass.
 
 ### 5.1 Stage 1: the rules (AUTO)
 
-The rules engine reads the kinematic model once (which parts each pin joins, in what order up the stack, which parts
-slide in which slots, which gears mesh) and builds every joint from its type (section 5b). Then the base, standoffs,
-feet, lubrication, timing marks, materials and the drive.
+The builder reads the record's declared joints (K8) once, with the solved sweeps, and builds every joint from its kit
+(section 5b): the axial stack along the joint's axis, its supports chosen and routed against the real swept volumes,
+every position set by the placement solver. Then the base, standoffs, feet, lubrication, timing marks, materials and
+the drive. Nothing is inferred from overlapping outlines.
 
 | Id | Rule | Tier |
 |---|---|---|
-| A1 | Every joint is classified by type (J1 to J11) from the model: fixed or moving pin, keyed or bored part, slot (closed, or open at the rim), slide, mesh, cam contact, belt, a pin on an x or y axis, a declared crossed-axis mesh or screw. Slots are found over the whole cycle, and over as many cycles as an indexing part takes to come round, so an intermittent contact is seen whatever the assembly phase. The canonical build of that type is generated in full. | AUTO |
-| A2 | A fixed pin that drives (the accent input, or a fixed pin with a keyed part) is a **live shaft** (J2); any other fixed pin is a **dead axle** (J1); a moving pin is a **shoulder bolt** joint (J3); a pin in a slot carries a **track roller** (J4); rails carry a **slide** (J5); meshing gears get **mesh hardware** (J6); a cam gets its **follower train** (J7); a declared flexible member gets **J12** and a compliant joint **J13**. A fixed pin on an x or y axis is a **shaft in plan** (J10), live or dead; a moving one is built in its own plane like any J3 or J4; a declared crossed-axis mesh gets **J9** and a declared screw **J11**. | AUTO |
+| A1 | Every joint is **read from the record** (K8) and classified by type (J1 to J13): fixed or moving pin, keyed or bored part, slot (closed, or open at the rim), slide, mesh (parallel or crossed), cam contact, belt, screw, flexible member, compliant joint, on any 3D axis. Slots and intermittent contacts are found over the whole cycle, and over as many cycles as an indexing part takes to come round. The canonical build of that type, its kit, is generated in full. | AUTO |
+| A2 | A fixed revolute that drives (the accent input, or one with a keyed part) is a **live shaft** (J2); any other fixed revolute is a **dead axle** (J1); a moving revolute is a **shoulder bolt** joint (J3); a pin in a slot carries a **track roller** (J4); a prismatic pair carries a **slide** (J5); meshing gears get **mesh hardware** (J6); a cam gets its **follower train** (J7); a declared flexible member gets **J12** and a compliant joint **J13**. A fixed revolute whose axis lies in the base plane is a **shaft in plan** (J10), live or dead; a crossed-axis mesh gets **J9** and a screw **J11**. A moving joint on any axis is built in its own frame like any J3 or J4. | AUTO |
 | A3 | **Catalogue sizing:** bore = largest catalogue bore every boss on the joint can take; each part gets the largest bearing its boss fits with a 1.2 mm wall, else a bronze bushing; gaps get inner-race spacers. | AUTO |
 | A4 | **Shafts are stepped profiles** (`H.shaft`): shoulders at every seat, circlip grooves, set-screw flats, thread with undercut, chamfered ends, wrench flats where tightened without a head, centre holes on turned ends. | AUTO |
 | A5 | **Keys by shaft size:** D-flat to Ø8; feather key and keyway above Ø8; taper pin on cross-pinned small parts. Every keyed part gets the matching bore. | AUTO |
@@ -171,35 +293,70 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | Rule or stage | Serves |
 |---|---|
 | `classify` | A1, A2, A3 |
+| `placement` | A10, A18 |
+| `lugs` | A1, A2 |
 | `base` | A7, D4, M4 |
-| `j6-mesh` | J6, F7 |
+| `posts` | A7, F1 |
+| `wheels` | D1, F2 |
+| `j6-mesh` | J6, F7, F9 |
+| `friction-contact` | J6, F6, F7, M10 |
+| `j9-crossed-mesh` | J9, F4, F7, F9 |
+| `tongue-slot` | J5, F8, M14 |
+| `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
+| `j12-cvt` | J12, J10, D9, F6, F7 |
+| `integrator-carriage` | J5, F1, F5 |
+| `j3-moving-pin` | J3, A12, M3 |
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
-| `j9-crossed-mesh` | J9, F4, F7, F9 |
-| `j11-screw` | J11, F3, F8 |
-| `j3-moving-pin` | J3, A12, M3 |
+| `cross-bearings` | J3, F2, F8 |
+| `trunnion` | J1, F2, F4, F6 |
+| `piston-bore` | J5, M14 |
+| `ring-carrier` | J6, F1, F2 |
+| `eccentric-bearing` | J3, F2 |
+| `pin-ring` | J6, F1, F2 |
+| `pin-hole` | J4, M14 |
+| `spider-pin` | J3, F2, F4 |
+| `ball-socket` | J3, J7, F8 |
 | `j4-slot-roller` | J4, M14 |
-| `j5-slide` | J5, F5, F7 |
+| `pin-lobe` | J4, M14 |
+| `groove-cam` | J7, M14 |
+| `j5-slide` | J5, F5, F7, A6 |
 | `j7-cam` | J7, F6 |
-| `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
-| `stops` | F5 |
-| `standoffs` | A6 |
-| `drive` | V1, V2, V3, V5, V6, F10 |
+| `pallet-contact` | J7, F6, M14 |
+| `fork-pin` | J4, F2 |
+| `pawl-tooth` | J7, F6, F5 |
+| `ring-hub` | J3, F2 |
+| `eccentric` | J3, F2, F8, M14 |
+| `die` | J4, M14 |
+| `hub` | J1, F1, F2, M14 |
+| `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
-| `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
+| `j12-other` | J12, F7 |
+| `strap-sheave` | J12, F1, F2, A11 |
+| `j11-screw` | J11, J10, F2, F3, F4, F5, F8 |
 | `j13-compliant` | J13, A6, F1, F2, F5 |
-| `j2-straddle` | A9, J2 |
+| `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |
+| `stops` | F5, A22 |
+| `drive` | V1, V2, V3, V5, V6, F10 |
+| `adjustable-length` | F7, A22 |
+| `cable-clip` | A22, V6 |
+| `standoffs` | A6 |
+| `covers` | F1, F2, F7 |
 | `feet` | A7, D4 |
 | `lubrication` | F8 |
 | `timing-marks` | F9 |
+| `trace-marks` | T4, L8 |
 | `locking` | M13 |
 | `materials` | M10 |
-| `fasteners (stage 3)` | A8, M4 |
+| `fasteners` | A8, M4 |
 | `headroom` | A13 |
-| `see-through` | L5 |
-| `explode` | E1, E2, E3, E5, E6, E7, E8 |
+| `see-through` | L5, T10, T11, T12 |
+| `explode` | E1, E2, E3, E5, E6, E7, E8, E10 |
+| `axial stack builder` | A20, A12, A3, A4, A5 |
+| `support router` | A14, A19, T11, T12 |
+| `placement solver` | A10, A18, A9 |
 | `hardware primitives` | A13, M1, M3, M5, M11, R3 |
-| `checks (clearance, clamp, edge distance)` | A12, A15, M6 |
+| `checks (clearance, clamp, edge distance)` | A15, M6 |
 <!-- auto-table:end -->
 
 ### 5.2 Stage 2: hand polish (HAND, mandatory for every mechanism)
@@ -210,21 +367,27 @@ meet:
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| A9 | **Double shear wherever the sweeps allow** (clevis pairs, a bridge over a ground pivot, a fork end). Single shear only where a part sweeps over the joint, then with the shortest overhang (1 to 1.5 mm) and two bearings far apart. A clevis is declared in the model (a part's `twin`, plating with `dz`); a live gear shaft, or a live shaft carrying a pulley or sprocket of a declared chain or belt, with nothing over it is straddle mounted by the rules. | HAND (choice) / AUTO (clevis twin, plating, straddle J2) | joint note + badge |
+| A9 | **Double shear wherever the sweeps allow** (clevis pairs, a bridge over a ground pivot, a fork end). Single shear only where a part sweeps over the joint, then with the shortest overhang (1 to 1.5 mm) and two bearings far apart. A clevis is chosen by the kit where the sweeps allow, its axial positions set by the placement solver (A18); a live gear shaft, or a live shaft carrying a pulley or sprocket of a declared chain or belt, with nothing over it is straddle mounted by the rules. | HAND (choice) / AUTO (clevis, plating, straddle J2) | joint note + badge |
 | A10 | **Balanced stack:** parts whose sweeps never meet share one plane; nothing is stacked only to clear something. | HAND | side view |
 | A11 | **Load path closed:** for every joint you can say where its load goes to ground (bolt → bearing → housing → base). Both ends of a dead axle held. Every housing and bridge screwed and dowelled. | HAND (choice) / AUTO (parts) | joint note |
 | A12 | **Bearings clamped through inner-race spacers**, so tightening never squeezes a moving part. A rotating stack never touches a ground face. | AUTO (spacers) / AUTO check | `tools/check` clamp check |
 | A13 | **Named hardware** with real catalogue sizes ("Shoulder bolt Ø6 x 15, M5", "Bearing 6900-2RS (10x22x6)") and materials (M10). | AUTO (defaults) / HAND (variants) | names in the solid list |
-| A14 | **Sweep clearance:** posts, standoffs, brackets, stops, sensors and every added detail clear of every moving part's sweep; state the margin in the note. | HAND | `tools/clearance` |
-| A15 | **Zero clashes** over the full cycle. | AUTO check | `tools/clearance <id>` = 0 |
+| A14 | **Sweep clearance:** posts, standoffs, brackets, stops, sensors and every added detail clear of every moving part's swept volume (not its swept outline); state the margin in the note. The support router (A19) does this by construction; a detail added by hand is checked by A15. | AUTO (router) / HAND (details) | `tools/clearance` |
+| A15 | **Zero clashes in true 3D** over the full cycle. Pairs are intersected with Manifold over sampled phases after a world-box filter, and judged by **penetration depth** (2 × volume ÷ area) against a 0.1 mm tolerance, so a shaft in its own faceted bore is not a clash. A hand `allow` exemption names the pair and its reason, and is flagged **unnecessary** when the pair does not overlap in 3D at any phase. | AUTO check | `tools/clearance <id>` = 0, no unnecessary `allow` |
 | A16 | **Engineering record:** a joint note for every joint saying why it is built that way, a badge (`["double shear","ok"]`, `["single shear","warn"]`, `["both ends held","ok"]`), and 3 to 5 build rules specific to this mechanism. Not on the page (P8). | HAND | code |
 | A17 | **Assemblable and serviceable:** there is an order in which it goes together; every fastener can be reached by a tool when assembled; every pressed bearing can be pulled; nothing is trapped. | HAND | walk the explode |
+| A18 | **The placement solver sets every axial position.** Along each joint axis it orders the parts of the stack by their swept volumes (parts whose sweeps never meet share one plane, A10), sizes the gaps for the hardware (washers, spacers, bearings), and places clevis halves and plating. There are no layers, no `dz`, no `twin`, and no search for them. | AUTO | audit: stack per joint |
+| A19 | **The support router** places posts, standoffs, bridges, hangers and plates against the real swept volumes (Manifold hull of sampled poses, then minimum gap), keeping them outside the swept volume of the principle parts (T3) when it can, and at least the clearance of A14 from every other moving part. What it cannot move is drawn see-through by T10; it is never removed (T12). | AUTO | audit: supports routed, moved, see-through |
+| A20 | **One axial stack builder, with a support selector.** The stack along any axis (bearing, spacer, retainer, thrust washer, hub, key) is one builder; the selector chooses housing (J2), pillow block (J10) or bridge (J1) from where the sweeps leave room and what the load needs. | AUTO | audit: support per joint |
+| A21 | **One kit per joint type.** A kit holds the joint's kinematic block, its hardware rule, its explode axis, its see-through zone and its detail rungs. A joint type that appears in a record without a kit gets a new kit (promotion), not hand hardware. | AUTO | audit: kit per joint |
+| A22 | **Recurring hand fixes are rules.** Rocker stops and swing scale, adjustable length, one hub per keyed gear, and the cable clip are generated by the builder, not placed by hand. A fix that recurs in three mechanisms is promoted to a rule or kit. | AUTO | promotion candidates |
 
 ### 5a. Explode (E)
 
-The explode view pulls the assembly apart along the pin axes, in the order a fitter would take it apart, every part
-whole, every screw out of its hole as one piece. Explode is encoded per solid as a stack level; the renderer moves a
-level by a fixed gap at full explode.
+The explode view pulls the assembly apart **along each stack's joint axis**, in the order a fitter would take it apart,
+every part whole, every screw out of its hole as one piece, with a trail line from each part to its place. Explode is
+encoded per solid as a stack level and an axis; the renderer moves a level by a fixed gap along that axis at full
+explode. Stacks on different axes (a bevel pair, a worm and its wheel) explode in their own directions.
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
@@ -236,11 +399,12 @@ level by a fixed gap at full explode.
 | E6 | **Bought units stay whole:** motor, bearing, track roller, sensor, pulley pair. Motor and bracket move as one; the belt stays in the pulley plane. | AUTO | explode |
 | E7 | **Loose spacers and washers sit midway** between the parts they separate. | AUTO | explode |
 | E8 | **Keyed parts on one shaft keep their order**; the shaft leaves to the side it was fitted from. | AUTO | explode |
-| E9 | **Readable at full explode:** nothing inside another part, labels attached, nothing leaves the frame. | HAND | screenshots at 100%, 28° and 70° |
+| E9 | **Readable at full explode:** nothing inside another part, labels attached, nothing leaves the frame. | HAND | screenshots at 100% in ISOMETRIC and the default view |
+| E10 | **Explode axes and trails.** Each stack carries its joint axis; a part moves only along it; a trail line joins every part to its assembled position. | AUTO | explode |
 
 ### 5b. Joint-type catalogue (J)
 
-The canonical full build per joint kind. The rules generate it; the polish picks variants (open or sealed, key or
+The canonical full build per joint kind, which is the hardware rule of that joint type's kit (A21). The kits generate it; the polish picks variants (open or sealed, key or
 D-flat, clevis or single, which side the bridge goes) and overrides what the sweeps forbid. A joint is not done until
 every line of its row exists or is marked N/A with a reason in the audit.
 
@@ -397,26 +561,29 @@ definition, as long as they are readable.
 | V2 | **One solid bracket:** top flange against the base, floor for the motor, full-height window for the belt; flange screws go up into the base from inside; nothing shows on top of the base. A motor beside a shaft in plan stands on one angle bracket instead: an upright its face screws to and a foot screwed to the base top, both slotted for the belt's tension. | AUTO | side view |
 | V3 | Belt and pulleys clear of feet, housings and base hardware; where the belt passes under a post, its lower screw becomes a flush countersunk screw. | AUTO (rule) / HAND (motor position) | `tools/clearance` |
 | V4 | Drive detail: pulley flanges, set screws or clamp hub, belt tension slot, idler where needed (J8). | AUTO | screenshot |
-| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. A compliant joint's lever (J13) has no shaft: a pin pressed into its tip runs down through an arc slot in the base to the link, the rocker's pivot the joint's centre, the motor on the line of the tip's chord. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
+| V5 | **Drive by input kind** (K7): `rotary`: belt to the input pulley. `oscillating`: motor, short crank and connecting link swinging the rocker through exactly the modelled range; the crank belongs to the drive. A compliant joint's lever (J13) has no shaft: a pin pressed into its tip runs down through an arc slot in the base to the link, the rocker's pivot the joint's centre, the motor on the line of the tip's chord. An oscillating input that turns more than one turn on a shaft in plan (a lead screw run back and forth) is driven by a reversing motor through the in-plan belt drive on the shaft's free end, since a crank and link cannot swing a shaft through several turns. `linear`: belt loop along the stroke with a carriage clamped to the input slider, tensioner on the far pulley. `manual`: no motor; a handle, knob or lever on the input and a stop at the end of the range; the page says hand operated. | AUTO | screenshot, page |
 | V6 | **Sensing and cabling:** home flag on the input and a fork sensor on the bracket or a post; motor and sensor leads to a terminal block on the base edge, one cable clip under the base (on the base top for a motor beside a shaft in plan). | AUTO | underside view |
 
 ---
 
 ## 9. Look and rendering (L)
 
-The look is the blueprint / drafting scheme: dark Blueprint and light Drafting sheets. Full styling lives in
-`docs/style-reference.md`; this section keeps the rules a mechanism build depends on.
+The look is the blueprint / drafting scheme: dark Blueprint and light Drafting sheets, now drawn from true 3D solids
+by a depth-buffer renderer with a free orthographic camera. Full styling lives in `docs/style-reference.md` (3.0); this
+section keeps the rules a mechanism build depends on.
 
 | Id | Requirement | Tier |
 |---|---|---|
 | L1 | **Every look value is global**, in `src/style`. A mechanism never carries colours, line weights, opacities, patterns or fonts. | STYLE |
 | L2 | **Records carry no look.** A model and a polish supply geometry, roles, materials, marks, detail levels and `accent: true` on the input; the renderer decides how they look. | HAND (don't break it) |
-| L3 | **Roles carry the look.** Each role has its own surface: driver fine stipple, link sparse dots, output hatching, ground soft dashes, base a faint dot grid, bearings cross-hatch, hardware plain. Every solid's `role` must be right. | HAND |
+| L3 | **Roles carry the look.** Each role has its own surface, registered to the part's local coordinates so it moves, turns and foreshortens with the part: driver fine stipple, link sparse dots, output hatching, ground soft dashes, base a faint dot grid, bearings cross-hatch, hardware plain; walls shade by stepped facing. Every solid's `role` must be right. | HAND |
 | L4 | **One accent colour** for the input shaft ring, the traced path and the forces. `accent: true` goes on the input only. | HAND (flag) / STYLE |
 | L5 | **Transparency stays.** Surfaces are semi-transparent and a covered edge becomes a dashed hidden line, so screws in holes, bearings in bores and shanks through plates show. Model them as real solids with real holes, never as a mark on a top face. A static solid that hides a working zone (the pitch point of a mesh, the run of a slot roller) is drawn see-through, so the zone stays in view. | AUTO (stage 3, see-through) / HAND |
-| L6 | **Correct depth order** at every tilt: solids sliced at every overlapping z boundary; a solid on an x or y axis cut along its own axis where another solid's box meets it and placed by the plane between their boxes; a posed solid kept whole and placed by its box (a tapered one boxed at both ends, one that slides or reaches boxed at its extent of the frame); nothing paints in front of what it sits behind. | AUTO |
-| L7 | **View:** tilt from 0° (true plan) to 88° (side elevation), no sideways shear. Pseudo-2D only. | STYLE |
-| L8 | **Drawing conventions the mechanism feeds:** chain centrelines through every joint head and base-plate dimensions are automatic. Engraved scales, index marks and match marks are `marks` and draw as fine ink lines. Fill patterns never get finer than the on-screen floor; a detail under about 1 mm becomes one mark or nothing. | AUTO / HAND |
+| L6 | **Correct depth at every view.** The renderer peels depth layers and composites them front to back: nothing paints in front of what it sits behind, at any camera, section or explode. There is no slicing, no painter's order, and no depth bias (T17). | AUTO |
+| L7 | **View:** a turntable orbit (yaw and tilt) in an orthographic camera, snapping to the named views PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ joint and VIEW az/el. No perspective. A mechanism declares its default view (T7). | STYLE |
+| L8 | **Drawing conventions the mechanism feeds:** centrelines along every joint axis (by the angle of the axis to the view) and base-plate dimensions in the named views are automatic. Engraved scales, index marks and match marks are `marks` and draw as fine ink lines. Fill patterns never get finer than the on-screen floor; a detail under about 1 mm becomes one mark or nothing. | AUTO / HAND |
+| L9 | **Section views, detail views and phantom positions** are views of the same solids. A section cuts at a plane the record names, hatches the cut faces at 45° and shows the cut outlines; a detail view magnifies a window; a phantom shows the part at an extreme position as a thin outline. They are declared in `teaching.views` (T8) and drawn by the renderer; a mechanism never draws them itself. | AUTO / DATA |
+| L10 | **Teaching overlays use the sheet's look:** construction overlays, ghost traces, equal-time ticks and highlights come from the record's teaching block and are drawn by the overlay rules (style reference SD22 to SD24, SD26); they never change the drawing beneath. | AUTO / STYLE |
 
 ### 9a. Reuse and performance (R)
 
@@ -425,11 +592,13 @@ The look is the blueprint / drafting scheme: dark Blueprint and light Drafting s
 | R1 | **Reuse before you draw.** If the part family, `H.*` or a subassembly already makes the part, use it. Never redraw a standard part inline in a polish. A part needed by two mechanisms becomes an `H.*` primitive first. | HAND | read the polish for inline outlines |
 | R2 | **Standard size series.** Bearings only from the catalogue table; screws M2, M2.5, M3, M4, M5, M6, M8; shafts Ø6, 8, 10, 12; standoffs Ø10; GT2 pulleys 16T and 32T; circlips, keys and springs from their tables. As few distinct sizes per mechanism as the loads allow. | HAND | sizes listed in the audit |
 | R3 | **Shared subassemblies are one function, never copied:** housing, bridge, slide, eccentric, stops, drag pack, belt drive, sensor. | AUTO | code |
-| R4 | **Pre-built packages.** The assembled mechanism (solids, traces, bounds, plot, joints) is packaged at build time; the browser loads the package, `solve(u)` and the renderer. The rules, hardware library and polish are never shipped. | AUTO | `tools/package` |
+| R4 | **Pre-built packages (package v2).** The assembled mechanism (profiles and operations, meshes for boolean results, traces, bounds, plot, joints, teaching block) is packaged at build time; the browser loads the package, `solve(u)` and the renderer. Manifold, the rules, the hardware library and the polish are never shipped. | AUTO | `tools/package` |
 | R5 | **Polish states only what differs** from the rules. No heavy sampling inside a polish; when it needs the swept range, sample once (≤ 180 steps). | HAND | polish ms in the bench |
-| R6 | **Load time and frame time are measured, not gated.** `tools/bench` reports package size, session setup, frame time at plan, 28°, side and explode, on the detail stage and a thumbnail, against the targets in the design (8 ms desktop frame, 16 ms phone, 20 ms setup). Over target is a flag to look at (section 9b), never a reason to cut function. | FLAG | bench report |
-| R7 | **Small records.** `model.ts` and `polish.ts` together under about 20 KB; no stored point lists where geometry can be generated. | HAND | file size |
+| R6 | **Load time and frame time are measured, not gated.** `tools/bench` reports package size, session setup split into decode, tessellate, edges and GPU, and frame time at each named view and dial position, on the detail stage and a thumbnail, against the targets in the design (8 ms desktop frame, 16 ms phone, 20 ms setup). Over target is a flag to look at (section 9b), never a reason to cut function. | FLAG | bench report |
+| R7 | **Small records, small polishes.** A polish states only true exceptions to the rules and kits, each with its reason in the audit; the share of the build the pipeline generates is reported (the plan's expectation: about three quarters of the model and three fifths of the polish are generated), and a polish that grows is a promotion candidate (A22). No stored point lists where geometry can be generated. | HAND / FLAG | polish size, audit |
 | R8 | **Draw only what is seen.** Thumbnails are pre-rendered images; cards animate on hover only; the stage draws only when u, view or theme changed. | SITE / AUTO | profile |
+| R9 | **Setup is shared and shipped cheap.** One GPU context serves a page; edges are shipped with the package or extracted in a worker; plain extrusions and revolutions turn into triangles in the browser (D10). | AUTO / SITE | bench: setup split |
+| R10 | **Phone measurement.** Startup and frame time on a mid-range phone are acceptance criteria of the engine's package and renderer steps. Method: a bench page published with each measured build; the owner opens it on the phone and sends the numbers back. Setup is split into decode, tessellate, edges and GPU, with frame time per view and dial position. | FLAG | bench page |
 
 ### 9b. Detail levels (DL)
 
@@ -448,13 +617,13 @@ performance and perception tests later.
 |---|---|---|---|
 | DL-A | first | Paper grain; bearing balls and cages; motor internals (stator, windings, magnets, commutator) | Faint by design; nothing about the build is lost |
 | DL-B | | Manufacturing marks: chamfer lines, bore-entry rings, head flutes, hex sockets, knurls, keyway marks, thread helices | Texture of the parts, not their presence |
-| DL-C | | Wall shading steps (walls flat), silhouette lines on inner slices (kept on the top slice) | Softens the drawing without removing a line that carries meaning |
+| DL-C | | Wall shading steps (walls flat), silhouette lines on the layers behind the nearest (kept on the nearest) | Softens the drawing without removing a line that carries meaning |
 | DL-D | | Stack hardware hidden inside a joint: inner-race spacers, thrust and plain washers, sleeves, shims, internal circlips | Invisible inside the stack unless exploded; drawn again whenever explode > 0 |
 | DL-E | | Service and sensing parts: oil sinks, nipples, felts, wipers, home flag, sensor, terminal block, cable clip, leads, timing marks | Small distinct parts off the load path; the build still reads complete |
 | DL-F | | Role surface patterns (roles then read by tone and outline only) | Large areas change; roles get harder to tell apart |
 | DL-G | | Hidden lines (the dashed copies of covered edges); device pixel ratio capped at 1 | A drafting convention the whole look leans on; a soft image is seen at once |
 | DL-H | last | Retention and adjustment parts: external circlips, retainer plates, nuts, set screws, eccentric bushings, gib strips, stops, springs, wear strips, dowels, spigots | Without these the build reads as incomplete |
-| never | | The mechanism's parts, base plate, every joint's main hardware (shaft or bolt, head, bearings, housing, bridge, standoffs), motor, bracket, belt, pulleys, traced paths, overlays | The build itself and what the page is for |
+| never | | The mechanism's parts, base plate, every joint's main hardware (shaft or bolt, head, bearings, housing, bridge, standoffs), motor, bracket, belt, pulleys, teaching traces, construction overlays, section and detail views | The build itself and what the page is for |
 
 | Id | Requirement | Tier |
 |---|---|---|
@@ -462,6 +631,7 @@ performance and perception tests later.
 | DL2 | A mechanism may declare a **default dial position** in the model (full unless the audit finds a reason); the audit header records it. The package stores everything; the dial is applied when drawing, never at packaging. | HAND |
 | DL3 | **View-aware exceptions live in the table too:** DL-D is drawn whenever explode > 0; DL-B marks are skipped at side elevation (tilt ≥ 80°) because they are edge-on. | AUTO |
 | DL4 | **Adaptive:** the site measures frame time on the stage and moves the dial one rung at a time with hysteresis, never past DL-G on its own, never on a thumbnail or a screenshot. The visitor can pin full detail. The dial position shows in the title block ("DETAIL A-H" or "FULL") so a screenshot is never mistaken for the full build. | SITE |
+| DL6 | **Teaching content is never on the ladder.** Traces, construction overlays, ghost paths, ticks and the views of `teaching.views` are drawn at every dial position; the dial drops only build detail. | AUTO |
 | DL5 | **Measured:** the bench reports, per mechanism, the solids and marks on each rung and the frame time at each dial position, so the ladder can be re-ranked from evidence and the cost of each rung is known. | FLAG |
 
 ---
@@ -470,13 +640,14 @@ performance and perception tests later.
 
 | Id | Check | Pass |
 |---|---|---|
-| Q1 | `tools/check <id>` | no `MISSING`, `NaN`, `LINK LEN`, `POSE JUMP`, `INTERFERE`, `OVERLAP`, `WARN`, `AXIS`, clamp or edge-distance fault; periodicity none |
-| Q2 | `tools/clearance <id>` | 0 clashes over the full cycle |
-| Q3 | `tools/package <id>` and the site build | package written, page builds |
-| Q4 | `tools/shot <id>`: plan, 28°, side, full explode at 28° and 70°, both sheets, overlays on | nothing clips, details readable, nothing distracts, E1 to E9 hold |
+| Q1 | `tools/check <id>` | no `MISSING`, `NaN`, `POSE JUMP`, `SOLID`, or clamp or edge-distance fault; K1 residual within tolerance; the claim table (T9) agrees with `solve()`; periodicity none |
+| Q2 | `tools/clearance <id>` | 0 clashes in 3D over the full cycle, no unnecessary `allow` |
+| Q3 | `tools/package <id>` and the site build | package v2 written, page builds |
+| Q4 | `tools/shot <id>`: the default view, PLAN, FRONT, SIDE and ISOMETRIC, every section and detail view of the record, full explode, both sheets, overlays on | nothing clips, details readable, nothing distracts, the principle reads (T1), E1 to E10 hold |
 | Q5 | `tools/bench <id>` | report written; flags noted in the audit (not a failure) |
 | Q6 | `tools/audit <id>` regenerated and judged | every requirement PASS or N/A with reason, or FAIL listed as open with a reason; ten-function table complete for every joint |
 | Q7 | `tools/conformance` | the mechanism is at the current standard version |
+| Q8 | Teaching review recorded | the verdict and every decision of T2 are in the record and the audit's `teaching:` line, and the six phases of the finished build were looked at again (a judgement; not a failing check) |
 
 Checks Q1, Q2, Q6 and Q7 run as tests for the changed mechanism; all mechanisms when the rules, hardware, style or
 renderer change. Q4 and Q5 run locally.
@@ -485,15 +656,18 @@ renderer change. Q4 and Q5 run locally.
 
 ## 11. Audit sheet template
 
-`tools/audit <id>` writes this. A row the tools decide outright (P1, K2, A12, A15, M6, R7, Q1, Q2) is filled and
-regenerated every time; every other row gets its tier and the evidence the tools collect (rule firing, joint types,
-names, sizes, materials, locking, rungs) and a `?` to judge. Judged rows, hand entries in the joints table, the
-header, deferrals, variants, promotion candidates and measured frame times survive regeneration. A deferral is a line
+`tools/audit <id>` writes this. A row the tools decide outright (P1, K1, K2, K11, T9, D11, A12, A15, M6, Q1, Q2) is
+filled and regenerated every time; every other row gets its tier and the evidence the tools collect (rule firing, kits,
+supports, names, sizes, materials, locking, rungs) and a `?` to judge. The evidence of K1 is the K1 residual, of T9 the
+claim table, of A15 the 3D clashes and the unnecessary `allow` exemptions. Judged rows, hand entries in the joints
+table, the header, the `teaching:` line, deferrals, variants, promotion candidates and measured frame times survive
+regeneration. A sheet below 3.0 does not register its mechanism; the pass writes a 3.0 sheet (S6). A deferral is a line
 `defer: <ids or version> · <reason>`; no reason, no deferral.
 
 ```markdown
 # Audit: <name> (<id>)
-standard: 2.0 · date: YYYY-MM-DD · result: pass | open · detail: full · pass: build | audit+fix
+standard: 3.0 · date: YYYY-MM-DD · result: pass | open · detail: full · pass: build | audit+fix
+teaching: keep | tweak | rethink · decisions in the record
 
 ## Summary
 PASS n · FAIL n · N/A n · open: ...
@@ -501,13 +675,18 @@ PASS n · FAIL n · N/A n · open: ...
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks) |
 | ... | | |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| <joint> | J3 | component / none / – reason | | | | | | | | | |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| <joint> | J3 | dyad | bridge (moved) | slab 1 | component / none / – reason | | | | | | | | | |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| <support> | <joint> | bridge | moved / first choice | 1.5 | principle bodies still covered | see-through / – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -521,7 +700,7 @@ PASS n · FAIL n · N/A n · open: ...
 Hand fixes that should become rules or primitives.
 
 ## Verification
-check · clearance · clamp · edge distance · package
+check (K1 residual, claims) · clearance (3D, unnecessary allow) · clamp · edge distance · package
 screenshots (paths) · bench (flags)
 ```
 
@@ -529,112 +708,148 @@ screenshots (paths) · bench (flags)
 
 ## Appendix A. Family playbooks
 
-Start here, then run the full ten-function audit.
+Start here, then run the full ten-function audit and the teaching review (T2). Each playbook names the kinematic
+blocks and joint kits a family uses, what its records declare, and the hardware choices that recur. A fix that recurs
+in three mechanisms becomes a rule or a kit (A22).
 
-**Linkages** (four-bar, Watt, Chebyshev, Hoekens, Peaucellier, Jansen, pantograph, scissor lift)
-- F5 stops just outside the rocker's range (`H.stops`); F2 circlips or shoulder bolts on every moving pin.
-- F7 where the model depends on an exact length ratio (straight-line linkages, pantographs), one length is adjustable,
-  shown at its set point, drawn length exact: `H.eccentricMount` where a ground pivot carries the exact dimension,
-  `H.turnbuckle` on a moving link otherwise (in the link's own plane, so it fits a swept stack with no room above or
-  below the link).
-- Scissor lift and pantograph: `manual` input with a handle and stops, or `linear` with a belt carriage.
+**Linkages** (four-bar and the planar family, straight-line linkages, six-bars, pantograph, scissor lift)
+- Blocks: dyad, slider dyad. Kits: J3 on every moving pin, J1 or J2 on the ground pivots, J5 on a slide.
+- Teaching: trace the point that carries the principle (both coupler ends of a parallelogram, B with equal-time ticks on
+  a double crank, the full figure eight of a Watt linkage as a ghost path, g's circle with p's line on a Hart
+  inversor); construction overlays for dead-centre lines, moment arms and workspace outlines; mark the toggles.
+  A bridge over a ground pivot that would read as a bar is moved by the router or drawn see-through (T10 to T12).
+- F5 stops just outside the rocker's range, generated from the solved range with the swing scaled (A22); F2 circlips or
+  shoulder bolts on every moving pin.
+- F7 where the record depends on an exact length ratio, one length is adjustable, shown at its set point, drawn length
+  exact (the kit generates the eccentric mount or the turnbuckle, in the link's own plane).
+- Scissor lift and pantograph: `manual` input with a handle and stops, or `linear` with a belt carriage. Five-bar:
+  two driven cranks, the tip by inverse kinematics, the workspace as a construction overlay.
 
-**Gears** (spur, gear train, planetary, rack and pinion)
-- J6 on every mesh; M2 hub and arms on large wheels; F8 open gears are greased, oil sinks on bridge pivots.
-- Rack: screwed and dowelled to the base, F5 end stops, F8 felt wiper. Planetary: marks for planet phase.
+**Gears** (spur, gear train, planetary and compound trains, rack and pinion, non-circular, cycloidal)
+- Blocks: gear mesh, Willis train (several drivers, a selector for Ravigneaux). Kit: J6 on every mesh; one hub per
+  keyed gear (A22).
+- M2 hub and arms on large wheels; F8 open gears are greased, oil sinks on bridge pivots. Planetary and compound trains:
+  marks for planet phase, a trace on a planet point (the cycloid), a mark on a sun or ring so a turn can be counted.
+  A gear that covers a smaller one is drawn see-through (T10), never removed.
+- Rack: screwed and dowelled to the base, F5 end stops, F8 felt wiper.
 
-**Intermittent** (Geneva, intermittent gear, ratchet and pawl)
-- M2 lighten the indexed member; F6 drag pack where locking is not positive; M14 a screwed locking segment on the
-  Geneva disc; ratchet: real pawl spring screwed down, second holding pawl if the model has one; F10 home sensor.
+**Intermittent** (Geneva, internal Geneva, intermittent gear, star wheel, ratchet and pawl, sprag clutch, indexers)
+- Blocks: cam (locking and indexing laws), gear mesh with a time map where a snap is the lesson. Kits: J7, J4 with
+  wear strips, J6.
+- M2 lighten the indexed member, smaller windows rather than none; F6 drag pack where locking is not positive; M14 a
+  screwed locking segment; ratchet: real pawl spring screwed down, a second holding pawl if the record has one; F10 home
+  sensor. Show the locking arcs clear of hardware; the crank bridge see-through so the locking sector shows.
+- A sprag clutch shows lock and overrun as timed phases and a detail view of a sector.
 
-**Quick-return and slider** (slider-crank, scotch yoke, crank shaper, Whitworth, oscillating cylinder, locomotive drive, toggle clamp)
-- J5 on every slide (reference rail, gib under the keeper, wipers, nipple, an end stop at each end); J4 in every slot
-  with wear strips.
+**Quick-return and slider** (slider-crank, offset slider-crank, scotch yoke, crank shaper, Whitworth, drag link,
+oscillating cylinder, locomotive drive, Walschaerts, Wankel, toggle clamp)
+- Blocks: dyad, slider dyad, cam for valve gears. Kits: J5 on every slide (reference rail, gib under the keeper, wipers,
+  nipple, an end stop at each end); J4 in every slot with wear strips.
+- Teaching: dead-centre and tangent lines and the chord splitting cut and return as construction overlays; a die control
+  with ghost traces for its other settings, never an automatic sweep (T14); a section view through a port face with the
+  open port highlighted. An oscillating cylinder's trunnion and its piston are kits of their own: the trunnion pin
+  pressed into the cylinder's port pad, in a bushing in the port face, a spring and a nut holding the faces together
+  (trunnion); the piston on two rings in the bore (piston-bore).
 - Scotch yoke: slide block in the slot (M14 liners). Toggle clamp: `manual`, over-centre stop visible (F5), adjustable
-  spindle with lock nut (F7). Oscillating cylinder: pivot pin retained (F2); spring holding the port face (F6).
+  spindle with lock nut (F7), a workpiece block. Oscillating cylinder: pivot pin retained (F2); spring holding the port
+  face (F6).
+- J5 on ground ways stands on risers from the base, so every part pinned to a slider lies over it (placement); its
+  rails stop short where a crank turns past their ends, a side whose part reaches past its block (a crosshead's arm)
+  keeps only its riser's lip. A block sliding in a moving part's slot (a crank-shaper's or Whitworth's lever) shares
+  that part's slab and runs on wear strips in the slot: the slot is the guide.
+- An eccentric (a revolute with a journal `radius`, sheave and strap) is a kit of its own: one slab, a split bronze liner,
+  a cheek ring, an oil nipple. A part turning on a fixed hub (a ground revolute with a `radius`: Whitworth's bull gear)
+  is the hub kit: hub post, liner, cap ring, slotted base holes for the backlash; a pivot inside the hub stands through it.
+- A curved slotted link (an expansion link) is two cheeks, the lower solid on its trunnion, the upper slotted, so its
+  die (the die kit, on the shared pin's spigot) runs in a groove over the trunnion; the die's carrier lies over the link.
+- When each pivot lies in the other part's sweep (a drag link with a rod over the output pivot), the output part is
+  split in two plates round a gap and its live shaft turns in a bushing in a bridge between them. A return crank fixed
+  on the outer end of a main crank pin is an outboard arm on a slab of its own, clamped in the pin's stack.
+- A rotary engine: rotor web underneath on its eccentric, its gear ring on top meshing with the stationary gear, which
+  hangs from the side cover through slotted holes (backlash, F7); housing and cover at the rotor's level; the cover is
+  drawn see-through (T10). A manual driver's shaft (a reverse arm's) is held at its setting by a clamp collar (F6).
 
-**Cam** (cam follower)
-- J7 complete: return spring with seat and preload, guide bushing with circlip, anti-rotation key on flat followers,
-  felt oiler, zero line; hardened cam and a replaceable track insert where the roller runs (M14).
+**Cam and escapement** (cam follower, flat-faced, face-groove, desmodromic, barrel cam, anchor, lever, verge)
+- Blocks: cam, escapement. Kit: J7 complete: return spring with seat and preload, guide bushing with circlip,
+  anti-rotation key on flat followers, felt oiler, zero line; hardened cam and a replaceable track insert (M14).
+- Teaching: the true orientation and a default view that shows it (an escapement's pendulum hanging down in front
+  elevation, a desmodromic valve vertical under its camshaft); the loaded wall or rocker highlighted; a time map slows
+  playback near an engagement (T13) and the swing stays true.
 
-**Couplings** (Oldham, universal joints)
-- Each shaft in its own J2 cartridge; F8 lubrication of sliding tongues; F3 clamp hubs on shaft ends.
+**Couplings** (Oldham, Schmidt, universal joint, double Cardan, Rzeppa, flexible couplings)
+- Blocks: Hooke, homokinetic, and the dyad for the Oldham and Schmidt families. Each shaft on its own support (J2 or J10);
+  the cross of a universal joint in needle cups held by circlips (F2), a grease nipple on the cross (F8), the cross-pin
+  kit; each yoke a keyed hub, a bar and two arms bored for the cups, placed on the cross's centre; clamp hubs or
+  keyed yokes on the shaft ends (F3); F8 lubrication of sliding tongues.
+- A member that tilts as it turns (the cross, a cage, a swash plate) is a part whose frame is a solved body; the cross's
+  arms lie along the two yokes' pins.
+- Teaching: discs and hubs see-through so tongues, slots and index marks show; the disc-centre orbit as a full circle;
+  parts of one role told apart by pattern (T16); a bend or phase control (T14); a section through a cage.
 
 **Spatial gears** (bevel, hypoid, worm, helical, herringbone, crossed helical)
-- The geometry from `src/core/spatial.ts`: bevel pitch cones from the tooth counts and shaft angle, the gear a toothed
-  frustum (`taper` = the inner end's scale) with Tredgold back-cone teeth; a worm's lead and lead angle, its wheel at
-  the lead angle; a helical gear's transverse profile turned by its `helix`.
-- Declare every crossed mesh in `meshes` (J9), the worm first. A gear on an x or y axis turns on a shaft in plan
-  (J10); a bevel pinion overhangs its wheel, so its blocks stand behind it and it is held on the shaft end. A rotary
-  input on that shaft is driven by a motor beside it (V1).
-- F7 by the shim packs (mounting distance); F4 where the mesh pushes; F9 marks at the mesh; herringbone: one shaft
-  located, the other free to float so the halves share the load.
-- Worm: the worm between its two blocks, never overhung; the located block takes its thrust both ways (F4); the wheel's
-  shim sets its mid-plane on the worm's axis (F7). A bronze wheel on hub and arms, a case-hardened ground worm (M2,
-  M10), oiled for the sliding contact (F8). Where the lead angle is below the friction angle the note says it is
-  self-locking, never a substitute for a brake.
+- Blocks: gear mesh on crossed axes. Kits: J9 on every crossed mesh, J10 on a shaft in plan, J2 for the rest. The
+  geometry comes from `src/core/spatial.ts` (pitch cones from the tooth counts and shaft angle, Tredgold back-cone teeth
+  as lofts, lead and lead angle of a worm, a helical gear's transverse profile turned by its helix).
+- A bevel pinion overhangs its wheel, so its blocks stand behind it; a worm runs between two blocks, never overhung,
+  the located one taking its thrust both ways (F4), the wheel's shim setting its mid-plane on the worm's axis (F7). A
+  rotary input on a shaft in plan is driven by a motor beside it (V1).
+- F7 by the shim packs; F4 where the mesh pushes; F9 marks at the mesh; herringbone: one shaft located, the other free
+  to float. Where the lead angle is below the friction angle the record says it is self-locking, never a substitute
+  for a brake. The AUX view down the worm axis is the worm's default teaching view.
 
-**Shaft couplings** (universal joint, double Cardan, Rzeppa, flexible couplings)
-- Each shaft on its own support (J2 or J10); the cross of a universal joint in needle cups held by circlips
-  (`H.crossBearings`, F2), a grease nipple on the cross (F8); clamp hubs or keyed yokes on the shaft ends (F3).
-- A member that tilts as it turns (the cross, a cage, a swash plate) is posed by a solved frame (axis `p`): the cross's
-  arms along the two yokes' pins, a yoke's axis along its shaft.
-
-**Flexible drives** (chain, rope and tackle, CVT, harmonic drive)
-- Declare the member in `flexible` (J12). A chain: ISO 606 sprockets (`P.sprocket(id, z, p, d1)`, pitch radius
-  p / (2 sin(π/z))); choose the centre distance for a whole number of links (`centresFor` in `src/core/flex.ts`); the
-  travel is the driving sprocket's angle times z1·p / 2π (one pitch per tooth, the mean chain speed), not times its
-  pitch radius, and the driven sprocket turns z1/z2 of it; phase each sprocket so a seat meets a roller at mid-wrap.
-  The rule conveys the chain on a path exactly N pitches long and phases and gears its idler sprocket to the same
-  mean speed. A rope: each span a stretched part (`P.ropeSpan`, outline at unit length) between solved tangent points;
-  each wrap a fixed arc at its sheave's centre (`P.ropeWrap`, declared in `wraps`); the hook on the load block. A
-  flexspline or a belt's wrap that bends: `deform`, the same point count every frame.
-- A CVT: declare `{ form: "cvt", pairs: [{ fixed, sliding, spring? }], belt }`. Each half a frustum (`taper`); the
-  fixed halves set diagonally (the input's on one side of the belt, the output's on the other), so as the sliding halves
-  move the belt plane moves as a whole; each sliding half posed by a frame (axis `p`) that slides along its shaft, its
-  local origin on the shaft. The input's wrap radius r1 swept over the cycle while the input turns a whole number of
-  turns; r2 solved each frame from the constant belt length (`radiusFor` in `src/core/flex.ts`); the output angle
-  integrated (dθ2 = r1 / r2 dθ1), trimmed to a whole number of turns so the cycle closes. The belt a deforming band
-  (`beltRing`, a fixed point count per ring) on a frame in the belt plane, its inner edge a hole. The input's sliding
-  half set by a shift fork on a J5 carriage (the controlled freedom, in the polish); the output's closed by its spring
-  (`spring: true`, J12).
-- A toothed belt: declare it `{ form: "belt" }` over two `P.pulley` timing pulleys (HTD, pitch radius p·z / 2π), the
-  centre distance `centresFor` a whole number of teeth; the driven pulley phased so a groove meets the tooth arriving
-  from the span. Draw the band fixed round the pitch path (it looks the same at every phase); the rule conveys the
-  teeth. Spans straight between the outer tangent points, the slack one's sag taken up by the idler.
+**Flexible drives** (belt, chain, rope and tackle, CVT, harmonic drive)
+- Block: convey for belts and chains, a stretched solid for rope spans, a deforming profile for a flexspline or a belt's
+  wrap, the flexure block for the harmonic drive's flexspline. Kit: J8 and J12.
+- Chain: ISO 606 sprockets (pitch radius p / (2 sin(π/z))); the centre distance for a whole number of links; the
+  travel is the driving sprocket's angle times z1·p / 2π; the driven sprocket turns z1/z2 of it; each sprocket phased so
+  a seat meets a roller at mid-wrap; the path exactly N pitches long; an idler sprocket of a whole number of teeth on
+  the rollers' line, phased and geared to the mean chain speed. Toothed belt: HTD pulleys, a whole number of teeth, the
+  band fixed round the pitch path and the teeth conveyed. Rope: spans stretched between solved tangent points, wraps
+  as fixed arcs in the sheaves' grooves, the hook on the load block.
+- CVT: each sheave half a frustum, the fixed halves diagonal, the sliding halves on a frame sliding along the shaft;
+  the input's wrap radius r1 swept while r2 is solved from the constant belt length, the output angle integrated and
+  trimmed to a whole number of turns so the cycle closes; the belt a deforming band; the ratio is a control.
 - F7 by the idler or the slotted mount; F8 grease on a chain, a belt dry; F2 guards over the sheaves whose centres
-  stand still. Chain and belt: centres fixed by the housings and bridges, both shafts straddle mounted (A9), the idler
-  on the slack span near the small wheel; flanges on a belt's small pulley and idler (F10), no guard on an open bench.
+  stand still. Chain and belt: both shafts straddle mounted (A9), the idler on the slack span near the small wheel;
+  flanges on a belt's small pulley and idler (F10).
 
-**Compliant mechanisms** (flexure hinge, compliant gripper, bistable)
-- Declare each neck in `compliant` (J13): the neck rigid, the lever's swing as its range; the model gives the `bend`
-  overlay of each neck (centre, direction, length, width, angle).
-- F5 stops just past the swing; the blank clamped and dowelled to the base (F1, F2).
-- The blank is one part in one material: block, necks and levers (J13 names it; a polish names another alloy or a
-  plastic). Its block stands on a seat plate, so the lever moves clear of the base.
-- A fixed-guided beam is a deforming outline from the solved state (the cubic clamped at both ends), its pseudo-rigid
-  chord kept in `solve()`; a fixed part that bends is swept, not ground. One J13 per anchor, none at the shuttle (the
-  same beam); the stops bank the shuttle, not the beam.
-- A motor drives a snap-through mechanism through a spring (the roller between two preloaded springs in a window of
-  the output), so the output snaps ahead of the input where the beams' force falls faster than the spring's rate,
-  near the force peak; the shuttle's balance against the spring is solved, the snap a short transfer.
+**Compliant mechanisms** (flexure hinge, bistable, compliant gripper)
+- Block: flexure. Kit: J13. The neck is rigid in `solve()` (its pseudo-rigid chord) and the model gives the `bend`
+  overlay of each neck; the lever's swing is the range.
+- F5 stops just past the swing; the blank clamped and dowelled to the base (F1, F2). The blank is one part in one
+  material: block, necks and levers, its block on a seat plate so the lever moves clear of the base.
+- A fixed-guided beam is a deforming profile from the solved state (the cubic clamped at both ends); one J13 per anchor,
+  none at the shuttle; the stops bank the shuttle, not the beam. A snap-through mechanism is driven by a motor through
+  a spring (the roller between two preloaded springs in a window of the output), the output snapping ahead of the
+  input near the force peak; the snap is a short transfer.
 
-**Screws** (lead screw, ball screw, screw jack)
-- Declare the screw in `screws` (J11): the screw on a shaft in plan (J10) with one end located and one floating; the
-  thread drawn by its helix at the lead (`src/core/spatial.ts`: lead, lead angle, self-locking).
+**Screws** (lead screw, ball screw, differential screw)
+- Block: screw. Kit: J11, the screw on a shaft in plan (J10: one end located, one floating), its thread swept at the
+  lead.
 - The nut on a carriage that slides (J5), so the slide holds it from turning; a ball nut's return and wipers (F8); end
-  stops just past the travel (F5).
+  stops just past the travel (F5). Ball screw: a section view through the nut shows the balls.
+
+**Friction drives and integrators** (friction wheel, ball-disc integrator)
+- Blocks: gear mesh (rolling, no slip), Willis train for the integrator's two drivers. Hardware as J6 without teeth: a
+  preload spring or an adjustable mount (F7).
 
 **Curve generators** (Tusi couple, elliptic trammel)
-- Trammel: F7 adjustable slider pins at the model's lengths; J5 on the slots. Tusi: F9 marks for the planet's phase.
+- Trammel: the rod on top, the blocks pinned up into it, the pen at its end; F7 adjustable slider pins at the record's
+  lengths; J5 on the slots, the groove plate see-through where it covers. Tusi: F9 marks for the planet's phase, bold
+  tracers or a bar from X to Y.
 
-## Appendix B. Hardware primitives and subassemblies
+---
+
+## Appendix B. Hardware primitives, builders and subassemblies
 
 Primitives (`H.*`): `plate, shaft (stepped profile), bearing (open / shield / seal), roller, bushing, washer, wave
 washer, tube, shank, head (socket / button / csk), nut, standoff, spigot, dowel, circlip (internal / external),
 retainer plate, key, set screw, collar, spring (compression / torsion / leaf), stop, bumper, nipple, felt, oil sink
 (marks), wear strip, eccentric bushing, gib, wiper, flag, sensor, terminal block, cable clip, lead`, helpers
 `disc, hex, taper, boltCircle, hullOf, window, filletPoly, spokes, boreChamfers`.
+
+Builders (A18 to A21): the **joint kits** (one per joint type, J1 to J13), the **axial stack builder** with its support
+selector, the **support router** and the **placement solver**.
 
 Subassemblies: `H.housing` (J2 cartridge), `H.bridge` (posts, spigots, dowels, lobes), `H.slide` (J5, a few
 blocks) with `seatRail` and `railLayout` (A6: the rail's riser, or pads clear of what passes under it, and its screws),
@@ -651,8 +866,124 @@ default detail level.
 
 ---
 
+## Appendix C. Traceability of the plan's decisions
+
+Every decision of the engine plan (#202) and every teaching-review decision of the rebuild issues (#212 to #218) has a
+requirement id here. A decision about one mechanism sits in that mechanism's rebuild issue and in its record's
+`teaching` block; this table gives each kind of decision its id and how it is enforced. **AUTO** is done or checked by
+the pipeline, **HAND** is built and judged in the pass, **DATA** is a record field.
+
+| Decision (plan #202) | Ids | Enforcement |
+|---|---|---|
+| Hardware covering the principle: never remove posts or plates; see-through first, supports moved second, a different construction only rarely; principle parts never out of depth order | T10, T11, T12, T17, A19, L5, L6 | AUTO (T10, T11, T17, A19), HAND (T12) |
+| Teaching content lives in the record's teaching block | T3 to T9, T13, T14, P12 | DATA |
+| Kinematics: closed-form blocks, numeric fallback, the solver verifies and does not drive | K1, K3, K8 to K12 | AUTO, DATA |
+| Transition: a 3D stamp until cut-over; old engine removed entirely (done at cut-over, 3.9) | S5, S6 | SITE, AUTO |
+| Delivery, parallel work, main frozen during the plan | `docs/workflow.md` (process, not a requirement of a mechanism) | none |
+| Phone measurement by a published bench page | R6, R10, Q5 | FLAG |
+| Teaching test | T1, T2, T15, Q8, section 1 step 2 | HAND |
+| Mechanisms built after the review get the review's method; the 20 unbuilt get the review against their record | T2, P13 | HAND |
+| From scratch: every mechanism rebuilt from record v3, blocks and kits, the old model only a loose comparison | section 1, K3, A21, R7, S6 | HAND, AUTO |
+| Open conformance passes retargeted to the rebuild batches | S4, section 1 | process (board, #219) |
+| Review pattern 2: wrong point traced | T4 | DATA, review |
+| Review pattern 3: effect too small | T6 | DATA, HAND |
+| Review pattern 4: missing construction geometry | T5, L10 | DATA |
+| Pushed back: Walschaerts die slider with ghost traces, not an automatic sweep | T14, K2, K9 | DATA, AUTO (cycle repeats at fixed controls) |
+| Pushed back: Wankel keeps the apex trace and traces E too | T4 | DATA |
+| Pushed back: Geneva smaller windows, not none; drag-link counterweight stays | M2, D2 | HAND |
+| Pushed back: Schmidt told apart by patterns, not colours | T16, D3, L3 | STYLE, HAND |
+| Pushed back: lever escapement a time map, not a cut amplitude | T13 | DATA |
+
+| Decision kind in #212 to #218 | Ids | Enforcement |
+|---|---|---|
+| Trace this point, trace both ends, equal-time ticks, ghost path, trace a point on a gear, trace E as well | T4, P10, L10 | DATA |
+| Construction overlays: dead-centre lines, tangent lines and arcs, axis lines meeting at a centre, moment-arm dimensions, workspace outline, chord, crank line O–E, speed-ratio plot, plot for several settings | T5, P10, L10 | DATA |
+| A bridge, hanger, flange, rail, guide or cover becomes see-through or is moved off the principle (O4 bridge, scissor-lift bridge, hart hanger, Scott Russell bridge, Geneva bar, rhombic guides, groove plate, rotor web, large sun, pin cover ring, spider, output hub, lever bridges) | T10, T11, T12, A19 | AUTO |
+| The part goes on top or underneath (trammel rod on top, output flange underneath, planet's link on top, disc on top of the pins) | T3, T17, A18 | AUTO (placement), DATA |
+| Re-proportion, change a parameter, change a number in the text (double-rocker, offset slider-crank, Whitworth, Hart swing, cam profile, star-wheel hand-off, cycloidal lobes, anchor swing and recoil, text fixes of the review) | T6, T9, K6, K10, P9 | DATA, AUTO check |
+| Rethink the representation (five-bar, Ackermann, elliptic trammel, Oldham, Ravigneaux, desmodromic, intermittent gear, sprag clutch, Schmidt) | T1, T2, T3, T7, K9 | HAND |
+| A default view or orientation (desmodromic and anchor in front elevation, worm AUX down its axis, a slight default tilt) | T7, L7 | DATA |
+| A section or detail view (oscillating cylinder port face, Rzeppa cage, ball-screw nut, sprag sector) and a highlighted part | T8, L9 | DATA |
+| A control: die position, gear selector, offset, bend, phase, ratio, tilt; two drivers (differential, integrator) | T14, K9 | DATA |
+| A time map (lever escapement; star wheel snap) | T13 | DATA |
+| Marks that let a viewer count (mark on the ring, the sun, the flywheel; one bold index mark per disc) | F9, L8, T16 | HAND |
+| A workpiece block, a thinner rim, a slimmer strap, a solider pawl, bolder tracers, a leaf spring inside the base | D1, D2, D6, M2 | HAND |
+| A new block or kit for a new joint or generator (loft teeth for hypoid, groove by boolean for a barrel cam, escapement block, flexure block, Bennett block, homokinetic block, tilt frame, two orthogonal dyads) | K3, A21, D8, D10 | AUTO (library), HAND (which) |
+| The placement solver replaces searched layers (Jansen); block-and-tackle drops 141 of 154 `allow` exemptions | A18, A15 | AUTO |
+| The mechanism's explode and detail rungs follow its joints | E10, A21, DL1 | AUTO |
+
+---
+
 ## Changelog
 
+- **3.9 (2026-10-22).** Cut-over: the 2.5D engine, v1 packages, the old models and polishes and the 3D stamp are
+  gone; every mechanism is built from its record v3 and drawn by the one engine, and a page or card carries no engine
+  mark [S5, SITE]. A registered mechanism is a record with an audit at 3.0 or later, held to every HAND change since its
+  version; the conformance report no longer tells two engines apart [S6, S3, AUTO].
+- **3.8 (2026-10-22).** The sixteen laws: the standard grouped into sixteen numbered rules, each naming the sections
+  and requirement ids it covers; every requirement id falls under exactly one law, checked by a test. No requirement
+  changes [S1, DATA].
+- **3.7 (2026-10-22).** Rebuild batch R4 (gears). J6 gear kits: compound gears and joined levels (a long pinion
+  through two planes); helical, herringbone, worm, spiral bevel and non-circular teeth; a rack guided from its back; a
+  ring gear on carrier rollers (`ring-carrier`); a cycloidal disc on ring pins (`pin-ring`) with output pins in
+  oversized holes (`pin-hole`, J4) on an eccentric bearing (`eccentric-bearing`, J3); a differential's spiders on the
+  case's cross-pin (`spider-pin`, J3, F4) [J6, J3, J4, F4, AUTO]. A live shaft hangs from its bridge where another
+  stack holds its axis below [J2, A20, AUTO]. A principle gear over a smaller one is drawn see-through [T10, AUTO].
+- **3.6 (2026-10-22).** Rebuild batch R3 (cranks, sliders and quick-returns). J5 rails and risers are judged against
+  the other parts' sweeps; a crosshead arm sits on its riser's lip; a block in a moving part's slot runs on wear strips
+  in that slot [J5, A6, F5, F8, M14, AUTO]. New kits: `eccentric` (sheave in strap, liner, cheek ring, nipple) [J3,
+  F2, F8, M14, AUTO]; `die` (a die in an expansion link of two cheeks) [J4, M14, AUTO]; `hub` (a part on a fixed hub)
+  [J1, F1, F2, M14, AUTO]; `covers` (a side cover on its housing, a stationary gear hung under it with slotted holes
+  for backlash) [F1, F2, F7, AUTO]. A split part on a live shaft in a bridge between its plates, outboard arms, and a
+  manual driver's shaft held by a clamp collar [A20, F6, AUTO].
+- **3.5 (2026-10-22).** Rebuild batch R6 (couplings and spatial linkages), and a check fix from R7. A drive on a shaft
+  in plan, belt or crank and link, takes the far end only where it clears the moving parts' sweeps, else the low end; a
+  lever's fork sensor that cannot stand under a low shaft's hub goes beside it [V1, V5, V6, AUTO]. Lugs and posts rules;
+  ball-socket, slipper and sphere-fit kits [A21, J3, AUTO]. The clamp check reads what moves at probe phases off the
+  profile's grid as well, so a part turning a whole number of times per cycle is not taken for ground at a coarse
+  profile [A12, AUTO].
+- **3.4 (2026-10-22).** Rebuild batch R7 (screws, flexible and compliant members). An oscillating input of more than one
+  turn on a shaft in plan is driven by a reversing motor through the in-plan belt drive [V5, AUTO]; a mechanism with two
+  drivers gets a second drive beside the first, and a manual input whose body has a knob gets no second one [V5, V1,
+  AUTO]. `j11-screw`: a screw that is its own shaft, journals in pillow blocks, a bronze or ball nut with wipers and a
+  nipple, the nut's guide, a fixed nut and knob for a differential screw [J11, J10, F2, F3, F4, F5, F8, AUTO].
+  `j13-compliant`: a one-piece blank with notch flexures, pads, a window with stretched springs and shuttle stops [J13,
+  A6, F1, F2, F5, AUTO]. `j12-flexible`: a timing belt with conveyed teeth, a roller chain conveyed in links on its seat
+  circles, a rope reeved over two planes with stretched parts, wraps, guards and an end clamp, the load's guide rod [J12,
+  J8, A11, F2, F3, F6, F7, F8, F10, AUTO]; `j12-cvt`: revolved sheave halves, sliding keys, the output's spring, the
+  input's clamped shift fork, a push belt on a live loop [J12, J10, D9, F6, F7, AUTO]. `friction-contact`: a tyred wheel
+  on a disc, its setting clamped and read on a scale [J6, F6, F7, M10, AUTO]. `integrator-carriage`: a ball in a cage on
+  an arm, a carriage on a railed block with stops, a cylinder that is its own shaft [J5, F1, F5, AUTO].
+- **3.3 (2026-10-22).** The V5 crank-and-link drive replaces R5's interim reversing servo for every oscillating input.
+  The `drive` rule builds the lever on a live shaft, on a shaft in plan with the motor on an angle bracket, or by a pin
+  in a compliant lever's tip through an arc slot; a gear step-up (sector and pinion) where the swing is wider than a
+  crank and link can give; the linear drive (a belt loop, a carriage through a slot in the base, a tensioner); and a
+  knob on a hand-worked input. A `manual` driver with `lo` and `hi` is a hand stroke, cycled with no motor [V1, V2,
+  V3, V4, V5, V6, F10, K7, AUTO].
+- **3.2 (2026-10-22).** Rebuild batch R5 (cams, intermittent motion, escapements). The J7 cam kit takes the record's
+  roller, a stretched return spring and an oiler; a groove cam carries its own groove; a pawl's spring sits on its
+  carrier [J7, F6, F8, AUTO]. J5 slides are held over a declared guide, and a shaft slider gets a stem guide [J5,
+  AUTO]. Feather keys run along their shaft [A5, F3, AUTO]. R5 also drove an oscillating input with a reversing servo;
+  that is interim, replaced by the V5 crank-and-link drive [V5, AUTO].
+- **3.1 (2026-10-22).** Rebuild batch R1 (planar linkages): a body's `shape.wheel` is built as a wheel on a stub
+  axle in an upright tube, by the new `wheels` rule [D1, F2, AUTO].
+- **3.0 (2026-10-20).** True 3D parts and a record-driven build; the 2.5D engine is replaced at cut-over. The pipeline
+  is catalogue record v3 (a `kin` block and a `teaching` block), closed-form kinematic blocks verified by a loop-closure
+  residual, a hardware builder (joint kits, one axial stack builder, a support router, a placement solver), true 3D
+  solids built by Manifold at build time, package v2 (profiles and meshes), 3D checks and a depth-buffer renderer with
+  a free orthographic camera [K1, K2, K8, K10, K11, D8, D10, D11, A1, A2, A14, A15, A18, A19, A20, A21, A22, E10, L5,
+  L6, L7, L9, L10, R4, R6, R9, R10, Q1 to Q4, AUTO]. Joints are declared with 3D axes, drivers include several
+  inputs, selectors and a time map, and the branch, points, outputs, design choices and ranges are in the record [K3,
+  K7, K9, K12, P12, DATA]. Parts are a profile, an operation and a 3D frame; layers, `dz` and `twin` are gone and K5
+  is retired. Explode runs along each stack's joint axis with trail lines. A15 is penetration depth in 3D. Section 3a
+  is new: the teaching test and its tools, the principle-visibility rule (transparency first, supports moved second,
+  posts and plates never removed, principle parts never out of depth order), traces, construction overlays, default
+  view, section and detail views, controls, time map and a checked claim table; the conformance pass gains a teaching
+  review; Appendix C traces every decision of the plan [P1, P9, P10, T9, T10, T11, T17, AUTO]. The rest of the new and
+  changed HAND requirements (T1 to T8, T12 to T16, P13, S2, R7, Q8, D8 and the pass of section 1) bind a mechanism at
+  its rebuild from record v3, so the 2.5D audits are not behind a HAND change; `tools/conformance` learns the split in
+  the engine's tools step [S5, S6, SITE]. The style reference is 3.0 [L3, L8, SD, STYLE]. Playbooks rewritten as
+  blocks, kits and teaching tools.
 - **2.14 (2026-10-20).** A shaft in plan's far block stands past the parts unless a moving part's sweep outline meets
   the block's area in plan (the housing's, or the foot's for a sweep that reaches down to it), so a worm runs between
   its two blocks and a bevel pinion stays overhung [J10, A9, AUTO]. Clearance between a z solid and one on an x or y

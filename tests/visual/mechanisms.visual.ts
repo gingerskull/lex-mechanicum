@@ -1,41 +1,41 @@
-// Visual snapshots (style SQ9), local only: `npm run test:visual`. Each registered mechanism at plan, 28°, side and full
-// explode at 70°, both sheets, overlays on, rendered by the site's renderer in Node and compared with our own
-// baselines in tests/visual/__baselines__. Baselines are written once, when the look is final:
-// `UPDATE_SNAPSHOTS=1 npm run test:visual`. Never regenerate them to make a run pass.
+// Visual snapshots (style SQ9), local only: `npm run test:visual`. Each registered mechanism at plan, 28° (elevation
+// 62), side and the full explode in isometric, both sheets, the sheet and every teaching layer on, drawn by the site's
+// renderer in local Chrome (tools/chrome3.ts) and compared with our own baselines in tests/visual/__baselines__. Baselines
+// are written once, when the look is final: `UPDATE_SNAPSHOTS=1 npm run test:visual`. Never regenerate them to make a
+// run pass.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { mechanisms } from "../../src/mechanisms";
+import { allIds } from "../../src/mechanisms";
 import type { ThemeKey } from "../../src/style/tokens";
-import { openChrome, type Chrome } from "../../tools/chrome";
-import { stageShot } from "../../tools/shot";
+import { openChrome3, type Chrome3, type Draw3Options } from "../../tools/chrome3";
 
 const DIR = join(import.meta.dirname, "__baselines__");
 const OUT = join("dist", "visual");
-const VIEWS = [
-  ["plan", { tilt: 0, explode: 0 }],
-  ["28", { tilt: 28, explode: 0 }],
-  ["side", { tilt: 88, explode: 0 }],
-  ["explode70", { tilt: 70, explode: 1 }],
-] as const;
+const VIEWS: [string, Partial<Draw3Options>][] = [
+  ["plan", { view: "PLAN" }],
+  ["28", { view: "VIEW 0 62" }],
+  ["side", { view: "SIDE" }],
+  ["explode", { view: "ISOMETRIC", explode: 1 }],
+];
 /** Pixels allowed to differ: anti-aliasing noise between runs and machines. */
 const TOLERANCE = 0.002;
 
 describe("visual snapshots", () => {
-  let chrome: Chrome;
+  let chrome: Chrome3;
   beforeAll(async () => {
-    chrome = await openChrome();
+    chrome = await openChrome3();
   }, 120_000);
   afterAll(() => chrome?.close());
-  for (const id of Object.keys(mechanisms))
+  for (const id of allIds())
     for (const theme of ["dark", "light"] as ThemeKey[])
       for (const [name, v] of VIEWS)
-        it(`${id} ${theme} ${name}`, { timeout: 60_000 }, async () => {
+        it(`${id} ${theme} ${name}`, { timeout: 120_000 }, async () => {
           // dial A drops only the paper grain and the faint bearing and motor internals: the grain is noise, which would
           // make every baseline large and every diff noisy
-          const png = await chrome.shot(id, stageShot(id, { w: 720, h: 450, dpr: 1, view: { ...v, theme, detail: "A", overlays: { paths: true, forces: true, angles: true } } }));
+          const png = await chrome.shot(id, { w: 720, h: 450, dpr: 1, u: 1.1, theme, detail: "A", ...v });
           const file = `${id}-${theme}-${name}.png`;
           const base = join(DIR, file);
           if (process.env.UPDATE_SNAPSHOTS || !existsSync(base)) {

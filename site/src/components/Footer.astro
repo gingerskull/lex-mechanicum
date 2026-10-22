@@ -1,8 +1,10 @@
 ---
-import { VERSION } from "../data";
+import { RELEASE_LINE } from "../release";
+import { MARK_SHAPES, MARK_VIEWBOX } from "../mark";
 ---
 <footer class="wrap">
   <span>Mechanism Database · drawn as built, kinematics solved exactly</span>
   <span>Code MIT · content <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license noopener">CC BY-SA 4.0</a></span>
-  <span>Version {VERSION}</span>
+  <span>{RELEASE_LINE}</span>
+  <svg class="foot-mark" viewBox={MARK_VIEWBOX} fill="currentColor" aria-hidden="true" focusable="false" set:html={MARK_SHAPES.join("")} />
 </footer>

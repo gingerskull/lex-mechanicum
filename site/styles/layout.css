@@ -217,6 +217,13 @@ header.top {
   gap: 14px;
   min-width: 0;
 }
+/* the page for a missing address: its header and the way back, with room before the footer */
+.lost {
+  min-height: 60vh;
+}
+.lost .dhead {
+  margin-block: 24px;
+}
 footer {
   color: var(--faint);
   font: 500 10.5px var(--font-mono);
@@ -227,6 +234,14 @@ footer {
   gap: 12px;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+/* the set's mark, faded in the sheet's ink, on its own row under the footer line: the row is the full width and the
+   drawing sits in its middle (the SVG's own centring) */
+footer .foot-mark {
+  flex: 0 0 100%;
+  height: var(--size-mark);
+  margin-top: 28px;
+  color: var(--mark);
 }
 @media (max-width: 1000px) {
   /* the set title block becomes one low strip across the header: four cells in a row (SS2) */
@@ -246,6 +261,15 @@ footer {
   }
   .dlayout {
     grid-template-columns: minmax(0, 1fr);
+  }
+  /* Sort keeps its name only, so the bar's row fits once it sticks; the current order is still read out */
+  .bar .sortv {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   .side {
     grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
@@ -270,9 +294,23 @@ footer {
   .bar .search {
     flex: 1;
   }
-  .bar .fbtn {
+  .bar .fbtn,
+  .bar .sort {
     align-self: stretch;
     justify-content: center;
+  }
+  /* Filters and Sort by name only and a little narrower, so the search keeps its room */
+  .bar .fbtn {
+    gap: 6px;
+    padding-inline: 10px;
+  }
+  .bar .fbtn svg {
+    display: none;
+  }
+  /* the menu opens toward the screen's middle, under the button's right edge */
+  .bar .sortmenu {
+    left: auto;
+    right: 0;
   }
   .bartitle {
     font-size: 16px;

@@ -1,5 +1,6 @@
 // Catalogue record type and controlled vocabularies. The source of truth for both is data/catalog/record-spec.md;
 // a change there is made here in the same commit.
+import type { Kin, Teaching } from "./kin";
 
 export const VOCABULARIES = {
   family: [
@@ -47,6 +48,7 @@ export const VOCABULARIES = {
     "wikipedia", "textbook", "kmoddl", "paper", "standard", "patent", "museum", "engineering-guide", "calculator",
   ],
   mediaKind: ["video", "photos", "animation", "interactive"],
+  precision: ["day", "year", "period"],
 } as const;
 
 export type Vocabularies = typeof VOCABULARIES;
@@ -65,11 +67,22 @@ export type PropertyTag = Of<"property">;
 export type ApplicationTag = Of<"application">;
 export type ReferenceKind = Of<"refKind">;
 export type MediaKind = Of<"mediaKind">;
+export type Precision = Of<"precision">;
 
 export interface Link<K extends string> {
   title: string;
   url: string;
   kind: K;
+}
+
+/** When the mechanism was first invented, patented, used or described, whichever is earliest (record-spec.md). */
+export interface Origin {
+  /** YYYY-MM-DD, the year negative before the year 1 (-0250 is 250 BC). */
+  date: string;
+  /** day: the full date is known; year: only the year, the month and day come from the id; period: a best-guess year. */
+  precision: Precision;
+  /** What the date is and the source URL, or a best guess marked as such. */
+  note: string;
 }
 
 /** A real product or machine using the mechanism, shown in a YouTube video of real footage (no animations or renders). */
@@ -97,6 +110,8 @@ export interface BuildSpec {
 }
 
 export interface CatalogRecord {
+  /** 2 until the cut-over, 3 after; v3 requires `kin` and `teaching` and rejects the retired `build` fields. */
+  record_version?: 2 | 3;
   id: string;
   name: string;
   aka?: string[];
@@ -125,12 +140,18 @@ export interface CatalogRecord {
   };
   explain: { motion: string; forces: string; benefits: string; limits: string };
   build: BuildSpec;
+  /** Record v3: the kinematic model. Present on every record; required at record_version 3. */
+  kin?: Kin;
+  /** Record v3: what makes the drawing teach. */
+  teaching?: Teaching;
   examples?: { use: string; detail: string }[];
   references: Link<ReferenceKind>[];
   media: Link<MediaKind>[];
   /** May be empty: no video is better than a wrong one. */
   real_world?: RealWorld[];
   related: string[];
+  /** Set from the patch file sources/origin.json; the validator requires it. */
+  origin?: Origin;
   /** Minimum counts this record is exempt from, set in a patch file where research found no more. */
   waive?: Waivable[];
 }

@@ -1,0 +1,5962 @@
+{
+  "slider-crank": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              220,
+              60
+            ],
+            "center": [
+              80,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 35,
+            "boss": [
+              9.5,
+              8
+            ]
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "rod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 110,
+            "boss": [
+              8.5,
+              8
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "block",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 20
+          },
+          "at": {
+            "joint": "B"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "rod",
+          "at": [
+            35,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "rod",
+          "b": "block",
+          "at": [
+            145,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "P",
+          "type": "prismatic",
+          "a": "block",
+          "b": "ground",
+          "at": [
+            145,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 35,
+          "unit": "mm",
+          "min": 20,
+          "max": 50,
+          "note": "crank radius"
+        },
+        {
+          "id": "l",
+          "value": 110,
+          "unit": "mm",
+          "min": 80,
+          "max": 200,
+          "note": "connecting rod, A to B (l > r)"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "rod-slider",
+          "joints": [
+            "A",
+            "B",
+            "P"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "A",
+            "r": "l",
+            "p": "O",
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "B"
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "slider-x",
+          "of": "B",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "obliquity",
+          "of": "B",
+          "from": "A",
+          "to": "O",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep) and issue #214. Kept as the in-line slider-crank, l/r = 3.14 so the uneven slider motion shows. Equal-time ticks on B show the slider covering the far half of the stroke in 161.7 degrees of crank and the near half in 198.3. The rod length was to be a control so a shorter rod makes the unevenness grow; the rod is built at l = 110, and the control waits on solids that rebuild under a param control."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "rod"
+        },
+        {
+          "body": "block"
+        },
+        {
+          "point": "B"
+        }
+      ],
+      "traces": [
+        {
+          "id": "slider",
+          "point": "B",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "crank-pin",
+          "point": "A"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "line-of-stroke",
+          "kind": "line",
+          "from": "O",
+          "to": "B",
+          "pose": {
+            "output": "slider-x",
+            "stat": "max"
+          },
+          "extend": true,
+          "label": "LINE OF STROKE"
+        },
+        {
+          "id": "obliquity",
+          "kind": "arc",
+          "center": "B",
+          "from": "O",
+          "to": "A",
+          "label": "ROD OBLIQUITY"
+        },
+        {
+          "id": "stroke",
+          "kind": "dimension",
+          "from": "B",
+          "to": "B",
+          "fromPose": {
+            "output": "slider-x",
+            "stat": "min"
+          },
+          "toPose": {
+            "output": "slider-x",
+            "stat": "max"
+          },
+          "label": "STROKE 2r"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "slider-x",
+        "label": "SLIDER POSITION"
+      },
+      "claims": [
+        {
+          "text": "stroke = 2 x crank radius (70 mm with r = 35 mm)",
+          "output": "slider-x",
+          "stat": "range",
+          "value": 70,
+          "tol": 0.1
+        },
+        {
+          "text": "slider moves 70 mm from x = 75 to x = 145 mm",
+          "output": "slider-x",
+          "stat": "min",
+          "value": 75,
+          "tol": 0.1
+        },
+        {
+          "text": "slider moves 70 mm from x = 75 to x = 145 mm",
+          "output": "slider-x",
+          "stat": "max",
+          "value": 145,
+          "tol": 0.1
+        },
+        {
+          "text": "rod obliquity up to 18.6°",
+          "output": "obliquity",
+          "stat": "max",
+          "value": 18.55,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "offset-slider-crank": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              200,
+              110
+            ],
+            "center": [
+              50,
+              15
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 30,
+            "boss": [
+              9.5,
+              8
+            ]
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "rod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 90,
+            "boss": [
+              8.5,
+              8
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "slider",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 20
+          },
+          "at": {
+            "joint": "B"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "rod",
+          "at": [
+            "r",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "rod",
+          "b": "slider",
+          "at": [
+            "r+sqrt(l^2-e^2)",
+            "e",
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "guide",
+          "type": "prismatic",
+          "a": "slider",
+          "b": "ground",
+          "at": [
+            "r+sqrt(l^2-e^2)",
+            "e",
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 30,
+          "unit": "mm",
+          "min": 20,
+          "max": 35,
+          "note": "crank radius"
+        },
+        {
+          "id": "l",
+          "value": 90,
+          "unit": "mm",
+          "min": 85,
+          "max": 140,
+          "note": "connecting rod, A to B; needs r + e < l"
+        },
+        {
+          "id": "e",
+          "value": 40,
+          "unit": "mm",
+          "min": 0,
+          "max": 45,
+          "note": "offset of the slide line from the crank centre (review: raised from 20 so the time ratio reads)"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "rod-slider",
+          "joints": [
+            "A",
+            "B",
+            "guide"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "A",
+            "r": "l",
+            "p": [
+              0,
+              "e",
+              0
+            ],
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "B"
+        }
+      ],
+      "points": [
+        {
+          "id": "L",
+          "body": "ground",
+          "local": [
+            0,
+            "e",
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "slider-x",
+          "of": "B",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "obliquity",
+          "of": "B",
+          "from": "A",
+          "to": "L",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214: e 40, l 90, r 30 raise the time ratio from 1.09 to 1.28, so the slow and quick strokes look different. The two dead-centre lines through O and the arcs of crank turn between them show why: the crank and rod line up at crank angles 202.3 degrees apart one way and 157.7 the other. Equal-time ticks on B show the slow and quick strokes. The offset is a control."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "rod"
+        },
+        {
+          "body": "slider"
+        },
+        {
+          "point": "B"
+        }
+      ],
+      "traces": [
+        {
+          "id": "slider",
+          "point": "B",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "crank-pin",
+          "point": "A"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "outer-dead-centre",
+          "kind": "line",
+          "from": "O",
+          "to": "B",
+          "pose": {
+            "output": "slider-x",
+            "stat": "max"
+          },
+          "label": "OUTER DEAD CENTRE"
+        },
+        {
+          "id": "inner-dead-centre",
+          "kind": "line",
+          "from": "A",
+          "to": "B",
+          "pose": {
+            "output": "slider-x",
+            "stat": "min"
+          },
+          "label": "INNER DEAD CENTRE"
+        },
+        {
+          "id": "slow-stroke",
+          "kind": "arc",
+          "center": "O",
+          "from": "A",
+          "to": "A",
+          "fromPose": {
+            "output": "slider-x",
+            "stat": "max"
+          },
+          "toPose": {
+            "output": "slider-x",
+            "stat": "min"
+          },
+          "sweep": "ccw",
+          "label": "SLOW STROKE"
+        },
+        {
+          "id": "quick-stroke",
+          "kind": "arc",
+          "center": "O",
+          "from": "A",
+          "to": "A",
+          "fromPose": {
+            "output": "slider-x",
+            "stat": "min"
+          },
+          "toPose": {
+            "output": "slider-x",
+            "stat": "max"
+          },
+          "sweep": "ccw",
+          "label": "QUICK STROKE"
+        },
+        {
+          "id": "offset",
+          "kind": "dimension",
+          "from": "O",
+          "to": "L",
+          "component": "y",
+          "label": "OFFSET e"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "offset",
+          "kind": "param",
+          "param": "e"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "slider-x",
+        "label": "SLIDER POSITION"
+      },
+      "claims": [
+        {
+          "text": "time ratio 1.28:1",
+          "output": "slider-x",
+          "stat": "time-ratio",
+          "value": 1.283,
+          "tol": 0.005
+        },
+        {
+          "text": "the slow stroke takes 202° of crank turn",
+          "output": "slider-x",
+          "stat": "phase",
+          "from": "max",
+          "to": "min",
+          "value": 202.34,
+          "tol": 0.2
+        },
+        {
+          "text": "the quick stroke takes 158°",
+          "output": "slider-x",
+          "stat": "phase",
+          "from": "min",
+          "to": "max",
+          "value": 157.66,
+          "tol": 0.2
+        },
+        {
+          "text": "stroke 68.4 mm",
+          "output": "slider-x",
+          "stat": "range",
+          "value": 68.42,
+          "tol": 0.1
+        },
+        {
+          "text": "outer dead centre x = 113.1",
+          "output": "slider-x",
+          "stat": "max",
+          "value": 113.14,
+          "tol": 0.1
+        },
+        {
+          "text": "inner dead centre x = 44.7",
+          "output": "slider-x",
+          "stat": "min",
+          "value": 44.72,
+          "tol": 0.1
+        },
+        {
+          "text": "the rod leans up to 51° from the slide line",
+          "output": "obliquity",
+          "stat": "max",
+          "value": 51.06,
+          "tol": 0.2
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "ratio.typical": "stroke 68.4 mm for r = 30, l = 90, e = 40; time ratio 1.28:1",
+      "explain.motion": "The crank turns at constant speed and the rod pushes a slider along a line that is offset from the crank centre by e. The slider's two dead centres occur where crank and rod are in line, and because of the offset these two crank positions are not 180° apart. Here the slow stroke takes 202° of crank turn and the quick stroke 158°.",
+      "explain.limits": "Only small time ratios are practical, as large offsets give poor transmission angles and high side thrust on the return stroke. Here the rod leans up to 51° from the slide line.",
+      "build.defining_relations": "x = r cos(theta) + sqrt(l^2 - (e - r sin(theta))^2). Outer dead centre x1 = sqrt((l + r)^2 - e^2) = 113.1; inner x2 = sqrt((l - r)^2 - e^2) = 44.7; stroke = 68.4 mm. Dead-centre crank angles: asin(e/(l + r)) = 19.47° and 180° + asin(e/(l - r)) = 221.81°. alpha = asin(e/(l - r)) - asin(e/(l + r)) = 22.34°; time ratio (180° + alpha)/(180° - alpha) = 1.28:1. Needs r + e < l for full rotation.",
+      "build.range": "crank 360° continuous; slider stroke 68.4 mm; the slow stroke takes 202.3° and the quick stroke 157.7° of crank angle; rod obliquity up to 51.1°"
+    }
+  },
+  "scotch-yoke": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              260,
+              130
+            ],
+            "center": [
+              70,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 40,
+            "boss": [
+              9.5,
+              7
+            ]
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "yoke",
+          "role": "output",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              28,
+              110
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "thickness": 7,
+            "note": "the yoke: a block 110 long across the slide with the slot through it; its long sides run between the rails, clear of the crank circle"
+          },
+          "frame": {
+            "origin": [
+              40,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "pin-in-slot",
+          "a": "crank",
+          "b": "yoke",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "slot": {
+            "from": [
+              40,
+              -41,
+              0
+            ],
+            "to": [
+              40,
+              41,
+              0
+            ]
+          },
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "G",
+          "type": "prismatic",
+          "a": "yoke",
+          "b": "ground",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 40,
+          "unit": "mm",
+          "min": 25,
+          "max": 45,
+          "note": "crank radius (less than the slot half length)"
+        },
+        {
+          "id": "slotHalf",
+          "value": 41,
+          "unit": "mm",
+          "min": 41,
+          "max": 41,
+          "note": "slot half length, fixed by the yoke"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "pin-in-yoke",
+          "joints": [
+            "A",
+            "G"
+          ],
+          "in": {
+            "kind": "rpp",
+            "a": "A",
+            "p": "O",
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "Y",
+          "note": "the slot is square to the slide: the slot centre is the pin's projection, x = r cos(theta)"
+        }
+      ],
+      "points": [
+        {
+          "id": "Y",
+          "body": "yoke",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "yoke-x",
+          "of": "Y",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep) and issue #214. The pin runs up and down the slot while the yoke takes only its sideways part. Equal-time ticks on the slot centre Y bunch evenly at both ends, the mark of pure harmonic motion, and the line from the pin to Y with the r cos(theta) dimension states the law."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "yoke"
+        },
+        {
+          "point": "Y"
+        }
+      ],
+      "traces": [
+        {
+          "id": "slot-centre",
+          "point": "Y",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "crank-pin",
+          "point": "A"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "projection",
+          "kind": "line",
+          "from": "A",
+          "to": "Y",
+          "label": "PIN IN SLOT"
+        },
+        {
+          "id": "cosine",
+          "kind": "dimension",
+          "from": "O",
+          "to": "Y",
+          "label": "x = r cos θ"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "yoke-x",
+        "label": "YOKE POSITION"
+      },
+      "claims": [
+        {
+          "text": "stroke = 2 x crank radius (80 mm with r = 40 mm)",
+          "output": "yoke-x",
+          "stat": "range",
+          "value": 80,
+          "tol": 0.1
+        },
+        {
+          "text": "yoke moves from x = -40 to +40 mm",
+          "output": "yoke-x",
+          "stat": "min",
+          "value": -40,
+          "tol": 0.1
+        },
+        {
+          "text": "yoke moves from x = -40 to +40 mm",
+          "output": "yoke-x",
+          "stat": "max",
+          "value": 40,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "eccentric-sheave": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              260,
+              120
+            ],
+            "center": [
+              80,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "sheave",
+          "role": "driver",
+          "shape": {
+            "type": "disc",
+            "radius": 40,
+            "thickness": 10,
+            "center": [
+              12,
+              0
+            ],
+            "bore": 7
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "strap",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 150,
+            "boss": [
+              50,
+              8.5
+            ],
+            "bore": 42,
+            "note": "the strap: a ring round the sheave (bore 42 for the 40 sheave and its 2 mm liner) and the rod to V in one piece"
+          },
+          "at": {
+            "joint": "E"
+          }
+        },
+        {
+          "id": "valve-rod",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 20
+          },
+          "at": {
+            "joint": "V"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "sheave",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "E",
+          "type": "revolute",
+          "a": "sheave",
+          "b": "strap",
+          "at": [
+            12,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "radius": 40,
+          "note": "the sheave turning in the strap is the crank pin"
+        },
+        {
+          "id": "V",
+          "type": "revolute",
+          "a": "strap",
+          "b": "valve-rod",
+          "at": [
+            162,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "G",
+          "type": "prismatic",
+          "a": "valve-rod",
+          "b": "ground",
+          "at": [
+            162,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "e",
+          "value": 12,
+          "unit": "mm",
+          "min": 6,
+          "max": 20,
+          "note": "eccentricity, O to E (the throw)"
+        },
+        {
+          "id": "R",
+          "value": 40,
+          "unit": "mm",
+          "min": 30,
+          "max": 50,
+          "note": "sheave radius"
+        },
+        {
+          "id": "l",
+          "value": 150,
+          "unit": "mm",
+          "min": 120,
+          "max": 200,
+          "note": "eccentric rod, E to V"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "strap-rod",
+          "joints": [
+            "E",
+            "V",
+            "G"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "E",
+            "r": "l",
+            "p": "O",
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "V"
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "valve-x",
+          "of": "V",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "obliquity",
+          "of": "V",
+          "from": "E",
+          "to": "O",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep) and issue #214. The off-centre disc reads as a crank once the line O-E is drawn and E's small circle is traced: the throw is e, so the travel is 2e. The eccentricity was to be a control so the link between e and the travel can be tried; the sheave is built for e = 12, and the control waits on solids that rebuild under a param control."
+      },
+      "principle": [
+        {
+          "body": "sheave"
+        },
+        {
+          "body": "strap"
+        },
+        {
+          "point": "E"
+        }
+      ],
+      "traces": [
+        {
+          "id": "sheave-centre",
+          "point": "E",
+          "comet": true
+        },
+        {
+          "id": "valve-rod",
+          "point": "V",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "crank-line",
+          "kind": "line",
+          "from": "O",
+          "to": "E",
+          "label": "ECCENTRICITY e"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "valve-x",
+        "label": "VALVE ROD POSITION"
+      },
+      "claims": [
+        {
+          "text": "travel = 2 x eccentricity (24 mm with e = 12 mm)",
+          "output": "valve-x",
+          "stat": "range",
+          "value": 24,
+          "tol": 0.1
+        },
+        {
+          "text": "valve rod moves 24 mm",
+          "output": "valve-x",
+          "stat": "min",
+          "value": 138,
+          "tol": 0.1
+        },
+        {
+          "text": "valve rod moves 24 mm",
+          "output": "valve-x",
+          "stat": "max",
+          "value": 162,
+          "tol": 0.1
+        },
+        {
+          "text": "rod obliquity under 4.6°",
+          "output": "obliquity",
+          "stat": "max",
+          "value": 4.59,
+          "tol": 0.05
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "crank-shaper": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              240,
+              200
+            ],
+            "center": [
+              20,
+              -20
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 40,
+            "boss": [
+              9.5,
+              8
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "block",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 24,
+            "width": 14
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "lever",
+          "role": "link",
+          "shape": {
+            "type": "slotLink",
+            "length": 160,
+            "slot": [
+              60,
+              140
+            ],
+            "slotWidth": 14,
+            "width": 30
+          },
+          "at": {
+            "joint": "O3"
+          }
+        },
+        {
+          "id": "link",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 40,
+            "boss": [
+              9,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "B"
+          }
+        },
+        {
+          "id": "ram",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 20
+          },
+          "at": {
+            "joint": "C"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "block",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "slot",
+          "type": "prismatic",
+          "a": "block",
+          "b": "lever",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0.3714,
+            0.9285,
+            0
+          ]
+        },
+        {
+          "id": "O3",
+          "type": "revolute",
+          "a": "ground",
+          "b": "lever",
+          "at": [
+            0,
+            -100,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "lever",
+          "b": "link",
+          "at": [
+            59.42,
+            48.56,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C",
+          "type": "revolute",
+          "a": "link",
+          "b": "ram",
+          "at": [
+            84.149059828469,
+            80,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "rails",
+          "type": "prismatic",
+          "a": "ram",
+          "b": "ground",
+          "at": [
+            84.149059828469,
+            80,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 40,
+          "unit": "mm",
+          "min": 40,
+          "max": 40,
+          "note": "crank radius"
+        },
+        {
+          "id": "d",
+          "value": 100,
+          "unit": "mm",
+          "min": 100,
+          "max": 100,
+          "note": "crank centre above the lever pivot"
+        },
+        {
+          "id": "Ll",
+          "value": 160,
+          "unit": "mm",
+          "min": 160,
+          "max": 160,
+          "note": "lever length, O3 to B"
+        },
+        {
+          "id": "l",
+          "value": 40,
+          "unit": "mm",
+          "min": 40,
+          "max": 40,
+          "note": "link, B to C"
+        },
+        {
+          "id": "yR",
+          "value": 80,
+          "unit": "mm",
+          "min": 80,
+          "max": 80,
+          "note": "ram line above O2 (raised from 64 so the ram rails clear the block sliding in the lever)"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "lever",
+          "joints": [
+            "A",
+            "slot",
+            "O3"
+          ],
+          "in": {
+            "kind": "rpr",
+            "a": "O3",
+            "p": "A",
+            "body": "lever"
+          },
+          "out": {
+            "angle": "lever-turn"
+          }
+        },
+        {
+          "block": "slider-dyad",
+          "id": "link-ram",
+          "joints": [
+            "B",
+            "C",
+            "rails"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "B",
+            "r": "l",
+            "p": "ram-line",
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "C"
+        }
+      ],
+      "points": [
+        {
+          "id": "ram-line",
+          "body": "ground",
+          "local": [
+            0,
+            "yR",
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "ram-x",
+          "of": "C",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "lever-angle",
+          "of": "lever",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep, draw the tangent lines) and issue #214. The lever's two extreme positions are tangent to the crank circle; drawn as lines from O3 with the cut and return arcs between the tangent points, they show the crank going the long way round (227.2 degrees) for the cut and the short way (132.8) for the return. Equal-time ticks on the ram show it."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "block"
+        },
+        {
+          "body": "lever"
+        },
+        {
+          "body": "ram"
+        },
+        {
+          "point": "C"
+        }
+      ],
+      "traces": [
+        {
+          "id": "ram",
+          "point": "C",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "lever-tip",
+          "point": "B"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "tangent-1",
+          "kind": "line",
+          "from": "O3",
+          "to": "B",
+          "pose": {
+            "output": "lever-angle",
+            "stat": "max"
+          },
+          "label": "LEVER TANGENT"
+        },
+        {
+          "id": "tangent-2",
+          "kind": "line",
+          "from": "O3",
+          "to": "B",
+          "pose": {
+            "output": "lever-angle",
+            "stat": "min"
+          },
+          "label": "LEVER TANGENT"
+        },
+        {
+          "id": "cut-arc",
+          "kind": "arc",
+          "center": "O2",
+          "from": "A",
+          "to": "A",
+          "fromPose": {
+            "output": "ram-x",
+            "stat": "max"
+          },
+          "toPose": {
+            "output": "ram-x",
+            "stat": "min"
+          },
+          "sweep": "ccw",
+          "label": "CUT"
+        },
+        {
+          "id": "return-arc",
+          "kind": "arc",
+          "center": "O2",
+          "from": "A",
+          "to": "A",
+          "fromPose": {
+            "output": "ram-x",
+            "stat": "min"
+          },
+          "toPose": {
+            "output": "ram-x",
+            "stat": "max"
+          },
+          "sweep": "ccw",
+          "label": "RETURN"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "ram-x",
+        "label": "RAM POSITION"
+      },
+      "claims": [
+        {
+          "text": "cut:return 1.71:1",
+          "output": "ram-x",
+          "stat": "time-ratio",
+          "value": 1.711,
+          "tol": 0.005
+        },
+        {
+          "text": "cut angle 227.2°",
+          "output": "ram-x",
+          "stat": "phase",
+          "from": "max",
+          "to": "min",
+          "value": 227.16,
+          "tol": 0.2
+        },
+        {
+          "text": "return 132.8°",
+          "output": "ram-x",
+          "stat": "phase",
+          "from": "min",
+          "to": "max",
+          "value": 132.84,
+          "tol": 0.2
+        },
+        {
+          "text": "stroke 128 mm",
+          "output": "ram-x",
+          "stat": "range",
+          "value": 128,
+          "tol": 0.1
+        },
+        {
+          "text": "lever rocks ±23.6°",
+          "output": "lever-angle",
+          "stat": "range",
+          "value": 47.16,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "whitworth": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              260,
+              160
+            ],
+            "center": [
+              20,
+              -20
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "pinion",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 16,
+            "module": 2,
+            "face": 10,
+            "bore": 6
+          },
+          "at": {
+            "joint": "Op"
+          }
+        },
+        {
+          "id": "bull",
+          "role": "gear",
+          "shape": {
+            "type": "gear",
+            "z": 50,
+            "module": 2,
+            "face": 10,
+            "bore": 64,
+            "note": "the bull gear turns on the fixed hub (bore 64 round the 60 hub and its liner); the crank pin A at 40"
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "block",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 14,
+            "width": 14,
+            "note": "a square die block, short enough to run to 20 mm from O3 in the lever slot clear of the pivot bearing"
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "lever",
+          "role": "link",
+          "shape": {
+            "type": "slotLink",
+            "length": 60,
+            "slot": [
+              20,
+              60
+            ],
+            "slotWidth": 14,
+            "width": 22,
+            "arm": 32
+          },
+          "at": {
+            "joint": "O3"
+          }
+        },
+        {
+          "id": "rod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 100,
+            "boss": [
+              8.5,
+              8
+            ]
+          },
+          "at": {
+            "joint": "B"
+          }
+        },
+        {
+          "id": "ram",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 28,
+            "width": 20
+          },
+          "at": {
+            "joint": "C"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "Op",
+          "type": "revolute",
+          "a": "ground",
+          "b": "pinion",
+          "at": [
+            -62.02,
+            -22.57,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "mesh",
+          "type": "gear-mesh",
+          "a": "pinion",
+          "b": "bull",
+          "at": [
+            -46.98,
+            -17.1,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "za": 16,
+          "zb": 50,
+          "ca": [
+            -62.02,
+            -22.57,
+            0
+          ],
+          "cb": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "bull",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "radius": 30,
+          "note": "the bull gear turns on a fixed hub of radius 30 about O2; the lever pivot O3 stands on the hub, 20 from O2"
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "bull",
+          "b": "block",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "slot",
+          "type": "prismatic",
+          "a": "block",
+          "b": "lever",
+          "at": [
+            40,
+            0,
+            0
+          ],
+          "axis": [
+            0.8944,
+            0.4472,
+            0
+          ]
+        },
+        {
+          "id": "O3",
+          "type": "revolute",
+          "a": "ground",
+          "b": "lever",
+          "at": [
+            0,
+            -20,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "lever",
+          "b": "rod",
+          "at": [
+            -28.62,
+            -34.31,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C",
+          "type": "revolute",
+          "a": "rod",
+          "b": "ram",
+          "at": [
+            70.350823478437,
+            -20,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "rails",
+          "type": "prismatic",
+          "a": "ram",
+          "b": "ground",
+          "at": [
+            70.350823478437,
+            -20,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 40,
+          "unit": "mm",
+          "min": 40,
+          "max": 40,
+          "note": "crank radius on the bull gear"
+        },
+        {
+          "id": "e",
+          "value": 20,
+          "unit": "mm",
+          "min": 10,
+          "max": 30,
+          "note": "lever pivot O3 below O2 (review: raised from 14 for a 2:1 ratio); e < r"
+        },
+        {
+          "id": "R",
+          "value": 32,
+          "unit": "mm",
+          "min": 32,
+          "max": 32,
+          "note": "lever arm to the rod pin B"
+        },
+        {
+          "id": "Lr",
+          "value": 100,
+          "unit": "mm",
+          "min": 100,
+          "max": 100,
+          "note": "connecting rod, B to C"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "Op",
+          "kind": "rotary",
+          "range": [
+            0,
+            1125
+          ],
+          "default": 0,
+          "note": "one cycle is one bull gear turn, 50/16 = 3.125 pinion turns; the pinion turns clockwise so the bull gear and its crank turn counter-clockwise",
+          "speed": -1
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "pinion-bull",
+          "joints": [
+            "mesh",
+            "O2"
+          ],
+          "in": {
+            "joint": "mesh",
+            "input": "input"
+          },
+          "out": {
+            "angle": "bull-turn"
+          }
+        },
+        {
+          "block": "slider-dyad",
+          "id": "lever",
+          "joints": [
+            "A",
+            "slot",
+            "O3"
+          ],
+          "in": {
+            "kind": "rpr",
+            "a": "O3",
+            "p": "A",
+            "body": "lever"
+          },
+          "out": {
+            "angle": "lever-turn"
+          }
+        },
+        {
+          "block": "slider-dyad",
+          "id": "rod-ram",
+          "joints": [
+            "B",
+            "C",
+            "rails"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "B",
+            "r": "Lr",
+            "p": "O3",
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "C"
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "crank-angle",
+          "of": "bull",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "lever-angle",
+          "of": "lever",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "ram-x",
+          "of": "C",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214: e raised from 14 to 20 mm so beta = asin(e/r) = 30 degrees and the ratio is exactly 2:1. O2 is marked and the crank line O2-A drawn, so the two centres read apart; the chord through O3 splits the crank circle into the 240 degree slow arc and the 120 degree quick arc. Ticks on B show the lever turning fully round at uneven speed (0.67x to 2x the crank)."
+      },
+      "principle": [
+        {
+          "body": "bull"
+        },
+        {
+          "body": "block"
+        },
+        {
+          "body": "lever"
+        },
+        {
+          "body": "rod"
+        },
+        {
+          "body": "ram"
+        },
+        {
+          "point": "O2"
+        },
+        {
+          "point": "O3"
+        }
+      ],
+      "traces": [
+        {
+          "id": "lever-pin",
+          "point": "B",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "ram",
+          "point": "C",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "o2-mark",
+          "kind": "circle",
+          "center": "O2",
+          "radius": 4,
+          "label": "O2"
+        },
+        {
+          "id": "crank-line",
+          "kind": "line",
+          "from": "O2",
+          "to": "A",
+          "label": "CRANK O2-A"
+        },
+        {
+          "id": "offset",
+          "kind": "dimension",
+          "from": "O2",
+          "to": "O3",
+          "label": "OFFSET e"
+        },
+        {
+          "id": "split-chord",
+          "kind": "chord",
+          "center": "O2",
+          "from": "A",
+          "to": "A",
+          "fromPose": {
+            "output": "ram-x",
+            "stat": "min"
+          },
+          "toPose": {
+            "output": "ram-x",
+            "stat": "max"
+          },
+          "label": "SLOW | QUICK"
+        },
+        {
+          "id": "slow-arc",
+          "kind": "arc",
+          "center": "O2",
+          "from": "A",
+          "to": "A",
+          "fromPose": {
+            "output": "ram-x",
+            "stat": "min"
+          },
+          "toPose": {
+            "output": "ram-x",
+            "stat": "max"
+          },
+          "sweep": "ccw",
+          "label": "SLOW STROKE"
+        },
+        {
+          "id": "quick-arc",
+          "kind": "arc",
+          "center": "O2",
+          "from": "A",
+          "to": "A",
+          "fromPose": {
+            "output": "ram-x",
+            "stat": "max"
+          },
+          "toPose": {
+            "output": "ram-x",
+            "stat": "min"
+          },
+          "sweep": "ccw",
+          "label": "QUICK STROKE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "crank-angle",
+        "y": "ram-x",
+        "label": "RAM POSITION"
+      },
+      "claims": [
+        {
+          "text": "cut:return 2:1 here",
+          "output": "ram-x",
+          "stat": "time-ratio",
+          "value": 2,
+          "tol": 0.005
+        },
+        {
+          "text": "slow stroke 240° of crank turn",
+          "output": "ram-x",
+          "stat": "phase",
+          "from": "min",
+          "to": "max",
+          "value": 240,
+          "tol": 0.2
+        },
+        {
+          "text": "quick stroke 120°",
+          "output": "ram-x",
+          "stat": "phase",
+          "from": "max",
+          "to": "min",
+          "value": 120,
+          "tol": 0.2
+        },
+        {
+          "text": "stroke = 2R = 64 mm",
+          "output": "ram-x",
+          "stat": "range",
+          "value": 64,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "ratio.typical": "cut:return = (180° + 2 asin(e/r)) : (180° - 2 asin(e/r)), 2:1 here (e = 20, r = 40); stroke = 2R = 64 mm",
+      "build.ground": "frame with bull gear axis O2 at (0, 0), lever pivot O3 at (0, -20), pinion axis at 66 mm from O2, ram line y = -20",
+      "build.defining_relations": "phi = angle of A seen from O3; B = O3 - R(cos phi, sin phi); C = (Bx + sqrt(Lr^2 - (By + e)^2), -e). Ram extremes when the lever is parallel to the ram line, at crank angles where sin = -e/r: beta = asin(e/r) = 30°, slow stroke 180° + 2 beta = 240°, quick stroke 120°, ratio 2:1. Stroke = 2R = 64 mm. Gear ratio 50/16 = 3.125:1, pinion angle = -(z1/z2) x bull angle + phase."
+    }
+  },
+  "drag-link-quick-return": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              340,
+              150
+            ],
+            "center": [
+              110,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "plate",
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                60,
+                0
+              ],
+              [
+                -14,
+                11
+              ],
+              [
+                -14,
+                -11
+              ]
+            ],
+            "boss": 9.5,
+            "note": "the input crank with its counterweight lobe opposite the pin (M2)"
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "coupler",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 70,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "follower",
+          "role": "output",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              12,
+              9.5
+            ],
+            "upper": {
+              "length": 50,
+              "boss": [
+                12,
+                9
+              ],
+              "angle": 180,
+              "gap": 22
+            },
+            "note": "the output crank in two arms on one shaft, the arm to B below and the ram arm to D above, a bridge between them carrying the shaft"
+          },
+          "at": {
+            "joint": "O4"
+          }
+        },
+        {
+          "id": "rod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 180,
+            "boss": [
+              9,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "D"
+          }
+        },
+        {
+          "id": "ram",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 20
+          },
+          "at": {
+            "joint": "E"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "coupler",
+          "at": [
+            60,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "B",
+          "type": "revolute",
+          "a": "coupler",
+          "b": "follower",
+          "at": [
+            23.928571428571,
+            59.990432910726,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "O4",
+          "type": "revolute",
+          "a": "ground",
+          "b": "follower",
+          "at": [
+            25,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "D",
+          "type": "revolute",
+          "a": "follower",
+          "b": "rod",
+          "at": [
+            25.891183616361,
+            -49.989978912994,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "E",
+          "type": "revolute",
+          "a": "rod",
+          "b": "ram",
+          "at": [
+            198.810245631739,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "rails",
+          "type": "prismatic",
+          "a": "ram",
+          "b": "ground",
+          "at": [
+            198.810245631739,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "d",
+          "value": 25,
+          "unit": "mm",
+          "min": 25,
+          "max": 25,
+          "note": "fixed link O2 to O4 (shortest)"
+        },
+        {
+          "id": "a",
+          "value": 60,
+          "unit": "mm",
+          "min": 60,
+          "max": 60,
+          "note": "input crank"
+        },
+        {
+          "id": "b",
+          "value": 70,
+          "unit": "mm",
+          "min": 70,
+          "max": 70,
+          "note": "coupler"
+        },
+        {
+          "id": "c",
+          "value": 60,
+          "unit": "mm",
+          "min": 60,
+          "max": 60,
+          "note": "output crank, O4 to B"
+        },
+        {
+          "id": "r",
+          "value": 50,
+          "unit": "mm",
+          "min": 50,
+          "max": 50,
+          "note": "ram arm, O4 to D, opposite B"
+        },
+        {
+          "id": "L",
+          "value": 180,
+          "unit": "mm",
+          "min": 180,
+          "max": 180,
+          "note": "connecting rod, D to E"
+        }
+      ],
+      "design": [
+        {
+          "id": "branch",
+          "options": [
+            "open",
+            "crossed"
+          ],
+          "value": "open"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "coupler-follower",
+          "joints": [
+            "A",
+            "B",
+            "O4"
+          ],
+          "in": {
+            "a": "O4",
+            "b": "A",
+            "ra": "c",
+            "rb": "b",
+            "body": "follower"
+          },
+          "branch": "branch",
+          "out": "B"
+        },
+        {
+          "block": "slider-dyad",
+          "id": "rod-ram",
+          "joints": [
+            "D",
+            "E",
+            "rails"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "D",
+            "r": "L",
+            "p": "O2",
+            "d": [
+              1,
+              0,
+              0
+            ]
+          },
+          "out": "E"
+        }
+      ],
+      "points": [],
+      "outputs": [
+        {
+          "id": "ram-x",
+          "of": "E",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "output-angle",
+          "of": "follower",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "transmission-angle",
+          "of": "B",
+          "kind": "angle",
+          "unit": "deg",
+          "from": "A",
+          "to": "O4"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214. A and B are traced, two full circles round two centres 25 mm apart, with equal-time ticks: A's are even, B's bunch and spread (the output crank runs from 0.56x to 1.8x the input), which is the drag-link principle. The ground link is dimensioned so the two pivots read. The counterweight stays (M2, a hardware decision). The open branch puts the ram extremes at input 305.5 and 89.0 degrees as the record says."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "coupler"
+        },
+        {
+          "body": "follower"
+        },
+        {
+          "point": "A"
+        },
+        {
+          "point": "B"
+        }
+      ],
+      "traces": [
+        {
+          "id": "output-pin",
+          "point": "B",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "input-pin",
+          "point": "A",
+          "ticks": {
+            "every": 15
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "fixed-link",
+          "kind": "dimension",
+          "from": "O2",
+          "to": "O4",
+          "label": "FIXED LINK d"
+        },
+        {
+          "id": "transmission",
+          "kind": "arc",
+          "center": "B",
+          "from": "A",
+          "to": "O4",
+          "label": "TRANSMISSION ANGLE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "ram-x",
+          "label": "RAM POSITION"
+        },
+        {
+          "x": "input",
+          "y": "output-angle",
+          "label": "OUTPUT CRANK ANGLE"
+        }
+      ],
+      "claims": [
+        {
+          "text": "time ratio about 1.5:1 here",
+          "output": "ram-x",
+          "stat": "time-ratio",
+          "value": 1.509,
+          "tol": 0.005
+        },
+        {
+          "text": "slow stroke 216.5°",
+          "output": "ram-x",
+          "stat": "phase",
+          "from": "max",
+          "to": "min",
+          "value": 216.53,
+          "tol": 0.2
+        },
+        {
+          "text": "fast stroke 143.5°",
+          "output": "ram-x",
+          "stat": "phase",
+          "from": "min",
+          "to": "max",
+          "value": 143.47,
+          "tol": 0.2
+        },
+        {
+          "text": "ram extremes at input angles about 305.5° and 89.0°",
+          "output": "ram-x",
+          "stat": "phase",
+          "of": "min",
+          "value": 305.51,
+          "tol": 0.2
+        },
+        {
+          "text": "ram extremes at input angles about 305.5° and 89.0°",
+          "output": "ram-x",
+          "stat": "phase",
+          "of": "max",
+          "value": 88.98,
+          "tol": 0.2
+        },
+        {
+          "text": "ram stroke 100 mm",
+          "output": "ram-x",
+          "stat": "range",
+          "value": 100,
+          "tol": 0.1
+        },
+        {
+          "text": "transmission angle minimum about 30°",
+          "output": "transmission-angle",
+          "stat": "min",
+          "value": 29.99,
+          "tol": 0.5
+        },
+        {
+          "text": "transmission angle ranges about 30° to 81°",
+          "output": "transmission-angle",
+          "stat": "max",
+          "value": 81.27,
+          "tol": 0.5
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "oscillating-cylinder": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              240,
+              120
+            ],
+            "center": [
+              70,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "standard",
+          "role": "frame",
+          "shape": {
+            "type": "disc",
+            "radius": 40,
+            "thickness": 8,
+            "holes": [
+              [
+                29.45,
+                -5.72,
+                2.5
+              ],
+              [
+                29.45,
+                5.72,
+                2.5
+              ],
+              [
+                0,
+                0,
+                6.05
+              ]
+            ]
+          },
+          "frame": {
+            "origin": [
+              120,
+              0,
+              -22
+            ]
+          }
+        },
+        {
+          "id": "crank",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 35,
+            "boss": [
+              9.5,
+              8
+            ]
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "piston",
+          "role": "slider",
+          "shape": {
+            "type": "piston",
+            "length": 120,
+            "rod": 10,
+            "eye": 9,
+            "head": [
+              16,
+              39
+            ],
+            "axis": 14
+          },
+          "at": {
+            "joint": "A"
+          }
+        },
+        {
+          "id": "cylinder",
+          "role": "output",
+          "shape": {
+            "type": "cylinder",
+            "bore": 40,
+            "wall": 6,
+            "span": [
+              -46,
+              46
+            ],
+            "face": -14,
+            "pad": [
+              -12,
+              40,
+              28
+            ],
+            "port": [
+              30,
+              2.5
+            ],
+            "rod": 10,
+            "axis": 14
+          },
+          "at": {
+            "joint": "O3"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "A",
+          "type": "revolute",
+          "a": "crank",
+          "b": "piston",
+          "at": [
+            35,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "bore",
+          "type": "prismatic",
+          "a": "piston",
+          "b": "cylinder",
+          "at": [
+            155,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "O3",
+          "type": "revolute",
+          "a": "ground",
+          "b": "cylinder",
+          "at": [
+            120,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 35,
+          "unit": "mm",
+          "min": 25,
+          "max": 45,
+          "note": "crank radius"
+        },
+        {
+          "id": "d",
+          "value": 120,
+          "unit": "mm",
+          "min": 100,
+          "max": 140,
+          "note": "crankshaft to trunnion"
+        },
+        {
+          "id": "Lp",
+          "value": 120,
+          "unit": "mm",
+          "min": 120,
+          "max": 120,
+          "note": "crank pin to piston centre"
+        },
+        {
+          "id": "portR",
+          "value": 30,
+          "unit": "mm",
+          "min": 30,
+          "max": 30,
+          "note": "port circle radius about the trunnion, on the port face (review: raised from 13 so the ports read)"
+        },
+        {
+          "id": "portA",
+          "value": 11,
+          "unit": "deg",
+          "min": 11,
+          "max": 11,
+          "note": "standard's ports either side of the centre line"
+        },
+        {
+          "id": "portHole",
+          "value": 2.5,
+          "unit": "mm",
+          "min": 2.5,
+          "max": 2.5,
+          "note": "port hole radius; at 30 mm and 11 degrees both ports are shut at the dead centres"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "note": "the piston drives the crank; the crank is driven here so the cycle passes the dead centres"
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "swinging-block",
+          "joints": [
+            "A",
+            "bore",
+            "O3"
+          ],
+          "in": {
+            "kind": "rpr",
+            "a": "O3",
+            "p": "A",
+            "body": "cylinder"
+          },
+          "out": {
+            "angle": "cyl-turn",
+            "dist": "cyl-dist"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "Pc",
+          "body": "piston",
+          "local": [
+            120,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "port",
+          "body": "cylinder",
+          "local": [
+            30,
+            0,
+            -14
+          ]
+        },
+        {
+          "id": "inlet",
+          "body": "ground",
+          "local": [
+            149.45,
+            -5.72,
+            -14
+          ]
+        },
+        {
+          "id": "exhaust",
+          "body": "ground",
+          "local": [
+            149.45,
+            5.72,
+            -14
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "cyl-angle",
+          "of": "cylinder",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "piston-s",
+          "of": "bore",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "port-path",
+          "of": "port",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Pilot. Applies the 2026-10-19 review (tweak) and issue #214: the ports are the principle (the swing is the valve), so a section at the port face shows the cylinder's port sweeping over the standard's inlet and exhaust, with the open one highlighted. The port circle is raised from 13 to 30 mm and the holes sized so the inlet is open for 170 degrees of the power stroke and both ports are shut at the dead centres. The slimmer trunnion strap is a hardware decision."
+      },
+      "principle": [
+        {
+          "body": "crank"
+        },
+        {
+          "body": "piston"
+        },
+        {
+          "body": "cylinder"
+        },
+        {
+          "point": "port"
+        },
+        {
+          "point": "inlet"
+        },
+        {
+          "point": "exhaust"
+        }
+      ],
+      "traces": [
+        {
+          "id": "cylinder-port",
+          "point": "port",
+          "comet": true
+        },
+        {
+          "id": "crank-pin",
+          "point": "A"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "inlet-port",
+          "kind": "circle",
+          "center": "inlet",
+          "radius": 2.5,
+          "label": "INLET"
+        },
+        {
+          "id": "exhaust-port",
+          "kind": "circle",
+          "center": "exhaust",
+          "radius": 2.5,
+          "label": "EXHAUST"
+        },
+        {
+          "id": "swing",
+          "kind": "arc",
+          "center": "O3",
+          "label": "SWING",
+          "through": "port"
+        }
+      ],
+      "view": "PLAN",
+      "views": [
+        {
+          "id": "port-face",
+          "kind": "section",
+          "plane": {
+            "origin": [
+              120,
+              0,
+              -13
+            ],
+            "normal": [
+              0,
+              0,
+              1
+            ]
+          },
+          "highlight": [
+            "port"
+          ],
+          "note": "1 mm into the cylinder's port pad, over the face it shares with the standard: the pad's port, cut, over the standard's inlet and exhaust; the open port is the one the cylinder's port overlaps"
+        }
+      ],
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "cyl-angle",
+        "label": "CYLINDER SWING"
+      },
+      "claims": [
+        {
+          "text": "cylinder swing ±asin(r/d) = ±17°",
+          "output": "cyl-angle",
+          "stat": "range",
+          "value": 33.92,
+          "tol": 0.1
+        },
+        {
+          "text": "stroke = 2 x crank radius (70 mm)",
+          "output": "piston-s",
+          "stat": "range",
+          "value": 70,
+          "tol": 0.1
+        },
+        {
+          "text": "the inlet is open for about 170° of crank, from 3.6° to 173.6°",
+          "output": "cyl-angle",
+          "stat": "dwell",
+          "band": [
+            -20.56,
+            -1.44
+          ],
+          "value": 170.1,
+          "tol": 0.5
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "build.defining_relations": "Cylinder angle ψ = atan2(O3 - A). Piston position along bore s = Lp - |A - O3|, range -35 to +35 mm (stroke 2r = 70). Swing amplitude = asin(r/d) = 17.0°. The cylinder's port sits 30 mm from the trunnion on the port face; the standard's inlet and exhaust sit 11° either side of the centre line. The inlet lines up while the swing is between -20.6° and -1.4°, which is crank 3.6° to 173.6° (170°, the power stroke), the exhaust likewise on the other side; both are shut for about 10° round each dead centre."
+    }
+  },
+  "rhombic-drive": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              200,
+              220
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "gear1",
+          "role": "gear",
+          "shape": {
+            "type": "gear",
+            "z": 30,
+            "module": 2,
+            "face": 10,
+            "bore": 6,
+            "crankPin": 20
+          },
+          "at": {
+            "joint": "G1"
+          }
+        },
+        {
+          "id": "gear2",
+          "role": "driver",
+          "shape": {
+            "type": "gear",
+            "z": 30,
+            "module": 2,
+            "face": 10,
+            "bore": 6,
+            "crankPin": 20
+          },
+          "at": {
+            "joint": "G2"
+          }
+        },
+        {
+          "id": "rod1",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8.5,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "PLa"
+          }
+        },
+        {
+          "id": "rod2",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8.5,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "PRa"
+          }
+        },
+        {
+          "id": "rod3",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8.5,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "PLb"
+          }
+        },
+        {
+          "id": "rod4",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8.5,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "PRb"
+          }
+        },
+        {
+          "id": "piston",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 26
+          },
+          "frame": {
+            "origin": [
+              0,
+              "sqrt(L^2-(e+r)^2)",
+              0
+            ]
+          }
+        },
+        {
+          "id": "displacer",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 36,
+            "width": 26
+          },
+          "frame": {
+            "origin": [
+              0,
+              "-sqrt(L^2-(e+r)^2)",
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "G1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear1",
+          "at": [
+            "-e",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "G2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "gear2",
+          "at": [
+            "e",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "mesh",
+          "type": "gear-mesh",
+          "a": "gear2",
+          "b": "gear1",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "za": 30,
+          "zb": 30,
+          "ca": [
+            30,
+            0,
+            0
+          ],
+          "cb": [
+            -30,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "PLa",
+          "type": "revolute",
+          "a": "gear1",
+          "b": "rod1",
+          "at": [
+            "-(e+r)",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PLb",
+          "type": "revolute",
+          "a": "gear1",
+          "b": "rod3",
+          "at": [
+            "-(e+r)",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PRa",
+          "type": "revolute",
+          "a": "gear2",
+          "b": "rod2",
+          "at": [
+            "e+r",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "PRb",
+          "type": "revolute",
+          "a": "gear2",
+          "b": "rod4",
+          "at": [
+            "e+r",
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Ta",
+          "type": "revolute",
+          "a": "rod1",
+          "b": "piston",
+          "at": [
+            0,
+            "sqrt(L^2-(e+r)^2)",
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Tb",
+          "type": "revolute",
+          "a": "rod2",
+          "b": "piston",
+          "at": [
+            0,
+            "sqrt(L^2-(e+r)^2)",
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Ba",
+          "type": "revolute",
+          "a": "rod3",
+          "b": "displacer",
+          "at": [
+            0,
+            "-sqrt(L^2-(e+r)^2)",
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Bb",
+          "type": "revolute",
+          "a": "rod4",
+          "b": "displacer",
+          "at": [
+            0,
+            "-sqrt(L^2-(e+r)^2)",
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "piston-guide",
+          "type": "prismatic",
+          "a": "piston",
+          "b": "ground",
+          "at": [
+            0,
+            "sqrt(L^2-(e+r)^2)",
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "displacer-guide",
+          "type": "prismatic",
+          "a": "displacer",
+          "b": "ground",
+          "at": [
+            0,
+            "-sqrt(L^2-(e+r)^2)",
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "e",
+          "value": 30,
+          "unit": "mm",
+          "min": 30,
+          "max": 30,
+          "note": "gear centre offset from the axis"
+        },
+        {
+          "id": "r",
+          "value": 20,
+          "unit": "mm",
+          "min": 20,
+          "max": 20,
+          "note": "crank radius"
+        },
+        {
+          "id": "L",
+          "value": 60,
+          "unit": "mm",
+          "min": 60,
+          "max": 60,
+          "note": "rhombus rod length (L > e + r)"
+        }
+      ],
+      "design": [
+        {
+          "id": "power-branch",
+          "options": [
+            "above",
+            "below"
+          ],
+          "value": "above"
+        },
+        {
+          "id": "displacer-branch",
+          "options": [
+            "below",
+            "above"
+          ],
+          "value": "below"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "G2",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "note": "the right gear is driven counter-clockwise so the displacer leads the piston"
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "gears",
+          "joints": [
+            "mesh",
+            "G1"
+          ],
+          "in": {
+            "joint": "mesh",
+            "input": "input"
+          },
+          "out": {
+            "angle": "gear1-turn"
+          },
+          "note": "1:1, counter-rotating: the crank pins stay mirrored about the axis"
+        },
+        {
+          "block": "dyad",
+          "id": "power-yoke",
+          "joints": [
+            "PLa",
+            "PRa",
+            "Ta",
+            "Tb",
+            "piston-guide"
+          ],
+          "in": {
+            "a": "PLa",
+            "b": "PRa",
+            "ra": "L",
+            "rb": "L"
+          },
+          "branch": "power-branch",
+          "out": "T"
+        },
+        {
+          "block": "dyad",
+          "id": "displacer-yoke",
+          "joints": [
+            "PLb",
+            "PRb",
+            "Ba",
+            "Bb",
+            "displacer-guide"
+          ],
+          "in": {
+            "a": "PRb",
+            "b": "PLb",
+            "ra": "L",
+            "rb": "L"
+          },
+          "branch": "displacer-branch",
+          "out": "Bt"
+        }
+      ],
+      "points": [
+        {
+          "id": "T",
+          "body": "piston",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Bt",
+          "body": "displacer",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "piston-y",
+          "of": "T",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "y"
+        },
+        {
+          "id": "displacer-y",
+          "of": "Bt",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "y"
+        },
+        {
+          "id": "yoke-gap",
+          "of": "T",
+          "kind": "position",
+          "unit": "mm",
+          "relativeTo": "Bt"
+        },
+        {
+          "id": "displacer-depth",
+          "of": "Bt",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "-y",
+          "note": "the displacer yoke read the other way round (its distance below the gears), so both pistons plot on one scale"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214. The rhombus is the principle, so the guides go outboard or underneath or are drawn see-through (a hardware decision). The text now gives the measured lag: the displacer leads the piston by 64 degrees (first harmonic; the peaks are 71 degrees apart). Both crank pins and both yokes are traced, the yokes with equal-time ticks, and both positions are plotted together so the lag reads."
+      },
+      "principle": [
+        {
+          "body": "gear1"
+        },
+        {
+          "body": "gear2"
+        },
+        {
+          "body": "rod1"
+        },
+        {
+          "body": "rod2"
+        },
+        {
+          "body": "rod3"
+        },
+        {
+          "body": "rod4"
+        },
+        {
+          "body": "piston"
+        },
+        {
+          "body": "displacer"
+        }
+      ],
+      "traces": [
+        {
+          "id": "piston-yoke",
+          "point": "T",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true
+        },
+        {
+          "id": "displacer-yoke",
+          "point": "Bt",
+          "ticks": {
+            "every": 30
+          }
+        },
+        {
+          "id": "left-pin",
+          "point": "PLa"
+        },
+        {
+          "id": "right-pin",
+          "point": "PRa"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "common-axis",
+          "kind": "axis-line",
+          "from": "Bt",
+          "to": "T",
+          "label": "COMMON AXIS"
+        },
+        {
+          "id": "yoke-gap",
+          "kind": "dimension",
+          "from": "Bt",
+          "to": "T",
+          "label": "YOKE GAP"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "piston-y",
+          "label": "PISTON POSITION"
+        },
+        {
+          "x": "input",
+          "y": "displacer-depth",
+          "label": "DISPLACER, MIRRORED"
+        }
+      ],
+      "claims": [
+        {
+          "text": "the two pistons slide along the same axis with a phase lag of about 64°",
+          "output": "piston-y",
+          "stat": "phase",
+          "against": "displacer-y",
+          "value": 64.37,
+          "tol": 1
+        },
+        {
+          "text": "each piston stroke about 2.4 x crank radius (47.7 mm at r = 20)",
+          "output": "piston-y",
+          "stat": "range",
+          "value": 47.7,
+          "tol": 0.1
+        },
+        {
+          "text": "displacer stroke 47.7",
+          "output": "displacer-y",
+          "stat": "range",
+          "value": 47.7,
+          "tol": 0.1
+        },
+        {
+          "text": "piston y 26.5 to 74.2",
+          "output": "piston-y",
+          "stat": "min",
+          "value": 26.46,
+          "tol": 0.1
+        },
+        {
+          "text": "piston y 26.5 to 74.2",
+          "output": "piston-y",
+          "stat": "max",
+          "value": 74.16,
+          "tol": 0.1
+        },
+        {
+          "text": "yokes never closer than 66 mm",
+          "output": "yoke-gap",
+          "stat": "min",
+          "value": 66.33,
+          "tol": 0.5
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "Two equal gears mesh and turn in opposite directions, each with a crank pin. Four equal rods join the two pins to an upper yoke on the power piston and a lower yoke on the displacer, forming a rhombus. As the cranks turn, the rhombus flattens and stretches, and the two pistons slide along the same axis with a phase lag of about 64°.",
+      "build.range": "gears 360° continuous; piston y 26.5 to 74.2 (stroke 47.7); displacer y -74.2 to -26.5 (stroke 47.7); displacer leads piston by about 64° (first harmonic; the peaks are 71° apart); yokes never closer than 66 mm",
+      "topology.notes": "ground, two crank gears, four equal rods, power piston and displacer; overconstrained: the count gives mobility -1, because each yoke is already located by its two rods (a dyad), so its guide is redundant while the gear mesh keeps the cranks mirrored"
+    }
+  },
+  "locomotive-drive": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              260,
+              100
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "wheel1",
+          "role": "driver",
+          "shape": {
+            "type": "disc",
+            "radius": 34,
+            "thickness": 8,
+            "crankPin": 17
+          },
+          "at": {
+            "joint": "W1"
+          }
+        },
+        {
+          "id": "wheel2",
+          "role": "output",
+          "shape": {
+            "type": "disc",
+            "radius": 34,
+            "thickness": 8,
+            "crankPin": 17
+          },
+          "at": {
+            "joint": "W2"
+          }
+        },
+        {
+          "id": "coupling",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 80,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "C1"
+          }
+        },
+        {
+          "id": "main",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 80,
+            "boss": [
+              8.5,
+              10
+            ]
+          },
+          "at": {
+            "joint": "X"
+          }
+        },
+        {
+          "id": "crosshead",
+          "role": "slider",
+          "shape": {
+            "type": "slider",
+            "length": 26,
+            "width": 20
+          },
+          "at": {
+            "joint": "X"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "W1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wheel1",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "W2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wheel2",
+          "at": [
+            80,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C1",
+          "type": "revolute",
+          "a": "wheel1",
+          "b": "coupling",
+          "at": [
+            17,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C2",
+          "type": "revolute",
+          "a": "coupling",
+          "b": "wheel2",
+          "at": [
+            97,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "C1m",
+          "type": "revolute",
+          "a": "main",
+          "b": "wheel1",
+          "at": [
+            17,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "X",
+          "type": "revolute",
+          "a": "crosshead",
+          "b": "main",
+          "at": [
+            -63,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "guide",
+          "type": "prismatic",
+          "a": "crosshead",
+          "b": "ground",
+          "at": [
+            -63,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "R",
+          "value": 34,
+          "unit": "mm",
+          "min": 34,
+          "max": 34,
+          "note": "wheel radius"
+        },
+        {
+          "id": "sp",
+          "value": 80,
+          "unit": "mm",
+          "min": 80,
+          "max": 80,
+          "note": "axle spacing"
+        },
+        {
+          "id": "r",
+          "value": 17,
+          "unit": "mm",
+          "min": 17,
+          "max": 17,
+          "note": "crank pin radius"
+        },
+        {
+          "id": "Lm",
+          "value": 80,
+          "unit": "mm",
+          "min": 80,
+          "max": 80,
+          "note": "main rod length"
+        }
+      ],
+      "design": [
+        {
+          "id": "coupling-branch",
+          "options": [
+            "parallelogram",
+            "antiparallelogram"
+          ],
+          "value": "parallelogram"
+        }
+      ],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "W1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "note": "the crosshead drives the wheel; the wheel is driven here so the cycle passes the dead centres"
+        }
+      ],
+      "solve": [
+        {
+          "block": "dyad",
+          "id": "coupling",
+          "joints": [
+            "C1",
+            "C2",
+            "W2"
+          ],
+          "in": {
+            "a": "C1",
+            "b": "W2",
+            "ra": "sp",
+            "rb": "r"
+          },
+          "branch": "coupling-branch",
+          "out": "C2",
+          "note": "the parallelogram closure keeps the rod level; it passes the line of centres twice a turn, where the two closures meet"
+        },
+        {
+          "block": "slider-dyad",
+          "id": "main-rod",
+          "joints": [
+            "C1m",
+            "X",
+            "guide"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "C1",
+            "r": "Lm",
+            "p": "W1",
+            "d": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "out": "X"
+        }
+      ],
+      "points": [
+        {
+          "id": "M",
+          "body": "coupling",
+          "local": [
+            40,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "crosshead-x",
+          "of": "X",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "wheel2-angle",
+          "of": "wheel2",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "wheel-ratio",
+          "of": "wheel2",
+          "kind": "speed-ratio",
+          "unit": ""
+        },
+        {
+          "id": "coupling-angle",
+          "of": "coupling",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "rod-angle",
+          "of": "X",
+          "from": "C1",
+          "to": "W1",
+          "kind": "angle",
+          "unit": "deg"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (keep) and issue #214. The coupling rod's midpoint is traced: it draws a circle of crank radius while the rod stays level, which is the parallelogram. Both crank pins are traced, the wheels turn 1:1, and the main rod's angle shows the slider-crank that drives them."
+      },
+      "principle": [
+        {
+          "body": "wheel1"
+        },
+        {
+          "body": "wheel2"
+        },
+        {
+          "body": "coupling"
+        },
+        {
+          "body": "main"
+        },
+        {
+          "body": "crosshead"
+        },
+        {
+          "point": "M"
+        }
+      ],
+      "traces": [
+        {
+          "id": "coupling-mid",
+          "point": "M",
+          "comet": true
+        },
+        {
+          "id": "pin-1",
+          "point": "C1"
+        },
+        {
+          "id": "pin-2",
+          "point": "C2"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "rod-angle",
+          "kind": "arc",
+          "center": "X",
+          "from": "W1",
+          "to": "C1",
+          "label": "ROD ANGLE"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "crosshead-x",
+        "label": "CROSSHEAD POSITION"
+      },
+      "claims": [
+        {
+          "text": "stroke = 2 x crank radius (34 mm)",
+          "output": "crosshead-x",
+          "stat": "range",
+          "value": 34,
+          "tol": 0.1
+        },
+        {
+          "text": "coupled wheels turn 1:1",
+          "output": "wheel-ratio",
+          "stat": "mean",
+          "value": 1,
+          "tol": 0.001
+        },
+        {
+          "text": "the coupling rod stays level",
+          "output": "coupling-angle",
+          "stat": "range",
+          "value": 0,
+          "tol": 0.01
+        }
+      ],
+      "exceptions": []
+    }
+  },
+  "walschaerts-valve-gear": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              640,
+              340
+            ],
+            "center": [
+              240,
+              110
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "wheel",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              14,
+              10
+            ],
+            "arm": {
+              "at": "Cp",
+              "joints": [
+                "Rc"
+              ],
+              "boss": [
+                10,
+                9
+              ]
+            },
+            "note": "the crank web with the main crank pin at 60; the return crank is fixed on the outer end of the main crank pin, outboard of the main rod, carrying the return crank pin Rc"
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "mainrod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 260,
+            "boss": [
+              9.5,
+              9.5
+            ]
+          },
+          "at": {
+            "joint": "Cp"
+          }
+        },
+        {
+          "id": "crosshead",
+          "role": "slider",
+          "shape": {
+            "type": "plate",
+            "outline": [
+              [
+                0,
+                0
+              ],
+              [
+                104,
+                22
+              ]
+            ],
+            "boss": 9,
+            "slider": [
+              26,
+              20
+            ]
+          },
+          "at": {
+            "joint": "Xh"
+          }
+        },
+        {
+          "id": "eccrod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 218.74,
+            "boss": [
+              8.5,
+              8.5
+            ]
+          },
+          "at": {
+            "joint": "Rc"
+          }
+        },
+        {
+          "id": "link",
+          "role": "link",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "profile": {
+              "slotArc": {
+                "center": [
+                  180,
+                  0
+                ],
+                "radius": 180,
+                "from": -31,
+                "to": 31,
+                "width": 15,
+                "wall": 10
+              },
+              "foot": [
+                -30,
+                -82
+              ]
+            },
+            "thick": 16,
+            "note": "expansion link: two cheeks 8 mm each, the lower solid on the trunnion, the upper slotted for the die (radius 180 about Zw, ±31°), an ear to the foot pin"
+          },
+          "frame": {
+            "origin": [
+              242.28,
+              128.44,
+              0
+            ]
+          }
+        },
+        {
+          "id": "radiusrod",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 180,
+            "boss": [
+              9,
+              9
+            ]
+          },
+          "at": {
+            "joint": "Dl"
+          }
+        },
+        {
+          "id": "lifting",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 110,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "Lr"
+          }
+        },
+        {
+          "id": "reversearm",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 180,
+            "boss": [
+              9,
+              8
+            ]
+          },
+          "at": {
+            "joint": "Rs"
+          }
+        },
+        {
+          "id": "comblever",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 110,
+            "boss": [
+              9,
+              9
+            ]
+          },
+          "at": {
+            "joint": "Rt"
+          }
+        },
+        {
+          "id": "union",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 60,
+            "boss": [
+              8,
+              8
+            ]
+          },
+          "at": {
+            "joint": "Ub"
+          }
+        },
+        {
+          "id": "spindle",
+          "role": "output",
+          "shape": {
+            "type": "slider",
+            "length": 28,
+            "width": 12
+          },
+          "at": {
+            "joint": "Vs"
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wheel",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Cp",
+          "type": "revolute",
+          "a": "wheel",
+          "b": "mainrod",
+          "at": [
+            60,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Xh",
+          "type": "revolute",
+          "a": "mainrod",
+          "b": "crosshead",
+          "at": [
+            320,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "guide",
+          "type": "prismatic",
+          "a": "crosshead",
+          "b": "ground",
+          "at": [
+            320,
+            0,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Rc",
+          "type": "revolute",
+          "a": "wheel",
+          "b": "eccrod",
+          "at": [
+            -5.34,
+            24.42,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Lf",
+          "type": "revolute",
+          "a": "eccrod",
+          "b": "link",
+          "at": [
+            212.289669358201,
+            46.431692689121,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Lt",
+          "type": "revolute",
+          "a": "ground",
+          "b": "link",
+          "at": [
+            242.28,
+            128.44,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "slot",
+          "type": "pin-in-slot",
+          "a": "radiusrod",
+          "b": "link",
+          "at": [
+            249.251540295467,
+            178.050000325303,
+            0
+          ],
+          "slot": {
+            "arc": {
+              "center": [
+                422.28,
+                128.44,
+                0
+              ],
+              "radius": "R",
+              "from": -31,
+              "to": 31
+            }
+          },
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Dl",
+          "type": "revolute",
+          "a": "lifting",
+          "b": "radiusrod",
+          "at": [
+            249.251540295467,
+            178.050000325303,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Lr",
+          "type": "revolute",
+          "a": "reversearm",
+          "b": "lifting",
+          "at": [
+            249.26,
+            288.05,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Rs",
+          "type": "revolute",
+          "a": "ground",
+          "b": "reversearm",
+          "at": [
+            422.28,
+            238.44,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Rt",
+          "type": "revolute",
+          "a": "radiusrod",
+          "b": "comblever",
+          "at": [
+            422.2712505103,
+            128.438989680737,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Vs",
+          "type": "revolute",
+          "a": "comblever",
+          "b": "spindle",
+          "at": [
+            434.272802891291,
+            110,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "vguide",
+          "type": "prismatic",
+          "a": "spindle",
+          "b": "ground",
+          "at": [
+            434.272802891291,
+            110,
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Ub",
+          "type": "revolute",
+          "a": "comblever",
+          "b": "union",
+          "at": [
+            482.279012415257,
+            36.244041277053,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "Uc",
+          "type": "revolute",
+          "a": "union",
+          "b": "crosshead",
+          "at": [
+            424,
+            22,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 60,
+          "unit": "mm",
+          "min": 60,
+          "max": 60,
+          "note": "main crank radius (piston stroke 120)"
+        },
+        {
+          "id": "Lm",
+          "value": 260,
+          "unit": "mm",
+          "min": 260,
+          "max": 260,
+          "note": "main rod"
+        },
+        {
+          "id": "rr",
+          "value": 25,
+          "unit": "mm",
+          "min": 25,
+          "max": 25,
+          "note": "return crank throw, O to Rc"
+        },
+        {
+          "id": "advance",
+          "value": 102.34,
+          "unit": "deg",
+          "min": 102.34,
+          "max": 102.34,
+          "note": "return crank ahead of the main crank: set so the link is at mid position at both dead centres"
+        },
+        {
+          "id": "Le",
+          "value": 218.74,
+          "unit": "mm",
+          "min": 218.74,
+          "max": 218.74,
+          "note": "eccentric rod, Rc to the link foot Lf"
+        },
+        {
+          "id": "foot",
+          "value": 87.32,
+          "unit": "mm",
+          "min": 87.32,
+          "max": 87.32,
+          "note": "trunnion to link foot, local (-30, -82)"
+        },
+        {
+          "id": "R",
+          "value": 180,
+          "unit": "mm",
+          "min": 180,
+          "max": 180,
+          "note": "expansion link slot radius = radius rod length"
+        },
+        {
+          "id": "Llift",
+          "value": 110,
+          "unit": "mm",
+          "min": 110,
+          "max": 110,
+          "note": "lifting link"
+        },
+        {
+          "id": "Lra",
+          "value": 180,
+          "unit": "mm",
+          "min": 180,
+          "max": 180,
+          "note": "reverse arm, Rs to Lr"
+        },
+        {
+          "id": "Lcl",
+          "value": 110,
+          "unit": "mm",
+          "min": 110,
+          "max": 110,
+          "note": "combination lever, Rt to Ub"
+        },
+        {
+          "id": "VS",
+          "value": 22,
+          "unit": "mm",
+          "min": 22,
+          "max": 22,
+          "note": "combination lever, Rt to the valve spindle pin Vs"
+        },
+        {
+          "id": "Lun",
+          "value": 60,
+          "unit": "mm",
+          "min": 60,
+          "max": 60,
+          "note": "union link"
+        },
+        {
+          "id": "lap",
+          "value": 10,
+          "unit": "mm",
+          "min": 10,
+          "max": 10,
+          "note": "valve lap: the valve must move this far off centre before a port opens"
+        },
+        {
+          "id": "lead",
+          "value": 2,
+          "unit": "mm",
+          "min": 2,
+          "max": 2,
+          "note": "valve lead"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        },
+        {
+          "id": "die",
+          "joint": "Rs",
+          "kind": "manual",
+          "range": [
+            -1,
+            1
+          ],
+          "default": 0.8,
+          "unit": "die position",
+          "note": "die position in the slot: +1 full forward, 0 mid gear, -1 full reverse; the reverse arm turns -20 degrees per unit (180 - 20 x die), which puts the die 20 degrees x die along the slot from the trunnion at the dead centres",
+          "scale": -20
+        }
+      ],
+      "solve": [
+        {
+          "block": "slider-dyad",
+          "id": "main-rod",
+          "joints": [
+            "Cp",
+            "Xh",
+            "guide"
+          ],
+          "in": {
+            "kind": "rrp",
+            "a": "Cp",
+            "r": "Lm",
+            "p": "O",
+            "d": [
+              1,
+              0,
+              0
+            ],
+            "body": "crosshead"
+          },
+          "out": "Xh"
+        },
+        {
+          "block": "dyad",
+          "id": "link-swing",
+          "joints": [
+            "Rc",
+            "Lf",
+            "Lt"
+          ],
+          "in": {
+            "a": "Lt",
+            "b": "Rc",
+            "ra": "foot",
+            "rb": "Le",
+            "body": "link"
+          },
+          "branch": "left",
+          "out": "Lf"
+        },
+        {
+          "block": "dyad",
+          "id": "die",
+          "joints": [
+            "slot",
+            "Dl",
+            "Lr"
+          ],
+          "in": {
+            "a": "Zw",
+            "b": "Lr",
+            "ra": "R",
+            "rb": "Llift"
+          },
+          "branch": "left",
+          "out": "Dl",
+          "note": "the die sits where the slot arc (about its centre Zw) meets the lifting link's circle; it slips a little along the slot as the link swings"
+        },
+        {
+          "block": "triad",
+          "id": "lever-triad",
+          "joints": [
+            "Rt",
+            "Vs",
+            "vguide",
+            "Ub",
+            "Uc"
+          ],
+          "in": {
+            "a": "Dl",
+            "lever": "comblever",
+            "p1": "Rt",
+            "p2": "Vs",
+            "p3": "Ub",
+            "slide": "vguide",
+            "c": "Uc"
+          },
+          "out": {
+            "p1": "Rt",
+            "p2": "Vs",
+            "p3": "Ub"
+          },
+          "note": "radius rod, combination lever, union link and valve spindle: a triad, closed by the lever's turn"
+        }
+      ],
+      "points": [
+        {
+          "id": "Zw",
+          "body": "link",
+          "local": [
+            180,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "D",
+          "body": "radiusrod",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "valve-x",
+          "of": "Vs",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "crosshead-x",
+          "of": "Xh",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x"
+        },
+        {
+          "id": "link-angle",
+          "of": "link",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "return-crank-angle",
+          "of": "O",
+          "kind": "angle",
+          "unit": "deg",
+          "from": "Cp",
+          "to": "Rc"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214: a die control (a driver) with ghost traces at +1, 0 and -1, never an automatic sweep, so the cycle repeats at fixed controls. The gear was resynthesised so its lesson holds exactly: the link is at mid position at both dead centres and its slot arc is centred on the radius rod end, so the valve is 12 mm off centre (lap 10 plus lead 2) at each dead centre at every die setting. Mid gear gives 24 mm travel, full forward 50 mm, full reverse 45 mm. The plot shows several die settings, as the record asks."
+      },
+      "principle": [
+        {
+          "body": "link"
+        },
+        {
+          "body": "radiusrod"
+        },
+        {
+          "body": "comblever"
+        },
+        {
+          "body": "union"
+        },
+        {
+          "body": "spindle"
+        },
+        {
+          "point": "D"
+        },
+        {
+          "point": "Rt"
+        },
+        {
+          "point": "Vs"
+        }
+      ],
+      "traces": [
+        {
+          "id": "die",
+          "point": "D",
+          "comet": true,
+          "ghosts": [
+            {
+              "control": "die",
+              "value": 1
+            },
+            {
+              "control": "die",
+              "value": 0
+            },
+            {
+              "control": "die",
+              "value": -1
+            }
+          ]
+        },
+        {
+          "id": "lever-top",
+          "point": "Rt",
+          "ghosts": [
+            {
+              "control": "die",
+              "value": 1
+            },
+            {
+              "control": "die",
+              "value": 0
+            },
+            {
+              "control": "die",
+              "value": -1
+            }
+          ]
+        }
+      ],
+      "overlays": [
+        {
+          "id": "slot-radius",
+          "kind": "arc",
+          "center": "Zw",
+          "through": "D",
+          "label": "SLOT RADIUS = RADIUS ROD"
+        },
+        {
+          "id": "die-offset",
+          "kind": "dimension",
+          "from": "Lt",
+          "to": "D",
+          "label": "DIE OFFSET"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        },
+        {
+          "id": "die",
+          "kind": "driver",
+          "driver": "die"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "valve-x",
+          "label": "VALVE DISPLACEMENT",
+          "ghosts": [
+            {
+              "control": "die",
+              "value": 1
+            },
+            {
+              "control": "die",
+              "value": 0
+            },
+            {
+              "control": "die",
+              "value": -1
+            }
+          ]
+        },
+        {
+          "x": "input",
+          "y": "crosshead-x",
+          "label": "PISTON POSITION"
+        }
+      ],
+      "claims": [
+        {
+          "text": "valve travel 24 mm in mid gear",
+          "output": "valve-x",
+          "stat": "range",
+          "when": {
+            "control": "die",
+            "value": 0
+          },
+          "value": 24,
+          "tol": 0.1
+        },
+        {
+          "text": "about 50 mm at die +1 (full forward)",
+          "output": "valve-x",
+          "stat": "range",
+          "when": {
+            "control": "die",
+            "value": 1
+          },
+          "value": 50.42,
+          "tol": 0.2
+        },
+        {
+          "text": "45 mm at die -1 (full reverse)",
+          "output": "valve-x",
+          "stat": "range",
+          "when": {
+            "control": "die",
+            "value": -1
+          },
+          "value": 44.89,
+          "tol": 0.2
+        },
+        {
+          "text": "39.6 mm at the default die 0.8",
+          "output": "valve-x",
+          "stat": "range",
+          "value": 39.62,
+          "tol": 0.2
+        },
+        {
+          "text": "constant lead: the valve is 12 mm off centre (lap 10 + lead 2) at the dead centre, whatever the die",
+          "output": "valve-x",
+          "stat": "at",
+          "input": 0,
+          "value": 434.28,
+          "tol": 0.05
+        },
+        {
+          "text": "piston stroke 120 mm",
+          "output": "crosshead-x",
+          "stat": "range",
+          "value": 120,
+          "tol": 0.1
+        },
+        {
+          "text": "a return crank set about 100° from the main crank",
+          "output": "return-crank-angle",
+          "stat": "at",
+          "input": 0,
+          "value": 102.34,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    },
+    "edit": {
+      "explain.motion": "A return crank on the driving wheel, set about 100° from the main crank, drives an eccentric rod that rocks the curved expansion link about its trunnion. A die block in the link moves the radius rod, whose end drives the top of the combination lever; the bottom of that lever is driven from the crosshead through the union link. The valve spindle, pinned between them, gets the sum: a lap and lead motion from the crosshead and a variable motion from the link.",
+      "topology.notes": "frame, wheel with crank and return crank, main rod, crosshead, eccentric rod, expansion link, radius rod, combination lever, union link, valve spindle, lifting link, reverse arm; die block in the curved link slot counted as one higher pair. The mobility counted from kin is 2: the reverse arm (the die setting) is a second input, held fixed while the wheel turns, so the gear runs with one degree of freedom",
+      "topology.links": 12,
+      "topology.revolute": 13,
+      "build.defining_relations": "The return crank is set 102.3° ahead of the main crank so the expansion link is at mid position at both dead centres. The link's slot is an arc of radius R = 180 = radius rod length, centred on the radius rod's end Rt in that position, so moving the die does not move the valve at the dead centres (constant lead). There the valve is lap + lead = 12 mm off centre, given by the combination lever from the crosshead (lever ratio 22/110 of the 120 mm stroke). The die's offset from the trunnion sets the size and sign of the link's part: travel 24 mm in mid gear, 50 mm at die +1, 45 mm at die -1. Cutoff shortens as the die approaches the trunnion.",
+      "ratio.typical": "valve travel set by die position: 24 mm = 2 x (lap + lead) in mid gear, 50 mm at full forward gear, 45 mm at full reverse",
+      "build.range": "wheel 360° continuous; piston stroke 120 mm; valve travel 24 mm in mid gear (die 0), 50 mm at die +1 (full forward), 45 mm at die -1 (full reverse); lead 2 mm at every die setting",
+      "build.notes": "Solve in order: crank and crosshead, expansion link angle from the eccentric rod, die from the lifting link, then the radius rod, combination lever, union link and spindle together (a triad, numeric). The die slips a few degrees along the slot as the link swings; keep the slot to ±31°. The die is a control set by the viewer, never swept: at a fixed die the cycle repeats."
+    }
+  },
+  "wankel": {
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              330,
+              290
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "z": -8
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "id": "housing",
+          "role": "frame",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "profile": {
+              "housing": {
+                "rect": [
+                  300,
+                  268
+                ],
+                "corner": 22
+              },
+              "bore": {
+                "epitrochoid": {
+                  "R": 103,
+                  "e": 15
+                }
+              }
+            },
+            "thick": 16.5,
+            "level": {
+              "with": "rotor",
+              "part": "all"
+            },
+            "note": "the housing block round the rotor, its bore the epitrochoid the apexes trace; 0.5 thicker than the rotor, so the side cover on it clears the rotor"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "cover",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              300,
+              268
+            ],
+            "center": [
+              0,
+              0
+            ],
+            "thickness": 5,
+            "level": {
+              "with": "rotor",
+              "part": "above",
+              "gap": 0.5
+            },
+            "note": "the side cover over the housing; it carries the stationary gear"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "shaft",
+          "role": "driver",
+          "shape": {
+            "type": "disc",
+            "radius": 26,
+            "center": [
+              15,
+              0
+            ],
+            "thickness": 8,
+            "note": "the eccentric shaft: its eccentric, a journal of radius 26 about E, keyed on the shaft at O"
+          },
+          "at": {
+            "joint": "O"
+          }
+        },
+        {
+          "id": "rotor",
+          "role": "output",
+          "shape": {
+            "type": "custom",
+            "op": "extrude",
+            "profile": {
+              "rotor": {
+                "apexRadius": 102.6,
+                "flank": 1.25,
+                "bore": 28
+              },
+              "internalGear": {
+                "z": 45,
+                "module": 2,
+                "rim": 56
+              }
+            },
+            "thick": 16,
+            "note": "the rotor: its web on the eccentric underneath, its internal gear ring on top"
+          },
+          "at": {
+            "joint": "E"
+          }
+        },
+        {
+          "id": "stator",
+          "role": "gear",
+          "fixed": true,
+          "shape": {
+            "type": "gear",
+            "z": 30,
+            "module": 2,
+            "face": 5.9,
+            "bore": 14,
+            "level": {
+              "with": "rotor",
+              "part": "upper",
+              "gap": 2.6
+            },
+            "note": "the stationary gear, fixed under the side cover, inside the rotor gear ring"
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O",
+          "type": "revolute",
+          "a": "ground",
+          "b": "shaft",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "id": "E",
+          "type": "revolute",
+          "a": "shaft",
+          "b": "rotor",
+          "at": [
+            15,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "radius": 26,
+          "note": "the rotor turns on the eccentric, a journal of radius 26 about E"
+        },
+        {
+          "id": "mesh",
+          "type": "gear-mesh",
+          "a": "stator",
+          "b": "rotor",
+          "at": [
+            -30,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "za": 30,
+          "zb": 45,
+          "internal": true,
+          "carrier": "shaft",
+          "ca": [
+            0,
+            0,
+            0
+          ],
+          "cb": [
+            15,
+            0,
+            0
+          ],
+          "note": "the fixed external gear (30) inside the rotor's internal gear (45); relative to the shaft they turn 30/45 the same way"
+        }
+      ],
+      "params": [
+        {
+          "id": "R",
+          "value": 103,
+          "unit": "mm",
+          "min": 103,
+          "max": 103,
+          "note": "generating radius, rotor centre to apex"
+        },
+        {
+          "id": "e",
+          "value": 15,
+          "unit": "mm",
+          "min": 15,
+          "max": 15,
+          "note": "eccentricity = m(z_rotor - z_fixed)/2"
+        },
+        {
+          "id": "m",
+          "value": 2,
+          "unit": "mm",
+          "min": 2,
+          "max": 2,
+          "note": "module"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O",
+          "kind": "rotary",
+          "range": [
+            0,
+            1080
+          ],
+          "default": 0,
+          "note": "one cycle is one rotor turn, three shaft turns"
+        }
+      ],
+      "solve": [
+        {
+          "block": "gear-mesh",
+          "id": "phasing-gears",
+          "joints": [
+            "mesh",
+            "E"
+          ],
+          "in": {
+            "joint": "mesh",
+            "input": "-input",
+            "parent": "shaft"
+          },
+          "out": {
+            "angle": "rotor-rel"
+          },
+          "note": "the rotor turns on the eccentric by -2/3 of the shaft's turn: rotor angle = shaft angle / 3"
+        }
+      ],
+      "points": [
+        {
+          "id": "A0",
+          "body": "rotor",
+          "local": [
+            103,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "A1",
+          "body": "rotor",
+          "local": [
+            -51.5,
+            89.2,
+            0
+          ]
+        },
+        {
+          "id": "A2",
+          "body": "rotor",
+          "local": [
+            -51.5,
+            -89.2,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "rotor-angle",
+          "of": "rotor",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "rotor-ratio",
+          "of": "rotor",
+          "kind": "speed-ratio",
+          "unit": "",
+          "relativeTo": "shaft"
+        },
+        {
+          "id": "apex-radius",
+          "of": "A0",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "radius"
+        },
+        {
+          "id": "e-path",
+          "of": "E",
+          "kind": "path"
+        },
+        {
+          "id": "apex-path",
+          "of": "A0",
+          "kind": "path"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-10-20",
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214. The apex trace stays: it draws the epitrochoid bore. E is traced as well (a 15 mm circle, the eccentric) and the crank line O-E is drawn, with the two pitch circles (30 fixed, 45 rotor) so the 3:2 gears and the 3:1 speed relation can be seen. The rotor web goes underneath or see-through (a hardware decision)."
+      },
+      "principle": [
+        {
+          "body": "rotor"
+        },
+        {
+          "body": "shaft"
+        },
+        {
+          "point": "E"
+        },
+        {
+          "point": "A0"
+        }
+      ],
+      "traces": [
+        {
+          "id": "apex",
+          "point": "A0",
+          "ticks": {
+            "every": 30
+          },
+          "comet": true
+        },
+        {
+          "id": "eccentric",
+          "point": "E"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "crank-line",
+          "kind": "line",
+          "from": "O",
+          "to": "E",
+          "label": "ECCENTRIC O-E"
+        },
+        {
+          "id": "fixed-pitch",
+          "kind": "circle",
+          "center": "O",
+          "radius": 30,
+          "label": "FIXED GEAR 30"
+        },
+        {
+          "id": "rotor-pitch",
+          "kind": "circle",
+          "center": "E",
+          "radius": 45,
+          "label": "ROTOR GEAR 45"
+        }
+      ],
+      "view": "PLAN",
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": {
+        "x": "input",
+        "y": "rotor-angle",
+        "label": "ROTOR ANGLE"
+      },
+      "claims": [
+        {
+          "text": "eccentric shaft 3 turns per rotor turn",
+          "output": "rotor-ratio",
+          "stat": "mean",
+          "value": 0.3333,
+          "tol": 0.0005
+        },
+        {
+          "text": "the apexes run from 88 to 118 mm from the shaft axis (R - e to R + e)",
+          "output": "apex-radius",
+          "stat": "min",
+          "value": 88,
+          "tol": 0.1
+        },
+        {
+          "text": "the apexes run from 88 to 118 mm from the shaft axis (R - e to R + e)",
+          "output": "apex-radius",
+          "stat": "max",
+          "value": 118,
+          "tol": 0.1
+        }
+      ],
+      "exceptions": []
+    }
+  }
+}

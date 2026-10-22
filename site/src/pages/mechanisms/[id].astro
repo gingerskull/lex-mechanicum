@@ -1,12 +1,12 @@
 ---
 // One page per registered mechanism (SS5, SS8): crumbs, header, stage, side panels, explanation, links. The catalogue
-// supplies every word; the drawing comes from the package and the model's solve.
+// supplies every word; the drawing comes from the package and the record's kinematics.
 import Sheet from "../../layouts/Sheet.astro";
 import "../../../styles/views.css";
 import Bar from "../../components/Bar.astro";
 import ThemeToggle from "../../components/ThemeToggle.astro";
-import Stage from "../../components/Stage.astro";
-import { SHEETS, driveOf, type Sheet as SheetInfo } from "../../data";
+import Stage3 from "../../components/Stage3.astro";
+import { SHEETS, controlsOf, driveOf, viewButtons, type Sheet as SheetInfo } from "../../data";
 import { url } from "../../url";
 
 export function getStaticPaths() {
@@ -17,7 +17,7 @@ const r = sheet.rec;
 const i = SHEETS.indexOf(sheet);
 const prev = SHEETS[(i - 1 + SHEETS.length) % SHEETS.length]!;
 const next = SHEETS[(i + 1) % SHEETS.length]!;
-const drive = await driveOf(sheet.id);
+const drive = driveOf(sheet.id);
 // a fact's value: plain text, or [text, href] for a value the library filters by
 type Part = string | [string, string];
 const facetLink = (key: string, v: string) => url(`/?${key}=${encodeURIComponent(v)}`);
@@ -79,7 +79,7 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
       } catch {}
     </script>
     <div class="dlayout">
-      <Stage id={sheet.id} no={sheet.no} title={r.name} />
+      <Stage3 id={sheet.id} no={sheet.no} title={r.name} controls={controlsOf(r)} views={viewButtons(r)} timeMap={Boolean((r as any).teaching?.timeMap)} />
       <aside class="side">
         <section class="panel">
           <h2>At a glance</h2>
@@ -120,7 +120,6 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
     </div>
   </main>
   <script>
-    import "../../islands/stage";
     import "../../islands/sheetnav";
   </script>
 </Sheet>

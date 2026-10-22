@@ -46,7 +46,7 @@ export interface Solid {
    * is z, as every solid on the base plane. A solid on a part's body has that part's axis.
    */
   axis?: "x" | "y" | "p";
-  /** Axis "p": the key of the solved frame the solid's plane is posed by (src/core/axis.ts, Frame3). */
+  /** Axis "p": the key of the solved frame the solid's plane is posed by. */
   frame?: string;
   /**
    * Solid modifiers (src/core/spatial.ts): `taper`, the outline's scale at the far end (z1) about the solid's origin,

@@ -30,7 +30,7 @@ export interface RoleSurface {
 }
 
 /** Surface keys: the part roles, the solid-only roles and the base plate. */
-export type SurfaceKey = "driver" | "link" | "output" | "ground" | "base" | "bearing" | "hw" | "trace";
+export type SurfaceKey = "driver" | "link" | "link2" | "output" | "ground" | "base" | "bearing" | "hw" | "trace";
 
 export const DRAFT = {
   // Paper: radial gradient paper -> paperEdge, then grain (paint order step 1, step 7).
@@ -51,12 +51,6 @@ export const DRAFT = {
 
   // Library cards (SS1): the thumbnail and the hover animation draw a small sheet, so they leave out detail nobody sees
   // and thin the two bold outlines. Used only for a view with `card` set; the mechanism page is untouched.
-  // The GPU solids pass: antialiasing samples per pixel, fewer on a phone or a dense screen, where a pixel is smaller.
-  gpu: {
-    samples: 8, // antialiasing samples per pixel
-    samplesDense: 4, // coarse pointer or device pixel ratio of 2 and more
-  },
-
   card: {
     detail: "B" as const, // detail dial position of a card drawing (DL): sharp, with wall shading
     plateTopFactor: 0.7, // factor on lines.plateTop on a card
@@ -112,6 +106,7 @@ export const DRAFT = {
     wallShade: {
       shade: 0.045, // 0..1 ink alpha
       steps: 5, // count of facing buckets
+      light: [0.75, -0.25] as const, // screen direction the light comes from (x right, y down), the wall facing it is lightest
       outer: { from: 0.4, span: 0.9 }, // factors, outer walls
       hole: { from: 1.2, span: 1 }, // factors, walls inside holes (darker)
     },
@@ -121,6 +116,7 @@ export const DRAFT = {
   role: {
     driver: { pattern: "dots", step: 1.3, alpha: 0.55, tint: 0.05 },
     link: { pattern: "dots", step: 2.4, alpha: 0.34, tint: 0 },
+    link2: { pattern: "cross", step: 2.6, alpha: 0.3, tint: 0 }, // a second set of like links, told apart from the first (T16)
     output: { pattern: "hatch", step: 2.1, alpha: 0.3, tint: 0.03 },
     ground: { pattern: "dash", step: 3.2, alpha: 0.24, tint: 0 },
     base: { pattern: "dots", step: 4.0, alpha: 0.18, tint: 0 },
@@ -151,6 +147,42 @@ export const DRAFT = {
     doubleAlpha: 0.3, // 0..1
   },
 
+  // Depth peeling (SD1, SD3): the renderer peels the nearest surfaces of each pixel, front to back.
+  peel: {
+    layers: 4, // count, depth layers peeled at full detail (at most 4)
+    layersLow: 2, // count, layers once rung C is dropped (the deep layers go with the wall shading)
+    edgeEps: 0.05, // mm, an edge is covered only by a surface nearer than its depth less this
+    ownEps: 0.3, // mm, extra margin for the faces of the edge's own solid (added to ownPx / s)
+    ownPx: 2.5, // px, margin for the faces of the edge's own solid, as a screen distance
+  },
+
+  // The camera (SD11): a turntable about z. A view is [yaw, tilt] in degrees: yaw turns the drawing about z, tilt is the
+  // angle from plan (0) to side elevation (90).
+  camera: {
+    pad: 28, // px, margin round the drawing when a view is fitted to the sheet
+    snap: 4, // degrees, a view this close to a named view is that view (title block, orbit snapping)
+    views: { PLAN: [0, 0], FRONT: [0, 90], SIDE: [90, 90], ISOMETRIC: [45, 54.7356], DIMETRIC: [20.7, 70.5288] } as Record<string, readonly [number, number]>, // [yaw, tilt] degrees
+    auxMinCos: 0.02, // an AUX view down an axis that stands this close to vertical turns the drawing's up to y
+  },
+
+  // Section views (SD19): the cut faces are paper hatched at 45 degrees, with a bold outline.
+  section: {
+    hatch: { pitch: 7, width: 1.2, alpha: 0.45 }, // px between lines, px, 0..1 ink
+    outline: { width: 1.6, alpha: 1 }, // px, 0..1: the bold outline of a cut face
+  },
+
+  // Detail views (SD20): a magnified window, framed and lettered.
+  detailView: {
+    frame: { width: 1, alpha: 0.7, dash: [6, 3] as const }, // px, 0..1, px: the window's frame in the main view
+    minScale: 1.5, // factor, the least magnification a detail view is drawn at
+  },
+
+  // Ghost paths, phantom positions, ticks, explode trails (SD21, SD23, SD24, SD12).
+  ghost: { alpha: 0.4, dash: [3, 3] as const, width: 1 }, // factor on path.alpha, px, px
+  phantom: { dash: [4, 3] as const, width: 0.8, alpha: 0.85 }, // px, px, factor on the hidden lines' alpha
+  tick: { half: 3.5, width: 1, alpha: 0.8 }, // px half length of the cross mark, px, 0..1 ink
+  trail: { width: 0.7, alpha: 0.55, dash: [2, 3] as const }, // px, 0..1, px: explode trail lines
+
   // Traced paths and the comet (SD7), accent.
   path: {
     color: "accent" as ColorName,
@@ -172,7 +204,8 @@ export const DRAFT = {
     width: 0.6, // px
     alpha: 0.5, // 0..1
     overshoot: 6, // px past the head
-    maxTilt: 60, // degrees, hidden at and above this tilt
+    endOnDeg: 8, // degrees, an axis this close to the view direction is drawn as a centre cross (3D renderer)
+    cross: 6, // px, half length of the centre cross seen end-on (3D renderer)
     minScale: 0.8, // px per mm, hidden when the drawing is smaller than this
   },
 
@@ -190,7 +223,6 @@ export const DRAFT = {
     labelPaper: 0.95, // 0..1, paper alpha of the knock-out
     labelGain: 0.25, // added to alpha for the label text (capped at 1)
     minDepthPx: 40, // px, depth label only when the projected depth is at least this
-    minCos: 0.2, // dimensions drawn only when cos(tilt) is above this
   },
 
   // Sheet frame, zones and title block (SD10), detail stage only.
@@ -218,9 +250,7 @@ export const DRAFT = {
     titleKeyY: 5, // px, key baseline from the row top
     titleValueX: 40, // px, value inset
     titleValueMargin: 44, // px, value truncated to the cell width less this
-    planTilt: 8, // degrees, VIEW reads PLAN at or below this
-    elevationTilt: 80, // degrees, VIEW reads ELEVATION at or above this; also the side view of the detail ladder
-    defaultTilt: 28, // degrees, the view when none is given
+    elevationTilt: 80, // degrees, the side view of the detail ladder at or above this tilt
   },
 
   // Overlays (SD14): colours by token name, never changing the drawing beneath.
@@ -233,13 +263,11 @@ export const DRAFT = {
     border: { color: "ink", alpha: 0.35 }, // label panel hairline
     width: 1.6, // px, force and velocity arrows
     arrow: 10, // px, force arrowhead
-    arrowSmall: 9, // px, axial and spin arrowheads
     arrowDim: 7, // px, dimension arrowheads
+    shortLine: 70, // px, a construction line shorter than this carries its label past its far end
+    shortGap: 8, // px, gap from that end to the label
     arrowAngle: 0.42, // radians, arrowhead half-angle
-    axialDash: [5, 4] as const, // px
-    axialOvershoot: 14, // px past each end
     angleR: 22, // mm, default angle arc radius
-    spinR: 24, // mm, default spin arc radius
     angleGuide: { width: 1, alpha: 0.55, dash: [3, 3] as const, reach: 1.5 }, // px, 0..1, px, factor on radius
     angleArc: 1.8, // px
     bend: { width: 1.4, zoneAlpha: 0.35, ticks: 5 }, // px, 0..1, count: a flexure's bent centreline and stress zone ticks
@@ -261,6 +289,8 @@ export const DRAFT = {
     grid: { width: 1, alpha: 0.14, dash: [2, 3] as const }, // px, 0..1, px
     labelAlpha: 0.5, // 0..1, axis tick labels
     curve: { width: 1.6, alpha: 0.95 }, // px, 0..1, ink
+    ghost: { width: 1, alpha: 0.45, dash: [3, 3] as const }, // px, 0..1, px: the same output at the settings not selected
+    second: { width: 1.2, alpha: 0.7, dash: [7, 3] as const }, // px, 0..1, px: a further output in the same unit
     hatch: { pitch: 5, width: 0.7, alpha: 0.18 }, // px, px, 0..1, hatching under the curve
     cursorAlpha: 0.6, // 0..1, accent cursor line
     pointR: 4, // px, current point in accent

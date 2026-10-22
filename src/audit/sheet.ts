@@ -4,7 +4,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-export const ROOT = join(import.meta.dirname, "..", "..");
+// the repository: two folders up from this file, or, where a bundler has moved the code (the site build), the working
+// directory the build runs in
+const here = join(import.meta.dirname, "..", "..");
+export const ROOT = existsSync(join(here, "docs", "mechanism-standard.md")) ? here : process.cwd();
 export const STANDARD_PATH = join(ROOT, "docs", "mechanism-standard.md");
 export const auditPath = (id: string): string => join(ROOT, "src", "mechanisms", id, "audit.md");
 
@@ -25,8 +28,15 @@ export interface AuditHeader {
   result: string;
   detail: string;
   pass: string;
+  /** The teaching review's verdict (T2, standard 3.0), "" on a sheet without a `teaching:` line. */
+  teaching: string;
   defers: Deferral[];
 }
+
+export const TEACHING_VERDICTS = ["keep", "tweak", "rethink"] as const;
+
+/** The teaching line of a 3.0 sheet: `teaching: tweak · decisions in the record`. */
+export const teachingLine = (verdict: string): string => `teaching: ${verdict} · decisions in the record`;
 
 /** The header line: `standard: 2.0 · date: 2026-10-17 · result: open · detail: full · pass: build`. */
 export const headerLine = (h: Pick<AuditHeader, "standard" | "date" | "result" | "detail" | "pass">): string =>
@@ -51,7 +61,9 @@ export function parseHeader(text: string): AuditHeader | null {
     const m = /^defer:\s*(.*?)\s*·\s*(.*?)\s*$/.exec(l);
     if (m && m[2]) defers.push({ items: m[1]!.split(/[,\s]+/).filter(Boolean), reason: m[2] });
   }
+  const tl = lines.find((l) => /^teaching:\s*\S/.test(l));
   return {
+    teaching: tl ? (/^teaching:\s*([a-z]+)/.exec(tl)?.[1] ?? "") : "",
     name: t?.[1] ?? "",
     id: t?.[2] ?? "",
     standard: kv.standard ?? "",

@@ -1,5 +1,5 @@
 // Part of npm run lint: the literal scan (style SA8, SQ1, standard L1). Fails on a colour or font literal in src/** or
-// site/** outside the style files and the generated tokens.css, and on a style key in a mechanism record.
+// site/** outside the style files and the generated tokens.css and site/public, and on a style key in a mechanism record.
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,7 +11,7 @@ export interface StyleFinding {
 }
 
 const SCANNED = ["src", "site"];
-const EXCLUDED = ["src/style/", "site/styles/tokens.css"];
+const EXCLUDED = ["src/style/", "site/styles/tokens.css", "site/public/"];
 const SKIP_DIRS = new Set(["node_modules", "dist", ".astro"]);
 const EXTENSIONS = /\.(ts|tsx|js|mjs|cjs|astro|css|html|svelte|vue|json)$/;
 

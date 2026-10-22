@@ -22,6 +22,7 @@ version: 2.0
 
 const sheet = (version: string, extra = "") => `# Audit: Fixture (fx)
 standard: ${version} · date: 2026-10-16 · result: pass · detail: full · pass: build
+teaching: keep · decisions in the record
 ${extra}
 ## Requirements
 | Id | Status | Evidence / action |
@@ -89,5 +90,49 @@ describe("standard 2.7", () => {
     const r = evaluate(std, { old: sheet("2.6"), now: sheet("2.7") });
     expect(r.mechanisms.map((m) => [m.id, m.status])).toEqual([["old", "current"], ["now", "current"]]);
     expect(r.failing).toEqual([]);
+  });
+});
+
+describe("conformance of a 3.0 audit (S6)", () => {
+  const SPLIT = `# Mechanism standard
+
+\`\`\`
+version: 3.1
+\`\`\`
+
+| Id | Requirement | Tier |
+|---|---|---|
+| K7 | **Input kind declared** | HAND |
+
+## Changelog
+
+- **3.1 (2026-11-01).** Section 9a [R7, HAND].
+- **3.0 (2026-10-20).** True 3D parts [K8, T1, AUTO + HAND].
+- **2.0 (2026-10-17).** Input kind [K7, V5, HAND].
+`;
+  const v3sheet = (version: string, teaching = "teaching: keep · decisions in the record") => `# Audit: Fixture (fx)
+standard: ${version} · date: 2026-10-21 · result: pass · detail: full · pass: build
+${teaching}
+
+## Requirements
+| Id | Status | Evidence / action |
+|---|---|---|
+| K7 | PASS | rotary |
+`;
+
+  it("holds an audit to every HAND change after it, the 3.0 ones included", () => {
+    const behind = evaluate(SPLIT, { fx: sheet("2.0") });
+    expect(behind.mechanisms[0]).toMatchObject({ status: "behind", behind: expect.arrayContaining(["K8", "T1", "R7"]) });
+  });
+
+  it("holds a 3.0 audit to the HAND changes after it, and to the teaching line", () => {
+    const behind = evaluate(SPLIT, { fx: v3sheet("3.0") });
+    expect(behind.mechanisms[0]).toMatchObject({ status: "behind", behind: ["R7"] });
+    const current = evaluate(SPLIT, { fx: v3sheet("3.1") });
+    expect(current.mechanisms[0]).toMatchObject({ status: "current" });
+    const none = evaluate(SPLIT, { fx: v3sheet("3.1", "") });
+    expect(none.mechanisms[0]).toMatchObject({ status: "no teaching" });
+    expect(none.failing).toEqual(["fx"]);
+    expect(evaluate(SPLIT, { fx: v3sheet("3.1", "teaching: ? · decisions in the record") }).failing).toEqual(["fx"]);
   });
 });
