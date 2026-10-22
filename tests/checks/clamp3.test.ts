@@ -16,6 +16,15 @@ describe("clampCheck3 (A12)", () => {
     expect(await clampCheck3([ground(-5, 0), pin("w", "spinner", 0, 0, 12, 0, 1, { kind: "thrustWasher" })], spinningPlacer(["spinner"]), 4)).toEqual([]);
   });
 
+  it("does not take a part that turns a whole number of times between the sampled phases for a ground part", async () => {
+    // a wheel at twice a disc's speed is back where it started at u = π: with two phases it must still count as turning
+    const rate: Record<string, number> = { disc: 1, wheel: 2 };
+    const spin = spinningPlacer(["disc", "wheel"]);
+    const placer = { ...spin, place: (s: Parameters<typeof spin.place>[0], u: number) => spin.place(s, u * (rate[s.body] ?? 0)), key: (s: { body: string }) => s.body };
+    const parts = [pin("disc", "disc", 0, 0, 30, -5, 0), pin("wheel", "wheel", 0, 0, 12, 0, 6)];
+    expect(await clampCheck3(parts, placer, 2)).toEqual([]);
+  });
+
   it("lets a turning part touch the inner race of a bearing only", async () => {
     // a 6 x 16 bearing has an inner race out to about Ø9.8: a Ø8 hub on it is clean, a Ø15 hub reaches the outer race
     const bearing = pin("brg", "ground", 0, 0, 8, -5, 0, { kind: "bearing", d: 6, D: 16 });
