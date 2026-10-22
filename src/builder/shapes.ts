@@ -196,6 +196,8 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     // a body no joint reaches stands at its own frame
     const fixed = !js.length && !!F;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.plan ? { plan: g.plan } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    // a pulley or sprocket turns on its own axis: its sweep is a revolve, its samples need no probes
+    if ((shape.type === "pulley" || shape.type === "sprocket") && at && kin.joints.some((j) => j.id === at.joint.id && j.type === "revolute" && (j.a === "ground" || j.b === "ground"))) geom.axisym = true;
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);

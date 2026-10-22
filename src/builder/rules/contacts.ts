@@ -11,7 +11,7 @@ import type { BuildCtx, JointNote } from "../ctx";
 import { MIN_GAP } from "../constants";
 import { type Contact, contactOf, cutRing, freeSpot, localAt, mid, ringOffsets, stadium } from "../contact";
 import { titleOf } from "../lib";
-import type { KitId } from "../sites";
+import type { JointInfo, KitId } from "../sites";
 import type { Local } from "../lib";
 import type { Rule } from "./types";
 import { v3 } from "../../kin/math";
@@ -26,6 +26,8 @@ interface KitDef {
   fixture: string;
   kits: KitId[];
   build: KitBuild;
+  /** Joints of the kit another rule builds. */
+  skip?: (ji: JointInfo) => boolean;
 }
 
 const bodyOf = (ctx: BuildCtx, id: string): string => (ctx.parts.has(id) ? id : "ground");
@@ -40,9 +42,9 @@ function contactRule(def: KitDef): Rule {
     tier: "AUTO",
     ids: def.ids,
     fixture: def.fixture,
-    applies: (ctx) => ctx.joints.some((j) => def.kits.includes(j.kit)),
+    applies: (ctx) => ctx.joints.some((j) => def.kits.includes(j.kit) && !def.skip?.(j)),
     apply(ctx) {
-      for (const ji of ctx.joints.filter((j) => def.kits.includes(j.kit))) {
+      for (const ji of ctx.joints.filter((j) => def.kits.includes(j.kit) && !def.skip?.(j))) {
         const c = contactOf(ctx, ji);
         if (!c) {
           ctx.issues.push(`joint ${ji.id}: no body of it is stacked, kit ${ji.kit} not built`);
@@ -291,7 +293,8 @@ function idler(ctx: BuildCtx, c: Contact, L: Local, what: string): ReturnType<Ki
 }
 
 const j8 = contactRule({ id: "j8-belt", ids: ["J8", "V4"], fixture: "kin:beltDrive", kits: ["J8"], build: (ctx, c, L) => idler(ctx, c, L, "belt") });
-const j12 = contactRule({ id: "j12-flexible", ids: ["J12", "J8", "A11", "F2", "F3", "F6", "F7", "F8", "F10"], fixture: "kin:chainDrive", kits: ["J12"], build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
+// a timing belt between two pulleys is built by src/builder/flexible.ts
+const j12 = contactRule({ id: "j12-other", ids: ["J12", "F7"], fixture: "kin:chainDrive", kits: ["J12"], skip: (ji) => (ji.joint as unknown as Record<string, unknown>).flexible === "belt" && ji.a !== "ground" && ji.b !== "ground", build: (ctx, c, L) => idler(ctx, c, L, "flexible member") });
 
 const strapSheave = contactRule({
   id: "strap-sheave",
