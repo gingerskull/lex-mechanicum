@@ -111,6 +111,17 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
     eccentric: ctx.eccentric.has(site.id),
     baseTopWorld: ctx.base?.top ?? 0,
   };
+  // a member set along the shaft by a param control (shape.slide { param, along, offset }) reaches its whole range
+  for (const m of members) {
+    const sh = ctx.geoms.get(m.body)?.shape;
+    const sl = sh?.slide as { param?: string; along?: number[] } | undefined;
+    const par = sl?.param ? ctx.kin.params?.find((q) => q.id === sl.param) : undefined;
+    if (!par || par.min === undefined || par.max === undefined) continue;
+    const k = Array.isArray(sl!.along) ? Math.sign((sl!.along[0] ?? 0) * frame.z[0] + (sl!.along[1] ?? 0) * frame.z[1] + (sl!.along[2] ?? 0) * frame.z[2]) || 1 : 1;
+    const d0 = k * (par.min - par.value);
+    const d1 = k * (par.max - par.value);
+    spec.reach = [Math.min(spec.reach?.[0] ?? Infinity, m.w0 + Math.min(d0, d1)), Math.max(spec.reach?.[1] ?? -Infinity, m.w1 + Math.max(d0, d1))];
+  }
   const r = axialStack(ctx, spec);
   ctx.add(r.solids);
   ctx.stacks.set(site.id, r);

@@ -268,6 +268,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `placement` | A10, A18 |
 | `base` | A7, D4, M4 |
 | `j6-mesh` | J6, F7, F9 |
+| `friction-contact` | J6, F6, F7, M10 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
 | `j3-moving-pin` | J3, A12, M3 |

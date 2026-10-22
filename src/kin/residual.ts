@@ -186,6 +186,10 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const tb1 = tb0 + turn(s.b0, s.b1, ax2);
     return chainAdvance(ta1, za, p, pa) - chainAdvance(ta0, za, p, pa) - (chainAdvance(tb1, zb, p, pb) - chainAdvance(tb0, zb, p, pb));
   }
+  if ((j.type === "belt" || j.type === "rolling") && j.ratio !== undefined) {
+    // a friction pair given by its ratio (a wheel on a disc's face at a set radius): b turns ratio times a
+    return wrapPi(turn(s.b0, s.b1, ax2) - n(j.ratio) * turn(s.a0, s.a1, ax));
+  }
   if (j.type === "belt" || j.type === "rolling") {
     const dA = turn(s.a0, s.a1, ax);
     const ra = n(j.radiusA);

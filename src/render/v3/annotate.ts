@@ -608,7 +608,9 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
     }
     case "circle": {
       const c = pointOf(A, o.center);
-      const r = typeof o.radius === "number" ? o.radius : null;
+      // a circle through a point (a contact circle on a disc), or of a given radius
+      const th = pointOf(A, o.through);
+      const r = typeof o.radius === "number" ? o.radius : c && th ? Math.hypot(th[0] - c[0], th[1] - c[1]) : null;
       if (!c || r === null) return;
       poly(arcPts(c, [1, 0, 0], [0, 0, 1], r, 0, TAU), true);
       tag(add(c, [r, 0, 0]), 18, 0);

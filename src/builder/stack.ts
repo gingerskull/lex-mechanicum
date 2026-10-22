@@ -41,6 +41,8 @@ export interface StackSpec {
   straddle?: boolean;
   /** A mesh asked for a backlash eccentric under the housing (F7). */
   eccentric?: boolean;
+  /** The axial range a member set along the shaft by a control reaches (its slide), for where the blocks go. */
+  reach?: [number, number];
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
 }
@@ -229,8 +231,9 @@ export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   const fromBase = support !== "hung" && support !== "pillow" && spec.base !== null;
 
   if (support === "pillow") {
-    const lo = Math.min(...L.list.map((x) => x.z0), first.w0);
-    const hi = Math.max(...L.list.map((x) => x.z1), zTop);
+    // a part set along its shaft by a control (a friction wheel's radius) reaches the ends of its range
+    const lo = Math.min(...L.list.map((x) => x.z0), first.w0, spec.reach?.[0] ?? Infinity);
+    const hi = Math.max(...L.list.map((x) => x.z1), zTop, spec.reach?.[1] ?? -Infinity);
     const baseTopW = spec.baseTopWorld ?? ctx.base?.top;
     if (baseTopW === undefined) throw new Error(`${id}: the base level is not set`);
     const p = pillowBlocks(ctx, { id: `${id}-pb`, frame: spec.frame, d, live, lo, hi, baseTop: baseTopW, joints: spec.joints });

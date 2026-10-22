@@ -210,6 +210,8 @@ const j6 = contactRule({
   ids: ["J6", "F7", "F9"],
   fixture: "kin:gearPair",
   kits: ["J6"],
+  // a friction pair (a rolling joint given by its ratio) is built by src/builder/friction.ts
+  skip: (ji) => ji.joint.type === "rolling" && ji.joint.ratio !== undefined,
   build(ctx, c) {
     const marked = [c.a, c.b].filter((b) => timingMark(ctx, b, c.at));
     // the backlash eccentric goes under the housing of the second gear's live shaft (F7)

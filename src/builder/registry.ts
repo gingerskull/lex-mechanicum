@@ -11,6 +11,7 @@ import { pistonBore, trunnion } from "./rules/cylinder";
 import { j11 } from "./screws";
 import { j13, yokeDrive } from "./compliant";
 import { j12 } from "./flexible";
+import { friction } from "./friction";
 import type { Rule } from "./rules/types";
 
 const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
@@ -26,6 +27,7 @@ export const rules: Rule[] = [
   placement,
   base,
   byId("j6-mesh"),
+  friction,
   byId("j9-crossed-mesh"),
   // a belt or chain loop first: the stacks' bridges are routed clear of what it carries round
   j12,

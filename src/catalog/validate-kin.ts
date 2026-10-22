@@ -168,7 +168,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
 
   for (const p of kin.points) {
     if (!bodies.has(p.body)) say(`point ${p.id}: body "${String(p.body)}" is not a body`);
-    if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every(isNum))) say(`point ${p.id}: local must be [x, y, z]`);
+    // a coordinate may be a param expression, so a point follows a control (a contact radius)
+    if (!(Array.isArray(p.local) && p.local.length >= 2 && p.local.every((v) => isNum(v) || isStr(v)))) say(`point ${p.id}: local must be [x, y, z]`);
   }
   for (const o of kin.outputs) {
     if (!KIN_VOCAB.output.includes(o.kind)) say(`output ${o.id}: kind "${String(o.kind)}" not in vocabulary`);

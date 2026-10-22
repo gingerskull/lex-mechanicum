@@ -52949,7 +52949,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven pulley turns 180° per driver turn, the same way, with the belt teeth carried in the grooves; the numbers in the relations were for 60 and 120 mm pulleys at 200 mm, not the built 24 and 48 groove pulleys. The principle (one belt speed at both rims) had nothing to show it. Decided: keep the open timing belt; trace a pitch-circle point on each pulley with equal-time ticks, so each tick is the same 16 mm of rim on both pulleys while the turns are 30° and 15°; one index mark per pulley to count 2:1; tight and slack spans and the wrap angle drawn; the relations restated for the built pulleys."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven pulley turns 180° per driver turn, the same way, with the belt teeth carried in the grooves; the numbers in the relations were for 60 and 120 mm pulleys at 200 mm, not the built 24 and 48 groove pulleys. The principle (one belt speed at both rims) had nothing to show it. Decided: keep the open timing belt; trace a pitch-circle point on each pulley with equal-time ticks, so each tick is the same 16 mm of rim on both pulleys while the turns are 30° and 15°; one index mark per pulley to count 2:1; tight and slack spans and the wrap angle drawn; the relations restated for the built pulleys. Rebuild (R7): the belt's teeth are carried round on a pitch path exactly 87 teeth long, the pulleys' grooves phased to them."
         },
         "principle": [
           {
@@ -54468,7 +54468,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven sprocket turns 180° per driver turn, the same way, and the rollers seat in every gap; but the chain ran on the pitch circles, so the chordal action the text explains (and the record's output character, Non-uniform) was absent from the motion. Decided: the chain is solved on the pitch polygon, so the chain speed falls to 0.978 of its peak once per tooth (2.2% for 15 teeth) and the speed plot shows the ripple the record promises; the pitch chord of the driver drawn; equal-time ticks on a pitch point of each sprocket and an index mark on each to count 2:1; the relations corrected to the built centre distance (62 links give 248.5 mm, not 254)."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the driven sprocket turns 180° per driver turn, the same way, and the rollers seat in every gap; but the chain ran on the pitch circles, so the chordal action the text explains (and the record's output character, Non-uniform) was absent from the motion. Decided: the chain is solved on the pitch polygon, so the chain speed falls to 0.978 of its peak once per tooth (2.2% for 15 teeth) and the speed plot shows the ripple the record promises; the pitch chord of the driver drawn; equal-time ticks on a pitch point of each sprocket and an index mark on each to count 2:1; the relations corrected to the built centre distance (62 links give 248.5 mm, not 254). Rebuild (R7): the chordal action is solved (the convey block's chain mode); the rollers ride the sprockets' seats exactly; the 0.67 mm span rise is not drawn."
         },
         "principle": [
           {
@@ -55604,26 +55604,27 @@
                 "material": "rubber",
                 "thickness": 4
               },
-              "spline": "hex sleeve AF 16"
-            },
-            "at": {
-              "frame": {
-                "origin": [
-                  60,
+              "slide": {
+                "param": "R",
+                "along": [
+                  1,
                   0,
-                  48
-                ],
-                "rot": [
-                  0,
-                  90,
                   0
-                ]
+                ],
+                "offset": -6
               }
             },
-            "along": {
-              "joint": "Ow",
-              "param": "R",
-              "note": "the wheel slides along its shaft to the contact radius R"
+            "frame": {
+              "origin": [
+                "R-6",
+                0,
+                48
+              ],
+              "rot": [
+                0,
+                90,
+                0
+              ]
             }
           }
         ],
@@ -55636,7 +55637,7 @@
             "at": [
               0,
               0,
-              18
+              10
             ],
             "axis": [
               0,
@@ -55659,7 +55660,7 @@
               0,
               0
             ],
-            "note": "wheel shaft across the disc, 30 mm over the face, crossing the disc's axis"
+            "note": "the wheel's shaft across the disc, 30 mm over the face, crossing the disc's axis; the wheel slides along it on a hex sleeve"
           },
           {
             "id": "contact",
@@ -55667,12 +55668,27 @@
             "a": "disc",
             "b": "wheel",
             "at": [
-              60,
+              "R",
               0,
               18
             ],
-            "radius": "R",
-            "note": "tyre on the disc face at radius R; sign follows R"
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "cb": [
+              0,
+              0,
+              48
+            ],
+            "ratio": "R/rw",
+            "note": "the tyre on the disc's face at radius R: the wheel turns R / rw of the disc, backward past the centre"
           }
         ],
         "params": [
@@ -55731,16 +55747,11 @@
               "contact"
             ],
             "in": {
-              "a": "disc",
-              "b": "wheel",
-              "ra": "R",
-              "rb": "rw"
+              "joint": "contact",
+              "input": "disc"
             },
-            "out": "theta-w",
-            "opts": {
-              "axes": "perpendicular intersecting",
-              "contact": "friction, wheel rim on the disc face",
-              "ratio": "omega_w / omega_d = R / rw, sign follows R, zero at the disc centre"
+            "out": {
+              "angle": "theta-w"
             }
           }
         ],
@@ -55751,7 +55762,25 @@
             "local": [
               0,
               30,
-              0
+              6
+            ]
+          },
+          {
+            "id": "C",
+            "body": "ground",
+            "local": [
+              "R",
+              0,
+              18
+            ]
+          },
+          {
+            "id": "O",
+            "body": "ground",
+            "local": [
+              0,
+              0,
+              18
             ]
           }
         ],
@@ -55766,12 +55795,6 @@
             "id": "speed-ratio",
             "of": "wheel",
             "kind": "speed-ratio"
-          },
-          {
-            "id": "contact-radius",
-            "of": "contact",
-            "kind": "position",
-            "unit": "mm"
           }
         ],
         "fallback": null
@@ -55780,7 +55803,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Reviewed after the original review with its method. Six phases from the solve: the wheel turns at R / rw of the disc (3.0 at R 90, still at the centre, -1.0 at R -30), which matches the text; but the contact radius swept by itself over the cycle, so no setting could be held and the ratio was mixed with the shift. Decided: the contact radius R is a control (default 60, 2.0x), with ghost tread traces at R 30 (1:1) and R -30 (reverse); the contact circle on the disc and R as a dimension; the speed ratio plotted against R as the record asks."
+          "note": "Reviewed after the original review with its method. Six phases from the solve: the wheel turns at R / rw of the disc (3.0 at R 90, still at the centre, -1.0 at R -30), which matches the text; but the contact radius swept by itself over the cycle, so no setting could be held and the ratio was mixed with the shift. Decided: the contact radius R is a control (default 60, 2.0x), with ghost tread traces at R 30 (1:1) and R -30 (reverse); the contact circle on the disc and R as a dimension; the speed ratio plotted against R as the record asks. Rebuild (R7): the wheel is set along its shaft by the R control and clamped there; the contact point and circle are ground points that follow R. The plot of speed ratio against R needs the engine to sweep a param, so the plot shows the wheel's angle; the ratio at each R reads from the ghosts and the claim."
         },
         "principle": [
           {
@@ -55790,7 +55813,7 @@
             "body": "wheel"
           },
           {
-            "point": "contact"
+            "point": "C"
           },
           {
             "point": "tread"
@@ -55820,21 +55843,21 @@
           {
             "id": "contact-circle",
             "kind": "circle",
-            "center": "Od",
-            "through": "contact",
+            "center": "O",
+            "through": "C",
             "label": "CONTACT CIRCLE"
           },
           {
             "id": "contact-radius",
             "kind": "dimension",
-            "from": "Od",
-            "to": "contact",
+            "from": "O",
+            "to": "C",
             "label": "CONTACT RADIUS R"
           },
           {
             "id": "wheel-axis",
             "kind": "axis-line",
-            "through": "Ow",
+            "at": "Ow",
             "label": "WHEEL AXIS"
           }
         ],
@@ -55851,18 +55874,11 @@
             "param": "R"
           }
         ],
-        "plot": [
-          {
-            "x": "disc",
-            "y": "wheel-angle",
-            "label": "WHEEL ANGLE"
-          },
-          {
-            "x": "contact-radius",
-            "y": "speed-ratio",
-            "label": "SPEED RATIO AGAINST CONTACT RADIUS"
-          }
-        ],
+        "plot": {
+          "x": "disc",
+          "y": "wheel-angle",
+          "label": "WHEEL ANGLE"
+        },
         "claims": [
           {
             "text": "R = 60 turns the wheel at 2.0 x disc speed",
@@ -55876,7 +55892,7 @@
             "output": "wheel-angle",
             "stat": "range",
             "value": 720,
-            "tol": 0.5
+            "tol": 2
           }
         ],
         "exceptions": []

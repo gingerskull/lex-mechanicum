@@ -197,7 +197,11 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const fixed = !js.length && !!F;
     const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.plan ? { plan: g.plan } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
     // a pulley or sprocket turns on its own axis: its sweep is a revolve, its samples need no probes
-    if ((shape.type === "pulley" || shape.type === "sprocket") && at && kin.joints.some((j) => j.id === at.joint.id && j.type === "revolute" && (j.a === "ground" || j.b === "ground"))) geom.axisym = true;
+    // (a wheel or disc on a ground revolute whose axis runs through the body's own frame, along its z)
+    if (["pulley", "sprocket", "disc"].includes(String(shape.type))) {
+      const rev = js.find((r) => r.joint.type === "revolute" && (r.joint.a === "ground" || r.joint.b === "ground"));
+      if (rev && Math.abs(Math.abs(v3.dot(v3.unit(rev.axis), frame.z)) - 1) < 1e-6 && v3.len(v3.cross(v3.sub(frame.o, rev.at), v3.unit(rev.axis))) < 1e-6) geom.axisym = true;
+    }
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? screwGeom(b, geom) ?? nutGeom(b, geom) ?? flexureGeom(kin, b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);
