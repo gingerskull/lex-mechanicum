@@ -9,10 +9,11 @@ import { planeCoords } from "../frames";
 import { fromPlane } from "../frames";
 import type { BuildCtx, JointNote } from "../ctx";
 import { MIN_GAP } from "../constants";
+import { clearance } from "../router";
 import { type Contact, contactOf, cutRing, freeSpot, localAt, mid, ringOffsets, stadium } from "../contact";
 import { titleOf } from "../lib";
 import type { JointInfo, KitId } from "../sites";
-import type { Local } from "../lib";
+import { Local } from "../lib";
 import type { Rule } from "./types";
 import { v3, type Vec3 } from "../../kin/math";
 import { anchorName } from "../../kin/compose";
@@ -168,6 +169,23 @@ function extentIn(ctx: BuildCtx, c: Contact, body: string): [number, number, num
   return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
 }
 
+/** A collar on a turning shaft, sliding along it: a bronze bushing pressed into its bore, running on the shaft (J5). */
+function sleeveOnShaft(ctx: BuildCtx, c: Contact, slider: string, host: string): ReturnType<KitBuild> {
+  const part = ctx.parts.get(slider);
+  const d = Number((ctx.kin.bodies.find((b) => b.id === host)?.shape as { diameter?: unknown } | undefined)?.diameter ?? 16);
+  if (!part || part.op.op !== "extrude") return { note: `${titleOf(c.id)}: ${titleOf(slider)} slides on ${titleOf(host)}.`, serves: {} };
+  const h = part.op.h;
+  const D = d + 4;
+  part.profile.holes = [circle(D / 2 + 0.05, 0, 0, 40).reverse()];
+  const L = new Local(part.frame, { joints: [c.id] });
+  L.add(H.bushing(`${c.id}-bush`, d, D, { body: slider, z0: 0, z1: h, name: `Bronze bushing ${d}x${D}x${h}`, mat: "Bronze CuSn8, oil-impregnated" }));
+  ctx.add(L.out());
+  return {
+    note: `${titleOf(c.id)}: ${titleOf(slider)} slides on the Ø${d} ${titleOf(host)} in a bronze bushing; it turns with the shaft because its links ride the shaft's arms.`,
+    serves: { F2: [`${c.id}-bush`] },
+  };
+}
+
 /**
  * A stem that slides along its own axis (a `shaft` on a prismatic joint, a desmodromic's follower): a bronze bushing in a
  * guide block round the stem, the block on four standoffs from the base, clear of what the stem carries. The block
@@ -231,6 +249,8 @@ const j5 = contactRule({
     const id = c.id;
     const slider = c.a === "ground" ? c.b : c.a;
     const host = slider === c.a ? c.b : c.a;
+    // a collar sliding on a turning shaft (a governor's sleeve): the shaft is its guide, a bushing in its bore
+    if (host !== "ground" && String(ctx.kin.bodies.find((b) => b.id === host)?.shape?.type) === "shaft") return sleeveOnShaft(ctx, c, slider, host);
     if (String(ctx.geoms.get(slider)?.shape.type) === "shaft") return stemGuide(ctx, c, id, slider);
     const e = extentIn(ctx, c, slider);
     // a slider whose part reaches past its guide (a cam follower's stem down to its roller) is held over its `guide`
@@ -596,8 +616,33 @@ const tongueSlot = contactRule({
     const id = c.id;
     const z = mid(c.zb, mid(c.za));
     const run = Math.max(8, c.run[1] - c.run[0]);
-    for (const [k, y] of [[0, 4], [1, -4]] as const) L.add(H.wearStrip(`${id}-liner${k}`, [[-run / 2 - 4, y - 0.6], [run / 2 + 4, y - 0.6], [run / 2 + 4, y + 0.6], [-run / 2 - 4, y + 0.6]], { body: bodyOf(ctx, c.b), z0: z - 2, z1: z + 2, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
-    L.add(H.nipple(`${id}-nip`, { body: bodyOf(ctx, c.b), at: [0, 9, 0], z0: z, z1: z + 9 }));
+    // the slotted body names its slot (`slot: { width, length }`): the liners line its walls, the nipple greases it from
+    // its far end, pointing out along it (an Oldham hub, whose face the disc sweeps over); else a narrow slot in b
+    const shapeOf = (b: string) => ctx.kin.bodies.find((q) => q.id === b)?.shape as { slot?: { width?: number; length?: number } } | undefined;
+    const slotted = [c.b, c.a].find((b) => shapeOf(b)?.slot);
+    const slot = slotted ? shapeOf(slotted)!.slot! : undefined;
+    const body = bodyOf(ctx, slotted ?? c.b);
+    const half = slot?.width ? slot.width / 2 - 0.6 : 4;
+    // the slot's walls are the slotted body's jaws (`bars`) where it has them: the liners run their height
+    const g0 = slotted ? ctx.geoms.get(slotted) : undefined;
+    const jaws = (g0?.shape.bars as { z?: [number, number] }[] | undefined)?.map((b) => b.z).filter((q): q is [number, number] => Array.isArray(q));
+    const wz = (h: number) => (g0 ? planeCoords(L.frame, v3.add(g0.frame.o, v3.mul(g0.frame.z, h))).w : z);
+    const [lz0, lz1] = jaws?.length ? ([wz(Math.min(...jaws.map((q) => q[0]))), wz(Math.max(...jaws.map((q) => q[1])))].sort((p, q) => p - q) as [number, number]) : [z - 2, z + 2];
+    for (const [k, y] of [[0, half], [1, -half]] as const) L.add(H.wearStrip(`${id}-liner${k}`, [[-run / 2 - 4, y - 0.6], [run / 2 + 4, y - 0.6], [run / 2 + 4, y + 0.6], [-run / 2 - 4, y + 0.6]], { body, z0: lz0 + 0.5, z1: lz1 - 0.5, ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+    if (slot?.length && slotted) {
+      // the slot runs symmetric about the slotted body's centre; the nipple stands at its end beyond the liners
+      const g = ctx.geoms.get(slotted);
+      const cx = g ? planeCoords(L.frame, g.frame.o).uv[0] : 0;
+      // at whichever end of the slot it keeps clear of the supports and the other parts' sweeps
+      const at = (sg: 1 | -1) => {
+        const f = { o: fromPlane(L.frame, [cx + (sg * (slot.length ?? 0)) / 2, 0], (lz0 + lz1) / 2), x: L.frame.z, z: v3.mul(L.frame.x, sg) };
+        const N = new Local(f, { joints: [id] });
+        N.add(H.nipple(`${id}-nip`, { body, z0: 0, z1: 9 }));
+        return N.out();
+      };
+      const plus = at(1);
+      ctx.add(clearance(ctx, plus, (q) => q.body === body) >= MIN_GAP ? plus : at(-1));
+    } else L.add(H.nipple(`${id}-nip`, { body, at: [0, 9, 0], z0: z, z1: z + 9 }));
     return { serves: { M14: [`${id}-liner0`], F8: [`${id}-nip`] }, note: `${titleOf(id)}: tongue in its slot; liners on both sides and a grease nipple into the slot.` };
   },
 });

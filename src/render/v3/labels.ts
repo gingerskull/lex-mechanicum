@@ -7,11 +7,17 @@ const O = DRAFT.overlays;
 
 export type Labeler = (text: string, x: number, y: number, col: string, small?: boolean) => void;
 
+/**
+ * Lettering in capitals (SF7) that keeps Greek letters as written: they name quantities (β, γ, ω), and their capitals
+ * read as other letters (Β as B) or as other quantities (Γ for γ).
+ */
+export const capitals = (text: string): string => text.replace(/[^\u0370-\u03ff]+/g, (s) => s.toUpperCase());
+
 export function labeler(ctx: CanvasRenderingContext2D, T: ResolvedTheme, w: number, h: number): Labeler {
   const placed: [number, number, number, number][] = [];
   const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
   return (text, x, y, col, small) => {
-    const t = DRAFT.type.uppercase ? text.toUpperCase() : text;
+    const t = DRAFT.type.uppercase ? capitals(text) : text;
     ctx.font = font(small ? DRAFT.type.overlaySmall : DRAFT.type.overlay);
     const lw = ctx.measureText(t).width + 2 * O.labelPadX;
     const lh = small ? O.labelHSmall : O.labelH;

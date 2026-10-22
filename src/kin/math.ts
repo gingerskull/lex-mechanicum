@@ -66,8 +66,10 @@ export const m3 = {
     const s = v3.len(w) / 2;
     if (s < 1e-12) {
       if (c > 0) return [0, 0, 0];
-      // half turn: axis from the diagonal
-      const d: Vec3 = [Math.sqrt(Math.max(0, (R[0] + 1) / 2)), Math.sqrt(Math.max(0, (R[4] + 1) / 2)), Math.sqrt(Math.max(0, (R[8] + 1) / 2))];
+      // half turn, R = 2 n nᵀ − I: the largest diagonal entry gives its component, the off-diagonal ones the others' signs
+      const k = R[0] >= R[4] && R[0] >= R[8] ? 0 : R[4] >= R[8] ? 1 : 2;
+      const nk = Math.sqrt(Math.max(0, (R[k * 4]! + 1) / 2));
+      const d = [0, 1, 2].map((j) => (j === k ? nk : R[k * 3 + j]! / (2 * nk))) as Vec3;
       return v3.mul(v3.unit(d), Math.PI);
     }
     return v3.mul(w, Math.atan2(s, c) / (2 * s));

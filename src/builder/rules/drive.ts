@@ -15,10 +15,12 @@ import { MOTORS, PULLEYS, SENSOR, circlipExt, keyFor } from "../../hardware/tabl
 import { D2R, type Vec3, v3, wrapPi, xf } from "../../kin/math";
 import type { KinDriver } from "../../kin/types";
 import { crankPin, driveSide, type DriveMotion } from "../../solids/drive";
+import type { Solid3 } from "../../solids/types";
 import { MIN_GAP } from "../constants";
-import type { BuildCtx } from "../ctx";
+import type { BuildCtx, JointNote } from "../ctx";
 import { fromPlane, parallel, place, planeCoords, rot2 as rot, type Frame } from "../frames";
 import { pointDist, ringDist } from "../planar";
+import { clearance } from "../router";
 import { UP } from "../sites";
 import { worldManifold, worldPoints } from "../sweeps";
 import { cutBore } from "./stacks";
@@ -45,6 +47,9 @@ const rangeOf = (d: KinDriver): [number, number] => [d.lo ?? d.range?.[0] ?? d.d
 // ------------------------------------------------------------------------------------------------ what is under the base
 
 /** A solid under the base seen from above, with its height range: what a drive part laid out there must clear. */
+/** The shortest post a fork sensor stands on, mm: below it the fork goes beside the hub (oscillatingInPlan). */
+const POST_MIN = 6;
+
 interface Obstacle {
   id: string;
   polys: Vec2[][];
@@ -467,12 +472,56 @@ function obstaclesIn(ctx: BuildCtx, F: Frame, w0: number, w1: number): Obstacle[
 }
 
 /**
+ * Builds a drive on a shaft in plan's free end (V1, V5): its low end, or the far one where the low end faces the eye in
+ * the default view (a front elevation looking at the low end) and the drive built there keeps clear of the moving parts'
+ * sweeps (not where a link is overhung on the shaft's end, or where a part comes down over it). Else the low end, the
+ * far end's stub back to its length with no drive there (stack.ts). `build(far)` builds the drive on that end through
+ * ctx.add and ctx.note; a shaft whose kit names its end (`end` on its stack) is built as it says.
+ */
+export function onFreeEnd(ctx: BuildCtx, siteId: string, build: (far: boolean) => void): void {
+  const st = ctx.stacks.get(siteId);
+  const axle = ctx.get(`${siteId}-axle`);
+  if (st && !st.end && axle && v3.dot(v3.unit(axle.frame.z as Vec3), ctx.viewDir()) > 0.5) {
+    // a trial on the far end, kept aside so its own parts ride no sweep while they are tested against the others
+    const trial: Solid3[] = [];
+    const notes: JointNote[] = [];
+    const issues = ctx.issues.length;
+    const { add, note } = ctx;
+    ctx.add = (...s) => {
+      const out = s.flat();
+      trial.push(...out);
+      return out;
+    };
+    ctx.note = (n) => void notes.push(n);
+    try {
+      build(true);
+    } finally {
+      ctx.add = add;
+      ctx.note = note;
+    }
+    // what turns with the shaft or rides the drive's own motion is left out: the stationary parts are tested
+    const fixed = trial.filter((s) => s.body !== axle.body && !s.drive);
+    if (ctx.issues.length === issues && trial.length && clearance(ctx, fixed, () => true) > 0) {
+      ctx.add(trial);
+      notes.forEach((n) => ctx.note(n));
+      return;
+    }
+    ctx.issues.splice(issues);
+    if (st.farStub && axle.op.op === "extrude") {
+      axle.op = { ...axle.op, h: axle.op.h - st.farStub };
+      ctx.sweeps.touch([axle.body]);
+    }
+  }
+  build(false);
+}
+
+/**
  * An oscillating input on a shaft in plan (J10): the lever keyed on the shaft's free end (the end the rotary drive in
  * plan takes), the link and the crank beyond it, the motor on the upright of a one-piece angle bracket whose foot is
  * screwed to the base, its axis along the shaft; the fork sensor under the lever's hub on a post from the base; terminals
  * and leads on the base top. Laid out in the plane of the lever: u across the shaft, v up, w out along it from its end.
  */
-function oscillatingInPlan(ctx: BuildCtx, drv: KinDriver, siteId: string): void {
+function oscillatingInPlan(ctx: BuildCtx, drv: KinDriver, siteId: string, far: boolean): void {
   const site = ctx.sites.find((s) => s.id === siteId)!;
   const st = ctx.stacks.get(site.id)!;
   const axle = ctx.get(`${site.id}-axle`);
@@ -482,10 +531,8 @@ function oscillatingInPlan(ctx: BuildCtx, drv: KinDriver, siteId: string): void 
     return;
   }
   const input = axle.body;
-  // the shaft's free end, as the rotary drive in plan chooses it: the low end, or the far one where the low end faces
-  // the eye in the default view
+  // the shaft's free end, as onFreeEnd chooses it for the rotary drive in plan as well
   const zA = v3.unit(axle.frame.z as Vec3);
-  const far = v3.dot(zA, ctx.viewDir()) > 0.5;
   const hA = axle.op.op === "extrude" ? axle.op.h : 0;
   const out: Vec3 = far ? zA : v3.mul(zA, -1);
   const E: Vec3 = far ? v3.add(axle.frame.o as Vec3, v3.mul(zA, hA)) : (axle.frame.o as Vec3);
@@ -515,15 +562,25 @@ function oscillatingInPlan(ctx: BuildCtx, drv: KinDriver, siteId: string): void 
   const own = obs.filter((o) => ctx.get(o.id)?.body !== input);
   const n = ctx.sampled.us.length;
   const vk = (zk[0] + zk[1]) / 2;
-  const fa = -Math.PI / 2;
   const mouth = hubR + 1.5;
-  const FF = (): Frame => ({ o: E, x: v3.mul(up, -1), z: out });
+  // the fork hangs under the lever's hub on a post from the base; where the shaft stands too low over the base for that
+  // (a post shorter than POST_MIN), it sits beside the hub on the side clear of the rest, its post under it
+  const down = -Math.PI / 2;
+  const forkAt = (a: number): Frame => ({ o: E, x: a === down ? v3.mul(up, -1) : v3.add(v3.mul(lat, Math.cos(a)), v3.mul(up, Math.sin(a))), z: out });
+  const forkGap = (a: number): number => {
+    const zm = (zl[0] + zl[1]) / 2;
+    const box: Vec2[] = [[mouth, -SENSOR.w / 2], [mouth + SENSOR.l, -SENSOR.w / 2], [mouth + SENSOR.l, SENSOR.w / 2], [mouth, SENSOR.w / 2]];
+    return clearance(ctx, place(forkAt(a), H.solid("drive-fork-t", { name: "", kind: "sensor", role: "hw", outer: box, z0: zm - SENSOR.h / 2, z1: zm + SENSOR.h / 2, joints: J })));
+  };
+  const fa = E[2] - (mouth + SENSOR.l) - base.top >= POST_MIN ? down : forkGap(0) >= forkGap(Math.PI) ? 0 : Math.PI;
+  const FF = (): Frame => forkAt(fa);
   const fring = forkRing({ o: [0, 0, 0], x: [Math.cos(fa), Math.sin(fa), 0], z: [0, 0, 1] }, mouth);
   let chosen: { a: number; T0: Vec2; c: CrankLayout } | null = null;
   for (let q = 0; q < 24; q++) {
     const a = (q / 24) * TAU;
-    // the lever keeps off the fork under its hub
-    if (Math.abs(wrapPi(a - fa)) < swing / 2 + (50 * Math.PI) / 180) continue;
+    // the lever keeps off the fork under its hub; off the fork beside it by the fork's own width too, since the lever's
+    // web passes level with the fork's slot there
+    if (Math.abs(wrapPi(a - fa)) < swing / 2 + (50 * Math.PI) / 180 + (fa === down ? 0 : Math.atan2(SENSOR.w / 2, mouth))) continue;
     const T0 = add2(P, dir2(a), rho);
     const tip = (X: ReturnType<typeof xf.id>): Vec2 => planeCoords(PF, xf.apply(X, W(T0, vk))).uv;
     const tips = ctx.sampled.us.map((_, i) => tip(ctx.xfOf(input, i)));
@@ -602,11 +659,11 @@ function oscillatingInPlan(ctx: BuildCtx, drv: KinDriver, siteId: string): void 
   [[-15, -15], [15, -15], [15, 15], [-15, 15]].forEach(([du, dv], k) =>
     ctx.add(place(PF, H.screw(`drive-fl${k}`, "socket", 3, 4 + 4.5, { at: [M[0] + du!, M[1] + dv!, 0], face: w0, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 4 }), joints: J }))),
   );
-  // the fork under the lever's hub, on a post from the base (V6)
+  // the fork under the lever's hub (or beside it, above), on a post from the base (V6)
   const fork = FF();
   forkSensor(ctx, fork, mouth, mid - SENSOR.vane / 2, false);
   const postAt = fromPlane(fork, [mouth + SENSOR.l - 6, 0], mid);
-  const forkLow = E[2] - (mouth + SENSOR.l);
+  const forkLow = fa === down ? E[2] - (mouth + SENSOR.l) : E[2] - SENSOR.w / 2;
   ctx.add(place(UPF, H.standoff("drive-sensor-post", { at: [postAt[0], postAt[1], 0], z0: base.top, z1: forkLow, name: "Standoff Ø10 on the base, carries the sensor", joints: J })));
   // terminals and the leads on the base top, past the motor
   const tb: [number, number, number] = [w1 + MOT.H + 14, M[0], 0];
@@ -771,7 +828,7 @@ function oscillatingCompliant(ctx: BuildCtx, drv: KinDriver, jointId: string): v
 export function oscillatingDrive(ctx: BuildCtx, drv: KinDriver): void {
   if (!ctx.base) return;
   const site = ctx.sites.find((s) => s.fixed && s.live && ctx.stacks.has(s.id) && s.joints.includes(drv.joint ?? ""));
-  if (site) return site.inPlan ? oscillatingInPlan(ctx, drv, site.id) : oscillatingShaft(ctx, drv, site.id);
+  if (site) return site.inPlan ? onFreeEnd(ctx, site.id, (far) => oscillatingInPlan(ctx, drv, site.id, far)) : oscillatingShaft(ctx, drv, site.id);
   const jt = ctx.joints.find((q) => q.id === drv.joint && q.kit === "J13");
   if (jt) return oscillatingCompliant(ctx, drv, jt.id);
   ctx.issues.push(`drive: the oscillating input ${drv.joint ?? drv.id} is neither a live shaft nor a compliant lever: no drive built`);

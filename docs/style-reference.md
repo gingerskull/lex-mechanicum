@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.0
-date: 2026-10-20
+version: 3.1
+date: 2026-10-22
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -346,6 +346,10 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.role.link.step` | 2.4 |  |
 | `draft.role.link.alpha` | 0.34 |  |
 | `draft.role.link.tint` | 0 |  |
+| `draft.role.link2.pattern` | `cross` | a second set of like links, told apart from the first (T16) |
+| `draft.role.link2.step` | 2.6 | a second set of like links, told apart from the first (T16) |
+| `draft.role.link2.alpha` | 0.3 | a second set of like links, told apart from the first (T16) |
+| `draft.role.link2.tint` | 0 | a second set of like links, told apart from the first (T16) |
 | `draft.role.output.pattern` | `hatch` |  |
 | `draft.role.output.step` | 2.1 |  |
 | `draft.role.output.alpha` | 0.3 |  |
@@ -662,6 +666,8 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 
 ## Changelog
 
+- **3.1 (2026-10-22).** A second link role surface, `link2`, tells two link sets of the same role apart by pattern
+  (the Schmidt coupling) [SD25, STYLE].
 - **3.0 (2026-10-20).** Restated for true 3D parts, a depth-buffer renderer and a free orthographic camera. SP10, SD1,
   SD11 and the view names of SD10 (turntable orbit snapping to PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ joint,
   VIEW az/el) [SP10, SD10, SD11, STYLE]. The depth buffer replaces slicing: SD1, SD3 (visible and hidden edges by depth,

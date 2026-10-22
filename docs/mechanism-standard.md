@@ -1,7 +1,7 @@
 # Mechanism standard
 
 ```
-version: 3.4
+version: 3.5
 date: 2026-10-20
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
@@ -266,11 +266,14 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 |---|---|
 | `classify` | A1, A2, A3 |
 | `placement` | A10, A18 |
+| `lugs` | A1, A2 |
 | `base` | A7, D4, M4 |
+| `posts` | A7, F1 |
 | `wheels` | D1, F2 |
 | `j6-mesh` | J6, F7, F9 |
 | `friction-contact` | J6, F6, F7, M10 |
 | `j9-crossed-mesh` | J9, F4, F7, F9 |
+| `tongue-slot` | J5, F8, M14 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |
 | `j12-cvt` | J12, J10, D9, F6, F7 |
 | `integrator-carriage` | J5, F1, F5 |
@@ -285,6 +288,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `pin-ring` | J6, F1, F2 |
 | `pin-hole` | J4, M14 |
 | `spider-pin` | J3, F2, F4 |
+| `ball-socket` | J3, J7, F8 |
 | `j4-slot-roller` | J4, M14 |
 | `pin-lobe` | J4, M14 |
 | `groove-cam` | J7, M14 |
@@ -293,7 +297,6 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `pallet-contact` | J7, F6, M14 |
 | `fork-pin` | J4, F2 |
 | `pawl-tooth` | J7, F6, F5 |
-| `tongue-slot` | J5, F8, M14 |
 | `ring-hub` | J3, F2 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
@@ -867,6 +870,12 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.5 (2026-10-22).** Rebuild batch R6 (couplings and spatial linkages), and a check fix from R7. A drive on a shaft
+  in plan, belt or crank and link, takes the far end only where it clears the moving parts' sweeps, else the low end; a
+  lever's fork sensor that cannot stand under a low shaft's hub goes beside it [V1, V5, V6, AUTO]. Lugs and posts rules;
+  ball-socket, slipper and sphere-fit kits [A21, J3, AUTO]. The clamp check reads what moves at probe phases off the
+  profile's grid as well, so a part turning a whole number of times per cycle is not taken for ground at a coarse
+  profile [A12, AUTO].
 - **3.4 (2026-10-22).** Rebuild batch R7 (screws, flexible and compliant members). An oscillating input of more than one
   turn on a shaft in plan is driven by a reversing motor through the in-plan belt drive [V5, AUTO]; a mechanism with two
   drivers gets a second drive beside the first, and a manual input whose body has a knob gets no second one [V5, V1,

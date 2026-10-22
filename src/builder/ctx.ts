@@ -90,6 +90,8 @@ export interface BuildCtx {
   twins: Map<string, Solid3>;
   /** A compound gear's further toothed levels, by body (bores not cut yet). */
   levels: Map<string, Solid3[]>;
+  /** Hinge lugs by site: parts of a body whose plane is not square to the hinge (rules/lugs). */
+  lugs: Map<string, Solid3[]>;
   bores: Map<string, Bore[]>;
   /** Holes the base needs, world xy and radius, with the joint that asked; `ring` gives a slot's own outline. */
   baseHoles: { at: [number, number]; r: number; joint: string; ring?: [number, number][] }[];
@@ -169,6 +171,7 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
     parts: new Map(),
     twins: new Map(),
     levels: new Map(),
+    lugs: new Map(),
     bores: new Map(),
     baseHoles: [],
     baseMarks: [],

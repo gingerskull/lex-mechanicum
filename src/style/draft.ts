@@ -30,7 +30,7 @@ export interface RoleSurface {
 }
 
 /** Surface keys: the part roles, the solid-only roles and the base plate. */
-export type SurfaceKey = "driver" | "link" | "output" | "ground" | "base" | "bearing" | "hw" | "trace";
+export type SurfaceKey = "driver" | "link" | "link2" | "output" | "ground" | "base" | "bearing" | "hw" | "trace";
 
 export const DRAFT = {
   // Paper: radial gradient paper -> paperEdge, then grain (paint order step 1, step 7).
@@ -122,6 +122,7 @@ export const DRAFT = {
   role: {
     driver: { pattern: "dots", step: 1.3, alpha: 0.55, tint: 0.05 },
     link: { pattern: "dots", step: 2.4, alpha: 0.34, tint: 0 },
+    link2: { pattern: "cross", step: 2.6, alpha: 0.3, tint: 0 }, // a second set of like links, told apart from the first (T16)
     output: { pattern: "hatch", step: 2.1, alpha: 0.3, tint: 0.03 },
     ground: { pattern: "dash", step: 3.2, alpha: 0.24, tint: 0 },
     base: { pattern: "dots", step: 4.0, alpha: 0.18, tint: 0 },

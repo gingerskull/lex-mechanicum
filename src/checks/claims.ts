@@ -9,8 +9,9 @@
 //                          or end (`feature`);
 //   dwell                  the longest span of the cycle, degrees, in which the output stays within `band` (default
 //                          one thousandth of its range).
-// `over: "speed"` style claims over another driver, and outputs the library does not compute, are reported as
-// uncheckable, never as a mismatch.
+// A path's `range` is its extent, the longest chord between two of its points.
+// A claim `over` a driver (a speed control) takes its statistic over that driver's range instead of the cycle. Outputs
+// the library does not compute are reported as uncheckable, never as a mismatch.
 import type { Kinematics } from "../kin/compose";
 import { xf } from "../kin/math";
 import type { Pose } from "../kin/types";
@@ -91,9 +92,7 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   const o = outputs.find((q) => q.id === claim.output);
   if (!o) return `no output ${claim.output}`;
   const drv = K.kin.drivers.find((d) => (claim.over ? d.id === claim.over : d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual"));
-  if (!drv) return "no primary driver";
-  if (claim.over && claim.over !== drv.id) return `claim over ${claim.over}`;
-  if (claim.over) return `claim over ${claim.over} sweeps a control, not the cycle`;
+  if (!drv) return claim.over ? `claim over ${claim.over}: no such driver` : "no primary driver";
   const n = poses.length;
   const u = poses.map((_, i) => (i / n) * 360);
   const x = poses.map((p) => p.values[drv.id] ?? NaN);
@@ -101,9 +100,10 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   if (o.kind === "speed-ratio" && poses.every((p) => typeof p.outputs[o.id] === "number")) {
     // computed with the pose (src/kin/compose.ts)
     y = poses.map((p) => p.outputs[o.id] as number);
-  } else if (o.kind === "speed-ratio" && poses.every((p) => p.points.has(o.of)) && !K.kin.bodies.some((b) => b.id === o.of)) {
+  } else if (o.kind === "speed-ratio" && poses.every((p) => p.points.has(o.of)) && !K.kin.bodies.some((b) => b.id === o.of) && !K.kin.joints.some((j) => j.id === o.of && j.type === "revolute" && (j.a === "ground" || j.b === "ground"))) {
     // a point's speed: per unit of input (P's speed over a slider's), or with unit "%" as a share of its mean speed over
-    // the cycle (a tip that slows on its straight)
+    // the cycle (a tip that slows on its straight); a ground hinge's point stands still, so its speed ratio is its
+    // turn (below)
     // a rotary input wraps by its span at the end of the cycle; the step across the wrap is the step before it
     const wrap = drv.kind === "rotary" ? (drv.range ? drv.range[1] - drv.range[0] : 360) : 0;
     const step = (i: number, j: number) => {
@@ -260,13 +260,13 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
     return claims.map((claim) => ({ claim, status: "uncheckable", why: `does not solve: ${(e as Error).message}` }));
   }
   const rotary = K.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual")?.kind === "rotary";
-  // a claim that holds at a setting of the params (`setting: { split: 0 }`) is checked on the motion at that setting
+  // a claim that holds at a setting of the params (`setting: { split: 0 }`) or of a selector (`setting: { gear: "2nd" }`)
+  // is checked on the motion at that setting
   const at = new Map<string, Pose[]>();
   const posesFor = (claim: Claim): Pose[] => {
     const setting = claim.setting as Record<string, number | string> | undefined;
     if (!setting || typeof setting !== "object") return poses;
     const key = JSON.stringify(setting);
-    // a setting names params, or a selector's option (`setting: { gear: "2nd" }`)
     const ctl: { params: Record<string, number>; select: Record<string, string> } = { params: {}, select: {} };
     for (const [k, v] of Object.entries(setting)) {
       if (K.kin.drivers.some((d) => d.id === k && d.kind === "select")) ctl.select[k] = String(v);
@@ -275,12 +275,39 @@ export function checkClaims(K: Kinematics, claims: Claim[], outputs: { id: strin
     if (!at.has(key)) at.set(key, Array.from({ length: n }, (_, i) => K.pose((i / n) * Math.PI * 2, ctl)));
     return at.get(key)!;
   };
-  return claims.map((claim): ClaimResult => {
-    let P: Pose[];
+  // a claim `over` a driver sweeps that driver across its range with the cycle at its start (a speed control)
+  const swept = new Map<string, Pose[] | string>();
+  const sweep = (id: string): Pose[] | string => {
+    const d = K.kin.drivers.find((q) => q.id === id);
+    const r = d?.range ?? (d?.lo !== undefined && d?.hi !== undefined ? [d.lo, d.hi] : undefined);
+    if (!d || !r) return `claim over ${id}: no driver with a range`;
     try {
-      P = posesFor(claim);
+      return Array.from({ length: n }, (_, i) => K.poseAt({ [id]: r[0] + ((r[1] - r[0]) * i) / (n - 1) }));
     } catch (e) {
-      return { claim, status: "uncheckable", why: `does not solve at its setting: ${(e as Error).message}` };
+      return `does not solve over ${id}: ${(e as Error).message}`;
+    }
+  };
+  return claims.map((claim): ClaimResult => {
+    let P: Pose[] | string;
+    if (claim.over) {
+      if (!swept.has(claim.over)) swept.set(claim.over, sweep(claim.over));
+      P = swept.get(claim.over)!;
+      if (typeof P === "string") return { claim, status: "uncheckable", why: P };
+    } else {
+      try {
+        P = posesFor(claim);
+      } catch (e) {
+        return { claim, status: "uncheckable", why: `does not solve at its setting: ${(e as Error).message}` };
+      }
+    }
+    // a path's range is its extent: the longest chord between two of its points (an orbit's diameter)
+    const po = outputs.find((q) => q.id === claim.output);
+    if (po?.kind === "path" && claim.stat === "range") {
+      const pts = P.map((p) => p.outputs[po.id]).filter((v): v is [number, number, number] => Array.isArray(v));
+      if (pts.length !== P.length) return { claim, status: "uncheckable", why: `output ${po.id} is not computed` };
+      let got = 0;
+      for (let a = 0; a < pts.length; a++) for (let b = a + 1; b < pts.length; b++) got = Math.max(got, Math.hypot(pts[a]![0] - pts[b]![0], pts[a]![1] - pts[b]![1], pts[a]![2] - pts[b]![2]));
+      return { claim, status: Math.abs(got - claim.value) <= claim.tol ? "ok" : "off", got };
     }
     const S = seriesOf(K, claim, outputs, P);
     if (typeof S === "string") return { claim, status: "uncheckable", why: S };

@@ -13,7 +13,7 @@ export const KIT_IDS = [
   "J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8", "J9", "J10", "J11", "J12", "J13",
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
   "cross-pin", "trunnion", "piston-bore", "ring-carrier", "eccentric-bearing", "pin-ring", "pin-hole", "spider-pin",
-  "ball-cage",
+  "ball-socket", "slipper", "sphere-fit", "ball-cage",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -93,11 +93,15 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (!ground && j.type === "revolute" && (typeof a?.shape?.offset === "number" || typeof b?.shape?.offset === "number")) return "eccentric-bearing";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
       if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
+      // a cage's spherical faces on a race and in a bell (a constant-velocity joint)
+      if (!ground && j.type === "spherical" && [a, b].some((x) => x?.shape?.type === "cage") && [a, b].some((x) => x?.shape?.type === "race" || x?.shape?.type === "bell")) return "sphere-fit";
+      // a ball end in a slipper's socket (a swash plate's piston)
+      if (!ground && j.type === "spherical" && (a?.shape?.ball || b?.shape?.ball)) return "ball-socket";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
       return parallel(axis, UP) ? "J1" : "J10";
     }
     case "prismatic":
-      if (a?.shape?.type === "piston" || b?.shape?.type === "piston") return "piston-bore";
+      if (a?.shape?.type === "piston" || b?.shape?.type === "piston" || a?.shape?.plunger || b?.shape?.plunger) return "piston-bore";
       // a nut's guide: the screw kit builds the anti-rotation with the nut (J11, F3)
       if (kin.joints.some((q) => q.type === "screw" && (q.b === j.a || q.b === j.b) && q.b !== "ground" && isScrew(body(q.a)?.shape as Record<string, unknown> | undefined))) return "J11";
       // a slide held by springs (a pseudo-rigid beam's give, a roller between springs in a window): the compliant kit
@@ -135,6 +139,9 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       return "J11";
     case "flexure":
       return "J13";
+    case "planar":
+      // a slipper's flat face on a plate
+      return "slipper";
     default:
       return "J3";
   }

@@ -7,11 +7,13 @@ import { adjustableLength, cableClip } from "./rules/fixes";
 import { drive, explode, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
+import { lugs, posts } from "./rules/lugs";
 import { wheels } from "./rules/wheels";
 import { pistonBore, trunnion } from "./rules/cylinder";
 import { ringCarrier } from "./rules/ring";
 import { eccentricBearing, pinHole, pinRing } from "./rules/cycloid";
 import { spiderPin } from "./rules/differential";
+import { ballSocket } from "./rules/slipper";
 import { j11 } from "./screws";
 import { j13 } from "./compliant";
 import { j12 } from "./flexible";
@@ -31,11 +33,15 @@ const byId = (id: string): Rule => contactRules.find((r) => r.id === id)!;
 export const rules: Rule[] = [
   classify,
   placement,
+  lugs,
   base,
+  posts,
   wheels,
   byId("j6-mesh"),
   friction,
   byId("j9-crossed-mesh"),
+  // a tongue's slot hardware turns with its hub: built before the stacks, so a bridge is routed clear of it
+  byId("tongue-slot"),
   // a belt or chain loop first: the stacks' bridges are routed clear of what it carries round
   j12,
   cvt,
@@ -51,6 +57,7 @@ export const rules: Rule[] = [
   pinRing,
   pinHole,
   spiderPin,
+  ballSocket,
   byId("j4-slot-roller"),
   byId("pin-lobe"),
   byId("groove-cam"),
@@ -59,7 +66,6 @@ export const rules: Rule[] = [
   byId("pallet-contact"),
   byId("fork-pin"),
   byId("pawl-tooth"),
-  byId("tongue-slot"),
   byId("ring-hub"),
   byId("ring-rollers"),
   byId("j8-belt"),
