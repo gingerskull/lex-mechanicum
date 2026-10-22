@@ -92,7 +92,9 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
     case "slider": {
       const L = num(shape.length, 36);
       const W = num(shape.width, 20);
-      return { profile: { outer: roundRect(-L / 2, -W / 2, L / 2, W / 2, Math.min(6, W / 2 - 0.5)), holes: [] }, thick: num(shape.thickness, 7), approx: false };
+      // centred on its joint, or starting at `from` along its x (a plunger whose pin is at its back end)
+      const x0 = shape.from !== undefined ? num(shape.from, -L / 2) : -L / 2;
+      return { profile: { outer: roundRect(x0, -W / 2, x0 + L, W / 2, Math.min(6, W / 2 - 0.5)), holes: [] }, thick: num(shape.thickness, 7), approx: false };
     }
     case "disc": {
       const r = num(shape.radius, 20);
