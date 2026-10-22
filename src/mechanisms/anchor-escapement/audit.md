@@ -1,171 +1,215 @@
 # Audit: Anchor escapement (anchor-escapement)
-standard: 2.6 · date: 2026-10-20 · result: pass · detail: full · pass: build
+standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
+teaching: tweak · decisions in the record
 
 ## Summary
-PASS 110 · FAIL 0 · N/A 9 · open: none
+PASS 144 · FAIL 0 · N/A 23 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · the standard carries version 2.6 and its changelog |
-| S2 | PASS | HAND · header with standard, date, result, detail, pass |
-| S3 | PASS | AUTO · tools/conformance reads this header and runs in npm run check |
-| S4 | PASS | SITE · #141 holds only this mechanism's decisions and open items |
-| P1 | PASS | DATA · record complete; model.ts, polish.ts, audit.md present |
-| P2 | PASS | DATA · catalogue validator clean (npm run catalog) |
-| P3 | PASS | DATA / SITE · page shows ratio (index step), parallel axes, intermittent, reversing and dwell output, other names, family, motion, level, dof and the motorised drive |
-| P4 | PASS | DATA · tags grouped Function, Property, Application |
-| P5 | PASS | DATA · motion, forces, benefits, limits; uses listed with one line each |
-| P6 | PASS | DATA · references and media as in the catalogue record, unchanged in this pass |
-| P7 | PASS | HAND / SITE · no prose in model.ts or polish.ts; lint-style clean |
-| P8 | PASS | SITE · no parts list, build or joint sections on the page |
-| P9 | PASS | HAND · solve(): the anchor swings ±3°, the wheel is locked most of the period, is pushed back about 1° while a pallet goes in, and drops forward twice per period, 12° in all, as the text says (one tooth per period, recoil) |
-| P10 | PASS | HAND · bob centre traced with its velocity, input spin at the arbor and the train's torque on the wheel, the swing angle, a staircase plot of the wheel angle with the recoil dips |
-| P11 | PASS | DATA · unchanged record prose: plain, short sentences, mm and degrees |
-| K1 | PASS | HAND · check: max link error 0.0e+0 mm · the wheel angle comes only from the simulation in escape.ts; tooth form, pallet faces and centres are the model's; the polish adds spokes, an eccentric and marks round them |
-| K2 | PASS | HAND · check: finite, continuous, periodic over 720 samples |
-| K3 | PASS | HAND · custom wheel, anchor and pendulum, caps; at and fixed placement |
-| K4 | PASS | HAND · roles output (wheel), driver (anchor), link (pendulum), pin; accent only on the input cap pA |
-| K5 | PASS | HAND · check: no INTERFERE, OVERLAP or WARN · pendulum layer -1 (a clevis twin of the anchor on one arbor), wheel and anchor layer 0, the pallets working in the wheel's plane; check clean |
-| K6 | PASS | DATA · N 30, tip 50, root 44, span 7.5 teeth (90°), d = r / cos 45° = 70.7, amplitude ±3°, 12° per period with about 1° recoil as the catalogue. Deliberate differences, commented in model.ts: the pendulum is drawn 120 mm long (catalogue L = 994) and points away from the wheel, the bench plan being flat; pallet faces are turned 35° off the dead line and give about 3° of lift (catalogue 3° to 4°); pallet places found by search |
-| K7 | PASS | HAND · input oscillating on anchor · input oscillating on the anchor: the drive swings the arbor through the pendulum's ±3° |
-| D1 | PASS | HAND · anchor bowed outside the teeth with a boss round the arbor; flush caps; one bridge shaped as a part; squircle base |
-| D2 | PASS | HAND · spokes only in the wheel, which starts and stops every beat; bosses round both arbors; the anchor arms bow where the teeth are not |
-| D3 | PASS | STYLE · roles told apart by pattern and tone in both sheets (screenshots) |
-| D4 | PASS | AUTO · fired: base (1 solid), feet (3 solids) · feet concentric with the corner arcs |
-| D5 | PASS | AUTO / HAND · one bridge over the wheel's axle on two spigoted posts; the base carries the arbor housing |
-| D6 | PASS | HAND / STYLE · stops, marks, eccentric and leads read quieter than the wheel, anchor and pendulum |
-| D7 | PASS | HAND · wheel, anchor, pendulum and bridge carry only load shape and manufacturing marks |
-| A1 | PASS | AUTO · pE J1, pA J2, escapement J7; fired: classify (no solids) · pE J1, pA J2 found; the pallet contact is recorded by hand as its own joint (escapement) |
-| A2 | PASS | AUTO · pE J1, pA J2, escapement J7 · live shaft at the accent arbor, dead axle for the wheel |
-| A3 | PASS | AUTO · fired: classify (no solids) · Ø8 arbor in 688-2RS housing bearings; Ø10 wheel axle with an F6800 in the wheel |
-| A4 | PASS | AUTO · fired: j1-dead-axle (28 solids) · stepped D-flat arbor with end retainer; shouldered wheel axle with undercut thread |
-| A5 | PASS | AUTO · fired: j2-live-shaft (27 solids) · D-flat on the Ø8 arbor for the anchor and the pendulum; the wheel runs on its bearing |
-| A6 | PASS | AUTO · fired: standoffs (no solids) · no floating fixed plate besides the bridge, on spigoted Ø10 standoffs |
-| A7 | PASS | AUTO · fired: base (1 solid), feet (3 solids) · 8 mm base, counterbored corners, feet, scale, clearance hole for the arbor; the base grew to carry the pendulum and the drive |
-| A8 | PASS | AUTO · fired: fasteners (stage 3) · every head has its shank; holes cut and tapped by stage 3 |
-| A9 | PASS | AUTO / HAND · fired: j2-straddle (no solids) · the wheel axle is held by base and bridge; the anchor arbor is carried by its housing cartridge and the anchor sweeps over it, so no bridge (single shear, warn, as the ratchet's input) |
-| A10 | PASS | HAND · wheel and anchor share z 0 to 6, the pendulum one layer under the anchor, outside the wheel |
-| A11 | PASS | AUTO / HAND · fired: j1-dead-axle (28 solids) · pallet load to the anchor, its keyed arbor, the housing, the base; wheel to its axle, base and bridge; housing screwed and dowelled |
+| S1 | PASS | DATA · the standard carries version 3.0 and its changelog |
+| S2 | PASS | HAND · header with standard, date, result, detail, pass and the teaching: line |
+| S3 | PASS | AUTO · tools/conformance reads this sheet (engine v3) and runs in npm run check |
+| S4 | PASS | SITE · the pass issue holds only this mechanism's decisions; batch status in #216 |
+| S5 | PASS | SITE · 3D stamp in the title block (every shot) and on the card and page header (site build) |
+| S6 | PASS | AUTO · rebuilt from its record v3 in rebuild batch R5 (#216): bound by 3.0 from this pass |
+| P1 | PASS | DATA · record v3 complete (kin and teaching blocks); no polish, audit.md present |
+| P2 | PASS | DATA · catalogue validator clean |
+| P3 | PASS | DATA / SITE · the page reads ratio, axes, character, backdrivable, aka, family, motion, level, dof and the drive from the record |
+| P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
+| P5 | PASS | DATA · explanation in four parts and the examples from the record |
+| P6 | PASS | DATA · references and media from the record, validated by the catalogue |
+| P7 | PASS | HAND / SITE · no prose in a polish; labels come from the record |
+| P8 | PASS | SITE · the page has no parts list or joint sections (site) |
+| P9 | PASS | AUTO / HAND · every number the explanation states is a claim and agrees (T9) |
+| P10 | PASS | HAND · the bob traced with 15-degree ticks and a tooth tip; the line of centres, both pallet arms, the tip circle, the swing arc; plots of the wheel and pendulum angles |
+| P11 | PASS | DATA · plain language, mm and degrees |
+| P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
+| P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| K1 | PASS | AUTO · K1 residual 0.0e+0 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
+| K3 | PASS | AUTO / HAND · 1 block (escape); no numeric fallback · composed from the block library; no fallback, no one-off model |
+| K4 | PASS | HAND · the pendulum's arbor carries the accent (the drive); the escape wheel is the output |
+| K6 | PASS | DATA · 30 teeth, tip 50, root 39.4, d 70.71; the escape block (geometric, time-stepped to its periodic state) with the record's pallets: 5.88 and 6.12 degrees per beat, 12 per period, recoil about 4 on each pallet (record corrected from 1.8 and 2.0) |
+| K7 | PASS | DATA · drivers input (oscillating) · input kind declared with its driven joint |
+| K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
+| K9 | PASS | DATA · one oscillating driver, the pendulum's ±7 degrees |
+| K10 | PASS | AUTO / DATA · one closure; the wheel's instant drops declared (drops: true), so its points may jump by design |
+| K11 | PASS | AUTO · mobility counted 1, dof 1 |
+| K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
+| T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
+| T2 | PASS | HAND · review before the build and again on the six phases of the finished build; decisions in the record |
+| T3 | PASS | DATA · principle parts declared; drawn whole, in depth order |
+| T4 | PASS | DATA · fired: trace-marks (no solids) · the bob with equal-time ticks (fast at the bottom), a tooth tip stepping and recoiling |
+| T5 | PASS | DATA · line of centres, the arms to both pallets, the tip circle, the swing |
+| T6 | PASS | HAND / DATA · ±7 degrees and the deep teeth: drop and recoil show at several mm |
+| T7 | PASS | DATA · FRONT: the escapement in its vertical plane, the pendulum hanging down past the wheel |
+| T8 | N/A | DATA · everything lies in one plane in plain view |
+| T9 | PASS | AUTO / DATA · claim table: 5 ok, 0 off, 0 uncheckable of 5 |
+| T10 | PASS | AUTO · 12 solids drawn see-through: A-pb-b1-foot, A-pb-b1-ped, A-pb-b1, A-pb-b1-brg, A-pb-b1-brg-balls, A-pb-b1-brg-cage, A-pb-b1-sc0, A-pb-b1-sc0-sh · the wheel's front pillow block is drawn see-through where it covers the wheel; nothing over the pallets |
+| T11 | PASS | AUTO · 2 supports routed, 2 moved off a sweep · the wheel's arbor held from the front only (record side), so the pendulum swings clear behind the wheel; the drive behind |
+| T12 | PASS | HAND · 19 support solids; dropped by the polish: none |
+| T13 | N/A | DATA · the drop is instant by design and the pendulum's swing is slow; no time map asked |
+| T14 | PASS | HAND / DATA · the crank's turn (see K9) |
+| T15 | PASS | HAND · labels state the mechanism, never its use |
+| T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
+| T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| D1 | PASS | HAND · pointed escape-wheel teeth, an anchor with two pallets reaching into the wheel's plane, a pendulum rod and bob |
+| D2 | PASS | HAND · the anchor's arms carry the pallets from the arbor; the rod is a plain bar |
+| D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
+| D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base corners and feet concentric (base, feet rules) |
+| D5 | PASS | AUTO / HAND · pillow blocks for both arbors, a motor bracket |
+| D6 | PASS | HAND / STYLE · hardware quieter than the parts, still readable (both sheets) |
+| D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame |
+| D9 | N/A | AUTO / HAND · no member changes shape |
+| D10 | PASS | AUTO · profiles only |
+| D11 | PASS | AUTO · SOLID: 0 of 100 solids unsound |
+| D7 | PASS | HAND · wheel, anchor and pendulum plain; richness in the stacks |
+| A1 | PASS | AUTO · E J10, A J10, P pallet, drive drive · every joint read from the record and built by its kit |
+| A2 | PASS | AUTO · E J10, A J10, P pallet, drive drive · escape wheel on an arbor in plan (J10, held from the front), anchor and pendulum on a live arbor in plan (J10, driven); the pallet contact (J7) |
+| A3 | PASS | AUTO · fired: classify (3 solids), axial stack builder · bores from the catalogue; bearings where a boss fits them |
+| A4 | PASS | AUTO · fired: j1-dead-axle (no solids), axial stack builder · stepped shafts with shoulders, grooves and chamfered ends (H.shaft) |
+| A5 | PASS | AUTO · fired: j2-live-shaft (no solids), j10-shaft-in-plan (53 solids), axial stack builder · keys by shaft size: D-flat to Ø8, feather key above |
+| A6 | N/A | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · no slide and no floating plate |
+| A7 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · base under the lowest part, counterbored corner holes, feet, engraved scale and paths, shaft clearance holes |
+| A8 | PASS | AUTO · fired: fasteners (33 solids) · stage 3 fasteners: shanks, clearance and tapped holes |
+| A9 | PASS | AUTO / HAND · fired: placement solver · the wheel overhung from its two front blocks |
+| A10 | PASS | HAND · fired: placement (10 solids), placement solver · the wheel in its plane, the pallets reaching into it, the arms and rod behind |
+| A11 | PASS | AUTO / HAND · fired: j12-flexible (no solids), strap-sheave (no solids), j1-dead-axle (no solids) · load paths closed: every joint note says where its load goes to ground |
 | A12 | PASS | AUTO · clamp check clean |
-| A13 | PASS | AUTO / HAND · 106 solids, 54 unnamed (further items of a listed set) · every solid named with catalogue sizes, sets counted |
-| A14 | PASS | HAND · bridge posts outside the wheel and the anchor's sweep; pendulum stops placed by H.stops beyond its swing; clearance 0 |
-| A15 | PASS | AUTO · clearance: 0 clashes over the cycle |
-| A16 | PASS | HAND · 5 build rules; no note: none; no badge: none · a note and a badge on every joint (pE, pA, the bridge posts, the drive, the escapement), five build rules |
-| A17 | PASS | HAND · housing and arbor up through the base, thrust washer, pendulum, spacer, anchor, end screw; wheel axle into its eccentric, wheel on its bearing, bridge last |
-| E1 | PASS | AUTO · every solid has one explode level; levels -8 to 3 · one level per solid; seen at full explode |
-| E2 | PASS | AUTO · 30 rigid groups; fired: explode · screws, bolts, shafts and bought units are groups; seen at full explode |
-| E3 | PASS | AUTO · fired: explode · screws leave along their axes to the head side |
-| E4 | PASS | HAND · pendulum under the anchor, wheel and anchor on their layer, bridge and heads above: the last fitted goes furthest |
-| E5 | PASS | AUTO · fired: explode · bearings and circlips stay in their parts |
-| E6 | PASS | AUTO · fired: explode · motor with its bracket, bearings whole |
-| E7 | PASS | AUTO · fired: explode · spacers midway |
-| E8 | PASS | AUTO · fired: explode · pendulum and anchor keep their order on the arbor |
-| E9 | PASS | HAND · readable at full explode at 28° and 70° in both sheets |
-| J1 | PASS | AUTO · fired: j1-dead-axle (28 solids) · pE: shouldered axle into the base on an eccentric bushing, bearing with circlip, thrust washer, bridge on spigoted posts, oil sink |
-| J2 | PASS | AUTO · fired: j2-live-shaft (27 solids), j2-straddle (no solids) · pA: housing with two sealed bearings, spacer sleeve, wave washer, circlips, screwed and dowelled; D-flat arbor, end retainer, thrust washer |
-| J3 | N/A | AUTO · fired: j3-moving-pin (no solids) · no moving pin |
-| J4 | N/A | AUTO · fired: j4-slot-roller (no solids) · no pin in a slot |
-| J5 | N/A | AUTO · fired: j5-slide (no solids) · no slide |
-| J6 | N/A | AUTO · fired: j6-mesh (no solids) · no gear mesh |
-| J7 | N/A | AUTO · fired: j7-cam (no solids) · the pallet on a tooth is a sliding contact of hardened faces, not a cam with a roller follower; recorded as the escapement joint (promotion candidate) |
-| J8 | N/A | AUTO · fired: j8-belt (no solids) · the oscillating drive is a crank and link: no belt |
-| F1 | PASS | AUTO · served at pE, pA, pE-bridge-post; fired: j2-live-shaft (27 solids) · housing dowelled, bridge spigoted |
-| F2 | PASS | AUTO · served at pE, pA; fired: j2-live-shaft (27 solids) · bearings held by circlips; arbor end retainer and end screw |
-| F3 | PASS | AUTO · served at pA; fired: j2-live-shaft (27 solids) · D-flat on the arbor for anchor and pendulum |
-| F4 | PASS | AUTO / HAND · served at pE, pA; fired: j2-live-shaft (27 solids) · bronze thrust washers under the pendulum and the wheel; wave washer preloading the arbor |
-| F5 | PASS | AUTO / HAND · served at pA; fired: j5-slide (no solids), stops (no solids) · stops 2° beyond both ends of the pendulum's swing beside its rod (polish, H.stops); the wheel needs none, the pallets hold it |
-| F6 | N/A | AUTO / HAND · served at no joint; fired: j7-cam (no solids) · the wheel is held by the pallets at every phase; nothing rattles free |
-| F7 | PASS | AUTO / HAND · served at pE; fired: j6-mesh (no solids), j5-slide (no solids) · the depth of engagement is set by an eccentric bushing under the wheel's axle (H.eccentricMount), drawn at its set point |
-| F8 | PASS | AUTO · served at pE; fired: lubrication (no solids) · oil sink on the bridge over the wheel's bearing; the pallet faces are named as oiled in the escapement note; sealed arbor bearings |
-| F9 | PASS | AUTO / HAND · served at no joint; fired: timing-marks (no solids) · beat line on the base past the bob and two ticks at the ends of the swing |
-| F10 | PASS | AUTO / HAND · served at drive; fired: drive (33 solids) · home flag on the drive crank read by a fork sensor, leads to the terminal block; the crank stops at its dead centres inside the pendulum stops |
-| M1 | PASS | AUTO · fired: hardware primitives · top edges chamfered by the form style |
-| M2 | PASS | HAND · six filleted spokes in the wheel, web 7 mm round the bearing and under the roots |
-| M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry rings on the bearing seats and through holes |
-| M4 | PASS | AUTO / HAND · fired: base (1 solid), fasteners (stage 3) · counterbores in the base, spot seats by stage 3 |
-| M5 | PASS | AUTO / HAND · fired: hardware primitives · spoke windows carry a 3 mm radius; the tooth roots are the modelled working profile (K1) |
+| A13 | PASS | AUTO / HAND · 100 solids, 64 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
+| A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps; details checked by A15 |
+| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A16 | PASS | HAND · 4 joint notes; no note: none; no badge: P · a note per joint; build rules: the wheel held from the front, the pendulum behind |
+| A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
+| A18 | PASS | AUTO · placement: 1 slabs in the tallest stack (4.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver |
+| A19 | PASS | AUTO · 2 supports routed (2 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: E-pb, A-pb · supports placed off the principle's sweep where the router could |
+| A20 | PASS | AUTO · support per joint: E pillow, A pillow · one axial stack builder with its support selector |
+| A21 | PASS | AUTO · kit per joint: E J10, A J10, P pallet, drive drive |
+| A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (2 solids) · the drive's swing sets the pendulum's; cable clips |
+| E1 | PASS | AUTO · every solid has one explode level; levels -2 to 10.5 · one level per solid |
+| E2 | PASS | AUTO · fired: explode (1 solid) · heads, shanks, washers and nuts move as one |
+| E3 | PASS | AUTO · fired: explode (1 solid) · screws back out along their axes |
+| E4 | PASS | HAND · last fitted goes furthest (explode shots, both sheets) |
+| E5 | PASS | AUTO · fired: explode (1 solid) · pressed bearings, bushings and clips stay with their parts |
+| E6 | PASS | AUTO · fired: explode (1 solid) · motor, bearings and pulley pair whole |
+| E7 | PASS | AUTO · fired: explode (1 solid) · loose spacers midway |
+| E8 | PASS | AUTO · fired: explode (1 solid) · keyed parts keep their order on their shaft |
+| E9 | PASS | HAND · full explode readable on both sheets |
+| E10 | PASS | AUTO · fired: explode (1 solid) · each stack explodes along its joint axis, with trail lines |
+| J1 | N/A | AUTO · fired: trunnion (no solids), j1-dead-axle (no solids) · no dead axle |
+| J2 | N/A | AUTO · fired: j2-live-shaft (no solids) · no live shaft |
+| J3 | N/A | AUTO · fired: j3-moving-pin (no solids), cross-bearings (no solids), ring-hub (no solids) · no moving revolute |
+| J4 | N/A | AUTO · fired: j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids) · no pin in a slot |
+| J5 | N/A | AUTO · fired: piston-bore (no solids), j5-slide (no solids), tongue-slot (no solids) · no slide |
+| J6 | N/A | AUTO · fired: j6-mesh (no solids), ring-rollers (no solids) · no parallel mesh |
+| J7 | PASS | AUTO · fired: groove-cam (no solids), j7-cam (no solids), pallet-contact (3 solids), pawl-tooth (no solids) · built by its kit (Joints table) |
+| J8 | N/A | AUTO · fired: j8-belt (no solids), j12-flexible (no solids) · no belt in the mechanism (the drive belt is V4) |
+| J9 | N/A | AUTO · fired: j9-crossed-mesh (no solids) · no crossed mesh |
+| J10 | PASS | AUTO · fired: j10-shaft-in-plan (53 solids) · built by its kit (Joints table) |
+| J12 | N/A | AUTO · fired: j12-flexible (no solids), strap-sheave (no solids) · no flexible member |
+| J13 | N/A | AUTO · fired: j13-compliant (no solids) · no compliant joint |
+| J11 | N/A | AUTO · fired: j11-screw (no solids) · no screw |
+| F1 | PASS | AUTO · served at E, A; fired: j2-live-shaft (no solids), j10-shaft-in-plan (53 solids), strap-sheave (no solids), j13-compliant (no solids) · housings, blocks and bridges dowelled (Joints table) |
+| F2 | PASS | AUTO · served at E, A; fired: j2-live-shaft (no solids), j10-shaft-in-plan (53 solids), cross-bearings (no solids), trunnion (no solids), fork-pin (no solids), ring-hub (no solids), ring-rollers (no solids), j12-flexible (no solids), strap-sheave (no solids), j13-compliant (no solids) · every bearing retained both sides; every part on a shaft retained (Joints table) |
+| F3 | PASS | AUTO · served at no joint; fired: j2-live-shaft (no solids), j10-shaft-in-plan (53 solids), j12-flexible (no solids), j11-screw (no solids) · every keyed part keyed or on a D-flat with its retainer |
+| F4 | PASS | AUTO / HAND · served at A; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (53 solids), trunnion (no solids) · thrust washers where a part turns free axially |
+| F5 | N/A | AUTO / HAND · served at no joint; fired: j5-slide (no solids), pawl-tooth (no solids), j13-compliant (no solids), stops (no solids) · the pendulum's swing is set by the drive |
+| F6 | N/A | AUTO / HAND · served at P; fired: trunnion (no solids), j7-cam (no solids), pallet-contact (3 solids), pawl-tooth (no solids), j12-flexible (no solids) · the train urges the wheel; no spring |
+| F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), j5-slide (no solids), j12-flexible (no solids), adjustable-length (no solids) · nothing to adjust: the slots and arcs are cut to the centre distance |
+| F8 | PASS | AUTO · served at no joint; fired: cross-bearings (no solids), tongue-slot (no solids), j12-flexible (no solids), j11-screw (no solids), lubrication (no solids) · sealed bearings need none; open contacts oiled or greased where they occur |
+| F9 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (1 solid) · no timing to set |
+| F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (30 solids) · home flag and fork sensor on the input (drive) |
+| M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
+| M2 | PASS | HAND · bosses round every loaded hole |
+| M3 | PASS | AUTO · fired: j3-moving-pin (no solids), hardware primitives · bore entry chamfers |
+| M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (33 solids) · counterbores and countersinks for heads (base, csk, housings) |
+| M5 | PASS | AUTO / HAND · fired: hardware primitives · cutter radii on windows and slots |
 | M6 | PASS | AUTO · edge distance and walls clean |
-| M7 | PASS | HAND · the anchor's arms run into the boss on wide straight runs; no loaded inside corner left sharp |
-| M8 | PASS | AUTO · fired: j1-dead-axle (28 solids) · thread undercut on the shouldered axle |
-| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (28 solids) · M3, M4, M5, M8 screws in standard lengths with engagement from the tables |
-| M10 | PASS | AUTO / HAND · 106 of 106 solids name a material · every solid names a material; wheel brass, anchor hardened steel with ground pallet faces, pendulum steel rod and brass bob |
-| M11 | PASS | AUTO · fired: j1-dead-axle (28 solids), hardware primitives · centre holes, wrench flats and chamfered ends on the shafts |
-| M12 | PASS | HAND · every screw reachable from above or below; the wheel bearing pulls through after the bridge comes off |
-| M13 | PASS | AUTO / HAND · 45 threaded, 0 without a locking method · every threaded fastener names its locking method |
-| M14 | N/A | AUTO / HAND · fired: j4-slot-roller (no solids) · no slot, slide or cam track; the wearing faces are the hardened pallets, a part of the anchor (separate jewelled pallets are a promotion candidate) |
-| V1 | PASS | AUTO · fired: drive (33 solids) · motor with its bracket under the base (oscillating build, pancake outrunner) |
-| V2 | PASS | AUTO · fired: drive (33 solids) · one-piece bracket with the flange screwed up into the base |
-| V3 | PASS | AUTO / HAND · fired: drive (33 solids) · drive clear of feet and housings; clearance 0 |
-| V4 | N/A | AUTO · fired: j8-belt (no solids) · no belt or pulleys in the oscillating drive |
-| V5 | PASS | AUTO · fired: drive (33 solids) · motor turns a 2 mm crank, a 94 mm link swings a 39 mm lever on the arbor through exactly the modelled 6° (the drive's long lever for small swings, see promotion candidates) |
-| V6 | PASS | AUTO · fired: drive (33 solids) · home flag on the drive crank, fork sensor, leads to the terminal block, one clip |
-| L1 | PASS | STYLE · no look value in model.ts or polish.ts; lint-style clean |
-| L2 | PASS | HAND · geometry, roles, materials, marks and accent only |
-| L3 | PASS | HAND · roles right on every solid; looked at in both sheets |
-| L4 | PASS | HAND / STYLE · accent only on the input cap, the traced path and the forces |
-| L5 | PASS | AUTO / HAND · fired: see-through · screws, bearings and shanks are real solids in real holes and show through |
-| L6 | PASS | AUTO · depth order correct at plan, 28°, 70° and side in both sheets |
-| L7 | PASS | STYLE · tilt 0° to 88°, no shear |
-| L8 | PASS | AUTO / HAND · engraved scale and beat marks are marks |
-| R1 | PASS | HAND · H.spokes, H.eccentricMount, H.stops, bridge and drive subassemblies; the wheel, anchor and pendulum are custom parts |
-| R2 | PASS | HAND · threads M3, M4, M5, M8; joint Ø 8, 10; bearings 688-2RS (8x16x5), F6800 (10x19x5) · threads M3, M4, M5, M8; shafts Ø8 and Ø10; bearings from the table |
-| R3 | PASS | AUTO · fired: hardware primitives · housing, bridge, stops, eccentric and drive are the shared functions |
-| R4 | PASS | AUTO · package 20.0 KB · package written |
-| R5 | PASS | HAND · polish 1 ms; no sampling in the polish. The model simulates its wheel once at load (about 60 ms in Node, 7200 steps) |
-| R6 | FLAG | FLAG · bench: package 20 KB, setup 9.9 ms; frame 1.67 ms plan, 2.04 ms 28°, 2.13 ms side, 2.41 ms explode 70° (local Chrome, RTX 5090) |
-| R7 | PASS | HAND · model.ts + polish.ts 12.2 KB |
-| R8 | PASS | AUTO / SITE · site behaviour, unchanged |
-| DL1 | PASS | AUTO / HAND · 37 of 106 solids on a dropping rung · nothing moved |
-| DL2 | PASS | HAND · model detail full · default dial full |
-| DL3 | PASS | AUTO · AUTO, unchanged |
-| DL4 | PASS | SITE · SITE, unchanged |
-| DL5 | FLAG | FLAG · bench rung table written: A 8 solids, B 140 marks, D 13, E 8 and 5 marks, H 8, never 69 and 85 marks |
+| M7 | N/A | HAND · no bracket corner turns a load |
+| M8 | PASS | AUTO · fired: j1-dead-axle (no solids) · thread undercuts on stepped shafts |
+| M9 | PASS | AUTO / HAND · fired: j1-dead-axle (no solids) · ISO coarse threads, engagement through the tapped part or to a nut |
+| M10 | PASS | AUTO / HAND · 98 of 100 solids name a material · materials named by kind and role |
+| M11 | PASS | AUTO · fired: j1-dead-axle (no solids), hardware primitives · centre holes, chamfered ends on turned parts |
+| M12 | PASS | HAND · every screw reachable by its key in the explode |
+| M13 | PASS | AUTO / HAND · 14 threaded · threadlocker or nyloc on every threaded fastener |
+| M14 | N/A | AUTO / HAND · fired: piston-bore (no solids), j4-slot-roller (no solids), pin-lobe (no solids), groove-cam (no solids), pallet-contact (3 solids), tongue-slot (no solids) · the roller rolls in the slots; the locking surfaces are oiled |
+| V1 | PASS | AUTO · fired: drive (30 solids) · pancake motor beside the pendulum's arbor, run as a servo that swings it, GT2 belt to the arbor's far end |
+| V2 | PASS | AUTO · fired: drive (30 solids) · one flange or bracket for the motor |
+| V3 | PASS | AUTO / HAND · fired: drive (30 solids) · belt and pulleys clear of feet and housings (A15) |
+| V4 | PASS | AUTO · fired: j8-belt (no solids) · flanged pulleys, belt in one plane |
+| V5 | PASS | AUTO · fired: drive (30 solids) · oscillating input: the motor swings the pendulum ±7 degrees |
+| V6 | PASS | AUTO · fired: drive (30 solids), cable-clip (2 solids) · home flag, fork sensor, terminals, lead and clip |
+| L1 | PASS | STYLE · STYLE: no look values in the record or polish |
+| L2 | PASS | HAND · records and polish carry no look |
+| L3 | PASS | HAND · roles right on every solid (both sheets) |
+| L4 | PASS | HAND / STYLE · one accent: the input ring, the traces |
+| L5 | PASS | AUTO / HAND · fired: see-through (12 solids) · transparency and hidden lines show screws in holes and bearings in bores |
+| L6 | PASS | AUTO · depth peeling at every view (shots) |
+| L7 | PASS | STYLE · STYLE: turntable orbit, named views, no perspective |
+| L8 | PASS | AUTO / HAND · fired: trace-marks (no solids) · centrelines along every joint axis, base dimensions, engraved marks |
+| L9 | N/A | AUTO / DATA · no section or detail view declared |
+| L10 | PASS | AUTO / STYLE · teaching overlays in the sheet's look |
+| R1 | PASS | HAND · every standard part from the primitives and kits |
+| R2 | PASS | HAND · standard sizes only |
+| R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies, one function each |
+| R4 | PASS | AUTO · package v2 15.4 KB · package v2 written at build time |
+| R5 | PASS | HAND · no polish, no sampling |
+| R6 | PASS | FLAG · FLAG: bench run (desktop, below); the phone is measured by David |
+| R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
+| R8 | PASS | AUTO / SITE · SITE: thumbnails pre-rendered, cards animate on hover |
+| R9 | PASS | AUTO / SITE · setup and bake in the worker, one context |
+| R10 | PASS | FLAG · FLAG: the bench page is built for the phone measurement |
+| DL1 | PASS | AUTO / HAND · 31 of 100 solids on a dropping rung · every solid, mark and effect on a rung by its kind |
+| DL2 | PASS | HAND · default dial: full |
+| DL3 | PASS | AUTO · view-aware exceptions in the ladder table |
+| DL4 | PASS | SITE · SITE: adaptive dial with hysteresis |
+| DL6 | PASS | AUTO · teaching layers drawn at every dial position |
+| DL5 | PASS | FLAG · FLAG: bench reports frame time per dial position |
 | Q1 | PASS | check, clamp and edge distance clean |
-| Q2 | PASS | 0 clashes |
-| Q3 | PASS | package written, 20.0 KB; site build not checked here · page builds from the registry |
-| Q4 | PASS | local: tools/shot · plan, 28°, side, full explode at 28° and 70°, both sheets, overlays on, looked at; baselines written |
-| Q5 | PASS | local: tools/bench · bench report written; flags noted above |
-| Q6 | PASS | every requirement judged; joints table complete |
-| Q7 | PASS | tools/conformance: current at 2.6 |
+| Q2 | PASS | 0 clashes, 0 unnecessary allows |
+| Q3 | PASS | package v2 written, 15.4 KB; site build not checked here · package v2 written; site builds (npm run build) |
+| Q4 | PASS | local: tools/shot · dist/shots3/<id>: record view, PLAN, FRONT, SIDE, ISOMETRIC, the declared views, full explode, both sheets |
+| Q5 | PASS | local: tools/bench · tools/bench run: dist/bench/report-v2.md |
+| Q6 | PASS | every row judged |
+| Q7 | PASS | at 3.0 |
+| Q8 | PASS | teaching review: tweak (2026-10-20); the six phases of the finished build are looked at by eye · verdict and decisions in the record and the teaching: line; six phases of the finished build looked at |
 
 ## Joints
-| Joint | Type | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| pE | J1 | 2 x spigot | Internal circlip DIN 472, Ø19; Bearing F6800 (10x19x5) | – free wheel, its torque comes from the train | Thrust washer 10.2x13.1, bronze | – the pallets stop it | – held by the pallets | Eccentric bushing Ø18, 0.3 mm offset bore Ø10, flanged | Bridge over the pivot, on two spigoted posts | – the wheel has no phase to keep: any tooth serves | – |
-| pA | J2 | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø16; Countersunk M4 x 10 (ISO 10642), into the shaft end, flush; Socket head M4 x 8 (ISO 4762), into the shaft end | Input shaft Ø8 h6, D-flat | Wave washer 12x15.8, spring steel; Thrust washer 8.2x14, bronze | 2 x Stop bumper, neoprene sleeve Ø12 | – driven through its whole swing | – the centre distance is adjusted at pE | none (sealed bearings) | Beat line on the base | – drive has its own flag, see drive |
-| pE-bridge-post | post | 2 x spigot | – screwed both ends | – | – | – | – | – | – | – | – |
-| drive | drive | – bracket screwed to the base | – | – | – | – crank dead centres | – | – | – | – | Home flag on the drive crank; 3 x Fork sensor, slotted optical, 5 mm gap |
-| escapement | J7 | – pallets are part of the anchor | – | – | – | – | – the locked tooth rests on a pallet | Eccentric at pE sets the depth | Clock oil on the pallet faces | – | – |
+| Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| E | J10 | escape | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base; Dead shaft Ø5, clamped in two pillow blocks | 2 x Set screw M4 on a flat, clamps the dead shaft (F2, F3) | none | none | none | none | none | none | none | none |
+| A | J10 | escape | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø9 | none | 2 x Shaft collar 4x12, set screw | none | none | none | none | none | none |
+| P | pallet | – | – | – | none | none | none | none | none | Set screw M2, adjusts the pallet stone | none | none | none | none |
+| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+
+## Supports
+| Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
+|---|---|---|---|---|---|---|
+| E-pb | E | pillow | moved | 1.5 | wheel, anchor | – |
+| A-pb | A | pillow | moved | 1.5 | wheel, anchor | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| Wheel | plain disc | six spokes, web 7 mm | M2: the wheel starts and stops every beat |
-| Wheel axle pE | plain seat in the base | eccentric bushing, 0.3 mm | F7: the depth of engagement is the one dimension to set |
-| Pendulum | no stops (input skipped by the rule) | stops 2° beyond its swing beside the rod | F5: with the drive off the pendulum would swing on |
-| Wheel, anchor | aluminium default | brass wheel, hardened steel anchor | M10: the pallet faces are the contact surfaces |
-| Beat marks | none | line past the bob, ticks at the swing ends | F9: setting the clock in beat |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 8 | 0 | 1.84 |
-| DL-B | 0 | 140 | 1.88 |
-| DL-C | 0 | 0 | 1.64 |
-| DL-D | 13 | 0 | 1.46 |
-| DL-E | 8 | 5 | 1.32 |
-| DL-F | 0 | 0 | 1.49 |
-| DL-G | 0 | 0 | 1.3 |
-| DL-H | 8 | 0 | 1.13 |
-| never | 69 | 85 | 1.99 (full) |
+| DL-A | 7 | 0 | 1.86 |
+| DL-B | 0 | 273 | 1.86 |
+| DL-C | 0 | 0 | 1.95 |
+| DL-D | 2 | 0 | 1.86 |
+| DL-E | 8 | 0 | 2 |
+| DL-F | 0 | 0 | 2.37 |
+| DL-G | 0 | 0 | 1.9 |
+| DL-H | 14 | 0 | 2.01 |
+| never | 69 | 74 | 1.83 |
 
 ## Promotion candidates
-- Escapement family playbook for Appendix A (proposed in the PR, not in the standard yet): wheel found by simulation in the model (escape.ts: pushed forward at a limited speed, pushed back by the pallets); the pendulum or balance as the oscillating input, the drive swinging it through exactly the modelled range; the depth of engagement adjustable by an eccentric under the wheel axle (F7); stops beside the pendulum or banking pins (F5); beat marks (F9); oiled, hardened pallet faces (F8, M10).
-- The pallet contact as a joint type of its own (J7 is a cam with a roller follower); separate screwed or jewelled pallets as replaceable wear parts (M14).
-- A train torque source on the escape wheel (weight or spring barrel) is not modelled: the bench wheel is shown urged forward by its train (force overlay).
-- Oscillating drive for small swings: a lever long enough for a 2 mm crank (shared change in this PR, src/hardware/sub/drive.ts; every existing mechanism swings 34° or more and is unchanged).
+None yet.
 
 ## Verification
-check: clean · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.0 KB
-screenshots: plan, 28°, side, explode 28° and 70°, both sheets (local, looked at) · bench: written, no frame over target
+check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 15.4 KB
+screenshots: dist/shots3/anchor-escapement (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)
