@@ -71,6 +71,34 @@ the text of D8, K1, K3, A15, L6 and L7; their ids stay. The ids of the plan's de
 
 ---
 
+## The sixteen laws
+
+The standard in sixteen laws, numbered I to XVI. Every drawing in the library is drawn under all of them. A law names
+the sections and the requirement ids it groups; the requirements stay the rule, and audits, issues and commits go on
+citing their ids. Every requirement id falls under exactly one law, so a new requirement joins the range of its law
+(`tests/docs/laws.test.ts`).
+
+| Law | Rule | Sections | Requirements |
+|---|---|---|---|
+| I | **One procedure.** Every mechanism is made and kept by the conformance pass; the standard is versioned and each audit sheet records its pass. | 0, 1, 11 | S1 to S6 |
+| II | **The record is the source.** Facts, prose, tags and links come from the catalogue record v3, and the page reads them by id. | 2 | P1 to P13 |
+| III | **The kinematics are the truth.** Declared in `kin`, solved by the blocks, verified by the loop closure, and never changed by what is built round them. | 3 | K1 to K12 |
+| IV | **It teaches its principle.** Mechanics first: traces, overlays, views, controls and the time map chosen so the lesson reads, and the text matches the motion. | 3a | T1 to T9, T13 to T15 |
+| V | **The principle stays in sight.** What covers it is drawn see-through, supports move aside and are never removed, same-role parts differ by pattern, and depth order holds. | 3a | T10 to T12, T16, T17 |
+| VI | **One form language.** One element, one form, everywhere: shapes follow load, mounts are designed, the big parts stay plain. | 4 | D1 to D7 |
+| VII | **Parts are true solids.** A profile, an operation and a 3D frame; sound, and shipped by operation. | 4 | D8 to D11 |
+| VIII | **Built by the rules.** Every joint is built from its declared type by its kit; supports are routed and every axial position is set by the solver. | 5, 5.1, 5.2, 5b | A1 to A8, A18 to A22, J1 to J13 |
+| IX | **Every load has a path.** Double shear where the sweeps allow, stacks balanced, bearings clamped, hardware named, zero clashes, and it can be assembled and serviced. | 5.2 | A9 to A17 |
+| X | **Taken apart as it was built.** Nothing stretches; fasteners back out the way they went in, in reverse assembly order. | 5a | E1 to E10 |
+| XI | **Nothing is missing.** Every joint and part passes the ten functions; a detail is admitted only when it does a job and stays readable. | 6 | F1 to F10 |
+| XII | **Made, not modelled.** Edges broken, seats and undercuts cut, materials named, every thread locked: the evidence of manufacture. | 7 | M1 to M14 |
+| XIII | **Driven as it would be.** A standard prime mover by input kind, on one solid bracket, sensed and cabled. | 8 | V1 to V6 |
+| XIV | **One look, owned by the style.** Every look value is global: records carry none, roles carry it, one accent, and depth is right in every view. | 9 | L1 to L10 |
+| XV | **Light to load.** Reuse before drawing, small records and polishes, measured load and frame times, and detail scaled on the ladder, never the teaching. | 9a, 9b | R1 to R10, DL1 to DL6 |
+| XVI | **Proven before it is done.** Every check clean, the shots looked at, the audit judged and the mechanism at the current standard. | 10 | Q1 to Q8 |
+
+---
+
 ## 0. Versioning and conformance
 
 | Id | Requirement | Tier |

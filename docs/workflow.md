@@ -38,7 +38,14 @@ issues: those live in the standard, the style reference and the code.
 ## Versions
 
 - `version` in `package.json` is bumped in every PR that merges to main: pre-1.0, MINOR for features, PATCH for the
-  rest. The CHANGELOG gets a `## <x.y.z> — <date>` heading. The merge commit is tagged `v<version>`.
+  rest. The CHANGELOG gets a `## <x.y.z>, <codename> — <date>` heading. The merge commit is tagged `v<version>`.
+- The release step does the bump: `npm run release -- minor` (or `patch`). It writes the version into `package.json`
+  and the lock file, the CHANGELOG heading and `data/codenames.json`. Lines written under an `## Unreleased` heading
+  move under the new one; otherwise write them under it.
+- **Codenames.** Each minor release takes the next unused name of `data/release-names.json`, in file order; its
+  patches keep it. When the list runs out, it comes round again with a numeral (Graia II). Nobody picks a name by
+  hand. Releases from before the first codename keep their `## <x.y.z> — <date>` headings and have none. The footer
+  shows the codename next to the version.
 - The version is shown on the site (footer) once there is a site.
 
 ## Checks: local first
