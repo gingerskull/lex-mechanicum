@@ -246,8 +246,8 @@
     "teaching": {
       "review": {
         "verdict": "tweak",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #213. The text promises the figure eight, so the whole curve is drawn: a dashed workspace of M over the full assembly range (rocker -69.2° to 32.3°, both branches, switching at the toggles) behind the solid trace of the working ±24° swing. The two tip arcs are drawn so it reads why they cancel: A's arc and B's arc bend opposite ways."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review and #213. The text promises the figure eight, so the whole curve is drawn: a dashed workspace of M over the full assembly range (rocker -69.2° to 32.3°, both branches, switching at the toggles) behind the solid trace of the working ±24° swing. The two tip arcs are drawn so it reads why they cancel: A's arc and B's arc bend opposite ways. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. The dashed figure eight of M over both branches stands behind the solid trace of the working swing, and the arcs of A and B show why their bends cancel at M."
       },
       "principle": [
         {
@@ -742,8 +742,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep) and #213: the text now names the near-dwell the second loop gives. The output stays within 1° for 53° of crank turn at the lower end of its swing; equal-time ticks on D make the bunching visible, and the plot shows both rockers so the reshaping reads."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep) and #213: the text now names the near-dwell the second loop gives. The output stays within 1° for 53° of crank turn at the lower end of its swing; equal-time ticks on D make the bunching visible, and the plot shows both rockers so the reshaping reads. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The second rocker's near-dwell reads from the bunched equal-time ticks on D; the text states it."
       },
       "principle": [
         {
@@ -1294,8 +1294,8 @@
     "teaching": {
       "review": {
         "verdict": "tweak",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #213. The old proportions gave no dwell (a plain 54° rock), so the linkage is re-synthesised as the classic dwell six-bar: the coupler curve of P has a near-circular arc of radius 61.5 mm, the dyad PD is that radius long, and in the dwell D sits at the arc's centre, so the output stands within 1° for 90° of crank turn (within 0.5° for 78°) and then swings 69°. The crank grows from 20 to 30 mm. The dwell arc is drawn as construction, centred on D's rest position, and P carries equal-time ticks so the run along the arc reads."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review and #213. The old proportions gave no dwell (a plain 54° rock), so the linkage is re-synthesised as the classic dwell six-bar: the coupler curve of P has a near-circular arc of radius 61.5 mm, the dyad PD is that radius long, and in the dwell D sits at the arc's centre, so the output stands within 1° for 90° of crank turn (within 0.5° for 78°) and then swings 69°. The crank grows from 20 to 30 mm. The dwell arc is drawn as construction, centred on D's rest position, and P carries equal-time ticks so the run along the arc reads. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. P runs its arc about D's rest place while the output stands, then the output swings out and back; the ticks on P bunch along the arc. O6 and the output stand below the ground line on the same base."
       },
       "principle": [
         {
@@ -1736,8 +1736,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The crossed rockers and the midpoint's flat run read well; the ideal line y = 120 and the verticals through both pivots are drawn so the end points (directly above each pivot) read."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep). The crossed rockers and the midpoint's flat run read well; the ideal line y = 120 and the verticals through both pivots are drawn so the end points (directly above each pivot) read. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The crossed rockers lie in different planes (placement solver) and M runs along the line y = 120 from over O1 to over O2. The swing ends at 36.87°, where the far side reaches its toggle (rockerR upright over O2); the kin follows the closure back through that turn."
       },
       "principle": [
         {
@@ -2108,8 +2108,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep) and its text fixes: there is no dwell (the tip never stops), and the tip speed on the straight is steady only to about 21% of its mean (63% to 85% of the mean speed over the whole turn). Equal-time ticks on the tip and the speed plot show both the straight run and the fast return."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep) and its text fixes: there is no dwell (the tip never stops), and the tip speed on the straight is steady only to about 21% of its mean (63% to 85% of the mean speed over the whole turn). Equal-time ticks on the tip and the speed plot show both the straight run and the fast return. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The equal-time ticks on T show the straight run and the faster return arc; the text no longer claims a dwell."
       },
       "principle": [
         {
@@ -2492,8 +2492,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The apex sliding along the pivot line between the two rockers reads directly; the pivot line is drawn so the straightness is judged against it."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep). The apex sliding along the pivot line between the two rockers reads directly; the pivot line is drawn so the straightness is judged against it. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The apex P of the coupler plate runs along the pivot line between the two pivots."
       },
       "principle": [
         {
@@ -2834,8 +2834,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep) and its text fix: O2 is not at the middle of B's travel (y 44 to 92, middle 68) but level with the point y 60 where B's arc touches the line B would slide on; that placement keeps P within 1.4 mm of y = 0 (moving O2 up to the middle makes it worse). Both beam ends are traced so B's gentle arc reads against P's near line."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep) and its text fix: O2 is not at the middle of B's travel (y 44 to 92, middle 68) but level with the point y 60 where B's arc touches the line B would slide on; that placement keeps P within 1.4 mm of y = 0 (moving O2 up to the middle makes it worse). Both beam ends are traced so B's gentle arc reads against P's near line. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. P's near-straight run and the short swing of the swing link read at plan; the text about O2 is fixed."
       },
       "principle": [
         {
@@ -3438,8 +3438,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). C's circle through O and D's straight line are both traced, and the line O, C, D is drawn: the inversion (O, C and D in line, OC x OD constant) is the lesson."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep). C's circle through O and D's straight line are both traced, and the line O, C, D is drawn: the inversion (O, C and D in line, OC x OD constant) is the lesson. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. C on its circle through O and D on its straight line are both traced, with O, C and D drawn in line; the four bar levels come from the placement solver."
       },
       "principle": [
         {
@@ -3954,8 +3954,8 @@
     "teaching": {
       "review": {
         "verdict": "tweak",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #213. The swing is cut from ±80° to ±65°: at ±80° the bars close to within 8° of each other and flatten into a bundle, at ±65° they stay 21° or more apart. g's circle through A is traced as well as p's line, as for Peaucellier, and the line through the midpoints A, g and p is drawn. The hanger over CE is drawn see-through or moved off the bars."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review and #213. The swing is cut from ±80° to ±65°: at ±80° the bars close to within 8° of each other and flatten into a bundle, at ±65° they stay 21° or more apart. g's circle through A is traced as well as p's line, as for Peaucellier, and the line through the midpoints A, g and p is drawn. The hanger over CE is drawn see-through or moved off the bars. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. The swing is ±65°, so the bars no longer close into a bundle; p's line and g's circle are both traced. The hanger over A is routed by the support router and drawn see-through where it covers the bars."
       },
       "principle": [
         {
@@ -4325,8 +4325,8 @@
     "teaching": {
       "review": {
         "verdict": "tweak",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #213. The circle about M through O, B and P is drawn: it is why P stays on the y axis. The slide line and P's line are drawn at right angles through O, and motion.axes now says the input and output lines are perpendicular. The bridge over O is routed off the crank O-M."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review and #213. The circle about M through O, B and P is drawn: it is why P stays on the y axis. The slide line and P's line are drawn at right angles through O, and motion.axes now says the input and output lines are perpendicular. The bridge over O is routed off the crank O-M. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): tweak done. The bridge over O is routed away from the crank O-M, so the crank reads whole at both ends of the stroke. The slider runs on rails on the base (18 mm long, so it stops clear of O); the beam and the crank pass over it."
       },
       "principle": [
         {
@@ -4721,8 +4721,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The tracers are drawn bolder and the bar X-Y is drawn as an overlay: it is a fixed diameter of the small gear whose ends run on two lines at right angles, the trammel's rod. The build text now puts Y where the model has it: the opposite end of the diameter from X."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep). The tracers are drawn bolder and the bar X-Y is drawn as an overlay: it is a fixed diameter of the small gear whose ends run on two lines at right angles, the trammel's rod. The build text now puts Y where the model has it: the opposite end of the diameter from X. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The fixed ring is now built as its own body at the planet's height (the first v3 build had no ring, so the planet ran in nothing); X and Y run on their lines, and the bar X-Y is drawn as the diameter."
       },
       "principle": [
         {
@@ -5988,8 +5988,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep) and #213. The foot path is traced with equal-time ticks, so the slow flat stride and the quick lifted return read; the stance line is drawn under the flat part. Layers come from the placement solver, not a search."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep) and #213. The foot path is traced with equal-time ticks, so the slow flat stride and the quick lifted return read; the stance line is drawn under the flat part. Layers come from the placement solver, not a search. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The foot's flat stride and its lift read from the ticked trace; the placement solver stacks the bars with no hand layers."
       },
       "principle": [
         {
@@ -6493,8 +6493,8 @@
     "teaching": {
       "review": {
         "verdict": "keep",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (keep). The foot path is traced with equal-time ticks: a near-flat stance (within 3 mm for about 105° of crank, roughly a third of the turn) and a high, quick return. The stance line is drawn under it."
+        "date": "2026-10-22",
+        "note": "Applies the 2026-10-19 review (keep). The foot path is traced with equal-time ticks: a near-flat stance (within 3 mm for about 105° of crank, roughly a third of the turn) and a high, quick return. The stance line is drawn under it. Reviewed again on the finished v3 build (R2, six phases, PLAN and an angled view): keep. The stance and the return arc read from the ticked foot trace."
       },
       "principle": [
         {
