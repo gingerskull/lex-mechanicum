@@ -287,6 +287,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `ring-hub` | J3, F2 |
 | `eccentric` | J3, F2, F8, M14 |
 | `die` | J4, M14 |
+| `hub` | J1, F1, F2, M14 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
 | `j12-flexible` | J12, J8, A11, F2, F3, F6, F7, F8, F10 |

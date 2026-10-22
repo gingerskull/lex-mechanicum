@@ -301,6 +301,8 @@ export const DRAFT = {
     grid: { width: 1, alpha: 0.14, dash: [2, 3] as const }, // px, 0..1, px
     labelAlpha: 0.5, // 0..1, axis tick labels
     curve: { width: 1.6, alpha: 0.95 }, // px, 0..1, ink
+    ghost: { width: 1, alpha: 0.45, dash: [3, 3] as const }, // px, 0..1, px: the same output at the settings not selected
+    second: { width: 1.2, alpha: 0.7, dash: [7, 3] as const }, // px, 0..1, px: a further output in the same unit
     hatch: { pitch: 5, width: 0.7, alpha: 0.18 }, // px, px, 0..1, hatching under the curve
     cursorAlpha: 0.6, // 0..1, accent cursor line
     pointR: 4, // px, current point in accent

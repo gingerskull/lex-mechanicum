@@ -28,7 +28,7 @@ describe("joint kits", () => {
     J1: "four-bar", J2: "four-bar", J3: "four-bar", J4: "kin:geneva", J5: "kin:sliderCrank", J6: "kin:gearPair", J7: "kin:camFollower",
     J8: "kin:beltDrive", J9: "kin:crossedMesh", J10: "kin:universalJoint", J11: "kin:leadScrew", J12: "kin:chainDrive", J13: "kin:flexureHinge",
     pallet: "kin:escapement", "fork-pin": "kin:fork", "pawl-tooth": "kin:ratchet", "pin-lobe": "kin:pinLobe", "tongue-slot": "kin:tongueSlot",
-    "ring-hub": "kin:ringHub", "ring-rollers": "kin:ringRollers", "strap-sheave": "kin:rope", "groove-cam": "kin:grooveCam", "cross-pin": "universal-joint", trunnion: "oscillating-cylinder", "piston-bore": "oscillating-cylinder", eccentric: "eccentric-sheave", die: "walschaerts-valve-gear",
+    "ring-hub": "kin:ringHub", "ring-rollers": "kin:ringRollers", "strap-sheave": "kin:rope", "groove-cam": "kin:grooveCam", "cross-pin": "universal-joint", trunnion: "oscillating-cylinder", "piston-bore": "oscillating-cylinder", eccentric: "eccentric-sheave", die: "walschaerts-valve-gear", hub: "whitworth",
   };
   for (const id of KIT_IDS) {
     it(`${id}: builds its joint, with an axis, a zone and a note`, async () => {

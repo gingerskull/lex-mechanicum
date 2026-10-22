@@ -11,7 +11,7 @@ import { v3, xf, type Xf } from "../kin/math";
 import type { Kin } from "../kin/types";
 import { HEADROOM, LATERAL, PITCH, SLAB_GAP, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
-import { pointDist, ringDist } from "./planar";
+import { edgeDist, inside, pointDist, ringDist } from "./planar";
 import type { BodyGeom } from "./shapes";
 import type { JointInfo, Site } from "./sites";
 
@@ -116,7 +116,9 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
     for (const j of joints) {
       const t = j.joint.type;
-      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || j.kit === "eccentric";
+      // (a sheave in its strap, and a block that slides in a moving part's slot, run in that part's plane)
+      const inSlot = t === "prismatic" && j.kit === "J5" && j.a !== "ground" && j.b !== "ground";
+      const planar = t === "gear-mesh" || t === "rolling" || t === "belt" || t === "cam-contact" || j.kit === "eccentric" || inSlot;
       if (!planar || !parent.has(j.a) || !parent.has(j.b)) continue;
       if (j.joint.crossed) continue;
       contact.add(pairKey(j.a, j.b));
@@ -133,12 +135,14 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     const N = nodeIds.length;
     const idx = new Map(nodeIds.map((r, i) => [r, i]));
 
-    // outlines per sample
+    // outlines per sample, and the holes of those that have them
     const rings = new Map<string, Vec2[][]>();
+    const holeRings = new Map<string, Vec2[][][]>();
     for (const id of fid) {
       const g = geoms.get(id)!;
       const xs = sampled.xfs.get(id) ?? [];
       rings.set(id, sampleIdx.map((i) => outlineAt(g, xs[i] ?? xf.id(), fam)));
+      if (g.profile.holes.length) holeRings.set(id, sampleIdx.map((i) => g.profile.holes.map((h) => outlineAt({ ...g, plan: h }, xs[i] ?? xf.id(), fam))));
     }
 
     // clash graph between nodes
@@ -193,7 +197,9 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
           const carrier = s.bodies[0];
           const X = s.fixed || !carrier ? xf.id() : (sampled.xfs.get(carrier)?.[i] ?? xf.id());
           const p = planeCoords(fam, xf.apply(X, s.at)).uv;
-          if (pointDist(rings.get(id)![i]!, p[0], p[1]) < HEAD_R + LATERAL) {
+          // a pin that stands inside a part's bore (a fixed hub's pivot inside a gear turning on the hub) is not passed
+          const inBore = holeRings.get(id)?.[i]?.some((h) => inside(h, p[0], p[1]) && edgeDist(h, p[0], p[1]) >= HEAD_R + LATERAL);
+          if (!inBore && pointDist(rings.get(id)![i]!, p[0], p[1]) < HEAD_R + LATERAL) {
             passers.add(n);
             break;
           }
@@ -398,8 +404,6 @@ interface ClevisPick {
  * pair, and puts no passer inside either pin stack.
  */
 function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][], H: number, nodeIds: string[], nodes: Map<string, Node>, above: [number, number][] = []): ClevisPick[] {
-  void nodeIds;
-  void nodes;
   const picks: ClevisPick[] = [];
   const twinned = new Set<number>();
   for (const c of cs) {
@@ -407,6 +411,8 @@ function clevisPicks(assign: number[], cs: SiteConstraint[], clash: boolean[][],
     const [m0, m1] = c.members as [number, number];
     for (const [host, twin] of [[m0, m1], [m1, m0]] as const) {
       if (twinned.has(twin) || Math.abs(assign[host]! - assign[twin]!) !== 1) continue;
+      // parts that run together in one plane (a mesh, a block in a slot) are never doubled
+      if ((nodes.get(nodeIds[twin]!)?.ids.length ?? 1) > 1) continue;
       const t = 2 * assign[host]! - assign[twin]!;
       if (t < 0 || t >= H) continue;
       // nothing already there meets the twin

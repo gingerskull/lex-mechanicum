@@ -528,6 +528,12 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.plot.labelAlpha` | 0.5 | 0..1, axis tick labels |
 | `draft.plot.curve.width` | 1.6 | px, 0..1, ink |
 | `draft.plot.curve.alpha` | 0.95 | px, 0..1, ink |
+| `draft.plot.ghost.width` | 1 | px, 0..1, px: the same output at the settings not selected |
+| `draft.plot.ghost.alpha` | 0.45 | px, 0..1, px: the same output at the settings not selected |
+| `draft.plot.ghost.dash` | [3, 3] | px, 0..1, px: the same output at the settings not selected |
+| `draft.plot.second.width` | 1.2 | px, 0..1, px: a further output in the same unit |
+| `draft.plot.second.alpha` | 0.7 | px, 0..1, px: a further output in the same unit |
+| `draft.plot.second.dash` | [7, 3] | px, 0..1, px: a further output in the same unit |
 | `draft.plot.hatch.pitch` | 5 | px, px, 0..1, hatching under the curve |
 | `draft.plot.hatch.width` | 0.7 | px, px, 0..1, hatching under the curve |
 | `draft.plot.hatch.alpha` | 0.18 | px, px, 0..1, hatching under the curve |

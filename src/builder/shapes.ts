@@ -204,19 +204,25 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const frame = F ? xfFrame(F) : frameAlong(originOf(b, S, js.map((j) => j.at)), canon(axis), [1, 0, 0]);
     const pins = js.map((j) => ({ joint: j.joint.id, ...(({ uv, w }) => ({ uv, w }))(planeCoords(frame, j.at)) }));
     const shape = (b.shape ?? {}) as Record<string, unknown>;
-    const g = outlineOf(shape, b.role, pins.map((p) => p.uv));
-    // a slider"s block lies along its slide: its length on the prismatic joint"s axis, whatever the body"s frame
+    const g: ReturnType<typeof outlineOf> & { plan?: Vec2[] } = outlineOf(shape, b.role, pins.map((p) => p.uv));
+    // a slider's block lies along its slide: its length on the prismatic joint's axis, whatever the body's frame
     const slide = String(shape.type) === "slider" ? js.find((j) => j.joint.type === "prismatic") : undefined;
     if (slide) {
       const d = planeCoords(frame, v3.add(frame.o, slide.axis)).uv;
       const o = planeCoords(frame, frame.o).uv;
       const ang = Math.atan2(d[1] - o[1], d[0] - o[0]);
       if (Math.abs(Math.sin(ang)) > 1e-6) g.profile = { outer: rot(g.profile.outer, ang), holes: g.profile.holes.map((h) => rot(h, ang)) };
+      // on ground ways its rails, risers and keeper stand 13 mm out either side of it: the placer keeps that room
+      if (slide.joint.a === "ground" || slide.joint.b === "ground") {
+        const L = num(shape.length, 36);
+        const W = num(shape.width, 20);
+        g.plan = rot(roundRect(-L / 2, -W / 2 - 13, L / 2, W / 2 + 13, 2), ang);
+      }
     }
     // a body no joint reaches stands at its own frame, unless it is placed at another body's level
     const lv = shape.level as BodyGeom["level"] | undefined;
     const fixed = !js.length && !!F && !lv;
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.upper ? { upper: g.upper } : {}), ...(lv ? { level: lv } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.upper ? { upper: g.upper } : {}), ...(lv ? { level: lv } : {}), ...(g.plan ? { plan: g.plan } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.exact || fixed ? { exact: { offset: 0 } } : {}) };
     out.set(b.id, universal(kin, S, b, geom) ?? cylinder(b, geom) ?? geom);
   }
   phaseMeshes(kin, S, out);

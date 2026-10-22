@@ -25094,14 +25094,7 @@
                 20,
                 -20
               ],
-              "z": -8,
-              "hub": {
-                "center": [
-                  0,
-                  0
-                ],
-                "radius": 24
-              }
+              "z": -8
             },
             "at": {
               "frame": {
@@ -25135,8 +25128,8 @@
               "z": 50,
               "module": 2,
               "face": 10,
-              "bore": 26,
-              "crankPin": 40
+              "bore": 64,
+              "note": "the bull gear turns on the fixed hub (bore 64 round the 60 hub and its liner); the crank pin A at 40"
             },
             "at": {
               "joint": "O2"
@@ -25147,8 +25140,9 @@
             "role": "slider",
             "shape": {
               "type": "slider",
-              "length": 22,
-              "width": 14
+              "length": 14,
+              "width": 14,
+              "note": "a square die block, short enough to run to 20 mm from O3 in the lever slot clear of the pivot bearing"
             },
             "at": {
               "joint": "A"
@@ -25259,7 +25253,9 @@
               0,
               0,
               1
-            ]
+            ],
+            "radius": 30,
+            "note": "the bull gear turns on a fixed hub of radius 30 about O2; the lever pivot O3 stands on the hub, 20 from O2"
           },
           {
             "id": "A",
