@@ -629,8 +629,9 @@ const escapeCache = new Map<string, ReturnType<typeof simulateEscape>>();
  * in: input (the pallets' angle, deg), lo, hi, default, wheel (body), wheelJoint, palletJoint, plane ("xz" or "xy": the
  * escapement's plane, its 2D axes), sense (+1: the wheel goes forward counter-clockwise in the plane), the wheel's teeth
  * (n, tip, root, lead and back: the tip's two roots, deg from the tip, positive ahead), tip0 (deg), pallets (outlines,
- * [u, v] in the plane relative to the arbor at the reference). out {advance, recoil}: the wheel's turn since the cycle's
- * start and the recoil of the current beat (deg).
+ * [u, v] in the plane relative to the arbor at the reference); `fork` (a balance driving a lever: see below) with
+ * `pallets_body` (the lever) and `rate` (a speed limit on the wheel). out {advance, recoil, pallet}: the wheel's turn
+ * since the cycle's start, the recoil of the current beat, the lever's angle (deg).
  */
 const escapeBlock: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -644,8 +645,14 @@ const escapeBlock: BlockFn = (c, s) => {
   const tip0 = c.num(i.tip0 ?? 0);
   const wc = P2(E);
   const wheel: [number, number][] = [];
+  // a tooth: the record's polygon (in the wheel's plane, its tip at angle 0), else a pointed tip with its two roots
+  const tooth = i.tooth as number[][] | undefined;
   for (let k = 0; k < n; k++) {
     const a = (tip0 + (360 / n) * k) * D;
+    if (tooth) {
+      for (const q of tooth) wheel.push([wc[0] + q[0]! * Math.cos(a) - q[1]! * Math.sin(a), wc[1] + q[0]! * Math.sin(a) + q[1]! * Math.cos(a)]);
+      continue;
+    }
     for (const [r, b] of [[c.num(i.root), a + c.num(i.lead) * D], [c.num(i.tip), a], [c.num(i.root), a + c.num(i.back) * D]] as const) wheel.push([wc[0] + r * Math.cos(b), wc[1] + r * Math.sin(b)]);
   }
   const ac = P2(A);
@@ -655,11 +662,28 @@ const escapeBlock: BlockFn = (c, s) => {
   const def = c.num(i.default ?? 0);
   const sense = (c.num(i.sense ?? 1) >= 0 ? 1 : -1) as 1 | -1;
   const spec = { wheel, wc, pallets, ac, n, sense };
-  const key = JSON.stringify([spec, lo, hi, def]);
+  // the pallets' angle (rad, from the reference) at cycle phase u: the driver's own swing, or, with a `fork` (a lever's
+  // fork on a balance's impulse pin: { joint (the balance's), roller, reach (lever pivot to fork), window (deg) }), the
+  // lever following the pin while the balance is within the window and resting on its banking outside it
+  const fork = i.fork as Record<string, unknown> | undefined;
+  const swing = (u: number) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D;
+  let palletAt = swing;
+  if (fork) {
+    const rr = c.num(fork.roller);
+    const reach = c.num(fork.reach);
+    const win = c.num(fork.window) * D;
+    const follow = (t: number) => Math.atan2(-rr * Math.sin(t), reach + rr - rr * Math.cos(t));
+    const bank = Math.abs(follow(win));
+    palletAt = (u) => {
+      const t = swing(u);
+      return Math.abs(t) < win ? follow(t) : -Math.sign(t) * bank;
+    };
+  }
+  const rate = i.rate !== undefined ? c.num(i.rate) : Infinity;
+  const key = JSON.stringify([spec, lo, hi, def, fork ?? null, rate]);
   let sim = escapeCache.get(key);
   if (!sim) {
-    // the pallets' angle relative to the reference, as the oscillating driver runs (deg → rad)
-    sim = simulateEscape(spec, (u) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D);
+    sim = simulateEscape(spec, palletAt, 1440, rate);
     escapeCache.set(key, sim);
   }
   const N = sim.wheel.length - 1;
@@ -675,6 +699,11 @@ const escapeBlock: BlockFn = (c, s) => {
   const d = c.delta("wheel", w);
   // the wheel's axis: its plane's normal, the sense of the 2D turn (xz: about −y; xy: about +z)
   spin(c, str(i.wheel, "escape.wheel"), E, plane === "xz" ? [0, -1, 0] : [0, 0, 1], sense * d);
+  if (fork && typeof i.pallets_body === "string") {
+    // the lever, moved by the fork (its arbor is not driven)
+    spin(c, i.pallets_body, A, plane === "xz" ? [0, -1, 0] : [0, 0, 1], palletAt(u) - palletAt(uRef));
+    outVal(c, s, palletAt(u) * R2D, "pallet");
+  }
   outVal(c, s, (w - sim.wheel[0]!) * R2D, "advance");
   outVal(c, s, sim.recoil[k]! * R2D, "recoil");
 };

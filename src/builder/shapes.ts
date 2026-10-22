@@ -159,6 +159,10 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
       const outer: Vec2[] = [];
       for (let k = 0; k < n; k++) {
         const a = (num(shape.tip0, 0) + (360 / n) * k) * D2R;
+        if (Array.isArray(shape.tooth)) {
+          for (const q of shape.tooth as number[][]) outer.push([q[0]! * Math.cos(a) - q[1]! * Math.sin(a), q[0]! * Math.sin(a) + q[1]! * Math.cos(a)]);
+          continue;
+        }
         for (const [r, b] of [[num(shape.root, 40), a + num(shape.lead, 1) * D2R], [num(shape.tip, 50), a], [num(shape.root, 40), a + num(shape.back, 8) * D2R]] as const) outer.push([r * Math.cos(b), r * Math.sin(b)]);
       }
       const ring = area(outer) < 0 ? outer.reverse() : outer;

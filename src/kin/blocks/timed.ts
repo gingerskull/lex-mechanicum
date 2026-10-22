@@ -358,7 +358,31 @@ export function overlapDepth(a: [number, number][], b: [number, number][]): numb
   let d = 0;
   for (const [x, y] of a) d = Math.max(d, -polyDist(b, x, y));
   for (const [x, y] of b) d = Math.max(d, -polyDist(a, x, y));
+  // two edges that cross with no vertex inside the other (a short tooth tip through a stone) overlap all the same
+  if (d === 0 && edgesCross(a, b)) d = 1;
   return d;
+}
+
+/** True when an edge of a crosses an edge of b (boxes first). */
+function edgesCross(a: [number, number][], b: [number, number][]): boolean {
+  const bx0 = Math.min(...b.map((p) => p[0])), bx1 = Math.max(...b.map((p) => p[0]));
+  const by0 = Math.min(...b.map((p) => p[1])), by1 = Math.max(...b.map((p) => p[1]));
+  const cr = (o: [number, number], p: [number, number], q: [number, number]) => (p[0] - o[0]) * (q[1] - o[1]) - (p[1] - o[1]) * (q[0] - o[0]);
+  for (let i = 0; i < a.length; i++) {
+    const p = a[i]!;
+    const q = a[(i + 1) % a.length]!;
+    if (Math.max(p[0], q[0]) < bx0 || Math.min(p[0], q[0]) > bx1 || Math.max(p[1], q[1]) < by0 || Math.min(p[1], q[1]) > by1) continue;
+    for (let j = 0; j < b.length; j++) {
+      const r = b[j]!;
+      const t = b[(j + 1) % b.length]!;
+      const d1 = cr(r, t, p);
+      const d2 = cr(r, t, q);
+      const d3 = cr(p, q, r);
+      const d4 = cr(p, q, t);
+      if (d1 * d2 < -1e-12 && d3 * d4 < -1e-12) return true;
+    }
+  }
+  return false;
 }
 
 export interface EscapeGeometry {
@@ -377,16 +401,18 @@ export interface EscapeGeometry {
 /**
  * A geometric escapement, time-stepped: the pallets swing as `pallet(u)` (radians about the arbor, u the cycle phase);
  * the wheel is urged forward by its train and goes forward until a tooth meets a pallet (an instant drop), and is pushed
- * back where a pallet moves into a tooth (the recoil). Run until periodic; returns the wheel's angle (radians, forward
+ * back where a pallet moves into a tooth (the recoil); with a `rate` (radians of wheel per radian of cycle) the wheel's
+ * speed is limited (a lever's wheel must not race past both stones while the lever flips). Run until periodic; returns the wheel's angle (radians, forward
  * positive) over one cycle in `steps` samples, its advance per cycle, and the recoil of the beat each sample lies in.
  */
-export function simulateEscape(g: EscapeGeometry, pallet: (u: number) => number, steps = 1440): { wheel: Float64Array; recoil: Float64Array; advance: number; beats: number[]; recoils: number[] } {
+export function simulateEscape(g: EscapeGeometry, pallet: (u: number) => number, steps = 1440, rate = Infinity): { wheel: Float64Array; recoil: Float64Array; advance: number; beats: number[]; recoils: number[] } {
   const pitch = TAU / g.n;
   const tol = 1e-4;
   const free = (w: number, p: number) => {
     const wp = turnPoly(g.wheel, g.wc, g.sense * w);
     return g.pallets.every((pl) => overlapDepth(wp, turnPoly(pl, g.ac, p)) <= tol);
   };
+  const cap = (rate * TAU) / steps;
   const settle = (w: number, p: number): number => {
     if (!free(w, p)) {
       // a pallet moved into a tooth: back the wheel off until it is clear (recoil)
@@ -403,10 +429,11 @@ export function simulateEscape(g: EscapeGeometry, pallet: (u: number) => number,
     }
     // urged forward: on until a tooth meets a pallet (the drop is instant)
     let lo = w;
-    let hi = w + 0.002;
+    let hi = w + Math.min(0.002, cap);
     let k = 0;
     while (free(hi, p) && k++ < 2 * pitch / 0.002) {
       lo = hi;
+      if (hi - w >= cap) return Math.min(hi, w + cap);
       hi += 0.002;
     }
     for (let i = 0; i < 40; i++) {
