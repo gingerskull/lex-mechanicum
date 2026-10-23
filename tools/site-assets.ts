@@ -1,7 +1,7 @@
 // Part of prebuild: everything the static site serves that is generated, written into site/public (git-ignored).
 // - fonts/: the IBM Plex faces of tokens.css, latin subset, from the @fontsource packages (SF7, self-hosted);
 // - packages/<id>.mx2 and meta/<id>.json: every mechanism's package v2 (R4) and its record's name, teaching and kin
-//   blocks; a package conformance built from the same sources is read from the cache (src/package/built.ts), the
+//   blocks and Imperial origin date (tools/meta.ts); a package conformance built from the same sources is read from the cache (src/package/built.ts), the
 //   others are built in a pool of processes (tools/pool.ts);
 // - thumbs/<id>-<theme>.webp and -still.webp: the card drawings and the stage's still, committed in site/thumbs (R8, SS1); their fingerprints are checked
 //   first, and a stale one fails the build with the command to run. Nothing is drawn here.
@@ -15,6 +15,7 @@ import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
 import { builtBytes } from "../src/package/built";
 import { copyBrand } from "./brand";
+import { metaOf } from "./meta";
 import { runPool } from "./pool";
 import { checkThumbs, imagesOf, THUMBS_DIR } from "./thumbs";
 import { FONT_FILES } from "./tokens-css";
@@ -41,8 +42,8 @@ export async function siteAssets(ids = allIds()): Promise<void> {
     const v2 = bytes[i]!;
     packages.set(id, v2);
     writeFileSync(join(pub, "packages", `${id}.mx2`), v2);
-    const rec = recordById(id) as unknown as { name?: string; kin?: unknown; teaching?: unknown } | undefined;
-    writeFileSync(join(pub, "meta", `${id}.json`), JSON.stringify({ name: rec?.name ?? id, teaching: rec?.teaching ?? null, kin: rec?.kin ?? null }));
+    const rec = recordById(id);
+    writeFileSync(join(pub, "meta", `${id}.json`), JSON.stringify(metaOf(id, rec)));
   }
   await checkThumbs(ids, packages);
   mkdirSync(join(pub, "thumbs"), { recursive: true });

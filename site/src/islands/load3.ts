@@ -3,11 +3,13 @@
 import { url } from "../url";
 type Engine = typeof import("./engine3");
 
-/** What the page ships beside the package: the record's name, teaching and kin blocks (tools: site-assets). */
+/** What the page ships beside the package: the record's name, teaching and kin blocks, and its origin as an Imperial date
+ * (tools/meta.ts). */
 export interface Meta {
   name: string;
   teaching: import("../../../src/catalog/kin").Teaching | null;
   kin: import("../../../src/catalog/kin").Kin | null;
+  date?: string;
 }
 
 export interface Loaded {
@@ -66,7 +68,7 @@ export async function load3(E: Engine, id: string, f: ReturnType<typeof fetchAll
     poser,
     teaching: meta.teaching,
     axes,
-    info: { title, no },
+    info: { title, no, ...(meta.date ? { date: meta.date } : {}) },
   };
   return { scene, meta, kinematics, setupMs: s.wall };
 }

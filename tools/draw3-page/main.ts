@@ -17,11 +17,12 @@ import { parseView, viewsOf, type ViewState } from "../../src/render/v3/views";
 import { setupInline } from "../../src/solids/setup";
 import type { Vec3 } from "../../src/solids/types";
 
-/** What the server sends besides the package: the record's blocks and its name. */
+/** What the server sends besides the package: the record's blocks, its name and its origin as an Imperial date. */
 export interface Meta {
   name: string;
   teaching: Teaching | null;
   kin: Kin | null;
+  date?: string;
 }
 
 /** One drawing: canvas size in CSS px, pixel ratio, phase, and the view over the record's own. */
@@ -77,7 +78,7 @@ async function load(id: string): Promise<Loaded> {
     const setupMs = performance.now() - t0;
     const axes: Record<string, Vec3> = {};
     for (const j of meta.kin?.joints ?? []) if (Array.isArray(j.axis) && j.axis.length >= 3) axes[j.id] = [j.axis[0] as number, j.axis[1] as number, j.axis[2] as number];
-    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, id, lifts: s.pkg.lifts }), teaching: meta.teaching, axes, ...(id === "fx3-ghost" ? { items: ghostItems } : {}), info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
+    const scene: Scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser: poserFor({ meta, id, lifts: s.pkg.lifts }), teaching: meta.teaching, axes, ...(id === "fx3-ghost" ? { items: ghostItems } : {}), info: { title: meta.name, no: `ST-${id.toUpperCase()}`, ...(meta.date ? { date: meta.date } : {}) } };
     return { scene, meta, setupMs };
   })();
   cache.set(id, p);

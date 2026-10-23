@@ -13,16 +13,16 @@ export const VERSION = pkg.version;
 export interface Sheet {
   id: string;
   no: string;
-  /** The sheet number as a number: 1 for MX-01. */
+  /** The sheet number as a number: 1 for ST-01. */
   n: number;
   rec: CatalogRecord;
 }
 
-/** Registered mechanisms in catalogue order (family, level, name), numbered MX-01, MX-02 ... */
+/** Registered mechanisms in catalogue order (family, level, name), numbered ST-01, ST-02 ... */
 const KNOWN = new Set(allIds());
 export const SHEETS: Sheet[] = loadCatalog()
   .mechanisms.filter((r) => KNOWN.has(r.id))
-  .map((rec, i) => ({ id: rec.id, no: `MX-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec }));
+  .map((rec, i) => ({ id: rec.id, no: `ST-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec }));
 
 export const sheetOf = (id: string) => SHEETS.find((s) => s.id === id)!;
 

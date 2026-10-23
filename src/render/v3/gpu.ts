@@ -242,6 +242,8 @@ export interface PassInput {
   clip: [number, number, number, number] | null;
   /** The mark kinds drawn, as a bit mask over MARK_KINDS index + 1. */
   markMask: number;
+  /** The input ring's strength, 0..1 (it breathes while the drawing is paused); 1 when absent. */
+  ring?: number;
 }
 
 const unit = (c: readonly number[]) => [c[0]! / 255, c[1]! / 255, c[2]! / 255];
@@ -420,6 +422,7 @@ export class Geometry {
     gl.uniform1f(ul.uDpr!, p.dpr);
     gl.uniform1f(ul.uHidden!, p.hidden ? 1 : 0);
     gl.uniform1i(ul.uMarkMask!, p.markMask);
+    gl.uniform1f(ul.uRing!, p.ring ?? 1);
     const mk = new Float32Array(32);
     MARK_KINDS.forEach((kind, i) => {
       const [w, a] = kind === "chamfer" ? [L.chamfer, L.chamferAlpha] : kind === "thread" ? [L.thread, L.threadAlpha] : [L.marks, L.marksAlpha];

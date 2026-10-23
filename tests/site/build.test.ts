@@ -129,6 +129,31 @@ describe("site build", () => {
     }
   });
 
+  it("numbers the sheets in set ST and finds a sheet by its number", () => {
+    const lib = read("index.html");
+    expect(lib).toContain("<div><i>Set</i><b>ST</b></div>");
+    expect(lib).not.toMatch(/MX-\d/);
+    const nos = [...lib.matchAll(/<span class="no">(ST-\d{2})<\/span>/g)].map((m) => m[1]);
+    expect(nos).toHaveLength(allIds().length);
+    for (const m of lib.matchAll(/<a class="card"[^>]*data-text="([^"]*)"/g)) expect(m[1]).toMatch(/^st-\d{2} /);
+    const page = read(join("mechanisms", allIds()[0]!, "index.html"));
+    expect(page).toMatch(/<div class="meta"><b>ST-\d{2}<\/b>/);
+  });
+
+  it("builds every Recovered badge hidden, with the sheet's added date for the browser to decide on", () => {
+    const lib = read("index.html");
+    const badges = [...lib.matchAll(/<span class="recovered" data-recovered="(\d{4}-\d{2}-\d{2})" hidden>Recovered<\/span>/g)];
+    expect(badges).toHaveLength(allIds().length);
+    for (const id of allIds()) expect(read(join("mechanisms", id, "index.html")), id).toMatch(/<span class="recovered" data-recovered="\d{4}-\d{2}-\d{2}" hidden>Recovered<\/span>/);
+  });
+
+  it("ships each mechanism's origin as an Imperial date for the title block", () => {
+    for (const id of allIds()) {
+      const meta = JSON.parse(read(join("meta", `${id}.json`))) as { date?: string };
+      expect(meta.date, id).toMatch(/^\d{3}\.\d{3}\.M-?\d+$/);
+    }
+  });
+
   it("shows the release line in the footer: the laws, the codename once the release has one, the version", () => {
     const html = read("index.html");
     const version: string = JSON.parse(readFileSync("package.json", "utf8")).version;

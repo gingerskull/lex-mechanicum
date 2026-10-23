@@ -179,6 +179,8 @@ async function main(box: HTMLElement) {
     rung: 0,
     slow: 0,
     fast: 0,
+    /** The input ring's strength: it breathes while paused (LM-06), never while playing or under reduced motion. */
+    ring: 1,
   };
   /** Frames are drawn at the coarsest dial until the page is idle (R9). */
   let warm = true;
@@ -195,6 +197,7 @@ async function main(box: HTMLElement) {
       sheet: true,
       dims: true,
       show: { traces: s.show.paths, ghosts: s.show.paths, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
+      ring: s.ring,
     });
 
   // the output plot
@@ -239,6 +242,8 @@ async function main(box: HTMLElement) {
     dirty = true;
   };
   let note = 0;
+  /** How long the last frame took, ms. */
+  let lastMs = 0;
   const draw = () => {
     const t0 = performance.now();
     try {
@@ -259,6 +264,7 @@ async function main(box: HTMLElement) {
     }
     good = JSON.parse(JSON.stringify(ctl));
     const ms = performance.now() - t0;
+    lastMs = ms;
     if (plot && series) E.drawPlot(plot, E.theme(E.pageTheme()), series.data, s.u, series.unit, series.more);
     if (!warm && s.auto && s.playing && autoStep(s, ms, sess.stats?.gpuLagMs ?? 0, LADDER.length - 1)) showDial();
     const deg = Math.round((((s.u % TAU) + TAU) % TAU) / TAU * 360) % 360;
@@ -284,6 +290,12 @@ async function main(box: HTMLElement) {
   }).observe(canvas);
 
   let last = performance.now();
+  // the paused ring's breath: a redraw of its own a few times a second, from the moment of the pause; a device that
+  // cannot draw a frame in that time lets the ring rest at full strength until the next pause
+  const breathe = E.DRAFT.lines.accentRing.breathe;
+  let pausedAt = performance.now();
+  let breathAt = 0;
+  let breathless = false;
   const tick = (now: number) => {
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
@@ -291,6 +303,13 @@ async function main(box: HTMLElement) {
       // playback runs on the time map (SD27): the phase is a function of the playback fraction
       s.t = (s.t + (dt * s.speed) / CYCLE) % 1;
       s.u = tm.uOf(s.t);
+      dirty = true;
+    } else if (!reduced && !breathless && inView && now - breathAt >= 1000 / breathe.fps) {
+      if (breathAt > pausedAt && lastMs > 1000 / breathe.fps) {
+        breathless = true;
+        s.ring = 1;
+      } else s.ring = E.ringBreath((now - pausedAt) / 1000);
+      breathAt = now;
       dirty = true;
     }
     if (ctlDirty) applyControls();
@@ -301,6 +320,11 @@ async function main(box: HTMLElement) {
   // transport
   const play = $<HTMLButtonElement>("play");
   const setPlaying = (v: boolean) => {
+    if (v) s.ring = 1;
+    else if (s.playing) {
+      pausedAt = performance.now();
+      breathless = false;
+    }
     s.playing = v;
     play.setAttribute("aria-pressed", String(v));
     play.setAttribute("aria-label", v ? "Pause" : "Play");

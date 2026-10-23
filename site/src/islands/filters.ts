@@ -1,8 +1,8 @@
 // Search, facets and order on the library (SS3): any chip of a facet matches (or), every facet must match (and), the
-// search matches name, other names, summary, tags and keywords, and the cards are sorted in the order picked from the
-// Sort menu, which stays as filters change. All data is on the cards; nothing is fetched. The filters, search and order
-// live in the page's URL as they change, and the state is kept for the tab when the page is left, so a mechanism page's
-// "Back to library" brings the library back as it was and its Previous and Next follow what it shows.
+// search matches sheet number, name, other names, summary, tags and keywords, and the cards are sorted in the order
+// picked from the Sort menu, which stays as filters change. All data is on the cards; nothing is fetched. The filters,
+// search and order live in the page's URL as they change, and the state is kept for the tab when the page is left, so a
+// mechanism page's "Back to library" brings the library back as it was and its Previous and Next follow what it shows.
 import { readLibrary, saveLibrary, takeReturn } from "../library";
 import { DEFAULT_ORDER, orderFrom, sortBy, type Order, type Sortable } from "../sort";
 import { sortMenu } from "./sortmenu";
@@ -53,7 +53,8 @@ function apply() {
     if (!byFacet.has(f)) byFacet.set(f, new Set());
     byFacet.get(f)!.add(c.dataset.v!);
   }
-  const words = (q?.value ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+  // a sheet number of the old set code (MX-07) finds the sheet it is now (ST-07)
+  const words = (q?.value ?? "").toLowerCase().split(/\s+/).filter(Boolean).map((w) => w.replace(/^mx-/, "st-"));
   let n = 0;
   for (const card of cards) {
     const facets = [...byFacet].every(([f, vals]) => (card.dataset[f] ?? "").split("|").some((v) => vals.has(v)));

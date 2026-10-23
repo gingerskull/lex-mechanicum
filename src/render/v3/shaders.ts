@@ -308,6 +308,7 @@ uniform sampler2D uD0t, uD1t, uD2t, uD3t, uM0, uM1, uM2, uM3;
 uniform int uK;
 uniform vec3 uInk, uAccent;
 uniform float uDash0, uDash1, uEps, uEpsOwn, uHidden;
+uniform float uRing; // the input ring's strength, 0..1
 uniform vec4 uClip;
 in vec2 vCap;
 in float vDist;
@@ -362,6 +363,7 @@ void main() {
   }
   float b = aBold * (covered ? tOcc : 1.0);
   c = vec4(ink * b, b) + c * (1.0 - b);
+  if (vRing == 1) c *= uRing;
   if (c.a <= 0.0) discard;
   o = c;
 }

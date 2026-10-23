@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-10-22",
+  "generated": "2026-10-23",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -424,6 +424,7 @@
         "rack-pinion",
         "bell-crank"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1816-02-11",
         "precision": "year",
@@ -1140,6 +1141,7 @@
         "double-rocker",
         "ackermann-steering"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1727-03-19",
         "precision": "year",
@@ -1849,6 +1851,7 @@
         "locomotive-drive",
         "cam-follower"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1800-03-14",
         "precision": "period",
@@ -2419,6 +2422,7 @@
         "hoekens-linkage",
         "watt-six-bar"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1235-02-06",
         "precision": "period",
@@ -3044,6 +3048,7 @@
         "five-bar",
         "elliptic-trammel"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1603-04-04",
         "precision": "year",
@@ -3749,6 +3754,7 @@
         "pantograph",
         "scissor-lift"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1784-03-25",
         "precision": "year",
@@ -4374,6 +4380,7 @@
         "sarrus-linkage",
         "toggle-clamp"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1836-10-27",
         "precision": "year",
@@ -5343,6 +5350,7 @@
         "elliptic-trammel",
         "crank-shaper"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1872-11-21",
         "precision": "year",
@@ -5886,6 +5894,7 @@
         "whitworth",
         "crank-shaper"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "0260-03-18",
         "precision": "period",
@@ -6472,6 +6481,7 @@
         "pantograph",
         "peaucellier-lipkin"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "0450-09-02",
         "precision": "period",
@@ -7292,6 +7302,7 @@
         "non-circular-gears",
         "double-crank"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1874-05-22",
         "precision": "year",
@@ -7923,6 +7934,7 @@
         "bell-crank",
         "slider-crank"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1787-07-13",
         "precision": "year",
@@ -8835,6 +8847,7 @@
         "antiparallelogram",
         "double-rocker"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1829-11-13",
         "precision": "year",
@@ -9425,6 +9438,7 @@
         "toggle-clamp",
         "watt-six-bar"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1784-04-28",
         "precision": "day",
@@ -10057,6 +10071,7 @@
         "double-crank",
         "parallelogram-linkage"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1991-02-18",
         "precision": "year",
@@ -10782,6 +10797,7 @@
         "locomotive-drive",
         "eccentric-sheave"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1785-08-24",
         "precision": "year",
@@ -11545,6 +11561,7 @@
         "hoekens-linkage",
         "double-rocker"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1842-04-18",
         "precision": "year",
@@ -12415,6 +12432,7 @@
         "double-rocker",
         "four-bar"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1936-12-26",
         "precision": "year",
@@ -13144,6 +13162,7 @@
         "double-rocker",
         "pantograph"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1784-09-13",
         "precision": "year",
@@ -14008,6 +14027,7 @@
         "four-bar",
         "stephenson-six-bar"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1990-07-10",
         "precision": "year",
@@ -14990,6 +15010,7 @@
         "hoekens-linkage",
         "four-bar"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1994-12-18",
         "precision": "year",
@@ -15829,6 +15850,7 @@
         "scotch-yoke",
         "locomotive-drive"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1900-03-04",
         "precision": "period",
@@ -16896,6 +16918,7 @@
         "four-bar",
         "watt-six-bar"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1844-02-06",
         "precision": "year",
@@ -18114,6 +18137,7 @@
         "klann-linkage",
         "jansen-linkage"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1854-03-02",
         "precision": "year",
@@ -18715,6 +18739,7 @@
         "hoekens-linkage",
         "double-rocker"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1841-01-17",
         "precision": "year",
@@ -19267,6 +19292,7 @@
         "slider-crank",
         "watt-linkage"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1803-11-17",
         "precision": "day",
@@ -19867,6 +19893,7 @@
         "double-rocker",
         "watt-six-bar"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1784-04-28",
         "precision": "day",
@@ -20470,6 +20497,7 @@
         "elliptic-trammel",
         "roberts-linkage"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1801-08-07",
         "precision": "year",
@@ -21109,6 +21137,7 @@
         "jansen-linkage",
         "klann-linkage"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1926-03-26",
         "precision": "year",
@@ -21734,6 +21763,7 @@
         "scotch-yoke",
         "peaucellier-lipkin"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1245-10-27",
         "precision": "period",
@@ -22404,6 +22434,7 @@
         "watt-linkage",
         "scott-russell"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1874-08-23",
         "precision": "year",
@@ -23227,6 +23258,7 @@
         "sarrus-linkage",
         "antiparallelogram"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1864-11-18",
         "precision": "year",
@@ -24055,6 +24087,7 @@
         "scotch-yoke",
         "drag-link-quick-return"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1912-11-08",
         "precision": "year",
@@ -24741,6 +24774,7 @@
         "slider-crank",
         "oscillating-cylinder"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1836-03-25",
         "precision": "year",
@@ -25552,6 +25586,7 @@
         "spur-gears",
         "offset-slider-crank"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1840-06-28",
         "precision": "period",
@@ -26414,6 +26449,7 @@
         "whitworth",
         "slider-crank"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1850-10-21",
         "precision": "period",
@@ -27170,6 +27206,7 @@
         "scotch-yoke",
         "slider-crank"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "-0270-07-20",
         "precision": "period",
@@ -27781,6 +27818,7 @@
         "rack-pinion",
         "planetary"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "-0350-01-14",
         "precision": "period",
@@ -28366,6 +28404,7 @@
         "worm-drive",
         "crossed-helical-gears"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "-0125-11-21",
         "precision": "period",
@@ -29014,6 +29053,7 @@
         "worm-drive",
         "helical-gears"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "-0125-02-08",
         "precision": "period",
@@ -29669,6 +29709,7 @@
         "crossed-helical-gears",
         "gear-train"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "1675-07-01",
         "precision": "period",
@@ -30258,6 +30299,7 @@
         "bevel-gears",
         "crossed-helical-gears"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1894-02-13",
         "precision": "period",
@@ -30831,6 +30873,7 @@
         "cycloidal-drive",
         "sun-and-planet"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1588-12-12",
         "precision": "year",
@@ -31431,6 +31474,7 @@
         "gear-train",
         "watt-linkage"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1781-10-25",
         "precision": "day",
@@ -32154,6 +32198,7 @@
         "bevel-gears",
         "gear-train"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "-0250-12-16",
         "precision": "period",
@@ -32761,6 +32806,7 @@
         "hypoid-gears",
         "bevel-gears"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1495-03-24",
         "precision": "period",
@@ -33345,6 +33391,7 @@
         "internal-gear-pair",
         "eccentric-sheave"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1925-03-18",
         "precision": "year",
@@ -34110,6 +34157,7 @@
         "ravigneaux",
         "ball-disc-integrator"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1720-05-13",
         "precision": "year",
@@ -35165,6 +35213,7 @@
         "internal-gear-pair",
         "flexure-hinge"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1955-12-27",
         "precision": "year",
@@ -36819,6 +36868,7 @@
         "worm-drive",
         "crossed-helical-gears"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1924-12-11",
         "precision": "year",
@@ -37394,6 +37444,7 @@
         "drag-link-quick-return",
         "whitworth"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1364-12-13",
         "precision": "period",
@@ -38069,6 +38120,7 @@
         "harmonic-drive",
         "cycloidal-drive"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "-0150-12-04",
         "precision": "period",
@@ -38949,6 +39001,7 @@
         "gear-train",
         "internal-gear-pair"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1949-07-28",
         "precision": "day",
@@ -40200,6 +40253,7 @@
         "slider-crank",
         "cycloidal-drive"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1929-12-06",
         "precision": "year",
@@ -40896,6 +40950,7 @@
         "internal-geneva",
         "lever-escapement"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1700-04-15",
         "precision": "period",
@@ -42039,6 +42094,7 @@
         "star-wheel",
         "ratchet-pawl"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1700-02-19",
         "precision": "period",
@@ -42774,6 +42830,7 @@
         "star-wheel",
         "ratchet-pawl"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "-0025-09-10",
         "precision": "period",
@@ -43369,6 +43426,7 @@
         "star-wheel",
         "internal-gear-pair"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1900-04-24",
         "precision": "period",
@@ -44113,6 +44171,7 @@
         "intermittent-gear",
         "cam-follower"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1930-10-12",
         "precision": "period",
@@ -44770,6 +44829,7 @@
         "lead-screw",
         "swash-plate"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "0850-08-14",
         "precision": "period",
@@ -45512,6 +45572,7 @@
         "slider-crank",
         "scotch-yoke"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "0060-06-02",
         "precision": "period",
@@ -46213,6 +46274,7 @@
         "barrel-cam",
         "eccentric-sheave"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1900-03-04",
         "precision": "period",
@@ -46886,6 +46948,7 @@
         "desmodromic-cam",
         "geneva"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1850-08-17",
         "precision": "period",
@@ -47669,6 +47732,7 @@
         "face-groove-cam",
         "bell-crank"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1896-04-02",
         "precision": "year",
@@ -48923,6 +48987,7 @@
         "eccentric-sheave",
         "double-crank"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1825-10-06",
         "precision": "year",
@@ -49632,6 +49697,7 @@
         "double-cardan",
         "tusi-couple"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "1821-01-24",
         "precision": "year",
@@ -50464,6 +50530,7 @@
         "schmidt-coupling",
         "bevel-gears"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1664-04-08",
         "precision": "year",
@@ -51110,6 +51177,7 @@
         "schmidt-coupling",
         "oldham-coupling"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1683-03-13",
         "precision": "year",
@@ -52086,6 +52154,7 @@
         "differential",
         "schmidt-coupling"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1926-11-19",
         "precision": "year",
@@ -53161,6 +53230,7 @@
         "double-cardan",
         "locomotive-drive"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1963-02-06",
         "precision": "year",
@@ -54327,6 +54397,7 @@
         "rack-pinion",
         "worm-drive"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "-0100-03-16",
         "precision": "period",
@@ -54945,6 +55016,7 @@
         "differential-screw",
         "rack-pinion"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1898-10-13",
         "precision": "year",
@@ -55550,6 +55622,7 @@
         "differential",
         "block-and-tackle"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1780-12-21",
         "precision": "day",
@@ -56174,6 +56247,7 @@
         "spur-gears",
         "block-and-tackle"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "-0015-06-11",
         "precision": "year",
@@ -56773,6 +56847,7 @@
         "bell-crank",
         "toggle-clamp"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "-0250-12-05",
         "precision": "period",
@@ -57765,6 +57840,7 @@
         "gear-train",
         "locomotive-drive"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "-0250-08-18",
         "precision": "period",
@@ -58398,6 +58474,7 @@
         "chain-drive",
         "planetary"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1879-03-14",
         "precision": "year",
@@ -59191,6 +59268,7 @@
         "belt-drive",
         "spur-gears"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "1877-01-24",
         "precision": "year",
@@ -59791,6 +59869,7 @@
         "cvt-belt",
         "gear-train"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1876-09-06",
         "precision": "year",
@@ -60511,6 +60590,7 @@
         "ratchet-pawl",
         "centrifugal-governor"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1670-09-15",
         "precision": "year",
@@ -61987,6 +62067,7 @@
         "lever-escapement",
         "ratchet-pawl"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1283-07-24",
         "precision": "year",
@@ -62829,6 +62910,7 @@
         "verge-escapement",
         "ratchet-pawl"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1754-10-14",
         "precision": "year",
@@ -64848,6 +64930,7 @@
         "anchor-escapement",
         "star-wheel"
       ],
+      "added": "2026-10-18",
       "origin": {
         "date": "-0410-10-23",
         "precision": "period",
@@ -65919,6 +66002,7 @@
         "ravigneaux",
         "friction-wheel-drive"
       ],
+      "added": "2026-10-19",
       "origin": {
         "date": "1943-03-11",
         "precision": "year",
@@ -70176,6 +70260,7 @@
         "flexure-hinge",
         "hart-inversor"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1853-08-02",
         "precision": "year",
@@ -70932,6 +71017,7 @@
         "slider-crank",
         "rhombic-drive"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1588-01-03",
         "precision": "year",
@@ -72343,6 +72429,7 @@
         "universal-joint",
         "double-cardan"
       ],
+      "added": "2026-10-22",
       "origin": {
         "date": "1903-02-28",
         "precision": "year",
@@ -72983,6 +73070,7 @@
         "parallelogram-linkage",
         "sarrus-linkage"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "1944-03-13",
         "precision": "year",
@@ -73523,6 +73611,7 @@
         "four-bar",
         "ratchet-pawl"
       ],
+      "added": "2026-10-20",
       "origin": {
         "date": "1923-12-12",
         "precision": "year",

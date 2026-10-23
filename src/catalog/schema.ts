@@ -152,6 +152,9 @@ export interface CatalogRecord {
   related: string[];
   /** Set from the patch file sources/origin.json; the validator requires it. */
   origin?: Origin;
+  /** The day the mechanism's sheet went live, YYYY-MM-DD, from the patch file sources/added.json; every drawn mechanism
+   * has one (the Recovered badge, the library's New order). */
+  added?: string;
   /** Minimum counts this record is exempt from, set in a patch file where research found no more. */
   waive?: Waivable[];
 }

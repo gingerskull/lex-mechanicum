@@ -1,4 +1,4 @@
-import { originProblems } from "./origin";
+import { addedProblems, originProblems } from "./origin";
 import { validateKinTeaching, validateRetired } from "./validate-kin";
 import { VOCABULARIES, type CatalogRecord, type Vocabularies, type Waivable } from "./schema";
 
@@ -42,6 +42,7 @@ export function validate(records: CatalogRecord[], opts: { asVersion?: 2 | 3 } =
     problems.push(...validateKinTeaching(r, { required: v3 }));
     if (v3 && opts.asVersion === undefined) problems.push(...validateRetired(r));
     problems.push(...originProblems(r));
+    problems.push(...addedProblems(r));
     for (const x of r.real_world ?? []) if (!YOUTUBE.test(x.url ?? "")) say(`real-world example not a YouTube video: ${String(x.url)}`);
   }
 

@@ -24,6 +24,16 @@ export function fillDate(id: string, year: number): string {
   return `${year < 0 ? "-" : ""}${pad(year, 4)}-${pad(month, 2)}-${pad(day, 2)}`;
 }
 
+/** Checks a record's `added` date when it has one: a real YYYY-MM-DD (every drawn mechanism has one, a test checks). */
+export function addedProblems(r: CatalogRecord): string[] {
+  if (r.added === undefined) return [];
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(r.added);
+  const [year, month, day] = m ? [Number(m[1]), Number(m[2]), Number(m[3])] : [0, 0, 0];
+  const leap = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  const ok = m && month >= 1 && month <= 12 && day >= 1 && day <= (month === 2 && !leap ? 28 : DAYS[month - 1]!);
+  return ok ? [] : [`${r.id}: added "${String(r.added)}" is not a date YYYY-MM-DD`];
+}
+
 /** Checks a record's `origin`: present, a real date, a known precision, the id's day for a year or a period, a note. */
 export function originProblems(r: CatalogRecord): string[] {
   const problems: string[] = [];

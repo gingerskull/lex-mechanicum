@@ -75,7 +75,8 @@ Use plain prose in text fields (no em-dashes; use commas or "to"). Units: mm, de
   "references": [ { "title": "...", "url": "https://...", "kind": "ONE of wikipedia|textbook|kmoddl|paper|standard|patent|museum|engineering-guide|calculator" } ],
   "media": [ { "title": "...", "url": "https://...", "kind": "ONE of video|photos|animation|interactive" } ],
   "related": ["ids of related mechanisms (from the master list below)"],
-  "origin": { "date": "1781-10-25", "precision": "day | year | period", "note": "what the date is. Source: https://..." }
+  "origin": { "date": "1781-10-25", "precision": "day | year | period", "note": "what the date is. Source: https://..." },
+  "added": "2026-10-22"
 }
 ```
 
@@ -364,6 +365,15 @@ whichever is earliest and can be found. It lives in the patch file `sources/orig
   from the id (`fillDate` in `src/catalog/origin.ts`), so a rerun gives the same date and the validator can check it.
 - `note`: what the date is and its source URL, or "Best guess:" and why where nothing solid was found. A `period`
   note names the period.
+
+## Added date
+
+`added` is the day the mechanism's sheet went live, `YYYY-MM-DD`. It lives in the patch file `sources/added.json`
+(keyed by id, `{ "added": "..." }`), which `npm run catalog` merges into each record. A record gets it in the change
+that draws its mechanism; a test fails a drawn mechanism without one, and the validator fails one that is not a date.
+The sheets drawn before the field existed have the day they first reached main, from the git history (and the first
+Pages release, 2026-10-18, for the ones that were on main before it). The site reads it for the library's New order
+and the Recovered badge a sheet wears for its first 7 days.
 
 ## LINKS MUST BE REAL
 
