@@ -1,7 +1,9 @@
 // The explode (standard E1 to E10): the build taken apart as it was put together, worked out once the whole build exists.
-// Rigid units move as one: a fastener with what its group holds (head, shank, the washer under it, the nut), a pressed or
-// bonded part with the part it sits in (a bearing in its housing, a dowel, a bushing, an internal circlip), the motor with
-// its bracket, pulley and belt. The fixed structure lifts off the base (or drops below it, for what hangs under it); a
+// The main parts, the ones that show how the mechanism works, come apart one by one; the small supporting hardware goes
+// with what it supports, so the explode does not scatter screws and washers: a fastener with the part it holds, stack
+// hardware (washers, spacers, shims, collars, keys, circlips) with the support block or plate it sits in, else its shaft,
+// else the main part on its joint, posts with their bridge, a pressed or bonded part with the part it sits in (a bearing
+// in its housing, a dowel, a bushing), and the motor with its bracket, pulleys, belt and sensing parts. The fixed structure lifts off the base (or drops below it, for what hangs under it); a
 // moving body slides out along its own joint axis, away from the middle of the mechanism; a fastener backs out along its
 // axis to its head side. A sweep in disassembly order then sets how far each unit goes: it clears, by a gap that grows
 // with its size, every unit it sits on or around, so at full explode nothing is inside another part. Shafts leave after
@@ -20,8 +22,17 @@ import type { Rule } from "./types";
 const PRESSED = new Set(["bearing", "bearingBalls", "bearingCage", "bushing", "dowel", "circlipInternal", "wearStrip", "sleeve"]);
 /** Parts a pressed one can sit in. */
 const HOSTS = new Set(["housing", "part", "bracket", "bridge", "plate", "base", "roller"]);
-/** The bought drive unit that stays whole (E6): motor and bracket, with the motor's pulley, its shaft and the belt. */
-const DRIVE = new Set(["motor", "motorInternal", "bracket", "pulley", "belt", "shaft"]);
+/** The bought drive unit that stays whole (E6): motor and bracket, with the motor's pulley, its shaft, the belt and the
+ * sensing parts and wiring on the ground. */
+const DRIVE = new Set(["motor", "motorInternal", "bracket", "pulley", "belt", "shaft", "sensor", "terminalBlock", "cableClip", "lead"]);
+/** Fastening hardware: it goes with the part it holds. */
+const FASTENER = new Set(["head", "shank", "nut", "setScrew"]);
+/** Stack hardware: it goes with the support it sits in, else its shaft, else the part on its joint. */
+const STACK = new Set(["spacer", "washer", "thrustWasher", "waveWasher", "shim", "circlipExternal", "collar", "key", "sleeve", "retainerPlate"]);
+/** Supports that take their hardware with them. */
+const SUPPORT = new Set(["housing", "bracket", "bridge", "plate", "standoff"]);
+/** Posts: they go with the bridge they carry. */
+const POSTS = new Set(["standoff", "spigot"]);
 
 type Box = [number, number, number, number, number, number];
 type Tier = 0 | 1 | 2;
@@ -61,6 +72,12 @@ function boxOf(s: Solid3): Box {
   return out;
 }
 
+/** The volume two boxes share once each is grown by `g` mm on every side (touching parts share a sliver). */
+const shared = (a: Box, b: Box, g = 0.6) => {
+  let v = 1;
+  for (let k = 0; k < 3; k++) v *= Math.max(0, Math.min(a[k + 3]! + g, b[k + 3]! + g) - Math.max(a[k]! - g, b[k]! - g));
+  return v;
+};
 const union = (a: Box, b: Box): Box => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.min(a[2], b[2]), Math.max(a[3], b[3]), Math.max(a[4], b[4]), Math.max(a[5], b[5])];
 const centre = (b: Box): Vec3 => [(b[0] + b[3]) / 2, (b[1] + b[4]) / 2, (b[2] + b[5]) / 2];
 const volume = (b: Box) => Math.max(0, b[3] - b[0]) * Math.max(0, b[4] - b[1]) * Math.max(0, b[5] - b[2]);
@@ -113,7 +130,7 @@ export const explode: Rule = {
   fixture: "four-bar",
   applies: () => true,
   apply() {},
-  after(ctx) {
+  last(ctx) {
     const S = ctx.solids;
     const n = S.length;
     const boxes = S.map(boxOf);
@@ -147,6 +164,41 @@ export const explode: Rule = {
     for (const i of drive.slice(1)) join(drive[0]!, i);
     const baseIdx = S.findIndex((s) => s.flags.isBase);
     if (baseIdx >= 0) S.forEach((s, i) => s.kind === "foot" && join(baseIdx, i));
+    // supporting hardware goes with what it supports: the candidate it shares most with, among those `ok` allows
+    const hostOf = (i: number, ok: (k: number) => boolean): number => {
+      let best = -1, most = 0;
+      S.forEach((_, k) => {
+        if (k === i || k === baseIdx || find(k) === find(i) || !ok(k)) return;
+        const v = shared(boxes[i]!, boxes[k]!);
+        if (v > most) {
+          most = v;
+          best = k;
+        }
+      });
+      return best;
+    };
+    const hw = (k: number) => FASTENER.has(S[k]!.kind) || STACK.has(S[k]!.kind) || PRESSED.has(S[k]!.kind);
+    const shareJoint = (i: number, k: number) => S[i]!.joints.some((j) => S[k]!.joints.includes(j));
+    // hardware already riding something (a bolt's washer in the bolt's group) stays where it is: hosting it again would
+    // chain two main parts into one
+    const ridden = (i: number, also: Set<string> = new Set()) => S.some((t, k) => find(k) === find(i) && !hw(k) && !also.has(t.kind));
+    S.forEach((s, i) => {
+      if (!FASTENER.has(s.kind) || ridden(i)) return;
+      const h = hostOf(i, (k) => !FASTENER.has(S[k]!.kind) && !STACK.has(S[k]!.kind));
+      if (h >= 0) join(h, i);
+    });
+    S.forEach((s, i) => {
+      if (!STACK.has(s.kind) || ridden(i)) return;
+      const h = [(k: number) => SUPPORT.has(S[k]!.kind) && S[k]!.body === "ground", (k: number) => S[k]!.kind === "shaft", (k: number) => !hw(k) && shareJoint(i, k)]
+        .map((ok) => hostOf(i, ok))
+        .find((k) => k >= 0);
+      if (h !== undefined) join(h, i);
+    });
+    S.forEach((s, i) => {
+      if (!POSTS.has(s.kind) || ridden(i, POSTS)) return;
+      const h = hostOf(i, (k) => S[k]!.kind === "bridge");
+      if (h >= 0) join(h, i);
+    });
 
     const members = new Map<number, number[]>();
     for (let i = 0; i < n; i++) {
@@ -167,7 +219,7 @@ export const explode: Rule = {
       const vertical = (): Vec3 => (c[2] >= baseTop ? [0, 0, 1] : [0, 0, -1]);
       let dir: Vec3;
       let tier: Tier = 0;
-      if (head || shank || ss.every((s) => s.kind === "setScrew" || s.kind === "nut")) {
+      if ((head || shank || ss.every((s) => s.kind === "setScrew" || s.kind === "nut")) && m.every(hw)) {
         // a fastener backs out along its axis to its head side (E3)
         tier = 2;
         const a = v3.unit((head ?? shank ?? ss[0]!).frame.z);
@@ -177,15 +229,30 @@ export const explode: Rule = {
         } else dir = Math.abs(a[2]) > 0.7 ? vertical() : a;
       } else if (ss.every((s) => s.body === "ground")) dir = vertical();
       else {
-        // a moving body leaves along its main part's axis, away from the middle (E8); a vertical one upward
+        // a moving body leaves along its main part's axis, away from the middle; a shaft away from what it carries, the
+        // side it went in from (E8); a vertical one upward
         const main = m.reduce((a, b) => (volume(boxes[b]!) > volume(boxes[a]!) ? b : a));
         const a = v3.unit(S[main]!.frame.z);
+        // a shaft with its hardware (keys, collars, an end screw) leaves after the parts on it
+        if (ss.some((s) => s.kind === "shaft") && m.every((k) => S[k]!.kind === "shaft" || hw(k))) tier = 1;
+        let from = mid;
+        if (tier === 1) {
+          // the volume-weighted middle of the moving parts it passes through (what it carries, not what holds it)
+          let w = 0;
+          let acc: Vec3 = [0, 0, 0];
+          S.forEach((t, k) => {
+            if (m.includes(k) || t.body === "ground" || !m.some((i) => shared(boxes[i]!, boxes[k]!, 0) > 0)) return;
+            const v = volume(boxes[k]!);
+            acc = v3.add(acc, v3.mul(centre(boxes[k]!), v));
+            w += v;
+          });
+          if (w > 0) from = v3.mul(acc, 1 / w);
+        }
         if (Math.abs(a[2]) > 0.7) dir = vertical();
         else {
-          const s = Math.sign(v3.dot(v3.sub(c, mid), a)) || 1;
+          const s = Math.sign(v3.dot(v3.sub(c, from), a)) || 1;
           dir = v3.mul(a, s);
         }
-        if (ss.some((s) => s.kind === "shaft") && ss.every((s) => s.kind === "shaft" || s.kind === "key" || s.kind === "circlipExternal" || s.kind === "collar")) tier = 1;
       }
       return { solids: ss, box, boxes: m.map((i) => boxes[i]!), dir, tier, base, t: 0, done: base };
     });

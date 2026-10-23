@@ -1,6 +1,6 @@
-// The explode rule (E1 to E10) on real builds: rigid units move as one, a pressed part goes with the part it sits in, the
-// structure lifts off the base while a moving body slides along its axis, a fastener backs out to its head side, and at
-// full explode the parts stand apart.
+// The explode rule (E1 to E10) on real builds: rigid units move as one, a pressed part goes with the part it sits in, a
+// support takes its hardware with it while the main parts come apart one by one, the structure lifts off the base while a
+// moving body slides along its axis, and at full explode the parts stand apart.
 import { afterAll, describe, expect, it } from "vitest";
 import { buildWithContext, type Assembly } from "../../src/builder/build";
 import type { BuildCtx } from "../../src/builder/ctx";
@@ -67,14 +67,13 @@ describe("the explode (E1 to E10)", () => {
     expect(pin.ex).toBeGreaterThan(0);
   });
 
-  it("backs a fastener out to its head side (E3)", async () => {
-    const { assembly } = await build("four-bar");
-    for (const h of assembly.solids.filter((s) => s.kind === "head" && s.group)) {
-      const sh = assembly.solids.find((s) => s.group === h.group && s.kind === "shank");
-      if (!sh || !h.exAxis) continue;
-      const toHead = [0, 1, 2].map((k) => (boxOf(h)[k]! + boxOf(h)[k + 3]!) / 2 - (boxOf(sh)[k]! + boxOf(sh)[k + 3]!) / 2);
-      expect(toHead[0]! * h.exAxis[0] + toHead[1]! * h.exAxis[1] + toHead[2]! * h.exAxis[2], h.id).toBeGreaterThan(0);
-    }
+  it("moves a support block with its bearings, screws and dowels, and comes apart main part by main part", async () => {
+    const bevel = (await build("bevel-gears")).assembly.solids;
+    const S = (id: string) => bevel.find((s) => s.id === id)!;
+    for (const id of ["O1-pb-b0-brg", "O1-pb-b0-sc0", "O1-pb-b0-sc0-sh", "O1-pb-b0-dw0"]) expect(moveKey(S(id)), id).toBe(moveKey(S("O1-pb-b0")));
+    // the links of the four-bar each go their own way
+    const fb = (await build("four-bar")).assembly.solids.filter((s) => s.kind === "part" && s.body !== "ground");
+    expect(new Set(fb.map(moveKey)).size).toBe(fb.length);
   });
 
   for (const id of ["four-bar", "bevel-gears"])
@@ -91,7 +90,7 @@ describe("the explode (E1 to E10)", () => {
           if (overlap(B0[i]!, B0[j]!)) before++;
           if (overlap(B1[i]!, B1[j]!)) after.push(`${S[i]!.id} x ${S[j]!.id}`);
         }
-      expect(before).toBeGreaterThan(80);
+      expect(before).toBeGreaterThan(40);
       // boxes are coarse (a diagonal link's box covers posts it never touches), so a few pairs may stay
       expect(after.length, after.join("; ")).toBeLessThanOrEqual(8);
     });

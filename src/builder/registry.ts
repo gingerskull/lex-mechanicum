@@ -117,6 +117,15 @@ export function runRules(ctx: BuildCtx, list: Rule[] = rules): void {
   ctx.rule = "polish";
 }
 
+/** The rules' last step, on the complete build (after the polish and the bodies' own parts). */
+export function runLast(ctx: BuildCtx, list: Rule[] = rules): void {
+  for (const r of list) {
+    ctx.rule = r.id;
+    if (r.applies(ctx)) r.last?.(ctx);
+  }
+  ctx.rule = "polish";
+}
+
 /** Every rule and stage with the standard ids it serves. */
 export function autoTable(): { id: string; ids: string[] }[] {
   return [...rules.map((r) => ({ id: r.id, ids: r.ids })), ...PROVIDERS];
