@@ -5,13 +5,13 @@ import Sheet from "../layouts/Sheet.astro";
 import Bar from "../components/Bar.astro";
 import Facets from "../components/Facets.astro";
 import Card from "../components/Card.astro";
-import { SHEETS, VERSION, sortableOf } from "../data";
+import { APP, SHEETS, VERSION, sortableOf } from "../data";
 import { DEFAULT_ORDER, sortBy } from "../sort";
 ---
 <Sheet title="Mechanism Library" description="Linkages, gears, cams and indexing drives, drawn live as working drawings of real hardware. Turn them, tilt them and take them apart, for a lesson or out of plain curiosity.">
   <header class="wrap top">
     <div class="brand">
-      <p class="kicker">Mechanism Database · drawing set</p>
+      <p class="kicker">{APP} · drawing set</p>
       <h1>Mechanism Library <span>{SHEETS.length}</span></h1>
       <p>Linkages, gears, cams and indexing drives, built from real hardware and drawn live as working drawings. Open a sheet to turn it, tilt it, pull it apart and see the forces. Handy in class, or just to see how things move.</p>
     </div>

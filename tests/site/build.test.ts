@@ -117,6 +117,18 @@ describe("site build", () => {
     }
   });
 
+  it("names the app, Lex Mechanicum, in the library's kicker, the footer and every page's head", () => {
+    const lib = read("index.html");
+    expect(lib).toContain('<p class="kicker">Lex Mechanicum · drawing set</p>');
+    for (const f of ["index.html", "404.html", join("mechanisms", allIds()[0]!, "index.html")]) {
+      const html = read(f);
+      expect(html, f).toContain('<meta name="application-name" content="Lex Mechanicum">');
+      expect(html, f).toContain('<meta property="og:site_name" content="Lex Mechanicum">');
+      expect(html, f).toContain("<span>Lex Mechanicum · drawn as built, kinematics solved exactly</span>");
+      expect(html, f).not.toMatch(/mechanism[ -]database/i);
+    }
+  });
+
   it("shows the release line in the footer: the laws, the codename once the release has one, the version", () => {
     const html = read("index.html");
     const version: string = JSON.parse(readFileSync("package.json", "utf8")).version;

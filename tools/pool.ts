@@ -1,7 +1,7 @@
 // A pool of child processes for the per-mechanism work of the tools (conformance, the site assets, clearance, the
 // thumbnails' fingerprints): each mechanism's build is independent and single-threaded, and Manifold starts in well under
 // 0.1 s in a new process. Child processes, not worker threads, which measured slower. A big build reaches about 2.1 GB, so
-// the pool is capped by memory as well as by the cores; MDB_JOBS sets its size (1 runs everything in this process).
+// the pool is capped by memory as well as by the cores; LM_JOBS sets its size (1 runs everything in this process).
 import { fork, type ChildProcess } from "node:child_process";
 import { availableParallelism, totalmem } from "node:os";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -12,12 +12,12 @@ const PER_JOB = 2.2e9;
 const RECYCLE = 3e9;
 
 /** Set in every child: a tool whose module is a task's runs its main only outside the pool (`inPool`). */
-const POOL_CHILD = "MDB_POOL_CHILD";
+const POOL_CHILD = "LM_POOL_CHILD";
 export const inPool = (): boolean => process.env[POOL_CHILD] === "1";
 
-/** How many children for n tasks: MDB_JOBS when set, else the cores and as many as most of the memory holds. */
+/** How many children for n tasks: LM_JOBS when set, else the cores and as many as most of the memory holds. */
 export function poolSize(n: number): number {
-  const env = Number(process.env.MDB_JOBS);
+  const env = Number(process.env.LM_JOBS);
   const cap = env > 0 ? env : Math.min(availableParallelism(), (totalmem() * 0.8) / PER_JOB);
   return Math.max(1, Math.floor(Math.min(n, cap)));
 }
