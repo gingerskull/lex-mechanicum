@@ -6,7 +6,7 @@ evergreen "how it works" documents.
 
 ## Board
 
-Project: **Mechanism Database** (GitHub project, owner `gingerskull`; link in `.github/ISSUE_TEMPLATE/config.yml`).
+Project: **Lex Mechanicum** (GitHub project, owner `gingerskull`; link in `.github/ISSUE_TEMPLATE/config.yml`).
 
 Fields: Status (Inbox, Ready, In progress, In review, Done, Deferred, Won't do), Kind, Area, Size, Version.
 Board automations (set in the project's Workflows settings): new issues go to Inbox; an issue with a linked PR goes to
@@ -75,8 +75,8 @@ job; `concurrency` cancels superseded runs; no CI on pushes to main (the PR alre
 run on main is the safety net. Time limits sit at about twice the observed run; reports are uploaded on failure only,
 with short retention. CI changes that save minutes are proposals, made in an issue.
 
-The `Pages` workflow publishes the site to GitHub Pages (https://gingerskull.github.io/mechanism-database/) when a
-merge to main changes what the site is built from, or on demand. It builds with `SITE_BASE=/mechanism-database/`, so
+The `Pages` workflow publishes the site to GitHub Pages (https://gingerskull.github.io/lex-mechanicum/) when a
+merge to main changes what the site is built from, or on demand. It builds with `SITE_BASE=/lex-mechanicum/`, so
 every link and asset path in the site goes through `site/src/url.ts`; local builds keep `/`.
 
 Before pushing a fix for a CI failure, reproduce it locally under CI-like conditions and fix plausible sibling

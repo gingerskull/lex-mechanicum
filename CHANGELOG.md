@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.37.2, Graia — 2026-10-23
+
+- The app is renamed Lex Mechanicum: the library's kicker, the footer, the site name in every page's head, the
+  README, the docs and the package. The repository is now `gingerskull/lex-mechanicum` and the site moves to
+  https://gingerskull.github.io/lex-mechanicum/ (the old Pages address no longer serves it). `MDB_JOBS` is now
+  `LM_JOBS`.
+
 ## 0.37.1, Graia — 2026-10-23
 
 - The checks and the site build about 5× faster, with the same packages and check results (spur-gears' gear bridge

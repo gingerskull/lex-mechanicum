@@ -1,6 +1,6 @@
 {
-  "name": "mechanism-database",
-  "version": "0.37.1",
+  "name": "lex-mechanicum",
+  "version": "0.37.2",
   "private": true,
   "license": "MIT",
   "description": "An online library of mechanical mechanisms, drawn live as bench assemblies in one house style.",
@@ -36,7 +36,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gingerskull/mechanism-database.git"
+    "url": "https://github.com/gingerskull/lex-mechanicum.git"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

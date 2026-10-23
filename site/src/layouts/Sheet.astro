@@ -6,6 +6,7 @@ import "../../styles/base.css";
 import "../../styles/layout.css";
 import "../../styles/components.css";
 import Footer from "../components/Footer.astro";
+import { APP } from "../data";
 import { url } from "../url";
 interface Props {
   title: string;
@@ -21,10 +22,12 @@ const card = new URL(url("/social.png"), Astro.site).href;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="application-name" content={APP} />
     <link rel="icon" href={url("/favicon.ico")} sizes="16x16 32x32 48x48" />
     <link rel="icon" href={url("/favicon.svg")} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={url("/apple-touch-icon.png")} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={APP} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={card} />

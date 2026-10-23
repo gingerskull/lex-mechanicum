@@ -1,6 +1,6 @@
 name: Pages
 
-# Publishes the static site to GitHub Pages (https://gingerskull.github.io/mechanism-database/) when a merge to main
+# Publishes the static site to GitHub Pages (https://gingerskull.github.io/lex-mechanicum/) when a merge to main
 # changes what the site is built from, or on demand. The PR's "Site build" job has already checked the build.
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 6
     env:
       ASTRO_TELEMETRY_DISABLED: 1
-      SITE_BASE: /mechanism-database/
+      SITE_BASE: /lex-mechanicum/
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

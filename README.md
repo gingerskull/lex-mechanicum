@@ -1,4 +1,4 @@
-# Mechanism Database
+# Lex Mechanicum
 
 **A library of mechanisms you can watch, turn and take apart, for a lesson, a build or plain curiosity.**
 
@@ -11,7 +11,7 @@ It's for anyone who wants to see how a mechanism really works: students and teac
 anyone who has wondered what goes on inside a machine. It works well on a classroom screen, and every sheet comes
 with a short, plain explanation.
 
-**Open the library: https://gingerskull.github.io/mechanism-database/**
+**Open the library: https://gingerskull.github.io/lex-mechanicum/**
 
 ![A spur gear pair on the Drafting sheet: pinion and wheel on their shafts under a see-through bridge, with the base plate, mounting holes and overall dimensions](docs/images/spur-gears.png)
 
@@ -89,7 +89,7 @@ We track the work on the project board (see [docs/workflow.md](docs/workflow.md)
 - **Code** (everything not listed below): MIT, see [LICENSE](LICENSE).
 - **Content**: the catalogue (`data/catalog/`), the documents and images in `docs/`, and the drawings the site
   renders: Creative Commons Attribution-ShareAlike 4.0, see [LICENSE-CONTENT](LICENSE-CONTENT). Please credit
-  "Mechanism Database" with a link to this repository, and share adaptations under the same licence.
+  "Lex Mechanicum" with a link to this repository, and share adaptations under the same licence.
 
 Linked references, photos and videos belong to their owners and aren't covered. The IBM Plex fonts the site ships
 are under the SIL Open Font License 1.1.
