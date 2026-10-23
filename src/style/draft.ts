@@ -80,7 +80,7 @@ export const DRAFT = {
     baseChamferGain: 0.7, // factor on chamferAlpha for the base plate
     baseMarksGain: 0.75, // factor on marksAlpha for the base plate
     // How an edge looks where a part covers it (SD3): width and alpha are factors on the visible line.
-    hidden: { dash: [3, 2.4] as const, width: 0.75, alpha: 0.85 }, // dash px, factor, factor
+    hidden: { dash: [3, 2.4] as const, width: 0.75, alpha: 0.5 }, // dash px, factor, factor
     // Ring round the input shaft head (SD5).
     accentRing: {
       color: "accent" as ColorName,
@@ -97,17 +97,17 @@ export const DRAFT = {
 
   // Surfaces: paper opacity per kind, 0..1 (SD2), and how much each erases the lines layer (SD3).
   fill: {
-    plate: 0.64,
-    other: 0.8,
+    plate: 0.9,
+    other: 0.95,
     base: 0.96, // laid once, on the top face (the parts under it read only through `occlude.base`)
-    wall: 0.55,
+    wall: 0.86,
     baseWallGain: 0.8, // factor on `wall` for the base plate's walls
     wallOcclude: 0.9, // factor on the occlusion for side walls
-    occlude: { plate: 1, other: 0.85, base: 0.9 }, // the base lets a tenth of what is under it show through
+    occlude: { plate: 1, other: 0.97, base: 0.92 }, // the base lets a twelfth of what is under it show through
     // A solid over a working zone or a principle part (L5, T10): a factor on its paper (`opacity`) and on its occlusion
     // (`occlude`), so what lies behind reads through it, and a flat ink wash on its faces (`tint`, 0..1), so it still reads
     // as a solid pane and never as empty outlines.
-    seeThrough: { opacity: 0.5, occlude: 0.6, tint: 0.07 },
+    seeThrough: { opacity: 0.85, occlude: 0.9, tint: 0.06 },
     // Ink shade on side walls, stepped by facing: alpha = shade * (from + span * i / (steps - 1)).
     wallShade: {
       shade: 0.1, // 0..1 ink alpha

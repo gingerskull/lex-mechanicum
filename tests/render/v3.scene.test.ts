@@ -1,3 +1,4 @@
+import { DRAFT } from "../../src/style/draft";
 import { describe, expect, it } from "vitest";
 import { recordById } from "../../src/catalog";
 import { Kinematics } from "../../src/kin/compose";
@@ -78,7 +79,7 @@ describe("scene runtime", () => {
     expect(w[5]).toBeCloseTo(5);
   });
 
-  it("writes the solid table: pose rows, paper, flags; a see-through solid takes half the paper", () => {
+  it("writes the solid table: pose rows, paper, flags; a see-through solid takes its share of the paper", () => {
     const m = new Float32Array(rt.n * 16);
     place(rt, 0, 0, m);
     const see = new Uint8Array(rt.n);
@@ -89,7 +90,7 @@ describe("scene runtime", () => {
     const plain = table[cover * ST * 4 + 12]!;
     see[cover] = 1;
     rows(rt, m, { see, ladder: L, card: false, patterns: true }, table);
-    expect(table[cover * ST * 4 + 12]).toBeCloseTo(plain * 0.5);
+    expect(table[cover * ST * 4 + 12]).toBeCloseTo(plain * DRAFT.fill.seeThrough.opacity);
     expect(table[cover * ST * 4 + 12 + 2]).toBeLessThan(1);
     // the detail ladder hides a solid by a flag
     const hide = ladder("H", { tilt: 0, explode: 0 });

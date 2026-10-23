@@ -376,7 +376,10 @@ describe("the stage on a phone", () => {
     await page.waitForTimeout(200);
     expect(Number(await page.locator("#tilt").inputValue())).not.toBe(t0);
     expect(await page.locator("#orbit").count()).toBe(0);
-    // the construction key under the narrow stage: a tap picks a line out on the drawing, a second lets it go
+    // construction starts off; once on, its key shows under the narrow stage, and a tap picks a line out on the drawing,
+    // a second lets it go
+    expect(await page.locator("#ckey").isVisible()).toBe(false);
+    await page.locator('.ovl .chip[data-o="construction"]').tap();
     const key = page.locator("#ckey button").first();
     expect(await page.locator("#ckey").isVisible()).toBe(true);
     const plain = await stageShot(page);

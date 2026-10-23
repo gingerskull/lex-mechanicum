@@ -154,7 +154,7 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | Id | Requirement |
 |---|---|
 | SD1 | **Depth order is sacred.** The depth buffer decides what is in front; there is no slicing and no painter's order, and no effect uses a depth bias. A new effect is inserted into the peeled composite or drawn as an annotation (steps 5 to 11), never layered over the finished frame in a way that reorders what it covers. |
-| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a tenth of the lines under it through. Side walls take a stepped ink shade by facing (`fill.wallShade`), so a plate, a bracket or a block reads as a body on both sheets and never as outlines with nothing between them; mounts (the ground role) take a faint ink tint on their faces. A solid drawn see-through (it covers a working zone or a principle part, standard L5 and T10) takes half the paper and part of the occlusion on every face in view (`fill.seeThrough`), so what lies behind reads through it, and a flat ink wash, so it reads as a deliberate pane, clearly apart from an ordinary plate. |
+| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a twelfth of the lines under it through. Side walls take a stepped ink shade by facing (`fill.wallShade`), so a plate, a bracket or a block reads as a body on both sheets and never as outlines with nothing between them; mounts (the ground role) take a faint ink tint on their faces. A solid drawn see-through (it covers a working zone or a principle part, standard L5 and T10) keeps most of its paper and occlusion on every face in view (`fill.seeThrough`), so what lies behind reads through it faintly without the support turning into outlines, and a flat ink wash, so it reads as a deliberate pane, clearly apart from an ordinary plate. |
 | SD3 | **Visible and hidden edges by depth.** Every edge is classified by what covers it in the depth layers. An edge seen directly is bold and solid; the same edge seen through a part is thin and dashed, with the bold line at what the occluders let through (fractional occlusion, each occluder at its opacity). Only the share the occluders hide turns into dashes, so an edge seen through a see-through solid never stacks its bold and dashed copies into a line as strong as an uncovered one. Fine detail (chamfers, threads, engraving) lives only in the visible class, so it disappears behind parts instead of turning into dashes. Edges are the cap outlines, the creases and the smooth-surface silhouettes of each solid, shipped or extracted once at setup. |
 | SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's own coordinates (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns go on the cap and primary faces within a set angle of the view, never on walls or faces turned edge-on. |
 | SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout. A second accent use needs a reason written here. While the drawing is paused, the input ring breathes slowly between full strength and a part of it (`lines.accentRing.breathe`); nothing else moves, the ring holds still while the drawing plays, and it never breathes under reduced motion. |
@@ -318,7 +318,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.baseMarksGain` | 0.75 | factor on marksAlpha for the base plate |
 | `draft.lines.hidden.dash` | [3, 2.4] | dash px, factor, factor |
 | `draft.lines.hidden.width` | 0.75 | dash px, factor, factor |
-| `draft.lines.hidden.alpha` | 0.85 | dash px, factor, factor |
+| `draft.lines.hidden.alpha` | 0.5 | dash px, factor, factor |
 | `draft.lines.accentRing.color` | `accent` |  |
 | `draft.lines.accentRing.width` | 1.8 | px |
 | `draft.lines.accentRing.radius` | 0.62 | factor on the head's projected half-size, per axis |
@@ -328,18 +328,18 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.accentRing.breathe.period` | 5 | s, 0..1, count per s |
 | `draft.lines.accentRing.breathe.low` | 0.35 | s, 0..1, count per s |
 | `draft.lines.accentRing.breathe.fps` | 15 | s, 0..1, count per s |
-| `draft.fill.plate` | 0.64 |  |
-| `draft.fill.other` | 0.8 |  |
+| `draft.fill.plate` | 0.9 |  |
+| `draft.fill.other` | 0.95 |  |
 | `draft.fill.base` | 0.96 | laid once, on the top face (the parts under it read only through `occlude.base`) |
-| `draft.fill.wall` | 0.55 |  |
+| `draft.fill.wall` | 0.86 |  |
 | `draft.fill.baseWallGain` | 0.8 | factor on `wall` for the base plate's walls |
 | `draft.fill.wallOcclude` | 0.9 | factor on the occlusion for side walls |
-| `draft.fill.occlude.plate` | 1 | the base lets a tenth of what is under it show through |
-| `draft.fill.occlude.other` | 0.85 | the base lets a tenth of what is under it show through |
-| `draft.fill.occlude.base` | 0.9 | the base lets a tenth of what is under it show through |
-| `draft.fill.seeThrough.opacity` | 0.5 |  |
-| `draft.fill.seeThrough.occlude` | 0.6 |  |
-| `draft.fill.seeThrough.tint` | 0.07 |  |
+| `draft.fill.occlude.plate` | 1 | the base lets a twelfth of what is under it show through |
+| `draft.fill.occlude.other` | 0.97 | the base lets a twelfth of what is under it show through |
+| `draft.fill.occlude.base` | 0.92 | the base lets a twelfth of what is under it show through |
+| `draft.fill.seeThrough.opacity` | 0.85 |  |
+| `draft.fill.seeThrough.occlude` | 0.9 |  |
+| `draft.fill.seeThrough.tint` | 0.06 |  |
 | `draft.fill.wallShade.shade` | 0.1 | 0..1 ink alpha |
 | `draft.fill.wallShade.steps` | 5 | count of facing buckets |
 | `draft.fill.wallShade.light` | [0.75, -0.25] | screen direction the light comes from (x right, y down), the wall facing it is lightest |
@@ -422,9 +422,11 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.phantom.dash` | [4, 3] | px, px, factor on the hidden lines' alpha |
 | `draft.phantom.width` | 0.8 | px, px, factor on the hidden lines' alpha |
 | `draft.phantom.alpha` | 0.85 | px, px, factor on the hidden lines' alpha |
-| `draft.tick.half` | 3.5 | px half length of the cross mark, px, 0..1 ink |
-| `draft.tick.width` | 1 | px half length of the cross mark, px, 0..1 ink |
-| `draft.tick.alpha` | 0.8 | px half length of the cross mark, px, 0..1 ink |
+| `draft.tick.half` | 3 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.width` | 1 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.alpha` | 0.75 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.minGap` | 10 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.minPath` | 60 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
 | `draft.trail.width` | 0.7 | px, 0..1, px: explode trail lines |
 | `draft.trail.alpha` | 0.55 | px, 0..1, px: explode trail lines |
 | `draft.trail.dash` | [2, 3] | px, 0..1, px: explode trail lines |
@@ -438,6 +440,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.path.cometAlpha` | 0.95 | 0..1 at the head, fading to 0 |
 | `draft.path.cometSamples` | 80 | count, longest trail in path samples (at most half the path) |
 | `draft.path.headR` | 2.6 | px, open circle at the current point |
+| `draft.path.edgeOn.fade` | [0.06, 0.18] | ratios, ratio |
+| `draft.path.edgeOn.straight` | 0.05 | ratios, ratio |
 | `draft.path.headStroke` | 1.2 | px |
 | `draft.centre.dash` | [9, 2.5, 1.5, 2.5] | px, long dash, gap, short dash, gap |
 | `draft.centre.width` | 0.6 | px |
@@ -528,6 +532,24 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.labelBorder` | 0.8 | px, panel hairline width |
 | `draft.overlays.labelEdge` | 4 | px, labels kept this far inside the canvas |
 | `draft.overlays.labelSpacing` | 3 | px, gap when a label is pushed below another |
+| `draft.overlays.rail.minStage` | 640 | px, the narrowest stage that gets rails (a narrower one gets markers) |
+| `draft.overlays.rail.maxW` | 200 | px, the widest a rail gets |
+| `draft.overlays.rail.gap` | 6 | px, between a label and its leader's shoulder |
+| `draft.overlays.rail.shoulder` | 12 | px, the leader's horizontal start at the label |
+| `draft.overlays.rail.spacing` | 20 | px, the least distance between two labels in a rail |
+| `draft.overlays.rail.textAlpha` | 0.85 | 0..1 |
+| `draft.overlays.rail.leaderWidth` | 0.75 | px |
+| `draft.overlays.rail.leaderAlpha` | 0.5 | 0..1 |
+| `draft.overlays.rail.dot` | 2 | px, radius of the dot at the anchor |
+| `draft.overlays.rail.dim` | 0.35 | 0..1, the other labels while one is picked out |
+| `draft.overlays.rail.edge` | 10 | px, a rail's clearance from the drawing |
+| `draft.overlays.rail.samples` | 24 | phases of the cycle a label's anchor is followed over to set its slot |
+| `draft.overlays.marker.r` | 7 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.width` | 0.9 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.offset` | 9 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.leaderWidth` | 0.6 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.leaderAlpha` | 0.45 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.dim` | 0.4 | px, px, px, px, 0..1, 0..1 |
 | `draft.plot.margin.left` | 40 | px |
 | `draft.plot.margin.right` | 8 | px |
 | `draft.plot.margin.top` | 8 | px |

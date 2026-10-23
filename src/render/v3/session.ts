@@ -210,7 +210,8 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       phantoms(A, view.phantoms);
       traces(A, { traces: sh.traces !== false, ghosts: sh.ghosts !== false, ticks: sh.ticks !== false });
       const edge = DRAFT.sheet.inset + DRAFT.sheet.innerOffset;
-      if (sh.construction !== false) overlays(A, { mode, plan, focus: view.focus ?? null, frame: { x0: edge, x1: card.w - edge } });
+      // a card draws no construction at all (SD22); the stage opens with it off, and the visitor turns it on
+      if (sh.construction !== false && !view.card) overlays(A, { mode, plan, focus: view.focus ?? null, frame: { x0: edge, x1: card.w - edge } });
       frames(A, view.frames);
       highlights(A, [...view.highlight, ...(view.state.section?.highlight ?? []), ...(view.state.detail?.highlight ?? [])]);
       if (view.sheet && !view.card) {

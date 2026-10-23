@@ -183,7 +183,7 @@ async function main(box: HTMLElement) {
     detail: undefined as ViewState["detail"],
     rview: "" as string,
     explode: 0,
-    show: { paths: true, construction: true, velocity: false, forces: false, angles: false } as Record<string, boolean>,
+    show: { paths: true, construction: false, velocity: false, forces: false, angles: false } as Record<string, boolean>,
     /** A construction label picked out in the key (its number in the record's order), or null. */
     focus: null as number | null,
     auto: true,
