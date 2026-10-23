@@ -66,11 +66,13 @@ export const DRAFT = {
     bottomAlpha: 0.75, // 0..1
     silhouette: 0.8, // px, vertical edges down the side walls
     silhouetteAlpha: 0.8, // 0..1
+    silhouetteShare: 1.6, // factor on a smooth outline's share of the line, so two edges sharing it read as one line
     edge: 0.7, // px, visible bottom edges of non-plates
     edgeAlpha: 0.7, // 0..1
     chamfer: 0.45, // px
     chamferAlpha: 0.5, // 0..1
     chamferMinScale: 1.5, // px per mm, chamfer lines drawn only above this projection scale
+    capFade: 0.12, // cos of a cap toward the viewer below which its bold top outline blends into the far cap's style (no pop as it turns edge-on)
     marks: 0.6, // px, engraved marks
     marksAlpha: 0.55, // 0..1
     thread: 0.5, // px, thread helices
@@ -133,7 +135,9 @@ export const DRAFT = {
 
   // Pattern tiles: one tile is one pattern step, mapped through the part's pose.
   pattern: {
-    offBelowCos: 0.15, // patterns switch off when cos(tilt) is below this (near edge-on, SD11)
+    offBelowCos: 0.15, // patterns are gone when cos(tilt) is below this (near edge-on, SD11)
+    fadeCos: 0.15, // over this much cos(tilt) above offBelowCos a pattern fades in, so it never switches off in one frame
+    superBelowPx: 8, // device px, a pattern step finer than this on screen is sampled four times per pixel (no shimmer)
     tile: 24, // px, cached tile side (tile units below)
     dotRadius: 3.6, // tile px, soft dot radius
     dotMid: [0.55, 0.8] as const, // gradient stop position and its alpha, soft dot falloff

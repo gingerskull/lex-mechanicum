@@ -50,6 +50,14 @@ export interface Gpu3 {
   post: { p: WebGLProgram; u: U; src: WebGLTexture; w: number; h: number } | "failed" | null;
   /** Shader compile and link time of the first context, ms (R6: once per page). */
   buildMs: number;
+  /** The GPU timer (EXT_disjoint_timer_query_webgl2) where the browser has one: the Auto dial's GPU measure (DL4). */
+  timer: TimerExt | null;
+}
+
+/** The parts of EXT_disjoint_timer_query_webgl2 the frame uses. */
+interface TimerExt {
+  TIME_ELAPSED_EXT: number;
+  GPU_DISJOINT_EXT: number;
 }
 
 let G: Gpu3 | null = null;
@@ -106,7 +114,8 @@ function build(gl: WebGL2RenderingContext, canvas: HTMLCanvasElement, gen: numbe
   const peel = settle(gl, sp);
   const comp = settle(gl, sc);
   const line = settle(gl, sl);
-  return { gl, canvas, gen, lost: false, peel, comp, line, up: uniforms(gl, peel), uc: uniforms(gl, comp), ul: uniforms(gl, line), patTex: null, w: 0, h: 0, layers: [], out: null, post: null, buildMs: performance.now() - t0 };
+  const timer = gl.getExtension("EXT_disjoint_timer_query_webgl2") as TimerExt | null;
+  return { gl, canvas, gen, lost: false, peel, comp, line, up: uniforms(gl, peel), uc: uniforms(gl, comp), ul: uniforms(gl, line), patTex: null, w: 0, h: 0, layers: [], out: null, post: null, buildMs: performance.now() - t0, timer };
 }
 
 /** The shared context, made on first use with the card's canvas factory. Throws where there is no WebGL2. */
@@ -223,8 +232,11 @@ export interface Stats3 {
   edges: number;
   layers: number;
   draws: number;
-  /** How long the GPU was still busy with the previous frame when this one started (a fence), ms: the adaptive dial's measure (DL4). */
+  /** How long the GPU was still busy with the previous frame when this one started (a fence), ms: the adaptive dial's
+   * measure (DL4) where the browser has no GPU timer. Capped by the display's refresh, so it shows no headroom. */
   gpuLagMs: number;
+  /** The GPU's own time for a recent frame (a timer query, read a frame or two late), ms; null without a GPU timer. */
+  gpuMs: number | null;
 }
 
 /** What a frame needs besides the solid table. */
@@ -263,11 +275,14 @@ export class Geometry {
   private px = new Uint8Array(4);
   private fence: WebGLSync | null = null;
   private fenceAt = 0;
+  /** The timer query in flight, if any: one at a time, so a frame whose query is still out goes untimed. */
+  private query: WebGLQuery | null = null;
+  private timing = false;
 
   constructor(readonly g: Gpu3, readonly baked: Baked, readonly n: number) {
     const gl = g.gl;
     this.gen = g.gen;
-    this.stats = { tris: baked.nVerts / 3, edges: baked.nEdges, layers: 0, draws: 0, gpuLagMs: 0 };
+    this.stats = { tris: baked.nVerts / 3, edges: baked.nEdges, layers: 0, draws: 0, gpuLagMs: 0, gpuMs: null };
     this.vao = gl.createVertexArray()!;
     gl.bindVertexArray(this.vao);
     const vb = gl.createBuffer()!;
@@ -336,6 +351,23 @@ export class Geometry {
       if (gl.getSyncParameter(this.fence, gl.SYNC_STATUS) !== gl.SIGNALED) stats.gpuLagMs = performance.now() - this.fenceAt;
       gl.deleteSync(this.fence);
       this.fence = null;
+    }
+    // the GPU's own time for an earlier frame, when its query is in; a disjoint result (the GPU was reset or throttled)
+    // is dropped
+    const T = g.timer;
+    this.timing = false;
+    if (T && this.query && gl.getQueryParameter(this.query, gl.QUERY_RESULT_AVAILABLE)) {
+      const ns = gl.getQueryParameter(this.query, gl.QUERY_RESULT) as number;
+      if (!gl.getParameter(T.GPU_DISJOINT_EXT)) stats.gpuMs = ns / 1e6;
+      gl.deleteQuery(this.query);
+      this.query = null;
+    }
+    if (T && !this.query) {
+      this.query = gl.createQuery();
+      if (this.query) {
+        gl.beginQuery(T.TIME_ELAPSED_EXT, this.query);
+        this.timing = true;
+      }
     }
     gl.bindTexture(gl.TEXTURE_2D, this.tableTex);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, TABLE_W, this.rows, gl.RGBA, gl.FLOAT, table);
@@ -445,6 +477,7 @@ export class Geometry {
     gl.blitFramebuffer(0, 0, p.cw, p.ch, 0, g.h - p.ch, p.cw, g.h, gl.COLOR_BUFFER_BIT, gl.NEAREST);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     stats.layers = K;
+    if (this.timing && g.timer) gl.endQuery(g.timer.TIME_ELAPSED_EXT);
     this.fence = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
     this.fenceAt = performance.now();
   }
@@ -461,6 +494,8 @@ export class Geometry {
     if (this.g.gen !== this.gen || gl.isContextLost()) return;
     if (this.fence) gl.deleteSync(this.fence);
     this.fence = null;
+    if (this.query) gl.deleteQuery(this.query);
+    this.query = null;
     for (const b of this.buffers) gl.deleteBuffer(b);
     gl.deleteVertexArray(this.vao);
     gl.deleteVertexArray(this.evao);

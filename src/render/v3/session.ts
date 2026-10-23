@@ -115,6 +115,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
   const mats = new Float32Array(rt.n * 16);
   let table = new Float32Array(0);
   const see = new Uint8Array(rt.n);
+  const seeA = new Float32Array(rt.n);
   const cache = { paper: {} as { c?: CanvasLike; key?: string }, ann: newCache() };
   let geo: Geometry | null = null;
   let last = "";
@@ -163,8 +164,8 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
           for (let k = 0; k < 6; k++) boxes[i * 6 + k] = wb[k]!;
         }
       }
-      seeThrough(rt, boxes, C, see);
-      rows(rt, mats, { see, ladder: LD, card: !!view.card, patterns: LD.effect("rolePatterns") }, table);
+      seeThrough(rt, boxes, C, see, seeA);
+      rows(rt, mats, { see: seeA, ladder: LD, card: !!view.card, patterns: LD.effect("rolePatterns") }, table);
       const A: Ann = { ctx: card.ctx, w: card.w, h: card.h, C, T, rt, mats, u, explode: e, LD, cache: cache.ann };
       const ctx = card.ctx;
       ctx.setTransform(card.dpr, 0, 0, card.dpr, 0, 0);

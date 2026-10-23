@@ -138,6 +138,25 @@ describe("principle visibility (T10, T17)", () => {
     expect(ids(seeThrough(rt, boxes, below))).toEqual(["cover", "under"]);
   });
 
+  it("eases a solid in and out of see-through while the view turns, never in one step", () => {
+    const amount = new Float32Array(rt.n);
+    let prev: Float32Array | null = null;
+    let worst = 0;
+    let moved = 0;
+    for (let t = 0; t <= 180; t += 0.5) {
+      const C = fit(basisOfOrient({ yaw: 30, tilt: t }), 800, 600, [-80, -80, 0, 80, 80, 34]);
+      seeThrough(rt, boxes, C, new Uint8Array(rt.n), amount);
+      if (prev) for (let i = 0; i < rt.n; i++) {
+        const d = Math.abs(amount[i]! - prev[i]!);
+        worst = Math.max(worst, d);
+        if (d > 0) moved++;
+      }
+      prev = amount.slice();
+    }
+    expect(moved).toBeGreaterThan(0);
+    expect(worst).toBeLessThan(0.34);
+  });
+
   it("is stable while the part moves: the set depends on the sweep, not on the phase", () => {
     const m2 = new Float32Array(rt.n * 16);
     place(rt, 2.3, 0, m2);
