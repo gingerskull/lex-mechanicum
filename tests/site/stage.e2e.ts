@@ -78,7 +78,9 @@ describe("a mechanism page", () => {
     await ready(page);
     expect(await page.locator(".stamp3d").count()).toBe(0);
     expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
-    expect(await page.locator('#presets button[data-view="PLAN"]').getAttribute("aria-pressed")).toBe("true");
+    // the four-bar declares a plan, which opens tilted to the 28 degree view (T7)
+    expect(await page.locator('#presets button[data-view="PLAN"]').getAttribute("aria-pressed")).toBe("false");
+    expect(await page.locator("#tiltv").textContent()).toBe("28°");
     const a = await stageShot(page);
     await page.waitForTimeout(600);
     expect(differs(a, await stageShot(page))).toBe(true);
@@ -253,6 +255,7 @@ describe("the stage on a desktop", () => {
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
     await ready(page);
     expect(await page.locator("#ckey").isHidden()).toBe(true);
+    await page.locator('#presets button[data-view="PLAN"]').click();
     expect(await page.locator("#tiltv").textContent()).toBe("Plan");
     await page.locator("#explode").fill("60");
     await page.waitForTimeout(700);

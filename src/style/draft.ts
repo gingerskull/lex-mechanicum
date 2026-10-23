@@ -171,6 +171,7 @@ export const DRAFT = {
     snap: 4, // degrees, a view this close to a named view is that view (title block, orbit snapping)
     views: { PLAN: [0, 0], FRONT: [0, 90], SIDE: [90, 90], ISOMETRIC: [45, 54.7356], DIMETRIC: [20.7, 70.5288] } as Record<string, readonly [number, number]>, // [yaw, tilt] degrees
     auxMinCos: 0.02, // an AUX view down an axis that stands this close to vertical turns the drawing's up to y
+    planOpens: 28, // degrees of tilt a record that declares PLAN opens at (it reads flat in plan; T7)
   },
 
   // Section views (SD19): the cut faces are paper hatched at 45 degrees, with a bold outline.
