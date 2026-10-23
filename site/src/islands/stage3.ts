@@ -200,7 +200,8 @@ async function main(box: HTMLElement) {
       detail: warm ? LADDER[LADDER.length - 1]! : LADDER[dial.rung]!,
       sheet: true,
       dims: true,
-      show: { traces: s.show.paths, ghosts: s.show.paths, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
+      // the ghost paths are sampled at other settings, each a cycle of solves: they come with the frame after the first (R9)
+      show: { traces: s.show.paths, ghosts: s.show.paths && !warm, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
       ring: s.ring,
       glitch: s.glitch,
     });
