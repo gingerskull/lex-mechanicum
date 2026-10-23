@@ -4,7 +4,7 @@
 // scrubber and the plot stay on the true input. The setup runs in a worker, the shaders build while the data downloads,
 // and the first frame is drawn at a coarse dial until the page is idle (R9). A browser without WebGL2 gets the still and a
 // note; the plot and the rest of the page work.
-import { autoStep } from "../autodial";
+import { AUTO, autoLast, autoSettle, autoState, autoStep, isDesktop } from "../autodial";
 import { hasWebGL2 } from "../gl";
 import { url } from "../url";
 import type { StageControl } from "../data";
@@ -162,6 +162,9 @@ async function main(box: HTMLElement) {
   const tm = E.timeMap(teaching?.timeMap ? { ...(teaching.timeMap.span ? { span: teaching.timeMap.span } : {}), ...(teaching.timeMap.spans ? { spans: teaching.timeMap.spans } : {}), slow: teaching.timeMap.slow } : undefined);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const LADDER: Dial[] = ["full", ...E.DETAIL.map((r) => r.id).filter((x) => x !== "H")];
+  /** The coarsest rung Auto may reach here (DL4): a desktop keeps the look (site/src/autodial.ts). */
+  const autoFloor = autoLast(LADDER, isDesktop(window), AUTO.desktopFloor);
+  const dial = autoState();
 
   const s = {
     t: tm.tOf((63 / 360) * TAU),
@@ -176,9 +179,6 @@ async function main(box: HTMLElement) {
     explode: 0,
     show: { paths: true, construction: true, velocity: false, forces: false, angles: false } as Record<string, boolean>,
     auto: true,
-    rung: 0,
-    slow: 0,
-    fast: 0,
     /** The input ring's strength: it breathes while paused (LM-06), never while playing or under reduced motion. */
     ring: 1,
     /** A Forge glitch on the drawing (SS14): 1 at a pulse, less at a blip, 0 between. */
@@ -195,7 +195,7 @@ async function main(box: HTMLElement) {
     E.recordDrawView(L.scene, {
       state: state(),
       theme: E.pageTheme(),
-      detail: warm ? LADDER[LADDER.length - 1]! : LADDER[s.rung]!,
+      detail: warm ? LADDER[LADDER.length - 1]! : LADDER[dial.rung]!,
       sheet: true,
       dims: true,
       show: { traces: s.show.paths, ghosts: s.show.paths, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
@@ -218,10 +218,12 @@ async function main(box: HTMLElement) {
   // the detail slider: right is full detail, each step left drops one more rung
   const detail = $<HTMLInputElement>("detail");
   function showDial() {
-    detail.value = String(LADDER.length - 1 - s.rung);
-    const r = LADDER[s.rung]!;
+    detail.value = String(LADDER.length - 1 - dial.rung);
+    const r = LADDER[dial.rung]!;
     $("detailv").textContent = r === "full" ? "Full" : r === "A" ? "−A" : `−A–${r}`;
-    $("detailv").title = r === "full" ? "Everything drawn" : `Not drawn: ${E.DETAIL.slice(0, E.DETAIL.findIndex((x) => x.id === r) + 1).map((x) => x.name.toLowerCase()).join("; ")}`;
+    // why Auto dropped detail, so a screenshot is never mistaken for the full build (DL4)
+    const why = s.auto && dial.why !== null ? ` Auto stepped down: frames took about ${Math.round(dial.why)} ms against a budget of ${AUTO.budgetMs} ms.` : "";
+    $("detailv").title = r === "full" ? "Everything drawn" : `Not drawn: ${E.DETAIL.slice(0, E.DETAIL.findIndex((x) => x.id === r) + 1).map((x) => x.name.toLowerCase()).join("; ")}.${why}`;
   }
 
   // the camera controls reflect the pose
@@ -269,7 +271,8 @@ async function main(box: HTMLElement) {
     const ms = performance.now() - t0;
     lastMs = ms;
     if (plot && series) E.drawPlot(plot, E.theme(E.pageTheme()), series.data, s.u, series.unit, series.more);
-    if (!warm && s.auto && s.playing && autoStep(s, ms, sess.stats?.gpuLagMs ?? 0, LADDER.length - 1)) showDial();
+    const st = sess.stats;
+    if (!warm && s.auto && s.playing && autoStep(dial, ms, st?.gpuMs ?? st?.gpuLagMs ?? 0, autoFloor)) showDial();
     const deg = Math.round((((s.u % TAU) + TAU) % TAU) / TAU * 360) % 360;
     $<HTMLInputElement>("scrub").value = String(deg);
     $("scrubv").textContent = `${deg}°`;
@@ -278,6 +281,7 @@ async function main(box: HTMLElement) {
       warmQueued = true;
       const done = () => {
         warm = false;
+        autoSettle(dial);
         dirty = true;
       };
       if ("requestIdleCallback" in window) requestIdleCallback(done, { timeout: 400 });
@@ -447,19 +451,19 @@ async function main(box: HTMLElement) {
   const auto = $<HTMLButtonElement>("auto");
   const setAuto = (v: boolean) => {
     s.auto = v;
-    s.slow = s.fast = 0;
+    autoSettle(dial);
     auto.setAttribute("aria-pressed", String(v));
   };
   auto.addEventListener("click", () => {
     setAuto(!s.auto);
-    if (s.auto) s.rung = 0;
+    if (s.auto) Object.assign(dial, autoState());
     showDial();
     dirty = true;
   });
   detail.max = String(LADDER.length - 1);
   detail.addEventListener("input", () => {
     setAuto(false);
-    s.rung = LADDER.length - 1 - Number(detail.value);
+    dial.rung = LADDER.length - 1 - Number(detail.value);
     showDial();
     dirty = true;
   });
