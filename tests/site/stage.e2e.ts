@@ -248,6 +248,20 @@ describe("the stage on a desktop", () => {
     await ctx.close();
   });
 
+  it("keeps the construction key out of sight on a wide stage, and leaves a plan for the 28 degree view to explode", async () => {
+    const ctx = await desktop();
+    const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
+    await ready(page);
+    expect(await page.locator("#ckey").isHidden()).toBe(true);
+    expect(await page.locator("#tiltv").textContent()).toBe("Plan");
+    await page.locator("#explode").fill("60");
+    await page.waitForTimeout(700);
+    expect(await page.locator("#tilt").inputValue()).toBe("28");
+    expect(await page.locator("#play").getAttribute("aria-pressed")).toBe("false");
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
   it("moves with the tilt slider and explodes", async () => {
     const ctx = await desktop();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
@@ -362,6 +376,16 @@ describe("the stage on a phone", () => {
     await page.waitForTimeout(200);
     expect(Number(await page.locator("#tilt").inputValue())).not.toBe(t0);
     expect(await page.locator("#orbit").count()).toBe(0);
+    // the construction key under the narrow stage: a tap picks a line out on the drawing, a second lets it go
+    const key = page.locator("#ckey button").first();
+    expect(await page.locator("#ckey").isVisible()).toBe(true);
+    const plain = await stageShot(page);
+    await key.tap();
+    expect(await key.getAttribute("aria-pressed")).toBe("true");
+    await page.waitForTimeout(200);
+    expect(differs(plain, await stageShot(page))).toBe(true);
+    await key.tap();
+    expect(await key.getAttribute("aria-pressed")).toBe("false");
     await page.locator('#presets button[data-view="FRONT"]').tap();
     await page.waitForSelector('#presets button[data-view="FRONT"][aria-pressed="true"]');
     await page.locator("#explode").fill("50");

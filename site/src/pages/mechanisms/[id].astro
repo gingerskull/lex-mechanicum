@@ -18,6 +18,11 @@ const i = SHEETS.indexOf(sheet);
 const prev = SHEETS[(i - 1 + SHEETS.length) % SHEETS.length]!;
 const next = SHEETS[(i + 1) % SHEETS.length]!;
 const drive = driveOf(sheet.id);
+// the construction labels in the record's order: the key a narrow stage shows under its numbered markers (SD22)
+function labelsOf(rec: SheetInfo["rec"]): string[] {
+  const ovs = ((rec as { teaching?: { overlays?: { label?: unknown }[] } }).teaching?.overlays ?? []) as { label?: unknown }[];
+  return ovs.map((o) => o.label).filter((l): l is string => typeof l === "string" && l.length > 0);
+}
 // a fact's value: plain text, or [text, href] for a value the library filters by
 type Part = string | [string, string];
 const facetLink = (key: string, v: string) => url(`/?${key}=${encodeURIComponent(v)}`);
@@ -80,7 +85,7 @@ const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
       } catch {}
     </script>
     <div class="dlayout">
-      <Stage3 id={sheet.id} no={sheet.no} title={r.name} controls={controlsOf(r)} views={viewButtons(r)} timeMap={Boolean((r as any).teaching?.timeMap)} />
+      <Stage3 id={sheet.id} no={sheet.no} title={r.name} controls={controlsOf(r)} views={viewButtons(r)} timeMap={Boolean((r as any).teaching?.timeMap)} labels={labelsOf(r)} />
       <aside class="side">
         <section class="panel">
           <h2>At a glance</h2>

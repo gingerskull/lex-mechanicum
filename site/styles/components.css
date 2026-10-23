@@ -634,6 +634,39 @@
   color: var(--paper);
 }
 
+/* the construction key under a narrow stage: the numbered markers' names; a tap picks one out (SD22) */
+.ckey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.ckey button {
+  font: 500 11px / 1.5 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.ckey button b {
+  display: inline-block;
+  min-width: 1.6em;
+  margin-right: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: 600;
+}
+.ckey button[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* panels */
 .panel {
   background: var(--paper);

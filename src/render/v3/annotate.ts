@@ -16,7 +16,7 @@ import { FORM } from "../../style/form";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
 import type { Ladder } from "../detail";
 import { angleToEye, project, scaleOf, type Camera } from "./camera";
-import { arrowHead, labeler, type Labeler } from "./labels";
+import { arrowHead, drawMarkers, drawRails, labeler, type LabelMode, type LabelPlan, type LabelSpot, type Labeler } from "./labels";
 import type { Controls } from "./poser";
 import { applyMat, mulMat, type Runtime } from "./scene";
 
@@ -489,20 +489,41 @@ export function traces(A: Ann, f: TraceFlags): void {
       if (shown > 0) stroke(ctx, pts, !open);
       ctx.setLineDash([]);
       if (f.ticks && tr.ticks?.every) {
+        // equal-time ticks (SD24): short strokes across the path in its accent; where they would crowd, every m-th is
+        // drawn (still equal steps of time, so uneven spacing still reads as uneven speed), and a path too short to carry
+        // them has none
+        const K = DRAFT.tick;
         const n = Math.max(1, Math.floor(360 / tr.ticks.every));
-        const h = DRAFT.tick.half;
-        ctx.lineWidth = DRAFT.tick.width;
-        ctx.strokeStyle = paint(T.ink, DRAFT.tick.alpha);
-        ctx.beginPath();
+        const at: [number, number][] = [];
         for (let k = 0; k < n; k++) {
           // in a body's frame, the tick is the path's sample at that phase (the path is already carried to now)
           const p = tr.frame ? sampleAt(path, k / n) : poser.point((k / n) * poser.period, tr.point);
-          if (!p) continue;
-          const [x, y] = P(A, p);
-          ctx.moveTo(x - h, y - h); ctx.lineTo(x + h, y + h);
-          ctx.moveTo(x - h, y + h); ctx.lineTo(x + h, y - h);
+          at.push(p ? P(A, p) : [NaN, NaN]);
         }
-        if (shown > 0) ctx.stroke();
+        let length = 0;
+        for (let k = 1; k < pts.length; k++) length += Math.hypot(pts[k]![0] - pts[k - 1]![0], pts[k]![1] - pts[k - 1]![1]);
+        const gaps = at.map((p, k) => Math.hypot(p[0] - at[(k + 1) % n]![0], p[1] - at[(k + 1) % n]![1])).filter(Number.isFinite).sort((a, b) => a - b);
+        const median = gaps[gaps.length >> 1] ?? 0;
+        const m = median > 0 ? Math.max(1, Math.ceil(K.minGap / median)) : 1;
+        if (length >= K.minPath && shown > 0) {
+          ctx.lineWidth = K.width;
+          ctx.strokeStyle = paint(T[SP.color], K.alpha * (i ? SP.otherGain : 1));
+          ctx.beginPath();
+          for (let k = 0; k < n; k += m) {
+            const [x, y] = at[k]!;
+            if (!Number.isFinite(x)) continue;
+            // across the path: square to the line through its neighbours on the path
+            const a = at[(k - 1 + n) % n]!, b = at[(k + 1) % n]!;
+            let dx = b[0] - a[0], dy = b[1] - a[1];
+            const l = Math.hypot(dx, dy);
+            if (!(l > 1e-6)) continue;
+            dx /= l;
+            dy /= l;
+            ctx.moveTo(x - dy * K.half, y + dx * K.half);
+            ctx.lineTo(x + dy * K.half, y - dx * K.half);
+          }
+          ctx.stroke();
+        }
       }
       ctx.globalAlpha = 1;
       if (tr.comet) {
@@ -682,19 +703,64 @@ const worldNormal = (a: Vec3, b: Vec3, c: Vec3): Vec3 => {
 };
 
 /** Dashed fine ink lines with mono labels on a paper panel: dead centres, tangents, axis lines, moment arms, chords, arcs, workspaces. */
-export function overlays(A: Ann): void {
+/** How the construction labels of a frame are drawn (SD22), and the label picked out (its number in the record's order). */
+export interface LabelDraw {
+  mode: LabelMode;
+  plan: LabelPlan | null;
+  focus: number | null;
+  /** The sheet's drawing area across, CSS px: the rails stand inside it. */
+  frame: { x0: number; x1: number };
+}
+
+/**
+ * The construction overlays (SD22). Their labels stand in rails at the sides with leaders, or are numbered markers with
+ * the key under the stage, as `L` says; with no layout they are lettered beside their elements (the screenshot tool's
+ * old form); with mode "none" (a card) there are none. A picked-out label's element is drawn bold in accent and the rest
+ * fade.
+ */
+export function overlays(A: Ann, L?: LabelDraw): void {
   const t = A.rt.scene.teaching;
   if (!t || !t.overlays.length) return;
   const { ctx, T } = A;
-  const label = labeler(ctx, T, A.w, A.h);
+  const spots: LabelSpot[] = [];
+  let base = "";
+  const collect: Labeler = (text, x, y, _c, _s, cands) => spots.push({ text, base: base || text, cands: cands?.length ? cands : [[x, y]] });
+  const label = L ? (L.mode === "none" ? () => {} : collect) : labeler(ctx, T, A.w, A.h);
   const ink = paint(T.ink, O.line.alpha + 0.3);
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = paint(T.ink, O.line.alpha);
-  ctx.lineWidth = O.line.width;
-  for (const ov of t.overlays) drawOverlay(A, ov, label, ink);
+  let n = 0;
+  for (const ov of t.overlays) {
+    const k = typeof ov.label === "string" && ov.label ? n++ : -1;
+    const picked = L?.focus !== null && L?.focus !== undefined && k === L.focus;
+    ctx.globalAlpha = L?.focus === null || L?.focus === undefined || picked ? 1 : O.rail.dim;
+    ctx.strokeStyle = picked ? paint(T.accent) : paint(T.ink, O.line.alpha);
+    ctx.lineWidth = picked ? O.line.width * 1.8 : O.line.width;
+    base = typeof ov.label === "string" ? ov.label : "";
+    drawOverlay(A, ov, label, ink);
+  }
   ctx.restore();
+  if (L?.plan && L.mode === "rails") drawRails(ctx, T, L.plan, spots, L.frame, L.focus);
+  else if (L?.plan && L.mode === "markers") drawMarkers(ctx, T, L.plan, spots, L.focus);
+}
+
+/** A 2D context that draws nothing: the overlays' geometry run for where their labels would go. */
+const DRY = new Proxy({}, { get: (_t, k) => (k === "measureText" ? () => ({ width: 0 }) : () => undefined), set: () => true }) as unknown as CanvasRenderingContext2D;
+
+/** Where the construction labels could hang at phase u, without drawing (the layout follows them over the cycle). */
+export function labelSpots(A: Ann, u: number): LabelSpot[] {
+  const t = A.rt.scene.teaching;
+  if (!t?.overlays.length) return [];
+  const out: LabelSpot[] = [];
+  let base = "";
+  const collect: Labeler = (text, x, y, _c, _s, cands) => out.push({ text, base: base || text, cands: cands?.length ? cands : [[x, y]] });
+  const B: Ann = { ...A, ctx: DRY, u };
+  for (const ov of t.overlays) {
+    base = typeof ov.label === "string" ? ov.label : "";
+    drawOverlay(B, ov, collect, "");
+  }
+  return out;
 }
 
 /** The two points of a line overlay drawn through two named points (`from` and `through`, or `from` and `to`). */
@@ -735,10 +801,12 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
     stroke(ctx, pts.map((p) => P(A, p)), close);
     solid();
   };
-  const tag = (p: Vec3, dx = 0, dy = -14) => {
+  // a label at a point, offset as it is lettered beside it; `more` are other points of the element it could hang on
+  // instead (its ends, its centre), for a layout that picks the steadiest (SD22)
+  const tag = (p: Vec3, dx = 0, dy = -14, more: (Vec3 | null)[] = []) => {
     if (!text) return;
     const [x, y] = P(A, p);
-    label(text, x + dx, y + dy, ink, true);
+    label(text, x + dx, y + dy, ink, true, [[x, y], ...more.filter((q): q is Vec3 => !!q).map((q) => P(A, q))]);
   };
   const o = ov as Record<string, unknown>;
   // a posed overlay is drawn where an output reaches an extreme (a dead centre, the ends of a stroke): `pose` for all
@@ -784,8 +852,8 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         ctx.font = font(DRAFT.type.overlaySmall);
         const w = ctx.measureText(DRAFT.type.uppercase ? text.toUpperCase() : text).width / 2 + O.labelPadX + O.shortGap;
         ctx.restore();
-        label(text, tx + ux * w, ty + uy * (O.labelHSmall / 2 + O.shortGap), ink, true);
-      } else tag(mul(add(a, b), 0.5));
+        label(text, tx + ux * w, ty + uy * (O.labelHSmall / 2 + O.shortGap), ink, true, [[tx, ty], [sx, sy]]);
+      } else tag(mul(add(a, b), 0.5), 0, -14, [a, b]);
       return;
     }
     case "dimension": {
@@ -822,7 +890,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       let rb = ln ? null : rawOf(o.to, o.toPose);
       if (ra && rb && k >= 0) rb = ra.map((v, i) => (i === k ? rb![i]! : v)) as Vec3;
       const m = ln ? Math.hypot(b[0] - a[0], b[1] - a[1]) : ra && rb ? len(sub(rb, ra)) : typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
-      if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
+      if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true, [[(p[0] + q[0]) / 2, (p[1] + q[1]) / 2], p, q]);
       return;
     }
     case "circle": {
@@ -836,7 +904,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const r = typeof o.radius === "number" ? o.radius : rv !== null ? rv : c && th ? across(sub(th, c)) : null;
       if (!c || r === null) return;
       poly(arcPts(c, e0, n, r, 0, TAU), true);
-      tag(add(c, mul(e0, r)), 18, 0);
+      tag(add(c, mul(e0, r)), 18, 0, [c]);
       return;
     }
     case "arc": {
@@ -855,7 +923,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
           pts = arcPts(cRef, e0, n, o.radius, a0!, a1!).map((p) => applyMat(M, p));
         }
         poly(pts);
-        tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
+        tag(pts[Math.floor(pts.length / 2)]!, 0, -10, [c]);
         return;
       }
       const from = fromPt(), to = toPt(), through = pointOf(A, o.through);
@@ -870,7 +938,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         else while (a1 < a0) a1 += TAU;
         const pts = arcPts(c, [1, 0, 0], [0, 0, 1], r, a0, a1);
         poly(pts);
-        tag(pts[32]!, 0, -10);
+        tag(pts[32]!, 0, -10, [c]);
         return;
       }
       if (from && to) {
@@ -882,7 +950,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         if (ang < 0) ang += TAU;
         const r = Math.min(len(sub(from, c)), len(sub(to, c))) * 0.5;
         poly(arcPts(c, e0, n, r, 0, ang));
-        tag(arcPts(c, e0, n, r, 0, ang)[32]!, 0, -10);
+        tag(arcPts(c, e0, n, r, 0, ang)[32]!, 0, -10, [c]);
         return;
       }
       if (through) {
@@ -914,7 +982,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         const full = hi - lo > TAU * 0.9;
         const pts = arcPts(c, [1, 0, 0], [0, 0, 1], r, full ? 0 : lo, full ? TAU : hi);
         poly(pts, full);
-        tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
+        tag(pts[Math.floor(pts.length / 2)]!, 0, -10, [c]);
       }
       return;
     }
@@ -934,7 +1002,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       poly([c, from]);
       if (Math.abs(ang) > 1e-4) poly(pts);
       const deg = (ang * 180) / Math.PI;
-      if (text) label(`${text} ${deg >= 0 ? "+" : ""}${deg.toFixed(2)}°`, P(A, from)[0], P(A, from)[1] - 14, ink, true);
+      if (text) label(`${text} ${deg >= 0 ? "+" : ""}${deg.toFixed(2)}°`, P(A, from)[0], P(A, from)[1] - 14, ink, true, [P(A, from), P(A, c)]);
       return;
     }
     case "axis-line": {
@@ -956,7 +1024,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         }
         const lo = Math.min(...ends) - 0.1, hi = Math.max(...ends) + 0.1;
         poly([add(p, mul(d, lo)), add(p, mul(d, hi))]);
-        tag(add(p, mul(d, hi)), 0, -12);
+        tag(add(p, mul(d, hi)), 0, -12, [p, q]);
         return;
       }
       // or at a point (`at`, or `point`) with its direction (`axis`, or `dir`)
@@ -968,7 +1036,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const a = unit(ax);
       const L = typeof o.length === "number" ? o.length : 80;
       poly([sub(c, mul(a, L)), add(c, mul(a, L))]);
-      tag(add(c, mul(a, L)), 0, -12);
+      tag(add(c, mul(a, L)), 0, -12, [c]);
       return;
     }
     case "workspace": {

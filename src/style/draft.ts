@@ -188,7 +188,7 @@ export const DRAFT = {
   // Ghost paths, phantom positions, ticks, explode trails (SD21, SD23, SD24, SD12).
   ghost: { alpha: 0.4, dash: [3, 3] as const, width: 1 }, // factor on path.alpha, px, px
   phantom: { dash: [4, 3] as const, width: 0.8, alpha: 0.85 }, // px, px, factor on the hidden lines' alpha
-  tick: { half: 3.5, width: 1, alpha: 0.8 }, // px half length of the cross mark, px, 0..1 ink
+  tick: { half: 3, width: 1, alpha: 0.75, minGap: 10, minPath: 60 }, // px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks
   trail: { width: 0.7, alpha: 0.55, dash: [2, 3] as const }, // px, 0..1, px: explode trail lines
 
   // Traced paths and the comet (SD7), accent.
@@ -296,6 +296,23 @@ export const DRAFT = {
     labelBorder: 0.8, // px, panel hairline width
     labelEdge: 4, // px, labels kept this far inside the canvas
     labelSpacing: 3, // px, gap when a label is pushed below another
+    // Construction labels on a wide stage (SD22): in rails at the sides of the sheet, each with a drafting leader.
+    rail: {
+      minStage: 640, // px, the narrowest stage that gets rails (a narrower one gets markers)
+      maxW: 200, // px, the widest a rail gets
+      gap: 6, // px, between a label and its leader's shoulder
+      shoulder: 12, // px, the leader's horizontal start at the label
+      spacing: 20, // px, the least distance between two labels in a rail
+      textAlpha: 0.85, // 0..1
+      leaderWidth: 0.75, // px
+      leaderAlpha: 0.5, // 0..1
+      dot: 2, // px, radius of the dot at the anchor
+      dim: 0.35, // 0..1, the other labels while one is picked out
+      edge: 10, // px, a rail's clearance from the drawing
+      samples: 24, // phases of the cycle a label's anchor is followed over to set its slot
+    },
+    // Construction labels on a narrow stage (SD22): numbered markers by the anchors, the key under the stage.
+    marker: { r: 7, width: 0.9, offset: 9, leaderWidth: 0.6, leaderAlpha: 0.45, dim: 0.4 }, // px, px, px, px, 0..1, 0..1
   },
 
   // Output plot (SD15).

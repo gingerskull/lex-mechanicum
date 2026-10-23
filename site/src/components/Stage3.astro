@@ -10,8 +10,10 @@ interface Props {
   controls: StageControl[];
   views: { id: string; kind: "section" | "detail" }[];
   timeMap: boolean;
+  /** The construction overlays' labels in the record's order: the key under a narrow stage (SD22). */
+  labels: string[];
 }
-const { id, no, title, controls, views, timeMap } = Astro.props;
+const { id, no, title, controls, views, timeMap, labels } = Astro.props;
 const overlays = [
   ["paths", "Paths", true],
   ["construction", "Construction", true],
@@ -86,6 +88,11 @@ const presets = [
       <button class="chip" type="button" data-o={k} aria-pressed={on ? "true" : "false"}><i></i>{label}</button>
     ))}
   </div>
+  {labels.length > 0 && (
+    <ol class="ckey" id="ckey" aria-label="Construction key" hidden>
+      {labels.map((l, i) => <li><button type="button" data-n={i} aria-pressed="false" title="Pick this line out on the drawing"><b>{i + 1}</b>{l}</button></li>)}
+    </ol>
+  )}
   <p class="stagenote" id="stage-err" hidden></p>
 </div>
 <script>

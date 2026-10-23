@@ -21,6 +21,10 @@ const ORBIT = 0.4;
 const DRAG_PX = 8;
 /** Degrees one Shift and arrow press orbits. */
 const KEY_ORBIT = 5;
+/** Explode opened in a view tilted less than this (a plan) eases to the 28 degree view, over this many seconds. */
+const EXPLODE_TILT_BELOW = 15;
+const EXPLODE_TILT = 28;
+const TWEEN_S = 0.45;
 
 const box = document.querySelector<HTMLElement>('.stagebox[data-engine="v3"]');
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -180,6 +184,8 @@ async function main(box: HTMLElement) {
     rview: "" as string,
     explode: 0,
     show: { paths: true, construction: true, velocity: false, forces: false, angles: false } as Record<string, boolean>,
+    /** A construction label picked out in the key (its number in the record's order), or null. */
+    focus: null as number | null,
     auto: true,
     /** The input ring's strength: it breathes while paused (LM-06), never while playing or under reduced motion. */
     ring: 1,
@@ -204,6 +210,7 @@ async function main(box: HTMLElement) {
       show: { traces: s.show.paths, ghosts: s.show.paths && !warm, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
       ring: s.ring,
       glitch: s.glitch,
+      focus: s.focus,
     });
 
   // the output plot
@@ -322,6 +329,15 @@ async function main(box: HTMLElement) {
       breathAt = now;
       dirty = true;
     }
+    if (tween) {
+      const k = Math.min(1, (now - tween.t0) / (TWEEN_S * 1000));
+      const e = k * k * (3 - 2 * k);
+      s.orient = { yaw: tween.from.yaw + (tween.to.yaw - tween.from.yaw) * e, tilt: tween.from.tilt + (tween.to.tilt - tween.from.tilt) * e };
+      s.auxName = undefined;
+      showCamera();
+      dirty = true;
+      if (k >= 1) tween = null;
+    }
     if (glitchUntil) {
       s.glitch = now < glitchUntil ? glitchStrength : 0;
       if (!s.glitch) glitchUntil = 0;
@@ -334,6 +350,8 @@ async function main(box: HTMLElement) {
   // a Forge glitch pulse or blip tears the drawing for its length (islands/forge.ts sends it, never under reduced motion)
   let glitchUntil = 0;
   let glitchStrength = 1;
+  /** A camera move under way (explode leaving a plan for the 28 degree view). */
+  let tween: { from: Orient; to: Orient; t0: number } | null = null;
   addEventListener("forgeglitch", (e) => {
     if (E.pageTheme() !== "forge") return;
     const d = (e as CustomEvent<{ length?: number; strength?: number }>).detail ?? {};
@@ -433,6 +451,16 @@ async function main(box: HTMLElement) {
     if (was === 0 && s.explode > 0) {
       playAfterExplode = s.playing;
       setPlaying(false);
+      // a plan looks straight down most explode axes, so the parts would only stack up unseen: ease to the 28 degree
+      // view, keeping the turn of the plan (SD12)
+      const o = turntable(s.orient);
+      if (!s.section && !s.detail && o.tilt < EXPLODE_TILT_BELOW) {
+        const to: Orient = { yaw: o.yaw, tilt: EXPLODE_TILT };
+        if (reduced) {
+          s.orient = to;
+          showCamera();
+        } else tween = { from: { yaw: o.yaw, tilt: o.tilt }, to, t0: performance.now() };
+      }
     } else if (was > 0 && s.explode === 0 && playAfterExplode) {
       playAfterExplode = false;
       setPlaying(true);
@@ -455,6 +483,7 @@ async function main(box: HTMLElement) {
     c.addEventListener("click", () => {
       s.show[k] = !s.show[k];
       c.setAttribute("aria-pressed", String(s.show[k]));
+      if (k === "construction") showKey();
       dirty = true;
     });
   }
@@ -526,11 +555,27 @@ async function main(box: HTMLElement) {
         setCtl(g.dataset.target as StageControl["target"], g.dataset.key!, optionValue(g.dataset.target!, g.dataset.key!, b.dataset.v!));
       });
 
+  // the construction key: shown under a stage narrow enough for numbered markers, while construction is on (SD22); a
+  // tap picks a line out on the drawing, a second tap lets it go
+  const ckey = document.getElementById("ckey");
+  const showKey = () => {
+    if (ckey) ckey.hidden = !s.show.construction || size().width >= E.DRAFT.overlays.rail.minStage;
+  };
+  for (const b of ckey?.querySelectorAll<HTMLButtonElement>("button") ?? [])
+    b.addEventListener("click", () => {
+      const n = Number(b.dataset.n);
+      s.focus = s.focus === n ? null : n;
+      for (const o of ckey!.querySelectorAll("button")) o.setAttribute("aria-pressed", String(Number((o as HTMLElement).dataset.n) === s.focus));
+      dirty = true;
+    });
+  showKey();
+
   // pointer (SS5): a sideways drag scrubs the cycle and pauses, as on the 2.5D stage; a tap plays or pauses. A mouse
   // orbits with the right button (or Shift and the left), and the stage's menu stays shut after an orbit. A finger drags
   // sideways to scrub and leaves up and down to the page (touch-action: pan-y); two fingers orbit.
   canvas.tabIndex = 0;
   const orbitTo = (yaw: number, tilt: number) => {
+    tween = null;
     s.orient = { yaw, tilt: Math.max(0, Math.min(90, tilt)) };
     s.auxName = undefined;
     if (!s.section) s.rview = "";
@@ -674,6 +719,7 @@ async function main(box: HTMLElement) {
     const r = size();
     sess.resize(r.width, r.height, E.pixelRatio());
     plotSize();
+    showKey();
     dirty = true;
   });
   resized.observe(canvas);
