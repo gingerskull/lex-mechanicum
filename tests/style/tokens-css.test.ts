@@ -14,14 +14,15 @@ const block = (selector: string) => {
 };
 
 describe("generated tokens.css", () => {
-  it("has a dark :root block and a light block", () => {
+  it("has a dark :root block, a light block and a forge block", () => {
     expect(block(":root")).toContain("color-scheme: dark");
     expect(block(':root[data-theme="light"]')).toContain("color-scheme: light");
+    expect(block(':root[data-theme="forge"]')).toContain("color-scheme: dark");
   });
 
-  it("names every theme token as --kebab in both blocks, with its value", () => {
-    for (const key of ["dark", "light"] as const) {
-      const b = block(key === "dark" ? ":root" : ':root[data-theme="light"]');
+  it("names every theme token as --kebab in every block, with its value", () => {
+    for (const key of ["dark", "light", "forge"] as const) {
+      const b = block(key === "dark" ? ":root" : `:root[data-theme="${key}"]`);
       const t = TOKENS.themes[key];
       for (const c of COLOR_NAMES) expect(b).toContain(`${kebab(c)}: ${t[c]};`);
       expect(b).toContain(`--pattern-gain: ${t.patternGain};`);
@@ -63,12 +64,13 @@ describe("theme()", () => {
     expect(t.paper).toEqual([0x14, 0x21, 0x30]);
     expect(t.dark).toBe(true);
     expect(theme("light").dark).toBe(false);
+    expect(theme("forge").dark).toBe(true);
     expect(rgba(t.accent, 0.5)).toBe("rgba(242,154,107,0.5)");
     expect(hexToRgb("#fff")).toEqual([255, 255, 255]);
   });
 
-  it("keeps warn amber on both sheets (no red, SF3)", () => {
-    for (const key of ["dark", "light"] as const) {
+  it("keeps warn amber on every sheet (no red, SF3)", () => {
+    for (const key of ["dark", "light", "forge"] as const) {
       const [r, g, b] = theme(key).warn.map((v) => v / 255) as [number, number, number];
       const max = Math.max(r, g, b), min = Math.min(r, g, b);
       const hue = max === r ? (60 * (g - b)) / (max - min) : 0;

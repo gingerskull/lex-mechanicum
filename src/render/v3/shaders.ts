@@ -368,3 +368,35 @@ void main() {
   o = c;
 }
 `;
+
+// The Forge sheet's post-process (style SS14, src/style/forge.ts): over the finished frame, red and blue pulled a little
+// apart, fine grain, and at a glitch pulse some bands of rows torn sideways. Drawn only on Forge and with the paper grain.
+export const POST_FRAG = /* glsl */ `#version 300 es
+precision highp float;
+uniform sampler2D uSrc;
+uniform vec2 uOrigin; // window px of the frame's bottom left
+uniform vec2 uSize;   // frame size, device px
+uniform float uSeed, uGrain, uChroma, uTear, uBand, uTorn;
+out vec4 o;
+float hash(vec2 p) {
+  p = fract(p * vec2(443.897, 441.423));
+  p += dot(p, p.yx + 19.19);
+  return fract((p.x + p.y) * p.x);
+}
+// the source is the 2D canvas, top row first
+vec4 at(vec2 q) {
+  q = clamp(q, vec2(0.0), uSize - 1.0);
+  return texelFetch(uSrc, ivec2(q.x, uSize.y - 1.0 - q.y), 0);
+}
+void main() {
+  vec2 q = floor(gl_FragCoord.xy - uOrigin);
+  float band = floor(q.y / uBand);
+  float torn = step(1.0 - uTorn, hash(vec2(band, uSeed + 7.0)));
+  q.x += floor(torn * uTear * (hash(vec2(uSeed, band)) * 2.0 - 1.0));
+  vec4 c = at(q);
+  float r = at(q - vec2(uChroma, 0.0)).r;
+  float b = at(q + vec2(uChroma, 0.0)).b;
+  vec3 col = vec3(r, c.g, b) + (hash(q + uSeed) - 0.5) * uGrain;
+  o = vec4(clamp(col, 0.0, 1.0), c.a);
+}
+`;

@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { DETAIL } from "../src/style/detail";
 import { DRAFT } from "../src/style/draft";
+import { FORGE } from "../src/style/forge";
 import { FORM } from "../src/style/form";
 import { TOKENS } from "../src/style/tokens";
 import { replaceBlock, table, writeOrCheck } from "./doc-tables";
@@ -49,7 +50,7 @@ function flatten(o: object, prefix = ""): [string, unknown][] {
     const p = prefix ? `${prefix}.${k}` : k;
     if (v && typeof v === "object" && !Array.isArray(v)) {
       const vals = Object.values(v);
-      if (vals.length <= 4 && vals.every((x) => typeof x !== "object" || Array.isArray(x)) && Object.keys(v).every((x) => x === "dark" || x === "light"))
+      if (vals.length <= 4 && vals.every((x) => typeof x !== "object" || Array.isArray(x)) && Object.keys(v).every((x) => x === "dark" || x === "light" || x === "forge"))
         out.push([p, v]);
       else out.push(...flatten(v, p));
     } else out.push([p, v]);
@@ -57,7 +58,7 @@ function flatten(o: object, prefix = ""): [string, unknown][] {
   return out;
 }
 
-const perTheme = (v: unknown) => (v && typeof v === "object" && "dark" in v ? `${fmt((v as Record<string, unknown>).dark)} / ${fmt((v as Record<string, unknown>).light)}` : fmt(v));
+const perTheme = (v: unknown) => (v && typeof v === "object" && "dark" in v ? (["dark", "light", "forge"] as const).filter((k) => k in v).map((k) => fmt((v as Record<string, unknown>)[k])).join(" / ") : fmt(v));
 
 function knobTable(root: string, o: object, notes: Map<string, string>): string {
   return table(
@@ -69,21 +70,22 @@ function knobTable(root: string, o: object, notes: Map<string, string>): string 
 
 export function styleTables(): Record<string, string> {
   const tn = comments(src("tokens.ts"));
-  const { dark, light } = TOKENS.themes;
+  const { dark, light, forge } = TOKENS.themes;
   const colours = Object.keys(dark).filter((k) => k !== "name") as (keyof typeof dark)[];
   const palettes = table(
-    ["Token", `${dark.name} (dark)`, `${light.name} (light)`, "Use"],
-    colours.map((k) => [`\`${k}\``, fmt(dark[k]), fmt(light[k]), tn.get(`themes.dark.${k}`) ?? tn.get(`themes.light.${k}`) ?? ""]),
+    ["Token", `${dark.name} (dark)`, `${light.name} (light)`, `${forge.name} (forge, hidden)`, "Use"],
+    colours.map((k) => [`\`${k}\``, fmt(dark[k]), fmt(light[k]), fmt(forge[k]), tn.get(`themes.dark.${k}`) ?? tn.get(`themes.light.${k}`) ?? ""]),
   );
   const tiers = table(
-    ["Tier", "Dark", "Light", "Use"],
-    [...Object.entries(TOKENS.tiers).map(([k, v]) => [`\`--${k.replace(/(\d)/, "-$1")}\``, String(v.dark), String(v.light), tn.get(`tiers.${k}`) ?? ""]),
-      ...Object.entries(TOKENS.gridTiers).map(([k, v]) => [`\`--${k.replace(/(\d)/, "-$1")}\``, String(v.dark), String(v.light), "page grid, alpha of `grid`"])],
+    ["Tier", "Dark", "Light", "Forge", "Use"],
+    [...Object.entries(TOKENS.tiers).map(([k, v]) => [`\`--${k.replace(/(\d)/, "-$1")}\``, String(v.dark), String(v.light), String(v.forge), tn.get(`tiers.${k}`) ?? ""]),
+      ...Object.entries(TOKENS.gridTiers).map(([k, v]) => [`\`--${k.replace(/(\d)/, "-$1")}\``, String(v.dark), String(v.light), String(v.forge), "page grid, alpha of `grid`"])],
   );
   const type = knobTable("tokens.type", TOKENS.type, new Map([...tn].filter(([k]) => k.startsWith("type.")).map(([k, v]) => [k.slice(5), v])));
   const site = knobTable("tokens.size", { ...TOKENS.size, ...TOKENS.ratio }, new Map([...tn].flatMap(([k, v]) => (k.startsWith("size.") ? [[k.slice(5), v]] : k.startsWith("ratio.") ? [[k.slice(6), v]] : [])) as [string, string][]));
   const drawing = knobTable("draft", DRAFT, comments(src("draft.ts")));
   const form = knobTable("form", FORM, comments(src("form.ts")));
+  const forgeKnobs = knobTable("forge", FORGE, comments(src("forge.ts")));
   const ladder = table(
     ["Rung", "What stops being drawn", "Selectors", "Exceptions"],
     DETAIL.map((r) => [
@@ -93,7 +95,7 @@ export function styleTables(): Record<string, string> {
       r.exceptions ? Object.entries(r.exceptions).map(([k, v]) => `${k}: ${v}`).join(", ") : "",
     ]),
   );
-  return { "style-palettes": palettes, "style-tiers": tiers, "style-type": type, "style-drawing": drawing, "style-form": form, "style-site": site, "style-ladder": ladder };
+  return { "style-palettes": palettes, "style-tiers": tiers, "style-type": type, "style-drawing": drawing, "style-form": form, "style-site": site, "style-ladder": ladder, "style-forge": forgeKnobs };
 }
 
 export function styleDoc(doc = readFileSync(STYLE_REF, "utf8")): string {

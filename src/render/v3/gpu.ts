@@ -12,7 +12,7 @@ import { tile } from "../patterns";
 import { EF2, VF, type Baked } from "./bake";
 import type { Camera } from "./camera";
 import { PATTERNS, ST } from "./scene";
-import { COMP_FRAG, LINE_FRAG, LINE_VERT, PEEL_FRAG, PEEL_VERT, QUAD_VERT, TABLE_W } from "./shaders";
+import { COMP_FRAG, LINE_FRAG, LINE_VERT, PEEL_FRAG, PEEL_VERT, POST_FRAG, QUAD_VERT, TABLE_W } from "./shaders";
 
 const L = DRAFT.lines;
 const WS = DRAFT.fill.wallShade;
@@ -45,6 +45,8 @@ export interface Gpu3 {
   h: number;
   layers: Layer[];
   out: { fb: WebGLFramebuffer; t: WebGLTexture } | null;
+  /** The Forge post-process, built on its first use (a page on the public sheets never builds it), and its source. */
+  post: { p: WebGLProgram; u: U; src: WebGLTexture; w: number; h: number } | null;
   /** Shader compile and link time of the first context, ms (R6: once per page). */
   buildMs: number;
 }
@@ -103,7 +105,7 @@ function build(gl: WebGL2RenderingContext, canvas: HTMLCanvasElement, gen: numbe
   const peel = settle(gl, sp);
   const comp = settle(gl, sc);
   const line = settle(gl, sl);
-  return { gl, canvas, gen, lost: false, peel, comp, line, up: uniforms(gl, peel), uc: uniforms(gl, comp), ul: uniforms(gl, line), patTex: null, w: 0, h: 0, layers: [], out: null, buildMs: performance.now() - t0 };
+  return { gl, canvas, gen, lost: false, peel, comp, line, up: uniforms(gl, peel), uc: uniforms(gl, comp), ul: uniforms(gl, line), patTex: null, w: 0, h: 0, layers: [], out: null, post: null, buildMs: performance.now() - t0 };
 }
 
 /** The shared context, made on first use with the card's canvas factory. Throws where there is no WebGL2. */
@@ -464,3 +466,71 @@ export class Geometry {
     gl.deleteTexture(this.tableTex);
   }
 }
+
+/** What the Forge post-process takes besides the frame: a seed for the grain and the tears, and the pulse's strengths. */
+export interface PostInput {
+  seed: number;
+  /** Noise added per pixel, 0..1. */
+  grain: number;
+  /** Red and blue pulled apart, device px. */
+  chroma: number;
+  /** A torn band's largest shift, device px, its height, and the share of bands torn (0 outside a glitch pulse). */
+  tear: number;
+  band: number;
+  torn: number;
+}
+
+/**
+ * The Forge post-process (style SS14) over a finished frame: the card's 2D canvas goes to the GPU, the pass draws it with
+ * grain, a colour split and torn bands into the shared canvas, and the card copies the result back. False where it could
+ * not run (no context); the frame is then left as drawn.
+ */
+export function postPass(card: Card, p: PostInput): boolean {
+  const g = gpu3(card);
+  if (g.lost || g.gl.isContextLost()) return false;
+  const gl = g.gl;
+  if (!g.post) {
+    const prog = settle(gl, submit(gl, QUAD_VERT, POST_FRAG));
+    g.post = { p: prog, u: uniforms(gl, prog), src: gl.createTexture()!, w: 0, h: 0 };
+  }
+  const P = g.post;
+  const { cw, ch } = card;
+  // the frame's solids pass has already grown the shared canvas to this card
+  if (g.w < cw || g.h < ch) return false;
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, P.src);
+  if (P.w !== cw || P.h !== ch) {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, cw, ch, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    P.w = cw;
+    P.h = ch;
+  }
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+  gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, card.canvas as unknown as HTMLCanvasElement);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.viewport(0, g.h - ch, cw, ch);
+  gl.disable(gl.BLEND);
+  gl.disable(gl.DEPTH_TEST);
+  gl.useProgram(P.p);
+  gl.bindVertexArray(null);
+  gl.uniform1i(P.u.uSrc!, 0);
+  gl.uniform2f(P.u.uOrigin!, 0, g.h - ch);
+  gl.uniform2f(P.u.uSize!, cw, ch);
+  gl.uniform1f(P.u.uSeed!, p.seed);
+  gl.uniform1f(P.u.uGrain!, p.grain);
+  gl.uniform1f(P.u.uChroma!, p.chroma);
+  gl.uniform1f(P.u.uTear!, p.tear);
+  gl.uniform1f(P.u.uBand!, Math.max(1, p.band));
+  gl.uniform1f(P.u.uTorn!, p.torn);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  const ctx = card.ctx;
+  ctx.save();
+  ctx.globalCompositeOperation = "copy";
+  ctx.globalAlpha = 1;
+  ctx.drawImage(g.canvas, 0, 0, cw, ch, 0, 0, card.w, card.h);
+  ctx.restore();
+  return true;
+}
+

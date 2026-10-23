@@ -16,7 +16,7 @@ import { build } from "esbuild";
 import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
 import { builtBytes } from "../src/package/built";
-import type { ThemeKey } from "../src/style/tokens";
+import { PUBLIC_THEMES, type ThemeKey } from "../src/style/tokens";
 import { openChrome3, type Draw3Options } from "./chrome3";
 import { runPool } from "./pool";
 
@@ -24,7 +24,8 @@ export const THUMB = { w: 320, h: 240, dpr: 2, u: 1.1 };
 /** The still: the stage's opening frame (63° of the cycle, dimensions on) at dial A, since paper grain is noise that
  * would make each image several times larger. */
 export const STILL = { w: 1200, h: 750, dpr: 1, u: (63 / 360) * Math.PI * 2, detail: "A" as const, quality: 0.75 };
-const THEMES: ThemeKey[] = ["dark", "light"];
+/** Forge is never a thumbnail: it shows only once unlocked, over the Blueprint images (style SS14). */
+const THEMES: readonly ThemeKey[] = PUBLIC_THEMES;
 const QUALITY = 0.92;
 /** A redraw that differs from the committed image in fewer pixels than this share keeps the committed file. */
 const SAME = 0.001;

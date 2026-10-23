@@ -26,7 +26,7 @@ export function hexToRgb(hex: string): RGB {
 export function theme(key: ThemeKey): ResolvedTheme {
   const t = TOKENS.themes[key];
   const colours = Object.fromEntries(COLOR_NAMES.map((c) => [c, hexToRgb(t[c])])) as Record<ColorName, RGB>;
-  return { ...colours, key, dark: key === "dark", name: t.name, patternGain: t.patternGain, grain: t.grain };
+  return { ...colours, key, dark: key !== "light", name: t.name, patternGain: t.patternGain, grain: t.grain };
 }
 
 /** A CSS colour string for a resolved colour at alpha a (0..1). */

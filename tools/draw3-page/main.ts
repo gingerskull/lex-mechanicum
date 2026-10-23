@@ -16,6 +16,7 @@ import { createSession3, recordDrawView, type DrawView3, type Session3 } from ".
 import { parseView, viewsOf, type ViewState } from "../../src/render/v3/views";
 import { setupInline } from "../../src/solids/setup";
 import type { Vec3 } from "../../src/solids/types";
+import type { ThemeKey } from "../../src/style/tokens";
 
 /** What the server sends besides the package: the record's blocks, its name and its origin as an Imperial date. */
 export interface Meta {
@@ -35,7 +36,7 @@ export interface Draw3Options {
   /** "record" (the default view of the teaching block), a name such as "PLAN", "AUX O2" or "VIEW 30 40", or a record view id (a section). */
   view?: string;
   explode?: number;
-  theme?: "dark" | "light";
+  theme?: ThemeKey;
   detail?: Dial;
   /** Settings of the record's controls for this drawing. */
   controls?: Controls;

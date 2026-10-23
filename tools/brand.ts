@@ -41,10 +41,11 @@ const markSvg = (fill: string, size?: number) =>
 export const faviconSvg = () =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MARK_VIEWBOX}"><style>g{fill:${light.ink}}@media (prefers-color-scheme:dark){g{fill:${dark.ink}}}</style><g>${shapes}</g></svg>\n`;
 
-/** What the images are drawn from: the mark, the colours they use, the sizes and this file. */
+/** What the images are drawn from: the mark, the colours they use (the public sheets' only), the sizes and this file. */
 export function fingerprint(): string {
+  const grid = Object.fromEntries(Object.entries(TOKENS.gridTiers).map(([k, v]) => [k, { dark: v.dark, light: v.light }]));
   const src = readFileSync(fileURLToPath(import.meta.url), "utf8").replace(/\r\n/g, "\n");
-  return createHash("sha256").update(JSON.stringify([MARK_VIEWBOX, MARK_SHAPES, dark, light, TOKENS.gridTiers, TOKENS.size.grid, TOKENS.size.gridMajor, src])).digest("hex").slice(0, 16);
+  return createHash("sha256").update(JSON.stringify([MARK_VIEWBOX, MARK_SHAPES, dark, light, grid, TOKENS.size.grid, TOKENS.size.gridMajor, src])).digest("hex").slice(0, 16);
 }
 
 /** null when the committed images are drawn from the current mark and tokens, else what to run. */

@@ -1,20 +1,21 @@
-// The sheet switch (SS7): Blueprint or Drafting, remembered per visitor, defaulting to the visitor's preference (the
-// inline script in the layout applies it before first paint). Every switch button on the page toggles it; switching
-// tells every canvas to redraw at once. A page brought back from the browser's cache takes the sheet chosen since.
-const root = document.documentElement;
-const NAMES = { dark: "Blueprint", light: "Drafting" } as const;
+// The sheet switch (SS7): Blueprint or Drafting, and Forge once it is unlocked (SS14), remembered per visitor, defaulting
+// to the visitor's preference (the inline script in the layout applies it before first paint). Every switch button on the
+// page steps it on; switching tells every canvas to redraw at once. A page brought back from the browser's cache takes
+// the sheet chosen since.
+import { currentSheet, forgeUnlocked, nextSheet, SHEET_NAMES, type SheetKey } from "../forge";
 
-const current = (): "dark" | "light" => (root.dataset.theme === "light" ? "light" : "dark");
+const root = document.documentElement;
 
 function label() {
-  const to = NAMES[current() === "dark" ? "light" : "dark"];
+  const to = SHEET_NAMES[nextSheet(currentSheet(), forgeUnlocked())];
   for (const b of document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")) {
     b.setAttribute("aria-label", `Switch to ${to}`);
     b.title = `Switch to ${to}`;
   }
 }
 
-function set(v: "dark" | "light", remember: boolean) {
+/** Shows sheet `v` everywhere on the page, and keeps it for the visitor when `remember` is set. */
+export function setSheet(v: SheetKey, remember: boolean) {
   root.dataset.theme = v;
   if (remember)
     try {
@@ -27,7 +28,7 @@ function set(v: "dark" | "light", remember: boolean) {
 }
 
 for (const b of document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]"))
-  b.addEventListener("click", () => set(current() === "dark" ? "light" : "dark", true));
+  b.addEventListener("click", () => setSheet(nextSheet(currentSheet(), forgeUnlocked()), true));
 addEventListener("pageshow", (e) => {
   if (!e.persisted) return;
   let v: string | null = null;
@@ -36,6 +37,7 @@ addEventListener("pageshow", (e) => {
   } catch {
     // nothing stored
   }
-  if ((v === "dark" || v === "light") && v !== current()) set(v, false);
+  if ((v === "dark" || v === "light" || (v === "forge" && forgeUnlocked())) && v !== currentSheet()) setSheet(v, false);
 });
+addEventListener("forgeunlock", label);
 label();

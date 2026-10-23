@@ -181,6 +181,8 @@ async function main(box: HTMLElement) {
     fast: 0,
     /** The input ring's strength: it breathes while paused (LM-06), never while playing or under reduced motion. */
     ring: 1,
+    /** A Forge glitch pulse on the drawing, 0 or 1 (SS14). */
+    glitch: 0,
   };
   /** Frames are drawn at the coarsest dial until the page is idle (R9). */
   let warm = true;
@@ -198,6 +200,7 @@ async function main(box: HTMLElement) {
       dims: true,
       show: { traces: s.show.paths, ghosts: s.show.paths, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
       ring: s.ring,
+      glitch: s.glitch,
     });
 
   // the output plot
@@ -312,10 +315,20 @@ async function main(box: HTMLElement) {
       breathAt = now;
       dirty = true;
     }
+    if (glitchUntil) {
+      s.glitch = now < glitchUntil ? 1 : 0;
+      if (!s.glitch) glitchUntil = 0;
+      dirty = true;
+    }
     if (ctlDirty) applyControls();
     if (dirty && inView) draw();
     requestAnimationFrame(tick);
   };
+  // a Forge glitch pulse tears the drawing for its length (islands/forge.ts sends it, never under reduced motion)
+  let glitchUntil = 0;
+  addEventListener("forgeglitch", (e) => {
+    if (E.pageTheme() === "forge") glitchUntil = performance.now() + (((e as CustomEvent<{ length: number }>).detail?.length ?? 0) * 1000);
+  });
 
   // transport
   const play = $<HTMLButtonElement>("play");

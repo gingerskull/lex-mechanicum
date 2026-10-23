@@ -24,7 +24,8 @@ src/catalog/                     record schema and vocabularies (the kin and tea
                                  views, loadCatalog / recordById
 src/style/                       tokens (palettes, type, sizes), form (geometry-affecting values), draft (renderer
                                  knobs), detail (the detail ladder), kinds (solid kinds, roles, mark kinds, effects),
-                                 theme (rgb resolution, font strings). One source per value; tokens.css is generated.
+                                 theme (rgb resolution, font strings), forge (the hidden Forge sheet's unlock and
+                                 effects). One source per value; tokens.css is generated.
 src/core/                        geometry, involute and flexible-member profiles (flex.ts: HTD pulleys, ISO 606
                                  sprockets), polygon queries (poly.ts), bevel, worm, helical and screw geometry
                                  (spatial.ts), the axis type of a hardware primitive (axis.ts)
@@ -77,7 +78,8 @@ src/mechanisms/<id>/polish3.ts   the true exceptions to the builder (polish API 
 src/mechanisms/<id>/audit.md     conformance record
 site/                            Astro: layout, pages (library, one page per mechanism, 404), components (the stage is
                                  Stage3.astro), islands (theme, filters and the sort menu, card, stage3, the engine chunk
-                                 engine3, load3, views), the library's orders (sort.ts), CSS on the generated tokens.css
+                                 engine3, load3, views, the Recovered badge, the Forge sheet), the library's orders
+                                 (sort.ts), CSS on the generated tokens.css
 tools/                           command-line tools (below)
 site/thumbs/                     the committed card thumbnails and stage stills (WebP) and their fingerprint manifest
 tests/                           unit and fixture tests, the record and 3D checks, site build test, visual snapshots;

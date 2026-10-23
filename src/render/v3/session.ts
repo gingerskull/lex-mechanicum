@@ -3,6 +3,7 @@
 // style's paint order: paper, base-plate construction lines, the solids peeled on the GPU (shared context), centrelines,
 // dimensions, paper tooth, teaching traces and overlays, the sheet, and the force, velocity and angle overlays.
 import { DRAFT } from "../../style/draft";
+import { FORGE } from "../../style/forge";
 import { MARK_KINDS } from "../../style/kinds";
 import { rgba as paint, theme, type ResolvedTheme } from "../../style/theme";
 import type { ThemeKey } from "../../style/tokens";
@@ -11,7 +12,7 @@ import { ladder, type Dial } from "../detail";
 import { paper, tooth } from "../sheet";
 import { baseSketch, basePencil, centrelines, dimensions, highlights, newCache, overlayItems, overlays, phantoms, scaleLabel, traces, trails, type Ann, type OverlayFlags } from "./annotate";
 import { basisOfOrient, fit, snapName, viewLabel, type Box, type Camera } from "./camera";
-import { Geometry, gpu3, gpuReady, onRestored, type Stats3 } from "./gpu";
+import { Geometry, gpu3, gpuReady, onRestored, postPass, type Stats3 } from "./gpu";
 import type { Poser } from "./poser";
 import { place, rows, runtime, worldBox, type Runtime, type Scene } from "./scene";
 import { sheetFrame } from "./sheet";
@@ -38,6 +39,8 @@ export interface DrawView3 {
   frames: DetailSpec[];
   /** The input ring's strength, 0..1: below 1 only while a paused drawing breathes (ringBreath). */
   ring?: number;
+  /** A Forge glitch pulse, 0..1 (0 or absent outside one): the post-process tears bands and splits the colours wider. */
+  glitch?: number;
 }
 
 /**
@@ -116,6 +119,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
   let geo: Geometry | null = null;
   let last = "";
   let rev = 0;
+  let frame = 0;
   let full = dpr;
   let off: (() => void) | null = null;
   const boxes = new Float64Array(rt.n * 6);
@@ -215,6 +219,12 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       const items = scene.items;
       const fl: OverlayFlags = { forces: sh.forces !== false, velocity: sh.velocity !== false, angles: sh.angles !== false };
       if (items) overlayItems(A, fl, { ...(items.forces ? { forces: items.forces(u) } : {}), ...(items.angles ? { angles: items.angles(u) } : {}), ...(items.velocity ? { velocity: items.velocity } : {}) });
+      // the Forge sheet's post-process, with the paper grain (rung A), so it is the first thing the dial drops (SS14)
+      if (view.theme === "forge" && !view.card && LD.effect("grain")) {
+        const F = FORGE.canvas;
+        const k = Math.max(0, Math.min(1, view.glitch ?? 0));
+        postPass(card, { seed: ++frame % 997, grain: F.grain, chroma: (F.chroma + k * (F.glitchChroma - F.chroma)) * card.dpr, tear: k * F.tear * card.dpr, band: F.band * card.dpr, torn: k * F.tornShare });
+      }
       last = key;
     },
     resize(w, h, d) {
