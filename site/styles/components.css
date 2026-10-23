@@ -598,14 +598,6 @@
   align-items: center;
   gap: 8px 10px;
 }
-#orbit {
-  display: none;
-}
-@media (pointer: coarse) {
-  #orbit {
-    display: inline-flex;
-  }
-}
 .ovl {
   display: flex;
   flex-wrap: wrap;

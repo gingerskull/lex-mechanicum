@@ -28,7 +28,7 @@ const presets = [
 ] as const;
 ---
 <div class="stagebox" data-id={id} data-no={no} data-title={title} data-engine="v3" data-timemap={timeMap ? "1" : undefined}>
-  <div class="stage"><canvas id="stage" role="img" aria-label={`${title}, live drawing`}></canvas></div>
+  <div class="stage"><canvas id="stage" role="img" aria-label={`${title}, live drawing`} aria-description="Drag sideways to step through the cycle; drag with the right button, Shift or two fingers to orbit. Keys: Space plays or pauses, the arrows step, Shift and the arrows orbit, 1 to 5 the named views, 0 the drawing's own view." title="Drag sideways to step through the cycle. Right drag, Shift drag or two fingers orbit."></canvas></div>
   <div class="controls">
     <button class="play" id="play" type="button" aria-pressed="true" aria-label="Pause">
       <svg viewBox="0 0 12 12" aria-hidden="true"><path id="playicon" d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor"></path></svg>
@@ -56,7 +56,6 @@ const presets = [
         {views.map((v) => <button type="button" data-rview={v.id} data-kind={v.kind} aria-pressed="false">{v.kind === "section" ? "Section" : "Detail"} {v.id}</button>)}
       </div>
     )}
-    <button class="btn" id="orbit" type="button" aria-pressed="false" title="Touch: drag the drawing to orbit it (the page does not scroll while it is on)">Orbit</button>
   </div>
   <div class="controls">
     <label class="sl tilt"><span class="lbl">Tilt</span><input id="tilt" type="range" min="0" max="90" step="1" value="0" /><output id="tiltv">Plan</output></label>

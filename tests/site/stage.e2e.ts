@@ -1,6 +1,7 @@
 // The stage in a real browser (SS5, SS7), local only: `npm run test:e2e` (builds the site, then runs this). The stage
-// opens in the record's view and plays, orbits, snaps to the named views, takes the record's section view and controls,
-// honours the dial, keeps the page's scroll on a phone until Orbit is on; a browser without WebGL2 gets the still. The
+// opens in the record's view and plays, scrubs on a sideways drag, orbits on a right drag, two fingers or the keyboard,
+// snaps to the named views, takes the record's section view and controls, honours the dial, keeps the page's scroll on a
+// phone; a browser without WebGL2 gets the still. The
 // sheet switch names the sheet it switches to and turns its cog half a turn per sheet.
 import { existsSync, readFileSync } from "node:fs";
 import { createServer, type Server } from "node:http";
@@ -59,15 +60,15 @@ const differs = (a: Buffer, b: Buffer) => !a.equals(b);
 const pause = async (page: Page) => {
   if ((await page.locator("#play").getAttribute("aria-pressed")) === "true") await page.locator("#play").click();
 };
-const drag = async (page: Page, dx: number, dy: number) => {
+const drag = async (page: Page, dx: number, dy: number, button: "left" | "right" = "left") => {
   const b = (await page.locator("#stage").boundingBox())!;
   const x = b.x + b.width / 2;
   const y = b.y + b.height / 2;
   await page.mouse.move(x, y);
-  await page.mouse.down();
+  await page.mouse.down({ button });
   await page.mouse.move(x + dx / 2, y + dy / 2, { steps: 4 });
   await page.mouse.move(x + dx, y + dy, { steps: 4 });
-  await page.mouse.up();
+  await page.mouse.up({ button });
 };
 
 describe("a mechanism page", () => {
@@ -193,13 +194,28 @@ describe("library cards", () => {
 });
 
 describe("the stage on a desktop", () => {
-  it("orbits by drag, names the view it lands on, and resets", async () => {
+  it("scrubs on a sideways drag and leaves the view alone", async () => {
+    const ctx = await desktop();
+    const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
+    await ready(page);
+    const deg = await page.locator("#scrub").inputValue();
+    await drag(page, 160, 10);
+    expect(await page.locator("#play").getAttribute("aria-pressed")).toBe("false");
+    expect(await page.locator("#scrub").inputValue()).not.toBe(deg);
+    expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it("orbits on a right drag without opening the menu, names the view it lands on, and resets", async () => {
     const ctx = await desktop();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
     await ready(page);
     await pause(page);
     const plan = await stageShot(page);
-    await drag(page, 40, -120);
+    const menu = page.evaluate(() => new Promise<boolean>((ok) => document.getElementById("stage")!.addEventListener("contextmenu", (e) => setTimeout(() => ok(e.defaultPrevented)), { once: true })));
+    await drag(page, 40, -120, "right");
+    expect(await menu).toBe(true);
     expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("false");
     expect(Number(await page.locator("#tilt").inputValue())).toBeGreaterThan(20);
     expect(differs(plan, await stageShot(page))).toBe(true);
@@ -209,6 +225,24 @@ describe("the stage on a desktop", () => {
     await page.locator('#presets button[data-view="ISOMETRIC"]').click();
     expect(await page.locator('#presets button[data-view="ISOMETRIC"]').getAttribute("aria-pressed")).toBe("true");
     await page.locator("#record-view").click();
+    expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it("orbits and takes the named views from the keyboard", async () => {
+    const ctx = await desktop();
+    const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
+    await ready(page);
+    await page.locator("#stage").focus();
+    await page.keyboard.press("3");
+    expect(await page.locator('#presets button[data-view="SIDE"]').getAttribute("aria-pressed")).toBe("true");
+    await page.keyboard.press("Shift+ArrowUp");
+    await page.keyboard.press("Shift+ArrowUp");
+    expect(Number(await page.locator("#tilt").inputValue())).toBe(80);
+    await page.keyboard.press("Shift+ArrowLeft");
+    expect(await page.locator('#presets button[data-view="SIDE"]').getAttribute("aria-pressed")).toBe("false");
+    await page.keyboard.press("0");
     expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
     expect(errors).toEqual([]);
     await ctx.close();
@@ -290,31 +324,44 @@ describe("the stage on a desktop", () => {
 });
 
 describe("the stage on a phone", () => {
-  it("lets a finger scroll the page, turns the drawing sideways, and orbits freely once Orbit is on", async () => {
+  it("lets a finger scroll the page, scrubs on a sideways swipe, and orbits with two fingers", async () => {
     const ctx = await phone();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
     await ready(page);
-    await pause(page);
     const cdp = await ctx.newCDPSession(page);
-    const swipe = async (x0: number, y0: number, x1: number, y1: number) => {
-      await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: x0, y: y0 }] });
-      for (let i = 1; i <= 8; i++) await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: x0 + ((x1 - x0) * i) / 8, y: y0 + ((y1 - y0) * i) / 8 }] });
+    const swipe = async (from: [number, number][], to: [number, number][]) => {
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: from.map(([x, y], id) => ({ x, y, id })) });
+      for (let i = 1; i <= 8; i++)
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: from.map(([x, y], id) => ({ x: x + ((to[id]![0] - x) * i) / 8, y: y + ((to[id]![1] - y) * i) / 8, id })) });
       await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
     };
     await page.locator("#stage").scrollIntoViewIfNeeded();
     const b = (await page.locator("#stage").boundingBox())!;
     const cx = b.x + b.width / 2;
     const cy = b.y + b.height / 2;
-    const before = await stageShot(page);
-    await swipe(cx - 60, cy, cx + 60, cy);
+    // sideways: the cycle steps and the drawing pauses; the view stays
+    const deg = await page.locator("#scrub").inputValue();
+    await swipe([[cx - 60, cy]], [[cx + 60, cy]]);
     await page.waitForTimeout(200);
-    expect(differs(before, await stageShot(page))).toBe(true);
-    await page.locator("#orbit").click();
-    expect(await page.locator("#orbit").getAttribute("aria-pressed")).toBe("true");
+    expect(await page.locator("#play").getAttribute("aria-pressed")).toBe("false");
+    expect(await page.locator("#scrub").inputValue()).not.toBe(deg);
+    expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
+    // up or down: the page scrolls, the drawing stays
+    const y0 = await page.evaluate(() => scrollY);
+    await swipe([[cx, cy + 60]], [[cx, cy - 60]]);
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => scrollY)).toBeGreaterThan(y0);
+    expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
+    // two fingers: an orbit
+    await page.locator("#stage").scrollIntoViewIfNeeded();
+    const c = (await page.locator("#stage").boundingBox())!;
+    const x = c.x + c.width / 2;
+    const y = c.y + c.height / 2;
     const t0 = Number(await page.locator("#tilt").inputValue());
-    await swipe(cx, cy + 40, cx, cy - 40);
+    await swipe([[x - 30, y + 40], [x + 30, y + 40]], [[x - 30, y - 40], [x + 30, y - 40]]);
     await page.waitForTimeout(200);
     expect(Number(await page.locator("#tilt").inputValue())).not.toBe(t0);
+    expect(await page.locator("#orbit").count()).toBe(0);
     await page.locator('#presets button[data-view="FRONT"]').tap();
     await page.waitForSelector('#presets button[data-view="FRONT"][aria-pressed="true"]');
     await page.locator("#explode").fill("50");

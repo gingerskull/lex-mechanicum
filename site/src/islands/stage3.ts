@@ -1,5 +1,5 @@
-// The stage of a mechanism (SS5): the transport (play, scrub, speed), and the camera (drag to
-// orbit, the named views, the record's own view, tilt), the section and detail views the record declares, explode, the
+// The stage of a mechanism (SS5): the transport (play, scrub, drag to scrub, speed), and the camera (right drag or two
+// fingers to orbit, the named views, the record's own view, tilt), the section and detail views the record declares, explode, the
 // detail dial (adaptive per DL4) and the record's own controls (T14). Playback honours the record's time map (SD27): the
 // scrubber and the plot stay on the true input. The setup runs in a worker, the shaders build while the data downloads,
 // and the first frame is drawn at a coarse dial until the page is idle (R9). A browser without WebGL2 gets the still and a
@@ -19,6 +19,8 @@ const CYCLE = 6;
 /** Degrees of orbit per CSS pixel of drag. */
 const ORBIT = 0.4;
 const DRAG_PX = 8;
+/** Degrees one Shift and arrow press orbits. */
+const KEY_ORBIT = 5;
 
 const box = document.querySelector<HTMLElement>('.stagebox[data-engine="v3"]');
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -512,56 +514,147 @@ async function main(box: HTMLElement) {
         setCtl(g.dataset.target as StageControl["target"], g.dataset.key!, optionValue(g.dataset.target!, g.dataset.key!, b.dataset.v!));
       });
 
-  // pointer: drag to orbit; a tap plays or pauses. A mouse drags in both directions. A finger drags sideways to turn the
-  // drawing and leaves up and down to the page (touch-action: pan-y), unless Orbit is on, which gives the drawing both.
-  const orbitBtn = $<HTMLButtonElement>("orbit");
-  const orbitOn = () => orbitBtn.getAttribute("aria-pressed") === "true";
-  orbitBtn.addEventListener("click", () => {
-    orbitBtn.setAttribute("aria-pressed", String(!orbitOn()));
-    canvas.style.touchAction = orbitOn() ? "none" : "";
-  });
+  // pointer (SS5): a sideways drag scrubs the cycle and pauses, as on the 2.5D stage; a tap plays or pauses. A mouse
+  // orbits with the right button (or Shift and the left), and the stage's menu stays shut after an orbit. A finger drags
+  // sideways to scrub and leaves up and down to the page (touch-action: pan-y); two fingers orbit.
   canvas.tabIndex = 0;
-  let drag: { id: number; x: number; y: number; orbiting: boolean; yaw: number; tilt: number; touch: boolean } | null = null;
-  canvas.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0) return;
+  const orbitTo = (yaw: number, tilt: number) => {
+    s.orient = { yaw, tilt: Math.max(0, Math.min(90, tilt)) };
+    s.auxName = undefined;
+    if (!s.section) s.rview = "";
+    showCamera();
+    dirty = true;
+  };
+  // a drag that ends near a named view lands on it; a plan turned in its plane stays as turned
+  const landOrbit = () => {
+    s.orient = E.snappedName(s.orient) === "PLAN" ? { yaw: s.orient.yaw, tilt: 0 } : E.snapped(s.orient);
+    showCamera();
+    dirty = true;
+  };
+  const scrubBy = (u0: number, dx: number) => {
+    setPlaying(false);
+    setPhase(u0 + (dx / size().width) * TAU);
+  };
+  type Drag = { id: number; x: number; y: number; mode: "" | "scrub" | "orbit"; orbit: boolean; u: number; yaw: number; tilt: number };
+  let drag: Drag | null = null;
+  let orbitedAt = 0;
+  const start = (id: number, x: number, y: number, orbit: boolean): Drag => {
     const o = turntable(s.orient);
-    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, orbiting: false, yaw: o.yaw, tilt: o.tilt, touch: e.pointerType === "touch" };
+    return { id, x, y, mode: "", orbit, u: s.u, yaw: o.yaw, tilt: o.tilt };
+  };
+  canvas.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "touch" || (e.button !== 0 && e.button !== 2)) return;
+    drag = start(e.pointerId, e.clientX, e.clientY, e.button === 2 || e.shiftKey);
   });
   canvas.addEventListener("pointermove", (e) => {
     if (!drag || e.pointerId !== drag.id) return;
     const dx = e.clientX - drag.x;
     const dy = e.clientY - drag.y;
-    if (!drag.orbiting) {
+    if (!drag.mode) {
       if (Math.hypot(dx, dy) < DRAG_PX) return;
-      // a finger that is mostly going up or down is the page scrolling, unless Orbit is on
-      if (drag.touch && !orbitOn() && Math.abs(dx) < Math.abs(dy)) return;
-      drag.orbiting = true;
+      // the left button scrubs only sideways; up and down it does nothing
+      if (!drag.orbit && Math.abs(dx) < Math.abs(dy)) return;
+      drag.mode = drag.orbit ? "orbit" : "scrub";
       canvas.setPointerCapture(e.pointerId);
+      if (drag.orbit) canvas.style.cursor = "move";
     }
-    const sideways = drag.touch && !orbitOn();
-    s.orient = { yaw: drag.yaw - dx * ORBIT, tilt: sideways ? drag.tilt : Math.max(0, Math.min(90, drag.tilt - dy * ORBIT)) };
-    s.auxName = undefined;
-    if (!s.section) s.rview = "";
-    showCamera();
-    dirty = true;
+    if (drag.mode === "orbit") orbitTo(drag.yaw - dx * ORBIT, drag.tilt - dy * ORBIT);
+    else scrubBy(drag.u, dx);
   });
   canvas.addEventListener("pointerup", (e) => {
     if (!drag || e.pointerId !== drag.id) return;
-    if (drag.orbiting) {
-      // a drag that ends near a named view lands on it; a plan turned in its plane stays as turned
-      s.orient = E.snappedName(s.orient) === "PLAN" ? { yaw: s.orient.yaw, tilt: 0 } : E.snapped(s.orient);
-      showCamera();
-      dirty = true;
-    } else if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < DRAG_PX) setPlaying(!s.playing);
+    if (drag.mode === "orbit") {
+      landOrbit();
+      orbitedAt = performance.now();
+    } else if (!drag.mode && !drag.orbit && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < DRAG_PX) setPlaying(!s.playing);
     drag = null;
+    canvas.style.cursor = "";
   });
-  canvas.addEventListener("pointercancel", () => (drag = null));
+  canvas.addEventListener("pointercancel", () => {
+    drag = null;
+    canvas.style.cursor = "";
+  });
+  // the right button is the orbit button: after a right drag (the menu opens on release on some systems) no menu
+  canvas.addEventListener("contextmenu", (e) => {
+    if (drag?.mode === "orbit" || performance.now() - orbitedAt < 400) e.preventDefault();
+  });
+  // touch: touch events, so a second finger can take the gesture over before the page starts to scroll
+  let touch: (Drag & { fingers: number }) | null = null;
+  const centre = (t: TouchList): [number, number] => {
+    let x = 0, y = 0;
+    for (const p of Array.from(t)) {
+      x += p.clientX;
+      y += p.clientY;
+    }
+    return [x / t.length, y / t.length];
+  };
+  canvas.addEventListener("touchstart", (e) => {
+    const [x, y] = centre(e.touches);
+    if (e.touches.length === 1) touch = { ...start(0, x, y, false), fingers: 1 };
+    else if (e.touches.length === 2) {
+      // a second finger turns the gesture into an orbit, from where the fingers are now
+      touch = { ...start(0, x, y, true), fingers: 2, mode: "orbit" };
+      if (e.cancelable) e.preventDefault();
+    } else touch = null;
+  }, { passive: false });
+  canvas.addEventListener("touchmove", (e) => {
+    if (!touch || e.touches.length !== touch.fingers) return;
+    const [x, y] = centre(e.touches);
+    const dx = x - touch.x;
+    const dy = y - touch.y;
+    if (touch.mode === "orbit") {
+      if (e.cancelable) e.preventDefault();
+      orbitTo(touch.yaw - dx * ORBIT, touch.tilt - dy * ORBIT);
+      return;
+    }
+    if (!touch.mode) {
+      if (Math.hypot(dx, dy) < DRAG_PX) return;
+      // mostly up or down: the page scrolls, and this finger is done with the drawing
+      if (Math.abs(dx) < Math.abs(dy)) {
+        touch = null;
+        return;
+      }
+      touch.mode = "scrub";
+    }
+    if (e.cancelable) e.preventDefault();
+    scrubBy(touch.u, dx);
+  }, { passive: false });
+  canvas.addEventListener("touchend", (e) => {
+    if (!touch) return;
+    if (touch.mode === "orbit") {
+      // lifting one of two fingers ends the orbit; the other finger does nothing more
+      landOrbit();
+      touch = null;
+      return;
+    }
+    if (!touch.mode && e.touches.length === 0) {
+      const p = e.changedTouches[0];
+      if (p && Math.hypot(p.clientX - touch.x, p.clientY - touch.y) < DRAG_PX) {
+        setPlaying(!s.playing);
+        // no click after the tap: it would reach the canvas as a mouse click too
+        if (e.cancelable) e.preventDefault();
+      }
+    }
+    if (e.touches.length === 0) touch = null;
+  });
+  canvas.addEventListener("touchcancel", () => (touch = null));
+  // keyboard on the drawing (SS10): Space plays or pauses, the arrows step the cycle, Shift with the arrows orbits, 1 to 5
+  // are the named views and 0 the record's own
+  const NAMED = ["PLAN", "FRONT", "SIDE", "ISOMETRIC", "DIMETRIC"];
+  const plain = (e: KeyboardEvent) => !e.ctrlKey && !e.metaKey && !e.altKey;
   canvas.addEventListener("keydown", (e) => {
     if (e.key === " ") setPlaying(!s.playing);
-    else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    else if (e.key.startsWith("Arrow") && e.shiftKey) {
+      const o = turntable(s.orient);
+      const k = KEY_ORBIT;
+      orbitTo(o.yaw + (e.key === "ArrowLeft" ? k : e.key === "ArrowRight" ? -k : 0), o.tilt + (e.key === "ArrowUp" ? -k : e.key === "ArrowDown" ? k : 0));
+      landOrbit();
+    } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       setPlaying(false);
       setPhase(s.u + ((e.key === "ArrowRight" ? 1 : -1) * TAU) / 72);
-    } else return;
+    } else if (/^[1-5]$/.test(e.key) && plain(e)) document.querySelector<HTMLButtonElement>(`#presets button[data-view="${NAMED[Number(e.key) - 1]}"]`)?.click();
+    else if (e.key === "0" && plain(e)) $("record-view").click();
+    else return;
     e.preventDefault();
   });
   window.addEventListener("themechange", () => (dirty = true));
