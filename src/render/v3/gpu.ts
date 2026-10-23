@@ -473,8 +473,10 @@ export interface PostInput {
   seed: number;
   /** Noise added per pixel, 0..1. */
   grain: number;
-  /** Red and blue pulled apart, device px. */
+  /** Red and blue pulled apart, device px, and how much that swells down the rows (device px, every `wobbleRows`). */
   chroma: number;
+  wobble: number;
+  wobbleRows: number;
   /** A torn band's largest shift, device px, its height, and the share of bands torn (0 outside a glitch pulse). */
   tear: number;
   band: number;
@@ -528,6 +530,8 @@ export function postPass(card: Card, p: PostInput): boolean {
   gl.uniform1f(P.u.uSeed!, p.seed);
   gl.uniform1f(P.u.uGrain!, p.grain);
   gl.uniform1f(P.u.uChroma!, p.chroma);
+  gl.uniform1f(P.u.uWobble!, p.wobble);
+  gl.uniform1f(P.u.uWobbleRows!, Math.max(1, p.wobbleRows));
   gl.uniform1f(P.u.uTear!, p.tear);
   gl.uniform1f(P.u.uBand!, Math.max(1, p.band));
   gl.uniform1f(P.u.uTorn!, p.torn);

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.40.0, Ryza — 2026-10-23
+
+- The hidden sheet is easier to wake, on a phone too. A riddle, for the curious: the switch turns at a touch, but the
+  forge answers only a hand that stays, one breath to be heard, two to be kindled. The archive leaves a few more hints
+  for those who search it, or lose their way in it.
+- And it lives more while it is on: scanlines split warm and cool, a band of furnace light rolling down the screen,
+  fringed lettering, small flickers here and there, a breathing glow, and a wider colour split on the drawing. Still
+  calm under reduced motion and never more than 3 flashes a second. The Motive force line, which overflowed the
+  title block on a phone, is gone. Style reference 3.7.
+
 ## 0.39.0, Metalica — 2026-10-23
 
 - A hidden third sheet, Forge: oxide-red paper, bone ink and brass, so the drawings recolour too. Finding it plays a

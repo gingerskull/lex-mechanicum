@@ -7,6 +7,7 @@ import Facets from "../components/Facets.astro";
 import Card from "../components/Card.astro";
 import { APP, SHEETS, VERSION, sortableOf } from "../data";
 import { DEFAULT_ORDER, sortBy } from "../sort";
+import { HINTS } from "../lore";
 ---
 <Sheet title="Mechanism Library" description="Linkages, gears, cams and indexing drives, drawn live as working drawings of real hardware. Turn them, tilt them and take them apart, for a lesson or out of plain curiosity.">
   <header class="wrap top">
@@ -20,7 +21,6 @@ import { DEFAULT_ORDER, sortBy } from "../sort";
       <div><i>Sheets</i><b>{SHEETS.length}</b></div>
       <div><i>Drawn</i><b>As built</b></div>
       <div data-forge-key><i>Rev</i><b>{VERSION}</b></div>
-      <div class="forge-line"><i>Motive force</i><b>Kindled</b></div>
     </div>
   </header>
   <Bar library set={{ name: "Mechanism Library", count: SHEETS.length }}><Facets /></Bar>
@@ -31,6 +31,11 @@ import { DEFAULT_ORDER, sortBy } from "../sort";
       <div class="empty" id="empty" hidden>
         <h2>No pattern found</h2>
         <p>No pattern in the archive matches. Clear a filter or the search.</p>
+      </div>
+      <div class="empty sealed" id="sealed" hidden>
+        <h2 id="sealed-title">Pattern sealed</h2>
+        <p id="sealed-text">This pattern rests behind a sealed sheet of the archive.</p>
+        <p class="lore-hint" data-lore-hint>{HINTS[0]}</p>
       </div>
     </div>
   </main>

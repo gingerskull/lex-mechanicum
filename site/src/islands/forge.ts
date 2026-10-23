@@ -1,17 +1,21 @@
-// The Forge sheet (SS14, LM-12): the unlock on the library's title block (its Rev cell, clicked once per law), the unlock
-// moment, the living effects while Forge is the sheet, and a greeting in the console once it is unlocked. Every layer here
-// is fixed over the page and takes no click; under reduced motion the moment is a plain fade and nothing moves. Strengths
-// and timings are in src/style/forge.ts. The layers hang from the root, not the body: the moment filters the body, and a
-// filtered body would hold its fixed children to its own height.
+// The Forge sheet (SS14, LM-12): the unlock (the sheet switch held until its cog fills with brass, or the library title
+// block's Rev cell clicked once per law), the unlock moment, the living effects while Forge is the sheet, the hints (a
+// glint on the cog, a line in the console, the hint phrases of site/src/lore.ts) and a greeting once it is unlocked. Every
+// layer here is fixed over the page and takes no click; under reduced motion the moment is a plain fade and nothing moves.
+// Strengths and timings are in src/style/forge.ts. The layers hang from the root, not the body: the moment filters the
+// body, and a filtered body would hold its fixed children to its own height.
 import { FORGE } from "../../../src/style/forge";
 import { TOKENS } from "../../../src/style/tokens";
 import { clickCounter, currentSheet, forgeUnlocked, rememberForge } from "../forge";
+import { pickHint } from "../lore";
 import { setSheet } from "./theme";
 
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const P = FORGE.page;
 const U = FORGE.unlock;
+const BRASS = TOKENS.themes.forge.accent;
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
+const root = document.documentElement;
 
 /** A tile of grey noise as a data URL, made once. */
 let noiseUrl = "";
@@ -41,12 +45,19 @@ function knobs(el: HTMLElement) {
   set("--fx-grain", P.grain.alpha);
   set("--fx-scan", `${P.scanlines.alpha * 100}%`);
   set("--fx-pitch", `${P.scanlines.pitch}px`);
+  set("--fx-drift", `${P.scanlines.drift}s`);
+  set("--fx-roll", `${P.roll.alpha * 100}%`);
+  set("--fx-roll-height", `${P.roll.height}px`);
+  set("--fx-roll-period", `${P.roll.period}s`);
   set("--fx-vignette", `${P.vignette.alpha * 100}%`);
   set("--fx-vignette-start", `${P.vignette.start * 100}%`);
   set("--fx-glow", `${P.glow.alpha * 100}%`);
   set("--fx-glow-size", `${P.glow.size}px`);
+  set("--fx-glow-low", P.glow.low);
+  set("--fx-glow-period", `${P.glow.period}s`);
   set("--fx-flicker", P.flicker.depth);
   set("--fx-flicker-period", `${P.flicker.period}s`);
+  set("--fx-blip", P.blips.depth);
   set("--fx-band-hue", `${P.glitch.hue}deg`);
   set("--fx-lit", `${U.glow}s`);
   set("--fx-noise-burst", U.noise);
@@ -58,7 +69,12 @@ let fx: HTMLElement | null = null;
 let grain: HTMLElement | null = null;
 let grainTimer = 0;
 let pulseTimer = 0;
+let blipTimer = 0;
 
+/** The drawing on the page tears with the page (islands/stage3.ts): `strength` 1 at a pulse, less at a blip. */
+const tearDrawing = (length: number, strength: number) => dispatchEvent(new CustomEvent("forgeglitch", { detail: { length, strength } }));
+
+/** A glitch pulse: a few thin bands of the page shift in colour, the text's fringe widens, the drawing tears. */
 function pulse() {
   if (!fx) return;
   const bands = fx.querySelector<HTMLElement>(".fx-bands");
@@ -70,14 +86,25 @@ function pulse() {
     bands.append(b);
     setTimeout(() => b.remove(), P.glitch.length * 1000);
   }
-  // the drawing on the page tears with it (islands/stage3.ts)
-  dispatchEvent(new CustomEvent("forgeglitch", { detail: { length: P.glitch.length } }));
-  schedule();
+  root.classList.add("forge-jolt");
+  setTimeout(() => root.classList.remove("forge-jolt"), P.glitch.length * 1000);
+  tearDrawing(P.glitch.length, 1);
+  pulseTimer = window.setTimeout(pulse, rand(P.glitch.every[0], P.glitch.every[1]) * 1000);
 }
 
-function schedule() {
-  clearTimeout(pulseTimer);
-  pulseTimer = window.setTimeout(pulse, rand(P.glitch.every[0], P.glitch.every[1]) * 1000);
+/** A blip: a strip of the page brightens or dims for a moment, or a thin line tears across it; the drawing twitches. */
+function blip() {
+  if (!fx) return;
+  const bands = fx.querySelector<HTMLElement>(".fx-bands");
+  const b = document.createElement("div");
+  const kind = Math.random();
+  b.className = kind < 0.4 ? "fx-blip dim" : kind < 0.75 ? "fx-blip lit" : "fx-blip line";
+  b.style.top = `${rand(0.03, 0.97) * innerHeight}px`;
+  if (kind < 0.75) b.style.height = `${rand(P.blips.height[0], P.blips.height[1])}px`;
+  bands?.append(b);
+  setTimeout(() => b.remove(), P.blips.length * 1000);
+  if (Math.random() < 0.5) tearDrawing(P.blips.length, FORGE.canvas.blip);
+  blipTimer = window.setTimeout(blip, rand(P.blips.every[0], P.blips.every[1]) * 1000);
 }
 
 function mount() {
@@ -85,13 +112,17 @@ function mount() {
   fx = document.createElement("div");
   fx.className = "forge-fx";
   fx.setAttribute("aria-hidden", "true");
-  fx.innerHTML = '<div class="fx-glow"></div><div class="fx-scan"></div><div class="fx-flicker"></div><div class="fx-bands"></div>';
+  fx.innerHTML = '<div class="fx-glow"></div><div class="fx-scan"></div><div class="fx-roll"></div><div class="fx-flicker"></div><div class="fx-bands"></div>';
   knobs(fx);
   grain = document.createElement("div");
   grain.className = "forge-grain";
   grain.setAttribute("aria-hidden", "true");
   knobs(grain);
-  document.documentElement.append(fx, grain);
+  root.append(fx, grain);
+  // the text's warm and cool fringe (forge.css reads these on the root)
+  root.style.setProperty("--fx-ab", `${P.aberration.shift}px`);
+  root.style.setProperty("--fx-ab-pulse", `${P.aberration.pulse}px`);
+  root.style.setProperty("--fx-ab-alpha", `${P.aberration.alpha * 100}%`);
   // the furnace comes up
   requestAnimationFrame(() => requestAnimationFrame(() => fx?.classList.add("lit")));
   if (reduced) return;
@@ -99,30 +130,38 @@ function mount() {
   grainTimer = window.setInterval(() => {
     g.style.transform = `translate(${-Math.floor(Math.random() * P.grain.tile)}px, ${-Math.floor(Math.random() * P.grain.tile)}px)`;
   }, 1000 / P.grain.fps);
-  schedule();
+  pulseTimer = window.setTimeout(pulse, rand(P.glitch.every[0], P.glitch.every[1]) * 1000);
+  blipTimer = window.setTimeout(blip, rand(P.blips.every[0], P.blips.every[1]) * 1000);
 }
 
 function unmount() {
   clearInterval(grainTimer);
   clearTimeout(pulseTimer);
+  clearTimeout(blipTimer);
   fx?.remove();
   grain?.remove();
   fx = grain = null;
+  root.classList.remove("forge-jolt");
+  for (const k of ["--fx-ab", "--fx-ab-pulse", "--fx-ab-alpha"]) root.style.removeProperty(k);
 }
 
 const sync = () => (currentSheet() === "forge" ? mount() : unmount());
 
+const consoleFont = (w: number, size: number) => `font: ${w} ${size}px ${TOKENS.type.mono};`;
+
 /** For whoever opens the developer tools on an unlocked sheet. */
 function greet() {
   const F = TOKENS.themes.forge;
-  const mono = TOKENS.type.mono;
   console.log(
     "%cLEX MECHANICUM%c  forge sheet\n%cThe motive force is kindled. Sixteen laws, one drawing office, every part accounted for.\nThe switch now has three sheets.",
-    `font: 600 13px ${mono}; letter-spacing: .14em; color: ${F.accent}; background: ${F.paper}; padding: 4px 8px;`,
-    `font: 500 11px ${mono}; letter-spacing: .08em; color: ${F.ink}; background: ${F.paper}; padding: 4px 8px;`,
-    `font: 400 11px ${mono}; color: ${F.grid};`,
+    `${consoleFont(600, 13)} letter-spacing: .14em; color: ${F.accent}; background: ${F.paper}; padding: 4px 8px;`,
+    `${consoleFont(500, 11)} letter-spacing: .08em; color: ${F.ink}; background: ${F.paper}; padding: 4px 8px;`,
+    `${consoleFont(400, 11)} color: ${F.grid};`,
   );
 }
+
+/** For whoever opens the developer tools before the unlock. */
+const whisper = () => console.log("%cThe forge sleeps. Hold the cog.", `${consoleFont(500, 11)} letter-spacing: .08em; color: ${TOKENS.themes.forge.grid};`);
 
 /** The unlock moment: flicker, torn bands, a red and blue split and a burst of noise that settles into the Forge sheet. */
 function moment() {
@@ -130,7 +169,7 @@ function moment() {
     const veil = document.createElement("div");
     veil.className = "forge-veil";
     veil.style.setProperty("--fx-fade", `${U.fade / 2}s`);
-    document.documentElement.append(veil);
+    root.append(veil);
     requestAnimationFrame(() => veil.classList.add("on"));
     setTimeout(() => {
       setSheet("forge", true);
@@ -144,7 +183,7 @@ function moment() {
   layer.setAttribute("aria-hidden", "true");
   layer.innerHTML = '<div class="m-noise"></div><div class="m-dip"></div>';
   knobs(layer);
-  document.documentElement.append(layer);
+  root.append(layer);
   const burst = layer.querySelector<HTMLElement>(".m-noise")!;
   const dip = layer.querySelector<HTMLElement>(".m-dip")!;
   const turb = document.getElementById("forge-turb");
@@ -199,11 +238,104 @@ function moment() {
 }
 
 function unlock() {
+  const first = !forgeUnlocked();
   rememberForge();
   dispatchEvent(new CustomEvent("forgeunlock"));
-  greet();
+  if (first) greet();
   moment();
 }
+
+// --- the cog: held for a second, it starts to fill with brass; full, it unlocks. A shorter press is a plain switch.
+
+/** True while the click that ends a hold must not switch the sheet. */
+let eatClick = false;
+addEventListener(
+  "click",
+  (e) => {
+    if (!eatClick || !(e.target as Element | null)?.closest?.("[data-theme-toggle]")) return;
+    eatClick = false;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  },
+  true,
+);
+
+function holdable(btn: HTMLButtonElement) {
+  let state: "idle" | "waiting" | "filling" = "idle";
+  let wait = 0;
+  let raf = 0;
+  let from = 0;
+  let at: [number, number] | null = null;
+  let kindle: HTMLElement | null = null;
+
+  const clear = () => {
+    clearTimeout(wait);
+    cancelAnimationFrame(raf);
+    kindle?.remove();
+    kindle = null;
+    btn.classList.remove("kindling");
+    state = "idle";
+  };
+  const fill = (now: number) => {
+    const p = Math.min(1, (now - from) / (U.holdFill * 1000));
+    kindle?.style.setProperty("--kindle", `${(p * 360).toFixed(1)}deg`);
+    if (p < 1) {
+      raf = requestAnimationFrame(fill);
+      return;
+    }
+    clear();
+    unlock();
+  };
+  const begin = (x?: number, y?: number) => {
+    clear();
+    eatClick = false;
+    at = x === undefined || y === undefined ? null : [x, y];
+    state = "waiting";
+    wait = window.setTimeout(() => {
+      // from here the hold is not a switch any more: the click that ends it is eaten
+      state = "filling";
+      eatClick = true;
+      const svg = btn.querySelector("svg");
+      if (!svg) return;
+      kindle = document.createElement("span");
+      kindle.className = "kindle";
+      kindle.setAttribute("aria-hidden", "true");
+      kindle.style.color = BRASS;
+      kindle.append(svg.cloneNode(true));
+      btn.append(kindle);
+      btn.classList.add("kindling");
+      from = performance.now();
+      raf = requestAnimationFrame(fill);
+    }, U.holdDelay * 1000);
+  };
+
+  btn.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    begin(e.clientX, e.clientY);
+  });
+  btn.addEventListener("pointermove", (e) => {
+    if (state !== "idle" && at && Math.hypot(e.clientX - at[0], e.clientY - at[1]) > U.holdSlop) clear();
+  });
+  for (const ev of ["pointerup", "pointercancel", "pointerleave"] as const) btn.addEventListener(ev, () => state !== "idle" && clear());
+  // a long press is ours, not the browser's menu
+  btn.addEventListener("contextmenu", (e) => e.preventDefault());
+  // the keyboard: Space or Enter held the same way; a short press still switches
+  btn.addEventListener("keydown", (e) => {
+    if (e.key !== " " && e.key !== "Enter") return;
+    e.preventDefault();
+    if (!e.repeat && state === "idle") begin();
+  });
+  btn.addEventListener("keyup", (e) => {
+    if (e.key !== " " && e.key !== "Enter") return;
+    e.preventDefault();
+    const short = state === "waiting";
+    if (state !== "idle") clear();
+    eatClick = false;
+    if (short) btn.click();
+  });
+}
+
+for (const b of document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")) holdable(b);
 
 // the Rev cell of the library's title block: silent until the last click
 const key = document.querySelector<HTMLElement>("[data-forge-key]");
@@ -214,6 +346,36 @@ if (key) {
   });
 }
 
+// --- the hints
+
+/** Every hint line on the page says one of the phrases, picked now. */
+export function hint(): void {
+  for (const el of document.querySelectorAll<HTMLElement>("[data-lore-hint]")) el.textContent = pickHint();
+}
+hint();
+
+/** The visit count, and on the visit set in the knobs, while Forge is still locked, a glint on the cog. */
+function glint() {
+  let n: number;
+  try {
+    n = Number(localStorage.getItem("forge-visits") ?? 0) + 1;
+    localStorage.setItem("forge-visits", String(n));
+  } catch {
+    return;
+  }
+  if (n !== U.glintVisit || forgeUnlocked() || reduced) return;
+  setTimeout(() => {
+    for (const b of document.querySelectorAll<HTMLElement>("[data-theme-toggle]")) {
+      b.style.setProperty("--brass", BRASS);
+      b.style.setProperty("--glint", `${U.glint}s`);
+      b.classList.add("glint");
+      setTimeout(() => b.classList.remove("glint"), U.glint * 1000);
+    }
+  }, 1500);
+}
+glint();
+
 addEventListener("themechange", sync);
 sync();
 if (forgeUnlocked()) greet();
+else whisper();

@@ -1,9 +1,11 @@
 ---
 // The page for an address the site does not have (GitHub Pages serves it for any missing path): a sheet of the set that
-// is not in the archive, and the way back to the library.
+// is not in the archive, a faint hint phrase about the Forge sheet (one picked on each load, SS14), and the way back to the
+// library.
 import Sheet from "../layouts/Sheet.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import { url } from "../url";
+import { HINTS } from "../lore";
 ---
 <Sheet title="Sheet ST-404 · Mechanism Library" description="This sheet is not in the archive.">
   <main class="wrap detail lost">
@@ -11,6 +13,7 @@ import { url } from "../url";
       <div class="meta"><b>ST-404</b> · Not in the archive</div>
       <div class="hrow"><h1>Sheet ST-404</h1><ThemeToggle /></div>
       <p>This sheet is not in the archive. Its pattern may be lost, or not yet recovered.</p>
+      <p class="lore-hint" data-lore-hint>{HINTS[0]}</p>
     </header>
     <a class="btn" href={url("/")}><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M10 3L5 8l5 5"></path></svg>Open the library</a>
   </main>

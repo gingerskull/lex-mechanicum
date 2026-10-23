@@ -369,14 +369,16 @@ void main() {
 }
 `;
 
-// The Forge sheet's post-process (style SS14, src/style/forge.ts): over the finished frame, red and blue pulled a little
-// apart, fine grain, and at a glitch pulse some bands of rows torn sideways. Drawn only on Forge and with the paper grain.
+// The Forge sheet's post-process (style SS14, src/style/forge.ts): over the finished frame, red and blue pulled apart by an
+// amount that swells down the rows, fine grain, and at a glitch some bands of rows torn sideways. Drawn only on Forge and
+// with the paper grain.
 export const POST_FRAG = /* glsl */ `#version 300 es
 precision highp float;
 uniform sampler2D uSrc;
 uniform vec2 uOrigin; // window px of the frame's bottom left
 uniform vec2 uSize;   // frame size, device px
 uniform float uSeed, uGrain, uChroma, uTear, uBand, uTorn;
+uniform float uWobble, uWobbleRows; // px the split swells by, px rows per swell
 out vec4 o;
 float hash(vec2 p) {
   p = fract(p * vec2(443.897, 441.423));
@@ -394,8 +396,10 @@ void main() {
   float torn = step(1.0 - uTorn, hash(vec2(band, uSeed + 7.0)));
   q.x += floor(torn * uTear * (hash(vec2(uSeed, band)) * 2.0 - 1.0));
   vec4 c = at(q);
-  float r = at(q - vec2(uChroma, 0.0)).r;
-  float b = at(q + vec2(uChroma, 0.0)).b;
+  // the split swells and shrinks down the rows, drifting a little from frame to frame
+  float k = uChroma + uWobble * sin(6.2831853 * q.y / uWobbleRows + uSeed * 0.05);
+  float r = at(q - vec2(k, 0.0)).r;
+  float b = at(q + vec2(k, 0.0)).b;
   // a new field of grain each frame, not the last one moved along
   vec3 col = vec3(r, c.g, b) + (hash(vec2(hash(q), fract(uSeed * 0.618034))) - 0.5) * uGrain;
   o = vec4(clamp(col, 0.0, 1.0), c.a);

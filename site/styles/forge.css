@@ -19,30 +19,51 @@
   transform: rotate(90deg);
 }
 
-/* the Rev cell takes 16 quick clicks without selecting text or zooming a phone */
-[data-forge-key] {
+/* the Rev cell takes 16 quick clicks, and the switch a long press, without selecting text, zooming a phone or opening
+   the browser's menu */
+[data-forge-key],
+[data-theme-toggle] {
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   touch-action: manipulation;
 }
-
-/* the motive force line in the library's title block */
-.tblock .forge-line {
-  display: none;
-  grid-column: 1 / -1;
-  border-right: 0;
-  border-top: 1px solid var(--line);
+[data-theme-toggle] {
+  position: relative;
 }
-:root[data-theme="forge"] .tblock .forge-line {
+/* the cog held: after a second it fills with brass in one sweep, ring and half-disc (the colour is set by the island) */
+.themebtn .kindle {
+  position: absolute;
+  inset: 0;
   display: grid;
-  animation: forge-line 0.9s ease-out both;
+  place-items: center;
+  pointer-events: none;
+  -webkit-mask: conic-gradient(var(--ink) var(--kindle, 0deg), transparent 0);
+  mask: conic-gradient(var(--ink) var(--kindle, 0deg), transparent 0);
+  filter: drop-shadow(0 0 3px currentColor);
 }
-:root[data-theme="forge"] .tblock .forge-line b {
-  color: var(--accent);
+.themebtn.kindling > svg {
+  opacity: 0.5;
 }
-@keyframes forge-line {
-  from {
-    opacity: 0;
+/* a hint, once, on the visit the knobs name: the cog catches the light of a forge it has not shown yet */
+.themebtn.glint > svg {
+  animation: forge-glint var(--glint) ease-in-out;
+}
+@keyframes forge-glint {
+  45% {
+    color: var(--brass);
+    filter: drop-shadow(0 0 4px var(--brass));
   }
+}
+
+/* a hint phrase (site/src/lore.ts): faint, set apart */
+.lore-hint,
+.empty .lore-hint,
+.dhead .lore-hint {
+  color: var(--faint);
+  font-style: italic;
+  font-size: 13px;
+  margin: 14px 0 0;
 }
 
 /* the living layers */
@@ -69,9 +90,39 @@
 }
 .forge-fx.lit .fx-glow {
   opacity: 1;
+  animation: forge-breathe var(--fx-glow-period) ease-in-out var(--fx-lit) infinite;
 }
+@keyframes forge-breathe {
+  50% {
+    opacity: var(--fx-glow-low);
+  }
+}
+/* scanlines split into a warm and a cool row, drifting slowly down */
 .forge-fx .fx-scan {
-  background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--bg) var(--fx-scan), transparent) 0 1px, transparent 1px var(--fx-pitch));
+  inset: calc(-1 * var(--fx-pitch)) 0 auto 0;
+  height: calc(100% + 2 * var(--fx-pitch));
+  background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--grid) var(--fx-scan), transparent) 0 1px, color-mix(in srgb, var(--vel) var(--fx-scan), transparent) 1px 2px, transparent 2px var(--fx-pitch));
+  animation: forge-drift var(--fx-drift) linear infinite;
+}
+@keyframes forge-drift {
+  to {
+    transform: translateY(var(--fx-pitch));
+  }
+}
+/* a soft band of furnace light rolling down the screen */
+.forge-fx .fx-roll {
+  inset: 0 0 auto 0;
+  height: var(--fx-roll-height);
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--accent) var(--fx-roll), transparent), transparent);
+  animation: forge-roll var(--fx-roll-period) linear infinite;
+}
+@keyframes forge-roll {
+  from {
+    transform: translateY(calc(-1 * var(--fx-roll-height)));
+  }
+  to {
+    transform: translateY(100vh);
+  }
 }
 /* fine grain: a noise tile on an oversized layer, moved to a new place a few times a second (no repaint); a layer of its
    own over the page, so it blends with the page and not only with the other layers */
@@ -115,6 +166,34 @@
     opacity: calc(var(--fx-flicker) * 0.8);
   }
 }
+/* the text fringed warm and cool; a glitch pulse widens it for a moment (the island sets the amounts) */
+:root[data-theme="forge"] body {
+  text-shadow:
+    calc(-1 * var(--fx-ab-now, var(--fx-ab, 0px))) 0 color-mix(in srgb, var(--grid) var(--fx-ab-alpha, 0%), transparent),
+    var(--fx-ab-now, var(--fx-ab, 0px)) 0 color-mix(in srgb, var(--vel) var(--fx-ab-alpha, 0%), transparent);
+}
+:root.forge-jolt {
+  --fx-ab-now: var(--fx-ab-pulse);
+}
+/* a blip, here and there: a strip dims or brightens for a moment, or a thin line tears across */
+.forge-fx .fx-blip {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+.forge-fx .fx-blip.dim {
+  background: var(--bg);
+  opacity: var(--fx-blip);
+}
+.forge-fx .fx-blip.lit {
+  background: var(--ink);
+  opacity: calc(var(--fx-blip) * 0.6);
+}
+.forge-fx .fx-blip.line {
+  height: 1px;
+  background: color-mix(in srgb, var(--accent) 55%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--vel) 40%, transparent);
+}
 /* a glitch pulse: thin bands of the page shifted in colour for a moment */
 .forge-fx .fx-band {
   position: absolute;
@@ -155,19 +234,14 @@ body.forge-glitching {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .forge-fx .fx-flicker {
-    animation: none;
-  }
+  .forge-fx .fx-flicker,
+  .forge-fx .fx-scan,
   .forge-fx .fx-glow,
-  :root[data-theme="forge"] .tblock .forge-line {
+  .forge-fx.lit .fx-glow {
     transition: none;
     animation: none;
   }
-}
-
-@media (max-width: 1000px) {
-  /* in the one-row strip the Rev cell stays the last of the row when the motive force line follows it */
-  header.top .tblock div:nth-child(4) {
-    border-right: 0;
+  .forge-fx .fx-roll {
+    display: none;
   }
 }
