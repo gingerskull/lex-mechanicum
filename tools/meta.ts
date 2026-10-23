@@ -3,6 +3,7 @@
 import type { CatalogRecord } from "../src/catalog/schema";
 import { imperialDate } from "../src/catalog/imperial";
 import { Kinematics } from "../src/kin";
+import { exportSims, simTrack } from "../src/kin/sims";
 import type { Controls, Kin } from "../src/kin/types";
 import { controlFor } from "../src/render/v3/annotate";
 import type { Meta } from "./draw3-page/main";
@@ -10,8 +11,11 @@ import type { Meta } from "./draw3-page/main";
 export function metaOf(id: string, rec: CatalogRecord | undefined): Meta {
   const r = rec as unknown as { name?: string; kin?: Meta["kin"]; teaching?: Meta["teaching"]; origin?: { date?: string } } | undefined;
   const date = r?.origin?.date ? imperialDate(r.origin.date) : null;
+  // the timed blocks' simulations the record's settings run, shipped with the branch tables (R9)
+  const stop = simTrack();
   const tables = r?.kin ? tablesOf(r.kin as unknown as Kin, r.teaching ?? null) : [];
-  return { name: r?.name ?? id, teaching: r?.teaching ?? null, kin: r?.kin ?? null, ...(date ? { date } : {}), ...(tables.length ? { tables } : {}) };
+  const sims = exportSims(stop());
+  return { name: r?.name ?? id, teaching: r?.teaching ?? null, kin: r?.kin ?? null, ...(date ? { date } : {}), ...(tables.length ? { tables } : {}), ...(Object.keys(sims).length ? { sims } : {}) };
 }
 
 /**

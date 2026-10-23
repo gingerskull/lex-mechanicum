@@ -5,6 +5,7 @@
 import { compose, differ } from "../page-image";
 import type { Kin, Teaching } from "../../src/catalog/kin";
 import { Kinematics, type BranchTables } from "../../src/kin/compose";
+import { importSims } from "../../src/kin/sims";
 import type { Controls, Kin as KinLib } from "../../src/kin/types";
 import { browserFactory } from "../../src/render/canvas";
 import type { Dial } from "../../src/render/detail";
@@ -26,10 +27,13 @@ export interface Meta {
   date?: string;
   /** The branch tables of the record's own setting and of each ghost trace's, where it tracks a closure (R9). */
   tables?: { controls?: Controls; blocks: BranchTables }[];
+  /** The timed blocks' simulations at those settings (src/kin/sims.ts, R9). */
+  sims?: Record<string, Record<string, unknown>>;
 }
 
 /** Hands the branch tables a meta file carries to the kinematics, so the first frame does not build them (R9). */
-export function useTables(k: { useBranchTables(d: BranchTables, c?: Controls): void }, meta: Pick<Meta, "tables">): void {
+export function useTables(k: { useBranchTables(d: BranchTables, c?: Controls): void }, meta: Pick<Meta, "tables" | "sims">): void {
+  importSims(meta.sims);
   for (const t of meta.tables ?? []) k.useBranchTables(t.blocks, t.controls);
 }
 

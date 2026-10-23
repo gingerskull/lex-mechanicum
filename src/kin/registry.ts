@@ -9,6 +9,7 @@ import { bennettB, bennettFrames, bisectorNormal, hookeAngle, sarrusPair } from 
 import { ellipticalAngle, meshRatio, ravigneaux, willis } from "./blocks/gears";
 import { type CamLaw, type CamSchedule, camMotion, lawRise, pressureAngle } from "./blocks/cam";
 import { chainAdvance, chainSpeed, chainTurn, differentialAdvance, flexureEnd, pathAt, pathLength, reeve, screwAdvance, sheaveShift, variatorR2, vonMises } from "./blocks/members";
+import { simKey, simulated } from "./sims";
 import { genevaAngle, genevaInternalAngle, ratchetWheel, rideAngle, sawOutline, simulateEscape, simulateEscapement, simulateStar, simulateVerge, type VergeSpec, type EscapementSpec, type RatchetSpec, type StarSpec } from "./blocks/timed";
 import { COUPLING_BLOCKS } from "./blocks/couplings";
 
@@ -981,8 +982,6 @@ const rockerBlock: BlockFn = (c, s) => {
   }
 };
 
-const starCache = new Map<string, ReturnType<typeof simulateStar>>();
-
 /**
  * star (a star wheel driven by a finger, held and snapped by a jumper): in: input (the driver's angle, deg), driver (its
  * ground joint), star and jumper (bodies), starJoint and jumperJoint (their ground revolutes), n, tip, root, tip0 (deg,
@@ -1004,12 +1003,7 @@ const starBlock: BlockFn = (c, s) => {
     jumper: [J[0] - O[0], J[1] - O[1]], swing: (i.swing as number[]).map((v) => c.num(v)) as [number, number],
     arm: c.num(i.arm), roller: c.num(i.roller), snap: c.num(i.snap),
   };
-  const key = JSON.stringify(spec);
-  let sim = starCache.get(key);
-  if (!sim) {
-    sim = simulateStar(spec);
-    starCache.set(key, sim);
-  }
+  const sim = simulated(simKey("star", spec), () => simulateStar(spec));
   const th = c.delta("in", c.num(i.input));
   const x = ((((th % 360) + 360) % 360) / sim.step);
   const k = Math.min(sim.star.length - 2, Math.floor(x));
@@ -1103,8 +1097,6 @@ const oneWay: BlockFn = (c, s) => {
   }
 };
 
-const escapeCache = new Map<string, ReturnType<typeof simulateEscape>>();
-
 /**
  * escape (a geometric escapement in a plane: anchor, lever): the pallets swing with the oscillating driver of their arbor
  * (`lo` to `hi` deg over the cycle, `default` at the reference); the escape wheel, urged forward by its train, goes on
@@ -1163,12 +1155,7 @@ const escapeBlock: BlockFn = (c, s) => {
     };
   }
   const rate = i.rate !== undefined ? c.num(i.rate) : Infinity;
-  const key = JSON.stringify([spec, lo, hi, def, fork ?? null, rate]);
-  let sim = escapeCache.get(key);
-  if (!sim) {
-    sim = simulateEscape(spec, palletAt, 1440, rate);
-    escapeCache.set(key, sim);
-  }
+  const sim = simulated(simKey("escape", [spec, lo, hi, def, fork ?? null, rate]), () => simulateEscape(spec, palletAt, 1440, rate));
   const N = sim.wheel.length - 1;
   // the reference (every driver at its default) is where the swing first passes the default
   const input = c.num(i.input);
@@ -1192,8 +1179,6 @@ const escapeBlock: BlockFn = (c, s) => {
   outVal(c, s, w * R2D, "phase");
 };
 
-const vergeCache = new Map<string, ReturnType<typeof simulateVerge>>();
-
 /**
  * verge (a crown wheel and a verge with two flag pallets): in: input (the foliot's angle, deg, an oscillating driver: lo,
  * hi, default), wheel (body), wheelJoint (its revolute, axis along y, the crown's rim face in the plane through it, the
@@ -1215,12 +1200,7 @@ const vergeBlock: BlockFn = (c, s) => {
   const lo = c.num(i.lo);
   const hi = c.num(i.hi);
   const def = c.num(i.default ?? 0);
-  const key = JSON.stringify([spec, lo, hi, def]);
-  let sim = vergeCache.get(key);
-  if (!sim) {
-    sim = simulateVerge(spec, (u) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D);
-    vergeCache.set(key, sim);
-  }
+  const sim = simulated(simKey("verge", [spec, lo, hi, def]), () => simulateVerge(spec, (u) => (lo + (hi - lo) * (0.5 - 0.5 * Math.cos(u)) - def) * D));
   const N = sim.wheel.length - 1;
   const input = c.num(i.input);
   const uRef = Math.acos(Math.max(-1, Math.min(1, (lo + hi - 2 * def) / (hi - lo))));

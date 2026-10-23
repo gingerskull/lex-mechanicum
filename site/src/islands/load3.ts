@@ -12,6 +12,8 @@ export interface Meta {
   date?: string;
   /** The branch tables of the record's own setting and of each ghost trace's (R9). */
   tables?: { controls?: import("../../../src/kin/types").Controls; blocks: import("../../../src/kin/compose").BranchTables }[];
+  /** The timed blocks' simulations at those settings (R9). */
+  sims?: Record<string, Record<string, unknown>>;
 }
 
 export interface Loaded {
@@ -59,7 +61,8 @@ export async function load3(E: Engine, id: string, f: ReturnType<typeof fetchAll
   const [blob, meta] = await Promise.all([f.blob, f.meta]);
   const s = await setup(E, blob);
   const kinematics = meta.kin ? new E.Kinematics(meta.kin as unknown as import("../../../src/kin/types").Kin) : null;
-  // the branch tables the build made, so the first frame does not build them (R9)
+  // the simulations and branch tables the build made, so the first frame does not make them again (R9)
+  E.importSims(meta.sims);
   if (kinematics) for (const t of meta.tables ?? []) kinematics.useBranchTables(t.blocks, t.controls);
   const axes: Record<string, [number, number, number]> = {};
   for (const j of meta.kin?.joints ?? []) if (Array.isArray(j.axis) && j.axis.length >= 3) axes[j.id] = [j.axis[0]!, j.axis[1]!, j.axis[2]!];
