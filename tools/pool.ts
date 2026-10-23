@@ -11,11 +11,15 @@ const PER_JOB = 2.2e9;
 /** A child past this resident size is replaced after its task: Manifold's heap grows and never shrinks. */
 const RECYCLE = 3e9;
 
+/** Set in every child: a tool whose module is a task's runs its main only outside the pool (`inPool`). */
+const POOL_CHILD = "MDB_POOL_CHILD";
+export const inPool = (): boolean => process.env[POOL_CHILD] === "1";
+
 /** How many children for n tasks: MDB_JOBS when set, else the cores and as many as most of the memory holds. */
 export function poolSize(n: number): number {
   const env = Number(process.env.MDB_JOBS);
-  const cap = env > 0 ? env : Math.min(availableParallelism(), Math.floor((totalmem() * 0.8) / PER_JOB));
-  return Math.max(1, Math.min(n, cap));
+  const cap = env > 0 ? env : Math.min(availableParallelism(), (totalmem() * 0.8) / PER_JOB);
+  return Math.max(1, Math.floor(Math.min(n, cap)));
 }
 
 interface Reply {
@@ -35,7 +39,7 @@ export async function runPool<T, R>(task: (x: T) => Promise<R>, module: string, 
   if (!items.length) return [];
   const url = module.startsWith("file:") ? module : pathToFileURL(module).href;
   const fn = task.name;
-  const jobs = o.jobs ?? poolSize(items.length);
+  const jobs = Math.floor(o.jobs ?? poolSize(items.length));
   const out = new Array<R>(items.length);
   const done = new Array<boolean>(items.length).fill(false);
   let flushed = 0;
@@ -63,7 +67,7 @@ export async function runPool<T, R>(task: (x: T) => Promise<R>, module: string, 
         reject(e);
       };
       const start = () => {
-        const child = fork(worker, [], { serialization: "advanced", stdio: ["ignore", "inherit", "inherit", "ipc"] });
+        const child = fork(worker, [], { serialization: "advanced", stdio: ["ignore", "inherit", "inherit", "ipc"], env: { ...process.env, [POOL_CHILD]: "1" } });
         live.add(child);
         // the item the child is working on, -1 when idle
         let busy = -1;

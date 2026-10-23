@@ -56,7 +56,8 @@ interface Job {
 
 /** The 3D check of one mechanism, built once (a pool task). */
 export async function clearanceOne(j: Job): Promise<Report> {
-  const b = await builtMechanism(j.id);
+  // --no-cache builds again as well
+  const b = await builtMechanism(j.id, { cache: j.cache });
   return report3(j.id, sourceOf(b.record, b.assembly), { profile: j.profile, cache: j.cache, ...(j.inject ? { inject: j.inject } : {}) });
 }
 

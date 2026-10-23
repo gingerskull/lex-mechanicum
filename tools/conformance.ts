@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { conformance, formatReport } from "../src/audit/conformance";
 import { check3d, checkRecord, clashLines, sourceOf } from "../src/checks";
 import { builtMechanism } from "../src/package/built";
-import { runPool } from "./pool";
+import { inPool, runPool } from "./pool";
 
 /** One mechanism's check results as the report prints them, and whether a check fails. */
 export async function conformanceOne(id: string): Promise<{ line: string; failed: boolean }> {
@@ -31,4 +31,5 @@ async function main() {
   if (report.failing.length || results.some((r) => r.failed)) process.exitCode = 1;
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+// the gate of `npm run check` runs whenever it is started; a pool child only imports it for its task
+if (!inPool()) await main();

@@ -4,7 +4,7 @@
 // a build reads (src/, data/catalog/, the lockfile) and the Node version, so the tools of one run build each mechanism
 // once between them, and a change to any source builds it again.
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { deserialize, serialize } from "node:v8";
 import { ROOT } from "../audit/sheet";
@@ -57,7 +57,8 @@ export async function builtMechanism(id: string, o: { cache?: boolean } = {}): P
   if (o.cache !== false && existsSync(file)) {
     try {
       const hit = deserialize(readFileSync(file)) as { key: string; assembly: Assembly; bytes: Uint8Array };
-      if (hit.key === k) return { ...own, assembly: hit.assembly, bytes: hit.bytes, cached: true };
+      // the bytes on their own buffer, not a view of the whole entry's
+      if (hit.key === k) return { ...own, assembly: hit.assembly, bytes: hit.bytes.slice(), cached: true };
     } catch {
       // a damaged entry is built again
     }
@@ -65,11 +66,15 @@ export async function builtMechanism(id: string, o: { cache?: boolean } = {}): P
   const assembly = await buildAssembly(record as never, polish ? { polish } : {});
   const bytes = await encode2((await packAssembly(record as never, assembly)).pkg);
   if (o.cache !== false) {
-    mkdirSync(BUILT_DIR, { recursive: true });
-    // whole or not at all: another tool may be reading the same entry
+    // whole or not at all: another tool may be reading the same entry; a cache that cannot be written only costs a build
     const tmp = `${file}.${process.pid}.tmp`;
-    writeFileSync(tmp, serialize({ key: k, assembly, bytes }));
-    renameSync(tmp, file);
+    try {
+      mkdirSync(BUILT_DIR, { recursive: true });
+      writeFileSync(tmp, serialize({ key: k, assembly, bytes }));
+      renameSync(tmp, file);
+    } catch {
+      rmSync(tmp, { force: true });
+    }
   }
   return { ...own, assembly, bytes, cached: false };
 }
