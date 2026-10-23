@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dayOfId, fillDate, originProblems } from "../../src/catalog/origin";
+import { addedProblems, dayOfId, fillDate, originProblems } from "../../src/catalog/origin";
 import type { Origin } from "../../src/catalog/schema";
 import { validate } from "../../src/catalog/validate";
 import { record } from "./fixtures";
@@ -60,5 +60,14 @@ describe("originProblems", () => {
     expect(originProblems(withOrigin({ date: "1781-10-25", precision: "year", note: "n" }))).toEqual([
       `x: origin.date 1781-10-25 at precision year should be ${fillDate("x", 1781)}`,
     ]);
+  });
+});
+
+describe("addedProblems", () => {
+  it("passes no date or a real one, and fails anything else", () => {
+    expect(addedProblems(record("x", {}))).toEqual([]);
+    expect(addedProblems(record("x", { added: "2026-10-22" }))).toEqual([]);
+    expect(addedProblems(record("x", { added: "2024-02-29" }))).toEqual([]);
+    for (const d of ["2026-02-29", "2026-13-01", "22 Oct 2026", "2026-10"]) expect(addedProblems(record("x", { added: d })), d).toEqual([`x: added "${d}" is not a date YYYY-MM-DD`]);
   });
 });

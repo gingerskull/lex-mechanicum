@@ -139,7 +139,7 @@ async function one(id: string, o: Opts, host: HTMLElement, log: (s: string) => v
     const g0 = performance.now();
     const canvas = canvasIn(host);
     const poser = meta.kin ? kinPoser(new Kinematics(meta.kin as unknown as KinLib), undefined, s.pkg.lifts) : staticPoser;
-    const scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser, teaching: meta.teaching, info: { title: meta.name, no: `MX-${id.toUpperCase()}` } };
+    const scene = { pkg: s.pkg, meshes: s.meshes, edges: s.edges, poser, teaching: meta.teaching, info: { title: meta.name, no: `ST-${id.toUpperCase()}`, ...(meta.date ? { date: meta.date } : {}) } };
     const sess = createSession3(canvas, scene, { factory: browserFactory, w: o.w, h: o.h, dpr: o.dpr });
     const viewOf = (v: StandInView): DrawView3 => recordDrawView(scene, { state: { orient: { yaw: 0, tilt: v.tilt }, explode: v.explode }, detail: v.detail });
     const stand = { draw: (u: number, v: StandInView) => sess.draw(u, viewOf(v)), finish: () => sess.finish(), dispose: () => sess.dispose(), counters: { draws: 0, instances: 0 } };

@@ -19,11 +19,12 @@ export const PLATE = new Set(["part", "plate", "bracket", "bridge", "housing", "
 /** The role patterns, in the order of the pattern texture's layers. */
 export const PATTERNS = ["dots", "hatch", "cross", "dash"] as const;
 
-/** The sheet the drawing sits on: title, drawing number, sheet. */
+/** The sheet the drawing sits on: title, drawing number, sheet, and the record's origin as an Imperial date. */
 export interface SheetInfo {
   title: string;
   no: string;
   sheet?: string;
+  date?: string;
 }
 
 export interface Scene {

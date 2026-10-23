@@ -87,6 +87,9 @@ export const DRAFT = {
       alpha: 1, // 0..1 on the lines layer
       hiddenAlpha: 0.7, // 0..1 on the frame (shows through covering parts)
       segments: 72, // straight pieces of the ring
+      // While the drawing is paused, the ring breathes (none while it plays, none under reduced motion): its strength
+      // runs from 1 down to `low` and back once a `period`, redrawn `fps` times a second.
+      breathe: { period: 5, low: 0.35, fps: 15 }, // s, 0..1, count per s
     },
   },
 
@@ -236,12 +239,15 @@ export const DRAFT = {
     zoneTick: 4, // px
     zoneAlpha: 0.45, // 0..1, zone labels
     zoneLabelInset: 2.5, // px from the border
+    // The microprint (LM-05): between the two borders, in the gaps between the zone marks, a line of ones and zeros so
+    // small that it reads as a dotted rule; zoomed in, it is the 8-bit ASCII of the sheet's MICROPRINT text.
+    microprint: { color: "grid" as ColorName, alpha: 0.5, gap: 3 }, // token, 0..1, px clear of a zone mark or a corner
     titleBlock: true,
     titleMinCanvas: 420, // px, title block only on canvases wider than this
-    titleMaxW: 250, // px, block width cap
+    titleMaxW: 270, // px, block width cap
     titleWFrac: 0.4, // fraction of canvas width, block width otherwise
-    titleRow: 15, // px, row height (3 rows)
-    titleSplit: 0.62, // fraction of block width where the second column starts
+    titleRow: 15, // px, row height (4 rows)
+    titleSplit: 0.6, // fraction of block width where the second column starts
     titlePaper: 0.92, // 0..1, paper alpha of the block
     titleRule: { width: 0.8, alpha: 0.6 }, // px, 0..1
     titleKeyAlpha: 0.5, // 0..1
@@ -316,6 +322,7 @@ export const DRAFT = {
     titleKey: { family: "mono", weight: 500, size: "titleKey" },
     titleValue: { family: "mono", weight: 600, size: "titleValue" },
     zone: { family: "mono", weight: 500, size: "zone" },
+    micro: { family: "mono", weight: 500, size: "micro" },
     dims: { family: "mono", weight: 500, size: "dims" },
     callout: { family: "mono", weight: 600, size: "callout" },
     overlay: { family: "mono", weight: 500, size: "overlay" },

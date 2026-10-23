@@ -14,6 +14,7 @@ import { ghostTeaching } from "../tests/fixtures/ghost3";
 import { builtBytes } from "../src/package/built";
 import { encode2 } from "../src/package/format2";
 import type { Bench3, Draw3Options, Draw3Page, ImageOut, Meta } from "./draw3-page/main";
+import { metaOf } from "./meta";
 import { FONT_FILES } from "./tokens-css";
 
 export type { Bench3, Draw3Options, ImageOut } from "./draw3-page/main";
@@ -66,9 +67,9 @@ function serve(js: string): Promise<{ server: Server; port: number }> {
     const meta = /^\/meta\/([a-z0-9-]+)\.json$/.exec(p);
     if (meta) {
       if (meta[1]!.startsWith("fx3-")) return send("application/json", JSON.stringify({ name: "Fixture", teaching: meta[1] === "fx3-ghost" ? ghostTeaching : null, kin: null } satisfies Meta));
-      const rec = recordById(meta[1]!) as unknown as { name?: string; kin?: Meta["kin"]; teaching?: Meta["teaching"] } | undefined;
+      const rec = recordById(meta[1]!);
       if (!rec) return fail(404);
-      return send("application/json", JSON.stringify({ name: rec.name ?? meta[1]!, teaching: rec.teaching ?? null, kin: rec.kin ?? null } satisfies Meta));
+      return send("application/json", JSON.stringify(metaOf(meta[1]!, rec)));
     }
     fail(404);
   });

@@ -48,6 +48,12 @@ describe("mergeSources", () => {
     expect(records[2]!.origin).toEqual(origin);
   });
 
+  it("sets the added date from an added patch file", () => {
+    const { records, problems } = mergeSources([...files, { name: "added.json", json: { c: { added: "2026-10-22" } } }]);
+    expect(problems).toEqual([]);
+    expect(records[2]!.added).toBe("2026-10-22");
+  });
+
   it("does not change its input", () => {
     const before = JSON.stringify(files);
     mergeSources(files);

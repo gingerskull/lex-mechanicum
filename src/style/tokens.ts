@@ -92,6 +92,7 @@ export const TOKENS = {
       titleKey: 7, // px, title-block key
       titleValue: 8.5, // px, title-block value
       zone: 8.5, // px, sheet zone marks
+      micro: 3, // px, the microprint between the sheet frame's two borders
       dims: 10, // px, dimension labels
       callout: 9.5, // px, joint highlight callout
       overlay: 11, // px, overlay labels

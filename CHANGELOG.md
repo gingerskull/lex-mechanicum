@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.38.0, Lucius — 2026-10-23
+
+- The set code is ST: sheets are numbered ST-01 to ST-89 on the cards, the mechanism pages, the library's title block
+  and the drawings' DWG cell, and the library search finds a sheet by its number (an old MX-07 finds ST-07).
+- The drawing sheet's frame carries a microprint between its two borders: "LEX MECHANICUM" in 8-bit ASCII, ones and
+  zeros so small they read as a dotted rule. The title block gains a DATE cell with the mechanism's origin as an
+  Imperial date (`800.026.M3` for 20 October 2026, years before 1 in M0), and is a little wider to hold it.
+- While a drawing is paused, its input ring breathes: a 5 s cycle between 35% and full strength, redrawn 15 times a
+  second; never while playing or under reduced motion.
+- Every record has an `added` date, the day its sheet went live (backfilled from the git history; a test fails a drawn
+  mechanism without one), and the library's New order follows it. A sheet wears a "Recovered" badge on its card and
+  its page for its first 7 days, decided in the browser when the page is viewed, so it goes without a release.
+- Style reference 3.5.
+
 ## 0.37.2, Graia — 2026-10-23
 
 - The app is renamed Lex Mechanicum: the library's kicker, the footer, the site name in every page's head, the

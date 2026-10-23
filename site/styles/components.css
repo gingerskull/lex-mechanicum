@@ -392,6 +392,28 @@
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
+/* the Recovered badge (LM-17): a stamp in title-block lettering for a sheet's first days, shown by islands/recovered.ts */
+.recovered {
+  font: 600 9px / 1 var(--font-mono);
+  letter-spacing: var(--tracking-mono-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid currentColor;
+  background: var(--paper);
+  padding: 3px 5px 3px 6px;
+}
+.recovered[hidden] {
+  display: none;
+}
+.thumb .recovered {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+}
+.dhead .meta .recovered {
+  margin-left: 10px;
+  vertical-align: 1px;
+}
 .card .no {
   font: 600 11px var(--font-mono);
   letter-spacing: 0.06em;

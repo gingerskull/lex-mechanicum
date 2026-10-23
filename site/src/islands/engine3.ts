@@ -6,6 +6,7 @@ export type { Controls, Kin } from "../../../src/kin/types";
 export { browserFactory, makeCard, sizeCard } from "../../../src/render/canvas";
 export { drawPlot } from "../../../src/render/plot";
 export { DETAIL } from "../../../src/style/detail";
+export { DRAFT } from "../../../src/style/draft";
 export { theme } from "../../../src/style/theme";
 export type { Dial } from "../../../src/render/detail";
 import { snapName, type Orient } from "../../../src/render/v3/camera";
@@ -14,7 +15,7 @@ export { namedOrient, snapped, type Orient } from "../../../src/render/v3/camera
 export const snappedName = (o: Orient) => snapName(o);
 export { warm3 } from "../../../src/render/v3/gpu";
 export { kinPoser, staticPoser, type Poser } from "../../../src/render/v3/poser";
-export { createSession3, recordDrawView, type DrawView3, type Session3 } from "../../../src/render/v3/session";
+export { createSession3, recordDrawView, ringBreath, type DrawView3, type Session3 } from "../../../src/render/v3/session";
 export { defaultView, viewsOf, type ViewState } from "../../../src/render/v3/views";
 export { setupInline, setupInWorker, type Setup } from "../../../src/solids/setup";
 export type { Scene } from "../../../src/render/v3/scene";

@@ -1,6 +1,6 @@
 ---
 // The page shell: tokens and site CSS, the mark's icons and social card (site/brand, tools/brand.ts), the theme set
-// before first paint (SS7), the footer with the version (SS12) and the faded mark.
+// before first paint (SS7), the footer with the version (SS12) and the faded mark, and the Recovered badges shown on view.
 import "../../styles/tokens.css";
 import "../../styles/base.css";
 import "../../styles/layout.css";
@@ -47,6 +47,7 @@ const card = new URL(url("/social.png"), Astro.site).href;
     <Footer />
     <script>
       import "../islands/theme";
+      import "../islands/recovered";
     </script>
   </body>
 </html>

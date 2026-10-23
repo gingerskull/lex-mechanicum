@@ -36,6 +36,17 @@ export interface DrawView3 {
   phantoms: string[];
   /** Windows of a detail view to frame in this view (SD20). */
   frames: DetailSpec[];
+  /** The input ring's strength, 0..1: below 1 only while a paused drawing breathes (ringBreath). */
+  ring?: number;
+}
+
+/**
+ * The input ring's strength `t` seconds after the drawing was paused (LM-06, draft.lines.accentRing.breathe): from 1
+ * down to `low` and back once a `period`, on a cosine, so a pause starts at full strength.
+ */
+export function ringBreath(t: number): number {
+  const B = DRAFT.lines.accentRing.breathe;
+  return B.low + (1 - B.low) * (0.5 + 0.5 * Math.cos((2 * Math.PI * t) / B.period));
 }
 
 /** The view a record opens in: its default named view, every teaching layer on, the sheet on. */
@@ -172,7 +183,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
         if (LD.mark(k) && (k !== "chamfer" || C.s > DRAFT.lines.chamferMinScale)) markMask |= 1 << (i + 1);
       });
       geo.draw(
-        { card, cam: C, cw: card.cw, ch: card.ch, dpr: card.dpr, T, layers: LD.effect("deepLayers") ? DRAFT.peel.layers : DRAFT.peel.layersLow, hidden: LD.effect("hiddenLines"), patterns: LD.effect("rolePatterns"), shade: LD.effect("wallShade"), clip, markMask },
+        { card, cam: C, cw: card.cw, ch: card.ch, dpr: card.dpr, T, layers: LD.effect("deepLayers") ? DRAFT.peel.layers : DRAFT.peel.layersLow, hidden: LD.effect("hiddenLines"), patterns: LD.effect("rolePatterns"), shade: LD.effect("wallShade"), clip, markMask, ring: view.ring ?? 1 },
         table,
       );
       const gl = gpu3(card).canvas;
@@ -194,6 +205,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
           title: info.title,
           no: info.no,
           ...(info.sheet ? { sheet: info.sheet } : {}),
+          ...(info.date ? { date: info.date } : {}),
           view: viewLabel(view.state.orient, view.state.auxName),
           scale: scaleLabel(C),
           dial: LD.label,

@@ -6,7 +6,7 @@ export type Order = "new" | "name" | "origin" | "sheet";
 
 /** What the orders read from a sheet. */
 export interface Sortable {
-  /** The sheet number: 1 for MX-01. */
+  /** The sheet number: 1 for ST-01. */
   no: number;
   name: string;
   /** The day the sheet went live, YYYY-MM-DD, once its record has one. */

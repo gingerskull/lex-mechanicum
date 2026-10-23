@@ -27,6 +27,7 @@ const CSV_COLUMNS: [string, (r: CatalogRecord) => unknown][] = [
   ["summary", (r) => r.summary],
   ["origin", (r) => r.origin?.date],
   ["origin_precision", (r) => r.origin?.precision],
+  ["added", (r) => r.added],
   ["first_reference", (r) => r.references[0]?.url],
   ["first_video", (r) => r.media.find((m) => m.kind === "video")?.url],
   ["real_world", (r) => (r.real_world ?? []).map((x) => `${x.product}: ${x.url}`).join(" | ")],
@@ -116,6 +117,7 @@ function entry(r: CatalogRecord, byId: Map<string, CatalogRecord>): string[] {
     `| Application | ${r.tags.application.join(", ")} |`,
     `| Keywords | ${(r.tags.keywords ?? []).join(", ")} |`,
     `| Origin | ${r.origin ? `${r.origin.date} (${r.origin.precision}): ${r.origin.note}` : "?"} |`,
+    `| Added | ${r.added ?? "not drawn yet"} |`,
     "",
   );
   const e = r.explain;

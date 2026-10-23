@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.4
-date: 2026-10-22
+version: 3.5
+date: 2026-10-23
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -102,7 +102,7 @@ site/styles/*.css        base, layout, components: var(--…) and color-mix() of
 | Id | Rule |
 |---|---|
 | SF1 | **Paper, ink, accent** carry the whole drawing. Ink is used at different alphas for every line and pattern. Grid lines use the grid colour, softer than ink. |
-| SF2 | **Accent use is reserved.** On drawings: the input shaft ring, the traced paths and the comet, force arrows, the highlighted joint callout. On the page: the kicker line, sheet numbers, the play button, card hover corner ticks, focus rings, the active-filter badge, explanation markers, the scrubber. Nothing else. |
+| SF2 | **Accent use is reserved.** On drawings: the input shaft ring, the traced paths and the comet, force arrows, the highlighted joint callout. On the page: the kicker line, sheet numbers, the Recovered badge, the play button, card hover corner ticks, focus rings, the active-filter badge, explanation markers, the scrubber. Nothing else. |
 | SF3 | **Secondary semantic colours** only where they carry meaning: `vel` (velocity arrows), `warn` (always amber: a force or angle out of range, a single-shear badge), `ok` (double-shear badge). They appear only with their overlay or badge. No red anywhere. |
 | SF4 | **Blueprint stays dark and desaturated:** a grey slate blue, not a saturated cyanotype. The accent is toned to sit on it. |
 | SF5 | **Contrast:** body text ≥ 4.5:1 on paper, secondary text ≥ 4.5:1 at its size, lines that carry meaning ≥ 3:1. Faint text is for labels only. |
@@ -157,12 +157,12 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a tenth of the lines under it through. A solid drawn see-through (it covers a working zone or a principle part, standard L5 and T10) takes half the paper and half the occlusion on every face in view, so what lies behind reads through it. |
 | SD3 | **Visible and hidden edges by depth.** Every edge is classified by what covers it in the depth layers. An edge seen directly is bold and solid; the same edge seen through a part is thin and dashed, with the bold line at what the occluders let through (fractional occlusion, each occluder at its opacity). Fine detail (chamfers, threads, engraving) lives only in the visible class, so it disappears behind parts instead of turning into dashes. Edges are the cap outlines, the creases and the smooth-surface silhouettes of each solid, shipped or extracted once at setup. |
 | SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's own coordinates (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns go on the cap and primary faces within a set angle of the view, never on walls or faces turned edge-on. |
-| SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout. A second accent use needs a reason written here. |
+| SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout. A second accent use needs a reason written here. While the drawing is paused, the input ring breathes slowly between full strength and a part of it (`lines.accentRing.breathe`); nothing else moves, the ring holds still while the drawing plays, and it never breathes under reduced motion. |
 | SD6 | **Centrelines along joint axes** (long dash, short dash) through every joint head and along its axis, overshooting a little; hidden for an axis within a set angle of the view direction (it would foreshorten to a point) and when the drawing is too small to read them. |
 | SD7 | **Traced paths** are a fine dotted accent line at the trace height; the first path gets the comet (tapering trail, open circle at the current point). The base plate keeps the path engraved as a mark (that is form, not overlay). |
 | SD8 | **Dimensions:** overall base-plate width and depth in mm, with extension lines, gaps and filled arrowheads, labels on a paper knock-out. Detail stage only, in the named views where the base reads true (PLAN, FRONT, SIDE) and when it is not near edge-on. A dimension is labelled true size even when foreshortened. |
 | SD9 | **Loose touches, the complete list:** (a) construction lines along the base plate's straight edges, running past the rounded corners; (b) a second, slightly offset pencil pass round the base outline. Nothing else is loose; a third needs a decision issue. |
-| SD10 | **Sheet frame on the detail stage:** double border, zone ticks with numbers across and letters down, a title block bottom right (TITLE, DWG number, SCALE computed from the projection, VIEW, SHEET n/N, DETAIL FULL or the rung). The view names are PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ joint (an auxiliary view down a joint axis, named with the joint) and VIEW az/el for any other orientation (azimuth and elevation in degrees). A section or detail view adds its name (SECTION A-A, DETAIL B). Thumbnails get no frame, no title block, no dimensions. |
+| SD10 | **Sheet frame on the detail stage:** double border, zone ticks with numbers across and letters down, a microprint between the two borders (the 8-bit ASCII of "LEX MECHANICUM" as ones and zeros, broken at each zone mark and reading clockwise round the frame: a faint dotted rule at normal size, `sheet.microprint`), a title block bottom right (TITLE, DWG number (the sheet number, ST-07), SCALE computed from the projection, VIEW, SHEET n/N, DETAIL FULL or the rung, DATE the mechanism's origin as an Imperial date: the part of the year gone in thousandths, the year within its millennium and the millennium, `800.026.M3` for 20 October 2026, with years before 1 in M0). The view names are PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ joint (an auxiliary view down a joint axis, named with the joint) and VIEW az/el for any other orientation (azimuth and elevation in degrees). A section or detail view adds its name (SECTION A-A, DETAIL B). Thumbnails get no frame, no title block, no dimensions. |
 | SD11 | **Camera:** orthographic, a turntable orbit (yaw and tilt) that snaps to the named views of SD10; parallel lines stay parallel; patterns foreshorten with the angle and switch off near edge-on. The default view is the mechanism's own (standard T7). |
 | SD12 | **Explode is a view state, not a style.** Parts move along their stack's joint axis by the rigid explode of the form style, each with a thin trail line to its assembled position; the drawing rules apply unchanged to exploded parts. |
 | SD13 | **Supporting hardware reads quieter.** Motor internals are faint; hardware has no pattern; the base is the faintest surface. Brackets and tall parts still get full outlines and silhouettes. |
@@ -191,11 +191,11 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 
 | Id | Requirement |
 |---|---|
-| SS1 | **Library grid:** cards in an auto-fill grid (min 290 px, 20 px gap). A card is a sheet: the drawing in a framed field (4:3, a pre-rendered image until hover) with a title block under it: name (display, uppercase) and sheet number (mono, accent) on the first row, family · motion · level meta row, two-line summary, dashed tags. Hover: ink border plus accent corner ticks at two opposite corners, and the drawing animates at the same dial and line weights as the thumbnail (`card.*`), so the swap does not jump. |
+| SS1 | **Library grid:** cards in an auto-fill grid (min 290 px, 20 px gap). A card is a sheet: the drawing in a framed field (4:3, a pre-rendered image until hover) with a title block under it: name (display, uppercase) and sheet number (mono, accent) on the first row, family · motion · level meta row, two-line summary, dashed tags. For its first 7 days (from its `added` date, counted in UTC when the page is viewed) a sheet wears a "Recovered" badge in the drawing's top left corner: mono uppercase in the accent with a hairline accent border on paper, the title-block lettering. Hover: ink border plus accent corner ticks at two opposite corners, and the drawing animates at the same dial and line weights as the thumbnail (`card.*`), so the swap does not jump. |
 | SS2 | **Header:** kicker (mono, accent), large condensed uppercase title, short intro, and a set title block (mono grid of label/value cells). Search field and the Filters and Sort buttons in the same row. Below 1000 px the title block is one low strip across the header, its four cells in a row with dividers, shown at every width. |
 | SS3 | **Sticky bar:** on the library, search, the Filters and Sort buttons and the sheet switch on one row, the switch at the right, the row on the same left and right edges as the header and the card grid; translucent paper with blur, hairline top and bottom. The search has a clear (x) at its right end while it holds text (Escape does the same); it empties the field and keeps the focus there. Once the bar sticks, the set's name and sheet count join the row at its left (not on a phone, where the row stays search, Filters, Sort and switch, the two buttons by name only). Filters hidden behind the button; facets open as chip rows in a scrollable panel with a "Clear all filters" button. Sort opens a menu of the orders, the current one pressed and ticked (a menu button: arrow keys, Home, End, Enter, Escape), and names it on the button above 1000 px: New (most recently added first, by default), Name A to Z, Oldest origin (once records carry origin dates), Sheet number. The order applies to what the search and filters show and stays as they change; clearing the filters returns it to New. When nothing matches, the grid says "No pattern found" and the status line keeps "Clear filters". The library keeps its filters, search and order in its address (`?<facet>=<value>`, `?q=<words>`, `?sort=<order>`, the default order left out), so a page can link to a filtered set. A mechanism page has no bar at the top: its sheet switch sits at the right of its name, and once the name scrolls away a compact bar slides in with the name (one line, cut with an ellipsis) and the switch. "Back to library" returns to the library as it was left, showing the card of the mechanism the visitor is on; Previous and Next step through what the library shows, in its order. |
 | SS4 | **Controls:** segmented buttons and chips are square, hairline, mono uppercase; pressed = ink fill with paper text. Tags are dashed outlines, solid on hover. The play button is the one round control (accent outline, fills on hover). Range inputs use `accent-color` (accent for the scrubber, ink for view sliders). |
-| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number, title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, the view modes, the orbit and the named views, explode, detail pin, the section and detail views the record declares, and the mechanism's own controls) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
+| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number and, in its first 7 days, the Recovered badge of SS1; title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, the view modes, the orbit and the named views, explode, detail pin, the section and detail views the record declares, and the mechanism's own controls) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
 | SS6 | **Panels:** paper fill, hairline frame, a mono uppercase header strip with a rule under it; fact lists as label/value rows with dashed separators. |
 | SS7 | **Theme switch** is one square button with one icon, a cog with a half-filled disc in its bore in the sheet's ink: as drawn (filled half to the right) on Drafting, turned 180° (filled half to the left) on Blueprint, so switching sheets turns it without animation; its name and tooltip say the sheet it switches to ("Switch to Blueprint", "Switch to Drafting"). The choice is remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
 | SS8 | **Real pages:** one static page per mechanism at `/mechanisms/<id>/`, prev and next from the catalogue order, the library at `/`, and a 404 page (sheet ST-404, with the way to the library) for any other address. The engine loads only on the mechanism page or on card hover. |
@@ -269,6 +269,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `tokens.type.size.titleKey` | 7 | px, title-block key |
 | `tokens.type.size.titleValue` | 8.5 | px, title-block value |
 | `tokens.type.size.zone` | 8.5 | px, sheet zone marks |
+| `tokens.type.size.micro` | 3 | px, the microprint between the sheet frame's two borders |
 | `tokens.type.size.dims` | 10 | px, dimension labels |
 | `tokens.type.size.callout` | 9.5 | px, joint highlight callout |
 | `tokens.type.size.overlay` | 11 | px, overlay labels |
@@ -319,6 +320,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.accentRing.alpha` | 1 | 0..1 on the lines layer |
 | `draft.lines.accentRing.hiddenAlpha` | 0.7 | 0..1 on the frame (shows through covering parts) |
 | `draft.lines.accentRing.segments` | 72 | straight pieces of the ring |
+| `draft.lines.accentRing.breathe.period` | 5 | s, 0..1, count per s |
+| `draft.lines.accentRing.breathe.low` | 0.35 | s, 0..1, count per s |
+| `draft.lines.accentRing.breathe.fps` | 15 | s, 0..1, count per s |
 | `draft.fill.plate` | 0.64 |  |
 | `draft.fill.other` | 0.8 |  |
 | `draft.fill.base` | 0.96 | laid once, on the top face (the parts under it read only through `occlude.base`) |
@@ -456,12 +460,15 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.sheet.zoneTick` | 4 | px |
 | `draft.sheet.zoneAlpha` | 0.45 | 0..1, zone labels |
 | `draft.sheet.zoneLabelInset` | 2.5 | px from the border |
+| `draft.sheet.microprint.color` | `grid` | token, 0..1, px clear of a zone mark or a corner |
+| `draft.sheet.microprint.alpha` | 0.5 | token, 0..1, px clear of a zone mark or a corner |
+| `draft.sheet.microprint.gap` | 3 | token, 0..1, px clear of a zone mark or a corner |
 | `draft.sheet.titleBlock` | true |  |
 | `draft.sheet.titleMinCanvas` | 420 | px, title block only on canvases wider than this |
-| `draft.sheet.titleMaxW` | 250 | px, block width cap |
+| `draft.sheet.titleMaxW` | 270 | px, block width cap |
 | `draft.sheet.titleWFrac` | 0.4 | fraction of canvas width, block width otherwise |
-| `draft.sheet.titleRow` | 15 | px, row height (3 rows) |
-| `draft.sheet.titleSplit` | 0.62 | fraction of block width where the second column starts |
+| `draft.sheet.titleRow` | 15 | px, row height (4 rows) |
+| `draft.sheet.titleSplit` | 0.6 | fraction of block width where the second column starts |
 | `draft.sheet.titlePaper` | 0.92 | 0..1, paper alpha of the block |
 | `draft.sheet.titleRule.width` | 0.8 | px, 0..1 |
 | `draft.sheet.titleRule.alpha` | 0.6 | px, 0..1 |
@@ -552,6 +559,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.type.zone.family` | `mono` |  |
 | `draft.type.zone.weight` | 500 |  |
 | `draft.type.zone.size` | `zone` |  |
+| `draft.type.micro.family` | `mono` |  |
+| `draft.type.micro.weight` | 500 |  |
+| `draft.type.micro.size` | `micro` |  |
 | `draft.type.dims.family` | `mono` |  |
 | `draft.type.dims.weight` | 500 |  |
 | `draft.type.dims.size` | `dims` |  |
@@ -653,6 +663,10 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 
 ## Changelog
 
+- **3.5 (2026-10-23).** The set code is ST (sheet ST-07; SS1, SD10), and the library search finds a sheet by its number.
+  The sheet frame carries a microprint between its borders and the title block a DATE cell, the mechanism's origin as
+  an Imperial date; the block is a little wider to hold it (SD10). The paused input ring breathes (SD5). A sheet wears
+  a Recovered badge for its first 7 days (SF2, SS1, SS5).
 - **3.4 (2026-10-22).** Cut-over: the 2.5D renderer is gone and the 3D stamp leaves the title block and the library
   cards; no page or card marks its engine [SS13, SITE]. The knobs only the 2.5D renderer and build read leave Part VI
   (the stamp, `draft.gpu`, the centreline and dimension tilt limits, the plan and default tilts, the axial and spin
