@@ -132,6 +132,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     for (const f of FIELD_FLAGS) if (s.flags[f]) flags |= FLAG3[f];
     if (s.deform) flags |= FLAG3.deform;
     const p: PackedSolid3 = { id: s.id, name: s.name, kind: s.kind, role: s.role, body: s.body, fr: rounded(s.frame), shape: shapeOf(s), ex: s.ex + 0, detail: s.detail, flags };
+    if (s.exAxis) p.exAxis = [s.exAxis[0], s.exAxis[1], s.exAxis[2]];
     if (s.joints.length) p.joints = [...s.joints];
     if (s.group !== undefined) p.group = s.group;
     if (s.motion) p.motion = s.motion;

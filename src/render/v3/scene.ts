@@ -61,7 +61,7 @@ export interface Runtime {
   /** The role surface per solid and its pattern layer (-1 for none). */
   surface: RoleSurface[];
   pattern: Int8Array;
-  /** The explode direction (unit, world) of each solid. */
+  /** The explode direction (unit, world) of each solid, as posed in the last frame placed. */
   axis: Float32Array;
   /** Rest matrices (phase 0, no explode), 16 floats per solid. */
   rest: Float32Array;
@@ -130,7 +130,16 @@ export function place(rt: Runtime, u: number, explode: number, out: Float32Array
   const { scene } = rt;
   const gap = FORM.explode.gap * explode;
   scene.pkg.solids.forEach((s, i) => {
-    let M: Mat4 = mulMat(scene.poser.place(s, u), mat4(s.fr));
+    const B = scene.poser.place(s, u);
+    let M: Mat4 = mulMat(B, mat4(s.fr));
+    if (gap && s.ex) {
+      // the direction it leaves along as posed (E10): its unit's axis in its body's frame, so a part that swings explodes
+      // along its axis where it is now; without one, its own axis
+      const a = s.exAxis;
+      const d: Vec3 = a ? [B[0]! * a[0] + B[4]! * a[1] + B[8]! * a[2], B[1]! * a[0] + B[5]! * a[1] + B[9]! * a[2], B[2]! * a[0] + B[6]! * a[1] + B[10]! * a[2]] : s.legacyAxis ? [0, 0, 1] : [M[8]!, M[9]!, M[10]!];
+      const l = Math.hypot(d[0], d[1], d[2]) || 1;
+      rt.axis.set([d[0] / l, d[1] / l, d[2] / l], i * 3);
+    }
     if (s.stretch) {
       // between its two points as solved: at the first, x toward the second, its unit length scaled to the span
       const e = scene.poser.ends?.(u, s.stretch[0], s.stretch[1]);

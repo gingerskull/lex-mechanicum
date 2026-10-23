@@ -423,8 +423,19 @@ async function main(box: HTMLElement) {
     showCamera();
     dirty = true;
   });
+  // explode holds the mechanism still where it is, so the parts do not drift while they are apart (SD12); playback picks
+  // up again once it closes, if it was playing
+  let playAfterExplode = false;
   $<HTMLInputElement>("explode").addEventListener("input", (e) => {
+    const was = s.explode;
     s.explode = Number((e.target as HTMLInputElement).value) / 100;
+    if (was === 0 && s.explode > 0) {
+      playAfterExplode = s.playing;
+      setPlaying(false);
+    } else if (was > 0 && s.explode === 0 && playAfterExplode) {
+      playAfterExplode = false;
+      setPlaying(true);
+    }
     $("explodev").textContent = `${Math.round(s.explode * 100)}%`;
     dirty = true;
   });
