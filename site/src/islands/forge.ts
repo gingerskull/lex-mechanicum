@@ -1,7 +1,8 @@
 // The Forge sheet (SS14, LM-12): the unlock on the library's title block (its Rev cell, clicked once per law), the unlock
 // moment, the living effects while Forge is the sheet, and a greeting in the console once it is unlocked. Every layer here
 // is fixed over the page and takes no click; under reduced motion the moment is a plain fade and nothing moves. Strengths
-// and timings are in src/style/forge.ts.
+// and timings are in src/style/forge.ts. The layers hang from the root, not the body: the moment filters the body, and a
+// filtered body would hold its fixed children to its own height.
 import { FORGE } from "../../../src/style/forge";
 import { TOKENS } from "../../../src/style/tokens";
 import { clickCounter, currentSheet, forgeUnlocked, rememberForge } from "../forge";
@@ -52,8 +53,9 @@ function knobs(el: HTMLElement) {
   set("--fx-dip", U.flickerDepth);
 }
 
-// the living layers while Forge is the sheet
+// the living layers while Forge is the sheet; the grain is a layer of its own so it blends with the page
 let fx: HTMLElement | null = null;
+let grain: HTMLElement | null = null;
 let grainTimer = 0;
 let pulseTimer = 0;
 
@@ -83,15 +85,19 @@ function mount() {
   fx = document.createElement("div");
   fx.className = "forge-fx";
   fx.setAttribute("aria-hidden", "true");
-  fx.innerHTML = '<div class="fx-glow"></div><div class="fx-scan"></div><div class="fx-grain"></div><div class="fx-flicker"></div><div class="fx-bands"></div>';
+  fx.innerHTML = '<div class="fx-glow"></div><div class="fx-scan"></div><div class="fx-flicker"></div><div class="fx-bands"></div>';
   knobs(fx);
-  document.body.append(fx);
+  grain = document.createElement("div");
+  grain.className = "forge-grain";
+  grain.setAttribute("aria-hidden", "true");
+  knobs(grain);
+  document.documentElement.append(fx, grain);
   // the furnace comes up
   requestAnimationFrame(() => requestAnimationFrame(() => fx?.classList.add("lit")));
   if (reduced) return;
-  const grain = fx.querySelector<HTMLElement>(".fx-grain")!;
+  const g = grain;
   grainTimer = window.setInterval(() => {
-    grain.style.transform = `translate(${-Math.floor(Math.random() * P.grain.tile)}px, ${-Math.floor(Math.random() * P.grain.tile)}px)`;
+    g.style.transform = `translate(${-Math.floor(Math.random() * P.grain.tile)}px, ${-Math.floor(Math.random() * P.grain.tile)}px)`;
   }, 1000 / P.grain.fps);
   schedule();
 }
@@ -100,7 +106,8 @@ function unmount() {
   clearInterval(grainTimer);
   clearTimeout(pulseTimer);
   fx?.remove();
-  fx = null;
+  grain?.remove();
+  fx = grain = null;
 }
 
 const sync = () => (currentSheet() === "forge" ? mount() : unmount());
@@ -123,7 +130,7 @@ function moment() {
     const veil = document.createElement("div");
     veil.className = "forge-veil";
     veil.style.setProperty("--fx-fade", `${U.fade / 2}s`);
-    document.body.append(veil);
+    document.documentElement.append(veil);
     requestAnimationFrame(() => veil.classList.add("on"));
     setTimeout(() => {
       setSheet("forge", true);
@@ -137,7 +144,7 @@ function moment() {
   layer.setAttribute("aria-hidden", "true");
   layer.innerHTML = '<div class="m-noise"></div><div class="m-dip"></div>';
   knobs(layer);
-  document.body.append(layer);
+  document.documentElement.append(layer);
   const burst = layer.querySelector<HTMLElement>(".m-noise")!;
   const dip = layer.querySelector<HTMLElement>(".m-dip")!;
   const turb = document.getElementById("forge-turb");

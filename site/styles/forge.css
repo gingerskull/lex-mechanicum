@@ -19,6 +19,12 @@
   transform: rotate(90deg);
 }
 
+/* the Rev cell takes 16 quick clicks without selecting text or zooming a phone */
+[data-forge-key] {
+  user-select: none;
+  touch-action: manipulation;
+}
+
 /* the motive force line in the library's title block */
 .tblock .forge-line {
   display: none;
@@ -41,6 +47,7 @@
 
 /* the living layers */
 .forge-fx,
+.forge-grain,
 .forge-moment,
 .forge-veil {
   position: fixed;
@@ -66,16 +73,19 @@
 .forge-fx .fx-scan {
   background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--bg) var(--fx-scan), transparent) 0 1px, transparent 1px var(--fx-pitch));
 }
-/* fine grain: a noise tile on an oversized layer, moved to a new place a few times a second (no repaint) */
-.forge-fx .fx-grain,
+/* fine grain: a noise tile on an oversized layer, moved to a new place a few times a second (no repaint); a layer of its
+   own over the page, so it blends with the page and not only with the other layers */
+.forge-grain,
 .forge-moment .m-noise {
   inset: calc(-1 * var(--fx-tile)) auto auto calc(-1 * var(--fx-tile));
-  width: calc(100% + 2 * var(--fx-tile));
-  height: calc(100% + 2 * var(--fx-tile));
+  width: calc(100vw + 2 * var(--fx-tile));
+  height: calc(100vh + 2 * var(--fx-tile));
   background-image: var(--fx-noise);
   mix-blend-mode: overlay;
 }
-.forge-fx .fx-grain {
+.forge-grain {
+  z-index: 41;
+  overflow: visible;
   opacity: var(--fx-grain);
 }
 /* a slow, shallow, irregular dimming: never a flash */
@@ -133,11 +143,12 @@ body.forge-glitching {
   opacity: 0;
 }
 /* under reduced motion: a plain fade */
+/* (a fade is the one transition reduced motion keeps here: base.css stops every other) */
 .forge-veil {
   z-index: 60;
   background: var(--bg);
   opacity: 0;
-  transition: opacity var(--fx-fade) ease-in-out;
+  transition: opacity var(--fx-fade) ease-in-out !important;
 }
 .forge-veil.on {
   opacity: 1;

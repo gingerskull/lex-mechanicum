@@ -65,6 +65,8 @@ async function sources(): Promise<{ renderer: string; style: string }> {
   const groups = new Map<string, string[]>();
   for (const f of files) {
     const p = f.replace(/\\/g, "/");
+    // the Forge sheet's knobs only draw on Forge, which never has a thumbnail (style SS14)
+    if (p === "src/style/forge.ts") continue;
     const g = p.startsWith("src/style/") ? "style" : "renderer";
     if (!groups.has(g)) groups.set(g, []);
     groups.get(g)!.push(`${p}\n${text(f)}`);

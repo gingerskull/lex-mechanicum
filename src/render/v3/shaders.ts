@@ -383,9 +383,9 @@ float hash(vec2 p) {
   p += dot(p, p.yx + 19.19);
   return fract((p.x + p.y) * p.x);
 }
-// the source is the 2D canvas, top row first
+// the source is the 2D canvas, top row first; a shift rounds to the nearest pixel, the same either way
 vec4 at(vec2 q) {
-  q = clamp(q, vec2(0.0), uSize - 1.0);
+  q = clamp(floor(q + 0.5), vec2(0.0), uSize - 1.0);
   return texelFetch(uSrc, ivec2(q.x, uSize.y - 1.0 - q.y), 0);
 }
 void main() {
@@ -396,7 +396,8 @@ void main() {
   vec4 c = at(q);
   float r = at(q - vec2(uChroma, 0.0)).r;
   float b = at(q + vec2(uChroma, 0.0)).b;
-  vec3 col = vec3(r, c.g, b) + (hash(q + uSeed) - 0.5) * uGrain;
+  // a new field of grain each frame, not the last one moved along
+  vec3 col = vec3(r, c.g, b) + (hash(vec2(hash(q), fract(uSeed * 0.618034))) - 0.5) * uGrain;
   o = vec4(clamp(col, 0.0, 1.0), c.a);
 }
 `;

@@ -312,7 +312,15 @@ describe("the Forge sheet (SS14)", () => {
     expect(await sheet(page)).toBe("dark");
     expect(await page.locator(".forge-fx").count()).toBe(0);
     await rev.click();
+    // the moment's layers cover the window, not the page, while the body is filtered
+    const cover = await page.evaluate(() => {
+      const m = document.querySelector(".forge-moment")?.getBoundingClientRect();
+      return m ? [m.height, innerHeight] : null;
+    });
+    if (cover) expect(cover[0]).toBe(cover[1]);
     await page.waitForFunction(() => document.documentElement.dataset.theme === "forge");
+    const fxHeight = await page.evaluate(() => [document.querySelector(".forge-fx")?.getBoundingClientRect().height, innerHeight]);
+    expect(fxHeight[0]).toBe(fxHeight[1]);
     // the moment ends by itself, the page is not left filtered, and the living layers take no click
     await page.waitForFunction(() => !document.body.classList.contains("forge-glitching") && !document.querySelector(".forge-moment"), null, { timeout: 4000 });
     expect(await page.locator(".forge-fx").evaluate((e) => getComputedStyle(e).pointerEvents)).toBe("none");
@@ -355,8 +363,10 @@ describe("the Forge sheet (SS14)", () => {
     const rev = page.locator("[data-forge-key]");
     for (let i = 0; i < 16; i++) await rev.click();
     expect(await page.locator(".forge-moment").count()).toBe(0);
+    // a plain fade: the veil eases in rather than cutting
+    expect(await page.locator(".forge-veil").evaluate((e) => getComputedStyle(e).transitionDuration)).not.toBe("0s");
     await page.waitForFunction(() => document.documentElement.dataset.theme === "forge");
-    const grain = () => page.locator(".fx-grain").evaluate((e) => (e as HTMLElement).style.transform);
+    const grain = () => page.locator(".forge-grain").evaluate((e) => (e as HTMLElement).style.transform);
     const g = await grain();
     await page.waitForTimeout(500);
     expect(await grain()).toBe(g);

@@ -45,8 +45,9 @@ export interface Gpu3 {
   h: number;
   layers: Layer[];
   out: { fb: WebGLFramebuffer; t: WebGLTexture } | null;
-  /** The Forge post-process, built on its first use (a page on the public sheets never builds it), and its source. */
-  post: { p: WebGLProgram; u: U; src: WebGLTexture; w: number; h: number } | null;
+  /** The Forge post-process, built on its first use (a page on the public sheets never builds it), and its source;
+   * "failed" where it would not build, and the frame is then left as drawn. */
+  post: { p: WebGLProgram; u: U; src: WebGLTexture; w: number; h: number } | "failed" | null;
   /** Shader compile and link time of the first context, ms (R6: once per page). */
   buildMs: number;
 }
@@ -483,16 +484,21 @@ export interface PostInput {
 /**
  * The Forge post-process (style SS14) over a finished frame: the card's 2D canvas goes to the GPU, the pass draws it with
  * grain, a colour split and torn bands into the shared canvas, and the card copies the result back. False where it could
- * not run (no context); the frame is then left as drawn.
+ * not run (no context, or the program would not build); the frame is then left as drawn.
  */
 export function postPass(card: Card, p: PostInput): boolean {
   const g = gpu3(card);
   if (g.lost || g.gl.isContextLost()) return false;
   const gl = g.gl;
   if (!g.post) {
-    const prog = settle(gl, submit(gl, QUAD_VERT, POST_FRAG));
-    g.post = { p: prog, u: uniforms(gl, prog), src: gl.createTexture()!, w: 0, h: 0 };
+    try {
+      const prog = settle(gl, submit(gl, QUAD_VERT, POST_FRAG));
+      g.post = { p: prog, u: uniforms(gl, prog), src: gl.createTexture()!, w: 0, h: 0 };
+    } catch {
+      g.post = "failed";
+    }
   }
+  if (g.post === "failed") return false;
   const P = g.post;
   const { cw, ch } = card;
   // the frame's solids pass has already grown the shared canvas to this card
@@ -507,6 +513,7 @@ export function postPass(card: Card, p: PostInput): boolean {
     P.h = ch;
   }
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  // the defaults, kept: the solid table and the pattern layers are uploaded under the same state
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, card.canvas as unknown as HTMLCanvasElement);
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -525,6 +532,8 @@ export function postPass(card: Card, p: PostInput): boolean {
   gl.uniform1f(P.u.uBand!, Math.max(1, p.band));
   gl.uniform1f(P.u.uTorn!, p.torn);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
+  // a context lost on the way leaves the frame as drawn
+  if (gl.isContextLost()) return false;
   const ctx = card.ctx;
   ctx.save();
   ctx.globalCompositeOperation = "copy";
