@@ -203,6 +203,9 @@ export const DRAFT = {
     cometAlpha: 0.95, // 0..1 at the head, fading to 0
     cometSamples: 80, // count, longest trail in path samples (at most half the path)
     headR: 2.6, // px, open circle at the current point
+    // A curved path seen edge-on (SD7): it fades out as its screen thinness falls, relative to its own in 3D, through
+    // `fade`; a path thinner than `straight` in 3D is straight and always drawn.
+    edgeOn: { fade: [0.06, 0.18] as const, straight: 0.05 }, // ratios, ratio
     headStroke: 1.2, // px
   },
 

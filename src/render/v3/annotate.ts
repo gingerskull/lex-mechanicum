@@ -399,6 +399,56 @@ export interface TraceFlags {
   ticks: boolean;
 }
 
+/** How thin a set of points is: the square root of the smaller spread over the larger, 0 for a line, 1 for a round cloud. */
+function thinness2(pts: readonly (readonly [number, number])[]): number {
+  let mx = 0, my = 0;
+  for (const p of pts) { mx += p[0]; my += p[1]; }
+  mx /= pts.length || 1; my /= pts.length || 1;
+  let a = 0, b = 0, c = 0;
+  for (const p of pts) { const x = p[0] - mx, y = p[1] - my; a += x * x; b += x * y; c += y * y; }
+  const tr = a + c, det = a * c - b * b, d = Math.sqrt(Math.max(0, (tr * tr) / 4 - det));
+  const l1 = tr / 2 + d, l2 = Math.max(0, tr / 2 - d);
+  return l1 > 1e-9 ? Math.sqrt(l2 / l1) : 0;
+}
+
+/** The same in 3D, of a path's two widest spreads: 0 for a straight path, 1 for a round one. */
+function thinness3(path: Float32Array): number {
+  const n = path.length / 3;
+  const m = [0, 0, 0];
+  for (let i = 0; i < n; i++) for (let k = 0; k < 3; k++) m[k]! += path[i * 3 + k]! / n;
+  const C = [0, 0, 0, 0, 0, 0]; // xx, xy, xz, yy, yz, zz
+  for (let i = 0; i < n; i++) {
+    const x = path[i * 3]! - m[0]!, y = path[i * 3 + 1]! - m[1]!, z = path[i * 3 + 2]! - m[2]!;
+    C[0]! += x * x; C[1]! += x * y; C[2]! += x * z; C[3]! += y * y; C[4]! += y * z; C[5]! += z * z;
+  }
+  // the largest spread by power iteration, then the largest across it
+  const mul = (v: number[]) => [C[0]! * v[0]! + C[1]! * v[1]! + C[2]! * v[2]!, C[1]! * v[0]! + C[3]! * v[1]! + C[4]! * v[2]!, C[2]! * v[0]! + C[4]! * v[1]! + C[5]! * v[2]!];
+  let v = [1, 0.7, 0.3];
+  for (let k = 0; k < 30; k++) {
+    const w = mul(v);
+    const l = Math.hypot(w[0]!, w[1]!, w[2]!) || 1;
+    v = w.map((x) => x / l);
+  }
+  const l1 = v.reduce((s, x, k) => s + x * mul(v)[k]!, 0);
+  const tr = C[0]! + C[3]! + C[5]!;
+  // the rest of the spread lies across v; its larger part is at least half of it
+  const rest = Math.max(0, tr - l1);
+  return l1 > 1e-9 ? Math.sqrt(rest / l1) : 0;
+}
+
+/**
+ * How much of a path to draw: a curved path seen edge-on collapses to a line that tells nothing and reads as a stray
+ * stroke through the parts, so it fades out as its plane turns to the view (a path straight in 3D always shows).
+ */
+export function faceOn(screen: readonly (readonly [number, number])[], path: Float32Array): number {
+  const r3 = thinness3(path);
+  if (r3 < DRAFT.path.edgeOn.straight) return 1;
+  const t = Math.min(1, thinness2(screen) / r3);
+  const [a, b] = DRAFT.path.edgeOn.fade;
+  const x = Math.max(0, Math.min(1, (t - a) / (b - a)));
+  return x * x * (3 - 2 * x);
+}
+
 /** Ghost paths (SD23), then the teaching traces with ticks and the comet (SD7, SD24): fine accent lines at the trace's height. */
 export function traces(A: Ann, f: TraceFlags): void {
   const t = A.rt.scene.teaching;
@@ -416,7 +466,11 @@ export function traces(A: Ann, f: TraceFlags): void {
     for (const tr of t.traces)
       for (const g of tr.ghosts ?? []) {
         const path = pathOf(A, tr.point, controlFor(t, g.control, g.value));
-        if (path) stroke(ctx, pathPts(A, path), true);
+        if (!path) continue;
+        const gp = pathPts(A, path);
+        ctx.globalAlpha = faceOn(gp, path);
+        if (ctx.globalAlpha > 0) stroke(ctx, gp, true);
+        ctx.globalAlpha = 1;
       }
   }
   if (f.traces) {
@@ -429,7 +483,10 @@ export function traces(A: Ann, f: TraceFlags): void {
       ctx.strokeStyle = paint(T[SP.color], SP.alpha * (i ? SP.otherGain : 1));
       // a path that does not close over a cycle (an indexing wheel's mark moves on a step each turn) is drawn open
       const open = isOpen(pts);
-      stroke(ctx, pts, !open);
+      // the path and its ticks fade as the path turns edge-on; the comet keeps showing the motion
+      const shown = faceOn(pts, path);
+      ctx.globalAlpha = shown;
+      if (shown > 0) stroke(ctx, pts, !open);
       ctx.setLineDash([]);
       if (f.ticks && tr.ticks?.every) {
         const n = Math.max(1, Math.floor(360 / tr.ticks.every));
@@ -445,8 +502,9 @@ export function traces(A: Ann, f: TraceFlags): void {
           ctx.moveTo(x - h, y - h); ctx.lineTo(x + h, y + h);
           ctx.moveTo(x - h, y + h); ctx.lineTo(x + h, y - h);
         }
-        ctx.stroke();
+        if (shown > 0) ctx.stroke();
       }
+      ctx.globalAlpha = 1;
       if (tr.comet) {
         const N = pts.length;
         const idx = Math.round(((((u % TAU) + TAU) % TAU) / TAU) * N);
