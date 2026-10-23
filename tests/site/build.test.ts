@@ -150,7 +150,7 @@ describe("site build", () => {
   it("ships each mechanism's origin as an Imperial date for the title block", () => {
     for (const id of allIds()) {
       const meta = JSON.parse(read(join("meta", `${id}.json`))) as { date?: string };
-      expect(meta.date, id).toMatch(/^\d{3}\.\d{3}\.M\d$/);
+      expect(meta.date, id).toMatch(/^\d{3}\.\d{3}\.M-?\d+$/);
     }
   });
 

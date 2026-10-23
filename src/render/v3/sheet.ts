@@ -1,6 +1,6 @@
 // The drawing sheet of the 3D renderer (style SD10): the frame with its zone marks, the microprint between its borders and
 // the title block, with the VIEW and SCALE cells read from the camera (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX, VIEW
-// az/el; a section or detail adds its name) and the DATE cell from the record's origin. The paper, grid and paper tooth
+// az/el; a section or detail view gives its own name instead) and the DATE cell from the record's origin. The paper, grid and paper tooth
 // are the generic ones in src/render/sheet.ts.
 import { DRAFT } from "../../style/draft";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
@@ -24,7 +24,7 @@ export interface SheetText {
   scale: string;
   /** The dial position (DL4): "FULL" or "DETAIL A-F". */
   dial: string;
-  /** A section or detail view's name, added to the last row. */
+  /** A section or detail view's name, shown in the VIEW cell in place of the orientation. */
   extra?: string;
   /** DATE cell: the record's origin as an Imperial date, "800.026.M3". */
   date?: string;
@@ -141,7 +141,7 @@ export function sheetFrame(card: Card, T: ResolvedTheme, text: SheetText): void 
     }
   }
   if (S.titleBlock && w > S.titleMinCanvas) {
-    const bw = Math.min(S.titleMaxW, w * S.titleWFrac);
+    const bw = Math.min(S.titleMaxW, Math.max(S.titleMinW, w * S.titleWFrac));
     const rh = S.titleRow;
     const bh = rh * 4;
     const x0 = w - i - o - bw;
@@ -175,9 +175,9 @@ export function sheetFrame(card: Card, T: ResolvedTheme, text: SheetText): void 
     cell("TITLE", up(text.title), x0, y0, bw);
     cell("DWG", text.no, x0, y0 + rh, c1 - x0);
     cell("SCALE", text.scale, c1, y0 + rh, x0 + bw - c1);
-    cell("VIEW", text.view, x0, y0 + 2 * rh, c1 - x0);
+    cell("VIEW", text.extra ?? text.view, x0, y0 + 2 * rh, c1 - x0);
     cell("SHEET", text.sheet ?? "1/1", c1, y0 + 2 * rh, x0 + bw - c1);
-    cell("DETAIL", text.extra ? `${text.dial} · ${text.extra}` : text.dial, x0, y0 + 3 * rh, c1 - x0);
+    cell("DETAIL", text.dial, x0, y0 + 3 * rh, c1 - x0);
     cell("DATE", text.date ?? "", c1, y0 + 3 * rh, x0 + bw - c1);
   }
   ctx.restore();

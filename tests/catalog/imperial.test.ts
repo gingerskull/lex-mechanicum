@@ -30,6 +30,7 @@ describe("imperialDate", () => {
     expect(imperialDate("-0250-12-16")?.endsWith(".250.M0")).toBe(true);
     expect(imperialDate("-0001-06-30")?.endsWith(".001.M0")).toBe(true);
     expect(imperialDate("-1000-06-30")?.endsWith(".000.M0")).toBe(true);
+    expect(imperialDate("-1001-06-30")?.endsWith(".001.M-1")).toBe(true);
     // 1 BC is a leap year (astronomical year 0)
     expect(imperialDate("-0001-02-29")).not.toBeNull();
     expect(imperialDate("-0002-02-29")).toBeNull();
@@ -40,6 +41,6 @@ describe("imperialDate", () => {
   });
 
   it("gives every record's origin a date of the same width", () => {
-    for (const r of loadCatalog().mechanisms) expect(imperialDate(r.origin?.date ?? ""), r.id).toMatch(/^\d{3}\.\d{3}\.M\d$/);
+    for (const r of loadCatalog().mechanisms) expect(imperialDate(r.origin?.date ?? ""), r.id).toMatch(/^\d{3}\.\d{3}\.M-?\d+$/);
   });
 });

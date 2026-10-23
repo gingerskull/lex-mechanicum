@@ -245,7 +245,8 @@ export const DRAFT = {
     titleBlock: true,
     titleMinCanvas: 420, // px, title block only on canvases wider than this
     titleMaxW: 270, // px, block width cap
-    titleWFrac: 0.4, // fraction of canvas width, block width otherwise
+    titleMinW: 250, // px, block width floor, so the DATE cell holds its date on a narrow stage
+    titleWFrac: 0.4, // fraction of canvas width, block width between the two
     titleRow: 15, // px, row height (4 rows)
     titleSplit: 0.6, // fraction of block width where the second column starts
     titlePaper: 0.92, // 0..1, paper alpha of the block

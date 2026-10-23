@@ -13,8 +13,10 @@ const pad3 = (n: number) => String(n).padStart(3, "0");
 /**
  * `date` as `fff.yyy.Mn`: fff is the part of the year gone before the day, floor(days before it / days in the year x
  * 1000); yyy the year within its millennium; n the millennium. Years 1 to 1000 are M1, 1001 to 2000 M2, 2001 to 3000 M3
- * (the year that ends one reads 000). Years before 1 are negative (-0250 is 250 BC, there is no year 0) and are M0,
- * counted back from year 0: 250 BC reads `.250.M0`. Null when `date` is not a date.
+ * (the year that ends one reads 000). Years before 1 are negative (-0250 is 250 BC, there is no year 0) and count back
+ * from year 0: 1 to 1000 BC are M0 (250 BC reads `.250.M0`), 1001 to 2000 BC M-1, and so on. Null when `date` is not a
+ * date. A record known only to the year or the period has the filled day of its origin date (record-spec.md), so its
+ * first part is that day's, like the full date the title block always shows.
  */
 export function imperialDate(date: string): string | null {
   const m = DATE.exec(date);

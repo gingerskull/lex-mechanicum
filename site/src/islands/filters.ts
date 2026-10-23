@@ -54,7 +54,7 @@ function apply() {
     byFacet.get(f)!.add(c.dataset.v!);
   }
   // a sheet number of the old set code (MX-07) finds the sheet it is now (ST-07)
-  const words = (q?.value ?? "").toLowerCase().split(/\s+/).filter(Boolean).map((w) => w.replace(/^mx-(\d)/, "st-$1"));
+  const words = (q?.value ?? "").toLowerCase().split(/\s+/).filter(Boolean).map((w) => w.replace(/^mx-/, "st-"));
   let n = 0;
   for (const card of cards) {
     const facets = [...byFacet].every(([f, vals]) => (card.dataset[f] ?? "").split("|").some((v) => vals.has(v)));
