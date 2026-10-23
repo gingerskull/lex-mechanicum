@@ -192,14 +192,15 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     const plate = rt.isPlate[i] === 1;
     const see = st.see[i] === 1 || hasFlag3(s, "seeThrough");
     const f = see ? F.seeThrough.opacity : 1;
-    const occ = (base ? F.occlude.base : plate ? F.occlude.plate : F.occlude.other) * f;
+    const occ = (base ? F.occlude.base : plate ? F.occlude.plate : F.occlude.other) * (see ? F.seeThrough.occlude : 1);
     const face = (base ? F.base : plate ? F.plate : F.other) * f;
     const wallA = F.wall * (base ? F.baseWallGain : 1) * f;
     const R = rt.surface[i]!;
     const pat = rt.pattern[i]!;
     const kx = s.stretch ? Math.hypot(mats[b]!, mats[b + 1]!, mats[b + 2]!) || 1 : 1;
     table.set([face, wallA, Math.min(1, occ), see ? 0 : Math.min(1, occ * F.wallOcclude)], o + 12);
-    table.set([R.tint ?? 0, st.patterns && pat >= 0 ? (R.alpha ?? 0) : 0, Math.max(0, pat), R.step ?? 1], o + 16);
+    const tint = see ? Math.max(R.tint ?? 0, F.seeThrough.tint) : (R.tint ?? 0);
+    table.set([tint, st.patterns && pat >= 0 ? (R.alpha ?? 0) : 0, Math.max(0, pat), R.step ?? 1], o + 16);
     table.set([hasFlag3(s, "faint") ? 0.5 : 1, base ? 1 : 0, plate ? 1 : 0, see ? 1 : 0], o + 20);
     const top = base ? L.baseTop * cardK.base : plate ? L.plateTop * cardK.plate : L.otherTop;
     table.set([top, st.ladder.solid(s.detail) ? 0 : 1, kx, 0], o + 24);

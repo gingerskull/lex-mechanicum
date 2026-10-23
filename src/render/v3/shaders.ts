@@ -356,9 +356,11 @@ void main() {
   vec3 ink = vRing == 1 ? uAccent : uInk;
   vec4 c = vec4(0.0);
   if (covered && uHidden > 0.5 && vStyle.w > 0.0) {
+    // only the share the occluders hide turns into dashes: what a see-through solid lets through stays the bold line, so
+    // the two never stack into a line as strong as an uncovered one (SD3)
     float hw = vStyle.z * 0.5;
     float on = vRing == 1 ? 1.0 : (mod(vDist, uDash0 + uDash1) <= uDash0 ? 1.0 : 0.0);
-    float aH = vStyle.w * (vRing == 1 ? 1.0 : tFill) * on * clamp(hw + 0.5 - r, 0.0, 1.0) * (hw < 0.5 ? hw * 2.0 : 1.0);
+    float aH = vStyle.w * (vRing == 1 ? 1.0 : tFill * (1.0 - tOcc)) * on * clamp(hw + 0.5 - r, 0.0, 1.0) * (hw < 0.5 ? hw * 2.0 : 1.0);
     c = vec4(ink * aH, aH);
   }
   float b = aBold * (covered ? tOcc : 1.0);

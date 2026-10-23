@@ -102,12 +102,13 @@ export const DRAFT = {
     baseWallGain: 0.8, // factor on `wall` for the base plate's walls
     wallOcclude: 0.9, // factor on the occlusion for side walls
     occlude: { plate: 1, other: 0.85, base: 0.9 }, // the base lets a tenth of what is under it show through
-    // A solid over a working zone of the mechanism (a mesh, a slot roller's run, L5): its opacity, a factor on its paper
-    // and on its occlusion, so the zone reads through it at half strength.
-    seeThrough: { opacity: 0.5 },
+    // A solid over a working zone or a principle part (L5, T10): a factor on its paper (`opacity`) and on its occlusion
+    // (`occlude`), so what lies behind reads through it, and a flat ink wash on its faces (`tint`, 0..1), so it still reads
+    // as a solid pane and never as empty outlines.
+    seeThrough: { opacity: 0.5, occlude: 0.6, tint: 0.07 },
     // Ink shade on side walls, stepped by facing: alpha = shade * (from + span * i / (steps - 1)).
     wallShade: {
-      shade: 0.045, // 0..1 ink alpha
+      shade: 0.1, // 0..1 ink alpha
       steps: 5, // count of facing buckets
       light: [0.75, -0.25] as const, // screen direction the light comes from (x right, y down), the wall facing it is lightest
       outer: { from: 0.4, span: 0.9 }, // factors, outer walls
@@ -121,7 +122,7 @@ export const DRAFT = {
     link: { pattern: "dots", step: 2.4, alpha: 0.34, tint: 0 },
     link2: { pattern: "cross", step: 2.6, alpha: 0.3, tint: 0 }, // a second set of like links, told apart from the first (T16)
     output: { pattern: "hatch", step: 2.1, alpha: 0.3, tint: 0.03 },
-    ground: { pattern: "dash", step: 3.2, alpha: 0.24, tint: 0 },
+    ground: { pattern: "dash", step: 3.2, alpha: 0.24, tint: 0.035 },
     base: { pattern: "dots", step: 4.0, alpha: 0.18, tint: 0 },
     bearing: { pattern: "cross", step: 0.9, alpha: 0.22, tint: 0.06 },
     hw: { pattern: "none", tint: 0.12 },
