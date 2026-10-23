@@ -3,15 +3,17 @@
 
 import { DETAIL } from "./detail";
 import { DRAFT } from "./draft";
+import { FORGE } from "./forge";
 import { FORM } from "./form";
 import { TOKENS } from "./tokens";
 
-export const STYLE = { tokens: TOKENS, form: FORM, draft: DRAFT, detail: DETAIL };
+export const STYLE = { tokens: TOKENS, form: FORM, draft: DRAFT, detail: DETAIL, forge: FORGE };
 
 if ("document" in globalThis) (globalThis as { STYLE?: typeof STYLE }).STYLE = STYLE;
 
 export * from "./detail";
 export * from "./draft";
+export * from "./forge";
 export * from "./form";
 export * from "./kinds";
 export * from "./theme";

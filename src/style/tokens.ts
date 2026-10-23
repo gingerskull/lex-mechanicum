@@ -1,8 +1,12 @@
-// TOKENS: the two sheet palettes, the type families and the shared sizes. One source per value (style SA1); the site's
+// TOKENS: the sheet palettes (Blueprint and Drafting, and Forge, the hidden third sheet of src/style/forge.ts), the type
+// families and the shared sizes. One source per value (style SA1); the site's
 // tokens.css is generated from this file (SA2), the renderer reads it through theme(). Semantic names only (SA3).
 // Colours are hex strings; alphas and gains are 0..1; sizes are CSS px unless a comment says otherwise.
 
-export type ThemeKey = "dark" | "light";
+export type ThemeKey = "dark" | "light" | "forge";
+
+/** The two sheets every visitor has; Forge shows only once unlocked, so thumbnails, stills and snapshots skip it. */
+export const PUBLIC_THEMES = ["dark", "light"] as const satisfies readonly ThemeKey[];
 
 /** The colour tokens of a theme, by semantic name. */
 export type ColorName = "bg" | "paper" | "paperEdge" | "ink" | "grid" | "accent" | "accentInk" | "vel" | "warn" | "ok";
@@ -52,24 +56,39 @@ export const TOKENS = {
       patternGain: 0.8, // 0..1: patterns read the same weight on bright paper (SF6)
       grain: 0.05, // 0..1, multiply blend
     },
+    forge: {
+      name: "Forge",
+      bg: "#1E0F0C", // oxide red, darker than the sheet
+      paper: "#2A1411",
+      paperEdge: "#1F0E0B",
+      ink: "#F0DCCB", // warm bone
+      grid: "#C8634A",
+      accent: "#E0A84E", // brass
+      accentInk: "#1A0E06",
+      vel: "#8FD0C4", // cool, so velocity reads apart from the brass
+      warn: "#F7D774", // a paler amber than the brass accent (SF3)
+      ok: "#A8E0B0",
+      patternGain: 1, // 0..1
+      grain: 0.04, // 0..1, overlay blend
+    },
   } satisfies PerTheme<Theme>,
 
   // Derived ink tiers for the page: alpha of ink (0..1) per sheet; tokens.css turns them into colour-mixes of --ink.
   tiers: {
-    body: { dark: 0.82, light: 0.84 }, // body text
-    muted: { dark: 0.62, light: 0.64 }, // secondary text
-    faint: { dark: 0.42, light: 0.45 }, // labels only (SF5)
-    line: { dark: 0.2, light: 0.2 }, // internal rules
-    line2: { dark: 0.38, light: 0.42 }, // frames
-    surface: { dark: 0.035, light: 0.025 }, // faint panel fill
-    surface2: { dark: 0.08, light: 0.06 }, // hover / pressed panel fill
-    mark: { dark: 0.2, light: 0.16 }, // the faded mark at the foot of every page
+    body: { dark: 0.82, light: 0.84, forge: 0.84 }, // body text
+    muted: { dark: 0.62, light: 0.64, forge: 0.64 }, // secondary text
+    faint: { dark: 0.42, light: 0.45, forge: 0.46 }, // labels only (SF5)
+    line: { dark: 0.2, light: 0.2, forge: 0.2 }, // internal rules
+    line2: { dark: 0.38, light: 0.42, forge: 0.4 }, // frames
+    surface: { dark: 0.035, light: 0.025, forge: 0.04 }, // faint panel fill
+    surface2: { dark: 0.08, light: 0.06, forge: 0.09 }, // hover / pressed panel fill
+    mark: { dark: 0.2, light: 0.16, forge: 0.2 }, // the faded mark at the foot of every page
   } satisfies Record<string, PerTheme<number>>,
 
   // Page grid alphas: alpha of the grid colour (0..1) per sheet, minor and major lines.
   gridTiers: {
-    grid1: { dark: 0.06, light: 0.08 },
-    grid2: { dark: 0.11, light: 0.15 },
+    grid1: { dark: 0.06, light: 0.08, forge: 0.07 },
+    grid2: { dark: 0.11, light: 0.15, forge: 0.13 },
   } satisfies Record<string, PerTheme<number>>,
 
   type: {

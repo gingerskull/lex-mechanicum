@@ -300,3 +300,77 @@ describe("sorting the library on a phone", () => {
     await ctx.close();
   });
 });
+
+describe("the Forge sheet (SS14)", () => {
+  const sheet = (page: Page) => page.evaluate(() => document.documentElement.dataset.theme ?? "dark");
+
+  it("opens on the 16th click on the title block's Rev cell, then the switch steps through three sheets and it stays", async () => {
+    const ctx = await desktop();
+    const { page, errors } = await open(ctx, "/");
+    const rev = page.locator("[data-forge-key]");
+    for (let i = 0; i < 15; i++) await rev.click();
+    expect(await sheet(page)).toBe("dark");
+    expect(await page.locator(".forge-fx").count()).toBe(0);
+    await rev.click();
+    // the moment's layers cover the window, not the page, while the body is filtered
+    const cover = await page.evaluate(() => {
+      const m = document.querySelector(".forge-moment")?.getBoundingClientRect();
+      return m ? [m.height, innerHeight] : null;
+    });
+    if (cover) expect(cover[0]).toBe(cover[1]);
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "forge");
+    const fxHeight = await page.evaluate(() => [document.querySelector(".forge-fx")?.getBoundingClientRect().height, innerHeight]);
+    expect(fxHeight[0]).toBe(fxHeight[1]);
+    // the moment ends by itself, the page is not left filtered, and the living layers take no click
+    await page.waitForFunction(() => !document.body.classList.contains("forge-glitching") && !document.querySelector(".forge-moment"), null, { timeout: 4000 });
+    expect(await page.locator(".forge-fx").evaluate((e) => getComputedStyle(e).pointerEvents)).toBe("none");
+    expect(await page.locator(".tblock .forge-line").isVisible()).toBe(true);
+    const toggle = page.locator("[data-theme-toggle]").first();
+    expect(await toggle.getAttribute("aria-label")).toBe("Switch to Blueprint");
+    const order: string[] = [];
+    for (let i = 0; i < 3; i++) {
+      await toggle.click();
+      order.push(await sheet(page));
+    }
+    expect(order).toEqual(["dark", "light", "forge"]);
+    // remembered: a new page opens on Forge, its thumbnails recoloured, without the moment
+    await page.goto(base + "/");
+    expect(await sheet(page)).toBe("forge");
+    expect(await page.locator(".forge-moment").count()).toBe(0);
+    expect(await page.locator(".thumb img.t-dark").first().evaluate((e) => getComputedStyle(e).filter)).toContain("forge-tone");
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it("starts the count again after a pause, and a click skips the moment", async () => {
+    const ctx = await desktop();
+    const { page } = await open(ctx, "/");
+    const rev = page.locator("[data-forge-key]");
+    for (let i = 0; i < 10; i++) await rev.click();
+    await page.waitForTimeout(4200);
+    for (let i = 0; i < 6; i++) await rev.click();
+    expect(await sheet(page)).toBe("dark");
+    for (let i = 0; i < 10; i++) await rev.click();
+    await page.mouse.click(5, 5);
+    await page.waitForFunction(() => !document.querySelector(".forge-moment"), null, { timeout: 1000 });
+    expect(await sheet(page)).toBe("forge");
+    await ctx.close();
+  });
+
+  it("is a plain fade under reduced motion, and nothing moves", async () => {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: "dark", reducedMotion: "reduce" });
+    const { page } = await open(ctx, "/");
+    const rev = page.locator("[data-forge-key]");
+    for (let i = 0; i < 16; i++) await rev.click();
+    expect(await page.locator(".forge-moment").count()).toBe(0);
+    // a plain fade: the veil eases in rather than cutting
+    expect(await page.locator(".forge-veil").evaluate((e) => getComputedStyle(e).transitionDuration)).not.toBe("0s");
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "forge");
+    const grain = () => page.locator(".forge-grain").evaluate((e) => (e as HTMLElement).style.transform);
+    const g = await grain();
+    await page.waitForTimeout(500);
+    expect(await grain()).toBe(g);
+    expect(await page.locator(".fx-flicker").evaluate((e) => getComputedStyle(e).animationName)).toBe("none");
+    await ctx.close();
+  });
+});

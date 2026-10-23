@@ -137,6 +137,42 @@ describe("the sheet switch", () => {
   });
 });
 
+describe("the Forge sheet on the stage (SS14)", () => {
+  it("draws the whole mechanism on Forge, through its post-process, and again on Blueprint after it", async () => {
+    const ctx = await desktop();
+    await ctx.addInitScript(() => {
+      localStorage.setItem("forge", "1");
+      localStorage.setItem("theme", "forge");
+    });
+    const { page, errors } = await open(ctx, "/mechanisms/geneva/");
+    await page.waitForSelector('.stagebox[data-ready="1"]');
+    await page.locator("#play").click();
+    // the bright pixels of the drawing (lines and solids), so a frame without its solids shows
+    const lit = () =>
+      page.evaluate(async () => {
+        await new Promise((r) => setTimeout(r, 600));
+        const c = document.getElementById("stage") as HTMLCanvasElement;
+        const d = c.getContext("2d")!.getImageData(0, 0, c.width, c.height).data;
+        let n = 0;
+        for (let i = 0; i < d.length; i += 4) if (0.2126 * d[i]! + 0.7152 * d[i + 1]! + 0.0722 * d[i + 2]! > 128) n++;
+        return n / (c.width * c.height);
+      });
+    expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe("forge");
+    // the switch beside the name (the compact bar's waits for a scroll)
+    const btn = page.locator(".dhead [data-theme-toggle]");
+    // a quarter turn on Forge: matrix(0, 1, -1, 0, 0, 0) up to rounding
+    expect(await btn.locator("svg").evaluate((e) => getComputedStyle(e).transform)).toMatch(/^matrix\([-\de.]+, 1, -1, [-\de.]+, 0, 0\)$/);
+    const forge = await lit();
+    await btn.click();
+    expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe("dark");
+    const blueprint = await lit();
+    expect(blueprint).toBeGreaterThan(0.01);
+    expect(forge).toBeGreaterThan(0.6 * blueprint);
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+});
+
 describe("library cards", () => {
   it("animate a card on hover from its package", async () => {
     const ctx = await desktop();

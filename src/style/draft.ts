@@ -38,7 +38,7 @@ export const DRAFT = {
     centre: [0.5, 0.45] as const, // gradient centre as a fraction of canvas width, height
     radius: 0.75, // gradient radius as a fraction of the larger canvas side
     grainTile: 128, // px, side of the cached noise tile
-    grainBlend: { dark: "overlay", light: "multiply" } as const, // composite operation of the paper tooth per sheet
+    grainBlend: { dark: "overlay", light: "multiply", forge: "overlay" } as const, // composite operation of the paper tooth per sheet
   },
 
   // Drawing-sheet grid: pitch from TOKENS.size.grid / gridMajor, colour `grid`.

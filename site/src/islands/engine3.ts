@@ -22,7 +22,10 @@ export type { Scene } from "../../../src/render/v3/scene";
 export type { Teaching } from "../../../src/catalog/kin";
 
 /** The sheet chosen on the page (SS7). */
-export const pageTheme = (): "dark" | "light" => (document.documentElement.dataset.theme === "light" ? "light" : "dark");
+export const pageTheme = (): "dark" | "light" | "forge" => {
+  const t = document.documentElement.dataset.theme;
+  return t === "light" || t === "forge" ? t : "dark";
+};
 
 /** Device pixel ratio for drawing, capped at 2. */
 export const pixelRatio = () => Math.min(2, window.devicePixelRatio || 1);

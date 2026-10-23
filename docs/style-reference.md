@@ -1,7 +1,7 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.5
+version: 3.6
 date: 2026-10-23
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
@@ -197,12 +197,13 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS4 | **Controls:** segmented buttons and chips are square, hairline, mono uppercase; pressed = ink fill with paper text. Tags are dashed outlines, solid on hover. The play button is the one round control (accent outline, fills on hover). Range inputs use `accent-color` (accent for the scrubber, ink for view sliders). |
 | SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number and, in its first 7 days, the Recovered badge of SS1; title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, the view modes, the orbit and the named views, explode, detail pin, the section and detail views the record declares, and the mechanism's own controls) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
 | SS6 | **Panels:** paper fill, hairline frame, a mono uppercase header strip with a rule under it; fact lists as label/value rows with dashed separators. |
-| SS7 | **Theme switch** is one square button with one icon, a cog with a half-filled disc in its bore in the sheet's ink: as drawn (filled half to the right) on Drafting, turned 180° (filled half to the left) on Blueprint, so switching sheets turns it without animation; its name and tooltip say the sheet it switches to ("Switch to Blueprint", "Switch to Drafting"). The choice is remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
+| SS7 | **Theme switch** is one square button with one icon, a cog with a half-filled disc in its bore in the sheet's ink: as drawn (filled half to the right) on Drafting, turned 180° (filled half to the left) on Blueprint, so switching sheets turns it without animation; its name and tooltip say the sheet it switches to ("Switch to Blueprint", "Switch to Drafting"). Once the hidden Forge sheet is unlocked (SS14) the switch steps through three sheets, Blueprint, Drafting, Forge, and shows the cog a quarter turn (filled half down) on Forge. The choice is remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
 | SS8 | **Real pages:** one static page per mechanism at `/mechanisms/<id>/`, prev and next from the catalogue order, the library at `/`, and a 404 page (sheet ST-404, with the way to the library) for any other address. The engine loads only on the mechanism page or on card hover. |
 | SS9 | **Responsive:** works at phone width with a 16 px side gutter (respecting safe areas) and no horizontal scroll; the mechanism layout drops to one column under 1000 px; the set title block hides under 640 px. The stage has three view modes: standard; Wide (above 1000 px only, remembered: the stage across the layout, at a glance (two thirds) and the plot side by side below it, the facts in a wrapping row where a short fact never wraps and a long one is sized to run to about two lines); full screen, where a short landscape screen puts the same controls in a rail beside the drawing with upright sliders (top is more) inside the safe areas. |
 | SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. |
 | SS11 | **Motion on the page is minimal:** short colour and border transitions (≤ .2 s). The only continuous motion is the mechanisms themselves. |
 | SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer, and under it, centred, the set's mark faded in the sheet's ink (`--mark`). The favicon is the same mark in the ink of the sheet that matches the browser's scheme. |
+| SS14 | **Forge, the hidden third sheet.** Oxide-red paper, bone ink, brass accent (the `forge` theme of the tokens), so the drawings recolour with the page. It is unlocked by clicking the Rev cell of the library's title block 16 times (once per law; silent until the last, the count starting again after a pause), and remembered per visitor; from then on the switch has three sheets. The unlock moment (1.5 s) flickers twice, tears bands of the page sideways, splits red from blue and bursts into noise that settles on the Forge sheet, lit by the furnace; a "Motive force" line joins the title block. A click or a key skips it; under reduced motion it is a plain fade. While Forge is the sheet the page carries subtle living effects, fixed layers that never take a click: fine grain, faint scanlines, a slow shallow dimming, a vignette with a warm glow at the edges, and a glitch pulse every 20 to 40 s (a few bands shift colour for a moment); on the drawing a post-process adds grain and a slight red and blue split, and tears bands at a pulse. It goes with the paper grain (rung A), so it is the first thing dropped when the device cannot keep up, and cards never draw it. Nothing flashes more than 3 times a second; under reduced motion nothing moves. Forge has no thumbnails or stills of its own: the Blueprint images are recoloured into its paper and ink. The public sheets, their thumbnails and their snapshots never change for it. This is the one exception to SS11. The knobs are in `src/style/forge.ts` (Part VI). |
 | SS13 | **No engine mark.** One engine draws every page and card, so neither the title block nor a library card marks the engine that drew it. The 3D stamp of the transition left with the 2.5D engine at cut-over. |
 
 ---
@@ -217,37 +218,37 @@ applied) and are tuned there.
 ## Theme palettes (tokens)
 
 <!-- style-palettes:start (generated, do not edit) -->
-| Token | Blueprint (dark) | Drafting (light) | Use |
-|---|---|---|---|
-| `bg` | `#0F1A26` | `#ECE9E0` | page background outside sheets |
-| `paper` | `#142130` | `#F3F1EA` | sheets, cards, panels, surface fill on drawings |
-| `paperEdge` | `#0C151F` | `#E6E2D6` | outer stop of the drawing's paper gradient |
-| `ink` | `#E6EDF5` | `#1C2636` | all lines, patterns, text |
-| `grid` | `#A9BCD2` | `#5B8BC4` | sheet grid, used at low alpha |
-| `accent` | `#F29A6B` | `#D4472B` | input ring, traced paths, forces, the page's few highlights (SF2, SD5) |
-| `accentInk` | `#1A0E06` | `#FFF7F2` | text on an accent fill |
-| `vel` | `#9CCFE0` | `#2B6CB0` | velocity overlay |
-| `warn` | `#FFC46B` | `#A8620B` | amber: out-of-range forces and angles, single-shear badge |
-| `ok` | `#9FE8C8` | `#1F7A55` | double-shear badge |
-| `patternGain` | 1 | 0.8 | 0..1 |
-| `grain` | 0.035 | 0.05 | 0..1, overlay blend (draft.paper.grainBlend) |
+| Token | Blueprint (dark) | Drafting (light) | Forge (forge, hidden) | Use |
+|---|---|---|---|---|
+| `bg` | `#0F1A26` | `#ECE9E0` | `#1E0F0C` | page background outside sheets |
+| `paper` | `#142130` | `#F3F1EA` | `#2A1411` | sheets, cards, panels, surface fill on drawings |
+| `paperEdge` | `#0C151F` | `#E6E2D6` | `#1F0E0B` | outer stop of the drawing's paper gradient |
+| `ink` | `#E6EDF5` | `#1C2636` | `#F0DCCB` | all lines, patterns, text |
+| `grid` | `#A9BCD2` | `#5B8BC4` | `#C8634A` | sheet grid, used at low alpha |
+| `accent` | `#F29A6B` | `#D4472B` | `#E0A84E` | input ring, traced paths, forces, the page's few highlights (SF2, SD5) |
+| `accentInk` | `#1A0E06` | `#FFF7F2` | `#1A0E06` | text on an accent fill |
+| `vel` | `#9CCFE0` | `#2B6CB0` | `#8FD0C4` | velocity overlay |
+| `warn` | `#FFC46B` | `#A8620B` | `#F7D774` | amber: out-of-range forces and angles, single-shear badge |
+| `ok` | `#9FE8C8` | `#1F7A55` | `#A8E0B0` | double-shear badge |
+| `patternGain` | 1 | 0.8 | 1 | 0..1 |
+| `grain` | 0.035 | 0.05 | 0.04 | 0..1, overlay blend (draft.paper.grainBlend) |
 <!-- style-palettes:end -->
 
 Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into colour-mixes in `tokens.css`.
 
 <!-- style-tiers:start (generated, do not edit) -->
-| Tier | Dark | Light | Use |
-|---|---|---|---|
-| `--body` | 0.82 | 0.84 | body text |
-| `--muted` | 0.62 | 0.64 | secondary text |
-| `--faint` | 0.42 | 0.45 | labels only (SF5) |
-| `--line` | 0.2 | 0.2 | internal rules |
-| `--line-2` | 0.38 | 0.42 | frames |
-| `--surface` | 0.035 | 0.025 | faint panel fill |
-| `--surface-2` | 0.08 | 0.06 | hover / pressed panel fill |
-| `--mark` | 0.2 | 0.16 | the faded mark at the foot of every page |
-| `--grid-1` | 0.06 | 0.08 | page grid, alpha of `grid` |
-| `--grid-2` | 0.11 | 0.15 | page grid, alpha of `grid` |
+| Tier | Dark | Light | Forge | Use |
+|---|---|---|---|---|
+| `--body` | 0.82 | 0.84 | 0.84 | body text |
+| `--muted` | 0.62 | 0.64 | 0.64 | secondary text |
+| `--faint` | 0.42 | 0.45 | 0.46 | labels only (SF5) |
+| `--line` | 0.2 | 0.2 | 0.2 | internal rules |
+| `--line-2` | 0.38 | 0.42 | 0.4 | frames |
+| `--surface` | 0.035 | 0.025 | 0.04 | faint panel fill |
+| `--surface-2` | 0.08 | 0.06 | 0.09 | hover / pressed panel fill |
+| `--mark` | 0.2 | 0.16 | 0.2 | the faded mark at the foot of every page |
+| `--grid-1` | 0.06 | 0.08 | 0.07 | page grid, alpha of `grid` |
+| `--grid-2` | 0.11 | 0.15 | 0.13 | page grid, alpha of `grid` |
 <!-- style-tiers:end -->
 
 ## Type
@@ -285,7 +286,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.paper.centre` | [0.5, 0.45] | gradient centre as a fraction of canvas width, height |
 | `draft.paper.radius` | 0.75 | gradient radius as a fraction of the larger canvas side |
 | `draft.paper.grainTile` | 128 | px, side of the cached noise tile |
-| `draft.paper.grainBlend` | `overlay` / `multiply` | composite operation of the paper tooth per sheet |
+| `draft.paper.grainBlend` | `overlay` / `multiply` / `overlay` | composite operation of the paper tooth per sheet |
 | `draft.grid.minorAlpha` | 0.07 | 0..1 |
 | `draft.grid.majorAlpha` | 0.14 | 0..1 |
 | `draft.grid.minorWidth` | 0.5 | px |
@@ -641,6 +642,49 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 | `tokens.size.stagePhone` | `4 / 3` | stage under bpPhone, and the card drawing field |
 <!-- style-site:end -->
 
+## Forge (hidden sheet)
+
+The unlock, the moment and the living effects of SS14; the colours are the `forge` columns above.
+
+<!-- style-forge:start (generated, do not edit) -->
+| Knob | Value | Unit and use |
+|---|---|---|
+| `forge.unlock.clicks` | 16 | count, one per law |
+| `forge.unlock.resetAfter` | 4 | s, a pause this long between clicks starts the count again |
+| `forge.unlock.moment` | 1.5 | s, the whole unlock moment |
+| `forge.unlock.switchAt` | 0.55 | s into the moment, the sheet turns to Forge under the noise |
+| `forge.unlock.flickers` | [0.12, 0.42] | s into the moment, the two brightness dips |
+| `forge.unlock.flickerLength` | 0.07 | s, one dip |
+| `forge.unlock.flickerDepth` | 0.4 | 0..1, alpha of the background colour over the page at a dip |
+| `forge.unlock.noise` | 0.5 | 0..1, alpha of the noise burst at its height, settling to the living grain |
+| `forge.unlock.tear` | 34 | px, the widest sideways tear of a band of the page |
+| `forge.unlock.split` | 5 | px, the widest red and blue split |
+| `forge.unlock.glow` | 0.9 | s, the furnace glow coming up at the end |
+| `forge.unlock.fade` | 0.4 | s, the whole moment under reduced motion: a plain fade |
+| `forge.page.grain.alpha` | 0.075 | 0..1 noise (overlay blend), px noise tile, steps per s |
+| `forge.page.grain.tile` | 160 | 0..1 noise (overlay blend), px noise tile, steps per s |
+| `forge.page.grain.fps` | 12 | 0..1 noise (overlay blend), px noise tile, steps per s |
+| `forge.page.scanlines.alpha` | 0.06 | 0..1 of bg on every pitch-th row, px |
+| `forge.page.scanlines.pitch` | 3 | 0..1 of bg on every pitch-th row, px |
+| `forge.page.vignette.alpha` | 0.5 | 0..1 of bg in the corners, fraction of the half-diagonal where it begins |
+| `forge.page.vignette.start` | 0.55 | 0..1 of bg in the corners, fraction of the half-diagonal where it begins |
+| `forge.page.glow.alpha` | 0.11 | 0..1 of the accent, px: the warm glow along the edges |
+| `forge.page.glow.size` | 150 | 0..1 of the accent, px: the warm glow along the edges |
+| `forge.page.flicker.depth` | 0.04 | 0..1 of bg at the deepest, s for one slow irregular cycle |
+| `forge.page.flicker.period` | 7.3 | 0..1 of bg at the deepest, s for one slow irregular cycle |
+| `forge.page.glitch.every` | [20, 40] | s, s, count, px, deg |
+| `forge.page.glitch.length` | 0.18 | s, s, count, px, deg |
+| `forge.page.glitch.bands` | 3 | s, s, count, px, deg |
+| `forge.page.glitch.height` | [3, 22] | s, s, count, px, deg |
+| `forge.page.glitch.hue` | 28 | s, s, count, px, deg |
+| `forge.canvas.grain` | 0.045 | 0..1, noise added to every pixel |
+| `forge.canvas.chroma` | 0.6 | px, red and blue pulled apart, always |
+| `forge.canvas.glitchChroma` | 3.5 | px, at a glitch pulse |
+| `forge.canvas.tear` | 12 | px, the shift of a torn band at a glitch pulse |
+| `forge.canvas.band` | 7 | px, height of a band that may tear |
+| `forge.canvas.tornShare` | 0.22 | 0..1, share of the bands torn at a pulse |
+<!-- style-forge:end -->
+
 ---
 
 # Part VII. Verification (SQ)
@@ -664,6 +708,9 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 
 ## Changelog
 
+- **3.6 (2026-10-23).** The hidden Forge sheet (SS14): a third palette in the tokens, unlocked on the library's title
+  block, with its unlock moment and living effects on the page and the drawing; the switch steps through three sheets
+  once it is unlocked (SS7). Part VI gains the Forge columns and its knobs.
 - **3.5 (2026-10-23).** The set code is ST (sheet ST-07; SS1, SD10), and the library search finds a sheet by its number.
   The sheet frame carries a microprint between its borders and the title block a DATE cell, the mechanism's origin as
   an Imperial date; the block is a little wider to hold it (SD10). The paused input ring breathes (SD5). A sheet wears

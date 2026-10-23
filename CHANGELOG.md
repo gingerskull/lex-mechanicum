@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.39.0, Metalica — 2026-10-23
+
+- A hidden third sheet, Forge: oxide-red paper, bone ink and brass, so the drawings recolour too. Finding it plays a
+  short moment (flicker, torn bands, a red and blue split, noise that settles into furnace light, and a new line in the
+  title block); while it is on, the page carries fine grain, scanlines, a slow dimming, a warm vignette and a rare
+  glitch pulse, and the drawing a matching post-process that goes with the paper grain on the detail dial. Calm under
+  reduced motion, never more than 3 flashes a second, and the public sheets, thumbnails and snapshots are unchanged.
+  How to find it is left to readers of the sixteen laws.
+- The icons' fingerprint reads only the public sheets' colours. Style reference 3.6.
+
 ## 0.38.0, Lucius — 2026-10-23
 
 - The set code is ST: sheets are numbered ST-01 to ST-89 on the cards, the mechanism pages, the library's title block

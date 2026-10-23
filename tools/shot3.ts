@@ -1,4 +1,4 @@
-// npx tsx tools/shot3.ts (npm run shot --) <id> [--view record|PLAN|FRONT|SIDE|ISOMETRIC|DIMETRIC|"AUX O2"|"VIEW 30 40"|<view id>] [--theme dark|light]
+// npx tsx tools/shot3.ts (npm run shot --) <id> [--view record|PLAN|FRONT|SIDE|ISOMETRIC|DIMETRIC|"AUX O2"|"VIEW 30 40"|<view id>] [--theme dark|light|forge]
 //   [--explode 0] [--detail full] [--u 1.1] [--w 1393] [--h 870] [--dpr 1.5] [--card] [--params a=1,b=2]
 //   [--select name=option] [--drivers speed=120] [out.png]
 // Draws one frame of a mechanism with the 3D renderer, in local Chrome (tools/chrome3.ts), to a PNG.
@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 import { recordById } from "../src/catalog";
 import type { Dial } from "../src/render/detail";
 import { openChrome3, type Draw3Options } from "./chrome3";
+import type { ThemeKey } from "../src/style/tokens";
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(`--${name}`);
@@ -74,7 +75,7 @@ export async function main() {
     return;
   }
   const view = arg("view") ?? "record";
-  const theme = (arg("theme") ?? "dark") as "dark" | "light";
+  const theme = (arg("theme") ?? "dark") as ThemeKey;
   const last = process.argv[process.argv.length - 1]!;
   const out = last.endsWith(".png") ? last : join("dist", "shots3", `${id}-${view.replace(/\W+/g, "-")}-${theme}.png`);
   const chrome = await openChrome3();

@@ -1,6 +1,7 @@
 // npm run tokens (also run by prebuild): writes site/styles/tokens.css from src/style/tokens.ts (style SA2). The CSS is
-// generated, never edited: a dark :root block, a light :root[data-theme="light"] block with the same names, derived ink
-// tiers and grid alphas as colour-mixes of the theme colours, then the type families and shared sizes.
+// generated, never edited: a dark :root block, a light :root[data-theme="light"] block and a forge :root[data-theme="forge"]
+// block with the same names, derived ink tiers and grid alphas as colour-mixes of the theme colours, then the type families
+// and shared sizes.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -23,7 +24,7 @@ const sizeValue = (key: string, v: number) => (UNITLESS.has(key) ? `${v}` : SECO
 
 function themeBlock(key: ThemeKey): string[] {
   const t = TOKENS.themes[key];
-  const out = [`  color-scheme: ${key};`];
+  const out = [`  color-scheme: ${key === "light" ? "light" : "dark"};`];
   for (const c of COLOR_NAMES) out.push(`  ${kebab(c)}: ${t[c]};`);
   out.push(`  ${kebab("patternGain")}: ${t.patternGain};`, `  ${kebab("grain")}: ${t.grain};`);
   for (const [name, a] of Object.entries(TOKENS.tiers)) out.push(`  ${kebab(name)}: ${mix("ink", a[key])};`);
@@ -73,6 +74,10 @@ export function tokensCss(): string {
     "",
     ':root[data-theme="light"] {',
     ...themeBlock("light"),
+    "}",
+    "",
+    ':root[data-theme="forge"] {',
+    ...themeBlock("forge"),
     "}",
     "",
   ].join("\n");

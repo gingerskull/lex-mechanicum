@@ -1,12 +1,15 @@
 ---
 // The page shell: tokens and site CSS, the mark's icons and social card (site/brand, tools/brand.ts), the theme set
-// before first paint (SS7), the footer with the version (SS12) and the faded mark, and the Recovered badges shown on view.
+// before first paint (SS7), the footer with the version (SS12) and the faded mark, the Recovered badges shown on view, and
+// the Forge sheet's filters and island (SS14).
 import "../../styles/tokens.css";
 import "../../styles/base.css";
 import "../../styles/layout.css";
 import "../../styles/components.css";
+import "../../styles/forge.css";
 import Footer from "../components/Footer.astro";
 import { APP } from "../data";
+import { FORGE_FILTERS } from "../forge-filters";
 import { url } from "../url";
 interface Props {
   title: string;
@@ -37,17 +40,19 @@ const card = new URL(url("/social.png"), Astro.site).href;
     <script is:inline>
       try {
         const t = localStorage.getItem("theme");
-        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+        if (t === "light" || t === "dark" || (t === "forge" && localStorage.getItem("forge") === "1")) document.documentElement.dataset.theme = t;
         else if (matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.dataset.theme = "light";
       } catch {}
     </script>
   </head>
   <body>
+    <Fragment set:html={FORGE_FILTERS} />
     <slot />
     <Footer />
     <script>
       import "../islands/theme";
       import "../islands/recovered";
+      import "../islands/forge";
     </script>
   </body>
 </html>
