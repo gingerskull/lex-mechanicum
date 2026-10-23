@@ -9,6 +9,7 @@ import { createServer, type Server } from "node:http";
 import { extname, join } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { HINTS, LORE_WORDS } from "../../site/src/lore";
 import { sortBy, type Order, type Sortable } from "../../site/src/sort";
 
 const OUT = join("dist", "site");
@@ -235,7 +236,7 @@ describe("the quiet states", () => {
       expect(res?.status()).toBe(404);
       expect(await page.title()).toBe("Sheet ST-404 · Mechanism Library");
       expect(await page.locator("h1").textContent()).toBe("Sheet ST-404");
-      expect(await page.locator(".dhead p").textContent()).toBe("This sheet is not in the archive. Its pattern may be lost, or not yet recovered.");
+      expect(await page.locator(".dhead p:not(.lore-hint)").textContent()).toBe("This sheet is not in the archive. Its pattern may be lost, or not yet recovered.");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.locator("main a.btn").click();
       await page.waitForURL(base + "/");
@@ -324,7 +325,7 @@ describe("the Forge sheet (SS14)", () => {
     // the moment ends by itself, the page is not left filtered, and the living layers take no click
     await page.waitForFunction(() => !document.body.classList.contains("forge-glitching") && !document.querySelector(".forge-moment"), null, { timeout: 4000 });
     expect(await page.locator(".forge-fx").evaluate((e) => getComputedStyle(e).pointerEvents)).toBe("none");
-    expect(await page.locator(".tblock .forge-line").isVisible()).toBe(true);
+    expect(await page.locator(".tblock div").count()).toBe(4);
     const toggle = page.locator("[data-theme-toggle]").first();
     expect(await toggle.getAttribute("aria-label")).toBe("Switch to Blueprint");
     const order: string[] = [];
@@ -374,3 +375,143 @@ describe("the Forge sheet (SS14)", () => {
     await ctx.close();
   });
 });
+
+describe("finding the Forge sheet (SS14)", () => {
+  const sheet = (page: Page) => page.evaluate(() => document.documentElement.dataset.theme ?? "dark");
+  const settled = (page: Page) => page.waitForFunction(() => !document.querySelector(".forge-moment, .forge-veil"), null, { timeout: 4000 });
+  const centre = async (page: Page) => {
+    const b = (await page.locator(".bar [data-theme-toggle]").first().boundingBox())!;
+    return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+  };
+
+  it("unlocks when the cog is held: a short press still switches, a hold of a second starts the fill, two more open it", async () => {
+    const ctx = await desktop();
+    // from the sealed state, where a hint has just been read
+    const { page, errors } = await open(ctx, "/?q=mars");
+    const c = await centre(page);
+    await page.mouse.move(c.x, c.y);
+    // a short press is a plain switch
+    await page.mouse.down();
+    await page.waitForTimeout(300);
+    await page.mouse.up();
+    expect(await sheet(page)).toBe("light");
+    // let go during the fill: nothing switches, nothing opens
+    await page.mouse.down();
+    await page.waitForTimeout(1500);
+    expect(await page.locator(".bar .themebtn .kindle").count()).toBe(1);
+    await page.mouse.up();
+    expect(await page.locator(".themebtn .kindle").count()).toBe(0);
+    expect(await sheet(page)).toBe("light");
+    // held to the end: Forge, and the click that ends the hold switches nothing
+    await page.mouse.down();
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "forge", null, { timeout: 4500 });
+    await page.mouse.up();
+    await settled(page);
+    expect(await sheet(page)).toBe("forge");
+    expect(await page.evaluate(() => localStorage.getItem("forge"))).toBe("1");
+    // the sealed state says so at once
+    expect(await page.locator("#sealed-title").textContent()).toBe("The forge burns");
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it("unlocks from the keyboard: Space held on the switch, a short press still switches", async () => {
+    const ctx = await desktop();
+    const { page } = await open(ctx, "/");
+    const btn = page.locator(".bar [data-theme-toggle]").first();
+    await btn.focus();
+    await page.keyboard.press(" ");
+    expect(await sheet(page)).toBe("light");
+    await page.keyboard.down(" ");
+    await page.waitForSelector(".forge-moment", { timeout: 4500 });
+    // the key still held repeats: the moment plays on
+    await page.keyboard.down(" ");
+    await page.keyboard.down(" ");
+    await page.waitForTimeout(100);
+    expect(await page.locator(".forge-moment").count()).toBe(1);
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "forge", null, { timeout: 4500 });
+    await page.keyboard.up(" ");
+    await settled(page);
+    expect(await sheet(page)).toBe("forge");
+    await ctx.close();
+  });
+
+  it("unlocks under a finger held on the switch on a phone, without the browser's long-press menu", async () => {
+    const ctx = await phone();
+    const { page, errors } = await open(ctx, "/");
+    const c = await centre(page);
+    const cdp = await ctx.newCDPSession(page);
+    const touch = (type: "touchStart" | "touchEnd") => cdp.send("Input.dispatchTouchEvent", { type, touchPoints: type === "touchEnd" ? [] : [{ x: c.x, y: c.y }] });
+    let menus = 0;
+    await page.exposeFunction("menuOpened", () => menus++);
+    await page.evaluate(() => addEventListener("contextmenu", (e) => !e.defaultPrevented && (window as unknown as { menuOpened(): void }).menuOpened()));
+    // a tap still switches
+    await touch("touchStart");
+    await touch("touchEnd");
+    expect(await sheet(page)).toBe("light");
+    await touch("touchStart");
+    await page.waitForFunction(() => document.documentElement.dataset.theme === "forge", null, { timeout: 4500 });
+    await touch("touchEnd");
+    await settled(page);
+    expect(await sheet(page)).toBe("forge");
+    expect(menus).toBe(0);
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it("answers a lore word in the search with a sealed state and a hint, and a real word with sheets", async () => {
+    for (const make of [desktop, phone]) {
+      const ctx = await make();
+      const { page } = await open(ctx, "/?q=omnissiah");
+      await page.waitForFunction(() => !document.getElementById("sealed")?.hidden);
+      expect(await page.locator(".grid .card:not([hidden])").count()).toBe(0);
+      expect(await page.locator("#empty").isHidden()).toBe(true);
+      expect(await page.locator("#sealed-title").textContent()).toBe("Pattern sealed");
+      expect(HINTS).toContain(await page.locator("#sealed [data-lore-hint]").textContent());
+      const q = page.locator("#q");
+      await q.fill("Tech-Priest");
+      expect(await page.locator("#sealed").isVisible()).toBe(true);
+      await q.fill(LORE_WORDS[LORE_WORDS.length - 1]!);
+      expect(await page.locator("#sealed").isVisible()).toBe(true);
+      await q.fill("gear");
+      expect(await page.locator("#sealed").isHidden()).toBe(true);
+      expect(await page.locator(".grid .card:not([hidden])").count()).toBeGreaterThan(0);
+      await ctx.close();
+    }
+  });
+
+  it("says the forge burns to a lore search once it is open", async () => {
+    const ctx = await desktop();
+    await ctx.addInitScript(() => localStorage.setItem("forge", "1"));
+    const { page } = await open(ctx, "/?q=mars");
+    await page.waitForFunction(() => !document.getElementById("sealed")?.hidden);
+    expect(await page.locator("#sealed-title").textContent()).toBe("The forge burns");
+    await ctx.close();
+  });
+
+  it("glints the cog once, on the third visit, while the forge is locked", async () => {
+    const ctx = await desktop();
+    await ctx.addInitScript(() => {
+      if (!sessionStorage.getItem("seeded")) {
+        sessionStorage.setItem("seeded", "1");
+        localStorage.setItem("forge-visits", "2");
+      }
+    });
+    const { page } = await open(ctx, "/");
+    await page.waitForSelector(".themebtn.glint", { timeout: 3000 });
+    await page.reload();
+    await page.waitForTimeout(2200);
+    expect(await page.locator(".themebtn.glint").count()).toBe(0);
+    await ctx.close();
+  });
+
+  it("leaves a faint hint on the 404 page", async () => {
+    const ctx = await phone();
+    const { page } = await open(ctx, "/no-such-sheet/");
+    const hint = page.locator(".lore-hint");
+    expect(await hint.isVisible()).toBe(true);
+    expect(HINTS).toContain(await hint.textContent());
+    await ctx.close();
+  });
+});
+

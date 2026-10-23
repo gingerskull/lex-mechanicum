@@ -1,7 +1,7 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.6
+version: 3.7
 date: 2026-10-23
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
@@ -203,7 +203,7 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. |
 | SS11 | **Motion on the page is minimal:** short colour and border transitions (≤ .2 s). The only continuous motion is the mechanisms themselves. |
 | SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer, and under it, centred, the set's mark faded in the sheet's ink (`--mark`). The favicon is the same mark in the ink of the sheet that matches the browser's scheme. |
-| SS14 | **Forge, the hidden third sheet.** Oxide-red paper, bone ink, brass accent (the `forge` theme of the tokens), so the drawings recolour with the page. It is unlocked by clicking the Rev cell of the library's title block 16 times (once per law; silent until the last, the count starting again after a pause), and remembered per visitor; from then on the switch has three sheets. The unlock moment (1.5 s) flickers twice, tears bands of the page sideways, splits red from blue and bursts into noise that settles on the Forge sheet, lit by the furnace; a "Motive force" line joins the title block. A click or a key skips it; under reduced motion it is a plain fade. While Forge is the sheet the page carries subtle living effects, fixed layers that never take a click: fine grain, faint scanlines, a slow shallow dimming, a vignette with a warm glow at the edges, and a glitch pulse every 20 to 40 s (a few bands shift colour for a moment); on the drawing a post-process adds grain and a slight red and blue split, and tears bands at a pulse. It goes with the paper grain (rung A), so it is the first thing dropped when the device cannot keep up, and cards never draw it. Nothing flashes more than 3 times a second; under reduced motion nothing moves. Forge has no thumbnails or stills of its own: the Blueprint images are recoloured into its paper and ink. The public sheets, their thumbnails and their snapshots never change for it. This is the one exception to SS11. The knobs are in `src/style/forge.ts` (Part VI). |
+| SS14 | **Forge, the hidden third sheet.** Oxide-red paper, bone ink, brass accent (the `forge` theme of the tokens), so the drawings recolour with the page. It is unlocked by holding the sheet switch: after a second the cog, ring and half-disc, fills with brass in one sweep over two seconds, and at full the unlock moment plays (a shorter press is a plain switch; letting go during the fill does nothing; a mouse, a finger with no long-press menu, or Space or Enter held all work). Clicking the Rev cell of the library's title block 16 times, once per law, also unlocks it. The unlock is remembered per visitor; from then on the switch has three sheets. The hints: the cog glints brass once on a visitor's third visit; the developer console says the forge sleeps; a search that is a word of its lore (`site/src/lore.ts`: Mechanicus terms, places, people, the forge-world release names) shows a sealed state in place of the cards, and the 404 page a line, each with a faint hint phrase picked at random. The unlock moment (1.5 s) flickers twice, tears bands of the page sideways, splits red from blue and bursts into noise that settles on the Forge sheet, lit by the furnace. A click or a key skips it; under reduced motion it is a plain fade. While Forge is the sheet the page lives, subtly, in fixed layers that never take a click: fine grain, scanlines split warm and cool and drifting down, a soft band rolling down the screen, text fringed warm and cool, a slow shallow dimming, the furnace glow breathing at the edges, a blip every few seconds (a strip that dims or brightens, or a thin line), and a glitch pulse every 20 to 40 s (bands shift colour, the fringe widens). On the drawing a post-process adds grain and a red and blue split that swells down the rows, and tears bands at a blip or a pulse. It goes with the paper grain (rung A), so it is the first thing dropped when the device cannot keep up, and cards never draw it. Nothing flashes more than 3 times a second; under reduced motion nothing moves. Forge has no thumbnails or stills of its own: the Blueprint images are recoloured into its paper and ink. The public sheets, their thumbnails and their snapshots never change for it. This is the one exception to SS11. The knobs are in `src/style/forge.ts` (Part VI). |
 | SS13 | **No engine mark.** One engine draws every page and card, so neither the title block nor a library card marks the engine that drew it. The 3D stamp of the transition left with the 2.5D engine at cut-over. |
 
 ---
@@ -649,6 +649,11 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 <!-- style-forge:start (generated, do not edit) -->
 | Knob | Value | Unit and use |
 |---|---|---|
+| `forge.unlock.holdDelay` | 1 | s, a hold on the sheet switch before the cog starts to fill (a shorter press is a plain switch) |
+| `forge.unlock.holdFill` | 2 | s, the cog filling with brass, ring and half-disc, in one sweep; at full the moment plays |
+| `forge.unlock.holdSlop` | 10 | px, a finger that moves further than this is scrolling, not holding |
+| `forge.unlock.glintVisit` | 3 | count, the page load on which the cog glints once, as a hint, while Forge is still locked |
+| `forge.unlock.glint` | 1.4 | s, the glint |
 | `forge.unlock.clicks` | 16 | count, one per law |
 | `forge.unlock.resetAfter` | 4 | s, a pause this long between clicks starts the count again |
 | `forge.unlock.moment` | 1.5 | s, the whole unlock moment |
@@ -661,25 +666,41 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 | `forge.unlock.split` | 5 | px, the widest red and blue split |
 | `forge.unlock.glow` | 0.9 | s, the furnace glow coming up at the end |
 | `forge.unlock.fade` | 0.4 | s, the whole moment under reduced motion: a plain fade |
-| `forge.page.grain.alpha` | 0.075 | 0..1 noise (overlay blend), px noise tile, steps per s |
+| `forge.page.grain.alpha` | 0.085 | 0..1 noise (overlay blend), px noise tile, steps per s |
 | `forge.page.grain.tile` | 160 | 0..1 noise (overlay blend), px noise tile, steps per s |
 | `forge.page.grain.fps` | 12 | 0..1 noise (overlay blend), px noise tile, steps per s |
-| `forge.page.scanlines.alpha` | 0.06 | 0..1 of bg on every pitch-th row, px |
-| `forge.page.scanlines.pitch` | 3 | 0..1 of bg on every pitch-th row, px |
+| `forge.page.scanlines.alpha` | 0.07 | 0..1 of each colour, px, s |
+| `forge.page.scanlines.pitch` | 3 | 0..1 of each colour, px, s |
+| `forge.page.scanlines.drift` | 6 | 0..1 of each colour, px, s |
+| `forge.page.roll.alpha` | 0.05 | 0..1 of the accent, px, s: a soft band rolling down the screen |
+| `forge.page.roll.height` | 160 | 0..1 of the accent, px, s: a soft band rolling down the screen |
+| `forge.page.roll.period` | 13 | 0..1 of the accent, px, s: a soft band rolling down the screen |
+| `forge.page.aberration.shift` | 0.6 | px, px at a glitch pulse, 0..1: text fringed warm and cool |
+| `forge.page.aberration.pulse` | 1.8 | px, px at a glitch pulse, 0..1: text fringed warm and cool |
+| `forge.page.aberration.alpha` | 0.4 | px, px at a glitch pulse, 0..1: text fringed warm and cool |
 | `forge.page.vignette.alpha` | 0.5 | 0..1 of bg in the corners, fraction of the half-diagonal where it begins |
 | `forge.page.vignette.start` | 0.55 | 0..1 of bg in the corners, fraction of the half-diagonal where it begins |
-| `forge.page.glow.alpha` | 0.11 | 0..1 of the accent, px: the warm glow along the edges |
-| `forge.page.glow.size` | 150 | 0..1 of the accent, px: the warm glow along the edges |
+| `forge.page.glow.alpha` | 0.12 | 0..1 of the accent, px, 0..1 at its faintest, s per breath |
+| `forge.page.glow.size` | 150 | 0..1 of the accent, px, 0..1 at its faintest, s per breath |
+| `forge.page.glow.low` | 0.7 | 0..1 of the accent, px, 0..1 at its faintest, s per breath |
+| `forge.page.glow.period` | 4.6 | 0..1 of the accent, px, 0..1 at its faintest, s per breath |
 | `forge.page.flicker.depth` | 0.04 | 0..1 of bg at the deepest, s for one slow irregular cycle |
 | `forge.page.flicker.period` | 7.3 | 0..1 of bg at the deepest, s for one slow irregular cycle |
+| `forge.page.blips.every` | [3, 8] | s, s, px, 0..1 |
+| `forge.page.blips.length` | 0.09 | s, s, px, 0..1 |
+| `forge.page.blips.height` | [24, 90] | s, s, px, 0..1 |
+| `forge.page.blips.depth` | 0.07 | s, s, px, 0..1 |
 | `forge.page.glitch.every` | [20, 40] | s, s, count, px, deg |
 | `forge.page.glitch.length` | 0.18 | s, s, count, px, deg |
 | `forge.page.glitch.bands` | 3 | s, s, count, px, deg |
 | `forge.page.glitch.height` | [3, 22] | s, s, count, px, deg |
 | `forge.page.glitch.hue` | 28 | s, s, count, px, deg |
-| `forge.canvas.grain` | 0.045 | 0..1, noise added to every pixel |
-| `forge.canvas.chroma` | 0.6 | px, red and blue pulled apart, always |
-| `forge.canvas.glitchChroma` | 3.5 | px, at a glitch pulse |
+| `forge.canvas.grain` | 0.05 | 0..1, noise added to every pixel |
+| `forge.canvas.chroma` | 1.1 | px, red and blue pulled apart, always |
+| `forge.canvas.wobble` | 0.7 | px, how much the split swells and shrinks down the rows |
+| `forge.canvas.wobbleRows` | 37 | px, rows per swell |
+| `forge.canvas.blip` | 0.35 | 0..1, a blip's strength on the drawing (a glitch pulse is 1) |
+| `forge.canvas.glitchChroma` | 4 | px, at a glitch pulse |
 | `forge.canvas.tear` | 12 | px, the shift of a torn band at a glitch pulse |
 | `forge.canvas.band` | 7 | px, height of a band that may tear |
 | `forge.canvas.tornShare` | 0.22 | 0..1, share of the bands torn at a pulse |
@@ -708,6 +729,10 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 
 ## Changelog
 
+- **3.7 (2026-10-23).** Forge is unlocked by holding the sheet switch, with hints around the site (a glint, the console,
+  a sealed search for its lore, a line on the 404 page), and lives more while it is on (split scanlines, a rolling
+  band, fringed text, blips, a breathing glow, a wider swelling colour split on the drawing). The Motive force line
+  leaves the title block (SS14).
 - **3.6 (2026-10-23).** The hidden Forge sheet (SS14): a third palette in the tokens, unlocked on the library's title
   block, with its unlock moment and living effects on the page and the drawing; the switch steps through three sheets
   once it is unlocked (SS7). Part VI gains the Forge columns and its knobs.

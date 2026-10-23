@@ -3,7 +3,11 @@
 // picked from the Sort menu, which stays as filters change. All data is on the cards; nothing is fetched. The filters,
 // search and order live in the page's URL as they change, and the state is kept for the tab when the page is left, so a
 // mechanism page's "Back to library" brings the library back as it was and its Previous and Next follow what it shows.
+// A search that is a word of the Forge sheet's lore (site/src/lore.ts) opens a sealed state in place of the cards, with a
+// faint hint (SS14).
+import { forgeUnlocked } from "../forge";
 import { readLibrary, saveLibrary, takeReturn } from "../library";
+import { isLore, pickHint } from "../lore";
 import { DEFAULT_ORDER, orderFrom, sortBy, type Order, type Sortable } from "../sort";
 import { sortMenu } from "./sortmenu";
 
@@ -17,6 +21,7 @@ const shown = document.getElementById("shown");
 const clear = document.getElementById("clear");
 const fclear = document.getElementById("fclear") as HTMLButtonElement | null;
 const empty = document.getElementById("empty");
+const sealed = document.getElementById("sealed");
 const chips = [...document.querySelectorAll<HTMLButtonElement>("#facets .chip")];
 const grid = document.getElementById("grid");
 const main = document.getElementById("library");
@@ -55,11 +60,12 @@ function apply() {
   }
   // a sheet number of the old set code (MX-07) finds the sheet it is now (ST-07)
   const words = (q?.value ?? "").toLowerCase().split(/\s+/).filter(Boolean).map((w) => w.replace(/^mx-/, "st-"));
+  const lore = isLore(q?.value ?? "");
   let n = 0;
   for (const card of cards) {
     const facets = [...byFacet].every(([f, vals]) => (card.dataset[f] ?? "").split("|").some((v) => vals.has(v)));
     const text = words.every((w) => (card.dataset.text ?? "").includes(w));
-    const ok = facets && text;
+    const ok = facets && text && !lore;
     card.hidden = !ok;
     if (ok) n++;
   }
@@ -70,7 +76,11 @@ function apply() {
   }
   if (clear) clear.hidden = on.length === 0 && words.length === 0;
   if (fclear) fclear.disabled = on.length === 0 && words.length === 0;
-  if (empty) empty.hidden = n > 0;
+  if (empty) empty.hidden = n > 0 || lore;
+  if (sealed) {
+    if (lore && sealed.hidden) seal(sealed);
+    sealed.hidden = !lore;
+  }
   if (qclear) qclear.hidden = !q?.value;
   // the URL says what is shown: ?<facet>=<value>..., ?q=<words> and ?sort=<order> (not the default)
   const p = new URLSearchParams();
@@ -80,6 +90,25 @@ function apply() {
   const search = p.toString() ? `?${p.toString()}` : "";
   if (search !== location.search) history.replaceState(history.state, "", location.pathname + search + location.hash);
 }
+
+/** The sealed state as it opens: sealed with a fresh hint while the Forge sheet is locked, burning once it is not. */
+function seal(el: HTMLElement) {
+  const open = forgeUnlocked();
+  const title = el.querySelector("#sealed-title");
+  const text = el.querySelector("#sealed-text");
+  const hint = el.querySelector<HTMLElement>("[data-lore-hint]");
+  if (title) title.textContent = open ? "The forge burns" : "Pattern sealed";
+  if (text) text.textContent = open ? "Its sheet is open to you now: the cog turns through three." : "This pattern rests behind a sealed sheet of the archive.";
+  if (hint) {
+    hint.hidden = open;
+    hint.textContent = pickHint();
+  }
+}
+
+// unlocked while the sealed state shows (its hint was read, the cog held): it says so at once
+addEventListener("forgeunlock", () => {
+  if (sealed && !sealed.hidden) seal(sealed);
+});
 
 toggle?.addEventListener("click", () => {
   const open = toggle.getAttribute("aria-expanded") !== "true";

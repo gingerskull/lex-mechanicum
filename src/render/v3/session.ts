@@ -223,7 +223,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       if (view.theme === "forge" && !view.card && LD.effect("grain")) {
         const F = FORGE.canvas;
         const k = Math.max(0, Math.min(1, view.glitch ?? 0));
-        postPass(card, { seed: ++frame % 997, grain: F.grain, chroma: (F.chroma + k * (F.glitchChroma - F.chroma)) * card.dpr, tear: k * F.tear * card.dpr, band: F.band * card.dpr, torn: k * F.tornShare });
+        postPass(card, { seed: ++frame % 997, grain: F.grain, chroma: (F.chroma + k * (F.glitchChroma - F.chroma)) * card.dpr, wobble: F.wobble * card.dpr, wobbleRows: F.wobbleRows * card.dpr, tear: k * F.tear * card.dpr, band: F.band * card.dpr, torn: k * F.tornShare });
       }
       last = key;
     },

@@ -181,7 +181,7 @@ async function main(box: HTMLElement) {
     fast: 0,
     /** The input ring's strength: it breathes while paused (LM-06), never while playing or under reduced motion. */
     ring: 1,
-    /** A Forge glitch pulse on the drawing, 0 or 1 (SS14). */
+    /** A Forge glitch on the drawing (SS14): 1 at a pulse, less at a blip, 0 between. */
     glitch: 0,
   };
   /** Frames are drawn at the coarsest dial until the page is idle (R9). */
@@ -316,7 +316,7 @@ async function main(box: HTMLElement) {
       dirty = true;
     }
     if (glitchUntil) {
-      s.glitch = now < glitchUntil ? 1 : 0;
+      s.glitch = now < glitchUntil ? glitchStrength : 0;
       if (!s.glitch) glitchUntil = 0;
       dirty = true;
     }
@@ -324,10 +324,17 @@ async function main(box: HTMLElement) {
     if (dirty && inView) draw();
     requestAnimationFrame(tick);
   };
-  // a Forge glitch pulse tears the drawing for its length (islands/forge.ts sends it, never under reduced motion)
+  // a Forge glitch pulse or blip tears the drawing for its length (islands/forge.ts sends it, never under reduced motion)
   let glitchUntil = 0;
+  let glitchStrength = 1;
   addEventListener("forgeglitch", (e) => {
-    if (E.pageTheme() === "forge") glitchUntil = performance.now() + (((e as CustomEvent<{ length: number }>).detail?.length ?? 0) * 1000);
+    if (E.pageTheme() !== "forge") return;
+    const d = (e as CustomEvent<{ length?: number; strength?: number }>).detail ?? {};
+    const now = performance.now();
+    // a blip inside a pulse neither shortens it nor weakens it
+    const going = glitchUntil > now;
+    glitchStrength = going ? Math.max(glitchStrength, d.strength ?? 1) : (d.strength ?? 1);
+    glitchUntil = Math.max(going ? glitchUntil : 0, now + (d.length ?? 0) * 1000);
   });
 
   // transport
