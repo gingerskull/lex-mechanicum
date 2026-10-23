@@ -45,6 +45,23 @@ export function toPlan(dir: Vec3): Mat3 {
 
 const mat16 = (R: Mat3): Mat4 => [R[0], R[3], R[6], 0, R[1], R[4], R[7], 0, R[2], R[5], R[8], 0, 0, 0, 0, 1];
 
+/**
+ * The union of many outlines, eight at a time and the results again: the same area as one flat union of them all, many
+ * times faster for the hundreds of hulls of a sweep. The parts stay the caller's.
+ */
+export function unionTree(M: Wasm, parts: Cs[]): Cs {
+  let level = parts;
+  while (level.length > 8) {
+    const next: Cs[] = [];
+    for (let i = 0; i < level.length; i += 8) next.push(M.CrossSection.union(level.slice(i, i + 8)));
+    if (level !== parts) level.forEach((p) => p.delete());
+    level = next;
+  }
+  const out = M.CrossSection.union(level);
+  if (level !== parts) level.forEach((p) => p.delete());
+  return out;
+}
+
 /** The outline of a solid shape seen along `dir`, in the view's plane. */
 export function projectAlong(m: Mf, dir: Vec3): Cs {
   if (Math.abs(dir[0]) < 1e-9 && Math.abs(dir[1]) < 1e-9 && dir[2] < 0) return m.project();

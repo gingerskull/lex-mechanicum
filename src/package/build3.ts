@@ -6,10 +6,10 @@ import { makePoseSource } from "../builder/poses";
 import { xfMat } from "../builder/sweeps";
 import type { Kin } from "../kin/types";
 import { xf } from "../kin/math";
-import { checkMesh, type SolidReport } from "../solids/check";
+import type { SolidReport } from "../solids/check";
 import { mat4 } from "../solids/frame";
-import { cleanProfile, manifold, meshOf } from "../solids/manifold";
-import { quantise } from "../solids/quantise";
+import { cleanProfile, manifold } from "../solids/manifold";
+import { meshOnce, quantisedOnce, solidReport } from "../solids/meshes";
 import type { Solid3 } from "../solids/types";
 import type { Joint, Package2 } from "./format2";
 import { pack2, type Sampled } from "./pack2";
@@ -24,15 +24,22 @@ export interface Built3 {
 
 const PHASES = 72;
 
+type Rec = Pick<CatalogRecord, "id"> & { kin?: unknown; teaching?: unknown };
+
 /** Assembles a record, checks every solid and packs it as package v2. */
-export async function buildPackage3(rec: Pick<CatalogRecord, "id"> & { kin?: unknown; teaching?: unknown }, opts: { polish?: Polish; allMesh?: boolean } = {}): Promise<Built3> {
+export async function buildPackage3(rec: Rec, opts: { polish?: Polish; allMesh?: boolean } = {}): Promise<Built3> {
   const assembly = await buildAssembly(rec as never, opts.polish ? { polish: opts.polish } : {});
+  return packAssembly(rec, assembly, opts);
+}
+
+/** Checks every solid of an assembly built from the record and packs it as package v2. */
+export async function packAssembly(rec: Rec, assembly: Assembly, opts: { allMesh?: boolean } = {}): Promise<Built3> {
   const M = await manifold();
   const reports: Built3["reports"] = [];
   const failed: Built3["failed"] = [];
   for (const s of assembly.solids) {
     try {
-      reports.push({ id: s.id, report: checkMesh(quantise(meshOf(M, s)), s.stretch ? { thin: false } : {}) });
+      reports.push({ id: s.id, report: solidReport(M, s) });
     } catch (e) {
       failed.push({ id: s.id, error: String(e) });
     }
@@ -48,7 +55,7 @@ export async function buildPackage3(rec: Pick<CatalogRecord, "id"> & { kin?: unk
     z0 = Math.min(z0, z); z1 = Math.max(z1, z);
   };
   const corners = (s: Solid3): [number, number, number][] => {
-    const m = quantise(meshOf(M, s));
+    const m = quantisedOnce(M, s);
     const out: [number, number, number][] = [];
     for (let i = 0; i < m.pos.length; i += 36) out.push([m.pos[i]!, m.pos[i + 1]!, m.pos[i + 2]!]);
     return out;
@@ -109,7 +116,7 @@ export async function buildPackage3(rec: Pick<CatalogRecord, "id"> & { kin?: unk
       lifts: assembly.lifts,
     },
     sampled,
-    (s) => meshOf(M, s),
+    (s) => meshOnce(M, s),
     { ...(opts.allMesh ? { allMesh: true } : {}), fixProfile: (p) => cleanProfile(M, p) },
   );
   return { assembly, pkg, reports, failed };

@@ -145,6 +145,13 @@ tests/                           unit and fixture tests, the record and 3D check
 | `standard-table`, `style-table` (`npm run docs:tables`) | the generated tables of the standard and the style reference |
 | `release minor \| patch [--date ...]` (`npm run release -- minor`) | the release step: the version bump, the CHANGELOG heading with the codename, `data/codenames.json` for the footer (`docs/workflow.md`, Versions) |
 
+The tools that go through every mechanism (conformance, clearance, site-assets, the thumbnails' fingerprints) build each
+one once per state of the sources (`src/package/built.ts`): the build gives the package and the checks alike and is
+kept in `dist/cache/built` under a hash of `src/`, `data/catalog/`, the lockfile and the Node version, so the tools of
+one run, the pre-push hook's included, build a mechanism once between them. They run in a pool of child processes
+(`tools/pool.ts`), as many as the cores and the memory allow (a big build reaches about 2 GB); `MDB_JOBS` sets the size,
+and `MDB_JOBS=1` runs in one process.
+
 Tools that draw go through `tools/chrome3.ts`: it bundles the drawing page (`tools/draw3-page`), serves it with the
 IBM Plex faces, the packages built from the current code and the records' teaching and kin blocks, and opens it in the
 installed Chrome (playwright-core, channel `chrome`, no browser download) on the real GPU with the frame-rate cap off.

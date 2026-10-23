@@ -9,7 +9,7 @@ import { m3, v3, xf, type Vec3, type Xf } from "../kin/math";
 import { SWEEP_STEP } from "./constants";
 import type { Vec2 } from "../core/geom";
 import type { BuildCtx } from "./ctx";
-import { projectAlong } from "./view";
+import { projectAlong, unionTree } from "./view";
 
 type Wasm = Awaited<ReturnType<typeof manifold>>;
 type Mf = InstanceType<Wasm["Manifold"]>;
@@ -77,28 +77,90 @@ const boxOfMf = (m: Mf): Box => {
   return [lo[0]!, lo[1]!, lo[2]!, hi[0]!, hi[1]!, hi[2]!];
 };
 
+const boxOfPts = (P: Vec3[]): Box => {
+  const b: Box = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+  for (const p of P)
+    for (let k = 0; k < 3; k++) {
+      b[k] = Math.min(b[k]!, p[k]!);
+      b[k + 3] = Math.max(b[k + 3]!, p[k]!);
+    }
+  return b;
+};
+const unionBox = (a: Box, b: Box): Box => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.min(a[2], b[2]), Math.max(a[3], b[3]), Math.max(a[4], b[4]), Math.max(a[5], b[5])];
+
+/** Convex hulls and their boxes; a hull is made when first asked for. */
+interface Hulls {
+  readonly boxes: Box[];
+  at(i: number): Mf;
+  delete(): void;
+}
+
+/**
+ * A cluster's hulls of consecutive poses. A hull's box is its points' box, so a query that only needs boxes (a bound, a
+ * gap far off) never builds the hull.
+ */
+class PairHulls implements Hulls {
+  readonly boxes: Box[];
+  private built: (Mf | undefined)[];
+  constructor(
+    private M: Wasm,
+    private poses: Vec3[][],
+  ) {
+    const pb = poses.map(boxOfPts);
+    this.boxes = pb.map((b, i) => unionBox(b, pb[(i + 1) % pb.length]!));
+    this.built = new Array<Mf | undefined>(poses.length);
+  }
+
+  at(i: number): Mf {
+    return (this.built[i] ??= this.M.Manifold.hull([...this.poses[i]!, ...this.poses[(i + 1) % this.poses.length]!]));
+  }
+
+  delete(): void {
+    this.built.forEach((h) => h?.delete());
+  }
+}
+
+/** Hulls made already (a body of revolution's). */
+class MadeHulls implements Hulls {
+  readonly boxes: Box[];
+  constructor(private hulls: Mf[]) {
+    this.boxes = hulls.map(boxOfMf);
+  }
+
+  at(i: number): Mf {
+    return this.hulls[i]!;
+  }
+
+  delete(): void {
+    this.hulls.forEach((h) => h.delete());
+  }
+}
+
 /**
  * A swept volume: the convex hulls of consecutive poses, kept apart (their union is a costly boolean and nothing here
  * needs it: a gap is the least over the hulls, a height the greatest, an outline the union of the projections).
  */
 export class Swept {
   readonly box: Box;
-  private boxes: Box[];
+  private items: { hulls: Hulls; i: number; box: Box }[];
+  private outlines = new Map<string, InstanceType<Wasm["CrossSection"]>>();
+  /** `own`: the hulls are the volume's and go with it (else whoever made them keeps them). */
   constructor(
     private M: Wasm,
-    readonly hulls: Mf[],
+    private sets: Hulls[],
+    private own: boolean,
   ) {
-    this.boxes = hulls.map(boxOfMf);
-    this.box = this.boxes.reduce<Box>((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.min(a[2], b[2]), Math.max(a[3], b[3]), Math.max(a[4], b[4]), Math.max(a[5], b[5])], [...this.boxes[0]!]);
+    this.items = sets.flatMap((h) => h.boxes.map((box, i) => ({ hulls: h, i, box })));
+    this.box = this.items.reduce<Box>((a, b) => unionBox(a, b.box), [...this.items[0]!.box]);
   }
 
   /** Least distance from a shape to the volume, at most `search`. */
   gap(shape: Mf, search: number): number {
     const sb = boxOfMf(shape);
     let g = search;
-    for (let i = 0; i < this.hulls.length; i++) {
-      if (boxGap3(sb, this.boxes[i]!) >= g) continue;
-      g = Math.min(g, shape.minGap(this.hulls[i]!, g));
+    for (const it of this.items) {
+      if (boxGap3(sb, it.box) >= g) continue;
+      g = Math.min(g, shape.minGap(it.hulls.at(it.i), g));
       if (g <= 0) return 0;
     }
     return g;
@@ -108,9 +170,9 @@ export class Swept {
   topWithin(prism: Mf): number | null {
     const pb = boxOfMf(prism);
     let top: number | null = null;
-    for (let i = 0; i < this.hulls.length; i++) {
-      if (boxGap3(pb, this.boxes[i]!) > 0) continue;
-      const x = this.hulls[i]!.intersect(prism);
+    for (const it of this.items) {
+      if (boxGap3(pb, it.box) > 0) continue;
+      const x = it.hulls.at(it.i).intersect(prism);
       if (!x.isEmpty()) {
         const t = (x.boundingBox().max as number[])[2]!;
         top = top === null ? t : Math.max(top, t);
@@ -120,21 +182,48 @@ export class Swept {
     return top;
   }
 
-  /** The outline seen along a direction: the union of the hulls' projections. */
+  /**
+   * The outline seen along a direction: the union of the hulls' projections. Kept per direction and owned by the volume
+   * (the caller never deletes it): a build asks for the same view several times.
+   */
   project(dir: Vec3): InstanceType<Wasm["CrossSection"]> {
-    const parts = this.hulls.map((h) => projectAlong(h, dir));
-    const u = this.M.CrossSection.union(parts);
+    const k = dir.join(",");
+    const hit = this.outlines.get(k);
+    if (hit) return hit;
+    const parts = this.items.map((it) => projectAlong(it.hulls.at(it.i), dir));
+    const u = unionTree(this.M, parts);
     parts.forEach((p) => p.delete());
+    this.outlines.set(k, u);
     return u;
   }
 
   delete(): void {
-    this.hulls.forEach((h) => h.delete());
+    if (this.own) this.sets.forEach((h) => h.delete());
+    this.outlines.forEach((o) => o.delete());
+    this.outlines.clear();
   }
+}
+
+/**
+ * The points on the convex hull of a set, in their order in it: the hull's vertices are points of the set, read back
+ * from its mesh at float precision.
+ */
+function hullVertices(M: Wasm, pts: Vec3[]): Vec3[] {
+  const h = M.Manifold.hull(pts);
+  const g = h.getMesh();
+  h.delete();
+  const on = new Set<string>();
+  for (let i = 0; i < g.numVert; i++) on.add(`${g.vertProperties[i * g.numProp]},${g.vertProperties[i * g.numProp + 1]},${g.vertProperties[i * g.numProp + 2]}`);
+  return pts.filter((p) => on.has(`${Math.fround(p[0])},${Math.fround(p[1])},${Math.fround(p[2])}`));
 }
 
 /** Groups of points from solids whose boxes touch (within 0.5 mm); a shaft stays a group of its own. */
 function clusters(items: { shaft: boolean; pts: Vec3[] }[]): Vec3[][] {
+  return clusterLists(items).map((c) => c.flat());
+}
+
+/** The clusters as their solids' point lists, in order. */
+function clusterLists(items: { shaft: boolean; pts: Vec3[] }[]): Vec3[][][] {
   const xs = items.filter((q) => q.pts.length >= 4);
   const box = xs.map((q) => {
     const b = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
@@ -149,16 +238,26 @@ function clusters(items: { shaft: boolean; pts: Vec3[] }[]): Vec3[][] {
   const touch = (a: number[], b: number[]) => [0, 1, 2].every((k) => a[k]! <= b[k + 3]! + 0.5 && b[k]! <= a[k + 3]! + 0.5);
   for (let i = 0; i < xs.length; i++)
     for (let j = i + 1; j < xs.length; j++) if (!xs[i]!.shaft && !xs[j]!.shaft && touch(box[i]!, box[j]!)) up[find(i)] = find(j);
-  const out = new Map<number, Vec3[]>();
+  const out = new Map<number, Vec3[][]>();
   xs.forEach((q, i) => {
     const r = find(i);
-    (out.get(r) ?? out.set(r, []).get(r)!).push(...q.pts);
+    (out.get(r) ?? out.set(r, []).get(r)!).push(q.pts);
   });
   return [...out.values()];
 }
 
+// a solid's point list is made once (worldPoints), so its identity names it in the keys of the hull caches
+const listIds = new WeakMap<Vec3[], number>();
+let lists = 0;
+const listId = (l: Vec3[]): number => listIds.get(l) ?? (listIds.set(l, ++lists), lists);
+
 export class Sweeps {
   private cache = new Map<string, { key: string; volume: Swept }>();
+  /** Each cluster's hull vertices, and its hulls over a body's poses, by its solids' point lists (and the poses). */
+  private vertices = new Map<string, Vec3[]>();
+  private hulls = new Map<string, PairHulls>();
+  /** The hulls each body's sweep uses: those it stops using are freed when it is made again. */
+  private uses = new Map<string, string[]>();
   private own: { delete(): void }[] = [];
   private statics = new Map<string, { s: Solid3; m: Mf }>();
   private plan: { key: string; polys: Vec2[][] } | null = null;
@@ -185,9 +284,8 @@ export class Sweeps {
     const key = bodies.map((b, i) => `${b}:${vs[i] ? this.cache.get(b)?.key : ""}`).join("|");
     if (this.plan && this.plan.key === key) return this.plan.polys;
     const parts = vs.filter((v): v is Swept => !!v).map((v) => v.project([0, 0, -1]));
-    const u = this.ctx.M.CrossSection.union(parts);
+    const u = unionTree(this.ctx.M, parts);
     const polys = u.toPolygons() as Vec2[][];
-    parts.forEach((p) => p.delete());
     u.delete();
     this.plan = { key, polys };
     return polys;
@@ -233,7 +331,8 @@ export class Sweeps {
     // the vertices of everything the body carries, in world reference coordinates, in clusters of solids that touch: a
     // shaft the body turns is hulled on its own, and a clip over a bridge apart from a hub under it, so the hull of a body
     // never fills a fixed plate its parts pass through or straddle
-    const each = clusters(solids.map((sol) => ({ shaft: sol.kind === "shaft", pts: worldPoints(M, sol) })));
+    const lists = clusterLists(solids.map((sol) => ({ shaft: sol.kind === "shaft", pts: worldPoints(M, sol) })));
+    const each = lists.map((c) => c.flat());
     const pts: Vec3[] = each.flat();
     const n = this.ctx.sampled.us.length;
     const step = n > 200 ? 2 : 1;
@@ -244,6 +343,7 @@ export class Sweeps {
     const xs: Xf[] = [];
     for (let i = 0; i < n; i += step) xs.push(this.ctx.xfOf(body, i));
     const refined: Xf[] = [];
+    const subs: number[] = [];
     for (let i = 0; i < xs.length; i++) {
       const A = xs[i]!;
       const B = xs[(i + 1) % xs.length]!;
@@ -251,14 +351,35 @@ export class Sweeps {
       // a fast part is sampled finer so the hull of two poses never covers more than it sweeps (SWEEP_STEP mm apart)
       const move = Math.max(...probe.map((p) => v3.dist(xf.apply(A, p), xf.apply(B, p))));
       const sub = Math.min(24, Math.floor(move / SWEEP_STEP));
+      subs.push(sub);
       for (let k = 1; k <= sub; k++) refined.push(between(A, B, k / (sub + 1)));
     }
-    const hulls: Mf[] = [];
-    for (const q of each) {
-      const poses: Vec3[][] = refined.map((X) => q.map((p) => xf.apply(X, p)));
-      for (let i = 0; i < poses.length; i++) hulls.push(M.Manifold.hull([...poses[i]!, ...poses[(i + 1) % poses.length]!]));
-    }
-    const volume = new Swept(M, hulls);
+    // the poses are the body's samples refined as `subs` says: a cluster met before over the same poses keeps its hulls
+    // (a rule that adds a washer to one end of a body does not rebuild the body's other clusters)
+    const at = `${body}|${step}|${subs.join(",")}`;
+    const sets: PairHulls[] = [];
+    const used: string[] = [];
+    each.forEach((q, c) => {
+      const ck = lists[c]!.map(listId).join(",");
+      // a pose's hull is the hull of the cluster's own hull, so only its vertices are carried (a few dozen of thousands)
+      let hv = this.vertices.get(ck);
+      if (!hv) this.vertices.set(ck, (hv = hullVertices(M, q)));
+      const hk = `${at}|${ck}`;
+      let h = this.hulls.get(hk);
+      if (!h) {
+        const P = hv;
+        this.hulls.set(hk, (h = new PairHulls(M, refined.map((X) => P.map((p) => xf.apply(X, p))))));
+      }
+      sets.push(h);
+      used.push(hk);
+    });
+    for (const k of this.uses.get(body) ?? [])
+      if (!used.includes(k)) {
+        this.hulls.get(k)?.delete();
+        this.hulls.delete(k);
+      }
+    this.uses.set(body, used);
+    const volume = new Swept(M, sets, false);
     this.cache.set(body, { key, volume });
     return volume;
   }
@@ -322,7 +443,7 @@ export class Sweeps {
       out.push(rv.transform(frame));
       rv.delete();
     }
-    return out.length ? new Swept(M, out) : null;
+    return out.length ? new Swept(M, [new MadeHulls(out)], true) : null;
   }
 
   /** Bodies that move (a pose that differs from the reference at some sample). */
@@ -383,6 +504,9 @@ export class Sweeps {
   dispose(): void {
     for (const c of this.cache.values()) c.volume.delete();
     this.cache.clear();
+    for (const h of this.hulls.values()) h.delete();
+    this.hulls.clear();
+    this.uses.clear();
     for (const c of this.statics.values()) c.m.delete();
     this.statics.clear();
     for (const m of this.own) m.delete();

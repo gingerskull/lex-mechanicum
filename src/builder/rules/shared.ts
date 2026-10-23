@@ -849,7 +849,6 @@ export const seeThrough: Rule = {
         (ctx.fired["see-through"] ??= []).push(s.id);
       }
     }
-    proj.forEach((p) => p.cs.delete());
     // a principle gear that covers a smaller one on its own axis is drawn see-through too, never removed (a large sun
     // over a small one)
     const gears = [...ctx.principle].map((b) => ({ b, g: ctx.geoms.get(b), part: ctx.parts.get(b) })).filter((x) => x.g && x.part && String(x.g.shape.type) === "gear" && parallel(x.g.frame.z, dir));

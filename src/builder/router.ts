@@ -152,7 +152,6 @@ export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: numb
     beam.delete();
     evals.push({ pair, bottom: o.minBottom, footprint, area, covers });
   }
-  principle.forEach((p) => p.proj?.delete());
   // outside the principle's footprint first, then the shortest
   evals.sort((a, b) => (a.covers.length ? 1 : 0) - (b.covers.length ? 1 : 0) || a.area - b.area || a.pair.cost - b.pair.cost);
   const pick = evals[0]!;

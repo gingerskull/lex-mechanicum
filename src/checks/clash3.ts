@@ -3,7 +3,8 @@
 // intersection) against the clash tolerance, so a shaft in its own faceted bore is not a clash. A hand `allow` names
 // a pair and is reported unnecessary when the pair does not overlap at any phase. Build time, Node only.
 import type { Mat4 } from "../solids/frame";
-import { manifold, meshOf } from "../solids/manifold";
+import { manifold } from "../solids/manifold";
+import { meshOnce } from "../solids/meshes";
 import { tessellate } from "../solids/tessellate";
 import { isPlain, type Solid3 } from "../solids/types";
 
@@ -92,7 +93,7 @@ export function localBox(M: Wasm, s: Solid3): Box | null {
     // fall through to Manifold
   }
   try {
-    return boxOfMesh(meshOf(M, s).pos);
+    return boxOfMesh(meshOnce(M, s).pos);
   } catch {
     return null;
   }
@@ -242,7 +243,7 @@ export async function clearance3(solids: ClashSolid[], placer: Placer, opts: Cla
   const baseOf = (i: number): Mf | null => {
     if (base[i] !== undefined) return base[i]!;
     try {
-      const m = meshOf(M, S[i]!);
+      const m = meshOnce(M, S[i]!);
       base[i] = M.Manifold.ofMesh(new M.Mesh({ numProp: 3, vertProperties: m.pos, triVerts: m.tri }));
     } catch {
       // a solid Manifold would not mesh is the SOLID check's finding, not a clash

@@ -5,9 +5,8 @@ import type { CatalogRecord } from "../catalog/schema";
 import { mobility } from "../catalog/validate-kin";
 import { Kinematics, verifyK1, type K1Report } from "../kin";
 import type { Kin } from "../kin/types";
-import { checkMesh } from "../solids/check";
-import { manifold, meshOf } from "../solids/manifold";
-import { quantise } from "../solids/quantise";
+import { manifold } from "../solids/manifold";
+import { solidReport } from "../solids/meshes";
 import type { Solid3 } from "../solids/types";
 import { checkClaims, type Claim, type ClaimResult } from "./claims";
 
@@ -89,7 +88,7 @@ export async function checkRecord(rec: Rec, opts: { samples?: number; solids?: S
     const M = await manifold();
     out.solids = opts.solids.map((s) => {
       try {
-        const r = checkMesh(quantise(meshOf(M, s)), s.stretch ? { thin: false } : {});
+        const r = solidReport(M, s);
         return { id: s.id, ok: r.ok, issues: r.issues };
       } catch (e) {
         return { id: s.id, ok: false, issues: [`Manifold would not mesh it: ${(e as Error).message}`] };

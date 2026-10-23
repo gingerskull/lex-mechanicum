@@ -5,4 +5,4 @@ export { checkClaims, type Claim, type ClaimResult } from "./claims";
 export { allIds, auditedStandard, isBuilt, isKnown, loadV3, V3_STANDARD } from "../mechanisms";
 export { checkRecord, formatRecordReport, type RecordFinding, type RecordReport } from "./record";
 export { cacheKey, check3d, clashLines, PROFILES, unnecessaryLines, type Profile3, type Result3 } from "./run";
-export { recordSource, type CheckSource } from "./source";
+export { recordSource, sourceOf, type CheckSource } from "./source";

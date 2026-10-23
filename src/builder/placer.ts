@@ -11,7 +11,7 @@ import { v3, xf, type Vec3, type Xf } from "../kin/math";
 import type { Kin } from "../kin/types";
 import { HEADROOM, LATERAL, PITCH, RAIL_ZONE, SLAB_GAP, SLIDE_ROOM, THREAD_ROOM } from "./constants";
 import { fromPlane, planeCoords, parallel, type Frame } from "./frames";
-import { edgeDist, inside, pointDist, ringDist } from "./planar";
+import { edgeDist, edgeDistRing, inside, insideRing, pointDist, ringDist, ringDistRing, ringOf, type Ring } from "./planar";
 import { inside as insidePoly } from "../core/poly";
 import { type BodyGeom, levelId, meshLevel } from "./shapes";
 import type { JointInfo, Site } from "./sites";
@@ -168,8 +168,11 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       rings.set(id, sampleIdx.map((i) => outlineAt(g, xs[i] ?? xf.id(), fam)));
       if (g.profile.holes.length) holeRings.set(id, sampleIdx.map((i) => g.profile.holes.map((h) => outlineAt({ ...g, plan: h }, xs[i] ?? xf.id(), fam))));
     }
+    // the same outlines indexed for the distance queries below, made once and asked many times
+    const indexed = new Map<Vec2[], Ring>();
+    const ring = (P: Vec2[]): Ring => indexed.get(P) ?? (indexed.set(P, ringOf(P)), indexed.get(P)!);
     // a part that stays inside another's bore (a disc on its eccentric) is no clash
-    const within = (inner: Vec2[], hs: Vec2[][] | undefined): boolean => !!hs && hs.some((h) => inner.every((q) => insidePoly(h, q) && edgeDist(h, q[0], q[1]) > LATERAL));
+    const within = (inner: Vec2[], hs: Vec2[][] | undefined): boolean => !!hs && hs.some((h) => inner.every((q) => insideRing(ring(h), q[0], q[1]) && edgeDistRing(ring(h), q[0], q[1], LATERAL) > LATERAL));
     const nested = (A: string, B: string, i: number): boolean => within(rings.get(A)![i]!, holeRings.get(B)?.[i]) || within(rings.get(B)![i]!, holeRings.get(A)?.[i]);
 
     // clash graph between nodes
@@ -181,7 +184,7 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
         if (contact.has(pairKey(A, B)) || nodeOf(A) === nodeOf(B)) continue;
         let hit = false;
         for (const i of sampleIdx) {
-          if (ringDist(rings.get(A)![i]!, rings.get(B)![i]!, LATERAL) <= LATERAL && !nested(A, B, i)) {
+          if (ringDistRing(ring(rings.get(A)![i]!), ring(rings.get(B)![i]!), LATERAL) <= LATERAL && !nested(A, B, i)) {
             hit = true;
             break;
           }

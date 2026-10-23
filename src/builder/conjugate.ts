@@ -9,6 +9,7 @@ import type { Controls, Kin } from "../kin/types";
 import type { Wasm } from "./ctx";
 import { fromPlane, planeCoords } from "./frames";
 import { sampleBodies } from "./sample";
+import { unionTree } from "./view";
 import type { BodyGeom } from "./shapes";
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -104,7 +105,7 @@ export function cutConjugates(M: Wasm, K: Kinematics, kin: Kin, geoms: Map<strin
       const rel = xf.mul(xf.inv(xb[i]!), Xa);
       return new M.CrossSection(rings.map((r) => r.map((q): Vec2 => planeCoords(B.frame, xf.apply(rel, fromPlane(A.frame, q, 0))).uv)), "NonZero");
     });
-    const env = M.CrossSection.union(cuts);
+    const env = unionTree(M, cuts);
     cuts.forEach((c) => c.delete());
     const blank = new M.CrossSection([pitchRing(cb, m)], "NonZero");
     const cut = blank.subtract(env);

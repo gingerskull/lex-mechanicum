@@ -4,7 +4,8 @@
 import type { Vec2 } from "../core/geom";
 import { edgeDist } from "../core/poly";
 import type { Mat4 } from "../solids/frame";
-import { manifold, meshOf } from "../solids/manifold";
+import { manifold } from "../solids/manifold";
+import { meshOnce } from "../solids/meshes";
 import type { Solid3, Vec3 } from "../solids/types";
 import { localBox, matClose, obbMeet, obbOf, type Box, type Placer, withScale } from "./clash3";
 
@@ -90,7 +91,7 @@ export async function clampCheck3(solids: Solid3[], placer: Placer, n = 12): Pro
   const baseOf = (i: number): Mf | null => {
     if (base[i] !== undefined) return base[i]!;
     try {
-      const m = meshOf(M, S[i]!);
+      const m = meshOnce(M, S[i]!);
       base[i] = M.Manifold.ofMesh(new M.Mesh({ numProp: 3, vertProperties: m.pos, triVerts: m.tri }));
     } catch {
       base[i] = null;

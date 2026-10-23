@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.37.1, Graia — 2026-10-23
+
+- The checks and the site build about 5× faster, with the same packages and check results (spur-gears' gear bridge
+  stands on another pair of posts): a union tree for the sweeps' outlines and the conjugate cut, hulls built only when a
+  query needs them and kept across rebuilds, indexed outlines in the placement solver, each mechanism built once per
+  run for its checks and its package (`dist/cache/built`), a pool of processes for conformance, clearance, the site
+  assets and the thumbnails, unit tests that share their builds, and a clearance cache keyed on the checks' own code.
+  Locally, conformance takes 27 s instead of 10 min and the pre-push hook 1.5 min instead of about 20.
+
 ## 0.37.0, Graia — 2026-10-22
 
 - True 3D engine (standard 3.0, style reference 3.0): every mechanism is built from its catalogue record v3 (a `kin`

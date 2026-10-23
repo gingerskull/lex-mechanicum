@@ -27,8 +27,8 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    # every mechanism's package is built from its record: about 18 min on the runner
-    timeout-minutes: 40
+    # every mechanism's package is built from its record, in a pool of processes: about 2 min on the runner
+    timeout-minutes: 6
     env:
       ASTRO_TELEMETRY_DISABLED: 1
       SITE_BASE: /mechanism-database/

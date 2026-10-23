@@ -57,7 +57,7 @@ Heavy checks run locally; CI runs what takes seconds.
 | Typecheck, style lint (no colour or font literal outside the style files, no style in mechanism records) | pre-push hook and CI | always |
 | Unit tests: geometry, meshing, bearing sizing, each rule on its fixture | pre-push and CI | module changed |
 | Per-mechanism headless checks from the record: kinematics (K1 residual), claims, SOLID, record completeness | pre-push and CI | that mechanism changed; all mechanisms when `src/` outside `src/mechanisms/` changed |
-| Clearance in 3D (penetration depth by Manifold, hand `allow` audit): CI samples 8 phases and caches on the solids and their poses; the full 72 phases run for the mechanisms the push changes | CI (sampled), pre-push (full) | mechanism, rules, hardware or checks changed |
+| Clearance in 3D (penetration depth by Manifold, hand `allow` audit): CI samples 8 phases and caches on the solids, their poses and the checks' code; the full 72 phases run for the mechanisms the push changes | CI (sampled), pre-push (full) | mechanism, rules, hardware or checks changed |
 | Conformance report (standard version per mechanism) | pre-push and CI | always |
 | Site build | CI | `site/`, catalogue or packages changed |
 | Thumbnails: stale ones redrawn in local Chrome; the push stops until `site/thumbs` is committed | pre-push hook | their fingerprint changed (package, record blocks and polish, renderer, style or view) |
