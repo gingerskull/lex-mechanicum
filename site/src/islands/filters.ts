@@ -105,6 +105,11 @@ function seal(el: HTMLElement) {
   }
 }
 
+// unlocked while the sealed state shows (its hint was read, the cog held): it says so at once
+addEventListener("forgeunlock", () => {
+  if (sealed && !sealed.hidden) seal(sealed);
+});
+
 toggle?.addEventListener("click", () => {
   const open = toggle.getAttribute("aria-expanded") !== "true";
   toggle.setAttribute("aria-expanded", String(open));

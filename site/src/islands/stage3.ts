@@ -330,8 +330,11 @@ async function main(box: HTMLElement) {
   addEventListener("forgeglitch", (e) => {
     if (E.pageTheme() !== "forge") return;
     const d = (e as CustomEvent<{ length?: number; strength?: number }>).detail ?? {};
-    glitchUntil = performance.now() + (d.length ?? 0) * 1000;
-    glitchStrength = d.strength ?? 1;
+    const now = performance.now();
+    // a blip inside a pulse neither shortens it nor weakens it
+    const going = glitchUntil > now;
+    glitchStrength = going ? Math.max(glitchStrength, d.strength ?? 1) : (d.strength ?? 1);
+    glitchUntil = Math.max(going ? glitchUntil : 0, now + (d.length ?? 0) * 1000);
   });
 
   // transport

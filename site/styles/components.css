@@ -21,7 +21,7 @@
 .tblock div:nth-child(2n) {
   border-right: 0;
 }
-/* the second row closes the block (a Forge line under it draws its own rule) */
+/* the second row closes the block */
 .tblock div:nth-child(n + 3) {
   border-bottom: 0;
 }

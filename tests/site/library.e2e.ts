@@ -386,7 +386,8 @@ describe("finding the Forge sheet (SS14)", () => {
 
   it("unlocks when the cog is held: a short press still switches, a hold of a second starts the fill, two more open it", async () => {
     const ctx = await desktop();
-    const { page, errors } = await open(ctx, "/");
+    // from the sealed state, where a hint has just been read
+    const { page, errors } = await open(ctx, "/?q=mars");
     const c = await centre(page);
     await page.mouse.move(c.x, c.y);
     // a short press is a plain switch
@@ -408,6 +409,8 @@ describe("finding the Forge sheet (SS14)", () => {
     await settled(page);
     expect(await sheet(page)).toBe("forge");
     expect(await page.evaluate(() => localStorage.getItem("forge"))).toBe("1");
+    // the sealed state says so at once
+    expect(await page.locator("#sealed-title").textContent()).toBe("The forge burns");
     expect(errors).toEqual([]);
     await ctx.close();
   });
@@ -420,6 +423,12 @@ describe("finding the Forge sheet (SS14)", () => {
     await page.keyboard.press(" ");
     expect(await sheet(page)).toBe("light");
     await page.keyboard.down(" ");
+    await page.waitForSelector(".forge-moment", { timeout: 4500 });
+    // the key still held repeats: the moment plays on
+    await page.keyboard.down(" ");
+    await page.keyboard.down(" ");
+    await page.waitForTimeout(100);
+    expect(await page.locator(".forge-moment").count()).toBe(1);
     await page.waitForFunction(() => document.documentElement.dataset.theme === "forge", null, { timeout: 4500 });
     await page.keyboard.up(" ");
     await settled(page);

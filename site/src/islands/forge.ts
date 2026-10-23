@@ -196,11 +196,15 @@ function moment() {
   let switched = false;
   let seedAt = 0;
   let done = false;
+  // a key still held from the hold on the cog repeats: only a fresh press skips
+  const skip = (e: KeyboardEvent) => {
+    if (!e.repeat) end();
+  };
   const end = () => {
     if (done) return;
     done = true;
     removeEventListener("pointerdown", end, true);
-    removeEventListener("keydown", end, true);
+    removeEventListener("keydown", skip, true);
     body.classList.remove("forge-glitching");
     tear?.setAttribute("scale", "0");
     red?.setAttribute("dx", "0");
@@ -210,7 +214,7 @@ function moment() {
   };
   // any click or key skips to the end
   addEventListener("pointerdown", end, true);
-  addEventListener("keydown", end, true);
+  addEventListener("keydown", skip, true);
   const frame = (now: number) => {
     if (done) return;
     const t = (now - t0) / 1000;
@@ -247,13 +251,16 @@ function unlock() {
 
 // --- the cog: held for a second, it starts to fill with brass; full, it unlocks. A shorter press is a plain switch.
 
-/** True while the click that ends a hold must not switch the sheet. */
+/** True while a hold has gone past the switch: the click that ends it must not switch the sheet. */
 let eatClick = false;
+/** Until when (ms) a click is still taken for the end of a hold: a hold that ends with no click leaves nothing behind. */
+let eatUntil = 0;
 addEventListener(
   "click",
   (e) => {
-    if (!eatClick || !(e.target as Element | null)?.closest?.("[data-theme-toggle]")) return;
+    if (!(eatClick || performance.now() < eatUntil) || !(e.target as Element | null)?.closest?.("[data-theme-toggle]")) return;
     eatClick = false;
+    eatUntil = 0;
     e.preventDefault();
     e.stopImmediatePropagation();
   },
@@ -309,16 +316,35 @@ function holdable(btn: HTMLButtonElement) {
     }, U.holdDelay * 1000);
   };
 
+  /** The hold is over: what it started stops, and the click that may follow is eaten for a moment only. */
+  const release = () => {
+    if (state !== "idle") clear();
+    if (eatClick) {
+      eatClick = false;
+      eatUntil = performance.now() + 400;
+    }
+  };
+  let touch = false;
   btn.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0) return;
+    touch = e.pointerType === "touch";
+    if (!e.isPrimary || e.button !== 0) return;
     begin(e.clientX, e.clientY);
   });
   btn.addEventListener("pointermove", (e) => {
-    if (state !== "idle" && at && Math.hypot(e.clientX - at[0], e.clientY - at[1]) > U.holdSlop) clear();
+    if (e.isPrimary && state !== "idle" && at && Math.hypot(e.clientX - at[0], e.clientY - at[1]) > U.holdSlop) release();
   });
-  for (const ev of ["pointerup", "pointercancel", "pointerleave"] as const) btn.addEventListener(ev, () => state !== "idle" && clear());
-  // a long press is ours, not the browser's menu
-  btn.addEventListener("contextmenu", (e) => e.preventDefault());
+  for (const ev of ["pointerup", "pointercancel", "pointerleave"] as const)
+    btn.addEventListener(ev, (e) => {
+      if (e.isPrimary) release();
+    });
+  // a hold the page loses (another window, another tab, the focus elsewhere) does not go on by itself
+  btn.addEventListener("blur", release);
+  addEventListener("blur", release);
+  document.addEventListener("visibilitychange", () => document.hidden && release());
+  // a finger's long press, or a press already holding, is ours, not the browser's menu; a right-click stays a right-click
+  btn.addEventListener("contextmenu", (e) => {
+    if (touch || state !== "idle") e.preventDefault();
+  });
   // the keyboard: Space or Enter held the same way; a short press still switches
   btn.addEventListener("keydown", (e) => {
     if (e.key !== " " && e.key !== "Enter") return;
@@ -331,6 +357,7 @@ function holdable(btn: HTMLButtonElement) {
     const short = state === "waiting";
     if (state !== "idle") clear();
     eatClick = false;
+    eatUntil = 0;
     if (short) btn.click();
   });
 }
