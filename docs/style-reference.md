@@ -303,11 +303,13 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.bottomAlpha` | 0.75 | 0..1 |
 | `draft.lines.silhouette` | 0.8 | px, vertical edges down the side walls |
 | `draft.lines.silhouetteAlpha` | 0.8 | 0..1 |
+| `draft.lines.silhouetteShare` | 1.6 | factor on a smooth outline's share of the line, so two edges sharing it read as one line |
 | `draft.lines.edge` | 0.7 | px, visible bottom edges of non-plates |
 | `draft.lines.edgeAlpha` | 0.7 | 0..1 |
 | `draft.lines.chamfer` | 0.45 | px |
 | `draft.lines.chamferAlpha` | 0.5 | 0..1 |
 | `draft.lines.chamferMinScale` | 1.5 | px per mm, chamfer lines drawn only above this projection scale |
+| `draft.lines.capFade` | 0.12 | cos of a cap toward the viewer below which its bold top outline blends into the far cap's style (no pop as it turns edge-on) |
 | `draft.lines.marks` | 0.6 | px, engraved marks |
 | `draft.lines.marksAlpha` | 0.55 | 0..1 |
 | `draft.lines.thread` | 0.5 | px, thread helices |
@@ -336,7 +338,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.fill.occlude.other` | 0.85 | the base lets a tenth of what is under it show through |
 | `draft.fill.occlude.base` | 0.9 | the base lets a tenth of what is under it show through |
 | `draft.fill.seeThrough.opacity` | 0.5 |  |
-| `draft.fill.wallShade.shade` | 0.045 | 0..1 ink alpha |
+| `draft.fill.seeThrough.occlude` | 0.6 |  |
+| `draft.fill.seeThrough.tint` | 0.07 |  |
+| `draft.fill.wallShade.shade` | 0.1 | 0..1 ink alpha |
 | `draft.fill.wallShade.steps` | 5 | count of facing buckets |
 | `draft.fill.wallShade.light` | [0.75, -0.25] | screen direction the light comes from (x right, y down), the wall facing it is lightest |
 | `draft.fill.wallShade.outer.from` | 0.4 | factors, outer walls |
@@ -362,7 +366,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.role.ground.pattern` | `dash` |  |
 | `draft.role.ground.step` | 3.2 |  |
 | `draft.role.ground.alpha` | 0.24 |  |
-| `draft.role.ground.tint` | 0 |  |
+| `draft.role.ground.tint` | 0.035 |  |
 | `draft.role.base.pattern` | `dots` |  |
 | `draft.role.base.step` | 4 |  |
 | `draft.role.base.alpha` | 0.18 |  |
@@ -376,7 +380,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.role.trace.pattern` | `none` |  |
 | `draft.role.trace.tint` | 0.2 |  |
 | `draft.minPx` | 2.2 | px, a pattern step (and any repeated mark) is never drawn finer than this on screen (SF11) |
-| `draft.pattern.offBelowCos` | 0.15 | patterns switch off when cos(tilt) is below this (near edge-on, SD11) |
+| `draft.pattern.offBelowCos` | 0.15 | patterns are gone when cos(tilt) is below this (near edge-on, SD11) |
+| `draft.pattern.fadeCos` | 0.15 | over this much cos(tilt) above offBelowCos a pattern fades in, so it never switches off in one frame |
+| `draft.pattern.superBelowPx` | 8 | device px, a pattern step finer than this on screen is sampled four times per pixel (no shimmer) |
 | `draft.pattern.tile` | 24 | px, cached tile side (tile units below) |
 | `draft.pattern.dotRadius` | 3.6 | tile px, soft dot radius |
 | `draft.pattern.dotMid` | [0.55, 0.8] | gradient stop position and its alpha, soft dot falloff |
@@ -598,7 +604,10 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `form.chamfer.csk` | 0 | mm, countersunk heads get none |
 | `form.thread.pitch` | function (see source) | mm, ISO coarse pitch for Ø d mm |
 | `form.explode.gap` | 11 | mm per explode level at full explode |
-| `form.explode.clear` | 0.5 | levels, how far a screw backs out past the topmost part it passes |
+| `form.explode.clear.k` | 0.6 | factor, mm, mm |
+| `form.explode.clear.min` | 12 | factor, mm, mm |
+| `form.explode.clear.max` | 30 | factor, mm, mm |
+| `form.explode.touch` | 0.5 | mm, an overlap this small is parts touching, not one inside the other |
 <!-- style-form:end -->
 
 ## Detail ladder
