@@ -210,11 +210,11 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.78 |
 | DL-G | 0 | 0 | 1.82 |
 | DL-H | 11 | 0 | 1.83 |
-| never | 100 | 247 | 1.87 |
+| never | 100 | 245 | 1.87 |
 
 ## Promotion candidates
 None left.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.6 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.8 KB
 screenshots: dist/shots3/rhombic-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

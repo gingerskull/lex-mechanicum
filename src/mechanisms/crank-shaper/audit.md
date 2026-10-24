@@ -217,5 +217,5 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 None left: the block-in-slot form of J5 and the same-slab rule for a slide between moving parts are in the kit and the placer.
 
 ## Verification
-check: clean · K1 residual: 4.9e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.0 KB
+check: clean · K1 residual: 4.9e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.2 KB
 screenshots: dist/shots3/crank-shaper (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

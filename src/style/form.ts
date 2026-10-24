@@ -23,7 +23,10 @@ export const FORM = {
   },
   explode: {
     gap: 11, // mm per explode level at full explode
-    clear: 0.5, // levels, how far a screw backs out past the topmost part it passes
+    // the gap a unit leaves to every unit it clears at full explode: this share of its own length along its explode axis,
+    // within these bounds (E9)
+    clear: { k: 0.6, min: 12, max: 30 }, // factor, mm, mm
+    touch: 0.5, // mm, an overlap this small is parts touching, not one inside the other
   },
 } as const;
 

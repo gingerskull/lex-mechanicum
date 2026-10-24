@@ -43,8 +43,9 @@ const PLATE = { face: F.plate, tint: DRAFT.role.hw.tint };
 const OTHER = { face: F.other, tint: DRAFT.role.trace.tint };
 
 describe("depth (SQ10)", () => {
-  // a card drawing has no sheet, so the paper behind the boxes is the same in both renders
-  const C = fit(basisOfOrient(namedOrient("PLAN")), W, H, [0, 0, 0, 90, 90, 16]);
+  // a card drawing has no sheet, so the paper behind the boxes is the same in both renders; its margin is the
+  // thumbnail's, scaled to the card (session camera)
+  const C = fit(basisOfOrient(namedOrient("PLAN")), W, H, [0, 0, 0, 90, 90, 16], { pad: (DRAFT.camera.pad * W) / DRAFT.card.refW });
   const at = (x: number, y: number) => project(C, [x, y, 0]);
   // [point, layers front to back]: boxes a (plate, z 0), b (other, z 6), c (plate, z 12)
   const CASES: [string, [number, number], { face: number; tint: number }[]][] = [
@@ -129,9 +130,10 @@ describe("teaching layers", () => {
     expect(diff(g, g0)).toBeGreaterThan(1000);
   });
 
-  it("makes the plate over the rocker see-through, and keeps the cycle's other solids opaque", async () => {
+  it("makes the plate over the rocker see-through, and keeps its post and the cycle's other solids opaque", async () => {
+    // only a covering part goes see-through; a standoff keeps its paper (T10)
     const ids = await chrome.seeThrough("fx3-ghost", { w: W, h: H, dpr: 1, u: 0, view: "PLAN" });
-    expect([...ids].sort()).toEqual(["plate", "post"]);
+    expect([...ids].sort()).toEqual(["plate"]);
   });
 });
 

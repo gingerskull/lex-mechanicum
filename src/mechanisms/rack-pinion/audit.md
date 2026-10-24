@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 117 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 113 solids unsound |
 | D7 | PASS | HAND · gears plain; richness in the stacks |
 | A1 | PASS | AUTO · M J6, O J2, S J5, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J6, O J2, S J5, drive drive · pinion on a live shaft (J2) straddled by a bridge; rack on a slide (J5) guided from its back; parallel mesh J6 |
@@ -181,7 +181,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Pinion; Rack | none |
 | O | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 13 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| S | J5 | – | – | – | 2 x Dowel pin Ø3 h6, gibbed rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 393.2, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| S | J5 | – | – | – | 2 x Dowel pin Ø3 h6, gibbed rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 381.2, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | drive | drive | – | – | – | none | External circlip DIN 471, Ø12; 2 x External circlip DIN 471, Ø4 | Feather key 4 x 4 x 9 (DIN 6885) | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -205,12 +205,12 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-E | 16 | 3 | – |
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.06 |
-| DL-H | 23 | 0 | – |
-| never | 68 | 153 | 0.93 (full) |
+| DL-H | 19 | 0 | – |
+| never | 68 | 146 | 0.93 (full) |
 
 ## Promotion candidates
 None left: the toothed rack outline, the rack guided from its back and the reversing belt drive for a swing over 180 deg are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 4.3e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.5 KB
+check: clean · K1 residual: 4.3e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.6 KB
 screenshots: dist/shots3/rack-pinion (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.93 ms full, 1.05 at C, 1.06 at G; phone by David)

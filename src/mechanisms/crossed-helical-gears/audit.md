@@ -64,7 +64,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 108 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 106 solids unsound |
 | D7 | PASS | HAND · gears plain; richness in the stacks |
 | A1 | PASS | AUTO · M J9, O2 J2, O1 J10, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J9, O2 J2, O1 J10, drive drive · gear 2 on a live shaft (J2) straddled by a bridge; gear 1 on a live shaft in plan (J10) in two pillow blocks; crossed mesh J9 |
@@ -206,11 +206,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.42 |
 | DL-H | 11 | 0 | – |
-| never | 73 | 123 | 0.93 (full) |
+| never | 71 | 121 | 0.93 (full) |
 
 ## Promotion candidates
 None left: helical gears placed by their joints (centred or standing) are shapes of the builder. Open: the helix-split control and its ghosts (a build variant per setting).
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.3 KB
+check: clean · K1 residual: 1.4e-14 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.2 KB
 screenshots: dist/shots3/crossed-helical-gears (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.93 ms full, 1.32 at C, 1.42 at G; phone by David)

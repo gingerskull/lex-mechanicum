@@ -505,6 +505,25 @@
   color: var(--muted);
   margin: 6px 0 0;
 }
+/* how to handle the drawing, in a quiet line under it: the mouse and keys, or fingers on a touch screen */
+.stagehint {
+  font: 400 11px / 1.4 var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 6px 0 0;
+  text-align: center;
+}
+.stagehint .h-touch {
+  display: none;
+}
+@media (pointer: coarse) {
+  .stagehint .h-fine {
+    display: none;
+  }
+  .stagehint .h-touch {
+    display: inline;
+  }
+}
 .stage canvas {
   position: absolute;
   inset: 0;
@@ -598,19 +617,19 @@
   align-items: center;
   gap: 8px 10px;
 }
-#orbit {
-  display: none;
-}
-@media (pointer: coarse) {
-  #orbit {
-    display: inline-flex;
-  }
-}
 .ovl {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding-top: 10px;
+}
+/* Reset view stands with the named views at their size: their lettering and padding, one border */
+#record-view {
+  font: 500 11.5px / 1 var(--font-mono);
+  padding: 7px 12px;
+}
+/* the overlay chips share the views' row, at its right */
+.controls.vx .ovl {
+  margin-left: auto;
 }
 .ovl .chip {
   font: 500 11px / 1.5 var(--font-mono);
@@ -640,6 +659,39 @@
 }
 .ovl .chip[aria-pressed="true"] i {
   color: var(--paper);
+}
+
+/* the construction key under a narrow stage: the numbered markers' names; a tap picks one out (SD22) */
+.ckey {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.ckey button {
+  font: 500 11px / 1.5 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.ckey button b {
+  display: inline-block;
+  min-width: 1.6em;
+  margin-right: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  text-align: center;
+  font-weight: 600;
+}
+.ckey button[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* panels */

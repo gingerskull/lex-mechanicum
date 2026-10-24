@@ -4,7 +4,8 @@ import type { BuildCtx } from "./ctx";
 import { contactRules } from "./rules/contacts";
 import { base, classify, placement } from "./rules/core";
 import { adjustableLength, cableClip } from "./rules/fixes";
-import { covers, drive, explode, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
+import { covers, drive, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
+import { explode } from "./rules/explode";
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
 import { lugs, posts } from "./rules/lugs";
@@ -112,6 +113,15 @@ export function runRules(ctx: BuildCtx, list: Rule[] = rules): void {
   for (const r of list) {
     ctx.rule = r.id;
     if (r.applies(ctx)) r.after?.(ctx);
+  }
+  ctx.rule = "polish";
+}
+
+/** The rules' last step, on the complete build (after the polish and the bodies' own parts). */
+export function runLast(ctx: BuildCtx, list: Rule[] = rules): void {
+  for (const r of list) {
+    ctx.rule = r.id;
+    if (r.applies(ctx)) r.last?.(ctx);
   }
   ctx.rule = "polish";
 }

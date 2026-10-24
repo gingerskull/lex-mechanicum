@@ -125,8 +125,19 @@ void main() {
     float tn = b.x * fa;
     col = uInk * tn + col * (1.0 - tn);
     al = tn + al * (1.0 - tn);
-    if (b.y > 0.0 && f >= uPatOff) {
-      float p = b.y * uPatGain * fa * texture(uPat, vec3(vLocal / max(uMinStep, b.w), b.z)).a;
+    // a pattern fades out as its face turns edge-on, instead of switching off at one angle
+    float pf = smoothstep(uPatOff, uPatOff + ${fl(DRAFT.pattern.fadeCos)}, f);
+    if (b.y > 0.0 && pf > 0.0) {
+      // the tile has no mipmaps (they wash the dots out), so where a step spans only a few pixels four rotated-grid taps
+      // stand in for one, or the pattern shimmers as its part turns
+      vec2 uv = vLocal / max(uMinStep, b.w);
+      vec2 ux = dFdx(uv), uy = dFdy(uv);
+      float pa;
+      if (max(length(ux), length(uy)) > ${fl(1 / DRAFT.pattern.superBelowPx)}) {
+        pa = 0.25 * (texture(uPat, vec3(uv + 0.375 * ux + 0.125 * uy, b.z)).a + texture(uPat, vec3(uv - 0.375 * ux - 0.125 * uy, b.z)).a
+          + texture(uPat, vec3(uv + 0.125 * ux - 0.375 * uy, b.z)).a + texture(uPat, vec3(uv - 0.125 * ux + 0.375 * uy, b.z)).a);
+      } else pa = texture(uPat, vec3(uv, b.z)).a;
+      float p = b.y * uPatGain * fa * pf * pa;
       col = uInk * p + col * (1.0 - p);
       al = p + al * (1.0 - p);
     }
@@ -266,14 +277,21 @@ void main() {
   else if (kind == 4) {
     bw = ${fl(L.accentRing.width)}; ba = ${fl(L.accentRing.alpha)}; hw = bw; ha = ${fl(L.accentRing.hiddenAlpha)};
   } else if (kind == 0) {
-    // a cap's outline: the cap toward the viewer is the top face; the far cap's outline is a plate's bottom outline
-    if (f1 > 1e-4) { bw = w.x; ba = 1.0; hw = bw * ${fl(L.hidden.width)}; ha = ${fl(L.hidden.alpha)}; }
-    else if (plate) { bw = ${fl(L.plateBottom)}; ba = ${fl(L.bottomAlpha)}; hw = bw * ${fl(L.hidden.width)}; ha = ba * ${fl(L.hidden.alpha)}; }
-    else if (f2 > 1e-4) { bw = ${fl(L.edge)}; ba = ${fl(L.edgeAlpha)}; }
+    // a cap's outline: the cap toward the viewer is the top face; the far cap's outline is a plate's bottom outline. Near
+    // edge-on the two styles blend, so an outline never changes weight in one frame as its face turns
+    float ow = 0.0, oa = 0.0, ohw = 0.0, oha = 0.0;
+    if (plate) { ow = ${fl(L.plateBottom)}; oa = ${fl(L.bottomAlpha)}; ohw = ow * ${fl(L.hidden.width)}; oha = oa * ${fl(L.hidden.alpha)}; }
+    else if (f2 > 1e-4) { ow = ${fl(L.edge)}; oa = ${fl(L.edgeAlpha)}; }
+    float k = smoothstep(0.0, ${fl(L.capFade)}, f1);
+    bw = mix(ow, w.x, k); ba = mix(oa, 1.0, k); hw = mix(ohw, w.x * ${fl(L.hidden.width)}, k); ha = mix(oha, ${fl(L.hidden.alpha)}, k);
   } else if (kind == 1) {
     if (f1 > 1e-4 || f2 > 1e-4) { bw = ${fl(L.silhouette)}; ba = ${fl(L.silhouetteAlpha)}; }
   } else if (kind == 2) {
-    if ((f1 > 1e-4) != (f2 > 1e-4)) { bw = ${fl(L.silhouette)}; ba = ${fl(L.silhouetteAlpha)}; }
+    // a smooth surface's outline lies between tessellation edges: the edges either side of it share the line by how near
+    // each is to it (a tent over the facing at the edge, one facet wide), so the outline glides as the surface turns
+    // instead of hopping from edge to edge
+    float t = 1.0 - abs(f1 + f2) / max(1e-4, 2.0 * abs(f1 - f2));
+    if (t > 0.0) { bw = ${fl(L.silhouette)}; ba = ${fl(L.silhouetteAlpha)} * min(1.0, ${fl(L.silhouetteShare)} * t); }
   } else if (kind == 3) {
     if (f1 > 1e-4 && ((uMarkMask >> mark) & 1) == 1) { bw = uMark[mark].x; ba = uMark[mark].y * (base ? (mark == 1 ? uBaseGain.y : uBaseGain.x) : 1.0); }
   }
@@ -356,9 +374,11 @@ void main() {
   vec3 ink = vRing == 1 ? uAccent : uInk;
   vec4 c = vec4(0.0);
   if (covered && uHidden > 0.5 && vStyle.w > 0.0) {
+    // only the share the occluders hide turns into dashes: what a see-through solid lets through stays the bold line, so
+    // the two never stack into a line as strong as an uncovered one (SD3)
     float hw = vStyle.z * 0.5;
     float on = vRing == 1 ? 1.0 : (mod(vDist, uDash0 + uDash1) <= uDash0 ? 1.0 : 0.0);
-    float aH = vStyle.w * (vRing == 1 ? 1.0 : tFill) * on * clamp(hw + 0.5 - r, 0.0, 1.0) * (hw < 0.5 ? hw * 2.0 : 1.0);
+    float aH = vStyle.w * (vRing == 1 ? 1.0 : tFill * (1.0 - tOcc)) * on * clamp(hw + 0.5 - r, 0.0, 1.0) * (hw < 0.5 ? hw * 2.0 : 1.0);
     c = vec4(ink * aH, aH);
   }
   float b = aBold * (covered ? tOcc : 1.0);

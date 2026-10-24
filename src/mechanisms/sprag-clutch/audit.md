@@ -203,11 +203,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.65 |
 | DL-G | 0 | 0 | 1.46 |
 | DL-H | 9 | 0 | 1.45 |
-| never | 49 | 104 | 1.5 |
+| never | 49 | 102 | 1.5 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.8 KB
+check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.6 KB
 screenshots: dist/shots3/sprag-clutch (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

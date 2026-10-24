@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · fired: j12-cvt (230 solids) · 150 belt elements conveyed round a live loop whose radii and plane follow the ratio (D9); the spring's turns stretched between the movable half and its collar |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 272 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 268 solids unsound |
 | D7 | PASS | HAND · the sheave halves plain cones; richness in the belt's elements, the spring and the shift |
 | A1 | PASS | AUTO · O1 J10, O2 J10, shift J5, belt J12, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · O1 J10, O2 J10, shift J5, belt J12, drive drive · both shafts live in pillow blocks (J10); the movable halves slide on sliding keys; the belt by J12 |
@@ -206,11 +206,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | 1.99 |
 | DL-G | 0 | 0 | 2.2 |
 | DL-H | 15 | 0 | 2.17 |
-| never | 236 | 158 | 2.26 |
+| never | 232 | 156 | 2.26 |
 
 ## Promotion candidates
 None left: the variator (the belt's length held, the sheave shifts) is a kin block; sheave halves, the sliding keys, the spring, the shift fork and the push belt on a live loop are the J12 CVT rule of the builder.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 36.0 KB
+check: clean · K1 residual: 2.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 34.8 KB
 screenshots: dist/shots3/cvt-belt (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode, section A-A; both sheets); clearance also posed at both ratio limits (r1 25 and 62.069): 0 clashes · bench: dist/bench/report-v2.md (desktop; phone by David)

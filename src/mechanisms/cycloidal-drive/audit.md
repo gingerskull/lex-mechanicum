@@ -207,11 +207,11 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.38 |
 | DL-H | 22 | 0 | – |
-| never | 87 | 108 | 0.93 (full) |
+| never | 87 | 106 | 0.93 (full) |
 
 ## Promotion candidates
 None left: the cycloidal disc profile, the pin-ring, eccentric-bearing and pin-hole kits and the follow block are in the library.
 
 ## Verification
-check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.8 KB
+check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.0 KB
 screenshots: dist/shots3/cycloidal-drive (record view VIEW 30 70, PLAN, FRONT, SIDE, ISOMETRIC, detail B, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.93 ms full, 1.34 at C, 1.38 at G; phone by David)

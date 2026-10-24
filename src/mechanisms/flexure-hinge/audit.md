@@ -201,11 +201,11 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 | DL-F | 0 | 0 | 1.64 |
 | DL-G | 0 | 0 | 1.61 |
 | DL-H | 8 | 0 | 1.66 |
-| never | 33 | 49 | 1.61 |
+| never | 33 | 48 | 1.61 |
 
 ## Promotion candidates
 None left: the compliant kit (J13: the blank's block and neck, the seat, clamp and stop pins) and the yoke drive (V5 for a short swing or slide) are rules of the builder; the bend overlay is drawn by the renderer.
 
 ## Verification
-check: clean · K1 residual: 0.0e+0 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 10.5 KB
+check: clean · K1 residual: 0.0e+0 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 10.6 KB
 screenshots: dist/shots3/flexure-hinge (record view, PLAN, FRONT, SIDE, ISOMETRIC, detail of the neck, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -5,7 +5,7 @@ import type { Solid3 } from "../solids/types";
 import { realBody } from "./arms";
 import { createCtx, type RecordLike, type BuildCtx, type BuildOpts, type JointNote, type RouteLog } from "./ctx";
 import { applyPolish, type Polish, type PolishApi } from "./polish";
-import { rules, runRules } from "./registry";
+import { rules, runLast, runRules } from "./registry";
 import type { Rule } from "./rules/types";
 
 export interface Assembly {
@@ -37,6 +37,7 @@ export async function buildWithContext(rec: RecordLike, opts: BuildOpts & { rule
   runRules(ctx, opts.rules ?? rules);
   const polish = opts.polish ? applyPolish(ctx, opts.polish) : undefined;
   finalize(ctx);
+  runLast(ctx, opts.rules ?? rules);
   return { assembly: assemble(ctx, polish), ctx };
 }
 

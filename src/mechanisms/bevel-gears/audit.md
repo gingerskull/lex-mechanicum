@@ -64,7 +64,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 113 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 111 solids unsound |
 | D7 | PASS | HAND · gears plain; richness in the stacks |
 | A1 | PASS | AUTO · M J9, O2 J2, O1 J10, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J9, O2 J2, O1 J10, drive drive · gear on a live shaft (J2) straddled by a bridge; pinion on a live shaft in plan (J10); crossed mesh J9 |
@@ -180,8 +180,8 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M | J9 | gear-mesh | – | – | none | none | none | pinion-tw, gear-tw | none | none | pinion-shim, gear-shim | none | Pinion; Gear | none |
-| O2 | J2 | – | bridge | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 12.9 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| O1 | J10 | driver | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x20, holds the pinion on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 4 x 4 x 21.9 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
+| O2 | J2 | – | bridge | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7.9 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O1 | J10 | driver | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x20, holds the pinion on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 4 x 4 x 16.9 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -207,11 +207,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.37 |
 | DL-G | 0 | 0 | 1.38 |
 | DL-H | 11 | 0 | 1.4 |
-| never | 75 | 141 | 1.43 |
+| never | 73 | 139 | 1.43 |
 
 ## Promotion candidates
 None left: the bevel frustum, mesh phasing, back-face shims, the overhung pinion's end retainer and the motor beside a shaft in plan are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.7 KB
+check: clean · K1 residual: 7.1e-15 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.4 KB
 screenshots: dist/shots3/bevel-gears (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

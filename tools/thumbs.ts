@@ -16,14 +16,15 @@ import { build } from "esbuild";
 import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
 import { builtBytes } from "../src/package/built";
+import { DRAFT } from "../src/style/draft";
 import { PUBLIC_THEMES, type ThemeKey } from "../src/style/tokens";
 import { openChrome3, type Draw3Options } from "./chrome3";
 import { runPool } from "./pool";
 
-export const THUMB = { w: 320, h: 240, dpr: 2, u: 1.1 };
-/** The still: the stage's opening frame (63° of the cycle, dimensions on) at dial A, since paper grain is noise that
- * would make each image several times larger. */
-export const STILL = { w: 1200, h: 750, dpr: 1, u: (63 / 360) * Math.PI * 2, detail: "A" as const, quality: 0.75 };
+export const THUMB = { w: DRAFT.card.refW, h: (DRAFT.card.refW * 3) / 4, dpr: 2, u: 1.1 };
+/** The still: the stage's opening frame (63° of the cycle, dimensions on) at dial A-C, the card's: paper grain is noise
+ * that would make each image several times larger. */
+export const STILL = { w: 1200, h: 750, dpr: 1, u: (63 / 360) * Math.PI * 2, detail: "C" as const, quality: 0.75 };
 /** Forge is never a thumbnail: it shows only once unlocked, over the Blueprint images (style SS14). */
 const THEMES: readonly ThemeKey[] = PUBLIC_THEMES;
 const QUALITY = 0.92;
@@ -52,7 +53,7 @@ const hash = (...parts: (string | Uint8Array)[]) => {
 
 /** The thumbnail's and the still's drawing: the record's own view (T7), no sheet on either. */
 const thumbView = (theme: ThemeKey): Draw3Options => ({ w: THUMB.w, h: THUMB.h, dpr: THUMB.dpr, u: THUMB.u, card: true, theme, view: "record" });
-const stillView = (theme: ThemeKey): Draw3Options => ({ w: STILL.w, h: STILL.h, dpr: STILL.dpr, u: STILL.u, theme, detail: STILL.detail, view: "record", over: { sheet: false } });
+const stillView = (theme: ThemeKey): Draw3Options => ({ w: STILL.w, h: STILL.h, dpr: STILL.dpr, u: STILL.u, theme, detail: STILL.detail, view: "record", over: { sheet: false, show: { construction: false } } });
 
 /**
  * The parts of the fingerprints that come from source: the files the drawing page bundles, split into the style

@@ -1,8 +1,8 @@
 # Mechanism standard
 
 ```
-version: 3.9
-date: 2026-10-22
+version: 3.10
+date: 2026-10-24
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
 
@@ -226,10 +226,10 @@ recorded in the record's `teaching` block so the text, the parameters and the dr
 | T4 | **Teaching traces** show the phenomenon: the point whose path is the principle (the cycloid of a planet point, both ends of a coupler, both crank circles, the full figure eight), with ticks at equal time where the speed variation is the lesson, and ghost paths for settings the viewer does not have selected. The first trace gets the comet. A wrong point traced is a teaching defect. | DATA | review |
 | T5 | **Construction overlays** carry the geometry a textbook figure draws as construction: dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, the chord that splits cut and return, a workspace outline, the line O–E of an eccentric. Each is a labelled element of `teaching.overlays` with the points it joins, drawn by the overlay rules (SD22 of the style reference). | DATA | review |
 | T6 | **The effect is large enough to see.** Parameters are chosen so the lesson is visible at the default size (a time ratio that differs from the plain slider-crank, a cam with real dwells, lobes deep enough that the wobble reads). Where the review changes a parameter, the change is made in the record and noted there. | DATA / HAND | six phases |
-| T7 | **A default named view** is declared for each mechanism (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ a joint, or VIEW az/el) and it is the one the principle reads in (a valve gear in front elevation, a worm down its axis). The site opens in it; the shot set always includes it. | DATA | `tools/shot` |
+| T7 | **A default named view** is declared for each mechanism (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ a joint, or VIEW az/el) and it is the one the principle reads in (a valve gear in front elevation, a worm down its axis). The site opens in it and its Reset view button returns to it; the shot set always includes it. A declared PLAN reads flat, so the site, the card and the still open it tilted to the 28° view (the plan's layout kept, its depth shown); the PLAN button still gives the true plan. | DATA | `tools/shot` |
 | T8 | **Section and detail views** are declared where a principle lives inside a part or between small parts: a section through a port face or a nut, a detail of a sector. Each is a named entry of `teaching.views`, with its cut plane or window, and highlights the part that matters (the open port, the loaded rocker, the load-carrying groove wall). | DATA | `tools/shot` |
 | T9 | **The text matches the motion.** Every number the explanation states (stroke, ratio, swing, time ratio, dwell, tip-speed variation, phase lag, range) is listed in `teaching.claims` with the output it comes from and a tolerance, and checked against `solve()` at build time. | AUTO check / DATA | `tools/check`: claim table |
-| T10 | **Principle visibility, first: transparency.** Any static solid that covers a principle part in the current view is drawn see-through, automatically, at the view being drawn: not only for a mesh's pitch point or a slot's run (L5) but for every principle part. | AUTO | audit lists solids drawn see-through per view |
+| T10 | **Principle visibility, first: transparency.** Any static solid that covers a principle part in the current view is drawn see-through, automatically, at the view being drawn: not only for a mesh's pitch point or a slot's run (L5) but for every principle part. Only covering parts (plates, bridges, housings, brackets) go see-through; small hardware (a standoff, a spacer, a fastener) keeps its paper, so nothing flickers as the view turns. | AUTO | audit lists solids drawn see-through per view |
 | T11 | **Principle visibility, second: supports are moved.** The support router (A19) places posts, bridges, hangers and plates outside the principle's swept volume when it can. | AUTO | audit lists supports moved |
 | T12 | **Posts and plates are never removed** to uncover the principle. A different construction (a fork end, a part drawn underneath) is allowed only in rare, individual cases, decided in that mechanism's issue and recorded in `teaching.exceptions` with its reason. | HAND | audit: solid count of support parts unchanged |
 | T13 | **A time map** re-parametrises playback near a feature that would otherwise go by in a blink (an escapement's engagement, a snap). It changes the speed of the animation only, never the kinematics (K1) or the swing, and the plot's horizontal axis stays the true input. | DATA | `teaching.timeMap`, shots |
@@ -392,15 +392,15 @@ explode. Stacks on different axes (a bevel pair, a worm and its wheel) explode i
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
 | E1 | **Nothing stretches.** Every solid is rigid: one explode level. Shafts, bolts, axles, shanks and standoffs included. | AUTO | explode at 100%: no part longer than at 0% |
-| E2 | **A fastener is one body.** Head, shank, the washer under the head and the nut on the far end move together. | AUTO | each head stays on its shank |
-| E3 | **Screws back out the way they went in**, along their axis, to the head side, half a level clear of the topmost part they pass. A nut goes the opposite way. | AUTO | explode |
+| E2 | **A fastener is one body, and it goes with what it holds.** Head, shank, the washer under the head and the nut on the far end move together, with the part they hold: a support block or plate takes its screws, bearings and shims with it. The explode takes the main parts apart, the ones that show how the mechanism works; small supporting hardware does not scatter. | AUTO | each head stays on its shank |
+| E3 | **A screw that holds nothing it can go with backs out the way it went in**, along its axis, to the head side, clear of the topmost part it passes (E9). A nut goes the opposite way. | AUTO | explode |
 | E4 | **Reverse assembly order:** the last part fitted goes furthest; a bridge and its screws come off before the parts they clamp. | HAND (levels follow A17) | walk the explode |
 | E5 | **Pressed and bonded parts stay put:** bearings, bushings, dowels, inserts, circlips and wear strips move with the part they sit in; track rollers stay on their stud. | AUTO | explode |
 | E6 | **Bought units stay whole:** motor, bearing, track roller, sensor, pulley pair. Motor and bracket move as one; the belt stays in the pulley plane. | AUTO | explode |
-| E7 | **Loose spacers and washers sit midway** between the parts they separate. | AUTO | explode |
+| E7 | **Stack hardware goes with what it sits in:** washers, spacers, shims, collars, keys and external circlips move with the support block or plate they sit in, else with their shaft, else with the main part on their joint; posts go with the bridge they carry. | AUTO | explode |
 | E8 | **Keyed parts on one shaft keep their order**; the shaft leaves to the side it was fitted from. | AUTO | explode |
-| E9 | **Readable at full explode:** nothing inside another part, labels attached, nothing leaves the frame. | HAND | screenshots at 100% in ISOMETRIC and the default view |
-| E10 | **Explode axes and trails.** Each stack carries its joint axis; a part moves only along it; a trail line joins every part to its assembled position. | AUTO | explode |
+| E9 | **Readable at full explode:** nothing inside another part, labels attached, nothing leaves the frame. Each rigid unit clears every unit it sits on or around by a gap that grows with its own length along its axis (`FORM.explode.clear`); shafts leave after the parts on them, fasteners after the parts they pass through, and what leaves sideways before the stack on the base. | HAND | screenshots at 100% in ISOMETRIC and the default view |
+| E10 | **Explode axes and trails.** Each rigid unit moves along one axis: the fixed structure off the base (up, or down for what hangs below it), a moving body along its joint axis away from the middle of the mechanism, a fastener along its own. The axis rides its body, so a part that swings explodes along its axis where it is. A trail line joins every part to its assembled position. | AUTO | explode |
 
 ### 5b. Joint-type catalogue (J)
 
@@ -597,7 +597,7 @@ section keeps the rules a mechanism build depends on.
 | R6 | **Load time and frame time are measured, not gated.** `tools/bench` reports package size, session setup split into decode, tessellate, edges and GPU, and frame time at each named view and dial position, on the detail stage and a thumbnail, against the targets in the design (8 ms desktop frame, 16 ms phone, 20 ms setup). Over target is a flag to look at (section 9b), never a reason to cut function. | FLAG | bench report |
 | R7 | **Small records, small polishes.** A polish states only true exceptions to the rules and kits, each with its reason in the audit; the share of the build the pipeline generates is reported (the plan's expectation: about three quarters of the model and three fifths of the polish are generated), and a polish that grows is a promotion candidate (A22). No stored point lists where geometry can be generated. | HAND / FLAG | polish size, audit |
 | R8 | **Draw only what is seen.** Thumbnails are pre-rendered images; cards animate on hover only; the stage draws only when u, view or theme changed. | SITE / AUTO | profile |
-| R9 | **Setup is shared and shipped cheap.** One GPU context serves a page; edges are shipped with the package or extracted in a worker; plain extrusions and revolutions turn into triangles in the browser (D10). | AUTO / SITE | bench: setup split |
+| R9 | **Setup is shared and shipped cheap.** One GPU context serves a page; edges are shipped with the package or extracted in a worker; plain extrusions and revolutions turn into triangles in the browser (D10). The kinematics solve each phase once however many solids or points ask for it, the branch tables of a record that tracks a closure and the simulations of its timed blocks (an escapement stepped through its cycle, a star wheel's snap) ship in its meta file (made at the site's build for its own setting and each ghost trace's), and the ghost paths come with the frame after the first. | AUTO / SITE | bench: setup split |
 | R10 | **Phone measurement.** Startup and frame time on a mid-range phone are acceptance criteria of the engine's package and renderer steps. Method: a bench page published with each measured build; the owner opens it on the phone and sends the numbers back. Setup is split into decode, tessellate, edges and GPU, with frame time per view and dial position. | FLAG | bench page |
 
 ### 9b. Detail levels (DL)
@@ -630,7 +630,7 @@ performance and perception tests later.
 | DL1 | Every solid, mark and render effect maps to one rung through the selectors in `detail.ts`; primitives and rules tag what they make (kind, role, mark kind); a polish may move a specific solid up the ladder (toward "never") and says why in the audit, never down. | AUTO / HAND |
 | DL2 | A mechanism may declare a **default dial position** in the model (full unless the audit finds a reason); the audit header records it. The package stores everything; the dial is applied when drawing, never at packaging. | HAND |
 | DL3 | **View-aware exceptions live in the table too:** DL-D is drawn whenever explode > 0; DL-B marks are skipped at side elevation (tilt ≥ 80°) because they are edge-on. | AUTO |
-| DL4 | **Adaptive:** the site measures frame time on the stage and moves the dial one rung at a time with hysteresis, never past DL-G on its own, never on a thumbnail or a screenshot. The visitor can pin full detail. The dial position shows in the title block ("DETAIL A-H" or "FULL") so a screenshot is never mistaken for the full build. | SITE |
+| DL4 | **Adaptive:** the site measures each frame's cost on the stage (the script time and the GPU's own time, from a timer query where the browser has one; never the interval between frames, which the display caps) and moves the dial one rung at a time with hysteresis: down only when most frames of the last two seconds were over budget, so a one-off long frame never moves it; back up after a run of fast frames, a run that doubles each time it had to step back down. It never passes DL-G on its own, and on a desktop-class device never DL-B; never on a thumbnail or a screenshot. The visitor can pin full detail. The dial position shows in the title block ("DETAIL A-H" or "FULL") so a screenshot is never mistaken for the full build, and the detail readout says why Auto stepped down. | SITE |
 | DL6 | **Teaching content is never on the ladder.** Traces, construction overlays, ghost paths, ticks and the views of `teaching.views` are drawn at every dial position; the dial drops only build detail. | AUTO |
 | DL5 | **Measured:** the bench reports, per mechanism, the solids and marks on each rung and the frame time at each dial position, so the ladder can be re-ranked from evidence and the cost of each rung is known. | FLAG |
 
@@ -916,6 +916,12 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.10 (2026-10-24).** The explode takes the main parts apart and keeps supporting hardware with what it supports;
+  units clear each other by a gap that grows with their size and move along one axis each [E2, E3, E7, E9, E10, AUTO].
+  A declared plan opens at the 28 degree view [T7, SITE]. Only covering parts go see-through [T10, AUTO]. Auto detail
+  measures the GPU's own time, steps down on a sustained cost, keeps B on a desktop and says why [DL4, SITE]. Setup
+  solves each phase once and ships the closure tables and the timed blocks' simulations [R9, SITE]. A pillow block on a
+  level shaft is one casting [J10, AUTO].
 - **3.9 (2026-10-22).** Cut-over: the 2.5D engine, v1 packages, the old models and polishes and the 3D stamp are
   gone; every mechanism is built from its record v3 and drawn by the one engine, and a page or card carries no engine
   mark [S5, SITE]. A registered mechanism is a record with an audit at 3.0 or later, held to every HAND change since its

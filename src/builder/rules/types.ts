@@ -13,4 +13,6 @@ export interface Rule {
   apply(ctx: BuildCtx): void;
   /** Runs after every rule has run (the base outline needs everything on the base). */
   after?(ctx: BuildCtx): void;
+  /** Runs once the build is complete: after the polish, with the bodies' own parts joined (the explode needs them all). */
+  last?(ctx: BuildCtx): void;
 }

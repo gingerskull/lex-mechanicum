@@ -12,7 +12,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { recordById } from "../src/catalog";
-import { allIds } from "../src/mechanisms";
+import { workIds } from "../src/mechanisms";
 import { builtBytes } from "../src/package/built";
 import { copyBrand } from "./brand";
 import { metaOf } from "./meta";
@@ -24,7 +24,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const pub = join(root, "site", "public");
 const require = createRequire(import.meta.url);
 
-export async function siteAssets(ids = allIds()): Promise<void> {
+export async function siteAssets(ids = workIds()): Promise<void> {
   copyBrand(pub);
   mkdirSync(join(pub, "fonts"), { recursive: true });
   for (const f of FONT_FILES) {
@@ -45,7 +45,13 @@ export async function siteAssets(ids = allIds()): Promise<void> {
     const rec = recordById(id);
     writeFileSync(join(pub, "meta", `${id}.json`), JSON.stringify(metaOf(id, rec)));
   }
-  await checkThumbs(ids, packages);
+  // a local working loop (LM_IDS) redraws its thumbnails once, at the end, so a stale one only warns there
+  try {
+    await checkThumbs(ids, packages);
+  } catch (e) {
+    if (!process.env.LM_IDS) throw e;
+    console.warn(`site-assets: ${e instanceof Error ? e.message : String(e)}`);
+  }
   mkdirSync(join(pub, "thumbs"), { recursive: true });
   for (const id of ids) for (const f of imagesOf(id)) copyFileSync(join(THUMBS_DIR, f), join(pub, "thumbs", f));
 }

@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; worm and wheel lofts; built by Manifold |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 108 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 106 solids unsound |
 | D7 | PASS | HAND · gears plain; richness in the stacks |
 | A1 | PASS | AUTO · M J9, O2 J2, O1 J10, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J9, O2 J2, O1 J10, drive drive · wheel on a live shaft (J2) straddled by a bridge; worm on a live shaft in plan (J10) in two pillow blocks; crossed mesh J9 |
@@ -206,11 +206,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.07 |
 | DL-H | 11 | 0 | – |
-| never | 73 | 121 | 0.98 (full) |
+| never | 71 | 119 | 0.98 (full) |
 
 ## Promotion candidates
 None left: the worm and the throated worm wheel are shapes of the builder (lofts). Open: the lock icon when the wheel is driven (record note); the lofted thread draws dark in front view where many transparent layers overlap (renderer).
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 73.0 KB
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 72.3 KB
 screenshots: dist/shots3/worm-drive (record view AUX O1, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.98 ms full, 1.18 at C, 1.07 at G; 75.6k triangles; phone by David)

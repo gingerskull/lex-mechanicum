@@ -109,6 +109,12 @@ describe("views", () => {
     expect(aux?.orient.aux).toEqual([0, 1, 0]);
   });
 
+  it("opens a record that declares a plan at the 28 degree view, and keeps any other view it declares", () => {
+    expect(defaultView({ view: "PLAN" }).orient).toEqual({ yaw: 0, tilt: 28 });
+    expect(defaultView({ view: "FRONT" }).orient).toEqual(parseView("FRONT")!.orient);
+    expect(defaultView({ view: "VIEW 30 40" }).orient).toEqual({ yaw: 30, tilt: 50 });
+  });
+
   it("every record opens in a view that parses", () => {
     for (const id of ["four-bar", "bevel-gears", "oscillating-cylinder", "watt-linkage", "universal-joint"]) {
       const t = (recordById(id) as unknown as { teaching: Teaching }).teaching;

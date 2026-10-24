@@ -29,3 +29,4 @@ export const pageTheme = (): "dark" | "light" | "forge" => {
 
 /** Device pixel ratio for drawing, capped at 2. */
 export const pixelRatio = () => Math.min(2, window.devicePixelRatio || 1);
+export { importSims } from "../../../src/kin/sims";

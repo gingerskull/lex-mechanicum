@@ -1,10 +1,10 @@
-// The stage of a mechanism (SS5): the transport (play, scrub, speed), and the camera (drag to
-// orbit, the named views, the record's own view, tilt), the section and detail views the record declares, explode, the
+// The stage of a mechanism (SS5): the transport (play, scrub, drag to scrub, speed), and the camera (right drag or two
+// fingers to orbit, the named views, the record's own view, tilt), the section and detail views the record declares, explode, the
 // detail dial (adaptive per DL4) and the record's own controls (T14). Playback honours the record's time map (SD27): the
 // scrubber and the plot stay on the true input. The setup runs in a worker, the shaders build while the data downloads,
 // and the first frame is drawn at a coarse dial until the page is idle (R9). A browser without WebGL2 gets the still and a
 // note; the plot and the rest of the page work.
-import { autoStep } from "../autodial";
+import { AUTO, autoLast, autoSettle, autoState, autoStep, isDesktop } from "../autodial";
 import { hasWebGL2 } from "../gl";
 import { url } from "../url";
 import type { StageControl } from "../data";
@@ -19,6 +19,12 @@ const CYCLE = 6;
 /** Degrees of orbit per CSS pixel of drag. */
 const ORBIT = 0.4;
 const DRAG_PX = 8;
+/** Degrees one Shift and arrow press orbits. */
+const KEY_ORBIT = 5;
+/** Explode opened in a view tilted less than this (a plan) eases to the 28 degree view, over this many seconds. */
+const EXPLODE_TILT_BELOW = 15;
+const EXPLODE_TILT = 28;
+const TWEEN_S = 0.45;
 
 const box = document.querySelector<HTMLElement>('.stagebox[data-engine="v3"]');
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -162,6 +168,9 @@ async function main(box: HTMLElement) {
   const tm = E.timeMap(teaching?.timeMap ? { ...(teaching.timeMap.span ? { span: teaching.timeMap.span } : {}), ...(teaching.timeMap.spans ? { spans: teaching.timeMap.spans } : {}), slow: teaching.timeMap.slow } : undefined);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const LADDER: Dial[] = ["full", ...E.DETAIL.map((r) => r.id).filter((x) => x !== "H")];
+  /** The coarsest rung Auto may reach here (DL4): a desktop keeps the look (site/src/autodial.ts). */
+  const autoFloor = autoLast(LADDER, isDesktop(window), AUTO.desktopFloor);
+  const dial = autoState();
 
   const s = {
     t: tm.tOf((63 / 360) * TAU),
@@ -174,11 +183,12 @@ async function main(box: HTMLElement) {
     detail: undefined as ViewState["detail"],
     rview: "" as string,
     explode: 0,
-    show: { paths: true, construction: true, velocity: false, forces: false, angles: false } as Record<string, boolean>,
+    show: { paths: true, construction: false, velocity: false, forces: false, angles: false } as Record<string, boolean>,
+    /** A construction label picked out in the key or by a click (its number in the record's order), or null. */
+    focus: null as number | null,
+    /** The construction label under the pointer (desktop), or null: picked out while it is there. */
+    hover: null as number | null,
     auto: true,
-    rung: 0,
-    slow: 0,
-    fast: 0,
     /** The input ring's strength: it breathes while paused (LM-06), never while playing or under reduced motion. */
     ring: 1,
     /** A Forge glitch on the drawing (SS14): 1 at a pulse, less at a blip, 0 between. */
@@ -195,12 +205,16 @@ async function main(box: HTMLElement) {
     E.recordDrawView(L.scene, {
       state: state(),
       theme: E.pageTheme(),
-      detail: warm ? LADDER[LADDER.length - 1]! : LADDER[s.rung]!,
+      detail: warm ? LADDER[LADDER.length - 1]! : LADDER[dial.rung]!,
       sheet: true,
       dims: true,
-      show: { traces: s.show.paths, ghosts: s.show.paths, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
+      // the ghost paths are sampled at other settings, each a cycle of solves: they come with the frame after the first (R9)
+      show: { traces: s.show.paths, ghosts: s.show.paths && !warm, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
       ring: s.ring,
       glitch: s.glitch,
+      focus: s.hover ?? s.focus,
+      now: performance.now(),
+      pulse: !reduced,
     });
 
   // the output plot
@@ -218,22 +232,23 @@ async function main(box: HTMLElement) {
   // the detail slider: right is full detail, each step left drops one more rung
   const detail = $<HTMLInputElement>("detail");
   function showDial() {
-    detail.value = String(LADDER.length - 1 - s.rung);
-    const r = LADDER[s.rung]!;
+    detail.value = String(LADDER.length - 1 - dial.rung);
+    const r = LADDER[dial.rung]!;
     $("detailv").textContent = r === "full" ? "Full" : r === "A" ? "−A" : `−A–${r}`;
-    $("detailv").title = r === "full" ? "Everything drawn" : `Not drawn: ${E.DETAIL.slice(0, E.DETAIL.findIndex((x) => x.id === r) + 1).map((x) => x.name.toLowerCase()).join("; ")}`;
+    // why Auto dropped detail, so a screenshot is never mistaken for the full build (DL4)
+    const why = s.auto && dial.why !== null ? ` Auto stepped down: frames took about ${Math.round(dial.why)} ms against a budget of ${AUTO.budgetMs} ms.` : "";
+    $("detailv").title = r === "full" ? "Everything drawn" : `Not drawn: ${E.DETAIL.slice(0, E.DETAIL.findIndex((x) => x.id === r) + 1).map((x) => x.name.toLowerCase()).join("; ")}.${why}`;
   }
 
-  // the camera controls reflect the pose
-  const tilt = $<HTMLInputElement>("tilt");
+  // the camera controls reflect the pose; the stage carries it too, as data, for whoever reads the page
   function showCamera() {
     const named = E.snappedName(s.orient);
     for (const b of document.querySelectorAll<HTMLButtonElement>("#presets button")) b.setAttribute("aria-pressed", String(!s.section && !s.detail && b.dataset.view === named));
     for (const b of document.querySelectorAll<HTMLButtonElement>("#vviews button")) b.setAttribute("aria-pressed", String(b.dataset.rview === s.rview));
     $("record-view").setAttribute("aria-pressed", String(!s.section && !s.detail && JSON.stringify(s.orient) === JSON.stringify(base.orient)));
     const o = turntable(s.orient);
-    tilt.value = String(Math.round(o.tilt));
-    $("tiltv").textContent = s.orient.aux ? "Aux" : o.tilt <= 0.5 ? "Plan" : o.tilt >= 89.5 ? "Side" : `${Math.round(o.tilt)}°`;
+    box.dataset.tilt = String(Math.round(o.tilt));
+    box.dataset.view = s.orient.aux ? "AUX" : (named ?? `VIEW ${Math.round(o.yaw)}/${Math.round(90 - o.tilt)}`);
   }
 
   let dirty = true;
@@ -269,7 +284,8 @@ async function main(box: HTMLElement) {
     const ms = performance.now() - t0;
     lastMs = ms;
     if (plot && series) E.drawPlot(plot, E.theme(E.pageTheme()), series.data, s.u, series.unit, series.more);
-    if (!warm && s.auto && s.playing && autoStep(s, ms, sess.stats?.gpuLagMs ?? 0, LADDER.length - 1)) showDial();
+    const st = sess.stats;
+    if (!warm && s.auto && s.playing && autoStep(dial, ms, st?.gpuMs ?? st?.gpuLagMs ?? 0, autoFloor)) showDial();
     const deg = Math.round((((s.u % TAU) + TAU) % TAU) / TAU * 360) % 360;
     $<HTMLInputElement>("scrub").value = String(deg);
     $("scrubv").textContent = `${deg}°`;
@@ -278,6 +294,7 @@ async function main(box: HTMLElement) {
       warmQueued = true;
       const done = () => {
         warm = false;
+        autoSettle(dial);
         dirty = true;
       };
       if ("requestIdleCallback" in window) requestIdleCallback(done, { timeout: 400 });
@@ -315,6 +332,15 @@ async function main(box: HTMLElement) {
       breathAt = now;
       dirty = true;
     }
+    if (tween) {
+      const k = Math.min(1, (now - tween.t0) / (TWEEN_S * 1000));
+      const e = k * k * (3 - 2 * k);
+      s.orient = { yaw: tween.from.yaw + (tween.to.yaw - tween.from.yaw) * e, tilt: tween.from.tilt + (tween.to.tilt - tween.from.tilt) * e };
+      s.auxName = undefined;
+      showCamera();
+      dirty = true;
+      if (k >= 1) tween = null;
+    }
     if (glitchUntil) {
       s.glitch = now < glitchUntil ? glitchStrength : 0;
       if (!s.glitch) glitchUntil = 0;
@@ -322,11 +348,15 @@ async function main(box: HTMLElement) {
     }
     if (ctlDirty) applyControls();
     if (dirty && inView) draw();
+    // a callout row easing to its new place after the view turned (SD22)
+    if (sess.busy) dirty = true;
     requestAnimationFrame(tick);
   };
   // a Forge glitch pulse or blip tears the drawing for its length (islands/forge.ts sends it, never under reduced motion)
   let glitchUntil = 0;
   let glitchStrength = 1;
+  /** A camera move under way (explode leaving a plan for the 28 degree view). */
+  let tween: { from: Orient; to: Orient; t0: number } | null = null;
   addEventListener("forgeglitch", (e) => {
     if (E.pageTheme() !== "forge") return;
     const d = (e as CustomEvent<{ length?: number; strength?: number }>).detail ?? {};
@@ -370,8 +400,9 @@ async function main(box: HTMLElement) {
       for (const o of document.querySelectorAll("#speed button")) o.setAttribute("aria-pressed", String(o === b));
     });
 
-  // camera: presets, the record's view, the record's section and detail views, tilt
+  // camera: presets, the record's view, the record's section and detail views
   const leaveViews = () => {
+    tween = null;
     s.section = undefined;
     s.detail = undefined;
     s.rview = "";
@@ -395,6 +426,7 @@ async function main(box: HTMLElement) {
     b.addEventListener("click", () => {
       const rv = rviews.find((x) => x.id === b.dataset.rview);
       if (!rv) return;
+      tween = null;
       if (s.rview === rv.id) {
         leaveViews();
         s.orient = { ...base.orient };
@@ -409,16 +441,29 @@ async function main(box: HTMLElement) {
       showCamera();
       dirty = true;
     });
-  tilt.addEventListener("input", () => {
-    const o = turntable(s.orient);
-    s.orient = { yaw: o.yaw, tilt: Number(tilt.value) };
-    s.auxName = undefined;
-    if (!s.section) s.rview = "";
-    showCamera();
-    dirty = true;
-  });
+  // explode holds the mechanism still where it is, so the parts do not drift while they are apart (SD12); playback picks
+  // up again once it closes, if it was playing
+  let playAfterExplode = false;
   $<HTMLInputElement>("explode").addEventListener("input", (e) => {
+    const was = s.explode;
     s.explode = Number((e.target as HTMLInputElement).value) / 100;
+    if (was === 0 && s.explode > 0) {
+      playAfterExplode = s.playing;
+      setPlaying(false);
+      // a plan looks straight down most explode axes, so the parts would only stack up unseen: ease to the 28 degree
+      // view, keeping the turn of the plan (SD12)
+      const o = turntable(s.orient);
+      if (!s.section && !s.detail && o.tilt < EXPLODE_TILT_BELOW) {
+        const to: Orient = { yaw: o.yaw, tilt: EXPLODE_TILT };
+        if (reduced) {
+          s.orient = to;
+          showCamera();
+        } else tween = { from: { yaw: o.yaw, tilt: o.tilt }, to, t0: performance.now() };
+      }
+    } else if (was > 0 && s.explode === 0 && playAfterExplode) {
+      playAfterExplode = false;
+      setPlaying(true);
+    }
     $("explodev").textContent = `${Math.round(s.explode * 100)}%`;
     dirty = true;
   });
@@ -437,6 +482,7 @@ async function main(box: HTMLElement) {
     c.addEventListener("click", () => {
       s.show[k] = !s.show[k];
       c.setAttribute("aria-pressed", String(s.show[k]));
+      if (k === "construction") showKey();
       dirty = true;
     });
   }
@@ -447,19 +493,19 @@ async function main(box: HTMLElement) {
   const auto = $<HTMLButtonElement>("auto");
   const setAuto = (v: boolean) => {
     s.auto = v;
-    s.slow = s.fast = 0;
+    autoSettle(dial);
     auto.setAttribute("aria-pressed", String(v));
   };
   auto.addEventListener("click", () => {
     setAuto(!s.auto);
-    if (s.auto) s.rung = 0;
+    if (s.auto) Object.assign(dial, autoState());
     showDial();
     dirty = true;
   });
   detail.max = String(LADDER.length - 1);
   detail.addEventListener("input", () => {
     setAuto(false);
-    s.rung = LADDER.length - 1 - Number(detail.value);
+    dial.rung = LADDER.length - 1 - Number(detail.value);
     showDial();
     dirty = true;
   });
@@ -508,56 +554,200 @@ async function main(box: HTMLElement) {
         setCtl(g.dataset.target as StageControl["target"], g.dataset.key!, optionValue(g.dataset.target!, g.dataset.key!, b.dataset.v!));
       });
 
-  // pointer: drag to orbit; a tap plays or pauses. A mouse drags in both directions. A finger drags sideways to turn the
-  // drawing and leaves up and down to the page (touch-action: pan-y), unless Orbit is on, which gives the drawing both.
-  const orbitBtn = $<HTMLButtonElement>("orbit");
-  const orbitOn = () => orbitBtn.getAttribute("aria-pressed") === "true";
-  orbitBtn.addEventListener("click", () => {
-    orbitBtn.setAttribute("aria-pressed", String(!orbitOn()));
-    canvas.style.touchAction = orbitOn() ? "none" : "";
-  });
+  // the construction key: shown under a stage narrow enough for numbered markers, while construction is on (SD22); a
+  // tap picks a line out on the drawing, a second tap lets it go
+  const ckey = document.getElementById("ckey");
+  const showKey = () => {
+    if (ckey) ckey.hidden = !s.show.construction || size().width >= E.DRAFT.overlays.labels.minStage;
+  };
+  for (const b of ckey?.querySelectorAll<HTMLButtonElement>("button") ?? [])
+    b.addEventListener("click", () => {
+      const n = Number(b.dataset.n);
+      s.focus = s.focus === n ? null : n;
+      for (const o of ckey!.querySelectorAll("button")) o.setAttribute("aria-pressed", String(Number((o as HTMLElement).dataset.n) === s.focus));
+      dirty = true;
+    });
+  showKey();
+
+  // pointer (SS5): a sideways drag scrubs the cycle and pauses, as on the 2.5D stage; a tap plays or pauses. A mouse
+  // orbits with the right button (or Shift and the left), and the stage's menu stays shut after an orbit. A finger drags
+  // sideways to scrub and leaves up and down to the page (touch-action: pan-y); two fingers orbit.
   canvas.tabIndex = 0;
-  let drag: { id: number; x: number; y: number; orbiting: boolean; yaw: number; tilt: number; touch: boolean } | null = null;
-  canvas.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0) return;
-    const o = turntable(s.orient);
-    drag = { id: e.pointerId, x: e.clientX, y: e.clientY, orbiting: false, yaw: o.yaw, tilt: o.tilt, touch: e.pointerType === "touch" };
-  });
-  canvas.addEventListener("pointermove", (e) => {
-    if (!drag || e.pointerId !== drag.id) return;
-    const dx = e.clientX - drag.x;
-    const dy = e.clientY - drag.y;
-    if (!drag.orbiting) {
-      if (Math.hypot(dx, dy) < DRAG_PX) return;
-      // a finger that is mostly going up or down is the page scrolling, unless Orbit is on
-      if (drag.touch && !orbitOn() && Math.abs(dx) < Math.abs(dy)) return;
-      drag.orbiting = true;
-      canvas.setPointerCapture(e.pointerId);
-    }
-    const sideways = drag.touch && !orbitOn();
-    s.orient = { yaw: drag.yaw - dx * ORBIT, tilt: sideways ? drag.tilt : Math.max(0, Math.min(90, drag.tilt - dy * ORBIT)) };
+  const orbitTo = (yaw: number, tilt: number) => {
+    tween = null;
+    s.orient = { yaw, tilt: Math.max(0, Math.min(90, tilt)) };
     s.auxName = undefined;
     if (!s.section) s.rview = "";
     showCamera();
     dirty = true;
+  };
+  // a drag that ends near a named view lands on it; a plan turned in its plane stays as turned
+  const landOrbit = () => {
+    s.orient = E.snappedName(s.orient) === "PLAN" ? { yaw: s.orient.yaw, tilt: 0 } : E.snapped(s.orient);
+    showCamera();
+    dirty = true;
+  };
+  const scrubBy = (u0: number, dx: number) => {
+    setPlaying(false);
+    setPhase(u0 + (dx / size().width) * TAU);
+  };
+  type Drag = { id: number; x: number; y: number; mode: "" | "scrub" | "orbit"; orbit: boolean; u: number; yaw: number; tilt: number };
+  let drag: Drag | null = null;
+  let orbitedAt = 0;
+  const start = (id: number, x: number, y: number, orbit: boolean): Drag => {
+    const o = turntable(s.orient);
+    return { id, x, y, mode: "", orbit, u: s.u, yaw: o.yaw, tilt: o.tilt };
+  };
+  canvas.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "touch" || (e.button !== 0 && e.button !== 2)) return;
+    drag = start(e.pointerId, e.clientX, e.clientY, e.button === 2 || e.shiftKey);
+  });
+  // a construction label under the mouse is picked out while the pointer is on it (SD22)
+  const local = (e: { clientX: number; clientY: number }): [number, number] => {
+    const r = canvas.getBoundingClientRect();
+    return [e.clientX - r.left, e.clientY - r.top];
+  };
+  canvas.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse" || drag?.mode) return;
+    const n = s.show.construction ? sess.labelAt(...local(e)) : null;
+    canvas.style.cursor = n !== null ? "pointer" : "";
+    if (n !== s.hover) {
+      s.hover = n;
+      dirty = true;
+    }
+  });
+  canvas.addEventListener("pointerleave", () => {
+    if (s.hover === null) return;
+    s.hover = null;
+    canvas.style.cursor = "";
+    dirty = true;
+  });
+  const pin = (n: number) => {
+    s.focus = s.focus === n ? null : n;
+    for (const o of ckey?.querySelectorAll("button") ?? []) o.setAttribute("aria-pressed", String(Number((o as HTMLElement).dataset.n) === s.focus));
+    dirty = true;
+  };
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    const dy = e.clientY - drag.y;
+    if (!drag.mode) {
+      if (Math.hypot(dx, dy) < DRAG_PX) return;
+      // the left button scrubs only sideways; up and down it does nothing
+      if (!drag.orbit && Math.abs(dx) < Math.abs(dy)) return;
+      drag.mode = drag.orbit ? "orbit" : "scrub";
+      // a scrub starts from where the drawing is now (it may have played on past the threshold)
+      if (!drag.orbit) {
+        drag.u = s.u;
+        drag.x = e.clientX;
+      }
+      canvas.setPointerCapture(e.pointerId);
+      if (drag.orbit) canvas.style.cursor = "move";
+    }
+    if (drag.mode === "orbit") orbitTo(drag.yaw - dx * ORBIT, drag.tilt - dy * ORBIT);
+    else scrubBy(drag.u, dx);
   });
   canvas.addEventListener("pointerup", (e) => {
     if (!drag || e.pointerId !== drag.id) return;
-    if (drag.orbiting) {
-      // a drag that ends near a named view lands on it; a plan turned in its plane stays as turned
-      s.orient = E.snappedName(s.orient) === "PLAN" ? { yaw: s.orient.yaw, tilt: 0 } : E.snapped(s.orient);
-      showCamera();
-      dirty = true;
-    } else if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < DRAG_PX) setPlaying(!s.playing);
+    if (drag.mode === "orbit") {
+      landOrbit();
+      orbitedAt = performance.now();
+    } else if (!drag.mode && !drag.orbit && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < DRAG_PX) {
+      // a click on a construction label keeps it picked out (again lets it go); anywhere else plays or pauses
+      const n = s.show.construction ? sess.labelAt(...local(e)) : null;
+      if (n !== null) pin(n);
+      else setPlaying(!s.playing);
+    }
     drag = null;
+    canvas.style.cursor = "";
   });
-  canvas.addEventListener("pointercancel", () => (drag = null));
+  canvas.addEventListener("pointercancel", () => {
+    drag = null;
+    canvas.style.cursor = "";
+  });
+  // the right button is the orbit button: after a right drag (the menu opens on release on some systems) no menu
+  canvas.addEventListener("contextmenu", (e) => {
+    if (drag?.orbit || performance.now() - orbitedAt < 400) e.preventDefault();
+  });
+  // touch: touch events, so a second finger can take the gesture over before the page starts to scroll
+  let touch: (Drag & { fingers: number }) | null = null;
+  const centre = (t: TouchList): [number, number] => {
+    let x = 0, y = 0;
+    for (const p of Array.from(t)) {
+      x += p.clientX;
+      y += p.clientY;
+    }
+    return [x / t.length, y / t.length];
+  };
+  canvas.addEventListener("touchstart", (e) => {
+    const [x, y] = centre(e.touches);
+    if (e.touches.length === 1) touch = { ...start(0, x, y, false), fingers: 1 };
+    else if (e.touches.length === 2) {
+      // a second finger turns the gesture into an orbit, from where the fingers are now
+      touch = { ...start(0, x, y, true), fingers: 2, mode: "orbit" };
+      if (e.cancelable) e.preventDefault();
+    } else touch = null;
+  }, { passive: false });
+  canvas.addEventListener("touchmove", (e) => {
+    if (!touch || e.touches.length !== touch.fingers) return;
+    const [x, y] = centre(e.touches);
+    const dx = x - touch.x;
+    const dy = y - touch.y;
+    if (touch.mode === "orbit") {
+      if (e.cancelable) e.preventDefault();
+      orbitTo(touch.yaw - dx * ORBIT, touch.tilt - dy * ORBIT);
+      return;
+    }
+    if (!touch.mode) {
+      if (Math.hypot(dx, dy) < DRAG_PX) return;
+      // mostly up or down: the page scrolls, and this finger is done with the drawing
+      if (Math.abs(dx) < Math.abs(dy)) {
+        touch = null;
+        return;
+      }
+      touch.mode = "scrub";
+      touch.u = s.u;
+      touch.x = x;
+    }
+    if (e.cancelable) e.preventDefault();
+    scrubBy(touch.u, dx);
+  }, { passive: false });
+  canvas.addEventListener("touchend", (e) => {
+    if (!touch) return;
+    if (touch.mode === "orbit") {
+      // lifting one of two fingers ends the orbit; the other finger does nothing more
+      landOrbit();
+      touch = null;
+      return;
+    }
+    if (!touch.mode && e.touches.length === 0) {
+      const p = e.changedTouches[0];
+      if (p && Math.hypot(p.clientX - touch.x, p.clientY - touch.y) < DRAG_PX) {
+        setPlaying(!s.playing);
+        // no click after the tap: it would reach the canvas as a mouse click too
+        if (e.cancelable) e.preventDefault();
+      }
+    }
+    if (e.touches.length === 0) touch = null;
+  });
+  canvas.addEventListener("touchcancel", () => (touch = null));
+  // keyboard on the drawing (SS10): Space plays or pauses, the arrows step the cycle, Shift with the arrows orbits, 1 to 5
+  // are the named views and 0 the record's own
+  const NAMED = ["PLAN", "FRONT", "SIDE", "ISOMETRIC", "DIMETRIC"];
+  const plain = (e: KeyboardEvent) => !e.ctrlKey && !e.metaKey && !e.altKey;
   canvas.addEventListener("keydown", (e) => {
     if (e.key === " ") setPlaying(!s.playing);
-    else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    else if (e.key.startsWith("Arrow") && e.shiftKey) {
+      const o = turntable(s.orient);
+      const k = KEY_ORBIT;
+      orbitTo(o.yaw + (e.key === "ArrowLeft" ? k : e.key === "ArrowRight" ? -k : 0), o.tilt + (e.key === "ArrowUp" ? -k : e.key === "ArrowDown" ? k : 0));
+      landOrbit();
+    } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       setPlaying(false);
       setPhase(s.u + ((e.key === "ArrowRight" ? 1 : -1) * TAU) / 72);
-    } else return;
+    } else if (/^[1-5]$/.test(e.key) && plain(e)) document.querySelector<HTMLButtonElement>(`#presets button[data-view="${NAMED[Number(e.key) - 1]}"]`)?.click();
+    else if (e.key === "0" && plain(e)) $("record-view").click();
+    else return;
     e.preventDefault();
   });
   window.addEventListener("themechange", () => (dirty = true));
@@ -565,6 +755,7 @@ async function main(box: HTMLElement) {
     const r = size();
     sess.resize(r.width, r.height, E.pixelRatio());
     plotSize();
+    showKey();
     dirty = true;
   });
   resized.observe(canvas);

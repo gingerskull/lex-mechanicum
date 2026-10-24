@@ -64,7 +64,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 132 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 126 solids unsound |
 | D7 | PASS | HAND · lobes and rockers plain; richness in the stacks and the guide |
 | A1 | PASS | AUTO · O J10, Q1 J10, Q2 J10, G J5, C1 J7, C2 J7, T1 J7, T2 J7, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · O J10, Q1 J10, Q2 J10, G J5, C1 J7, C2 J7, T1 J7, T2 J7, drive drive · camshaft live in plan (J10); rocker pivots in plan (J10); the stem in a guide bush (J5 stem guide); cam contacts J7 |
@@ -211,7 +211,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | 1.59 |
 | DL-G | 0 | 0 | 1.52 |
 | DL-H | 18 | 0 | 1.45 |
-| never | 93 | 110 | 1.54 |
+| never | 87 | 108 | 1.54 |
 
 ## Promotion candidates
 None yet.

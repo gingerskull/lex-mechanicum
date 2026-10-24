@@ -1,3 +1,4 @@
+import { DRAFT } from "../../src/style/draft";
 import { describe, expect, it } from "vitest";
 import { recordById } from "../../src/catalog";
 import { Kinematics } from "../../src/kin/compose";
@@ -78,7 +79,7 @@ describe("scene runtime", () => {
     expect(w[5]).toBeCloseTo(5);
   });
 
-  it("writes the solid table: pose rows, paper, flags; a see-through solid takes half the paper", () => {
+  it("writes the solid table: pose rows, paper, flags; a see-through solid takes its share of the paper", () => {
     const m = new Float32Array(rt.n * 16);
     place(rt, 0, 0, m);
     const see = new Uint8Array(rt.n);
@@ -89,7 +90,7 @@ describe("scene runtime", () => {
     const plain = table[cover * ST * 4 + 12]!;
     see[cover] = 1;
     rows(rt, m, { see, ladder: L, card: false, patterns: true }, table);
-    expect(table[cover * ST * 4 + 12]).toBeCloseTo(plain * 0.5);
+    expect(table[cover * ST * 4 + 12]).toBeCloseTo(plain * DRAFT.fill.seeThrough.opacity);
     expect(table[cover * ST * 4 + 12 + 2]).toBeLessThan(1);
     // the detail ladder hides a solid by a flag
     const hide = ladder("H", { tilt: 0, explode: 0 });
@@ -136,6 +137,25 @@ describe("principle visibility (T10, T17)", () => {
   it("judges the view: from below the plate under the link covers it, and the cover now lies between the viewer and the mover", () => {
     const below = fit(basisOfOrient({ yaw: 0, tilt: 180 }), 800, 600, [-80, -80, 0, 80, 80, 34]);
     expect(ids(seeThrough(rt, boxes, below))).toEqual(["cover", "under"]);
+  });
+
+  it("eases a solid in and out of see-through while the view turns, never in one step", () => {
+    const amount = new Float32Array(rt.n);
+    let prev: Float32Array | null = null;
+    let worst = 0;
+    let moved = 0;
+    for (let t = 0; t <= 180; t += 0.5) {
+      const C = fit(basisOfOrient({ yaw: 30, tilt: t }), 800, 600, [-80, -80, 0, 80, 80, 34]);
+      seeThrough(rt, boxes, C, new Uint8Array(rt.n), amount);
+      if (prev) for (let i = 0; i < rt.n; i++) {
+        const d = Math.abs(amount[i]! - prev[i]!);
+        worst = Math.max(worst, d);
+        if (d > 0) moved++;
+      }
+      prev = amount.slice();
+    }
+    expect(moved).toBeGreaterThan(0);
+    expect(worst).toBeLessThan(0.34);
   });
 
   it("is stable while the part moves: the set depends on the sweep, not on the phase", () => {

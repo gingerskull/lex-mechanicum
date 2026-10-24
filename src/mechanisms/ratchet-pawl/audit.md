@@ -207,11 +207,11 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.72 |
 | DL-G | 0 | 0 | 1.82 |
 | DL-H | 18 | 0 | 1.71 |
-| never | 59 | 154 | 1.94 |
+| never | 59 | 153 | 1.94 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.4 KB
+check: clean · K1 residual: 2.8e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.9 KB
 screenshots: dist/shots3/ratchet-pawl (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

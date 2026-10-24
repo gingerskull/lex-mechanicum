@@ -210,5 +210,5 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 None left: the crank and slide forms (rpp, point positions, posed overlays, time-ratio claims) and the J5 changes are in the library and kit.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.7 KB
+check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.8 KB
 screenshots: dist/shots3/slider-crank (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

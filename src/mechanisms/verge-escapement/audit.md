@@ -64,7 +64,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles only |
-| D11 | PASS | AUTO · SOLID: 0 of 109 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 107 solids unsound |
 | D7 | PASS | HAND · wheel, anchor and pendulum plain; richness in the stacks |
 | A1 | PASS | AUTO · V J2, C J10, P pallet, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · V J2, C J10, P pallet, drive drive · the crown on an arbor in plan (J10, held from behind), the verge on a live vertical staff (J2, driven); the pallet contacts (J7) |
@@ -204,11 +204,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.6 |
 | DL-G | 0 | 0 | 1.57 |
 | DL-H | 17 | 0 | 1.62 |
-| never | 72 | 74 | 1.65 |
+| never | 70 | 72 | 1.65 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.7 KB
+check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 18.5 KB
 screenshots: dist/shots3/verge-escapement (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -52,7 +52,8 @@ export const DRAFT = {
   // Library cards (SS1): the thumbnail and the hover animation draw a small sheet, so they leave out detail nobody sees
   // and thin the two bold outlines. Used only for a view with `card` set; the mechanism page is untouched.
   card: {
-    detail: "B" as const, // detail dial position of a card drawing (DL): sharp, with wall shading
+    detail: "C" as const, // detail dial position of a card drawing (DL): sharp, without wall shading or the deep layers
+    refW: 320, // px, width of the canvas the card thumbnails are drawn on; a live card scales its margin to it
     plateTopFactor: 0.7, // factor on lines.plateTop on a card
     baseTopFactor: 0.7, // factor on lines.baseTop on a card
   },
@@ -66,11 +67,13 @@ export const DRAFT = {
     bottomAlpha: 0.75, // 0..1
     silhouette: 0.8, // px, vertical edges down the side walls
     silhouetteAlpha: 0.8, // 0..1
+    silhouetteShare: 1.6, // factor on a smooth outline's share of the line, so two edges sharing it read as one line
     edge: 0.7, // px, visible bottom edges of non-plates
     edgeAlpha: 0.7, // 0..1
     chamfer: 0.45, // px
     chamferAlpha: 0.5, // 0..1
     chamferMinScale: 1.5, // px per mm, chamfer lines drawn only above this projection scale
+    capFade: 0.12, // cos of a cap toward the viewer below which its bold top outline blends into the far cap's style (no pop as it turns edge-on)
     marks: 0.6, // px, engraved marks
     marksAlpha: 0.55, // 0..1
     thread: 0.5, // px, thread helices
@@ -78,7 +81,7 @@ export const DRAFT = {
     baseChamferGain: 0.7, // factor on chamferAlpha for the base plate
     baseMarksGain: 0.75, // factor on marksAlpha for the base plate
     // How an edge looks where a part covers it (SD3): width and alpha are factors on the visible line.
-    hidden: { dash: [3, 2.4] as const, width: 0.75, alpha: 0.85 }, // dash px, factor, factor
+    hidden: { dash: [3, 2.4] as const, width: 0.75, alpha: 0.5 }, // dash px, factor, factor
     // Ring round the input shaft head (SD5).
     accentRing: {
       color: "accent" as ColorName,
@@ -95,19 +98,20 @@ export const DRAFT = {
 
   // Surfaces: paper opacity per kind, 0..1 (SD2), and how much each erases the lines layer (SD3).
   fill: {
-    plate: 0.64,
-    other: 0.8,
+    plate: 0.9,
+    other: 0.95,
     base: 0.96, // laid once, on the top face (the parts under it read only through `occlude.base`)
-    wall: 0.55,
+    wall: 0.86,
     baseWallGain: 0.8, // factor on `wall` for the base plate's walls
     wallOcclude: 0.9, // factor on the occlusion for side walls
-    occlude: { plate: 1, other: 0.85, base: 0.9 }, // the base lets a tenth of what is under it show through
-    // A solid over a working zone of the mechanism (a mesh, a slot roller's run, L5): its opacity, a factor on its paper
-    // and on its occlusion, so the zone reads through it at half strength.
-    seeThrough: { opacity: 0.5 },
+    occlude: { plate: 1, other: 0.97, base: 0.92 }, // the base lets a twelfth of what is under it show through
+    // A solid over a working zone or a principle part (L5, T10): a factor on its paper (`opacity`) and on its occlusion
+    // (`occlude`), so what lies behind reads through it, and a flat ink wash on its faces (`tint`, 0..1), so it still reads
+    // as a solid pane and never as empty outlines.
+    seeThrough: { opacity: 0.85, occlude: 0.9, tint: 0.06, kinds: ["plate", "bridge", "housing", "bracket", "part"] as const },
     // Ink shade on side walls, stepped by facing: alpha = shade * (from + span * i / (steps - 1)).
     wallShade: {
-      shade: 0.045, // 0..1 ink alpha
+      shade: 0.1, // 0..1 ink alpha
       steps: 5, // count of facing buckets
       light: [0.75, -0.25] as const, // screen direction the light comes from (x right, y down), the wall facing it is lightest
       outer: { from: 0.4, span: 0.9 }, // factors, outer walls
@@ -121,7 +125,7 @@ export const DRAFT = {
     link: { pattern: "dots", step: 2.4, alpha: 0.34, tint: 0 },
     link2: { pattern: "cross", step: 2.6, alpha: 0.3, tint: 0 }, // a second set of like links, told apart from the first (T16)
     output: { pattern: "hatch", step: 2.1, alpha: 0.3, tint: 0.03 },
-    ground: { pattern: "dash", step: 3.2, alpha: 0.24, tint: 0 },
+    ground: { pattern: "dash", step: 3.2, alpha: 0.24, tint: 0.035 },
     base: { pattern: "dots", step: 4.0, alpha: 0.18, tint: 0 },
     bearing: { pattern: "cross", step: 0.9, alpha: 0.22, tint: 0.06 },
     hw: { pattern: "none", tint: 0.12 },
@@ -132,7 +136,9 @@ export const DRAFT = {
 
   // Pattern tiles: one tile is one pattern step, mapped through the part's pose.
   pattern: {
-    offBelowCos: 0.15, // patterns switch off when cos(tilt) is below this (near edge-on, SD11)
+    offBelowCos: 0.15, // patterns are gone when cos(tilt) is below this (near edge-on, SD11)
+    fadeCos: 0.15, // over this much cos(tilt) above offBelowCos a pattern fades in, so it never switches off in one frame
+    superBelowPx: 8, // device px, a pattern step finer than this on screen is sampled four times per pixel (no shimmer)
     tile: 24, // px, cached tile side (tile units below)
     dotRadius: 3.6, // tile px, soft dot radius
     dotMid: [0.55, 0.8] as const, // gradient stop position and its alpha, soft dot falloff
@@ -166,6 +172,7 @@ export const DRAFT = {
     snap: 4, // degrees, a view this close to a named view is that view (title block, orbit snapping)
     views: { PLAN: [0, 0], FRONT: [0, 90], SIDE: [90, 90], ISOMETRIC: [45, 54.7356], DIMETRIC: [20.7, 70.5288] } as Record<string, readonly [number, number]>, // [yaw, tilt] degrees
     auxMinCos: 0.02, // an AUX view down an axis that stands this close to vertical turns the drawing's up to y
+    planOpens: 28, // degrees of tilt a record that declares PLAN opens at (it reads flat in plan; T7)
   },
 
   // Section views (SD19): the cut faces are paper hatched at 45 degrees, with a bold outline.
@@ -183,7 +190,7 @@ export const DRAFT = {
   // Ghost paths, phantom positions, ticks, explode trails (SD21, SD23, SD24, SD12).
   ghost: { alpha: 0.4, dash: [3, 3] as const, width: 1 }, // factor on path.alpha, px, px
   phantom: { dash: [4, 3] as const, width: 0.8, alpha: 0.85 }, // px, px, factor on the hidden lines' alpha
-  tick: { half: 3.5, width: 1, alpha: 0.8 }, // px half length of the cross mark, px, 0..1 ink
+  tick: { half: 3, width: 1, alpha: 0.75, minGap: 10, minPath: 60 }, // px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks
   trail: { width: 0.7, alpha: 0.55, dash: [2, 3] as const }, // px, 0..1, px: explode trail lines
 
   // Traced paths and the comet (SD7), accent.
@@ -198,6 +205,9 @@ export const DRAFT = {
     cometAlpha: 0.95, // 0..1 at the head, fading to 0
     cometSamples: 80, // count, longest trail in path samples (at most half the path)
     headR: 2.6, // px, open circle at the current point
+    // A curved path seen edge-on (SD7): it fades out as its screen thinness falls, relative to its own in 3D, through
+    // `fade`; a path thinner than `straight` in 3D is straight and always drawn.
+    edgeOn: { fade: [0.06, 0.18] as const, straight: 0.05 }, // ratios, ratio
     headStroke: 1.2, // px
   },
 
@@ -288,6 +298,43 @@ export const DRAFT = {
     labelBorder: 0.8, // px, panel hairline width
     labelEdge: 4, // px, labels kept this far inside the canvas
     labelSpacing: 3, // px, gap when a label is pushed below another
+    // Construction labels (SD22): callouts on a stage at least `minStage` wide, else numbered markers with a key.
+    labels: {
+      minStage: 640, // px, the narrowest stage that gets callouts
+      dim: 0.35, // 0..1, the other labels while one is picked out
+      samples: 24, // phases of the cycle a label's anchor is followed over to set its place
+    },
+    // Construction labels on a wide stage as elbow callouts (SD22): drop, shoulder, lettering on the shoulder.
+    callout: {
+      drop: 16, // px, the shortest drop from the anchor to the shoulder
+      rows: 10, // rows tried above the anchor, and as many below
+      maxRun: 320, // px, the longest shoulder run before the lettering (to carry it clear of the drawing)
+      runStep: 16, // px, the shoulder runs tried
+      overDrawing: 60, // cost of lettering wholly over the drawing, against px of leader (perPx)
+      perPx: 0.05, // cost per px of leader (drop and run)
+      otherSide: 3, // cost of the shoulder running inboard instead of outboard
+      clear: 8, // px, the lettering's clearance from the drawing
+      rowGap: 6, // px, between rows
+      sepX: 12, // px, the least paper between two labels across
+      sepY: 8, // px, the least paper between two labels up and down
+      textH: 11, // px, the lettering's height
+      lift: 3, // px, the lettering above its shoulder
+      gap: 6, // px, from the drop to the lettering, and past it to the shoulder's end
+      width: 1.1, // px, leader
+      leaderAlpha: 0.9, // 0..1
+      textAlpha: 1, // 0..1
+      arrow: 7, // px, the arrowhead's length at the element
+      arrowAngle: 0.38, // radians, its half-angle
+      dot: 2.4, // px, radius of the dot where a leader has no drop
+      panel: 0.85, // 0..1, paper behind the lettering
+      replanDeg: 25, // degrees the view turns before the rows are chosen again
+      sep: 16, // px, the least distance between two labels' anchors (each takes its own point on its element)
+      tween: 200, // ms, a row moving to its new place
+    },
+    // A picked construction label's end (SD22): it swells by `amount` and settles once a `period` (none under reduced motion).
+    pulse: { amount: 0.45, period: 1100 }, // factor, ms
+    // Construction labels on a narrow stage (SD22): numbered markers by the anchors, the key under the stage.
+    marker: { r: 7, width: 0.9, offset: 9, leaderWidth: 0.6, leaderAlpha: 0.45, dim: 0.4 }, // px, px, px, px, 0..1, 0..1
   },
 
   // Output plot (SD15).

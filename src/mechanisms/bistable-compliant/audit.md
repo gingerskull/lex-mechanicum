@@ -64,7 +64,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · the beams drawn rigid either side of each flexure, as their pseudo-rigid halves; the springs stretched between the roller and the window's ends |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 107 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 103 solids unsound |
 | D7 | PASS | HAND · blank and pusher plain; richness in the pads' clamps, the springs, the slide and the drive |
 | A1 | PASS | AUTO · slide J5, AL J13, TL J13, SL J13, AR J13, TR J13, SR J13, window J13, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · slide J5, AL J13, TL J13, SL J13, AR J13, TR J13, SR J13, window J13, drive drive · the beams' flexures and the window's springs by the compliant kit (J13); the pusher on a slide (J5); the drive by the input kind (V5) |
@@ -179,7 +179,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 61.9, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 49.9, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | AL | J13 | flexure | – | – | none | none | none | none | none | none | none | none | none | none |
 | TL | J13 | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | SL | J13 | flexure | – | – | none | none | none | none | none | none | none | none | none | none |
@@ -207,8 +207,8 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-E | 15 | 0 | 1.97 |
 | DL-F | 0 | 0 | 1.98 |
 | DL-G | 0 | 0 | 2.03 |
-| DL-H | 13 | 0 | 1.92 |
-| never | 77 | 51 | 1.98 |
+| DL-H | 9 | 0 | 1.92 |
+| never | 77 | 49 | 1.98 |
 
 ## Promotion candidates
 None left: the compliant kit builds the pads, the window's roller and springs, and the shuttle's stop pins; the yoke drive serves the linear pusher; the snap is a mode of the flexure block.
