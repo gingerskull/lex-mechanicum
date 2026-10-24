@@ -12,7 +12,7 @@ export const meshOfShape = (s: Shape2): MeshData => s.mesh ?? tessellate(s.profi
 /** The drafting edges of a shape, straight from the profile where it is a plain extrusion, else from the mesh. */
 export function edgesOfShape(s: Shape2, mesh: MeshData): EdgeSet {
   const marks = s.marks ?? [];
-  if (s.profile && s.op?.op === "extrude" && !s.op.twist && (s.op.scaleTop ?? 1) === 1) return edgesOfExtrude(s.profile, s.op, marks);
+  if (s.profile && s.op?.op === "extrude" && !s.op.twist) return edgesOfExtrude(s.profile, s.op, marks);
   const op = s.op?.op === "extrude" ? s.op : null;
   return edgesOfMesh(mesh, marks, { z: op ? op.h : 0, scale: op?.scaleTop ?? 1, turn: ((op?.twist ?? 0) * Math.PI) / 180 });
 }

@@ -60,11 +60,16 @@ export function edgesOfExtrude(profile: Profile, op: Extract<Op, { op: "extrude"
   const p = orient(profile);
   const out = new Out();
   const h = op.h;
+  // a tapered extrusion (a bevel gear's frustum): the top ring is the profile scaled about the origin; its walls lean,
+  // so their normals come from the 3D faces, but which wall edges are corners still comes from the profile (a tooth's tip
+  // and root stay corners on a gear whose face lies nearly flat, where the faces meet at only a few degrees)
+  const k = op.scaleTop ?? 1;
   [p.outer, ...p.holes].forEach((ring, r) => {
     const n = ring.length;
     const nx = new Float64Array(n);
     const ny = new Float64Array(n);
     const len = new Float64Array(n);
+    const w3: [number, number, number][] = [];
     for (let i = 0; i < n; i++) {
       const a = ring[i]!;
       const b = ring[(i + 1) % n]!;
@@ -74,26 +79,34 @@ export function edgesOfExtrude(profile: Profile, op: Extract<Op, { op: "extrude"
       len[i] = l;
       nx[i] = dy / l;
       ny[i] = -dx / l;
+      // the wall's normal: across its bottom edge and its rise to the scaled top
+      const ex = (k - 1) * a[0], ey = (k - 1) * a[1];
+      const wx = dy * h, wy = -dx * h, wz = dx * ey - dy * ex;
+      const wl = Math.hypot(wx, wy, wz) || 1;
+      w3.push([wx / wl, wy / wl, wz / wl]);
     }
     const fl = r ? EFLAG.hole : 0;
     let cum = 0;
+    let cumTop = 0;
     for (let i = 0; i < n; i++) {
       const a = ring[i]!;
       const b = ring[(i + 1) % n]!;
-      const wall = [nx[i]!, ny[i]!, 0];
+      const wall = w3[i]!;
       out.push(a[0], a[1], 0, b[0], b[1], 0, [0, 0, -1], wall, cum, cum + len[i]!, EDGE.cap, fl);
-      out.push(a[0], a[1], h, b[0], b[1], h, [0, 0, 1], wall, cum, cum + len[i]!, EDGE.cap, fl | EFLAG.top);
+      out.push(k * a[0], k * a[1], h, k * b[0], k * b[1], h, [0, 0, 1], wall, cumTop, cumTop + k * len[i]!, EDGE.cap, fl | EFLAG.top);
       cum += len[i]!;
+      cumTop += k * len[i]!;
     }
     for (let i = 0; i < n; i++) {
       const j = (i + n - 1) % n;
       const d = nx[j]! * nx[i]! + ny[j]! * ny[i]!;
       if (d > FLAT) continue;
       const a = ring[i]!;
-      out.push(a[0], a[1], 0, a[0], a[1], h, [nx[j]!, ny[j]!, 0], [nx[i]!, ny[i]!, 0], 0, h, d < CREASE ? EDGE.crease : EDGE.smooth, 0);
+      const L = Math.hypot((k - 1) * a[0], (k - 1) * a[1], h);
+      out.push(a[0], a[1], 0, k * a[0], k * a[1], h, w3[j]!, w3[i]!, 0, L, d < CREASE ? EDGE.crease : EDGE.smooth, 0);
     }
   });
-  pushMarks(out, marks, h, 1, 0);
+  pushMarks(out, marks, h, k, 0);
   return out.done();
 }
 
