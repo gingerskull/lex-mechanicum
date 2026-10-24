@@ -313,6 +313,29 @@ export const DRAFT = {
       edge: 10, // px, a rail's clearance from the drawing
       samples: 24, // phases of the cycle a label's anchor is followed over to set its slot
     },
+    // Construction labels on a wide stage as elbow callouts (SD22): drop, shoulder, lettering on the shoulder.
+    callout: {
+      drop: 16, // px, the shortest drop from the anchor to the shoulder
+      rows: 10, // rows tried above the anchor, and as many below
+      maxRun: 320, // px, the longest shoulder run before the lettering (to carry it clear of the drawing)
+      runStep: 16, // px, the shoulder runs tried
+      overDrawing: 60, // cost of lettering wholly over the drawing, against px of leader (perPx)
+      perPx: 0.05, // cost per px of leader (drop and run)
+      otherSide: 3, // cost of the shoulder running inboard instead of outboard
+      clear: 8, // px, the lettering's clearance from the drawing
+      rowGap: 6, // px, between rows
+      textH: 11, // px, the lettering's height
+      lift: 3, // px, the lettering above its shoulder
+      gap: 6, // px, from the drop to the lettering, and past it to the shoulder's end
+      width: 0.8, // px, leader
+      leaderAlpha: 0.6, // 0..1
+      textAlpha: 0.9, // 0..1
+      dot: 2, // px, radius of the dot at the anchor
+      panel: 0.85, // 0..1, paper behind the lettering
+      replanDeg: 25, // degrees the view turns before the rows are chosen again
+      sep: 16, // px, the least distance between two labels' anchors (each takes its own point on its element)
+      tween: 200, // ms, a row moving to its new place
+    },
     // Construction labels on a narrow stage (SD22): numbered markers by the anchors, the key under the stage.
     marker: { r: 7, width: 0.9, offset: 9, leaderWidth: 0.6, leaderAlpha: 0.45, dim: 0.4 }, // px, px, px, px, 0..1, 0..1
   },

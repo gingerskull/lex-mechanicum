@@ -211,6 +211,7 @@ async function main(box: HTMLElement) {
       ring: s.ring,
       glitch: s.glitch,
       focus: s.focus,
+      now: performance.now(),
     });
 
   // the output plot
@@ -345,6 +346,8 @@ async function main(box: HTMLElement) {
     }
     if (ctlDirty) applyControls();
     if (dirty && inView) draw();
+    // a callout row easing to its new place after the view turned (SD22)
+    if (sess.busy) dirty = true;
     requestAnimationFrame(tick);
   };
   // a Forge glitch pulse or blip tears the drawing for its length (islands/forge.ts sends it, never under reduced motion)

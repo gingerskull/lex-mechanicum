@@ -16,7 +16,7 @@ import { FORM } from "../../style/form";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
 import type { Ladder } from "../detail";
 import { angleToEye, project, scaleOf, type Camera } from "./camera";
-import { arrowHead, drawMarkers, drawRails, labeler, type LabelMode, type LabelPlan, type LabelSpot, type Labeler } from "./labels";
+import { arrowHead, drawCallouts, drawMarkers, drawRails, labeler, type LabelMode, type LabelPlan, type LabelSpot, type Labeler } from "./labels";
 import type { Controls } from "./poser";
 import { applyMat, mulMat, type Runtime } from "./scene";
 
@@ -710,6 +710,8 @@ export interface LabelDraw {
   focus: number | null;
   /** The sheet's drawing area across, CSS px: the rails stand inside it. */
   frame: { x0: number; x1: number };
+  /** Callout rows mid-tween (session), by label key. */
+  rows?: Map<string, number>;
 }
 
 /**
@@ -741,7 +743,8 @@ export function overlays(A: Ann, L?: LabelDraw): void {
     drawOverlay(A, ov, label, ink);
   }
   ctx.restore();
-  if (L?.plan && L.mode === "rails") drawRails(ctx, T, L.plan, spots, L.frame, L.focus);
+  if (L?.plan && L.mode === "callouts") drawCallouts(ctx, T, L.plan, spots, L.focus, L.rows);
+  else if (L?.plan && L.mode === "rails") drawRails(ctx, T, L.plan, spots, L.frame, L.focus);
   else if (L?.plan && L.mode === "markers") drawMarkers(ctx, T, L.plan, spots, L.focus);
 }
 

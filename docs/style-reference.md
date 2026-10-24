@@ -174,7 +174,7 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | SD19 | **Section views.** The record names a cut plane; solids on the near side are removed, the cut faces are hatched at 45° in ink with the cut outlines drawn bold, and what lies behind shows as in any other view. Cut faces never show through translucent plates: a section draws the cut outline and hatching of the cut solids only. |
 | SD20 | **Detail views.** A magnified window of the drawing, framed and lettered (DETAIL B), drawn by the same renderer at a larger scale with its own line weights floor (SF11); the dial position applies as in the main view. |
 | SD21 | **Phantom positions.** A part at an extreme position is shown as a thin, dashed outline in ink at the alpha of the hidden lines, with no fill, so the range of motion reads without a second copy of the part. |
-| SD22 | **Construction overlays** (dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, a workspace outline, a chord, a crank line) are drafting construction: fine dashed ink lines, their points named in the record. They never change the drawing beneath, and their labels never cover it or move about. On a wide stage the labels stand in rails at the sides of the sheet (the drawing is fitted with room for them), each with a drafting leader, a short shoulder then a straight line, to its element; on a narrow stage they are small numbered markers by their elements, with the key under the stage, where a tap picks a line out (bold, in accent, the rest faded); a card has none. A leader ends on the element's steadiest point (of its ends, middle, vertex or rim, the one that moves least over the cycle), and a label's slot is set from where it sits over the whole cycle, so neither changes while the drawing plays or is scrubbed; both are set again only when the view, the stage or the controls change. |
+| SD22 | **Construction overlays** (dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, a workspace outline, a chord, a crank line) are drafting construction: fine dashed ink lines, their points named in the record, off until the visitor turns them on. They never change the drawing beneath. On a wide stage each label is a drafting callout on its element: from a dot on the element a leader drops straight up or down to the label's row, a horizontal shoulder runs outboard (away from the drawing's middle) and the lettering sits on the shoulder over a paper ground. The dot is the element's steadiest point (of its ends, middle, vertex or rim, the one that moves least over the cycle) clear of the other labels' dots, so a moving element's label rides with it and no two leaders share a dot. Rows and sides are chosen once for the view over the whole cycle, so labels never meet while the drawing plays, keep off the title block and stay on the sheet; they are chosen again only when the view turns more than 25° or the stage, the controls or the explode change, and a row then eases to its new place. On a narrow stage the labels are small numbered markers by their elements, with the key under the stage, where a tap picks a line out (bold, in accent, the rest faded); a card has none. |
 | SD23 | **Ghost traces.** The path of a setting that is not selected (a Walschaerts die at +1, 0 and -1; the full lemniscate of a Watt linkage) is a fine dashed accent line at a fraction of the trace alpha, drawn under the selected trace. |
 | SD24 | **Teaching traces and ticks.** A teaching trace follows SD7; equal-time ticks are short strokes across it in its accent at equal steps of the input, so uneven speed reads as uneven spacing. Where they would crowd, every second (or third) is drawn, still at equal steps; a path too short on screen to carry them has none. A curved trace seen edge-on fades out (it would be a stray line), and its comet keeps showing the motion. |
 | SD25 | **Same-role parts told apart by pattern variant or an index mark**, never by hue (a Schmidt coupling's two link sets): a role has a small set of registered pattern variants, and one bold index mark on a disc is a `mark`. |
@@ -294,6 +294,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.minorWidth` | 0.5 | px |
 | `draft.grid.majorWidth` | 0.8 | px |
 | `draft.card.detail` | `C` | detail dial position of a card drawing (DL): sharp, without wall shading or the deep layers |
+| `draft.card.refW` | 320 | px, width of the canvas the card thumbnails are drawn on; a live card scales its margin to it |
 | `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
 | `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
 | `draft.lines.plateTop` | 1.7 | px, bold top outline of plates |
@@ -546,6 +547,26 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.rail.dim` | 0.35 | 0..1, the other labels while one is picked out |
 | `draft.overlays.rail.edge` | 10 | px, a rail's clearance from the drawing |
 | `draft.overlays.rail.samples` | 24 | phases of the cycle a label's anchor is followed over to set its slot |
+| `draft.overlays.callout.drop` | 16 | px, the shortest drop from the anchor to the shoulder |
+| `draft.overlays.callout.rows` | 10 | rows tried above the anchor, and as many below |
+| `draft.overlays.callout.maxRun` | 320 | px, the longest shoulder run before the lettering (to carry it clear of the drawing) |
+| `draft.overlays.callout.runStep` | 16 | px, the shoulder runs tried |
+| `draft.overlays.callout.overDrawing` | 60 | cost of lettering wholly over the drawing, against px of leader (perPx) |
+| `draft.overlays.callout.perPx` | 0.05 | cost per px of leader (drop and run) |
+| `draft.overlays.callout.otherSide` | 3 | cost of the shoulder running inboard instead of outboard |
+| `draft.overlays.callout.clear` | 8 | px, the lettering's clearance from the drawing |
+| `draft.overlays.callout.rowGap` | 6 | px, between rows |
+| `draft.overlays.callout.textH` | 11 | px, the lettering's height |
+| `draft.overlays.callout.lift` | 3 | px, the lettering above its shoulder |
+| `draft.overlays.callout.gap` | 6 | px, from the drop to the lettering, and past it to the shoulder's end |
+| `draft.overlays.callout.width` | 0.8 | px, leader |
+| `draft.overlays.callout.leaderAlpha` | 0.6 | 0..1 |
+| `draft.overlays.callout.textAlpha` | 0.9 | 0..1 |
+| `draft.overlays.callout.dot` | 2 | px, radius of the dot at the anchor |
+| `draft.overlays.callout.panel` | 0.85 | 0..1, paper behind the lettering |
+| `draft.overlays.callout.replanDeg` | 25 | degrees the view turns before the rows are chosen again |
+| `draft.overlays.callout.sep` | 16 | px, the least distance between two labels' anchors (each takes its own point on its element) |
+| `draft.overlays.callout.tween` | 200 | ms, a row moving to its new place |
 | `draft.overlays.marker.r` | 7 | px, px, px, px, 0..1, 0..1 |
 | `draft.overlays.marker.width` | 0.9 | px, px, px, px, 0..1, 0..1 |
 | `draft.overlays.marker.offset` | 9 | px, px, px, px, 0..1, 0..1 |

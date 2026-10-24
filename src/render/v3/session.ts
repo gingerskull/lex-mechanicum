@@ -12,8 +12,9 @@ import { ladder, type Dial } from "../detail";
 import { paper, tooth } from "../sheet";
 import { baseSketch, basePencil, centrelines, dimensions, highlights, labelSpots, newCache, overlayItems, overlays, phantoms, scaleLabel, traces, trails, type Ann, type OverlayFlags } from "./annotate";
 import { font } from "../../style/theme";
-import { railSides, railSlots, steadiest, type LabelMode, type LabelPlan } from "./labels";
-import { basisOfOrient, fit, snapName, viewLabel, type Box, type Camera } from "./camera";
+import { calloutPlan, coverage, railSides, railSlots, steadiest, type LabelMode, type LabelPlan } from "./labels";
+import { basisOfOrient, fit, project, snapName, viewLabel, type Box, type Camera } from "./camera";
+import type { Vec3 } from "../../solids/types";
 import { Geometry, gpu3, gpuReady, onRestored, postPass, type Stats3 } from "./gpu";
 import type { Poser } from "./poser";
 import { place, rows, runtime, worldBox, type Runtime, type Scene } from "./scene";
@@ -47,6 +48,8 @@ export interface DrawView3 {
   labels?: LabelMode;
   /** A construction label picked out (its number in the record's order, from 0): its element bold, the rest faded. */
   focus?: number | null;
+  /** The views' clock, ms (performance.now on the stage): callout rows ease to a new place on it; absent, they jump. */
+  now?: number;
 }
 
 /**
@@ -77,6 +80,8 @@ export interface Session3 {
   setPoser(p: Poser): void;
   /** Solids see-through in the last frame (T10), for the audit and the tests. */
   readonly see: Uint8Array;
+  /** True while a callout row is easing to a new place: whoever draws keeps drawing until it settles. */
+  readonly busy: boolean;
   readonly stats: Stats3 | null;
   /** Called after a lost GPU context is rebuilt (set by whoever draws). */
   onRestored: (() => void) | null;
@@ -141,6 +146,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     see,
     get stats() {
       return geo?.stats ?? null;
+    },
+    get busy() {
+      return tween !== null;
     },
     onRestored: null,
     draw(u, view) {
@@ -211,7 +219,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       traces(A, { traces: sh.traces !== false, ghosts: sh.ghosts !== false, ticks: sh.ticks !== false });
       const edge = DRAFT.sheet.inset + DRAFT.sheet.innerOffset;
       // a card draws no construction at all (SD22); the stage opens with it off, and the visitor turns it on
-      if (sh.construction !== false && !view.card) overlays(A, { mode, plan, focus: view.focus ?? null, frame: { x0: edge, x1: card.w - edge } });
+      if (sh.construction !== false && !view.card) overlays(A, { mode, plan, focus: view.focus ?? null, frame: { x0: edge, x1: card.w - edge }, rows: tweenRows(plan, view.now) });
       frames(A, view.frames);
       highlights(A, [...view.highlight, ...(view.state.section?.highlight ?? []), ...(view.state.detail?.highlight ?? [])]);
       if (view.sheet && !view.card) {
@@ -263,20 +271,74 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
   };
 
   // where the construction labels go for a view, and the room the rails take: fixed for the view (SD22)
-  let labelCache: { key: string; plan: LabelPlan | null } = { key: "", plan: null };
-  const labelMode = (view: DrawView3): LabelMode => (view.card ? "none" : (view.labels ?? (card.w >= DRAFT.overlays.rail.minStage ? "rails" : "markers")));
+  let labelCache: { key: string; plan: LabelPlan | null; eye?: Vec3 } = { key: "", plan: null };
+  // a callout row moving to the place a new plan gives it: from where it was, over `tween` ms of the views' clock
+  let tween: { from: Map<string, number>; t0: number } | null = null;
+  const labelMode = (view: DrawView3): LabelMode => (view.card ? "none" : (view.labels ?? (card.w >= DRAFT.overlays.rail.minStage ? "callouts" : "markers")));
   function labelPlan(view: DrawView3, u: number, e: number, mode: LabelMode, A0: Omit<Ann, "C">): LabelPlan | null {
     const t = scene.teaching;
     if (mode === "none" || view.show.construction === false || !t?.overlays.some((o) => typeof o.label === "string" && o.label)) return null;
-    const key = JSON.stringify([view.state, card.w, card.h, mode, rev, e, view.theme]);
-    if (labelCache.key === key) return labelCache.plan;
+    const eye = basisOfOrient(view.state.orient).eye;
+    // callouts keep their rows while the view turns less than `replanDeg` from where they were chosen (no jumps in an
+    // orbit); anything else about the view chooses again
+    const rest = { ...view.state, orient: undefined };
+    const key = JSON.stringify([mode === "callouts" ? rest : view.state, view.state.orient.aux ?? null, card.w, card.h, mode, rev, Math.round(e * 4), view.theme]);
+    const near = labelCache.eye && Math.acos(Math.min(1, Math.abs(labelCache.eye[0] * eye[0] + labelCache.eye[1] * eye[1] + labelCache.eye[2] * eye[2]))) < (DRAFT.overlays.callout.replanDeg * Math.PI) / 180;
+    if (labelCache.key === key && (mode !== "callouts" || near)) return labelCache.plan;
     const R = DRAFT.overlays.rail;
     const follow = (C: Camera) => steadiest(Array.from({ length: R.samples }, (_, k) => labelSpots({ ...A0, C }, (k / R.samples) * scene.poser.period)));
     const C0 = camera(view, u, e);
     let st = follow(C0);
     let plan: LabelPlan;
     if (mode === "markers") plan = { mode, left: 0, right: 0, items: st.map((s) => ({ key: s.key, n: s.n, text: s.text, cand: s.cand, side: 0, y: 0 })) };
-    else {
+    else if (mode === "callouts") {
+      const samples = Array.from({ length: R.samples }, (_, k) => labelSpots({ ...A0, C: C0 }, (k / R.samples) * scene.poser.period));
+      const box = sceneBox(rt, mats, e);
+      const cx = project(C0, [(box[0] + box[3]) / 2, (box[1] + box[4]) / 2, (box[2] + box[5]) / 2])[0];
+      const S = DRAFT.sheet;
+      const tw = Math.max(S.titleMinW, Math.min(S.titleMaxW, card.w * S.titleWFrac));
+      const e0 = S.inset + S.innerOffset;
+      const block: [number, number, number, number] | null = view.sheet && card.w > S.titleMinCanvas ? [card.w - e0 - tw, card.h - e0 - 4 * S.titleRow, card.w - e0, card.h - e0] : null;
+      // where the drawing is over the cycle: each solid's outline on the sheet (the base plate and its feet left out, its
+      // plain face is fine to letter over), at every sampled phase for a moving one
+      const rects: [number, number, number, number][] = [];
+      const M = new Float32Array(rt.n * 16);
+      const wb: number[] = [];
+      const solids = rt.scene.pkg.solids;
+      const rectOf = (m: Float32Array, i: number) => {
+        worldBox(rt, m, i, wb);
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const x of [wb[0]!, wb[3]!]) for (const y of [wb[1]!, wb[4]!]) for (const z of [wb[2]!, wb[5]!]) {
+          const p = project(C0, [x, y, z]);
+          x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]);
+        }
+        rects.push([x0, y0, x1, y1]);
+      };
+      const skip = (i: number) => rt.isBase[i] === 1 || solids[i]!.kind === "foot" || !LDof(view, e).solid(solids[i]!.detail);
+      place(rt, u, e, M);
+      for (let i = 0; i < rt.n; i++) if (!skip(i) && rt.fixed[i]) rectOf(M, i);
+      for (let k = 0; k < R.samples; k++) {
+        place(rt, (k / R.samples) * scene.poser.period, e, M);
+        for (let i = 0; i < rt.n; i++) if (!skip(i) && !rt.fixed[i]) rectOf(M, i);
+      }
+      const drawn = coverage(rects, card.w, card.h);
+      const ctx = card.ctx;
+      ctx.save();
+      ctx.font = font(DRAFT.type.overlaySmall);
+      const items = calloutPlan(samples, st, cx, { w: card.w, h: card.h, block, drawn }, (x) => ctx.measureText(x).width);
+      ctx.restore();
+      // where the old rows were, for the tween
+      const old = labelCache.plan?.mode === "callouts" ? labelCache.plan : null;
+      if (old && view.now !== undefined) {
+        const from = new Map<string, number>();
+        for (const it of items) {
+          const o = old.items.find((q) => q.key === it.key && q.side === it.side);
+          if (o && o.y !== it.y) from.set(it.key, o.y);
+        }
+        tween = from.size ? { from, t0: view.now } : null;
+      }
+      plan = { mode, left: 0, right: 0, items };
+    } else {
       const ctx = card.ctx;
       ctx.save();
       ctx.font = font(DRAFT.type.overlaySmall);
@@ -290,10 +352,28 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       const bottom: [number, number] = [card.h - S.inset - S.innerOffset - R.spacing, card.h - S.inset - S.innerOffset - block - R.spacing];
       plan = { mode, left, right, items: railSlots(st, sides, top, bottom) };
     }
-    labelCache = { key, plan };
+    labelCache = { key, plan, eye };
     return plan;
   }
 
+  /** The callout rows of this frame mid-tween, or undefined when none is moving. */
+  function tweenRows(plan: LabelPlan | null, now: number | undefined): Map<string, number> | undefined {
+    if (!tween || !plan || now === undefined) return undefined;
+    const k = Math.min(1, (now - tween.t0) / DRAFT.overlays.callout.tween);
+    if (k >= 1) {
+      tween = null;
+      return undefined;
+    }
+    const e = 1 - (1 - k) * (1 - k);
+    const out = new Map<string, number>();
+    for (const it of plan.items) {
+      const f = tween.from.get(it.key);
+      if (f !== undefined) out.set(it.key, f + (it.y - f) * e);
+    }
+    return out;
+  }
+
+  const LDof = (view: DrawView3, e: number) => ladder(view.detail, { tilt: tiltOf(basisFor(view)), explode: e });
   const basisFor = (view: DrawView3): Camera => ({ ...basisOfOrient(view.state.orient), s: 1, ox: 0, oy: 0, d0: 0, d1: 1 });
 
   function camera(view: DrawView3, u: number, explode: number, rails?: { left: number; right: number }): Camera {

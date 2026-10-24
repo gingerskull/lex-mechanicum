@@ -65,11 +65,13 @@ export interface LabelSpot {
 }
 
 /** How the construction labels are laid out (SD22): in rails at the sides with leaders, as numbered markers, or not. */
-export type LabelMode = "rails" | "markers" | "none";
+export type LabelMode = "callouts" | "rails" | "markers" | "none";
 
 /** One construction label's place for a view: the candidate it hangs on, its side, and its slot's height (rails). */
 export interface LabelItem {
   key: string;
+  /** A callout's shoulder run before its lettering, CSS px (it carries the lettering clear of the drawing). */
+  x?: number;
   /** Its number in the record's order, from 0 (the key under a phone's stage counts from 1). */
   n: number;
   text: string;
@@ -80,7 +82,7 @@ export interface LabelItem {
 
 /** Where a view's construction labels go, fixed until the view changes. */
 export interface LabelPlan {
-  mode: "rails" | "markers";
+  mode: "callouts" | "rails" | "markers";
   /** Room the drawing leaves for the rails, CSS px (0 where a side has no labels). */
   left: number;
   right: number;
@@ -121,23 +123,27 @@ export function steadiest(samples: LabelSpot[][]): Steady[] {
     });
   }
   const out: Steady[] = [];
+  // a point several labels share (a pivot two lines start from, an apex where axes meet) would leave their leaders on
+  // one dot: each label takes the steadiest of its points clear of the anchors already taken, in the record's order
+  const sep = DRAFT.overlays.callout.sep;
+  const taken: [number, number][] = [];
   for (const [key, e] of by) {
-    let best = 0;
-    let spread = Infinity;
-    let mean: [number, number] = [0, 0];
-    e.pts.forEach((pts, k) => {
-      if (!pts.length) return;
-      const mx = pts.reduce((a, p) => a + p[0], 0) / pts.length;
-      const my = pts.reduce((a, p) => a + p[1], 0) / pts.length;
-      const v = pts.reduce((a, p) => a + (p[0] - mx) ** 2 + (p[1] - my) ** 2, 0) / pts.length;
-      // a later candidate wins only when it is clearly steadier (the first is the overlay's own place for the label)
-      if (v + 1 < spread) {
-        spread = v;
-        best = k;
-        mean = [mx, my];
-      }
-    });
-    out.push({ key, n: out.length, text: e.text, cand: best, mean });
+    const stats = e.pts
+      .map((pts, k) => {
+        if (!pts.length) return null;
+        const mx = pts.reduce((a, p) => a + p[0], 0) / pts.length;
+        const my = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+        const v = pts.reduce((a, p) => a + (p[0] - mx) ** 2 + (p[1] - my) ** 2, 0) / pts.length;
+        // the first is the overlay's own place for the label: a later one wins only when clearly steadier
+        return { k, v: k === 0 ? v - 1 : v, mean: [mx, my] as [number, number] };
+      })
+      .filter((x): x is { k: number; v: number; mean: [number, number] } => !!x)
+      .sort((a, b) => a.v - b.v);
+    const clear = (m: [number, number]) => Math.min(Infinity, ...taken.map((t) => Math.hypot(t[0] - m[0], t[1] - m[1])));
+    const pick = stats.find((s) => clear(s.mean) >= sep) ?? [...stats].sort((a, b) => clear(b.mean) - clear(a.mean))[0];
+    if (!pick) continue;
+    taken.push(pick.mean);
+    out.push({ key, n: out.length, text: e.text, cand: pick.k, mean: pick.mean });
   }
   return out;
 }
@@ -253,4 +259,141 @@ export function drawMarkers(ctx: CanvasRenderingContext2D, T: ResolvedTheme, pla
     ctx.fillText(String(it.n + 1), x, y + 0.5);
   }
   ctx.restore();
+}
+
+// ------------------------------------------------------------------------------------------ elbow callouts (wide)
+
+/**
+ * The callouts of a wide stage (SD22): each label rides its element. From the anchor a leader drops straight up or down
+ * to the label's row, then a horizontal shoulder runs outboard (away from the drawing's middle), and the lettering sits on
+ * the shoulder. The row and side are chosen once for the view, over the whole cycle, so two labels never meet while the
+ * drawing plays: each label in the record's order takes the first row, above its anchor then below, whose lettering and
+ * drop stay clear of those already placed at every sampled phase, inside the sheet and off the title block.
+ */
+export function calloutPlan(samples: LabelSpot[][], steady: Steady[], cx: number, area: { w: number; h: number; block: [number, number, number, number] | null; drawn?: (b: [number, number, number, number]) => number }, width: (t: string) => number): LabelItem[] {
+  const K = O.callout;
+  const th = K.textH;
+  type Box = [number, number, number, number];
+  const hit = (a: Box, b: Box) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+  const keysBy = samples.map(spotKeys);
+  const placed: Box[][] = samples.map(() => []);
+  const edge = DRAFT.sheet.inset + DRAFT.sheet.innerOffset + 4;
+  const out: LabelItem[] = [];
+  for (const it of steady) {
+    const tw = width(DRAFT.type.uppercase ? capitals(it.text) : it.text);
+    const pts = samples.map((f, k) => {
+      const i = keysBy[k]!.indexOf(it.key);
+      return i < 0 ? null : (f[i]!.cands[it.cand] ?? f[i]!.cands[0]!);
+    });
+    const boxes = (side: 0 | 1, dy: number, run = 0): (Box[] | null)[] =>
+      pts.map((p) => {
+        if (!p) return null;
+        const s = side === 0 ? -1 : 1;
+        const ky = p[1] + dy;
+        const x0 = p[0] + s * (K.gap + run), x1 = p[0] + s * (K.gap + run + tw);
+        const text: Box = [Math.min(x0, x1) - 2, ky - th - K.lift, Math.max(x0, x1) + 2, ky + 1];
+        const drop: Box = [p[0] - 2, Math.min(p[1], ky), p[0] + 2, Math.max(p[1], ky)];
+        return [text, drop];
+      });
+    // a candidate's cost: off the sheet or on the title block is out; on another label or its drop nearly so; lettering
+    // over the drawing costs by how much of it is covered; then the shorter leader wins
+    const n = Math.max(1, pts.filter(Boolean).length);
+    const cost = (bx: (Box[] | null)[], dy: number, run: number): number => {
+      let bad = 0;
+      bx.forEach((b, k) => {
+        if (!b) return;
+        const t = b[0]!;
+        if (t[0] < edge || t[2] > area.w - edge || t[1] < edge || t[3] > area.h - edge) bad += 1000;
+        if (area.block && hit(t, area.block)) bad += 1000;
+        for (const q of placed[k]!) for (const m of b) if (hit(m, q)) bad += 200;
+        if (area.drawn) bad += K.overDrawing * area.drawn([t[0] - K.clear, t[1] - K.clear, t[2] + K.clear, t[3] + K.clear]);
+      });
+      return bad / n + K.perPx * (Math.abs(dy) + run);
+    };
+    const home: 0 | 1 = it.mean[0] < cx ? 0 : 1;
+    const rows: number[] = [];
+    for (let r = 0; r < K.rows; r++) rows.push(-(K.drop + r * (th + K.rowGap)));
+    for (let r = 0; r < K.rows; r++) rows.push(K.drop + th + r * (th + K.rowGap));
+    let best: { side: 0 | 1; dy: number; run: number; bad: number } | null = null;
+    for (const side of [home, (1 - home) as 0 | 1])
+      for (const dy of rows)
+        for (let run = 0; run <= K.maxRun; run += K.runStep) {
+          const bad = cost(boxes(side, dy, run), dy, run) + (side === home ? 0 : K.otherSide);
+          if (!best || bad < best.bad) best = { side, dy, run, bad };
+        }
+    const pick = best!;
+    boxes(pick.side, pick.dy, pick.run).forEach((b, k) => b && placed[k]!.push(...b));
+    out.push({ key: it.key, n: it.n, text: it.text, cand: it.cand, side: pick.side, y: pick.dy, x: pick.run });
+  }
+  return out;
+}
+
+/** Draws the callouts at the anchors now: a drop, a shoulder outboard, the lettering on it; `dy` overrides a row mid-tween. */
+export function drawCallouts(ctx: CanvasRenderingContext2D, T: ResolvedTheme, plan: LabelPlan, spots: LabelSpot[], focus: number | null, dy?: Map<string, number>): void {
+  const K = O.callout;
+  const keys = spotKeys(spots);
+  ctx.save();
+  ctx.font = font(DRAFT.type.overlaySmall);
+  ctx.textBaseline = "alphabetic";
+  for (const it of plan.items) {
+    const k = keys.indexOf(it.key);
+    if (k < 0) continue;
+    const a = spots[k]!.cands[it.cand] ?? spots[k]!.cands[0];
+    if (!a) continue;
+    const now = spots[k]!.text;
+    const t = DRAFT.type.uppercase ? capitals(now) : now;
+    const tw = ctx.measureText(t).width;
+    const s = it.side === 0 ? -1 : 1;
+    const ky = a[1] + (dy?.get(it.key) ?? it.y);
+    const run = it.x ?? 0;
+    const end = a[0] + s * (K.gap * 2 + run + tw);
+    const lit = focus === null || focus === it.n;
+    ctx.globalAlpha = lit ? 1 : O.rail.dim;
+    const ink = focus === it.n ? paint(T.accent) : paint(T.ink, K.leaderAlpha);
+    // the lettering's ground: the paper, so it reads where it crosses a part
+    const tx = s < 0 ? end + K.gap * 0.5 : a[0] + K.gap * 1.5 + run;
+    ctx.fillStyle = paint(T.paper, K.panel);
+    ctx.fillRect(Math.min(tx, tx + tw) - 2, ky - K.textH - K.lift, tw + 4, K.textH + K.lift - 1);
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = K.width;
+    ctx.beginPath();
+    ctx.moveTo(a[0], a[1]);
+    ctx.lineTo(a[0], ky);
+    ctx.lineTo(end, ky);
+    ctx.stroke();
+    ctx.fillStyle = ink;
+    ctx.beginPath();
+    ctx.arc(a[0], a[1], K.dot, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = focus === it.n ? paint(T.accent) : paint(T.ink, K.textAlpha);
+    ctx.textAlign = "left";
+    ctx.fillText(t, tx, ky - K.lift);
+  }
+  ctx.restore();
+}
+
+/**
+ * Where the drawing is, for the callouts (SD22): screen rectangles (the solids' outlines, every sampled phase of a moving
+ * one) laid on a grid of `cell` px, with a summed-area table so a box's covered share is found at once. Returns that query:
+ * 0 for a box clear of the drawing, 1 for one wholly over it.
+ */
+export function coverage(rects: [number, number, number, number][], w: number, h: number, cell = 6): (b: [number, number, number, number]) => number {
+  const nx = Math.ceil(w / cell) + 1, ny = Math.ceil(h / cell) + 1;
+  const g = new Uint8Array(nx * ny);
+  for (const r of rects) {
+    const x0 = Math.max(0, Math.floor(r[0] / cell)), x1 = Math.min(nx - 1, Math.floor(r[2] / cell));
+    const y0 = Math.max(0, Math.floor(r[1] / cell)), y1 = Math.min(ny - 1, Math.floor(r[3] / cell));
+    for (let y = y0; y <= y1; y++) g.fill(1, y * nx + x0, y * nx + x1 + 1);
+  }
+  const S = new Float64Array((nx + 1) * (ny + 1));
+  for (let y = 0; y < ny; y++)
+    for (let x = 0; x < nx; x++) S[(y + 1) * (nx + 1) + x + 1] = g[y * nx + x]! + S[y * (nx + 1) + x + 1]! + S[(y + 1) * (nx + 1) + x]! - S[y * (nx + 1) + x]!;
+  return (b) => {
+    const x0 = Math.max(0, Math.min(nx, Math.floor(b[0] / cell))), x1 = Math.max(0, Math.min(nx, Math.ceil(b[2] / cell)));
+    const y0 = Math.max(0, Math.min(ny, Math.floor(b[1] / cell))), y1 = Math.max(0, Math.min(ny, Math.ceil(b[3] / cell)));
+    const area = (x1 - x0) * (y1 - y0);
+    if (area <= 0) return 0;
+    const sum = S[y1 * (nx + 1) + x1]! - S[y0 * (nx + 1) + x1]! - S[y1 * (nx + 1) + x0]! + S[y0 * (nx + 1) + x0]!;
+    return sum / area;
+  };
 }
