@@ -621,7 +621,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding-top: 10px;
+}
+/* the overlay chips share the views' row, at its right */
+.controls.vx .ovl {
+  margin-left: auto;
 }
 .ovl .chip {
   font: 500 11px / 1.5 var(--font-mono);

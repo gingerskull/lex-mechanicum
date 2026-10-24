@@ -80,7 +80,7 @@ describe("a mechanism page", () => {
     expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("true");
     // the four-bar declares a plan, which opens tilted to the 28 degree view (T7)
     expect(await page.locator('#presets button[data-view="PLAN"]').getAttribute("aria-pressed")).toBe("false");
-    expect(await page.locator("#tiltv").textContent()).toBe("28°");
+    expect(await page.locator(".stagebox").getAttribute("data-tilt")).toBe("28");
     const a = await stageShot(page);
     await page.waitForTimeout(600);
     expect(differs(a, await stageShot(page))).toBe(true);
@@ -219,10 +219,10 @@ describe("the stage on a desktop", () => {
     await drag(page, 40, -120, "right");
     expect(await menu).toBe(true);
     expect(await page.locator("#record-view").getAttribute("aria-pressed")).toBe("false");
-    expect(Number(await page.locator("#tilt").inputValue())).toBeGreaterThan(20);
+    expect(Number(await page.locator(".stagebox").getAttribute("data-tilt"))).toBeGreaterThan(20);
     expect(differs(plan, await stageShot(page))).toBe(true);
     await page.locator('#presets button[data-view="SIDE"]').click();
-    expect(await page.locator("#tiltv").textContent()).toBe("Side");
+    expect(await page.locator(".stagebox").getAttribute("data-view")).toBe("SIDE");
     expect(await page.locator('#presets button[data-view="SIDE"]').getAttribute("aria-pressed")).toBe("true");
     await page.locator('#presets button[data-view="ISOMETRIC"]').click();
     expect(await page.locator('#presets button[data-view="ISOMETRIC"]').getAttribute("aria-pressed")).toBe("true");
@@ -241,7 +241,7 @@ describe("the stage on a desktop", () => {
     expect(await page.locator('#presets button[data-view="SIDE"]').getAttribute("aria-pressed")).toBe("true");
     await page.keyboard.press("Shift+ArrowUp");
     await page.keyboard.press("Shift+ArrowUp");
-    expect(Number(await page.locator("#tilt").inputValue())).toBe(80);
+    expect(Number(await page.locator(".stagebox").getAttribute("data-tilt"))).toBe(80);
     await page.keyboard.press("Shift+ArrowLeft");
     expect(await page.locator('#presets button[data-view="SIDE"]').getAttribute("aria-pressed")).toBe("false");
     await page.keyboard.press("0");
@@ -256,10 +256,10 @@ describe("the stage on a desktop", () => {
     await ready(page);
     expect(await page.locator("#ckey").isHidden()).toBe(true);
     await page.locator('#presets button[data-view="PLAN"]').click();
-    expect(await page.locator("#tiltv").textContent()).toBe("Plan");
+    expect(await page.locator(".stagebox").getAttribute("data-view")).toBe("PLAN");
     await page.locator("#explode").fill("60");
     await page.waitForTimeout(700);
-    expect(await page.locator("#tilt").inputValue()).toBe("28");
+    expect(await page.locator(".stagebox").getAttribute("data-tilt")).toBe("28");
     expect(await page.locator("#play").getAttribute("aria-pressed")).toBe("false");
     expect(errors).toEqual([]);
     await ctx.close();
@@ -299,14 +299,14 @@ describe("the stage on a desktop", () => {
     await ctx.close();
   });
 
-  it("moves with the tilt slider and explodes", async () => {
+  it("has no tilt slider (orbit and the named views turn the drawing), and explodes", async () => {
     const ctx = await desktop();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");
     await ready(page);
     await pause(page);
     const a = await stageShot(page);
-    await page.locator("#tilt").fill("60");
-    expect(await page.locator("#tiltv").textContent()).toBe("60°");
+    expect(await page.locator("#tilt").count()).toBe(0);
+    await page.locator('#presets button[data-view="ISOMETRIC"]').click();
     const b = await stageShot(page);
     expect(differs(a, b)).toBe(true);
     await page.locator("#explode").fill("100");
@@ -342,7 +342,7 @@ describe("the stage on a desktop", () => {
     const section = page.locator('#vviews button[data-kind="section"]').first();
     await section.click();
     expect(await section.getAttribute("aria-pressed")).toBe("true");
-    expect(await page.locator("#tiltv").textContent()).toBe("Aux");
+    expect(await page.locator(".stagebox").getAttribute("data-view")).toBe("AUX");
     expect(differs(a, await stageShot(page))).toBe(true);
     await section.click();
     expect(await section.getAttribute("aria-pressed")).toBe("false");
@@ -408,10 +408,10 @@ describe("the stage on a phone", () => {
     const c = (await page.locator("#stage").boundingBox())!;
     const x = c.x + c.width / 2;
     const y = c.y + c.height / 2;
-    const t0 = Number(await page.locator("#tilt").inputValue());
+    const t0 = Number(await page.locator(".stagebox").getAttribute("data-tilt"));
     await swipe([[x - 30, y + 40], [x + 30, y + 40]], [[x - 30, y - 40], [x + 30, y - 40]]);
     await page.waitForTimeout(200);
-    expect(Number(await page.locator("#tilt").inputValue())).not.toBe(t0);
+    expect(Number(await page.locator(".stagebox").getAttribute("data-tilt"))).not.toBe(t0);
     expect(await page.locator("#orbit").count()).toBe(0);
     // construction starts off; once on, its key shows under the narrow stage, and a tap picks a line out on the drawing,
     // a second lets it go

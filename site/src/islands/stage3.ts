@@ -240,16 +240,15 @@ async function main(box: HTMLElement) {
     $("detailv").title = r === "full" ? "Everything drawn" : `Not drawn: ${E.DETAIL.slice(0, E.DETAIL.findIndex((x) => x.id === r) + 1).map((x) => x.name.toLowerCase()).join("; ")}.${why}`;
   }
 
-  // the camera controls reflect the pose
-  const tilt = $<HTMLInputElement>("tilt");
+  // the camera controls reflect the pose; the stage carries it too, as data, for whoever reads the page
   function showCamera() {
     const named = E.snappedName(s.orient);
     for (const b of document.querySelectorAll<HTMLButtonElement>("#presets button")) b.setAttribute("aria-pressed", String(!s.section && !s.detail && b.dataset.view === named));
     for (const b of document.querySelectorAll<HTMLButtonElement>("#vviews button")) b.setAttribute("aria-pressed", String(b.dataset.rview === s.rview));
     $("record-view").setAttribute("aria-pressed", String(!s.section && !s.detail && JSON.stringify(s.orient) === JSON.stringify(base.orient)));
     const o = turntable(s.orient);
-    tilt.value = String(Math.round(o.tilt));
-    $("tiltv").textContent = s.orient.aux ? "Aux" : o.tilt <= 0.5 ? "Plan" : o.tilt >= 89.5 ? "Side" : `${Math.round(o.tilt)}°`;
+    box.dataset.tilt = String(Math.round(o.tilt));
+    box.dataset.view = s.orient.aux ? "AUX" : (named ?? `VIEW ${Math.round(o.yaw)}/${Math.round(90 - o.tilt)}`);
   }
 
   let dirty = true;
@@ -401,7 +400,7 @@ async function main(box: HTMLElement) {
       for (const o of document.querySelectorAll("#speed button")) o.setAttribute("aria-pressed", String(o === b));
     });
 
-  // camera: presets, the record's view, the record's section and detail views, tilt
+  // camera: presets, the record's view, the record's section and detail views
   const leaveViews = () => {
     s.section = undefined;
     s.detail = undefined;
@@ -440,14 +439,6 @@ async function main(box: HTMLElement) {
       showCamera();
       dirty = true;
     });
-  tilt.addEventListener("input", () => {
-    const o = turntable(s.orient);
-    s.orient = { yaw: o.yaw, tilt: Number(tilt.value) };
-    s.auxName = undefined;
-    if (!s.section) s.rview = "";
-    showCamera();
-    dirty = true;
-  });
   // explode holds the mechanism still where it is, so the parts do not drift while they are apart (SD12); playback picks
   // up again once it closes, if it was playing
   let playAfterExplode = false;

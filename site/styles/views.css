@@ -99,18 +99,17 @@
 }
 
 /* full screen on a short landscape screen: the drawing keeps the full height, the controls stand in a rail at its
-   right, four columns: transport on top, the four sliders upright, the overlay chips below */
+   right: transport on top, the three sliders upright, the views with the overlay chips below */
 @media (orientation: landscape) and (max-height: 500px) {
   .stagebox[data-full] {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) repeat(4, auto);
-    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+    grid-template-columns: minmax(0, 1fr) repeat(3, auto);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
     grid-template-areas:
-      "stage play speed speed views"
-      "stage scrub tilt explode dial"
-      "stage vx vx vx vx"
-      "stage vc vc vc vc"
-      "stage ovl ovl ovl ovl";
+      "stage play speed views"
+      "stage scrub explode dial"
+      "stage vx vx vx"
+      "stage vc vc vc";
     gap: 10px;
     overflow: hidden;
   }
@@ -152,9 +151,6 @@
   }
   .stagebox[data-full] .scrub {
     grid-area: scrub;
-  }
-  .stagebox[data-full] .tilt {
-    grid-area: tilt;
   }
   .stagebox[data-full] .explode {
     grid-area: explode;
@@ -199,10 +195,11 @@
     min-height: 0;
     width: auto;
   }
-  .stagebox[data-full] .ovl {
-    grid-area: ovl;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding-top: 0;
+  .stagebox[data-full] .vx {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stagebox[data-full] .vx .ovl {
+    margin-left: 0;
   }
 }

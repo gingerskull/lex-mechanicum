@@ -1,6 +1,6 @@
 ---
 // The stage of a mechanism (SS5): the transport (play, scrub, speed), then the camera (the
-// named views, the record's own, orbit and tilt), the section and detail views the record declares, explode, the detail
+// named views, the record's own) with the overlay chips at its right, the section and detail views the record declares, explode, the detail
 // dial, and the record's own controls (T14): a slider for each parameter, a choice for each selector or design choice.
 import type { StageControl } from "../data";
 interface Props {
@@ -59,9 +59,13 @@ const presets = [
         {views.map((v) => <button type="button" data-rview={v.id} data-kind={v.kind} aria-pressed="false">{v.kind === "section" ? "Section" : "Detail"} {v.id}</button>)}
       </div>
     )}
+    <div class="ovl" role="group" aria-label="Overlays">
+      {overlays.map(([k, label, on]) => (
+        <button class="chip" type="button" data-o={k} aria-pressed={on ? "true" : "false"}><i></i>{label}</button>
+      ))}
+    </div>
   </div>
   <div class="controls">
-    <label class="sl tilt"><span class="lbl">Tilt</span><input id="tilt" type="range" min="0" max="90" step="1" value="0" /><output id="tiltv">Plan</output></label>
     <label class="sl explode"><span class="lbl">Explode</span><input id="explode" type="range" min="0" max="100" step="1" value="0" /><output id="explodev">0%</output></label>
     <div class="dial">
       <button class="btn" id="auto" type="button" aria-pressed="true" title="Drop detail on its own when the drawing is slow">Auto</button>
@@ -84,11 +88,6 @@ const presets = [
       )}
     </div>
   )}
-  <div class="ovl" role="group" aria-label="Overlays">
-    {overlays.map(([k, label, on]) => (
-      <button class="chip" type="button" data-o={k} aria-pressed={on ? "true" : "false"}><i></i>{label}</button>
-    ))}
-  </div>
   {labels.length > 0 && (
     <ol class="ckey" id="ckey" aria-label="Construction key" hidden>
       {labels.map((l, i) => <li><button type="button" data-n={i} aria-pressed="false" title="Pick this line out on the drawing"><b>{i + 1}</b>{l}</button></li>)}
