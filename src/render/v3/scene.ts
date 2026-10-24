@@ -135,8 +135,9 @@ export function place(rt: Runtime, u: number, explode: number, out: Float32Array
     if (gap && s.ex) {
       // the direction it leaves along as posed (E10): its unit's axis in its body's frame, so a part that swings explodes
       // along its axis where it is now; without one, its own axis
+      // a conveyed part (a ball round its circuit, a chain link) is posed along its path: its unit's direction as built
       const a = s.exAxis;
-      const d: Vec3 = a ? [B[0]! * a[0] + B[4]! * a[1] + B[8]! * a[2], B[1]! * a[0] + B[5]! * a[1] + B[9]! * a[2], B[2]! * a[0] + B[6]! * a[1] + B[10]! * a[2]] : s.legacyAxis ? [0, 0, 1] : [M[8]!, M[9]!, M[10]!];
+      const d: Vec3 = a && s.cv ? [a[0], a[1], a[2]] : a ? [B[0]! * a[0] + B[4]! * a[1] + B[8]! * a[2], B[1]! * a[0] + B[5]! * a[1] + B[9]! * a[2], B[2]! * a[0] + B[6]! * a[1] + B[10]! * a[2]] : s.legacyAxis ? [0, 0, 1] : [M[8]!, M[9]!, M[10]!];
       const l = Math.hypot(d[0], d[1], d[2]) || 1;
       rt.axis.set([d[0] / l, d[1] / l, d[2] / l], i * 3);
     }

@@ -53,7 +53,7 @@ const hash = (...parts: (string | Uint8Array)[]) => {
 
 /** The thumbnail's and the still's drawing: the record's own view (T7), no sheet on either. */
 const thumbView = (theme: ThemeKey): Draw3Options => ({ w: THUMB.w, h: THUMB.h, dpr: THUMB.dpr, u: THUMB.u, card: true, theme, view: "record" });
-const stillView = (theme: ThemeKey): Draw3Options => ({ w: STILL.w, h: STILL.h, dpr: STILL.dpr, u: STILL.u, theme, detail: STILL.detail, view: "record", over: { sheet: false } });
+const stillView = (theme: ThemeKey): Draw3Options => ({ w: STILL.w, h: STILL.h, dpr: STILL.dpr, u: STILL.u, theme, detail: STILL.detail, view: "record", over: { sheet: false, show: { construction: false } } });
 
 /**
  * The parts of the fingerprints that come from source: the files the drawing page bundles, split into the style
