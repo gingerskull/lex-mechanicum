@@ -61,6 +61,10 @@ export interface LabelSpot {
   /** What it reads in this frame (a dimension carries its live value), and the overlay's own label, which names it. */
   text: string;
   base: string;
+  /** The overlay's number among the labelled ones in the record's order, and which of its labels this is: the key the
+   * page and the phone's key count by, so a frame where another overlay draws nothing shifts no one. */
+  n?: number;
+  sub?: number;
   cands: [number, number][];
 }
 
@@ -99,6 +103,7 @@ export interface Steady {
 export function spotKeys(spots: LabelSpot[]): string[] {
   const seen = new Map<string, number>();
   return spots.map((s) => {
+    if (s.n !== undefined) return `${s.n}.${s.sub ?? 0}`;
     const n = seen.get(s.base) ?? 0;
     seen.set(s.base, n + 1);
     return `${s.base}#${n}`;
@@ -110,11 +115,11 @@ export function spotKeys(spots: LabelSpot[]): string[] {
  * at all), and its mean place: the leader then barely moves, and the slot is set from where the label sits on average.
  */
 export function steadiest(samples: LabelSpot[][]): Steady[] {
-  const by = new Map<string, { text: string; pts: [number, number][][] }>();
+  const by = new Map<string, { text: string; n?: number; pts: [number, number][][] }>();
   for (const frame of samples) {
     const keys = spotKeys(frame);
     frame.forEach((s, i) => {
-      const e = by.get(keys[i]!) ?? { text: s.base, pts: [] };
+      const e = by.get(keys[i]!) ?? { text: s.base, ...(s.n !== undefined ? { n: s.n } : {}), pts: [] };
       s.cands.forEach((c, k) => (e.pts[k] ??= []).push(c));
       by.set(keys[i]!, e);
     });
@@ -140,7 +145,7 @@ export function steadiest(samples: LabelSpot[][]): Steady[] {
     const pick = stats.find((s) => clear(s.mean) >= sep) ?? [...stats].sort((a, b) => clear(b.mean) - clear(a.mean))[0];
     if (!pick) continue;
     taken.push(pick.mean);
-    out.push({ key, n: out.length, text: e.text, cand: pick.k, mean: pick.mean });
+    out.push({ key, n: e.n ?? out.length, text: e.text, cand: pick.k, mean: pick.mean });
   }
   return out;
 }
@@ -345,6 +350,8 @@ export function coverage(rects: [number, number, number, number][], w: number, h
   for (const r of rects) {
     const x0 = Math.max(0, Math.floor(r[0] / cell)), x1 = Math.min(nx - 1, Math.floor(r[2] / cell));
     const y0 = Math.max(0, Math.floor(r[1] / cell)), y1 = Math.min(ny - 1, Math.floor(r[3] / cell));
+    // an outline off the canvas (a magnified detail view) covers nothing
+    if (x1 < x0 || y1 < y0) continue;
     for (let y = y0; y <= y1; y++) g.fill(1, y * nx + x0, y * nx + x1 + 1);
   }
   const S = new Float64Array((nx + 1) * (ny + 1));

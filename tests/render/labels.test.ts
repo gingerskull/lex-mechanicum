@@ -62,6 +62,19 @@ describe("construction labels (SD22)", () => {
     for (const b of boxes) expect(drawn(b)).toBeLessThan(0.05);
   });
 
+  it("counts an outline off the canvas as covering nothing", () => {
+    const drawn = coverage([[-400, 10, -100, 200]], 400, 300);
+    expect(drawn([0, 0, 400, 300])).toBe(0);
+  });
+
+  it("numbers labels by their overlay, so a frame where one draws nothing shifts no other", () => {
+    const frames: LabelSpot[][] = [
+      [{ text: "A", base: "A", n: 0, sub: 0, cands: [[10, 10]] }, { text: "B", base: "B", n: 1, sub: 0, cands: [[50, 50]] }, { text: "C", base: "C", n: 2, sub: 0, cands: [[90, 90]] }],
+      [{ text: "A", base: "A", n: 0, sub: 0, cands: [[10, 10]] }, { text: "C", base: "C", n: 2, sub: 0, cands: [[90, 90]] }],
+    ];
+    expect(steadiest(frames).map((s) => [s.text, s.n])).toEqual([["A", 0], ["B", 1], ["C", 2]]);
+  });
+
   it("finds how much of a box lies over the drawing", () => {
     const drawn = coverage([[100, 100, 200, 200]], 400, 300);
     expect(drawn([10, 10, 60, 60])).toBe(0);

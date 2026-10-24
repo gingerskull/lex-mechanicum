@@ -726,7 +726,9 @@ export function overlays(A: Ann, L?: LabelDraw): LabelHit[] {
   const { ctx, T } = A;
   const spots: LabelSpot[] = [];
   let base = "";
-  const collect: Labeler = (text, x, y, _c, _s, cands) => spots.push({ text, base: base || text, cands: cands?.length ? cands : [[x, y]] });
+  let cur = -1;
+  let sub = 0;
+  const collect: Labeler = (text, x, y, _c, _s, cands) => spots.push({ text, base: base || text, n: cur, sub: sub++, cands: cands?.length ? cands : [[x, y]] });
   const label = L ? (L.mode === "none" ? () => {} : collect) : labeler(ctx, T, A.w, A.h);
   const ink = paint(T.ink, O.line.alpha + 0.3);
   ctx.save();
@@ -740,6 +742,8 @@ export function overlays(A: Ann, L?: LabelDraw): LabelHit[] {
     ctx.strokeStyle = picked ? paint(T.accent) : paint(T.ink, O.line.alpha);
     ctx.lineWidth = picked ? O.line.width * 1.8 : O.line.width;
     base = typeof ov.label === "string" ? ov.label : "";
+    cur = k;
+    sub = 0;
     drawOverlay(A, ov, label, ink);
   }
   ctx.restore();
@@ -757,10 +761,15 @@ export function labelSpots(A: Ann, u: number): LabelSpot[] {
   if (!t?.overlays.length) return [];
   const out: LabelSpot[] = [];
   let base = "";
-  const collect: Labeler = (text, x, y, _c, _s, cands) => out.push({ text, base: base || text, cands: cands?.length ? cands : [[x, y]] });
+  let cur = -1;
+  let sub = 0;
+  let k = 0;
+  const collect: Labeler = (text, x, y, _c, _s, cands) => out.push({ text, base: base || text, n: cur, sub: sub++, cands: cands?.length ? cands : [[x, y]] });
   const B: Ann = { ...A, ctx: DRY, u };
   for (const ov of t.overlays) {
     base = typeof ov.label === "string" ? ov.label : "";
+    cur = base ? k++ : -1;
+    sub = 0;
     drawOverlay(B, ov, collect, "");
   }
   return out;

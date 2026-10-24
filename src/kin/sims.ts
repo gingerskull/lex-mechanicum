@@ -94,11 +94,10 @@ export function exportSims(keys: string[]): Record<string, Record<string, Packed
   for (const k of keys) {
     const r = store.get(k);
     if (!r) continue;
+    // a result that holds code is not shipped (the page makes it again)
+    if (Object.values(r).some((v) => typeof v === "function")) continue;
     const e: Record<string, Packed> = {};
-    for (const [f, v] of Object.entries(r)) {
-      if (typeof v === "function") return out; // a result that holds code is not shipped
-      e[f] = v instanceof Float64Array ? pack(v) : v;
-    }
+    for (const [f, v] of Object.entries(r)) e[f] = v instanceof Float64Array ? pack(v) : v;
     out[k] = e;
   }
   return out;

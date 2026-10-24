@@ -402,6 +402,7 @@ async function main(box: HTMLElement) {
 
   // camera: presets, the record's view, the record's section and detail views
   const leaveViews = () => {
+    tween = null;
     s.section = undefined;
     s.detail = undefined;
     s.rview = "";
@@ -425,6 +426,7 @@ async function main(box: HTMLElement) {
     b.addEventListener("click", () => {
       const rv = rviews.find((x) => x.id === b.dataset.rview);
       if (!rv) return;
+      tween = null;
       if (s.rview === rv.id) {
         leaveViews();
         s.orient = { ...base.orient };
@@ -634,6 +636,11 @@ async function main(box: HTMLElement) {
       // the left button scrubs only sideways; up and down it does nothing
       if (!drag.orbit && Math.abs(dx) < Math.abs(dy)) return;
       drag.mode = drag.orbit ? "orbit" : "scrub";
+      // a scrub starts from where the drawing is now (it may have played on past the threshold)
+      if (!drag.orbit) {
+        drag.u = s.u;
+        drag.x = e.clientX;
+      }
       canvas.setPointerCapture(e.pointerId);
       if (drag.orbit) canvas.style.cursor = "move";
     }
@@ -660,7 +667,7 @@ async function main(box: HTMLElement) {
   });
   // the right button is the orbit button: after a right drag (the menu opens on release on some systems) no menu
   canvas.addEventListener("contextmenu", (e) => {
-    if (drag?.mode === "orbit" || performance.now() - orbitedAt < 400) e.preventDefault();
+    if (drag?.orbit || performance.now() - orbitedAt < 400) e.preventDefault();
   });
   // touch: touch events, so a second finger can take the gesture over before the page starts to scroll
   let touch: (Drag & { fingers: number }) | null = null;
@@ -699,6 +706,8 @@ async function main(box: HTMLElement) {
         return;
       }
       touch.mode = "scrub";
+      touch.u = s.u;
+      touch.x = x;
     }
     if (e.cancelable) e.preventDefault();
     scrubBy(touch.u, dx);

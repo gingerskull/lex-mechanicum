@@ -226,6 +226,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       phantoms(A, view.phantoms);
       traces(A, { traces: sh.traces !== false, ghosts: sh.ghosts !== false, ticks: sh.ticks !== false });
       // a card draws no construction at all (SD22); the stage opens with it off, and the visitor turns it on
+      if (sh.construction === false || view.card) tween = null;
       pulsing = sh.construction !== false && !view.card && view.focus !== null && view.focus !== undefined && view.pulse === true && view.now !== undefined;
       hits = sh.construction !== false && !view.card ? overlays(A, { mode, plan, focus: view.focus ?? null, rows: tweenRows(plan, view.now), pulse: pulsing ? pulseOf(view.now) : 1 }) : [];
       frames(A, view.frames);
@@ -292,10 +293,11 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     const eye = basisOfOrient(view.state.orient).eye;
     // callouts keep their rows while the view turns less than `replanDeg` from where they were chosen (no jumps in an
     // orbit); anything else about the view chooses again
-    const rest = { ...view.state, orient: undefined };
-    const key = JSON.stringify([mode === "callouts" ? rest : view.state, view.state.orient.aux ?? null, card.w, card.h, mode, rev, Math.round(e * 4), view.theme]);
-    const near = labelCache.eye && Math.acos(Math.min(1, Math.abs(labelCache.eye[0] * eye[0] + labelCache.eye[1] * eye[1] + labelCache.eye[2] * eye[2]))) < (DRAFT.overlays.callout.replanDeg * Math.PI) / 180;
-    if (labelCache.key === key && (mode !== "callouts" || near)) return labelCache.plan;
+    // the explode in quarters: a slider drag chooses again a few times, not at every step
+    const rest = { ...view.state, orient: undefined, explode: undefined };
+    const key = JSON.stringify([rest, view.state.orient.aux ?? null, card.w, card.h, mode, rev, Math.round(e * 4), view.theme]);
+    const near = labelCache.eye && Math.acos(Math.max(-1, Math.min(1, labelCache.eye[0] * eye[0] + labelCache.eye[1] * eye[1] + labelCache.eye[2] * eye[2]))) < (DRAFT.overlays.callout.replanDeg * Math.PI) / 180;
+    if (labelCache.key === key && near) return labelCache.plan;
     const R = DRAFT.overlays.labels;
     const follow = (C: Camera) => steadiest(Array.from({ length: R.samples }, (_, k) => labelSpots({ ...A0, C }, (k / R.samples) * scene.poser.period)));
     const C0 = camera(view, u, e);
@@ -332,6 +334,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
         place(rt, (k / R.samples) * scene.poser.period, e, M);
         for (let i = 0; i < rt.n; i++) if (!skip(i) && !rt.fixed[i]) rectOf(M, i);
       }
+      // the frame's own placement back (the explode axes ride the bodies as posed now)
+      place(rt, u, e, M);
+      place(rt, u, e, mats);
       const drawn = coverage(rects, card.w, card.h);
       const ctx = card.ctx;
       ctx.save();
