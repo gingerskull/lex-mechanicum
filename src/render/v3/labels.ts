@@ -218,7 +218,7 @@ export function drawRails(ctx: CanvasRenderingContext2D, T: ResolvedTheme, plan:
 }
 
 /** Draws the numbered markers at the labels' anchors now (a phone's stage; the key is under it), the picked one in accent. */
-export function drawMarkers(ctx: CanvasRenderingContext2D, T: ResolvedTheme, plan: LabelPlan, spots: LabelSpot[], focus: number | null): void {
+export function drawMarkers(ctx: CanvasRenderingContext2D, T: ResolvedTheme, plan: LabelPlan, spots: LabelSpot[], focus: number | null, pulse = 1): void {
   const M = O.marker;
   const keys = spotKeys(spots);
   const placed: [number, number][] = [];
@@ -252,7 +252,7 @@ export function drawMarkers(ctx: CanvasRenderingContext2D, T: ResolvedTheme, pla
     ctx.strokeStyle = lit ? paint(T.accent) : paint(T.ink, 0.85);
     ctx.lineWidth = lit ? M.width * 1.6 : M.width;
     ctx.beginPath();
-    ctx.arc(x, y, M.r, 0, Math.PI * 2);
+    ctx.arc(x, y, M.r * (lit ? pulse : 1), 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
     ctx.fillStyle = lit ? paint(T.accent) : paint(T.ink, 0.9);
@@ -331,9 +331,23 @@ export function calloutPlan(samples: LabelSpot[][], steady: Steady[], cx: number
 }
 
 /** Draws the callouts at the anchors now: a drop, a shoulder outboard, the lettering on it; `dy` overrides a row mid-tween. */
-export function drawCallouts(ctx: CanvasRenderingContext2D, T: ResolvedTheme, plan: LabelPlan, spots: LabelSpot[], focus: number | null, dy?: Map<string, number>): void {
+/** Where a drawn label can be pointed at (CSS px): its lettering and leader, by its number in the record's order. */
+export interface LabelHit {
+  n: number;
+  boxes: [number, number, number, number][];
+}
+
+/** The pulse of a picked label's end, 1 at rest: it swells and settles once a period of the views' clock. */
+export const pulseOf = (now: number | undefined): number => {
+  if (now === undefined) return 1;
+  const P = O.pulse;
+  return 1 + P.amount * (0.5 - 0.5 * Math.cos((2 * Math.PI * now) / P.period));
+};
+
+export function drawCallouts(ctx: CanvasRenderingContext2D, T: ResolvedTheme, plan: LabelPlan, spots: LabelSpot[], focus: number | null, dy?: Map<string, number>, pulse = 1): LabelHit[] {
   const K = O.callout;
   const keys = spotKeys(spots);
+  const hits: LabelHit[] = [];
   ctx.save();
   ctx.font = font(DRAFT.type.overlaySmall);
   ctx.textBaseline = "alphabetic";
@@ -366,17 +380,30 @@ export function drawCallouts(ctx: CanvasRenderingContext2D, T: ResolvedTheme, pl
     // the end on the element: an arrowhead along the drop, touching the line it names (the drafting mark for a line or
     // an edge); a dot where there is no drop to point along
     ctx.fillStyle = ink;
-    if (Math.abs(ky - a[1]) > K.arrow) arrowHead(ctx, [a[0], ky], [a[0], a[1]], K.arrow, K.arrowAngle);
+    const p = focus === it.n ? pulse : 1;
+    if (Math.abs(ky - a[1]) > K.arrow) arrowHead(ctx, [a[0], ky], [a[0], a[1]], K.arrow * p, K.arrowAngle);
     else {
       ctx.beginPath();
-      ctx.arc(a[0], a[1], K.dot, 0, Math.PI * 2);
+      ctx.arc(a[0], a[1], K.dot * p, 0, Math.PI * 2);
       ctx.fill();
     }
+    // the picked label's end rings out as it pulses, so the eye finds it on a busy drawing
+    if (p > 1) {
+      ctx.globalAlpha = Math.max(0, 1 - (p - 1) / O.pulse.amount) * 0.8;
+      ctx.lineWidth = K.width;
+      ctx.beginPath();
+      ctx.arc(a[0], a[1], K.arrow * 0.6 * p * p, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    const tl = Math.min(tx, tx + tw) - 4;
+    hits.push({ n: it.n, boxes: [[tl, ky - K.textH - K.lift - 4, tl + tw + 8, ky + 4], [a[0] - 4, Math.min(a[1], ky), a[0] + 4, Math.max(a[1], ky)], [Math.min(a[0], end), ky - 4, Math.max(a[0], end), ky + 4]] });
     ctx.fillStyle = focus === it.n ? paint(T.accent) : paint(T.ink, K.textAlpha);
     ctx.textAlign = "left";
     ctx.fillText(t, tx, ky - K.lift);
   }
   ctx.restore();
+  return hits;
 }
 
 /**

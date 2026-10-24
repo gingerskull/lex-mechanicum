@@ -265,6 +265,40 @@ describe("the stage on a desktop", () => {
     await ctx.close();
   });
 
+  it("picks a construction label out under the mouse, and pins it on a click without pausing", async () => {
+    const ctx = await desktop();
+    const { page, errors } = await open(ctx, "/mechanisms/bevel-gears/");
+    await ready(page);
+    await pause(page);
+    await page.locator('.ovl .chip[data-o="construction"]').click();
+    await page.waitForTimeout(200);
+    // the stage's screenshots scroll it into view: settle that first, so the places found below stay put
+    await stageShot(page);
+    const b = (await page.locator("#stage").boundingBox())!;
+    // find a label: the cursor turns to a pointer over one
+    let at: [number, number] | null = null;
+    for (let y = 0.06; y < 0.9 && !at; y += 0.03)
+      for (let x = 0.3; x < 0.95 && !at; x += 0.02) {
+        await page.mouse.move(b.x + b.width * x, b.y + b.height * y);
+        if ((await page.locator("#stage").evaluate((c) => (c as HTMLElement).style.cursor)) === "pointer") at = [b.x + b.width * x, b.y + b.height * y];
+      }
+    expect(at).not.toBeNull();
+    await page.mouse.move(b.x + 2, b.y + 2);
+    await page.waitForTimeout(100);
+    const plain = await stageShot(page);
+    await page.mouse.move(...at!);
+    await page.waitForTimeout(150);
+    expect(differs(plain, await stageShot(page))).toBe(true);
+    await page.mouse.click(...at!);
+    expect(await page.locator("#play").getAttribute("aria-pressed")).toBe("false");
+    await page.mouse.move(b.x + 2, b.y + 2);
+    await page.waitForTimeout(150);
+    // pinned: still picked out once the mouse has left
+    expect(differs(plain, await stageShot(page))).toBe(true);
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
   it("moves with the tilt slider and explodes", async () => {
     const ctx = await desktop();
     const { page, errors } = await open(ctx, "/mechanisms/four-bar/");

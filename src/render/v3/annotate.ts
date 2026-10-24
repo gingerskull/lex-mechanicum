@@ -16,7 +16,7 @@ import { FORM } from "../../style/form";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
 import type { Ladder } from "../detail";
 import { angleToEye, project, scaleOf, type Camera } from "./camera";
-import { arrowHead, drawCallouts, drawMarkers, drawRails, labeler, type LabelMode, type LabelPlan, type LabelSpot, type Labeler } from "./labels";
+import { arrowHead, drawCallouts, drawMarkers, drawRails, type LabelHit, labeler, type LabelMode, type LabelPlan, type LabelSpot, type Labeler } from "./labels";
 import type { Controls } from "./poser";
 import { applyMat, mulMat, type Runtime } from "./scene";
 
@@ -712,6 +712,8 @@ export interface LabelDraw {
   frame: { x0: number; x1: number };
   /** Callout rows mid-tween (session), by label key. */
   rows?: Map<string, number>;
+  /** The picked label's pulse, 1 at rest (labels pulseOf). */
+  pulse?: number;
 }
 
 /**
@@ -720,9 +722,9 @@ export interface LabelDraw {
  * old form); with mode "none" (a card) there are none. A picked-out label's element is drawn bold in accent and the rest
  * fade.
  */
-export function overlays(A: Ann, L?: LabelDraw): void {
+export function overlays(A: Ann, L?: LabelDraw): LabelHit[] {
   const t = A.rt.scene.teaching;
-  if (!t || !t.overlays.length) return;
+  if (!t || !t.overlays.length) return [];
   const { ctx, T } = A;
   const spots: LabelSpot[] = [];
   let base = "";
@@ -743,9 +745,10 @@ export function overlays(A: Ann, L?: LabelDraw): void {
     drawOverlay(A, ov, label, ink);
   }
   ctx.restore();
-  if (L?.plan && L.mode === "callouts") drawCallouts(ctx, T, L.plan, spots, L.focus, L.rows);
-  else if (L?.plan && L.mode === "rails") drawRails(ctx, T, L.plan, spots, L.frame, L.focus);
-  else if (L?.plan && L.mode === "markers") drawMarkers(ctx, T, L.plan, spots, L.focus);
+  if (L?.plan && L.mode === "callouts") return drawCallouts(ctx, T, L.plan, spots, L.focus, L.rows, L.pulse);
+  if (L?.plan && L.mode === "rails") drawRails(ctx, T, L.plan, spots, L.frame, L.focus);
+  else if (L?.plan && L.mode === "markers") drawMarkers(ctx, T, L.plan, spots, L.focus, L.pulse);
+  return [];
 }
 
 /** A 2D context that draws nothing: the overlays' geometry run for where their labels would go. */

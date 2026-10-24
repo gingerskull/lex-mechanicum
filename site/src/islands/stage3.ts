@@ -184,8 +184,10 @@ async function main(box: HTMLElement) {
     rview: "" as string,
     explode: 0,
     show: { paths: true, construction: false, velocity: false, forces: false, angles: false } as Record<string, boolean>,
-    /** A construction label picked out in the key (its number in the record's order), or null. */
+    /** A construction label picked out in the key or by a click (its number in the record's order), or null. */
     focus: null as number | null,
+    /** The construction label under the pointer (desktop), or null: picked out while it is there. */
+    hover: null as number | null,
     auto: true,
     /** The input ring's strength: it breathes while paused (LM-06), never while playing or under reduced motion. */
     ring: 1,
@@ -210,8 +212,9 @@ async function main(box: HTMLElement) {
       show: { traces: s.show.paths, ghosts: s.show.paths && !warm, ticks: s.show.paths, construction: s.show.construction, forces: s.show.forces, velocity: s.show.velocity, angles: s.show.angles },
       ring: s.ring,
       glitch: s.glitch,
-      focus: s.focus,
+      focus: s.hover ?? s.focus,
       now: performance.now(),
+      pulse: !reduced,
     });
 
   // the output plot
@@ -606,6 +609,31 @@ async function main(box: HTMLElement) {
     if (e.pointerType === "touch" || (e.button !== 0 && e.button !== 2)) return;
     drag = start(e.pointerId, e.clientX, e.clientY, e.button === 2 || e.shiftKey);
   });
+  // a construction label under the mouse is picked out while the pointer is on it (SD22)
+  const local = (e: { clientX: number; clientY: number }): [number, number] => {
+    const r = canvas.getBoundingClientRect();
+    return [e.clientX - r.left, e.clientY - r.top];
+  };
+  canvas.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse" || drag?.mode) return;
+    const n = s.show.construction ? sess.labelAt(...local(e)) : null;
+    canvas.style.cursor = n !== null ? "pointer" : "";
+    if (n !== s.hover) {
+      s.hover = n;
+      dirty = true;
+    }
+  });
+  canvas.addEventListener("pointerleave", () => {
+    if (s.hover === null) return;
+    s.hover = null;
+    canvas.style.cursor = "";
+    dirty = true;
+  });
+  const pin = (n: number) => {
+    s.focus = s.focus === n ? null : n;
+    for (const o of ckey?.querySelectorAll("button") ?? []) o.setAttribute("aria-pressed", String(Number((o as HTMLElement).dataset.n) === s.focus));
+    dirty = true;
+  };
   canvas.addEventListener("pointermove", (e) => {
     if (!drag || e.pointerId !== drag.id) return;
     const dx = e.clientX - drag.x;
@@ -626,7 +654,12 @@ async function main(box: HTMLElement) {
     if (drag.mode === "orbit") {
       landOrbit();
       orbitedAt = performance.now();
-    } else if (!drag.mode && !drag.orbit && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < DRAG_PX) setPlaying(!s.playing);
+    } else if (!drag.mode && !drag.orbit && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < DRAG_PX) {
+      // a click on a construction label keeps it picked out (again lets it go); anywhere else plays or pauses
+      const n = s.show.construction ? sess.labelAt(...local(e)) : null;
+      if (n !== null) pin(n);
+      else setPlaying(!s.playing);
+    }
     drag = null;
     canvas.style.cursor = "";
   });

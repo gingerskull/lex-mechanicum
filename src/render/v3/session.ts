@@ -12,7 +12,7 @@ import { ladder, type Dial } from "../detail";
 import { paper, tooth } from "../sheet";
 import { baseSketch, basePencil, centrelines, dimensions, highlights, labelSpots, newCache, overlayItems, overlays, phantoms, scaleLabel, traces, trails, type Ann, type OverlayFlags } from "./annotate";
 import { font } from "../../style/theme";
-import { calloutPlan, coverage, railSides, railSlots, steadiest, type LabelMode, type LabelPlan } from "./labels";
+import { calloutPlan, coverage, pulseOf, railSides, type LabelHit, railSlots, steadiest, type LabelMode, type LabelPlan } from "./labels";
 import { basisOfOrient, fit, project, snapName, viewLabel, type Box, type Camera } from "./camera";
 import type { Vec3 } from "../../solids/types";
 import { Geometry, gpu3, gpuReady, onRestored, postPass, type Stats3 } from "./gpu";
@@ -50,6 +50,8 @@ export interface DrawView3 {
   focus?: number | null;
   /** The views' clock, ms (performance.now on the stage): callout rows ease to a new place on it; absent, they jump. */
   now?: number;
+  /** The picked label's end pulses (the stage, unless reduced motion asks for stillness). */
+  pulse?: boolean;
 }
 
 /**
@@ -80,8 +82,10 @@ export interface Session3 {
   setPoser(p: Poser): void;
   /** Solids see-through in the last frame (T10), for the audit and the tests. */
   readonly see: Uint8Array;
-  /** True while a callout row is easing to a new place: whoever draws keeps drawing until it settles. */
+  /** True while a callout row is easing to a new place or a picked label pulses: whoever draws keeps drawing. */
   readonly busy: boolean;
+  /** The construction label drawn at a point of the canvas (CSS px) in the last frame, by its number, or null. */
+  labelAt(x: number, y: number): number | null;
   readonly stats: Stats3 | null;
   /** Called after a lost GPU context is rebuilt (set by whoever draws). */
   onRestored: (() => void) | null;
@@ -148,7 +152,11 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       return geo?.stats ?? null;
     },
     get busy() {
-      return tween !== null;
+      return tween !== null || pulsing;
+    },
+    labelAt(x, y) {
+      for (const h of hits) for (const b of h.boxes) if (x >= b[0] && x <= b[2] && y >= b[1] && y <= b[3]) return h.n;
+      return null;
     },
     onRestored: null,
     draw(u, view) {
@@ -219,7 +227,8 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       traces(A, { traces: sh.traces !== false, ghosts: sh.ghosts !== false, ticks: sh.ticks !== false });
       const edge = DRAFT.sheet.inset + DRAFT.sheet.innerOffset;
       // a card draws no construction at all (SD22); the stage opens with it off, and the visitor turns it on
-      if (sh.construction !== false && !view.card) overlays(A, { mode, plan, focus: view.focus ?? null, frame: { x0: edge, x1: card.w - edge }, rows: tweenRows(plan, view.now) });
+      pulsing = sh.construction !== false && !view.card && view.focus !== null && view.focus !== undefined && view.pulse === true && view.now !== undefined;
+      hits = sh.construction !== false && !view.card ? overlays(A, { mode, plan, focus: view.focus ?? null, frame: { x0: edge, x1: card.w - edge }, rows: tweenRows(plan, view.now), pulse: pulsing ? pulseOf(view.now) : 1 }) : [];
       frames(A, view.frames);
       highlights(A, [...view.highlight, ...(view.state.section?.highlight ?? []), ...(view.state.detail?.highlight ?? [])]);
       if (view.sheet && !view.card) {
@@ -274,6 +283,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
   let labelCache: { key: string; plan: LabelPlan | null; eye?: Vec3 } = { key: "", plan: null };
   // a callout row moving to the place a new plan gives it: from where it was, over `tween` ms of the views' clock
   let tween: { from: Map<string, number>; t0: number } | null = null;
+  // the labels' places in the last frame (for pointing at them), and whether a picked one is pulsing
+  let hits: LabelHit[] = [];
+  let pulsing = false;
   const labelMode = (view: DrawView3): LabelMode => (view.card ? "none" : (view.labels ?? (card.w >= DRAFT.overlays.rail.minStage ? "callouts" : "markers")));
   function labelPlan(view: DrawView3, u: number, e: number, mode: LabelMode, A0: Omit<Ann, "C">): LabelPlan | null {
     const t = scene.teaching;

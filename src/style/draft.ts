@@ -340,6 +340,8 @@ export const DRAFT = {
       sep: 16, // px, the least distance between two labels' anchors (each takes its own point on its element)
       tween: 200, // ms, a row moving to its new place
     },
+    // A picked construction label's end (SD22): it swells by `amount` and settles once a `period` (none under reduced motion).
+    pulse: { amount: 0.45, period: 1100 }, // factor, ms
     // Construction labels on a narrow stage (SD22): numbered markers by the anchors, the key under the stage.
     marker: { r: 7, width: 0.9, offset: 9, leaderWidth: 0.6, leaderAlpha: 0.45, dim: 0.4 }, // px, px, px, px, 0..1, 0..1
   },
