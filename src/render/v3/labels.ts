@@ -291,8 +291,10 @@ export function calloutPlan(samples: LabelSpot[][], steady: Steady[], cx: number
         const s = side === 0 ? -1 : 1;
         const ky = p[1] + dy;
         const x0 = p[0] + s * (K.gap + run), x1 = p[0] + s * (K.gap + run + tw);
-        const text: Box = [Math.min(x0, x1) - 2, ky - th - K.lift, Math.max(x0, x1) + 2, ky + 1];
-        const drop: Box = [p[0] - 2, Math.min(p[1], ky), p[0] + 2, Math.max(p[1], ky)];
+        // each box carries the labels' margin, so two labels keep at least that much paper between them
+        const mx = K.sepX / 2, my = K.sepY / 2;
+        const text: Box = [Math.min(x0, x1) - mx, ky - th - K.lift - my, Math.max(x0, x1) + mx, ky + 1 + my];
+        const drop: Box = [p[0] - mx / 2, Math.min(p[1], ky), p[0] + mx / 2, Math.max(p[1], ky)];
         return [text, drop];
       });
     // a candidate's cost: off the sheet or on the title block is out; on another label or its drop nearly so; lettering
@@ -306,7 +308,7 @@ export function calloutPlan(samples: LabelSpot[][], steady: Steady[], cx: number
         if (t[0] < edge || t[2] > area.w - edge || t[1] < edge || t[3] > area.h - edge) bad += 1000;
         if (area.block && hit(t, area.block)) bad += 1000;
         for (const q of placed[k]!) for (const m of b) if (hit(m, q)) bad += 200;
-        if (area.drawn) bad += K.overDrawing * area.drawn([t[0] - K.clear, t[1] - K.clear, t[2] + K.clear, t[3] + K.clear]);
+        if (area.drawn) bad += K.overDrawing * area.drawn([t[0] - K.clear + K.sepX / 2, t[1] - K.clear + K.sepY / 2, t[2] + K.clear - K.sepX / 2, t[3] + K.clear - K.sepY / 2]);
       });
       return bad / n + K.perPx * (Math.abs(dy) + run);
     };
@@ -361,10 +363,15 @@ export function drawCallouts(ctx: CanvasRenderingContext2D, T: ResolvedTheme, pl
     ctx.lineTo(a[0], ky);
     ctx.lineTo(end, ky);
     ctx.stroke();
+    // the end on the element: an arrowhead along the drop, touching the line it names (the drafting mark for a line or
+    // an edge); a dot where there is no drop to point along
     ctx.fillStyle = ink;
-    ctx.beginPath();
-    ctx.arc(a[0], a[1], K.dot, 0, Math.PI * 2);
-    ctx.fill();
+    if (Math.abs(ky - a[1]) > K.arrow) arrowHead(ctx, [a[0], ky], [a[0], a[1]], K.arrow, K.arrowAngle);
+    else {
+      ctx.beginPath();
+      ctx.arc(a[0], a[1], K.dot, 0, Math.PI * 2);
+      ctx.fill();
+    }
     ctx.fillStyle = focus === it.n ? paint(T.accent) : paint(T.ink, K.textAlpha);
     ctx.textAlign = "left";
     ctx.fillText(t, tx, ky - K.lift);

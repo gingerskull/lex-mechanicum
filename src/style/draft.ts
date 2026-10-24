@@ -324,13 +324,17 @@ export const DRAFT = {
       otherSide: 3, // cost of the shoulder running inboard instead of outboard
       clear: 8, // px, the lettering's clearance from the drawing
       rowGap: 6, // px, between rows
+      sepX: 12, // px, the least paper between two labels across
+      sepY: 8, // px, the least paper between two labels up and down
       textH: 11, // px, the lettering's height
       lift: 3, // px, the lettering above its shoulder
       gap: 6, // px, from the drop to the lettering, and past it to the shoulder's end
-      width: 0.8, // px, leader
-      leaderAlpha: 0.6, // 0..1
-      textAlpha: 0.9, // 0..1
-      dot: 2, // px, radius of the dot at the anchor
+      width: 1.1, // px, leader
+      leaderAlpha: 0.9, // 0..1
+      textAlpha: 1, // 0..1
+      arrow: 7, // px, the arrowhead's length at the element
+      arrowAngle: 0.38, // radians, its half-angle
+      dot: 2.4, // px, radius of the dot where a leader has no drop
       panel: 0.85, // 0..1, paper behind the lettering
       replanDeg: 25, // degrees the view turns before the rows are chosen again
       sep: 16, // px, the least distance between two labels' anchors (each takes its own point on its element)
