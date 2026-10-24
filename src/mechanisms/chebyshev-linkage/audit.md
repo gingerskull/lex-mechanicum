@@ -207,11 +207,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.31 |
 | DL-G | 0 | 0 | 1.31 |
 | DL-H | 19 | 0 | 1.36 |
-| never | 76 | 168 | 1.34 |
+| never | 76 | 167 | 1.34 |
 
 ## Promotion candidates
 None: no hand fix in this mechanism.
 
 ## Verification
-check: clean · K1 residual: 3.3e-13 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.2 KB
+check: clean · K1 residual: 3.3e-13 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.8 KB
 screenshots: dist/shots3/chebyshev-linkage (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

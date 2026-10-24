@@ -207,7 +207,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | 1.61 |
 | DL-G | 0 | 0 | 1.65 |
 | DL-H | 6 | 0 | 1.59 |
-| never | 64 | 112 | 1.6 |
+| never | 64 | 111 | 1.6 |
 
 ## Promotion candidates
 None left: the cylinder and piston shapes and the trunnion and piston-bore kits are in the builder; the interval dwell claim is in the claim checker.

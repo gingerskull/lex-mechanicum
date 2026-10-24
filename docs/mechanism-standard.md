@@ -1,8 +1,8 @@
 # Mechanism standard
 
 ```
-version: 3.9
-date: 2026-10-22
+version: 3.10
+date: 2026-10-24
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
 
@@ -916,6 +916,12 @@ the pipeline, **HAND** is built and judged in the pass, **DATA** is a record fie
 
 ## Changelog
 
+- **3.10 (2026-10-24).** The explode takes the main parts apart and keeps supporting hardware with what it supports;
+  units clear each other by a gap that grows with their size and move along one axis each [E2, E3, E7, E9, E10, AUTO].
+  A declared plan opens at the 28 degree view [T7, SITE]. Only covering parts go see-through [T10, AUTO]. Auto detail
+  measures the GPU's own time, steps down on a sustained cost, keeps B on a desktop and says why [DL4, SITE]. Setup
+  solves each phase once and ships the closure tables and the timed blocks' simulations [R9, SITE]. A pillow block on a
+  level shaft is one casting [J10, AUTO].
 - **3.9 (2026-10-22).** Cut-over: the 2.5D engine, v1 packages, the old models and polishes and the 3D stamp are
   gone; every mechanism is built from its record v3 and drawn by the one engine, and a page or card carries no engine
   mark [S5, SITE]. A registered mechanism is a record with an audit at 3.0 or later, held to every HAND change since its

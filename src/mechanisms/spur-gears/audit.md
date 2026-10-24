@@ -205,11 +205,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.15 |
 | DL-H | 17 | 0 | – |
-| never | 76 | 142 | 0.94 (full) |
+| never | 76 | 140 | 0.94 (full) |
 
 ## Promotion candidates
 None: the mesh, both live shafts and the drive are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.2 KB
+check: clean · K1 residual: 1.4e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.9 KB
 screenshots: dist/shots3/spur-gears (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.94 ms full, 1.16 at C, 1.15 at G; phone by David)

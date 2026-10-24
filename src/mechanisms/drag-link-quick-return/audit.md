@@ -214,5 +214,5 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 None left: the split part and its between-bridge are in the stack builder.
 
 ## Verification
-check: clean · K1 residual: 8.0e-13 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.8 KB
+check: clean · K1 residual: 8.0e-13 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.0 KB
 screenshots: dist/shots3/drag-link-quick-return (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

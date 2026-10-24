@@ -205,11 +205,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | 1.51 |
 | DL-G | 0 | 0 | 1.54 |
 | DL-H | 6 | 0 | 1.46 |
-| never | 64 | 118 | 1.47 |
+| never | 64 | 116 | 1.47 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 3.6e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 27.4 KB
+check: clean · K1 residual: 3.6e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.1 KB
 screenshots: dist/shots3/internal-geneva (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

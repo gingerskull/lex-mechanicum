@@ -204,11 +204,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.54 |
 | DL-G | 0 | 0 | 1.52 |
 | DL-H | 7 | 0 | 1.48 |
-| never | 51 | 77 | 1.52 |
+| never | 51 | 76 | 1.52 |
 
 ## Promotion candidates
 None left: the pin-in-square-slot block (rpp) is in the library.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.7 KB
+check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.8 KB
 screenshots: dist/shots3/scotch-yoke (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

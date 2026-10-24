@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · fired: j12-cvt (no solids) · every solid rigid on its body; the ball's spin solved by the integrator block |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 157 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 155 solids unsound |
 | D7 | PASS | HAND · disc, ball and cylinder plain; richness in the cage, the carriage and its rail |
 | A1 | PASS | AUTO · Oc J10, slide J5, Od J2, drive drive, drive2 drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · Oc J10, slide J5, Od J2, drive drive, drive2 drive · the disc on a live shaft (J2); the cylinder its own shaft in two pillow blocks (J10); the carriage on its rail (J5); the ball in its cage (ball-cage) |
@@ -208,11 +208,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | 1.96 |
 | DL-G | 0 | 0 | 2.1 |
 | DL-H | 14 | 0 | 2.11 |
-| never | 104 | 124 | 2.18 |
+| never | 102 | 122 | 2.18 |
 
 ## Promotion candidates
 None left: the integral is a kin block (closed form for the standard driver laws, quadrature otherwise); the ball in its cage, the carriage on its rail and a body that is its own shaft are the integrator rule and the ball-cage kit; the Scotch yoke takes a driver's phase and side.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.5 KB
+check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.4 KB
 screenshots: dist/shots3/ball-disc-integrator (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; phone by David)

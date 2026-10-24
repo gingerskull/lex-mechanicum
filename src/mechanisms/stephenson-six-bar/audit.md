@@ -64,7 +64,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 173 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 170 solids unsound |
 | D7 | PASS | HAND · links and plates plain; the richness in the stacks |
 | A1 | PASS | AUTO · A J3, B J3, P J3, D J3, O2 J2, O4 J1, O6 J1, O4-rocker1-stops stops, O6-rocker2-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · A J3, B J3, P J3, D J3, O2 J2, O4 J1, O6 J1, O4-rocker1-stops stops, O6-rocker2-stops stops, drive drive · fixed pins on their kits, moving pins J3 |
@@ -183,7 +183,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | B | J3 | – | – | – | none | Shoulder bolt Ø8 x 30, M6 (ISO 7379) | Shoulder bolt Ø8 x 30, M6 (ISO 7379) | Inner-race spacer 8.2x10.8 | none | none | none | none | none | none |
 | P | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | D | J3 | – | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| O2 | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the crank on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the crank on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 5 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | O4 | J1 | dyad | bridge | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Inner-race spacer 12.2x15.1; Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | O6 | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | O4-rocker1-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
@@ -203,7 +203,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 21 | 0 | 2.47 |
+| DL-A | 19 | 0 | 2.47 |
 | DL-B | 0 | 241 | 2.45 |
 | DL-C | 0 | 0 | 2.62 |
 | DL-D | 21 | 0 | 2.38 |
@@ -211,7 +211,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 2.38 |
 | DL-G | 0 | 0 | 2.28 |
 | DL-H | 12 | 0 | 2.07 |
-| never | 111 | 247 | 2.31 |
+| never | 110 | 234 | 2.31 |
 
 ## Promotion candidates
 None: no hand fix in this mechanism.

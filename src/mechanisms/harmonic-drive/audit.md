@@ -203,11 +203,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.73 |
 | DL-H | 4 | 0 | – |
-| never | 110 | 87 | 2.16 (full) |
+| never | 110 | 85 | 2.16 (full) |
 
 ## Promotion candidates
 None left: the wave block, the flexTooth segment shape, an elliptical cam outline and a ring gear's short teeth are in the library. Open: a deforming solid in the v3 renderer would draw the rim as one bending part.
 
 ## Verification
-check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.2 KB
+check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.2 KB
 screenshots: dist/shots3/harmonic-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 2.16 ms full, 1.75 at C, 1.73 at G; phone by David)

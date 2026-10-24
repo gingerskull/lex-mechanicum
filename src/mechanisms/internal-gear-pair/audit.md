@@ -205,11 +205,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.18 |
 | DL-H | 9 | 0 | – |
-| never | 69 | 101 | 1.00 (full) |
+| never | 69 | 99 | 1.00 (full) |
 
 ## Promotion candidates
 None left: the ring on carrier rollers (ring-carrier) is a kit of the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.1 KB
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.5 KB
 screenshots: dist/shots3/internal-gear-pair (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 1.00 ms full, 1.34 at C, 1.18 at G; phone by David)

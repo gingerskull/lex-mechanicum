@@ -218,11 +218,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | 1.73 |
 | DL-G | 0 | 0 | 1.71 |
 | DL-H | 5 | 0 | 2.24 |
-| never | 127 | 276 | 1.98 |
+| never | 127 | 275 | 1.98 |
 
 ## Promotion candidates
 Promoted in this pass: ring discs (`ring: { inner, spokes, hub }`), engraved index marks (`indexMark`), a second link set's own pattern (`set: "B"` drawn as link2), the `parallel-cranks` block.
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.1 KB
+check: clean · K1 residual: 4.3e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.2 KB
 screenshots: dist/shots3/schmidt-coupling (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

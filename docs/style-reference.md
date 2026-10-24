@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.7
-date: 2026-10-23
+version: 3.8
+date: 2026-10-24
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -783,6 +783,13 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 
 ## Changelog
 
+- **3.8 (2026-10-24).** Parts read as solids: higher paper and wall opacity, stepped wall shading, a faint tint on
+  mounts; a see-through part keeps most of its paper, takes a wash, and its walls follow its faces; only covering parts
+  go see-through (SD2, SD3). No pop-ins (SD28, SQ13). Patterns fade near edge-on (SD11). Gestures on the drawing and the
+  keys (SS10, SS15); no tilt slider, the overlay chips on the views' row, a hint line under the drawing (SS5).
+  Construction labels as callouts on their elements with arrowheads, hover and pin, markers and a key on a phone, none
+  on a card (SD22); ticks across the path, an edge-on trace fades, no engraved trace on the base (SD7, SD24). The
+  explode freezes the drawing and leaves a plan for 28 degrees (SD12). Cards and stills at dial A-C (SD16).
 - **3.7 (2026-10-23).** Forge is unlocked by holding the sheet switch, with hints around the site (a glint, the console,
   a sealed search for its lore, a line on the 404 page), and lives more while it is on (split scanlines, a rolling
   band, fringed text, blips, a breathing glow, a wider swelling colour split on the drawing). The Motive force line

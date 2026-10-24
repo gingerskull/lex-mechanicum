@@ -64,7 +64,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 84 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 82 solids unsound |
 | D7 | PASS | HAND · cam and follower plain; richness in the stacks, slide and spring |
 | A1 | PASS | AUTO · O J2, G J5, C J7, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · O J2, G J5, C J7, drive drive · cam on a live shaft (J2) in a housing under the base; follower in a gibbed slide (J5); cam contact J7 |
@@ -180,7 +180,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 9 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | Stop block | none | Gib strip 3 x 6 x 73, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | Stop block | none | Gib strip 3 x 6 x 73, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | C | J7 | cam | – | – | none | none | none | none | none | Compression spring Ø6, wire 0.8: holds the follower on the cam; Spring post Ø8 on the base, M4; Spring pin Ø4, pressed into the follower | none | Felt oiler on the follower's foot, oil-soaked wool felt | Cam | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
@@ -202,12 +202,12 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-E | 12 | 1 | 1.48 |
 | DL-F | 0 | 0 | 1.59 |
 | DL-G | 0 | 0 | 1.61 |
-| DL-H | 12 | 0 | 1.61 |
-| never | 50 | 77 | 1.55 |
+| DL-H | 10 | 0 | 1.61 |
+| never | 50 | 76 | 1.55 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.5 KB
+check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.2 KB
 screenshots: dist/shots3/flat-faced-cam (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

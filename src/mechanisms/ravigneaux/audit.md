@@ -226,11 +226,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.12 |
 | DL-H | 9 | 0 | – |
-| never | 120 | 248 | 0.90 (full) |
+| never | 120 | 247 | 0.90 (full) |
 
 ## Promotion candidates
 None left: the ravigneaux block and the gear selector's record options, the joined level, the undriven live shaft hung from its bridge and a principle gear see-through over a smaller one are rules of the builder. Open: brakes and a clutch for the held and locked members, and a drive on the large sun's shaft for reverse.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 43.6 KB
+check: clean · K1 residual: 2.8e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 42.6 KB
 screenshots: dist/shots3/ravigneaux (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.90 ms full, 1.23 at C, 1.12 at G; phone by David)

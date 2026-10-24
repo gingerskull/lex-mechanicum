@@ -206,11 +206,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.35 |
 | DL-G | 0 | 0 | 1.39 |
 | DL-H | 13 | 0 | 1.45 |
-| never | 64 | 149 | 1.41 |
+| never | 64 | 148 | 1.41 |
 
 ## Promotion candidates
 None: no hand fix in this mechanism.
 
 ## Verification
-check: clean · K1 residual: 5.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.0 KB
+check: clean · K1 residual: 5.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.1 KB
 screenshots: dist/shots3/roberts-linkage (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

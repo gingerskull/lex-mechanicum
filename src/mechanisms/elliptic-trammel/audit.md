@@ -64,7 +64,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 105 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 103 solids unsound |
 | D7 | PASS | HAND · links and plates plain; the richness in the stacks |
 | A1 | PASS | AUTO · M J3, A J3, B J3, O J2, SX J5, SY J5, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J3, A J3, B J3, O J2, SX J5, SY J5, drive drive · fixed pins on their kits, moving pins J3 |
@@ -179,10 +179,10 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| M | J3 | slider-dyad | – | – | none | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | none | none | none | none | none | none | none |
-| A | J3 | – | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
+| M | J3 | slider-dyad | – | – | none | Shoulder bolt Ø6 x 45, M5 (ISO 7379) | Shoulder bolt Ø6 x 45, M5 (ISO 7379) | none | none | none | none | none | none | none |
+| A | J3 | – | – | – | none | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | none | none | none | none | none | none | none |
 | B | J3 | – | – | – | none | Shoulder bolt Ø5 x 16, M4 (ISO 7379) | Shoulder bolt Ø5 x 16, M4 (ISO 7379) | none | none | none | none | none | none | none |
-| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the crank on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the crank on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 5 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | SX | J5 | – | – | – | SX-dw0, SX-dw1 | SX-keeper | none | none | SX-stop0, SX-stop1 | none | SX-gib | Felt wiper in a steel clip | none | none |
 | SY | J5 | – | – | – | SY-dw0, SY-dw1 | SY-keeper | none | none | SY-stop0, SY-stop1 | none | SY-gib | Felt wiper in a steel clip | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -203,15 +203,15 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-B | 0 | 180 | 1.33 |
 | DL-C | 0 | 0 | 1.31 |
 | DL-D | 12 | 0 | 1.38 |
-| DL-E | 12 | 0 | 1.35 |
+| DL-E | 10 | 0 | 1.35 |
 | DL-F | 0 | 0 | 1.42 |
 | DL-G | 0 | 0 | 1.42 |
 | DL-H | 2 | 0 | 1.41 |
-| never | 68 | 151 | 1.36 |
+| never | 68 | 131 | 1.36 |
 
 ## Promotion candidates
 The groove plate is one mechanism's hand fix (polish): crossed slides in one plate become a kit only if two more mechanisms need them.
 
 ## Verification
-check: clean · K1 residual: 9.1e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.6 KB
+check: clean · K1 residual: 9.1e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.2 KB
 screenshots: dist/shots3/elliptic-trammel (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

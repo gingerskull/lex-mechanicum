@@ -64,7 +64,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 106 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 102 solids unsound |
 | D7 | PASS | HAND · races, cage and balls plain; richness in the grooves and stacks |
 | A1 | PASS | AUTO · B1 J10, B2 J10, F1 sphere-fit, F2 sphere-fit, W1 slipper, W2 slipper, W3 slipper, W4 slipper, W5 slipper, W6 slipper, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · B1 J10, B2 J10, F1 sphere-fit, F2 sphere-fit, W1 slipper, W2 slipper, W3 slipper, W4 slipper, W5 slipper, W6 slipper, drive drive · two live shafts in plan (J10); the cage's spherical fits and the balls in its windows noted by their kits |
@@ -213,11 +213,11 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.58 |
 | DL-G | 0 | 0 | 1.7 |
 | DL-H | 12 | 0 | 1.64 |
-| never | 75 | 105 | 1.7 |
+| never | 71 | 104 | 1.7 |
 
 ## Promotion candidates
 Promoted in this pass: the `ball`, `race`, `bell` and `cage` shapes (revolves with swept grooves and cut windows), the sphere-fit kit, the `rzeppa` block.
 
 ## Verification
-check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.1 KB
+check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.0 KB
 screenshots: dist/shots3/rzeppa-cv-joint (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

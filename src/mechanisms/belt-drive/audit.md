@@ -205,11 +205,11 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.68 |
 | DL-G | 0 | 0 | 1.81 |
 | DL-H | 16 | 0 | 1.71 |
-| never | 178 | 174 | 1.79 |
+| never | 178 | 172 | 1.79 |
 
 ## Promotion candidates
 None left: the timing belt (teeth conveyed, the fixed band, grooves phased to the teeth, flanges, the idler, spokes on a large wheel, index marks) is the J12 rule of the builder.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 29.3 KB
+check: clean · K1 residual: 2.8e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 29.4 KB
 screenshots: dist/shots3/belt-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

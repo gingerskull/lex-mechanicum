@@ -207,11 +207,11 @@ PASS 140 · FAIL 0 · N/A 27 · open: none
 | DL-F | 0 | 0 | 1.42 |
 | DL-G | 0 | 0 | 1.46 |
 | DL-H | 4 | 0 | 1.38 |
-| never | 51 | 151 | 1.43 |
+| never | 51 | 150 | 1.43 |
 
 ## Promotion candidates
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 8.5e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.7 KB
+check: clean · K1 residual: 8.5e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.3 KB
 screenshots: dist/shots3/pantograph (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

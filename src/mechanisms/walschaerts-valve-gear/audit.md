@@ -219,7 +219,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | DL-F | 0 | 0 | 1.79 |
 | DL-G | 0 | 0 | 1.8 |
 | DL-H | 18 | 0 | 1.8 |
-| never | 150 | 418 | 1.88 |
+| never | 150 | 417 | 1.88 |
 
 ## Promotion candidates
 None left: outboard arms, the curved link and die kit, the slider placement order and the manual-driver hold are in the builder.

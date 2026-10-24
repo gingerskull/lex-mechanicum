@@ -64,7 +64,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 196 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 192 solids unsound |
 | D7 | PASS | HAND · links plain; the richness in the stacks |
 | A1 | PASS | AUTO · R0 J3, M0 J3, L1 J3, R1 J3, M1 J3, L2 J3, R2 J3, M2 J3, L3 J3, R3 J4, carriage-slide J5, L0 J1, L0-a0-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · R0 J3, M0 J3, L1 J3, R1 J3, M1 J3, L2 J3, R2 J3, M2 J3, L3 J3, R3 J4, carriage-slide J5, L0 J1, L0-a0-stops stops, drive drive · ground pivots by their kits (live shaft J2, dead axle J1), moving pins J3 (Joints table) |
@@ -189,7 +189,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | M2 | J3 | lerp | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | L3 | J3 | slider-dyad | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | R3 | J4 | slider-dyad | – | – | none | none | none | none | none | none | none | Felt oiler, oil-soaked wool felt | none | none |
-| carriage-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 83, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| carriage-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 71, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | L0 | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø8, shouldered, M6 end | External circlip DIN 471, Ø8 | none | Thrust washer 8.2x16, bronze | none | none | none | none | none | none |
 | L0-a0-stops | stops | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | Belt clamp plate, the near span between it and the jaw | none | none | none | none | Belt tensioner plate, slotted, 2 x M4 up into the base | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -213,12 +213,12 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | DL-E | 16 | 1 | 1.39 |
 | DL-F | 0 | 0 | 1.33 |
 | DL-G | 0 | 0 | 1.33 |
-| DL-H | 12 | 0 | 1.38 |
-| never | 125 | 220 | 1.4 |
+| DL-H | 8 | 0 | 1.38 |
+| never | 125 | 219 | 1.4 |
 
 ## Promotion candidates
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 5.7e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.0 KB
+check: clean · K1 residual: 5.7e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.7 KB
 screenshots: dist/shots3/scissor-lift (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

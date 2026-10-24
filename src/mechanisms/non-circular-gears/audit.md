@@ -206,11 +206,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.61 |
 | DL-H | 17 | 0 | – |
-| never | 76 | 145 | 1.05 (full) |
+| never | 76 | 142 | 1.05 (full) |
 
 ## Promotion candidates
 None left: non-circular pitch curves and the conjugate cut of the driven gear are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.3 KB
+check: clean · K1 residual: 1.4e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 69.6 KB
 screenshots: dist/shots3/non-circular-gears (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 1.05 ms full, 1.61 at C, 1.61 at G; phone by David)

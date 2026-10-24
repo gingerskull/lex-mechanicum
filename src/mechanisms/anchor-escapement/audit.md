@@ -64,7 +64,7 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles only |
-| D11 | PASS | AUTO · SOLID: 0 of 109 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 105 solids unsound |
 | D7 | PASS | HAND · wheel, anchor and pendulum plain; richness in the stacks |
 | A1 | PASS | AUTO · E J10, A J10, P pallet, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · E J10, A J10, P pallet, drive drive · escape wheel on an arbor in plan (J10, held from the front), anchor and pendulum on a live arbor in plan (J10, driven); the pallet contact (J7) |
@@ -205,11 +205,11 @@ PASS 144 · FAIL 0 · N/A 23 · open: none
 | DL-F | 0 | 0 | 2.37 |
 | DL-G | 0 | 0 | 1.9 |
 | DL-H | 20 | 0 | 2.01 |
-| never | 68 | 75 | 1.83 |
+| never | 64 | 73 | 1.83 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.2 KB
+check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.6 KB
 screenshots: dist/shots3/anchor-escapement (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

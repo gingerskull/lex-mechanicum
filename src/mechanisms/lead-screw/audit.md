@@ -64,7 +64,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 104 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 102 solids unsound |
 | D7 | PASS | HAND · screw and carriage plain; richness in the nut, the guide and the blocks |
 | A1 | PASS | AUTO · bearing J10, thread J11, guide J11, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · bearing J10, thread J11, guide J11, drive drive · the screw a live shaft in plan (J10) built by the screw kit; the nut on the thread (J11); the guide by the screw kit |
@@ -204,7 +204,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.45 |
 | DL-G | 0 | 0 | 1.45 |
 | DL-H | 12 | 0 | 1.39 |
-| never | 74 | 89 | 1.43 |
+| never | 72 | 88 | 1.43 |
 
 ## Promotion candidates
 None left: the screw kit (J11: the screw as its own shaft, its thread on the helix, the flanged nut and its ridge, the fork on a rail) serves the lead, ball and differential screws; the reversing belt drive and the revolved sweep of a spinning screw are rules.

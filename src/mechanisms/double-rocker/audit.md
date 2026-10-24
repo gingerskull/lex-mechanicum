@@ -213,5 +213,5 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.5 KB
+check: clean · K1 residual: 4.3e-14 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.6 KB
 screenshots: dist/shots3/double-rocker (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)
