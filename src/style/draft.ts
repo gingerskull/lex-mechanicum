@@ -107,7 +107,7 @@ export const DRAFT = {
     // A solid over a working zone or a principle part (L5, T10): a factor on its paper (`opacity`) and on its occlusion
     // (`occlude`), so what lies behind reads through it, and a flat ink wash on its faces (`tint`, 0..1), so it still reads
     // as a solid pane and never as empty outlines.
-    seeThrough: { opacity: 0.85, occlude: 0.9, tint: 0.06 },
+    seeThrough: { opacity: 0.85, occlude: 0.9, tint: 0.06, kinds: ["plate", "bridge", "housing", "bracket", "part"] as const },
     // Ink shade on side walls, stepped by facing: alpha = shade * (from + span * i / (steps - 1)).
     wallShade: {
       shade: 0.1, // 0..1 ink alpha

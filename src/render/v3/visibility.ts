@@ -4,10 +4,14 @@
 // part moves under a plate's edge: the solid's box overlaps the swept box on the sheet and reaches nearer the viewer than
 // the part ever does. While the view turns, a solid eases in and out of see-through over a small range of overlap and
 // depth instead of switching in one frame (no pop-ins). Pure maths: the renderer, the audit and the tests share it.
+import { DRAFT } from "../../style/draft";
 import { mat4 } from "../../solids/frame";
 import type { Vec3 } from "../../solids/types";
 import { depthOf, project, type Camera } from "./camera";
 import { applyMat, mulMat, type Runtime } from "./scene";
+
+/** The kinds that go see-through over a principle part: plates and the like, never small hardware. */
+const COVERS = new Set<string>(DRAFT.fill.seeThrough.kinds);
 
 /** How much of the smaller of the two sheet areas (the part's swept box, the covering solid) their overlap must fill, 0..1. */
 const OVERLAP = 0.25;
@@ -100,6 +104,9 @@ export function seeThrough(rt: Runtime, boxes: ArrayLike<number>, C: Camera, out
   if (!parts.length) return out;
   for (let c = 0; c < rt.n; c++) {
     if (rt.principle[c] || !rt.fixed[c] || rt.isBase[c]) continue;
+    // only a covering part goes see-through: small hardware (a standoff, a spacer, a screw) keeps its paper, so it does
+    // not flicker in and out as the view turns
+    if (!COVERS.has(rt.scene.pkg.solids[c]!.kind)) continue;
     const r = rectOf(C, boxes, c * 6);
     let a = 0;
     for (const p of parts) {

@@ -340,6 +340,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.fill.seeThrough.opacity` | 0.85 |  |
 | `draft.fill.seeThrough.occlude` | 0.9 |  |
 | `draft.fill.seeThrough.tint` | 0.06 |  |
+| `draft.fill.seeThrough.kinds` | [`plate`, `bridge`, `housing`, `bracket`, `part`] |  |
 | `draft.fill.wallShade.shade` | 0.1 | 0..1 ink alpha |
 | `draft.fill.wallShade.steps` | 5 | count of facing buckets |
 | `draft.fill.wallShade.light` | [0.75, -0.25] | screen direction the light comes from (x right, y down), the wall facing it is lightest |
@@ -407,6 +408,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.camera.views.ISOMETRIC` | [45, 54.7356] | [yaw, tilt] degrees |
 | `draft.camera.views.DIMETRIC` | [20.7, 70.5288] | [yaw, tilt] degrees |
 | `draft.camera.auxMinCos` | 0.02 | an AUX view down an axis that stands this close to vertical turns the drawing's up to y |
+| `draft.camera.planOpens` | 28 | degrees of tilt a record that declares PLAN opens at (it reads flat in plan; T7) |
 | `draft.section.hatch.pitch` | 7 | px between lines, px, 0..1 ink |
 | `draft.section.hatch.width` | 1.2 | px between lines, px, 0..1 ink |
 | `draft.section.hatch.alpha` | 0.45 | px between lines, px, 0..1 ink |
