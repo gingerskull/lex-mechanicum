@@ -16,11 +16,12 @@ import { build } from "esbuild";
 import { recordById } from "../src/catalog";
 import { allIds } from "../src/mechanisms";
 import { builtBytes } from "../src/package/built";
+import { DRAFT } from "../src/style/draft";
 import { PUBLIC_THEMES, type ThemeKey } from "../src/style/tokens";
 import { openChrome3, type Draw3Options } from "./chrome3";
 import { runPool } from "./pool";
 
-export const THUMB = { w: 320, h: 240, dpr: 2, u: 1.1 };
+export const THUMB = { w: DRAFT.card.refW, h: (DRAFT.card.refW * 3) / 4, dpr: 2, u: 1.1 };
 /** The still: the stage's opening frame (63° of the cycle, dimensions on) at dial A-C, the card's: paper grain is noise
  * that would make each image several times larger. */
 export const STILL = { w: 1200, h: 750, dpr: 1, u: (63 / 360) * Math.PI * 2, detail: "C" as const, quality: 0.75 };

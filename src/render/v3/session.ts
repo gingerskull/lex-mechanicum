@@ -308,7 +308,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     // the dimension lines of the detail stage run along the bottom and the right of the drawing: keep room for them
     const room = view.sheet && view.dims && !view.card ? DRAFT.dims.offset + DRAFT.dims.ext + DRAFT.dims.labelH / 2 : 0;
     const side = rails ?? { left: 0, right: 0 };
-    return fit(B, card.w, card.h, box, { ...(win ? { window: win } : {}), ...(room || side.left || side.right ? { inset: { left: side.left, right: room + side.right, bottom: room } } : {}) });
+    // a card's margin is the thumbnail's, scaled to the card: the live drawing takes over from the image without a jump
+    const pad = view.card ? (DRAFT.camera.pad * card.w) / DRAFT.card.refW : DRAFT.camera.pad;
+    return fit(B, card.w, card.h, box, { pad, ...(win ? { window: win } : {}), ...(room || side.left || side.right ? { inset: { left: side.left, right: room + side.right, bottom: room } } : {}) });
   }
 
   /** Outlines the windows of detail views in this view (SD20). */

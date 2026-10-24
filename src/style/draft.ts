@@ -53,6 +53,7 @@ export const DRAFT = {
   // and thin the two bold outlines. Used only for a view with `card` set; the mechanism page is untouched.
   card: {
     detail: "C" as const, // detail dial position of a card drawing (DL): sharp, without wall shading or the deep layers
+    refW: 320, // px, width of the canvas the card thumbnails are drawn on; a live card scales its margin to it
     plateTopFactor: 0.7, // factor on lines.plateTop on a card
     baseTopFactor: 0.7, // factor on lines.baseTop on a card
   },
