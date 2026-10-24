@@ -12,7 +12,7 @@ import { ladder, type Dial } from "../detail";
 import { paper, tooth } from "../sheet";
 import { baseSketch, basePencil, centrelines, dimensions, highlights, labelSpots, newCache, overlayItems, overlays, phantoms, scaleLabel, traces, trails, type Ann, type OverlayFlags } from "./annotate";
 import { font } from "../../style/theme";
-import { calloutPlan, coverage, pulseOf, railSides, type LabelHit, railSlots, steadiest, type LabelMode, type LabelPlan } from "./labels";
+import { calloutPlan, coverage, pulseOf, steadiest, type LabelHit, type LabelMode, type LabelPlan } from "./labels";
 import { basisOfOrient, fit, project, snapName, viewLabel, type Box, type Camera } from "./camera";
 import type { Vec3 } from "../../solids/types";
 import { Geometry, gpu3, gpuReady, onRestored, postPass, type Stats3 } from "./gpu";
@@ -44,7 +44,7 @@ export interface DrawView3 {
   ring?: number;
   /** A Forge glitch pulse, 0..1 (0 or absent outside one): the post-process tears bands and splits the colours wider. */
   glitch?: number;
-  /** How the construction labels are laid out (SD22); absent: none on a card, rails on a wide stage, else markers. */
+  /** How the construction labels are laid out (SD22); absent: none on a card, callouts on a wide stage, else markers. */
   labels?: LabelMode;
   /** A construction label picked out (its number in the record's order, from 0): its element bold, the rest faded. */
   focus?: number | null;
@@ -180,7 +180,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       place(rt, u, e, mats);
       const mode = labelMode(view);
       const plan = labelPlan(view, u, e, mode, { ctx: card.ctx, w: card.w, h: card.h, T, rt, mats, u, explode: e, LD, cache: cache.ann });
-      const C = camera(view, u, e, plan?.mode === "rails" ? plan : undefined);
+      const C = camera(view, u, e);
       sess.camera = C;
       for (let i = 0; i < rt.n; i++) {
         if (rt.fixed[i]) {
@@ -225,10 +225,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
       if (sh.trails !== false) trails(A);
       phantoms(A, view.phantoms);
       traces(A, { traces: sh.traces !== false, ghosts: sh.ghosts !== false, ticks: sh.ticks !== false });
-      const edge = DRAFT.sheet.inset + DRAFT.sheet.innerOffset;
       // a card draws no construction at all (SD22); the stage opens with it off, and the visitor turns it on
       pulsing = sh.construction !== false && !view.card && view.focus !== null && view.focus !== undefined && view.pulse === true && view.now !== undefined;
-      hits = sh.construction !== false && !view.card ? overlays(A, { mode, plan, focus: view.focus ?? null, frame: { x0: edge, x1: card.w - edge }, rows: tweenRows(plan, view.now), pulse: pulsing ? pulseOf(view.now) : 1 }) : [];
+      hits = sh.construction !== false && !view.card ? overlays(A, { mode, plan, focus: view.focus ?? null, rows: tweenRows(plan, view.now), pulse: pulsing ? pulseOf(view.now) : 1 }) : [];
       frames(A, view.frames);
       highlights(A, [...view.highlight, ...(view.state.section?.highlight ?? []), ...(view.state.detail?.highlight ?? [])]);
       if (view.sheet && !view.card) {
@@ -279,14 +278,14 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     },
   };
 
-  // where the construction labels go for a view, and the room the rails take: fixed for the view (SD22)
+  // where the construction labels go for a view: fixed for the view (SD22)
   let labelCache: { key: string; plan: LabelPlan | null; eye?: Vec3 } = { key: "", plan: null };
   // a callout row moving to the place a new plan gives it: from where it was, over `tween` ms of the views' clock
   let tween: { from: Map<string, number>; t0: number } | null = null;
   // the labels' places in the last frame (for pointing at them), and whether a picked one is pulsing
   let hits: LabelHit[] = [];
   let pulsing = false;
-  const labelMode = (view: DrawView3): LabelMode => (view.card ? "none" : (view.labels ?? (card.w >= DRAFT.overlays.rail.minStage ? "callouts" : "markers")));
+  const labelMode = (view: DrawView3): LabelMode => (view.card ? "none" : (view.labels ?? (card.w >= DRAFT.overlays.labels.minStage ? "callouts" : "markers")));
   function labelPlan(view: DrawView3, u: number, e: number, mode: LabelMode, A0: Omit<Ann, "C">): LabelPlan | null {
     const t = scene.teaching;
     if (mode === "none" || view.show.construction === false || !t?.overlays.some((o) => typeof o.label === "string" && o.label)) return null;
@@ -297,13 +296,13 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     const key = JSON.stringify([mode === "callouts" ? rest : view.state, view.state.orient.aux ?? null, card.w, card.h, mode, rev, Math.round(e * 4), view.theme]);
     const near = labelCache.eye && Math.acos(Math.min(1, Math.abs(labelCache.eye[0] * eye[0] + labelCache.eye[1] * eye[1] + labelCache.eye[2] * eye[2]))) < (DRAFT.overlays.callout.replanDeg * Math.PI) / 180;
     if (labelCache.key === key && (mode !== "callouts" || near)) return labelCache.plan;
-    const R = DRAFT.overlays.rail;
+    const R = DRAFT.overlays.labels;
     const follow = (C: Camera) => steadiest(Array.from({ length: R.samples }, (_, k) => labelSpots({ ...A0, C }, (k / R.samples) * scene.poser.period)));
     const C0 = camera(view, u, e);
-    let st = follow(C0);
+    const st = follow(C0);
     let plan: LabelPlan;
-    if (mode === "markers") plan = { mode, left: 0, right: 0, items: st.map((s) => ({ key: s.key, n: s.n, text: s.text, cand: s.cand, side: 0, y: 0 })) };
-    else if (mode === "callouts") {
+    if (mode === "markers") plan = { mode, items: st.map((s) => ({ key: s.key, n: s.n, text: s.text, cand: s.cand, side: 0, y: 0 })) };
+    else {
       const samples = Array.from({ length: R.samples }, (_, k) => labelSpots({ ...A0, C: C0 }, (k / R.samples) * scene.poser.period));
       const box = sceneBox(rt, mats, e);
       const cx = project(C0, [(box[0] + box[3]) / 2, (box[1] + box[4]) / 2, (box[2] + box[5]) / 2])[0];
@@ -349,20 +348,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
         }
         tween = from.size ? { from, t0: view.now } : null;
       }
-      plan = { mode, left: 0, right: 0, items };
-    } else {
-      const ctx = card.ctx;
-      ctx.save();
-      ctx.font = font(DRAFT.type.overlaySmall);
-      const { sides, left, right } = railSides(st, card.w / 2, (x) => ctx.measureText(x).width);
-      ctx.restore();
-      // the drawing fitted again with the rails' room, and the labels followed again in that camera
-      st = follow(camera(view, u, e, { left, right }));
-      const S = DRAFT.sheet;
-      const top = S.inset + S.innerOffset + R.spacing;
-      const block = view.sheet && card.w > S.titleMinCanvas ? 4 * S.titleRow + R.spacing : 0;
-      const bottom: [number, number] = [card.h - S.inset - S.innerOffset - R.spacing, card.h - S.inset - S.innerOffset - block - R.spacing];
-      plan = { mode, left, right, items: railSlots(st, sides, top, bottom) };
+      plan = { mode, items };
     }
     labelCache = { key, plan, eye };
     return plan;
@@ -388,7 +374,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
   const LDof = (view: DrawView3, e: number) => ladder(view.detail, { tilt: tiltOf(basisFor(view)), explode: e });
   const basisFor = (view: DrawView3): Camera => ({ ...basisOfOrient(view.state.orient), s: 1, ox: 0, oy: 0, d0: 0, d1: 1 });
 
-  function camera(view: DrawView3, u: number, explode: number, rails?: { left: number; right: number }): Camera {
+  function camera(view: DrawView3, u: number, explode: number): Camera {
     const B = basisOfOrient(view.state.orient);
     const box = sceneBox(rt, mats, explode);
     const det = view.state.detail;
@@ -399,10 +385,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     }
     // the dimension lines of the detail stage run along the bottom and the right of the drawing: keep room for them
     const room = view.sheet && view.dims && !view.card ? DRAFT.dims.offset + DRAFT.dims.ext + DRAFT.dims.labelH / 2 : 0;
-    const side = rails ?? { left: 0, right: 0 };
     // a card's margin is the thumbnail's, scaled to the card: the live drawing takes over from the image without a jump
     const pad = view.card ? (DRAFT.camera.pad * card.w) / DRAFT.card.refW : DRAFT.camera.pad;
-    return fit(B, card.w, card.h, box, { pad, ...(win ? { window: win } : {}), ...(room || side.left || side.right ? { inset: { left: side.left, right: room + side.right, bottom: room } } : {}) });
+    return fit(B, card.w, card.h, box, { pad, ...(win ? { window: win } : {}), ...(room ? { inset: { right: room, bottom: room } } : {}) });
   }
 
   /** Outlines the windows of detail views in this view (SD20). */

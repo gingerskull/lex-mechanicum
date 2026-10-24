@@ -505,6 +505,24 @@
   color: var(--muted);
   margin: 6px 0 0;
 }
+/* how to handle the drawing, in a quiet line under it: the mouse and keys, or fingers on a touch screen */
+.stagehint {
+  font: 400 11px / 1.4 var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+.stagehint .h-touch {
+  display: none;
+}
+@media (pointer: coarse) {
+  .stagehint .h-fine {
+    display: none;
+  }
+  .stagehint .h-touch {
+    display: inline;
+  }
+}
 .stage canvas {
   position: absolute;
   inset: 0;

@@ -535,18 +535,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.labelBorder` | 0.8 | px, panel hairline width |
 | `draft.overlays.labelEdge` | 4 | px, labels kept this far inside the canvas |
 | `draft.overlays.labelSpacing` | 3 | px, gap when a label is pushed below another |
-| `draft.overlays.rail.minStage` | 640 | px, the narrowest stage that gets rails (a narrower one gets markers) |
-| `draft.overlays.rail.maxW` | 200 | px, the widest a rail gets |
-| `draft.overlays.rail.gap` | 6 | px, between a label and its leader's shoulder |
-| `draft.overlays.rail.shoulder` | 12 | px, the leader's horizontal start at the label |
-| `draft.overlays.rail.spacing` | 20 | px, the least distance between two labels in a rail |
-| `draft.overlays.rail.textAlpha` | 0.85 | 0..1 |
-| `draft.overlays.rail.leaderWidth` | 0.75 | px |
-| `draft.overlays.rail.leaderAlpha` | 0.5 | 0..1 |
-| `draft.overlays.rail.dot` | 2 | px, radius of the dot at the anchor |
-| `draft.overlays.rail.dim` | 0.35 | 0..1, the other labels while one is picked out |
-| `draft.overlays.rail.edge` | 10 | px, a rail's clearance from the drawing |
-| `draft.overlays.rail.samples` | 24 | phases of the cycle a label's anchor is followed over to set its slot |
+| `draft.overlays.labels.minStage` | 640 | px, the narrowest stage that gets callouts |
+| `draft.overlays.labels.dim` | 0.35 | 0..1, the other labels while one is picked out |
+| `draft.overlays.labels.samples` | 24 | phases of the cycle a label's anchor is followed over to set its place |
 | `draft.overlays.callout.drop` | 16 | px, the shortest drop from the anchor to the shoulder |
 | `draft.overlays.callout.rows` | 10 | rows tried above the anchor, and as many below |
 | `draft.overlays.callout.maxRun` | 320 | px, the longest shoulder run before the lettering (to carry it clear of the drawing) |

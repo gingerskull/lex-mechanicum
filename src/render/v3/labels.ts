@@ -64,10 +64,10 @@ export interface LabelSpot {
   cands: [number, number][];
 }
 
-/** How the construction labels are laid out (SD22): in rails at the sides with leaders, as numbered markers, or not. */
-export type LabelMode = "callouts" | "rails" | "markers" | "none";
+/** How the construction labels are laid out (SD22): as callouts on their elements, as numbered markers, or not. */
+export type LabelMode = "callouts" | "markers" | "none";
 
-/** One construction label's place for a view: the candidate it hangs on, its side, and its slot's height (rails). */
+/** One construction label's place for a view: the candidate it hangs on, its shoulder's side and its row (callouts). */
 export interface LabelItem {
   key: string;
   /** A callout's shoulder run before its lettering, CSS px (it carries the lettering clear of the drawing). */
@@ -82,10 +82,7 @@ export interface LabelItem {
 
 /** Where a view's construction labels go, fixed until the view changes. */
 export interface LabelPlan {
-  mode: "callouts" | "rails" | "markers";
-  /** Room the drawing leaves for the rails, CSS px (0 where a side has no labels). */
-  left: number;
-  right: number;
+  mode: "callouts" | "markers";
   items: LabelItem[];
 }
 
@@ -146,75 +143,6 @@ export function steadiest(samples: LabelSpot[][]): Steady[] {
     out.push({ key, n: out.length, text: e.text, cand: pick.k, mean: pick.mean });
   }
   return out;
-}
-
-/** The rails' sides and widths from where the labels sit: a label goes to the side of the drawing it is on. */
-export function railSides(items: Steady[], centreX: number, width: (t: string) => number): { sides: Map<string, 0 | 1>; left: number; right: number } {
-  const R = O.rail;
-  const sides = new Map<string, 0 | 1>();
-  let left = 0;
-  let right = 0;
-  for (const it of items) {
-    const side: 0 | 1 = it.mean[0] < centreX ? 0 : 1;
-    sides.set(it.key, side);
-    const w = Math.min(R.maxW, width(DRAFT.type.uppercase ? capitals(it.text) : it.text) + R.shoulder + 2 * R.gap + R.edge);
-    if (side === 0) left = Math.max(left, w);
-    else right = Math.max(right, w);
-  }
-  return { sides, left, right };
-}
-
-/** The slots: each side's labels in the order of their mean height, at that height, pushed apart, kept in the rail. */
-export function railSlots(items: Steady[], sides: Map<string, 0 | 1>, top: number, bottom: [number, number]): LabelItem[] {
-  const R = O.rail;
-  const out: LabelItem[] = [];
-  for (const side of [0, 1] as const) {
-    const list = items.filter((it) => (sides.get(it.key) ?? 0) === side).sort((a, b) => a.mean[1] - b.mean[1]);
-    const ys: number[] = [];
-    list.forEach((it, i) => ys.push(Math.max(it.mean[1], i ? ys[i - 1]! + R.spacing : top)));
-    for (let i = ys.length - 1; i >= 0; i--) ys[i] = Math.min(ys[i]!, i === ys.length - 1 ? bottom[side] : ys[i + 1]! - R.spacing);
-    for (let i = 0; i < ys.length; i++) ys[i] = Math.max(ys[i]!, i ? ys[i - 1]! + R.spacing : top);
-    list.forEach((it, i) => out.push({ key: it.key, n: it.n, text: it.text, cand: it.cand, side, y: ys[i]! }));
-  }
-  return out;
-}
-
-/** Draws the rails: each label in its slot, with a drafting leader (a shoulder, then a straight line) to its anchor now. */
-export function drawRails(ctx: CanvasRenderingContext2D, T: ResolvedTheme, plan: LabelPlan, spots: LabelSpot[], frame: { x0: number; x1: number }, focus: number | null): void {
-  const R = O.rail;
-  const keys = spotKeys(spots);
-  ctx.save();
-  ctx.font = font(DRAFT.type.overlaySmall);
-  ctx.textBaseline = "middle";
-  for (const it of plan.items) {
-    const k = keys.indexOf(it.key);
-    const at = k >= 0 ? (spots[k]!.cands[it.cand] ?? spots[k]!.cands[0]) : undefined;
-    // what it reads now (a dimension's live value), else its name
-    const now = k >= 0 ? spots[k]!.text : it.text;
-    const t = DRAFT.type.uppercase ? capitals(now) : now;
-    const lit = focus === null || focus === it.n;
-    // the rail's inner edge is where the drawing's room starts; the lettering stands outside the shoulder
-    const inner = it.side === 0 ? frame.x0 + plan.left - R.edge : frame.x1 - plan.right + R.edge;
-    const xText = it.side === 0 ? inner - R.shoulder - R.gap : inner + R.shoulder + R.gap;
-    ctx.globalAlpha = lit ? 1 : R.dim;
-    ctx.fillStyle = paint(T.ink, R.textAlpha);
-    ctx.textAlign = it.side === 0 ? "right" : "left";
-    ctx.fillText(t, xText, it.y + 0.5);
-    if (!at) continue;
-    const s0 = it.side === 0 ? xText + R.gap * 0.5 : xText - R.gap * 0.5;
-    ctx.strokeStyle = paint(T.ink, R.leaderAlpha);
-    ctx.lineWidth = R.leaderWidth;
-    ctx.beginPath();
-    ctx.moveTo(s0, it.y);
-    ctx.lineTo(inner, it.y);
-    ctx.lineTo(at[0], at[1]);
-    ctx.stroke();
-    ctx.fillStyle = paint(T.ink, R.leaderAlpha);
-    ctx.beginPath();
-    ctx.arc(at[0], at[1], R.dot, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
 }
 
 /** Draws the numbered markers at the labels' anchors now (a phone's stage; the key is under it), the picked one in accent. */
@@ -364,7 +292,7 @@ export function drawCallouts(ctx: CanvasRenderingContext2D, T: ResolvedTheme, pl
     const run = it.x ?? 0;
     const end = a[0] + s * (K.gap * 2 + run + tw);
     const lit = focus === null || focus === it.n;
-    ctx.globalAlpha = lit ? 1 : O.rail.dim;
+    ctx.globalAlpha = lit ? 1 : O.labels.dim;
     const ink = focus === it.n ? paint(T.accent) : paint(T.ink, K.leaderAlpha);
     // the lettering's ground: the paper, so it reads where it crosses a part
     const tx = s < 0 ? end + K.gap * 0.5 : a[0] + K.gap * 1.5 + run;

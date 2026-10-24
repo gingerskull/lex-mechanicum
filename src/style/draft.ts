@@ -298,20 +298,11 @@ export const DRAFT = {
     labelBorder: 0.8, // px, panel hairline width
     labelEdge: 4, // px, labels kept this far inside the canvas
     labelSpacing: 3, // px, gap when a label is pushed below another
-    // Construction labels on a wide stage (SD22): in rails at the sides of the sheet, each with a drafting leader.
-    rail: {
-      minStage: 640, // px, the narrowest stage that gets rails (a narrower one gets markers)
-      maxW: 200, // px, the widest a rail gets
-      gap: 6, // px, between a label and its leader's shoulder
-      shoulder: 12, // px, the leader's horizontal start at the label
-      spacing: 20, // px, the least distance between two labels in a rail
-      textAlpha: 0.85, // 0..1
-      leaderWidth: 0.75, // px
-      leaderAlpha: 0.5, // 0..1
-      dot: 2, // px, radius of the dot at the anchor
+    // Construction labels (SD22): callouts on a stage at least `minStage` wide, else numbered markers with a key.
+    labels: {
+      minStage: 640, // px, the narrowest stage that gets callouts
       dim: 0.35, // 0..1, the other labels while one is picked out
-      edge: 10, // px, a rail's clearance from the drawing
-      samples: 24, // phases of the cycle a label's anchor is followed over to set its slot
+      samples: 24, // phases of the cycle a label's anchor is followed over to set its place
     },
     // Construction labels on a wide stage as elbow callouts (SD22): drop, shoulder, lettering on the shoulder.
     callout: {

@@ -2,10 +2,9 @@
 // the cycle (so it does not move while the drawing plays), and the slots of a rail keep their order, their spacing and
 // the rail's bounds.
 import { describe, expect, it } from "vitest";
-import { railSides, railSlots, spotKeys, steadiest, type LabelSpot } from "../../src/render/v3/labels";
+import { calloutPlan, coverage, spotKeys, steadiest, type LabelSpot } from "../../src/render/v3/labels";
 import { DRAFT } from "../../src/style/draft";
 
-const R = DRAFT.overlays.rail;
 /** A label whose first point swings round a circle and whose second stays put, sampled over a cycle. */
 const cycle = (n: number): LabelSpot[][] =>
   Array.from({ length: n }, (_, k) => {
@@ -37,24 +36,37 @@ describe("construction labels (SD22)", () => {
     expect(st.map((s) => s.n)).toEqual([0, 1, 2]);
   });
 
-  it("puts each label in the rail on its side of the drawing, the rail as wide as its widest label", () => {
-    const st = steadiest(cycle(24));
-    const { sides, left, right } = railSides(st, 500, (t) => t.length * 7);
-    expect(sides.get("CRANK#0")).toBe(0);
-    expect(sides.get("AXIS#0")).toBe(1);
-    expect(left).toBeGreaterThan(0);
-    expect(right).toBeGreaterThan(0);
-    expect(Math.max(left, right)).toBeLessThanOrEqual(R.maxW);
+  it("keeps callouts apart, and their lettering off the drawing where the sheet has room", () => {
+    const frames = cycle(24);
+    const st = steadiest(frames);
+    // the drawing fills the middle of an 800 x 500 sheet
+    const drawn = coverage([[250, 120, 550, 380]], 800, 500);
+    const items = calloutPlan(frames, st, 400, { w: 800, h: 500, block: [560, 440, 790, 490], drawn }, (t) => t.length * 7);
+    expect(items).toHaveLength(3);
+    // each label's lettering at the first phase, as calloutPlan lays it out
+    const K = DRAFT.overlays.callout;
+    const boxes = items.map((it) => {
+      const k = frames[0]!.findIndex((f, i) => `${f.base}#${frames[0]!.slice(0, i).filter((g) => g.base === f.base).length}` === it.key);
+      const a = frames[0]![k]!.cands[it.cand]!;
+      const s = it.side === 0 ? -1 : 1;
+      const w = it.text.length * 7;
+      const x0 = a[0] + s * (K.gap + (it.x ?? 0)), x1 = x0 + s * w;
+      const ky = a[1] + it.y;
+      return [Math.min(x0, x1), ky - K.textH - K.lift, Math.max(x0, x1), ky] as [number, number, number, number];
+    });
+    for (let i = 0; i < boxes.length; i++)
+      for (let j = i + 1; j < boxes.length; j++) {
+        const [a, b] = [boxes[i]!, boxes[j]!];
+        expect(a[2] + K.sepX / 2 <= b[0] || b[2] + K.sepX / 2 <= a[0] || a[3] + K.sepY / 2 <= b[1] || b[3] + K.sepY / 2 <= a[1], `${items[i]!.key} and ${items[j]!.key}`).toBe(true);
+      }
+    for (const b of boxes) expect(drawn(b)).toBeLessThan(0.05);
   });
 
-  it("keeps a rail's labels in the order of their height, apart, and inside the rail", () => {
-    const items = Array.from({ length: 8 }, (_, i) => ({ key: `L${i}#0`, n: i, text: `L${i}`, cand: 0, mean: [700, 300 + (i % 3)] as [number, number] }));
-    const sides = new Map(items.map((it) => [it.key, 1 as const]));
-    const slots = railSlots(items, sides, 30, [600, 560]);
-    const ys = slots.map((s) => s.y);
-    for (let i = 1; i < ys.length; i++) expect(ys[i]! - ys[i - 1]!).toBeGreaterThanOrEqual(R.spacing - 1e-9);
-    expect(Math.min(...ys)).toBeGreaterThanOrEqual(30);
-    expect(Math.max(...ys)).toBeLessThanOrEqual(560 + 1e-9);
+  it("finds how much of a box lies over the drawing", () => {
+    const drawn = coverage([[100, 100, 200, 200]], 400, 300);
+    expect(drawn([10, 10, 60, 60])).toBe(0);
+    expect(drawn([110, 110, 190, 190])).toBe(1);
+    expect(drawn([50, 120, 150, 180])).toBeGreaterThan(0.3);
   });
 
   it("sets the slots from the whole cycle, so where the drawing is in it does not move them", () => {

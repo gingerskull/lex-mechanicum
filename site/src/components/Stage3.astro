@@ -30,7 +30,8 @@ const presets = [
 ] as const;
 ---
 <div class="stagebox" data-id={id} data-no={no} data-title={title} data-engine="v3" data-timemap={timeMap ? "1" : undefined}>
-  <div class="stage"><canvas id="stage" role="img" aria-label={`${title}, live drawing`} aria-description="Drag sideways to step through the cycle; drag with the right button, Shift or two fingers to orbit. Keys: Space plays or pauses, the arrows step, Shift and the arrows orbit, 1 to 5 the named views, 0 the drawing's own view." title="Drag sideways to step through the cycle. Right drag, Shift drag or two fingers orbit."></canvas></div>
+  <div class="stage"><canvas id="stage" role="img" aria-label={`${title}, live drawing`} aria-description="Drag sideways to step through the cycle; drag with the right button, Shift or two fingers to orbit. Keys: Space plays or pauses, the arrows step, Shift and the arrows orbit, 1 to 5 the named views, 0 the drawing's own view."></canvas></div>
+  <p class="stagehint" aria-hidden="true"><span class="h-fine">Drag sideways to step through the cycle · right drag or Shift drag to orbit · keys 1–5 for the views, 0 to reset</span><span class="h-touch">Swipe sideways to step through the cycle · two fingers to orbit</span></p>
   <div class="controls">
     <button class="play" id="play" type="button" aria-pressed="true" aria-label="Pause">
       <svg viewBox="0 0 12 12" aria-hidden="true"><path id="playicon" d="M3 2h2v8H3zM7 2h2v8H7z" fill="currentColor"></path></svg>

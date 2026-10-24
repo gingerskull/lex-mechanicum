@@ -565,7 +565,7 @@ async function main(box: HTMLElement) {
   // tap picks a line out on the drawing, a second tap lets it go
   const ckey = document.getElementById("ckey");
   const showKey = () => {
-    if (ckey) ckey.hidden = !s.show.construction || size().width >= E.DRAFT.overlays.rail.minStage;
+    if (ckey) ckey.hidden = !s.show.construction || size().width >= E.DRAFT.overlays.labels.minStage;
   };
   for (const b of ckey?.querySelectorAll<HTMLButtonElement>("button") ?? [])
     b.addEventListener("click", () => {
