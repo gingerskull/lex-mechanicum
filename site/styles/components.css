@@ -511,6 +511,7 @@
   letter-spacing: 0.04em;
   color: var(--muted);
   margin: 6px 0 0;
+  text-align: center;
 }
 .stagehint .h-touch {
   display: none;
