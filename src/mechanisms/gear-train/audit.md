@@ -181,9 +181,9 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M1 | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | A; Cluster | none |
 | M2 | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Cluster; D | none |
-| A | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 12 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| B | J2 | – | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | 2 x Feather key 4 x 4 x 12 (DIN 6885); 2 x Clamp hub Ø12x22, two set screws at 90°; 2 x Set screw M4 (DIN 916), threadlocked | Inner-race spacer 12.2x15; Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| D | J2 | – | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 12 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| A | J2 | driver | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| B | J2 | – | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | 2 x Feather key 4 x 4 x 7 (DIN 6885); 2 x Clamp hub Ø12x22, two set screws at 90°; 2 x Set screw M4 (DIN 916), threadlocked | Inner-race spacer 12.2x15; Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| D | J2 | – | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -209,11 +209,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.26 |
 | DL-H | 29 | 0 | – |
-| never | 104 | 195 | 0.82 (full) |
+| never | 104 | 193 | 0.82 (full) |
 
 ## Promotion candidates
 None left: the compound gear (a gear with cluster levels) is a shape of the builder, placed by the placement solver one slab per level.
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.2 KB
+check: clean · K1 residual: 1.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.5 KB
 screenshots: dist/shots3/gear-train (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.82 ms full, 1.07 at C, 1.26 at G; phone by David)

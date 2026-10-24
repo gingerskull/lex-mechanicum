@@ -64,7 +64,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 147 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 143 solids unsound |
 | D7 | PASS | HAND · leaves and plates plain; richness in the stacks |
 | A1 | PASS | AUTO · K1 J3, T1 J3, K2 J3, T2 J3, H1 J10, H2 J10 · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · K1 J3, T1 J3, K2 J3, T2 J3, H1 J10, H2 J10 · the base hinges as shafts in plan in pillow blocks (J10); knees and top hinges moving pins (J3) through the leaves and the plate's lugs |
@@ -210,7 +210,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | DL-F | 0 | 0 | 2.37 |
 | DL-G | 0 | 0 | 2.31 |
 | DL-H | 18 | 0 | 1.93 |
-| never | 87 | 156 | 2.26 |
+| never | 83 | 155 | 2.26 |
 
 ## Promotion candidates
 Promoted in this pass: hinge lugs (`lugs` on a shape, the lugs rule), record-placed parts (`axial`), a link's `thickness`.

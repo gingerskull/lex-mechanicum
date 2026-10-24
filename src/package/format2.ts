@@ -81,6 +81,8 @@ export interface PackedSolid3 {
   /** Index into `shapes`. */
   shape: number;
   ex: number;
+  /** The direction it explodes along, in its body's frame (unit); absent: its own z. */
+  exAxis?: Vec3;
   detail: RungId;
   joints?: string[];
   group?: string;

@@ -203,7 +203,7 @@ PASS 141 · FAIL 0 · N/A 26 · open: none
 | DL-F | 0 | 0 | 1.38 |
 | DL-G | 0 | 0 | 1.38 |
 | DL-H | 9 | 0 | 1.37 |
-| never | 52 | 66 | 1.33 |
+| never | 52 | 64 | 1.33 |
 
 ## Promotion candidates
 None: the fixed nut and the knob are part of the screw kit (J11).

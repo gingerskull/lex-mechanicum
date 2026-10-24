@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 130 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 127 solids unsound |
 | D7 | PASS | HAND · gears plain; richness in the stacks |
 | A1 | PASS | AUTO · M J6, B J3, P J3, Os J2, Ob J1, Ob-beam-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J6, B J3, P J3, Os J2, Ob J1, Ob-beam-stops stops, drive drive · the retainer keyed to the driven live shaft (J2), the sun and its flywheel turning free on it in bearings; rod, beam and retainer pins as shoulder bolts (J3); the beam's pivot a dead axle (J1) under a bridge; the mesh J6 |
@@ -182,7 +182,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | M | J6 | gear-mesh | – | – | none | none | none | none | none | none | Eccentric bushing Ø28, 0.3 mm offset bore Ø14, flanged | none | Rod; Sun | none |
 | B | J3 | gear-mesh | – | – | none | Shoulder bolt Ø12 x 16, M10 (ISO 7379) | Shoulder bolt Ø12 x 16, M10 (ISO 7379) | none | none | none | none | none | none | none |
 | P | J3 | dyad | – | – | none | Shoulder bolt Ø12 x 25, M10 (ISO 7379) | Shoulder bolt Ø12 x 25, M10 (ISO 7379) | Inner-race spacer 12.2x15.1 | none | none | none | none | none | none |
-| Os | J2 | – | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø24; 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the retainer on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 8 (DIN 6885) | 2 x Inner-race spacer 12.2x16.2; Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| Os | J2 | – | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø24; 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the retainer on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 5 (DIN 6885) | 2 x Inner-race spacer 12.2x16.2; Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | Ob | J1 | dyad | bridge | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | Ob-beam-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -201,7 +201,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 17 | 0 | – |
+| DL-A | 15 | 0 | – |
 | DL-B | 0 | 204 | – |
 | DL-C | 0 | 0 | 1.11 |
 | DL-D | 18 | 0 | – |
@@ -209,11 +209,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.12 |
 | DL-H | 8 | 0 | – |
-| never | 79 | 273 | 1.01 (full) |
+| never | 78 | 255 | 1.01 (full) |
 
 ## Promotion candidates
 None left: a gear fixed on a link's end, a flywheel level under a gear and a shaft that keys only what turns together are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 2.3e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.9 KB
+check: clean · K1 residual: 2.3e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.0 KB
 screenshots: dist/shots3/sun-and-planet (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 1.01 ms full, 1.11 at C, 1.12 at G; phone by David)

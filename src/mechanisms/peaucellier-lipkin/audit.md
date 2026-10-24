@@ -64,7 +64,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 177 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 171 solids unsound |
 | D7 | PASS | HAND · links and plates plain; the richness in the stacks |
 | A1 | PASS | AUTO · C1 J3, A1 J3, B1 J3, D J3, Q J2, O1 J1, O1-armA-stops stops, O1-armB-stops stops, Q-input-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · C1 J3, A1 J3, B1 J3, D J3, Q J2, O1 J1, O1-armA-stops stops, O1-armB-stops stops, Q-input-stops stops, drive drive · fixed pins on their kits, moving pins J3 |
@@ -202,7 +202,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 27 | 0 | 1.52 |
+| DL-A | 23 | 0 | 1.52 |
 | DL-B | 0 | 236 | 1.53 |
 | DL-C | 0 | 0 | 1.58 |
 | DL-D | 23 | 0 | 1.46 |
@@ -210,11 +210,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.38 |
 | DL-G | 0 | 0 | 1.38 |
 | DL-H | 16 | 0 | 1.4 |
-| never | 99 | 322 | 1.52 |
+| never | 97 | 293 | 1.52 |
 
 ## Promotion candidates
 None: no hand fix in this mechanism.
 
 ## Verification
-check: clean · K1 residual: 5.7e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.1 KB
+check: clean · K1 residual: 5.7e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.8 KB
 screenshots: dist/shots3/peaucellier-lipkin (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

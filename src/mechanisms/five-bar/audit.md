@@ -64,7 +64,7 @@ PASS 137 · FAIL 0 · N/A 30 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 108 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 114 solids unsound |
 | D7 | PASS | HAND · links plain; the richness in the stacks |
 | A1 | PASS | AUTO · A J3, B J3, P J3, O1 J2, O2 J2, O1-crank-left-stops stops, O2-crank-right-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · A J3, B J3, P J3, O1 J2, O2 J2, O1-crank-left-stops stops, O2-crank-right-stops stops, drive drive · ground pivots by their kits (live shaft J2, dead axle J1), moving pins J3 (Joints table) |
@@ -182,8 +182,8 @@ PASS 137 · FAIL 0 · N/A 30 · open: none
 | A | J3 | – | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | B | J3 | – | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | P | J3 | five-bar | – | – | none | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | Shoulder bolt Ø8 x 12, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| O1 | J2 | five-bar | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 5 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| O2 | J2 | five-bar | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 5 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O1 | J2 | five-bar | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 5 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | Split clamp collar 12x24 with a thumb screw: holds the setting | none | none | none | none |
+| O2 | J2 | five-bar | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 5 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | Split clamp collar 12x24 with a thumb screw: holds the setting | none | none | none | none |
 | O1-crank-left-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | O2-crank-right-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | none |
@@ -200,18 +200,18 @@ PASS 137 · FAIL 0 · N/A 30 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 14 | 0 | 1.42 |
-| DL-B | 0 | 192 | 1.41 |
+| DL-B | 0 | 194 | 1.41 |
 | DL-C | 0 | 0 | 1.43 |
 | DL-D | 18 | 0 | 1.38 |
 | DL-E | 0 | 0 | 1.35 |
 | DL-F | 0 | 0 | 1.37 |
 | DL-G | 0 | 0 | 1.48 |
-| DL-H | 16 | 0 | 1.45 |
-| never | 60 | 197 | 1.37 |
+| DL-H | 18 | 0 | 1.45 |
+| never | 64 | 197 | 1.37 |
 
 ## Promotion candidates
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 4.6e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.1 KB
+check: clean · K1 residual: 4.6e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.6 KB
 screenshots: dist/shots3/five-bar (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

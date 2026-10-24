@@ -61,7 +61,7 @@ export interface Runtime {
   /** The role surface per solid and its pattern layer (-1 for none). */
   surface: RoleSurface[];
   pattern: Int8Array;
-  /** The explode direction (unit, world) of each solid. */
+  /** The explode direction (unit, world) of each solid, as posed in the last frame placed. */
   axis: Float32Array;
   /** Rest matrices (phase 0, no explode), 16 floats per solid. */
   rest: Float32Array;
@@ -130,7 +130,17 @@ export function place(rt: Runtime, u: number, explode: number, out: Float32Array
   const { scene } = rt;
   const gap = FORM.explode.gap * explode;
   scene.pkg.solids.forEach((s, i) => {
-    let M: Mat4 = mulMat(scene.poser.place(s, u), mat4(s.fr));
+    const B = scene.poser.place(s, u);
+    let M: Mat4 = mulMat(B, mat4(s.fr));
+    if (gap && s.ex) {
+      // the direction it leaves along as posed (E10): its unit's axis in its body's frame, so a part that swings explodes
+      // along its axis where it is now; without one, its own axis
+      // a conveyed part (a ball round its circuit, a chain link) is posed along its path: its unit's direction as built
+      const a = s.exAxis;
+      const d: Vec3 = a && s.cv ? [a[0], a[1], a[2]] : a ? [B[0]! * a[0] + B[4]! * a[1] + B[8]! * a[2], B[1]! * a[0] + B[5]! * a[1] + B[9]! * a[2], B[2]! * a[0] + B[6]! * a[1] + B[10]! * a[2]] : s.legacyAxis ? [0, 0, 1] : [M[8]!, M[9]!, M[10]!];
+      const l = Math.hypot(d[0], d[1], d[2]) || 1;
+      rt.axis.set([d[0] / l, d[1] / l, d[2] / l], i * 3);
+    }
     if (s.stretch) {
       // between its two points as solved: at the first, x toward the second, its unit length scaled to the span
       const e = scene.poser.ends?.(u, s.stretch[0], s.stretch[1]);
@@ -170,8 +180,8 @@ export function worldBox(rt: Runtime, mats: ArrayLike<number>, i: number, out: n
 }
 
 export interface RowState {
-  /** Per solid, 1 when it is drawn see-through (L5, T10). */
-  see: Uint8Array;
+  /** Per solid, how far it is drawn see-through (L5, T10), 0..1: 1 outright, between while it eases in or out. */
+  see: ArrayLike<number>;
   ladder: Ladder;
   /** A library card: its two bold outlines are thinner (SD16). */
   card: boolean;
@@ -190,17 +200,19 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     for (let r = 0; r < 3; r++) table.set([mats[b + r]!, mats[b + 4 + r]!, mats[b + 8 + r]!, mats[b + 12 + r]!], o + r * 4);
     const base = rt.isBase[i] === 1;
     const plate = rt.isPlate[i] === 1;
-    const see = st.see[i] === 1 || hasFlag3(s, "seeThrough");
-    const f = see ? F.seeThrough.opacity : 1;
-    const occ = (base ? F.occlude.base : plate ? F.occlude.plate : F.occlude.other) * f;
+    const a = hasFlag3(s, "seeThrough") ? 1 : Math.max(0, Math.min(1, st.see[i] ?? 0));
+    const f = 1 + (F.seeThrough.opacity - 1) * a;
+    const occ = (base ? F.occlude.base : plate ? F.occlude.plate : F.occlude.other) * (1 + (F.seeThrough.occlude - 1) * a);
     const face = (base ? F.base : plate ? F.plate : F.other) * f;
     const wallA = F.wall * (base ? F.baseWallGain : 1) * f;
     const R = rt.surface[i]!;
     const pat = rt.pattern[i]!;
     const kx = s.stretch ? Math.hypot(mats[b]!, mats[b + 1]!, mats[b + 2]!) || 1 : 1;
-    table.set([face, wallA, Math.min(1, occ), see ? 0 : Math.min(1, occ * F.wallOcclude)], o + 12);
-    table.set([R.tint ?? 0, st.patterns && pat >= 0 ? (R.alpha ?? 0) : 0, Math.max(0, pat), R.step ?? 1], o + 16);
-    table.set([hasFlag3(s, "faint") ? 0.5 : 1, base ? 1 : 0, plate ? 1 : 0, see ? 1 : 0], o + 20);
+    // the walls take the same see-through share as the faces: a part reads as one solid at one opacity
+    table.set([face, wallA, Math.min(1, occ), Math.min(1, occ * F.wallOcclude)], o + 12);
+    const tint = (R.tint ?? 0) + Math.max(0, F.seeThrough.tint - (R.tint ?? 0)) * a;
+    table.set([tint, st.patterns && pat >= 0 ? (R.alpha ?? 0) : 0, Math.max(0, pat), R.step ?? 1], o + 16);
+    table.set([hasFlag3(s, "faint") ? 0.5 : 1, base ? 1 : 0, plate ? 1 : 0, a], o + 20);
     const top = base ? L.baseTop * cardK.base : plate ? L.plateTop * cardK.plate : L.otherTop;
     table.set([top, st.ladder.solid(s.detail) ? 0 : 1, kx, 0], o + 24);
     table.set([0, 0, 0, 0], o + 28);

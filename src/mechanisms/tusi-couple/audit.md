@@ -64,7 +64,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 81 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 52 solids unsound |
 | D7 | PASS | HAND · links and plates plain; the richness in the stacks |
 | A1 | PASS | AUTO · mesh J6, C J3, O J2, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · mesh J6, C J3, O J2, drive drive · fixed pins on their kits, moving pins J3 |
@@ -180,9 +180,8 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | mesh | J6 | gear-mesh | – | – | none | none | none | none | none | none | none | none | Planet | none |
-| C | J3 | – | – | – | none | Internal circlip DIN 472, Ø22; Shoulder bolt Ø8 x 20, M6 (ISO 7379) | Shoulder bolt Ø8 x 20, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the arm on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
+| C | J3 | – | – | – | none | Internal circlip DIN 472, Ø22; Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
+| O | ring-carrier | driver | – | – | Standoff Ø10, M5 | Roller flange, under the rim; Roller flange, over the rim | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
@@ -195,19 +194,19 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 7 | 0 | 1.33 |
-| DL-B | 0 | 143 | 1.46 |
+| DL-A | 2 | 0 | 1.33 |
+| DL-B | 0 | 195 | 1.46 |
 | DL-C | 0 | 0 | 1.33 |
 | DL-D | 9 | 0 | 1.37 |
-| DL-E | 8 | 1 | 1.36 |
+| DL-E | 0 | 1 | 1.36 |
 | DL-F | 0 | 0 | 1.33 |
 | DL-G | 0 | 0 | 1.31 |
-| DL-H | 2 | 0 | 1.36 |
-| never | 55 | 97 | 1.35 |
+| DL-H | 0 | 0 | 1.36 |
+| never | 41 | 61 | 1.35 |
 
 ## Promotion candidates
 None: no hand fix in this mechanism.
 
 ## Verification
-check: clean · K1 residual: 1.1e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.3 KB
+check: clean · K1 residual: 1.1e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 13.1 KB
 screenshots: dist/shots3/tusi-couple (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

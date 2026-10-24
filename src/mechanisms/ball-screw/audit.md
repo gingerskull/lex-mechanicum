@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · the balls are conveyed round the circuit by the solved travel (D9), whole, one shape shared |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 164 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 162 solids unsound |
 | D7 | PASS | HAND · screw and carriage plain; richness in the nut, the guide and the blocks |
 | A1 | PASS | AUTO · bearing J10, balls J11, guide J11, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · bearing J10, balls J11, guide J11, drive drive · the screw a live shaft in plan (J10) built by the screw kit; the nut on the thread (J11); the guide by the screw kit |
@@ -204,11 +204,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | 1.73 |
 | DL-G | 0 | 0 | 1.71 |
 | DL-H | 12 | 0 | 1.58 |
-| never | 134 | 97 | 2.01 |
+| never | 132 | 96 | 2.01 |
 
 ## Promotion candidates
 None left: the ball circuit (balls conveyed round the grooves and a return tube) is part of the screw kit (J11); conveyed solids are a feature of the package and the renderer.
 
 ## Verification
-check: clean · K1 residual: 2.6e-14 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 47.7 KB
+check: clean · K1 residual: 2.6e-14 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 47.6 KB
 screenshots: dist/shots3/ball-screw (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

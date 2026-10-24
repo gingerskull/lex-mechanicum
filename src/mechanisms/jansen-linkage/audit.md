@@ -184,7 +184,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | C1 | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 30, M6 (ISO 7379) | Shoulder bolt Ø8 x 30, M6 (ISO 7379) | Inner-race spacer 8.2x10.8 | none | none | none | none | none | none |
 | D | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | E | J3 | – | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the crank on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 10 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; End washer 5.4x20, holds the crank on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 4 x 4 x 5 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | Y1 | J1 | dyad | – | – | Dead axle Ø8, shouldered, M6 end | External circlip DIN 471, Ø8 | none | Inner-race spacer 8.2x10.8; Thrust washer 8.2x16, bronze | none | none | none | none | none | none |
 | Y1-upper-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | Y1-c-stops | stops | – | – | – | none | none | none | none | Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
@@ -209,11 +209,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.49 |
 | DL-G | 0 | 0 | 1.49 |
 | DL-H | 6 | 0 | 1.53 |
-| never | 85 | 284 | 1.54 |
+| never | 85 | 283 | 1.54 |
 
 ## Promotion candidates
 None: no hand fix in this mechanism.
 
 ## Verification
-check: clean · K1 residual: 3.0e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.7 KB
+check: clean · K1 residual: 3.0e-13 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.5 KB
 screenshots: dist/shots3/jansen-linkage (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -16,7 +16,7 @@ import { titleOf } from "../lib";
 import { edgeDist } from "../planar";
 import { inside } from "../../core/poly";
 import { worldPoints } from "../sweeps";
-import { v3, xf } from "../../kin/math";
+import { v3 } from "../../kin/math";
 import type { Rule } from "./types";
 
 const BODY_ROLE: Record<string, Solid3["role"]> = { driver: "driver", output: "output", frame: "ground" };
@@ -231,7 +231,6 @@ export const base: Rule = {
     const marks = [
       ...ticks.map((pts) => ({ kind: "scale" as const, pts })),
       ...corners.map((c) => ({ kind: "boreEntry" as const, pts: circle(4.2, c[0], c[1], 24) })),
-      ...tracePaths(ctx).map((pts) => ({ kind: "engrave" as const, pts })),
       ...ctx.baseMarks.map((m) => ({ kind: m.kind, pts: m.pts as Vec2[] })),
     ];
     const plate = place(
@@ -246,21 +245,3 @@ export const base: Rule = {
   },
 };
 
-/** The paths the teaching traces follow, as polylines in base coordinates (engraved on the base). */
-function tracePaths(ctx: BuildCtx): Vec2[][] {
-  const out: Vec2[][] = [];
-  for (const t of ctx.teaching?.traces ?? []) {
-    const pt = ctx.kin.points?.find((q) => q.id === (t as { point?: string }).point);
-    if (!pt) continue;
-    const ref = ctx.S.refPts.get(pt.id);
-    if (!ref) continue;
-    const pts: Vec2[] = [];
-    ctx.sampled.us.forEach((_, i) => {
-      const p = xf.apply(ctx.xfOf(pt.body, i), ref);
-      pts.push([p[0], p[1]]);
-    });
-    if (pts.length > 2) out.push([...pts, pts[0]!]);
-  }
-  void v3;
-  return out;
-}

@@ -3,7 +3,7 @@
 // A record's `kin` block is composed here from closed-form blocks. `new Kinematics(kin).pose(u, controls)` solves every
 // body for the cycle phase u; `verifyK1(kin)` checks every declared joint in 3D over the cycle. The block functions in
 // ./blocks are pure and usable on their own.
-export { Kinematics, BranchTable } from "./compose";
+export { Kinematics, BranchTable, type BranchTables } from "./compose";
 export { verifyK1, K1_TOL, type K1Report, type K1Options } from "./verify";
 export { evalExpr } from "./expr";
 export { timeMap, type TimeMapSpec } from "./timemap";

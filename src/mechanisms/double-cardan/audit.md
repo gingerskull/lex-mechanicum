@@ -64,7 +64,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 147 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 143 solids unsound |
 | D7 | PASS | HAND · yokes and crosses plain; richness in the cups and stacks |
 | A1 | PASS | AUTO · B1 J10, B2 J10, C1a cross-pin, C1b cross-pin, C2a cross-pin, C2b cross-pin, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · B1 J10, B2 J10, C1a cross-pin, C1b cross-pin, C2a cross-pin, C2b cross-pin, drive drive · two live shafts in plan (J10); the yoke pins in the crosses by the cross-pin kit |
@@ -209,11 +209,11 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | DL-F | 0 | 0 | 1.85 |
 | DL-G | 0 | 0 | 1.83 |
 | DL-H | 12 | 0 | 1.77 |
-| never | 104 | 183 | 1.99 |
+| never | 100 | 181 | 1.99 |
 
 ## Promotion candidates
 Promoted in this pass: the Hooke block with a shaft that has no ground joint (`shafts`), body frames given by axes (`frame: { z, x }`) so a control can turn them.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.8 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.9 KB
 screenshots: dist/shots3/double-cardan (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

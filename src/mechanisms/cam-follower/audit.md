@@ -64,7 +64,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 90 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 93 solids unsound |
 | D7 | PASS | HAND · cam and stem plain; richness in the stacks, the slide and the spring |
 | A1 | PASS | AUTO · F J3, O J2, G J5, C J7, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · F J3, O J2, G J5, C J7, drive drive · cam on a live shaft (J2) in a housing under the base; roller on a shoulder bolt in the stem (J3); stem in a gibbed slide (J5); cam contact J7 |
@@ -179,9 +179,9 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| F | J3 | – | – | – | none | Shoulder bolt Ø3 x 12, M2.5 (ISO 7379) | Shoulder bolt Ø3 x 12, M2.5 (ISO 7379) | none | none | none | none | none | none | none |
+| F | J3 | – | – | – | none | Internal circlip DIN 472, Ø10; Shoulder bolt Ø3 x 20, M2.5 (ISO 7379) | Shoulder bolt Ø3 x 20, M2.5 (ISO 7379) | none | none | none | none | none | none | none |
 | O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 9 (DIN 6885); Clamp hub Ø12x22, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
-| G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 72, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 72, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | C | J7 | cam | – | – | none | none | none | none | none | Compression spring Ø6, wire 0.8: holds the follower on the cam; Spring post Ø8 on the base, M4; Spring pin Ø4, pressed into the follower | none | Felt oiler on the roller, oil-soaked wool felt | Cam | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
@@ -196,19 +196,19 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 5 | 0 | 2 |
+| DL-A | 7 | 0 | 2 |
 | DL-B | 0 | 133 | 1.47 |
 | DL-C | 0 | 0 | 1.67 |
-| DL-D | 7 | 0 | 1.73 |
+| DL-D | 8 | 0 | 1.73 |
 | DL-E | 12 | 1 | 1.53 |
 | DL-F | 0 | 0 | 1.6 |
 | DL-G | 0 | 0 | 1.62 |
 | DL-H | 10 | 0 | 2.12 |
-| never | 56 | 82 | 1.57 |
+| never | 56 | 91 | 1.57 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.0 KB
+check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.1 KB
 screenshots: dist/shots3/cam-follower (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

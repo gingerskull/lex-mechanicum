@@ -64,7 +64,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | D8 | PASS | AUTO / HAND · the groove is a cut feature of the disc (a boolean, shipped as a mesh); every other solid a profile, an operation and a frame |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · the grooved disc ships as a mesh (a boolean result), the rest as profiles |
-| D11 | PASS | AUTO · SOLID: 0 of 86 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 84 solids unsound |
 | D7 | PASS | HAND · disc and arm plain; richness in the stacks and the slide |
 | A1 | PASS | AUTO · F J3, O J2, C groove-cam, G J5, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · F J3, O J2, C groove-cam, G J5, drive drive · disc on a live shaft (J2) in a housing under the base; roller on a shoulder bolt in the arm (J3); arm in a gibbed slide (J5); groove cam (J7, form-closed) |
@@ -182,7 +182,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | F | J3 | – | – | – | none | Shoulder bolt Ø3 x 10, M2.5 (ISO 7379) | Shoulder bolt Ø3 x 10, M2.5 (ISO 7379) | none | none | none | none | none | none | none |
 | O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 15 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | C | groove-cam | cam | – | – | none | none | none | none | none | none | none | Felt oiler over the groove, oil-soaked wool felt | Disc | none |
-| G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | Stop block | none | Gib strip 3 x 6 x 90, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| G | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | Stop block | none | Gib strip 3 x 6 x 90, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -203,7 +203,7 @@ PASS 151 · FAIL 0 · N/A 16 · open: none
 | DL-E | 12 | 1 | 1.44 |
 | DL-F | 0 | 0 | 1.49 |
 | DL-G | 0 | 0 | 1.39 |
-| DL-H | 8 | 0 | 1.41 |
+| DL-H | 6 | 0 | 1.41 |
 | never | 54 | 108 | 1.42 |
 
 ## Promotion candidates

@@ -1,4 +1,4 @@
-// Visual snapshots (style SQ9), local only: `npm run test:visual`. Each registered mechanism at plan, 28° (elevation
+// Visual snapshots (style SQ9), local only: `npm run test:visual` (LM_IDS=a,b narrows it to a few mechanisms). Each registered mechanism at plan, 28° (elevation
 // 62), side and the full explode in isometric, both sheets, the sheet and every teaching layer on, drawn by the site's
 // renderer in local Chrome (tools/chrome3.ts) and compared with our own baselines in tests/visual/__baselines__. Baselines
 // are written once, when the look is final: `UPDATE_SNAPSHOTS=1 npm run test:visual`. Never regenerate them to make a
@@ -8,7 +8,7 @@ import { join } from "node:path";
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { allIds } from "../../src/mechanisms";
+import { workIds } from "../../src/mechanisms";
 import type { ThemeKey } from "../../src/style/tokens";
 import { openChrome3, type Chrome3, type Draw3Options } from "../../tools/chrome3";
 
@@ -29,7 +29,7 @@ describe("visual snapshots", () => {
     chrome = await openChrome3();
   }, 120_000);
   afterAll(() => chrome?.close());
-  for (const id of allIds())
+  for (const id of workIds())
     for (const theme of ["dark", "light"] as ThemeKey[])
       for (const [name, v] of VIEWS)
         it(`${id} ${theme} ${name}`, { timeout: 120_000 }, async () => {

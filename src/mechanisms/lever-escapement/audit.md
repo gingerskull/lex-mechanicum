@@ -205,11 +205,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | 1.79 |
 | DL-G | 0 | 0 | 1.77 |
 | DL-H | 13 | 0 | 1.73 |
-| never | 61 | 89 | 1.77 |
+| never | 61 | 88 | 1.77 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 2.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.9 KB
+check: clean · K1 residual: 2.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.1 KB
 screenshots: dist/shots3/lever-escapement (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

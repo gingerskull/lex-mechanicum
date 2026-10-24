@@ -64,7 +64,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 128 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 122 solids unsound |
 | D7 | PASS | HAND · links and plates plain; the richness in the stacks |
 | A1 | PASS | AUTO · M J3, B J3, S J5, O J1, O-crank-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · M J3, B J3, S J5, O J1, O-crank-stops stops, drive drive · fixed pins on their kits, moving pins J3 |
@@ -181,7 +181,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M | J3 | – | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | B | J3 | dyad | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
-| S | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 105, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| S | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 93, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | O | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | O-crank-stops | stops | – | – | – | none | none | none | none | Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | drive | drive | – | – | – | none | Belt clamp plate, the near span between it and the jaw | none | none | none | none | Belt tensioner plate, slotted, 2 x M4 up into the base | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -199,18 +199,18 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 7 | 0 | 1.34 |
-| DL-B | 0 | 122 | 1.32 |
+| DL-B | 0 | 121 | 1.32 |
 | DL-C | 0 | 0 | 1.33 |
 | DL-D | 8 | 0 | 1.36 |
 | DL-E | 15 | 1 | 1.35 |
 | DL-F | 0 | 0 | 1.37 |
 | DL-G | 0 | 0 | 1.34 |
-| DL-H | 11 | 0 | 1.38 |
-| never | 87 | 120 | 1.43 |
+| DL-H | 7 | 0 | 1.38 |
+| never | 85 | 118 | 1.43 |
 
 ## Promotion candidates
 None: no hand fix in this mechanism.
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.4 KB
+check: clean · K1 residual: 1.4e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.2 KB
 screenshots: dist/shots3/scott-russell (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) and six phases at plan and an angled view · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

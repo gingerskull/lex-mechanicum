@@ -36,7 +36,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
 | K9 | PASS | DATA · one rotary driver; the swash angle a param control (0 to 18) |
 | K10 | PASS | AUTO / DATA · closed forms, continuous over the cycle; no branch flips |
-| K11 | PASS | AUTO · mobility counted 18, dof 1 |
+| K11 | PASS | AUTO · mobility counted 12, dof 1 |
 | K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
 | T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
 | T2 | PASS | HAND · review before the build and again on six phases of the finished build; decisions in the record |
@@ -64,7 +64,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 100 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 98 solids unsound |
 | D7 | PASS | HAND · block, plate and plungers plain; richness in the liners, sockets and stacks |
 | A1 | PASS | AUTO · S J10, P1 piston-bore, P2 piston-bore, P3 piston-bore, P4 piston-bore, P5 piston-bore, SB1 ball-socket, SB2 ball-socket, SB3 ball-socket, SB4 ball-socket, SB5 ball-socket, K1 slipper, K2 slipper, K3 slipper, K4 slipper, K5 slipper, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · S J10, P1 piston-bore, P2 piston-bore, P3 piston-bore, P4 piston-bore, P5 piston-bore, SB1 ball-socket, SB2 ball-socket, SB3 ball-socket, SB4 ball-socket, SB5 ball-socket, K1 slipper, K2 slipper, K3 slipper, K4 slipper, K5 slipper, drive drive · the shaft in plan (J10); pistons in lined bores (piston-bore); ball ends in sockets (ball-socket); slippers on the plate (slipper) |
@@ -219,7 +219,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | 2.06 |
 | DL-G | 0 | 0 | 1.71 |
 | DL-H | 6 | 0 | 1.81 |
-| never | 79 | 134 | 1.76 |
+| never | 77 | 133 | 1.76 |
 
 ## Promotion candidates
 Promoted in this pass: the `plane-slide` block (the tilt frame), plunger pistons in lined bores (piston-bore), the ball-socket and slipper kits, posts under a fixed body.

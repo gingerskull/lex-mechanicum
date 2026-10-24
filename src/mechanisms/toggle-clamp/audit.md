@@ -64,7 +64,7 @@ PASS 142 · FAIL 0 · N/A 25 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 94 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 95 solids unsound |
 | D7 | PASS | HAND · links plain; the richness in the stacks |
 | A1 | PASS | AUTO · A J3, B J3, O J2, slide J5, O-handle-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · A J3, B J3, O J2, slide J5, O-handle-stops stops, drive drive · ground pivots by their kits (live shaft J2, dead axle J1), moving pins J3 (Joints table) |
@@ -181,8 +181,8 @@ PASS 142 · FAIL 0 · N/A 25 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | A | J3 | slider-dyad | – | – | none | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | Shoulder bolt Ø6 x 12, M5 (ISO 7379) | none | none | none | none | none | none | none |
 | B | J3 | – | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
-| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø13; External circlip DIN 471, Ø6 | Clamp hub Ø6x16, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 6.2x14, bronze; Wave washer 9.5x12.8, spring steel | none | none | none | none | none | none |
-| slide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | stop | none | Gib strip 3 x 6 x 119.3, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø13; External circlip DIN 471, Ø6 | Clamp hub Ø6x16, two set screws at 90°; Set screw M4 (DIN 916), threadlocked | Thrust washer 6.2x14, bronze; Wave washer 9.5x12.8, spring steel | none | Split clamp collar 6x18 with a thumb screw: holds the setting | none | none | none | none |
+| slide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | stop | none | Gib strip 3 x 6 x 107.3, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | O-handle-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | none |
 
@@ -200,18 +200,18 @@ PASS 142 · FAIL 0 · N/A 25 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 8 | 0 | 2.18 |
-| DL-B | 0 | 112 | 2.19 |
+| DL-B | 0 | 113 | 2.19 |
 | DL-C | 0 | 0 | 2.06 |
 | DL-D | 10 | 0 | 1.95 |
 | DL-E | 3 | 0 | 2.04 |
 | DL-F | 0 | 0 | 1.96 |
 | DL-G | 0 | 0 | 2.01 |
-| DL-H | 15 | 0 | 1.91 |
-| never | 58 | 153 | 2.06 |
+| DL-H | 14 | 0 | 1.91 |
+| never | 60 | 152 | 2.06 |
 
 ## Promotion candidates
 The spindle and the dropped front stop are this mechanism's own (one mechanism). Promoted in this pass: sliders on the ground placed lowest and clear of their rail zone, the slide kit's travel, wipers, risers and nipple (R1 closing comment).
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.9 KB
+check: clean · K1 residual: 2.8e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.2 KB
 screenshots: dist/shots3/toggle-clamp (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

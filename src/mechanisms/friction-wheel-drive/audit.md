@@ -64,7 +64,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 92 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 95 solids unsound |
 | D7 | PASS | HAND · disc and wheel plain; richness in the stacks and the tyre |
 | A1 | PASS | AUTO · contact J6, Od J2, Ow J10, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · contact J6, Od J2, Ow J10, drive drive · the disc on a live shaft (J2), the wheel on a live shaft in plan (J10); the friction contact (J6 recorded) by its rule |
@@ -197,18 +197,18 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 9 | 0 | 1.48 |
-| DL-B | 0 | 197 | 1.47 |
+| DL-B | 0 | 201 | 1.47 |
 | DL-C | 0 | 0 | 1.41 |
 | DL-D | 7 | 0 | 1.45 |
 | DL-E | 8 | 0 | 1.33 |
 | DL-F | 0 | 0 | 1.34 |
 | DL-G | 0 | 0 | 1.4 |
 | DL-H | 15 | 0 | 1.38 |
-| never | 53 | 85 | 1.39 |
+| never | 56 | 150 | 1.39 |
 
 ## Promotion candidates
 None left: the friction contact (tyre, preload, the setting clamped and read on a scale) is a rule of the builder; pillow blocks reach the range of a part set along its shaft.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.0 KB
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.7 KB
 screenshots: dist/shots3/friction-wheel-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

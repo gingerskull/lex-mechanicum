@@ -29,6 +29,13 @@ export class BranchTable {
   refined = false;
 }
 
+/**
+ * A setting's branch tables as data, by stateful block: the side it starts on, the phases it flips at, and whether it
+ * comes back to its start. Built once where it is cheap (the site's build) and handed to the page, so a record whose
+ * closures are tracked numerically does not build them again before its first frame (R9).
+ */
+export type BranchTables = Record<string, { start: 0 | 1; flips: number[]; periodic: boolean }>;
+
 interface Tracker {
   p1?: number[];
   p2?: number[];
@@ -229,6 +236,35 @@ export class Kinematics {
   }
 
   // ------------------------------------------------------------------- poses
+
+  /** The branch tables of a setting, built if need be (see BranchTables). */
+  branchTables(controls?: Controls): BranchTables {
+    const s = this.setup(controls);
+    this.ensureTables(s);
+    const out: BranchTables = {};
+    for (const [id, t] of s.tables) out[id] = { start: t.start, flips: [...t.flips], periodic: t.periodic };
+    return out;
+  }
+
+  /** Takes the branch tables `branchTables()` made for the same record and setting, so they are not built again. */
+  useBranchTables(data: BranchTables, controls?: Controls): void {
+    const s = this.setup(controls);
+    if (s.tablesReady) return;
+    // the reference run still: it is one pass, and it sets the reference values the blocks measure from; the homotopy
+    // and the tracked cycle, the costly part, are what the data stands in for
+    s.trackers.clear();
+    s.stateful = [];
+    this.run(s, 0, this.refValues(s), "ref");
+    for (const [id, d] of Object.entries(data)) {
+      const t = new BranchTable(TABLE_STEPS);
+      t.start = d.start;
+      t.flips = [...d.flips];
+      t.periodic = d.periodic;
+      t.refined = true;
+      s.tables.set(id, t);
+    }
+    s.tablesReady = true;
+  }
 
   /** The pose at cycle phase u (radians, 0..2π per cycle) at the given controls. Continuous, periodic. */
   pose(u: number, controls?: Controls): Pose {

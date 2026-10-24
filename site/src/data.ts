@@ -3,7 +3,7 @@
 import pkg from "../../package.json";
 import { loadCatalog, recordById, type CatalogRecord } from "../../src/catalog";
 import type { Kin, Teaching } from "../../src/catalog/kin";
-import { allIds } from "../../src/mechanisms";
+import { workIds } from "../../src/mechanisms";
 import { originKey, type Sortable } from "./sort";
 
 /** The app's name: the library's kicker, the footer and the site name in every page's head. */
@@ -18,8 +18,9 @@ export interface Sheet {
   rec: CatalogRecord;
 }
 
-/** Registered mechanisms in catalogue order (family, level, name), numbered ST-01, ST-02 ... */
-const KNOWN = new Set(allIds());
+/** Registered mechanisms in catalogue order (family, level, name), numbered ST-01, ST-02 ... (only LM_IDS in a local
+ * working loop, src/mechanisms) */
+const KNOWN = new Set(workIds());
 export const SHEETS: Sheet[] = loadCatalog()
   .mechanisms.filter((r) => KNOWN.has(r.id))
   .map((rec, i) => ({ id: rec.id, no: `ST-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec }));

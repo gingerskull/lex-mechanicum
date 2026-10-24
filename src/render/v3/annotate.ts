@@ -16,7 +16,7 @@ import { FORM } from "../../style/form";
 import { font, rgba as paint, type ResolvedTheme } from "../../style/theme";
 import type { Ladder } from "../detail";
 import { angleToEye, project, scaleOf, type Camera } from "./camera";
-import { arrowHead, labeler, type Labeler } from "./labels";
+import { arrowHead, drawCallouts, drawMarkers, type LabelHit, labeler, type LabelMode, type LabelPlan, type LabelSpot, type Labeler } from "./labels";
 import type { Controls } from "./poser";
 import { applyMat, mulMat, type Runtime } from "./scene";
 
@@ -399,6 +399,56 @@ export interface TraceFlags {
   ticks: boolean;
 }
 
+/** How thin a set of points is: the square root of the smaller spread over the larger, 0 for a line, 1 for a round cloud. */
+function thinness2(pts: readonly (readonly [number, number])[]): number {
+  let mx = 0, my = 0;
+  for (const p of pts) { mx += p[0]; my += p[1]; }
+  mx /= pts.length || 1; my /= pts.length || 1;
+  let a = 0, b = 0, c = 0;
+  for (const p of pts) { const x = p[0] - mx, y = p[1] - my; a += x * x; b += x * y; c += y * y; }
+  const tr = a + c, det = a * c - b * b, d = Math.sqrt(Math.max(0, (tr * tr) / 4 - det));
+  const l1 = tr / 2 + d, l2 = Math.max(0, tr / 2 - d);
+  return l1 > 1e-9 ? Math.sqrt(l2 / l1) : 0;
+}
+
+/** The same in 3D, of a path's two widest spreads: 0 for a straight path, 1 for a round one. */
+function thinness3(path: Float32Array): number {
+  const n = path.length / 3;
+  const m = [0, 0, 0];
+  for (let i = 0; i < n; i++) for (let k = 0; k < 3; k++) m[k]! += path[i * 3 + k]! / n;
+  const C = [0, 0, 0, 0, 0, 0]; // xx, xy, xz, yy, yz, zz
+  for (let i = 0; i < n; i++) {
+    const x = path[i * 3]! - m[0]!, y = path[i * 3 + 1]! - m[1]!, z = path[i * 3 + 2]! - m[2]!;
+    C[0]! += x * x; C[1]! += x * y; C[2]! += x * z; C[3]! += y * y; C[4]! += y * z; C[5]! += z * z;
+  }
+  // the largest spread by power iteration, then the largest across it
+  const mul = (v: number[]) => [C[0]! * v[0]! + C[1]! * v[1]! + C[2]! * v[2]!, C[1]! * v[0]! + C[3]! * v[1]! + C[4]! * v[2]!, C[2]! * v[0]! + C[4]! * v[1]! + C[5]! * v[2]!];
+  let v = [1, 0.7, 0.3];
+  for (let k = 0; k < 30; k++) {
+    const w = mul(v);
+    const l = Math.hypot(w[0]!, w[1]!, w[2]!) || 1;
+    v = w.map((x) => x / l);
+  }
+  const l1 = v.reduce((s, x, k) => s + x * mul(v)[k]!, 0);
+  const tr = C[0]! + C[3]! + C[5]!;
+  // the rest of the spread lies across v; its larger part is at least half of it
+  const rest = Math.max(0, tr - l1);
+  return l1 > 1e-9 ? Math.sqrt(rest / l1) : 0;
+}
+
+/**
+ * How much of a path to draw: a curved path seen edge-on collapses to a line that tells nothing and reads as a stray
+ * stroke through the parts, so it fades out as its plane turns to the view (a path straight in 3D always shows).
+ */
+export function faceOn(screen: readonly (readonly [number, number])[], path: Float32Array): number {
+  const r3 = thinness3(path);
+  if (r3 < DRAFT.path.edgeOn.straight) return 1;
+  const t = Math.min(1, thinness2(screen) / r3);
+  const [a, b] = DRAFT.path.edgeOn.fade;
+  const x = Math.max(0, Math.min(1, (t - a) / (b - a)));
+  return x * x * (3 - 2 * x);
+}
+
 /** Ghost paths (SD23), then the teaching traces with ticks and the comet (SD7, SD24): fine accent lines at the trace's height. */
 export function traces(A: Ann, f: TraceFlags): void {
   const t = A.rt.scene.teaching;
@@ -416,7 +466,11 @@ export function traces(A: Ann, f: TraceFlags): void {
     for (const tr of t.traces)
       for (const g of tr.ghosts ?? []) {
         const path = pathOf(A, tr.point, controlFor(t, g.control, g.value));
-        if (path) stroke(ctx, pathPts(A, path), true);
+        if (!path) continue;
+        const gp = pathPts(A, path);
+        ctx.globalAlpha = faceOn(gp, path);
+        if (ctx.globalAlpha > 0) stroke(ctx, gp, true);
+        ctx.globalAlpha = 1;
       }
   }
   if (f.traces) {
@@ -429,24 +483,49 @@ export function traces(A: Ann, f: TraceFlags): void {
       ctx.strokeStyle = paint(T[SP.color], SP.alpha * (i ? SP.otherGain : 1));
       // a path that does not close over a cycle (an indexing wheel's mark moves on a step each turn) is drawn open
       const open = isOpen(pts);
-      stroke(ctx, pts, !open);
+      // the path and its ticks fade as the path turns edge-on; the comet keeps showing the motion
+      const shown = faceOn(pts, path);
+      ctx.globalAlpha = shown;
+      if (shown > 0) stroke(ctx, pts, !open);
       ctx.setLineDash([]);
       if (f.ticks && tr.ticks?.every) {
+        // equal-time ticks (SD24): short strokes across the path in its accent; where they would crowd, every m-th is
+        // drawn (still equal steps of time, so uneven spacing still reads as uneven speed), and a path too short to carry
+        // them has none
+        const K = DRAFT.tick;
         const n = Math.max(1, Math.floor(360 / tr.ticks.every));
-        const h = DRAFT.tick.half;
-        ctx.lineWidth = DRAFT.tick.width;
-        ctx.strokeStyle = paint(T.ink, DRAFT.tick.alpha);
-        ctx.beginPath();
+        const at: [number, number][] = [];
         for (let k = 0; k < n; k++) {
           // in a body's frame, the tick is the path's sample at that phase (the path is already carried to now)
           const p = tr.frame ? sampleAt(path, k / n) : poser.point((k / n) * poser.period, tr.point);
-          if (!p) continue;
-          const [x, y] = P(A, p);
-          ctx.moveTo(x - h, y - h); ctx.lineTo(x + h, y + h);
-          ctx.moveTo(x - h, y + h); ctx.lineTo(x + h, y - h);
+          at.push(p ? P(A, p) : [NaN, NaN]);
         }
-        ctx.stroke();
+        let length = 0;
+        for (let k = 1; k < pts.length; k++) length += Math.hypot(pts[k]![0] - pts[k - 1]![0], pts[k]![1] - pts[k - 1]![1]);
+        const gaps = at.map((p, k) => Math.hypot(p[0] - at[(k + 1) % n]![0], p[1] - at[(k + 1) % n]![1])).filter(Number.isFinite).sort((a, b) => a - b);
+        const median = gaps[gaps.length >> 1] ?? 0;
+        const m = median > 0 ? Math.max(1, Math.ceil(K.minGap / median)) : 1;
+        if (length >= K.minPath && shown > 0) {
+          ctx.lineWidth = K.width;
+          ctx.strokeStyle = paint(T[SP.color], K.alpha * (i ? SP.otherGain : 1));
+          ctx.beginPath();
+          for (let k = 0; k < n; k += m) {
+            const [x, y] = at[k]!;
+            if (!Number.isFinite(x)) continue;
+            // across the path: square to the line through its neighbours on the path
+            const a = at[(k - 1 + n) % n]!, b = at[(k + 1) % n]!;
+            let dx = b[0] - a[0], dy = b[1] - a[1];
+            const l = Math.hypot(dx, dy);
+            if (!(l > 1e-6)) continue;
+            dx /= l;
+            dy /= l;
+            ctx.moveTo(x - dy * K.half, y + dx * K.half);
+            ctx.lineTo(x + dy * K.half, y - dx * K.half);
+          }
+          ctx.stroke();
+        }
       }
+      ctx.globalAlpha = 1;
       if (tr.comet) {
         const N = pts.length;
         const idx = Math.round(((((u % TAU) + TAU) % TAU) / TAU) * N);
@@ -624,19 +703,76 @@ const worldNormal = (a: Vec3, b: Vec3, c: Vec3): Vec3 => {
 };
 
 /** Dashed fine ink lines with mono labels on a paper panel: dead centres, tangents, axis lines, moment arms, chords, arcs, workspaces. */
-export function overlays(A: Ann): void {
+/** How the construction labels of a frame are drawn (SD22), and the label picked out (its number in the record's order). */
+export interface LabelDraw {
+  mode: LabelMode;
+  plan: LabelPlan | null;
+  focus: number | null;
+  /** Callout rows mid-tween (session), by label key. */
+  rows?: Map<string, number>;
+  /** The picked label's pulse, 1 at rest (labels pulseOf). */
+  pulse?: number;
+}
+
+/**
+ * The construction overlays (SD22). Their labels are callouts on their elements, or numbered markers with
+ * the key under the stage, as `L` says; with no layout they are lettered beside their elements (the screenshot tool's
+ * old form); with mode "none" (a card) there are none. A picked-out label's element is drawn bold in accent and the rest
+ * fade.
+ */
+export function overlays(A: Ann, L?: LabelDraw): LabelHit[] {
   const t = A.rt.scene.teaching;
-  if (!t || !t.overlays.length) return;
+  if (!t || !t.overlays.length) return [];
   const { ctx, T } = A;
-  const label = labeler(ctx, T, A.w, A.h);
+  const spots: LabelSpot[] = [];
+  let base = "";
+  let cur = -1;
+  let sub = 0;
+  const collect: Labeler = (text, x, y, _c, _s, cands) => spots.push({ text, base: base || text, n: cur, sub: sub++, cands: cands?.length ? cands : [[x, y]] });
+  const label = L ? (L.mode === "none" ? () => {} : collect) : labeler(ctx, T, A.w, A.h);
   const ink = paint(T.ink, O.line.alpha + 0.3);
   ctx.save();
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.strokeStyle = paint(T.ink, O.line.alpha);
-  ctx.lineWidth = O.line.width;
-  for (const ov of t.overlays) drawOverlay(A, ov, label, ink);
+  let n = 0;
+  for (const ov of t.overlays) {
+    const k = typeof ov.label === "string" && ov.label ? n++ : -1;
+    const picked = L?.focus !== null && L?.focus !== undefined && k === L.focus;
+    ctx.globalAlpha = L?.focus === null || L?.focus === undefined || picked ? 1 : O.labels.dim;
+    ctx.strokeStyle = picked ? paint(T.accent) : paint(T.ink, O.line.alpha);
+    ctx.lineWidth = picked ? O.line.width * 1.8 : O.line.width;
+    base = typeof ov.label === "string" ? ov.label : "";
+    cur = k;
+    sub = 0;
+    drawOverlay(A, ov, label, ink);
+  }
   ctx.restore();
+  if (L?.plan && L.mode === "callouts") return drawCallouts(ctx, T, L.plan, spots, L.focus, L.rows, L.pulse);
+  if (L?.plan && L.mode === "markers") drawMarkers(ctx, T, L.plan, spots, L.focus, L.pulse);
+  return [];
+}
+
+/** A 2D context that draws nothing: the overlays' geometry run for where their labels would go. */
+const DRY = new Proxy({}, { get: (_t, k) => (k === "measureText" ? () => ({ width: 0 }) : () => undefined), set: () => true }) as unknown as CanvasRenderingContext2D;
+
+/** Where the construction labels could hang at phase u, without drawing (the layout follows them over the cycle). */
+export function labelSpots(A: Ann, u: number): LabelSpot[] {
+  const t = A.rt.scene.teaching;
+  if (!t?.overlays.length) return [];
+  const out: LabelSpot[] = [];
+  let base = "";
+  let cur = -1;
+  let sub = 0;
+  let k = 0;
+  const collect: Labeler = (text, x, y, _c, _s, cands) => out.push({ text, base: base || text, n: cur, sub: sub++, cands: cands?.length ? cands : [[x, y]] });
+  const B: Ann = { ...A, ctx: DRY, u };
+  for (const ov of t.overlays) {
+    base = typeof ov.label === "string" ? ov.label : "";
+    cur = base ? k++ : -1;
+    sub = 0;
+    drawOverlay(B, ov, collect, "");
+  }
+  return out;
 }
 
 /** The two points of a line overlay drawn through two named points (`from` and `through`, or `from` and `to`). */
@@ -677,10 +813,12 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
     stroke(ctx, pts.map((p) => P(A, p)), close);
     solid();
   };
-  const tag = (p: Vec3, dx = 0, dy = -14) => {
+  // a label at a point, offset as it is lettered beside it; `more` are other points of the element it could hang on
+  // instead (its ends, its centre), for a layout that picks the steadiest (SD22)
+  const tag = (p: Vec3, dx = 0, dy = -14, more: (Vec3 | null)[] = []) => {
     if (!text) return;
     const [x, y] = P(A, p);
-    label(text, x + dx, y + dy, ink, true);
+    label(text, x + dx, y + dy, ink, true, [[x, y], ...more.filter((q): q is Vec3 => !!q).map((q) => P(A, q))]);
   };
   const o = ov as Record<string, unknown>;
   // a posed overlay is drawn where an output reaches an extreme (a dead centre, the ends of a stroke): `pose` for all
@@ -726,8 +864,8 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         ctx.font = font(DRAFT.type.overlaySmall);
         const w = ctx.measureText(DRAFT.type.uppercase ? text.toUpperCase() : text).width / 2 + O.labelPadX + O.shortGap;
         ctx.restore();
-        label(text, tx + ux * w, ty + uy * (O.labelHSmall / 2 + O.shortGap), ink, true);
-      } else tag(mul(add(a, b), 0.5));
+        label(text, tx + ux * w, ty + uy * (O.labelHSmall / 2 + O.shortGap), ink, true, [[tx, ty], [sx, sy]]);
+      } else tag(mul(add(a, b), 0.5), 0, -14, [a, b]);
       return;
     }
     case "dimension": {
@@ -764,7 +902,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       let rb = ln ? null : rawOf(o.to, o.toPose);
       if (ra && rb && k >= 0) rb = ra.map((v, i) => (i === k ? rb![i]! : v)) as Vec3;
       const m = ln ? Math.hypot(b[0] - a[0], b[1] - a[1]) : ra && rb ? len(sub(rb, ra)) : typeof o.from === "string" && typeof o.to === "string" ? A.rt.scene.poser.measure?.(A.u, o.from, o.to) : null;
-      if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true);
+      if (text) label(`${text} ${(m ?? len(sub(b, a))).toFixed(1)}`, (p[0] + q[0]) / 2, (p[1] + q[1]) / 2 - 14, ink, true, [[(p[0] + q[0]) / 2, (p[1] + q[1]) / 2], p, q]);
       return;
     }
     case "circle": {
@@ -778,7 +916,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const r = typeof o.radius === "number" ? o.radius : rv !== null ? rv : c && th ? across(sub(th, c)) : null;
       if (!c || r === null) return;
       poly(arcPts(c, e0, n, r, 0, TAU), true);
-      tag(add(c, mul(e0, r)), 18, 0);
+      tag(add(c, mul(e0, r)), 18, 0, [c]);
       return;
     }
     case "arc": {
@@ -797,7 +935,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
           pts = arcPts(cRef, e0, n, o.radius, a0!, a1!).map((p) => applyMat(M, p));
         }
         poly(pts);
-        tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
+        tag(pts[Math.floor(pts.length / 2)]!, 0, -10, [c]);
         return;
       }
       const from = fromPt(), to = toPt(), through = pointOf(A, o.through);
@@ -812,7 +950,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         else while (a1 < a0) a1 += TAU;
         const pts = arcPts(c, [1, 0, 0], [0, 0, 1], r, a0, a1);
         poly(pts);
-        tag(pts[32]!, 0, -10);
+        tag(pts[32]!, 0, -10, [c]);
         return;
       }
       if (from && to) {
@@ -824,7 +962,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         if (ang < 0) ang += TAU;
         const r = Math.min(len(sub(from, c)), len(sub(to, c))) * 0.5;
         poly(arcPts(c, e0, n, r, 0, ang));
-        tag(arcPts(c, e0, n, r, 0, ang)[32]!, 0, -10);
+        tag(arcPts(c, e0, n, r, 0, ang)[32]!, 0, -10, [c]);
         return;
       }
       if (through) {
@@ -856,7 +994,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         const full = hi - lo > TAU * 0.9;
         const pts = arcPts(c, [1, 0, 0], [0, 0, 1], r, full ? 0 : lo, full ? TAU : hi);
         poly(pts, full);
-        tag(pts[Math.floor(pts.length / 2)]!, 0, -10);
+        tag(pts[Math.floor(pts.length / 2)]!, 0, -10, [c]);
       }
       return;
     }
@@ -876,7 +1014,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       poly([c, from]);
       if (Math.abs(ang) > 1e-4) poly(pts);
       const deg = (ang * 180) / Math.PI;
-      if (text) label(`${text} ${deg >= 0 ? "+" : ""}${deg.toFixed(2)}°`, P(A, from)[0], P(A, from)[1] - 14, ink, true);
+      if (text) label(`${text} ${deg >= 0 ? "+" : ""}${deg.toFixed(2)}°`, P(A, from)[0], P(A, from)[1] - 14, ink, true, [P(A, from), P(A, c)]);
       return;
     }
     case "axis-line": {
@@ -898,7 +1036,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         }
         const lo = Math.min(...ends) - 0.1, hi = Math.max(...ends) + 0.1;
         poly([add(p, mul(d, lo)), add(p, mul(d, hi))]);
-        tag(add(p, mul(d, hi)), 0, -12);
+        tag(add(p, mul(d, hi)), 0, -12, [p, q]);
         return;
       }
       // or at a point (`at`, or `point`) with its direction (`axis`, or `dir`)
@@ -910,7 +1048,7 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const a = unit(ax);
       const L = typeof o.length === "number" ? o.length : 80;
       poly([sub(c, mul(a, L)), add(c, mul(a, L))]);
-      tag(add(c, mul(a, L)), 0, -12);
+      tag(add(c, mul(a, L)), 0, -12, [c]);
       return;
     }
     case "workspace": {

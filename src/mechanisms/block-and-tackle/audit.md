@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · each rope part stretched between its two solved tangent points (D9), the crossing part slanting between its sheaves' planes; wraps fixed arcs on the far side of each sheave |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 170 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 166 solids unsound |
 | D7 | PASS | HAND · sheaves plain; richness in the rope, the guide and the slide |
 | A1 | PASS | AUTO · guide J5, L-A J3, fall-slide J5, U-A J1, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · guide J5, L-A J3, fall-slide J5, U-A J1, drive drive · upper sheaves on a dead axle in a bridge (J1); lower sheaves on a shoulder bolt in the lower block (J3); the rope by J12 |
@@ -181,7 +181,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | guide | J5 | – | – | – | Dowel pin Ø4 h6, rod block to base | none | Swivel pin Ø6, the hook turns on it | none | none | none | none | none | none | none |
 | L-A | J3 | reeve | – | – | none | 2 x Internal circlip DIN 472, Ø24; Shoulder bolt Ø12 x 35, M10 (ISO 7379) | Shoulder bolt Ø12 x 35, M10 (ISO 7379) | Inner-race spacer 12.2x16.2 | none | none | none | none | none | none |
-| fall-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 222, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| fall-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 210, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | U-A | J1 | reeve | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | 2 x Internal circlip DIN 472, Ø24; External circlip DIN 471, Ø12 | none | Inner-race spacer 12.2x16.2; Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | Belt clamp plate, the near span between it and the jaw | none | none | none | none | Belt tensioner plate, slotted, 2 x M4 up into the base | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
@@ -204,12 +204,12 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-E | 15 | 1 | 1.74 |
 | DL-F | 0 | 0 | 1.63 |
 | DL-G | 0 | 0 | 1.81 |
-| DL-H | 12 | 0 | 1.73 |
-| never | 122 | 111 | 1.74 |
+| DL-H | 8 | 0 | 1.73 |
+| never | 122 | 109 | 1.74 |
 
 ## Promotion candidates
 None left: the rope (stretched parts between solved tangent points, slanting between planes; wraps; the rope's end clamped on a moving body) and the load's guide rod are the J12 rule; the reeve is a kin block.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.6 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.0 KB
 screenshots: dist/shots3/block-and-tackle (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

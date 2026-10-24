@@ -64,7 +64,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | D8 | PASS | AUTO / HAND · the rib is a boolean: a blank with every roller pose over a turn subtracted in the camshaft's frame; every other solid a profile, an operation and a frame |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · the camshaft ships as a mesh (a boolean), the rest as profiles |
-| D11 | PASS | AUTO · SOLID: 0 of 102 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 100 solids unsound |
 | D7 | PASS | HAND · cam and turret plain; richness in the stacks |
 | A1 | PASS | AUTO · B J2, A J10, C1 J7, C2 J7, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · B J2, A J10, C1 J7, C2 J7, drive drive · the camshaft on a live shaft in plan (J10, keyed), the turret on a dead stub axle (J1); two roller contacts on the rib (J7) |
@@ -205,11 +205,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | 1.53 |
 | DL-G | 0 | 0 | 1.57 |
 | DL-H | 9 | 0 | 1.47 |
-| never | 69 | 133 | 1.51 |
+| never | 67 | 132 | 1.51 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 52.1 KB
+check: clean · K1 residual: 1.4e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 51.8 KB
 screenshots: dist/shots3/roller-gear-indexer (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

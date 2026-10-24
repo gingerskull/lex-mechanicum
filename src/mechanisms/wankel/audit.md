@@ -205,11 +205,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.59 |
 | DL-G | 0 | 0 | 1.53 |
 | DL-H | 6 | 0 | 1.53 |
-| never | 68 | 107 | 1.7 |
+| never | 68 | 106 | 1.7 |
 
 ## Promotion candidates
 None left: fixed members of a joint, bodies at another's level, rotor and housing shapes and the covers rule are in the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.9 KB
+check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.1 KB
 screenshots: dist/shots3/wankel (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

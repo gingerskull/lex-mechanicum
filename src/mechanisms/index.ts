@@ -25,6 +25,20 @@ export function isBuilt(id: string): boolean {
 /** Every registered mechanism, in catalogue order. */
 export const allIds = (): string[] => loadCatalog().mechanisms.filter((r) => isBuilt(r.id)).map((r) => r.id);
 
+/**
+ * The mechanisms a local working loop builds, draws and tests: `LM_IDS=a,b,c` narrows allIds() for the dev server, the
+ * site assets and the visual snapshots while a change is iterated on a few mechanisms; unset, every one. The checks,
+ * the thumbnails' manifest and the pre-push hook always read allIds().
+ */
+export function workIds(): string[] {
+  const ids = allIds();
+  const only = process.env.LM_IDS?.split(",").map((s) => s.trim()).filter(Boolean);
+  if (!only?.length) return ids;
+  const unknown = only.filter((id) => !ids.includes(id));
+  if (unknown.length) throw new Error(`LM_IDS: not a registered mechanism: ${unknown.join(", ")}`);
+  return ids.filter((id) => only.includes(id));
+}
+
 /** The record and polish of a mechanism. */
 export async function loadV3(id: string): Promise<{ record: CatalogRecord; polish?: Polish }> {
   const record = recordById(id);

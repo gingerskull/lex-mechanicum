@@ -79,6 +79,10 @@ function fromXf(X: Xf): Mat4 {
  * The poser of a record's kinematic block. A solid's frame is placed in the reference configuration (every driver at its
  * default), so a body's pose Xf, which carries that configuration to the present one, is its matrix.
  */
+/** Poses a poser keeps, by phase and setting: a playing stage asks for a new phase each frame, the setup for a few
+ * hundred, and each ghost setting for as many again. */
+const POSE_CACHE = 2048;
+
 export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<string, [number, number, number, number]>): Poser {
   // a teaching point is drawn on the top face of the body it rides, where the builder placed that body (package v2
   // `lifts`); a joint rides the higher of its two bodies
@@ -133,16 +137,21 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
     }
     return undefined;
   };
-  let at = NaN;
-  let cached: ReturnType<Kinematics["pose"]> | null = null;
+  // poses by phase: the setup asks for the same few phases once per solid (which solids never move, the see-through
+  // sweep) and the paths for the same samples once per point, so a solve is made once per phase, not once per question;
+  // a record solved numerically would otherwise take seconds to set up on a phone (R9)
+  // (a ghost trace's setting too: two traces with the same ghosts share their solves)
+  const cache = new Map<string, ReturnType<Kinematics["pose"]>>();
   const phases = new Map<string, number | null>();
   const pose = (u: number, ctl?: Controls) => {
-    if (ctl) return k.pose(u, { ...controls, ...ctl });
-    if (u !== at || !cached) {
-      cached = k.pose(u, controls);
-      at = u;
+    const key = ctl ? `${u}|${JSON.stringify(ctl)}` : String(u);
+    let P = cache.get(key);
+    if (!P) {
+      if (cache.size >= POSE_CACHE) cache.delete(cache.keys().next().value!);
+      P = ctl ? k.pose(u, { ...controls, ...ctl }) : k.pose(u, controls);
+      cache.set(key, P);
     }
-    return cached;
+    return P;
   };
   return {
     period: Math.PI * 2,

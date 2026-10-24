@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.41.0, Stygies — 2026-10-24
+
+- The drawings read as solid parts: plates, brackets, mounts and pillow blocks are paper at a convincing opacity with
+  stepped wall shading, and a part that covers a moving one goes see-through as a whole, faces and walls alike, as a
+  tinted pane. Small hardware keeps its opacity. A pillow block on a level shaft is one casting.
+- Nothing pops while the drawing turns or plays: see-through parts, role patterns and outlines fade over a range
+  instead of switching, and smooth outlines glide; a local test watches for pop-ins.
+- The stage: a sideways drag steps through the cycle again; a right drag, a Shift drag or two fingers orbit; keys 1 to
+  5 pick the named views and 0 resets. A record that declares a plan opens at the 28 degree view. The tilt slider is
+  gone; the overlay chips sit on the views' row, and a hint line under the drawing says how to handle it.
+- Auto detail holds full detail on a fast machine: it measures the GPU's own time, steps down only on a sustained
+  cost, and says why when it does.
+- The explode reads as a disassembly: the main parts come apart one by one, supports keep their screws, bearings and
+  shims, nothing is left inside another part, and the mechanism holds still while exploded. From a plan it eases to
+  the 28 degree view.
+- Construction lines start off. Turned on, each label is a drafting callout on its line, in the empty space beside
+  the drawing, and stays put while the drawing plays; hovering one picks its line out and pulses its arrowhead, and a
+  click pins it. On a phone the labels are numbered markers with a key under the stage. Equal-time ticks are short
+  strokes across the path, a trace seen edge-on fades, and nothing is engraved on the base plate for a trace.
+- Pages load faster: each phase is solved once, and the closure tables and the escapements' and star wheel's
+  simulations ship with the page (the anchor escapement went from about 5 s to under half a second on a desktop).
+- A bevel gear whose face lies nearly flat draws its teeth. Cards and stills draw at detail A-C and start the
+  animation without a jump; cards carry no labels. Standard 3.10, style reference 3.8.
+
 ## 0.40.0, Ryza — 2026-10-23
 
 - The hidden sheet is easier to wake, on a phone too. A riddle, for the curious: the switch turns at a touch, but the

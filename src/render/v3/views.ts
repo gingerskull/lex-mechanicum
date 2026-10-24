@@ -1,6 +1,7 @@
 // The views of a drawing (standard T7, T8, L7, L9; style SD10, SD19, SD20): the named orientation a record opens in, the
 // section views (a cut plane) and detail views (a magnified window) it declares, and the explode. A view is plain data;
 // the renderer reads it and nothing in it changes the solids (a section hides the near side at draw time).
+import { DRAFT } from "../../style/draft";
 import type { Teaching } from "../../catalog/kin";
 import type { Vec3 } from "../../solids/types";
 import { namedOrient, NAMED_VIEWS, snapped, type NamedView, type Orient } from "./camera";
@@ -58,9 +59,14 @@ export function parseView(text: string, axisOf: (joint: string) => Vec3 | null =
   return null;
 }
 
-/** The view a record opens in (its `teaching.view`), or the isometric when it does not parse. */
+/**
+ * The view a record opens in (its `teaching.view`), or the isometric when it does not parse. A plan reads flat, so a
+ * record that declares one opens tilted to the 28 degree view, its layout kept and its depth shown (T7); any other view
+ * it declares (a front elevation, a view down an axis) is kept as it is.
+ */
 export function defaultView(t: Pick<Teaching, "view"> | null | undefined, axisOf?: (joint: string) => Vec3 | null): ViewState {
   const p = t ? parseView(t.view, axisOf) : null;
+  if (p && !p.orient.aux && p.orient.tilt === 0) return { orient: { yaw: p.orient.yaw, tilt: DRAFT.camera.planOpens }, explode: 0 };
   return p ? { orient: p.orient, ...(p.auxName ? { auxName: p.auxName } : {}), explode: 0 } : ISO;
 }
 

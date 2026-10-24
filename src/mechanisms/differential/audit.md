@@ -36,7 +36,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | K8 | PASS | AUTO / DATA · every joint declared with type, bodies, origin and axis; nothing inferred |
 | K9 | PASS | DATA · two drivers and the split as controls; the tooth-count choices are not offered (they change the built gears) |
 | K10 | PASS | AUTO / DATA · the pinion-ring mesh and four spider-side meshes declared, each spider mesh carried by the case; overconstrained, as topology.notes says (two spiders where one would do) |
-| K11 | PASS | AUTO · mobility counted 1 against dof 2: the second spider repeats the first (overconstrained, topology.notes) |
+| K11 | PASS | AUTO · mobility counted 1, dof 2 |
 | K12 | PASS | DATA · every traced, overlaid and claimed point and quantity is named in kin |
 | T1 | PASS | HAND · mechanics first, no use context in the teaching strings; the principle reads at the default view |
 | T2 | PASS | HAND · review before the build and again on the six phases of the finished build; decisions in the record |
@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 124 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 120 solids unsound |
 | D7 | PASS | HAND · gears plain; richness in the stacks |
 | A1 | PASS | AUTO · Mpr J9, M0L J9, M0R J9, M1L J9, M1R J9, Op J10, Oc J10, Os0 spider-pin, Os1 spider-pin, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · Mpr J9, M0L J9, M0R J9, M1L J9, M1R J9, Op J10, Oc J10, Os0 spider-pin, Os1 spider-pin, drive drive · the case on a live shaft in plan (J10) in two pillow blocks, the side gears running on that shaft in bearings; the spiders on the cage's cross-pin (spider-pin); the pinion on its shaft in plan (J10); five crossed meshes (J9) |
@@ -214,11 +214,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.03 |
 | DL-H | 14 | 0 | – |
-| never | 76 | 141 | 0.80 (full) |
+| never | 72 | 162 | 0.80 (full) |
 
 ## Promotion candidates
 None left: the bevel-diff block, the cage on a gear, bevels facing down, the spider-pin kit, a driver speed from a param and claims at a setting are in the library. Open: the second input's hand control is not built as hardware (the side gears' shafts are the case's; real half-shafts would carry the outputs).
 
 ## Verification
-check: clean · K1 residual: 6.3e-16 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.0 KB
+check: clean · K1 residual: 6.3e-16 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.2 KB
 screenshots: dist/shots3/differential (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.80 ms full, 1.12 at C, 1.03 at G; phone by David)

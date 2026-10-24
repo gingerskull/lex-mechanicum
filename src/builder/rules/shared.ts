@@ -8,7 +8,7 @@ import { cleanProfile } from "../../solids/manifold";
 import type { Solid3 } from "../../solids/types";
 import { type Vec3, v3, wrapPi, xf } from "../../kin/math";
 import type { BuildCtx } from "../ctx";
-import { LEVER_WALL, MIN_GAP, PITCH } from "../constants";
+import { LEVER_WALL, MIN_GAP } from "../constants";
 import { canon, fromPlane, parallel, place, planeCoords, type Frame } from "../frames";
 import { pointDist } from "../planar";
 import { clearance } from "../router";
@@ -875,48 +875,6 @@ function centroidDepth(ctx: BuildCtx, body: string, dir: Vec3): number {
   const p = ctx.parts.get(body);
   return p ? v3.dot(centroid(worldPoints(ctx.M, p)), dir) : 0;
 }
-
-// ---------------------------------------------------------------------------------------------------- explode (E1 to E10)
-
-export const explode: Rule = {
-  id: "explode",
-  tier: "AUTO",
-  ids: ["E1", "E2", "E3", "E5", "E6", "E7", "E8", "E10"],
-  fixture: "four-bar",
-  applies: () => true,
-  apply() {},
-  after(ctx) {
-    // every solid is one rigid body; its level is its centre's place along its own axis, in pitches, so a spacer or a
-    // washer sits midway between the parts it separates and a stack of one axis moves in its own direction
-    const level = new Map<string, number>();
-    const unit = (s: Solid3): string => s.group ?? s.id;
-    const sum = new Map<string, { n: number; v: number }>();
-    for (const s of ctx.solids) {
-      if (s.flags.isBase) continue;
-      const z = canon(s.frame.z);
-      const h = s.op.op === "extrude" ? s.op.h : 0;
-      const c = v3.add(s.frame.o, v3.mul(s.frame.z, h / 2));
-      const v = v3.dot(c, z) / PITCH;
-      const u = sum.get(unit(s)) ?? { n: 0, v: 0 };
-      u.n++;
-      u.v += v;
-      sum.set(unit(s), u);
-    }
-    for (const [u, a] of sum) level.set(u, Math.round((a.v / a.n) * 2) / 2);
-    for (const s of ctx.solids) {
-      if (s.flags.isBase) {
-        s.ex = -2;
-        continue;
-      }
-      s.ex = level.get(unit(s)) ?? 0;
-      s.exAxis = canon(s.frame.z);
-    }
-    // a bridge and its screws come off before the parts they clamp (E4)
-    const top = Math.max(0, ...[...level.values()]);
-    for (const s of ctx.solids.filter((q) => q.kind === "bridge")) s.ex = top + 1;
-    (ctx.fired.explode ??= []).push(`${ctx.solids.length} solids`);
-  },
-};
 
 void clearance;
 void pointDist;

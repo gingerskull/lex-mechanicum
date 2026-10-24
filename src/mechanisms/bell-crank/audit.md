@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 167 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 159 solids unsound |
 | D7 | PASS | HAND · links plain; the richness in the stacks |
 | A1 | PASS | AUTO · A J3, B J3, S J3, G J3, S-slide J5, G-slide J5, O J1, O-lever-stops stops, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · A J3, B J3, S J3, G J3, S-slide J5, G-slide J5, O J1, O-lever-stops stops, drive drive · ground pivots by their kits (live shaft J2, dead axle J1), moving pins J3 (Joints table) |
@@ -183,8 +183,8 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | B | J3 | slider-dyad | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | S | J3 | dyad | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
 | G | J3 | – | – | – | none | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | Shoulder bolt Ø8 x 16, M6 (ISO 7379) | none | none | none | none | none | none | none |
-| S-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 89, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
-| G-slide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 67.4, bronze | Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| S-slide | J5 | driver | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 77, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| G-slide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | 2 x Stop block | none | Gib strip 3 x 6 x 63.4, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | O | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
 | O-lever-stops | stops | – | – | – | none | none | none | none | 2 x Stop pin Ø6, hardened, on the lever's edge | none | none | none | none | none |
 | drive | drive | – | – | – | none | Belt clamp plate, the near span between it and the jaw | none | none | none | none | Belt tensioner plate, slotted, 2 x M4 up into the base | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -208,12 +208,12 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-E | 18 | 1 | 1.39 |
 | DL-F | 0 | 0 | 1.44 |
 | DL-G | 0 | 0 | 1.4 |
-| DL-H | 19 | 0 | 1.35 |
+| DL-H | 11 | 0 | 1.35 |
 | never | 108 | 153 | 1.41 |
 
 ## Promotion candidates
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.3 KB
+check: clean · K1 residual: 2.8e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.1 KB
 screenshots: dist/shots3/bell-crank (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

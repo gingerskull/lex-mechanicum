@@ -64,7 +64,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 123 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 121 solids unsound |
 | D7 | PASS | HAND · bars and knuckles plain; richness in the stacks |
 | A1 | PASS | AUTO · C J3, D J3, A J10, B J10, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · C J3, D J3, A J10, B J10, drive drive · ground hinges A (driven) and B as shafts in plan (J10); C and D moving pins through the knuckles (J3) |
@@ -210,11 +210,11 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | DL-F | 0 | 0 | 2 |
 | DL-G | 0 | 0 | 2.11 |
 | DL-H | 12 | 0 | 2.21 |
-| never | 82 | 139 | 2 |
+| never | 80 | 138 | 2 |
 
 ## Promotion candidates
 Promoted in this pass: the `spatial-link` shape, the Bennett block from its four joints, the joint-angle output, a stack on hinge lugs alone, a moving pin turned end for end, the drive's side chosen clear of the sweeps, pillow blocks on a sloping shaft spaced by their feet.
 
 ## Verification
-check: clean · K1 residual: 4.0e-12 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.0 KB
+check: clean · K1 residual: 4.0e-12 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.0 KB
 screenshots: dist/shots3/bennett-linkage (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -205,11 +205,11 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.78 |
 | DL-G | 0 | 0 | 1.78 |
 | DL-H | 17 | 0 | 1.69 |
-| never | 333 | 172 | 1.78 |
+| never | 333 | 170 | 1.78 |
 
 ## Promotion candidates
 None left: the roller chain (links conveyed in links on the seat circles, plates as rigid links between rollers, the shoe) is the J12 rule of the builder; the chordal action is a mode of the convey block.
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 32.5 KB
+check: clean · K1 residual: 4.3e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 32.7 KB
 screenshots: dist/shots3/chain-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.7
-date: 2026-10-23
+version: 3.8
+date: 2026-10-24
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -154,32 +154,33 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | Id | Requirement |
 |---|---|
 | SD1 | **Depth order is sacred.** The depth buffer decides what is in front; there is no slicing and no painter's order, and no effect uses a depth bias. A new effect is inserted into the peeled composite or drawn as an annotation (steps 5 to 11), never layered over the finished frame in a way that reorders what it covers. |
-| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a tenth of the lines under it through. A solid drawn see-through (it covers a working zone or a principle part, standard L5 and T10) takes half the paper and half the occlusion on every face in view, so what lies behind reads through it. |
-| SD3 | **Visible and hidden edges by depth.** Every edge is classified by what covers it in the depth layers. An edge seen directly is bold and solid; the same edge seen through a part is thin and dashed, with the bold line at what the occluders let through (fractional occlusion, each occluder at its opacity). Fine detail (chamfers, threads, engraving) lives only in the visible class, so it disappears behind parts instead of turning into dashes. Edges are the cap outlines, the creases and the smooth-surface silhouettes of each solid, shipped or extracted once at setup. |
+| SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a twelfth of the lines under it through. Side walls take a stepped ink shade by facing (`fill.wallShade`), so a plate, a bracket or a block reads as a body on both sheets and never as outlines with nothing between them; mounts (the ground role) take a faint ink tint on their faces. A solid drawn see-through (it covers a working zone or a principle part, standard L5 and T10) keeps most of its paper and occlusion on every face in view (`fill.seeThrough`), so what lies behind reads through it faintly without the support turning into outlines, and a flat ink wash, so it reads as a deliberate pane, clearly apart from an ordinary plate. |
+| SD3 | **Visible and hidden edges by depth.** Every edge is classified by what covers it in the depth layers. An edge seen directly is bold and solid; the same edge seen through a part is thin and dashed, with the bold line at what the occluders let through (fractional occlusion, each occluder at its opacity). Only the share the occluders hide turns into dashes, so an edge seen through a see-through solid never stacks its bold and dashed copies into a line as strong as an uncovered one. Fine detail (chamfers, threads, engraving) lives only in the visible class, so it disappears behind parts instead of turning into dashes. Edges are the cap outlines, the creases and the smooth-surface silhouettes of each solid, shipped or extracted once at setup. |
 | SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's own coordinates (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns go on the cap and primary faces within a set angle of the view, never on walls or faces turned edge-on. |
 | SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout. A second accent use needs a reason written here. While the drawing is paused, the input ring breathes slowly between full strength and a part of it (`lines.accentRing.breathe`); nothing else moves, the ring holds still while the drawing plays, and it never breathes under reduced motion. |
 | SD6 | **Centrelines along joint axes** (long dash, short dash) through every joint head and along its axis, overshooting a little; hidden for an axis within a set angle of the view direction (it would foreshorten to a point) and when the drawing is too small to read them. |
-| SD7 | **Traced paths** are a fine dotted accent line at the trace height; the first path gets the comet (tapering trail, open circle at the current point). The base plate keeps the path engraved as a mark (that is form, not overlay). |
+| SD7 | **Traced paths** are a fine dotted accent line at the trace height; the first path gets the comet (tapering trail, open circle at the current point). The live trace is the only drawing of the path: nothing is engraved on the base plate for it (a path in a plane that is not the base's would project to a stray line, and one under parts shows through them). |
 | SD8 | **Dimensions:** overall base-plate width and depth in mm, with extension lines, gaps and filled arrowheads, labels on a paper knock-out. Detail stage only, in the named views where the base reads true (PLAN, FRONT, SIDE) and when it is not near edge-on. A dimension is labelled true size even when foreshortened. |
 | SD9 | **Loose touches, the complete list:** (a) construction lines along the base plate's straight edges, running past the rounded corners; (b) a second, slightly offset pencil pass round the base outline. Nothing else is loose; a third needs a decision issue. |
 | SD10 | **Sheet frame on the detail stage:** double border, zone ticks with numbers across and letters down, a microprint between the two borders (the 8-bit ASCII of "LEX MECHANICUM" as ones and zeros, broken at each zone mark and reading clockwise round the frame: a faint dotted rule at normal size, `sheet.microprint`), a title block bottom right (TITLE, DWG number (the sheet number, ST-07), SCALE computed from the projection, VIEW, SHEET n/N, DETAIL FULL or the rung, DATE the mechanism's origin as an Imperial date: the part of the year gone in thousandths, the year within its millennium and the millennium, `800.026.M3` for 20 October 2026, with 1 to 1000 BC in M0; an origin known only to the year or the period shows its filled date, as the record does). The block is 40% of the canvas width, at least 250 and at most 270 px. The view names are PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ joint (an auxiliary view down a joint axis, named with the joint) and VIEW az/el for any other orientation (azimuth and elevation in degrees). A section or detail view gives its name in the VIEW cell (SECTION A-A, DETAIL B). Thumbnails get no frame, no title block, no dimensions. |
-| SD11 | **Camera:** orthographic, a turntable orbit (yaw and tilt) that snaps to the named views of SD10; parallel lines stay parallel; patterns foreshorten with the angle and switch off near edge-on. The default view is the mechanism's own (standard T7). |
-| SD12 | **Explode is a view state, not a style.** Parts move along their stack's joint axis by the rigid explode of the form style, each with a thin trail line to its assembled position; the drawing rules apply unchanged to exploded parts. |
+| SD11 | **Camera:** orthographic, a turntable orbit (yaw and tilt) that snaps to the named views of SD10; parallel lines stay parallel; patterns foreshorten with the angle and fade out near edge-on. The default view is the mechanism's own (standard T7). |
+| SD12 | **Explode is a view state, not a style.** Parts move along their unit's explode axis by the distance the build gives them (standard E9, E10), each with a thin trail line to its assembled position; the drawing rules apply unchanged to exploded parts. While exploded the mechanism holds still where it was: playback stops, and picks up again when explode closes. |
 | SD13 | **Supporting hardware reads quieter.** Motor internals are faint; hardware has no pattern; the base is the faintest surface. Brackets and tall parts still get full outlines and silhouettes. |
-| SD14 | **Overlays use the sheet's colours:** forces in accent (warn when out of range), velocity in `vel`, angles in ink, labels in mono on a paper panel with an ink hairline. Overlays never change the drawing beneath. |
+| SD14 | **Overlays use the sheet's colours:** forces in accent (warn when out of range), velocity in `vel`, angles in ink, labels in mono on a paper panel with an ink hairline (construction labels: SD22). Overlays never change the drawing beneath. |
 | SD15 | **Output plot** (detail side panel) is drawn on the sheet: ink grid dashed, curve in ink, current point in accent, mono labels. |
-| SD16 | **Thumbnails and the detail stage share one renderer and one style.** The only differences are the annotation set (SD8, SD10), scale-dependent switches (SF11, SD6) and the card rules: a card (thumbnail and hover animation) draws at detail dial A-B (`card.detail`), sharp at full pixel ratio with wall shading, and its two bold outlines, `lines.plateTop` and `lines.baseTop`, are scaled by `card.plateTopFactor` and `card.baseTopFactor`. Never a second thumbnail style. Thumbnails are drawn to images by the same renderer and committed; they are redrawn when what they are drawn from changes. |
+| SD16 | **Thumbnails and the detail stage share one renderer and one style.** The only differences are the annotation set (SD8, SD10), scale-dependent switches (SF11, SD6) and the card rules: a card (thumbnail and hover animation) and the no-WebGL2 still draw at detail dial A-C (`card.detail`), sharp at full pixel ratio, and its two bold outlines, `lines.plateTop` and `lines.baseTop`, are scaled by `card.plateTopFactor` and `card.baseTopFactor`. Never a second thumbnail style. Thumbnails are drawn to images by the same renderer and committed; they are redrawn when what they are drawn from changes. |
 | SD17 | **Performance is part of the style.** Paper and pattern tiles are cached per theme and size; one GPU context serves a page and a session's geometry is uploaded once; a frame sends the pose and draws in a few instanced calls per target; nothing draws unless u, view or theme changed; no per-frame blur. A new effect that costs per-frame passes is measured with the browser bench before it lands; setup is measured split into decode, tessellate, edges and GPU (standard R6, R10). |
 | SD18 | **The detail ladder** (standard 9b) is the only way the drawing drops anything. Render effects sit in the ladder at the rung their noticeability earns: paper grain in the first rung, wall shading and silhouettes on the layers behind the nearest and the DPR cap in the third, role patterns in the sixth, hidden lines in the seventh. The order is data in `src/style/detail.ts`. |
 | SD19 | **Section views.** The record names a cut plane; solids on the near side are removed, the cut faces are hatched at 45° in ink with the cut outlines drawn bold, and what lies behind shows as in any other view. Cut faces never show through translucent plates: a section draws the cut outline and hatching of the cut solids only. |
 | SD20 | **Detail views.** A magnified window of the drawing, framed and lettered (DETAIL B), drawn by the same renderer at a larger scale with its own line weights floor (SF11); the dial position applies as in the main view. |
 | SD21 | **Phantom positions.** A part at an extreme position is shown as a thin, dashed outline in ink at the alpha of the hidden lines, with no fill, so the range of motion reads without a second copy of the part. |
-| SD22 | **Construction overlays** (dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, a workspace outline, a chord, a crank line) are drafting construction: fine dashed ink lines with mono labels on a paper panel, their points named in the record. They never change the drawing beneath. |
+| SD22 | **Construction overlays** (dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, a workspace outline, a chord, a crank line) are drafting construction: fine dashed ink lines, their points named in the record, off until the visitor turns them on. They never change the drawing beneath. On a wide stage each label is a drafting callout on its element: from an arrowhead touching the element (the drafting mark for a line or an edge) a leader drops straight up or down to the label's row, a horizontal shoulder runs outboard (away from the drawing's middle) and the lettering sits on the shoulder over a paper ground. The dot is the element's steadiest point (of its ends, middle, vertex or rim, the one that moves least over the cycle) clear of the other labels' dots, so a moving element's label rides with it and no two leaders share a dot. Rows and sides are chosen once for the view over the whole cycle, so labels never meet while the drawing plays and keep a margin of paper between them (`overlays.callout.sepX`, `sepY`), keep off the title block and stay on the sheet; they are chosen again only when the view turns more than 25° or the stage, the controls or the explode change, and a row then eases to its new place. On a desktop the pointer over a label or its leader picks it out: its line bold in accent, its label and leader in accent, the rest faded, and its arrowhead pulses (swells and rings out once a second; still under reduced motion); a click keeps it picked out, a second lets it go. On a narrow stage the labels are small numbered markers by their elements, with the key under the stage, where a tap picks a line out (bold, in accent, the rest faded); a card has none. |
 | SD23 | **Ghost traces.** The path of a setting that is not selected (a Walschaerts die at +1, 0 and -1; the full lemniscate of a Watt linkage) is a fine dashed accent line at a fraction of the trace alpha, drawn under the selected trace. |
-| SD24 | **Teaching traces and ticks.** A teaching trace follows SD7; equal-time ticks are small ink cross-marks along it at equal steps of the input, so uneven speed reads as uneven spacing. |
+| SD24 | **Teaching traces and ticks.** A teaching trace follows SD7; equal-time ticks are short strokes across it in its accent at equal steps of the input, so uneven speed reads as uneven spacing. Where they would crowd, every second (or third) is drawn, still at equal steps; a path too short on screen to carry them has none. A curved trace seen edge-on fades out (it would be a stray line), and its comet keeps showing the motion. |
 | SD25 | **Same-role parts told apart by pattern variant or an index mark**, never by hue (a Schmidt coupling's two link sets): a role has a small set of registered pattern variants, and one bold index mark on a disc is a `mark`. |
 | SD26 | **Highlights.** The part a view or a setting makes the point of (the open port, the loaded rocker, the load-carrying groove wall) is drawn with the accent ring or the highlight callout (SD5), the one accent use added by the teaching block. |
 | SD27 | **Time map.** Playback slows near a declared feature; the drawing and the plot do not change, only the rate at which u advances; the scrubber shows the true input. |
+| SD28 | **No pop-ins.** Nothing the drawing shows switches in one frame while the view turns or the cycle plays: a solid eases in and out of see-through over a small range of overlap and depth (T10); a pattern fades out over a range of angles as its face turns edge-on; a cap's bold top outline blends into the far cap's style as its face turns edge-on; a smooth surface's outline is shared by the tessellation edges either side of it, so it glides as the surface turns; a pattern finer than a few pixels on screen is sampled several times per pixel, so it does not shimmer; and the Auto dial moves only on a sustained cost (DL4 of the standard). A face that really turns from one side to the other, edge-on, is an event of the geometry and stays. |
 
 ---
 
@@ -195,15 +196,16 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS2 | **Header:** kicker (mono, accent), large condensed uppercase title, short intro, and a set title block (mono grid of label/value cells). Search field and the Filters and Sort buttons in the same row. Below 1000 px the title block is one low strip across the header, its four cells in a row with dividers, shown at every width. |
 | SS3 | **Sticky bar:** on the library, search, the Filters and Sort buttons and the sheet switch on one row, the switch at the right, the row on the same left and right edges as the header and the card grid; translucent paper with blur, hairline top and bottom. The search has a clear (x) at its right end while it holds text (Escape does the same); it empties the field and keeps the focus there. Once the bar sticks, the set's name and sheet count join the row at its left (not on a phone, where the row stays search, Filters, Sort and switch, the two buttons by name only). Filters hidden behind the button; facets open as chip rows in a scrollable panel with a "Clear all filters" button. Sort opens a menu of the orders, the current one pressed and ticked (a menu button: arrow keys, Home, End, Enter, Escape), and names it on the button above 1000 px: New (most recently added first, by default), Name A to Z, Oldest origin (once records carry origin dates), Sheet number. The order applies to what the search and filters show and stays as they change; clearing the filters returns it to New. When nothing matches, the grid says "No pattern found" and the status line keeps "Clear filters". The library keeps its filters, search and order in its address (`?<facet>=<value>`, `?q=<words>`, `?sort=<order>`, the default order left out), so a page can link to a filtered set. A mechanism page has no bar at the top: its sheet switch sits at the right of its name, and once the name scrolls away a compact bar slides in with the name (one line, cut with an ellipsis) and the switch. "Back to library" returns to the library as it was left, showing the card of the mechanism the visitor is on; Previous and Next step through what the library shows, in its order. |
 | SS4 | **Controls:** segmented buttons and chips are square, hairline, mono uppercase; pressed = ink fill with paper text. Tags are dashed outlines, solid on hover. The play button is the one round control (accent outline, fills on hover). Range inputs use `accent-color` (accent for the scrubber, ink for view sliders). |
-| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number and, in its first 7 days, the Recovered badge of SS1; title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, the view modes, the orbit and the named views, explode, detail pin, the section and detail views the record declares, and the mechanism's own controls) and overlay chips whose legend swatch uses the overlay's own token and dash style; side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
+| SS5 | **Mechanism page order:** crumbs (back, prev / next), header (meta with sheet number and, in its first 7 days, the Recovered badge of SS1; title, summary), the stage (drawing sheet, 16:10, 4:3 on phones) with controls (play, scrubber, speed, the view modes, the named views and Reset view, which returns to the record's own view, explode, detail pin, the section and detail views the record declares, and the mechanism's own controls; no tilt slider, since orbit and the named views turn the drawing) and overlay chips, at the right of the views' row, whose legend swatch uses the overlay's own token and dash style; a quiet hint line under the drawing says how to handle it (the mouse and keys, or fingers on a touch screen); side panels (at a glance including the drive, its family, input, output and level linking to the library filtered by them; output plot); tags in a full-width band, one column per group (function, property, application, keywords), each tag linking to the library filtered or searched by it; explanation (numbered accent markers: motion, forces, benefits, limits, where you'll find it, in the real world); references, photos and video, animations. No parts list, no "how it is built", no joint sections. |
 | SS6 | **Panels:** paper fill, hairline frame, a mono uppercase header strip with a rule under it; fact lists as label/value rows with dashed separators. |
 | SS7 | **Theme switch** is one square button with one icon, a cog with a half-filled disc in its bore in the sheet's ink: as drawn (filled half to the right) on Drafting, turned 180° (filled half to the left) on Blueprint, so switching sheets turns it without animation; its name and tooltip say the sheet it switches to ("Switch to Blueprint", "Switch to Drafting"). Once the hidden Forge sheet is unlocked (SS14) the switch steps through three sheets, Blueprint, Drafting, Forge, and shows the cog a quarter turn (filled half down) on Forge. The choice is remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
 | SS8 | **Real pages:** one static page per mechanism at `/mechanisms/<id>/`, prev and next from the catalogue order, the library at `/`, and a 404 page (sheet ST-404, with the way to the library) for any other address. The engine loads only on the mechanism page or on card hover. |
 | SS9 | **Responsive:** works at phone width with a 16 px side gutter (respecting safe areas) and no horizontal scroll; the mechanism layout drops to one column under 1000 px; the set title block hides under 640 px. The stage has three view modes: standard; Wide (above 1000 px only, remembered: the stage across the layout, at a glance (two thirds) and the plot side by side below it, the facts in a wrapping row where a short fact never wraps and a long one is sized to run to about two lines); full screen, where a short landscape screen puts the same controls in a rail beside the drawing with upright sliders (top is more) inside the safe areas. |
-| SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. |
+| SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. The drawing itself takes focus and the keys: Space plays or pauses, the arrows step the cycle, Shift with the arrows orbits, 1 to 5 are the named views and 0 the record's own. |
 | SS11 | **Motion on the page is minimal:** short colour and border transitions (≤ .2 s). The only continuous motion is the mechanisms themselves. |
 | SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer, and under it, centred, the set's mark faded in the sheet's ink (`--mark`). The favicon is the same mark in the ink of the sheet that matches the browser's scheme. |
 | SS14 | **Forge, the hidden third sheet.** Oxide-red paper, bone ink, brass accent (the `forge` theme of the tokens), so the drawings recolour with the page. It is unlocked by holding the sheet switch: after a second the cog, ring and half-disc, fills with brass in one sweep over two seconds, and at full the unlock moment plays (a shorter press is a plain switch; letting go during the fill does nothing; a mouse, a finger with no long-press menu, or Space or Enter held all work). Clicking the Rev cell of the library's title block 16 times, once per law, also unlocks it. The unlock is remembered per visitor; from then on the switch has three sheets. The hints: the cog glints brass once on a visitor's third visit; the developer console says the forge sleeps; a search that is a word of its lore (`site/src/lore.ts`: Mechanicus terms, places, people, the forge-world release names) shows a sealed state in place of the cards, and the 404 page a line, each with a faint hint phrase picked at random. The unlock moment (1.5 s) flickers twice, tears bands of the page sideways, splits red from blue and bursts into noise that settles on the Forge sheet, lit by the furnace. A click or a key skips it; under reduced motion it is a plain fade. While Forge is the sheet the page lives, subtly, in fixed layers that never take a click: fine grain, scanlines split warm and cool and drifting down, a soft band rolling down the screen, text fringed warm and cool, a slow shallow dimming, the furnace glow breathing at the edges, a blip every few seconds (a strip that dims or brightens, or a thin line), and a glitch pulse every 20 to 40 s (bands shift colour, the fringe widens). On the drawing a post-process adds grain and a red and blue split that swells down the rows, and tears bands at a blip or a pulse. It goes with the paper grain (rung A), so it is the first thing dropped when the device cannot keep up, and cards never draw it. Nothing flashes more than 3 times a second; under reduced motion nothing moves. Forge has no thumbnails or stills of its own: the Blueprint images are recoloured into its paper and ink. The public sheets, their thumbnails and their snapshots never change for it. This is the one exception to SS11. The knobs are in `src/style/forge.ts` (Part VI). |
+| SS15 | **Gestures on the drawing.** A sideways drag scrubs the cycle and pauses, a tap plays or pauses, an up or down drag is the page's. A mouse orbits with the right button, or Shift and the left, and the stage's menu stays shut after an orbit; a finger drags sideways to scrub, and two fingers orbit. An orbit that ends near a named view lands on it; a plan turned in its plane stays as turned. |
 | SS13 | **No engine mark.** One engine draws every page and card, so neither the title block nor a library card marks the engine that drew it. The 3D stamp of the transition left with the 2.5D engine at cut-over. |
 
 ---
@@ -291,7 +293,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.majorAlpha` | 0.14 | 0..1 |
 | `draft.grid.minorWidth` | 0.5 | px |
 | `draft.grid.majorWidth` | 0.8 | px |
-| `draft.card.detail` | `B` | detail dial position of a card drawing (DL): sharp, with wall shading |
+| `draft.card.detail` | `C` | detail dial position of a card drawing (DL): sharp, without wall shading or the deep layers |
+| `draft.card.refW` | 320 | px, width of the canvas the card thumbnails are drawn on; a live card scales its margin to it |
 | `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
 | `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
 | `draft.lines.plateTop` | 1.7 | px, bold top outline of plates |
@@ -301,11 +304,13 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.bottomAlpha` | 0.75 | 0..1 |
 | `draft.lines.silhouette` | 0.8 | px, vertical edges down the side walls |
 | `draft.lines.silhouetteAlpha` | 0.8 | 0..1 |
+| `draft.lines.silhouetteShare` | 1.6 | factor on a smooth outline's share of the line, so two edges sharing it read as one line |
 | `draft.lines.edge` | 0.7 | px, visible bottom edges of non-plates |
 | `draft.lines.edgeAlpha` | 0.7 | 0..1 |
 | `draft.lines.chamfer` | 0.45 | px |
 | `draft.lines.chamferAlpha` | 0.5 | 0..1 |
 | `draft.lines.chamferMinScale` | 1.5 | px per mm, chamfer lines drawn only above this projection scale |
+| `draft.lines.capFade` | 0.12 | cos of a cap toward the viewer below which its bold top outline blends into the far cap's style (no pop as it turns edge-on) |
 | `draft.lines.marks` | 0.6 | px, engraved marks |
 | `draft.lines.marksAlpha` | 0.55 | 0..1 |
 | `draft.lines.thread` | 0.5 | px, thread helices |
@@ -314,7 +319,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.baseMarksGain` | 0.75 | factor on marksAlpha for the base plate |
 | `draft.lines.hidden.dash` | [3, 2.4] | dash px, factor, factor |
 | `draft.lines.hidden.width` | 0.75 | dash px, factor, factor |
-| `draft.lines.hidden.alpha` | 0.85 | dash px, factor, factor |
+| `draft.lines.hidden.alpha` | 0.5 | dash px, factor, factor |
 | `draft.lines.accentRing.color` | `accent` |  |
 | `draft.lines.accentRing.width` | 1.8 | px |
 | `draft.lines.accentRing.radius` | 0.62 | factor on the head's projected half-size, per axis |
@@ -324,17 +329,20 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.accentRing.breathe.period` | 5 | s, 0..1, count per s |
 | `draft.lines.accentRing.breathe.low` | 0.35 | s, 0..1, count per s |
 | `draft.lines.accentRing.breathe.fps` | 15 | s, 0..1, count per s |
-| `draft.fill.plate` | 0.64 |  |
-| `draft.fill.other` | 0.8 |  |
+| `draft.fill.plate` | 0.9 |  |
+| `draft.fill.other` | 0.95 |  |
 | `draft.fill.base` | 0.96 | laid once, on the top face (the parts under it read only through `occlude.base`) |
-| `draft.fill.wall` | 0.55 |  |
+| `draft.fill.wall` | 0.86 |  |
 | `draft.fill.baseWallGain` | 0.8 | factor on `wall` for the base plate's walls |
 | `draft.fill.wallOcclude` | 0.9 | factor on the occlusion for side walls |
-| `draft.fill.occlude.plate` | 1 | the base lets a tenth of what is under it show through |
-| `draft.fill.occlude.other` | 0.85 | the base lets a tenth of what is under it show through |
-| `draft.fill.occlude.base` | 0.9 | the base lets a tenth of what is under it show through |
-| `draft.fill.seeThrough.opacity` | 0.5 |  |
-| `draft.fill.wallShade.shade` | 0.045 | 0..1 ink alpha |
+| `draft.fill.occlude.plate` | 1 | the base lets a twelfth of what is under it show through |
+| `draft.fill.occlude.other` | 0.97 | the base lets a twelfth of what is under it show through |
+| `draft.fill.occlude.base` | 0.92 | the base lets a twelfth of what is under it show through |
+| `draft.fill.seeThrough.opacity` | 0.85 |  |
+| `draft.fill.seeThrough.occlude` | 0.9 |  |
+| `draft.fill.seeThrough.tint` | 0.06 |  |
+| `draft.fill.seeThrough.kinds` | [`plate`, `bridge`, `housing`, `bracket`, `part`] |  |
+| `draft.fill.wallShade.shade` | 0.1 | 0..1 ink alpha |
 | `draft.fill.wallShade.steps` | 5 | count of facing buckets |
 | `draft.fill.wallShade.light` | [0.75, -0.25] | screen direction the light comes from (x right, y down), the wall facing it is lightest |
 | `draft.fill.wallShade.outer.from` | 0.4 | factors, outer walls |
@@ -360,7 +368,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.role.ground.pattern` | `dash` |  |
 | `draft.role.ground.step` | 3.2 |  |
 | `draft.role.ground.alpha` | 0.24 |  |
-| `draft.role.ground.tint` | 0 |  |
+| `draft.role.ground.tint` | 0.035 |  |
 | `draft.role.base.pattern` | `dots` |  |
 | `draft.role.base.step` | 4 |  |
 | `draft.role.base.alpha` | 0.18 |  |
@@ -374,7 +382,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.role.trace.pattern` | `none` |  |
 | `draft.role.trace.tint` | 0.2 |  |
 | `draft.minPx` | 2.2 | px, a pattern step (and any repeated mark) is never drawn finer than this on screen (SF11) |
-| `draft.pattern.offBelowCos` | 0.15 | patterns switch off when cos(tilt) is below this (near edge-on, SD11) |
+| `draft.pattern.offBelowCos` | 0.15 | patterns are gone when cos(tilt) is below this (near edge-on, SD11) |
+| `draft.pattern.fadeCos` | 0.15 | over this much cos(tilt) above offBelowCos a pattern fades in, so it never switches off in one frame |
+| `draft.pattern.superBelowPx` | 8 | device px, a pattern step finer than this on screen is sampled four times per pixel (no shimmer) |
 | `draft.pattern.tile` | 24 | px, cached tile side (tile units below) |
 | `draft.pattern.dotRadius` | 3.6 | tile px, soft dot radius |
 | `draft.pattern.dotMid` | [0.55, 0.8] | gradient stop position and its alpha, soft dot falloff |
@@ -399,6 +409,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.camera.views.ISOMETRIC` | [45, 54.7356] | [yaw, tilt] degrees |
 | `draft.camera.views.DIMETRIC` | [20.7, 70.5288] | [yaw, tilt] degrees |
 | `draft.camera.auxMinCos` | 0.02 | an AUX view down an axis that stands this close to vertical turns the drawing's up to y |
+| `draft.camera.planOpens` | 28 | degrees of tilt a record that declares PLAN opens at (it reads flat in plan; T7) |
 | `draft.section.hatch.pitch` | 7 | px between lines, px, 0..1 ink |
 | `draft.section.hatch.width` | 1.2 | px between lines, px, 0..1 ink |
 | `draft.section.hatch.alpha` | 0.45 | px between lines, px, 0..1 ink |
@@ -414,9 +425,11 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.phantom.dash` | [4, 3] | px, px, factor on the hidden lines' alpha |
 | `draft.phantom.width` | 0.8 | px, px, factor on the hidden lines' alpha |
 | `draft.phantom.alpha` | 0.85 | px, px, factor on the hidden lines' alpha |
-| `draft.tick.half` | 3.5 | px half length of the cross mark, px, 0..1 ink |
-| `draft.tick.width` | 1 | px half length of the cross mark, px, 0..1 ink |
-| `draft.tick.alpha` | 0.8 | px half length of the cross mark, px, 0..1 ink |
+| `draft.tick.half` | 3 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.width` | 1 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.alpha` | 0.75 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.minGap` | 10 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
+| `draft.tick.minPath` | 60 | px half length across the path, px, 0..1 of the path's accent, px least spacing on screen, px shortest path that carries ticks |
 | `draft.trail.width` | 0.7 | px, 0..1, px: explode trail lines |
 | `draft.trail.alpha` | 0.55 | px, 0..1, px: explode trail lines |
 | `draft.trail.dash` | [2, 3] | px, 0..1, px: explode trail lines |
@@ -430,6 +443,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.path.cometAlpha` | 0.95 | 0..1 at the head, fading to 0 |
 | `draft.path.cometSamples` | 80 | count, longest trail in path samples (at most half the path) |
 | `draft.path.headR` | 2.6 | px, open circle at the current point |
+| `draft.path.edgeOn.fade` | [0.06, 0.18] | ratios, ratio |
+| `draft.path.edgeOn.straight` | 0.05 | ratios, ratio |
 | `draft.path.headStroke` | 1.2 | px |
 | `draft.centre.dash` | [9, 2.5, 1.5, 2.5] | px, long dash, gap, short dash, gap |
 | `draft.centre.width` | 0.6 | px |
@@ -520,6 +535,41 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.overlays.labelBorder` | 0.8 | px, panel hairline width |
 | `draft.overlays.labelEdge` | 4 | px, labels kept this far inside the canvas |
 | `draft.overlays.labelSpacing` | 3 | px, gap when a label is pushed below another |
+| `draft.overlays.labels.minStage` | 640 | px, the narrowest stage that gets callouts |
+| `draft.overlays.labels.dim` | 0.35 | 0..1, the other labels while one is picked out |
+| `draft.overlays.labels.samples` | 24 | phases of the cycle a label's anchor is followed over to set its place |
+| `draft.overlays.callout.drop` | 16 | px, the shortest drop from the anchor to the shoulder |
+| `draft.overlays.callout.rows` | 10 | rows tried above the anchor, and as many below |
+| `draft.overlays.callout.maxRun` | 320 | px, the longest shoulder run before the lettering (to carry it clear of the drawing) |
+| `draft.overlays.callout.runStep` | 16 | px, the shoulder runs tried |
+| `draft.overlays.callout.overDrawing` | 60 | cost of lettering wholly over the drawing, against px of leader (perPx) |
+| `draft.overlays.callout.perPx` | 0.05 | cost per px of leader (drop and run) |
+| `draft.overlays.callout.otherSide` | 3 | cost of the shoulder running inboard instead of outboard |
+| `draft.overlays.callout.clear` | 8 | px, the lettering's clearance from the drawing |
+| `draft.overlays.callout.rowGap` | 6 | px, between rows |
+| `draft.overlays.callout.sepX` | 12 | px, the least paper between two labels across |
+| `draft.overlays.callout.sepY` | 8 | px, the least paper between two labels up and down |
+| `draft.overlays.callout.textH` | 11 | px, the lettering's height |
+| `draft.overlays.callout.lift` | 3 | px, the lettering above its shoulder |
+| `draft.overlays.callout.gap` | 6 | px, from the drop to the lettering, and past it to the shoulder's end |
+| `draft.overlays.callout.width` | 1.1 | px, leader |
+| `draft.overlays.callout.leaderAlpha` | 0.9 | 0..1 |
+| `draft.overlays.callout.textAlpha` | 1 | 0..1 |
+| `draft.overlays.callout.arrow` | 7 | px, the arrowhead's length at the element |
+| `draft.overlays.callout.arrowAngle` | 0.38 | radians, its half-angle |
+| `draft.overlays.callout.dot` | 2.4 | px, radius of the dot where a leader has no drop |
+| `draft.overlays.callout.panel` | 0.85 | 0..1, paper behind the lettering |
+| `draft.overlays.callout.replanDeg` | 25 | degrees the view turns before the rows are chosen again |
+| `draft.overlays.callout.sep` | 16 | px, the least distance between two labels' anchors (each takes its own point on its element) |
+| `draft.overlays.callout.tween` | 200 | ms, a row moving to its new place |
+| `draft.overlays.pulse.amount` | 0.45 | factor, ms |
+| `draft.overlays.pulse.period` | 1100 | factor, ms |
+| `draft.overlays.marker.r` | 7 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.width` | 0.9 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.offset` | 9 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.leaderWidth` | 0.6 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.leaderAlpha` | 0.45 | px, px, px, px, 0..1, 0..1 |
+| `draft.overlays.marker.dim` | 0.4 | px, px, px, px, 0..1, 0..1 |
 | `draft.plot.margin.left` | 40 | px |
 | `draft.plot.margin.right` | 8 | px |
 | `draft.plot.margin.top` | 8 | px |
@@ -596,7 +646,10 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `form.chamfer.csk` | 0 | mm, countersunk heads get none |
 | `form.thread.pitch` | function (see source) | mm, ISO coarse pitch for Ø d mm |
 | `form.explode.gap` | 11 | mm per explode level at full explode |
-| `form.explode.clear` | 0.5 | levels, how far a screw backs out past the topmost part it passes |
+| `form.explode.clear.k` | 0.6 | factor, mm, mm |
+| `form.explode.clear.min` | 12 | factor, mm, mm |
+| `form.explode.clear.max` | 30 | factor, mm, mm |
+| `form.explode.touch` | 0.5 | mm, an overlap this small is parts touching, not one inside the other |
 <!-- style-form:end -->
 
 ## Detail ladder
@@ -724,11 +777,19 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 | SQ10 | Depth | A renderer test: with the principle parts selected, no depth bias or draw-order trick is in use; the peeled composite equals a reference ray-cast on a fixture scene of overlapping translucent solids. |
 | SQ11 | Views | Every named view, every section and detail view the records declare, and full explode render without clipping, on both sheets; the default view of each mechanism is the one its record names. |
 | SQ12 | Phone | The bench page for a measured build reports setup (decode, tessellate, edges, GPU) and frame times per view on a mid-range phone; targets are flags, not gates (standard R10). |
+| SQ13 | No pop-ins | A local test scrubs each pilot through its cycle and orbits it through a range of yaw, measures the frames tile by tile for a change smooth motion cannot explain, and fails when the count rises above the allowance recorded when the look was last made final (SD28). |
 
 ---
 
 ## Changelog
 
+- **3.8 (2026-10-24).** Parts read as solids: higher paper and wall opacity, stepped wall shading, a faint tint on
+  mounts; a see-through part keeps most of its paper, takes a wash, and its walls follow its faces; only covering parts
+  go see-through (SD2, SD3). No pop-ins (SD28, SQ13). Patterns fade near edge-on (SD11). Gestures on the drawing and the
+  keys (SS10, SS15); no tilt slider, the overlay chips on the views' row, a hint line under the drawing (SS5).
+  Construction labels as callouts on their elements with arrowheads, hover and pin, markers and a key on a phone, none
+  on a card (SD22); ticks across the path, an edge-on trace fades, no engraved trace on the base (SD7, SD24). The
+  explode freezes the drawing and leaves a plan for 28 degrees (SD12). Cards and stills at dial A-C (SD16).
 - **3.7 (2026-10-23).** Forge is unlocked by holding the sheet switch, with hints around the site (a glint, the console,
   a sealed search for its lore, a line on the 404 page), and lives more while it is on (split scanlines, a rolling
   band, fringed text, blips, a breathing glow, a wider swelling colour split on the drawing). The Motive force line
