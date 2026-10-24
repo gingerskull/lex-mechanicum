@@ -207,7 +207,8 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     const R = rt.surface[i]!;
     const pat = rt.pattern[i]!;
     const kx = s.stretch ? Math.hypot(mats[b]!, mats[b + 1]!, mats[b + 2]!) || 1 : 1;
-    table.set([face, wallA, Math.min(1, occ), (1 - a) * Math.min(1, occ * F.wallOcclude)], o + 12);
+    // the walls take the same see-through share as the faces: a part reads as one solid at one opacity
+    table.set([face, wallA, Math.min(1, occ), Math.min(1, occ * F.wallOcclude)], o + 12);
     const tint = (R.tint ?? 0) + Math.max(0, F.seeThrough.tint - (R.tint ?? 0)) * a;
     table.set([tint, st.patterns && pat >= 0 ? (R.alpha ?? 0) : 0, Math.max(0, pat), R.step ?? 1], o + 16);
     table.set([hasFlag3(s, "faint") ? 0.5 : 1, base ? 1 : 0, plate ? 1 : 0, a], o + 20);
