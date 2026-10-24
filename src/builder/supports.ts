@@ -81,11 +81,16 @@ export interface PillowOut {
 
 interface BlockGeom {
   foot: Solid3;
-  ped: Solid3;
+  /** The pedestal of a block on a tilted shaft; on a level shaft it is one casting with the boss. */
+  ped?: Solid3;
   boss: Solid3;
 }
 
-/** The three castings of a block at axial position wb: foot plate, pedestal and boss. */
+/**
+ * The castings of a block at axial position wb: the foot plate, and the body that holds the bearing. On a level shaft the
+ * body is one casting, a pillow block's outline (a rectangle from the foot up to the shaft, topped by a half circle round
+ * it) along the shaft, so no edge of one part runs through another; on a tilted shaft a pedestal rises into a round boss.
+ */
 function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: boolean; wb: number; baseTop: number; first: boolean; joints?: string[] }): BlockGeom {
   const W = pillowWidth(o.d, o.live);
   const Rb = bossR(o.d, o.live);
@@ -120,9 +125,19 @@ function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: bo
   )[0]!;
   // the boss's x stands up, across the shaft (the stand's x runs along it)
   const bf = frameAlong(unitAlong(o.f, o.wb - W / 2), a, [0, 0, 1]);
+  const drop = P[2] - o.baseTop - FOOT;
+  const level = Math.abs(a[2]) < 1e-6 && drop > 1;
+  // a level shaft's body: up from the foot's top (x = -drop) to the shaft, round it in a half circle
+  const n = Math.max(14, Math.round(Rb * 1.5));
+  const tomb: Vec2[] = [];
+  for (let i = 0; i <= n; i++) {
+    const t = -Math.PI / 2 + (Math.PI * i) / n;
+    tomb.push([Rb * Math.cos(t), Rb * Math.sin(t)]);
+  }
+  tomb.push([-drop, Rb], [-drop, -Rb]);
   const boss = place(
     bf,
-    H.plate(`${o.id}`, H.disc(Rb), {
+    H.plate(`${o.id}`, level ? tomb : H.disc(Rb), {
       kind: "housing",
       role: "ground",
       name: o.first ? `Pillow block, ${b ? `bored for a ${b.name ? `${b.name}-2RS` : "bearing"}` : `clamping the Ø${o.d} shaft`}` : "",
@@ -137,10 +152,10 @@ function blockGeom(ctx: BuildCtx, o: { id: string; f: Frame; d: number; live: bo
     }),
   )[0]!;
   void ctx;
-  return { foot, ped, boss };
+  return level ? { foot, boss } : { foot, ped, boss };
 }
 
-const geomList = (g: BlockGeom): Solid3[] => [g.foot, g.ped, g.boss];
+const geomList = (g: BlockGeom): Solid3[] => (g.ped ? [g.foot, g.ped, g.boss] : [g.foot, g.boss]);
 
 /**
  * Two blocks for a shaft in plan or tilted: past either end of what the shaft carries, far apart (A9), or both behind it
