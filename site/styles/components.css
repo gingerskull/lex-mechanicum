@@ -622,6 +622,11 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+/* Reset view stands with the named views at their size: their lettering and padding, one border */
+#record-view {
+  font: 500 11.5px / 1 var(--font-mono);
+  padding: 7px 12px;
+}
 /* the overlay chips share the views' row, at its right */
 .controls.vx .ovl {
   margin-left: auto;
