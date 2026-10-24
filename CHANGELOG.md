@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.41.0, Stygies — 2026-10-24
 
 - The drawings read as solid parts: plates, brackets, mounts and pillow blocks are paper at a convincing opacity with
   stepped wall shading, and a part that covers a moving one goes see-through as a whole, faces and walls alike, as a
