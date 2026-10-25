@@ -44,6 +44,9 @@ function sampleOutput(K: NonNullable<Loaded["kinematics"]>, y: string, ctl?: Ctl
   } catch {
     return null;
   }
+  // an angle turns on past ±180 degrees: drawn unwrapped, it never jumps down the plot
+  if (K.kin.outputs?.find((o) => o.id === y)?.kind === "angle")
+    for (let i = 1; i < data.length; i++) data[i] = data[i]! - 360 * Math.round((data[i]! - data[i - 1]!) / 360);
   return data;
 }
 
@@ -175,6 +178,9 @@ async function main(box: HTMLElement) {
   const s = {
     t: tm.tOf((63 / 360) * TAU),
     u: (63 / 360) * TAU,
+    /** Whole cycles played since the page opened: a part whose turn per cycle is not a whole turn (a gear pair's wheel)
+     * carries on round instead of jumping back at the end of each cycle, so the drawing is posed at u + turn cycles. */
+    turn: 0,
     playing: !reduced,
     speed: 1,
     orient: { ...base.orient } as Orient,
@@ -194,6 +200,8 @@ async function main(box: HTMLElement) {
     /** A Forge glitch on the drawing (SS14): 1 at a pulse, less at a blip, 0 between. */
     glitch: 0,
   };
+  /** The running phase the drawing is posed at. */
+  const phase = () => s.u + s.turn * TAU;
   /** Frames are drawn at the coarsest dial until the page is idle (R9). */
   let warm = true;
   let warmQueued = false;
@@ -265,7 +273,7 @@ async function main(box: HTMLElement) {
   const draw = () => {
     const t0 = performance.now();
     try {
-      sess.draw(s.u, view());
+      sess.draw(phase(), view());
     } catch (e) {
       // a setting the mechanism cannot assemble in: back to the last one that drew
       if (JSON.stringify(ctl) !== JSON.stringify(good)) {
@@ -321,7 +329,9 @@ async function main(box: HTMLElement) {
     last = now;
     if (s.playing) {
       // playback runs on the time map (SD27): the phase is a function of the playback fraction
-      s.t = (s.t + (dt * s.speed) / CYCLE) % 1;
+      const t = s.t + (dt * s.speed) / CYCLE;
+      s.turn += Math.floor(t);
+      s.t = t - Math.floor(t);
       s.u = tm.uOf(s.t);
       dirty = true;
     } else if (!reduced && !breathless && inView && now - breathAt >= 1000 / breathe.fps) {
@@ -382,8 +392,10 @@ async function main(box: HTMLElement) {
   };
   setPlaying(s.playing);
   play.addEventListener("click", () => setPlaying(!s.playing));
+  /** Sets the phase from a running one (whole cycles count on in s.turn). */
   const setPhase = (u: number) => {
-    s.u = ((u % TAU) + TAU) % TAU;
+    s.turn = Math.floor(u / TAU);
+    s.u = u - s.turn * TAU;
     s.t = tm.tOf(s.u);
     const deg = Math.round((s.u / TAU) * 360) % 360;
     $<HTMLInputElement>("scrub").value = String(deg);
@@ -392,7 +404,7 @@ async function main(box: HTMLElement) {
   };
   $<HTMLInputElement>("scrub").addEventListener("input", (e) => {
     setPlaying(false);
-    setPhase((Number((e.target as HTMLInputElement).value) / 360) * TAU);
+    setPhase(s.turn * TAU + (Number((e.target as HTMLInputElement).value) / 360) * TAU);
   });
   for (const b of document.querySelectorAll<HTMLButtonElement>("#speed button"))
     b.addEventListener("click", () => {
@@ -596,7 +608,7 @@ async function main(box: HTMLElement) {
   let orbitedAt = 0;
   const start = (id: number, x: number, y: number, orbit: boolean): Drag => {
     const o = turntable(s.orient);
-    return { id, x, y, mode: "", orbit, u: s.u, yaw: o.yaw, tilt: o.tilt };
+    return { id, x, y, mode: "", orbit, u: phase(), yaw: o.yaw, tilt: o.tilt };
   };
   canvas.addEventListener("pointerdown", (e) => {
     if (e.pointerType === "touch" || (e.button !== 0 && e.button !== 2)) return;
@@ -638,7 +650,7 @@ async function main(box: HTMLElement) {
       drag.mode = drag.orbit ? "orbit" : "scrub";
       // a scrub starts from where the drawing is now (it may have played on past the threshold)
       if (!drag.orbit) {
-        drag.u = s.u;
+        drag.u = phase();
         drag.x = e.clientX;
       }
       canvas.setPointerCapture(e.pointerId);
@@ -706,7 +718,7 @@ async function main(box: HTMLElement) {
         return;
       }
       touch.mode = "scrub";
-      touch.u = s.u;
+      touch.u = phase();
       touch.x = x;
     }
     if (e.cancelable) e.preventDefault();
@@ -744,7 +756,7 @@ async function main(box: HTMLElement) {
       landOrbit();
     } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
       setPlaying(false);
-      setPhase(s.u + ((e.key === "ArrowRight" ? 1 : -1) * TAU) / 72);
+      setPhase(phase() + ((e.key === "ArrowRight" ? 1 : -1) * TAU) / 72);
     } else if (/^[1-5]$/.test(e.key) && plain(e)) document.querySelector<HTMLButtonElement>(`#presets button[data-view="${NAMED[Number(e.key) - 1]}"]`)?.click();
     else if (e.key === "0" && plain(e)) $("record-view").click();
     else return;

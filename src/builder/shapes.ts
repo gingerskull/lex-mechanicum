@@ -11,7 +11,9 @@ import { Kinematics, bodyFrameOf, type Setup } from "../kin/compose";
 import { lawRise, type CamLaw } from "../kin/blocks/cam";
 import { sawOutline, starOutline, type StarSpec } from "../kin/blocks/timed";
 import { type Vec3, m3, v3, xf } from "../kin/math";
-import type { Feature, LoftSection, Op, Profile } from "../solids/types";
+import type { Feature, LoftSection, MeshData, Op, Profile } from "../solids/types";
+import { bevelTeeth3, type Bevel3 } from "./bevel3";
+import { inside } from "../core/poly";
 import { nutGeom, screwGeom } from "./screws";
 import { flexureGeom } from "./compliant";
 import { forkGeom, sheaveGeom } from "./cvt";
@@ -73,6 +75,13 @@ export interface BodyGeom {
   axisym?: boolean;
   /** Shapes cut from or added to the part (a cam's groove), in the part's own coordinates (D8: a boolean result). */
   features?: import("../solids/types").Feature[];
+  /**
+   * The part as a closed mesh where no operation makes it (a bevel gear's teeth on the back cone, src/builder/bevel3.ts):
+   * drawn and packed as it is, while `profile`, `thick` and `scaleTop` stand for it in the planning and the checks.
+   */
+  mesh?: MeshData;
+  /** The bevel teeth `mesh` was made from, made again when the pair's depth module is known (matchBevelDepth). */
+  teeth?: Bevel3;
   /** The body's whole footprint in its frame's plane, where its pieces reach past its own part (the placer reads it). */
   plan?: Vec2[];
   /**
@@ -111,7 +120,7 @@ function originOf(body: KinBody, S: Setup, pins: Vec3[]): Vec3 {
 }
 
 /** Outline in plane coordinates for each shape type. `pins` are the body's joints in those coordinates. */
-function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean; exactOffset?: number; upper?: BodyGeom["upper"]; plan?: Vec2[]; features?: import("../solids/types").Feature[] } {
+function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean; exactOffset?: number; upper?: BodyGeom["upper"]; plan?: Vec2[]; features?: import("../solids/types").Feature[]; mesh?: MeshData; teeth?: Bevel3 } {
   const g = outlineOf0(shape, role, pins);
   // a window along a plate's x (a shuttle's window for the pusher's roller): { from, to, width }
   const win = shape.window as { from?: unknown; to?: unknown; width?: unknown } | undefined;
@@ -144,7 +153,7 @@ function outlineOf(shape: Record<string, unknown>, role: string, pins: Vec2[]): 
   return g;
 }
 
-function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean; exactOffset?: number; upper?: BodyGeom["upper"]; plan?: Vec2[]; features?: import("../solids/types").Feature[] } {
+function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]): { profile: Profile; thick: number; approx: boolean; scaleTop?: number; twist?: number; loft?: LoftSection[]; exact?: boolean; exactOffset?: number; upper?: BodyGeom["upper"]; plan?: Vec2[]; features?: import("../solids/types").Feature[]; mesh?: MeshData; teeth?: Bevel3 } {
   const type = String(shape.type ?? "");
   const far = pins.reduce((m, p) => Math.max(m, Math.hypot(p[0], p[1])), 0);
   const hole = (r: number): Vec2[] => circle(r, 0, 0, 28);
@@ -232,24 +241,28 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
         if (typeof shape.spiral === "number" && shape.spiral !== 0) {
           // a spiral bevel or hypoid gear: the back-cone teeth lofted toward the apex, shrinking along the pitch cone and
           // turning by the spiral angle along the face (left hand clockwise going in); the bore is the stack's
-          const rMean = ((z * m) / 2) * (1 - (1 - bv.inner) / 2);
-          const turn = ((bv.b * Math.tan(shape.spiral * D2R)) / rMean) * (shape.hand === "left" ? -1 : 1);
+          const turn = spiralTurn(shape);
           const n = Math.max(6, Math.ceil(Math.abs(turn) / (4 * D2R)));
           const loft: LoftSection[] = Array.from({ length: n }, (_, i) => {
             const t = (i + 1) / n;
             const s = 1 - t * (1 - bv.inner);
             return { z: t * bv.axial, outer: rot(outer, t * turn).map(([x, y]): Vec2 => [x * s, y * s]), holes: [] };
           });
-          return { profile: { outer, holes: [] }, thick: bv.axial, approx: false, scaleTop: bv.inner, loft, exact: true };
+          // the part itself: the teeth on the back cone (the loft stands for it in the planning)
+          const teeth: Bevel3 = { z, m, cone: shape.cone, face: bv.b, turn };
+          return { profile: { outer, holes: [] }, thick: bv.axial, approx: false, scaleTop: bv.inner, loft, exact: true, mesh: bevelTeeth3(teeth), teeth };
         }
         // its back face at `backFace` along the frame's z (default the frame's origin); `facing: -1` puts its apex toward
-        // -z: the frustum then runs from its small end up to its back face
+        // -z: the frustum then runs from its small end up to its back face. The part is its teeth on the back cone (the
+        // frustum stands for it in the planning)
         const back = num(shape.backFace, 0);
         if (shape.facing === -1) {
           const s = bv.inner;
-          return { profile: { outer: outer.map(([x, y]): Vec2 => [x * s, y * s]), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: 1 / s, exact: true, exactOffset: back - bv.axial };
+          const teeth: Bevel3 = { z, m, cone: shape.cone, face: bv.b, bore, facing: -1, back: bv.axial };
+          return { profile: { outer: outer.map(([x, y]): Vec2 => [x * s, y * s]), holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: 1 / s, exact: true, exactOffset: back - bv.axial, mesh: bevelTeeth3(teeth), teeth };
         }
-        return { profile: { outer, holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true, ...(back ? { exactOffset: back } : {}) };
+        const teeth: Bevel3 = { z, m, cone: shape.cone, face: bv.b, bore };
+        return { profile: { outer, holes: [hole(bore / 2)] }, thick: bv.axial, approx: false, scaleTop: bv.inner, exact: true, ...(back ? { exactOffset: back } : {}), mesh: bevelTeeth3(teeth), teeth };
       }
       if (shape.form === "worm" || shape.form === "worm wheel") return wormShape(shape, z, m);
       // a non-circular gear: teeth along its own pitch curve (the gear it drives is cut conjugate to it, conjugate.ts)
@@ -446,7 +459,7 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     const fixed = !js.length && !!F && !lv;
     // `place`: the part starts that far along its frame's z, where the joints put it (a roller down in a groove), not on a slab
     const placed = typeof shape.place === "number" ? { exact: { offset: shape.place } } : g.exact || fixed ? { exact: { offset: g.exactOffset ?? 0 } } : {};
-    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.upper ? { upper: g.upper } : {}), ...(lv ? { level: lv } : {}), ...(g.plan ? { plan: g.plan } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.loft ? { loft: g.loft } : {}), ...(g.features ? { features: g.features } : {}), ...placed };
+    const geom: BodyGeom = { id: b.id, role: b.role, frame, profile: g.profile, thick: g.thick, approx: g.approx, pins, shape, ...(g.upper ? { upper: g.upper } : {}), ...(lv ? { level: lv } : {}), ...(g.plan ? { plan: g.plan } : {}), ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}), ...(g.loft ? { loft: g.loft } : {}), ...(g.features ? { features: g.features } : {}), ...(g.mesh ? { mesh: g.mesh } : {}), ...(g.teeth ? { teeth: g.teeth } : {}), ...placed };
     const levels = clusterLevels(shape, pins);
     if (levels.length) geom.levels = levels;
     // a differential's case: its ring gear (the part) and a cage frame round the spiders and side gears, in the plane of
@@ -486,8 +499,51 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
     if (built.shape.rollers && typeof built.shape.rollers === "object") built.pieces = [...(built.pieces ?? []), ...turretRollers(built)];
     out.set(b.id, withPieces(b, withIndex(withBars(withBall(built)))));
   }
+  matchBevelDepth(kin, out);
+  seatBevels(kin, S, out);
   phaseMeshes(kin, S, out);
   return out;
+}
+
+/** Bevel gears in mesh share one working depth, the smaller module's (a hypoid's pinion and ring differ in module). */
+function matchBevelDepth(kin: Kin, geoms: Map<string, BodyGeom>): void {
+  for (const j of kin.joints) {
+    if (j.type !== "gear-mesh") continue;
+    const A = geoms.get(j.a)?.teeth, B = geoms.get(j.b)?.teeth;
+    if (!A || !B || Math.abs(A.m - B.m) < 1e-9) continue;
+    const depth = Math.min(A.m, B.m);
+    for (const id of [j.a, j.b]) {
+      const g = geoms.get(id)!;
+      if (g.teeth!.depth === depth) continue;
+      g.teeth = { ...g.teeth!, depth };
+      g.mesh = bevelTeeth3(g.teeth);
+    }
+  }
+}
+
+/**
+ * A bevel or hypoid gear stands along its axis so its pitch cone passes through its mesh point (J9): a mesh given at
+ * the mean point of contact (a hypoid's) puts the gear's outer pitch circle behind it, where the cone's radius is the
+ * outer pitch radius. A gear whose record sets its back face (`backFace`, `place`) or turns it over (`facing: -1`)
+ * stands where it says.
+ */
+function seatBevels(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
+  for (const g of geoms.values()) {
+    const sh = g.shape;
+    if (String(sh.type) !== "gear" || typeof sh.cone !== "number" || sh.facing === -1 || sh.backFace !== undefined || sh.place !== undefined || !g.exact) continue;
+    const j = kin.joints.find((q) => q.type === "gear-mesh" && (q.a === g.id || q.b === g.id) && S.joints.get(q.id));
+    if (!j) continue;
+    const P = S.joints.get(j.id)!.at;
+    const z = num(sh.z, 20);
+    const m = num(sh.module, 2);
+    const bv = bevel(z, m, sh.cone * D2R, num(sh.face, 0) || undefined);
+    const { uv, w } = planeCoords(g.frame, P);
+    const k = Math.hypot(uv[0], uv[1]) / ((z * m) / 2);
+    if (k < bv.inner - 0.02 || k > 1.02) continue;
+    // the cone's radius is k of the outer pitch radius at (1 - k) of the apex's height over the outer pitch circle
+    const offset = w - (1 - k) * bv.apex;
+    if (Math.abs(offset - g.exact.offset) > 0.05) g.exact = { offset };
+  }
 }
 
 /**
@@ -670,6 +726,41 @@ function wormShape(shape: Record<string, unknown>, z: number, m: number): { prof
 /** Angle wrapped into [-h, h) for a period 2h. */
 const wrapTo = (a: number, h: number): number => a - 2 * h * Math.floor((a + h) / (2 * h));
 
+/** A spiral bevel or hypoid gear's turn of its teeth from the outer end to the inner, radians, signed by its hand; 0 else. */
+function spiralTurn(shape: Record<string, unknown>): number {
+  if (typeof shape.cone !== "number" || typeof shape.spiral !== "number" || !shape.spiral) return 0;
+  const z = num(shape.z, 20);
+  const m = num(shape.module, 2);
+  const bv = bevel(z, m, shape.cone * D2R, num(shape.face, 0) || undefined);
+  const rMean = ((z * m) / 2) * (1 - (1 - bv.inner) / 2);
+  return ((bv.b * Math.tan(shape.spiral * D2R)) / rMean) * (shape.hand === "left" ? -1 : 1);
+}
+
+/** How far a spiral gear's teeth have turned from the outer end where they cross the section through `P`, radians. */
+function spiralAt(g: BodyGeom, P: Vec3): number {
+  const turn = spiralTurn(g.shape);
+  if (!turn) return 0;
+  const z = num(g.shape.z, 20);
+  const m = num(g.shape.module, 2);
+  const bv = bevel(z, m, num(g.shape.cone, 45) * D2R, num(g.shape.face, 0) || undefined);
+  const uv = planeCoords(g.frame, P).uv;
+  const k = Math.hypot(uv[0], uv[1]) / ((z * m) / 2);
+  return Math.max(0, Math.min(1, (1 - k) / (1 - bv.inner))) * turn;
+}
+
+/** A mesh turned by `a` about its z axis. */
+function turnMesh(m: MeshData, a: number): MeshData {
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  const pos = new Float32Array(m.pos.length);
+  for (let k = 0; k < pos.length; k += 3) {
+    pos[k] = c * m.pos[k]! - s * m.pos[k + 1]!;
+    pos[k + 1] = s * m.pos[k]! + c * m.pos[k + 1]!;
+    pos[k + 2] = m.pos[k + 2]!;
+  }
+  return { pos, tri: m.tri, tag: m.tag };
+}
+
 /**
  * Gears in mesh are turned so a tooth of one meets a gap of the other at the mesh point (J6, J9). Every outline starts
  * with a tooth (a ring: a gap) on its x axis; a gear's turn is set once, by the first mesh that reaches it from a gear
@@ -711,6 +802,7 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
     } else {
       s.g.profile = { outer: rot(s.g.profile.outer, v), holes: s.g.profile.holes.map((h) => rot(h, v)) };
       if (s.g.loft) s.g.loft = s.g.loft.map((x) => ({ z: x.z, outer: rot(x.outer, v), holes: x.holes.map((h) => rot(h, v)) }));
+      if (s.g.mesh) s.g.mesh = turnMesh(s.g.mesh, v);
     }
   };
   const meshes = kin.joints.filter((j) => j.type === "gear-mesh" && S.joints.get(j.id));
@@ -738,10 +830,16 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
         const c = s.c ?? [0, 0];
         return Math.atan2(uv[1] - c[1], uv[0] - c[0]);
       };
-      if (j.crossed) {
-        // a tooth of the first, a gap of the second on the mesh point
-        if (!knownA && A.kind !== "rack") apply(A, phi(A));
-        if (!knownB && B.kind !== "rack") apply(B, phi(B) + (B.kind === "ring" ? 0 : Math.PI / B.z));
+      if (j.crossed && A.kind !== "rack" && B.kind !== "rack") {
+        // the set gear's nearest tooth (a spiral tooth where it crosses the mesh point's section) stands off the mesh
+        // point by an arc along its pitch circle; the other gear's gap goes to the same place, carried along its own
+        // turning direction there (the two pitch surfaces roll on each other at the mesh)
+        const [K, U] = knownA ? [A, B] : [B, A];
+        const radius = (q: Side) => Math.hypot(...planeCoords(q.g.frame, P).uv);
+        const along = (q: Side) => v3.unit(v3.cross(q.g.frame.z, v3.sub(P, fromPlane(q.g.frame, q.c ?? [0, 0], 0))));
+        const off = wrapTo(phi(K) - spiralAt(K.g, P) - set.get(K.key)!, Math.PI / K.z);
+        const d = (-off * radius(K) * v3.dot(along(K), along(U))) / Math.max(1e-9, radius(U));
+        apply(U, phi(U) - spiralAt(U.g, P) + d + (U.kind === "ring" ? 0 : Math.PI / U.z));
         continue;
       }
       // the known side, the side to set
@@ -784,9 +882,10 @@ function phaseMeshes(kin: Kin, S: Setup, geoms: Map<string, BodyGeom>): void {
       if (!j) break;
       const A = sideOf(j.a, j);
       if (A && A.kind !== "rack" && !set.has(A.key)) {
-        const uv = planeCoords(A.g.frame, S.joints.get(j.id)!.at).uv;
+        const at = S.joints.get(j.id)!.at;
+        const uv = planeCoords(A.g.frame, at).uv;
         const c = A.c ?? [0, 0];
-        apply(A, Math.atan2(uv[1] - c[1], uv[0] - c[0]));
+        apply(A, Math.atan2(uv[1] - c[1], uv[0] - c[0]) - spiralAt(A.g, at));
       } else if (A) set.set(A.key, 0);
     }
   }
@@ -1579,8 +1678,16 @@ function withIndex(g: BodyGeom): BodyGeom {
   const u: Vec2 = [at[0]! / L, at[1]! / L];
   const v: Vec2 = [-u[1], u[0]];
   const p = (s: number, w: number): Vec2 => [u[0] * s + v[0] * w, u[1] * s + v[1] * w];
-  // a shaft of 12 mm and a head of 8, 6 mm wide, ending at the mark's point
-  let outer: Vec2[] = [p(L - 20, -1.5), p(L - 8, -1.5), p(L - 8, -3.5), p(L, 0), p(L - 8, 3.5), p(L - 8, 1.5), p(L - 20, 1.5)];
+  // a small arrow on the material along its ray, clear of both edges (a ring's inner edge): its tip short of the outer
+  // edge, its tail in from the inner one, a head of 4.5 mm, 5 wide, on a shaft 2 wide, 12 long in all at the most
+  const solid = (r: number) => inside(g.profile.outer, p(r, 0)) && !g.profile.holes.some((h) => inside(h, p(r, 0)));
+  let lo = L, hi = L;
+  while (lo > 0 && solid(lo - 0.25)) lo -= 0.25;
+  while (hi < 4 * L && solid(hi + 0.25)) hi += 0.25;
+  const tip = Math.min(L, hi - 2.5);
+  const tail = Math.min(tip - 7, Math.max(tip - 12, lo > 0.5 ? lo + 3 : 0));
+  const neck = tip - 4.5;
+  let outer: Vec2[] = [p(tail, -1), p(neck, -1), p(neck, -2.5), p(tip, 0), p(neck, 2.5), p(neck, 1), p(tail, 1)];
   if (signedArea(outer) < 0) outer = outer.reverse();
   const o = v3.add(g.frame.o, v3.mul(g.frame.z, g.exact.offset + g.thick));
   return { ...g, pieces: [...(g.pieces ?? []), { id: `${g.id}-index`, name: "Index arrow, raised", frame: { o, x: g.frame.x, z: g.frame.z }, profile: { outer, holes: [] }, h: 1.5 }] };

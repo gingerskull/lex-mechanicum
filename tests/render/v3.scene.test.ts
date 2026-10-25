@@ -4,7 +4,7 @@ import { recordById } from "../../src/catalog";
 import { Kinematics } from "../../src/kin/compose";
 import type { Kin } from "../../src/kin/types";
 import { buildPackage } from "../../src/package/build";
-import { newCache, controlFor, extremes, pathOf, type Ann } from "../../src/render/v3/annotate";
+import { newCache, controlFor, extremes, locusOf, pathOf, type Ann } from "../../src/render/v3/annotate";
 import { bake, EDGE_RING, EF2, VF } from "../../src/render/v3/bake";
 import { basisOfOrient, fit, namedOrient } from "../../src/render/v3/camera";
 import { kinPoser } from "../../src/render/v3/poser";
@@ -171,7 +171,13 @@ describe("principle visibility (T10, T17)", () => {
 });
 
 describe("teaching layers", () => {
-  const poser = turning("arm", 0, 0, { tip: (u) => [50 * Math.cos(u), 50 * Math.sin(u), 20], rock: (u) => [30 + 10 * Math.sin(u), 0, 20] });
+  const poser = turning("arm", 0, 0, {
+    tip: (u) => [50 * Math.cos(u), 50 * Math.sin(u), 20],
+    rock: (u) => [30 + 10 * Math.sin(u), 0, 20],
+    // a wheel's mark turned on 240 degrees a cycle, and one on a ratio that never comes round
+    wheel: (u) => [40 * Math.cos((2 * u) / 3), 40 * Math.sin((2 * u) / 3), 20],
+    slip: (u) => [40 * Math.cos(0.515 * u), 40 * Math.sin(0.515 * u), 20],
+  });
   const scene = scene3(SOLIDS, { poser, teaching });
   const rt = runtime(scene);
   const ann = (): Ann => ({ ctx: null as never, w: 100, h: 100, C: fit(basisOfOrient(namedOrient("PLAN")), 100, 100, [-80, -80, 0, 80, 80, 34]), T: theme("dark"), rt, mats: new Float32Array(rt.n * 16), u: 0, explode: 0, LD: ladder("full", { tilt: 0, explode: 0 }), cache: newCache() });
@@ -186,6 +192,21 @@ describe("teaching layers", () => {
     const g = pathOf(A, "rock", { drivers: { phase: Math.PI } })!;
     expect(g[0]).toBeCloseTo(30); // sin(pi) = 0 at u = 0
     expect(pathOf(A, "rock")![3 * 60]).toBeCloseTo(40); // sin(pi / 2) at a quarter
+  });
+
+  it("follows a point over the cycles its path takes: closed when it comes round, open once it has gone all round", () => {
+    const A = ann();
+    expect(locusOf(A, "tip")).toMatchObject({ cycles: 1, closed: true });
+    const w = locusOf(A, "wheel")!;
+    expect(w).toMatchObject({ cycles: 3, closed: true });
+    expect(w.path.length).toBe(3 * 240 * 3);
+    // the last sample is a step short of the first: the path closes on itself
+    const n = w.path.length;
+    expect(Math.hypot(w.path[n - 3]! - w.path[0]!, w.path[n - 2]! - w.path[1]!)).toBeLessThan(1);
+    const s = locusOf(A, "slip")!;
+    expect(s).toMatchObject({ cycles: 2, closed: false });
+    expect(locusOf(A, "nowhere")).toBeNull();
+    expect(locusOf(A, "wheel")).toBe(w);
   });
 
   it("maps a ghost's control to the setting it stands for", () => {

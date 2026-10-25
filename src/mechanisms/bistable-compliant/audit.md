@@ -208,11 +208,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | 1.98 |
 | DL-G | 0 | 0 | 2.03 |
 | DL-H | 9 | 0 | 1.92 |
-| never | 77 | 49 | 1.98 |
+| never | 77 | 38 | 1.98 |
 
 ## Promotion candidates
 None left: the compliant kit builds the pads, the window's roller and springs, and the shuttle's stop pins; the yoke drive serves the linear pusher; the snap is a mode of the flexure block.
 
 ## Verification
-check: clean · K1 residual: 4.0e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.9 KB
+check: clean · K1 residual: 4.0e-14 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 14.6 KB
 screenshots: dist/shots3/bistable-compliant (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

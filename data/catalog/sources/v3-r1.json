@@ -4634,67 +4634,14 @@
           ]
         },
         {
-          "id": "rear-left",
-          "body": "ground",
-          "local": [
-            -75,
-            -200,
-            0
-          ]
-        },
-        {
-          "id": "rear-right",
-          "body": "ground",
-          "local": [
-            75,
-            -200,
-            0
-          ]
-        },
-        {
           "id": "aim",
           "body": "ground",
           "local": [
             0,
             -224.15,
             0
-          ]
-        },
-        {
-          "id": "rear-far-left",
-          "body": "ground",
-          "local": [
-            -379.0,
-            -200,
-            0
-          ]
-        },
-        {
-          "id": "rear-far-right",
-          "body": "ground",
-          "local": [
-            329.1,
-            -200,
-            0
-          ]
-        },
-        {
-          "id": "centre-left-lock",
-          "body": "ground",
-          "local": [
-            -359.0,
-            -238.3,
-            0
-          ]
-        },
-        {
-          "id": "centre-right-lock",
-          "body": "ground",
-          "local": [
-            309.1,
-            -221.8,
-            0
-          ]
+          ],
+          "construction": true
         }
       ],
       "outputs": [
@@ -4754,7 +4701,7 @@
           "from": "KL",
           "through": "WL",
           "dashed": true,
-          "extend": "rear-axle",
+          "extend": "plate",
           "label": "LEFT WHEEL AXIS"
         },
         {
@@ -4763,27 +4710,8 @@
           "from": "KR",
           "through": "WR",
           "dashed": true,
-          "extend": "rear-axle",
+          "extend": "plate",
           "label": "RIGHT WHEEL AXIS"
-        },
-        {
-          "id": "rear-axle",
-          "kind": "axis-line",
-          "from": "rear-far-left",
-          "through": "rear-far-right",
-          "dashed": true,
-          "label": "REAR AXLE LINE"
-        },
-        {
-          "id": "turning-centre",
-          "kind": "circle",
-          "meet": [
-            "axis-left",
-            "axis-right",
-            "rear-axle"
-          ],
-          "radius": 4,
-          "label": "TURNING CENTRE"
         },
         {
           "id": "arm-aim-left",
@@ -4794,7 +4722,8 @@
             "driver": "steer",
             "value": 0
           },
-          "label": "ARMS AIM NEAR THE REAR AXLE CENTRE"
+          "label": "ARMS AIM NEAR THE REAR AXLE CENTRE",
+          "clip": "plate"
         },
         {
           "id": "arm-aim-right",
@@ -4804,7 +4733,8 @@
           "pose": {
             "driver": "steer",
             "value": 0
-          }
+          },
+          "clip": "plate"
         }
       ],
       "view": "PLAN",

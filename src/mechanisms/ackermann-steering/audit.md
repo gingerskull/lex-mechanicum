@@ -209,11 +209,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.36 |
 | DL-G | 0 | 0 | 1.37 |
 | DL-H | 21 | 0 | 1.37 |
-| never | 86 | 328 | 1.37 |
+| never | 86 | 235 | 1.37 |
 
 ## Promotion candidates
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 6.4e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.6 KB
+check: clean · K1 residual: 6.4e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.8 KB
 screenshots: dist/shots3/ackermann-steering (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -2146,7 +2146,7 @@
       "type": "plate",
       "outline": [
        [
-        0,
+        11,
         0
        ],
        [
@@ -2156,10 +2156,10 @@
       ],
       "boss": 0.75,
       "thickness": 6,
-      "note": "shuttle half of the left beam"
+      "note": "shuttle half of the left beam, from the shuttle's edge"
      },
      "at": {
-      "joint": "TL"
+      "joint": "SL"
      }
     },
     {
@@ -2192,7 +2192,7 @@
       "type": "plate",
       "outline": [
        [
-        0,
+        11,
         0
        ],
        [
@@ -2202,10 +2202,10 @@
       ],
       "boss": 0.75,
       "thickness": 6,
-      "note": "shuttle half of the right beam"
+      "note": "shuttle half of the right beam, from the shuttle's edge"
      },
      "at": {
-      "joint": "TR"
+      "joint": "SR"
      }
     },
     {

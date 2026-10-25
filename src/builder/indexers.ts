@@ -35,7 +35,7 @@ export interface IndexerPart {
  * A Geneva wheel (`genevaWheel`): `n` slots of half-width `hw` from radius `slotEnd` out through the rim (`tip`),
  * straddling the line to the crank at ±π/n at the reference (mid-dwell); between them concave locking arcs of radius
  * `lock` + `clear`, centred `c` away; `windows` (small round lightening holes, radius `windowR` at `windowAt`) between the
- * slots, behind the arcs, so the wheel's turn shows without a lattice (M2). Internal (`internal: { rimIn, rimOut }`): a
+ * slots, behind the arcs and a wall of at least their own radius clear of them, so the wheel's turn shows without a lattice (M2). Internal (`internal: { rimIn, rimOut }`): a
  * ring whose slots open inward from `slotEnd` (the mouth) to `slotRoot`, the arcs on its inner edge.
  */
 export function genevaWheel(sh: Record<string, unknown>): IndexerPart {
@@ -64,13 +64,16 @@ export function genevaWheel(sh: Record<string, unknown>): IndexerPart {
   const tip = num(sh.tip, 80);
   const slotEnd = num(sh.slotEnd, 27);
   const wR = num(sh.windowR, 0);
-  const wAt = num(sh.windowAt, 0);
+  // a window stands well clear of the locking arc beside it: at least its own radius (4 mm at the least) of wall
+  // and clear of the bore by as much: with no room between, no windows
+  const wAt = Math.min(num(sh.windowAt, 0), c - lockR - wR - Math.max(4, wR));
+  const roomy = wAt >= num(sh.bore, 10) / 2 + wR + Math.max(4, wR);
   for (let k = 0; k < n; k++) {
     const a = Math.PI / n + (k * TAU) / n;
     f.push(cut(radialSlot(a, slotEnd, tip + 10, hw), -1, thick + 2));
     const b = (k * TAU) / n;
     f.push(cut(circle(lockR, c * Math.cos(b), c * Math.sin(b), 96), -1, thick + 2));
-    if (wR > 0) f.push(cut(circle(wR, wAt * Math.cos(b), wAt * Math.sin(b), 32), -1, thick + 2));
+    if (wR > 0 && roomy) f.push(cut(circle(wR, wAt * Math.cos(b), wAt * Math.sin(b), 32), -1, thick + 2));
   }
   return { profile: { outer: circle(tip, 0, 0, 144), holes: [circle(num(sh.bore, 10) / 2, 0, 0, 28).reverse()] }, thick, features: f };
 }

@@ -136,6 +136,13 @@ export interface Solid3 {
   spin?: { at: Vec3; axis: Vec3; u0: number };
   /** A stretched member's two solved points: its unit-length profile spans them. */
   stretch?: [string, string];
+  /**
+   * The heights (world z) its two ends run at instead of their points' (a rope part in the planes of the sheaves it runs
+   * between, where the build set them).
+   */
+  stretchZ?: [number, number];
+  /** The flexible member it is a piece of (a rope's parts and wraps meet end to end): the clearance check passes them. */
+  member?: string;
   /** A deforming member: its profile is made again each frame from the solved state, same point count per ring. */
   deform?: boolean;
   /** A posed part whose end reaches a world point each frame. */

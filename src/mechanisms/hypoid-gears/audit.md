@@ -188,7 +188,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
 |---|---|---|---|---|---|---|
 | O2-bridge | O2 | bridge | moved | 1.5 | ring | see-through |
-| O1-pb | O1 | pillow | moved | 1.5 | ring | – |
+| O1-pb | O1 | pillow | moved | 1.5 | – | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -206,11 +206,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.30 |
 | DL-H | 11 | 0 | – |
-| never | 73 | 156 | 1.11 (full) |
+| never | 73 | 153 | 1.11 (full) |
 
 ## Promotion candidates
 None left: spiral bevel teeth (a cone with a spiral angle, lofted) are a shape of the builder. Open: true hypoid tooth surfaces cut conjugate to each other; the offset control and its ghost.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 88.7 KB
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 93.5 KB
 screenshots: dist/shots3/hypoid-gears (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 1.11 ms full, 1.30 at C, 1.30 at G; phone by David)

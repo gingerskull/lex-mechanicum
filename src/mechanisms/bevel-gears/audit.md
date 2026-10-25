@@ -207,11 +207,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.37 |
 | DL-G | 0 | 0 | 1.38 |
 | DL-H | 11 | 0 | 1.4 |
-| never | 73 | 139 | 1.43 |
+| never | 73 | 136 | 1.43 |
 
 ## Promotion candidates
 None left: the bevel frustum, mesh phasing, back-face shims, the overhung pinion's end retainer and the motor beside a shaft in plan are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.4 KB
+check: clean · K1 residual: 7.1e-15 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 47.1 KB
 screenshots: dist/shots3/bevel-gears (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

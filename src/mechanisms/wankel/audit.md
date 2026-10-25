@@ -80,7 +80,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · 94 solids, 52 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps; details checked by A15 |
-| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A15 | PASS | AUTO · clearance in 3D over 8 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
 | A16 | PASS | HAND · 5 joint notes; no note: none; no badge: mesh, E, stator-fix · a note per joint and the cover's; build rules: the web underneath, the cover drawn see-through |
 | A17 | PASS | HAND · base, housing and shaft, eccentric, rotor with its liner, cheek ring, housing block, stationary gear, cover |
 | A18 | PASS | AUTO · placement: 1 slabs in the tallest stack (16.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver (order kept: a slider's partners over it, a die's carrier over its link) |
@@ -205,11 +205,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.59 |
 | DL-G | 0 | 0 | 1.53 |
 | DL-H | 6 | 0 | 1.53 |
-| never | 68 | 106 | 1.7 |
+| never | 68 | 104 | 1.7 |
 
 ## Promotion candidates
 None left: fixed members of a joint, bodies at another's level, rotor and housing shapes and the covers rule are in the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.1 KB
+check: clean · K1 residual: 7.1e-15 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.3 KB
 screenshots: dist/shots3/wankel (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

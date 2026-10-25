@@ -4056,13 +4056,13 @@
           "shape": {
             "type": "gear",
             "z": 10,
-            "module": 6.57,
+            "module": 6.3,
             "face": 30,
             "bore": 16,
             "spiral": 50,
-            "hand": "left",
+            "hand": "right",
             "teeth": "hypoid, curved, lofted along the face",
-            "pitchDiameter": 65.7,
+            "pitchDiameter": 63,
             "cone": 13.7
           },
           "at": {
@@ -4079,7 +4079,7 @@
             "face": 30,
             "bore": 40,
             "spiral": 30,
-            "hand": "right",
+            "hand": "left",
             "cone": 76.3,
             "teeth": "hypoid, curved, lofted along the face",
             "pitchDiameter": 200

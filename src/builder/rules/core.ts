@@ -7,17 +7,27 @@ import { PULLEYS, SENSOR } from "../../hardware/tables";
 import { extrudeOp, revolveOp } from "../../solids/tessellate";
 import type { Solid3 } from "../../solids/types";
 import { type BuildCtx } from "../ctx";
-import { BASE_GAP, BASE_T } from "../constants";
+import { BASE_GAP, BASE_T, BOSS } from "../constants";
 
 /** Room under a ring gear's rim for its carrier rollers' lower flanges and posts (ring-carrier), mm. */
 const RING_ROOM = 9;
 import { fromPlane, place, planeCoords } from "../frames";
-import { titleOf } from "../lib";
+import { settingsOf, titleOf } from "../lib";
 import { edgeDist } from "../planar";
 import { inside } from "../../core/poly";
 import { worldPoints } from "../sweeps";
 import { v3 } from "../../kin/math";
 import type { Rule } from "./types";
+
+/** Joints a part carries on a pin, which earn a boss ring round it. */
+const PIN_TYPES = new Set(["revolute", "spherical", "universal"]);
+
+/** The engraved boss ring's radius round a pin at `uv`: inset from the edge, no larger than a hub round the pin's bore. */
+function bossRing(profile: { outer: Vec2[]; holes: Vec2[][] }, uv: Vec2): number {
+  const bore = profile.holes.filter((h) => inside(h, uv)).map((h) => edgeDist(h, uv[0], uv[1]))[0];
+  const hub = bore !== undefined ? BOSS.hub * bore : BOSS.bare;
+  return Math.max(BOSS.min, Math.min(edgeDist(profile.outer, uv[0], uv[1]) - BOSS.inset, hub));
+}
 
 const BODY_ROLE: Record<string, Solid3["role"]> = { driver: "driver", output: "output", frame: "ground" };
 
@@ -75,18 +85,31 @@ export const placement: Rule = {
       const set = (body as { set?: unknown }).set;
       const role = BODY_ROLE[body.role] ?? (set !== undefined && set !== "A" ? "link2" : "link");
       const frame = { o, x: g.frame.x, z: g.exact ? g.frame.z : fam.z };
-      // a boss ring round each pin the part carries (a joint off the part, a slide's line, has none)
-      const marks: Solid3["marks"] = g.part ? [] : g.pins.filter((p) => inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(Math.max(1.5, edgeDist(g.profile.outer, p.uv[0], p.uv[1]) - 1.6), p.uv[0], p.uv[1], 36) }));
+      // a boss ring round each pin the part carries (a joint off the part, a slide's line, a contact or a mesh has none; a
+      // part made as a mesh has no top face to engrave)
+      const marks: Solid3["marks"] = g.part || g.mesh ? [] : g.pins.filter((p) => PIN_TYPES.has(ctx.kin.joints.find((j) => j.id === p.joint)?.type ?? "") && inside(g.profile.outer, p.uv)).map((p) => ({ kind: "boss" as const, pts: circle(bossRing(g.profile, p.uv), p.uv[0], p.uv[1], 36) }));
       // an index mark (`indexMark: { at: [x, y] }`): a bold radial arrow engraved on the part, so parts that keep the
       // same orientation show it (a Schmidt coupling's three discs)
       const im = (g.shape.indexMark as { at?: number[] } | undefined)?.at;
-      if (Array.isArray(im) && im.length >= 2) {
-        const L = Math.hypot(im[0]!, im[1]!) || 1;
-        const u: [number, number] = [im[0]! / L, im[1]! / L];
+      // (a part the record places itself carries a raised arrow instead, shapes.ts withIndex)
+      if (Array.isArray(im) && im.length >= 2 && !g.exact) {
+        const L0 = Math.hypot(im[0]!, im[1]!) || 1;
+        const u: [number, number] = [im[0]! / L0, im[1]! / L0];
         const v: [number, number] = [-u[1], u[0]];
         const at = (s: number, w: number): [number, number] => [u[0] * s + v[0] * w, u[1] * s + v[1] * w];
-        for (const w of [-0.8, 0, 0.8]) marks.push({ kind: "index" as const, pts: [at(L - 14, w), at(L, w)] });
-        marks.push({ kind: "index" as const, pts: [at(L - 4, -3), at(L + 2, 0), at(L - 4, 3), at(L - 4, -3)] });
+        // the arrow stays on the material along its ray, clear of the edges either side (a ring's inner edge), shifted
+        // and shortened to fit
+        const solid = (r: number) => inside(g.profile.outer, at(r, 0)) && !g.profile.holes.some((h) => inside(h, at(r, 0)));
+        let lo = L0, hi = L0;
+        while (lo > 0 && solid(lo - 0.25)) lo -= 0.25;
+        while (hi < 4 * L0 && solid(hi + 0.25)) hi += 0.25;
+        // a short arrow toward the outer edge, in from an inner edge by half again the part's thickness, or the hole's far
+        // edge, seen through the part in a tilted view, crosses the tail
+        const tip = Math.min(L0 + 2, hi - 2.5);
+        const L = tip - 1.5;
+        const tail = Math.min(L - 3, Math.max(tip - 9, lo > 0.5 ? lo + Math.max(3, 1.5 * g.thick) : 0, 0));
+        for (const w of [-0.6, 0, 0.6]) marks.push({ kind: "index" as const, pts: [at(tail, w), at(L, w)] });
+        marks.push({ kind: "index" as const, pts: [at(L - 2.5, -2.2), at(tip, 0), at(L - 2.5, 2.2), at(L - 2.5, -2.2)] });
       }
       const part: Solid3 = {
         id,
@@ -98,6 +121,7 @@ export const placement: Rule = {
         profile: g.part ? { outer: [...g.part.profile.outer], holes: g.part.profile.holes.map((h) => [...h]) } : { outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) },
         op: g.part ? g.part.op : g.revolve ? revolveOp(g.profile) : g.loft ? { op: "loft", sections: [{ z: 0, outer: [...g.profile.outer], holes: g.profile.holes.map((h) => [...h]) }, ...g.loft] } : extrudeOp(g.upper ? (g.upper.lower ?? g.thick - g.upper.h) : g.thick, { ...(g.scaleTop !== undefined ? { scaleTop: g.scaleTop } : {}), ...(g.twist ? { twist: g.twist } : {}) }),
         ...(g.features?.length ? { features: g.features } : {}),
+        ...(g.mesh && !g.part ? { mesh: g.mesh } : {}),
         marks,
         ex: 0,
         joints: g.pins.map((p) => p.joint),
@@ -113,17 +137,19 @@ export const placement: Rule = {
         // a joined level runs down to the top of the part under it, one piece through the gap (a long pinion)
         const w = L.joined && slab ? Math.min(r.w0, slab.w0 + g.thick) : r.w0;
         const lo = fromPlane(r.frame, planeCoords(r.frame, g.frame.o).uv, w);
-        const lv: Solid3 = { ...part, id: L.z ? `${id}-z${L.z}${L.joined ? "-upper" : ""}` : `${id}-disc`, name: L.z ? `${titleOf(id)}, ${L.joined ? "upper half" : `${L.z}-tooth ${String(g.shape.type) === "link" ? "gear fixed on it" : "level"}`}` : `${titleOf(id)}, flywheel disc`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick + r.w0 - w), marks: [], joints: [...part.joints] };
+        const lv: Solid3 = { ...settingsOf(part), id: L.z ? `${id}-z${L.z}${L.joined ? "-upper" : ""}` : `${id}-disc`, name: L.z ? `${titleOf(id)}, ${L.joined ? "upper half" : `${L.z}-tooth ${String(g.shape.type) === "link" ? "gear fixed on it" : "level"}`}` : `${titleOf(id)}, flywheel disc`, frame: { o: lo, x: g.frame.x, z: r.frame.z }, profile: { outer: [...L.profile.outer], holes: L.profile.holes.map((h) => [...h]) }, op: extrudeOp(L.thick + r.w0 - w), marks: [], joints: [...part.joints] };
         ctx.levels.set(id, [...(ctx.levels.get(id) ?? []), lv]);
         (ctx.fired.placement ??= []).push(lv.id);
       });
+      // the body's further solids share the part's settings but not its own geometry (a bevel gear's mesh)
+      const shared = settingsOf(part);
       // a slotted upper cheek on the solid lower one
       if (g.upper) {
         const lift = g.upper.lift ?? g.thick - g.upper.h;
-        ctx.add({ ...part, id: `${id}-cheek`, name: `${titleOf(id)}, ${g.upper.name ?? "upper plate"}`, frame: { ...frame, o: v3.add(o, v3.mul(frame.z, lift)) }, profile: { outer: [...g.upper.profile.outer], holes: g.upper.profile.holes.map((h) => [...h]) }, op: extrudeOp(g.upper.h), marks: [], joints: [...part.joints] });
+        ctx.add({ ...shared, id: `${id}-cheek`, name: `${titleOf(id)}, ${g.upper.name ?? "upper plate"}`, frame: { ...frame, o: v3.add(o, v3.mul(frame.z, lift)) }, profile: { outer: [...g.upper.profile.outer], holes: g.upper.profile.holes.map((h) => [...h]) }, op: extrudeOp(g.upper.h), marks: [], joints: [...part.joints] });
       }
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...part, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? (pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h)), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
+        ctx.add({ ...shared, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? (pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h)), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);
@@ -205,9 +231,10 @@ export const base: Rule = {
       for (const p of worldPoints(ctx.M, s)) if (p[2] <= bs.top + 2) grow(p);
     }
     // the points the teaching names on the ground (a rear axle line, a turning centre) lie on the base
-    // (where the kinematics put them: a coordinate may be an expression of the params)
+    // (where the kinematics put them: a coordinate may be an expression of the params); a construction point (an aim
+    // off the plate, which a line runs toward and the plate's edge cuts) does not
     for (const p of ctx.kin.points ?? []) {
-      const q = p.body === "ground" ? ctx.S.refPts.get(p.id) : undefined;
+      const q = p.body === "ground" && (p as { construction?: unknown }).construction !== true ? ctx.S.refPts.get(p.id) : undefined;
       if (q) grow(q);
     }
     for (const h of ctx.baseHoles) {

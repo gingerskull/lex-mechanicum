@@ -58,12 +58,14 @@ in vec3 aNrm;
 in vec2 aMeta;
 out vec2 vLocal;
 out vec3 vN;
+out vec3 vNl;
 out vec3 vW;
 flat out int vSolid;
 flat out int vTag;
 void main() {
   int i = int(aMeta.x + 0.5);
-  if (solidT(i, 6).y > 0.5) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vSolid = 0; vTag = 0; vLocal = vec2(0.0); vN = vec3(0.0, 0.0, 1.0); vW = vec3(0.0); return; }
+  if (solidT(i, 6).y > 0.5) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vSolid = 0; vTag = 0; vLocal = vec2(0.0); vN = vec3(0.0, 0.0, 1.0); vNl = vN; vW = vec3(0.0); return; }
+  vNl = aNrm;
   vSolid = i;
   vTag = int(aMeta.y + 0.5);
   vLocal = aPos.xy;
@@ -83,15 +85,31 @@ uniform vec3 uInk, uPaper;
 uniform float uSteps, uShade, uPatGain, uMinStep, uPatOff, uHatch, uHatchW, uCapA, uHatchA;
 in vec2 vLocal;
 in vec3 vN;
+in vec3 vNl;
 in vec3 vW;
 flat in int vSolid;
 flat in int vTag;
 layout(location = 0) out vec4 oC;
 layout(location = 1) out vec4 oM;
+// rulings on a turning round part (SD29): coverage of the nearest of n lines round the local z axis at this pixel, faded
+// out where they crowd on screen (toward the outline, where the wall turns away); px, py are the local position's
+// derivatives, taken at the top of main() where every pixel of the quad runs (not inside a branch)
+float rulings(float n, vec2 px, vec2 py) {
+  float r2 = dot(vLocal, vLocal);
+  if (r2 < 1e-6) return 0.0;
+  float t = atan(vLocal.y, vLocal.x) * n / ${fl(2 * Math.PI)};
+  // the angle's change across the pixel, from the position's (no jump where atan wraps)
+  float k = n / ${fl(2 * Math.PI)} / r2;
+  float dt = abs(vLocal.x * px.y - vLocal.y * px.x) * k + abs(vLocal.x * py.y - vLocal.y * py.x) * k;
+  float d = abs(t - floor(t + 0.5)) / max(dt, 1e-6);
+  float gap = 1.0 / max(dt, 1e-6);
+  return clamp(${fl(DRAFT.spin.width)} * 0.5 + 0.5 - d, 0.0, 1.0) * smoothstep(${fl(DRAFT.spin.fadePx[0])}, ${fl(DRAFT.spin.fadePx[1])}, gap);
+}
 float bucket(vec2 n) {
   return clamp(floor(((dot(n, vec2(${fl(WS.light[0])}, ${fl(WS.light[1])})) + 1.0) * (uSteps - 1.0)) / 2.0 + 0.5), 0.0, uSteps - 1.0);
 }
 void main() {
+  vec2 lpx = dFdx(vLocal), lpy = dFdy(vLocal);
   vec3 n = normalize(vN);
   float f = dot(n, uEye);
   bool section = dot(uClip.xyz, uClip.xyz) > 0.0;
@@ -141,6 +159,12 @@ void main() {
       col = uInk * p + col * (1.0 - p);
       al = p + al * (1.0 - p);
     }
+    vec4 sp = solidT(vSolid, 7); // spin radius, rulings, alpha, tick length
+    if (sp.x > 0.0 && length(vLocal) > sp.x - sp.w) {
+      float p = sp.z * fa * rulings(sp.y, lpx, lpy);
+      col = uInk * p + col * (1.0 - p);
+      al = p + al * (1.0 - p);
+    }
     occ = a.z;
   } else {
     float i = bucket(screenN(n));
@@ -151,6 +175,14 @@ void main() {
     float wa = hole ? 0.0 : a.y * fa;
     col = uInk * s + uPaper * wa * (1.0 - s);
     al = s + wa * (1.0 - s);
+    vec4 sp = solidT(vSolid, 7);
+    // a surface of revolution about the part's axis (a cylinder, a ball, a crowned roller): its normal leans out from
+    // the axis in the plane through it
+    if (sp.x > 0.0 && !hole && length(vNl.xy) > 0.2 && dot(normalize(vNl.xy), normalize(vLocal)) > 0.995) {
+      float p = sp.z * fa * rulings(sp.y, lpx, lpy);
+      col = uInk * p + col * (1.0 - p);
+      al = p + al * (1.0 - p);
+    }
     occ = hole ? 0.0 : a.w;
   }
   oC = vec4(col, al);

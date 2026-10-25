@@ -1004,7 +1004,9 @@ export function manualDrive(ctx: BuildCtx): void {
       const at = jt.a === "ground" || jt.b === "ground" ? [0.85, 0.7, 0.55, 0.4, 0.25].map((f) => f * reach) : [14, 18, 24, 30, 40].filter((s) => s < reach);
       // at the grip the record names on the part, else along it
       const grip = (ctx.kin.points ?? []).filter((q) => q.body === body && /grip|handle|knob/i.test(q.id)).map((q) => ctx.S.refPts.get(q.id)).filter((q): q is Vec3 => !!q);
-      const cands: Vec2[] = [...grip.map(xy), ...at.flatMap((s) => [0, 0.25, -0.25].map((da) => add2(J0, dir2(a + da), s)))];
+      // on the part's centreline from the pivot (toward its far end): a knob off to one side reads as a stray peg
+      const mid = centreline(part, J0, a);
+      const cands: Vec2[] = [...grip.map(xy), ...at.map((s) => add2(J0, dir2(mid), s)), ...at.flatMap((s) => [0.12, -0.12].map((da) => add2(J0, dir2(mid + da), s)))];
       for (const p of cands) {
         if (pts.length && pins.some((q) => d2(q, p) < 12)) continue;
         if (!onPart(part, p)) continue;
@@ -1023,6 +1025,27 @@ export function manualDrive(ctx: BuildCtx): void {
     if (!placed) ctx.issues.push(`drive: no place for a knob on the hand-worked input ${drv.id} clears the other parts`);
   });
   ctx.note({ id: "drive", kit: "drive", at: manual[0] ? (ctx.joints.find((q) => q.id === manual[0]!.joint)?.at ?? [0, 0, 0]) : [0, 0, 0], title: "Drive · hand operated", note: "Hand operated: no motor; a knob on a shoulder screw on each hand-worked input, its range limited by the stops at the ends of its swing where it has ends.", serves: {}, badge: ["hand operated", "ok"] });
+}
+
+/**
+ * The direction from the pivot J0 along the middle of the part (a crank's centreline): of the directions near `a` (its
+ * farthest point's), the one whose ray stays on the part longest, ties broken toward the middle of the run.
+ */
+function centreline(part: { frame: Frame; profile: { outer: Vec2[] } }, J0: Vec2, a: number): number {
+  const ring = part.profile.outer.map((q): Vec2 => {
+    const w = fromPlane(part.frame, q, 0);
+    return [w[0], w[1]];
+  });
+  const reach = (t: number) => {
+    let s = 0;
+    while (s < 400 && pointDist(ring, J0[0] + Math.cos(t) * (s + 1), J0[1] + Math.sin(t) * (s + 1)) === 0) s += 1;
+    return s;
+  };
+  const tries = Array.from({ length: 41 }, (_, k) => a + ((k - 20) * Math.PI) / 120);
+  const r = tries.map(reach);
+  const best = Math.max(...r);
+  const ok = tries.filter((_, k) => r[k]! >= best - 1);
+  return ok[Math.floor(ok.length / 2)]!;
 }
 
 /** True when the world point p lies on the part's outline in plan (its frame's plane is the base plane's). */

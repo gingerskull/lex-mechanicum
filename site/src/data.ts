@@ -1,5 +1,6 @@
 // What the pages read at build time: the registered mechanisms in catalogue order, with their sheet numbers, the
 // catalogue records, the drive and the facets. Nothing here ships to the browser.
+import { isConstruction } from "../../src/builder/construction";
 import pkg from "../../package.json";
 import { loadCatalog, recordById, type CatalogRecord } from "../../src/catalog";
 import type { Kin, Teaching } from "../../src/catalog/kin";
@@ -45,7 +46,10 @@ export const sortableOf = (s: Sheet): Sortable => ({ no: s.n, name: s.rec.name, 
 /** The drive line of the at-a-glance facts (P3, V5), from the record's first driver. */
 export function driveOf(id: string): string {
   const kin = (recordById(id) as { kin?: Kin } | undefined)?.kin;
-  const d = kin?.drivers[0]?.kind;
+  // a driver on a construction body's joint (a trammel's crank, which the hand stands in for) is worked by hand
+  const drv = kin?.drivers[0];
+  const onConstruction = !!drv && kin!.joints.some((j) => j.id === drv.joint && [j.a, j.b].some((b) => kin!.bodies.find((q) => q.id === b && isConstruction(q))));
+  const d = onConstruction ? "manual" : drv?.kind;
   const k = d === "oscillating" || d === "linear" || d === "manual" ? d : "rotary";
   if (k === "manual") return "Hand operated";
   return `Motorised: brushless pancake motor, ${k === "rotary" ? "GT2 belt 32:16 to the input" : k === "oscillating" ? "crank and link swinging the input" : "belt carriage on the input slide"}`;

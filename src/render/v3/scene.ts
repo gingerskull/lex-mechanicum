@@ -58,6 +58,8 @@ export interface Runtime {
   principle: Uint8Array;
   /** Solids whose body never moves over the cycle, found by sampling the poser. */
   fixed: Uint8Array;
+  /** The radius (mm) of a round solid that turns over the cycle (SD29), else 0. */
+  spin: Float32Array;
   /** The role surface per solid and its pattern layer (-1 for none). */
   surface: RoleSurface[];
   pattern: Int8Array;
@@ -95,6 +97,8 @@ export function runtime(scene: Scene): Runtime {
   const isPlate = new Uint8Array(n);
   const principle = new Uint8Array(n);
   const fixed = new Uint8Array(n);
+  const spin = new Float32Array(n);
+  const roundR = scene.meshes.map(roundRadius);
   const pattern = new Int8Array(n);
   const surface: RoleSurface[] = [];
   const axis = new Float32Array(n * 3);
@@ -116,13 +120,48 @@ export function runtime(scene: Scene): Runtime {
     const l = Math.hypot(...z) || 1;
     axis.set([z[0] / l, z[1] / l, z[2] / l], i * 3);
     let still = 1;
+    let turns = false;
     for (const u of phases) {
       const q = poser.place(s, u);
       for (let k = 0; k < 16; k++) if (Math.abs(q[k]! - M0[k]!) > 1e-6) still = 0;
+      // turning: the local x swings round (a part that only slides keeps it)
+      const w = mulMat(q, mat4(s.fr));
+      if (Math.abs(w[0]! - m[0]!) + Math.abs(w[1]! - m[1]!) + Math.abs(w[2]! - m[2]!) > 1e-3) turns = true;
     }
     fixed[i] = still;
+    spin[i] = turns && !s.stretch ? (roundR[s.shape] ?? 0) : 0;
   });
-  return { scene, n, baked, box: baked.box, isBase, isPlate, principle, fixed, surface, pattern, axis, rest };
+  return { scene, n, baked, box: baked.box, isBase, isPlate, principle, fixed, spin, surface, pattern, axis, rest };
+}
+
+/**
+ * The outer radius of a shape round its local z axis when its outline is round, else 0: no point in the band
+ * DRAFT.spin.round of that radius at a height where the outline reaches it (a gear's teeth or a cam's flank, beside its
+ * rim), and its widest ring going all round; a ball's or a crowned roller's points in the band lie above and below
+ * its widest ring, and it is round.
+ */
+function roundRadius(m: MeshData | undefined): number {
+  if (!m) return 0;
+  const p = m.pos;
+  let R = 0;
+  for (let k = 0; k < p.length; k += 3) R = Math.max(R, Math.hypot(p[k]!, p[k + 1]!));
+  if (R <= 0) return 0;
+  const [lo, hi] = DRAFT.spin.round;
+  const level = (z: number) => Math.round(z * 100);
+  const rim = new Set<number>();
+  for (let k = 0; k < p.length; k += 3) if (Math.hypot(p[k]!, p[k + 1]!) > 0.995 * R) rim.add(level(p[k + 2]!));
+  for (let k = 0; k < p.length; k += 3) {
+    const r = Math.hypot(p[k]!, p[k + 1]!) / R;
+    if (r > lo && r < hi && rim.has(level(p[k + 2]!))) return 0;
+  }
+  // and its widest ring goes all round, with no gap wider than DRAFT.spin.gap (a square or a hexagon has its corners
+  // alone at the widest radius)
+  const angs: number[] = [];
+  for (let k = 0; k < p.length; k += 3) if (Math.hypot(p[k]!, p[k + 1]!) > 0.995 * R) angs.push(Math.atan2(p[k + 1]!, p[k]!));
+  angs.sort((a, b) => a - b);
+  let gap = angs.length ? angs[0]! + 2 * Math.PI - angs[angs.length - 1]! : 2 * Math.PI;
+  for (let k = 1; k < angs.length; k++) gap = Math.max(gap, angs[k]! - angs[k - 1]!);
+  return gap <= (DRAFT.spin.gap * Math.PI) / 180 ? R : 0;
 }
 
 /** The world matrices of every solid at phase u and explode e (0..1): body pose, frame, stretch, then the explode shift. */
@@ -143,8 +182,10 @@ export function place(rt: Runtime, u: number, explode: number, out: Float32Array
     }
     if (s.stretch) {
       // between its two points as solved: at the first, x toward the second, its unit length scaled to the span
-      const e = scene.poser.ends?.(u, s.stretch[0], s.stretch[1]);
-      const e0 = scene.poser.refEnds?.(s.stretch[0], s.stretch[1]);
+      // ends held at the heights the build gave them (a rope part in its sheaves' planes)
+      const atZ = (p: [Vec3, Vec3] | null | undefined): [Vec3, Vec3] | null | undefined => (p && s.sz ? [[p[0][0], p[0][1], s.sz[0]], [p[1][0], p[1][1], s.sz[1]]] : p);
+      const e = atZ(scene.poser.ends?.(u, s.stretch[0], s.stretch[1]));
+      const e0 = atZ(scene.poser.refEnds?.(s.stretch[0], s.stretch[1]));
       if (e && e0) M = stretchMatrix(e[0], e[1], e0[0], e0[1], mat4(s.fr)) as Mat4;
       else {
         const L = scene.poser.span(u, s.stretch[0], s.stretch[1]);
@@ -215,6 +256,10 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     table.set([hasFlag3(s, "faint") ? 0.5 : 1, base ? 1 : 0, plate ? 1 : 0, a], o + 20);
     const top = base ? L.baseTop * cardK.base : plate ? L.plateTop * cardK.plate : L.otherTop;
     table.set([top, st.ladder.solid(s.detail) ? 0 : 1, kx, 0], o + 24);
-    table.set([0, 0, 0, 0], o + 28);
+    // rulings on a turning round part (SD29): its radius, the count round it, their alpha
+    const sr = st.patterns ? rt.spin[i]! : 0;
+    const [c0, c1] = DRAFT.spin.count;
+    const count = sr ? Math.max(c0, Math.min(c1, 4 * Math.round((2 * Math.PI * sr) / DRAFT.spin.pitch / 4))) : 0;
+    table.set([sr, count, sr ? DRAFT.spin.alpha : 0, Math.min(DRAFT.spin.bandMax, DRAFT.spin.band * sr)], o + 28);
   });
 }

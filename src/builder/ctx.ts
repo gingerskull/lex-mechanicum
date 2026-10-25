@@ -1,6 +1,7 @@
 // The shared state the builder's rules work on (standard 5.1): the record's poses, its joints and sites, the placement,
 // the solids built so far, and the log the audit reads. Everything is in the reference configuration's world
 // coordinates until the end, where `finish` gives each solid the frame of the body it rides.
+import { withoutConstruction } from "./construction";
 import type { CatalogRecord } from "../catalog/schema";
 import { armPoses, withArms } from "./arms";
 
@@ -93,6 +94,8 @@ export interface BuildCtx {
   levels: Map<string, Solid3[]>;
   /** Hinge lugs by site: parts of a body whose plane is not square to the hinge (rules/lugs). */
   lugs: Map<string, Solid3[]>;
+  /** The lugs joined to their body's part by a web (not a spatial link's plain knuckle), by solid id. */
+  lugWebs: Set<string>;
   bores: Map<string, Bore[]>;
   /** Holes the base needs, world xy and radius, with the joint that asked; `ring` gives a slot's own outline. */
   baseHoles: { at: [number, number]; r: number; joint: string; ring?: [number, number][] }[];
@@ -137,7 +140,8 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
   const source = makePoseSource(rec.kin as Kin, opts.controls);
   const K = source.K;
   // outboard arms are bodies of their own for the build (src/builder/arms.ts)
-  const W = withArms(source.kin, K.setup(opts.controls));
+  // construction bodies (a hand-worked trammel's crank) are kinematics only: the build never sees them
+  const W = withArms(withoutConstruction(source.kin), K.setup(opts.controls));
   const kin = W.kin;
   const S = W.S;
   const geoms = bodyGeoms(kin, S);
@@ -176,6 +180,7 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
     twins: new Map(),
     levels: new Map(),
     lugs: new Map(),
+    lugWebs: new Set(),
     bores: new Map(),
     baseHoles: [],
     baseMarks: [],

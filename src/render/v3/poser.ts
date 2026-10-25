@@ -146,11 +146,15 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   const pose = (u: number, ctl?: Controls) => {
     const key = ctl ? `${u}|${JSON.stringify(ctl)}` : String(u);
     let P = cache.get(key);
-    if (!P) {
-      if (cache.size >= POSE_CACHE) cache.delete(cache.keys().next().value!);
-      P = ctl ? k.pose(u, { ...controls, ...ctl }) : k.pose(u, controls);
+    if (P) {
+      // the least recently asked goes first: a hit moves to the back (the comet's trail asks the same phases each frame)
+      cache.delete(key);
       cache.set(key, P);
+      return P;
     }
+    if (cache.size >= POSE_CACHE) cache.delete(cache.keys().next().value!);
+    P = ctl ? k.pose(u, { ...controls, ...ctl }) : k.pose(u, controls);
+    cache.set(key, P);
     return P;
   };
   return {
