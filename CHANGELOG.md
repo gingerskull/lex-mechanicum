@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.43.0, Agripinaa — 2026-10-25
 
 - Ready for search and sharing: a sitemap and robots.txt, a canonical address on every page, and titles that carry
   the name (Lex Mechanicum · Mechanism Library; a mechanism's page is "<name> · Lex Mechanicum"). Each mechanism has
