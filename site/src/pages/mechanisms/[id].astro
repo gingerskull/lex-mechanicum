@@ -6,7 +6,8 @@ import "../../../styles/views.css";
 import Bar from "../../components/Bar.astro";
 import ThemeToggle from "../../components/ThemeToggle.astro";
 import Stage3 from "../../components/Stage3.astro";
-import { SHEETS, controlsOf, driveOf, sortableOf, viewButtons, type Sheet as SheetInfo } from "../../data";
+import { APP, SHEETS, controlsOf, driveOf, sortableOf, viewButtons, type Sheet as SheetInfo } from "../../data";
+import { absolute, mechanismLd } from "../../seo";
 import { url } from "../../url";
 
 export function getStaticPaths() {
@@ -60,8 +61,12 @@ const tagsets = (
 const added = sortableOf(sheet).added;
 const media = r.media.filter((m) => m.kind === "video" || m.kind === "photos");
 const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
+// the page's social card (tools/cards.ts) and its structured data
+const card = url(`/cards/${sheet.id}.jpg`);
+const cardAlt = `${r.name}: its working drawing on the Blueprint sheet, with its name in the title block`;
+const ld = mechanismLd({ name: r.name, description: r.summary, url: absolute(Astro.url.pathname, Astro.site), image: absolute(card, Astro.site), level: r.level, home: absolute(url("/"), Astro.site), keywords: [r.family, ...r.tags.function, ...(r.tags.keywords ?? [])] });
 ---
-<Sheet title={`${r.name} · Mechanism Library`} description={r.summary}>
+<Sheet title={`${r.name} · ${APP}`} description={r.summary} image={card} imageAlt={cardAlt} ld={ld}>
   <Bar title={r.name} />
   <main class="wrap detail">
     <nav class="crumbs" aria-label="Sheets">

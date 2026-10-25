@@ -62,6 +62,7 @@ Heavy checks run locally; CI runs what takes seconds.
 | Site build | CI | `site/`, catalogue or packages changed |
 | Thumbnails: stale ones redrawn in local Chrome; the push stops until `site/thumbs` is committed | pre-push hook | their fingerprint changed (package, record blocks and polish, renderer, style or view) |
 | Thumbnail fingerprints compared with the manifest (no drawing) | CI, in the site build | `site/`, catalogue or packages changed |
+| Social cards (`site/cards`): stale ones redrawn in local Chrome like the thumbnails, compared in the site build | pre-push hook, CI (compare only) | as the thumbnails, or a mechanism's name, family or level changed |
 | Visual snapshots (local Chrome, both sheets, four views per mechanism, against our own baselines) | local only | mechanism, renderer, style or rules changed |
 | Browser bench, audit screenshots | local, on demand | |
 

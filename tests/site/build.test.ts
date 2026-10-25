@@ -10,7 +10,8 @@ import { DEFAULT_ORDER, sortBy } from "../../site/src/sort";
 
 const OUT = join("dist", "site");
 const read = (f: string) => readFileSync(join(OUT, f), "utf8");
-const scripts = (html: string) => [...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map((m) => m[1]!);
+/** The site's own scripts on a page (GoatCounter's, from its own host, is not part of the build). */
+const scripts = (html: string) => [...html.matchAll(/<script[^>]*src="([^"]+)"/g)].map((m) => m[1]!).filter((src) => !/^(https?:)?\/\//.test(src));
 
 /** A module and every chunk it imports statically or dynamically, by file name. */
 function closure(file: string, seen = new Set<string>()): Set<string> {
@@ -159,5 +160,47 @@ describe("site build", () => {
     const version: string = JSON.parse(readFileSync("package.json", "utf8")).version;
     const codename: string | undefined = JSON.parse(readFileSync("data/codenames.json", "utf8"))[version.split(".").slice(0, 2).join(".")];
     expect(html).toContain(`<span>drawn under XVI laws · ${codename ? `${codename} · ` : ""}${version}</span>`);
+  });
+
+  it("lists the library and every mechanism page in the sitemap, and points robots.txt at it", () => {
+    const locs = [...read("sitemap.xml").matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]!));
+    expect(locs).toHaveLength(allIds().length + 1);
+    const home = locs[0]!;
+    expect(home.pathname).toMatch(/\/$/);
+    for (const id of allIds()) expect(locs.some((u) => u.href === new URL(`mechanisms/${id}/`, home).href), id).toBe(true);
+    expect(read("robots.txt")).toContain(`Sitemap: ${new URL("sitemap.xml", home).href}`);
+  });
+
+  it("serves the IndexNow key at the site root, holding just the key", () => {
+    const keys = readdirSync(OUT).filter((f) => /^[0-9a-f]{32}\.txt$/.test(f));
+    expect(keys).toHaveLength(1);
+    expect(read(keys[0]!)).toBe(keys[0]!.replace(".txt", ""));
+  });
+
+  it("gives every page its canonical address, its own social card and structured data that parses (seo.ts)", () => {
+    const meta = (html: string, key: string) => new RegExp(`<meta (?:property|name)="${key}" content="([^"]*)"`).exec(html)?.[1];
+    const lds = (html: string) => [...html.matchAll(/<script type="application\/ld\+json">([^<]*)<\/script>/g)].map((m) => JSON.parse(m[1]!) as Record<string, unknown>);
+    const lib = read("index.html");
+    expect(lib).toMatch(/<title>Lex Mechanicum · Mechanism Library<\/title>/);
+    expect(lds(lib).map((d) => d["@type"])).toEqual(["WebSite", "Organization"]);
+    expect(meta(lib, "google-site-verification")).toBeTruthy();
+    expect(lib).toMatch(/<script async data-goatcounter="https:\/\/[a-z0-9-]+\.goatcounter\.com\/count" src="https:\/\/gc\.zgo\.at\/count\.js">/);
+    for (const id of allIds()) {
+      const html = read(join("mechanisms", id, "index.html"));
+      const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
+      expect(canonical && new URL(canonical).pathname, id).toMatch(new RegExp(`/mechanisms/${id}/$`));
+      expect(meta(html, "og:url"), id).toBe(canonical);
+      const image = meta(html, "og:image")!;
+      expect(new URL(image).pathname, id).toMatch(new RegExp(`/cards/${id}\\.jpg$`));
+      expect(existsSync(join(OUT, "cards", `${id}.jpg`)), id).toBe(true);
+      expect(meta(html, "twitter:image"), id).toBe(image);
+      expect(meta(html, "og:image:alt"), id).toBeTruthy();
+      const [ld] = lds(html);
+      expect(ld, id).toMatchObject({ "@type": "LearningResource", url: canonical, image, inLanguage: "en", isAccessibleForFree: true });
+      expect(["Basic", "Intermediate", "Advanced"], id).toContain(ld!.educationalLevel);
+    }
+    const lost = read("404.html");
+    expect(lost).toContain('<meta name="robots" content="noindex">');
+    expect(lost).not.toContain('rel="canonical"');
   });
 });

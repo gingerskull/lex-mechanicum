@@ -5,9 +5,10 @@
 //   others are built in a pool of processes (tools/pool.ts);
 // - thumbs/<id>-<theme>.webp and -still.webp: the card drawings and the stage's still, committed in site/thumbs (R8, SS1); their fingerprints are checked
 //   first, and a stale one fails the build with the command to run. Nothing is drawn here.
+// - cards/<id>.jpg: each mechanism page's social card, committed in site/cards (tools/cards.ts) and checked the same way;
 // - favicon.svg, favicon-*.png, favicon.ico, apple-touch-icon.png, social.png: the mark's icons and the social card,
 //   committed in site/brand by tools/brand.ts and checked the same way.
-import { copyFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +16,7 @@ import { recordById } from "../src/catalog";
 import { workIds } from "../src/mechanisms";
 import { builtBytes } from "../src/package/built";
 import { copyBrand } from "./brand";
+import { CARDS_DIR, cardOf, checkCards } from "./cards";
 import { metaOf } from "./meta";
 import { runPool } from "./pool";
 import { checkThumbs, imagesOf, THUMBS_DIR } from "./thumbs";
@@ -48,18 +50,22 @@ export async function siteAssets(ids = workIds()): Promise<void> {
   // a local working loop (LM_IDS) redraws its thumbnails once, at the end, so a stale one only warns there
   try {
     await checkThumbs(ids, packages);
+    await checkCards(ids, packages);
   } catch (e) {
     if (!process.env.LM_IDS) throw e;
     console.warn(`site-assets: ${e instanceof Error ? e.message : String(e)}`);
   }
   mkdirSync(join(pub, "thumbs"), { recursive: true });
   for (const id of ids) for (const f of imagesOf(id)) copyFileSync(join(THUMBS_DIR, f), join(pub, "thumbs", f));
+  rmSync(join(pub, "cards"), { recursive: true, force: true });
+  mkdirSync(join(pub, "cards"), { recursive: true });
+  for (const id of ids) if (existsSync(join(CARDS_DIR, cardOf(id)))) copyFileSync(join(CARDS_DIR, cardOf(id)), join(pub, "cards", cardOf(id)));
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try {
     await siteAssets();
-    console.log(`wrote the icons, fonts, packages and thumbnails to ${pub}`);
+    console.log(`wrote the icons, fonts, packages, thumbnails and social cards to ${pub}`);
   } catch (e) {
     console.error(`site-assets: ${e instanceof Error ? e.message : String(e)}`);
     process.exitCode = 1;

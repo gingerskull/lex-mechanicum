@@ -80,9 +80,13 @@ npm run check             typecheck, lint, unit tests, conformance
 npm run build             the static site into dist/site
 npm run shot <id>         draw one frame of a mechanism to a PNG (local Chrome)
 npm run thumbs            redraw the library thumbnails that are out of date
+npm run cards             redraw the social cards (link previews) that are out of date
 ```
 
 We track the work on the project board (see [docs/workflow.md](docs/workflow.md)).
+
+The site counts page views with [GoatCounter](https://www.goatcounter.com/), which uses no cookies and does not identify
+visitors.
 
 ## Licence
 

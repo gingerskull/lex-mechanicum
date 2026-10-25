@@ -8,8 +8,11 @@ import Card from "../components/Card.astro";
 import { APP, SHEETS, VERSION, sortableOf } from "../data";
 import { DEFAULT_ORDER, sortBy } from "../sort";
 import { HINTS } from "../lore";
+import { absolute, siteLd } from "../seo";
+import { url } from "../url";
+const description = "Linkages, gears, cams and indexing drives, drawn live as working drawings of real hardware. Turn them, tilt them and take them apart, for a lesson or out of plain curiosity.";
 ---
-<Sheet title="Mechanism Library" description="Linkages, gears, cams and indexing drives, drawn live as working drawings of real hardware. Turn them, tilt them and take them apart, for a lesson or out of plain curiosity.">
+<Sheet title={`${APP} · Mechanism Library`} description={description} ld={siteLd(absolute(url("/"), Astro.site), description)}>
   <header class="wrap top">
     <div class="brand">
       <p class="kicker">{APP} · drawing set</p>

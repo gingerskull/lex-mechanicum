@@ -1,7 +1,8 @@
 ---
 // The page shell: tokens and site CSS, the mark's icons and social card (site/brand, tools/brand.ts), the theme set
 // before first paint (SS7), the footer with the version (SS12) and the faded mark, the Recovered badges shown on view, and
-// the Forge sheet's filters and island (SS14).
+// the Forge sheet's filters and island (SS14), and what search engines and link previews read (site/src/seo.ts): the
+// canonical address, the page's own social card, structured data, the Search Console tag and GoatCounter.
 import "../../styles/tokens.css";
 import "../../styles/base.css";
 import "../../styles/layout.css";
@@ -10,13 +11,23 @@ import "../../styles/forge.css";
 import Footer from "../components/Footer.astro";
 import { APP } from "../data";
 import { FORGE_FILTERS } from "../forge-filters";
+import { GOATCOUNTER, GOOGLE_SITE_VERIFICATION, absolute, ldJson } from "../seo";
 import { url } from "../url";
 interface Props {
   title: string;
   description: string;
+  /** The social card, a site-absolute path (url()), 1200 x 630; the mark's card by default. */
+  image?: string;
+  imageAlt?: string;
+  /** Structured data (schema.org), one object or several. */
+  ld?: unknown;
+  /** Kept out of search results (the 404 page): no canonical address either. */
+  noindex?: boolean;
 }
-const { title, description } = Astro.props;
-const card = new URL(url("/social.png"), Astro.site).href;
+const { title, description, image = url("/social.png"), imageAlt = `${APP}, the mark: a cog on the Blueprint sheet`, ld, noindex = false } = Astro.props;
+const card = absolute(image, Astro.site);
+const canonical = absolute(Astro.url.pathname, Astro.site);
+const lds = ld === undefined ? [] : Array.isArray(ld) ? ld : [ld];
 ---
 <!doctype html>
 <html lang="en">
@@ -26,6 +37,8 @@ const card = new URL(url("/social.png"), Astro.site).href;
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="application-name" content={APP} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />}
     <link rel="icon" href={url("/favicon.ico")} sizes="16x16 32x32 48x48" />
     <link rel="icon" href={url("/favicon.svg")} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={url("/apple-touch-icon.png")} />
@@ -33,10 +46,16 @@ const card = new URL(url("/social.png"), Astro.site).href;
     <meta property="og:site_name" content={APP} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={card} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={card} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    {lds.map((d) => <script type="application/ld+json" is:inline set:html={ldJson(d)} />)}
+    {import.meta.env.PROD && GOATCOUNTER && <script is:inline async data-goatcounter={`https://${GOATCOUNTER}.goatcounter.com/count`} src="https://gc.zgo.at/count.js"></script>}
     <script is:inline>
       try {
         const t = localStorage.getItem("theme");

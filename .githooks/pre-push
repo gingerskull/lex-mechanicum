@@ -1,6 +1,7 @@
 #!/bin/sh
-# Redraws stale library thumbnails in local Chrome and stops the push while they are uncommitted, then runs the full
+# Redraws stale library thumbnails and social cards in local Chrome and stops the push while they are uncommitted, then runs the full
 # 3D clearance (72 phases, the hand `allow` audit) for the mechanisms the push changes, then what CI runs.
 npx tsx tools/thumbs.ts --hook || exit 1
+npx tsx tools/cards.ts --hook || exit 1
 npx tsx tools/clearance.ts changed || exit 1
 exec npm run check
