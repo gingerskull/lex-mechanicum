@@ -7,7 +7,7 @@ import type { Kin, Teaching } from "../../src/catalog/kin";
 import { workIds } from "../../src/mechanisms";
 import { originKey, type Sortable } from "./sort";
 
-/** The app's name: the library's kicker, the footer and the site name in every page's head. */
+/** The app's name: the library's heading, the footer and the site name in every page's head. */
 export const APP = "Lex Mechanicum";
 export const VERSION = pkg.version;
 
