@@ -18,7 +18,7 @@ import type { Ladder } from "../detail";
 import { angleToEye, project, scaleOf, type Camera } from "./camera";
 import { arrowHead, drawCallouts, drawMarkers, type LabelHit, labeler, type LabelMode, type LabelPlan, type LabelSpot, type Labeler } from "./labels";
 import type { Controls } from "./poser";
-import { applyMat, mulMat, type Runtime } from "./scene";
+import { applyMat, mulMat, worldBox, type Runtime } from "./scene";
 
 const TAU = Math.PI * 2;
 const O = DRAFT.overlays;
@@ -50,10 +50,24 @@ export interface Ann {
 /** Sampled paths, kept by the session: a path depends on the point and the control settings only. */
 export interface AnnCache {
   paths: Map<string, Float32Array>;
+  loci: Map<string, Locus | null>;
+  /** A trace's equal-time tick points (SD24), by point and count. */
+  ticks: Map<string, (Vec3 | null)[]>;
   extremes: Map<string, number[]>;
 }
 
-export const newCache = (): AnnCache => ({ paths: new Map(), extremes: new Map() });
+export const newCache = (): AnnCache => ({ paths: new Map(), loci: new Map(), ticks: new Map(), extremes: new Map() });
+
+/**
+ * The whole path of a point (SD7): over as many cycles as it takes to close (a wheel turned on 240 degrees a cycle closes
+ * after three), or, when it does not close within DRAFT.path.cycles, over as many as it takes to have gone all round
+ * once, drawn open.
+ */
+export interface Locus {
+  path: Float32Array;
+  cycles: number;
+  closed: boolean;
+}
 
 /** Samples of one cycle in a sampled path. */
 const SAMPLES = 240;
@@ -78,6 +92,59 @@ export function pathOf(A: Ann, point: string, ctl?: Controls): Float32Array | nu
   }
   A.cache.paths.set(key, ok ? out : new Float32Array(0));
   return ok ? out : null;
+}
+
+const dist3 = (a: Vec3, b: Vec3) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+
+/** The point's whole path over one or more cycles (cached); null if the point is unknown. */
+export function locusOf(A: Ann, point: string, ctl?: Controls): Locus | null {
+  const key = `${point}|${ctl ? JSON.stringify(ctl) : ""}`;
+  const hit = A.cache.loci.get(key);
+  if (hit !== undefined) return hit;
+  const one = pathOf(A, point, ctl);
+  const poser = A.rt.scene.poser;
+  let out: Locus | null = null;
+  if (one) {
+    const n = one.length / 3;
+    const at = (k: number): Vec3 => [one[k * 3]!, one[k * 3 + 1]!, one[k * 3 + 2]!];
+    let step = 0;
+    for (let k = 1; k < n; k++) step += dist3(at(k), at(k - 1));
+    const tol = Math.max(1e-3, (2 * step) / (n - 1));
+    const p0 = at(0);
+    const covered = (q: Vec3) => {
+      for (let k = 0; k < n; k++) if (dist3(q, at(k)) <= tol) return true;
+      return false;
+    };
+    // where each cycle starts: the first back at the start closes the path; failing that, the first on ground the first
+    // cycle covered has gone all round
+    const starts: (Vec3 | null)[] = [];
+    for (let m = 1; m <= DRAFT.path.cycles; m++) {
+      const q = poser.point(m * poser.period, point, ctl);
+      starts.push(q);
+      if (!q) break;
+    }
+    const until = starts.findIndex((q) => !q);
+    const known = until < 0 ? starts : starts.slice(0, until);
+    const back = known.findIndex((q) => dist3(q!, p0) <= tol);
+    const round = known.findIndex((q, k) => k > 0 && covered(q!));
+    const closed = back >= 0;
+    const cycles = closed ? back + 1 : round >= 0 ? round + 1 : 1;
+    if (cycles === 1) out = { path: one, cycles, closed };
+    else {
+      // on the first cycle's sample phases where the count allows it (their poses are cached)
+      const N = Math.min(DRAFT.path.samples, n * cycles);
+      const path = new Float32Array(N * 3);
+      let ok = true;
+      for (let k = 0; k < N && ok; k++) {
+        const p = poser.point(N === n * cycles ? (k / n) * poser.period : (k / N) * cycles * poser.period, point, ctl);
+        if (p) path.set(p, k * 3);
+        else ok = false;
+      }
+      out = ok ? { path, cycles, closed } : { path: one, cycles: 1, closed: false };
+    }
+  }
+  A.cache.loci.set(key, out);
+  return out;
 }
 
 /** Controls that set one of the record's controls to a value (for a ghost trace, SD23). */
@@ -465,24 +532,27 @@ export function traces(A: Ann, f: TraceFlags): void {
     ctx.strokeStyle = paint(T[SP.color], SP.alpha * DRAFT.ghost.alpha);
     for (const tr of t.traces)
       for (const g of tr.ghosts ?? []) {
-        const path = pathOf(A, tr.point, controlFor(t, g.control, g.value));
-        if (!path) continue;
-        const gp = pathPts(A, path);
-        ctx.globalAlpha = faceOn(gp, path);
-        if (ctx.globalAlpha > 0) stroke(ctx, gp, true);
+        const lo = locusOf(A, tr.point, controlFor(t, g.control, g.value));
+        if (!lo) continue;
+        const gp = pathPts(A, lo.path);
+        ctx.globalAlpha = faceOn(gp, lo.path);
+        if (ctx.globalAlpha > 0) stroke(ctx, gp, lo.closed);
         ctx.globalAlpha = 1;
       }
   }
   if (f.traces) {
     t.traces.forEach((tr, i) => {
-      const path = tr.frame ? framedPath(A, tr.point, tr.frame) : pathOf(A, tr.point);
+      // a path in a body's frame is one cycle's, carried to now; any other is the point's whole path over its cycles
+      const lo = tr.frame ? null : locusOf(A, tr.point);
+      const path = tr.frame ? framedPath(A, tr.point, tr.frame) : (lo?.path ?? null);
       if (!path) return;
       const pts = pathPts(A, path);
+      const cycles = lo?.cycles ?? 1;
       ctx.setLineDash([...SP.dash]);
       ctx.lineWidth = SP.width;
       ctx.strokeStyle = paint(T[SP.color], SP.alpha * (i ? SP.otherGain : 1));
-      // a path that does not close over a cycle (an indexing wheel's mark moves on a step each turn) is drawn open
-      const open = isOpen(pts);
+      // a path that never closes is drawn open
+      const open = lo ? !lo.closed : isOpen(pts);
       // the path and its ticks fade as the path turns edge-on; the comet keeps showing the motion
       const shown = faceOn(pts, path);
       ctx.globalAlpha = shown;
@@ -493,11 +563,16 @@ export function traces(A: Ann, f: TraceFlags): void {
         // drawn (still equal steps of time, so uneven spacing still reads as uneven speed), and a path too short to carry
         // them has none
         const K = DRAFT.tick;
-        const n = Math.max(1, Math.floor(360 / tr.ticks.every));
+        // a path that closes after several cycles carries every cycle's ticks; one that never closes, the first cycle's
+        const per = Math.max(1, Math.floor(360 / tr.ticks.every));
+        const n = per * (open ? 1 : cycles);
         const at: [number, number][] = [];
+        const tkey = `${tr.point}|${n}|${per}`;
+        let fixed = tr.frame ? undefined : A.cache.ticks.get(tkey);
+        if (!tr.frame && !fixed) A.cache.ticks.set(tkey, (fixed = Array.from({ length: n }, (_, k) => poser.point((k / per) * poser.period, tr.point))));
         for (let k = 0; k < n; k++) {
           // in a body's frame, the tick is the path's sample at that phase (the path is already carried to now)
-          const p = tr.frame ? sampleAt(path, k / n) : poser.point((k / n) * poser.period, tr.point);
+          const p = tr.frame ? sampleAt(path, k / n) : fixed![k];
           at.push(p ? P(A, p) : [NaN, NaN]);
         }
         let length = 0;
@@ -512,8 +587,8 @@ export function traces(A: Ann, f: TraceFlags): void {
           for (let k = 0; k < n; k += m) {
             const [x, y] = at[k]!;
             if (!Number.isFinite(x)) continue;
-            // across the path: square to the line through its neighbours on the path
-            const a = at[(k - 1 + n) % n]!, b = at[(k + 1) % n]!;
+            // across the path: square to the line through its neighbours on the path (at an open path's end, its one)
+            const a = at[open && k === 0 ? 0 : (k - 1 + n) % n]!, b = at[open && k === n - 1 ? k : (k + 1) % n]!;
             let dx = b[0] - a[0], dy = b[1] - a[1];
             const l = Math.hypot(dx, dy);
             if (!(l > 1e-6)) continue;
@@ -527,13 +602,36 @@ export function traces(A: Ann, f: TraceFlags): void {
       }
       ctx.globalAlpha = 1;
       if (tr.comet) {
-        const N = pts.length;
-        const idx = Math.round(((((u % TAU) + TAU) % TAU) / TAU) * N);
-        const L = Math.min(SP.cometSamples, N >> 1);
-        for (let k = 0; k < L; k++) {
-          if (open && idx - k - 1 < 0) break;
-          const a = pts[(idx - k - 1 + 10 * N) % N]!;
-          const b = pts[(idx - k + 10 * N) % N]!;
+        // the trail: where the point was over the last stretch of time, at the first cycle's sample phases carried on
+        // (their poses are cached, so a frame solves one new pose at most), with the point now at its head: it runs on
+        // without a jump where a cycle ends, however many cycles the point's path takes
+        const L = Math.min(SP.cometSamples, SAMPLES >> 1);
+        const cur = poser.point(u, tr.point) ?? null;
+        const trail: [number, number][] = [];
+        if (tr.frame) {
+          const M = pts.length;
+          const idx = Math.round(((((u % TAU) + TAU) % TAU) / TAU) * M);
+          for (let k = 0; k <= L; k++) {
+            if (open && idx - k < 0) break;
+            trail.push(pts[(idx - k + 10 * M) % M]!);
+          }
+        } else {
+          if (cur) trail.push(P(A, cur));
+          const g = Math.floor((u / poser.period) * SAMPLES);
+          for (let k = 0; k < L; k++) {
+            // on a closed path the samples come round again after its cycles (so the phases asked stay in its first
+            // cycles, whose poses are cached); an open one has no past before the first cycle
+            let j = g - k;
+            if (!open) j = ((j % (SAMPLES * cycles)) + SAMPLES * cycles) % (SAMPLES * cycles);
+            if (j < 0) break;
+            const p = poser.point((j / SAMPLES) * poser.period, tr.point);
+            if (!p) break;
+            trail.push(P(A, p));
+          }
+        }
+        for (let k = 0; k + 1 < trail.length && k < L; k++) {
+          const a = trail[k + 1]!;
+          const b = trail[k]!;
           ctx.beginPath();
           ctx.moveTo(a[0], a[1]);
           ctx.lineTo(b[0], b[1]);
@@ -541,8 +639,8 @@ export function traces(A: Ann, f: TraceFlags): void {
           ctx.strokeStyle = paint(T[SP.color], (1 - k / L) * SP.cometAlpha);
           ctx.stroke();
         }
-        const cur = poser.point(u, tr.point) ?? null;
-        const pt = cur ? P(A, cur) : pts[idx % N]!;
+        const pt = cur ? P(A, cur) : trail[0];
+        if (!pt) return;
         ctx.beginPath();
         ctx.arc(pt[0], pt[1], SP.headR, 0, TAU);
         ctx.fillStyle = paint(T.paper);
@@ -784,6 +882,41 @@ function lineOf(A: Ann, ov: Ov | undefined): [Vec3, Vec3] | null {
   return a && b && len(sub(b, a)) > 1e-6 ? [a, b] : null;
 }
 
+/** The base plate's box in plan (x0, y0, x1, y1) as posed, null without one. */
+function plateBox(A: Ann): [number, number, number, number] | null {
+  let b: [number, number, number, number] | null = null;
+  const w: number[] = [];
+  for (let i = 0; i < A.rt.n; i++) {
+    if (!A.rt.isBase[i]) continue;
+    worldBox(A.rt, A.mats, i, w);
+    b = b ? [Math.min(b[0], w[0]!), Math.min(b[1], w[1]!), Math.max(b[2], w[3]!), Math.max(b[3], w[4]!)] : [w[0]!, w[1]!, w[3]!, w[4]!];
+  }
+  return b;
+}
+
+/**
+ * The stretch of the line through p and q (parameters t0 to t1 along q - p) over the base plate in plan, null where it
+ * misses the plate; the line as given without a plate.
+ */
+function clipToPlate(A: Ann, p: Vec3, q: Vec3, t0: number, t1: number): [Vec3, Vec3] | null {
+  const box = plateBox(A);
+  const d = sub(q, p);
+  // a line seen end-on in plan has no stretch over the plate
+  if (Math.abs(d[0]) < 1e-9 && Math.abs(d[1]) < 1e-9) return null;
+  if (!box) return isFinite(t0) && isFinite(t1) ? [add(p, mul(d, t0)), add(p, mul(d, t1))] : null;
+  let lo = t0, hi = t1;
+  for (const [k, mn, mx] of [[0, box[0], box[2]], [1, box[1], box[3]]] as const) {
+    if (Math.abs(d[k]) < 1e-12) {
+      if (p[k] < mn || p[k] > mx) return null;
+      continue;
+    }
+    const a = (mn - p[k]) / d[k], b = (mx - p[k]) / d[k];
+    lo = Math.max(lo, Math.min(a, b));
+    hi = Math.min(hi, Math.max(a, b));
+  }
+  return hi > lo ? [add(p, mul(d, lo)), add(p, mul(d, hi))] : null;
+}
+
 /** Where two lines cross in the plan plane (at the first line's height); null when they are near parallel. */
 function crossing(l: [Vec3, Vec3], m: [Vec3, Vec3]): Vec3 | null {
   const d1 = sub(l[1], l[0]), d2 = sub(m[1], m[0]);
@@ -848,11 +981,16 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
       const fixed = o.pose as { driver?: unknown; value?: unknown } | undefined;
       const held = fixed && typeof fixed.driver === "string" && typeof fixed.value === "number" && A.rt.scene.poser.pointAt;
       const at = (ref: unknown) => (typeof ref === "string" ? A.rt.scene.poser.pointAt!({ [fixed!.driver as string]: fixed!.value as number }, ref) : pointOf(A, ref));
-      const a = held ? at(o.from) : fromPt(), b = held ? at(o.to) : toPt();
-      if (!a || !b) return;
+      const a0 = held ? at(o.from) : fromPt(), b0 = held ? at(o.to) : toPt();
+      if (!a0 || !b0) return;
       const ext = o.extend === true ? 0.25 : 0;
-      const d = sub(b, a);
-      poly([sub(a, mul(d, ext)), add(b, mul(d, ext))]);
+      const d = sub(b0, a0);
+      // `clip: "plate"`: the part of the line over the base plate, toward a point off it (the plate's edge leaves the
+      // rest to the eye)
+      const seg = o.clip === "plate" ? clipToPlate(A, sub(a0, mul(d, ext)), add(b0, mul(d, ext)), 0, 1) : [sub(a0, mul(d, ext)), add(b0, mul(d, ext))];
+      if (!seg) return;
+      const [a, b] = seg as [Vec3, Vec3];
+      poly([a, b]);
       // a line too short to carry its label (an eccentric's O-E) keeps it clear, past its far end
       const [sx, sy] = P(A, a);
       const [tx, ty] = P(A, b);
@@ -1033,6 +1171,14 @@ function drawOverlay(A: Ann, ov: Ov, label: Labeler, ink: string): void {
         for (const m of all) {
           const mm = m as Record<string, unknown>;
           if (Array.isArray(mm.meet) && mm.meet.includes(ov.id)) reach(meetOf(A, mm.meet));
+        }
+        // `extend: "plate"`: the axis runs both ways to the base plate's edges and no further (with no plate, as any)
+        if (o.extend === "plate" && plateBox(A)) {
+          const seg = clipToPlate(A, p, q, -Infinity, Infinity);
+          if (!seg) return;
+          poly(seg);
+          tag(seg[1], 0, -12, [p, q, seg[0]]);
+          return;
         }
         const lo = Math.min(...ends) - 0.1, hi = Math.max(...ends) + 0.1;
         poly([add(p, mul(d, lo)), add(p, mul(d, hi))]);

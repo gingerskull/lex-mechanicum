@@ -61,10 +61,12 @@ export function sourceOf(rec: RecordLike, assembly3: Assembly3, opts: { controls
       if (s.drive) return mul(xfMat(driveXf(s.drive, posed(u).get(s.drive.input) ?? xf.id(), u)), mat4(s.frame));
       if (s.stretch) {
         const P = poseAt(u);
-        const a = endOf(P, s.stretch[0]);
-        const b = endOf(P, s.stretch[1]);
-        const a0 = endOf(refPose, s.stretch[0]);
-        const b0 = endOf(refPose, s.stretch[1]);
+        // ends held at the heights the build gave them (a rope part in its sheaves' planes)
+        const atZ = (p: Vec3 | null | undefined, k: 0 | 1): Vec3 | null | undefined => (p && s.stretchZ ? [p[0], p[1], s.stretchZ[k]] : p);
+        const a = atZ(endOf(P, s.stretch[0]), 0);
+        const b = atZ(endOf(P, s.stretch[1]), 1);
+        const a0 = atZ(endOf(refPose, s.stretch[0]), 0);
+        const b0 = atZ(endOf(refPose, s.stretch[1]), 1);
         // the member's whole matrix, its length included (stretch() then gives 1)
         if (a && b && a0 && b0) return stretchMatrix(a, b, a0, b0, mat4(s.frame)) as Mat4;
       }

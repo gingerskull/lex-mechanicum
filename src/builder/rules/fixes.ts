@@ -8,7 +8,7 @@ import { v3, type Vec3 } from "../../kin/math";
 import type { Solid3 } from "../../solids/types";
 import type { BuildCtx } from "../ctx";
 import { fromPlane, place, type Frame } from "../frames";
-import { Local } from "../lib";
+import { Local, settingsOf } from "../lib";
 import type { Rule } from "./types";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
@@ -51,7 +51,7 @@ export const adjustableLength: Rule = {
       };
       const [near, far] = halves.map(profileOf) as [ReturnType<typeof profileOf>, ReturnType<typeof profileOf>];
       part.profile = near;
-      const farPart: Solid3 = { ...part, id: `${id}-far`, name: "", profile: far, marks: [], joints: [...part.joints] };
+      const farPart: Solid3 = { ...settingsOf(part), id: `${id}-far`, name: "", profile: far, marks: [], joints: [...part.joints] };
       ctx.sweeps.touch([id]);
       ctx.rule = adjustableLength.id;
       ctx.add(farPart);

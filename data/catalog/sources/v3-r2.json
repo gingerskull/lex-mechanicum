@@ -4935,10 +4935,7 @@
           },
           "at": {
             "joint": "A"
-          },
-          "above": [
-            "crank"
-          ]
+          }
         },
         {
           "id": "blockY",
@@ -4946,14 +4943,15 @@
           "shape": {
             "type": "slider",
             "length": 40,
-            "width": 17
+            "width": 17,
+            "level": {
+              "with": "blockX",
+              "part": "all"
+            }
           },
           "at": {
             "joint": "B"
           },
-          "above": [
-            "crank"
-          ],
           "frame": {
             "origin": [
               0,
@@ -5005,7 +5003,9 @@
           },
           "at": {
             "joint": "O"
-          }
+          },
+          "construction": true,
+          "note": "construction only: the rod's midpoint runs round O on this radius; worked by hand at the knob on the rod, so the crank is not built"
         }
       ],
       "joints": [
@@ -5206,6 +5206,15 @@
           "body": "rod",
           "local": [
             "L+p",
+            0,
+            0
+          ]
+        },
+        {
+          "id": "grip",
+          "body": "rod",
+          "local": [
+            84,
             0,
             0
           ]

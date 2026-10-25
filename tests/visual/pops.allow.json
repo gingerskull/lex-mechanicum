@@ -1,10 +1,10 @@
 {
   "four-bar scrub": 62,
   "four-bar orbit": 90,
-  "bevel-gears scrub": 352,
-  "bevel-gears orbit": 1012,
+  "bevel-gears scrub": 348,
+  "bevel-gears orbit": 1072,
   "oscillating-cylinder scrub": 0,
   "oscillating-cylinder orbit": 99,
-  "universal-joint scrub": 14,
+  "universal-joint scrub": 15,
   "universal-joint orbit": 270
 }

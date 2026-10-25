@@ -238,8 +238,16 @@ record names on the ground lies on the base.
 - *Placed by the record:* `place` (mm along the body's frame z, the field every shape may carry, below) puts the part
   there instead of on a slab (a hinge leaf beside its partner, an arm beside a spindle head); such a `link` takes its
   own `thickness`.
+- *Construction lines to the plate:* an `axis-line` overlay with `extend: "plate"` runs both ways to the base plate's
+  edges; a `line` with `clip: "plate"` is drawn only over the plate. A ground point with `construction: true` (an aim
+  point off the plate) is not on the base, so the plate is not grown to hold it.
+- *Construction bodies:* `construction: true` on a body keeps it in the kinematics but out of the build: a body the
+  motion is defined by but a hand stands in for (a hand-worked trammel's crank, whose pin is the rod's midpoint). A
+  driver on one of its joints is worked by hand at a knob on the built body it carries (a `grip` point there places it).
 - *Shape features:* `lugs: [{ joint, span: [w0, w1], r }]`, a hinge lug on the joint's axis joined by a web to a part
-  whose plane is not square to the hinge (a plate's edge hinge, a spindle head); `posts: [{ at: [x, y], top, r }]`,
+  whose plane is not square to the hinge (a plate's edge hinge, a spindle head), its span along the hinge overlapping
+  the part there (the web runs within the span: a lug beyond the part, with the mate's part between, would stand in
+  the air); `posts: [{ at: [x, y], top, r }]`,
   columns from the base into a fixed body; `bars: [{ from, to, width, z: [z0, z1] }]`, straight bars on a part's face
   (slot jaws, tongues; the slotted body names its `slot: { width, length }`); `ring: { inner, spokes, hub }` on a `disc`
   (a rim, spoked to a hub or bare); `indexMark: { at: [x, y] }`, a raised arrow that stays opaque on a see-through part;

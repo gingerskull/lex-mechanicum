@@ -108,6 +108,19 @@ interface Seat {
 
 export function axialStack(ctx: BuildCtx, spec: StackSpec): StackResult {
   if (spec.between) return betweenStack(ctx, spec);
+  // a moving pin through a lug webbed to its part (rules/lugs) threads into the lug, so its head stands on the free side,
+  // over the other part, not against the part the lug grows from: the stack runs the other way along the axis when the
+  // lug comes last
+  const sorted = [...spec.members].sort((a, b) => a.w0 - b.w0);
+  const isLug = (m: Member) => ctx.lugWebs.has(m.solid);
+  if (spec.kind === "moving" && !spec.base && !spec.reach && sorted.length > 1 && isLug(sorted[sorted.length - 1]!) && !isLug(sorted[0]!)) {
+    const r = stackAlong(ctx, { ...spec, frame: { o: spec.frame.o, x: spec.frame.x, z: v3.mul(spec.frame.z, -1) }, members: spec.members.map((m) => ({ ...m, w0: -m.w1, w1: -m.w0 })) });
+    return { ...r, w0: -r.w1, w1: -r.w0 };
+  }
+  return stackAlong(ctx, spec);
+}
+
+function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
   const members = [...spec.members].sort((a, b) => a.w0 - b.w0);
   const fit = fitBore(members);
   const { d } = fit;

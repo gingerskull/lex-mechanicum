@@ -143,6 +143,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     if (s.chamfer !== undefined) p.chamfer = s.chamfer;
     if (s.thread) p.thr = { ...s.thread };
     if (s.stretch) p.stretch = [s.stretch[0], s.stretch[1]];
+    if (s.stretchZ) p.sz = [s.stretchZ[0], s.stretchZ[1]];
     if (s.posedBy) p.posedBy = s.posedBy;
     if (s.reach) p.reach = { to: [s.reach.to[0], s.reach.to[1], s.reach.to[2]], end: s.reach.end };
     if (s.legacyAxis) p.legacyAxis = s.legacyAxis;

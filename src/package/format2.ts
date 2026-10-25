@@ -94,6 +94,8 @@ export interface PackedSolid3 {
   chamfer?: number;
   thr?: { m: number; z0: number; z1: number; lead?: number };
   stretch?: [string, string];
+  /** Solid3.stretchZ. */
+  sz?: [number, number];
   posedBy?: string;
   reach?: { to: Vec3; end: 0 | 1 };
   legacyAxis?: "x" | "y" | "p";

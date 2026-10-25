@@ -337,6 +337,8 @@ function buildRope(ctx: BuildCtx, ropes: KinJoint[]): void {
   const rr = (j: KinJoint) => num((j as unknown as Record<string, unknown>).rope, 3.2) / 2;
   const centre = (b: string): Vec3 => ctx.geoms.get(b)!.frame.o;
   const pointOf = (id: string): Vec3 | null => ctx.S.refPts.get(id) ?? null;
+  // the rope's parts and wraps are one member, meeting end to end
+  const member = `rope:${ropes[0]?.id ?? ""}`;
   const rope = (id: string, name: string, a: Vec3, b: Vec3, z: number, r: number, ends: [string, string], body: string): Solid3 => {
     const ring = circle(r, 0, 0, 16);
     // ends at their sheaves' heights (a part crossing between planes slants): built in the frame it is stretched in;
@@ -344,7 +346,7 @@ function buildRope(ctx: BuildCtx, ropes: KinJoint[]): void {
     const flat = a[2] === 0 && b[2] === 0;
     const x = v3.unit(flat ? v3.sub([b[0], b[1], 0], [a[0], a[1], 0]) : v3.sub(b, a));
     const up = v3.unit(v3.sub(UP, v3.mul(x, v3.dot(UP, x))));
-    return { id, name, role: "hw", kind: "belt", body, frame: { o: flat ? [a[0], a[1], z] : a, x, z: up }, profile: { outer: ring, holes: [] }, op: { op: "sweep", path: [[0, 0, 0], [1, 0, 0]] }, marks: [], ex: 0, joints: [], detail: "never", flags: {}, mat: "Polyester rope, braided", stretch: ends };
+    return { id, name, role: "hw", kind: "belt", body, frame: { o: flat ? [a[0], a[1], z] : a, x, z: up }, profile: { outer: ring, holes: [] }, op: { op: "sweep", path: [[0, 0, 0], [1, 0, 0]] }, marks: [], ex: 0, joints: [], detail: "never", flags: {}, mat: "Polyester rope, braided", stretch: ends, member };
   };
   // the sheaves: a core under the rope, a flange each side of it
   for (const s of sheaves) {
@@ -372,15 +374,62 @@ function buildRope(ctx: BuildCtx, ropes: KinJoint[]): void {
     const zs = [j.a, j.b].map((b) => (sheaves.has(b) ? midZ(b) : null)).filter((x): x is number => x !== null);
     return zs.reduce((a, b) => a + b, 0) / Math.max(1, zs.length);
   };
+  // each end at the height of the sheave it meets, where the placement put that sheave (not the record's height for its
+  // plane, which the placement may have moved); a dead end on the ground at its sheave's; an end on a moving body (the
+  // fall's on its carriage) at its point's, where its clamp is built
+  const bodyOfPoint = (id: string) => ctx.kin.points?.find((p) => p.id === id)?.body ?? "ground";
+  const zEnd = (j: KinJoint, k: 0 | 1, P: Vec3): number => {
+    const s = k ? j.b : j.a;
+    const other = k ? j.a : j.b;
+    if (sheaves.has(s)) {
+      const m = midZ(s) ?? P[2];
+      // a part crossing to another plane leaves its groove as far from that plane as the groove allows, so its slant
+      // clears the flange on the side it heads for
+      const o = sheaves.has(other) ? midZ(other) : null;
+      const zr = zRange(ctx, s);
+      if (o === null || Math.abs(o - m) < 0.5 || !zr) return m;
+      const r = rr(j);
+      const t = Math.min(1.5, (zr[1] - zr[0] - 2 * r - 0.6) / 2);
+      const spare = Math.max(0, (zr[1] - zr[0]) / 2 - t - r - 0.2);
+      return m + Math.sign(m - o) * spare;
+    }
+    return bodyOfPoint(((j as unknown as Record<string, unknown>).ends as [string, string])[k]) === "ground" && sheaves.has(other) ? (midZ(other) ?? P[2]) : P[2];
+  };
+  const dead: { at: Vec3; to: Vec3; r: number; id: string }[] = [];
   for (const j of ropes) {
     const ends = (j as unknown as Record<string, unknown>).ends as [string, string] | undefined;
     if (!ends) continue;
-    const a = pointOf(ends[0]);
-    const b = pointOf(ends[1]);
-    if (!a || !b) continue;
-    const z = zOfPart(j);
-    const body = ctx.kin.points?.find((p) => p.id === ends[0])?.body ?? "ground";
-    out.push(rope(`${j.id}-rope`, `Rope, ${titleOf(j.id).toLowerCase()}, Ø${2 * rr(j)} braided polyester`, a, b, z, rr(j), ends, body));
+    const a0 = pointOf(ends[0]);
+    const b0 = pointOf(ends[1]);
+    if (!a0 || !b0) continue;
+    const za = zEnd(j, 0, a0);
+    const zb = zEnd(j, 1, b0);
+    const a: Vec3 = [a0[0], a0[1], za];
+    const b: Vec3 = [b0[0], b0[1], zb];
+    const body = bodyOfPoint(ends[0]);
+    out.push({ ...rope(`${j.id}-rope`, `Rope, ${titleOf(j.id).toLowerCase()}, Ø${2 * rr(j)} braided polyester`, a, b, zOfPart(j), rr(j), ends, body), stretchZ: [za, zb] });
+    ends.forEach((e, k) => {
+      if (bodyOfPoint(e) === "ground" && !sheaves.has(k ? j.b : j.a)) dead.push({ at: k ? b : a, to: k ? a : b, r: rr(j), id: e });
+    });
+  }
+  // a dead end on the ground: round a thimble on a becket pin in a post screwed to the base, at the rope's height (F1)
+  const seen = new Set<string>();
+  for (const d of dead) {
+    // one post per dead end, however many parts name its point
+    if (seen.has(d.id)) continue;
+    seen.add(d.id);
+    const out2 = v3.unit([d.at[0] - d.to[0], d.at[1] - d.to[1], 0]);
+    const c: Vec3 = v3.add(d.at, v3.mul(out2, 5 + d.r));
+    const L = new Local({ o: [c[0], c[1], 0], x: [1, 0, 0], z: UP }, { joints: [] });
+    const z = d.at[2];
+    if (z - 5 < ctx.base.top + 1) {
+      ctx.issues.push(`rope: the dead end ${d.id} is ${(z - ctx.base.top).toFixed(1)} mm over the base: no room for its becket post`);
+      continue;
+    }
+    L.add(H.standoff(`${d.id}-post`, { at: [0, 0, 0], z0: ctx.base.top, z1: z - 5, name: "Becket post, screwed to the base" }));
+    L.add(H.dowel(`${d.id}-becket`, 4, { body: "ground", at: [0, 0, 0], z0: z - 6, z1: z + 5, name: "Becket pin Ø4, in the post" }));
+    L.add(H.collar(`${d.id}-thimble`, 4, 10, { body: "ground", at: [0, 0, 0], z0: z - d.r - 0.5, z1: z + d.r + 0.5, name: "Thimble Ø10 on the becket pin, the rope's dead end round it" }));
+    out.push(...L.out());
   }
   // a rope's end on a moving body (the fall on its carriage): clamped between two jaws on the body's top face, the lower
   // jaw a post standing from it, so the rope runs in over whatever the body's slide carries at its ends (F1)
@@ -453,7 +502,7 @@ function buildRope(ctx: BuildCtx, ropes: KinJoint[]): void {
     // the wrap rides what carries the sheave's pin (the lower block, or the ground)
     const rev = ctx.kin.joints.find((q) => q.type === "revolute" && (q.a === s || q.b === s));
     const carrier = rev ? (rev.a === s ? rev.b : rev.a) : "ground";
-    out.push({ id: `${s}-wrap`, name: "", role: "hw", kind: "belt", body: carrier, frame: { o: [c[0], c[1], z], x: [1, 0, 0], z: UP }, profile: { outer: circle(r, 0, 0, 16), holes: [] }, op: { op: "sweep", path }, marks: [], ex: 0, joints: [], detail: "never", flags: {}, mat: "Polyester rope, braided" });
+    out.push({ id: `${s}-wrap`, name: "", role: "hw", kind: "belt", body: carrier, frame: { o: [c[0], c[1], z], x: [1, 0, 0], z: UP }, profile: { outer: circle(r, 0, 0, 16), holes: [] }, op: { op: "sweep", path }, marks: [], ex: 0, joints: [], detail: "never", flags: {}, mat: "Polyester rope, braided", member });
     // a guard round the far side of a sheave that stands still, keeping the rope in its groove
     if (carrier === "ground") {
       const RS = num(g.shape.diameter, 60) / 2;

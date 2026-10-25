@@ -105,4 +105,21 @@ describe("the axial stack builder", () => {
     expect(selectSupport({ frame: T, kind: "live", held: "both", straddle: false, base: null })).toBe("pillow");
     expect(selectSupport({ frame: Z, kind: "moving", held: "both", straddle: false, base: b })).toBe("stub");
   });
+  it("threads a moving pin into a lug webbed to its part, so the head stands over the other part (J3)", () => {
+    const head = (r: Solid3[]) => r.find((s) => s.id.endsWith("-bolt-head"))!;
+    // plain parts: the head over the top one
+    expect(along(head(axialStack(ctx, spec("jm", Z, "moving")).solids), Z)[0]).toBeGreaterThanOrEqual(16);
+    // the top part a lug grown from its body's part (its part lies past it): the pin turns round, the head under M0
+    ctx.lugWebs.add("m1");
+    try {
+      const r = axialStack(ctx, spec("jl", Z, "moving"));
+      const h = head(r.solids);
+      // the head runs the other way along the axis: its far end the lowest
+      expect(v3.dot(h.frame.z, Z.z)).toBeCloseTo(-1);
+      expect(v3.dot(v3.sub(h.frame.o, Z.o), Z.z)).toBeLessThanOrEqual(0);
+      expect(r.w0).toBeLessThan(0);
+    } finally {
+      ctx.lugWebs.delete("m1");
+    }
+  });
 });

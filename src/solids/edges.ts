@@ -194,3 +194,79 @@ export function edgesOfMesh(m: MeshData, marks: { pts: Vec2[] }[] = [], top: Top
   pushMarks(out, marks, top.z, top.scale, top.turn);
   return out.done();
 }
+
+/**
+ * Edges of a loft (a worm's section turned along its length, a herringbone gear's halves): like a plain extrusion's,
+ * from its rings, not its mesh. Each ring point's path through the sections is a corner (crease) or a smooth surface's
+ * outline as the walls either side of it meet; a ring between two sections is a smooth outline where the wall
+ * bends across it; the first and last sections' rings are the caps. A section
+ * turned far from the one before leaves its wall quads skewed, so a mesh search would find a line on every diagonal.
+ */
+export function edgesOfLoft(op: Extract<Op, { op: "loft" }>, marks: { pts: Vec2[] }[]): EdgeSet {
+  const S = op.sections;
+  const out = new Out();
+  const K = S.length;
+  const ringsOf = (k: number) => [S[k]!.outer, ...S[k]!.holes];
+  const base = ringsOf(0);
+  base.forEach((ring0, r) => {
+    const n = ring0.length;
+    if (S.some((s) => (r ? s.holes[r - 1] : s.outer)?.length !== n)) throw new Error("loft: rings differ");
+    // walk each ring the way that keeps the material on its left (outer counter-clockwise, holes clockwise)
+    let a2 = 0;
+    for (let i = 0; i < n; i++) a2 += ring0[i]![0] * ring0[(i + 1) % n]![1] - ring0[(i + 1) % n]![0] * ring0[i]![1];
+    const flip = r ? a2 > 0 : a2 < 0;
+    const at = (k: number, i: number): [number, number, number] => {
+      const ring = ringsOf(k)[r]!;
+      const q = ring[flip ? (n - 1 - (((i % n) + n) % n)) : ((i % n) + n) % n]!;
+      return [q[0], q[1], S[k]!.z];
+    };
+    // the wall's outward normal between points i and i+1, sections k and k+1
+    const wall = (k: number, i: number): [number, number, number] => {
+      const p = at(k, i), q = at(k, i + 1), u = at(k + 1, i);
+      const e = [q[0] - p[0], q[1] - p[1], q[2] - p[2]], f = [u[0] - p[0], u[1] - p[1], u[2] - p[2]];
+      const nx = e[1]! * f[2]! - e[2]! * f[1]!, ny = e[2]! * f[0]! - e[0]! * f[2]!, nz = e[0]! * f[1]! - e[1]! * f[0]!;
+      const l = Math.hypot(nx, ny, nz) || 1;
+      return [nx / l, ny / l, nz / l];
+    };
+    const fl = r ? EFLAG.hole : 0;
+    // corners by the walls either side as built (a turned section's flank meets its crest at a sharp angle in 3D,
+    // though the section itself turns gently there), at the middle section
+    const km = Math.max(0, Math.floor((K - 2) / 2));
+    for (let i = 0; i < n; i++) {
+      const w0 = wall(km, i - 1), w1 = wall(km, i);
+      const d = w0[0] * w1[0] + w0[1] * w1[1] + w0[2] * w1[2];
+      if (d > FLAT) continue;
+      const kind = d < CREASE ? EDGE.crease : EDGE.smooth;
+      let cum = 0;
+      for (let k = 0; k + 1 < K; k++) {
+        const p = at(k, i), q = at(k + 1, i);
+        const L = Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]);
+        out.push(p[0], p[1], p[2], q[0], q[1], q[2], wall(k, i - 1), wall(k, i), cum, cum + L, kind, 0);
+        cum += L;
+      }
+    }
+    // between two sections the wall bends a little as the section turns: a smooth outline round the part (a thread's
+    // flank seen edge-on draws there)
+    for (let k = 1; k + 1 < K; k++) {
+      let cum = 0;
+      for (let i = 0; i < n; i++) {
+        const p = at(k, i), q = at(k, i + 1);
+        const L = Math.hypot(q[0] - p[0], q[1] - p[1]);
+        const lo = wall(k - 1, i), hi = wall(k, i);
+        if (lo[0] * hi[0] + lo[1] * hi[1] + lo[2] * hi[2] <= FLAT) out.push(p[0], p[1], p[2], q[0], q[1], q[2], lo, hi, cum, cum + L, EDGE.smooth, 0);
+        cum += L;
+      }
+    }
+    for (const [k, top] of [[0, false], [K - 1, true]] as const) {
+      let cum = 0;
+      for (let i = 0; i < n; i++) {
+        const p = at(k, i), q = at(k, i + 1);
+        const L = Math.hypot(q[0] - p[0], q[1] - p[1]);
+        out.push(p[0], p[1], p[2], q[0], q[1], q[2], [0, 0, top ? 1 : -1], wall(top ? K - 2 : 0, i), cum, cum + L, EDGE.cap, fl | (top ? EFLAG.top : 0));
+        cum += L;
+      }
+    }
+  });
+  pushMarks(out, marks, S[K - 1]!.z, 1, 0);
+  return out.done();
+}

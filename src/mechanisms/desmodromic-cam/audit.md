@@ -80,7 +80,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · 132 solids, 83 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps; details checked by A15 |
-| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A15 | PASS | AUTO · clearance in 3D over 8 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
 | A16 | PASS | HAND · 9 joint notes; no note: none; no badge: G, C1, C2, T1, T2 · a note per joint; build rules: lobes from the shoes' paths, the drive behind the front view, a guide bush for the stem |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
 | A18 | PASS | AUTO · placement: 1 slabs in the tallest stack (79.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver |
@@ -211,11 +211,11 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | 1.59 |
 | DL-G | 0 | 0 | 1.52 |
 | DL-H | 18 | 0 | 1.45 |
-| never | 87 | 108 | 1.54 |
+| never | 87 | 103 | 1.54 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.2 KB
+check: clean · K1 residual: 2.8e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.9 KB
 screenshots: dist/shots3/desmodromic-cam (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

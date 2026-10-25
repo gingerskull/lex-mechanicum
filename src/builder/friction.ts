@@ -8,7 +8,7 @@ import { H } from "../hardware/primitives";
 import type { KinJoint } from "../kin/types";
 import { v3 } from "../kin/math";
 import type { BuildCtx } from "./ctx";
-import { titleOf } from "./lib";
+import { settingsOf, titleOf } from "./lib";
 import type { Rule } from "./rules/types";
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
@@ -27,7 +27,7 @@ function tyre(ctx: BuildCtx, body: string, joint: string): string | null {
   part.profile.outer = circle(R - th, 0, 0, Math.max(48, Math.round(R * 3)));
   part.name = `${titleOf(body)}, hub under its tyre`;
   const h = part.op.h;
-  ctx.add({ ...part, id: `${body}-tyre`, name: `Tyre, ${String(t.material ?? "rubber")} ${th} mm, vulcanised to the hub: the contact's grip`, kind: "part", profile: { outer: circle(R, 0, 0, Math.max(48, Math.round(R * 3))), holes: [circle(R - th, 0, 0, Math.max(48, Math.round(R * 3))).reverse()] }, op: { op: "extrude", h, steps: 1 }, marks: [], joints: [joint], mat: "Nitrile rubber, 80 Shore A" });
+  ctx.add({ ...settingsOf(part), id: `${body}-tyre`, name: `Tyre, ${String(t.material ?? "rubber")} ${th} mm, vulcanised to the hub: the contact's grip`, kind: "part", profile: { outer: circle(R, 0, 0, Math.max(48, Math.round(R * 3))), holes: [circle(R - th, 0, 0, Math.max(48, Math.round(R * 3))).reverse()] }, op: { op: "extrude", h, steps: 1 }, marks: [], joints: [joint], mat: "Nitrile rubber, 80 Shore A" });
   return `${body}-tyre`;
 }
 

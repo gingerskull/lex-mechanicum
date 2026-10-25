@@ -215,6 +215,10 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
       const zone: Vec2[] = [[S0, T0], [S1, T0], [S1, T1], [S0, T1]].map(([sv, tv]) => [sv! * dx - tv! * dy, sv! * dy + tv! * dx]);
       for (const id of fid) {
         if (id === sl || nodeOf(id) === nodeOf(sl) || kin.joints.some((q) => (q.a === id && q.b === sl) || (q.b === id && q.a === sl))) continue;
+        // a body the record sets at the slider's level runs in the same plate (a trammel's second block, across the
+        // first's groove): no rails stand in its way there
+        const sameLevel = (q: string, w: string) => geoms.get(q)?.level?.with === w && geoms.get(q)?.level?.part === "all";
+        if (sameLevel(id, sl) || sameLevel(sl, id)) continue;
         if (sampleIdx.some((i) => ringDist(zone, rings.get(id)![i]!, LATERAL) <= LATERAL)) {
           const a = idx.get(nodeOf(id))!, b = idx.get(nodeOf(sl))!;
           clash[a]![b] = clash[b]![a] = true;

@@ -146,6 +146,20 @@ export const DRAFT = {
     dashes: [[3, 10, 6], [15, 22, 18]] as const, // tile px, dash segments as [x0, x1, y]
   },
 
+  // Rulings on a turning round part (SD29): faint lines along its round walls and short ticks round the rim of its faces,
+  // registered to the part, so a plain shaft, roller or disc shows that it turns. Toothed parts show it by their teeth.
+  spin: {
+    pitch: 7, // mm, ruling spacing round the part's largest radius (the count is the same on every step of a shaft)
+    count: [8, 48] as const, // rulings round the part, least and most (a multiple of four)
+    width: 0.6, // px
+    alpha: 0.45, // 0..1, times the face's faint factor
+    fadePx: [3, 6] as const, // px, rulings closer than this on screen fade out (from fully gone to fully drawn)
+    band: 0.14, // factor on the radius, the ticks' length in from the rim on a face
+    bandMax: 5, // mm, the ticks' longest length
+    gap: 30, // degrees, a round part's widest ring has no gap wider than this round the axis (a polygon's corners do)
+    round: [0.85, 0.97] as const, // factors on the radius: a part with no outline point between them is round (a gear's teeth fill the band)
+  },
+
   // Loose touches, the complete list (SD9).
   sketch: {
     overshoot: 14, // px, construction lines run this far past the base plate's corners
@@ -209,6 +223,10 @@ export const DRAFT = {
     // `fade`; a path thinner than `straight` in 3D is straight and always drawn.
     edgeOn: { fade: [0.06, 0.18] as const, straight: 0.05 }, // ratios, ratio
     headStroke: 1.2, // px
+    // A point whose path does not close over one cycle (a gear's mark turns on past a whole turn) is followed for up to
+    // `cycles` cycles, until its path closes or has gone all round, in `samples` samples at most.
+    cycles: 40, // count
+    samples: 1440, // count
   },
 
   // Chain centrelines through every joint head (SD6).

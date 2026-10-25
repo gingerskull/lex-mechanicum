@@ -80,7 +80,7 @@ PASS 137 · FAIL 0 · N/A 30 · open: none
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · 108 solids, 58 unnamed (further items of a listed set) · named hardware with catalogue sizes and materials |
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
-| A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
+| A15 | PASS | AUTO · clearance in 3D over 8 phases: 0 clashes; hand allow: 0 named, 0 unnecessary |
 | A16 | PASS | HAND · 8 joint notes; no note: none; no badge: none · a note and badge per joint; build rules: stops and swing scales on both cranks, each held on its shaft end |
 | A17 | PASS | HAND · assembles in the explode order; every screw reachable; pressed bearings pullable through their bores |
 | A18 | PASS | AUTO · placement: 2 slabs in the tallest stack (16.0 mm), 0 clevises; stack per joint in the Joints table · axial positions set by the placement solver |
@@ -213,5 +213,5 @@ PASS 137 · FAIL 0 · N/A 30 · open: none
 None: this pass needed no hand fix.
 
 ## Verification
-check: clean · K1 residual: 4.6e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.6 KB
+check: clean · K1 residual: 4.6e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.4 KB
 screenshots: dist/shots3/five-bar (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

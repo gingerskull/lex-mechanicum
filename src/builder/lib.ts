@@ -6,6 +6,16 @@ import type { Solid3 } from "../solids/types";
 import { v3, type Vec3 } from "../kin/math";
 
 /** A member of a stack: a body's part turning on the axis, with its extent along it and the boss that holds the bore. */
+/**
+ * A solid's settings without its own made geometry (a bevel gear's `mesh`): for a further solid of the same body that has
+ * an outline of its own (a lug, a tyre, a level, the far part of a split one).
+ */
+export function settingsOf(s: Solid3): Solid3 {
+  const { mesh: _own, ...rest } = s;
+  void _own;
+  return rest;
+}
+
 export interface Member {
   /** Solid id of the part (a clevis's second half has its own). */
   solid: string;

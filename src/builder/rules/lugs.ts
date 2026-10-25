@@ -4,14 +4,15 @@
 // point. The lug is a boss on the axis joined to the body's part by a web, both one solid of the body; it becomes a
 // member of the hinge's stack, so the pin, bores and bearings are the stack builder's as for any part.
 import { circle, roundedPoly, type Vec2 } from "../../core/geom";
-import type { Solid3 } from "../../solids/types";
+import type { Feature, Solid3 } from "../../solids/types";
 import { extrudeOp } from "../../solids/tessellate";
 import { type Vec3, v3 } from "../../kin/math";
 import type { BuildCtx } from "../ctx";
 import { canon, fromPlane, frameAlong, planeCoords } from "../frames";
 import { H } from "../../hardware/primitives";
-import { Local, titleOf } from "../lib";
+import { Local, settingsOf, titleOf } from "../lib";
 import type { Rule } from "./types";
+import { inside } from "../../core/poly";
 
 export interface LugSpec {
   joint: string;
@@ -79,19 +80,42 @@ export const lugs: Rule = {
         const r = L.r ?? 8;
         const [w0, w1] = L.span[0] <= L.span[1] ? L.span : [L.span[1], L.span[0]];
         const f = frameAlong(v3.add(j.at as Vec3, v3.mul(axis, w0)), axis);
-        const root: Vec2 = L.round ? [0, 0] : planeCoords(f, rootOf(part, j.at as Vec3)).uv;
+        const at3 = L.round ? null : rootOf(part, j.at as Vec3);
+        const root: Vec2 = at3 ? planeCoords(f, at3).uv : [0, 0];
+        // the web runs in the lug's own span along the hinge: a span that stands clear of the part's root there leaves
+        // the lug in the air (the record's span is to change, toward the part)
+        if (at3) {
+          const w = planeCoords(part.frame, at3).w;
+          const along = part.profile.outer.map((q) => v3.dot(v3.sub(fromPlane(part.frame, q, w), j.at as Vec3), axis));
+          const lo = Math.min(...along);
+          const hi = Math.max(...along);
+          if (w1 < lo - 1 || w0 > hi + 1) ctx.issues.push(`lug on ${b.id} at ${L.joint}: its span ${w0} to ${w1} along the hinge does not reach the part (${lo.toFixed(1)} to ${hi.toFixed(1)})`);
+        }
         const outer = Math.hypot(root[0], root[1]) > 1 ? roundedPoly([[0, 0], root], r) : circle(r, 0, 0, 36);
+        // where the web runs into the part, the part's bores stay open through it (a sleeve's bore for its spindle)
+        const fy = v3.cross(f.z, f.x);
+        const toLug = (p: Vec3): Vec3 => [v3.dot(v3.sub(p, f.o), f.x), v3.dot(v3.sub(p, f.o), fy), v3.dot(v3.sub(p, f.o), f.z)];
+        const dirLug = (d: Vec3): Vec3 => [v3.dot(d, f.x), v3.dot(d, fy), v3.dot(d, f.z)];
+        const reach = 1000;
+        // only the holes the lug's outline reaches over, seen along the part's normal (its bottom and its top faces)
+        const shadow = [0, w1 - w0].map((h) => outer.map((q) => planeCoords(part.frame, fromPlane(f, q, h)).uv));
+        const reaches = (hole: Vec2[]) => shadow.some((ring) => ring.some((q) => inside(hole, q)) || hole.some((q) => inside(ring, q)));
+        const bores: Feature[] = at3
+          ? part.profile.holes.filter(reaches).map((h) => ({ mode: "cut", profile: { outer: [...h].reverse(), holes: [] }, op: extrudeOp(2 * reach), frame: { o: toLug(v3.sub(part.frame.o, v3.mul(part.frame.z, reach))), x: dirLug(part.frame.x), z: dirLug(part.frame.z) } }))
+          : [];
         const lug: Solid3 = {
-          ...part,
+          ...settingsOf(part),
           id: `${b.id}-lug-${L.joint}`,
           name: "",
           frame: f,
           profile: { outer, holes: [] },
           op: extrudeOp(w1 - w0),
+          features: bores,
           marks: [],
           joints: [L.joint],
         };
         ctx.add(lug);
+        if (!L.round) ctx.lugWebs.add(lug.id);
         const site = j.site ?? j.id;
         const list = ctx.lugs.get(site) ?? [];
         list.push(lug);

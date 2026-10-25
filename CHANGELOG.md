@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.42.0, Triplex Phall — 2026-10-25
+
+- Gears couple cleanly: bevel and hypoid teeth are true three-dimensional teeth on the back cone, a ring gear's
+  standing up from its face, in the long-and-short proportions real ring-and-pinion sets use, set so every tooth meets
+  a gap. The hypoid pair, the differential and the bevel pair mesh without parts passing through each other.
+- A turning shaft, roller, disc or ball shows that it turns: faint rulings fixed to it, which fade where they would
+  crowd. Stray rings on plates and discs are gone: a boss ring is engraved only round a pin.
+- Traced paths no longer jump: the drawing plays on from cycle to cycle, a path is drawn whole over the cycles it takes
+  to close, and the comet follows the motion; the plot shows an angle without its jump. The worm reads as a clean
+  thread.
+- Mechanisms fixed: the governor's links are pinned to lugs on the sleeve; the bistable beams run whole to the shuttle;
+  the tackle's ropes run in their sheaves' grooves, the dead end round a thimble; the desmodromic rockers clear the cam;
+  the Geneva wheel's windows stand clear of its edges; the Wankel's cover has windows over the rotor; the five-bar's
+  knobs sit on their cranks; the Schmidt coupling's index arrows stay on their rings. The Ackermann linkage sits on a
+  plate its own size, its construction lines ending at the edge. The trammel is worked by hand at a knob on its rod,
+  both blocks riding in one cross-shaped groove plate.
+
 ## 0.41.0, Stygies — 2026-10-24
 
 - The drawings read as solid parts: plates, brackets, mounts and pillow blocks are paper at a convincing opacity with

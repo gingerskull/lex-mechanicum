@@ -29,3 +29,9 @@ export const THREAD_ROOM = 9;
 export const SLIDE_ROOM = 1.5 + 3 + MIN_GAP + 1;
 /** How far a ground slider's rails, gib and end stops reach past its swept outline (J5), along the slide and across, mm. */
 export const RAIL_ZONE = { along: 24, across: 12 };
+/**
+ * The boss ring engraved round a pin a part carries (a revolute, spherical or universal joint): inset from the part's
+ * edge, and on a wide part no larger than a hub round the pin's bore (`hub` times the bore's radius, `bare` without a
+ * bore), so a disc's pin shows a hub, not a second rim, mm.
+ */
+export const BOSS = { inset: 1.6, min: 1.5, hub: 1.8, bare: 7 };

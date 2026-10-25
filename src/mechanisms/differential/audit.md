@@ -214,11 +214,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.03 |
 | DL-H | 14 | 0 | – |
-| never | 72 | 162 | 0.80 (full) |
+| never | 72 | 149 | 0.80 (full) |
 
 ## Promotion candidates
 None left: the bevel-diff block, the cage on a gear, bevels facing down, the spider-pin kit, a driver speed from a param and claims at a setting are in the library. Open: the second input's hand control is not built as hardware (the side gears' shafts are the case's; real half-shafts would carry the outputs).
 
 ## Verification
-check: clean · K1 residual: 6.3e-16 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.2 KB
+check: clean · K1 residual: 6.3e-16 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 80.2 KB
 screenshots: dist/shots3/differential (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.80 ms full, 1.12 at C, 1.03 at G; phone by David)

@@ -64,7 +64,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | PASS | AUTO / HAND · each rope part stretched between its two solved tangent points (D9), the crossing part slanting between its sheaves' planes; wraps fixed arcs on the far side of each sheave |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, revolutions and sweeps, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 166 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 169 solids unsound |
 | D7 | PASS | HAND · sheaves plain; richness in the rope, the guide and the slide |
 | A1 | PASS | AUTO · guide J5, L-A J3, fall-slide J5, U-A J1, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · guide J5, L-A J3, fall-slide J5, U-A J1, drive drive · upper sheaves on a dead axle in a bridge (J1); lower sheaves on a shoulder bolt in the lower block (J3); the rope by J12 |
@@ -204,12 +204,12 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-E | 15 | 1 | 1.74 |
 | DL-F | 0 | 0 | 1.63 |
 | DL-G | 0 | 0 | 1.81 |
-| DL-H | 8 | 0 | 1.73 |
-| never | 122 | 109 | 1.74 |
+| DL-H | 10 | 0 | 1.73 |
+| never | 123 | 107 | 1.74 |
 
 ## Promotion candidates
 None left: the rope (stretched parts between solved tangent points, slanting between planes; wraps; the rope's end clamped on a moving body) and the load's guide rod are the J12 rule; the reeve is a kin block.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.0 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 23.2 KB
 screenshots: dist/shots3/block-and-tackle (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)
