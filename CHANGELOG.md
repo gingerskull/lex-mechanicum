@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.43.0, Agripinaa — 2026-10-25
+
+- Ready for search and sharing: a sitemap and robots.txt, a canonical address on every page, and titles that carry
+  the name (Lex Mechanicum · Mechanism Library; a mechanism's page is "<name> · Lex Mechanicum"). Each mechanism has
+  its own social card for link previews, its drawing on the Blueprint sheet over a title block with its name, drawn
+  locally and committed like the thumbnails (`npm run cards`). Pages carry structured data (a LearningResource per
+  mechanism), the Search Console tag and cookie-free GoatCounter page counts, and each deploy tells IndexNow engines
+  about the pages.
+
 ## 0.42.0, Triplex Phall — 2026-10-25
 
 - Gears couple cleanly: bevel and hypoid teeth are true three-dimensional teeth on the back cone, a ring gear's

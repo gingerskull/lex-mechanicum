@@ -32,6 +32,9 @@ jobs:
     env:
       ASTRO_TELEMETRY_DISABLED: 1
       SITE_BASE: /lex-mechanicum/
+    outputs:
+      indexnow-key: ${{ steps.indexnow.outputs.key }}
+      indexnow-urls: ${{ steps.indexnow.outputs.urls }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -40,6 +43,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # IndexNow's key (site/src/seo.ts, served as dist/site/<key>.txt) and the sitemap's URLs, for the deploy's last step
+      - id: indexnow
+        run: |
+          echo "key=$(basename dist/site/[0-9a-f]*.txt .txt)" >> "$GITHUB_OUTPUT"
+          echo "urls=$(grep -o '<loc>[^<]*</loc>' dist/site/sitemap.xml | sed -e 's/<loc>//' -e 's#</loc>##' | jq -R . | jq -sc .)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/site
@@ -58,3 +66,16 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+      # Tells Bing, Yandex and the other IndexNow engines that the site's pages changed: every URL of the sitemap, with
+      # the key file that proves the site is ours. Best effort: it never fails the deploy.
+      - name: IndexNow
+        continue-on-error: true
+        timeout-minutes: 1
+        env:
+          SITE: ${{ steps.deployment.outputs.page_url }}
+          KEY: ${{ needs.build.outputs.indexnow-key }}
+          URLS: ${{ needs.build.outputs.indexnow-urls }}
+        run: |
+          body=$(jq -nc --arg host "$(echo "$SITE" | cut -d/ -f3)" --arg key "$KEY" --arg loc "${SITE}${KEY}.txt" --argjson urls "$URLS" '{host: $host, key: $key, keyLocation: $loc, urlList: $urls}')
+          code=$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json; charset=utf-8' -d "$body" https://api.indexnow.org/indexnow)
+          echo "IndexNow: HTTP $code for $(echo "$URLS" | jq length) URLs"

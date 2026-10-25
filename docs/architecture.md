@@ -82,6 +82,7 @@ site/                            Astro: layout, pages (library, one page per mec
                                  (sort.ts), CSS on the generated tokens.css
 tools/                           command-line tools (below)
 site/thumbs/                     the committed card thumbnails and stage stills (WebP) and their fingerprint manifest
+site/cards/                      the committed social cards (JPEG, each mechanism page's og:image) and their manifest
 tests/                           unit and fixture tests, the record and 3D checks, site build test, visual snapshots;
                                  fixture scenes of the 3D renderer (tests/fixtures/scene3.ts, ids "fx3-...")
 ```
@@ -135,6 +136,7 @@ tests/                           unit and fixture tests, the record and 3D check
 | `conformance` (`npm run conformance`) | audited standard version and check results per mechanism (Q7), part of `npm run check` |
 | `shot3 <id> [options]` (`npm run shot`) | one frame to a PNG in any named view, section, detail or explode (Q4); `--set` draws the Q4 set |
 | `thumbs [id ...] [--all] [--hook]` (`npm run thumbs`) | redraws the stale thumbnails and stills in `site/thumbs` and their manifest |
+| `cards [id ...] [--all] [--hook]` (`npm run cards`) | redraws the stale social cards in `site/cards` (1200 x 630: the stage's opening drawing over a title block with the name) and their manifest |
 | `bench [id ...]` (`npm run bench`) | the browser bench (Q5, R6, R10, DL5) in local Chrome: package size, setup split into decode, tessellate, edges and GPU (and in a worker), frames per view and dial position, flags against the R6 targets |
 | `bench --page` (`npm run bench:page`) | builds the bench page as a static folder (`dist/bench-page`) to publish and open on a phone |
 | `bench3 [id ...]` | frame times of the 3D renderer per view, paced and with a one-pixel read-back, setup and first frame |
@@ -142,7 +144,7 @@ tests/                           unit and fixture tests, the record and 3D check
 | `npm run test:e2e` (`tools/site-e2e.ts`) | builds the site, then runs the browser tests of the stage (desktop, phone, no WebGL2) and the library (sort, empty search, 404) in local Chrome |
 | `compare [--shots --ref dir] [--cards] [--lose]` | the renderer's look against reference images, card drawings per dial position, the lost-context check |
 | `tokens-css` (`npm run tokens`) | writes `site/styles/tokens.css` and its `@font-face` rules |
-| `site-assets` (in `prebuild`) | fonts, packages and meta files into `site/public`; checks the thumbnails' fingerprints and copies them (never draws) |
+| `site-assets` (in `prebuild`) | fonts, packages and meta files into `site/public`; checks the thumbnails' and social cards' fingerprints and copies them (never draws) |
 | `lint-style` (in `npm run lint`) | colour and font literals outside `src/style`, style keys in records |
 | `standard-table`, `style-table` (`npm run docs:tables`) | the generated tables of the standard and the style reference |
 | `release minor \| patch [--date ...]` (`npm run release -- minor`) | the release step: the version bump, the CHANGELOG heading with the codename, `data/codenames.json` for the footer (`docs/workflow.md`, Versions) |
@@ -164,7 +166,19 @@ Thumbnails are committed: `site/thumbs/manifest.json` holds each mechanism's fin
 (the record's kin and teaching blocks and its polish), the renderer, the style and the thumbnail view, the source parts
 taken from the drawing page's bundle inputs), so a mechanism change redraws its own images, a renderer or style change
 redraws all, and catalogue prose or site changes none. The pre-push hook redraws what is stale; the site build only
-compares.
+compares. The social cards (`site/cards`) work the same way; their fingerprint adds the card's layout and its words
+(the name, family and level), so a renamed mechanism redraws its card.
+
+## Search and sharing
+
+`site/src/seo.ts` holds what search engines and link previews read: the Search Console verification code, the
+GoatCounter site code (cookie-free page counts, in production builds only; GoatCounter's script skips localhost
+itself) and the IndexNow key, one value each, an empty one rendering nothing; and the structured data (schema.org
+JSON-LD), WebSite and Organization on the library and a LearningResource on each mechanism page. Every page has its
+canonical address and og:url; a mechanism page's og:image is its social card, the library and the 404 page use the
+mark's card (`site/brand/social.png`), and the 404 page is `noindex`. The build writes `sitemap.xml`, `robots.txt`
+and the IndexNow key file (`<key>.txt`) at the site's root. The `Pages` workflow submits the sitemap's URLs to
+IndexNow after each deploy, best effort.
 
 ## Invariants
 

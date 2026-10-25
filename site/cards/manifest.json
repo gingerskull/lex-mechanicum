@@ -1,0 +1,625 @@
+{
+  "ackermann-steering": {
+    "package": "4e8f894788b2bd6a",
+    "model": "1c31d2a1f0982026",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "1108a01942ea25d3"
+  },
+  "bell-crank": {
+    "package": "039e486a264b252f",
+    "model": "be374a05235fed8a",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "d3fe5269341710b7"
+  },
+  "eccentric-sheave": {
+    "package": "0a89cce5b85b57d0",
+    "model": "1afcd5025397094d",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "ea4b1ccbc17adc30"
+  },
+  "four-bar": {
+    "package": "27ab5475bbce6507",
+    "model": "a3e49697c1e3c5e4",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "7f28bc3e4e18a15d"
+  },
+  "pantograph": {
+    "package": "9647d4fdf9369ed9",
+    "model": "5e224aab0786a8f4",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "5245b9226cc2c04a"
+  },
+  "parallelogram-linkage": {
+    "package": "6f3c803b60df55d5",
+    "model": "ddb23f7faba01ca6",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "a90ee0c64e74439e"
+  },
+  "scissor-lift": {
+    "package": "2ccd985d938f14a8",
+    "model": "bf03a1f63cf092c9",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "7ff9070bcb73db23"
+  },
+  "scotch-yoke": {
+    "package": "0f0302f9ba00cb27",
+    "model": "0344bf07b6718ef1",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "a3744f7bd5bed250"
+  },
+  "slider-crank": {
+    "package": "9b82d3b67c4d7913",
+    "model": "147062f22aa8bbbb",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "2aa4f793c64207d8"
+  },
+  "elliptic-trammel": {
+    "package": "157900e35c1aa328",
+    "model": "077f4424fe70eb5e",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "ea2abf6cfcdf1c0e"
+  },
+  "antiparallelogram": {
+    "package": "2b264eb62a85029b",
+    "model": "abf3542e707749da",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "92fc0c04ab001eb4"
+  },
+  "centrifugal-governor": {
+    "package": "93f8ddd48ebe9104",
+    "model": "e8085d0f8dc90566",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "82d61b8b505e755b"
+  },
+  "double-crank": {
+    "package": "5c0ffbb4a84d2ee9",
+    "model": "72c13f6315a4c2fb",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "76d3a77719ce2b6d"
+  },
+  "double-rocker": {
+    "package": "4414e07ce1d5b0e2",
+    "model": "4564d6c27883c79d",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "7ba4d5f352db2817"
+  },
+  "five-bar": {
+    "package": "f3ec279b18cbcc3f",
+    "model": "d5aa40ef03e7072a",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "a4e29524a05926aa"
+  },
+  "oscillating-cylinder": {
+    "package": "805f87f0272f993d",
+    "model": "0fccccfb82053d62",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "ca6f47fd209ec4fa"
+  },
+  "stephenson-six-bar": {
+    "package": "0e378a21dfef2a15",
+    "model": "4287b4612e4f5dd1",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "2492c446064b23d9"
+  },
+  "toggle-clamp": {
+    "package": "7fb489df838cd39e",
+    "model": "0afee776c31f2f1c",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "38a44160bdfddbc6"
+  },
+  "watt-six-bar": {
+    "package": "d23108ab1ebcc4b9",
+    "model": "1db8813d085dae6d",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "8f0620b6a450ade7"
+  },
+  "jansen-linkage": {
+    "package": "2b0366b67ce2891a",
+    "model": "a02648b303200e9f",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "9a86445a836bc713"
+  },
+  "klann-linkage": {
+    "package": "c37b82ef341c2c96",
+    "model": "21809a0e261313ce",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "ff38638b9f6c16be"
+  },
+  "rhombic-drive": {
+    "package": "90a8346f7ef04733",
+    "model": "07a22b9226208f73",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "1fab15d62d9acce9"
+  },
+  "walschaerts-valve-gear": {
+    "package": "2aaa92ff15c161d2",
+    "model": "5145da00b9056a35",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "5c2cb97fda5f500d"
+  },
+  "chebyshev-linkage": {
+    "package": "3b4705796fd26f20",
+    "model": "2f1fa751dea046dc",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "6cc62d312ac2b040"
+  },
+  "roberts-linkage": {
+    "package": "9d3dfe3455ec84f4",
+    "model": "9b26ac4ecf0c600a",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "05eacd043b46c343"
+  },
+  "scott-russell": {
+    "package": "b02f08b724c3bb94",
+    "model": "06ccf67a1d68a6e7",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "b6cce6b7362808bf"
+  },
+  "watt-linkage": {
+    "package": "9cf61898bc4a810a",
+    "model": "8668d109a2b1e60c",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "757465d34e5ff519"
+  },
+  "evans-grasshopper": {
+    "package": "0eb75c3ef85e4c29",
+    "model": "e7139840c309b3e2",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "8cf69c83cfa37647"
+  },
+  "hoekens-linkage": {
+    "package": "7e81f00c8072bdc7",
+    "model": "341b2d2080be2c58",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "1a0e33297bae7952"
+  },
+  "tusi-couple": {
+    "package": "d16e0a8a4e195e8f",
+    "model": "a409177934be7de8",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "0efd749dba6b74b8"
+  },
+  "hart-inversor": {
+    "package": "8839d7ea2f45db24",
+    "model": "4bd7e82525b6152f",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "550641eb2988f691"
+  },
+  "peaucellier-lipkin": {
+    "package": "026f43425b6dfeaf",
+    "model": "f68443e28069139c",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "e91c95f7259e082b"
+  },
+  "offset-slider-crank": {
+    "package": "9aba93329e65d83d",
+    "model": "0b4816ba0cb40300",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "93eb90b1c51f2b9c"
+  },
+  "crank-shaper": {
+    "package": "94c9e24383ac324d",
+    "model": "552fadecfdede8d4",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "c653f01200e05edf"
+  },
+  "whitworth": {
+    "package": "007b710b2a4ff296",
+    "model": "f1a9b7858b46d8be",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "c14195118b53e332"
+  },
+  "drag-link-quick-return": {
+    "package": "07a10a30271443ef",
+    "model": "940e5a6cbb80a361",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "9de960f293cb5b72"
+  },
+  "rack-pinion": {
+    "package": "a517b6858f7926c8",
+    "model": "d5166f2dad6b3b0b",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "2afceb42c1a65e0c"
+  },
+  "spur-gears": {
+    "package": "6a0a6b465e069bc1",
+    "model": "6f3feb09c30de317",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "c729f7cc9621ca7f"
+  },
+  "bevel-gears": {
+    "package": "f1c78eec7117fa32",
+    "model": "8327967c0b3577d7",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "74cae7b79592deb4"
+  },
+  "gear-train": {
+    "package": "523bfa36bec0f924",
+    "model": "eb1b204a0bbca243",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "aaf6a03dceea40a1"
+  },
+  "helical-gears": {
+    "package": "79697b82ed14bc53",
+    "model": "b709e4ded808db98",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "dee8f358d685ec1e"
+  },
+  "herringbone-gears": {
+    "package": "4b51b2786cd69310",
+    "model": "68d9efc37dcdd03b",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "c19af1bb71c59e51"
+  },
+  "internal-gear-pair": {
+    "package": "b4b546ff3c14a397",
+    "model": "a96bd4d2f9547a31",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "b69b4fb21111cf62"
+  },
+  "sun-and-planet": {
+    "package": "9ca0b5d83c659081",
+    "model": "6fb5a878bc3f6a6e",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "41048cc10e7cd2c3"
+  },
+  "worm-drive": {
+    "package": "9aec751c2db1e734",
+    "model": "c73c55f992f0aa2a",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "1f5cf430ff8b27cf"
+  },
+  "crossed-helical-gears": {
+    "package": "808bc3d2654cb7a2",
+    "model": "f350c6d3f64f484f",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "dbc72dbe07e82cb8"
+  },
+  "cycloidal-drive": {
+    "package": "489d3685d73047be",
+    "model": "367dc38d2dc2d655",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "cfefca356d902811"
+  },
+  "differential": {
+    "package": "02d773bad8ee31e8",
+    "model": "b4b6278b582ca8cf",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "3a6c867663072686"
+  },
+  "harmonic-drive": {
+    "package": "9c4bbd3cd4f1d73f",
+    "model": "d073328c213101b9",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "75de5de089f09e67"
+  },
+  "hypoid-gears": {
+    "package": "812c152df71d8427",
+    "model": "7426f79c73fb244e",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "8ac62461451513af"
+  },
+  "non-circular-gears": {
+    "package": "fc11e4495422e596",
+    "model": "481ad74d4829af8f",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "7fe1ac80a7afde4f"
+  },
+  "planetary": {
+    "package": "85669507990557e6",
+    "model": "a0356d3ca590f948",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "476ae26b63132256"
+  },
+  "ravigneaux": {
+    "package": "ee5493575684e2be",
+    "model": "3b7f40aeb76e6a69",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "c61c3e6a0f1be38b"
+  },
+  "wankel": {
+    "package": "8bcb43130459e6c7",
+    "model": "4da911ff3bae487c",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "8cf04dd614fc7e4b"
+  },
+  "star-wheel": {
+    "package": "bf99543cc5bd0908",
+    "model": "784daf7a753e8573",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "19028cb593cd0f06"
+  },
+  "geneva": {
+    "package": "e928d3cdf2160a11",
+    "model": "c18dc4d554e8fd01",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "d0f32afec3912f3f"
+  },
+  "intermittent-gear": {
+    "package": "6981a5f86fa26d81",
+    "model": "42744443baac1903",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "75a474001e1b2b00"
+  },
+  "internal-geneva": {
+    "package": "84b4f11fbb793b5d",
+    "model": "784709e9dcb94212",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "7de6033e245dacfb"
+  },
+  "roller-gear-indexer": {
+    "package": "4c2fed0d480f9b69",
+    "model": "c38be0c424ecb763",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "c7cc5ba7b8301cf6"
+  },
+  "barrel-cam": {
+    "package": "43c1308c729da9f7",
+    "model": "ed86df5cc8f3350b",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "70a34ea3ef457a1a"
+  },
+  "cam-follower": {
+    "package": "55a2aa68d687b7bd",
+    "model": "3ad41316f3000227",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "ca0d8c54bd9be6b2"
+  },
+  "flat-faced-cam": {
+    "package": "5eb0b095551a8fe3",
+    "model": "a4f57d951f7ddae8",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "bd2eb9361beb9d1b"
+  },
+  "face-groove-cam": {
+    "package": "473e950dc4d54ab1",
+    "model": "b0e1b802ebab84b2",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "140d154bd0827cd1"
+  },
+  "desmodromic-cam": {
+    "package": "85dc09f00fcb178c",
+    "model": "3254b59c81917255",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "615c2c3ea61741c8"
+  },
+  "locomotive-drive": {
+    "package": "69726fe3d01b2db0",
+    "model": "e213a12fa4730895",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "2fee9da0a6d0c90a"
+  },
+  "oldham-coupling": {
+    "package": "268486debf27e73c",
+    "model": "8d6b1a46474b40f8",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "32fcca2e8b512931"
+  },
+  "universal-joint": {
+    "package": "4d2ff5748be8d266",
+    "model": "79b4c135c60427b7",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "78074fa41468fc4c"
+  },
+  "double-cardan": {
+    "package": "59ce5d7179ce442f",
+    "model": "31bf769d5f8fd689",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "89229f842f1a602b"
+  },
+  "rzeppa-cv-joint": {
+    "package": "9d6af288f0f7fadf",
+    "model": "aa4ca822dd73ec93",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "95b5f21bc923e307"
+  },
+  "schmidt-coupling": {
+    "package": "d43b9b80971bd13f",
+    "model": "f051cffaafc8905b",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "7dd33b1ca651b61a"
+  },
+  "lead-screw": {
+    "package": "6b48cce1fbb196e8",
+    "model": "066cdc6908dc8ca7",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "770c6f49ed186b19"
+  },
+  "ball-screw": {
+    "package": "86e87c388123bce3",
+    "model": "c1d1f9c8077e810a",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "c511bcb3c8b71e81"
+  },
+  "differential-screw": {
+    "package": "b6312c66bb60f451",
+    "model": "bf465bc3bad63049",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "6d71812ca5a84677"
+  },
+  "belt-drive": {
+    "package": "1bb89a1905c6a51e",
+    "model": "44ff267191777654",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "3013bfe090b08f65"
+  },
+  "block-and-tackle": {
+    "package": "e9df2708326eeaa3",
+    "model": "b851ded4ef70b959",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "ce9875e8ae632be9"
+  },
+  "chain-drive": {
+    "package": "0572be6d7cf01016",
+    "model": "d24963e6c88cc1ff",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "bff42fbdefce367f"
+  },
+  "cvt-belt": {
+    "package": "afae072611aa62ac",
+    "model": "56dab9e599e47079",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "384dba56fb6bfa8b"
+  },
+  "friction-wheel-drive": {
+    "package": "d91d5261716c2123",
+    "model": "c0604b8ad4757b66",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "027b2be3532dcc86"
+  },
+  "ball-disc-integrator": {
+    "package": "979eeaa4fefdc68c",
+    "model": "e1ffc92b3b119fc1",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "13627811b28604bd"
+  },
+  "anchor-escapement": {
+    "package": "dbefe0716831bca4",
+    "model": "5f2e316c0ddc05ff",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "781bc8fe09c93e33"
+  },
+  "verge-escapement": {
+    "package": "1c1664681caa7d29",
+    "model": "57132009d9e8de64",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "23316c20685cf0b9"
+  },
+  "lever-escapement": {
+    "package": "f57fe4967fca3df6",
+    "model": "4229345990064531",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "dae57483f3f1d3c6"
+  },
+  "ratchet-pawl": {
+    "package": "155aa6e3a82895cd",
+    "model": "485db18554ab5f12",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "0eaee3c0866e9d13"
+  },
+  "sprag-clutch": {
+    "package": "d7d77a7819cdc38f",
+    "model": "b18792409001b37a",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "ed914c5b6b16eab5"
+  },
+  "sarrus-linkage": {
+    "package": "a019ca7608bb16dd",
+    "model": "8d9590c75797b3f1",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "4e407c0417ce6453"
+  },
+  "swash-plate": {
+    "package": "7f85a9cb81b60d7b",
+    "model": "bfef9674fffd7d9f",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "957c96c20942719d"
+  },
+  "bennett-linkage": {
+    "package": "dd09140be0fbb554",
+    "model": "3c8ac018e4186f79",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "86ea25cd7a9c2cba"
+  },
+  "flexure-hinge": {
+    "package": "82d99d7958138a15",
+    "model": "061bab2223d97dd2",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "3681286c9d869956"
+  },
+  "bistable-compliant": {
+    "package": "dc94c729b834a7e3",
+    "model": "c10aa9506783597f",
+    "renderer": "2b016f4ddad81195",
+    "style": "caa2d1e889a98326",
+    "card": "1d6e679b81dd892a"
+  }
+}

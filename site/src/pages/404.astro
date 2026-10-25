@@ -4,10 +4,11 @@
 // library.
 import Sheet from "../layouts/Sheet.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
+import { APP } from "../data";
 import { url } from "../url";
 import { HINTS } from "../lore";
 ---
-<Sheet title="Sheet ST-404 · Mechanism Library" description="This sheet is not in the archive.">
+<Sheet title={`Sheet ST-404 · ${APP}`} description="This sheet is not in the archive." noindex>
   <main class="wrap detail lost">
     <header class="dhead">
       <div class="meta"><b>ST-404</b> · Not in the archive</div>

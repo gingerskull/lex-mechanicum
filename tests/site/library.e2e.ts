@@ -234,7 +234,7 @@ describe("the quiet states", () => {
       const page = await ctx.newPage();
       const res = await page.goto(base + "/mechanisms/no-such-sheet/");
       expect(res?.status()).toBe(404);
-      expect(await page.title()).toBe("Sheet ST-404 · Mechanism Library");
+      expect(await page.title()).toBe("Sheet ST-404 · Lex Mechanicum");
       expect(await page.locator("h1").textContent()).toBe("Sheet ST-404");
       expect(await page.locator(".dhead p:not(.lore-hint)").textContent()).toBe("This sheet is not in the archive. Its pattern may be lost, or not yet recovered.");
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
