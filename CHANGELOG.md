@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.43.1, Agripinaa — 2026-10-25
+
+- The library is headed Lex Mechanicum, under a Mechanism Library kicker. Its link preview fits: a shorter description,
+  and a card with the name and what the site does beside the mark, at an address that changes with the card so
+  services fetch the new one.
+
 ## 0.43.0, Agripinaa — 2026-10-25
 
 - Ready for search and sharing: a sitemap and robots.txt, a canonical address on every page, and titles that carry

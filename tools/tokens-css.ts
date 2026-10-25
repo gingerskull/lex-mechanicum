@@ -2,7 +2,8 @@
 // generated, never edited: a dark :root block, a light :root[data-theme="light"] block and a forge :root[data-theme="forge"]
 // block with the same names, derived ink tiers and grid alphas as colour-mixes of the theme colours, then the type families
 // and shared sizes.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COLOR_NAMES, TOKENS, type ThemeKey } from "../src/style/tokens";
@@ -38,6 +39,15 @@ export const FONT_FILES = (["display", "body", "mono"] as const).flatMap((f) => 
   const slug = family.toLowerCase().replace(/ /g, "-");
   return TOKENS.type.weights[f].map((w) => ({ family, slug, weight: w, file: `${slug}-${w}.woff2` }));
 });
+
+/** The faces as @font-face rules with the fonts inline, for a page with no font server (the social cards). */
+export function inlineFontFaces(): string {
+  const require = createRequire(import.meta.url);
+  return FONT_FILES.map((f) => {
+    const file = join(dirname(require.resolve(`@fontsource/${f.slug}/package.json`)), "files", `${f.slug}-latin-${f.weight}-normal.woff2`);
+    return `@font-face{font-family:"${f.family}";font-weight:${f.weight};src:url(data:font/woff2;base64,${readFileSync(file).toString("base64")}) format("woff2")}`;
+  }).join("");
+}
 
 const fontFaces = () =>
   FONT_FILES.flatMap((f) => [

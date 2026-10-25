@@ -6,7 +6,8 @@
 //   favicon.svg          the mark in the sheet's ink: Drafting ink in a light browser, Blueprint ink in a dark one
 //   favicon-{16,32,48}.png, favicon.ico (16, 32, 48)   fallbacks for browsers without SVG icons: Drafting ink, clear
 //   apple-touch-icon.png 180 px, the mark in Blueprint ink on Blueprint paper
-//   social.png           1200 x 630, the mark on the Blueprint sheet with its grid
+//   social.png           1200 x 630, the mark and the name on the Blueprint sheet with its grid (the library's and the
+//                        404 page's og:image; seo.ts versions its address with brand.json's fingerprint)
 import { createHash } from "node:crypto";
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -14,6 +15,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright-core";
 import { MARK_SHAPES, MARK_VIEWBOX } from "../site/src/mark";
 import { TOKENS } from "../src/style/tokens";
+import { inlineFontFaces } from "./tokens-css";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 export const BRAND_DIR = join(root, "site", "brand");
@@ -26,7 +28,7 @@ const light = TOKENS.themes.light;
 const ICON_SIZES = [16, 32, 48] as const;
 const TOUCH = 180; // px, apple-touch-icon
 const TOUCH_MARK = 0.72; // 0..1, the mark's share of the touch icon's side
-const CARD = { w: 1200, h: 630, mark: 300 }; // px, social card and the mark's side on it
+const CARD = { w: 1200, h: 630, mark: 220, gap: 52, text: 640 }; // px, social card, the mark's side, the gap to the words and their width
 
 /** Every file this writes into site/brand, brand.json aside. */
 export const BRAND_FILES = ["favicon.svg", ...ICON_SIZES.map((s) => `favicon-${s}.png`), "favicon.ico", "apple-touch-icon.png", "social.png"];
@@ -45,7 +47,7 @@ export const faviconSvg = () =>
 export function fingerprint(): string {
   const grid = Object.fromEntries(Object.entries(TOKENS.gridTiers).map(([k, v]) => [k, { dark: v.dark, light: v.light }]));
   const src = readFileSync(fileURLToPath(import.meta.url), "utf8").replace(/\r\n/g, "\n");
-  return createHash("sha256").update(JSON.stringify([MARK_VIEWBOX, MARK_SHAPES, dark, light, grid, TOKENS.size.grid, TOKENS.size.gridMajor, src])).digest("hex").slice(0, 16);
+  return createHash("sha256").update(JSON.stringify([MARK_VIEWBOX, MARK_SHAPES, dark, light, grid, TOKENS.size.grid, TOKENS.size.gridMajor, TOKENS.type, TOKENS.tiers, src])).digest("hex").slice(0, 16);
 }
 
 /** null when the committed images are drawn from the current mark and tokens, else what to run. */
@@ -59,7 +61,8 @@ export function brandStale(): string | null {
   return stored === fingerprint() ? null : "the icons and social card in site/brand are stale: run npx tsx tools/brand.ts and commit site/brand";
 }
 
-/** The social card page: the Blueprint sheet, its grid at the page's pitch and alphas, the mark in the middle. */
+/** The social card page: the Blueprint sheet, its grid at the page's pitch and alphas, the mark and beside it the name,
+ * the set and what the site does, lettered as the mechanisms' cards are (tools/cards.ts). */
 function cardHtml(): string {
   const g = TOKENS.size.grid;
   const major = g * TOKENS.size.gridMajor;
@@ -67,9 +70,18 @@ function cardHtml(): string {
     `linear-gradient(color-mix(in srgb, ${dark.grid} ${alpha * 100}%, transparent) 1px, transparent 1px) 0 0 / ${pitch}px ${pitch}px,` +
     `linear-gradient(90deg, color-mix(in srgb, ${dark.grid} ${alpha * 100}%, transparent) 1px, transparent 1px) 0 0 / ${pitch}px ${pitch}px`;
   const bg = `${line(TOKENS.gridTiers.grid2.dark, major)},${line(TOKENS.gridTiers.grid1.dark, g)},${dark.paper}`;
-  // the grid is centred on the mark, as the drawing's grid is centred on the drawing (SF12)
+  // the grid is centred on the card, as the drawing's grid is centred on the drawing (SF12)
   const pos = `${(CARD.w / 2) % major}px ${(CARD.h / 2) % major}px`;
-  return `<body style="margin:0;width:${CARD.w}px;height:${CARD.h}px;display:grid;place-items:center;background:${bg};background-position:${pos}">${markSvg(dark.ink, CARD.mark)}</body>`;
+  const T = TOKENS.type;
+  const muted = `color-mix(in srgb, ${dark.ink} ${TOKENS.tiers.muted.dark * 100}%, transparent)`;
+  return `<style>${inlineFontFaces()}
+.c{display:flex;align-items:center;gap:${CARD.gap}px}
+.w{width:${CARD.text}px;color:${dark.ink}}
+.k{margin:0;font:500 20px ${T.mono};letter-spacing:${T.tracking.monoWide}em;color:${muted}}
+.k b{color:${dark.accent};font-weight:500}
+.n{margin:14px 0 18px;font:600 66px/1 ${T.mono};letter-spacing:${T.tracking.mono}em}
+.t{margin:0;font:400 26px/1.4 ${T.body};color:${muted};text-wrap:balance}
+</style><body style="margin:0;width:${CARD.w}px;height:${CARD.h}px;display:grid;place-items:center;background:${bg};background-position:${pos}"><div class="c">${markSvg(dark.ink, CARD.mark)}<div class="w"><p class="k"><b>&#9632;</b> MECHANISM LIBRARY</p><p class="n">LEX MECHANICUM</p><p class="t">Linkages, gears, cams and indexing drives, drawn live as working drawings. Turn them, tilt them, take them apart.</p></div></div></body>`;
 }
 
 /** The touch icon page: the mark centred on Blueprint paper. */
@@ -105,6 +117,7 @@ export async function drawBrand(): Promise<void> {
     const shot = async (html: string, w: number, h: number, clear: boolean): Promise<Buffer> => {
       const page = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 1 });
       await page.setContent(`<!doctype html><meta charset="utf-8">${html}`);
+      await page.evaluate(() => document.fonts.ready);
       const png = await page.screenshot({ omitBackground: clear, clip: { x: 0, y: 0, width: w, height: h } });
       await page.close();
       return png;

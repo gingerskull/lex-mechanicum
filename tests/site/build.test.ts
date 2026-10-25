@@ -118,9 +118,10 @@ describe("site build", () => {
     }
   });
 
-  it("names the app, Lex Mechanicum, in the library's kicker, the footer and every page's head", () => {
+  it("names the app, Lex Mechanicum, in the library's heading under the Mechanism Library kicker, the footer and every page's head", () => {
     const lib = read("index.html");
-    expect(lib).toContain('<p class="kicker">Lex Mechanicum · drawing set</p>');
+    expect(lib).toContain('<p class="kicker">Mechanism Library</p>');
+    expect(lib).toMatch(new RegExp(`<h1>Lex Mechanicum <span>${allIds().length}</span></h1>`));
     for (const f of ["index.html", "404.html", join("mechanisms", allIds()[0]!, "index.html")]) {
       const html = read(f);
       expect(html, f).toContain('<meta name="application-name" content="Lex Mechanicum">');
@@ -162,6 +163,12 @@ describe("site build", () => {
     expect(html).toContain(`<span>drawn under XVI laws · ${codename ? `${codename} · ` : ""}${version}</span>`);
   });
 
+  it("keeps every page's description short enough for search results (about 155 characters)", () => {
+    const desc = (html: string) => /<meta name="description" content="([^"]*)"/.exec(html)![1]!.replace(/&#39;|&quot;|&amp;/g, "x");
+    expect(desc(read("index.html")).length).toBeLessThanOrEqual(155);
+    for (const id of allIds()) expect(desc(read(join("mechanisms", id, "index.html"))).length, id).toBeLessThanOrEqual(160);
+  });
+
   it("lists the library and every mechanism page in the sitemap, and points robots.txt at it", () => {
     const locs = [...read("sitemap.xml").matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]!));
     expect(locs).toHaveLength(allIds().length + 1);
@@ -184,6 +191,9 @@ describe("site build", () => {
     expect(lib).toMatch(/<title>Lex Mechanicum · Mechanism Library<\/title>/);
     expect(lds(lib).map((d) => d["@type"])).toEqual(["WebSite", "Organization"]);
     expect(meta(lib, "google-site-verification")).toBeTruthy();
+    // the mark's card, its address versioned by what it is drawn from (brand.json)
+    const fingerprint = (JSON.parse(readFileSync("site/brand/brand.json", "utf8")) as { fingerprint: string }).fingerprint;
+    expect(new URL(meta(lib, "og:image")!).search).toBe(`?v=${fingerprint}`);
     expect(lib).toMatch(/<script async data-goatcounter="https:\/\/[a-z0-9-]+\.goatcounter\.com\/count" src="https:\/\/gc\.zgo\.at\/count\.js">/);
     for (const id of allIds()) {
       const html = read(join("mechanisms", id, "index.html"));

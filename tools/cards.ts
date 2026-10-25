@@ -8,8 +8,7 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { MARK_SHAPES, MARK_VIEWBOX } from "../site/src/mark";
 import { recordById } from "../src/catalog";
@@ -18,7 +17,7 @@ import { TOKENS } from "../src/style/tokens";
 import type { Page } from "playwright-core";
 import { openChrome3, type Chrome3, type Draw3Options } from "./chrome3";
 import { STILL, fingerprints as thumbFingerprints } from "./thumbs";
-import { FONT_FILES } from "./tokens-css";
+import { inlineFontFaces } from "./tokens-css";
 
 /** px: the card, the title block's height under the drawing, the mark's side in it; JPEG quality 0..1. */
 export const CARD = { w: 1200, h: 630, block: 150, mark: 64, pad: 40, name: 64, nameMin: 36, quality: 0.86 };
@@ -28,7 +27,6 @@ const SAME = 0.001;
 const root = fileURLToPath(new URL("..", import.meta.url));
 export const CARDS_DIR = join(root, "site", "cards");
 const MANIFEST = join(CARDS_DIR, "manifest.json");
-const require = createRequire(import.meta.url);
 const dark = TOKENS.themes.dark;
 
 /** The drawing above the title block: the stage's opening frame on Blueprint, no sheet frame (the card is its sheet). */
@@ -95,14 +93,6 @@ export async function checkCards(ids: string[], packages: Map<string, Uint8Array
   if (bad.length) throw new Error(`social cards out of date: ${bad.map((b) => `${b.id} (${b.why.join(", ")})`).join("; ")}. Run npm run cards and commit site/cards.`);
 }
 
-/** The faces the title block uses, inline: the card page has no font server. */
-function faces(): string {
-  return FONT_FILES.map((f) => {
-    const file = join(dirname(require.resolve(`@fontsource/${f.slug}/package.json`)), "files", `${f.slug}-latin-${f.weight}-normal.woff2`);
-    return `@font-face{font-family:"${f.family}";font-weight:${f.weight};src:url(data:font/woff2;base64,${readFileSync(file).toString("base64")}) format("woff2")}`;
-  }).join("");
-}
-
 const esc = (t: string) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 const inkAt = (alpha: number) => `color-mix(in srgb, ${dark.ink} ${alpha * 100}%, transparent)`;
 
@@ -147,7 +137,7 @@ export async function cards(ids = allIds(), all = false): Promise<string[]> {
   const todo = all ? ids : staleCards(manifest, now).map((s) => s.id);
   const files: string[] = [];
   if (todo.length) {
-    const fonts = faces();
+    const fonts = inlineFontFaces();
     const chrome = await openChrome3();
     try {
       const page = await chrome.page.context().browser()!.newPage({ viewport: { width: CARD.w, height: CARD.h }, deviceScaleFactor: 1 });

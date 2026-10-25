@@ -9,6 +9,7 @@ import "../../styles/layout.css";
 import "../../styles/components.css";
 import "../../styles/forge.css";
 import Footer from "../components/Footer.astro";
+import brand from "../../brand/brand.json";
 import { APP } from "../data";
 import { FORGE_FILTERS } from "../forge-filters";
 import { GOATCOUNTER, GOOGLE_SITE_VERIFICATION, absolute, ldJson } from "../seo";
@@ -16,7 +17,8 @@ import { url } from "../url";
 interface Props {
   title: string;
   description: string;
-  /** The social card, a site-absolute path (url()), 1200 x 630; the mark's card by default. */
+  /** The social card, a site-absolute path (url()), 1200 x 630; the mark's card by default, its address versioned by
+   * what it is drawn from, so link previews that cached an older card fetch the new one. */
   image?: string;
   imageAlt?: string;
   /** Structured data (schema.org), one object or several. */
@@ -24,7 +26,7 @@ interface Props {
   /** Kept out of search results (the 404 page): no canonical address either. */
   noindex?: boolean;
 }
-const { title, description, image = url("/social.png"), imageAlt = `${APP}, the mark: a cog on the Blueprint sheet`, ld, noindex = false } = Astro.props;
+const { title, description, image = url(`/social.png?v=${brand.fingerprint}`), imageAlt = `${APP}, Mechanism Library: the mark, a cog, beside the name on the Blueprint sheet`, ld, noindex = false } = Astro.props;
 const card = absolute(image, Astro.site);
 const canonical = absolute(Astro.url.pathname, Astro.site);
 const lds = ld === undefined ? [] : Array.isArray(ld) ? ld : [ld];
