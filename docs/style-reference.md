@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.9
-date: 2026-10-25
+version: 3.10
+date: 2026-10-27
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -778,7 +778,7 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 | Id | Check | Pass |
 |---|---|---|
 | SQ1 | Literal scan: a colour (`#…`, `rgb(`) or a font family string outside `src/style` and the generated CSS | No hits in renderer, site code, component CSS or records (pattern tiles may build `rgba()` strings from token values) |
-| SQ2 | Look match | The four pilots, side by side with the hand-off proposal at plan, an isometric view and side view in both sheets, read as the same style and overall look to the eye. Not pixel for pixel. |
+| SQ2 | Look match | Retired in 3.10. The look is held by our own snapshot baselines (SQ9); the hand-off proposal it compared against is no longer a reference. |
 | SQ3 | One-knob test | Changing `tokens.themes.dark.accent` changes the input ring, paths, forces, play button, kicker, sheet numbers and focus ring together, and nothing else. Changing `draft.lines.plateTop` changes every mechanism. |
 | SQ4 | Theme switch | Every visible card and the stage redraw in the new theme with no stale cached paper, patterns or thumbnails. |
 | SQ5 | Headless | Checks, clearance, packaging and audit generation run in Node (style must not need the DOM); the bench, shots and snapshots draw in local Chrome. |
@@ -795,6 +795,8 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 
 ## Changelog
 
+- **3.10 (2026-10-27).** SQ2, the look match against the hand-off proposal, is retired: our own snapshot baselines
+  (SQ9) hold the look.
 - **3.9 (2026-10-25).** A turning round part carries rulings registered to it, a ball and a crowned roller too (SD29),
   and boss rings go only round pins, hub-sized; an index arrow stays on its part's material. A lofted part (a worm) is
   drawn by its crests, roots and outlines, not its tessellation (SD3). A construction line may end at the base plate's

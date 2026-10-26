@@ -871,7 +871,8 @@ default detail level.
 Every decision of the engine plan (#202) and every teaching-review decision of the rebuild issues (#212 to #218) has a
 requirement id here. A decision about one mechanism sits in that mechanism's rebuild issue and in its record's
 `teaching` block; this table gives each kind of decision its id and how it is enforced. **AUTO** is done or checked by
-the pipeline, **HAND** is built and judged in the pass, **DATA** is a record field.
+the pipeline, **HAND** is built and judged in the pass, **DATA** is a record field. The original teaching review
+these decisions started from is kept in `docs/teaching-review.md`.
 
 | Decision (plan #202) | Ids | Enforcement |
 |---|---|---|
