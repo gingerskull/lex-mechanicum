@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.43.2, Agripinaa — 2026-10-27
+
+- The original teaching review is kept in `docs/teaching-review.md`. The workflow says which work needs local
+  Chrome and which runs anywhere. The look match against the hand-off proposal (style SQ2) is retired; our own
+  snapshot baselines hold the look.
+
 ## 0.43.1, Agripinaa — 2026-10-25
 
 - The library is headed Lex Mechanicum, under a Mechanism Library kicker. Its link preview fits: a shorter description,

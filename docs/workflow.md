@@ -69,6 +69,21 @@ Heavy checks run locally; CI runs what takes seconds.
 Snapshot baselines are regenerated once, when the look is final, never to make a run pass. Everything that draws
 needs Google Chrome installed locally (`tools/chrome3.ts`); CI never draws.
 
+### What needs local tools
+
+Everything that does not draw runs in Node anywhere, so a session in the cloud can do it: records and the catalogue,
+kinematics, rules and hardware, the headless checks and clearance, site code, docs. Work that draws needs a checkout
+with Google Chrome and WebGL2:
+
+- a change that makes thumbnails or social cards stale (a mechanism's package, record blocks or polish, the
+  renderer, the style, a thumbnail view, or a mechanism's name, family or level): the pre-push hook redraws them,
+  and the site build fails while they are stale;
+- visual snapshots and their baselines, the browser bench, `compare`, `shot3` and `pilots3`;
+- the verify step of a conformance pass, which looks at the drawn views (standard section 1).
+
+Every other input a session needs is in the repository or on the board: the standard, the style reference, the
+catalogue and its sources, and the original teaching review (`docs/teaching-review.md`).
+
 ## CI
 
 One workflow for pull requests. Drafts run nothing. A cheap "what changed" job selects the rest by paths; no browser
