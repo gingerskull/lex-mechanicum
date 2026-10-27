@@ -114,7 +114,7 @@ describe("inputs a rule cannot build are refused or reported", () => {
   const shape = (kin: Kin, body: string) => kin.bodies.find((b) => b.id === body)!.shape as Record<string, unknown>;
 
   it("a wobble journal no bearing in the table fits", async () => {
-    await expect(buildWithContext(bent("wobble-box", (k) => (shape(k, "journal").diameter = 21)))).rejects.toThrow(/no bearing in the table has a 21 mm bore/);
+    await expect(buildWithContext(bent("wobble-box", (k) => ((shape(k, "input").journal as Record<string, unknown>).diameter = 21)))).rejects.toThrow(/no bearing in the table has a 21 mm bore/);
   });
 
   it("a held rack too shallow for its setting slots, or too short for its dowels", async () => {

@@ -7,8 +7,8 @@ export const KIN_VOCAB = {
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
     "rope", "cage", "cross", "tracer", "cylinder", "piston", "nut", "fork", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
     "spatial-link", "ball", "race", "bell", "shoe",
-    // a wobble drive's trunnion ring on its inclined journal, and the journal sleeve
-    "wobble-ring", "wobble-journal",
+    // a wobble drive's trunnion ring on its inclined journal
+    "wobble-ring",
     // a rod bent to the angle of its two joints' axes (Hobson's joint)
     "elbow",
   ],
