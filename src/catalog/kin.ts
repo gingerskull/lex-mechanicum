@@ -25,6 +25,8 @@ export const KIN_VOCAB = {
     "sarrus", "cross-slide", "parallel-cranks", "plane-slide", "rzeppa", "conical-pendulum",
     // the spherical four-bar (a wobble drive)
     "spherical-four-bar",
+    // a member anchored at one end round a sprocket on a moving member (a stroke doubler's chain)
+    "strand",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

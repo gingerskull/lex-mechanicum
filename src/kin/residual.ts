@@ -218,6 +218,15 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     return wrapPi(turn(s.b0, s.b1, ax2) - dC - ratio * dA);
   }
   const jr = j as unknown as Record<string, unknown>;
+  if (j.type === "belt" && jr.strand && j.radiusA !== undefined && s.c0 && s.c1) {
+    // a strand of a member anchored at one end round a sprocket on a carrier (the strand block): in the carrier's
+    // frame, b's end moves along axis2 by r Δθa, as a rack on a pinion
+    const i0 = xf.inv(s.c0);
+    const i1 = xf.inv(s.c1);
+    const a0 = xf.mul(i0, s.a0), a1 = xf.mul(i1, s.a1), b0 = xf.mul(i0, s.b0), b1 = xf.mul(i1, s.b1);
+    const trav = v3.dot(v3.sub(xf.apply(b1, r.at), xf.apply(b0, r.at)), ax2);
+    return trav - n(j.radiusA) * turn(a0, a1, ax);
+  }
   if (j.type === "belt" && jr.flexible === "chain" && j.za !== undefined && jr.pitch !== undefined) {
     // a chain on its pitch polygons: the advance the driver gives equals the advance the driven takes (chordal action)
     const za = n(j.za), zb = n(j.zb), p = n(jr.pitch);
