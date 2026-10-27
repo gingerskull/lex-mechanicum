@@ -586,7 +586,7 @@
     { "title": "How I designed a two stage belt drive (YouTube)", "url": "https://www.youtube.com/watch?v=utBKRAg8tdw", "kind": "video" },
     { "title": "Types of Belt Drive (YouTube)", "url": "https://www.youtube.com/watch?v=eljkrcjywLQ", "kind": "video" }
   ],
-  "related": ["chain-drive", "cvt-belt", "friction-wheel-drive", "spur-gears", "block-and-tackle"]
+  "related": ["chain-drive", "cvt-belt", "friction-wheel-drive", "spur-gears", "block-and-tackle", "chain-stroke-doubler"]
 },
 {
   "id": "chain-drive",
@@ -671,7 +671,7 @@
     { "title": "Drive roller chains (DIN 8187 / ISO 606), TYMA", "url": "https://tyma.eu/products/chains/drive-roller-chains", "kind": "photos" },
     { "title": "Chain and Sprocket Drive Animation (YouTube)", "url": "https://www.youtube.com/watch?v=bH9VuurFOA8", "kind": "animation" }
   ],
-  "related": ["belt-drive", "spur-gears", "gear-train", "locomotive-drive"]
+  "related": ["belt-drive", "spur-gears", "gear-train", "locomotive-drive", "chain-stroke-doubler"]
 },
 {
   "id": "block-and-tackle",
@@ -757,7 +757,7 @@
     { "title": "Block (sailing), Wikipedia (photos of Mary Rose and modern blocks)", "url": "https://en.wikipedia.org/wiki/Block_(sailing)", "kind": "photos" },
     { "title": "Pulley system simulation, Walter Fendt", "url": "https://www.walter-fendt.de/html5/phen/pulleysystem_en.htm", "kind": "interactive" }
   ],
-  "related": ["belt-drive", "differential-screw", "bell-crank", "toggle-clamp"]
+  "related": ["belt-drive", "differential-screw", "bell-crank", "toggle-clamp", "chain-stroke-doubler"]
 },
 {
   "id": "oldham-coupling",

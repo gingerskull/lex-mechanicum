@@ -34414,6 +34414,7 @@
       "real_world": [],
       "related": [
         "rack-pinion",
+        "chain-stroke-doubler",
         "slider-crank",
         "planetary"
       ],
@@ -61769,7 +61770,8 @@
         "cvt-belt",
         "friction-wheel-drive",
         "spur-gears",
-        "block-and-tackle"
+        "block-and-tackle",
+        "chain-stroke-doubler"
       ],
       "added": "2026-10-20",
       "origin": {
@@ -62369,7 +62371,8 @@
         "belt-drive",
         "differential-screw",
         "bell-crank",
-        "toggle-clamp"
+        "toggle-clamp",
+        "chain-stroke-doubler"
       ],
       "added": "2026-10-20",
       "origin": {
@@ -63362,7 +63365,8 @@
         "belt-drive",
         "spur-gears",
         "gear-train",
-        "locomotive-drive"
+        "locomotive-drive",
+        "chain-stroke-doubler"
       ],
       "added": "2026-10-20",
       "origin": {
@@ -64572,6 +64576,714 @@
         ],
         "exceptions": []
       }
+    },
+    {
+      "record_version": 3,
+      "id": "chain-stroke-doubler",
+      "name": "Chain stroke doubler",
+      "aka": [
+        "chain doubler",
+        "2:1 chain reeving",
+        "free-lift chain",
+        "telescopic fork chain drive",
+        "moving sprocket doubler"
+      ],
+      "in_site": false,
+      "family": "Flexible drive",
+      "level": "Intermediate",
+      "summary": "A chain anchored to the frame runs round a sprocket on a moving carrier to an output slide, which moves twice as far as the carrier.",
+      "motion": {
+        "input": "Linear",
+        "output": "Linear",
+        "label": "Linear → Linear",
+        "output_character": [
+          "Reciprocating"
+        ],
+        "axes": "Offset parallel",
+        "plane": "Planar"
+      },
+      "ratio": {
+        "kind": "Stroke",
+        "class": "Low (<5:1)",
+        "typical": "output stroke = 2 x carrier stroke for any sprocket; 160 mm for an 80 mm carrier stroke"
+      },
+      "dof": 1,
+      "topology": {
+        "links": 4,
+        "revolute": 1,
+        "prismatic": 2,
+        "higher_pairs": 4,
+        "notes": "ground, carrier (prismatic on the ground), sprocket (revolute on the carrier), output (prismatic on the ground); four chain strands, each a higher pair: two chains, each with an anchored strand and a running strand. Overconstrained by two: the second chain repeats the first's relation the other way round, which is why the pair is tensioned against each other at one anchor"
+      },
+      "backdrivable": "Yes",
+      "tags": {
+        "function": [
+          "Speed increase",
+          "Positioning",
+          "Motion conversion"
+        ],
+        "property": [
+          "Exact",
+          "Positive drive",
+          "Backdrivable",
+          "High load"
+        ],
+        "application": [
+          "Construction & lifting",
+          "Packaging & automation"
+        ],
+        "keywords": [
+          "chain doubler",
+          "moving sprocket",
+          "anchored strand",
+          "free lift",
+          "hydraulic jigger",
+          "William Armstrong",
+          "telescopic fork",
+          "pulley block in reverse"
+        ]
+      },
+      "explain": {
+        "motion": "A carrier slides back and forth with a sprocket turning free on a stud. A roller chain is anchored to the frame, runs along under the sprocket, round its end and back over it to the output slide. When the carrier moves, the anchored strand grows by the carrier's travel, so the strand on the other side of the sprocket must shrink by the same amount: the chain runs round the sprocket and its far end moves twice as far, the same way. The output moves 160 mm while the carrier moves 80 mm, at twice its speed at every point of the stroke.",
+        "forces": "The sprocket is the moving pulley of a block and tackle, driven at its centre instead of at the rope: the output's load pulls the running strand, the anchored strand holds the same tension, so the carrier pushes with twice the output force. A chain only pulls, so a second chain round the other side of the sprocket, anchored at the frame's other end, pulls the output back.",
+        "benefits": "Doubles a stroke with one driven slide and no second drive, positively and exactly, and the doubling holds for any sprocket size, since only the anchored strand sets it.",
+        "limits": "Each direction needs its own chain, and the two must be kept tight against each other; chain stretch and slack at the anchors show twice at the output. The carrier needs twice the output force, and the ratio cannot be changed."
+      },
+      "build": {
+        "ground": "base with the carrier's slide, the output's slide beside it, and an anchor block for each chain's held end, one at either end of the base",
+        "defining_relations": "The sprocket (ISO 606 08B, 12 teeth, seat circle radius 24.53 mm) takes 152.4 mm of chain per turn, so r = z p / 2π = 24.26 mm. Each chain's anchored strand is held: for a carrier travel x the sprocket turns θ = -x / r, and the strand on its far side moves x again relative to the carrier, so the output moves x - r θ = 2x, whatever r is. Carrier stroke 80 mm (±40), output stroke 160 mm (±80), sprocket turn 189° over the stroke (80 / 24.26 rad).",
+        "notes": "Seen in plan: the anchored strands run under the sprocket's centre (y -24.53), the running strands over it (y +24.53), the output slide beyond them. Chain A, in the sprocket's lower row, wraps its +x half: anchored at x -114.3, pinned to the output at -76.2. Chain B, in the upper row 16.5 mm higher, wraps the -x half: anchored at +114.3, pinned to the output at +76.2. Both 21 links, a whole number of pitches from each end to the sprocket, so a roller sits in a seat at both tangent points. Each chain end is pinned to an anchor bolt; the nuts on the bolts set each chain's length, the two chains drawn tight against each other."
+      },
+      "kin": {
+        "bodies": [
+          {
+            "id": "ground",
+            "role": "ground",
+            "shape": {
+              "type": "plate",
+              "rect": [
+                400,
+                150
+              ]
+            },
+            "at": {
+              "frame": {
+                "origin": [
+                  0,
+                  14,
+                  -8
+                ]
+              }
+            }
+          },
+          {
+            "id": "carrier",
+            "role": "driver",
+            "shape": {
+              "type": "slider",
+              "length": 56,
+              "width": 26
+            },
+            "at": {
+              "joint": "S"
+            }
+          },
+          {
+            "id": "sprocket",
+            "role": "link",
+            "shape": {
+              "type": "sprocket",
+              "z": 12,
+              "pitch": 12.7,
+              "roller": 8.5,
+              "standard": "ISO 606 08B",
+              "bore": 10,
+              "face": 23.5,
+              "rows": 2,
+              "rowPitch": 16.5
+            },
+            "at": {
+              "joint": "S"
+            }
+          },
+          {
+            "id": "output",
+            "role": "output",
+            "shape": {
+              "type": "slider",
+              "length": 230,
+              "width": 20
+            },
+            "at": {
+              "joint": "O"
+            },
+            "frame": {
+              "origin": [
+                0,
+                56,
+                0
+              ]
+            }
+          }
+        ],
+        "joints": [
+          {
+            "id": "C",
+            "type": "prismatic",
+            "a": "ground",
+            "b": "carrier",
+            "at": [
+              0,
+              0,
+              0
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "limits": [
+              -40,
+              40
+            ]
+          },
+          {
+            "id": "S",
+            "type": "revolute",
+            "a": "carrier",
+            "b": "sprocket",
+            "at": [
+              0,
+              0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "id": "O",
+            "type": "prismatic",
+            "a": "ground",
+            "b": "output",
+            "at": [
+              0,
+              56,
+              0
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "limits": [
+              -80,
+              80
+            ]
+          },
+          {
+            "id": "held-A",
+            "type": "belt",
+            "flexible": "chain",
+            "strand": true,
+            "a": "sprocket",
+            "b": "ground",
+            "carrier": "carrier",
+            "at": [
+              0,
+              -24.5345,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "radiusA": 24.255213,
+            "pitch": 12.7,
+            "roller": 8.5,
+            "standard": "ISO 606 08B",
+            "row": 0,
+            "wrap": 1,
+            "links": 21,
+            "ends": [
+              "anchor-A",
+              "end-A"
+            ],
+            "note": "chain A's anchored strand, under the sprocket: held by its anchor bolt at x -114.3"
+          },
+          {
+            "id": "run-A",
+            "type": "belt",
+            "flexible": "chain",
+            "strand": true,
+            "a": "sprocket",
+            "b": "output",
+            "carrier": "carrier",
+            "at": [
+              0,
+              24.5345,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              -1,
+              0,
+              0
+            ],
+            "radiusA": 24.255213,
+            "pitch": 12.7,
+            "row": 0,
+            "note": "chain A's running strand, over the sprocket, pinned to the output at x -76.2: it pulls the output toward +x"
+          },
+          {
+            "id": "held-B",
+            "type": "belt",
+            "flexible": "chain",
+            "strand": true,
+            "a": "sprocket",
+            "b": "ground",
+            "carrier": "carrier",
+            "at": [
+              0,
+              -24.5345,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "radiusA": 24.255213,
+            "pitch": 12.7,
+            "roller": 8.5,
+            "standard": "ISO 606 08B",
+            "row": 1,
+            "wrap": -1,
+            "links": 21,
+            "ends": [
+              "anchor-B",
+              "end-B"
+            ],
+            "note": "chain B's anchored strand, under the sprocket: held by its anchor bolt at x +114.3"
+          },
+          {
+            "id": "run-B",
+            "type": "belt",
+            "flexible": "chain",
+            "strand": true,
+            "a": "sprocket",
+            "b": "output",
+            "carrier": "carrier",
+            "at": [
+              0,
+              24.5345,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              -1,
+              0,
+              0
+            ],
+            "radiusA": 24.255213,
+            "pitch": 12.7,
+            "row": 1,
+            "note": "chain B's running strand, pinned to the output at x +76.2: it pulls the output back toward -x"
+          }
+        ],
+        "params": [
+          {
+            "id": "p",
+            "value": 12.7,
+            "unit": "mm",
+            "min": 12.7,
+            "max": 12.7,
+            "note": "chain pitch, ISO 606 08B"
+          },
+          {
+            "id": "r",
+            "value": 24.255213,
+            "unit": "mm",
+            "min": 24.255213,
+            "max": 24.255213,
+            "note": "chain per radian of the 12-tooth sprocket, z p / 2π"
+          }
+        ],
+        "design": [],
+        "drivers": [
+          {
+            "id": "input",
+            "joint": "C",
+            "kind": "linear",
+            "range": [
+              -40,
+              40
+            ],
+            "default": 0,
+            "lo": -40,
+            "hi": 40
+          }
+        ],
+        "solve": [
+          {
+            "block": "strand",
+            "id": "doubler",
+            "joints": [
+              "S",
+              "held-A",
+              "run-A",
+              "held-B",
+              "run-B",
+              "O"
+            ],
+            "in": {
+              "carrier": "carrier",
+              "joint": "S",
+              "held": "held-A",
+              "running": [
+                "run-A"
+              ]
+            },
+            "out": {
+              "angle": "sprocket-turn",
+              "travel": "chain-travel"
+            }
+          }
+        ],
+        "points": [
+          {
+            "id": "axle",
+            "body": "carrier",
+            "local": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "contact-held",
+            "body": "carrier",
+            "local": [
+              0,
+              -24.5345,
+              0
+            ]
+          },
+          {
+            "id": "contact-run",
+            "body": "carrier",
+            "local": [
+              0,
+              24.5345,
+              0
+            ]
+          },
+          {
+            "id": "anchor-A",
+            "body": "ground",
+            "local": [
+              -114.3,
+              -24.5345,
+              0
+            ]
+          },
+          {
+            "id": "anchor-B",
+            "body": "ground",
+            "local": [
+              114.3,
+              -24.5345,
+              0
+            ]
+          },
+          {
+            "id": "end-A",
+            "body": "output",
+            "local": [
+              -76.2,
+              -31.4655,
+              0
+            ]
+          },
+          {
+            "id": "end-B",
+            "body": "output",
+            "local": [
+              76.2,
+              -31.4655,
+              0
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "id": "carrier-x",
+            "of": "axle",
+            "kind": "position",
+            "axis": "x",
+            "unit": "mm"
+          },
+          {
+            "id": "output-x",
+            "of": "end-A",
+            "kind": "position",
+            "axis": "x",
+            "unit": "mm"
+          },
+          {
+            "id": "sprocket-angle",
+            "of": "sprocket",
+            "kind": "angle",
+            "unit": "deg"
+          },
+          {
+            "id": "output-speed",
+            "of": "end-A",
+            "kind": "speed-ratio",
+            "unit": "mm/mm"
+          }
+        ],
+        "fallback": null
+      },
+      "teaching": {
+        "review": {
+          "verdict": "keep",
+          "date": "2026-10-27",
+          "note": "New record (#258), reviewed against its kinematics before the build. Six phases (every 60 degrees of the cycle): the carrier at -40, -20, +20, +40, +20, -20 mm and the output (chain A's end) at -80, -40, +40, +80, +40, -40 mm from its reference, always twice the carrier and the same way; the sprocket turns back as the carrier goes forward, +94.5 to -94.5 degrees (189 over the stroke, 80 / 24.26 rad); the anchored strands' ends stay where they are while the strand under the sprocket grows and shrinks, and the strand over it runs at twice the carrier's speed. Decided: the carrier is driven by the linear drive along its own slide (standard section 8), the output on a slide of its own beside it, so the two straight strokes lie side by side in plan as in the rack-and-pinion doubler; two chains, one per direction, since a chain only pulls and the drive works both ways: chain A wraps the sprocket's +x half and pulls the output out, chain B the -x half and pulls it back, in two rows of one sprocket so the four strands lie on two lines in plan, both anchored strands under the sprocket's centre and both running strands over it; a 12-tooth ISO 606 08B sprocket and chains of 21 links, a carrier stroke of 80 mm and an output stroke of 160 mm, the same strokes as the rack doubler so the two pages compare; the output a plain bar, the sprocket a link (it is an idler), the carrier the driver. Default view PLAN (opened at 28 degrees), where both strand lines and both strokes show true. Traces: chain A's end on the output (the comet) and the axle, both ticked every 30 degrees of the cycle, so at every tick the output's step is twice the carrier's; overlays: the line through both anchors (the anchored strands, at rest), a circle at the instant centre where the held strand leaves the sprocket, the line from it through the axle to the running strand (speeds 0, v, 2v), and both stroke dimensions between the posed ends. Plot of the output against the carrier (a straight line of slope 2). Controls: the input only; the sprocket size is not offered (the chains are built for one sprocket) and the claim that the doubling holds for any sprocket is the law, checked by the strand block's fixture test at three radii. No section or detail view: the principle lies in plain view. No time map."
+        },
+        "principle": [
+          {
+            "body": "carrier"
+          },
+          {
+            "body": "sprocket"
+          },
+          {
+            "body": "output"
+          },
+          {
+            "point": "contact-held"
+          }
+        ],
+        "traces": [
+          {
+            "id": "output-end",
+            "point": "end-A",
+            "ticks": {
+              "every": 30
+            },
+            "comet": true
+          },
+          {
+            "id": "axle",
+            "point": "axle",
+            "ticks": {
+              "every": 30
+            }
+          }
+        ],
+        "overlays": [
+          {
+            "id": "held-strand",
+            "kind": "line",
+            "from": "anchor-A",
+            "to": "anchor-B",
+            "label": "ANCHORED STRANDS, AT REST"
+          },
+          {
+            "id": "instant-centre",
+            "kind": "circle",
+            "center": "contact-held",
+            "radius": 3,
+            "label": "INSTANT CENTRE"
+          },
+          {
+            "id": "speeds",
+            "kind": "line",
+            "from": "contact-held",
+            "to": "contact-run",
+            "label": "SPEED 0, v, 2v"
+          },
+          {
+            "id": "carrier-stroke",
+            "kind": "dimension",
+            "from": "axle",
+            "to": "axle",
+            "fromPose": {
+              "output": "carrier-x",
+              "stat": "min"
+            },
+            "toPose": {
+              "output": "carrier-x",
+              "stat": "max"
+            },
+            "label": "CARRIER STROKE"
+          },
+          {
+            "id": "output-stroke",
+            "kind": "dimension",
+            "from": "end-A",
+            "to": "end-A",
+            "fromPose": {
+              "output": "output-x",
+              "stat": "min"
+            },
+            "toPose": {
+              "output": "output-x",
+              "stat": "max"
+            },
+            "label": "OUTPUT STROKE, TWICE"
+          }
+        ],
+        "view": "PLAN",
+        "views": [],
+        "controls": [
+          {
+            "id": "input",
+            "kind": "driver",
+            "driver": "input"
+          }
+        ],
+        "plot": {
+          "x": "input",
+          "y": "output-x",
+          "label": "OUTPUT AGAINST CARRIER"
+        },
+        "claims": [
+          {
+            "text": "the output moves 160 mm",
+            "output": "output-x",
+            "stat": "range",
+            "value": 160,
+            "tol": 0.05
+          },
+          {
+            "text": "while the carrier moves 80 mm",
+            "output": "carrier-x",
+            "stat": "range",
+            "value": 80,
+            "tol": 0.05
+          },
+          {
+            "text": "output stroke = 2 x carrier stroke, the same way, for any sprocket",
+            "output": "output-x",
+            "stat": "ratio",
+            "value": 2,
+            "tol": 0.001
+          },
+          {
+            "text": "at twice its speed at every point of the stroke",
+            "output": "output-speed",
+            "stat": "min",
+            "value": 2,
+            "tol": 0.01
+          },
+          {
+            "text": "at twice its speed at every point of the stroke",
+            "output": "output-speed",
+            "stat": "max",
+            "value": 2,
+            "tol": 0.01
+          },
+          {
+            "text": "sprocket turn 189° over the stroke (80 / 24.26 rad)",
+            "output": "sprocket-angle",
+            "stat": "range",
+            "value": 188.98,
+            "tol": 0.05
+          }
+        ],
+        "exceptions": []
+      },
+      "examples": [
+        {
+          "use": "Lift truck masts",
+          "detail": "The lift chain is anchored to the frame and runs over a sheave on the ram's head to the carriage, so the carriage rises two inches for each inch of ram."
+        },
+        {
+          "use": "Telescopic forks",
+          "detail": "Two chains per stage, each anchored to the lower fork and run round a wheel on the next stage to the upper fork, extend and retract the upper fork at twice the middle fork's stroke."
+        },
+        {
+          "use": "Industrial trucks",
+          "detail": "A cable anchored to the truck's frame over a sheave on the moving frame lifts the load platform twice as far and twice as fast."
+        },
+        {
+          "use": "Hydraulic jiggers",
+          "detail": "A ram moves the sheaves of a chain block, so the chain's free end travels several times the ram's short stroke to work a crane or a lift."
+        }
+      ],
+      "references": [
+        {
+          "title": "Hydraulic jigger (a pulley block used in reverse), Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Hydraulic_jigger",
+          "kind": "wikipedia"
+        },
+        {
+          "title": "US patent 1837486, Industrial truck (Baker-Raulang, filed 1926): cable anchored to the frame over a sheave on the moving frame, twice the speed and travel",
+          "url": "https://patents.google.com/patent/US1837486A/en",
+          "kind": "patent"
+        },
+        {
+          "title": "US patent 2670811, Multicylinder hydraulic lift truck (Towmotor, filed 1949): the carriage moves twice the ram",
+          "url": "https://patents.google.com/patent/US2670811A/en",
+          "kind": "patent"
+        },
+        {
+          "title": "CN patent 110963447, Double-deep-position fork (Siasun, filed 2018): two chains per stage, one for each direction, 2:1 at each stage",
+          "url": "https://patents.google.com/patent/CN110963447A/en",
+          "kind": "patent"
+        },
+        {
+          "title": "Lift cylinder and chains: one inch of cylinder, two inches of lift (forklift technical notes)",
+          "url": "https://www.fork-lift-training.co.uk/m/forklifttechnical/lift-cylinder-and-chains.html",
+          "kind": "engineering-guide"
+        }
+      ],
+      "media": [
+        {
+          "title": "Hydraulic jiggers, Wikimedia Commons (photos and period drawings of the multi-sheave form)",
+          "url": "https://commons.wikimedia.org/wiki/Category:Hydraulic_jiggers",
+          "kind": "photos"
+        }
+      ],
+      "real_world": [],
+      "related": [
+        "rack-stroke-doubler",
+        "block-and-tackle",
+        "chain-drive",
+        "belt-drive"
+      ],
+      "added": "2026-10-27",
+      "origin": {
+        "date": "1840-06-16",
+        "precision": "period",
+        "note": "Best guess: William Armstrong's hydraulic jigger (period: around 1840) drives the sheaves of a chain block with a ram, so the chain's free end travels a multiple of the ram's stroke, a pulley block used in reverse; it is the earliest form of the principle found. The first statement of the exact 2:1 with one sheave found is US 1837486 (Baker-Raulang, filed 1926-08-06): a cable anchored to the frame over a sheave on the moving frame drives the load twice the distance. Source: https://en.wikipedia.org/wiki/Hydraulic_jigger"
+      },
+      "waive": [
+        "media"
+      ]
     },
     {
       "id": "friction-wheel-drive",
