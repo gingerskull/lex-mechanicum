@@ -15400,7 +15400,7 @@
         "locomotive-drive",
         "double-crank"
       ],
-      "added": "2026-10-27",
+      "added": "2026-10-28",
       "origin": {
         "date": "1905-11-21",
         "precision": "day",
@@ -34418,7 +34418,7 @@
         "slider-crank",
         "planetary"
       ],
-      "added": "2026-10-27",
+      "added": "2026-10-28",
       "origin": {
         "date": "1868-10-16",
         "precision": "year",
@@ -53523,7 +53523,7 @@
         "oldham-coupling",
         "double-cardan"
       ],
-      "added": "2026-10-27",
+      "added": "2026-10-28",
       "origin": {
         "date": "1911-05-30",
         "precision": "day",
@@ -61526,7 +61526,7 @@
         "face-groove-cam",
         "ball-screw"
       ],
-      "added": "2026-10-27",
+      "added": "2026-10-28",
       "origin": {
         "date": "1882-11-13",
         "precision": "year",
@@ -65275,7 +65275,7 @@
         "chain-drive",
         "belt-drive"
       ],
-      "added": "2026-10-27",
+      "added": "2026-10-28",
       "origin": {
         "date": "1840-06-16",
         "precision": "period",
@@ -79123,7 +79123,7 @@
         "four-bar",
         "double-cardan"
       ],
-      "added": "2026-10-27",
+      "added": "2026-10-28",
       "origin": {
         "date": "1920-08-30",
         "precision": "day",
