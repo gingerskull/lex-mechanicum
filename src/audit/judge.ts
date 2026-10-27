@@ -31,7 +31,8 @@ export function judgeSheet(text: string, js: Judgement[]): string {
   }
   const start = text.indexOf("\n## Requirements\n");
   if (start < 0) throw new Error("no Requirements section");
-  const end = text.indexOf("\n## ", start + 1);
+  const next = text.indexOf("\n## ", start + 1);
+  const end = next < 0 ? text.length : next;
   const by = new Map(js.map((j) => [j.row, j]));
   const table = text
     .slice(start, end)

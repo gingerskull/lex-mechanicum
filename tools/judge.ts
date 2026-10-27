@@ -30,8 +30,17 @@ function main() {
     for (const id of idsOf(spec)) plan.set(id, [...(plan.get(id) ?? []), { row, status: status as Verdict, note }]);
   };
   if (args[0] === "--file") {
-    const json = JSON.parse(readFileSync(args[1] ?? "", "utf8")) as Record<string, Record<string, [string, string]>>;
-    for (const [spec, rows] of Object.entries(json)) for (const [row, [status, note]] of Object.entries(rows)) add(spec, row, status, note);
+    let json: Record<string, Record<string, unknown>>;
+    try {
+      json = JSON.parse(readFileSync(args[1] ?? "", "utf8")) as typeof json;
+    } catch (e) {
+      return fail(`--file ${args[1] ?? ""}: ${(e as Error).message}`);
+    }
+    for (const [spec, rows] of Object.entries(json))
+      for (const [row, j] of Object.entries(rows)) {
+        if (!Array.isArray(j) || typeof j[0] !== "string" || typeof j[1] !== "string") return fail(`${spec} ${row}: a judgement is ["<status>", "<note>"]`);
+        add(spec, row, j[0], j[1]);
+      }
   } else if (args.length === 4) add(args[0]!, args[1]!, args[2]!, args[3]!);
   else return fail(USAGE, 2);
 
@@ -51,9 +60,16 @@ function main() {
     }
   }
   if (problems.length) return fail(problems.join("\n"));
-  for (const [id, js] of plan) {
-    writeFileSync(auditPath(id), judgeSheet(texts.get(id)!, js));
-    console.log(`${auditPath(id)}: ${js.map((j) => `${j.row} ${j.status}`).join(", ")}`);
+  // every sheet written in memory first, so a sheet that cannot take its judgements leaves all of them as they were
+  let out: [string, string][];
+  try {
+    out = [...plan].map(([id, js]) => [id, judgeSheet(texts.get(id)!, js)]);
+  } catch (e) {
+    return fail((e as Error).message);
+  }
+  for (const [id, text] of out) {
+    writeFileSync(auditPath(id), text);
+    console.log(`${auditPath(id)}: ${plan.get(id)!.map((j) => `${j.row} ${j.status}`).join(", ")}`);
   }
 }
 

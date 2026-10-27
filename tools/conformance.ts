@@ -25,6 +25,11 @@ export async function conformanceOne(id: string): Promise<{ line: string; failed
 
 async function main() {
   const args = process.argv.slice(2);
+  if (args.includes("changed") && args.length > 1) {
+    console.error("usage: tsx tools/conformance.ts [id ... | changed]; `changed` takes no ids");
+    process.exitCode = 2;
+    return;
+  }
   const named = args.includes("changed") ? changedIds() : args.length ? args : allIds();
   const unknown = named.find((id) => !isKnown(id));
   if (unknown) {

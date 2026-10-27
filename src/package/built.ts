@@ -8,7 +8,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { deserialize, serialize } from "node:v8";
-import { ROOT } from "../audit/sheet";
+import { parseHeader, readAudit, ROOT } from "../audit/sheet";
 import { buildAssembly, type Assembly, type Polish } from "../builder";
 import type { CatalogRecord } from "../catalog/schema";
 import { loadV3 } from "../mechanisms";
@@ -62,14 +62,16 @@ export function sharedKey(): string {
 }
 
 /**
- * The key of one mechanism's build: the shared key, its own folder (its polish; not its audit sheet, which no build
- * reads for more than its registration) and its record. A change to one mechanism builds that one again, a change to
- * shared code every one.
+ * The key of one mechanism's build: the shared key, its own folder (its polish; of its audit sheet only the header's
+ * standard and result, which the package carries) and its record. A change to one mechanism builds that one again, a
+ * change to shared code every one.
  */
-export function buildKey(id: string, record: CatalogRecord): string {
+export function buildKey(id: string, record: CatalogRecord, audit: string | null = readAudit(id)): string {
   const h = createHash("sha256");
   h.update(sharedKey());
   walk(h, join(MECHANISMS, id), (p) => p.endsWith("audit.md"));
+  const header = audit ? parseHeader(audit) : null;
+  h.update(JSON.stringify({ standard: header?.standard || "none", result: header?.result || "none" }));
   h.update(JSON.stringify(record));
   return h.digest("hex").slice(0, 32);
 }
