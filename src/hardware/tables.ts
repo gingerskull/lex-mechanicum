@@ -18,6 +18,13 @@ export const BEARINGS: readonly Bearing[] = (
   ] as const
 ).map(([name, d, D, B]) => ({ name, d, D, B }));
 
+/**
+ * Double-row angular-contact ball bearings, thin section (38xx): one wide bearing that carries a radial load and thrust
+ * both ways where a single deep-groove row would need a pair (a wobble drive's ring on its inclined journal). Chosen by
+ * a kit by name, never by the bore fitting of the stacks.
+ */
+export const BEARINGS_DOUBLE_ROW: readonly Bearing[] = ([["3804", 20, 32, 10]] as const).map(([name, d, D, B]) => ({ name, d, D, B }));
+
 /** Bore sizes with a catalogue bearing, largest first. */
 export const BORES: readonly number[] = [...new Set(BEARINGS.map((b) => b.d))].sort((a, b) => b - a);
 

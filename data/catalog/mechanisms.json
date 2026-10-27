@@ -78454,7 +78454,7 @@
       "ratio": {
         "kind": "Stroke",
         "class": "n/a",
-        "typical": "output swing ±α, the journal's angle to the shaft (±15° here); arm stroke 2 L sin α"
+        "typical": "output swing ±α, the journal's angle to the shaft (±20° here); arm stroke 2 L sin α"
       },
       "dof": 1,
       "topology": {
@@ -78462,7 +78462,7 @@
         "revolute": 4,
         "prismatic": 0,
         "higher_pairs": 0,
-        "notes": "ground, input shaft with its inclined journal, the trunnion ring, the output shaft with its yoke; a spherical four-bar, the four revolute axes (input shaft, journal, trunnions, output shaft) meeting at one centre. The kin block keeps the journal sleeve pinned on the input and the arm keyed on the output as bodies of their own (posed with them), so the joint count does not give the mobility: Kutzbach counts 5, which ignores the concurrent axes and counts the sleeve's spin; the true mobility is 1, solved in closed form by the spherical-four-bar block. The loop is overconstrained in the count, as a universal joint is."
+        "notes": "ground, input hub with its inclined journal (one piece), the trunnion ring, the output shaft with its yoke; a spherical four-bar, the four revolute axes (input shaft, journal, trunnions, output shaft) meeting at one centre. The kin block keeps the arm keyed on the output as a body of its own (posed with it). Kutzbach counts -1 because it ignores that the four axes are concurrent; the true mobility is 1, solved in closed form by the spherical-four-bar block. The loop is overconstrained in the count, as a universal joint is."
       },
       "backdrivable": "Partly",
       "tags": {
@@ -78490,15 +78490,15 @@
         ]
       },
       "explain": {
-        "motion": "The input shaft carries a journal set at a small angle α to its axis, and a ring turns on the journal in bearings. Trunnion pins on the ring, square to the journal, sit in a yoke on an output shaft that stands square to the input. All four axes meet at one centre, so the ring cannot turn with the shaft: it nods, and the yoke rocks the output to and fro through exactly ±α while the input turns on. The swing follows ψ = atan(tan α sin θ), close to a sine, and an arm on the output turns it into a stroke of 2 L sin α.",
+        "motion": "The input shaft carries a journal set at a small angle α to its axis, and a ring turns on the journal on a bearing. Trunnion pins on the ring, square to the journal, sit in a yoke on an output shaft that stands square to the input. All four axes meet at one centre, so the ring cannot turn with the shaft: it nods, and the yoke rocks the output to and fro through exactly ±α while the input turns on. The swing follows ψ = atan(tan α sin θ), close to a sine, and an arm on the output turns it into a stroke of 2 L sin α.",
         "forces": "The input torque reaches the output as a pair of forces on the trunnions, carried by the ring's bearings on the journal. The output moves fastest, at tan α times the input speed, as it passes mid-swing, and its reaction then twists the journal hardest; at the ends of the swing it stands still and a load on the arm cannot turn the input.",
         "benefits": "It turns a fast shaft into a strong, smooth, nearly sinusoidal rocking in a compact sealed unit, with only turning bearings and no sliding guides.",
         "limits": "The swing is fixed by the journal's angle, so changing the stroke means a new journal. The axes must meet at one point: a machining or shimming error loads the bearings and wears them quickly, and the rocking mass shakes the frame at high speed."
       },
       "build": {
-        "ground": "base plate with the input shaft's two pillow blocks and the output shaft's, the two axes square and meeting at the centre",
+        "ground": "base plate with the input shaft's two pillow blocks on its drive side and the output shaft's two, the two axes square and meeting at the centre",
         "defining_relations": "spherical four-bar with input link α (journal to shaft), coupler 90° (journal to trunnions), output link 90° (trunnions to output shaft), ground 90° (input to output); output angle ψ = atan(tan α sin θ), θ from the pose where the journal leans in the plane of the two shafts (equivalently ψ = atan(tan α cos θ) counted from the pose square to it); amplitude exactly α; output speed ratio dψ/dθ = tan α cos θ / (1 + tan²α sin²θ), at most tan α; arm stroke 2 L sin α",
-        "notes": "Input 360° continuous; the output rocks ±15° at α = 15° and a 60 mm arm sweeps a chord of 31.1 mm. Every axis must pass through the centre. The ring's bearings on the journal take the trunnion loads; the trunnions turn in needle cups in the yoke's arms. At θ = 0 the journal leans in the plane of the two shafts, the trunnions stand upright and the yoke and arm are at mid-swing."
+        "notes": "Input 360° continuous; the output rocks ±20° at α = 20° and a 60 mm arm sweeps a chord of 41.0 mm. Every axis must pass through the centre. The journal is machined on the input hub at α, one piece; the ring's double-row bearing on it takes the trunnion loads; the trunnions turn in needle cups in the yoke's arms. At θ = 0 the journal leans in the plane of the two shafts, the trunnions stand upright and the yoke and arm are at mid-swing."
       },
       "kin": {
         "bodies": [
@@ -78530,47 +78530,25 @@
             "shape": {
               "type": "shaft",
               "diameter": 25,
-              "length": 26.5,
-              "place": 30
+              "length": 80,
+              "place": 30,
+              "journal": {
+                "joint": "J",
+                "diameter": 20,
+                "collar": 25,
+                "neck": 10,
+                "seat": [
+                  -5,
+                  5
+                ],
+                "bore": 12,
+                "shank": 26.5
+              }
             },
             "at": {
               "joint": "S1"
             },
-            "note": "the wobble hub's straight shank, keyed on the input shaft; the inclined journal is one piece with it"
-          },
-          {
-            "id": "journal",
-            "role": "driver",
-            "shape": {
-              "type": "wobble-journal",
-              "diameter": 20,
-              "collar": 25,
-              "neck": 10,
-              "seat": [
-                -7,
-                7
-              ],
-              "bore": 12,
-              "shaft": "S1"
-            },
-            "frame": {
-              "o": [
-                0,
-                0,
-                55
-              ],
-              "z": [
-                "cos(alpha)",
-                "sin(alpha)",
-                0
-              ],
-              "x": [
-                0,
-                0,
-                1
-              ]
-            },
-            "note": "the wobble hub's inclined journal, turned at alpha to the shaft on a collar that runs back into the straight shank: one forging with it, bored for the shaft"
+            "note": "the wobble hub: a straight shank keyed on the input shaft, with the inclined journal machined on it at alpha, one piece, bored through for the shaft"
           },
           {
             "id": "ring",
@@ -78578,10 +78556,10 @@
             "shape": {
               "type": "wobble-ring",
               "outer": 40,
-              "width": 18,
+              "width": 14,
               "bore": 32,
               "trunnion": 10,
-              "pad": 16
+              "pad": 14
             },
             "at": {
               "joint": "J"
@@ -78655,12 +78633,12 @@
               0,
               0
             ],
-            "note": "input shaft"
+            "note": "input shaft, through the hub and on to a pillow block each side"
           },
           {
             "id": "J",
             "type": "revolute",
-            "a": "journal",
+            "a": "input",
             "b": "ring",
             "at": [
               0,
@@ -78672,7 +78650,7 @@
               "sin(alpha)",
               0
             ],
-            "note": "the ring on the inclined journal, on two bearings"
+            "note": "the ring on the inclined journal, on one double-row bearing"
           },
           {
             "id": "T",
@@ -78729,11 +78707,11 @@
         "params": [
           {
             "id": "alpha",
-            "value": 15,
+            "value": 20,
             "unit": "deg",
-            "min": 5,
-            "max": 25,
-            "note": "journal angle to the input shaft: the swing amplitude"
+            "min": 20,
+            "max": 20,
+            "note": "journal angle to the input shaft: the swing amplitude (machined on the hub, not a control)"
           },
           {
             "id": "L",
@@ -78781,9 +78759,6 @@
                 "yoke-out"
               ],
               "carry": {
-                "input": [
-                  "journal"
-                ],
                 "output": [
                   "arm"
                 ]
@@ -78818,11 +78793,11 @@
           },
           {
             "id": "journal-ext",
-            "body": "journal",
+            "body": "input",
             "local": [
               0,
-              0,
-              35
+              "-35*sin(alpha)",
+              "70+35*cos(alpha)"
             ]
           },
           {
@@ -78903,14 +78878,11 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-27",
-          "note": "T2 before the build, from the solved kinematics: six phases at 60 degrees of input give swings of 0, -13.1, -13.1, 0, +13.1, +13.1 degrees, so the yoke and the arm visibly rock while the shaft turns; the solve matches psi = atan(tan(alpha) sin(theta)) to 2e-14 at 8, 15 and 25 degrees, amplitude exactly alpha, within 0.13 degrees of a pure sine at 15; the arm tip sweeps 31.1 mm; the output's speed ratio peaks at tan(alpha) at mid-swing; no dwell. Decided: the output shaft lies in plan square to the input, as the universal joint's does, so the two relatives read side by side; the reference pose is mid-swing (journal leaning in the plane of the two shafts, trunnions upright, yoke and arm upright), so the journal angle reads true in PLAN at the start; the journal angle is a control (5 to 25 degrees) with a ghost trace and plot ghosts at 8 and 25, because 'the swing is the journal's angle' is the lesson; the arm's tip is traced with equal-time ticks every 15 degrees (bunched at the ends of the stroke, near harmonic) and a rim point of the ring is traced to show its nod; construction: the four axis lines (input, journal, trunnion, output) and a circle at the common centre, the journal angle arc, the stroke dimension; default view ISOMETRIC, where all four axes and the nod read at once; section A-A through the input and journal axes at the start shows the inclined journal inside the ring on its bearings, the one part of the principle a housing hides; no use context in the drawing."
+          "note": "T2 before the build, from the solved kinematics: six phases at 60 degrees of input give swings of 0, -17.5, -17.5, 0, +17.5, +17.5 degrees, so the yoke and the arm visibly rock while the shaft turns; the solve matches psi = atan(tan(alpha) sin(theta)) to 2e-14 (tests at 5, 15 and 25 degrees), amplitude exactly alpha, within 0.32 degrees of a pure sine at 20; the arm tip sweeps 41.0 mm; the output's speed ratio peaks at tan(alpha) = 0.36 at mid-swing; no dwell. Decided: the output shaft lies in plan square to the input, as the universal joint's does, so the two relatives read side by side; the reference pose is mid-swing (journal leaning in the plane of the two shafts, trunnions upright, yoke and arm upright), so the journal angle reads true in PLAN at the start; the arm's tip is traced with equal-time ticks every 15 degrees (bunched at the ends of the stroke, near harmonic) and a rim point of the ring is traced to show its nod; construction: the four axes as centrelines and a circle at the common centre, the journal angle arc, the stroke dimension; default view ISOMETRIC; section A-A through the input and journal axes at the start shows the inclined journal inside the ring on its bearing, the one part of the principle a housing hides; no use context in the drawing. Owner's review (#253): the centre did not read, so the journal is machined on the input hub as one solid at a fixed angle (alpha is no longer a control), alpha is 20 degrees (was 15) so the nod and the swing read at a glance, the ring runs on one double-row bearing instead of two with seals, both input pillow blocks stand on the drive side so no support is in front of the meeting point in ISOMETRIC and DIMETRIC, and only two labels remain: JOURNAL ANGLE and ALL FOUR AXES MEET HERE."
         },
         "principle": [
           {
             "body": "input"
-          },
-          {
-            "body": "journal"
           },
           {
             "body": "ring"
@@ -78935,13 +78907,7 @@
             "ticks": {
               "every": 15
             },
-            "comet": true,
-            "ghosts": [
-              {
-                "control": "angle",
-                "value": 8
-              }
-            ]
+            "comet": true
           },
           {
             "id": "ring-nod",
@@ -78955,28 +78921,24 @@
           {
             "id": "input-axis",
             "kind": "axis-line",
-            "at": "S1",
-            "label": "INPUT AXIS"
+            "at": "S1"
           },
           {
             "id": "output-axis",
             "kind": "axis-line",
-            "at": "S2",
-            "label": "OUTPUT AXIS"
+            "at": "S2"
           },
           {
             "id": "journal-axis",
             "kind": "axis-line",
             "from": "centre",
-            "through": "journal-ext",
-            "label": "JOURNAL AXIS"
+            "through": "journal-ext"
           },
           {
             "id": "trunnion-axis",
             "kind": "axis-line",
             "from": "centre",
-            "through": "trunnion-tip",
-            "label": "TRUNNION AXIS"
+            "through": "trunnion-tip"
           },
           {
             "id": "common-centre",
@@ -79005,8 +78967,7 @@
             "toPose": {
               "output": "tip-x",
               "stat": "max"
-            },
-            "label": "STROKE 2 L sin α"
+            }
           }
         ],
         "view": "ISOMETRIC",
@@ -79027,10 +78988,10 @@
               ]
             },
             "highlight": [
-              "journal",
+              "input",
               "ring"
             ],
-            "note": "through the input axis and the journal axis at the start: the inclined journal inside the ring, on its two bearings"
+            "note": "through the input axis and the journal axis at the start: the inclined journal inside the ring, on its bearing"
           }
         ],
         "controls": [
@@ -79038,28 +78999,13 @@
             "id": "input",
             "kind": "driver",
             "driver": "input"
-          },
-          {
-            "id": "angle",
-            "kind": "param",
-            "param": "alpha"
           }
         ],
         "plot": [
           {
             "x": "input",
             "y": "output-angle",
-            "label": "OUTPUT SWING ψ",
-            "ghosts": [
-              {
-                "control": "angle",
-                "value": 8
-              },
-              {
-                "control": "angle",
-                "value": 25
-              }
-            ]
+            "label": "OUTPUT SWING ψ"
           },
           {
             "x": "input",
@@ -79069,44 +79015,33 @@
         ],
         "claims": [
           {
-            "text": "the yoke rocks the output to and fro through exactly ±α (±15°)",
+            "text": "the yoke rocks the output to and fro through exactly ±α (±20°)",
             "output": "output-angle",
             "stat": "max",
-            "value": 15,
+            "value": 20,
             "tol": 0.01
           },
           {
-            "text": "the yoke rocks the output to and fro through exactly ±α (±15°)",
+            "text": "the yoke rocks the output to and fro through exactly ±α (±20°)",
             "output": "output-angle",
             "stat": "min",
-            "value": -15,
+            "value": -20,
             "tol": 0.01
           },
           {
-            "text": "an arm 60 mm long sweeps a stroke of 2 L sin α = 31.1 mm",
+            "text": "an arm 60 mm long sweeps a stroke of 2 L sin α = 41.0 mm",
             "output": "tip-x",
             "stat": "range",
-            "value": 31.06,
+            "value": 41.04,
             "tol": 0.05
           },
           {
-            "text": "the output moves fastest, at tan α = 0.27 times the input speed, as it passes mid-swing",
+            "text": "the output moves fastest, at tan α = 0.36 times the input speed, as it passes mid-swing",
             "output": "speed-ratio",
             "stat": "max",
             "abs": true,
-            "value": 0.268,
+            "value": 0.364,
             "tol": 0.002
-          },
-          {
-            "text": "at 8° the swing is ±8°: the amplitude is always the journal's angle",
-            "output": "output-angle",
-            "stat": "max",
-            "value": 8,
-            "tol": 0.01,
-            "when": {
-              "control": "angle",
-              "value": 8
-            }
           }
         ],
         "exceptions": []
