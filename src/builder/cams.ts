@@ -3,7 +3,7 @@
 // roller on the pitch curve; a flat face's cam is the envelope of the face's lines. Outlines are in the cam body's plane
 // coordinates (its frame), sampled finely enough that a 1° step moves the contact well under 0.1 mm.
 import { D2R, TAU, type Vec2 } from "../core/geom";
-import { camMotion, camTurns, scheduleOf, type CamLaw, type CamSchedule } from "../kin/blocks/cam";
+import { camMotion, scheduleOf, type CamLaw, type CamSchedule } from "../kin/blocks/cam";
 import type { KinJoint } from "../kin/types";
 
 export interface CamLawSpec {

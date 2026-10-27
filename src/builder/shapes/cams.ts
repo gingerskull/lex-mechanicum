@@ -173,7 +173,7 @@ function grooveShoe(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | nul
   const rTop = R + clear + 0.4;
   const blade = {
     id: `${b.id}-blade`,
-    name: `Shoe blade ${len} x ${wid}, hardened bronze`,
+    name: `Shoe blade ${len} x ${wid}, under its boss`,
     frame: { o: v3.add(foot, v3.mul(out, r0)), x: T0, z: out },
     profile: { outer: lens, holes: [] as Vec2[][] },
     h: rTop - r0,

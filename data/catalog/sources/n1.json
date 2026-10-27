@@ -91,7 +91,7 @@
           "shape": {
             "type": "plate",
             "exact": true,
-            "outline": [[-30, -16], [30, -16], [30, 16], [-30, 16]],
+            "outline": [[-22, -16], [22, -16], [22, 16], [-22, 16]],
             "fillet": 4,
             "thickness": 8,
             "pieces": [
@@ -192,7 +192,7 @@
       "view": "FRONT",
       "seeThrough": ["carriage"],
       "views": [
-        { "id": "crossing", "kind": "detail", "center": [0, -14, 40], "scale": 4, "highlight": ["shoe"] }
+        { "id": "crossing", "kind": "detail", "center": [50, -14, 40], "scale": 4, "highlight": ["shoe"] }
       ],
       "controls": [
         { "id": "screw", "kind": "driver", "driver": "input" }
