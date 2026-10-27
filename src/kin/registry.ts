@@ -10,6 +10,7 @@ import { CAM_BLOCKS } from "./steps/cam";
 import { MEMBER_BLOCKS } from "./steps/members";
 import { TIMED_BLOCKS } from "./steps/timed";
 import { COUPLING_BLOCKS } from "./blocks/couplings";
+import { TRANSFER_BLOCKS } from "./steps/transfer";
 
 export { gearDelta } from "./steps/gears";
 export { roundedSquareAt } from "./steps/linkage";
@@ -22,4 +23,5 @@ export const BLOCKS: Record<string, BlockFn> = {
   ...MEMBER_BLOCKS,
   ...TIMED_BLOCKS,
   ...COUPLING_BLOCKS,
+  ...TRANSFER_BLOCKS,
 };

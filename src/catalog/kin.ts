@@ -21,6 +21,8 @@ export const KIN_VOCAB = {
     "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet", "one-way", "escape", "verge",
     // couplings and spatial linkages (R6)
     "sarrus", "cross-slide", "parallel-cranks", "plane-slide", "rzeppa", "conical-pendulum",
+    // transfers
+    "walking-beam",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;
