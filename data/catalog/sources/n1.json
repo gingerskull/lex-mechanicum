@@ -279,36 +279,36 @@
     "build": {
       "ground": "base with two pillow blocks under each shaft, the shafts level and at a right angle, their axes meeting at J",
       "defining_relations": "Bores on one radius r = 22 mm in both discs; rods bent to the shafts' angle beta = 90°. A rod's corner B lies on its input bore line and r from the output axis. With B - J = x a1 + q (q square to the input axis a1), x = (q · a2) / (1 - cos beta) on the assembled root, so at 90° x = q · a2: the corners keep to the plane through J that bisects the right angle, and output angle = input angle exactly. Each leg slides r cos(theta) from mid-stroke, a stroke of 2r = 44 mm per turn. The other root, x = -(q · a2) / (1 + cos beta), turns the output the other way; it meets the assembled one where q · a2 = 0 (the rod's bores straight above or below the shafts), twice a turn for each rod. Rods at 0°, 120° and 240° reach those points one at a time, so the other two hold the output on its root.",
-      "notes": "Shafts level at 55 mm, the input along x and the output along y, their axes meeting at J; discs Ø64 x 12 with their front faces 36 mm from J; rods Ø6 with 74 mm legs and a 6 mm bend radius, the bores through, so each leg's end comes out behind its disc as it slides. The rod count is a design choice: three is the fewest rods spaced evenly round the circle that keep the output on its root through every point (two set opposite reach their switch points together). The reference has rod 1 in the plane of the shafts, its corner at the outer end of its stroke."
+      "notes": "Shafts level at 55 mm, the input along x and the output along y, their axes meeting at J; discs Ø64 x 12 with their front faces 56 mm from J; rods Ø6 with 94 mm legs and a 6 mm bend radius, the bores through, so each leg's end comes out behind its disc as it slides. The rod count is a design choice: three is the fewest rods spaced evenly round the circle that keep the output on its root through every point (two set opposite reach their switch points together). The reference has rod 1 in the plane of the shafts, its corner at the outer end of its stroke."
     },
     "kin": {
       "bodies": [
-        { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [240, 240], "thickness": 8 }, "at": { "frame": { "origin": [-60, -60, -4] } } },
+        { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [235, 235], "thickness": 8 }, "at": { "frame": { "origin": [-82, -82, -4] } } },
         {
           "id": "disc-in", "role": "driver", "accent": true,
-          "shape": { "type": "disc", "radius": 32, "thickness": 12, "place": 12, "holes": [[22, 0, 5], [-11, 19.0526, 5], [-11, -19.0526, 5]] },
+          "shape": { "type": "disc", "radius": 32, "thickness": 12, "place": 12, "holes": [[22, 0, 5], [-11, 19.0526, 5], [-11, -19.0526, 5]], "indexMark": { "at": [14, 24.2487] } },
           "at": { "joint": "B1" },
-          "frame": { "o": [-60, 0, "H"], "z": [1, 0, 0], "x": [0, 1, 0] }
+          "frame": { "o": [-80, 0, "H"], "z": [1, 0, 0], "x": [0, 1, 0] }
         },
         {
           "id": "disc-out", "role": "output",
-          "shape": { "type": "disc", "radius": 32, "thickness": 12, "place": 12, "holes": [[0, 22, 5], [19.0526, -11, 5], [-19.0526, -11, 5]] },
+          "shape": { "type": "disc", "radius": 32, "thickness": 12, "place": 12, "holes": [[0, 22, 5], [19.0526, -11, 5], [-19.0526, -11, 5]], "indexMark": { "at": [24.2487, 14] } },
           "at": { "joint": "B2" },
-          "frame": { "o": [0, -60, "H"], "z": [0, 1, 0], "x": [0, 0, 1] }
+          "frame": { "o": [0, -80, "H"], "z": [0, 1, 0], "x": [0, 0, 1] }
         },
-        { "id": "rod-1", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [74, 74], "bend": 6 }, "frame": { "o": ["r*cos(0)", "r*cos(0)", "H+r*sin(0)"], "z": [1, 0, 0], "x": [0, 1, 0] } },
-        { "id": "rod-2", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [74, 74], "bend": 6 }, "frame": { "o": ["r*cos(120)", "r*cos(120)", "H+r*sin(120)"], "z": [1, 0, 0], "x": [0, 1, 0] } },
-        { "id": "rod-3", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [74, 74], "bend": 6 }, "frame": { "o": ["r*cos(240)", "r*cos(240)", "H+r*sin(240)"], "z": [1, 0, 0], "x": [0, 1, 0] } }
+        { "id": "rod-1", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [94, 94], "bend": 6 }, "frame": { "o": ["r*cos(0)", "r*cos(0)", "H+r*sin(0)"], "z": [0.707107, 0.707107, 0], "x": [0, 0, 1] } },
+        { "id": "rod-2", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [94, 94], "bend": 6 }, "frame": { "o": ["r*cos(120)", "r*cos(120)", "H+r*sin(120)"], "z": [0.707107, 0.707107, 0], "x": [0, 0, 1] } },
+        { "id": "rod-3", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [94, 94], "bend": 6 }, "frame": { "o": ["r*cos(240)", "r*cos(240)", "H+r*sin(240)"], "z": [0.707107, 0.707107, 0], "x": [0, 0, 1] } }
       ],
       "joints": [
-        { "id": "B1", "type": "revolute", "a": "ground", "b": "disc-in", "at": [-60, 0, "H"], "axis": [1, 0, 0], "note": "the input shaft, along x toward J" },
-        { "id": "B2", "type": "revolute", "a": "ground", "b": "disc-out", "at": [0, -60, "H"], "axis": [0, -1, 0], "note": "the output shaft, along y; its axis points away from J, the sense the output turns in with the input" },
-        { "id": "R1-in", "type": "cylindrical", "a": "disc-in", "b": "rod-1", "at": [-42, "r*cos(0)", "H+r*sin(0)"], "axis": [1, 0, 0], "note": "rod 1's first leg in its bore of the input disc: it slides and turns there" },
-        { "id": "R1-out", "type": "cylindrical", "a": "disc-out", "b": "rod-1", "at": ["r*cos(0)", -42, "H+r*sin(0)"], "axis": [0, 1, 0], "note": "rod 1's second leg in its bore of the output disc" },
-        { "id": "R2-in", "type": "cylindrical", "a": "disc-in", "b": "rod-2", "at": [-42, "r*cos(120)", "H+r*sin(120)"], "axis": [1, 0, 0] },
-        { "id": "R2-out", "type": "cylindrical", "a": "disc-out", "b": "rod-2", "at": ["r*cos(120)", -42, "H+r*sin(120)"], "axis": [0, 1, 0] },
-        { "id": "R3-in", "type": "cylindrical", "a": "disc-in", "b": "rod-3", "at": [-42, "r*cos(240)", "H+r*sin(240)"], "axis": [1, 0, 0] },
-        { "id": "R3-out", "type": "cylindrical", "a": "disc-out", "b": "rod-3", "at": ["r*cos(240)", -42, "H+r*sin(240)"], "axis": [0, 1, 0] }
+        { "id": "B1", "type": "revolute", "a": "ground", "b": "disc-in", "at": [-80, 0, "H"], "axis": [1, 0, 0], "side": -1, "note": "the input shaft, along x toward J; both pillow blocks behind the disc, since the rods sweep past its front face" },
+        { "id": "B2", "type": "revolute", "a": "ground", "b": "disc-out", "at": [0, -80, "H"], "axis": [0, -1, 0], "side": -1, "note": "the output shaft, along y; its axis points away from J, the sense the output turns in with the input; both pillow blocks behind the disc" },
+        { "id": "R1-in", "type": "cylindrical", "a": "disc-in", "b": "rod-1", "at": [-62, "r*cos(0)", "H+r*sin(0)"], "axis": [1, 0, 0], "note": "rod 1's first leg in its bore of the input disc: it slides and turns there" },
+        { "id": "R1-out", "type": "cylindrical", "a": "disc-out", "b": "rod-1", "at": ["r*cos(0)", -62, "H+r*sin(0)"], "axis": [0, 1, 0], "note": "rod 1's second leg in its bore of the output disc" },
+        { "id": "R2-in", "type": "cylindrical", "a": "disc-in", "b": "rod-2", "at": [-62, "r*cos(120)", "H+r*sin(120)"], "axis": [1, 0, 0] },
+        { "id": "R2-out", "type": "cylindrical", "a": "disc-out", "b": "rod-2", "at": ["r*cos(120)", -62, "H+r*sin(120)"], "axis": [0, 1, 0] },
+        { "id": "R3-in", "type": "cylindrical", "a": "disc-in", "b": "rod-3", "at": [-62, "r*cos(240)", "H+r*sin(240)"], "axis": [1, 0, 0] },
+        { "id": "R3-out", "type": "cylindrical", "a": "disc-out", "b": "rod-3", "at": ["r*cos(240)", -62, "H+r*sin(240)"], "axis": [0, 1, 0] }
       ],
       "params": [
         { "id": "r", "value": 22, "unit": "mm", "min": 22, "max": 22, "note": "radius of the bore circle, the same in both discs" },
@@ -338,8 +338,8 @@
         { "id": "plane-a", "body": "ground", "local": [-34, -34, "H"] },
         { "id": "plane-b", "body": "ground", "local": [34, 34, "H"] },
         { "id": "corner-1", "body": "rod-1", "local": [0, 0, 0] },
-        { "id": "leg-in-1", "body": "rod-1", "local": [0, 0, -24] },
-        { "id": "leg-out-1", "body": "rod-1", "local": [-24, 0, 0] },
+        { "id": "leg-in-1", "body": "rod-1", "local": [0, -16.9706, -16.9706] },
+        { "id": "leg-out-1", "body": "rod-1", "local": [0, 16.9706, -16.9706] },
         { "id": "in-mark", "body": "disc-in", "local": [14, 24.2487, 24] },
         { "id": "out-mark", "body": "disc-out", "local": [24.2487, 14, 24] },
         { "id": "in-ext", "body": "disc-in", "local": [0, 0, 40] },
@@ -361,7 +361,7 @@
       "fallback": null
     },
     "teaching": {
-      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record, reviewed against its kinematics before the build (#256). Six phases of the solved cycle (input 0, 60, 120, 180, 240, 300): rod 1's corner runs (22, 22, 0), (11, 11, 19), (-11, -11, 19), (-22, -22, 0), (-11, -11, -19), (11, 11, -19) from J, an ellipse in the plane x = y that bisects the right angle; the rods never turn; each leg slides 44 mm in its bore, the corner farthest from both discs at 0 and nearest at 180, both legs of a rod together; speed ratio 1 within 1e-4, output minus input 0, K1 residual 1e-14. Branch: the other root of a rod's corner (x = -q · a2) turns the output the other way and meets the assembled root where the rod's bores stand straight above or below the shafts (input 90 and 270 for rod 1); solved for all three rods, the other root gives each rod a different output turn, so it cannot be taken while the other two hold the output, and the rods reach their switch points one at a time, 60 degrees apart. Two rods set opposite would reach theirs together and could not hold it, so three rods at 120 degrees. Decided: bores on a 22 mm circle in Ø64 discs 36 mm from J, a stroke large enough to see against the disc; the reference with rod 1 in the plane of the shafts, so the section in that plane cuts both its legs along their bores. What must be seen: equal angles on both shafts, by a mark on each disc's face at the same angle traced with ticks every 30 degrees (the same twelve ticks on both); rod 1's corner traced with the comet; the corners' plane as a line; the leg stroke as a dimension between its posed ends; why the angle is fixed, by the shaft angle arc beside the rod's bend arc, both 90 degrees. Both discs see-through on purpose (teaching.seeThrough) so the legs show in their bores. Default view ISOMETRIC. Controls: the input only; the shaft angle is fixed by the bend of the rods, so it is not offered." },
+      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record, reviewed against its kinematics before the build (#256). Six phases of the solved cycle (input 0, 60, 120, 180, 240, 300): rod 1's corner runs (22, 22, 0), (11, 11, 19), (-11, -11, 19), (-22, -22, 0), (-11, -11, -19), (11, 11, -19) from J, an ellipse in the plane x = y that bisects the right angle; the rods never turn; each leg slides 44 mm in its bore, the corner farthest from both discs at 0 and nearest at 180, both legs of a rod together; speed ratio 1 within 1e-4, output minus input 0, K1 residual 1e-14. Branch: the other root of a rod's corner (x = -q · a2) turns the output the other way and meets the assembled root where the rod's bores stand straight above or below the shafts (input 90 and 270 for rod 1); solved for all three rods, the other root gives each rod a different output turn, so it cannot be taken while the other two hold the output, and the rods reach their switch points one at a time, 60 degrees apart. Two rods set opposite would reach theirs together and could not hold it, so three rods at 120 degrees. Decided: bores on a 22 mm circle in Ø64 discs 56 mm from J, a stroke large enough to see against the disc and room between the discs to take them off their shafts; the reference with rod 1 in the plane of the shafts, so the section in that plane cuts both its legs along their bores. What must be seen: equal angles on both shafts, by a mark on each disc's face at the same angle traced with ticks every 30 degrees (the same twelve ticks on both); rod 1's corner traced with the comet; the corners' plane as a line; the leg stroke as a dimension between its posed ends; why the angle is fixed, by the shaft angle arc beside the rod's bend arc, both 90 degrees. Both discs see-through on purpose (teaching.seeThrough) so the legs show in their bores. Default view ISOMETRIC. Controls: the input only; the shaft angle is fixed by the bend of the rods, so it is not offered." },
       "principle": [{ "body": "disc-in" }, { "body": "disc-out" }, { "body": "rod-1" }, { "body": "rod-2" }, { "body": "rod-3" }, { "point": "corner-1" }],
       "traces": [
         { "id": "corner", "point": "corner-1", "ticks": { "every": 30 }, "comet": true },
@@ -376,7 +376,7 @@
         { "id": "corner-plane", "kind": "line", "from": "plane-a", "to": "plane-b", "label": "PLANE OF THE CORNERS" },
         { "id": "leg-stroke", "kind": "dimension", "from": "corner-1", "to": "corner-1", "fromPose": { "output": "leg-in-slide", "stat": "min" }, "toPose": { "output": "leg-in-slide", "stat": "max" }, "component": "x", "label": "LEG SLIDE 2r PER TURN" }
       ],
-      "view": "ISOMETRIC",
+      "view": "VIEW 135 30",
       "seeThrough": ["disc-in", "disc-out"],
       "views": [
         { "id": "plane-of-shafts", "kind": "section", "plane": { "origin": [0, 0, 55], "normal": [0, 0, 1] }, "highlight": ["rod-1"], "note": "the plane of the two shafts; at the reference rod 1 lies in it, both legs cut along their bores" }
