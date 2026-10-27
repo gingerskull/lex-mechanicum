@@ -23,6 +23,8 @@
   held rack, and a held rack is seated and dowelled on the base; a strand block and an open chain anchored at both
   ends. Every existing mechanism's package is unchanged.
 - The catalogue merges the n-numbered batch files of later waves; `n1.json` holds the six records.
+- A mechanism page may load up to 110 KB of JavaScript gzipped (was 100 KB): every page carries the whole kinematic
+  library, now about 105 KB with the new blocks.
 
 ## 0.43.3, Agripinaa — 2026-10-27
 
