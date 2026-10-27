@@ -284,9 +284,9 @@
     "kin": {
       "bodies": [
         { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [340, 150] }, "at": { "frame": { "origin": [0, 0, -8] } } },
-        { "id": "carrier", "role": "driver", "shape": { "type": "slider", "length": 44, "width": 24 }, "at": { "joint": "P" } },
+        { "id": "carrier", "role": "driver", "shape": { "type": "slider", "length": 84, "width": 24 }, "at": { "joint": "P" } },
         { "id": "pinion", "role": "gear", "shape": { "type": "gear", "z": 16, "module": 3, "face": 12, "bore": 10 }, "at": { "joint": "P" } },
-        { "id": "fixed-rack", "role": "gear", "fixed": true, "shape": { "type": "rack", "module": 3, "teeth": 16, "length": 150.796, "face": 12, "height": 16, "pitchLine": 0 }, "frame": { "origin": [0, -24, 0] } },
+        { "id": "fixed-rack", "role": "frame", "fixed": true, "shape": { "type": "rack", "module": 3, "teeth": 16, "length": 150.796, "face": 12, "height": 16, "pitchLine": 0 }, "frame": { "origin": [0, -24, 0] } },
         { "id": "free-rack", "role": "output", "shape": { "type": "rack", "module": 3, "teeth": 16, "length": 150.796, "face": 12, "height": 16, "pitchLine": 0 }, "at": { "joint": "R" }, "frame": { "origin": [0, 24, 0], "rot": [0, 0, 180] } }
       ],
       "joints": [
@@ -325,7 +325,7 @@
       "fallback": null
     },
     "teaching": {
-      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record (#257), reviewed against its kinematics before the build." },
+      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record (#257), reviewed against its kinematics before the build and again on the six phases of the finished build. Six phases (every 60 degrees of the cycle): the carrier at -40, -20, +20, +40, +20, -20 mm and the free rack at -80, -40, +40, +80, +40, -40 mm, always twice the carrier and the same way; the pinion turns back as it rolls forward, +95.5 to -95.5 degrees (191 over the stroke, 80 / 24 rad); its contact with the fixed rack stays on the fixed pitch line under the axle. Decided: the carrier is driven by the linear drive along its own slide (standard section 8), not by Brown's crank and rod, so the lesson is the two straight strokes alone with no second mechanism in front of it; module 3, 16 teeth (pitch radius 24), a carrier stroke of 80 mm and a free rack stroke of 160 mm; both racks 16 teeth, enough to stay in mesh over the stroke; the carrier 84 mm long, so it shows past the pinion at both ends; the fixed rack drawn as frame (role frame) and the free rack as the output, so which rack moves reads at a glance. Default view PLAN (opened at 28 degrees), where the pitch circle, both pitch lines and both strokes show true. Traces: a mark on the free rack's pitch line (the comet) and the axle, both ticked every 30 degrees of the cycle, so at every tick the rack's step is twice the carrier's; overlays: the fixed pitch line, a circle at the instant centre, the line from it through the axle to the far contact (speeds 0, v, 2v), and the two stroke dimensions between the posed ends. Plot of the free rack against the carrier (a straight line of slope 2). Controls: the input only; the pinion size is not offered (the parts are built for one pinion), and the claim that the ratio holds for any pinion is the law, checked by the block's test at three radii. No section or detail view: the principle lies in plain view. No time map." },
       "principle": [{ "body": "carrier" }, { "body": "pinion" }, { "body": "fixed-rack" }, { "body": "free-rack" }, { "point": "contact-fixed" }],
       "traces": [
         { "id": "free-rack", "point": "rack-mark", "ticks": { "every": 30 }, "comet": true },
