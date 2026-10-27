@@ -17,6 +17,7 @@ import { PAWL_KITS } from "./contacts/pawl";
 import { TONGUE_KITS } from "./contacts/tongue";
 import { RING_KITS } from "./contacts/ring";
 import { FLEXIBLE_KITS } from "./contacts/flexible";
+import { WOBBLE_KITS } from "./contacts/wobble";
 
 export const contactRules: Rule[] = [
   ...ECCENTRIC_KITS,
@@ -31,4 +32,5 @@ export const contactRules: Rule[] = [
   ...TONGUE_KITS,
   ...RING_KITS,
   ...FLEXIBLE_KITS,
+  ...WOBBLE_KITS,
 ];

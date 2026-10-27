@@ -22,15 +22,17 @@ export const crossBearings: Rule = {
   apply(ctx: BuildCtx) {
     let nipple = false;
     for (const j of ctx.joints.filter((q) => q.kit === "cross-pin")) {
-      const crossId = [j.a, j.b].find((b) => String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type) === "cross")!;
+      // the cross, or a wobble drive's trunnion ring (its trunnions on one axis: shapes/wobble.ts)
+      const crossId = [j.a, j.b].find((b) => ["cross", "wobble-ring"].includes(String(ctx.kin.bodies.find((q) => q.id === b)?.shape?.type)))!;
       const yokeId = crossId === j.a ? j.b : j.a;
       const yoke = ctx.kin.bodies.find((q) => q.id === yokeId)?.shape as Record<string, unknown> | undefined;
       const cross = ctx.kin.bodies.find((q) => q.id === crossId)?.shape as Record<string, unknown> | undefined;
+      const ring = cross?.type === "wobble-ring";
       const yk = (yoke?.yoke ?? {}) as Record<string, unknown>;
       const R = num(yk.radius, 30);
       const a = num(yk.arm, 8);
       const cupD = num(yoke?.cup, 14);
-      const d = num(cross?.diameter, 10);
+      const d = num(ring ? cross?.trunnion : cross?.diameter, 10);
       const c = circlipInt(cupD);
       const p = v3.unit(j.r.axis);
       const ids: string[] = [];
@@ -46,10 +48,11 @@ export const crossBearings: Rule = {
         ids.push(id, `${j.id}-cl${n}`);
       });
       if (!nipple) {
-        // the grease nipple on the centre block, along the third arm direction (F8)
-        const other = ctx.joints.find((q) => q.kit === "cross-pin" && q.id !== j.id);
+        // the grease nipple on the centre block, along the third arm direction (F8); on a trunnion ring, on its rim
+        // square to the trunnions and the journal, drilled through to both trunnions' cups
+        const other = ring ? ctx.joints.find((q) => q.kit === "oblique-journal" && (q.a === crossId || q.b === crossId)) : ctx.joints.find((q) => q.kit === "cross-pin" && q.id !== j.id);
         const n3 = other ? v3.unit(v3.cross(p, v3.unit(other.r.axis))) : ([0, 0, 1] as Vec3);
-        const block = d / 2 + 3;
+        const block = ring ? num(cross?.outer, 40) / 2 : d / 2 + 3;
         const L = new Local(frameAlong(j.at as Vec3, n3), { joints: [j.id] });
         L.add(H.nipple(`${crossId}-nip`, { body: crossId, z0: block, z1: block + 9 }));
         ctx.add(L.out());
@@ -61,7 +64,9 @@ export const crossBearings: Rule = {
         kit: "cross-pin",
         at: j.at,
         title: `cross-pin · ${titleOf(j.id)}`,
-        note: `${titleOf(j.id)}: the ${yokeId}'s pin into the cross: two needle cups Ø${cupD} pressed into the arms, each held by an internal circlip; the trunnions run on the needles. Double support across the cross.`,
+        note: ring
+          ? `${titleOf(j.id)}: the ring's two Ø${d} trunnions in the ${yokeId}'s arms: two needle cups Ø${cupD} pressed into the arms, each held by an internal circlip; a grease nipple on the ring's rim feeds both cups. Double support across the ring; the trunnion axis passes through the common centre.`
+          : `${titleOf(j.id)}: the ${yokeId}'s pin into the cross: two needle cups Ø${cupD} pressed into the arms, each held by an internal circlip; the trunnions run on the needles. Double support across the cross.`,
         badge: ["double shear", "ok"],
         serves: { F2: ids.filter((x) => x.includes("-cl")), F8: [`${crossId}-nip`].filter(() => true) },
       });

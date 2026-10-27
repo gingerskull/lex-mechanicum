@@ -28,6 +28,7 @@ import { plateCam } from "./shapes/cams";
 import { INDEXER_OUTLINES, ringWheel, turretRollers } from "./shapes/indexers";
 import { TIMED_OUTLINES, crown, vergeStaff } from "./shapes/timed";
 import { SPATIAL_OUTLINES, ballProfile, spatialLink, spherical, universal } from "./shapes/spatial";
+import { wobble } from "./shapes/wobble";
 
 export { spider } from "./shapes/plain";
 export { levelId, meshLevel } from "./shapes/meshing";
@@ -212,6 +213,7 @@ const GEOMS: GeomFn[] = [
   (kin, _S, b, g) => carriageGeom(kin, b, g),
   (_kin, S, _b, g) => spatialLink(S, g),
   spherical,
+  wobble,
 ];
 
 /** The geometry of every body of the record except the ground, in the reference configuration. */

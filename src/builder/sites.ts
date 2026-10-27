@@ -14,6 +14,7 @@ export const KIT_IDS = [
   "pallet", "fork-pin", "pawl-tooth", "pin-lobe", "tongue-slot", "ring-hub", "ring-rollers", "strap-sheave", "groove-cam",
   "cross-pin", "trunnion", "piston-bore", "ring-carrier", "eccentric-bearing", "pin-ring", "pin-hole", "spider-pin",
   "ball-socket", "slipper", "sphere-fit", "eccentric", "die", "hub", "ball-cage",
+  "oblique-journal",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -95,6 +96,9 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (!ground && j.type === "revolute" && (typeof a?.shape?.offset === "number" || typeof b?.shape?.offset === "number")) return "eccentric-bearing";
       // a yoke's pin into a universal joint's cross turns in needle cups in the yoke's arms
       if (!ground && (a?.shape?.type === "cross" || b?.shape?.type === "cross")) return "cross-pin";
+      // a wobble drive's trunnion ring: its trunnions in the yoke's needle cups (cross-pin), its bore on the inclined
+      // journal's bearings (oblique-journal)
+      if (!ground && (a?.shape?.type === "wobble-ring" || b?.shape?.type === "wobble-ring")) return a?.shape?.yoke || b?.shape?.yoke ? "cross-pin" : "oblique-journal";
       // a cage's spherical faces on a race and in a bell (a constant-velocity joint)
       if (!ground && j.type === "spherical" && [a, b].some((x) => x?.shape?.type === "cage") && [a, b].some((x) => x?.shape?.type === "race" || x?.shape?.type === "bell")) return "sphere-fit";
       // a ball end in a slipper's socket (a swash plate's piston)

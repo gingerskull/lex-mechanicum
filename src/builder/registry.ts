@@ -51,6 +51,7 @@ export const rules: Rule[] = [
   j2,
   j10,
   crossBearings,
+  byId("oblique-journal"),
   trunnion,
   pistonBore,
   ringCarrier,
