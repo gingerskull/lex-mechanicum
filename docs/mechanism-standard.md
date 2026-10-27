@@ -309,6 +309,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
 | `cross-bearings` | J3, F2, F8 |
+| `oblique-journal` | J3, F2 |
 | `trunnion` | J1, F2, F4, F6 |
 | `piston-bore` | J5, M14 |
 | `ring-carrier` | J6, F1, F2 |

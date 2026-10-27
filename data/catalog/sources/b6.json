@@ -923,7 +923,7 @@
     { "title": "Universal joint, Cardan joints, design and applications (YouTube)", "url": "https://www.youtube.com/watch?v=fQhuR50m9qo", "kind": "video" },
     { "title": "Universal Joint, Wolfram Demonstrations", "url": "http://demonstrations.wolfram.com/UniversalJoint/", "kind": "interactive" }
   ],
-  "related": ["double-cardan", "rzeppa-cv-joint", "oldham-coupling", "schmidt-coupling", "bevel-gears"]
+  "related": ["double-cardan", "rzeppa-cv-joint", "oldham-coupling", "schmidt-coupling", "bevel-gears", "wobble-box"]
 },
 {
   "id": "double-cardan",
@@ -1007,7 +1007,7 @@
     { "title": "Double Cardan Drive Shaft Rebuild (YouTube)", "url": "https://www.youtube.com/watch?v=KXn1nBkafNk", "kind": "video" },
     { "title": "Study of double Cardan universal joint 2a (YouTube)", "url": "https://www.youtube.com/watch?v=cydmR0lX2t8", "kind": "video" }
   ],
-  "related": ["universal-joint", "rzeppa-cv-joint", "schmidt-coupling", "oldham-coupling"]
+  "related": ["universal-joint", "rzeppa-cv-joint", "schmidt-coupling", "oldham-coupling", "wobble-box"]
 },
 {
   "id": "rzeppa-cv-joint",
