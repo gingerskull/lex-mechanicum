@@ -337,7 +337,7 @@
     { "title": "Non Captive Lead Screw Actuators (Motorized Assemblies) (YouTube)", "url": "https://www.youtube.com/watch?v=2arakJuK6tA", "kind": "video" },
     { "title": "Lead Screws Explained, Fractory", "url": "https://fractory.com/lead-screws/", "kind": "photos" }
   ],
-  "related": ["ball-screw", "differential-screw", "rack-pinion", "worm-drive"]
+  "related": ["ball-screw", "differential-screw", "rack-pinion", "worm-drive", "self-reversing-screw"]
 },
 {
   "id": "ball-screw",
@@ -423,7 +423,7 @@
     { "title": "What Is a Ball Screw?, Dynatect", "url": "https://dynatect.com/resources/what-is-a-ball-screw/", "kind": "photos" },
     { "title": "How A Ball Screw Works (Animated) (YouTube)", "url": "https://www.youtube.com/watch?v=oEPrXljqeHA", "kind": "animation" }
   ],
-  "related": ["lead-screw", "differential-screw", "rack-pinion"]
+  "related": ["lead-screw", "differential-screw", "rack-pinion", "self-reversing-screw"]
 },
 {
   "id": "differential-screw",

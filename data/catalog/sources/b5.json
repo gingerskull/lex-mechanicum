@@ -1497,7 +1497,8 @@
    "face-groove-cam",
    "roller-gear-indexer",
    "lead-screw",
-   "swash-plate"
+   "swash-plate",
+   "self-reversing-screw"
   ]
  },
  {
@@ -1744,7 +1745,8 @@
    "cam-follower",
    "barrel-cam",
    "desmodromic-cam",
-   "geneva"
+   "geneva",
+   "self-reversing-screw"
   ]
  },
  {

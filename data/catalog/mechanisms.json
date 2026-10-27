@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-10-25",
+  "generated": "2026-10-27",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -45324,7 +45324,8 @@
         "face-groove-cam",
         "roller-gear-indexer",
         "lead-screw",
-        "swash-plate"
+        "swash-plate",
+        "self-reversing-screw"
       ],
       "added": "2026-10-22",
       "origin": {
@@ -47443,7 +47444,8 @@
         "cam-follower",
         "barrel-cam",
         "desmodromic-cam",
-        "geneva"
+        "geneva",
+        "self-reversing-screw"
       ],
       "added": "2026-10-19",
       "origin": {
@@ -54940,7 +54942,8 @@
         "ball-screw",
         "differential-screw",
         "rack-pinion",
-        "worm-drive"
+        "worm-drive",
+        "self-reversing-screw"
       ],
       "added": "2026-10-22",
       "origin": {
@@ -55559,7 +55562,8 @@
       "related": [
         "lead-screw",
         "differential-screw",
-        "rack-pinion"
+        "rack-pinion",
+        "self-reversing-screw"
       ],
       "added": "2026-10-22",
       "origin": {
@@ -56551,6 +56555,712 @@
           }
         ],
         "exceptions": []
+      }
+    },
+    {
+      "record_version": 3,
+      "id": "self-reversing-screw",
+      "name": "Self-reversing screw",
+      "aka": [
+        "diamond screw",
+        "diamond thread screw",
+        "reversing screw",
+        "cross-threaded spindle",
+        "Kreuzgewindespindel",
+        "self-reversing spindle",
+        "yankee screw",
+        "level wind worm shaft",
+        "double screw of Napier"
+      ],
+      "in_site": false,
+      "family": "Screw",
+      "level": "Intermediate",
+      "summary": "A screw cut with a right-hand and a left-hand groove joined at the ends drives a shoe to and fro at constant speed while it turns one way.",
+      "motion": {
+        "input": "Rotary",
+        "output": "Linear",
+        "label": "Rotary → Linear",
+        "output_character": [
+          "Reciprocating",
+          "Constant velocity",
+          "Reversing"
+        ],
+        "axes": "Rotary-to-along-axis",
+        "plane": "Spatial"
+      },
+      "ratio": {
+        "kind": "Stroke",
+        "class": "n/a",
+        "typical": "one lead per turn (48 mm by default); stroke = lead x (turns per traverse - turn-round), 120 mm over 3 turns"
+      },
+      "dof": 1,
+      "topology": {
+        "links": 4,
+        "revolute": 2,
+        "prismatic": 1,
+        "higher_pairs": 1,
+        "notes": "ground, screw (revolute in its pillow blocks), carriage (prismatic on its guide), shoe (revolute pivot in the carriage); the shoe in the groove is a form-closed cam contact; counted mobility 2, because the shoe's swivel on its pivot is set by the groove's walls, which the count does not see"
+      },
+      "backdrivable": "Partly",
+      "tags": {
+        "function": [
+          "Motion conversion",
+          "Reversing",
+          "Positioning"
+        ],
+        "property": [
+          "Positive drive",
+          "Exact",
+          "Few parts"
+        ],
+        "application": [
+          "Construction & lifting",
+          "Marine",
+          "Printing & textiles",
+          "Consumer products"
+        ],
+        "keywords": [
+          "diamond screw",
+          "level winder",
+          "crossing grooves",
+          "swivelling shoe",
+          "Reuleaux",
+          "Napier",
+          "traverse",
+          "crossover"
+        ]
+      },
+      "explain": {
+        "motion": "The screw carries a right-hand and a left-hand groove of the same lead, joined at both ends into one endless track that crosses itself twice on every turn. A shoe rides the groove on a pivot in the carriage. Turning the screw one way at a steady speed carries the shoe along at a steady 48 mm per turn. Near each end the groove bends round within 1 turn of the screw: the shoe slows, stops, swivels across into the other groove and comes back, so the carriage runs 120 mm there and back every 6 turns with the screw never changing direction.",
+        "forces": "The groove's wall pushes on the side of the shoe, and the push along the screw is the turning effort over the lead, less friction. At the pitch radius the grooves lean 28.6° from the circumference, so the shoe swivels through 57.2° at each turn-round. Where the grooves cross, the shoe loses its walls in the middle and is carried by its two ends, which is why it must be longer than a crossing.",
+        "benefits": "Turns steady one-way rotation into a steady to-and-fro with no reversing gear, clutch or change of direction, and the reversal points are cut into the screw, so they never drift.",
+        "limits": "The stroke and the reversal points are fixed when the screw is cut. The sharp points where the grooves cross and the long shoe wear fastest, and a worn shoe can turn into the wrong groove and reverse early; heavy loads wear the shoe quickly."
+      },
+      "build": {
+        "ground": "base with the screw's two pillow blocks and a straight guide for the carriage along the screw",
+        "defining_relations": "Both grooves have the lead p = 48 mm; at the pitch radius rp = 14 mm the lead angle is atan(p / (2 pi rp)) = 28.6°. Over each traverse of N = 3 turns the shoe moves by the trapezoidal law: steady at one lead per turn, with a parabolic turn-round of tr = 0.5 turn at each end (blend tr / N = 1/6), so the stroke is h = p (N - tr) = 120 mm and the track repeats after 2N = 6 turns. The shoe lies along the groove: its swivel is the change of atan(s' / rp), plus or minus 28.6° in the steady runs. Groove 7 mm wide and 4 mm deep; at the lead angle a crossing is 7 / sin(57.2°) = 8.3 mm long along the groove, bridged by a shoe 18 mm long.",
+        "notes": "Screw axis horizontal, the shoe on the near side, seen in front elevation where the grooves cross in a diamond pattern. The track is cut by Manifold in pieces along the law, the root turned back as one core. The shoe's blade is an ellipse in plan, its underside cut round the screw's axis; it swivels on a pivot bolt in the carriage's upright."
+      },
+      "kin": {
+        "bodies": [
+          {
+            "id": "ground",
+            "role": "ground",
+            "shape": {
+              "type": "plate",
+              "rect": [
+                260,
+                110
+              ]
+            },
+            "at": {
+              "frame": {
+                "origin": [
+                  0,
+                  -20,
+                  -10
+                ]
+              }
+            }
+          },
+          {
+            "id": "screw",
+            "role": "driver",
+            "shape": {
+              "type": "cam",
+              "form": "barrel",
+              "radius": 16,
+              "length": 170,
+              "pitchRadius": 14,
+              "groove": {
+                "width": 7,
+                "depth": 4,
+                "centreline": "x = s(theta) at the pitch radius, theta over 6 turns: right hand out, left hand back",
+                "make": "boolean: the track cut in pieces of the groove's section along the law, the root turned back as one core"
+              },
+              "shaft": 12,
+              "bore": 12
+            },
+            "at": {
+              "joint": "O"
+            }
+          },
+          {
+            "id": "carriage",
+            "role": "follower",
+            "shape": {
+              "type": "plate",
+              "exact": true,
+              "outline": [
+                [
+                  -22,
+                  -16
+                ],
+                [
+                  22,
+                  -16
+                ],
+                [
+                  22,
+                  16
+                ],
+                [
+                  -22,
+                  16
+                ]
+              ],
+              "fillet": 4,
+              "thickness": 8,
+              "pieces": [
+                {
+                  "id": "upright",
+                  "origin": [
+                    0,
+                    -26,
+                    0
+                  ],
+                  "rot": [
+                    90,
+                    0,
+                    0
+                  ],
+                  "thick": 6,
+                  "outline": [
+                    [
+                      -14,
+                      8
+                    ],
+                    [
+                      14,
+                      8
+                    ],
+                    [
+                      4.5,
+                      40
+                    ],
+                    [
+                      0,
+                      44.5
+                    ],
+                    [
+                      -4.5,
+                      40
+                    ]
+                  ]
+                }
+              ]
+            },
+            "frame": {
+              "origin": [
+                0,
+                -34,
+                0
+              ]
+            }
+          },
+          {
+            "id": "shoe",
+            "role": "follower",
+            "shape": {
+              "type": "shoe",
+              "length": 18,
+              "width": 6.8,
+              "root": 0.8,
+              "clear": 1,
+              "boss": {
+                "radius": 5,
+                "height": 5
+              }
+            },
+            "at": {
+              "joint": "F"
+            }
+          }
+        ],
+        "joints": [
+          {
+            "id": "O",
+            "type": "revolute",
+            "a": "ground",
+            "b": "screw",
+            "at": [
+              0,
+              0,
+              40
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "G",
+            "type": "prismatic",
+            "a": "carriage",
+            "b": "ground",
+            "at": [
+              0,
+              -34,
+              0
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "limits": [
+              -60,
+              60
+            ]
+          },
+          {
+            "id": "F",
+            "type": "revolute",
+            "a": "carriage",
+            "b": "shoe",
+            "at": [
+              0,
+              -14,
+              40
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ]
+          },
+          {
+            "id": "C",
+            "type": "cam-contact",
+            "a": "shoe",
+            "b": "screw",
+            "at": [
+              0,
+              -14,
+              40
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "ca": [
+              0,
+              0,
+              40
+            ],
+            "closure": "form",
+            "cam": {
+              "form": "barrel",
+              "turns": "2*N",
+              "schedule": [
+                {
+                  "kind": "rise",
+                  "span": "360*N",
+                  "law": "trapezoidal",
+                  "blend": "tr/N"
+                },
+                {
+                  "kind": "return",
+                  "span": "360*N",
+                  "law": "trapezoidal",
+                  "blend": "tr/N"
+                }
+              ],
+              "lift": "lead*(N-tr)",
+              "rb": "Rp",
+              "theta0": "180*N"
+            },
+            "note": "at is the shoe's centre at the pitch radius Rp (mid-depth of the groove); the track's centre line runs along the axis by the law over 2N turns, so it crosses itself"
+          }
+        ],
+        "params": [
+          {
+            "id": "lead",
+            "value": 48,
+            "unit": "mm",
+            "min": 24,
+            "max": 64,
+            "note": "lead of both grooves"
+          },
+          {
+            "id": "N",
+            "value": 3,
+            "unit": "turns",
+            "min": 2,
+            "max": 4,
+            "note": "turns of the screw per traverse"
+          },
+          {
+            "id": "tr",
+            "value": 0.5,
+            "unit": "turns",
+            "min": 0.25,
+            "max": 1,
+            "note": "turn-round at each end, turns of the screw"
+          },
+          {
+            "id": "Rp",
+            "value": 14,
+            "unit": "mm",
+            "min": 12,
+            "max": 15,
+            "note": "pitch radius (groove mid-depth)"
+          }
+        ],
+        "design": [],
+        "drivers": [
+          {
+            "id": "input",
+            "joint": "O",
+            "kind": "rotary",
+            "range": [
+              0,
+              2160
+            ],
+            "default": 0
+          }
+        ],
+        "solve": [
+          {
+            "block": "cam",
+            "id": "track",
+            "joints": [
+              "G",
+              "F",
+              "C"
+            ],
+            "in": {
+              "joint": "C",
+              "input": "input",
+              "follower": [
+                "carriage"
+              ],
+              "axis": [
+                1,
+                0,
+                0
+              ],
+              "shoe": "shoe",
+              "pivot": "F"
+            },
+            "out": {
+              "s": "shoe-s",
+              "pressure": "lead-angle",
+              "swivel": "shoe-swivel"
+            }
+          }
+        ],
+        "points": [
+          {
+            "id": "shoe-centre",
+            "body": "shoe",
+            "local": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "stroke-mark",
+            "body": "carriage",
+            "local": [
+              0,
+              20,
+              68
+            ]
+          },
+          {
+            "id": "lead-0",
+            "body": "ground",
+            "local": [
+              -24,
+              -14,
+              76
+            ]
+          },
+          {
+            "id": "lead-1",
+            "body": "ground",
+            "local": [
+              24,
+              -14,
+              76
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "id": "shoe-x",
+            "of": "G",
+            "kind": "position",
+            "unit": "mm"
+          },
+          {
+            "id": "shoe-speed",
+            "of": "shoe-centre",
+            "kind": "speed-ratio",
+            "unit": "mm/deg"
+          },
+          {
+            "id": "shoe-swivel",
+            "of": "shoe",
+            "kind": "angle",
+            "unit": "deg"
+          },
+          {
+            "id": "lead-angle",
+            "of": "C",
+            "kind": "angle",
+            "unit": "deg"
+          }
+        ],
+        "fallback": null
+      },
+      "teaching": {
+        "review": {
+          "verdict": "keep",
+          "date": "2026-10-27",
+          "note": "New record, reviewed against its kinematics before the build (#255). Six phases of the solved cycle (every 60 degrees of the cycle, one turn of the screw): the shoe at mid-stroke on a crossing, 48 mm further, at the far end turning round (swivel through 0 to -57.2), and back the same way; the shoe's travel against the screw's turn is an exact triangle wave with rounded tips, 24 mm per half turn in the steady runs. Decided: 3 turns per traverse and a turn-round of half a turn either side of each end, so the cycle is 6 turns, the shoe runs steady for 2 of every 3 turns and the turn-round is a sixth of the cycle, long enough to watch with no time map; lead 48 on a 32 mm screw, a lead angle of 28.6 degrees at the 14 mm pitch radius, so a crossing is 8.3 mm long and an 18 mm shoe bridges it with 4.8 mm in the groove at each end; the reference at mid-stroke, where both grooves cross under the shoe, so the opening drawing shows the shoe bridging a crossing. Default view FRONT, the screw's near side where the grooves cross in diamonds and the shoe lies along its groove at true size. One tick per screw turn on the shoe's trace, a fixed one-lead dimension above it and the stroke dimension between the posed ends, so a turn reads as one lead; plot of the shoe's position against the screw's turn (the triangle wave over 6 turns); a detail view at the crossing under the shoe at the reference. The carriage is drawn see-through on purpose (teaching.seeThrough): its upright stands in front of the shoe in FRONT. Controls: the screw's turn only; the lead, turns and turn-round are built into the screw, so they are not offered."
+        },
+        "principle": [
+          {
+            "body": "screw"
+          },
+          {
+            "body": "shoe"
+          },
+          {
+            "body": "carriage"
+          },
+          {
+            "point": "shoe-centre"
+          }
+        ],
+        "traces": [
+          {
+            "id": "shoe",
+            "point": "shoe-centre",
+            "ticks": {
+              "every": 60
+            },
+            "comet": true
+          }
+        ],
+        "overlays": [
+          {
+            "id": "screw-axis",
+            "kind": "axis-line",
+            "at": "O",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "length": 190,
+            "label": "SCREW AXIS"
+          },
+          {
+            "id": "stroke",
+            "kind": "dimension",
+            "from": "stroke-mark",
+            "to": "stroke-mark",
+            "fromPose": {
+              "output": "shoe-x",
+              "stat": "min"
+            },
+            "toPose": {
+              "output": "shoe-x",
+              "stat": "max"
+            },
+            "label": "STROKE, 3 TURNS"
+          },
+          {
+            "id": "lead",
+            "kind": "dimension",
+            "from": "lead-0",
+            "to": "lead-1",
+            "label": "ONE LEAD PER TURN"
+          }
+        ],
+        "view": "FRONT",
+        "seeThrough": [
+          "carriage"
+        ],
+        "views": [
+          {
+            "id": "crossing",
+            "kind": "detail",
+            "center": [
+              50,
+              -14,
+              40
+            ],
+            "scale": 4,
+            "highlight": [
+              "shoe"
+            ]
+          }
+        ],
+        "controls": [
+          {
+            "id": "screw",
+            "kind": "driver",
+            "driver": "input"
+          }
+        ],
+        "plot": {
+          "x": "input",
+          "y": "shoe-x",
+          "label": "SHOE POSITION AGAINST SCREW TURN"
+        },
+        "claims": [
+          {
+            "text": "carries the shoe along at a steady 48 mm per turn",
+            "output": "shoe-speed",
+            "stat": "max",
+            "value": 0.133333,
+            "tol": 0.0002
+          },
+          {
+            "text": "the carriage runs 120 mm there and back",
+            "output": "shoe-x",
+            "stat": "range",
+            "value": 120,
+            "tol": 0.01
+          },
+          {
+            "text": "every 6 turns: out in 3 turns (half the cycle)",
+            "output": "shoe-x",
+            "stat": "phase",
+            "from": "min",
+            "to": "max",
+            "value": 180,
+            "tol": 1
+          },
+          {
+            "text": "bends round within 1 turn of the screw (a sixth of the cycle below full speed at each end)",
+            "output": "shoe-speed",
+            "stat": "dwell",
+            "band": [
+              0,
+              0.13325
+            ],
+            "value": 60,
+            "tol": 1
+          },
+          {
+            "text": "the grooves lean 28.6° from the circumference",
+            "output": "lead-angle",
+            "stat": "max",
+            "value": 28.62,
+            "tol": 0.05
+          },
+          {
+            "text": "the shoe swivels through 57.2° at each turn-round",
+            "output": "shoe-swivel",
+            "stat": "range",
+            "value": 57.24,
+            "tol": 0.1
+          }
+        ],
+        "exceptions": []
+      },
+      "examples": [
+        {
+          "use": "Level winder on a winch",
+          "detail": "A diamond screw driven from the drum carries the rope guide to and fro so heavy cable is laid in even layers."
+        },
+        {
+          "use": "Baitcasting fishing reel",
+          "detail": "The line guide rides a small worm shaft cut both ways with a crossover, so line spools evenly across the reel."
+        },
+        {
+          "use": "Cable and hose reels",
+          "detail": "Self-reversing spindles traverse the cable guide on reels in places that are hard to reach."
+        },
+        {
+          "use": "Yarn winding",
+          "detail": "A drum with a groove that crosses itself and reverses near the ends traverses the yarn as it winds a package."
+        }
+      ],
+      "references": [
+        {
+          "title": "Double Screw of Napier, Reuleaux model M6 (1882), Cornell University Library",
+          "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:372594",
+          "kind": "museum"
+        },
+        {
+          "title": "US patent 4031765, Reversing nut for diamond thread screw",
+          "url": "https://patents.google.com/patent/US4031765",
+          "kind": "patent"
+        },
+        {
+          "title": "US patent 10640346, Automatic reversing screw mechanism for cable winding (background on diamond and reversing screws)",
+          "url": "https://patents.google.com/patent/US10640346",
+          "kind": "patent"
+        },
+        {
+          "title": "The Cross Threaded Spindle: Back and Forth for Perfect Spooling, BAER",
+          "url": "https://baer.tools/en/blog/the-cross-threaded-spindle-back-and-forth-for-perfect-spooling",
+          "kind": "engineering-guide"
+        },
+        {
+          "title": "Diamond Screws, Bornemann Gewindetechnik",
+          "url": "https://www.bornemann-gewindetechnik.de/en/press/diamond-screws/",
+          "kind": "engineering-guide"
+        }
+      ],
+      "media": [
+        {
+          "title": "Self reverse screw on manual lathe (YouTube)",
+          "url": "https://www.youtube.com/shorts/DZdhhuUdF6c",
+          "kind": "video"
+        },
+        {
+          "title": "Diamond threaded rods, McMaster-Carr",
+          "url": "https://www.mcmaster.com/products/threaded-rods/thread-type~diamond/",
+          "kind": "photos"
+        },
+        {
+          "title": "Winch drum with screw level winder, Wikimedia Commons",
+          "url": "https://commons.wikimedia.org/wiki/File:Seilwinde-Kreuzgewindespindel.jpg",
+          "kind": "photos"
+        }
+      ],
+      "real_world": [
+        {
+          "product": "Self-reversing wireline winch",
+          "maker": "James Seabrook",
+          "use": "The winch's level wind carriage runs on a self-reversing screw and turns round at each end of the drum while the drum keeps turning one way.",
+          "url": "https://www.youtube.com/watch?v=RtToZ6ULJU0"
+        },
+        {
+          "product": "Diamond screw level winder",
+          "maker": "LEBUS International Engineers",
+          "use": "A diamond screw beside a winch drum traverses the rope guide across the drum and back as the rope is spooled.",
+          "url": "https://www.youtube.com/watch?v=tvJI2YSpUUA",
+          "note": "low resolution"
+        },
+        {
+          "product": "Self-reversing screw unit",
+          "maker": "Abssac",
+          "use": "A running self-reversing screw carries its follower to the end of the thread and back with the screw turning one way.",
+          "url": "https://www.youtube.com/watch?v=zv7cXR1UkWQ"
+        }
+      ],
+      "related": [
+        "lead-screw",
+        "barrel-cam",
+        "face-groove-cam",
+        "ball-screw"
+      ],
+      "added": "2026-10-27",
+      "origin": {
+        "date": "1882-11-13",
+        "precision": "year",
+        "note": "Best guess: the earliest dated hard source found is Reuleaux model M6, the Double Screw of Napier, made by Gustav Voigt in 1882: a cylinder with crossing helical grooves and a swivelling follower that reverses at the ends. The name points to an older origin that was not found. Source: https://dcp-production-container.library.cornell.edu/catalog/ss:372594"
       }
     },
     {
