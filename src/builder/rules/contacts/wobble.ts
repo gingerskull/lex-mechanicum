@@ -47,6 +47,13 @@ const obliqueJournal: Rule = {
       L.add(H.circlip(`${j.id}-cli1`, D, { internal: true, body: ringId, z0: s0 - 1.2, z1: s0, name: "", qty: 0 }));
       L.add(H.circlip(`${j.id}-cle`, dj, { body: hubId, z0: end }));
       f2.push(`${j.id}-cli0`, `${j.id}-cli1`, `${j.id}-cle`);
+      // the inner race stands on a spacer on the journal where the hub's shoulder stands back from the seat (so the
+      // shank ends clear of the ring's flank)
+      const sp = num(jrn.spacer, 0);
+      if (sp > 0) {
+        L.add(H.spacer(`${j.id}-sp`, dj, dj + 4, { body: hubId, z0: s0 - sp, z1: s0, name: `Inner-race spacer ${dj}x${dj + 4}x${sp}, from the hub's shoulder to the bearing` }));
+        f2.push(`${j.id}-sp`);
+      }
       ctx.add(L.out());
       // the hub's key runs in the straight shank only (the stack keys the whole planned length, which spans the shaft's
       // run on through the journal to the far pillow block)

@@ -51,7 +51,11 @@ export const crossBearings: Rule = {
         // the grease nipple on the centre block, along the third arm direction (F8); on a trunnion ring, on its rim
         // square to the trunnions and the journal, drilled through to both trunnions' cups
         const other = ring ? ctx.joints.find((q) => q.kit === "oblique-journal" && (q.a === crossId || q.b === crossId)) : ctx.joints.find((q) => q.kit === "cross-pin" && q.id !== j.id);
-        const n3 = other ? v3.unit(v3.cross(p, v3.unit(other.r.axis))) : ([0, 0, 1] as Vec3);
+        const n0 = other ? v3.unit(v3.cross(p, v3.unit(other.r.axis))) : ([0, 0, 1] as Vec3);
+        // a ring's nipple stands on the rim away from its yoke, where a grease gun reaches it and it does not stand
+        // alone between the yoke's arms
+        const yokeAt = ring ? ctx.joints.find((q) => (q.a === yokeId || q.b === yokeId) && (q.a === "ground" || q.b === "ground"))?.at : undefined;
+        const n3 = yokeAt && v3.dot(n0, v3.sub(yokeAt as Vec3, j.at as Vec3)) > 0 ? v3.mul(n0, -1) : n0;
         const block = ring ? num(cross?.outer, 40) / 2 : d / 2 + 3;
         const L = new Local(frameAlong(j.at as Vec3, n3), { joints: [j.id] });
         L.add(H.nipple(`${crossId}-nip`, { body: crossId, z0: block, z1: block + 9 }));
