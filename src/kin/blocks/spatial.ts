@@ -104,6 +104,44 @@ export function bennettClosure(p: BennettParams, th1: number): number {
 }
 
 /**
+ * Spherical four-bar (four revolutes whose axes meet at one centre), closed form. a1 is the driven ground axis, a2 the
+ * input-coupler axis, a3 the coupler-output axis and a4 the output's ground axis, all unit vectors in the reference
+ * pose. The input turns by θ about a1, carrying a2 round a cone; the output turns by ψ about a4 so that a3 keeps its
+ * link angle from a2 (the coupler's): A cos ψ + B sin ψ + C = cos(a2, a3). `roots` are the two solutions (the + and −
+ * sign of the arccos); `side` +1 takes the first, −1 the second. `h` is the distance from the touching (toggle) pose,
+ * √(A² + B²) − |cos − C|; a negative h means the loop does not close at this θ.
+ */
+export function sphericalFourBar(a1: Vec3, a2: Vec3, a3: Vec3, a4: Vec3, theta: number, side: 1 | -1): { psi: number; a2: Vec3; a3: Vec3; h: number; roots: [number, number] } {
+  const w = m3.mulV(m3.axisAngle(a1, theta), a2);
+  const k = v3.dot(a2, a3);
+  const va = v3.dot(a4, a3);
+  const A = v3.dot(a3, w) - va * v3.dot(a4, w);
+  const B = v3.dot(v3.cross(a4, a3), w);
+  const C = va * v3.dot(a4, w);
+  const r = Math.hypot(A, B);
+  const h = r - Math.abs(k - C);
+  const c = r > 1e-12 ? Math.max(-1, Math.min(1, (k - C) / r)) : 1;
+  const phi = Math.atan2(B, A);
+  const roots: [number, number] = [wrapPi(phi + Math.acos(c)), wrapPi(phi - Math.acos(c))];
+  const psi = side === 1 ? roots[0] : roots[1];
+  return { psi, a2: w, a3: m3.mulV(m3.axisAngle(a4, psi), a3), h, roots };
+}
+
+/** The link angles of a spherical four-bar from its four axes (radians): input a1–a2, coupler a2–a3, output a3–a4, ground a4–a1. */
+export function sphericalLinkAngles(a1: Vec3, a2: Vec3, a3: Vec3, a4: Vec3): [number, number, number, number] {
+  const ang = (p: Vec3, q: Vec3) => Math.acos(Math.max(-1, Math.min(1, v3.dot(v3.unit(p), v3.unit(q)))));
+  return [ang(a1, a2), ang(a2, a3), ang(a3, a4), ang(a4, a1)];
+}
+
+/**
+ * The wobble drive's swing: an inclined journal at α to the input shaft, its ring held by trunnions square to the
+ * journal in a yoke on an output shaft square to the input (coupler, output and ground links all 90°). With θ from the
+ * pose where the journal leans in the plane of the input and the yoke's trunnion axis, the output swings
+ * ψ = atan(tan α cos θ): exactly ±α.
+ */
+export const wobbleSwing = (alpha: number, theta: number): number => Math.atan(Math.tan(alpha) * Math.cos(theta));
+
+/**
  * Sarrus pair: two legs of two hinged links (l1 on the base, l2 on the top) in orthogonal planes carry a top plate that
  * moves in a straight line normal to the base. With the base link at θ from the base plane the upper link stands at φ
  * with l2 cos φ = l1 cos θ (no lateral drift); the top height is l1 sin θ + l2 sin φ.
