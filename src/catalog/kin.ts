@@ -31,6 +31,8 @@ export const KIN_VOCAB = {
     "walking-beam",
     // the bent-rod coupling (Hobson's joint)
     "elbow-rods",
+    // a member anchored at one end round a sprocket on a moving member (a stroke doubler's chain)
+    "strand",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;
