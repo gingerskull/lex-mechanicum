@@ -51,6 +51,7 @@ jobs:
     if: always() && (github.event_name != 'pull_request' || needs.changes.outputs.code == 'true')
     runs-on: ubuntu-latest
     # the 3D build: every mechanism built once from its record and checked, in a pool of processes: about 4 min
+    # with nothing cached
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +60,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # the build cache (dist/cache): each mechanism's build is keyed on its own sources (src/package/built.ts), so a
+      # run reuses every build of the last run that still holds, and a change to one mechanism builds only that one
+      - uses: actions/cache@v4
+        with:
+          path: dist/cache
+          key: build-${{ runner.os }}-node22-check-${{ hashFiles('src/**', 'data/catalog/**', 'package-lock.json') }}
+          restore-keys: |
+            build-${{ runner.os }}-node22-check-
+            build-${{ runner.os }}-node22-
       - run: npm run check
 
   site:
@@ -78,5 +88,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # the build cache (dist/cache): each mechanism's build is keyed on its own sources (src/package/built.ts), so a
+      # run reuses every build of the last run that still holds, and a change to one mechanism builds only that one
+      - uses: actions/cache@v4
+        with:
+          path: dist/cache
+          key: build-${{ runner.os }}-node22-site-${{ hashFiles('src/**', 'data/catalog/**', 'package-lock.json') }}
+          restore-keys: |
+            build-${{ runner.os }}-node22-site-
+            build-${{ runner.os }}-node22-
       - run: npm run build
       - run: npm run test:site

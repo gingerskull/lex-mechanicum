@@ -1,5 +1,5 @@
 // The kits of a cylinder that swings on a trunnion (the quick-return and slider playbook: "pivot pin retained (F2);
-// spring holding the port face (F6)"). The cylinder and its piston are the bodies' own parts (src/builder/shapes.ts):
+// spring holding the port face (F6)"). The cylinder and its piston are the bodies' own parts (shapes/engines.ts):
 //  - trunnion: the cylinder's ground revolute. A pin pressed into the cylinder's port pad turns in a bronze bushing in
 //    the fixed port face under it, runs down through the base, and a compression spring between a thrust washer under
 //    the base and a nyloc nut on the pin holds the port faces together;

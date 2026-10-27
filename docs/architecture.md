@@ -30,9 +30,10 @@ src/core/                        geometry, involute and flexible-member profiles
                                  sprockets), polygon queries (poly.ts), bevel, worm, helical and screw geometry
                                  (spatial.ts), the axis type of a hardware primitive (axis.ts)
 src/kin/                         the kinematic library: closed-form blocks (blocks/: linkages, gears, cams, couplings,
-                                 spatial, timed, members), the composition of a record's kin block (compose.ts: drivers,
-                                 solve list, bodies, numeric fallback, controls), the K1 verifier (verify.ts, the
-                                 loop-closure residual) and the time map (timemap.ts)
+                                 spatial, timed, members), the `solve` blocks that use them, one file per family
+                                 (steps/, registered in registry.ts with one line each), the composition of a record's
+                                 kin block (compose.ts: drivers, solve list, bodies, numeric fallback, controls), the K1
+                                 verifier (verify.ts, the loop-closure residual) and the time map (timemap.ts)
 src/hardware/                    tables (bearings, screws, circlips, keys, pulleys, springs, motors) as data; the
                                  primitive Solid type (an outline with an extent along its axis); primitives H.*; the
                                  housing bearing and the pillow block's sizes (sub/)
@@ -52,7 +53,9 @@ src/builder/                     the hardware builder: poses (the record's compo
                                  its strap), hub (a part on a fixed hub), die (a die in a curved link) and the covers rule;
                                  arms.ts makes an outboard arm (a return crank on a crank pin's end) a body of its own for
                                  the build. A slider on the ground is placed lowest, clear of its rails' zone; a body's
-                                 `shape.wheel` is built by the wheels rule (wheel, stub axle, upright tube)
+                                 `shape.wheel` is built by the wheels rule (wheel, stub axle, upright tube). Body outlines
+                                 and special body geometry are in shapes/, one file per family, dispatched from shapes.ts;
+                                 the contact kits in rules/contacts/, one file per kind, ordered in rules/contacts.ts
 src/package/                     package v2: the format (format2.ts: encode, decode, the joint notes and bounds), packing
                                  (pack2.ts), the build of a record (build3.ts) and of a registered mechanism with its
                                  polish (build.ts), Node
@@ -61,8 +64,8 @@ src/checks/                      the 3D checks: clash3 (A15: Manifold intersecti
                                  record (the K checks of a record: the K1 residual, K2, branch continuity, mobility K11, the
                                  claim table T9 in claims.ts, SOLID D11), source (a record built by the hardware builder,
                                  posed by its own kin block), run (the `ci` and `full` profiles and the result cache)
-src/audit/                       the audit generator (generate3.ts), the sheet reader and writer (sheet.ts) and the
-                                 conformance report (conformance.ts)
+src/audit/                       the audit generator (generate3.ts), the sheet reader and writer (sheet.ts), judging a
+                                 sheet's open rows (judge.ts) and the conformance report (conformance.ts)
 src/render/                      canvas factory, detail dial, pattern tiles, the paper and its tooth (sheet.ts), plot
 src/render/v3/                   the 3D drafting renderer: camera (turntable and AUX bases, named views, fit), views (record
                                  view strings, sections, details), scene (solid table: poses, explode, paper and role
@@ -130,10 +133,11 @@ tests/                           unit and fixture tests, the record and 3D check
 | `catalog` (`npm run catalog`) | merges and validates the sources, writes `mechanisms.json` and the CSV and Markdown views |
 | `kin-check <id \| file>` (`npm run kin-check`) | validates the kin and teaching blocks of the named records and lists the numbers in the explanation no claim mentions |
 | `check <id \| all> [n] [--no-solids]` | the kinematic checks of a record (standard Q1): K1 residual, periodicity, branch continuity, mobility, the claim table, SOLID |
-| `clearance <id \| all \| changed>` | clashes, clamp faults and hole walls in 3D (Q2); `--ci` samples 8 phases, the default `--full` 72 phases and audits the hand `allow` exemptions; `changed` is the pre-push selection |
+| `clearance <id ... \| all \| changed>` | clashes, clamp faults and hole walls in 3D (Q2); `--ci` samples 8 phases, the default `--full` 72 phases and audits the hand `allow` exemptions; `changed` is the pre-push selection |
 | `package [id ...] [--mesh]` (`npm run package`) | writes `dist/packages/<id>.mx2` (Q3): every solid meshed and checked (SOLID), the size and the shapes per kind |
-| `audit <id> [--ci]` (`npm run audit`) | writes or regenerates `src/mechanisms/<id>/audit.md` (Q6): the `teaching:` line, kit and block per joint, K1 residual, claim table, supports and the 3D clearance |
-| `conformance` (`npm run conformance`) | audited standard version and check results per mechanism (Q7), part of `npm run check` |
+| `audit <id> [--ci]` (`npm run audit`) | writes or regenerates `src/mechanisms/<id>/audit.md` (Q6): the `teaching:` line, kit and block per joint, K1 residual, claim table, supports and the 3D clearance; it fills the rows the rules' output or the pipeline decides (a joint-type row, an AUTO row a rule built solids for, the rows the pipeline holds for every mechanism) and leaves `?` where judgement is needed |
+| `judge <id[,id ...] \| all> <row> <status> "<note>"` (`npm run judge`) | writes a judgement into the audit sheets of the named mechanisms after the generated evidence; `--file <json>` writes many, `--open <id>` lists a sheet's unjudged rows; refuses a tool-decided row, an unknown row or a judgement without a note before writing anything |
+| `conformance [id ... \| changed]` (`npm run conformance`) | audited standard version and check results per mechanism (Q7), part of `npm run check` (every mechanism); a pass names its own, or `changed` as the pre-push hook selects them |
 | `shot3 <id> [options]` (`npm run shot`) | one frame to a PNG in any named view, section, detail or explode (Q4); `--set` draws the Q4 set |
 | `thumbs [id ...] [--all] [--hook]` (`npm run thumbs`) | redraws the stale thumbnails and stills in `site/thumbs` and their manifest |
 | `cards [id ...] [--all] [--hook]` (`npm run cards`) | redraws the stale social cards in `site/cards` (1200 x 630: the stage's opening drawing over a title block with the name) and their manifest |
@@ -150,9 +154,12 @@ tests/                           unit and fixture tests, the record and 3D check
 | `release minor \| patch [--date ...]` (`npm run release -- minor`) | the release step: the version bump, the CHANGELOG heading with the codename, `data/codenames.json` for the footer (`docs/workflow.md`, Versions) |
 
 The tools that go through every mechanism (conformance, clearance, site-assets, the thumbnails' fingerprints) build each
-one once per state of the sources (`src/package/built.ts`): the build gives the package and the checks alike and is
-kept in `dist/cache/built` under a hash of `src/`, `data/catalog/`, the lockfile and the Node version, so the tools of
-one run, the pre-push hook's included, build a mechanism once between them. They run in a pool of child processes
+one once per state of its sources (`src/package/built.ts`): the build gives the package and the checks alike and is
+kept in `dist/cache/built` under a key of the shared sources (`src/` outside the mechanisms' own folders, the
+catalogue's vocabularies, the lockfile, the Node version), the mechanism's own folder (not its audit sheet) and its
+record, so the tools of one run, the pre-push hook's included, build a mechanism once between them, and a change to one
+mechanism builds only that one again. CI keeps `dist/cache` between runs (the 3D checks' results are cached on their
+own inputs in `dist/cache/checks3`), and the Pages workflow saves it on main for every pull request to start from. They run in a pool of child processes
 (`tools/pool.ts`), as many as the cores and the memory allow (a big build reaches about 2 GB); `LM_JOBS` sets the size,
 and `LM_JOBS=1` runs in one process.
 

@@ -1,4 +1,4 @@
-// npx tsx tools/clearance.ts <id | all | changed> [--ci | --full] [--no-cache] [--inject <solid>,<dz>]
+// npx tsx tools/clearance.ts <id ... | all | changed> [--ci | --full] [--no-cache] [--inject <solid>,<dz>]
 // A15, A12 and M6 over the full cycle (standard Q2): the mechanism built from its record v3 by the hardware builder, its
 // solids tested in 3D with Manifold, penetration depth against 0.1 mm, with the hand `allow` exemptions flagged
 // unnecessary when the pair never overlaps. --ci samples 8 phases and skips the `allow` audit; --full (the default)
@@ -63,7 +63,8 @@ export async function clearanceOne(j: Job): Promise<Report> {
 
 /** The mechanisms a push changes: see the header. */
 export function changedIds(base?: string): string[] {
-  const git = (...a: string[]) => execFileSync("git", a, { encoding: "utf8" }).trim();
+  // a missing upstream is expected on a new branch: its message is not shown
+  const git = (...a: string[]) => execFileSync("git", a, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
   let ref = base;
   if (!ref) {
     for (const r of ["@{upstream}", "origin/main"]) {
@@ -93,7 +94,7 @@ async function main() {
   const inject = inj > 0 ? ((): [string, number] => { const [a, b] = process.argv[inj + 1]!.split(","); return [a!, Number(b)]; })() : undefined;
   const args = process.argv.slice(2).filter((a, i, all) => !a.startsWith("--") && all[i - 1] !== "--inject");
   const arg = args[0] ?? "all";
-  const ids = arg === "all" ? allIds() : arg === "changed" ? changedIds() : [arg];
+  const ids = arg === "all" ? allIds() : arg === "changed" ? changedIds() : args;
   if (arg === "changed" && !ids.length) console.log("clearance: no mechanism changed");
   const profile = flags.has("--ci") ? "ci" : "full";
   const unknown = ids.find((id) => !isKnown(id));

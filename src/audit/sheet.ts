@@ -120,6 +120,15 @@ export function tableRows(text: string): string[][] {
 
 export const escapeCell = (s: string): string => s.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
 
+/** The Summary line of a sheet from its requirement rows: the counts, then the failing ids and the unjudged count. */
+export function summaryLine(rows: string[][]): string {
+  const count = (s: string) => rows.filter((r) => r[1] === s).length;
+  const fails = rows.filter((r) => r[1] === "FAIL").map((r) => r[0]);
+  const unjudged = count("?");
+  const open = [fails.length ? `FAIL ${fails.join(", ")}` : "", unjudged ? `${unjudged} unjudged` : ""].filter(Boolean).join("; ") || "none";
+  return `PASS ${count("PASS")} · FAIL ${count("FAIL")} · N/A ${count("N/A")} · open: ${open}`;
+}
+
 // ---------------------------------------------------------------------------------------------------------------
 // The standard
 
