@@ -2,7 +2,7 @@
 // on a follower's end by its round nose.
 import { type BlockFn, KinError } from "../ctx";
 import { D2R, v3, xf, R2D } from "../math";
-import { type CamSchedule, camMotion, pressureAngle } from "../blocks/cam";
+import { camMotion, pressureAngle, scheduleOf } from "../blocks/cam";
 import { lawOf, outName, outVal, str } from "./shared";
 
 /**
@@ -11,6 +11,10 @@ import { lawOf, outName, outVal, str } from "./shared";
  * swing (true: an oscillating follower about the joint's `at`; lift is then radians' worth in degrees).
  * follower may be a list (the follower and the bodies it carries); rr (roller radius) or flat (true: a flat face) place
  * the contact point, which needs the joint's `ca` (the cam's centre).
+ * A barrel track of several turns (the joint's cam `turns`, a self-reversing screw) repeats after that many turns of
+ * the cam. shoe (a body) and pivot (its revolute in the follower, square to the cam's surface): a shoe that swivels on
+ * its pivot to lie along a barrel groove, turned from its reference place by the change of the groove's direction
+ * under it, rb t̂ − (ds/dθ) f̂ (t̂ the cam surface's way round, f̂ the follower's axis); out `swivel` is that turn (deg).
  * out {s, v, pressure, contact}: displacement (mm or deg), ds/dθ, pressure angle (deg), the contact point.
  */
 const camBlock: BlockFn = (c, s) => {
@@ -18,10 +22,7 @@ const camBlock: BlockFn = (c, s) => {
   const jid = str(i.joint, "cam.joint");
   const j = c.joint(jid);
   if (!j.cam) throw new KinError(`cam ${s.id}: joint ${jid} has no cam data`);
-  const sched: CamSchedule = {
-    lift: c.num(j.cam.lift),
-    segments: j.cam.schedule.map((g) => ({ kind: g.kind, span: c.num(g.span) * D2R, law: lawOf(g.law) })),
-  };
+  const sched = scheduleOf(j.cam, (v) => c.num(v), lawOf);
   const th0 = c.num(j.cam.theta0 ?? 0) * D2R;
   const th = th0 + c.delta("in", c.rad(i.input));
   const m = camMotion(sched, th);
@@ -31,6 +32,24 @@ const camBlock: BlockFn = (c, s) => {
   const X = i.swing === true ? xf.rotAbout(c.jointAt(jid), c.vec(i.axis), (m.s - m0.s) * D2R) : xf.trans(v3.mul(v3.unit(c.vec(i.axis)), m.s - m0.s));
   for (const f of carried) c.setXf(f, X);
   const rb = c.num(j.cam.rb);
+  if (typeof i.shoe === "string" && j.cam.form === "barrel" && j.ca) {
+    // the groove's direction under the follower at the pitch radius: the cam's surface carries the groove round by rb per
+    // radian while the groove's centre line falls back along the follower's axis by ds/dθ
+    const ax = c.jointAxis(jid);
+    const f = v3.unit(c.vec(i.axis));
+    const at0 = c.jointAt(jid);
+    const rel = v3.sub(at0, c.vec(j.ca));
+    const rHat = v3.unit(v3.sub(rel, v3.mul(ax, v3.dot(rel, ax))));
+    const tHat = v3.cross(ax, rHat);
+    const T = (v: number) => v3.unit(v3.sub(v3.mul(tHat, rb), v3.mul(f, v)));
+    const pj = str(i.pivot, "cam.pivot");
+    const pAx = c.jointAxis(pj);
+    const T0 = T(m0.v);
+    const T1 = T(m.v);
+    const gam = Math.atan2(v3.dot(v3.cross(T0, T1), pAx), v3.dot(T0, T1));
+    c.setXf(i.shoe, xf.mul(X, xf.rotAbout(c.jointAt(pj), pAx, gam)));
+    outVal(c, s, gam * R2D, "swivel");
+  }
   outVal(c, s, m.s, "s");
   outVal(c, s, m.v, "v");
   // a barrel cam's follower runs along the axis at the pitch radius: tan φ = s' / rb

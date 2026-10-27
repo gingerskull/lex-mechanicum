@@ -3,7 +3,7 @@
 // roller on the pitch curve; a flat face's cam is the envelope of the face's lines. Outlines are in the cam body's plane
 // coordinates (its frame), sampled finely enough that a 1° step moves the contact well under 0.1 mm.
 import { D2R, TAU, type Vec2 } from "../core/geom";
-import { camMotion, type CamLaw, type CamSchedule } from "../kin/blocks/cam";
+import { camMotion, camTurns, scheduleOf, type CamLaw, type CamSchedule } from "../kin/blocks/cam";
 import type { KinJoint } from "../kin/types";
 
 export interface CamLawSpec {
@@ -19,10 +19,7 @@ export interface CamLawSpec {
 /** The cam law of a cam-contact joint, its numbers bound. */
 export function camLawOf(j: KinJoint, num: (v: unknown) => number, beta0: number): CamLawSpec | null {
   if (!j.cam) return null;
-  const sched: CamSchedule = {
-    lift: num(j.cam.lift),
-    segments: j.cam.schedule.map((g) => ({ kind: g.kind, span: num(g.span) * D2R, law: (g.law as CamLaw | undefined) ?? "cycloidal" })),
-  };
+  const sched: CamSchedule = scheduleOf(j.cam, num, (l) => (l as CamLaw | undefined) ?? "cycloidal");
   return { sched, rb: num(j.cam.rb), theta0: num(j.cam.theta0 ?? 0) * D2R, beta0 };
 }
 
@@ -98,6 +95,68 @@ export function curvature(pts: Vec2[]): { least: number; convex: boolean } {
     if (R < least) least = R;
   }
   return { least, convex };
+}
+
+/**
+ * The cutters of a barrel track of several turns (a self-reversing screw's groove, there and back over the cam's
+ * period), in the drum's frame: the track crosses itself on every turn, so one tube round it would cut through itself.
+ * It is cut in `pieces` equal pieces of the period (each well under half a turn, so no piece meets itself), each a
+ * closed tube of the groove's section as barrelGroove makes it, capped at both ends; neighbours share their end
+ * section exactly (the same ring, the same diagonal), so the cuts join with no seam.
+ */
+export function barrelTrack(L: CamLawSpec, a0: number, rp: number, width: number, rIn: number, rOut: number, opts: { perTurn?: number; perPiece?: number } = {}): import("../solids/types").MeshData[] {
+  const P = L.sched.period ?? TAU;
+  const perTurn = opts.perTurn ?? 180;
+  const perPiece = opts.perPiece ?? 30;
+  const s0 = camMotion(L.sched, L.theta0).s;
+  const total = Math.round((P / TAU) * perTurn);
+  const nPieces = Math.max(1, Math.ceil(total / perPiece));
+  // the rings along the whole track, shared by the pieces at their ends
+  const ring = (k: number): number[] => {
+    const psi = (k / total) * P;
+    const m = camMotion(L.sched, L.theta0 + L.beta0 - psi);
+    const a = a0 + m.s - s0;
+    const hw = (width / 2) * Math.hypot(1, m.v / rp);
+    const c = Math.cos(psi);
+    const s = Math.sin(psi);
+    const out: number[] = [];
+    for (const [r, z] of [[rIn, a - hw], [rOut, a - hw], [rOut, a + hw], [rIn, a + hw]] as const) out.push(r * c, r * s, z);
+    return out;
+  };
+  const out: import("../solids/types").MeshData[] = [];
+  for (let p = 0; p < nPieces; p++) {
+    const k0 = Math.round((p * total) / nPieces);
+    const k1 = Math.round(((p + 1) * total) / nPieces);
+    const rings = k1 - k0 + 1;
+    const pos: number[] = [];
+    for (let k = k0; k <= k1; k++) pos.push(...ring(k % total));
+    const tri: number[] = [];
+    for (let k = 0; k < rings - 1; k++) {
+      for (let e = 0; e < 4; e++) {
+        const a = k * 4 + e;
+        const b = k * 4 + ((e + 1) % 4);
+        const c = (k + 1) * 4 + ((e + 1) % 4);
+        const d = (k + 1) * 4 + e;
+        tri.push(a, c, b, a, d, c);
+      }
+    }
+    // the end caps (two triangles each), wound against the sides; the orientation pass below sets them all outward
+    const last = (rings - 1) * 4;
+    tri.push(0, 1, 2, 0, 2, 3, last, last + 2, last + 1, last, last + 3, last + 2);
+    out.push(outward(pos, tri));
+  }
+  return out;
+}
+
+/** A closed mesh turned outward: every triangle flipped if the signed volume is negative. */
+function outward(pos: number[], tri: number[]): import("../solids/types").MeshData {
+  let vol = 0;
+  for (let t = 0; t < tri.length; t += 3) {
+    const [i, j, k] = [tri[t]! * 3, tri[t + 1]! * 3, tri[t + 2]! * 3];
+    vol += pos[i]! * (pos[j + 1]! * pos[k + 2]! - pos[j + 2]! * pos[k + 1]!) - pos[i + 1]! * (pos[j]! * pos[k + 2]! - pos[j + 2]! * pos[k]!) + pos[i + 2]! * (pos[j]! * pos[k + 1]! - pos[j + 1]! * pos[k]!);
+  }
+  if (vol < 0) for (let t = 0; t < tri.length; t += 3) [tri[t + 1], tri[t + 2]] = [tri[t + 2]!, tri[t + 1]!];
+  return { pos: new Float32Array(pos), tri: new Uint32Array(tri), tag: new Uint8Array(tri.length / 3) };
 }
 
 /**
