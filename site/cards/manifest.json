@@ -125,6 +125,13 @@
     "style": "caa2d1e889a98326",
     "card": "743ab579466f4350"
   },
+  "walking-beam": {
+    "package": "2c4209c0d24e0a70",
+    "model": "355be2cba604830b",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "card": "72b056be302c7cd0"
+  },
   "watt-six-bar": {
     "package": "d23108ab1ebcc4b9",
     "model": "1db8813d085dae6d",
@@ -300,6 +307,13 @@
     "style": "caa2d1e889a98326",
     "card": "05187e7be46f8f43"
   },
+  "rack-stroke-doubler": {
+    "package": "a5f659922b1d413d",
+    "model": "5e89c0640dca94bf",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "card": "b83f5d65dbf01ee1"
+  },
   "sun-and-planet": {
     "package": "9ca0b5d83c659081",
     "model": "6fb5a878bc3f6a6e",
@@ -447,6 +461,13 @@
     "style": "caa2d1e889a98326",
     "card": "5ba6a892b952ebb3"
   },
+  "hobsons-joint": {
+    "package": "f3d6331f310e63e1",
+    "model": "159d39b7c8e5d2a8",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "card": "9b0fd6b2e8b5f54a"
+  },
   "locomotive-drive": {
     "package": "69726fe3d01b2db0",
     "model": "e213a12fa4730895",
@@ -510,6 +531,13 @@
     "style": "caa2d1e889a98326",
     "card": "9104728bb7966c4b"
   },
+  "self-reversing-screw": {
+    "package": "d5c6fcf2d9d878bc",
+    "model": "23a4f26b91750a8a",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "card": "8e366cce4b051446"
+  },
   "belt-drive": {
     "package": "1bb89a1905c6a51e",
     "model": "44ff267191777654",
@@ -537,6 +565,13 @@
     "renderer": "86fbda20d6538273",
     "style": "caa2d1e889a98326",
     "card": "bd810390078a1cd4"
+  },
+  "chain-stroke-doubler": {
+    "package": "a85c2e76b99c1880",
+    "model": "450785018ec12a42",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "card": "3b55368d762fecee"
   },
   "friction-wheel-drive": {
     "package": "d91d5261716c2123",
@@ -600,6 +635,13 @@
     "renderer": "86fbda20d6538273",
     "style": "caa2d1e889a98326",
     "card": "40fcba23bcbf614b"
+  },
+  "wobble-box": {
+    "package": "bc5eac44b4706c3b",
+    "model": "b63ceff0b299e332",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "card": "19a47d1ce655979c"
   },
   "bennett-linkage": {
     "package": "dd09140be0fbb554",

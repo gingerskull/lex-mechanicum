@@ -125,6 +125,13 @@
     "style": "caa2d1e889a98326",
     "view": "e1686735c9940657"
   },
+  "walking-beam": {
+    "package": "2c4209c0d24e0a70",
+    "model": "355be2cba604830b",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "view": "e1686735c9940657"
+  },
   "watt-six-bar": {
     "package": "d23108ab1ebcc4b9",
     "model": "1db8813d085dae6d",
@@ -300,6 +307,13 @@
     "style": "caa2d1e889a98326",
     "view": "e1686735c9940657"
   },
+  "rack-stroke-doubler": {
+    "package": "a5f659922b1d413d",
+    "model": "5e89c0640dca94bf",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "view": "e1686735c9940657"
+  },
   "sun-and-planet": {
     "package": "9ca0b5d83c659081",
     "model": "6fb5a878bc3f6a6e",
@@ -447,6 +461,13 @@
     "style": "caa2d1e889a98326",
     "view": "e1686735c9940657"
   },
+  "hobsons-joint": {
+    "package": "f3d6331f310e63e1",
+    "model": "159d39b7c8e5d2a8",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "view": "e1686735c9940657"
+  },
   "locomotive-drive": {
     "package": "69726fe3d01b2db0",
     "model": "e213a12fa4730895",
@@ -510,6 +531,13 @@
     "style": "caa2d1e889a98326",
     "view": "e1686735c9940657"
   },
+  "self-reversing-screw": {
+    "package": "d5c6fcf2d9d878bc",
+    "model": "23a4f26b91750a8a",
+    "renderer": "ab57d55504b33663",
+    "style": "caa2d1e889a98326",
+    "view": "e1686735c9940657"
+  },
   "belt-drive": {
     "package": "1bb89a1905c6a51e",
     "model": "44ff267191777654",
@@ -535,6 +563,13 @@
     "package": "afae072611aa62ac",
     "model": "56dab9e599e47079",
     "renderer": "86fbda20d6538273",
+    "style": "caa2d1e889a98326",
+    "view": "e1686735c9940657"
+  },
+  "chain-stroke-doubler": {
+    "package": "a85c2e76b99c1880",
+    "model": "450785018ec12a42",
+    "renderer": "ab57d55504b33663",
     "style": "caa2d1e889a98326",
     "view": "e1686735c9940657"
   },
@@ -598,6 +633,13 @@
     "package": "7f85a9cb81b60d7b",
     "model": "bfef9674fffd7d9f",
     "renderer": "86fbda20d6538273",
+    "style": "caa2d1e889a98326",
+    "view": "e1686735c9940657"
+  },
+  "wobble-box": {
+    "package": "bc5eac44b4706c3b",
+    "model": "b63ceff0b299e332",
+    "renderer": "ab57d55504b33663",
     "style": "caa2d1e889a98326",
     "view": "e1686735c9940657"
   },
