@@ -3327,7 +3327,7 @@
     "kin": {
       "bodies": [
         { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [300, 230], "thickness": 8 }, "at": { "frame": { "origin": [-20, 45, -4] } } },
-        { "id": "input", "role": "driver", "accent": true, "shape": { "type": "shaft", "diameter": 22, "length": 80, "place": 30, "journal": { "joint": "J", "diameter": 20, "seat": [-5, 5], "spacer": 3.5, "bore": 10, "shank": 26 } }, "at": { "joint": "S1" }, "note": "the wobble hub: a straight shank keyed on the input shaft, its end faced square to the journal as the bearing's shoulder outside the ring (a spacer between), the inclined journal machined on it at alpha, one piece, bored through for the shaft" },
+        { "id": "input", "role": "driver", "accent": true, "shape": { "type": "shaft", "diameter": 22, "length": 80, "place": 30, "journal": { "joint": "J", "diameter": 20, "seat": [-5, 5], "shoulder": 24, "boss": [30, -20, -9], "bore": 10 } }, "at": { "joint": "S1" }, "note": "the wobble hub: one piece turned on the journal's axis at alpha (a boss keyed on the input shaft, the shoulder step the bearing's inner race stands on, the journal), bored obliquely for the shaft, which runs on to a pillow block each side" },
         { "id": "ring", "role": "link", "shape": { "type": "wobble-ring", "outer": 40, "width": 14, "bore": 32, "trunnion": 10, "pad": 14 },
           "at": { "joint": "J" },
           "frame": { "o": [0, 0, 55], "z": ["cos(alpha)", "sin(alpha)", 0], "x": [0, 0, 1] } },

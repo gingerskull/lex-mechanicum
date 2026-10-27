@@ -25,12 +25,11 @@ function cylinder(mode: Feature["mode"], o: Vec3, x: Vec3, z: Vec3, from: Vec3, 
 }
 
 /**
- * A `shaft` with a `journal` ({ joint, diameter, seat [s0, s1], spacer, bore, shank }): the wobble hub. Its own part is the
- * straight shank (the shaft shape, keyed on the live shaft by the stack), cut off by the plane square to the journal at
- * the seat's start: that oblique end face is the shoulder the inner race stands on. The journal stands on it along the
- * journal joint's axis through that joint's point, to past the seat's end (room for the circlip that holds the
- * bearing); the shaft's bore runs through the whole piece along its own axis. (`shank`, the length along the shaft
- * where the hub is solid all round, is the kit's: its key runs there.)
+ * A `shaft` with a `journal` ({ joint, diameter, seat [s0, s1], shoulder, boss [diameter, from, to], bore }): the
+ * wobble hub, one solid turned on the journal joint's axis through that joint's point: a boss, the shoulder step the
+ * inner race stands on and the journal to past the seat's end (room for the circlip that holds the bearing), bored
+ * obliquely for the shaft along the shaft's axis. The shape's own straight part (the shank the stack keys and sizes
+ * the shaft from, its length the shaft's run to both pillow blocks) is not drawn; the kit puts the key in the boss.
  * `wobble-ring` (outer, width, bore, trunnion, pad): the housing round the journal's bearing, its trunnions out to the
  * yoke's cup radius along the trunnion joint's axis, each on a boss pad, one solid.
  */
@@ -52,23 +51,22 @@ export function wobble(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | 
     const end = s1 + 1.5;
     const rb = num(jr.bore, 0) / 2;
     const at = (s: number): Vec3 => v3.add(c, v3.mul(a, s));
-    // the shank's planned length runs on past the journal (the shaft's run to the pillow block beyond, so the stack
-    // straddles the hub): everything past the plane square to the journal at the seat's start is cut away, which leaves
-    // the shank's end face as the shoulder the inner race stands on, square to the journal; the journal stands on it
-    const reach = 2 * (g.thick + Math.abs(s0) + end);
-    // the shoulder stands `spacer` back from the seat (an inner-race spacer between, the kit's), so the shank ends
-    // outside the ring's flank with a visible gap; behind the shoulder the shank is turned down to a boss square to the
-    // journal (`boss` across, `relief` deep), so the ring's flank keeps clear of the shank's oblique edge as it turns
-    const sh0 = s0 - num(jr.spacer, 0);
-    const relief = num(jr.relief, 3);
-    const rboss = num(jr.boss, 2 * rj + 5) / 2;
-    const turned = cylinder("cut", po, F.x, F.z, at(sh0 - relief), a, reach, relief + 0.01);
-    turned.profile.holes.push(circle(rboss, 0, 0, 48).reverse());
+    // the hub is turned on the journal's axis, one stepped piece: a boss (`boss` [diameter, from, to] along the journal
+    // from the centre), the shoulder step the inner race stands on (`shoulder` across, from the boss to the seat) and the
+    // journal; every face square to the journal, so nothing meets the ring at a grazing angle. The shank's straight part
+    // stands only for the stack (it sizes and keys the shaft and spans its run to both pillow blocks): it is cut away
+    const bb = Array.isArray(jr.boss) ? (jr.boss as unknown[]) : [];
+    const db = num(bb[0], 2 * rj + 10);
+    const b0 = num(bb[1], s0 - 15);
+    const b1 = num(bb[2], s0 - 4);
+    const rs = num(jr.shoulder, 2 * rj + 4) / 2;
+    const reach = 2 * (g.thick + Math.abs(b0) + end);
+    // (each step starts a millimetre inside the one before it, so no two faces are coplanar)
     const features: Feature[] = [
-      cylinder("cut", po, F.x, F.z, at(sh0), a, reach, reach),
-      turned,
-      // (the journal starts a little inside the shank, so its foot is not coplanar with the shoulder)
-      cylinder("add", po, F.x, F.z, at(sh0 - 1), a, rj, end - sh0 + 1),
+      cylinder("cut", po, F.x, F.z, v3.sub(po, F.z), F.z, num(g.shape.diameter, 22) / 2 + 1, g.thick + 2),
+      cylinder("add", po, F.x, F.z, at(b0), a, db / 2, b1 - b0),
+      cylinder("add", po, F.x, F.z, at(b1 - 1), a, rs, s0 - b1 + 1),
+      cylinder("add", po, F.x, F.z, at(s0 - 1), a, rj, end - s0 + 1),
       ...(rb > 0 ? [cylinder("cut", po, F.x, F.z, v3.sub(c, v3.mul(F.z, reach / 2)), F.z, rb + 0.05, reach)] : []),
     ];
     return { ...g, approx: false, features: [...(g.features ?? []), ...features] };

@@ -41,22 +41,19 @@ export const crossBearings: Rule = {
         const L = new Local(f, { joints: [j.id] });
         const id = `${j.id}-cup${n}`;
         // the drawn cup: a sleeve on the trunnion through the arm, closed by its bottom; the circlip outside it
-        L.add(H.solid(id, { name: n ? "" : `Needle bearing cup Ø${cupD} on a Ø${d} trunnion, drawn and closed`, qty: n ? 0 : 4, kind: "bearing", role: "bearing", outer: circle(cupD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.05, 0, 0, 24)], z0: R - a / 2, z1: R + a / 2 - c.s - 1, body: yokeId, mat: "Bearing steel 100Cr6, needles in a drawn cup", why: "the cross's trunnion turns in it" }));
+        L.add(H.solid(id, { name: n ? "" : `Needle bearing cup Ø${cupD} on a Ø${d} trunnion, drawn and closed${ring ? ", sealed and greased for life" : ""}`, qty: n ? 0 : 4, kind: "bearing", role: "bearing", outer: circle(cupD / 2, 0, 0, 32), holes: [circle(d / 2 + 0.05, 0, 0, 24)], z0: R - a / 2, z1: R + a / 2 - c.s - 1, body: yokeId, mat: "Bearing steel 100Cr6, needles in a drawn cup", why: "the cross's trunnion turns in it" }));
         L.add(H.solid(`${id}-end`, { name: "", kind: "bearing", role: "bearing", outer: circle(cupD / 2, 0, 0, 32), holes: [], z0: R + a / 2 - c.s - 1, z1: R + a / 2 - c.s, body: yokeId, group: id }));
         L.add(H.circlip(`${j.id}-cl${n}`, cupD, { internal: true, body: yokeId, z0: R + a / 2 - c.s, z1: R + a / 2, ...(n ? { name: "", qty: 0 } : { qty: 4 }) }));
         ctx.add(L.out());
         ids.push(id, `${j.id}-cl${n}`);
       });
-      if (!nipple) {
-        // the grease nipple on the centre block, along the third arm direction (F8); on a trunnion ring, on its rim
-        // square to the trunnions and the journal, drilled through to both trunnions' cups
-        const other = ring ? ctx.joints.find((q) => q.kit === "oblique-journal" && (q.a === crossId || q.b === crossId)) : ctx.joints.find((q) => q.kit === "cross-pin" && q.id !== j.id);
-        const n0 = other ? v3.unit(v3.cross(p, v3.unit(other.r.axis))) : ([0, 0, 1] as Vec3);
-        // a ring's nipple stands on the rim away from its yoke, where a grease gun reaches it and it does not stand
-        // alone between the yoke's arms
-        const yokeAt = ring ? ctx.joints.find((q) => (q.a === yokeId || q.b === yokeId) && (q.a === "ground" || q.b === "ground"))?.at : undefined;
-        const n3 = yokeAt && v3.dot(n0, v3.sub(yokeAt as Vec3, j.at as Vec3)) > 0 ? v3.mul(n0, -1) : n0;
-        const block = ring ? num(cross?.outer, 40) / 2 : d / 2 + 3;
+      // a cross is greased through a nipple on its centre block (F8); a trunnion ring's cups are sealed and greased for
+      // life (F8 asks nothing of a sealed bearing), so no nipple stands loose on the ring's rim
+      if (!nipple && !ring) {
+        // the grease nipple on the centre block, along the third arm direction (F8)
+        const other = ctx.joints.find((q) => q.kit === "cross-pin" && q.id !== j.id);
+        const n3 = other ? v3.unit(v3.cross(p, v3.unit(other.r.axis))) : ([0, 0, 1] as Vec3);
+        const block = d / 2 + 3;
         const L = new Local(frameAlong(j.at as Vec3, n3), { joints: [j.id] });
         L.add(H.nipple(`${crossId}-nip`, { body: crossId, z0: block, z1: block + 9 }));
         ctx.add(L.out());
@@ -69,10 +66,10 @@ export const crossBearings: Rule = {
         at: j.at,
         title: `cross-pin · ${titleOf(j.id)}`,
         note: ring
-          ? `${titleOf(j.id)}: the ring's two Ø${d} trunnions in the ${yokeId}'s arms: two needle cups Ø${cupD} pressed into the arms, each held by an internal circlip; a grease nipple on the ring's rim feeds both cups. Double support across the ring; the trunnion axis passes through the common centre.`
+          ? `${titleOf(j.id)}: the ring's two Ø${d} trunnions in the ${yokeId}'s arms: two needle cups Ø${cupD} pressed into the arms, each held by an internal circlip; the cups are sealed and greased for life. Double support across the ring; the trunnion axis passes through the common centre.`
           : `${titleOf(j.id)}: the ${yokeId}'s pin into the cross: two needle cups Ø${cupD} pressed into the arms, each held by an internal circlip; the trunnions run on the needles. Double support across the cross.`,
         badge: ["double shear", "ok"],
-        serves: { F2: ids.filter((x) => x.includes("-cl")), F8: [`${crossId}-nip`].filter(() => true) },
+        serves: { F2: ids.filter((x) => x.includes("-cl")), F8: ring ? [] : [`${crossId}-nip`].filter(() => true) },
       });
       (ctx.fired["cross-bearings"] ??= []).push(j.id);
     }
