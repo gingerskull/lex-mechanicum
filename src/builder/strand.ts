@@ -13,7 +13,7 @@ import { v3, type Vec3 } from "../kin/math";
 import type { KinJoint } from "../kin/types";
 import { along, distOf, type ConveyPath } from "../solids/convey";
 import type { Solid3 } from "../solids/types";
-import type { BuildCtx } from "./ctx";
+import type { BuildCtx, JointNote } from "./ctx";
 import type { Frame } from "./frames";
 import { Local, titleOf } from "./lib";
 
@@ -103,9 +103,7 @@ export function buildStrands(ctx: BuildCtx): void {
     Ls.add(t);
   }
   out.push(...Ls.out());
-  const anchors: string[] = [];
-  const adjust: string[] = [];
-  const notes: string[] = [];
+  const notes: JointNote[] = [];
   for (const ch of chains) {
     const r = rec(ch.held);
     const N = num(r.links, 21);
@@ -129,7 +127,6 @@ export function buildStrands(ctx: BuildCtx): void {
     // the path, ccw round the sprocket seen from +z: chain A (wrap +1) from the held end along under the sprocket, round
     // its +x half and back over it to the drawn end; chain B (wrap -1) from the drawn end over the sprocket, round its -x
     // half and under it to the held end. Each straight runs EXT past its end, so the links never reach the closing line.
-    const sx = ch.wrap; // the side the strands leave toward is -wrap
     const first: [Vec2, Vec2] = ch.wrap > 0 ? [[G[0] - EXT, yH], [c[0], yH]] : [[E[0] + EXT, yR], [c[0], yR]];
     const arc = ch.wrap > 0 ? arcPts(c[0], c[1], R, -Math.PI / 2, Math.PI / 2, Math.PI / 180) : arcPts(c[0], c[1], R, Math.PI / 2, (3 * Math.PI) / 2, Math.PI / 180);
     const last: [Vec2, Vec2] = ch.wrap > 0 ? [[c[0], yR], [E[0] - EXT, yR]] : [[c[0], yH], [G[0] + EXT, yH]];
@@ -141,7 +138,6 @@ export function buildStrands(ctx: BuildCtx): void {
     const cArc = wrapL * p;
     const total = L1 + cArc + L2;
     const path: ConveyPath = { pts: pts2.map(([x, y]): Vec3 => [x, y, zc]), key: step.key, carrier: step.carrier, up: UP, map: { c: [0, L1, L1 + cArc, total, total + 1], d: [0, L1, L1 + arcLen, L1 + arcLen + L2, L1 + arcLen + L2 + Math.hypot(last[1][0] - first[0][0], last[1][1] - first[0][1])] } };
-    void sx;
     const id = ch.held.id.replace(/^held-/, "chain-");
     const mat = "Steel, case hardened";
     const inner0 = zc + RW / 2 + 0.1;
@@ -165,23 +161,27 @@ export function buildStrands(ctx: BuildCtx): void {
     // the two anchors: the held end's in a block on the base, the drawn end's in a bracket on the drawn body
     const held = anchor(ctx, `${id}-anchor0`, [G[0], G[1]], c[0], zc, "ground", ch.held.id, out, `${titleOf(id)}'s held end`);
     const drawn = anchor(ctx, `${id}-anchor1`, [E[0], E[1]], c[0], zc, ch.run.b, ch.run.id, out, `${titleOf(id)}'s drawn end`);
-    anchors.push(held.block, drawn.block);
-    adjust.push(held.bolt, drawn.bolt);
-    notes.push(`${titleOf(id)}: ${N} links of ISO 606 08B roller chain in row ${ch.row + 1} of the sprocket, wrapping its ${ch.wrap > 0 ? "+x" : "-x"} half; ${Math.round(lh)} links from the held end to the sprocket and ${Math.round(lr)} from the drawn end, so a roller sits in a seat at both tangent points.`);
-  }
-  ctx.add(out);
-  for (const ch of chains) {
-    ctx.note({
+    notes.push({
       id: ch.held.id,
       kit: "J12",
       at: ctx.S.joints.get(ch.held.id)!.at,
       title: `J12 · ${titleOf(ch.held.id)}`,
-      note: `${notes.join(" ")} Seen from the carrier each chain's path keeps its shape, so its rollers, pins and plates are carried along it by the chain's travel past the carrier, and the held end stands still while the drawn end moves twice the carrier. Each end is an outer link pair pinned to the tongue of an M8 anchor bolt; the bolt passes a block (on the base) or a bracket (on the output) with a nyloc nut either side, which sets the chain's length and takes up its stretch, the two chains drawn tight against each other (F7, M13). The blocks and brackets are screwed and dowelled (F1, A11). Greased (F8).`,
+      note: `${titleOf(id)}: ${N} links of ISO 606 08B roller chain in row ${ch.row + 1} of the sprocket, wrapping its ${ch.wrap > 0 ? "+x" : "-x"} half; ${Math.round(lh)} links from the held end to the sprocket and ${Math.round(lr)} from the drawn end, so a roller sits in a seat at both tangent points. Seen from the carrier the chain's path keeps its shape, so its rollers, pins and plates are carried along it by the chain's travel past the carrier: the held strand stands still while the drawn end moves twice the carrier. The held end is an outer link pair pinned to the tongue of an M8 anchor bolt through a block on the base, a nyloc nut either side: the nuts set the chain's length and take up its stretch, the two chains drawn tight against each other (F7, M13); the block's foot is screwed and dowelled to the base, so the strand's pull goes bolt, nuts, block, screws and dowels, base (F1, A11). Greased (F8).`,
       badge: ["whole number of links to each seat", "ok"],
-      serves: { F1: anchors, F7: adjust, F8: [] },
+      serves: { F1: [held.block], F7: [held.bolt] },
     });
-    ctx.note({ id: ch.run.id, kit: "J12", at: ctx.S.joints.get(ch.run.id)!.at, title: `J12 · ${titleOf(ch.run.id)}`, note: `${titleOf(ch.run.id)}: the running strand of the chain in row ${ch.row + 1}, from the sprocket to its anchor on the ${ch.run.b}; built with the held strand (${ch.held.id}).`, badge: ["built with its chain", "ok"], serves: {} });
+    notes.push({
+      id: ch.run.id,
+      kit: "J12",
+      at: ctx.S.joints.get(ch.run.id)!.at,
+      title: `J12 · ${titleOf(ch.run.id)}`,
+      note: `${titleOf(ch.run.id)}: the running strand of ${titleOf(id)}, built with its held strand (${ch.held.id}). Its end is an outer link pair pinned to the tongue of an M8 anchor bolt through a bracket on the ${ch.run.b}, a nyloc nut either side (F7, M13); the bracket's foot is screwed and dowelled to the ${ch.run.b}'s top beyond its slide's keeper and its arm reaches over to the chain's line, so the pull goes bolt, nuts, bracket, screws and dowels, ${ch.run.b} (F1, A11).`,
+      badge: ["anchored on the output", "ok"],
+      serves: { F1: [drawn.block], F7: [drawn.bolt] },
+    });
   }
+  ctx.add(out);
+  for (const n of notes) ctx.note(n);
 }
 
 /**

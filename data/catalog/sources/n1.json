@@ -587,7 +587,7 @@
         { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [400, 150] }, "at": { "frame": { "origin": [0, 14, -8] } } },
         { "id": "carrier", "role": "driver", "shape": { "type": "slider", "length": 56, "width": 26 }, "at": { "joint": "S" } },
         { "id": "sprocket", "role": "link", "shape": { "type": "sprocket", "z": 12, "pitch": 12.7, "roller": 8.5, "standard": "ISO 606 08B", "bore": 10, "face": 23.5, "rows": 2, "rowPitch": 16.5 }, "at": { "joint": "S" } },
-        { "id": "output", "role": "output", "shape": { "type": "slider", "length": 200, "width": 20 }, "at": { "joint": "O" }, "frame": { "origin": [0, 56, 0] } }
+        { "id": "output", "role": "output", "shape": { "type": "slider", "length": 230, "width": 20 }, "at": { "joint": "O" }, "frame": { "origin": [0, 56, 0] } }
       ],
       "joints": [
         { "id": "C", "type": "prismatic", "a": "ground", "b": "carrier", "at": [0, 0, 0], "axis": [1, 0, 0], "limits": [-40, 40] },
