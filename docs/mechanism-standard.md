@@ -309,6 +309,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `j2-live-shaft` | J2, A5, F1, F2, F3, F4 |
 | `j10-shaft-in-plan` | J10, A5, F1, F2, F3, F4 |
 | `cross-bearings` | J3, F2, F8 |
+| `oblique-journal` | J3, F2 |
 | `trunnion` | J1, F2, F4, F6 |
 | `piston-bore` | J5, M14 |
 | `ring-carrier` | J6, F1, F2 |
@@ -329,6 +330,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `eccentric` | J3, F2, F8, M14 |
 | `die` | J4, M14 |
 | `hub` | J1, F1, F2, M14 |
+| `leg-bore` | J5, F2, F8, M14 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
 | `j12-other` | J12, F7 |

@@ -2144,7 +2144,8 @@
    "four-bar",
    "sarrus-linkage",
    "universal-joint",
-   "double-cardan"
+   "double-cardan",
+   "wobble-box"
   ]
  },
  {
@@ -2363,7 +2364,8 @@
    "barrel-cam",
    "cam-follower",
    "slider-crank",
-   "rhombic-drive"
+   "rhombic-drive",
+   "wobble-box"
   ]
  },
  {

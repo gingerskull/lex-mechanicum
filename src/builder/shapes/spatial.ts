@@ -26,7 +26,8 @@ export function universal(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom
   const isYoke = String(sh.type) === "shaft" && typeof sh.yoke === "object" && sh.yoke !== null;
   const isCross = String(sh.type) === "cross";
   if (!isYoke && !isCross) return null;
-  const crossOf = (j: { a: string; b: string }) => [j.a, j.b].find((x) => String(kin.bodies.find((q) => q.id === x)?.shape?.type) === "cross");
+  // the yoke's pins go into a cross, or into a wobble drive's trunnion ring (./wobble)
+  const crossOf = (j: { a: string; b: string }) => [j.a, j.b].find((x) => ["cross", "wobble-ring"].includes(String(kin.bodies.find((q) => q.id === x)?.shape?.type)));
   const F = g.frame;
   const o = F.o;
   const z = F.z;

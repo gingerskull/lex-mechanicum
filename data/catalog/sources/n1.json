@@ -1,0 +1,3447 @@
+[
+{
+    "record_version": 3,
+    "id": "self-reversing-screw",
+    "name": "Self-reversing screw",
+    "aka": [
+      "diamond screw",
+      "diamond thread screw",
+      "reversing screw",
+      "cross-threaded spindle",
+      "Kreuzgewindespindel",
+      "self-reversing spindle",
+      "yankee screw",
+      "level wind worm shaft",
+      "double screw of Napier"
+    ],
+    "in_site": false,
+    "family": "Screw",
+    "level": "Intermediate",
+    "summary": "A screw cut with a right-hand and a left-hand groove joined at the ends drives a shoe to and fro at constant speed while it turns one way.",
+    "motion": {
+      "input": "Rotary",
+      "output": "Linear",
+      "label": "Rotary → Linear",
+      "output_character": ["Reciprocating", "Constant velocity", "Reversing"],
+      "axes": "Rotary-to-along-axis",
+      "plane": "Spatial"
+    },
+    "ratio": {
+      "kind": "Stroke",
+      "class": "n/a",
+      "typical": "one lead per turn (48 mm by default); stroke = lead x (turns per traverse - turn-round), 120 mm over 3 turns"
+    },
+    "dof": 1,
+    "topology": {
+      "links": 4,
+      "revolute": 2,
+      "prismatic": 1,
+      "higher_pairs": 1,
+      "notes": "ground, screw (revolute in its pillow blocks), carriage (prismatic on its guide), shoe (revolute pivot in the carriage); the shoe in the groove is a form-closed cam contact; counted mobility 2, because the shoe's swivel on its pivot is set by the groove's walls, which the count does not see"
+    },
+    "backdrivable": "Partly",
+    "tags": {
+      "function": ["Motion conversion", "Reversing", "Positioning"],
+      "property": ["Positive drive", "Exact", "Few parts"],
+      "application": ["Construction & lifting", "Marine", "Printing & textiles", "Consumer products"],
+      "keywords": ["diamond screw", "level winder", "crossing grooves", "swivelling shoe", "Reuleaux", "Napier", "traverse", "crossover"]
+    },
+    "explain": {
+      "motion": "The screw carries a right-hand and a left-hand groove of the same lead, joined at both ends into one endless track that crosses itself twice on every turn. A shoe rides the groove on a pivot in the carriage. Turning the screw one way at a steady speed carries the shoe along at a steady 48 mm per turn. Near each end the groove bends round within 1 turn of the screw: the shoe slows, stops, swivels across into the other groove and comes back, so the carriage runs 120 mm there and back every 6 turns with the screw never changing direction.",
+      "forces": "The groove's wall pushes on the side of the shoe, and the push along the screw is the turning effort over the lead, less friction. At the pitch radius the grooves lean 28.6° from the circumference, so the shoe swivels through 57.2° at each turn-round. Where the grooves cross, the shoe loses its walls in the middle and is carried by its two ends, which is why it must be longer than a crossing.",
+      "benefits": "Turns steady one-way rotation into a steady to-and-fro with no reversing gear, clutch or change of direction, and the reversal points are cut into the screw, so they never drift.",
+      "limits": "The stroke and the reversal points are fixed when the screw is cut. The sharp points where the grooves cross and the long shoe wear fastest, and a worn shoe can turn into the wrong groove and reverse early; heavy loads wear the shoe quickly."
+    },
+    "build": {
+      "ground": "base with the screw's two pillow blocks and a straight guide for the carriage along the screw",
+      "defining_relations": "Both grooves have the lead p = 48 mm; at the pitch radius rp = 14 mm the lead angle is atan(p / (2 pi rp)) = 28.6°. Over each traverse of N = 3 turns the shoe moves by the trapezoidal law: steady at one lead per turn, with a parabolic turn-round of tr = 0.5 turn at each end (blend tr / N = 1/6), so the stroke is h = p (N - tr) = 120 mm and the track repeats after 2N = 6 turns. The shoe lies along the groove: its swivel is the change of atan(s' / rp), plus or minus 28.6° in the steady runs. Groove 7 mm wide and 4 mm deep; at the lead angle a crossing is 7 / sin(57.2°) = 8.3 mm long along the groove, bridged by a shoe 18 mm long.",
+      "notes": "Screw axis horizontal, the shoe on the near side, seen in front elevation where the grooves cross in a diamond pattern. The track is cut by Manifold in pieces along the law, the root turned back as one core. The shoe's blade is an ellipse in plan, its underside cut round the screw's axis; it swivels on a pivot bolt in the carriage's upright."
+    },
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": { "type": "plate", "rect": [260, 110] },
+          "at": { "frame": { "origin": [0, -20, -10] } }
+        },
+        {
+          "id": "screw",
+          "role": "driver",
+          "shape": {
+            "type": "cam",
+            "form": "barrel",
+            "radius": 16,
+            "length": 170,
+            "pitchRadius": 14,
+            "groove": {
+              "width": 7,
+              "depth": 4,
+              "centreline": "x = s(theta) at the pitch radius, theta over 6 turns: right hand out, left hand back",
+              "make": "boolean: the track cut in pieces of the groove's section along the law, the root turned back as one core"
+            },
+            "shaft": 12,
+            "bore": 12
+          },
+          "at": { "joint": "O" }
+        },
+        {
+          "id": "carriage",
+          "role": "follower",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [[-22, -16], [22, -16], [22, 16], [-22, 16]],
+            "fillet": 4,
+            "thickness": 8,
+            "pieces": [
+              {
+                "id": "upright",
+                "origin": [0, -26, 0],
+                "rot": [90, 0, 0],
+                "thick": 6,
+                "outline": [[-14, 8], [14, 8], [4.5, 40], [0, 44.5], [-4.5, 40]]
+              }
+            ]
+          },
+          "frame": { "origin": [0, -34, 0] }
+        },
+        {
+          "id": "shoe",
+          "role": "follower",
+          "shape": { "type": "shoe", "length": 18, "width": 6.8, "root": 0.8, "clear": 1, "boss": { "radius": 5, "height": 5 } },
+          "at": { "joint": "F" }
+        }
+      ],
+      "joints": [
+        { "id": "O", "type": "revolute", "a": "ground", "b": "screw", "at": [0, 0, 40], "axis": [1, 0, 0] },
+        { "id": "G", "type": "prismatic", "a": "carriage", "b": "ground", "at": [0, -34, 0], "axis": [1, 0, 0], "limits": [-60, 60] },
+        { "id": "F", "type": "revolute", "a": "carriage", "b": "shoe", "at": [0, -14, 40], "axis": [0, 1, 0] },
+        {
+          "id": "C",
+          "type": "cam-contact",
+          "a": "shoe",
+          "b": "screw",
+          "at": [0, -14, 40],
+          "axis": [1, 0, 0],
+          "ca": [0, 0, 40],
+          "closure": "form",
+          "cam": {
+            "form": "barrel",
+            "turns": "2*N",
+            "schedule": [
+              { "kind": "rise", "span": "360*N", "law": "trapezoidal", "blend": "tr/N" },
+              { "kind": "return", "span": "360*N", "law": "trapezoidal", "blend": "tr/N" }
+            ],
+            "lift": "lead*(N-tr)",
+            "rb": "Rp",
+            "theta0": "180*N"
+          },
+          "note": "at is the shoe's centre at the pitch radius Rp (mid-depth of the groove); the track's centre line runs along the axis by the law over 2N turns, so it crosses itself"
+        }
+      ],
+      "params": [
+        { "id": "lead", "value": 48, "unit": "mm", "min": 24, "max": 64, "note": "lead of both grooves" },
+        { "id": "N", "value": 3, "unit": "turns", "min": 2, "max": 4, "note": "turns of the screw per traverse" },
+        { "id": "tr", "value": 0.5, "unit": "turns", "min": 0.25, "max": 1, "note": "turn-round at each end, turns of the screw" },
+        { "id": "Rp", "value": 14, "unit": "mm", "min": 12, "max": 15, "note": "pitch radius (groove mid-depth)" }
+      ],
+      "design": [],
+      "drivers": [
+        { "id": "input", "joint": "O", "kind": "rotary", "range": [0, 2160], "default": 0 }
+      ],
+      "solve": [
+        {
+          "block": "cam",
+          "id": "track",
+          "joints": ["G", "F", "C"],
+          "in": { "joint": "C", "input": "input", "follower": ["carriage"], "axis": [1, 0, 0], "shoe": "shoe", "pivot": "F" },
+          "out": { "s": "shoe-s", "pressure": "lead-angle", "swivel": "shoe-swivel" }
+        }
+      ],
+      "points": [
+        { "id": "shoe-centre", "body": "shoe", "local": [0, 0, 0] },
+        { "id": "stroke-mark", "body": "carriage", "local": [0, 20, 68] },
+        { "id": "lead-0", "body": "ground", "local": [-24, -14, 76] },
+        { "id": "lead-1", "body": "ground", "local": [24, -14, 76] }
+      ],
+      "outputs": [
+        { "id": "shoe-x", "of": "G", "kind": "position", "unit": "mm" },
+        { "id": "shoe-speed", "of": "shoe-centre", "kind": "speed-ratio", "unit": "mm/deg" },
+        { "id": "shoe-swivel", "of": "shoe", "kind": "angle", "unit": "deg" },
+        { "id": "lead-angle", "of": "C", "kind": "angle", "unit": "deg" }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record, reviewed against its kinematics before the build (#255). Six phases of the solved cycle (every 60 degrees of the cycle, one turn of the screw): the shoe at mid-stroke on a crossing, 48 mm further, at the far end turning round (swivel through 0 to -57.2), and back the same way; the shoe's travel against the screw's turn is an exact triangle wave with rounded tips, 24 mm per half turn in the steady runs. Decided: 3 turns per traverse and a turn-round of half a turn either side of each end, so the cycle is 6 turns, the shoe runs steady for 2 of every 3 turns and the turn-round is a sixth of the cycle, long enough to watch with no time map; lead 48 on a 32 mm screw, a lead angle of 28.6 degrees at the 14 mm pitch radius, so a crossing is 8.3 mm long and an 18 mm shoe bridges it with 4.8 mm in the groove at each end; the reference at mid-stroke, where both grooves cross under the shoe, so the opening drawing shows the shoe bridging a crossing. Default view DIMETRIC (owner's review): the screw's length, the diamonds of the crossing grooves and the shoe in its groove read together with the depth of the carriage and drive; FRONT keeps the grooves at true size. One tick per screw turn on the shoe's trace, a fixed one-lead dimension above it and the stroke dimension between the posed ends, so a turn reads as one lead; plot of the shoe's position against the screw's turn (the triangle wave over 6 turns); a detail view at the crossing under the shoe at the reference. The carriage is drawn see-through on purpose (teaching.seeThrough): its upright stands in front of the shoe in FRONT. Controls: the screw's turn only; the lead, turns and turn-round are built into the screw, so they are not offered." },
+      "principle": [
+        { "body": "screw" },
+        { "body": "shoe" },
+        { "body": "carriage" },
+        { "point": "shoe-centre" }
+      ],
+      "traces": [
+        { "id": "shoe", "point": "shoe-centre", "ticks": { "every": 60 }, "comet": true }
+      ],
+      "overlays": [
+        { "id": "screw-axis", "kind": "axis-line", "at": "O", "axis": [1, 0, 0], "length": 190, "label": "SCREW AXIS" },
+        { "id": "stroke", "kind": "dimension", "from": "stroke-mark", "to": "stroke-mark", "fromPose": { "output": "shoe-x", "stat": "min" }, "toPose": { "output": "shoe-x", "stat": "max" }, "label": "STROKE, 3 TURNS" },
+        { "id": "lead", "kind": "dimension", "from": "lead-0", "to": "lead-1", "label": "ONE LEAD PER TURN" }
+      ],
+      "view": "DIMETRIC",
+      "seeThrough": ["carriage"],
+      "views": [
+        { "id": "crossing", "kind": "detail", "center": [50, -14, 40], "scale": 4, "highlight": ["shoe"] }
+      ],
+      "controls": [
+        { "id": "screw", "kind": "driver", "driver": "input" }
+      ],
+      "plot": { "x": "input", "y": "shoe-x", "label": "SHOE POSITION AGAINST SCREW TURN" },
+      "claims": [
+        { "text": "carries the shoe along at a steady 48 mm per turn", "output": "shoe-speed", "stat": "max", "value": 0.133333, "tol": 0.0002 },
+        { "text": "the carriage runs 120 mm there and back", "output": "shoe-x", "stat": "range", "value": 120, "tol": 0.01 },
+        { "text": "every 6 turns: out in 3 turns (half the cycle)", "output": "shoe-x", "stat": "phase", "from": "min", "to": "max", "value": 180, "tol": 1 },
+        { "text": "bends round within 1 turn of the screw (a sixth of the cycle below full speed at each end)", "output": "shoe-speed", "stat": "dwell", "band": [0, 0.13325], "value": 60, "tol": 1 },
+        { "text": "the grooves lean 28.6° from the circumference", "output": "lead-angle", "stat": "max", "value": 28.62, "tol": 0.05 },
+        { "text": "the shoe swivels through 57.2° at each turn-round", "output": "shoe-swivel", "stat": "range", "value": 57.24, "tol": 0.1 }
+      ],
+      "exceptions": []
+    },
+    "examples": [
+      { "use": "Level winder on a winch", "detail": "A diamond screw driven from the drum carries the rope guide to and fro so heavy cable is laid in even layers." },
+      { "use": "Baitcasting fishing reel", "detail": "The line guide rides a small worm shaft cut both ways with a crossover, so line spools evenly across the reel." },
+      { "use": "Cable and hose reels", "detail": "Self-reversing spindles traverse the cable guide on reels in places that are hard to reach." },
+      { "use": "Yarn winding", "detail": "A drum with a groove that crosses itself and reverses near the ends traverses the yarn as it winds a package." }
+    ],
+    "references": [
+      { "title": "Double Screw of Napier, Reuleaux model M6 (1882), Cornell University Library", "url": "https://dcp-production-container.library.cornell.edu/catalog/ss:372594", "kind": "museum" },
+      { "title": "US patent 4031765, Reversing nut for diamond thread screw", "url": "https://patents.google.com/patent/US4031765", "kind": "patent" },
+      { "title": "US patent 10640346, Automatic reversing screw mechanism for cable winding (background on diamond and reversing screws)", "url": "https://patents.google.com/patent/US10640346", "kind": "patent" },
+      { "title": "The Cross Threaded Spindle: Back and Forth for Perfect Spooling, BAER", "url": "https://baer.tools/en/blog/the-cross-threaded-spindle-back-and-forth-for-perfect-spooling", "kind": "engineering-guide" },
+      { "title": "Diamond Screws, Bornemann Gewindetechnik", "url": "https://www.bornemann-gewindetechnik.de/en/press/diamond-screws/", "kind": "engineering-guide" }
+    ],
+    "media": [
+      { "title": "Self reverse screw on manual lathe (YouTube)", "url": "https://www.youtube.com/shorts/DZdhhuUdF6c", "kind": "video" },
+      { "title": "Diamond threaded rods, McMaster-Carr", "url": "https://www.mcmaster.com/products/threaded-rods/thread-type~diamond/", "kind": "photos" },
+      { "title": "Winch drum with screw level winder, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/File:Seilwinde-Kreuzgewindespindel.jpg", "kind": "photos" }
+    ],
+    "real_world": [
+      { "product": "Self-reversing wireline winch", "maker": "James Seabrook", "use": "The winch's level wind carriage runs on a self-reversing screw and turns round at each end of the drum while the drum keeps turning one way.", "url": "https://www.youtube.com/watch?v=RtToZ6ULJU0" },
+      { "product": "Diamond screw level winder", "maker": "LEBUS International Engineers", "use": "A diamond screw beside a winch drum traverses the rope guide across the drum and back as the rope is spooled.", "url": "https://www.youtube.com/watch?v=tvJI2YSpUUA", "note": "low resolution" },
+      { "product": "Self-reversing screw unit", "maker": "Abssac", "use": "A running self-reversing screw carries its follower to the end of the thread and back with the screw turning one way.", "url": "https://www.youtube.com/watch?v=zv7cXR1UkWQ" }
+    ],
+    "related": ["lead-screw", "barrel-cam", "face-groove-cam", "ball-screw"]
+  },
+{
+    "record_version": 3,
+    "id": "rack-stroke-doubler",
+    "name": "Rack-and-pinion stroke doubler",
+    "aka": ["stroke doubler", "stroke multiplier", "double rack and pinion", "floating rack", "ejector accelerator", "accelerated ejector"],
+    "in_site": false,
+    "family": "Gears",
+    "level": "Intermediate",
+    "summary": "A pinion carried on a slide rolls on a fixed rack and drives a free rack on its far side twice as far as the slide moves.",
+    "motion": {
+      "input": "Linear",
+      "output": "Linear",
+      "label": "Linear → Linear",
+      "output_character": ["Reciprocating"],
+      "axes": "Offset parallel",
+      "plane": "Planar"
+    },
+    "ratio": {
+      "kind": "Stroke",
+      "class": "Low (<5:1)",
+      "typical": "output stroke = 2 x carrier stroke for any pinion; 160 mm for an 80 mm carrier stroke"
+    },
+    "dof": 1,
+    "topology": {
+      "links": 4,
+      "revolute": 1,
+      "prismatic": 2,
+      "higher_pairs": 2,
+      "notes": "ground with the fixed rack, carrier (prismatic on the ground), pinion (revolute on the carrier), free rack (prismatic on the ground); two gear meshes, the pinion with each rack"
+    },
+    "backdrivable": "Yes",
+    "tags": {
+      "function": ["Speed increase", "Scaling & copying", "Positioning"],
+      "property": ["Exact", "Positive drive", "Backdrivable", "Compact", "Few parts"],
+      "application": ["Machine tools", "Packaging & automation", "Robotics"],
+      "keywords": ["stroke doubler", "instant centre", "rolling pinion", "fixed rack", "floating rack", "Brown No. 118", "ejector accelerator"]
+    },
+    "explain": {
+      "motion": "A carrier slides back and forth with a pinion turning on its axle. The pinion meshes a fixed rack on one side and a free rack on the other. As the carrier moves, the pinion rolls along the fixed rack, so its contact there stands still for an instant: it is the instant centre. The far side of the pitch circle is twice as far from that point as the axle, so it moves twice as fast: the free rack moves 160 mm while the carrier moves 80 mm, the same way, whatever the pinion's size.",
+      "forces": "The free rack's load comes back through the pinion on both sides: the carrier pushes with twice the output force, half of it taken by the fixed rack, so the stroke doubles and the force halves. The pressure angle of each mesh pushes the racks away from the pinion, and their guides take it.",
+      "benefits": "Doubles a short stroke in a narrow space with an exact, positive drive, and the 2:1 holds for any pinion, since only the rolling sets it.",
+      "limits": "The backlash of two meshes adds up at the output, and the racks must stay parallel over the whole stroke or the pinion binds. The carrier needs twice the output force, and the ratio cannot be changed."
+    },
+    "build": {
+      "ground": "base with the fixed rack screwed and dowelled to it, a slide for the carrier and a slide for the free rack, all along x",
+      "defining_relations": "The pinion (module 3, 16 teeth, pitch radius r = 24 mm) rolls on the fixed rack's pitch line: for a carrier travel x it turns θ = -x / r. The free rack meshes it on the opposite side, 2r from the fixed pitch line, and moves x - r θ = 2x, whatever r is. Carrier stroke 80 mm (±40), free rack stroke 160 mm (±80), pinion turn 191° over the stroke (80 / 24 rad).",
+      "notes": "Seen in plan: the fixed rack below the pinion's centre, teeth up, the free rack above, teeth down. Relative to the carrier each rack moves ±40 mm, so 16 teeth (150.8 mm) keep both in mesh over the stroke. The carrier is the driven slide; the free rack rides its own slide from its back, its toothed side open for the pinion."
+    },
+    "kin": {
+      "bodies": [
+        { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [340, 150] }, "at": { "frame": { "origin": [0, 0, -8] } } },
+        { "id": "carrier", "role": "driver", "shape": { "type": "slider", "length": 84, "width": 24 }, "at": { "joint": "P" } },
+        { "id": "pinion", "role": "gear", "shape": { "type": "gear", "z": 16, "module": 3, "face": 12, "bore": 10 }, "at": { "joint": "P" } },
+        { "id": "fixed-rack", "role": "frame", "fixed": true, "shape": { "type": "rack", "module": 3, "teeth": 16, "length": 150.796, "face": 12, "height": 16, "pitchLine": 0 }, "frame": { "origin": [0, -24, 0] } },
+        { "id": "free-rack", "role": "output", "shape": { "type": "rack", "module": 3, "teeth": 16, "length": 150.796, "face": 12, "height": 16, "pitchLine": 0 }, "at": { "joint": "R" }, "frame": { "origin": [0, 24, 0], "rot": [0, 0, 180] } }
+      ],
+      "joints": [
+        { "id": "C", "type": "prismatic", "a": "ground", "b": "carrier", "at": [0, 0, 0], "axis": [1, 0, 0], "limits": [-40, 40] },
+        { "id": "P", "type": "revolute", "a": "carrier", "b": "pinion", "at": [0, 0, 0], "axis": [0, 0, 1] },
+        { "id": "R", "type": "prismatic", "a": "ground", "b": "free-rack", "at": [0, 24, 0], "axis": [1, 0, 0], "limits": [-80, 80] },
+        { "id": "M1", "type": "gear-mesh", "a": "pinion", "b": "fixed-rack", "at": [0, -24, 0], "axis": [0, 0, 1], "axis2": [1, 0, 0], "radiusA": 24, "za": 16, "carrier": "carrier", "note": "the pinion rolls on the fixed rack: relative to the carrier the rack moves r per radian of the pinion's turn" },
+        { "id": "M2", "type": "gear-mesh", "a": "pinion", "b": "free-rack", "at": [0, 24, 0], "axis": [0, 0, 1], "axis2": [-1, 0, 0], "radiusA": 24, "za": 16, "carrier": "carrier", "note": "the free rack on the pinion's far side: relative to the carrier it moves the carrier's travel again" }
+      ],
+      "params": [
+        { "id": "m", "value": 3, "unit": "mm", "min": 2, "max": 4, "note": "module of the pinion and both racks" },
+        { "id": "r", "value": 24, "unit": "mm", "min": 16, "max": 32, "note": "pinion pitch radius, m z / 2: half the distance between the racks' pitch lines" }
+      ],
+      "design": [],
+      "drivers": [
+        { "id": "input", "joint": "C", "kind": "linear", "range": [-40, 40], "default": 0, "lo": -40, "hi": 40 }
+      ],
+      "solve": [
+        { "block": "gear-mesh", "id": "roll", "joints": ["P", "M1"], "in": { "joint": "M1", "rolls": "P", "parent": "carrier" }, "out": { "angle": "pinion-turn", "travel": "axle-travel" } },
+        { "block": "gear-mesh", "id": "drive", "joints": ["R", "M2"], "in": { "joint": "M2", "input": "pinion-turn", "parent": "carrier" }, "out": { "travel": "rack-on-carrier" } }
+      ],
+      "points": [
+        { "id": "axle", "body": "carrier", "local": [0, 0, 0] },
+        { "id": "contact-fixed", "body": "carrier", "local": [0, -24, 0] },
+        { "id": "contact-free", "body": "carrier", "local": [0, 24, 0] },
+        { "id": "rack-mark", "body": "free-rack", "local": [0, 0, 0] },
+        { "id": "fixed-left", "body": "fixed-rack", "local": [-75.398, 0, 0] },
+        { "id": "fixed-right", "body": "fixed-rack", "local": [75.398, 0, 0] }
+      ],
+      "outputs": [
+        { "id": "carrier-x", "of": "axle", "kind": "position", "axis": "x", "unit": "mm" },
+        { "id": "rack-x", "of": "rack-mark", "kind": "position", "axis": "x", "unit": "mm" },
+        { "id": "pinion-angle", "of": "pinion", "kind": "angle", "unit": "deg" },
+        { "id": "rack-speed", "of": "rack-mark", "kind": "speed-ratio", "unit": "mm/mm" }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record (#257), reviewed against its kinematics before the build and again on the six phases of the finished build. Six phases (every 60 degrees of the cycle): the carrier at -40, -20, +20, +40, +20, -20 mm and the free rack at -80, -40, +40, +80, +40, -40 mm, always twice the carrier and the same way; the pinion turns back as it rolls forward, +95.5 to -95.5 degrees (191 over the stroke, 80 / 24 rad); its contact with the fixed rack stays on the fixed pitch line under the axle. Decided: the carrier is driven by the linear drive along its own slide (standard section 8), not by Brown's crank and rod, so the lesson is the two straight strokes alone with no second mechanism in front of it; module 3, 16 teeth (pitch radius 24), a carrier stroke of 80 mm and a free rack stroke of 160 mm; both racks 16 teeth, enough to stay in mesh over the stroke; the carrier 84 mm long, so it shows past the pinion at both ends; the fixed rack drawn as frame (role frame) and the free rack as the output, so which rack moves reads at a glance. Default view PLAN (opened at 28 degrees), where the pitch circle, both pitch lines and both strokes show true. Traces: a mark on the free rack's pitch line (the comet) and the axle, both ticked every 30 degrees of the cycle, so at every tick the rack's step is twice the carrier's; overlays: the fixed pitch line, a circle at the instant centre, the line from it through the axle to the far contact (speeds 0, v, 2v), and the two stroke dimensions between the posed ends. Plot of the free rack against the carrier (a straight line of slope 2). Controls: the input only; the pinion size is not offered (the parts are built for one pinion), and the claim that the ratio holds for any pinion is the law, checked by the block's test at three radii. No section or detail view: the principle lies in plain view. No time map." },
+      "principle": [{ "body": "carrier" }, { "body": "pinion" }, { "body": "fixed-rack" }, { "body": "free-rack" }, { "point": "contact-fixed" }],
+      "traces": [
+        { "id": "free-rack", "point": "rack-mark", "ticks": { "every": 30 }, "comet": true },
+        { "id": "axle", "point": "axle", "ticks": { "every": 30 } }
+      ],
+      "overlays": [
+        { "id": "fixed-pitch-line", "kind": "line", "from": "fixed-left", "to": "fixed-right", "label": "FIXED PITCH LINE" },
+        { "id": "instant-centre", "kind": "circle", "center": "contact-fixed", "radius": 3, "label": "INSTANT CENTRE" },
+        { "id": "speeds", "kind": "line", "from": "contact-fixed", "to": "contact-free", "label": "SPEED 0, v, 2v" },
+        { "id": "carrier-stroke", "kind": "dimension", "from": "axle", "to": "axle", "fromPose": { "output": "carrier-x", "stat": "min" }, "toPose": { "output": "carrier-x", "stat": "max" }, "label": "CARRIER STROKE" },
+        { "id": "rack-stroke", "kind": "dimension", "from": "rack-mark", "to": "rack-mark", "fromPose": { "output": "rack-x", "stat": "min" }, "toPose": { "output": "rack-x", "stat": "max" }, "label": "FREE RACK STROKE, TWICE" }
+      ],
+      "view": "PLAN",
+      "views": [],
+      "controls": [{ "id": "input", "kind": "driver", "driver": "input" }],
+      "plot": { "x": "input", "y": "rack-x", "label": "FREE RACK AGAINST CARRIER" },
+      "claims": [
+        { "text": "the free rack moves 160 mm", "output": "rack-x", "stat": "range", "value": 160, "tol": 0.05 },
+        { "text": "while the carrier moves 80 mm", "output": "carrier-x", "stat": "range", "value": 80, "tol": 0.05 },
+        { "text": "output stroke = 2 x carrier stroke, the same way: the 2:1 holds for any pinion", "output": "rack-x", "stat": "ratio", "value": 2, "tol": 0.001 },
+        { "text": "it moves twice as fast (2 mm per mm of carrier, at every point of the stroke)", "output": "rack-speed", "stat": "min", "value": 2, "tol": 0.01 },
+        { "text": "it moves twice as fast (2 mm per mm of carrier, at every point of the stroke)", "output": "rack-speed", "stat": "max", "value": 2, "tol": 0.01 },
+        { "text": "pinion turn 191° over the stroke (80 / 24 rad)", "output": "pinion-angle", "stat": "range", "value": 190.99, "tol": 0.05 }
+      ],
+      "exceptions": []
+    },
+    "examples": [
+      { "use": "Accelerated ejectors in moulds", "detail": "A pinion on the ejector plate rolls on a rack held by the mould plate and drives a second rack, with its ejector pin, ahead at twice the plate's speed." },
+      { "use": "Moulded part removal robots", "detail": "A pinion on the first telescoping tube rolls on a rack in the housing and runs a rack on the inner tube out at double the tube's speed." },
+      { "use": "Vise carriages", "detail": "A pinion on the end of a cylinder's piston rod meshes a frame rack and a carriage rack, so the carriage travels twice the piston stroke." },
+      { "use": "Blow moulding tools", "detail": "A pinion carried by the ejector between a fixed and a moving rack gives the ejection carriage twice the ejector's stroke." }
+    ],
+    "references": [
+      { "title": "Epicyclic gearing: kinematic equations (the rack and pinion model), Wikipedia", "url": "https://en.wikipedia.org/wiki/Epicyclic_gearing", "kind": "wikipedia" },
+      { "title": "Instant centre of rotation (a rolling wheel's top moves at twice its centre), Wikipedia", "url": "https://en.wikipedia.org/wiki/Instant_centre_of_rotation", "kind": "wikipedia" },
+      { "title": "Brown, 507 Mechanical Movements (1868), No. 118: doubling the stroke with a fixed and a moving rack", "url": "https://507movements.com/mm_118.html", "kind": "textbook" },
+      { "title": "US patent 3893644, Ejector accelerator for molding apparatus (Drazick, 1975)", "url": "https://patents.google.com/patent/US3893644A/en", "kind": "patent" },
+      { "title": "US patent 5125789, Molded parts removal and transfer robot (Peerless Automation, 1992)", "url": "https://patents.google.com/patent/US5125789", "kind": "patent" }
+    ],
+    "media": [
+      { "title": "Accelerated ejectors, DME Mold Components catalogue (unit photos, pinion and racks labelled)", "url": "https://online.flippingbook.com/view/562699730/197/", "kind": "photos" },
+      { "title": "507 Mechanical Movements No. 118 to 126, 3D animation (YouTube)", "url": "https://www.youtube.com/watch?v=HFDfu_BOpa0", "kind": "animation" }
+    ],
+    "real_world": [],
+    "related": ["rack-pinion", "chain-stroke-doubler", "slider-crank", "planetary"]
+  },
+{
+    "record_version": 3,
+    "id": "chain-stroke-doubler",
+    "name": "Chain stroke doubler",
+    "aka": ["chain doubler", "2:1 chain reeving", "free-lift chain", "telescopic fork chain drive", "moving sprocket doubler"],
+    "in_site": false,
+    "family": "Flexible drive",
+    "level": "Intermediate",
+    "summary": "A chain anchored to the frame runs round a sprocket on a moving carrier to an output slide, which moves twice as far as the carrier.",
+    "motion": { "input": "Linear", "output": "Linear", "label": "Linear → Linear", "output_character": ["Reciprocating"], "axes": "Offset parallel", "plane": "Planar" },
+    "ratio": { "kind": "Stroke", "class": "Low (<5:1)", "typical": "output stroke = 2 x carrier stroke for any sprocket; 160 mm for an 80 mm carrier stroke" },
+    "dof": 1,
+    "topology": {
+      "links": 4,
+      "revolute": 1,
+      "prismatic": 2,
+      "higher_pairs": 4,
+      "notes": "ground, carrier (prismatic on the ground), sprocket (revolute on the carrier), output (prismatic on the ground); four chain strands, each a higher pair: two chains, each with an anchored strand and a running strand. Overconstrained by two: the second chain repeats the first's relation the other way round, which is why the pair is tensioned against each other at one anchor"
+    },
+    "backdrivable": "Yes",
+    "tags": {
+      "function": ["Speed increase", "Positioning", "Motion conversion"],
+      "property": ["Exact", "Positive drive", "Backdrivable", "High load"],
+      "application": ["Construction & lifting", "Packaging & automation"],
+      "keywords": ["chain doubler", "moving sprocket", "anchored strand", "free lift", "hydraulic jigger", "William Armstrong", "telescopic fork", "pulley block in reverse"]
+    },
+    "explain": {
+      "motion": "A carrier slides back and forth with a sprocket turning free on a stud. A roller chain is anchored to the frame, runs along under the sprocket, round its end and back over it to the output slide. When the carrier moves, the anchored strand grows by the carrier's travel, so the strand on the other side of the sprocket must shrink by the same amount: the chain runs round the sprocket and its far end moves twice as far, the same way. The output moves 160 mm while the carrier moves 80 mm, at twice its speed at every point of the stroke.",
+      "forces": "The sprocket is the moving pulley of a block and tackle, driven at its centre instead of at the rope: the output's load pulls the running strand, the anchored strand holds the same tension, so the carrier pushes with twice the output force. A chain only pulls, so a second chain round the other side of the sprocket, anchored at the frame's other end, pulls the output back.",
+      "benefits": "Doubles a stroke with one driven slide and no second drive, positively and exactly, and the doubling holds for any sprocket size, since only the anchored strand sets it.",
+      "limits": "Each direction needs its own chain, and the two must be kept tight against each other; chain stretch and slack at the anchors show twice at the output. The carrier needs twice the output force, and the ratio cannot be changed."
+    },
+    "build": {
+      "ground": "base with the carrier's slide, the output's slide beside it, and an anchor block for each chain's held end, one at either end of the base",
+      "defining_relations": "The sprocket (ISO 606 08B, 12 teeth, seat circle radius 24.53 mm) takes 152.4 mm of chain per turn, so r = z p / 2π = 24.26 mm. Each chain's anchored strand is held: for a carrier travel x the sprocket turns θ = -x / r, and the strand on its far side moves x again relative to the carrier, so the output moves x - r θ = 2x, whatever r is. Carrier stroke 80 mm (±40), output stroke 160 mm (±80), sprocket turn 189° over the stroke (80 / 24.26 rad).",
+      "notes": "Seen in plan: the anchored strands run under the sprocket's centre (y -24.53), the running strands over it (y +24.53), the output slide beyond them. Chain A, in the sprocket's lower row, wraps its +x half: anchored at x -114.3, pinned to the output at -76.2. Chain B, in the upper row 16.5 mm higher, wraps the -x half: anchored at +114.3, pinned to the output at +76.2. Both 21 links, a whole number of pitches from each end to the sprocket, so a roller sits in a seat at both tangent points. Each chain end is pinned to an anchor bolt; the nuts on the bolts set each chain's length, the two chains drawn tight against each other."
+    },
+    "kin": {
+      "bodies": [
+        { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [400, 150] }, "at": { "frame": { "origin": [0, 14, -8] } } },
+        { "id": "carrier", "role": "driver", "shape": { "type": "slider", "length": 56, "width": 26 }, "at": { "joint": "S" } },
+        { "id": "sprocket", "role": "link", "shape": { "type": "sprocket", "z": 12, "pitch": 12.7, "roller": 8.5, "standard": "ISO 606 08B", "bore": 10, "face": 23.5, "rows": 2, "rowPitch": 16.5 }, "at": { "joint": "S" } },
+        { "id": "output", "role": "output", "shape": { "type": "slider", "length": 230, "width": 20 }, "at": { "joint": "O" }, "frame": { "origin": [0, 56, 0] } }
+      ],
+      "joints": [
+        { "id": "C", "type": "prismatic", "a": "ground", "b": "carrier", "at": [0, 0, 0], "axis": [1, 0, 0], "limits": [-40, 40] },
+        { "id": "S", "type": "revolute", "a": "carrier", "b": "sprocket", "at": [0, 0, 0], "axis": [0, 0, 1] },
+        { "id": "O", "type": "prismatic", "a": "ground", "b": "output", "at": [0, 56, 0], "axis": [1, 0, 0], "limits": [-80, 80] },
+        { "id": "held-A", "type": "belt", "flexible": "chain", "strand": true, "a": "sprocket", "b": "ground", "carrier": "carrier", "at": [0, -24.5345, 0], "axis": [0, 0, 1], "axis2": [1, 0, 0], "radiusA": 24.255213, "pitch": 12.7, "roller": 8.5, "standard": "ISO 606 08B", "row": 0, "wrap": 1, "links": 21, "ends": ["anchor-A", "end-A"], "note": "chain A's anchored strand, under the sprocket: held by its anchor bolt at x -114.3" },
+        { "id": "run-A", "type": "belt", "flexible": "chain", "strand": true, "a": "sprocket", "b": "output", "carrier": "carrier", "at": [0, 24.5345, 0], "axis": [0, 0, 1], "axis2": [-1, 0, 0], "radiusA": 24.255213, "pitch": 12.7, "row": 0, "note": "chain A's running strand, over the sprocket, pinned to the output at x -76.2: it pulls the output toward +x" },
+        { "id": "held-B", "type": "belt", "flexible": "chain", "strand": true, "a": "sprocket", "b": "ground", "carrier": "carrier", "at": [0, -24.5345, 0], "axis": [0, 0, 1], "axis2": [1, 0, 0], "radiusA": 24.255213, "pitch": 12.7, "roller": 8.5, "standard": "ISO 606 08B", "row": 1, "wrap": -1, "links": 21, "ends": ["anchor-B", "end-B"], "note": "chain B's anchored strand, under the sprocket: held by its anchor bolt at x +114.3" },
+        { "id": "run-B", "type": "belt", "flexible": "chain", "strand": true, "a": "sprocket", "b": "output", "carrier": "carrier", "at": [0, 24.5345, 0], "axis": [0, 0, 1], "axis2": [-1, 0, 0], "radiusA": 24.255213, "pitch": 12.7, "row": 1, "note": "chain B's running strand, pinned to the output at x +76.2: it pulls the output back toward -x" }
+      ],
+      "params": [
+        { "id": "p", "value": 12.7, "unit": "mm", "min": 12.7, "max": 12.7, "note": "chain pitch, ISO 606 08B" },
+        { "id": "r", "value": 24.255213, "unit": "mm", "min": 24.255213, "max": 24.255213, "note": "chain per radian of the 12-tooth sprocket, z p / 2π" }
+      ],
+      "design": [],
+      "drivers": [ { "id": "input", "joint": "C", "kind": "linear", "range": [-40, 40], "default": 0, "lo": -40, "hi": 40 } ],
+      "solve": [
+        { "block": "strand", "id": "doubler", "joints": ["S", "held-A", "run-A", "held-B", "run-B", "O"], "in": { "carrier": "carrier", "joint": "S", "held": "held-A", "running": ["run-A"] }, "out": { "angle": "sprocket-turn", "travel": "chain-travel" } }
+      ],
+      "points": [
+        { "id": "axle", "body": "carrier", "local": [0, 0, 0] },
+        { "id": "contact-held", "body": "carrier", "local": [0, -24.5345, 0] },
+        { "id": "contact-run", "body": "carrier", "local": [0, 24.5345, 0] },
+        { "id": "anchor-A", "body": "ground", "local": [-114.3, -24.5345, 0] },
+        { "id": "anchor-B", "body": "ground", "local": [114.3, -24.5345, 0] },
+        { "id": "end-A", "body": "output", "local": [-76.2, -31.4655, 0] },
+        { "id": "end-B", "body": "output", "local": [76.2, -31.4655, 0] }
+      ],
+      "outputs": [
+        { "id": "carrier-x", "of": "axle", "kind": "position", "axis": "x", "unit": "mm" },
+        { "id": "output-x", "of": "end-A", "kind": "position", "axis": "x", "unit": "mm" },
+        { "id": "sprocket-angle", "of": "sprocket", "kind": "angle", "unit": "deg" },
+        { "id": "output-speed", "of": "end-A", "kind": "speed-ratio", "unit": "mm/mm" }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record (#258), reviewed against its kinematics before the build. Six phases (every 60 degrees of the cycle): the carrier at -40, -20, +20, +40, +20, -20 mm and the output (chain A's end) at -80, -40, +40, +80, +40, -40 mm from its reference, always twice the carrier and the same way; the sprocket turns back as the carrier goes forward, +94.5 to -94.5 degrees (189 over the stroke, 80 / 24.26 rad); the anchored strands' ends stay where they are while the strand under the sprocket grows and shrinks, and the strand over it runs at twice the carrier's speed. Decided: the carrier is driven by the linear drive along its own slide (standard section 8), the output on a slide of its own beside it, so the two straight strokes lie side by side in plan as in the rack-and-pinion doubler; two chains, one per direction, since a chain only pulls and the drive works both ways: chain A wraps the sprocket's +x half and pulls the output out, chain B the -x half and pulls it back, in two rows of one sprocket so the four strands lie on two lines in plan, both anchored strands under the sprocket's centre and both running strands over it; a 12-tooth ISO 606 08B sprocket and chains of 21 links, a carrier stroke of 80 mm and an output stroke of 160 mm, the same strokes as the rack doubler so the two pages compare; the output a plain bar, the sprocket a link (it is an idler), the carrier the driver. Default view PLAN (opened at 28 degrees), where both strand lines and both strokes show true. Traces: chain A's end on the output (the comet) and the axle, both ticked every 30 degrees of the cycle, so at every tick the output's step is twice the carrier's; overlays: the line through both anchors (the anchored strands, at rest), a circle at the instant centre where the held strand leaves the sprocket, the line from it through the axle to the running strand (speeds 0, v, 2v), and both stroke dimensions between the posed ends. Plot of the output against the carrier (a straight line of slope 2). Controls: the input only; the sprocket size is not offered (the chains are built for one sprocket) and the claim that the doubling holds for any sprocket is the law, checked by the strand block's fixture test at three radii. No section or detail view: the principle lies in plain view. No time map." },
+      "principle": [ { "body": "carrier" }, { "body": "sprocket" }, { "body": "output" }, { "point": "contact-held" } ],
+      "traces": [
+        { "id": "output-end", "point": "end-A", "ticks": { "every": 30 }, "comet": true },
+        { "id": "axle", "point": "axle", "ticks": { "every": 30 } }
+      ],
+      "overlays": [
+        { "id": "held-strand", "kind": "line", "from": "anchor-A", "to": "anchor-B", "label": "ANCHORED STRANDS, AT REST" },
+        { "id": "instant-centre", "kind": "circle", "center": "contact-held", "radius": 3, "label": "INSTANT CENTRE" },
+        { "id": "speeds", "kind": "line", "from": "contact-held", "to": "contact-run", "label": "SPEED 0, v, 2v" },
+        { "id": "carrier-stroke", "kind": "dimension", "from": "axle", "to": "axle", "fromPose": { "output": "carrier-x", "stat": "min" }, "toPose": { "output": "carrier-x", "stat": "max" }, "label": "CARRIER STROKE" },
+        { "id": "output-stroke", "kind": "dimension", "from": "end-A", "to": "end-A", "fromPose": { "output": "output-x", "stat": "min" }, "toPose": { "output": "output-x", "stat": "max" }, "label": "OUTPUT STROKE, TWICE" }
+      ],
+      "view": "PLAN",
+      "views": [],
+      "controls": [ { "id": "input", "kind": "driver", "driver": "input" } ],
+      "plot": { "x": "input", "y": "output-x", "label": "OUTPUT AGAINST CARRIER" },
+      "claims": [
+        { "text": "the output moves 160 mm", "output": "output-x", "stat": "range", "value": 160, "tol": 0.05 },
+        { "text": "while the carrier moves 80 mm", "output": "carrier-x", "stat": "range", "value": 80, "tol": 0.05 },
+        { "text": "output stroke = 2 x carrier stroke, the same way, for any sprocket", "output": "output-x", "stat": "ratio", "value": 2, "tol": 0.001 },
+        { "text": "at twice its speed at every point of the stroke", "output": "output-speed", "stat": "min", "value": 2, "tol": 0.01 },
+        { "text": "at twice its speed at every point of the stroke", "output": "output-speed", "stat": "max", "value": 2, "tol": 0.01 },
+        { "text": "sprocket turn 189° over the stroke (80 / 24.26 rad)", "output": "sprocket-angle", "stat": "range", "value": 188.98, "tol": 0.05 }
+      ],
+      "exceptions": []
+    },
+    "examples": [
+      { "use": "Lift truck masts", "detail": "The lift chain is anchored to the frame and runs over a sheave on the ram's head to the carriage, so the carriage rises two inches for each inch of ram." },
+      { "use": "Telescopic forks", "detail": "Two chains per stage, each anchored to the lower fork and run round a wheel on the next stage to the upper fork, extend and retract the upper fork at twice the middle fork's stroke." },
+      { "use": "Industrial trucks", "detail": "A cable anchored to the truck's frame over a sheave on the moving frame lifts the load platform twice as far and twice as fast." },
+      { "use": "Hydraulic jiggers", "detail": "A ram moves the sheaves of a chain block, so the chain's free end travels several times the ram's short stroke to work a crane or a lift." }
+    ],
+    "references": [
+      { "title": "Hydraulic jigger (a pulley block used in reverse), Wikipedia", "url": "https://en.wikipedia.org/wiki/Hydraulic_jigger", "kind": "wikipedia" },
+      { "title": "US patent 1837486, Industrial truck (Baker-Raulang, filed 1926): cable anchored to the frame over a sheave on the moving frame, twice the speed and travel", "url": "https://patents.google.com/patent/US1837486A/en", "kind": "patent" },
+      { "title": "US patent 2670811, Multicylinder hydraulic lift truck (Towmotor, filed 1949): the carriage moves twice the ram", "url": "https://patents.google.com/patent/US2670811A/en", "kind": "patent" },
+      { "title": "CN patent 110963447, Double-deep-position fork (Siasun, filed 2018): two chains per stage, one for each direction, 2:1 at each stage", "url": "https://patents.google.com/patent/CN110963447A/en", "kind": "patent" },
+      { "title": "Lift cylinder and chains: one inch of cylinder, two inches of lift (forklift technical notes)", "url": "https://www.fork-lift-training.co.uk/m/forklifttechnical/lift-cylinder-and-chains.html", "kind": "engineering-guide" }
+    ],
+    "media": [
+      { "title": "Hydraulic jiggers, Wikimedia Commons (photos and period drawings of the multi-sheave form)", "url": "https://commons.wikimedia.org/wiki/Category:Hydraulic_jiggers", "kind": "photos" }
+    ],
+    "real_world": [],
+    "related": ["rack-stroke-doubler", "block-and-tackle", "chain-drive", "belt-drive"]
+  },
+{
+    "record_version": 3,
+    "id": "walking-beam",
+    "name": "Walking-beam transfer",
+    "aka": [
+      "walking beam conveyor",
+      "lift-and-carry transfer",
+      "walking beam",
+      "walking beam furnace",
+      "walking hearth",
+      "walking beam cooling bed"
+    ],
+    "in_site": false,
+    "family": "Linkage",
+    "level": "Intermediate",
+    "summary": "A beam on two equal cranks lifts every part off its notches, carries it one station on and sets it down, then returns empty below the rails.",
+    "motion": {
+      "input": "Rotary",
+      "output": "Intermittent linear",
+      "label": "Rotary → Intermittent linear",
+      "output_character": [
+        "Intermittent",
+        "Dwell"
+      ],
+      "axes": "Rotary-to-in-plane",
+      "plane": "Planar"
+    },
+    "ratio": {
+      "kind": "Index step",
+      "class": "n/a",
+      "typical": "one station per crank turn: pitch = 2 x crank radius along the notch line"
+    },
+    "dof": 1,
+    "topology": {
+      "links": 4,
+      "revolute": 4,
+      "prismatic": 0,
+      "higher_pairs": 0,
+      "notes": "a parallelogram four-bar: ground, two equal cranks and the beam, count includes ground. The balls are carried by contacts that change from notch to seat and back each turn, so the mobility is not counted from them: one input moves everything."
+    },
+    "backdrivable": "No",
+    "tags": {
+      "function": [
+        "Indexing",
+        "Dwell",
+        "Lifting",
+        "Motion conversion"
+      ],
+      "property": [
+        "Exact",
+        "Positive drive",
+        "Singular positions",
+        "Few parts"
+      ],
+      "application": [
+        "Packaging & automation",
+        "Machine tools"
+      ],
+      "keywords": [
+        "walking beam",
+        "lift and carry",
+        "transfer line",
+        "reheating furnace",
+        "cooling bed",
+        "circular translation",
+        "indexing conveyor"
+      ]
+    },
+    "explain": {
+      "motion": "Two equal cranks turn together, so the beam pinned to them translates round a 40 mm circle without turning. On the upper half of the circle its seats rise through the notches of the fixed rails, lift every ball at once, carry it one station on and set it down in the next notch; on the lower half the beam returns empty below the rails. Each turn moves every ball 38.4 mm along and 11.2 mm up the notch line, and each ball stands still in its notch for half of every turn while the cranks keep turning. The last ball rolls off onto the return track, and the packed queue on it rolls on one ball each turn, so the front ball is waiting in the first notch when the beam comes up under it.",
+      "forces": "The beam carries the whole row at once, so the crank torque is greatest while it lifts and small on the empty return. The balls are handed over at the ends of the circle's diameter, where the seats move nearly square to the notches, so nothing slides in a notch; but the beam moves fastest there, so each ball is picked up and set down at full crank speed.",
+      "benefits": "Every part moves the same distance at the same moment and is located in a notch between moves, so the pitch is exact and the parts never rub on each other or on the rails. One rotary input drives the whole row.",
+      "limits": "The parts are set down while the beam is still moving, so heavy or fragile parts need a drive that slows near the hand-over, such as a lift-and-carry drive with a rectangular path. The parallelogram passes its change points at the hand-overs, where both cranks lie along the line of their centres, so a real machine ties the two cranks by a chain or gears."
+    },
+    "build": {
+      "ground": "the base, the two notched rails, the return tracks and the crank bearings",
+      "defining_relations": "beam translation = crank pin displacement (two equal cranks of radius r, parallel and in phase); the hand-overs are the ends of the circle's diameter along the notch line, so one turn carries a ball 2r along the line: pitch 2r cos a and rise 2r sin a with r = 20 mm and sin a = 0.28; carry on the upper half turn, rest on the lower; every ball moves one slot of the closed circuit per turn",
+      "notes": "The notch line rises so that the return can run back by gravity: the beam lifts each ball one rise per station and the return track gives the height back. The return runs beside the transfer, not under it: a return under the beam would have to climb back past the beam's own depth and travel, more than the beam can lift. The thirteen balls are like, so after one turn each stands where the next one stood and the picture repeats; the parallelogram is held on its parallel branch through the change points at 0 and 180 degrees."
+    },
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              215,
+              120
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                -78,
+                -5,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank1",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 20,
+            "boss": [
+              10,
+              8
+            ],
+            "place": -14,
+            "thickness": 6
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "crank2",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 20,
+            "boss": [
+              10,
+              8
+            ],
+            "place": -14,
+            "thickness": 6
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "beam",
+          "role": "output",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -12,
+                22
+              ],
+              [
+                130,
+                22
+              ],
+              [
+                130,
+                105.917
+              ],
+              [
+                124.567,
+                104.332
+              ],
+              [
+                115.2,
+                94.965
+              ],
+              [
+                110.063,
+                100.102
+              ],
+              [
+                86.167,
+                93.132
+              ],
+              [
+                76.8,
+                83.765
+              ],
+              [
+                71.663,
+                88.902
+              ],
+              [
+                47.767,
+                81.932
+              ],
+              [
+                38.4,
+                72.565
+              ],
+              [
+                33.263,
+                77.702
+              ],
+              [
+                9.367,
+                70.732
+              ],
+              [
+                0,
+                61.365
+              ],
+              [
+                -5.137,
+                66.502
+              ],
+              [
+                -12,
+                64.5
+              ]
+            ],
+            "thickness": 5,
+            "place": -2.5
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "rail-front",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -10,
+                53.083
+              ],
+              [
+                174,
+                106.75
+              ],
+              [
+                174,
+                118.75
+              ],
+              [
+                166.304,
+                116.505
+              ],
+              [
+                153.6,
+                103.802
+              ],
+              [
+                146.633,
+                110.768
+              ],
+              [
+                122.963,
+                103.864
+              ],
+              [
+                115.2,
+                96.102
+              ],
+              [
+                110.943,
+                100.358
+              ],
+              [
+                84.563,
+                92.664
+              ],
+              [
+                76.8,
+                84.902
+              ],
+              [
+                72.543,
+                89.158
+              ],
+              [
+                46.163,
+                81.464
+              ],
+              [
+                38.4,
+                73.702
+              ],
+              [
+                34.143,
+                77.958
+              ],
+              [
+                7.763,
+                70.264
+              ],
+              [
+                0,
+                62.502
+              ],
+              [
+                -4.257,
+                66.758
+              ],
+              [
+                -10,
+                65.083
+              ]
+            ],
+            "thickness": 4,
+            "place": 3,
+            "posts": [
+              {
+                "at": [
+                  -10,
+                  9
+                ],
+                "top": 58.917,
+                "r": 5
+              },
+              {
+                "at": [
+                  -89,
+                  9
+                ],
+                "top": 81.958,
+                "r": 5
+              },
+              {
+                "at": [
+                  -166,
+                  9
+                ],
+                "top": 104.417,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              90,
+              0,
+              180
+            ]
+          }
+        },
+        {
+          "id": "rail-back",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -10,
+                53.083
+              ],
+              [
+                174,
+                106.75
+              ],
+              [
+                174,
+                118.75
+              ],
+              [
+                161.363,
+                115.064
+              ],
+              [
+                153.6,
+                107.302
+              ],
+              [
+                149.343,
+                111.558
+              ],
+              [
+                122.963,
+                103.864
+              ],
+              [
+                115.2,
+                96.102
+              ],
+              [
+                110.943,
+                100.358
+              ],
+              [
+                84.563,
+                92.664
+              ],
+              [
+                76.8,
+                84.902
+              ],
+              [
+                72.543,
+                89.158
+              ],
+              [
+                46.163,
+                81.464
+              ],
+              [
+                38.4,
+                73.702
+              ],
+              [
+                34.143,
+                77.958
+              ],
+              [
+                7.763,
+                70.264
+              ],
+              [
+                0,
+                62.502
+              ],
+              [
+                -4.257,
+                66.758
+              ],
+              [
+                -10,
+                65.083
+              ]
+            ],
+            "thickness": 4,
+            "place": -7,
+            "posts": [
+              {
+                "at": [
+                  -10,
+                  -9
+                ],
+                "top": 58.917,
+                "r": 5
+              },
+              {
+                "at": [
+                  -89,
+                  -9
+                ],
+                "top": 81.958,
+                "r": 5
+              },
+              {
+                "at": [
+                  -166,
+                  -9
+                ],
+                "top": 104.417,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              90,
+              0,
+              180
+            ]
+          }
+        },
+        {
+          "id": "lane",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -7,
+                -14.135
+              ],
+              [
+                7,
+                -14.135
+              ],
+              [
+                7,
+                -4.135
+              ],
+              [
+                4.5,
+                -4.135
+              ],
+              [
+                0,
+                -8.635
+              ],
+              [
+                -4.5,
+                -4.135
+              ],
+              [
+                -7,
+                -4.135
+              ]
+            ],
+            "thickness": 153.234,
+            "place": 0,
+            "posts": [
+              {
+                "at": [
+                  -30,
+                  40
+                ],
+                "top": 73.358,
+                "r": 5
+              },
+              {
+                "at": [
+                  -90,
+                  40
+                ],
+                "top": 81.022,
+                "r": 5
+              },
+              {
+                "at": [
+                  -145,
+                  40
+                ],
+                "top": 88.046,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -7.552,
+              40,
+              84.626
+            ],
+            "z": [
+              -0.992,
+              0,
+              0.127
+            ],
+            "x": [
+              0,
+              -1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "cross-out",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -7,
+                -14.135
+              ],
+              [
+                7,
+                -14.135
+              ],
+              [
+                7,
+                -4.135
+              ],
+              [
+                4.5,
+                -4.135
+              ],
+              [
+                0,
+                -8.635
+              ],
+              [
+                -4.5,
+                -4.135
+              ],
+              [
+                -7,
+                -4.135
+              ]
+            ],
+            "thickness": 19.225,
+            "place": 0,
+            "posts": [
+              {
+                "at": [
+                  -153.6,
+                  14
+                ],
+                "top": 97.04,
+                "r": 5
+              },
+              {
+                "at": [
+                  -153.6,
+                  24
+                ],
+                "top": 95.24,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -153.6,
+              9.047,
+              112.331
+            ],
+            "z": [
+              0,
+              0.984,
+              -0.177
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "cross-in",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -7,
+                -14.135
+              ],
+              [
+                7,
+                -14.135
+              ],
+              [
+                7,
+                -4.135
+              ],
+              [
+                4.5,
+                -4.135
+              ],
+              [
+                0,
+                -8.635
+              ],
+              [
+                -4.5,
+                -4.135
+              ],
+              [
+                -7,
+                -4.135
+              ]
+            ],
+            "thickness": 37.942,
+            "place": 0,
+            "posts": [
+              {
+                "at": [
+                  0,
+                  18
+                ],
+                "top": 61.59,
+                "r": 5
+              },
+              {
+                "at": [
+                  0,
+                  40
+                ],
+                "top": 65.55,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              9.055,
+              74.38
+            ],
+            "z": [
+              0,
+              0.984,
+              0.177
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "ball0",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              70
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball1"
+        },
+        {
+          "id": "ball1",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -38.4,
+              0,
+              81.2
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball2"
+        },
+        {
+          "id": "ball2",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -76.8,
+              0,
+              92.4
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball3"
+        },
+        {
+          "id": "ball3",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -115.19999999999999,
+              0,
+              103.6
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball4"
+        },
+        {
+          "id": "ball4",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball5"
+        },
+        {
+          "id": "ball5",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -63.597099581761086,
+              40,
+              91.78464387924643
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball6"
+        },
+        {
+          "id": "ball6",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -51.197824686320814,
+              40,
+              90.20098290943483
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball7"
+        },
+        {
+          "id": "ball7",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -38.79854979088054,
+              40,
+              88.61732193962321
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball8"
+        },
+        {
+          "id": "ball8",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -26.39927489544027,
+              40,
+              87.0336609698116
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball9"
+        },
+        {
+          "id": "ball9",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              -14,
+              40,
+              85.45
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball10"
+        },
+        {
+          "id": "ball10",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              40,
+              79.95
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball11"
+        },
+        {
+          "id": "ball11",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              25,
+              77.25
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball12"
+        },
+        {
+          "id": "ball12",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              12.5,
+              75
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "next": "ball0"
+        },
+        {
+          "id": "seats",
+          "role": "frame",
+          "construction": true,
+          "shape": {
+            "type": "plate",
+            "rect": [
+              10,
+              10
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "tracks",
+          "role": "frame",
+          "construction": true,
+          "fixed": true,
+          "shape": {
+            "type": "plate",
+            "rect": [
+              10,
+              10
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank1",
+          "at": [
+            -49.2,
+            0,
+            37.6
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "side": -1
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank2",
+          "at": [
+            -129.2,
+            0,
+            37.6
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "side": -1
+        },
+        {
+          "id": "A1",
+          "type": "revolute",
+          "a": "crank1",
+          "b": "beam",
+          "at": [
+            -30,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "A2",
+          "type": "revolute",
+          "a": "crank2",
+          "b": "beam",
+          "at": [
+            -110,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ]
+        },
+        {
+          "id": "D1",
+          "type": "revolute",
+          "a": "seats",
+          "b": "beam",
+          "at": [
+            -30,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "note": "the seats' datum rides the beam"
+        },
+        {
+          "id": "D2",
+          "type": "revolute",
+          "a": "seats",
+          "b": "beam",
+          "at": [
+            -110,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "note": "the seats' datum rides the beam"
+        },
+        {
+          "id": "b0a",
+          "type": "pin-in-slot",
+          "a": "ball0",
+          "b": "seats",
+          "at": [
+            0,
+            0,
+            70
+          ],
+          "slot": {
+            "from": [
+              0,
+              10,
+              70
+            ],
+            "to": [
+              0,
+              -10,
+              70
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 0 in its seat on the beam"
+        },
+        {
+          "id": "b0b",
+          "type": "pin-in-slot",
+          "a": "ball0",
+          "b": "tracks",
+          "at": [
+            0,
+            0,
+            70
+          ],
+          "slot": {
+            "from": [
+              -38.4,
+              10,
+              81.2
+            ],
+            "to": [
+              -38.4,
+              -10,
+              81.2
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 180,
+            "hi": 359.5
+          },
+          "note": "ball 0 in its notch at S1"
+        },
+        {
+          "id": "b1a",
+          "type": "pin-in-slot",
+          "a": "ball1",
+          "b": "seats",
+          "at": [
+            -38.4,
+            0,
+            81.2
+          ],
+          "slot": {
+            "from": [
+              -38.4,
+              10,
+              81.2
+            ],
+            "to": [
+              -38.4,
+              -10,
+              81.2
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 1 in its seat on the beam"
+        },
+        {
+          "id": "b1b",
+          "type": "pin-in-slot",
+          "a": "ball1",
+          "b": "tracks",
+          "at": [
+            -38.4,
+            0,
+            81.2
+          ],
+          "slot": {
+            "from": [
+              -76.8,
+              10,
+              92.4
+            ],
+            "to": [
+              -76.8,
+              -10,
+              92.4
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 180,
+            "hi": 359.5
+          },
+          "note": "ball 1 in its notch at S2"
+        },
+        {
+          "id": "b2a",
+          "type": "pin-in-slot",
+          "a": "ball2",
+          "b": "seats",
+          "at": [
+            -76.8,
+            0,
+            92.4
+          ],
+          "slot": {
+            "from": [
+              -76.8,
+              10,
+              92.4
+            ],
+            "to": [
+              -76.8,
+              -10,
+              92.4
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 2 in its seat on the beam"
+        },
+        {
+          "id": "b2b",
+          "type": "pin-in-slot",
+          "a": "ball2",
+          "b": "tracks",
+          "at": [
+            -76.8,
+            0,
+            92.4
+          ],
+          "slot": {
+            "from": [
+              -115.2,
+              10,
+              103.6
+            ],
+            "to": [
+              -115.2,
+              -10,
+              103.6
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 180,
+            "hi": 359.5
+          },
+          "note": "ball 2 in its notch at S3"
+        },
+        {
+          "id": "b3a",
+          "type": "pin-in-slot",
+          "a": "ball3",
+          "b": "seats",
+          "at": [
+            -115.19999999999999,
+            0,
+            103.6
+          ],
+          "slot": {
+            "from": [
+              -115.2,
+              10,
+              103.6
+            ],
+            "to": [
+              -115.2,
+              -10,
+              103.6
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 3 in its seat on the beam"
+        },
+        {
+          "id": "b3b",
+          "type": "pin-in-slot",
+          "a": "ball3",
+          "b": "tracks",
+          "at": [
+            -115.19999999999999,
+            0,
+            103.6
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              12,
+              111.80000000000001
+            ],
+            "to": [
+              -153.6,
+              26,
+              109.28000000000002
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 210,
+            "hi": 300
+          },
+          "note": "ball 3 on its track C1 to C2"
+        },
+        {
+          "id": "b3c",
+          "type": "pin-in-slot",
+          "a": "ball3",
+          "b": "tracks",
+          "at": [
+            -115.19999999999999,
+            0,
+            103.6
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "to": [
+              -14,
+              40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 350,
+            "hi": 359.5
+          },
+          "note": "ball 3 on its track F to Q4"
+        },
+        {
+          "id": "b4a",
+          "type": "pin-in-slot",
+          "a": "ball4",
+          "b": "tracks",
+          "at": [
+            -153.6,
+            40,
+            103.28000000000002
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "to": [
+              -14,
+              40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 4 on its track F to Q4"
+        },
+        {
+          "id": "b5a",
+          "type": "pin-in-slot",
+          "a": "ball5",
+          "b": "tracks",
+          "at": [
+            -63.597099581761086,
+            40,
+            91.78464387924643
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "to": [
+              -14,
+              40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 5 on its track F to Q4"
+        },
+        {
+          "id": "b6a",
+          "type": "pin-in-slot",
+          "a": "ball6",
+          "b": "tracks",
+          "at": [
+            -51.197824686320814,
+            40,
+            90.20098290943483
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "to": [
+              -14,
+              40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 6 on its track F to Q4"
+        },
+        {
+          "id": "b7a",
+          "type": "pin-in-slot",
+          "a": "ball7",
+          "b": "tracks",
+          "at": [
+            -38.79854979088054,
+            40,
+            88.61732193962321
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "to": [
+              -14,
+              40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 7 on its track F to Q4"
+        },
+        {
+          "id": "b8a",
+          "type": "pin-in-slot",
+          "a": "ball8",
+          "b": "tracks",
+          "at": [
+            -26.39927489544027,
+            40,
+            87.0336609698116
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "to": [
+              -14,
+              40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 8 on its track F to Q4"
+        },
+        {
+          "id": "b9a",
+          "type": "pin-in-slot",
+          "a": "ball9",
+          "b": "tracks",
+          "at": [
+            -14,
+            40,
+            85.45
+          ],
+          "slot": {
+            "from": [
+              -153.6,
+              40,
+              103.28000000000002
+            ],
+            "to": [
+              -14,
+              40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 280
+          },
+          "note": "ball 9 on its track F to Q4"
+        },
+        {
+          "id": "b9b",
+          "type": "pin-in-slot",
+          "a": "ball9",
+          "b": "tracks",
+          "at": [
+            -14,
+            40,
+            85.45
+          ],
+          "slot": {
+            "from": [
+              0,
+              40,
+              79.95
+            ],
+            "to": [
+              0,
+              12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 330,
+            "hi": 359.5
+          },
+          "note": "ball 9 on its track Q3 to Q1"
+        },
+        {
+          "id": "b10a",
+          "type": "pin-in-slot",
+          "a": "ball10",
+          "b": "tracks",
+          "at": [
+            0,
+            40,
+            79.95
+          ],
+          "slot": {
+            "from": [
+              0,
+              40,
+              79.95
+            ],
+            "to": [
+              0,
+              12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 10 on its track Q3 to Q1"
+        },
+        {
+          "id": "b11a",
+          "type": "pin-in-slot",
+          "a": "ball11",
+          "b": "tracks",
+          "at": [
+            0,
+            25,
+            77.25
+          ],
+          "slot": {
+            "from": [
+              0,
+              40,
+              79.95
+            ],
+            "to": [
+              0,
+              12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 11 on its track Q3 to Q1"
+        },
+        {
+          "id": "b12a",
+          "type": "pin-in-slot",
+          "a": "ball12",
+          "b": "tracks",
+          "at": [
+            0,
+            12.5,
+            75
+          ],
+          "slot": {
+            "from": [
+              0,
+              40,
+              79.95
+            ],
+            "to": [
+              0,
+              12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 250
+          },
+          "note": "ball 12 on its track Q3 to Q1"
+        },
+        {
+          "id": "b12b",
+          "type": "pin-in-slot",
+          "a": "ball12",
+          "b": "tracks",
+          "at": [
+            0,
+            12.5,
+            75
+          ],
+          "slot": {
+            "from": [
+              0,
+              10,
+              70
+            ],
+            "to": [
+              0,
+              -10,
+              70
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 330,
+            "hi": 359.5
+          },
+          "note": "ball 12 in its notch at S0"
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 20,
+          "unit": "mm",
+          "min": 20,
+          "max": 20,
+          "note": "crank radius, both cranks"
+        },
+        {
+          "id": "pitch",
+          "value": 38.4,
+          "unit": "mm",
+          "min": 38.4,
+          "max": 38.4,
+          "note": "station pitch along x: 2 r cos a"
+        },
+        {
+          "id": "rise",
+          "value": 11.2,
+          "unit": "mm",
+          "min": 11.2,
+          "max": 11.2,
+          "note": "rise per station: 2 r sin a, sin a = 0.28"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "parallel-cranks",
+          "id": "cranks",
+          "joints": [
+            "O2",
+            "A1",
+            "A2"
+          ],
+          "in": {
+            "input": "input",
+            "discs": [
+              {
+                "body": "crank1",
+                "center": "O1",
+                "axis": [
+                  0,
+                  -1,
+                  0
+                ]
+              },
+              {
+                "body": "crank2",
+                "center": "O2",
+                "axis": [
+                  0,
+                  -1,
+                  0
+                ]
+              }
+            ],
+            "links": [
+              {
+                "body": "beam",
+                "pin": "A1",
+                "disc": "crank1"
+              }
+            ]
+          },
+          "out": {
+            "turn": "crank-turn"
+          }
+        },
+        {
+          "block": "walking-beam",
+          "id": "transfer",
+          "joints": [
+            "D1",
+            "D2",
+            "b0a",
+            "b0b",
+            "b1a",
+            "b1b",
+            "b2a",
+            "b2b",
+            "b3a",
+            "b3b",
+            "b3c",
+            "b4a",
+            "b5a",
+            "b6a",
+            "b7a",
+            "b8a",
+            "b9a",
+            "b9b",
+            "b10a",
+            "b11a",
+            "b12a",
+            "b12b"
+          ],
+          "in": {
+            "input": "input",
+            "crank": {
+              "center": "O1",
+              "pin": "A1",
+              "axis": [
+                0,
+                -1,
+                0
+              ]
+            },
+            "beam": "beam",
+            "datum": "seats",
+            "parts": [
+              "ball0",
+              "ball1",
+              "ball2",
+              "ball3",
+              "ball4",
+              "ball5",
+              "ball6",
+              "ball7",
+              "ball8",
+              "ball9",
+              "ball10",
+              "ball11",
+              "ball12"
+            ],
+            "track": 1,
+            "slots": [
+              {
+                "from": "S0",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "S1",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "S2",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "S3",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  },
+                  {
+                    "to": "C1",
+                    "window": [
+                      180,
+                      210
+                    ]
+                  },
+                  {
+                    "to": "C2",
+                    "window": [
+                      210,
+                      250
+                    ]
+                  },
+                  {
+                    "to": "G",
+                    "window": [
+                      300,
+                      330
+                    ]
+                  },
+                  {
+                    "to": "F",
+                    "window": [
+                      330,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "F",
+                "legs": [
+                  {
+                    "to": "Q8",
+                    "window": [
+                      250,
+                      355
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q8",
+                "legs": [
+                  {
+                    "to": "Q7",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q7",
+                "legs": [
+                  {
+                    "to": "Q6",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q6",
+                "legs": [
+                  {
+                    "to": "Q5",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q5",
+                "legs": [
+                  {
+                    "to": "Q4",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q4",
+                "legs": [
+                  {
+                    "to": "E",
+                    "window": [
+                      240,
+                      280
+                    ]
+                  },
+                  {
+                    "to": "Q3",
+                    "window": [
+                      280,
+                      330
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q3",
+                "legs": [
+                  {
+                    "to": "Q2",
+                    "window": [
+                      200,
+                      345
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q2",
+                "legs": [
+                  {
+                    "to": "Q1",
+                    "window": [
+                      200,
+                      345
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q1",
+                "legs": [
+                  {
+                    "to": "K",
+                    "window": [
+                      190,
+                      250
+                    ]
+                  },
+                  {
+                    "to": "S0",
+                    "window": [
+                      250,
+                      330
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "out": {
+            "advance": "advance",
+            "rise": "step-rise",
+            "carried": "carried"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "S0",
+          "body": "tracks",
+          "local": [
+            0,
+            0,
+            70
+          ]
+        },
+        {
+          "id": "S1",
+          "body": "tracks",
+          "local": [
+            -38.4,
+            0,
+            81.2
+          ]
+        },
+        {
+          "id": "S2",
+          "body": "tracks",
+          "local": [
+            -76.8,
+            0,
+            92.4
+          ]
+        },
+        {
+          "id": "S3",
+          "body": "tracks",
+          "local": [
+            -115.19999999999999,
+            0,
+            103.6
+          ]
+        },
+        {
+          "id": "S4",
+          "body": "tracks",
+          "local": [
+            -153.6,
+            0,
+            114.80000000000001
+          ]
+        },
+        {
+          "id": "C1",
+          "body": "tracks",
+          "local": [
+            -153.6,
+            12,
+            111.80000000000001
+          ]
+        },
+        {
+          "id": "C2",
+          "body": "tracks",
+          "local": [
+            -153.6,
+            26,
+            109.28000000000002
+          ]
+        },
+        {
+          "id": "G",
+          "body": "tracks",
+          "local": [
+            -153.6,
+            38,
+            108.28000000000002
+          ]
+        },
+        {
+          "id": "F",
+          "body": "tracks",
+          "local": [
+            -153.6,
+            40,
+            103.28000000000002
+          ]
+        },
+        {
+          "id": "E",
+          "body": "tracks",
+          "local": [
+            -7.5,
+            40,
+            84.61980659025788
+          ]
+        },
+        {
+          "id": "K",
+          "body": "tracks",
+          "local": [
+            0,
+            6.5,
+            73.92
+          ]
+        },
+        {
+          "id": "Q1",
+          "body": "tracks",
+          "local": [
+            0,
+            12.5,
+            75
+          ]
+        },
+        {
+          "id": "Q2",
+          "body": "tracks",
+          "local": [
+            0,
+            25,
+            77.25
+          ]
+        },
+        {
+          "id": "Q3",
+          "body": "tracks",
+          "local": [
+            0,
+            40,
+            79.95
+          ]
+        },
+        {
+          "id": "Q4",
+          "body": "tracks",
+          "local": [
+            -14,
+            40,
+            85.45
+          ]
+        },
+        {
+          "id": "Q5",
+          "body": "tracks",
+          "local": [
+            -26.39927489544027,
+            40,
+            87.0336609698116
+          ]
+        },
+        {
+          "id": "Q6",
+          "body": "tracks",
+          "local": [
+            -38.79854979088054,
+            40,
+            88.61732193962321
+          ]
+        },
+        {
+          "id": "Q7",
+          "body": "tracks",
+          "local": [
+            -51.197824686320814,
+            40,
+            90.20098290943483
+          ]
+        },
+        {
+          "id": "Q8",
+          "body": "tracks",
+          "local": [
+            -63.597099581761086,
+            40,
+            91.78464387924643
+          ]
+        },
+        {
+          "id": "seat",
+          "body": "beam",
+          "local": [
+            76.8,
+            92.4,
+            0
+          ]
+        },
+        {
+          "id": "pin1",
+          "body": "crank1",
+          "local": [
+            20,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "advance",
+          "of": "advance",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "step-rise",
+          "of": "step-rise",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "beam-x",
+          "of": "seat",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "-x",
+          "datum": 76.8
+        },
+        {
+          "id": "seat-path",
+          "of": "seat",
+          "kind": "path",
+          "unit": "mm"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-27",
+        "note": "T2 review 2026-10-27, six phases drawn from the solved motion at 0, 60, 120, 180, 240 and 300 degrees in VIEW -25 30: keep. Drive: two equal cranks (circular translation) rather than a lift-and-carry drive: one rotary input with the standard motor and belt (section 8), and the beam's whole motion is one closed curve to trace; the flat carry and square hand-over of a lift-and-carry drive are named in the limits. The notch line rises (sin a = 0.28) so the hand-overs lie at the ends of the circle's diameter: the seats meet the notches 16.3 degrees from square, inside the 45 degree flank of the V, so nothing slides, and the beam lifts each ball 11.2 mm per station, the height the gravity return gives back. Closed circuit: the return under the transfer was set aside, since a ball returning under the beam must climb back past the beam's depth and its fall below the rails, more than one seat can lift. The return runs beside the transfer: the out-track rolls the ball from the top notch across onto the return lane, a packed queue rolls down the lane and back across on the in-track, and the front ball rolls into the first notch while the beam is down. Every slot advances one per turn, so after one turn each ball stands where the next one stood (kin.bodies next, K2) and the loop shows no jump. Balls rather than pins: they roll across onto the cross tracks and round the corners, which a pin cannot. Trace: the seat at S2 draws the beam's 40 mm circle with 30 degree ticks; overlays: the notch line, the station (2r) and the crank radius; plot: a ball's advance (a step) against the beam's travel (a sine), the stepwise advance against the continuous motion. Solve checks: advance 38.4 mm and rise 11.2 mm per turn, circle 40 mm, dwell 180 degrees, all within tolerance. The parallelogram's change points fall at the hand-overs: held on the parallel branch as in the parallelogram linkage; a chain or gear tie between the cranks is an open question. Owner's review (#254): the model is turned 180 degrees about the vertical so the walking plate and its cranks face the standard views; it opens at VIEW 32 31, the owner's stage view, and ISOMETRIC and DIMETRIC look at the same side. Sizes, drive, circuit and claims unchanged."
+      },
+      "principle": [
+        {
+          "body": "beam"
+        },
+        {
+          "body": "crank1"
+        },
+        {
+          "body": "crank2"
+        },
+        {
+          "body": "ball0"
+        },
+        {
+          "body": "ball1"
+        },
+        {
+          "body": "ball2"
+        },
+        {
+          "body": "ball3"
+        },
+        {
+          "body": "ball4"
+        },
+        {
+          "body": "ball5"
+        },
+        {
+          "body": "ball6"
+        },
+        {
+          "body": "ball7"
+        },
+        {
+          "body": "ball8"
+        },
+        {
+          "body": "ball9"
+        },
+        {
+          "body": "ball10"
+        },
+        {
+          "body": "ball11"
+        },
+        {
+          "body": "ball12"
+        },
+        {
+          "point": "seat"
+        }
+      ],
+      "traces": [
+        {
+          "id": "seat-circle",
+          "point": "seat",
+          "comet": true,
+          "ticks": {
+            "every": 30
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "notch-line",
+          "kind": "line",
+          "from": "S0",
+          "to": "S4",
+          "label": "NOTCH LINE"
+        },
+        {
+          "id": "pitch",
+          "kind": "dimension",
+          "from": "S1",
+          "to": "S2",
+          "label": "STATION 2r"
+        },
+        {
+          "id": "crank-r",
+          "kind": "dimension",
+          "from": "O1",
+          "to": "A1",
+          "label": "r"
+        }
+      ],
+      "view": "VIEW 32 31",
+      "views": [
+        {
+          "id": "hand-over",
+          "kind": "detail",
+          "center": [
+            -38.4,
+            0,
+            81.2
+          ],
+          "scale": 2.2,
+          "highlight": [
+            "beam",
+            "rail-front"
+          ],
+          "note": "a ball between notch and seat at the hand-over"
+        }
+      ],
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "advance",
+          "label": "BALL ADVANCE"
+        },
+        {
+          "x": "input",
+          "y": "beam-x",
+          "label": "BEAM TRAVEL"
+        }
+      ],
+      "claims": [
+        {
+          "text": "each turn carries every ball one station on, 38.4 mm along",
+          "output": "advance",
+          "stat": "at",
+          "input": 359,
+          "value": 38.4,
+          "tol": 0.01
+        },
+        {
+          "text": "and 11.2 mm up",
+          "output": "step-rise",
+          "stat": "at",
+          "input": 359,
+          "value": 11.2,
+          "tol": 0.01
+        },
+        {
+          "text": "the beam translates round a 40 mm circle",
+          "output": "seat-path",
+          "stat": "range",
+          "value": 40,
+          "tol": 0.05
+        },
+        {
+          "text": "each ball stands still in its notch for half of every turn",
+          "output": "advance",
+          "stat": "dwell",
+          "value": 180,
+          "tol": 1
+        }
+      ],
+      "exceptions": []
+    },
+    "examples": [
+      {
+        "use": "Reheating furnace",
+        "detail": "Slabs and billets are stepped through a walking beam furnace on moving beams that rise between fixed skids."
+      },
+      {
+        "use": "Rolling-mill cooling bed",
+        "detail": "A moving rake lifts the hot bars out of the notches of fixed rakes and sets them down one notch on, so they cool evenly while they cross the bed."
+      },
+      {
+        "use": "Press-line transfer",
+        "detail": "A walking-beam transfer lifts the blanks out of each press die and carries them to the next press in one stroke."
+      },
+      {
+        "use": "Assembly automation",
+        "detail": "Lift-and-carry conveyors move parts station to station and hold each one located in a nest while it is worked."
+      }
+    ],
+    "references": [
+      {
+        "title": "Conveyor system: walking beam (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Conveyor_system",
+        "kind": "wikipedia"
+      },
+      {
+        "title": "US 805,041: Heating-furnace (C. P. Turner, 1905)",
+        "url": "https://patents.google.com/patent/US805041A/en",
+        "kind": "patent"
+      },
+      {
+        "title": "US 2,235,771: Continuous heating furnace (G. R. McDermott, 1941)",
+        "url": "https://patents.google.com/patent/US2235771",
+        "kind": "patent"
+      },
+      {
+        "title": "US 1,441,042: Cooling bed (G. E. Thackray, 1923)",
+        "url": "https://patents.google.com/patent/US1441042",
+        "kind": "patent"
+      },
+      {
+        "title": "Rolling Mill Cooling Bed (IspatGuru)",
+        "url": "https://www.ispatguru.com/rolling-mill-cooling-bed/",
+        "kind": "engineering-guide"
+      }
+    ],
+    "media": [
+      {
+        "title": "Walking Beam Furnace for Slabs (Tenova)",
+        "url": "https://tenova.com/technologies/walking-beam-furnace-slabs",
+        "kind": "photos"
+      },
+      {
+        "title": "Walking Beams (Wirco)",
+        "url": "https://wirco.com/resources/industries/steel-mill/walking-beams",
+        "kind": "photos"
+      },
+      {
+        "title": "The STELRON CWB (Conveyor Walking Beam)",
+        "url": "https://www.youtube.com/watch?v=MLoRV4ApIlM",
+        "kind": "video"
+      },
+      {
+        "title": "Pneumatic walking beam mechanism",
+        "url": "https://www.youtube.com/watch?v=LK-_KQUYHdE",
+        "kind": "video"
+      }
+    ],
+    "real_world": [
+      {
+        "product": "Nine-press walking-beam transfer line",
+        "maker": "Great Lakes Metal Stamping",
+        "use": "A walking-beam transfer lifts the blanks out of each die and carries them on to the next of nine presses in one stroke.",
+        "url": "https://www.youtube.com/watch?v=PxJqQnekJV4"
+      },
+      {
+        "product": "Twin channel automatic rake type cooling bed",
+        "maker": "Newfield",
+        "use": "Moving rakes lift the bars out of the fixed rakes' notches and set them down one notch on across the bed.",
+        "url": "https://www.youtube.com/watch?v=ZtfUE3rM3qo"
+      }
+    ],
+    "related": [
+      "parallelogram-linkage",
+      "locomotive-drive",
+      "double-crank"
+    ]
+  },
+{
+    "record_version": 3,
+    "id": "hobsons-joint",
+    "name": "Hobson's joint",
+    "aka": ["elbow mechanism", "elbow joint", "bent-rod coupling", "gearless right-angle drive", "gearless angle drive", "Hobson coupling", "Hobson's coupler"],
+    "in_site": false,
+    "family": "Coupling",
+    "level": "Intermediate",
+    "summary": "Rods bent at a right angle slide in bores of two discs on shafts at 90°, so the output turns exactly with the input, with no gears.",
+    "motion": {
+      "input": "Rotary",
+      "output": "Rotary",
+      "label": "Rotary → Rotary",
+      "output_character": ["Continuous", "Constant velocity"],
+      "axes": "Perpendicular intersecting",
+      "plane": "Spatial"
+    },
+    "ratio": {
+      "kind": "Unity",
+      "class": "1:1",
+      "typical": "1:1 exactly at every instant, round the fixed angle the rods are bent to (90° here)"
+    },
+    "dof": 1,
+    "topology": {
+      "links": 6,
+      "revolute": 2,
+      "prismatic": 0,
+      "higher_pairs": 0,
+      "notes": "ground, input and output discs on their revolutes, three bent rods each held by two cylindrical joints (one leg in a bore of each disc); counted mobility -4: the joint is overconstrained, since the count does not see that every leg is held parallel to its shaft and that all the bores lie on one radius; it moves with 1 degree of freedom"
+    },
+    "backdrivable": "Yes",
+    "tags": {
+      "function": ["Shaft coupling"],
+      "property": ["Exact", "Positive drive", "Few parts", "Backdrivable"],
+      "application": ["Consumer products", "Steam & engines", "Education"],
+      "keywords": ["Hobson", "elbow engine", "bent rods", "bent pins", "gearless", "right angle", "constant velocity", "angle drive"]
+    },
+    "explain": {
+      "motion": "Each shaft ends in a disc with three bores on a 22 mm circle, the same in both. Three rods bent at 90° pass through the bores, one leg in each disc, each leg parallel to its own shaft. A leg can only slide and turn in its bore, so a rod never turns: it is carried round, its corner keeping to the plane that bisects the right angle, and the two discs are held at the same angle. The output turns at exactly the input's speed at every instant, and each leg slides 44 mm out and back in its bore on every turn.",
+      "forces": "Torque passes as the push of each leg on the side of its bore, 22 mm from each axis, and the rods carry it round the corner in bending. The legs slide in their bores while they carry the load, so the sliding friction is the joint's loss.",
+      "benefits": "Constant velocity round a right angle with no gears and no cross: two drilled discs and a few bent rods, and it drives either way.",
+      "limits": "The shaft angle is fixed by the bend of the rods and cannot change. The legs slide under load, so the joint binds when the bores are not true, wears in its bores and suits low speeds and light torque. One rod, or two set opposite each other, would not do: twice a turn it can carry the output on backwards, so three or more are spaced round the circle."
+    },
+    "build": {
+      "ground": "base with two pillow blocks under each shaft, the shafts level and at a right angle, their axes meeting at J",
+      "defining_relations": "Bores on one radius r = 22 mm in both discs; rods bent to the shafts' angle beta = 90°. A rod's corner B lies on its input bore line and r from the output axis. With B - J = x a1 + q (q square to the input axis a1), x = (q · a2) / (1 - cos beta) on the assembled root, so at 90° x = q · a2: the corners keep to the plane through J that bisects the right angle, and output angle = input angle exactly. Each leg slides r cos(theta) from mid-stroke, a stroke of 2r = 44 mm per turn. The other root, x = -(q · a2) / (1 + cos beta), turns the output the other way; it meets the assembled one where q · a2 = 0 (the rod's bores straight above or below the shafts), twice a turn for each rod. Rods at 0°, 120° and 240° reach those points one at a time, so the other two hold the output on its root.",
+      "notes": "Shafts level at 55 mm, the input along x and the output along y, their axes meeting at J; discs Ø64 x 12 with their front faces 56 mm from J; rods Ø6 with 94 mm legs and a 6 mm bend radius, the bores through, so each leg's end comes out behind its disc as it slides. The rod count is a design choice: three is the fewest rods spaced evenly round the circle that keep the output on its root through every point (two set opposite reach their switch points together). The reference has rod 1 in the plane of the shafts, its corner at the outer end of its stroke."
+    },
+    "kin": {
+      "bodies": [
+        { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [235, 235], "thickness": 8 }, "at": { "frame": { "origin": [-82, -82, -4] } } },
+        {
+          "id": "disc-in", "role": "driver", "accent": true,
+          "shape": { "type": "disc", "radius": 32, "thickness": 12, "place": 12, "holes": [[22, 0, 5], [-11, 19.0526, 5], [-11, -19.0526, 5]], "indexMark": { "at": [14, 24.2487] } },
+          "at": { "joint": "B1" },
+          "frame": { "o": [-80, 0, "H"], "z": [1, 0, 0], "x": [0, 1, 0] }
+        },
+        {
+          "id": "disc-out", "role": "output",
+          "shape": { "type": "disc", "radius": 32, "thickness": 12, "place": 12, "holes": [[0, 22, 5], [19.0526, -11, 5], [-19.0526, -11, 5]], "indexMark": { "at": [24.2487, 14] } },
+          "at": { "joint": "B2" },
+          "frame": { "o": [0, -80, "H"], "z": [0, 1, 0], "x": [0, 0, 1] }
+        },
+        { "id": "rod-1", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [94, 94], "bend": 6 }, "frame": { "o": ["r*cos(0)", "r*cos(0)", "H+r*sin(0)"], "z": [0.707107, 0.707107, 0], "x": [0, 0, 1] } },
+        { "id": "rod-2", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [94, 94], "bend": 6 }, "frame": { "o": ["r*cos(120)", "r*cos(120)", "H+r*sin(120)"], "z": [0.707107, 0.707107, 0], "x": [0, 0, 1] } },
+        { "id": "rod-3", "role": "link", "shape": { "type": "elbow", "diameter": 6, "legs": [94, 94], "bend": 6 }, "frame": { "o": ["r*cos(240)", "r*cos(240)", "H+r*sin(240)"], "z": [0.707107, 0.707107, 0], "x": [0, 0, 1] } }
+      ],
+      "joints": [
+        { "id": "B1", "type": "revolute", "a": "ground", "b": "disc-in", "at": [-80, 0, "H"], "axis": [1, 0, 0], "side": -1, "note": "the input shaft, along x toward J; both pillow blocks behind the disc, since the rods sweep past its front face" },
+        { "id": "B2", "type": "revolute", "a": "ground", "b": "disc-out", "at": [0, -80, "H"], "axis": [0, -1, 0], "side": -1, "note": "the output shaft, along y; its axis points away from J, the sense the output turns in with the input; both pillow blocks behind the disc" },
+        { "id": "R1-in", "type": "cylindrical", "a": "disc-in", "b": "rod-1", "at": [-62, "r*cos(0)", "H+r*sin(0)"], "axis": [1, 0, 0], "note": "rod 1's first leg in its bore of the input disc: it slides and turns there" },
+        { "id": "R1-out", "type": "cylindrical", "a": "disc-out", "b": "rod-1", "at": ["r*cos(0)", -62, "H+r*sin(0)"], "axis": [0, 1, 0], "note": "rod 1's second leg in its bore of the output disc" },
+        { "id": "R2-in", "type": "cylindrical", "a": "disc-in", "b": "rod-2", "at": [-62, "r*cos(120)", "H+r*sin(120)"], "axis": [1, 0, 0] },
+        { "id": "R2-out", "type": "cylindrical", "a": "disc-out", "b": "rod-2", "at": ["r*cos(120)", -62, "H+r*sin(120)"], "axis": [0, 1, 0] },
+        { "id": "R3-in", "type": "cylindrical", "a": "disc-in", "b": "rod-3", "at": [-62, "r*cos(240)", "H+r*sin(240)"], "axis": [1, 0, 0] },
+        { "id": "R3-out", "type": "cylindrical", "a": "disc-out", "b": "rod-3", "at": ["r*cos(240)", -62, "H+r*sin(240)"], "axis": [0, 1, 0] }
+      ],
+      "params": [
+        { "id": "r", "value": 22, "unit": "mm", "min": 22, "max": 22, "note": "radius of the bore circle, the same in both discs" },
+        { "id": "H", "value": 55, "unit": "mm", "min": 55, "max": 55, "note": "height of the shafts' axes above the base" }
+      ],
+      "design": [],
+      "drivers": [{ "id": "input", "joint": "B1", "kind": "rotary", "range": [0, 360], "default": 0 }],
+      "solve": [
+        {
+          "block": "elbow-rods", "id": "rods",
+          "joints": ["B2", "R1-in", "R1-out", "R2-in", "R2-out", "R3-in", "R3-out"],
+          "in": {
+            "input": "input",
+            "joints": { "in": "B1", "out": "B2" },
+            "rods": [
+              { "body": "rod-1", "joints": { "in": "R1-in", "out": "R1-out" } },
+              { "body": "rod-2", "joints": { "in": "R2-in", "out": "R2-out" } },
+              { "body": "rod-3", "joints": { "in": "R3-in", "out": "R3-out" } }
+            ]
+          },
+          "out": { "turn": "out-turn", "slideIn": "leg-in-slide", "slideOut": "leg-out-slide" },
+          "opts": { "relation": "each rod's corner on its input bore line turned with the input, r from the output axis, on the assembled root x = q · a2; the rods translate, and the output turns by the input's angle" }
+        }
+      ],
+      "points": [
+        { "id": "joint-centre", "body": "ground", "local": [0, 0, "H"] },
+        { "id": "plane-a", "body": "ground", "local": [-34, -34, "H"] },
+        { "id": "plane-b", "body": "ground", "local": [34, 34, "H"] },
+        { "id": "corner-1", "body": "rod-1", "local": [0, 0, 0] },
+        { "id": "leg-in-1", "body": "rod-1", "local": [0, -16.9706, -16.9706] },
+        { "id": "leg-out-1", "body": "rod-1", "local": [0, 16.9706, -16.9706] },
+        { "id": "in-mark", "body": "disc-in", "local": [14, 24.2487, 24] },
+        { "id": "out-mark", "body": "disc-out", "local": [24.2487, 14, 24] },
+        { "id": "in-ext", "body": "disc-in", "local": [0, 0, 40] },
+        { "id": "out-ext", "body": "disc-out", "local": [0, 0, 40] },
+        { "id": "bore-1", "body": "disc-in", "local": [22, 0, 24] },
+        { "id": "face-centre", "body": "disc-in", "local": [0, 0, 24] }
+      ],
+      "outputs": [
+        { "id": "input-angle", "of": "disc-in", "kind": "angle", "unit": "deg" },
+        { "id": "output-angle", "of": "disc-out", "kind": "angle", "unit": "deg" },
+        { "id": "speed-ratio", "of": "disc-out", "kind": "speed-ratio" },
+        { "id": "angle-error", "of": "disc-out", "kind": "angle", "unit": "deg", "minus": "input-angle" },
+        { "id": "leg-in-slide", "of": "leg-in-slide", "kind": "position", "unit": "mm", "note": "rod 1's first leg along its bore in the input disc, from the reference" },
+        { "id": "leg-out-slide", "of": "leg-out-slide", "kind": "position", "unit": "mm", "note": "rod 1's second leg along its bore in the output disc, from the reference" },
+        { "id": "bend-angle", "of": "corner-1", "kind": "angle", "unit": "deg", "from": "leg-in-1", "to": "leg-out-1", "note": "the angle rod 1 is bent to" },
+        { "id": "shaft-angle", "of": "joint-centre", "kind": "angle", "unit": "deg", "from": "in-ext", "to": "out-ext", "note": "the angle between the shafts" },
+        { "id": "bore-radius", "of": "bore-1", "kind": "position", "unit": "mm", "relativeTo": "face-centre", "note": "rod 1's bore from the input axis" }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": { "verdict": "keep", "date": "2026-10-27", "note": "New record, reviewed against its kinematics before the build (#256). Six phases of the solved cycle (input 0, 60, 120, 180, 240, 300): rod 1's corner runs (22, 22, 0), (11, 11, 19), (-11, -11, 19), (-22, -22, 0), (-11, -11, -19), (11, 11, -19) from J, an ellipse in the plane x = y that bisects the right angle; the rods never turn; each leg slides 44 mm in its bore, the corner farthest from both discs at 0 and nearest at 180, both legs of a rod together; speed ratio 1 within 1e-4, output minus input 0, K1 residual 1e-14. Branch: the other root of a rod's corner (x = -q · a2) turns the output the other way and meets the assembled root where the rod's bores stand straight above or below the shafts (input 90 and 270 for rod 1); solved for all three rods, the other root gives each rod a different output turn, so it cannot be taken while the other two hold the output, and the rods reach their switch points one at a time, 60 degrees apart. Two rods set opposite would reach theirs together and could not hold it, so three rods at 120 degrees. Decided: bores on a 22 mm circle in Ø64 discs 36 mm from J, a stroke large enough to see against the disc; the reference with rod 1 in the plane of the shafts, so the section in that plane cuts both its legs along their bores. What must be seen: equal angles on both shafts, by a mark on each disc's face at the same angle traced with ticks every 30 degrees (the same twelve ticks on both); rod 1's corner traced with the comet; the corners' plane as a line; the leg stroke as a dimension between its posed ends; why the angle is fixed, by the shaft angle arc beside the rod's bend arc, both 90 degrees. Both discs see-through on purpose (teaching.seeThrough) so the legs show in their bores. Default view VIEW 135 30. Controls: the input only; the shaft angle is fixed by the bend of the rods, so it is not offered. Looked at again on the finished build (record view, PLAN, SIDE, the 28° view, the section and the explode, both sheets): keep. The view from the outside corner of the right angle replaced ISOMETRIC, where the output disc stood in front of the rods' corners; there both discs face the viewer at 45° with their arrows and ticks side by side and the three bends in front; the corner's trace lies edge-on in it (its plane holds the line of sight) and reads in SIDE and the 28° view. The discs moved from 36 to 56 mm from J, so they come off their shaft ends in the explode without meeting and more of each sliding leg shows between disc and corner; a raised index arrow on each disc at the same angle." },
+      "principle": [{ "body": "disc-in" }, { "body": "disc-out" }, { "body": "rod-1" }, { "body": "rod-2" }, { "body": "rod-3" }, { "point": "corner-1" }],
+      "traces": [
+        { "id": "corner", "point": "corner-1", "ticks": { "every": 30 }, "comet": true },
+        { "id": "input-mark", "point": "in-mark", "ticks": { "every": 30 } },
+        { "id": "output-mark", "point": "out-mark", "ticks": { "every": 30 } }
+      ],
+      "overlays": [
+        { "id": "input-axis", "kind": "axis-line", "at": "B1", "label": "INPUT AXIS" },
+        { "id": "output-axis", "kind": "axis-line", "at": "B2", "label": "OUTPUT AXIS" },
+        { "id": "shaft-angle", "kind": "arc", "center": "joint-centre", "from": "in-ext", "to": "out-ext", "label": "SHAFT ANGLE 90°" },
+        { "id": "bend", "kind": "arc", "center": "corner-1", "from": "leg-in-1", "to": "leg-out-1", "label": "ROD BENT 90°" },
+        { "id": "corner-plane", "kind": "line", "from": "plane-a", "to": "plane-b", "label": "PLANE OF THE CORNERS" },
+        { "id": "leg-stroke", "kind": "dimension", "from": "corner-1", "to": "corner-1", "fromPose": { "output": "leg-in-slide", "stat": "min" }, "toPose": { "output": "leg-in-slide", "stat": "max" }, "component": "x", "label": "LEG SLIDE 2r PER TURN" }
+      ],
+      "view": "VIEW 135 30",
+      "seeThrough": ["disc-in", "disc-out"],
+      "views": [
+        { "id": "plane-of-shafts", "kind": "section", "plane": { "origin": [0, 0, 55], "normal": [0, 0, 1] }, "highlight": ["rod-1"], "note": "the plane of the two shafts; at the reference rod 1 lies in it, both legs cut along their bores" }
+      ],
+      "controls": [{ "id": "input", "kind": "driver", "driver": "input" }],
+      "plot": [
+        { "x": "input", "y": "speed-ratio", "label": "OUTPUT SPEED RATIO" },
+        { "x": "input", "y": "leg-in-slide", "label": "ROD 1: LEG SLIDE IN ITS BORE" }
+      ],
+      "claims": [
+        { "text": "the output turns at exactly the input's speed at every instant", "output": "speed-ratio", "stat": "min", "value": 1, "tol": 0.0001 },
+        { "text": "the output turns at exactly the input's speed at every instant", "output": "speed-ratio", "stat": "max", "value": 1, "tol": 0.0001 },
+        { "text": "the two discs are held at the same angle", "output": "angle-error", "stat": "max", "value": 0, "tol": 0.001 },
+        { "text": "the two discs are held at the same angle", "output": "angle-error", "stat": "min", "value": 0, "tol": 0.001 },
+        { "text": "each leg slides 44 mm out and back in its bore on every turn", "output": "leg-in-slide", "stat": "range", "value": 44, "tol": 0.01 },
+        { "text": "each leg slides 44 mm out and back in its bore on every turn", "output": "leg-out-slide", "stat": "range", "value": 44, "tol": 0.01 },
+        { "text": "three bores on a 22 mm circle", "output": "bore-radius", "stat": "mean", "value": 22, "tol": 0.01 },
+        { "text": "rods bent at 90°", "output": "bend-angle", "stat": "mean", "value": 90, "tol": 0.01 },
+        { "text": "two shafts at 90°", "output": "shaft-angle", "stat": "mean", "value": 90, "tol": 0.01 }
+      ],
+      "exceptions": []
+    },
+    "examples": [
+      { "use": "Gearless right-angle socket adapter", "detail": "A hand-tool adapter turns a socket at 90° to the wrench through bent bars sliding in bores of two heads." },
+      { "use": "Elbow engine", "detail": "Model engines use the bent rods as pistons, sliding in cylinders bored in two blocks at 90° that turn together." },
+      { "use": "Teaching and display models", "detail": "Large models with six rods show constant-velocity drive round a corner without gears." }
+    ],
+    "references": [
+      { "title": "Hobson's joint, Wikipedia", "url": "https://en.wikipedia.org/wiki/Hobson%27s_joint", "kind": "wikipedia" },
+      { "title": "Elbow engine, Wikipedia", "url": "https://en.wikipedia.org/wiki/Elbow_engine", "kind": "wikipedia" },
+      { "title": "US patent 5967004, Angular drive adapter for sockets and the like (bent bars sliding in bores of two heads)", "url": "https://patents.google.com/patent/US5967004", "kind": "patent" },
+      { "title": "DE patent 271663, a driver coupling for shafts at an angle with bent pins sliding in bored heads (1911)", "url": "https://patents.google.com/patent/DE271663C/en", "kind": "patent" }
+    ],
+    "media": [
+      { "title": "#008 Hobson's Joint, Mechanical Library (photos, video and animation of a six-rod model)", "url": "https://mechanical-library.org/hobsons-joint.html", "kind": "photos" },
+      { "title": "Cal-Van Tools 483 90 Degree Gearless Angle Drive, JB Tools", "url": "https://www.jbtools.com/cal-van-tools-483-90-degree-gearless-angle-drive/", "kind": "photos" },
+      { "title": "Weird tool basics: Socket Angle Adapter (a.k.a. Gearless Angle Drive), Just Tool Basics (YouTube)", "url": "https://www.youtube.com/watch?v=o6h3QRNA0zE", "kind": "video" },
+      { "title": "Lego Hobson Coupling (YouTube)", "url": "https://www.youtube.com/watch?v=pVldn35XuXo", "kind": "video" }
+    ],
+    "real_world": [
+      { "product": "Cal-Van Tools gearless 90 degree 3/8 in. socket adapter", "maker": "Cal-Van Tools", "use": "Bent rods sliding in two bored heads turn the socket at a right angle to the wrench, at the wrench's own speed.", "url": "https://www.youtube.com/watch?v=QIte5al8_AY" }
+    ],
+    "related": ["universal-joint", "rzeppa-cv-joint", "bevel-gears", "oldham-coupling", "double-cardan"]
+  },
+{
+    "record_version": 3,
+    "id": "wobble-box",
+    "name": "Wobble box",
+    "aka": ["wobble drive", "wobble shaft drive", "knife drive gearbox", "oblique crank", "spherical crank-rocker"],
+    "in_site": false,
+    "family": "Spatial linkage",
+    "level": "Intermediate",
+    "summary": "A turning shaft with an inclined journal nods a trunnioned ring, which rocks an output shaft at right angles to and fro through the journal's angle.",
+    "motion": {
+      "input": "Rotary",
+      "output": "Oscillating",
+      "label": "Rotary → Oscillating",
+      "output_character": ["Reciprocating", "Harmonic"],
+      "axes": "Perpendicular intersecting",
+      "plane": "Spatial"
+    },
+    "ratio": {
+      "kind": "Stroke",
+      "class": "n/a",
+      "typical": "output swing ±α, the journal's angle to the shaft (±20° here); arm stroke 2 L sin α"
+    },
+    "dof": 1,
+    "topology": {
+      "links": 4,
+      "revolute": 4,
+      "prismatic": 0,
+      "higher_pairs": 0,
+      "notes": "ground, input hub with its inclined journal (one piece), the trunnion ring, the output shaft with its yoke; a spherical four-bar, the four revolute axes (input shaft, journal, trunnions, output shaft) meeting at one centre. The kin block keeps the arm keyed on the output as a body of its own (posed with it). Kutzbach counts -1 because it ignores that the four axes are concurrent; the true mobility is 1, solved in closed form by the spherical-four-bar block. The loop is overconstrained in the count, as a universal joint is."
+    },
+    "backdrivable": "Partly",
+    "tags": {
+      "function": ["Motion conversion"],
+      "property": ["Exact", "Compact", "Smooth (harmonic)", "High load"],
+      "application": ["Agriculture"],
+      "keywords": ["wobble shaft", "inclined journal", "trunnion", "yoke", "spherical four-bar", "oblique crank", "sickle drive", "Reuleaux"]
+    },
+    "explain": {
+      "motion": "The input shaft carries a journal set at a small angle α to its axis, and a ring turns on the journal on a bearing. Trunnion pins on the ring, square to the journal, sit in a yoke on an output shaft that stands square to the input. All four axes meet at one centre, so the ring cannot turn with the shaft: it nods, and the yoke rocks the output to and fro through exactly ±α while the input turns on. The swing follows ψ = atan(tan α sin θ), close to a sine, and an arm on the output turns it into a stroke of 2 L sin α.",
+      "forces": "The input torque reaches the output as a pair of forces on the trunnions, carried by the ring's bearings on the journal. The output moves fastest, at tan α times the input speed, as it passes mid-swing, and its reaction then twists the journal hardest; at the ends of the swing it stands still and a load on the arm cannot turn the input.",
+      "benefits": "It turns a fast shaft into a strong, smooth, nearly sinusoidal rocking in a compact sealed unit, with only turning bearings and no sliding guides.",
+      "limits": "The swing is fixed by the journal's angle, so changing the stroke means a new journal. The axes must meet at one point: a machining or shimming error loads the bearings and wears them quickly, and the rocking mass shakes the frame at high speed."
+    },
+    "build": {
+      "ground": "base plate with the input shaft's two pillow blocks on its drive side and the output shaft's two, the two axes square and meeting at the centre",
+      "defining_relations": "spherical four-bar with input link α (journal to shaft), coupler 90° (journal to trunnions), output link 90° (trunnions to output shaft), ground 90° (input to output); output angle ψ = atan(tan α sin θ), θ from the pose where the journal leans in the plane of the two shafts (equivalently ψ = atan(tan α cos θ) counted from the pose square to it); amplitude exactly α; output speed ratio dψ/dθ = tan α cos θ / (1 + tan²α sin²θ), at most tan α; arm stroke 2 L sin α",
+      "notes": "Input 360° continuous; the output rocks ±20° at α = 20° and a 60 mm arm sweeps a chord of 41.0 mm. Every axis must pass through the centre. The journal is machined on the input hub at α, one piece; the ring's double-row bearing on it takes the trunnion loads; the trunnions turn in needle cups in the yoke's arms. At θ = 0 the journal leans in the plane of the two shafts, the trunnions stand upright and the yoke and arm are at mid-swing."
+    },
+    "kin": {
+      "bodies": [
+        { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [300, 230], "thickness": 8 }, "at": { "frame": { "origin": [-20, 45, -4] } } },
+        { "id": "input", "role": "driver", "accent": true, "shape": { "type": "shaft", "diameter": 22, "length": 80, "place": 30, "journal": { "joint": "J", "diameter": 20, "seat": [-5, 5], "shoulder": 24, "boss": [30, -20, -9], "bore": 10 } }, "at": { "joint": "S1" }, "note": "the wobble hub: one piece turned on the journal's axis at alpha (a boss keyed on the input shaft, the shoulder step the bearing's inner race stands on, the journal), bored obliquely for the shaft, which runs on to a pillow block each side" },
+        { "id": "ring", "role": "link", "shape": { "type": "wobble-ring", "outer": 40, "width": 14, "bore": 32, "trunnion": 10, "pad": 14 },
+          "at": { "joint": "J" },
+          "frame": { "o": [0, 0, 55], "z": ["cos(alpha)", "sin(alpha)", 0], "x": [0, 0, 1] } },
+        { "id": "yoke-out", "role": "output", "shape": { "type": "shaft", "diameter": 16, "length": 130, "yoke": { "radius": 30, "arm": 8 } }, "at": { "joint": "S2" } },
+        { "id": "arm", "role": "output", "shape": { "type": "link", "length": 60, "boss": [11, 7], "thickness": 8, "place": 20, "keyed": true }, "at": { "joint": "S3" } }
+      ],
+      "joints": [
+        { "id": "S1", "type": "revolute", "a": "ground", "b": "input", "at": [-70, 0, 55], "axis": [1, 0, 0], "note": "input shaft, through the hub and on to a pillow block each side" },
+        { "id": "J", "type": "revolute", "a": "input", "b": "ring", "at": [0, 0, 55], "axis": ["cos(alpha)", "sin(alpha)", 0], "note": "the ring on the inclined journal, on one double-row bearing" },
+        { "id": "T", "type": "revolute", "a": "ring", "b": "yoke-out", "at": [0, 0, 55], "axis": [0, 0, 1], "note": "the ring's trunnions in the yoke, square to the journal" },
+        { "id": "S2", "type": "revolute", "a": "ground", "b": "yoke-out", "at": [0, 60, 55], "axis": [0, 1, 0], "note": "output shaft, square to the input, through the same centre" },
+        { "id": "S3", "type": "revolute", "a": "ground", "b": "arm", "at": [0, 60, 55], "axis": [0, 1, 0], "note": "the arm keyed on the output shaft" }
+      ],
+      "params": [
+        { "id": "alpha", "value": 20, "unit": "deg", "min": 20, "max": 20, "note": "journal angle to the input shaft: the swing amplitude (machined on the hub, not a control)" },
+        { "id": "L", "value": 60, "unit": "mm", "min": 60, "max": 60, "note": "arm length, output axis to the arm's tip (the arm's shape length)" }
+      ],
+      "design": [],
+      "drivers": [
+        { "id": "input", "joint": "S1", "kind": "rotary", "range": [0, 360], "default": 0 }
+      ],
+      "solve": [
+        {
+          "block": "spherical-four-bar",
+          "id": "loop",
+          "joints": ["J", "T", "S2", "S3"],
+          "in": {
+            "input": "input",
+            "joints": ["S1", "J", "T", "S2"],
+            "bodies": ["input", "ring", "yoke-out"],
+            "carry": { "output": ["arm"] }
+          },
+          "out": { "angle": "swing" },
+          "opts": { "relation": "psi = atan(tan(alpha) sin(theta)), the root through the reference pose" }
+        }
+      ],
+      "points": [
+        { "id": "centre", "body": "ring", "local": [0, 0, 0] },
+        { "id": "in-ext", "body": "input", "local": [0, 0, 105] },
+        { "id": "journal-ext", "body": "input", "local": [0, "-35*sin(alpha)", "70+35*cos(alpha)"] },
+        { "id": "trunnion-tip", "body": "ring", "local": [42, 0, 0] },
+        { "id": "rim", "body": "ring", "local": [0, 20, 0] },
+        { "id": "out-ext", "body": "yoke-out", "local": [0, 0, -100] },
+        { "id": "arm-hub", "body": "arm", "local": [0, 0, 0] },
+        { "id": "tip", "body": "arm", "local": ["L", 0, 0] }
+      ],
+      "outputs": [
+        { "id": "input-angle", "of": "input", "kind": "angle", "unit": "deg" },
+        { "id": "output-angle", "of": "yoke-out", "kind": "angle", "unit": "deg" },
+        { "id": "speed-ratio", "of": "yoke-out", "kind": "speed-ratio" },
+        { "id": "tip-x", "of": "tip", "kind": "position", "unit": "mm", "axis": "x" }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-27",
+        "note": "T2 before the build, from the solved kinematics: six phases at 60 degrees of input give swings of 0, -17.5, -17.5, 0, +17.5, +17.5 degrees, so the yoke and the arm visibly rock while the shaft turns; the solve matches psi = atan(tan(alpha) sin(theta)) to 2e-14 (tests at 5, 15 and 25 degrees), amplitude exactly alpha, within 0.32 degrees of a pure sine at 20; the arm tip sweeps 41.0 mm; the output's speed ratio peaks at tan(alpha) = 0.36 at mid-swing; no dwell. Decided: the output shaft lies in plan square to the input, as the universal joint's does, so the two relatives read side by side; the reference pose is mid-swing (journal leaning in the plane of the two shafts, trunnions upright, yoke and arm upright), so the journal angle reads true in PLAN at the start; the arm's tip is traced with equal-time ticks every 15 degrees (bunched at the ends of the stroke, near harmonic) and a rim point of the ring is traced to show its nod; construction: the four axes as centrelines and a circle at the common centre, the journal angle arc, the stroke dimension; default view ISOMETRIC; section A-A through the input and journal axes at the start shows the inclined journal inside the ring on its bearing, the one part of the principle a housing hides; no use context in the drawing. Owner's review (#253): the centre did not read, so the journal is machined on the input hub as one solid at a fixed angle (alpha is no longer a control), alpha is 20 degrees (was 15) so the nod and the swing read at a glance, the ring runs on one double-row bearing instead of two with seals, both input pillow blocks stand on the drive side so no support is in front of the meeting point in ISOMETRIC and DIMETRIC, and only two labels remain: JOURNAL ANGLE and ALL FOUR AXES MEET HERE."
+      },
+      "principle": [
+        { "body": "input" }, { "body": "ring" }, { "body": "yoke-out" }, { "body": "arm" },
+        { "point": "centre" }, { "point": "tip" }
+      ],
+      "traces": [
+        { "id": "arm-tip", "point": "tip", "ticks": { "every": 15 }, "comet": true },
+        { "id": "ring-nod", "point": "rim", "ticks": { "every": 15 } }
+      ],
+      "overlays": [
+        { "id": "input-axis", "kind": "axis-line", "at": "S1" },
+        { "id": "output-axis", "kind": "axis-line", "at": "S2" },
+        { "id": "journal-axis", "kind": "axis-line", "from": "centre", "through": "journal-ext" },
+        { "id": "trunnion-axis", "kind": "axis-line", "from": "centre", "through": "trunnion-tip" },
+        { "id": "common-centre", "kind": "circle", "center": "centre", "radius": 4, "label": "ALL FOUR AXES MEET HERE" },
+        { "id": "journal-angle", "kind": "arc", "center": "centre", "from": "in-ext", "to": "journal-ext", "label": "JOURNAL ANGLE α" },
+        { "id": "stroke", "kind": "dimension", "from": "tip", "to": "tip", "fromPose": { "output": "tip-x", "stat": "min" }, "toPose": { "output": "tip-x", "stat": "max" } }
+      ],
+      "view": "ISOMETRIC",
+      "views": [{ "id": "A-A", "kind": "section", "plane": { "origin": [0, 0, 55], "normal": [0, 0, 1] }, "highlight": ["input", "ring"], "note": "through the input axis and the journal axis at the start: the inclined journal inside the ring, on its bearing" }],
+      "controls": [
+        { "id": "input", "kind": "driver", "driver": "input" }
+      ],
+      "plot": [
+        { "x": "input", "y": "output-angle", "label": "OUTPUT SWING ψ" },
+        { "x": "input", "y": "speed-ratio", "label": "OUTPUT SPEED RATIO" }
+      ],
+      "claims": [
+        { "text": "the yoke rocks the output to and fro through exactly ±α (±20°)", "output": "output-angle", "stat": "max", "value": 20, "tol": 0.01 },
+        { "text": "the yoke rocks the output to and fro through exactly ±α (±20°)", "output": "output-angle", "stat": "min", "value": -20, "tol": 0.01 },
+        { "text": "an arm 60 mm long sweeps a stroke of 2 L sin α = 41.0 mm", "output": "tip-x", "stat": "range", "value": 41.04, "tol": 0.05 },
+        { "text": "the output moves fastest, at tan α = 0.36 times the input speed, as it passes mid-swing", "output": "speed-ratio", "stat": "max", "abs": true, "value": 0.364, "tol": 0.002 }
+      ],
+      "exceptions": []
+    },
+    "examples": [
+      { "use": "Knife drives on combine and windrower headers", "detail": "A wobble box at the end of the cutter bar turns a shaft from the header drive into the rapid to-and-fro stroke of the sickle." },
+      { "use": "Sickle bar mowers", "detail": "Tractor and self-propelled mowers drive their reciprocating knife with a wobble box in place of a pitman crank." }
+    ],
+    "references": [
+      { "title": "Four-bar linkage (spherical four-bar), Wikipedia", "url": "https://en.wikipedia.org/wiki/Four-bar_linkage", "kind": "wikipedia" },
+      { "title": "Reuleaux model C3, Spherical Four-bar Linkage (Konisches Kurbelviereck), Cornell KMODDL", "url": "https://digital.library.cornell.edu/catalog/ss:372516", "kind": "museum" },
+      { "title": "US1390890A, Attachment for mowing-machines, W. Dyer (1921)", "url": "https://patents.google.com/patent/US1390890A/en", "kind": "patent" },
+      { "title": "US5778727A, Headed spindle pin for wobble-type sickle drive, Deere (1998)", "url": "https://patents.google.com/patent/US5778727", "kind": "patent" },
+      { "title": "US20050086919A1, Wobble drive for windrower header (2005)", "url": "https://patents.google.com/patent/US20050086919A1/en", "kind": "patent" }
+    ],
+    "media": [
+      { "title": "Sickle mower operation with a wobble box (YouTube)", "url": "https://www.youtube.com/watch?v=Tx2Si2n_spw", "kind": "video" },
+      { "title": "How it's made: a wobble box for combine headers, Agri Parts (YouTube)", "url": "https://www.youtube.com/watch?v=1VE12XfMyrg", "kind": "video" },
+      { "title": "Knife drive wobble box AE41481, photos", "url": "https://www.fridayparts.com/knife-drive-wobble-box-ae41481-for-john-deere-mower-1600-710-720-300a-1600a-harvester-200-213-215-220e-6622-900-913-916r-918r-930", "kind": "photos" },
+      { "title": "Wobble box animation (YouTube)", "url": "https://www.youtube.com/watch?v=X26q7gGjMTk", "kind": "animation" }
+    ],
+    "real_world": [
+      { "product": "Sickle bar mower with a wobble box knife drive", "use": "The wobble box at the end of the cutter bar rocks its output arm, which strokes the knife to and fro across the guards.", "url": "https://www.youtube.com/watch?v=Tx2Si2n_spw", "note": "the mower's make is not named in the video's title" }
+    ],
+    "related": ["universal-joint", "swash-plate", "bennett-linkage", "four-bar", "double-cardan"]
+  }
+]

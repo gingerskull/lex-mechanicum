@@ -3,11 +3,11 @@
 import { D2R, TAU, area, circle, type Vec2 } from "../../core/geom";
 import type { Kin, KinBody } from "../../kin/types";
 import { Kinematics, type Setup } from "../../kin/compose";
-import { lawRise, type CamLaw } from "../../kin/blocks/cam";
+import { camMotion, camTurns, lawRise, type CamLaw } from "../../kin/blocks/cam";
 import { type Vec3, v3, xf } from "../../kin/math";
 import { THICK } from "../constants";
 import { planeCoords } from "../frames";
-import { barrelGroove, camLawOf, flatCam, rollerCam } from "../cams";
+import { barrelGroove, barrelTrack, camLawOf, type CamLawSpec, flatCam, rollerCam } from "../cams";
 import type { BodyGeom } from "../shapes";
 import { num } from "./common";
 
@@ -17,6 +17,7 @@ import { num } from "./common";
  * bored for its shaft. The joint's `at` is the roller centre (or the face's point on the follower line) at the reference.
  */
 export function plateCam(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  if (String(g.shape.type) === "shoe") return grooveShoe(kin, S, b, g);
   if (String(g.shape.type) !== "cam") return null;
   if (g.shape.form === "barrel") return barrel(kin, S, b, g);
   if (g.shape.form === "lobes") return lobes(kin, b, g);
@@ -84,6 +85,7 @@ function barrel(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
   const rp = Math.hypot(pc.uv[0], pc.uv[1]);
   const offset = typeof g.shape.place === "number" ? g.shape.place : -len / 2;
   const bore = num(g.shape.bore, num(g.shape.shaft, 16));
+  if (camTurns(L.sched) > 1) return barrelTrackGeom(g, L, pc.w, rp, { R, len, w, depth, offset, bore });
   const mesh = barrelGroove(L, pc.w, rp, w, R - depth, R + 2);
   return {
     ...g,
@@ -92,6 +94,104 @@ function barrel(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
     approx: false,
     exact: { offset },
     features: [{ mode: "cut", profile: { outer: [], holes: [] }, op: { op: "extrude", h: 1, steps: 1 }, frame: { o: [0, 0, -offset], x: [1, 0, 0], z: [0, 0, 1] }, mesh }],
+  };
+}
+
+/**
+ * A barrel track of several turns (a self-reversing screw's crossing grooves): the drum with the track cut in pieces
+ * (src/builder/cams.ts barrelTrack), each cutter reaching 1 mm below the groove's root, then the root put back as one
+ * turned core over the grooved length, so the root is one smooth cylinder where the grooves cross (D8, a boolean).
+ */
+function barrelTrackGeom(g: BodyGeom, L: CamLawSpec, a0: number, rp: number, d: { R: number; len: number; w: number; depth: number; offset: number; bore: number }): BodyGeom {
+  const { R, len, w, depth, offset, bore } = d;
+  const rIn = R - depth;
+  const pieces = barrelTrack(L, a0, rp, w, rIn - 1, R + 2);
+  // the grooved length along the drum's axis, in the part's coordinates (from its start), with a groove's width spare
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (const m of pieces)
+    for (let k = 2; k < m.pos.length; k += 3) {
+      lo = Math.min(lo, m.pos[k]!);
+      hi = Math.max(hi, m.pos[k]!);
+    }
+  const z0 = Math.max(0.5, lo - offset - w / 2);
+  const z1 = Math.min(len - 0.5, hi - offset + w / 2);
+  const features: import("../../solids/types").Feature[] = pieces.map((mesh) => ({ mode: "cut", profile: { outer: [], holes: [] }, op: { op: "extrude", h: 1, steps: 1 }, frame: { o: [0, 0, -offset], x: [1, 0, 0], z: [0, 0, 1] }, mesh }));
+  features.push({ mode: "add", profile: { outer: circle(rIn, 0, 0, 144), holes: [circle(bore / 2, 0, 0, 32).reverse()] }, op: { op: "extrude", h: z1 - z0, steps: 1 }, frame: { o: [0, 0, z0], x: [1, 0, 0], z: [0, 0, 1] } });
+  return {
+    ...g,
+    profile: { outer: circle(R, 0, 0, 144), holes: [circle(bore / 2, 0, 0, 32).reverse()] },
+    thick: len,
+    approx: false,
+    exact: { offset },
+    features,
+  };
+}
+
+/**
+ * A groove shoe (`shoe`): the swivelling follower of a barrel track that crosses itself, a boat-shaped blade in the
+ * groove under a round boss that carries its pivot. Its body is the cam contact's follower on the drum (the joint's
+ * `at` the blade's centre at the pitch radius) and turns on its own pivot square to the drum's surface (its `at` joint),
+ * so the blade lies along the groove at the reference and the kinematics swivel it with the groove (the cam block's
+ * `shoe`). The blade is `length` long and `width` wide at its middle, narrowing to round points (an ellipse in plan), so
+ * it bridges the crossing groove and clears the walls as they twist away from its middle; its underside is cut round
+ * the drum's axis, `root` clear of the groove's root, and its top meets the boss `clear` above the drum.
+ */
+function grooveShoe(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | null {
+  const cj = kin.joints.find((q) => q.type === "cam-contact" && (q.a === b.id || q.b === b.id) && q.cam);
+  const r = cj ? S.joints.get(cj.id) : undefined;
+  if (!cj || !r || !r.ca) return null;
+  if (cj.cam!.form !== "barrel") throw new Error(`${b.id}: a groove shoe rides a barrel cam's groove; joint ${cj.id} is not a barrel cam (cam.form "barrel")`);
+  const drum = kin.bodies.find((q) => q.id === (cj.a === b.id ? cj.b : cj.a));
+  const ds = (drum?.shape ?? {}) as Record<string, unknown>;
+  const R = num(ds.radius, 16);
+  const depth = num(((ds.groove ?? {}) as Record<string, unknown>).depth, 4);
+  const rIn = R - depth;
+  const L = camLawOf(cj, r.num, 0);
+  if (!L) return null;
+  const sh = g.shape;
+  const len = num(sh.length, 18);
+  const wid = num(sh.width, 6.8);
+  const rootGap = num(sh.root, 0.8);
+  const clear = num(sh.clear, 1);
+  const bossR = num((sh.boss as Record<string, unknown> | undefined)?.radius, 5);
+  const bossH = num((sh.boss as Record<string, unknown> | undefined)?.height, 5);
+  // the world directions at the reference: inward to the drum's axis, the drum's axis, the groove's way round
+  const ax = v3.unit(r.axis);
+  const foot = v3.add(r.ca, v3.mul(ax, v3.dot(v3.sub(r.at, r.ca), ax)));
+  const out = v3.unit(v3.sub(r.at, foot));
+  const rp = v3.dist(r.at, foot);
+  const tHat = v3.cross(ax, out);
+  const v0 = camMotion(L.sched, L.theta0).v;
+  const T0 = v3.unit(v3.sub(v3.mul(tHat, L.rb), v3.mul(ax, v0)));
+  // the blade: an ellipse in the plane square to the radius, from inside the crescent's cut up into the boss
+  const n = 48;
+  const lens: Vec2[] = Array.from({ length: n }, (_, k) => {
+    const t = (k / n) * TAU;
+    return [(len / 2) * Math.cos(t), (wid / 2) * Math.sin(t)];
+  });
+  const r0 = rIn + rootGap - 1.5;
+  const rTop = R + clear + 0.4;
+  const blade = {
+    id: `${b.id}-blade`,
+    name: `Shoe blade ${len} x ${wid}, under its boss`,
+    frame: { o: v3.add(foot, v3.mul(out, r0)), x: T0, z: out },
+    profile: { outer: lens, holes: [] as Vec2[][] },
+    h: rTop - r0,
+    // the underside cut round the drum's axis (its centre r0 below the piece's origin), square to the blade's long axis
+    features: [{ mode: "cut" as const, profile: { outer: circle(rIn + rootGap, 0, r0, 180), holes: [] }, op: { op: "extrude" as const, h: wid + 4, steps: 1 }, frame: { o: [0, -(wid / 2 + 2), 0] as Vec3, x: [1, 0, 0] as Vec3, z: [0, 1, 0] as Vec3 } }],
+  };
+  // the boss: the body's own part, on its pivot, from `clear` above the drum outward
+  const pz = v3.dot(out, g.frame.z) >= 0 ? 1 : -1;
+  const w0 = pz * (R + clear - rp);
+  const offset = pz > 0 ? w0 : w0 - bossH;
+  return {
+    ...g,
+    profile: { outer: circle(bossR, 0, 0, 48), holes: [] },
+    thick: bossH,
+    approx: false,
+    exact: { offset },
+    pieces: [...(g.pieces ?? []), blade],
   };
 }
 

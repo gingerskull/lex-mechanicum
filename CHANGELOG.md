@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.44.0, Gryphonne — 2026-10-28
+
+- Six new mechanisms, each built from its record at standard 3.11:
+  - Self-reversing screw: one-way rotation drives a carriage back and forth along crossing right- and left-hand
+    grooves of lead 48, three turns out and three back for a 120 mm stroke; a swivelling shoe longer than a crossing
+    keeps to its own groove.
+  - Wobble box: a journal machined at 20° on the input hub nods a trunnion ring on one double-row bearing, which rocks
+    a perpendicular output shaft through ±20°, all four axes meeting at one point (a spherical four-bar).
+  - Walking-beam transfer: a beam on two equal cranks lifts every ball off its notch, carries it one station and sets
+    it down; the balls go round a closed circuit through a return lane beside the transfer, so the cycle loops with no
+    jump.
+  - Hobson's joint: three rods bent at 90° slide in the bores of two discs at a right angle and carry the turn round
+    the corner at exactly 1:1.
+  - Rack-and-pinion stroke doubler: a pinion on a carrier rolls on a held rack and drives a free rack twice the
+    carrier's 80 mm stroke.
+  - Chain stroke doubler: two chains anchored to the base run round a two-row sprocket on the carrier to the output and
+    drive it twice the carrier's stroke, one chain for each direction.
+- Engine: cam tracks of several turns and a trapezoidal law, a crossing barrel groove and a groove shoe; a spherical
+  four-bar block and the oblique-journal kit; a walking-beam block, with parts handed on round a closed circuit and
+  each checked against the one it replaces; an elbow-rods block and the leg-bore kit; gear-mesh rolls a pinion on a
+  held rack, and a held rack is seated and dowelled on the base; a strand block and an open chain anchored at both
+  ends. Every existing mechanism's package is unchanged.
+- The catalogue merges the n-numbered batch files of later waves; `n1.json` holds the six records.
+- A mechanism page may load up to 110 KB of JavaScript gzipped (was 100 KB): every page carries the whole kinematic
+  library, now about 105 KB with the new blocks.
+
 ## 0.43.3, Agripinaa — 2026-10-27
 
 - Tooling for batch mechanism passes. A fresh audit sheet fills the rows the rules' output or the pipeline decides

@@ -251,7 +251,8 @@
    "antiparallelogram",
    "slider-crank",
    "hoekens-linkage",
-   "watt-six-bar"
+   "watt-six-bar",
+   "wobble-box"
   ]
  },
  {
@@ -480,7 +481,8 @@
    "four-bar",
    "locomotive-drive",
    "whitworth",
-   "crank-shaper"
+   "crank-shaper",
+   "rack-stroke-doubler"
   ]
  },
  {
@@ -1155,7 +1157,8 @@
    "drag-link-quick-return",
    "parallelogram-linkage",
    "antiparallelogram",
-   "double-rocker"
+   "double-rocker",
+   "walking-beam"
   ]
  },
  {
@@ -1612,7 +1615,8 @@
    "double-crank",
    "locomotive-drive",
    "pantograph",
-   "scissor-lift"
+   "scissor-lift",
+   "walking-beam"
   ]
  },
  {
@@ -3543,7 +3547,8 @@
    "parallelogram-linkage",
    "walschaerts-valve-gear",
    "eccentric-sheave",
-   "double-crank"
+   "double-crank",
+   "walking-beam"
   ]
  }
 ]

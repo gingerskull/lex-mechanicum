@@ -5,11 +5,15 @@
 import type { BlockFn } from "./ctx";
 import { LINKAGE_BLOCKS } from "./steps/linkage";
 import { SPATIAL_BLOCKS } from "./steps/spatial";
+import { SPHERICAL_BLOCKS } from "./steps/spherical";
 import { GEAR_BLOCKS } from "./steps/gears";
 import { CAM_BLOCKS } from "./steps/cam";
 import { MEMBER_BLOCKS } from "./steps/members";
 import { TIMED_BLOCKS } from "./steps/timed";
 import { COUPLING_BLOCKS } from "./blocks/couplings";
+import { TRANSFER_BLOCKS } from "./steps/transfer";
+import { ELBOW_BLOCKS } from "./steps/elbow";
+import { STRAND_BLOCKS } from "./steps/strand";
 
 export { gearDelta } from "./steps/gears";
 export { roundedSquareAt } from "./steps/linkage";
@@ -17,9 +21,13 @@ export { roundedSquareAt } from "./steps/linkage";
 export const BLOCKS: Record<string, BlockFn> = {
   ...LINKAGE_BLOCKS,
   ...SPATIAL_BLOCKS,
+  ...SPHERICAL_BLOCKS,
   ...GEAR_BLOCKS,
   ...CAM_BLOCKS,
   ...MEMBER_BLOCKS,
   ...TIMED_BLOCKS,
   ...COUPLING_BLOCKS,
+  ...TRANSFER_BLOCKS,
+  ...ELBOW_BLOCKS,
+  ...STRAND_BLOCKS,
 };

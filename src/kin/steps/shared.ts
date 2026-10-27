@@ -33,4 +33,4 @@ export const spin = (c: BlockCtx, body: string, center: Vec3, axis: Vec3, ang: n
 /** Angle of vector d about unit axis a, from the unit direction e0 (right-handed). */
 export const angleFrom = (d: Vec3, a: Vec3, e0: Vec3): number => Math.atan2(v3.dot(a, v3.cross(e0, d)), v3.dot(e0, d));
 
-export const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" || l === "modsine" ? l : "cycloidal");
+export const lawOf = (l: string | undefined): CamLaw => (l === "harmonic" || l === "poly345" || l === "uniform" || l === "modsine" || l === "trapezoidal" ? l : "cycloidal");

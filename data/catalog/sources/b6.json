@@ -337,7 +337,7 @@
     { "title": "Non Captive Lead Screw Actuators (Motorized Assemblies) (YouTube)", "url": "https://www.youtube.com/watch?v=2arakJuK6tA", "kind": "video" },
     { "title": "Lead Screws Explained, Fractory", "url": "https://fractory.com/lead-screws/", "kind": "photos" }
   ],
-  "related": ["ball-screw", "differential-screw", "rack-pinion", "worm-drive"]
+  "related": ["ball-screw", "differential-screw", "rack-pinion", "worm-drive", "self-reversing-screw"]
 },
 {
   "id": "ball-screw",
@@ -423,7 +423,7 @@
     { "title": "What Is a Ball Screw?, Dynatect", "url": "https://dynatect.com/resources/what-is-a-ball-screw/", "kind": "photos" },
     { "title": "How A Ball Screw Works (Animated) (YouTube)", "url": "https://www.youtube.com/watch?v=oEPrXljqeHA", "kind": "animation" }
   ],
-  "related": ["lead-screw", "differential-screw", "rack-pinion"]
+  "related": ["lead-screw", "differential-screw", "rack-pinion", "self-reversing-screw"]
 },
 {
   "id": "differential-screw",
@@ -586,7 +586,7 @@
     { "title": "How I designed a two stage belt drive (YouTube)", "url": "https://www.youtube.com/watch?v=utBKRAg8tdw", "kind": "video" },
     { "title": "Types of Belt Drive (YouTube)", "url": "https://www.youtube.com/watch?v=eljkrcjywLQ", "kind": "video" }
   ],
-  "related": ["chain-drive", "cvt-belt", "friction-wheel-drive", "spur-gears", "block-and-tackle"]
+  "related": ["chain-drive", "cvt-belt", "friction-wheel-drive", "spur-gears", "block-and-tackle", "chain-stroke-doubler"]
 },
 {
   "id": "chain-drive",
@@ -671,7 +671,7 @@
     { "title": "Drive roller chains (DIN 8187 / ISO 606), TYMA", "url": "https://tyma.eu/products/chains/drive-roller-chains", "kind": "photos" },
     { "title": "Chain and Sprocket Drive Animation (YouTube)", "url": "https://www.youtube.com/watch?v=bH9VuurFOA8", "kind": "animation" }
   ],
-  "related": ["belt-drive", "spur-gears", "gear-train", "locomotive-drive"]
+  "related": ["belt-drive", "spur-gears", "gear-train", "locomotive-drive", "chain-stroke-doubler"]
 },
 {
   "id": "block-and-tackle",
@@ -757,7 +757,7 @@
     { "title": "Block (sailing), Wikipedia (photos of Mary Rose and modern blocks)", "url": "https://en.wikipedia.org/wiki/Block_(sailing)", "kind": "photos" },
     { "title": "Pulley system simulation, Walter Fendt", "url": "https://www.walter-fendt.de/html5/phen/pulleysystem_en.htm", "kind": "interactive" }
   ],
-  "related": ["belt-drive", "differential-screw", "bell-crank", "toggle-clamp"]
+  "related": ["belt-drive", "differential-screw", "bell-crank", "toggle-clamp", "chain-stroke-doubler"]
 },
 {
   "id": "oldham-coupling",
@@ -840,7 +840,7 @@
     { "title": "What are Oldham Couplings? (YouTube)", "url": "https://www.youtube.com/watch?v=utEKKox2WHA", "kind": "video" },
     { "title": "Oldham Coupling Mechanism Explained, wooden model (YouTube)", "url": "https://www.youtube.com/watch?v=7-jrf3z3FuI", "kind": "video" }
   ],
-  "related": ["schmidt-coupling", "elliptic-trammel", "universal-joint", "double-cardan", "tusi-couple"]
+  "related": ["schmidt-coupling", "elliptic-trammel", "universal-joint", "double-cardan", "tusi-couple", "hobsons-joint"]
 },
 {
   "id": "universal-joint",
@@ -923,7 +923,7 @@
     { "title": "Universal joint, Cardan joints, design and applications (YouTube)", "url": "https://www.youtube.com/watch?v=fQhuR50m9qo", "kind": "video" },
     { "title": "Universal Joint, Wolfram Demonstrations", "url": "http://demonstrations.wolfram.com/UniversalJoint/", "kind": "interactive" }
   ],
-  "related": ["double-cardan", "rzeppa-cv-joint", "oldham-coupling", "schmidt-coupling", "bevel-gears"]
+  "related": ["double-cardan", "rzeppa-cv-joint", "oldham-coupling", "schmidt-coupling", "bevel-gears", "wobble-box", "hobsons-joint"]
 },
 {
   "id": "double-cardan",
@@ -1007,7 +1007,7 @@
     { "title": "Double Cardan Drive Shaft Rebuild (YouTube)", "url": "https://www.youtube.com/watch?v=KXn1nBkafNk", "kind": "video" },
     { "title": "Study of double Cardan universal joint 2a (YouTube)", "url": "https://www.youtube.com/watch?v=cydmR0lX2t8", "kind": "video" }
   ],
-  "related": ["universal-joint", "rzeppa-cv-joint", "schmidt-coupling", "oldham-coupling"]
+  "related": ["universal-joint", "rzeppa-cv-joint", "schmidt-coupling", "oldham-coupling", "wobble-box", "hobsons-joint"]
 },
 {
   "id": "rzeppa-cv-joint",
@@ -1093,7 +1093,7 @@
     { "title": "How To Assemble a CV Joint, Air Cooled VW Tech Tips (YouTube)", "url": "https://www.youtube.com/watch?v=pmhPYCJWurc", "kind": "video" },
     { "title": "3D Print Rzeppa Joint (Constant Velocity) Mechanism (YouTube)", "url": "https://www.youtube.com/watch?v=1Ky5V9HLle4", "kind": "video" }
   ],
-  "related": ["universal-joint", "double-cardan", "differential", "schmidt-coupling"]
+  "related": ["universal-joint", "double-cardan", "differential", "schmidt-coupling", "hobsons-joint"]
 },
 {
   "id": "schmidt-coupling",

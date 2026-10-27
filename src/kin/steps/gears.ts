@@ -18,12 +18,16 @@ import { angleFrom, outPoint, outVal, spin, str } from "./shared";
  * A gear a on a moving centre (a planet fixed to a rod, the sun-and-planet gear): `line` [p, q], two points of body a
  * whose direction gives a's turn in place of `input`, and `carrier` (a value: the angle of the link that carries a's
  * centre round b, deg); b turns by the carrier's turn plus the ratio times a's turn relative to the carrier.
+ * A pinion a rolling on a held rack b (a stroke doubler's fixed rack): `rolls` (the pinion's centre) and `parent` (the
+ * body that carries it) in place of `input`; see rollingPinion. A second rack driven by that pinion is a plain rack
+ * mesh with the pinion's turn as `input` and the same `parent`, so its travel is read relative to the moving centre.
  */
 const gearMesh: BlockFn = (c, s) => {
   const i = s.in ?? {};
   const jid = str(i.joint, "gear-mesh.joint");
   const j = c.joint(jid);
   if (Array.isArray(i.line)) return planetMesh(c, s, j);
+  if (i.rolls !== undefined) return rollingPinion(c, s, j);
   // a's turn (a held ring or ground pins have none); with a carrier, b's turn relative to it follows a's relative to it
   const dA = i.input !== undefined ? c.delta("in", c.rad(i.input)) : 0;
   const dC = i.carrier !== undefined ? c.delta("carrier", c.rad(i.carrier)) : 0;
@@ -77,6 +81,30 @@ function planetMesh(c: BlockCtx, s: SolveStep, j: import("../types").KinJoint): 
   const dB = dC + gearDelta(c, j, dA - dC);
   c.setXf(j.b, xf.rotAbout(c.vec(j.cb ?? j.at), axisB, dB));
   outVal(c, s, dB * R2D + c.num(i.ref ?? 0), "angle");
+}
+
+/**
+ * gear-mesh with `rolls` (a point: the pinion's centre, carried by `parent`): pinion a rolls on rack b, which is held
+ * (fixed, or posed before this step). The centre's travel along the rack's axis2 relative to the rack, t, turns a by
+ * Δθ = -t / r about the joint's axis, so the rack moves r Δθ along axis2 relative to the centre (the rack form's law
+ * read the other way). a is posed by the parent's pose and that turn about the centre. out: a's turn (deg) and t (mm).
+ */
+function rollingPinion(c: BlockCtx, s: SolveStep, j: import("../types").KinJoint): void {
+  const i = s.in ?? {};
+  if (j.radiusA === undefined) throw new KinError(`${s.id}: a rolling pinion needs the joint's radiusA`);
+  // the rack's way is its own: the pinion's axis would give no travel, so the pinion would never turn
+  if (j.axis2 === undefined) throw new KinError(`${s.id}: a rolling pinion needs the joint's axis2 (the rack's way)`);
+  const parent = str(i.parent, "gear-mesh.parent");
+  const centre = i.rolls;
+  const axisB = v3.unit(c.vec(j.axis2));
+  const ref = c.refVec(centre);
+  // the rack's own displacement, where a block posed it before this step (a held rack has none)
+  const rack = c.has(j.b) ? v3.sub(xf.apply(c.xf(j.b), ref), ref) : ([0, 0, 0] as Vec3);
+  const t = c.delta("travel", v3.dot(v3.sub(v3.sub(c.vec(centre), ref), rack), axisB));
+  const dA = -t / c.num(j.radiusA);
+  c.setXf(j.a, xf.mul(c.xf(parent), xf.rotAbout(ref, c.jointAxis(j.id), dA)));
+  outVal(c, s, dA * R2D + c.num(i.ref ?? 0), "angle");
+  outVal(c, s, t, "travel");
 }
 
 /** Angle of gear b for a turn dA of a, from the joint's ratio, tooth counts or non-circular pitch curve. */

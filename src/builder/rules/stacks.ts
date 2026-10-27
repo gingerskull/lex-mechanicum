@@ -80,6 +80,8 @@ function keyedBodies(ctx: BuildCtx, site: Site): Set<string> {
     const body = ctx.kin.bodies.find((q) => q.id === b);
     if (sheave(b)) continue;
     if (body && KEYED.has(String(body.shape?.type))) out.add(b);
+    // a part the record keys on the shaft (`shape.keyed`: an arm on a rocking output shaft)
+    if (body && (body.shape as { keyed?: unknown } | undefined)?.keyed === true) out.add(b);
     if (ctx.kin.joints.some((j) => (j.type === "gear-mesh" || j.type === "belt" || j.type === "screw") && (j.a === b || j.b === b))) out.add(b);
   }
   if (!out.size && site.bodies[0]) out.add(site.bodies[0]);

@@ -5,11 +5,11 @@
 import { readFileSync } from "node:fs";
 import { afterAll, describe, expect, it } from "vitest";
 import { buildWithContext, type Assembly } from "../../src/builder/build";
-import type { BuildCtx } from "../../src/builder/ctx";
+import type { BuildCtx, RecordLike } from "../../src/builder/ctx";
 import { KITS, rungsOf } from "../../src/builder/kits";
 import { autoTable, rules } from "../../src/builder/registry";
 import { KIT_IDS, type KitId } from "../../src/builder/sites";
-import { BLOCKS } from "../../src/kin";
+import { BLOCKS, type Kin } from "../../src/kin";
 import { v3 } from "../../src/kin/math";
 import { fixtureRecord } from "./fixtures";
 
@@ -84,6 +84,8 @@ describe("joint kits", () => {
     "pin-ring": "cycloidal-drive",
     "pin-hole": "cycloidal-drive",
     "spider-pin": "differential",
+    "oblique-journal": "wobble-box",
+    "leg-bore": "hobsons-joint",
   };
   for (const id of KIT_IDS) {
     it(`${id}: builds its joint, with an axis, a zone and a note`, async () => {
@@ -100,4 +102,40 @@ describe("joint kits", () => {
       expect(assembly.notes.some((n) => n.kit === id), `a note for ${id}`).toBe(true);
     });
   }
+});
+
+describe("inputs a rule cannot build are refused or reported", () => {
+  // a catalogue record with one body's shape or one joint bent
+  const bent = (id: string, edit: (kin: Kin) => void): RecordLike => {
+    const r = structuredClone(fixtureRecord(id));
+    edit(r.kin as Kin);
+    return r;
+  };
+  const shape = (kin: Kin, body: string) => kin.bodies.find((b) => b.id === body)!.shape as Record<string, unknown>;
+
+  it("a wobble journal no bearing in the table fits", async () => {
+    await expect(buildWithContext(bent("wobble-box", (k) => ((shape(k, "input").journal as Record<string, unknown>).diameter = 21)))).rejects.toThrow(/no bearing in the table has a 21 mm bore/);
+  });
+
+  it("a held rack too shallow for its setting slots, or too short for its dowels", async () => {
+    await expect(buildWithContext(bent("rack-stroke-doubler", (k) => (shape(k, "fixed-rack").height = 12)))).rejects.toThrow(/too little for its setting slots/);
+    await expect(buildWithContext(bent("rack-stroke-doubler", (k) => (shape(k, "fixed-rack").length = 60)))).rejects.toThrow(/too short for its two dowels/);
+  });
+
+  it("a groove shoe on a cam that is not a barrel", async () => {
+    const plate = bent("self-reversing-screw", (k) => {
+      k.joints.find((q) => q.type === "cam-contact" && q.cam)!.cam!.form = "plate";
+    });
+    await expect(buildWithContext(plate)).rejects.toThrow(/a groove shoe rides a barrel cam's groove/);
+  });
+
+  it("a chain the strand layout cannot build is reported, not built wrongly", async () => {
+    // chain B in a third row of a two-row sprocket
+    const row = (k: Kin, id: string) => void ((k.joints.find((j) => j.id === id) as unknown as Record<string, unknown>).row = 2);
+    const { ctx } = await buildWithContext(bent("chain-stroke-doubler", (k) => [row(k, "held-B"), row(k, "run-B")]));
+    expect(ctx.issues.some((s) => s.startsWith("held-B: the chain's ends") && s.endsWith("its links are not built"))).toBe(true);
+    expect(ctx.get("chain-B-roller1")).toBeUndefined();
+    expect(ctx.get("chain-A-roller1")).toBeDefined();
+    ctx.dispose();
+  });
 });

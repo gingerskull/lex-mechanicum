@@ -4,7 +4,7 @@ import { D2R, type Mat3, type Vec3, m3, v3, wrapPi, xf, type Xf } from "./math";
 import { evalExpr } from "./expr";
 import type { KinJoint } from "./types";
 import { ellipticalAngle, meshRatio } from "./blocks/gears";
-import { type CamSchedule, camMotion, type CamLaw } from "./blocks/cam";
+import { camMotion, camTurns, scheduleOf, type CamLaw } from "./blocks/cam";
 import { chainAdvance, screwAdvance, variatorR2 } from "./blocks/members";
 import { reflection, bisectorNormal } from "./blocks/spatial";
 
@@ -125,10 +125,24 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
     case "cam-contact": {
       if (!j.cam) break;
       const n = r.num;
-      const sched: CamSchedule = {
-        lift: n(j.cam.lift),
-        segments: j.cam.schedule.map((g) => ({ kind: g.kind, span: n(g.span) * D2R, law: (g.law as CamLaw | undefined) ?? "cycloidal" })),
-      };
+      // the schedule as the cam block and the builder bind it: blends and the period included
+      const sched = scheduleOf(j.cam, n, (l) => (l as CamLaw | undefined) ?? "cycloidal");
+      if (j.cam.turns !== undefined && j.cam.form === "barrel" && r.ca) {
+        // a barrel track of several turns: the cam's pose gives its angle only within a turn, so the follower must lie on
+        // the groove where it passes under the follower on one of those turns (a self-reversing screw's crossing grooves)
+        const th = n(j.cam.theta0 ?? 0) * D2R + xf.angleAbout(Xb, r.axis);
+        const tip = xf.apply(xf.inv(Xb), xf.apply(Xa, r.at));
+        const s0 = camMotion(sched, n(j.cam.theta0 ?? 0) * D2R).s;
+        const a0 = v3.dot(v3.sub(r.at, r.ca), r.axis);
+        const along = v3.dot(v3.sub(tip, r.ca), r.axis);
+        let miss = Infinity;
+        for (let k = 0; k < camTurns(sched); k++) {
+          const d = along - (a0 + camMotion(sched, th + k * 2 * Math.PI).s - s0);
+          if (Math.abs(d) < Math.abs(miss)) miss = d;
+        }
+        out.push(v3.len(v3.perp(v3.sub(tip, r.ca), r.axis)) - n(j.cam.rb), miss);
+        break;
+      }
       if (!r.ca) break; // the cam's axis point is needed
       const th = n(j.cam.theta0 ?? 0) * D2R + xf.angleAbout(Xb, r.axis);
       const m = camMotion(sched, th);
@@ -201,6 +215,15 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     return wrapPi(turn(s.b0, s.b1, ax2) - dC - ratio * dA);
   }
   const jr = j as unknown as Record<string, unknown>;
+  if (j.type === "belt" && jr.strand && j.radiusA !== undefined && s.c0 && s.c1) {
+    // a strand of a member anchored at one end round a sprocket on a carrier (the strand block): in the carrier's
+    // frame, b's end moves along axis2 by r Δθa, as a rack on a pinion
+    const i0 = xf.inv(s.c0);
+    const i1 = xf.inv(s.c1);
+    const a0 = xf.mul(i0, s.a0), a1 = xf.mul(i1, s.a1), b0 = xf.mul(i0, s.b0), b1 = xf.mul(i1, s.b1);
+    const trav = v3.dot(v3.sub(xf.apply(b1, r.at), xf.apply(b0, r.at)), ax2);
+    return trav - n(j.radiusA) * turn(a0, a1, ax);
+  }
   if (j.type === "belt" && jr.flexible === "chain" && j.za !== undefined && jr.pitch !== undefined) {
     // a chain on its pitch polygons: the advance the driver gives equals the advance the driven takes (chordal action)
     const za = n(j.za), zb = n(j.zb), p = n(jr.pitch);

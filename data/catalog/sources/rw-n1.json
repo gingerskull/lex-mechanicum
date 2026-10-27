@@ -1,0 +1,10 @@
+{
+  "rack-stroke-doubler": {
+    "waive": ["media"],
+    "note": "No video of the rack form at work was found: a build video found by the issue has embedding disabled (its oEmbed does not answer), and the others are animations. Media holds the DME catalogue page with photos of the units and a 3D animation of Brown's No. 118."
+  },
+  "chain-stroke-doubler": {
+    "waive": ["media"],
+    "note": "No video was found in which the chain doing the doubling can be seen or is documented for the product shown: the telescopic fork and forklift mast videos found by the issue answer their oEmbed, but none shows or states the chain round the moving sprocket, so none is listed. Media holds the Wikimedia Commons category of hydraulic jiggers, the principle's historic multi-sheave form."
+  }
+}

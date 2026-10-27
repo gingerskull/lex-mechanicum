@@ -18,6 +18,7 @@ import { Local, titleOf } from "./lib";
 import type { Rule } from "./rules/types";
 import { worldPoints } from "./sweeps";
 import { BASE_GAP, BASE_T } from "./constants";
+import { buildStrands } from "./strand";
 
 const num = (v: unknown, d: number): number => (typeof v === "number" && Number.isFinite(v) ? v : d);
 const UP: Vec3 = [0, 0, 1];
@@ -584,15 +585,19 @@ function buildLoadRod(ctx: BuildCtx, j: KinJoint): void {
 }
 
 /** The flexible members this rule builds: a timing belt or a roller chain between two wheels. */
-export const builds = (j: KinJoint): boolean => j.type === "belt" && ["belt", "chain"].includes(String((j as unknown as Record<string, unknown>).flexible)) && j.a !== "ground" && j.b !== "ground";
+export const builds = (j: KinJoint): boolean => j.type === "belt" && ["belt", "chain"].includes(String((j as unknown as Record<string, unknown>).flexible)) && j.a !== "ground" && j.b !== "ground" && !(j as unknown as Record<string, unknown>).strand;
+
+/** A strand of a member anchored at one end round a sprocket on a moving carrier (a stroke doubler): src/builder/strand.ts. */
+const isStrand = (j: KinJoint): boolean => j.type === "belt" && !!(j as unknown as Record<string, unknown>).strand;
 
 export const j12: Rule = {
   id: "j12-flexible",
   tier: "AUTO",
   ids: ["J12", "J8", "A11", "F2", "F3", "F6", "F7", "F8", "F10"],
   fixture: "belt-drive",
-  applies: (ctx) => ctx.kin.joints.some((j) => builds(j) || (j.type === "belt" && (j as unknown as Record<string, unknown>).flexible === "rope")),
+  applies: (ctx) => ctx.kin.joints.some((j) => builds(j) || isStrand(j) || (j.type === "belt" && (j as unknown as Record<string, unknown>).flexible === "rope")),
   apply(ctx) {
+    if (ctx.kin.joints.some(isStrand)) buildStrands(ctx);
     for (const j of ctx.kin.joints.filter(builds)) {
       if ((j as unknown as Record<string, unknown>).flexible === "chain") buildChain(ctx, j);
       else buildTimingBelt(ctx, j);

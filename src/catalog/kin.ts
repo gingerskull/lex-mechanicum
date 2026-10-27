@@ -6,7 +6,11 @@ export const KIN_VOCAB = {
   shape: [
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
     "rope", "cage", "cross", "tracer", "cylinder", "piston", "nut", "fork", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
-    "spatial-link", "ball", "race", "bell",
+    "spatial-link", "ball", "race", "bell", "shoe",
+    // a wobble drive's trunnion ring on its inclined journal
+    "wobble-ring",
+    // a rod bent to the angle of its two joints' axes (Hobson's joint)
+    "elbow",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
@@ -21,6 +25,14 @@ export const KIN_VOCAB = {
     "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet", "one-way", "escape", "verge",
     // couplings and spatial linkages (R6)
     "sarrus", "cross-slide", "parallel-cranks", "plane-slide", "rzeppa", "conical-pendulum",
+    // the spherical four-bar (a wobble drive)
+    "spherical-four-bar",
+    // transfers
+    "walking-beam",
+    // the bent-rod coupling (Hobson's joint)
+    "elbow-rods",
+    // a member anchored at one end round a sprocket on a moving member (a stroke doubler's chain)
+    "strand",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

@@ -32,6 +32,12 @@ export interface KinBody {
   drops?: boolean;
   /** Bodies this one lies above in its stack (a rod pinned down onto blocks that run in a plate's grooves): a placement hint. */
   above?: string[];
+  /**
+   * The body that this one stands in for at the end of the cycle (like parts handed on one station per cycle round a
+   * closed circuit): at u = 2π the body stands where `next` stood at u = 0, so the picture repeats though no single
+   * part comes back (K2).
+   */
+  next?: string;
 }
 
 export type JointType =
@@ -98,7 +104,15 @@ export interface KinJoint {
   // flexure
   neck?: Record<string, unknown>;
   // cam-contact: the cam's schedule (spans in degrees), lift, base (or prime) radius, offset and its angle at the reference
-  cam?: { schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string }[]; lift: Num; rb: Num; e?: Num; theta0?: Num; /** "barrel": the follower runs along the cam's axis at the pitch radius rb (a barrel cam's groove). */ form?: "plate" | "barrel" };
+  cam?: {
+    /** `blend`: the trapezoidal law's share of the segment at each end, speeding up and slowing down. */
+    schedule: { kind: "rise" | "return" | "dwell"; span: Num; law?: string; blend?: Num }[];
+    lift: Num; rb: Num; e?: Num; theta0?: Num;
+    /** "barrel": the follower runs along the cam's axis at the pitch radius rb (a barrel cam's groove). */
+    form?: "plate" | "barrel";
+    /** Turns of the cam before the schedule repeats (default 1; the spans then sum to 360 times this): a self-reversing screw's track. */
+    turns?: Num;
+  };
   /** The joint is engaged only while this driver is inside [lo, hi] degrees (mod 360): a Geneva pin in its slot. */
   active?: { driver: string; lo: number; hi: number };
 }

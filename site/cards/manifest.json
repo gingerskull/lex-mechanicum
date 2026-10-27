@@ -2,623 +2,665 @@
   "ackermann-steering": {
     "package": "4e8f894788b2bd6a",
     "model": "1c31d2a1f0982026",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "2f014dfb88bd7e61"
   },
   "bell-crank": {
     "package": "039e486a264b252f",
     "model": "be374a05235fed8a",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "58954995344ad12b"
   },
   "eccentric-sheave": {
     "package": "0a89cce5b85b57d0",
     "model": "1afcd5025397094d",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "daaafd6eafce5faf"
   },
   "four-bar": {
     "package": "27ab5475bbce6507",
     "model": "a3e49697c1e3c5e4",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "f7dc500b01c67539"
   },
   "pantograph": {
     "package": "9647d4fdf9369ed9",
     "model": "5e224aab0786a8f4",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "1ac5b63352cc9ffa"
   },
   "parallelogram-linkage": {
     "package": "6f3c803b60df55d5",
     "model": "ddb23f7faba01ca6",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "77908d651428c207"
   },
   "scissor-lift": {
     "package": "2ccd985d938f14a8",
     "model": "bf03a1f63cf092c9",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "f92491419384bbed"
   },
   "scotch-yoke": {
     "package": "0f0302f9ba00cb27",
     "model": "0344bf07b6718ef1",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "9624dca184104aba"
   },
   "slider-crank": {
     "package": "9b82d3b67c4d7913",
     "model": "147062f22aa8bbbb",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "12dbce657146cd66"
   },
   "elliptic-trammel": {
     "package": "157900e35c1aa328",
     "model": "077f4424fe70eb5e",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "db9305589bf9a5c1"
   },
   "antiparallelogram": {
     "package": "2b264eb62a85029b",
     "model": "abf3542e707749da",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "51dba8c9020e111e"
   },
   "centrifugal-governor": {
     "package": "93f8ddd48ebe9104",
     "model": "e8085d0f8dc90566",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "6eb959b89df0fe8d"
   },
   "double-crank": {
     "package": "5c0ffbb4a84d2ee9",
     "model": "72c13f6315a4c2fb",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "06b3b08e226a2764"
   },
   "double-rocker": {
     "package": "4414e07ce1d5b0e2",
     "model": "4564d6c27883c79d",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "9a073377b05b5ad7"
   },
   "five-bar": {
     "package": "f3ec279b18cbcc3f",
     "model": "d5aa40ef03e7072a",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "b1a79c39adb49999"
   },
   "oscillating-cylinder": {
     "package": "805f87f0272f993d",
     "model": "0fccccfb82053d62",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "5430b822640ed1c8"
   },
   "stephenson-six-bar": {
     "package": "0e378a21dfef2a15",
     "model": "4287b4612e4f5dd1",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "22eeb35d0e8cb9e8"
   },
   "toggle-clamp": {
     "package": "7fb489df838cd39e",
     "model": "0afee776c31f2f1c",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "743ab579466f4350"
+  },
+  "walking-beam": {
+    "package": "0d8ddd4442dec2d1",
+    "model": "eceb81cf0d190d1d",
+    "renderer": "4e7de9be6f31f9f4",
+    "style": "caa2d1e889a98326",
+    "card": "72b056be302c7cd0"
   },
   "watt-six-bar": {
     "package": "d23108ab1ebcc4b9",
     "model": "1db8813d085dae6d",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "bd23f0b32f30dc42"
   },
   "jansen-linkage": {
     "package": "2b0366b67ce2891a",
     "model": "a02648b303200e9f",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "915291af8489d0cd"
   },
   "klann-linkage": {
     "package": "c37b82ef341c2c96",
     "model": "21809a0e261313ce",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "374bf4bb31bcfa0c"
   },
   "rhombic-drive": {
     "package": "90a8346f7ef04733",
     "model": "07a22b9226208f73",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "08eca5173000bfc5"
   },
   "walschaerts-valve-gear": {
     "package": "2aaa92ff15c161d2",
     "model": "5145da00b9056a35",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "37a0391ee7111e08"
   },
   "chebyshev-linkage": {
     "package": "3b4705796fd26f20",
     "model": "2f1fa751dea046dc",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "dd2817f54224949a"
   },
   "roberts-linkage": {
     "package": "9d3dfe3455ec84f4",
     "model": "9b26ac4ecf0c600a",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "164fd0d937068939"
   },
   "scott-russell": {
     "package": "b02f08b724c3bb94",
     "model": "06ccf67a1d68a6e7",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "07173178f2a46440"
   },
   "watt-linkage": {
     "package": "9cf61898bc4a810a",
     "model": "8668d109a2b1e60c",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "aad16010d61f5d11"
   },
   "evans-grasshopper": {
     "package": "0eb75c3ef85e4c29",
     "model": "e7139840c309b3e2",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "051b68cc37e9ed2d"
   },
   "hoekens-linkage": {
     "package": "7e81f00c8072bdc7",
     "model": "341b2d2080be2c58",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "c242ab84a343d363"
   },
   "tusi-couple": {
     "package": "d16e0a8a4e195e8f",
     "model": "a409177934be7de8",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "69ee9b2d3d9e0f7d"
   },
   "hart-inversor": {
     "package": "8839d7ea2f45db24",
     "model": "4bd7e82525b6152f",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "6fa234cae8b20468"
   },
   "peaucellier-lipkin": {
     "package": "026f43425b6dfeaf",
     "model": "f68443e28069139c",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "7ef73f45ee98c40b"
   },
   "offset-slider-crank": {
     "package": "9aba93329e65d83d",
     "model": "0b4816ba0cb40300",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "eec26a0c32404ea0"
   },
   "crank-shaper": {
     "package": "94c9e24383ac324d",
     "model": "552fadecfdede8d4",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "554d3a0f107067df"
   },
   "whitworth": {
     "package": "007b710b2a4ff296",
     "model": "f1a9b7858b46d8be",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "3fc97e52cff7783e"
   },
   "drag-link-quick-return": {
     "package": "07a10a30271443ef",
     "model": "940e5a6cbb80a361",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "a29fabfb0278ab5c"
   },
   "rack-pinion": {
     "package": "a517b6858f7926c8",
     "model": "d5166f2dad6b3b0b",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "4de83e68955c9663"
   },
   "spur-gears": {
     "package": "6a0a6b465e069bc1",
     "model": "6f3feb09c30de317",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "d6e5a7ce68c24c54"
   },
   "bevel-gears": {
     "package": "f1c78eec7117fa32",
     "model": "8327967c0b3577d7",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "d7d1c0e7a1d3b5b4"
   },
   "gear-train": {
     "package": "523bfa36bec0f924",
     "model": "eb1b204a0bbca243",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "2977e2c28c509b18"
   },
   "helical-gears": {
     "package": "79697b82ed14bc53",
     "model": "b709e4ded808db98",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "26131d2bb0b4ca7d"
   },
   "herringbone-gears": {
     "package": "4b51b2786cd69310",
     "model": "68d9efc37dcdd03b",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "c95c185ff293a843"
   },
   "internal-gear-pair": {
     "package": "b4b546ff3c14a397",
     "model": "a96bd4d2f9547a31",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "05187e7be46f8f43"
+  },
+  "rack-stroke-doubler": {
+    "package": "a5f659922b1d413d",
+    "model": "5e89c0640dca94bf",
+    "renderer": "4e7de9be6f31f9f4",
+    "style": "caa2d1e889a98326",
+    "card": "b83f5d65dbf01ee1"
   },
   "sun-and-planet": {
     "package": "9ca0b5d83c659081",
     "model": "6fb5a878bc3f6a6e",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "41a7896848495b0d"
   },
   "worm-drive": {
     "package": "9aec751c2db1e734",
     "model": "c73c55f992f0aa2a",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "de56d9fd325dae49"
   },
   "crossed-helical-gears": {
     "package": "808bc3d2654cb7a2",
     "model": "f350c6d3f64f484f",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "09c6ea2269c11a16"
   },
   "cycloidal-drive": {
     "package": "489d3685d73047be",
     "model": "367dc38d2dc2d655",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "0e553efbecfd91c4"
   },
   "differential": {
     "package": "02d773bad8ee31e8",
     "model": "b4b6278b582ca8cf",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "bc58badd6aa90848"
   },
   "harmonic-drive": {
     "package": "9c4bbd3cd4f1d73f",
     "model": "d073328c213101b9",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "710839a6e94eca91"
   },
   "hypoid-gears": {
     "package": "812c152df71d8427",
     "model": "7426f79c73fb244e",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "1dccb41c0c139615"
   },
   "non-circular-gears": {
     "package": "fc11e4495422e596",
     "model": "481ad74d4829af8f",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "91fe68e339653030"
   },
   "planetary": {
     "package": "85669507990557e6",
     "model": "a0356d3ca590f948",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "bc9ea60bebd89c24"
   },
   "ravigneaux": {
     "package": "ee5493575684e2be",
     "model": "3b7f40aeb76e6a69",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "17b9a4a68218fdb4"
   },
   "wankel": {
     "package": "8bcb43130459e6c7",
     "model": "4da911ff3bae487c",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "eb0b4ced528b9081"
   },
   "star-wheel": {
     "package": "bf99543cc5bd0908",
     "model": "784daf7a753e8573",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "d03d70a057d59b51"
   },
   "geneva": {
     "package": "e928d3cdf2160a11",
     "model": "c18dc4d554e8fd01",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "dc4cf0ec2f5f4467"
   },
   "intermittent-gear": {
     "package": "6981a5f86fa26d81",
     "model": "42744443baac1903",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "f6183e3e692ef715"
   },
   "internal-geneva": {
     "package": "84b4f11fbb793b5d",
     "model": "784709e9dcb94212",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "0826d37ce5ca3fd4"
   },
   "roller-gear-indexer": {
     "package": "4c2fed0d480f9b69",
     "model": "c38be0c424ecb763",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "44536518cc880cb0"
   },
   "barrel-cam": {
     "package": "43c1308c729da9f7",
     "model": "ed86df5cc8f3350b",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "fdaafa55694dbb42"
   },
   "cam-follower": {
     "package": "55a2aa68d687b7bd",
     "model": "3ad41316f3000227",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "d5ee14f3e30a433f"
   },
   "flat-faced-cam": {
     "package": "5eb0b095551a8fe3",
     "model": "a4f57d951f7ddae8",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "7b377d636e2dd959"
   },
   "face-groove-cam": {
     "package": "473e950dc4d54ab1",
     "model": "b0e1b802ebab84b2",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "e1e9f5e2a82a58cd"
   },
   "desmodromic-cam": {
     "package": "85dc09f00fcb178c",
     "model": "3254b59c81917255",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "5ba6a892b952ebb3"
+  },
+  "hobsons-joint": {
+    "package": "f3d6331f310e63e1",
+    "model": "159d39b7c8e5d2a8",
+    "renderer": "4e7de9be6f31f9f4",
+    "style": "caa2d1e889a98326",
+    "card": "9b0fd6b2e8b5f54a"
   },
   "locomotive-drive": {
     "package": "69726fe3d01b2db0",
     "model": "e213a12fa4730895",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "0ac43f3b408658af"
   },
   "oldham-coupling": {
     "package": "268486debf27e73c",
     "model": "8d6b1a46474b40f8",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "808495aa387620d3"
   },
   "universal-joint": {
     "package": "4d2ff5748be8d266",
     "model": "79b4c135c60427b7",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "ca9804b526df244f"
   },
   "double-cardan": {
     "package": "59ce5d7179ce442f",
     "model": "31bf769d5f8fd689",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "1859aa219209c7a6"
   },
   "rzeppa-cv-joint": {
     "package": "9d6af288f0f7fadf",
     "model": "aa4ca822dd73ec93",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "0d2f1133672f45ae"
   },
   "schmidt-coupling": {
     "package": "d43b9b80971bd13f",
     "model": "f051cffaafc8905b",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "d4be42c8d68a62e4"
   },
   "lead-screw": {
     "package": "6b48cce1fbb196e8",
     "model": "066cdc6908dc8ca7",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "8bde5691d9dc9789"
   },
   "ball-screw": {
     "package": "86e87c388123bce3",
     "model": "c1d1f9c8077e810a",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "5078fdd7fede2271"
   },
   "differential-screw": {
     "package": "b6312c66bb60f451",
     "model": "bf465bc3bad63049",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "9104728bb7966c4b"
+  },
+  "self-reversing-screw": {
+    "package": "39bbef51acabee00",
+    "model": "f6e11a4bd8372569",
+    "renderer": "4e7de9be6f31f9f4",
+    "style": "caa2d1e889a98326",
+    "card": "8e366cce4b051446"
   },
   "belt-drive": {
     "package": "1bb89a1905c6a51e",
     "model": "44ff267191777654",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "0a75a9d7576fd197"
   },
   "block-and-tackle": {
     "package": "e9df2708326eeaa3",
     "model": "b851ded4ef70b959",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "9758c27cd36ccf7f"
   },
   "chain-drive": {
     "package": "0572be6d7cf01016",
     "model": "d24963e6c88cc1ff",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "f1d1c9795edb6092"
   },
   "cvt-belt": {
     "package": "afae072611aa62ac",
     "model": "56dab9e599e47079",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "bd810390078a1cd4"
+  },
+  "chain-stroke-doubler": {
+    "package": "a85c2e76b99c1880",
+    "model": "450785018ec12a42",
+    "renderer": "4e7de9be6f31f9f4",
+    "style": "caa2d1e889a98326",
+    "card": "3b55368d762fecee"
   },
   "friction-wheel-drive": {
     "package": "d91d5261716c2123",
     "model": "c0604b8ad4757b66",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "c187d61c3f316a0c"
   },
   "ball-disc-integrator": {
     "package": "979eeaa4fefdc68c",
     "model": "e1ffc92b3b119fc1",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "761a936bff3d5afe"
   },
   "anchor-escapement": {
     "package": "dbefe0716831bca4",
     "model": "5f2e316c0ddc05ff",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "ce3ee7fb9886595c"
   },
   "verge-escapement": {
     "package": "1c1664681caa7d29",
     "model": "57132009d9e8de64",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "079c45ef7a261573"
   },
   "lever-escapement": {
     "package": "f57fe4967fca3df6",
     "model": "4229345990064531",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "769e7bd8952e5fc7"
   },
   "ratchet-pawl": {
     "package": "155aa6e3a82895cd",
     "model": "485db18554ab5f12",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "f7855fe91a6c1bb8"
   },
   "sprag-clutch": {
     "package": "d7d77a7819cdc38f",
     "model": "b18792409001b37a",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "aca915979dc1d961"
   },
   "sarrus-linkage": {
     "package": "a019ca7608bb16dd",
     "model": "8d9590c75797b3f1",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "3f3582684ce9d841"
   },
   "swash-plate": {
     "package": "7f85a9cb81b60d7b",
     "model": "bfef9674fffd7d9f",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "40fcba23bcbf614b"
+  },
+  "wobble-box": {
+    "package": "4df1c2a35c99b114",
+    "model": "3e2b14efc8eaf5f1",
+    "renderer": "4e7de9be6f31f9f4",
+    "style": "caa2d1e889a98326",
+    "card": "19a47d1ce655979c"
   },
   "bennett-linkage": {
     "package": "dd09140be0fbb554",
     "model": "3c8ac018e4186f79",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "cdff89128a363752"
   },
   "flexure-hinge": {
     "package": "82d99d7958138a15",
     "model": "061bab2223d97dd2",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "47d4b6f3c4f508db"
   },
   "bistable-compliant": {
     "package": "dc94c729b834a7e3",
     "model": "c10aa9506783597f",
-    "renderer": "86fbda20d6538273",
+    "renderer": "4e7de9be6f31f9f4",
     "style": "caa2d1e889a98326",
     "card": "b510443e49bde4f8"
   }

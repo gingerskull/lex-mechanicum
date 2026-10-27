@@ -441,16 +441,17 @@ antiparallelogram, bell-crank, toggle-clamp, scissor-lift, pantograph, watt-six-
 klann-linkage, jansen-linkage, ackermann-steering, rhombic-drive, elliptic-trammel,
 watt-linkage, chebyshev-linkage, hoekens-linkage, roberts-linkage, evans-grasshopper, scott-russell, peaucellier-lipkin,
 hart-inversor, sarrus-linkage, tusi-couple, crank-shaper, whitworth, drag-link-quick-return, offset-slider-crank,
-walschaerts-valve-gear, bennett-linkage,
+walschaerts-valve-gear, bennett-linkage, wobble-box, walking-beam,
 spur-gears, gear-train, internal-gear-pair, helical-gears, herringbone-gears, bevel-gears, hypoid-gears, worm-drive,
-crossed-helical-gears, rack-pinion, planetary, differential, harmonic-drive, cycloidal-drive, non-circular-gears,
-sun-and-planet, wankel, ravigneaux,
+crossed-helical-gears, rack-pinion, rack-stroke-doubler, planetary, differential, harmonic-drive, cycloidal-drive,
+non-circular-gears, sun-and-planet, wankel, ravigneaux,
 cam-follower, flat-faced-cam, barrel-cam, face-groove-cam, desmodromic-cam, swash-plate, geneva, internal-geneva,
 intermittent-gear, roller-gear-indexer, ratchet-pawl, sprag-clutch, anchor-escapement, lever-escapement,
 verge-escapement, centrifugal-governor, star-wheel,
-lead-screw, ball-screw, differential-screw, belt-drive, chain-drive, block-and-tackle, oldham-coupling,
-universal-joint, double-cardan, rzeppa-cv-joint, schmidt-coupling, friction-wheel-drive, cvt-belt, ball-disc-integrator,
-eccentric-sheave, locomotive-drive, flexure-hinge, bistable-compliant
+lead-screw, ball-screw, differential-screw, self-reversing-screw, belt-drive, chain-drive, chain-stroke-doubler,
+block-and-tackle, oldham-coupling, universal-joint, double-cardan, hobsons-joint, rzeppa-cv-joint, schmidt-coupling,
+friction-wheel-drive, cvt-belt, ball-disc-integrator, eccentric-sheave, locomotive-drive, flexure-hinge,
+bistable-compliant
 
 ## real_world (YouTube videos since 2026-10-18)
 

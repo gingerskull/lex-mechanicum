@@ -476,7 +476,7 @@
     { "title": "Bevel gears explained", "url": "https://www.youtube.com/watch?v=Ayu93VdwkuU", "kind": "video" },
     { "title": "Category:Bevel gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Bevel_gears", "kind": "photos" }
   ],
-  "related": ["hypoid-gears", "differential", "spur-gears", "worm-drive", "crossed-helical-gears"]
+  "related": ["hypoid-gears", "differential", "spur-gears", "worm-drive", "crossed-helical-gears", "hobsons-joint"]
 },
 {
   "id": "hypoid-gears",
@@ -788,7 +788,7 @@
   "media": [
     { "title": "Category:Rack gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Rack_gears", "kind": "photos" }
   ],
-  "related": ["spur-gears", "lead-screw", "ackermann-steering", "scotch-yoke", "slider-crank"]
+  "related": ["spur-gears", "lead-screw", "ackermann-steering", "scotch-yoke", "slider-crank", "rack-stroke-doubler"]
 },
 {
   "id": "planetary",
@@ -874,7 +874,7 @@
     { "title": "Epicyclic gearing animation, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/File:Epicyclic_gearing_animation.svg", "kind": "animation" },
     { "title": "Planetary gear with fixed ring gear, tec-science animation", "url": "https://www.tec-science.com/wp-content/uploads/2018/09/en-planetary-gear.mp4", "kind": "animation" }
   ],
-  "related": ["internal-gear-pair", "differential", "ravigneaux", "sun-and-planet", "harmonic-drive", "cycloidal-drive"]
+  "related": ["internal-gear-pair", "differential", "ravigneaux", "sun-and-planet", "harmonic-drive", "cycloidal-drive", "rack-stroke-doubler"]
 },
 {
   "id": "differential",

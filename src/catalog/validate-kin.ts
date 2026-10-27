@@ -1,3 +1,5 @@
+import { scheduleOf } from "../kin/blocks/cam";
+import { evalExpr } from "../kin/expr";
 import { KIN_VOCAB, TEACHING_VOCAB, type Kin, type Teaching } from "./kin";
 import type { CatalogRecord } from "./schema";
 
@@ -99,6 +101,17 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (needsAxis && !(Array.isArray(j.axis) && j.axis.length === 3 && j.axis.every((x) => isNum(x) || isStr(x)))) say(`joint ${j.id}: axis must be [x, y, z]`);
     if (j.type === "belt" && !KIN_VOCAB.flexible.includes(j.flexible as never)) say(`joint ${j.id}: belt joint needs flexible in ${KIN_VOCAB.flexible.join("/")}`);
     if (j.limits !== undefined && !(Array.isArray(j.limits) && j.limits.length === 2 && j.limits.every(isNum) && j.limits[0] <= j.limits[1])) say(`joint ${j.id}: limits must be [lo, hi]`);
+    // a cam's schedule at the params' values: whole turns, blends 0 to 0.5, spans summing to 360° per turn (the cam
+    // block refuses the same)
+    if (j.type === "cam-contact" && isObj(j.cam) && Array.isArray(j.cam.schedule)) {
+      const pv = new Map(kin.params.map((p) => [p.id, p.value]));
+      const val = (v: unknown) => (isNum(v) ? v : evalExpr(String(v), (n) => pv.get(n)));
+      try {
+        scheduleOf(j.cam as unknown as Parameters<typeof scheduleOf>[0], val, () => "cycloidal");
+      } catch (e) {
+        say(`joint ${j.id}: ${(e as Error).message}`);
+      }
+    }
   }
 
   for (const p of kin.params) {
