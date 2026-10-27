@@ -1,0 +1,6 @@
+{
+  "rack-stroke-doubler": {
+    "waive": ["media"],
+    "note": "No video of the rack form at work was found: a build video found by the issue has embedding disabled (its oEmbed does not answer), and the others are animations. Media holds the DME catalogue page with photos of the units and a 3D animation of Brown's No. 118."
+  }
+}
