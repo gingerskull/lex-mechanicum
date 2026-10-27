@@ -78529,26 +78529,25 @@
             "accent": true,
             "shape": {
               "type": "shaft",
-              "diameter": 25,
+              "diameter": 22,
               "length": 80,
               "place": 30,
               "journal": {
                 "joint": "J",
                 "diameter": 20,
-                "collar": 25,
-                "neck": 10,
                 "seat": [
                   -5,
                   5
                 ],
-                "bore": 12,
-                "shank": 26.5
+                "spacer": 3.5,
+                "bore": 10,
+                "shank": 26
               }
             },
             "at": {
               "joint": "S1"
             },
-            "note": "the wobble hub: a straight shank keyed on the input shaft, with the inclined journal machined on it at alpha, one piece, bored through for the shaft"
+            "note": "the wobble hub: a straight shank keyed on the input shaft, its end faced square to the journal as the bearing's shoulder outside the ring (a spacer between), the inclined journal machined on it at alpha, one piece, bored through for the shaft"
           },
           {
             "id": "ring",

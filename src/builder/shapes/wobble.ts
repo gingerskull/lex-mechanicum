@@ -25,12 +25,12 @@ function cylinder(mode: Feature["mode"], o: Vec3, x: Vec3, z: Vec3, from: Vec3, 
 }
 
 /**
- * A `shaft` with a `journal` ({ joint, diameter, collar, neck, seat [s0, s1], bore, shank }): the wobble hub. Its own
- * part is the straight shank (the shaft shape, keyed on the live shaft by the stack; `shank` long where the shape's
- * length also spans the shaft's run on through the journal); the journal is machined on it along the
- * journal joint's axis through that joint's point, from the seat's start to past its end (room for the circlip that
- * holds the bearing), with the collar the inner race stands on below the seat, `neck` long, running back into the shank;
- * the shaft's bore runs through the whole piece along its own axis.
+ * A `shaft` with a `journal` ({ joint, diameter, seat [s0, s1], spacer, bore, shank }): the wobble hub. Its own part is the
+ * straight shank (the shaft shape, keyed on the live shaft by the stack), cut off by the plane square to the journal at
+ * the seat's start: that oblique end face is the shoulder the inner race stands on. The journal stands on it along the
+ * journal joint's axis through that joint's point, to past the seat's end (room for the circlip that holds the
+ * bearing); the shaft's bore runs through the whole piece along its own axis. (`shank`, the length along the shaft
+ * where the hub is solid all round, is the kit's: its key runs there.)
  * `wobble-ring` (outer, width, bore, trunnion, pad): the housing round the journal's bearing, its trunnions out to the
  * yoke's cup radius along the trunnion joint's axis, each on a boss pad, one solid.
  */
@@ -48,22 +48,28 @@ export function wobble(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | 
     const c = jj.at;
     const a = canon(jj.axis);
     const rj = num(jr.diameter, 20) / 2;
-    const rc = num(jr.collar, 25) / 2;
     const [s0, s1] = pair(jr.seat, [-5, 5]);
-    const neck = num(jr.neck, 10);
     const end = s1 + 1.5;
     const rb = num(jr.bore, 0) / 2;
     const at = (s: number): Vec3 => v3.add(c, v3.mul(a, s));
-    const len = 4 * (end - s0 + neck + rc) + (g.thick ?? 0);
-    // `shank`: the straight shank's own length; past it the shape's length is only the run of the shaft through the
-    // journal to the pillow block beyond, so the stack straddles the hub: the shank is cut back to it
-    const shank = num(jr.shank, g.thick);
-    const back = shank < g.thick ? [cylinder("cut", po, F.x, F.z, v3.add(po, v3.mul(F.z, shank)), F.z, rc + 2, g.thick - shank + 1)] : [];
+    // the shank's planned length runs on past the journal (the shaft's run to the pillow block beyond, so the stack
+    // straddles the hub): everything past the plane square to the journal at the seat's start is cut away, which leaves
+    // the shank's end face as the shoulder the inner race stands on, square to the journal; the journal stands on it
+    const reach = 2 * (g.thick + Math.abs(s0) + end);
+    // the shoulder stands `spacer` back from the seat (an inner-race spacer between, the kit's), so the shank ends
+    // outside the ring's flank with a visible gap; behind the shoulder the shank is turned down to a boss square to the
+    // journal (`boss` across, `relief` deep), so the ring's flank keeps clear of the shank's oblique edge as it turns
+    const sh0 = s0 - num(jr.spacer, 0);
+    const relief = num(jr.relief, 3);
+    const rboss = num(jr.boss, 2 * rj + 5) / 2;
+    const turned = cylinder("cut", po, F.x, F.z, at(sh0 - relief), a, reach, relief + 0.01);
+    turned.profile.holes.push(circle(rboss, 0, 0, 48).reverse());
     const features: Feature[] = [
-      ...back,
-      cylinder("add", po, F.x, F.z, at(s0), a, rj, end - s0),
-      cylinder("add", po, F.x, F.z, at(s0 - neck), a, rc, neck),
-      ...(rb > 0 ? [cylinder("cut", po, F.x, F.z, v3.sub(c, v3.mul(F.z, len / 2)), F.z, rb + 0.05, len)] : []),
+      cylinder("cut", po, F.x, F.z, at(sh0), a, reach, reach),
+      turned,
+      // (the journal starts a little inside the shank, so its foot is not coplanar with the shoulder)
+      cylinder("add", po, F.x, F.z, at(sh0 - 1), a, rj, end - sh0 + 1),
+      ...(rb > 0 ? [cylinder("cut", po, F.x, F.z, v3.sub(c, v3.mul(F.z, reach / 2)), F.z, rb + 0.05, reach)] : []),
     ];
     return { ...g, approx: false, features: [...(g.features ?? []), ...features] };
   }
