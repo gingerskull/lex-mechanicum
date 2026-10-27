@@ -6,8 +6,8 @@
   - Self-reversing screw: one-way rotation drives a carriage back and forth along crossing right- and left-hand
     grooves of lead 48, three turns out and three back for a 120 mm stroke; a swivelling shoe longer than a crossing
     keeps to its own groove.
-  - Wobble box: an inclined journal on the input shaft nods a trunnion ring that rocks a perpendicular output shaft
-    through ±α, all four axes meeting at one point (a spherical four-bar); α is a control from 5° to 25°.
+  - Wobble box: a journal machined at 20° on the input hub nods a trunnion ring on one double-row bearing, which rocks
+    a perpendicular output shaft through ±20°, all four axes meeting at one point (a spherical four-bar).
   - Walking-beam transfer: a beam on two equal cranks lifts every ball off its notch, carries it one station and sets
     it down; the balls go round a closed circuit through a return lane beside the transfer, so the cycle loops with no
     jump.
