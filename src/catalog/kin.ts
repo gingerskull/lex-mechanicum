@@ -6,7 +6,7 @@ export const KIN_VOCAB = {
   shape: [
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
     "rope", "cage", "cross", "tracer", "cylinder", "piston", "nut", "fork", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
-    "spatial-link", "ball", "race", "bell",
+    "spatial-link", "ball", "race", "bell", "shoe",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
