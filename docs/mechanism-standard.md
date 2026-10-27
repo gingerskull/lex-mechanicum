@@ -330,6 +330,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `eccentric` | J3, F2, F8, M14 |
 | `die` | J4, M14 |
 | `hub` | J1, F1, F2, M14 |
+| `leg-bore` | J5, F2, F8, M14 |
 | `ring-rollers` | J6, F2 |
 | `j8-belt` | J8, V4 |
 | `j12-other` | J12, F7 |

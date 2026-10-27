@@ -476,7 +476,7 @@
     { "title": "Bevel gears explained", "url": "https://www.youtube.com/watch?v=Ayu93VdwkuU", "kind": "video" },
     { "title": "Category:Bevel gears, Wikimedia Commons", "url": "https://commons.wikimedia.org/wiki/Category:Bevel_gears", "kind": "photos" }
   ],
-  "related": ["hypoid-gears", "differential", "spur-gears", "worm-drive", "crossed-helical-gears"]
+  "related": ["hypoid-gears", "differential", "spur-gears", "worm-drive", "crossed-helical-gears", "hobsons-joint"]
 },
 {
   "id": "hypoid-gears",
