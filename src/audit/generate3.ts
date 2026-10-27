@@ -1,6 +1,7 @@
 // The audit generator (standard 1 step 2, section 11): a mechanism built from its catalogue record v3 by the hardware
 // builder, with the 3D checks, written as its audit sheet. One row per requirement id parsed from the standard; evidence
-// for everything a tool can collect; a status only where a tool decides it outright, `?` elsewhere. The `teaching:` line
+// for everything a tool can collect; a status where a tool decides it outright, or where the rules' output or the
+// pipeline settles it (`autoFill`, marked so a later run fills it again), `?` elsewhere. The `teaching:` line
 // under the header, the kit and the block of each joint, the K1 residual and the claim table (T9) in the tool-decided
 // rows, and a Supports section for the support router (A19) and the see-through stage (T10 to T12). Judged rows, hand
 // cells and hand sections of an earlier sheet survive regeneration.
@@ -30,6 +31,7 @@ import {
   ROOT,
   section,
   standardVersion,
+  summaryLine,
   tableRows,
   teachingLine,
   TEACHING_VERDICTS,
@@ -44,6 +46,31 @@ const FN_TITLES = ["locate", "retain", "torque", "thrust", "limit", "hold", "adj
  * retired in 3.0 and has no row; K1, K11, T9 and D11 are decided from the record v3 and its solids.
  */
 export const TOOL_DECIDED = new Set(["P1", "K1", "K2", "K11", "T9", "D11", "A12", "A15", "M6", "R7", "Q1", "Q2"]);
+
+/**
+ * AUTO rows the pipeline holds for every mechanism it builds (classification, placement, packaging, the renderer, the
+ * conformance report): a sheet generated at all passes them. Every one was judged PASS on all 89 sheets of the rebuild.
+ */
+export const PIPELINE_PASS = new Set(["A1", "A2", "A18", "D10", "DL3", "DL6", "E1", "L6", "R4", "S3", "S6", "T17"]);
+
+/** The note on a row `autoFill` decided: such a row is filled again on regeneration, never kept as judged. */
+export const AUTO_FILLED = "filled by the generator";
+
+/**
+ * The status of an unjudged row where the rules' output or the pipeline decides it, null where it needs judgement: a
+ * joint-type row (5b) passes when a rule built its kit and is N/A when the mechanism has no joint of that type; an AUTO
+ * row passes when a rule built solids for it, or when the pipeline holds it for every mechanism (PIPELINE_PASS). Against
+ * the judged sheets of the rebuild this agrees on 99.4% of the rows it fills.
+ */
+export function autoFill(q: Requirement, built: boolean | undefined): { status: string; why: string } | null {
+  if (q.section === "5b") {
+    if (built === undefined) return null;
+    return built ? { status: "PASS", why: "a rule built its kit" } : { status: "N/A", why: "no joint of this type" };
+  }
+  if (PIPELINE_PASS.has(q.id)) return { status: "PASS", why: "the pipeline holds it for every built mechanism" };
+  if (q.tiers.length === 1 && q.tiers[0] === "AUTO" && built) return { status: "PASS", why: "a rule built solids for it" };
+  return null;
+}
 
 export const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : /(s|sh|ch)$/.test(w) ? "es" : "s"}`;
 export const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
@@ -107,7 +134,8 @@ export function blockOf(kin: Kin, joint: string): string {
   return "–";
 }
 
-function evidence(inp: AuditInput3, reqs: Requirement[]): Record<string, Row> {
+/** The evidence of every row, and per requirement served by rules whether any of them built solids. */
+function evidence(inp: AuditInput3, reqs: Requirement[]): { rows: Record<string, Row>; built: Record<string, boolean> } {
   const a = inp.assembly;
   const kin = inp.record.kin as unknown as Kin;
   const out: Record<string, Row> = {};
@@ -116,11 +144,13 @@ function evidence(inp: AuditInput3, reqs: Requirement[]): Record<string, Row> {
 
   // what the rules fired, per requirement id
   const served: Record<string, string[]> = {};
+  const built: Record<string, boolean> = {};
   const ruleIds = new Set(rules.map((r) => r.id));
   for (const r of autoTable())
     for (const id of r.ids) {
       const n = a.fired[r.id]?.length ?? 0;
       (served[id] ??= []).push(!ruleIds.has(r.id) ? r.id : `${r.id} (${n ? plural(n, "solid") : "no solids"})`);
+      built[id] = !!built[id] || (ruleIds.has(r.id) && n > 0);
     }
   for (const q of reqs) if (served[q.id]) set(q.id, `fired: ${served[q.id]!.join(", ")}`);
 
@@ -224,7 +254,7 @@ function evidence(inp: AuditInput3, reqs: Requirement[]): Record<string, Row> {
   set("Q4", "local: tools/shot");
   set("Q5", "local: tools/bench");
   set("Q8", `teaching review: ${inp.record.teaching?.review?.verdict ?? "missing"} (${inp.record.teaching?.review?.date ?? "no date"}); the six phases of the finished build are looked at by eye`);
-  return out;
+  return { rows: out, built };
 }
 
 type RecordReportFindingType = RecordReport["findings"][number]["type"];
@@ -240,21 +270,19 @@ function jointCells(serves: Partial<Record<(typeof FUNCTIONS)[number], string[]>
 /** Writes the sheet, keeping judged rows, hand cells and hand sections of `existing`. */
 export function auditSheet3(inp: AuditInput3, standard: string, existing: string | null): string {
   const reqs = requirements(standard);
-  const ev = evidence(inp, reqs);
+  const { rows: ev, built } = evidence(inp, reqs);
   const old = existing ? parseHeader(existing) : null;
 
   const oldRows = new Map<string, string[]>();
   for (const c of tableRows(existing ? section(existing, "Requirements") ?? "" : "")) if (c[0]) oldRows.set(c[0], c);
   const rows = reqs.map((q) => {
     const kept = oldRows.get(q.id);
-    if (kept && kept[1] && kept[1] !== "?" && !TOOL_DECIDED.has(q.id)) return [q.id, kept[1], kept[2] ?? ""];
+    if (kept && kept[1] && kept[1] !== "?" && !TOOL_DECIDED.has(q.id) && !kept[2]?.includes(AUTO_FILLED)) return [q.id, kept[1], kept[2] ?? ""];
     const e = ev[q.id];
-    const text = [q.tiers.join(" / "), e?.evidence].filter(Boolean).join(" · ");
-    return [q.id, e?.status ?? "?", escapeCell(text)];
+    const fill = (e?.status ?? "?") === "?" ? autoFill(q, built[q.id]) : null;
+    const text = [q.tiers.join(" / "), e?.evidence, fill && `${AUTO_FILLED}: ${fill.why}`].filter(Boolean).join(" · ");
+    return [q.id, fill?.status ?? e?.status ?? "?", escapeCell(text)];
   });
-  const count = (s: string) => rows.filter((r) => r[1] === s).length;
-  const fails = rows.filter((r) => r[1] === "FAIL").map((r) => r[0]);
-  const unjudged = count("?");
 
   // joints: kit and block from the builder and the record; a generated "none" gives way to a hand entry
   const kin = inp.record.kin as unknown as Kin;
@@ -299,7 +327,6 @@ export function auditSheet3(inp: AuditInput3, standard: string, existing: string
     pass: old?.pass || "build",
   };
   const verdict = TEACHING_VERDICTS.find((v) => v === inp.record.teaching?.review?.verdict) ?? old?.teaching ?? "";
-  const open = [fails.length ? `FAIL ${fails.join(", ")}` : "", unjudged ? `${unjudged} unjudged` : ""].filter(Boolean).join("; ") || "none";
   return [
     `# Audit: ${old?.name || inp.name} (${inp.id})`,
     headerLine(header),
@@ -307,7 +334,7 @@ export function auditSheet3(inp: AuditInput3, standard: string, existing: string
     ...(old?.defers ?? []).map(deferLine),
     "",
     "## Summary",
-    `PASS ${count("PASS")} · FAIL ${count("FAIL")} · N/A ${count("N/A")} · open: ${open}`,
+    summaryLine(rows),
     "",
     "## Requirements",
     table(["Id", "Status", "Evidence / action"], rows),

@@ -69,6 +69,11 @@ Heavy checks run locally; CI runs what takes seconds.
 Snapshot baselines are regenerated once, when the look is final, never to make a run pass. Everything that draws
 needs Google Chrome installed locally (`tools/chrome3.ts`); CI never draws.
 
+While working, `npm run test:changed` runs only the tests the uncommitted changes touch, and `conformance` and
+`clearance` take the ids of the mechanisms in hand (or `changed`); the full suite runs at the push. Builds are cached
+per mechanism (`dist/cache`, keyed on its own sources), locally and between CI runs, so a change to one mechanism
+builds that one again and a change to shared code every one.
+
 ### What needs local tools
 
 Everything that does not draw runs in Node anywhere, so a session in the cloud can do it: records and the catalogue,
@@ -103,3 +108,24 @@ failures in the same push. One push per round. Rerun only failed jobs, only afte
 A mechanism is added or upgraded through the conformance pass in `docs/mechanism-standard.md` (section 1):
 generate the audit, fix what fails, verify, record. One issue and one PR per pass. Promoting a hand fix to a rule is
 its own PR, because it reruns every mechanism's checks.
+
+The audit generator fills the rows the rules' output or the pipeline decides and leaves `?` on the rest. Those are
+judged with `npm run judge`, into the sheet itself: one row on one or more sheets, or a file of judgements for rows a
+family judges alike; `npm run judge -- --open <id>` lists what is left.
+
+### Batch passes
+
+When several passes run at once (a family, a wave of new records):
+
+- **Readiness gate.** Every record of the batch validates and solves (`npm run kin-check -- <id>`, `tools/check.ts
+  <id> --no-solids`), and a stub build and conformance run on all of them; a requirement row that fails in three or more
+  mechanisms for engine reasons becomes an engine task first. The first passes are pilots that cover every input kind
+  and kit family in the batch.
+- **Shared work first.** The kits, blocks and rules several passes need land on the batch's integration branch before
+  the passes start. Each shared file has one owner; a pass that finds a gap posts it on the plan issue before touching
+  shared code. A family's blocks, shapes and contact kits each live in a file of their own (`src/kin/steps/`,
+  `src/builder/shapes/`, `src/builder/rules/contacts/`), registered by one line, so passes on different families do not
+  edit the same file.
+- **Small passes.** A few mechanisms each, the hard ones first or alone.
+- **Merges.** The integrator merges each finished pass right away, one at a time, and runs the whole-library checks
+  once per merge. Pass branches never commit generated files or thumbnails.

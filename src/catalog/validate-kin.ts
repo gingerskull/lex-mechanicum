@@ -163,7 +163,7 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     }
     if (!isObj(s.in)) say(`solve ${by}: in must be an object`);
     else for (const [k, v] of Object.entries(s.in)) resolveIn(v, by, k);
-    // a name, a list of names, or the block's keyed outputs ({ angle: "gear-turn" }, as src/kin/registry reads them)
+    // a name, a list of names, or the block's keyed outputs ({ angle: "gear-turn" }, as src/kin/steps read them)
     const outs = typeof s.out === "string" ? [s.out] : isObj(s.out) && !Array.isArray(s.out) ? Object.values(s.out) : arr(s.out);
     if (!outs.length || !outs.every(isStr)) say(`solve ${by}: out must name what the block produces`);
     for (const o of outs as string[]) {

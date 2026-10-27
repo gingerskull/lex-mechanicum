@@ -42,6 +42,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # the build cache, as in the CI workflow (dist/cache, each mechanism keyed on its own sources); saved here on main,
+      # where every pull request's run can restore it
+      - uses: actions/cache@v4
+        with:
+          path: dist/cache
+          key: build-${{ runner.os }}-node22-site-${{ hashFiles('src/**', 'data/catalog/**', 'package-lock.json') }}
+          restore-keys: |
+            build-${{ runner.os }}-node22-site-
       - run: npm run build
       # IndexNow's key (site/src/seo.ts, served as dist/site/<key>.txt) and the sitemap's URLs, for the deploy's last step
       - id: indexnow

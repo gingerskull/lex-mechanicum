@@ -1,7 +1,7 @@
 // The cross-pin kit (J3 for a universal joint's cross, couplings playbook): each yoke's pin into the cross turns in two
 // needle cups pressed into the yoke's arms, each held by an internal circlip in the arm's bore (F2); the cross carries a
 // grease nipple on its centre block (F8). The cross's trunnions and the yokes' arms are the bodies' own parts
-// (src/builder/shapes.ts); this rule adds what sits between them.
+// (src/builder/shapes/spatial.ts); this rule adds what sits between them.
 import { circle } from "../../core/geom";
 import { H } from "../../hardware/primitives";
 import { circlipInt } from "../../hardware/tables";

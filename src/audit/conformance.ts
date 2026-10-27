@@ -96,9 +96,9 @@ export function evaluate(standard: string, audits: Record<string, string | null>
   return { standard: current, mechanisms: out, failing: out.filter((m) => m.status === "behind" || m.status === "no header" || m.status === "no teaching").map((m) => m.id) };
 }
 
-/** The report for every registered mechanism, from the files in the repository. */
-export function conformance(): Report {
-  return evaluate(readStandard(), Object.fromEntries(allIds().map((id) => [id, readAudit(id)])));
+/** The report for the given mechanisms (every registered one by default), from the files in the repository. */
+export function conformance(ids: string[] = allIds()): Report {
+  return evaluate(readStandard(), Object.fromEntries(ids.map((id) => [id, readAudit(id)])));
 }
 
 /** The report as table lines. */

@@ -1,8 +1,9 @@
 // One build per mechanism per state of the sources (Node only). The record built once by the hardware builder feeds its
 // package (R4), the record checks (Q1) and the 3D checks (A15, A12): conformance, clearance, the thumbnails'
-// fingerprints and the site build all start here. The build is kept on disk (dist/cache/built) under a key of every file
-// a build reads (src/, data/catalog/, the lockfile) and the Node version, so the tools of one run build each mechanism
-// once between them, and a change to any source builds it again.
+// fingerprints and the site build all start here. The build is kept on disk (dist/cache/built) under a key of what it
+// reads (`buildKey`: the shared sources, the mechanism's own folder and record, the lockfile and the Node version), so
+// the tools of one run build each mechanism once between them, a change to one mechanism builds only that one again, and
+// CI keeps the folder between runs.
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
@@ -27,25 +28,50 @@ export interface BuiltMechanism {
   cached: boolean;
 }
 
-let key: string | null = null;
-/** The key of every build: a hash of the files under src/ and data/catalog/, the lockfile and the Node version. */
-export function sourcesKey(): string {
-  if (key) return key;
+const MECHANISMS = join(ROOT, "src", "mechanisms");
+
+/** Hashes every file under `dir` (by path and content) into `h`, in name order, except what `skip` names. */
+function walk(h: ReturnType<typeof createHash>, dir: string, skip: (path: string, isDir: boolean) => boolean = () => false): void {
+  for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
+    const p = join(dir, e.name);
+    if (skip(p, e.isDirectory())) continue;
+    if (e.isDirectory()) walk(h, p, skip);
+    else {
+      h.update(`${relative(ROOT, p).replace(/\\/g, "/")}\n`);
+      h.update(readFileSync(p));
+    }
+  }
+}
+
+let shared: string | null = null;
+/**
+ * The part of the key every build shares: the Node version, the lockfile, and the files under src/ and data/catalog/
+ * except each mechanism's own folder and the records, which each build keys on itself (`buildKey`). The catalogue's
+ * vocabularies and version count; its generation date does not.
+ */
+export function sharedKey(): string {
+  if (shared) return shared;
   const h = createHash("sha256");
   h.update(`${process.version}\n`);
-  const walk = (dir: string) => {
-    for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
-      const p = join(dir, e.name);
-      if (e.isDirectory()) walk(p);
-      else {
-        h.update(`${relative(ROOT, p).replace(/\\/g, "/")}\n`);
-        h.update(readFileSync(p));
-      }
-    }
-  };
-  for (const d of ["src", "data/catalog"]) walk(join(ROOT, d));
+  walk(h, join(ROOT, "src"), (p, isDir) => isDir && join(p, "..") === MECHANISMS);
+  walk(h, join(ROOT, "data", "catalog"), (p) => p === join(ROOT, "data", "catalog", "sources") || p === join(ROOT, "data", "catalog", "mechanisms.json"));
+  const { version, vocabularies } = JSON.parse(readFileSync(join(ROOT, "data", "catalog", "mechanisms.json"), "utf8")) as { version: unknown; vocabularies: unknown };
+  h.update(JSON.stringify({ version, vocabularies }));
   h.update(readFileSync(join(ROOT, "package-lock.json")));
-  return (key = h.digest("hex").slice(0, 32));
+  return (shared = h.digest("hex").slice(0, 32));
+}
+
+/**
+ * The key of one mechanism's build: the shared key, its own folder (its polish; not its audit sheet, which no build
+ * reads for more than its registration) and its record. A change to one mechanism builds that one again, a change to
+ * shared code every one.
+ */
+export function buildKey(id: string, record: CatalogRecord): string {
+  const h = createHash("sha256");
+  h.update(sharedKey());
+  walk(h, join(MECHANISMS, id), (p) => p.endsWith("audit.md"));
+  h.update(JSON.stringify(record));
+  return h.digest("hex").slice(0, 32);
 }
 
 /** A mechanism built once: read from the cache when its sources are unchanged, else built, packed and kept. */
@@ -53,7 +79,7 @@ export async function builtMechanism(id: string, o: { cache?: boolean } = {}): P
   const { record, polish } = await loadV3(id);
   const own = { id, record, ...(polish ? { polish } : {}) };
   const file = join(BUILT_DIR, `${id}.bin`);
-  const k = sourcesKey();
+  const k = buildKey(id, record);
   if (o.cache !== false && existsSync(file)) {
     try {
       const hit = deserialize(readFileSync(file)) as { key: string; assembly: Assembly; bytes: Uint8Array };

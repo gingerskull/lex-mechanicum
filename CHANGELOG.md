@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.43.3, Agripinaa — 2026-10-27
+
+- Tooling for batch mechanism passes. A fresh audit sheet fills the rows the rules' output or the pipeline decides
+  (about a third of them), and `npm run judge` writes the rest into the sheet, one row on many sheets or a file of
+  judgements at once. Conformance and clearance take the ids of the mechanisms in hand, or `changed`, and
+  `npm run test:changed` runs only the tests a change touches. Each family's kinematic blocks, body shapes and contact
+  kits live in files of their own, so passes on different families no longer edit the same files.
+- Builds are cached per mechanism, and CI keeps the cache between runs: a pull request that changes one mechanism
+  builds only that one again.
+- The workflow describes how batch passes run: the readiness gate, shared work first, small passes, merges.
+
 ## 0.43.2, Agripinaa — 2026-10-27
 
 - The original teaching review is kept in `docs/teaching-review.md`. The workflow says which work needs local
