@@ -243,3 +243,48 @@ export const COUPLING_BLOCKS: Record<string, BlockFn> = {
   rzeppa: rzeppaBlock,
   "conical-pendulum": conicalPendulum,
 };
+
+/** The point of two lines (through p along unit u, through q along unit w) nearest both: their meeting point. */
+export function lineMeet(p: Vec3, u: Vec3, q: Vec3, w: Vec3): Vec3 {
+  const r = v3.sub(p, q);
+  const b = v3.dot(u, w);
+  const den = 1 - b * b;
+  if (Math.abs(den) < 1e-12) throw new KinError("the two lines run parallel: they have no meeting point");
+  const s = (b * v3.dot(w, r) - v3.dot(u, r)) / den;
+  const t = (v3.dot(w, r) - b * v3.dot(u, r)) / den;
+  return v3.mul(v3.add(v3.add(p, v3.mul(u, s)), v3.add(q, v3.mul(w, t))), 0.5);
+}
+
+/**
+ * The corner of a bent rod of a Hobson's joint. The shafts' axes (unit a1, a2) meet at j; the rod's first leg lies along
+ * a1 through the point p of the input disc's bore (any point of the bore line), its second along a2. The corner is on
+ * the bore line as far from the output axis as the bore is from the input axis: with B − j = x a1 + q (q square to
+ * a1), x² + |q|² − (x cos β + q·a2)² = |q|², whose two roots are x = k q·a2 with k = 1 / (1 − cos β) or
+ * −1 / (1 + cos β), cos β = a1·a2. `k` is the root the joint was assembled on. Both are linear in q, so the corner keeps
+ * to one plane through j (one of the two planes that bisect the shafts' angle), and the roots cross only where q·a2 = 0.
+ */
+export function elbowCorner(j: Vec3, a1: Vec3, a2: Vec3, p: Vec3, k: number): Vec3 {
+  const q = v3.perp(v3.sub(p, j), a1);
+  return v3.add(j, v3.add(q, v3.mul(a1, k * v3.dot(q, a2))));
+}
+
+/**
+ * The root k of `elbowCorner` a rod was assembled on, read from its reference corner b0, and the other root. Throws
+ * where the reference corner sits on the crossing of the roots (q·a2 = 0) or is not on either root (the bore and the
+ * corner at different radii).
+ */
+export function elbowRoot(j: Vec3, a1: Vec3, a2: Vec3, b0: Vec3): { k: number; other: number } {
+  const cb = v3.dot(a1, a2);
+  const kA = 1 / (1 - cb);
+  const kB = -1 / (1 + cb);
+  const rel = v3.sub(b0, j);
+  const q = v3.perp(rel, a1);
+  const qa = v3.dot(q, a2);
+  const x = v3.dot(rel, a1);
+  const scale = Math.max(1, v3.len(q));
+  if (Math.abs(qa) < 1e-6 * scale) throw new KinError("elbow-rods: a rod's reference corner lies where the two roots meet; set the reference off it");
+  const eA = Math.abs(x - kA * qa);
+  const eB = Math.abs(x - kB * qa);
+  if (Math.min(eA, eB) > 1e-4 * scale) throw new KinError("elbow-rods: a rod's corner is not as far from the output axis as its bore is from the input axis");
+  return eA <= eB ? { k: kA, other: kB } : { k: kB, other: kA };
+}

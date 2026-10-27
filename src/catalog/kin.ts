@@ -9,6 +9,8 @@ export const KIN_VOCAB = {
     "spatial-link", "ball", "race", "bell", "shoe",
     // a wobble drive's trunnion ring on its inclined journal, and the journal sleeve
     "wobble-ring", "wobble-journal",
+    // a rod bent to the angle of its two joints' axes (Hobson's joint)
+    "elbow",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
@@ -27,6 +29,8 @@ export const KIN_VOCAB = {
     "spherical-four-bar",
     // transfers
     "walking-beam",
+    // the bent-rod coupling (Hobson's joint)
+    "elbow-rods",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

@@ -15,6 +15,7 @@ export const KIT_IDS = [
   "cross-pin", "trunnion", "piston-bore", "ring-carrier", "eccentric-bearing", "pin-ring", "pin-hole", "spider-pin",
   "ball-socket", "slipper", "sphere-fit", "eccentric", "die", "hub", "ball-cage",
   "oblique-journal",
+  "leg-bore",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -106,6 +107,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       // a journal as large as a disc is not a pin: a sheave turning in its strap (an eccentric), or a part turning on a
       // fixed hub that carries other pivots (a bull gear round its lever's pivot)
       if (j.type === "revolute" && typeof rec.radius === "number" && rec.radius > 12) return ground ? "hub" : "eccentric";
+      // a bent rod's leg sliding and turning in a bore of a turning disc (Hobson's joint)
+      if (!ground && j.type === "cylindrical" && (a?.shape?.type === "elbow" || b?.shape?.type === "elbow")) return "leg-bore";
       if (!ground) return j.type === "spherical" && (any("cage") || a?.shape?.type === "cage" || b?.shape?.type === "cage") ? "ring-hub" : "J3";
       return parallel(axis, UP) ? "J1" : "J10";
     }
