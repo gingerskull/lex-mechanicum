@@ -89,6 +89,7 @@ export const KITS: Record<KitId, Kit> = {
   hub: mk("hub", "Part on a fixed hub", ["J1"], ["gear-mesh", "dyad"], "hub", ["housing", "bushing", "plate"], own, pinZone("the hub")),
   "ball-cage": mk("ball-cage", "Ball in a cage, rolling on a disc and a cylinder", ["J6"], ["integrator"], "integrator-carriage", ["plate", "stop", "dowel"], own, pinZone("the ball's contacts")),
   "groove-cam": mk("groove-cam", "Groove cam", ["J7"], ["cam"], "groove-cam", ["roller", "shaft", "wearStrip", "felt"], normalOf, runZone("the roller in the groove")),
+  "oblique-journal": mk("oblique-journal", "Ring on an inclined journal", ["J3"], ["spherical-four-bar"], "oblique-journal", ["bearing", "circlipInternal", "circlipExternal", "dowel"], own, pinZone("the journal")),
 };
 
 /** The detail ladder rungs a kit's hardware sits on, from the kinds it builds (DL1). */

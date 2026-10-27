@@ -50,15 +50,15 @@
     "kin": {
       "bodies": [
         { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [300, 230], "thickness": 8 }, "at": { "frame": { "origin": [-20, 45, -4] } } },
-        { "id": "input", "role": "driver", "accent": true, "shape": { "type": "shaft", "diameter": 10, "length": 200, "place": -50 }, "at": { "joint": "S1" } },
-        { "id": "journal", "role": "driver", "shape": { "type": "wobble-journal", "diameter": 20, "collar": 25, "bore": 10, "shaft": "S1", "seat": [-7, 7] },
+        { "id": "input", "role": "driver", "accent": true, "shape": { "type": "shaft", "diameter": 25, "length": 26.5, "place": 30 }, "at": { "joint": "S1" }, "note": "the wobble hub's straight shank, keyed on the input shaft; the inclined journal is one piece with it" },
+        { "id": "journal", "role": "driver", "shape": { "type": "wobble-journal", "diameter": 20, "collar": 25, "neck": 10, "seat": [-7, 7], "bore": 12, "shaft": "S1" },
           "frame": { "o": [0, 0, 55], "z": ["cos(alpha)", "sin(alpha)", 0], "x": [0, 0, 1] },
-          "note": "the inclined journal: a sleeve turned at alpha to the shaft, pinned on it" },
+          "note": "the wobble hub's inclined journal, turned at alpha to the shaft on a collar that runs back into the straight shank: one forging with it, bored for the shaft" },
         { "id": "ring", "role": "link", "shape": { "type": "wobble-ring", "outer": 40, "width": 18, "bore": 32, "trunnion": 10, "pad": 16 },
           "at": { "joint": "J" },
           "frame": { "o": [0, 0, 55], "z": ["cos(alpha)", "sin(alpha)", 0], "x": [0, 0, 1] } },
-        { "id": "yoke-out", "role": "output", "shape": { "type": "shaft", "diameter": 12, "length": 130, "yoke": { "radius": 30, "arm": 8 } }, "at": { "joint": "S2" } },
-        { "id": "arm", "role": "output", "shape": { "type": "link", "length": 60, "boss": [11, 7], "thickness": 8, "place": 20 }, "at": { "joint": "S3" } }
+        { "id": "yoke-out", "role": "output", "shape": { "type": "shaft", "diameter": 16, "length": 130, "yoke": { "radius": 30, "arm": 8 } }, "at": { "joint": "S2" } },
+        { "id": "arm", "role": "output", "shape": { "type": "link", "length": 60, "boss": [11, 7], "thickness": 8, "place": 20, "keyed": true }, "at": { "joint": "S3" } }
       ],
       "joints": [
         { "id": "S1", "type": "revolute", "a": "ground", "b": "input", "at": [-70, 0, 55], "axis": [1, 0, 0], "note": "input shaft" },

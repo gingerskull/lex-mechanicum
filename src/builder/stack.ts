@@ -216,7 +216,10 @@ function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
       // the key runs along the shaft through the keyed part: its b x h section in the plane, its length along the axis
       const kl = Math.max(4, s.m.w1 - s.m.w0 - 1);
       const kr = d / 2 - kf.t1 + kf.h / 2 - 0.4;
-      L.add(H.key(`${nm}-key`, kf.b, kl, { body: s.m.body, outer: roundRect(kr - kf.h / 2, -kf.b / 2, kr + kf.h / 2, kf.b / 2, 0.4), z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kl }));
+      // a key of a part on another body than the shaft's (a second keyed part) sits in the shaft's keyway: the two move
+      // as one, so their overlap is the key seat, not a clash
+      const seat = !moving && s.m.body !== turn ? { allow: [`${id}-axle`], why: "the key sits in the shaft's keyway; the keyed part turns with the shaft" } : {};
+      L.add(H.key(`${nm}-key`, kf.b, kl, { body: s.m.body, outer: roundRect(kr - kf.h / 2, -kf.b / 2, kr + kf.h / 2, kf.b / 2, 0.4), z0: s.m.w0 + 0.5, z1: s.m.w0 + 0.5 + kl, ...seat }));
       serve("F3", `${nm}-key`);
     }
     if (endHeld) return;
