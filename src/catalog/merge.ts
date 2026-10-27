@@ -5,7 +5,7 @@ export interface SourceFile {
   json: unknown;
 }
 
-const BATCH = /^b\d+\.json$/;
+const BATCH = /^[bn]\d+\.json$/;
 const PATCH = /^(gap|rw|v3|origin|added).*\.json$/;
 const V3_PATCH = /^v3.*\.json$/;
 const PATCH_KEYS = ["media", "references", "real_world"] as const;

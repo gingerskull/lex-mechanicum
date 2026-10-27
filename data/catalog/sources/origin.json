@@ -87,5 +87,6 @@
   "swash-plate": {"origin": {"date":"1588-01-03","precision":"year","note":"Agostino Ramelli's book of machines shows swashplate pumps. Source: https://ecp.ep.liu.se/index.php/WIEFP/article/download/652/580"}},
   "bennett-linkage": {"origin": {"date":"1903-02-28","precision":"year","note":"G. T. Bennett publishes 'A new mechanism' in Engineering. Source: https://eng.ox.ac.uk/specialstructuresgroup/research/expandable-structures-based-on-the-bennett-linkage"}},
   "flexure-hinge": {"origin": {"date":"1944-03-13","precision":"year","note":"Earliest dated study found: Young's 1944 investigation of the cross-spring flexure pivot, cited by Haringx in 1949. Flexures were used earlier. Source: https://link.springer.com/doi/10.1007/BF02120338"}},
-  "bistable-compliant": {"origin": {"date":"1923-12-12","precision":"year","note":"Richard von Mises analyses the bistable snap-through truss in ZAMM. Source: https://arxiv.org/pdf/1809.04620"}}
+  "bistable-compliant": {"origin": {"date":"1923-12-12","precision":"year","note":"Richard von Mises analyses the bistable snap-through truss in ZAMM. Source: https://arxiv.org/pdf/1809.04620"}},
+  "wobble-box": {"origin": {"date":"1920-08-30","precision":"day","note":"Warren Dyer files US 1,390,890 (granted 1921): a mower shaft with an angled middle portion, a bearing on it whose trunnions swing a head that drives the sickle. Reuleaux's spherical four-bar model C3 (1882) shows the chain itself. Source: https://patents.google.com/patent/US1390890A/en"}}
 }
