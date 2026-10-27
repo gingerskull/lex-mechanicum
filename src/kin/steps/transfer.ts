@@ -46,8 +46,8 @@ export function turnOf(deg: number): { turn: number; phase: number } {
  * Every part moves one slot per turn: in turn t part k runs slot (k + t) mod n, so after one turn each part stands where
  * the next one stood and the picture is the same; the parts translate (a round part's own turn does not show). A part
  * on a seat while the beam is above its rails moves with the beam; it rests in its notch, or rolls and slides on its
- * track, otherwise. out { advance, rise, carried }: the tracked part's move along x and z from its slot's start (mm),
- * and 1 while it rides the beam.
+ * track, otherwise. out { advance, rise, carried }: the tracked part's move from its slot's start (mm) along the slot's
+ * way in the base plane and along the base normal, and 1 while it rides the beam.
  */
 const walkingBeam: BlockFn = (c, s) => {
   const i = s.in ?? {};
@@ -77,8 +77,13 @@ const walkingBeam: BlockFn = (c, s) => {
   const tk = Math.min(n - 1, Math.max(0, Math.round(i.track !== undefined ? c.num(i.track) : 1)));
   const t = slots[tk]!;
   const p = slotAt(t.from, t.legs, phase, beam);
-  outVal(c, s, p[0] - t.from[0], "advance");
-  outVal(c, s, p[2] - t.from[2], "rise");
+  // the advance is read along the slot's own way in the base plane (from its start to its end), so the record may face
+  // the transfer any way round; the rise is along the base normal
+  const d = v3.sub(slotAt(t.from, t.legs, 360, beam), t.from);
+  const way = Math.hypot(d[0], d[1]) > 1e-9 ? v3.unit([d[0], d[1], 0]) : ([1, 0, 0] as Vec3);
+  const moved = v3.sub(p, t.from);
+  outVal(c, s, v3.dot(moved, way), "advance");
+  outVal(c, s, moved[2], "rise");
   outVal(c, s, t.legs.some((l) => l.carry && phase > l.window[0] && phase < l.window[1]) ? 1 : 0, "carried");
 };
 

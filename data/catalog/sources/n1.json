@@ -592,8 +592,8 @@
           "at": {
             "frame": {
               "origin": [
-                78,
-                5,
+                -78,
+                -5,
                 -8
               ]
             }
@@ -609,7 +609,7 @@
               10,
               8
             ],
-            "place": 8,
+            "place": -14,
             "thickness": 6
           },
           "at": {
@@ -626,7 +626,7 @@
               10,
               8
             ],
-            "place": 8,
+            "place": -14,
             "thickness": 6
           },
           "at": {
@@ -642,67 +642,67 @@
             "outline": [
               [
                 -12,
-                -22
+                22
               ],
               [
                 130,
-                -22
+                22
               ],
               [
                 130,
-                -105.917
+                105.917
               ],
               [
                 124.567,
-                -104.332
+                104.332
               ],
               [
                 115.2,
-                -94.965
+                94.965
               ],
               [
                 110.063,
-                -100.102
+                100.102
               ],
               [
                 86.167,
-                -93.132
+                93.132
               ],
               [
                 76.8,
-                -83.765
+                83.765
               ],
               [
                 71.663,
-                -88.902
+                88.902
               ],
               [
                 47.767,
-                -81.932
+                81.932
               ],
               [
                 38.4,
-                -72.565
+                72.565
               ],
               [
                 33.263,
-                -77.702
+                77.702
               ],
               [
                 9.367,
-                -70.732
+                70.732
               ],
               [
                 0,
-                -61.365
+                61.365
               ],
               [
                 -5.137,
-                -66.502
+                66.502
               ],
               [
                 -12,
-                -64.5
+                64.5
               ]
             ],
             "thickness": 5,
@@ -720,7 +720,7 @@
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -815,24 +815,24 @@
             "posts": [
               {
                 "at": [
-                  10,
-                  -9
+                  -10,
+                  9
                 ],
                 "top": 58.917,
                 "r": 5
               },
               {
                 "at": [
-                  89,
-                  -9
+                  -89,
+                  9
                 ],
                 "top": 81.958,
                 "r": 5
               },
               {
                 "at": [
-                  166,
-                  -9
+                  -166,
+                  9
                 ],
                 "top": 104.417,
                 "r": 5
@@ -848,7 +848,7 @@
             "rot": [
               90,
               0,
-              0
+              180
             ]
           }
         },
@@ -941,24 +941,24 @@
             "posts": [
               {
                 "at": [
-                  10,
-                  9
+                  -10,
+                  -9
                 ],
                 "top": 58.917,
                 "r": 5
               },
               {
                 "at": [
-                  89,
-                  9
+                  -89,
+                  -9
                 ],
                 "top": 81.958,
                 "r": 5
               },
               {
                 "at": [
-                  166,
-                  9
+                  -166,
+                  -9
                 ],
                 "top": 104.417,
                 "r": 5
@@ -974,7 +974,7 @@
             "rot": [
               90,
               0,
-              0
+              180
             ]
           }
         },
@@ -1019,24 +1019,24 @@
             "posts": [
               {
                 "at": [
-                  30,
-                  -40
+                  -30,
+                  40
                 ],
                 "top": 73.358,
                 "r": 5
               },
               {
                 "at": [
-                  90,
-                  -40
+                  -90,
+                  40
                 ],
                 "top": 81.022,
                 "r": 5
               },
               {
                 "at": [
-                  145,
-                  -40
+                  -145,
+                  40
                 ],
                 "top": 88.046,
                 "r": 5
@@ -1045,18 +1045,18 @@
           },
           "frame": {
             "origin": [
-              7.552,
-              -40,
+              -7.552,
+              40,
               84.626
             ],
             "z": [
-              0.992,
+              -0.992,
               0,
               0.127
             ],
             "x": [
               0,
-              1,
+              -1,
               0
             ]
           }
@@ -1102,16 +1102,16 @@
             "posts": [
               {
                 "at": [
-                  153.6,
-                  -14
+                  -153.6,
+                  14
                 ],
                 "top": 97.04,
                 "r": 5
               },
               {
                 "at": [
-                  153.6,
-                  -24
+                  -153.6,
+                  24
                 ],
                 "top": 95.24,
                 "r": 5
@@ -1120,17 +1120,17 @@
           },
           "frame": {
             "origin": [
-              153.6,
-              -9.047,
+              -153.6,
+              9.047,
               112.331
             ],
             "z": [
               0,
-              -0.984,
+              0.984,
               -0.177
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1178,7 +1178,7 @@
               {
                 "at": [
                   0,
-                  -18
+                  18
                 ],
                 "top": 61.59,
                 "r": 5
@@ -1186,7 +1186,7 @@
               {
                 "at": [
                   0,
-                  -40
+                  40
                 ],
                 "top": 65.55,
                 "r": 5
@@ -1196,16 +1196,16 @@
           "frame": {
             "origin": [
               0,
-              -9.055,
+              9.055,
               74.38
             ],
             "z": [
               0,
-              -0.984,
+              0.984,
               0.177
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1226,11 +1226,11 @@
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1246,17 +1246,17 @@
           },
           "frame": {
             "origin": [
-              38.4,
+              -38.4,
               0,
               81.2
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1272,17 +1272,17 @@
           },
           "frame": {
             "origin": [
-              76.8,
+              -76.8,
               0,
               92.4
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1298,17 +1298,17 @@
           },
           "frame": {
             "origin": [
-              115.19999999999999,
+              -115.19999999999999,
               0,
               103.6
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1324,17 +1324,17 @@
           },
           "frame": {
             "origin": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1350,17 +1350,17 @@
           },
           "frame": {
             "origin": [
-              63.597099581761086,
-              -40,
+              -63.597099581761086,
+              40,
               91.78464387924643
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1376,17 +1376,17 @@
           },
           "frame": {
             "origin": [
-              51.197824686320814,
-              -40,
+              -51.197824686320814,
+              40,
               90.20098290943483
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1402,17 +1402,17 @@
           },
           "frame": {
             "origin": [
-              38.79854979088054,
-              -40,
+              -38.79854979088054,
+              40,
               88.61732193962321
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1428,17 +1428,17 @@
           },
           "frame": {
             "origin": [
-              26.39927489544027,
-              -40,
+              -26.39927489544027,
+              40,
               87.0336609698116
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1454,17 +1454,17 @@
           },
           "frame": {
             "origin": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1481,16 +1481,16 @@
           "frame": {
             "origin": [
               0,
-              -40,
+              40,
               79.95
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1507,16 +1507,16 @@
           "frame": {
             "origin": [
               0,
-              -25,
+              25,
               77.25
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1533,16 +1533,16 @@
           "frame": {
             "origin": [
               0,
-              -12.5,
+              12.5,
               75
             ],
             "z": [
               0,
-              1,
+              -1,
               0
             ],
             "x": [
-              1,
+              -1,
               0,
               0
             ]
@@ -1596,16 +1596,16 @@
           "a": "ground",
           "b": "crank1",
           "at": [
-            49.2,
+            -49.2,
             0,
             37.6
           ],
           "axis": [
             0,
-            1,
+            -1,
             0
           ],
-          "side": 1
+          "side": -1
         },
         {
           "id": "O2",
@@ -1613,16 +1613,16 @@
           "a": "ground",
           "b": "crank2",
           "at": [
-            129.2,
+            -129.2,
             0,
             37.6
           ],
           "axis": [
             0,
-            1,
+            -1,
             0
           ],
-          "side": 1
+          "side": -1
         },
         {
           "id": "A1",
@@ -1630,13 +1630,13 @@
           "a": "crank1",
           "b": "beam",
           "at": [
-            30,
+            -30,
             0,
             32
           ],
           "axis": [
             0,
-            1,
+            -1,
             0
           ]
         },
@@ -1646,13 +1646,13 @@
           "a": "crank2",
           "b": "beam",
           "at": [
-            110,
+            -110,
             0,
             32
           ],
           "axis": [
             0,
-            1,
+            -1,
             0
           ]
         },
@@ -1662,13 +1662,13 @@
           "a": "seats",
           "b": "beam",
           "at": [
-            30,
+            -30,
             0,
             32
           ],
           "axis": [
             0,
-            1,
+            -1,
             0
           ],
           "note": "the seats' datum rides the beam"
@@ -1679,13 +1679,13 @@
           "a": "seats",
           "b": "beam",
           "at": [
-            110,
+            -110,
             0,
             32
           ],
           "axis": [
             0,
-            1,
+            -1,
             0
           ],
           "note": "the seats' datum rides the beam"
@@ -1703,12 +1703,12 @@
           "slot": {
             "from": [
               0,
-              -10,
+              10,
               70
             ],
             "to": [
               0,
-              10,
+              -10,
               70
             ]
           },
@@ -1731,13 +1731,13 @@
           ],
           "slot": {
             "from": [
-              38.4,
-              -10,
+              -38.4,
+              10,
               81.2
             ],
             "to": [
-              38.4,
-              10,
+              -38.4,
+              -10,
               81.2
             ]
           },
@@ -1754,19 +1754,19 @@
           "a": "ball1",
           "b": "seats",
           "at": [
-            38.4,
+            -38.4,
             0,
             81.2
           ],
           "slot": {
             "from": [
-              38.4,
-              -10,
+              -38.4,
+              10,
               81.2
             ],
             "to": [
-              38.4,
-              10,
+              -38.4,
+              -10,
               81.2
             ]
           },
@@ -1783,19 +1783,19 @@
           "a": "ball1",
           "b": "tracks",
           "at": [
-            38.4,
+            -38.4,
             0,
             81.2
           ],
           "slot": {
             "from": [
-              76.8,
-              -10,
+              -76.8,
+              10,
               92.4
             ],
             "to": [
-              76.8,
-              10,
+              -76.8,
+              -10,
               92.4
             ]
           },
@@ -1812,19 +1812,19 @@
           "a": "ball2",
           "b": "seats",
           "at": [
-            76.8,
+            -76.8,
             0,
             92.4
           ],
           "slot": {
             "from": [
-              76.8,
-              -10,
+              -76.8,
+              10,
               92.4
             ],
             "to": [
-              76.8,
-              10,
+              -76.8,
+              -10,
               92.4
             ]
           },
@@ -1841,19 +1841,19 @@
           "a": "ball2",
           "b": "tracks",
           "at": [
-            76.8,
+            -76.8,
             0,
             92.4
           ],
           "slot": {
             "from": [
-              115.2,
-              -10,
+              -115.2,
+              10,
               103.6
             ],
             "to": [
-              115.2,
-              10,
+              -115.2,
+              -10,
               103.6
             ]
           },
@@ -1870,19 +1870,19 @@
           "a": "ball3",
           "b": "seats",
           "at": [
-            115.19999999999999,
+            -115.19999999999999,
             0,
             103.6
           ],
           "slot": {
             "from": [
-              115.2,
-              -10,
+              -115.2,
+              10,
               103.6
             ],
             "to": [
-              115.2,
-              10,
+              -115.2,
+              -10,
               103.6
             ]
           },
@@ -1899,19 +1899,19 @@
           "a": "ball3",
           "b": "tracks",
           "at": [
-            115.19999999999999,
+            -115.19999999999999,
             0,
             103.6
           ],
           "slot": {
             "from": [
-              153.6,
-              -12,
+              -153.6,
+              12,
               111.80000000000001
             ],
             "to": [
-              153.6,
-              -26,
+              -153.6,
+              26,
               109.28000000000002
             ]
           },
@@ -1928,19 +1928,19 @@
           "a": "ball3",
           "b": "tracks",
           "at": [
-            115.19999999999999,
+            -115.19999999999999,
             0,
             103.6
           ],
           "slot": {
             "from": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "to": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ]
           },
@@ -1957,19 +1957,19 @@
           "a": "ball4",
           "b": "tracks",
           "at": [
-            153.6,
-            -40,
+            -153.6,
+            40,
             103.28000000000002
           ],
           "slot": {
             "from": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "to": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ]
           },
@@ -1986,19 +1986,19 @@
           "a": "ball5",
           "b": "tracks",
           "at": [
-            63.597099581761086,
-            -40,
+            -63.597099581761086,
+            40,
             91.78464387924643
           ],
           "slot": {
             "from": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "to": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ]
           },
@@ -2015,19 +2015,19 @@
           "a": "ball6",
           "b": "tracks",
           "at": [
-            51.197824686320814,
-            -40,
+            -51.197824686320814,
+            40,
             90.20098290943483
           ],
           "slot": {
             "from": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "to": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ]
           },
@@ -2044,19 +2044,19 @@
           "a": "ball7",
           "b": "tracks",
           "at": [
-            38.79854979088054,
-            -40,
+            -38.79854979088054,
+            40,
             88.61732193962321
           ],
           "slot": {
             "from": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "to": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ]
           },
@@ -2073,19 +2073,19 @@
           "a": "ball8",
           "b": "tracks",
           "at": [
-            26.39927489544027,
-            -40,
+            -26.39927489544027,
+            40,
             87.0336609698116
           ],
           "slot": {
             "from": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "to": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ]
           },
@@ -2102,19 +2102,19 @@
           "a": "ball9",
           "b": "tracks",
           "at": [
-            14,
-            -40,
+            -14,
+            40,
             85.45
           ],
           "slot": {
             "from": [
-              153.6,
-              -40,
+              -153.6,
+              40,
               103.28000000000002
             ],
             "to": [
-              14,
-              -40,
+              -14,
+              40,
               85.45
             ]
           },
@@ -2131,19 +2131,19 @@
           "a": "ball9",
           "b": "tracks",
           "at": [
-            14,
-            -40,
+            -14,
+            40,
             85.45
           ],
           "slot": {
             "from": [
               0,
-              -40,
+              40,
               79.95
             ],
             "to": [
               0,
-              -12.5,
+              12.5,
               75
             ]
           },
@@ -2161,18 +2161,18 @@
           "b": "tracks",
           "at": [
             0,
-            -40,
+            40,
             79.95
           ],
           "slot": {
             "from": [
               0,
-              -40,
+              40,
               79.95
             ],
             "to": [
               0,
-              -12.5,
+              12.5,
               75
             ]
           },
@@ -2190,18 +2190,18 @@
           "b": "tracks",
           "at": [
             0,
-            -25,
+            25,
             77.25
           ],
           "slot": {
             "from": [
               0,
-              -40,
+              40,
               79.95
             ],
             "to": [
               0,
-              -12.5,
+              12.5,
               75
             ]
           },
@@ -2219,18 +2219,18 @@
           "b": "tracks",
           "at": [
             0,
-            -12.5,
+            12.5,
             75
           ],
           "slot": {
             "from": [
               0,
-              -40,
+              40,
               79.95
             ],
             "to": [
               0,
-              -12.5,
+              12.5,
               75
             ]
           },
@@ -2248,18 +2248,18 @@
           "b": "tracks",
           "at": [
             0,
-            -12.5,
+            12.5,
             75
           ],
           "slot": {
             "from": [
               0,
-              -10,
+              10,
               70
             ],
             "to": [
               0,
-              10,
+              -10,
               70
             ]
           },
@@ -2327,7 +2327,7 @@
                 "center": "O1",
                 "axis": [
                   0,
-                  1,
+                  -1,
                   0
                 ]
               },
@@ -2336,7 +2336,7 @@
                 "center": "O2",
                 "axis": [
                   0,
-                  1,
+                  -1,
                   0
                 ]
               }
@@ -2387,7 +2387,7 @@
               "pin": "A1",
               "axis": [
                 0,
-                1,
+                -1,
                 0
               ]
             },
@@ -2631,7 +2631,7 @@
           "id": "S1",
           "body": "tracks",
           "local": [
-            38.4,
+            -38.4,
             0,
             81.2
           ]
@@ -2640,7 +2640,7 @@
           "id": "S2",
           "body": "tracks",
           "local": [
-            76.8,
+            -76.8,
             0,
             92.4
           ]
@@ -2649,7 +2649,7 @@
           "id": "S3",
           "body": "tracks",
           "local": [
-            115.19999999999999,
+            -115.19999999999999,
             0,
             103.6
           ]
@@ -2658,7 +2658,7 @@
           "id": "S4",
           "body": "tracks",
           "local": [
-            153.6,
+            -153.6,
             0,
             114.80000000000001
           ]
@@ -2667,8 +2667,8 @@
           "id": "C1",
           "body": "tracks",
           "local": [
-            153.6,
-            -12,
+            -153.6,
+            12,
             111.80000000000001
           ]
         },
@@ -2676,8 +2676,8 @@
           "id": "C2",
           "body": "tracks",
           "local": [
-            153.6,
-            -26,
+            -153.6,
+            26,
             109.28000000000002
           ]
         },
@@ -2685,8 +2685,8 @@
           "id": "G",
           "body": "tracks",
           "local": [
-            153.6,
-            -38,
+            -153.6,
+            38,
             108.28000000000002
           ]
         },
@@ -2694,8 +2694,8 @@
           "id": "F",
           "body": "tracks",
           "local": [
-            153.6,
-            -40,
+            -153.6,
+            40,
             103.28000000000002
           ]
         },
@@ -2703,8 +2703,8 @@
           "id": "E",
           "body": "tracks",
           "local": [
-            7.5,
-            -40,
+            -7.5,
+            40,
             84.61980659025788
           ]
         },
@@ -2713,7 +2713,7 @@
           "body": "tracks",
           "local": [
             0,
-            -6.5,
+            6.5,
             73.92
           ]
         },
@@ -2722,7 +2722,7 @@
           "body": "tracks",
           "local": [
             0,
-            -12.5,
+            12.5,
             75
           ]
         },
@@ -2731,7 +2731,7 @@
           "body": "tracks",
           "local": [
             0,
-            -25,
+            25,
             77.25
           ]
         },
@@ -2740,7 +2740,7 @@
           "body": "tracks",
           "local": [
             0,
-            -40,
+            40,
             79.95
           ]
         },
@@ -2748,8 +2748,8 @@
           "id": "Q4",
           "body": "tracks",
           "local": [
-            14,
-            -40,
+            -14,
+            40,
             85.45
           ]
         },
@@ -2757,8 +2757,8 @@
           "id": "Q5",
           "body": "tracks",
           "local": [
-            26.39927489544027,
-            -40,
+            -26.39927489544027,
+            40,
             87.0336609698116
           ]
         },
@@ -2766,8 +2766,8 @@
           "id": "Q6",
           "body": "tracks",
           "local": [
-            38.79854979088054,
-            -40,
+            -38.79854979088054,
+            40,
             88.61732193962321
           ]
         },
@@ -2775,8 +2775,8 @@
           "id": "Q7",
           "body": "tracks",
           "local": [
-            51.197824686320814,
-            -40,
+            -51.197824686320814,
+            40,
             90.20098290943483
           ]
         },
@@ -2784,8 +2784,8 @@
           "id": "Q8",
           "body": "tracks",
           "local": [
-            63.597099581761086,
-            -40,
+            -63.597099581761086,
+            40,
             91.78464387924643
           ]
         },
@@ -2794,7 +2794,7 @@
           "body": "beam",
           "local": [
             76.8,
-            -92.4,
+            92.4,
             0
           ]
         },
@@ -2826,7 +2826,7 @@
           "of": "seat",
           "kind": "position",
           "unit": "mm",
-          "axis": "x",
+          "axis": "-x",
           "datum": 76.8
         },
         {
@@ -2842,7 +2842,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-27",
-        "note": "T2 review 2026-10-27, six phases drawn from the solved motion at 0, 60, 120, 180, 240 and 300 degrees in VIEW -25 30: keep. Drive: two equal cranks (circular translation) rather than a lift-and-carry drive: one rotary input with the standard motor and belt (section 8), and the beam's whole motion is one closed curve to trace; the flat carry and square hand-over of a lift-and-carry drive are named in the limits. The notch line rises (sin a = 0.28) so the hand-overs lie at the ends of the circle's diameter: the seats meet the notches 16.3 degrees from square, inside the 45 degree flank of the V, so nothing slides, and the beam lifts each ball 11.2 mm per station, the height the gravity return gives back. Closed circuit: the return under the transfer was set aside, since a ball returning under the beam must climb back past the beam's depth and its fall below the rails, more than one seat can lift. The return runs beside the transfer: the out-track rolls the ball from the top notch across onto the return lane, a packed queue rolls down the lane and back across on the in-track, and the front ball rolls into the first notch while the beam is down. Every slot advances one per turn, so after one turn each ball stands where the next one stood (kin.bodies next, K2) and the loop shows no jump. Balls rather than pins: they roll across onto the cross tracks and round the corners, which a pin cannot. Trace: the seat at S2 draws the beam's 40 mm circle with 30 degree ticks; overlays: the notch line, the station (2r) and the crank radius; plot: a ball's advance (a step) against the beam's travel (a sine), the stepwise advance against the continuous motion. Solve checks: advance 38.4 mm and rise 11.2 mm per turn, circle 40 mm, dwell 180 degrees, all within tolerance. The parallelogram's change points fall at the hand-overs: held on the parallel branch as in the parallelogram linkage; a chain or gear tie between the cranks is an open question."
+        "note": "T2 review 2026-10-27, six phases drawn from the solved motion at 0, 60, 120, 180, 240 and 300 degrees in VIEW -25 30: keep. Drive: two equal cranks (circular translation) rather than a lift-and-carry drive: one rotary input with the standard motor and belt (section 8), and the beam's whole motion is one closed curve to trace; the flat carry and square hand-over of a lift-and-carry drive are named in the limits. The notch line rises (sin a = 0.28) so the hand-overs lie at the ends of the circle's diameter: the seats meet the notches 16.3 degrees from square, inside the 45 degree flank of the V, so nothing slides, and the beam lifts each ball 11.2 mm per station, the height the gravity return gives back. Closed circuit: the return under the transfer was set aside, since a ball returning under the beam must climb back past the beam's depth and its fall below the rails, more than one seat can lift. The return runs beside the transfer: the out-track rolls the ball from the top notch across onto the return lane, a packed queue rolls down the lane and back across on the in-track, and the front ball rolls into the first notch while the beam is down. Every slot advances one per turn, so after one turn each ball stands where the next one stood (kin.bodies next, K2) and the loop shows no jump. Balls rather than pins: they roll across onto the cross tracks and round the corners, which a pin cannot. Trace: the seat at S2 draws the beam's 40 mm circle with 30 degree ticks; overlays: the notch line, the station (2r) and the crank radius; plot: a ball's advance (a step) against the beam's travel (a sine), the stepwise advance against the continuous motion. Solve checks: advance 38.4 mm and rise 11.2 mm per turn, circle 40 mm, dwell 180 degrees, all within tolerance. The parallelogram's change points fall at the hand-overs: held on the parallel branch as in the parallelogram linkage; a chain or gear tie between the cranks is an open question. Owner's review (#254): the model is turned 180 degrees about the vertical so the walking plate and its cranks face the standard views; it opens at VIEW 32 31, the owner's stage view, and ISOMETRIC and DIMETRIC look at the same side. Sizes, drive, circuit and claims unchanged."
       },
       "principle": [
         {
@@ -2930,13 +2930,13 @@
           "label": "r"
         }
       ],
-      "view": "VIEW -25 30",
+      "view": "VIEW 32 31",
       "views": [
         {
           "id": "hand-over",
           "kind": "detail",
           "center": [
-            38.4,
+            -38.4,
             0,
             81.2
           ],
