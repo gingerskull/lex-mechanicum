@@ -92,9 +92,11 @@ function planetMesh(c: BlockCtx, s: SolveStep, j: import("../types").KinJoint): 
 function rollingPinion(c: BlockCtx, s: SolveStep, j: import("../types").KinJoint): void {
   const i = s.in ?? {};
   if (j.radiusA === undefined) throw new KinError(`${s.id}: a rolling pinion needs the joint's radiusA`);
+  // the rack's way is its own: the pinion's axis would give no travel, so the pinion would never turn
+  if (j.axis2 === undefined) throw new KinError(`${s.id}: a rolling pinion needs the joint's axis2 (the rack's way)`);
   const parent = str(i.parent, "gear-mesh.parent");
   const centre = i.rolls;
-  const axisB = j.axis2 ? v3.unit(c.vec(j.axis2)) : c.jointAxis(j.id);
+  const axisB = v3.unit(c.vec(j.axis2));
   const ref = c.refVec(centre);
   // the rack's own displacement, where a block posed it before this step (a held rack has none)
   const rack = c.has(j.b) ? v3.sub(xf.apply(c.xf(j.b), ref), ref) : ([0, 0, 0] as Vec3);

@@ -86,6 +86,24 @@ describe("kin and teaching validation", () => {
     expect(validate([withBlocks((b) => (b.kin.drivers[0]!.default = 400))])).toContain("x: driver input: default 400 outside its range");
   });
 
+  it("checks a cam's turns, blends and spans at the params' values", () => {
+    const withCam = (cam: Record<string, unknown>) =>
+      validate([
+        withBlocks((b) => {
+          b.kin.params.push({ id: "N", value: 2, unit: "turns", min: 1, max: 3 });
+          b.kin.joints.push({ id: "K", type: "cam-contact", a: "rocker", b: "crank", at: [0, 0, 0], cam: { lift: 10, rb: 30, ...cam } } as unknown as Kin["joints"][number]);
+        }),
+      ]);
+    const rise = (span: unknown, blend?: unknown) => ({ kind: "rise", span, law: "trapezoidal", ...(blend !== undefined ? { blend } : {}) });
+    const ret = (span: unknown) => ({ kind: "return", span });
+    expect(has(withCam({ schedule: [rise(180), ret(180)] }), "joint K: cam schedule")).toBe(false);
+    expect(has(withCam({ turns: "N", schedule: [rise("180*N", 0.25), ret("180*N")] }), "joint K: cam schedule")).toBe(false);
+    expect(has(withCam({ turns: 1.5, schedule: [rise(270), ret(270)] }), "joint K: cam schedule: turns 1.5 must be a whole number from 1")).toBe(true);
+    expect(has(withCam({ schedule: [rise(180, 0.7), ret(180)] }), "joint K: cam schedule: blend 0.7 must lie in 0 to 0.5")).toBe(true);
+    expect(has(withCam({ turns: "N", schedule: [rise(360), ret(360)] }), "joint K: cam schedule: spans sum to 720°, not 360° × 2 turns")).toBe(false);
+    expect(has(withCam({ turns: "N+1", schedule: [rise(360), ret(360)] }), "joint K: cam schedule: spans sum to 720°, not 360° × 3 turns")).toBe(true);
+  });
+
   it("checks mobility against dof (K11), excusing a stated overconstraint", () => {
     expect(has(validate([withBlocks(() => {}, { dof: 2 })]), "mobility counted from kin is 1 but dof is 2")).toBe(true);
     const notes = { links: 4, revolute: 4, prismatic: 0, higher_pairs: 0, notes: "overconstrained" };

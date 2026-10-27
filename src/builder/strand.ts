@@ -53,26 +53,35 @@ function chainsOf(ctx: BuildCtx): Chain[] {
   return out;
 }
 
-/** The value the strand step gives for the chain's travel past its carrier (out.travel), and that step's carrier. */
+/**
+ * The value the strand step solving a held strand gives for the chain's travel past its carrier (out.travel), and that
+ * step's carrier: the step whose held strand it is, or that claims it among its joints.
+ */
 function stepOf(ctx: BuildCtx, held: string): { key: string; carrier: string } | null {
-  const st = ctx.kin.solve.find((q) => q.block === "strand" && q.in?.held !== undefined);
+  const st = ctx.kin.solve.find((q) => q.block === "strand" && q.in?.held !== undefined && (q.in.held === held || ((q as { joints?: unknown[] }).joints ?? []).includes(held)));
   const o = st?.out;
   const key = o && typeof o === "object" && !Array.isArray(o) ? o.travel : undefined;
   const carrier = st?.in?.carrier;
-  void held;
   return typeof key === "string" && typeof carrier === "string" ? { key, carrier } : null;
 }
 
 export function buildStrands(ctx: BuildCtx): void {
   if (!ctx.base) return;
-  const chains = chainsOf(ctx);
-  if (!chains.length) return;
-  const step = stepOf(ctx, chains[0]!.held.id);
+  const all = chainsOf(ctx);
+  if (!all.length) return;
+  const step = stepOf(ctx, all[0]!.held.id);
   if (!step) {
-    ctx.issues.push(`${chains[0]!.held.id}: no strand step names the chain's travel (out.travel): its links are not built`);
+    ctx.issues.push(`${all[0]!.held.id}: no strand step names the chain's travel (out.travel): its links are not built`);
     return;
   }
-  const spr = chains[0]!.held.a;
+  const spr = all[0]!.held.a;
+  // the chains are built on one sprocket, conveyed by one travel on one carrier: a chain that is not is left unbuilt
+  const chains = all.filter((ch) => {
+    const st = stepOf(ctx, ch.held.id);
+    if (ch.held.a === spr && st && st.key === step.key && st.carrier === step.carrier) return true;
+    ctx.issues.push(`${ch.held.id}: the chain is not on ${spr} with the travel ${step.key} past ${step.carrier}, as the first chain is: its links are not built`);
+    return false;
+  });
   const g = ctx.geoms.get(spr);
   const ext = ctx.extent(spr);
   const part = ctx.parts.get(spr);
@@ -117,6 +126,13 @@ export function buildStrands(ctx: BuildCtx): void {
     const zc = rowZ(ch.row);
     const yH = c[1] - R;
     const yR = c[1] + R;
+    // the path below takes the held end on the strand under the sprocket, the drawn end on the one over it, both on the
+    // side away from the half it wraps (-x for wrap +1, +x for wrap -1), in one of the sprocket's rows
+    const side = -ch.wrap;
+    if (ch.row < 0 || ch.row >= rows || (G[0] - c[0]) * side <= 0 || (E[0] - c[0]) * side <= 0 || Math.abs(G[1] - yH) > 0.01 || Math.abs(E[1] - yR) > 0.01) {
+      ctx.issues.push(`${ch.held.id}: the chain's ends ${ends.join(", ")} do not lie on its strands' tangent lines on the ${side < 0 ? "-x" : "+x"} side of the sprocket (row ${ch.row} of ${rows}): its links are not built`);
+      continue;
+    }
     // the lengths from each end to the sprocket's tangent points, in links: whole numbers so a roller meets the seats
     const lh = Math.abs(G[0] - c[0]) / p;
     const lr = Math.abs(E[0] - c[0]) / p;

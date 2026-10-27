@@ -37,7 +37,7 @@ function heldRack(ctx: BuildCtx, a: string, b: string): string | undefined {
  * the teeth's side left open for what runs under them; socket screws down through slots across the rack, the riser and
  * into the base, so the rack is set to its pinion (F7) before two dowels pin it (F1). Built once, at its first mesh.
  */
-function seatRack(ctx: BuildCtx, rack: string): { F1: string[]; F7: string[]; note: string } | null {
+function seatRack(ctx: BuildCtx, rack: string, at: readonly number[]): { F1: string[]; F7: string[]; note: string } | null {
   const part = ctx.parts.get(rack);
   const shape = ctx.kin.bodies.find((q) => q.id === rack)?.shape as Record<string, unknown> | undefined;
   if (!part || !shape || part.op.op !== "extrude" || !ctx.base || ctx.get(`${rack}-riser`)) return null;
@@ -49,6 +49,11 @@ function seatRack(ctx: BuildCtx, rack: string): { F1: string[]; F7: string[]; no
   const bottom = ctx.base.top - part.frame.o[2];
   const top = part.op.h;
   if (bottom > -0.5) return null;
+  const M = 4;
+  // the slots need a wall of 1 mm each side in the back, the dowels 30 mm in from each end 12 mm between them
+  const slotH = M + 2.5;
+  if (back[1] - back[0] < slotH + 2) throw new Error(`${rack}: a held rack ${h} mm high (module ${m}) has ${(back[1] - back[0]).toFixed(2)} mm of back under its teeth, too little for its setting slots (${slotH + 2} mm)`);
+  if (len < 72) throw new Error(`${rack}: a held rack ${len} mm long is too short for its two dowels 30 mm in from each end (72 mm at least)`);
   const L = new Local(part.frame, { joints: [] });
   const x0 = -len / 2;
   const x1 = len / 2;
@@ -56,11 +61,11 @@ function seatRack(ctx: BuildCtx, rack: string): { F1: string[]; F7: string[]; no
   // screws at most 100 mm apart, near each end; slots across the rack for the setting, 1 mm each way
   const n = Math.max(2, Math.ceil((len - 24) / 100) + 1);
   const xs = Array.from({ length: n }, (_, k) => x0 + 12 + ((len - 24) * k) / (n - 1));
-  const M = 4;
   const slot = (x: number) => roundRect(x - M / 2 - 0.25, yc - M / 2 - 1.25, x + M / 2 + 0.25, yc + M / 2 + 1.25, M / 2 + 0.25).reverse();
   part.profile.holes = [...part.profile.holes, ...xs.map(slot)];
   // the match mark at the pitch point, across the root line under the pinion's tooth at the reference (F9)
-  part.marks.push({ kind: "timing", pts: [[0, -1.25 * m - 0.4], [0, -1.25 * m - 2.9]] });
+  const xm = planeCoords(part.frame, [at[0]!, at[1]!, at[2]!]).uv[0];
+  part.marks.push({ kind: "timing", pts: [[xm, -1.25 * m - 0.4], [xm, -1.25 * m - 2.9]] });
   xs.forEach((x, k) => L.add(H.screw(`${rack}-sc${k}`, "socket", M, top - bottom + 6, { body: "ground", at: [x, yc, 0], face: top, dir: -1, ...(k ? { name: "", qty: 0 } : { qty: n }) })));
   // two dowels between the screws, diagonal across the back, through rack and riser into the base
   const dws = [0, 1].map((k) => {
@@ -85,7 +90,7 @@ const j6 = contactRule({
     // a held rack is seated on the base and set to its pinion on its own slots
     const held = heldRack(ctx, c.a, c.b);
     if (held) {
-      const seat = seatRack(ctx, held);
+      const seat = seatRack(ctx, held, c.at);
       if (seat) marked.push(held);
       const serves: Record<string, string[]> = { F9: marked, F7: seat?.F7 ?? [], F1: seat?.F1 ?? [] };
       return { serves, note: `${titleOf(c.id)}: parallel mesh with a held rack; timing marks on ${marked.join(" and ") || "the gears"}; ${seat ? seat.note : `${titleOf(held)} seated at its first mesh`}.` };

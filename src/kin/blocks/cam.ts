@@ -75,7 +75,22 @@ export function scheduleOf(
     segments: cam.schedule.map((g) => ({ kind: g.kind, span: num(g.span) * D2R, law: lawOf(g.law), ...(g.blend !== undefined ? { blend: num(g.blend) } : {}) })),
   };
   if (cam.turns !== undefined) sched.period = num(cam.turns) * TAU;
+  const problem = scheduleProblem(sched);
+  if (problem) throw new Error(`cam schedule: ${problem}`);
   return sched;
+}
+
+/**
+ * What is wrong with a bound schedule, or null: its turns a whole number from 1, each blend 0 to 0.5, and its spans
+ * summing to 360° times its turns (the period). The catalogue's validator refuses a record that breaks these.
+ */
+export function scheduleProblem(c: CamSchedule): string | null {
+  const turns = (c.period ?? TAU) / TAU;
+  if (!(turns >= 1) || Math.abs(turns - Math.round(turns)) > 1e-9) return `turns ${+turns.toFixed(6)} must be a whole number from 1`;
+  for (const g of c.segments) if (g.blend !== undefined && !(g.blend >= 0 && g.blend <= 0.5)) return `blend ${g.blend} must lie in 0 to 0.5`;
+  const sum = c.segments.reduce((a, g) => a + g.span, 0);
+  if (Math.abs(sum - turns * TAU) > 1e-6) return `spans sum to ${+(sum / (Math.PI / 180)).toFixed(4)}°, not 360° × ${Math.round(turns)} turns`;
+  return null;
 }
 
 /** Turns of the cam per repeat of its schedule (1 unless the schedule gives a longer period). */

@@ -53,6 +53,12 @@ describe("gear-mesh: a pinion rolling on a held rack", () => {
     });
   }
 
+  it("refuses a rolling pinion whose mesh gives no axis2 (the rack's way)", () => {
+    const kin = doubler(24);
+    delete (kin.joints.find((j) => j.id === "M1") as { axis2?: unknown }).axis2;
+    expect(() => new Kinematics(kin).pose(0.4)).toThrow(/a rolling pinion needs the joint's axis2/);
+  });
+
   it("a free rack posed without the moving centre fails K1 (its mesh is checked in the carrier's frame)", () => {
     const rep = verifyK1(new Kinematics(doubler(24, true)));
     expect(rep.ok).toBe(false);

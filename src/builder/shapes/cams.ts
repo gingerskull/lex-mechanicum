@@ -141,6 +141,7 @@ function grooveShoe(kin: Kin, S: Setup, b: KinBody, g: BodyGeom): BodyGeom | nul
   const cj = kin.joints.find((q) => q.type === "cam-contact" && (q.a === b.id || q.b === b.id) && q.cam);
   const r = cj ? S.joints.get(cj.id) : undefined;
   if (!cj || !r || !r.ca) return null;
+  if (cj.cam!.form !== "barrel") throw new Error(`${b.id}: a groove shoe rides a barrel cam's groove; joint ${cj.id} is not a barrel cam (cam.form "barrel")`);
   const drum = kin.bodies.find((q) => q.id === (cj.a === b.id ? cj.b : cj.a));
   const ds = (drum?.shape ?? {}) as Record<string, unknown>;
   const R = num(ds.radius, 16);

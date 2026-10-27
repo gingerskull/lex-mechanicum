@@ -2,7 +2,10 @@
 import { describe, expect, it } from "vitest";
 import { camMotion, camTurns, lawRise, scheduleOf } from "../../src/kin/blocks/cam";
 import { barrelTrack, camLawOf } from "../../src/builder/cams";
+import { Kinematics } from "../../src/kin/compose";
 import type { KinJoint } from "../../src/kin/types";
+import { verifyK1 } from "../../src/kin/verify";
+import { camFollower } from "./fixtures";
 
 const D = Math.PI / 180;
 
@@ -53,6 +56,24 @@ describe("a schedule of several turns", () => {
     expect(one.period).toBeUndefined();
     expect(camTurns(one)).toBe(1);
     expect(one.segments[0]).toEqual({ kind: "rise", span: Math.PI, law: "cycloidal" });
+  });
+
+  it("refuses a schedule whose turns, blends or spans do not fit", () => {
+    const bind = (c: Parameters<typeof scheduleOf>[0]) => () => scheduleOf(c, (v) => Number(v), () => "trapezoidal");
+    expect(bind({ ...cam, turns: 2.5 })).toThrow(/turns 2.5 must be a whole number/);
+    expect(bind({ ...cam, turns: 0 })).toThrow(/whole number from 1/);
+    expect(bind({ ...cam, turns: 5 })).toThrow(/spans sum to 2160°, not 360° × 5 turns/);
+    expect(bind({ ...cam, schedule: [{ ...cam.schedule[0]!, blend: 0.6 }, cam.schedule[1]!] })).toThrow(/blend 0.6 must lie in 0 to 0.5/);
+    expect(bind({ schedule: [{ kind: "rise", span: 180 }, { kind: "return", span: 170 }], lift: 10 })).toThrow(/spans sum to 350°/);
+  });
+
+  it("checks a one-turn cam's contact with its own blend (K1)", () => {
+    const k = camFollower();
+    const c = k.joints.find((j) => j.id === "C")!.cam!;
+    c.schedule[0] = { kind: "rise", span: 120, law: "trapezoidal", blend: 0.1 };
+    const rep = verifyK1(new Kinematics(k));
+    expect(rep.failures).toEqual([]);
+    expect(rep.ok).toBe(true);
   });
 
   it("cuts its barrel track in closed pieces that share their end rings", () => {

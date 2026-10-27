@@ -30,7 +30,8 @@ const obliqueJournal: Rule = {
       const dj = num(jrn.diameter, 20);
       const D = num(ring.bore, 32);
       const [s0, s1] = pair(jrn.seat, [-7, 7]);
-      const b = BEARINGS.find((q) => q.d === dj && q.D === D) ?? BEARINGS.find((q) => q.d === dj)!;
+      const b = BEARINGS.find((q) => q.d === dj && q.D === D) ?? BEARINGS.find((q) => q.d === dj);
+      if (!b) throw new Error(`${j.id}: no bearing in the table has a ${dj} mm bore for the journal ${jrnId}`);
       const n = Math.max(1, Math.round((s1 - s0) / b.B));
       // the journal's axis, its sign as the journal's frame has it (its collar at the seat's start)
       const g = ctx.geoms.get(jrnId);

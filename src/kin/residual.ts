@@ -4,7 +4,7 @@ import { D2R, type Mat3, type Vec3, m3, v3, wrapPi, xf, type Xf } from "./math";
 import { evalExpr } from "./expr";
 import type { KinJoint } from "./types";
 import { ellipticalAngle, meshRatio } from "./blocks/gears";
-import { type CamSchedule, camMotion, camTurns, scheduleOf, type CamLaw } from "./blocks/cam";
+import { camMotion, camTurns, scheduleOf, type CamLaw } from "./blocks/cam";
 import { chainAdvance, screwAdvance, variatorR2 } from "./blocks/members";
 import { reflection, bisectorNormal } from "./blocks/spatial";
 
@@ -125,10 +125,11 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
     case "cam-contact": {
       if (!j.cam) break;
       const n = r.num;
+      // the schedule as the cam block and the builder bind it: blends and the period included
+      const sched = scheduleOf(j.cam, n, (l) => (l as CamLaw | undefined) ?? "cycloidal");
       if (j.cam.turns !== undefined && j.cam.form === "barrel" && r.ca) {
         // a barrel track of several turns: the cam's pose gives its angle only within a turn, so the follower must lie on
         // the groove where it passes under the follower on one of those turns (a self-reversing screw's crossing grooves)
-        const sched = scheduleOf(j.cam, n, (l) => (l as CamLaw | undefined) ?? "cycloidal");
         const th = n(j.cam.theta0 ?? 0) * D2R + xf.angleAbout(Xb, r.axis);
         const tip = xf.apply(xf.inv(Xb), xf.apply(Xa, r.at));
         const s0 = camMotion(sched, n(j.cam.theta0 ?? 0) * D2R).s;
@@ -142,10 +143,6 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
         out.push(v3.len(v3.perp(v3.sub(tip, r.ca), r.axis)) - n(j.cam.rb), miss);
         break;
       }
-      const sched: CamSchedule = {
-        lift: n(j.cam.lift),
-        segments: j.cam.schedule.map((g) => ({ kind: g.kind, span: n(g.span) * D2R, law: (g.law as CamLaw | undefined) ?? "cycloidal" })),
-      };
       if (!r.ca) break; // the cam's axis point is needed
       const th = n(j.cam.theta0 ?? 0) * D2R + xf.angleAbout(Xb, r.axis);
       const m = camMotion(sched, th);
