@@ -7,6 +7,8 @@ export const KIN_VOCAB = {
     "link", "plate", "slotLink", "slider", "gear", "rack", "ringGear", "cam", "disc", "shaft", "sprocket", "pulley",
     "rope", "cage", "cross", "tracer", "cylinder", "piston", "nut", "fork", "custom", "genevaWheel", "genevaCrank", "intermittentDriver", "intermittentDriven", "star", "ratchetWheel", "escapeWheel", "crownWheel", "verge",
     "spatial-link", "ball", "race", "bell", "shoe",
+    // a rod bent to the angle of its two joints' axes (Hobson's joint)
+    "elbow",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
   joint: [
@@ -21,6 +23,8 @@ export const KIN_VOCAB = {
     "lerp", "line-crossing", "target-path", "rocker", "indexer", "star", "ratchet", "one-way", "escape", "verge",
     // couplings and spatial linkages (R6)
     "sarrus", "cross-slide", "parallel-cranks", "plane-slide", "rzeppa", "conical-pendulum",
+    // the bent-rod coupling (Hobson's joint)
+    "elbow-rods",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;
