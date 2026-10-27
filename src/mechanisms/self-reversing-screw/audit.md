@@ -38,13 +38,13 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | K10 | PASS | AUTO / DATA · AUTO / DATA · one closure; the track repeats after 6 turns, continuous over the cycle |
 | K11 | PASS | AUTO · mobility counted 2, dof 1 |
 | K12 | PASS | DATA · DATA · every traced, overlaid, plotted and claimed point and quantity is named in kin |
-| T1 | PASS | HAND · HAND · mechanics first; the shoe running out and back on a screw that turns one way reads in FRONT, the diamonds of the crossing grooves, the shoe swivelling at each end; no winch, reel or cable in any string |
+| T1 | PASS | HAND · HAND · mechanics first; the shoe running out and back on a screw that turns one way reads in DIMETRIC, the diamonds of the crossing grooves, the shoe swivelling at each end; no winch, reel or cable in any string |
 | T2 | PASS | HAND · HAND · review before the build and again on the six phases of the finished build (shots at u 0, 1.1, 1.57 and the set); decisions in the record |
 | T3 | PASS | DATA · DATA · screw, shoe, carriage and the shoe's centre declared; drawn whole, in depth order |
 | T4 | PASS | DATA · fired: trace-marks (1 solid) · DATA · the shoe's centre with one tick per screw turn: ticks one lead apart in the steady runs, closer in the turn-round |
 | T5 | PASS | DATA · DATA · screw axis; a one-lead dimension; the stroke between the shoe's posed ends, labelled with the 3 turns |
 | T6 | PASS | HAND / DATA · HAND / DATA · 120 mm of stroke on a 170 mm screw, a 57.2° swivel at each end, 8.3 mm crossings under an 18 mm shoe: all read at the default size |
-| T7 | PASS | DATA · DATA · FRONT: the screw's near side, where the grooves cross in diamonds and the shoe lies along its groove at true size |
+| T7 | PASS | DATA · DATA · DIMETRIC: the screw's length, the diamonds of the crossing grooves and the shoe in its groove read together with the carriage and the drive in depth; FRONT keeps the grooves at true size |
 | T8 | PASS | DATA · DATA · detail CROSSING at 4:1 where the shoe bridges a crossing at the stage's opening phase, the shoe highlighted |
 | T9 | PASS | AUTO / DATA · claim table: 6 ok, 0 off, 0 uncheckable of 6 |
 | T10 | PASS | AUTO · 22 solids drawn see-through: carriage-upright, O-pb-b0, O-pb-b0-brg, O-pb-b0-brg-balls, O-pb-b0-brg-cage, O-pb-b0-col0, O-pb-b0-col1, O-pb-b1 · filled by the generator: a rule built solids for it |
