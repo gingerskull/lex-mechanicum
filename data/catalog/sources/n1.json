@@ -580,13 +580,13 @@
     "build": {
       "ground": "base with the carrier's slide, the output's slide beside it, and an anchor block for each chain's held end, one at either end of the base",
       "defining_relations": "The sprocket (ISO 606 08B, 12 teeth, seat circle radius 24.53 mm) takes 152.4 mm of chain per turn, so r = z p / 2π = 24.26 mm. Each chain's anchored strand is held: for a carrier travel x the sprocket turns θ = -x / r, and the strand on its far side moves x again relative to the carrier, so the output moves x - r θ = 2x, whatever r is. Carrier stroke 80 mm (±40), output stroke 160 mm (±80), sprocket turn 189° over the stroke (80 / 24.26 rad).",
-      "notes": "Seen in plan: the anchored strands run under the sprocket's centre (y -24.53), the running strands over it (y +24.53), the output slide beyond them. Chain A, in the sprocket's lower row, wraps its +x half: anchored at x -114.3, pinned to the output at -76.2. Chain B, in the upper row 15.5 mm higher, wraps the -x half: anchored at +114.3, pinned to the output at +76.2. Both 21 links, a whole number of pitches from each end to the sprocket, so a roller sits in a seat at both tangent points. Each chain end is pinned to an anchor bolt; the bolt at chain A's held end sets the length of the pair."
+      "notes": "Seen in plan: the anchored strands run under the sprocket's centre (y -24.53), the running strands over it (y +24.53), the output slide beyond them. Chain A, in the sprocket's lower row, wraps its +x half: anchored at x -114.3, pinned to the output at -76.2. Chain B, in the upper row 16.5 mm higher, wraps the -x half: anchored at +114.3, pinned to the output at +76.2. Both 21 links, a whole number of pitches from each end to the sprocket, so a roller sits in a seat at both tangent points. Each chain end is pinned to an anchor bolt; the nuts on the bolts set each chain's length, the two chains drawn tight against each other."
     },
     "kin": {
       "bodies": [
         { "id": "ground", "role": "ground", "shape": { "type": "plate", "rect": [400, 150] }, "at": { "frame": { "origin": [0, 14, -8] } } },
         { "id": "carrier", "role": "driver", "shape": { "type": "slider", "length": 56, "width": 26 }, "at": { "joint": "S" } },
-        { "id": "sprocket", "role": "link", "shape": { "type": "sprocket", "z": 12, "pitch": 12.7, "roller": 8.5, "standard": "ISO 606 08B", "bore": 10, "face": 22.5, "rows": 2, "rowPitch": 15.5 }, "at": { "joint": "S" } },
+        { "id": "sprocket", "role": "link", "shape": { "type": "sprocket", "z": 12, "pitch": 12.7, "roller": 8.5, "standard": "ISO 606 08B", "bore": 10, "face": 23.5, "rows": 2, "rowPitch": 16.5 }, "at": { "joint": "S" } },
         { "id": "output", "role": "output", "shape": { "type": "slider", "length": 200, "width": 20 }, "at": { "joint": "O" }, "frame": { "origin": [0, 56, 0] } }
       ],
       "joints": [

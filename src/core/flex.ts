@@ -91,12 +91,14 @@ export const sprocketSeat = (d1: number): number => 0.505 * d1 + 0.069 * Math.cb
  * polygon (the first at angle a0), its seating angle 140° - 90°/z, convex flanks of the mean standard radius tangent to
  * it, the tip circle midway between the standard's limits, a land left on each tip.
  */
-export function sprocketOutline(z: number, p: number, d1: number, a0 = 0): Vec2[] {
+export function sprocketOutline(z: number, p: number, d1: number, a0 = 0, tip: "mid" | "min" = "mid"): Vec2[] {
   const R = sprocketR(z, p);
   const seat = sprocketSeat(d1);
   const al = ((140 - 90 / z) * Math.PI) / 180;
   const re = (0.12 * d1 * (z + 2) + 0.008 * d1 * (z * z + 180)) / 2;
-  const Ra = (2 * R + p * (1 - 1.6 / z) - d1 + (2 * R + 1.25 * p - d1)) / 4;
+  // the tip circle midway between the standard's limits, or at its least: a sprocket whose free strands are drawn along
+  // the seat circle's tangents, which the teeth of the larger tip would graze as a roller leaves its seat
+  const Ra = tip === "min" ? (2 * R + p * (1 - 1.6 / z) - d1) / 2 : (2 * R + p * (1 - 1.6 / z) - d1 + (2 * R + 1.25 * p - d1)) / 4;
   // one tooth gap in its own frame (the vertex on +x): the seat, then the flank on the +y side out to the tip circle
   const E: Vec2 = [R - seat * Math.cos(al / 2), seat * Math.sin(al / 2)];
   const cf: Vec2 = [E[0] + (re * (R - E[0])) / seat, E[1] + (re * (0 - E[1])) / seat];
