@@ -374,6 +374,2596 @@
   },
 {
     "record_version": 3,
+    "id": "walking-beam",
+    "name": "Walking-beam transfer",
+    "aka": [
+      "walking beam conveyor",
+      "lift-and-carry transfer",
+      "walking beam",
+      "walking beam furnace",
+      "walking hearth",
+      "walking beam cooling bed"
+    ],
+    "in_site": false,
+    "family": "Linkage",
+    "level": "Intermediate",
+    "summary": "A beam on two equal cranks lifts every part off its notches, carries it one station on and sets it down, then returns empty below the rails.",
+    "motion": {
+      "input": "Rotary",
+      "output": "Intermittent linear",
+      "label": "Rotary → Intermittent linear",
+      "output_character": [
+        "Intermittent",
+        "Dwell"
+      ],
+      "axes": "Rotary-to-in-plane",
+      "plane": "Planar"
+    },
+    "ratio": {
+      "kind": "Index step",
+      "class": "n/a",
+      "typical": "one station per crank turn: pitch = 2 x crank radius along the notch line"
+    },
+    "dof": 1,
+    "topology": {
+      "links": 4,
+      "revolute": 4,
+      "prismatic": 0,
+      "higher_pairs": 0,
+      "notes": "a parallelogram four-bar: ground, two equal cranks and the beam, count includes ground. The balls are carried by contacts that change from notch to seat and back each turn, so the mobility is not counted from them: one input moves everything."
+    },
+    "backdrivable": "No",
+    "tags": {
+      "function": [
+        "Indexing",
+        "Dwell",
+        "Lifting",
+        "Motion conversion"
+      ],
+      "property": [
+        "Exact",
+        "Positive drive",
+        "Singular positions",
+        "Few parts"
+      ],
+      "application": [
+        "Packaging & automation",
+        "Machine tools"
+      ],
+      "keywords": [
+        "walking beam",
+        "lift and carry",
+        "transfer line",
+        "reheating furnace",
+        "cooling bed",
+        "circular translation",
+        "indexing conveyor"
+      ]
+    },
+    "explain": {
+      "motion": "Two equal cranks turn together, so the beam pinned to them translates round a 40 mm circle without turning. On the upper half of the circle its seats rise through the notches of the fixed rails, lift every ball at once, carry it one station on and set it down in the next notch; on the lower half the beam returns empty below the rails. Each turn moves every ball 38.4 mm along and 11.2 mm up the notch line, and each ball stands still in its notch for half of every turn while the cranks keep turning. The last ball rolls off onto the return track, and the packed queue on it rolls on one ball each turn, so the front ball is waiting in the first notch when the beam comes up under it.",
+      "forces": "The beam carries the whole row at once, so the crank torque is greatest while it lifts and small on the empty return. The balls are handed over at the ends of the circle's diameter, where the seats move nearly square to the notches, so nothing slides in a notch; but the beam moves fastest there, so each ball is picked up and set down at full crank speed.",
+      "benefits": "Every part moves the same distance at the same moment and is located in a notch between moves, so the pitch is exact and the parts never rub on each other or on the rails. One rotary input drives the whole row.",
+      "limits": "The parts are set down while the beam is still moving, so heavy or fragile parts need a drive that slows near the hand-over, such as a lift-and-carry drive with a rectangular path. The parallelogram passes its change points at the hand-overs, where both cranks lie along the line of their centres, so a real machine ties the two cranks by a chain or gears."
+    },
+    "build": {
+      "ground": "the base, the two notched rails, the return tracks and the crank bearings",
+      "defining_relations": "beam translation = crank pin displacement (two equal cranks of radius r, parallel and in phase); the hand-overs are the ends of the circle's diameter along the notch line, so one turn carries a ball 2r along the line: pitch 2r cos a and rise 2r sin a with r = 20 mm and sin a = 0.28; carry on the upper half turn, rest on the lower; every ball moves one slot of the closed circuit per turn",
+      "notes": "The notch line rises so that the return can run back by gravity: the beam lifts each ball one rise per station and the return track gives the height back. The return runs beside the transfer, not under it: a return under the beam would have to climb back past the beam's own depth and travel, more than the beam can lift. The thirteen balls are like, so after one turn each stands where the next one stood and the picture repeats; the parallelogram is held on its parallel branch through the change points at 0 and 180 degrees."
+    },
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              215,
+              120
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                78,
+                5,
+                -8
+              ]
+            }
+          }
+        },
+        {
+          "id": "crank1",
+          "role": "driver",
+          "shape": {
+            "type": "link",
+            "length": 20,
+            "boss": [
+              10,
+              8
+            ],
+            "place": 8,
+            "thickness": 6
+          },
+          "at": {
+            "joint": "O1"
+          }
+        },
+        {
+          "id": "crank2",
+          "role": "link",
+          "shape": {
+            "type": "link",
+            "length": 20,
+            "boss": [
+              10,
+              8
+            ],
+            "place": 8,
+            "thickness": 6
+          },
+          "at": {
+            "joint": "O2"
+          }
+        },
+        {
+          "id": "beam",
+          "role": "output",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -12,
+                -22
+              ],
+              [
+                130,
+                -22
+              ],
+              [
+                130,
+                -105.917
+              ],
+              [
+                124.567,
+                -104.332
+              ],
+              [
+                115.2,
+                -94.965
+              ],
+              [
+                110.063,
+                -100.102
+              ],
+              [
+                86.167,
+                -93.132
+              ],
+              [
+                76.8,
+                -83.765
+              ],
+              [
+                71.663,
+                -88.902
+              ],
+              [
+                47.767,
+                -81.932
+              ],
+              [
+                38.4,
+                -72.565
+              ],
+              [
+                33.263,
+                -77.702
+              ],
+              [
+                9.367,
+                -70.732
+              ],
+              [
+                0,
+                -61.365
+              ],
+              [
+                -5.137,
+                -66.502
+              ],
+              [
+                -12,
+                -64.5
+              ]
+            ],
+            "thickness": 5,
+            "place": -2.5
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "rail-front",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -10,
+                53.083
+              ],
+              [
+                174,
+                106.75
+              ],
+              [
+                174,
+                118.75
+              ],
+              [
+                166.304,
+                116.505
+              ],
+              [
+                153.6,
+                103.802
+              ],
+              [
+                146.633,
+                110.768
+              ],
+              [
+                122.963,
+                103.864
+              ],
+              [
+                115.2,
+                96.102
+              ],
+              [
+                110.943,
+                100.358
+              ],
+              [
+                84.563,
+                92.664
+              ],
+              [
+                76.8,
+                84.902
+              ],
+              [
+                72.543,
+                89.158
+              ],
+              [
+                46.163,
+                81.464
+              ],
+              [
+                38.4,
+                73.702
+              ],
+              [
+                34.143,
+                77.958
+              ],
+              [
+                7.763,
+                70.264
+              ],
+              [
+                0,
+                62.502
+              ],
+              [
+                -4.257,
+                66.758
+              ],
+              [
+                -10,
+                65.083
+              ]
+            ],
+            "thickness": 4,
+            "place": 3,
+            "posts": [
+              {
+                "at": [
+                  10,
+                  -9
+                ],
+                "top": 58.917,
+                "r": 5
+              },
+              {
+                "at": [
+                  89,
+                  -9
+                ],
+                "top": 81.958,
+                "r": 5
+              },
+              {
+                "at": [
+                  166,
+                  -9
+                ],
+                "top": 104.417,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "rail-back",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -10,
+                53.083
+              ],
+              [
+                174,
+                106.75
+              ],
+              [
+                174,
+                118.75
+              ],
+              [
+                161.363,
+                115.064
+              ],
+              [
+                153.6,
+                107.302
+              ],
+              [
+                149.343,
+                111.558
+              ],
+              [
+                122.963,
+                103.864
+              ],
+              [
+                115.2,
+                96.102
+              ],
+              [
+                110.943,
+                100.358
+              ],
+              [
+                84.563,
+                92.664
+              ],
+              [
+                76.8,
+                84.902
+              ],
+              [
+                72.543,
+                89.158
+              ],
+              [
+                46.163,
+                81.464
+              ],
+              [
+                38.4,
+                73.702
+              ],
+              [
+                34.143,
+                77.958
+              ],
+              [
+                7.763,
+                70.264
+              ],
+              [
+                0,
+                62.502
+              ],
+              [
+                -4.257,
+                66.758
+              ],
+              [
+                -10,
+                65.083
+              ]
+            ],
+            "thickness": 4,
+            "place": -7,
+            "posts": [
+              {
+                "at": [
+                  10,
+                  9
+                ],
+                "top": 58.917,
+                "r": 5
+              },
+              {
+                "at": [
+                  89,
+                  9
+                ],
+                "top": 81.958,
+                "r": 5
+              },
+              {
+                "at": [
+                  166,
+                  9
+                ],
+                "top": 104.417,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ],
+            "rot": [
+              90,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "lane",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -7,
+                -14.135
+              ],
+              [
+                7,
+                -14.135
+              ],
+              [
+                7,
+                -4.135
+              ],
+              [
+                4.5,
+                -4.135
+              ],
+              [
+                0,
+                -8.635
+              ],
+              [
+                -4.5,
+                -4.135
+              ],
+              [
+                -7,
+                -4.135
+              ]
+            ],
+            "thickness": 153.234,
+            "place": 0,
+            "posts": [
+              {
+                "at": [
+                  30,
+                  -40
+                ],
+                "top": 73.358,
+                "r": 5
+              },
+              {
+                "at": [
+                  90,
+                  -40
+                ],
+                "top": 81.022,
+                "r": 5
+              },
+              {
+                "at": [
+                  145,
+                  -40
+                ],
+                "top": 88.046,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              7.552,
+              -40,
+              84.626
+            ],
+            "z": [
+              0.992,
+              0,
+              0.127
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "cross-out",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -7,
+                -14.135
+              ],
+              [
+                7,
+                -14.135
+              ],
+              [
+                7,
+                -4.135
+              ],
+              [
+                4.5,
+                -4.135
+              ],
+              [
+                0,
+                -8.635
+              ],
+              [
+                -4.5,
+                -4.135
+              ],
+              [
+                -7,
+                -4.135
+              ]
+            ],
+            "thickness": 19.225,
+            "place": 0,
+            "posts": [
+              {
+                "at": [
+                  153.6,
+                  -14
+                ],
+                "top": 97.04,
+                "r": 5
+              },
+              {
+                "at": [
+                  153.6,
+                  -24
+                ],
+                "top": 95.24,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              153.6,
+              -9.047,
+              112.331
+            ],
+            "z": [
+              0,
+              -0.984,
+              -0.177
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "cross-in",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -7,
+                -14.135
+              ],
+              [
+                7,
+                -14.135
+              ],
+              [
+                7,
+                -4.135
+              ],
+              [
+                4.5,
+                -4.135
+              ],
+              [
+                0,
+                -8.635
+              ],
+              [
+                -4.5,
+                -4.135
+              ],
+              [
+                -7,
+                -4.135
+              ]
+            ],
+            "thickness": 37.942,
+            "place": 0,
+            "posts": [
+              {
+                "at": [
+                  0,
+                  -18
+                ],
+                "top": 61.59,
+                "r": 5
+              },
+              {
+                "at": [
+                  0,
+                  -40
+                ],
+                "top": 65.55,
+                "r": 5
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              -9.055,
+              74.38
+            ],
+            "z": [
+              0,
+              -0.984,
+              0.177
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "ball0",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              70
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball1"
+        },
+        {
+          "id": "ball1",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              38.4,
+              0,
+              81.2
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball2"
+        },
+        {
+          "id": "ball2",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              76.8,
+              0,
+              92.4
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball3"
+        },
+        {
+          "id": "ball3",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              115.19999999999999,
+              0,
+              103.6
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball4"
+        },
+        {
+          "id": "ball4",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball5"
+        },
+        {
+          "id": "ball5",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              63.597099581761086,
+              -40,
+              91.78464387924643
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball6"
+        },
+        {
+          "id": "ball6",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              51.197824686320814,
+              -40,
+              90.20098290943483
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball7"
+        },
+        {
+          "id": "ball7",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              38.79854979088054,
+              -40,
+              88.61732193962321
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball8"
+        },
+        {
+          "id": "ball8",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              26.39927489544027,
+              -40,
+              87.0336609698116
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball9"
+        },
+        {
+          "id": "ball9",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              14,
+              -40,
+              85.45
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball10"
+        },
+        {
+          "id": "ball10",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              -40,
+              79.95
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball11"
+        },
+        {
+          "id": "ball11",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              -25,
+              77.25
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball12"
+        },
+        {
+          "id": "ball12",
+          "role": "output",
+          "shape": {
+            "type": "ball",
+            "diameter": 12
+          },
+          "frame": {
+            "origin": [
+              0,
+              -12.5,
+              75
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "next": "ball0"
+        },
+        {
+          "id": "seats",
+          "role": "frame",
+          "construction": true,
+          "shape": {
+            "type": "plate",
+            "rect": [
+              10,
+              10
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "tracks",
+          "role": "frame",
+          "construction": true,
+          "fixed": true,
+          "shape": {
+            "type": "plate",
+            "rect": [
+              10,
+              10
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "O1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank1",
+          "at": [
+            49.2,
+            0,
+            37.6
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "side": 1
+        },
+        {
+          "id": "O2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "crank2",
+          "at": [
+            129.2,
+            0,
+            37.6
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "side": 1
+        },
+        {
+          "id": "A1",
+          "type": "revolute",
+          "a": "crank1",
+          "b": "beam",
+          "at": [
+            30,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "A2",
+          "type": "revolute",
+          "a": "crank2",
+          "b": "beam",
+          "at": [
+            110,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "id": "D1",
+          "type": "revolute",
+          "a": "seats",
+          "b": "beam",
+          "at": [
+            30,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "note": "the seats' datum rides the beam"
+        },
+        {
+          "id": "D2",
+          "type": "revolute",
+          "a": "seats",
+          "b": "beam",
+          "at": [
+            110,
+            0,
+            32
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "note": "the seats' datum rides the beam"
+        },
+        {
+          "id": "b0a",
+          "type": "pin-in-slot",
+          "a": "ball0",
+          "b": "seats",
+          "at": [
+            0,
+            0,
+            70
+          ],
+          "slot": {
+            "from": [
+              0,
+              -10,
+              70
+            ],
+            "to": [
+              0,
+              10,
+              70
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 0 in its seat on the beam"
+        },
+        {
+          "id": "b0b",
+          "type": "pin-in-slot",
+          "a": "ball0",
+          "b": "tracks",
+          "at": [
+            0,
+            0,
+            70
+          ],
+          "slot": {
+            "from": [
+              38.4,
+              -10,
+              81.2
+            ],
+            "to": [
+              38.4,
+              10,
+              81.2
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 180,
+            "hi": 359.5
+          },
+          "note": "ball 0 in its notch at S1"
+        },
+        {
+          "id": "b1a",
+          "type": "pin-in-slot",
+          "a": "ball1",
+          "b": "seats",
+          "at": [
+            38.4,
+            0,
+            81.2
+          ],
+          "slot": {
+            "from": [
+              38.4,
+              -10,
+              81.2
+            ],
+            "to": [
+              38.4,
+              10,
+              81.2
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 1 in its seat on the beam"
+        },
+        {
+          "id": "b1b",
+          "type": "pin-in-slot",
+          "a": "ball1",
+          "b": "tracks",
+          "at": [
+            38.4,
+            0,
+            81.2
+          ],
+          "slot": {
+            "from": [
+              76.8,
+              -10,
+              92.4
+            ],
+            "to": [
+              76.8,
+              10,
+              92.4
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 180,
+            "hi": 359.5
+          },
+          "note": "ball 1 in its notch at S2"
+        },
+        {
+          "id": "b2a",
+          "type": "pin-in-slot",
+          "a": "ball2",
+          "b": "seats",
+          "at": [
+            76.8,
+            0,
+            92.4
+          ],
+          "slot": {
+            "from": [
+              76.8,
+              -10,
+              92.4
+            ],
+            "to": [
+              76.8,
+              10,
+              92.4
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 2 in its seat on the beam"
+        },
+        {
+          "id": "b2b",
+          "type": "pin-in-slot",
+          "a": "ball2",
+          "b": "tracks",
+          "at": [
+            76.8,
+            0,
+            92.4
+          ],
+          "slot": {
+            "from": [
+              115.2,
+              -10,
+              103.6
+            ],
+            "to": [
+              115.2,
+              10,
+              103.6
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 180,
+            "hi": 359.5
+          },
+          "note": "ball 2 in its notch at S3"
+        },
+        {
+          "id": "b3a",
+          "type": "pin-in-slot",
+          "a": "ball3",
+          "b": "seats",
+          "at": [
+            115.19999999999999,
+            0,
+            103.6
+          ],
+          "slot": {
+            "from": [
+              115.2,
+              -10,
+              103.6
+            ],
+            "to": [
+              115.2,
+              10,
+              103.6
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 180
+          },
+          "note": "ball 3 in its seat on the beam"
+        },
+        {
+          "id": "b3b",
+          "type": "pin-in-slot",
+          "a": "ball3",
+          "b": "tracks",
+          "at": [
+            115.19999999999999,
+            0,
+            103.6
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -12,
+              111.80000000000001
+            ],
+            "to": [
+              153.6,
+              -26,
+              109.28000000000002
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 210,
+            "hi": 300
+          },
+          "note": "ball 3 on its track C1 to C2"
+        },
+        {
+          "id": "b3c",
+          "type": "pin-in-slot",
+          "a": "ball3",
+          "b": "tracks",
+          "at": [
+            115.19999999999999,
+            0,
+            103.6
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "to": [
+              14,
+              -40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 350,
+            "hi": 359.5
+          },
+          "note": "ball 3 on its track F to Q4"
+        },
+        {
+          "id": "b4a",
+          "type": "pin-in-slot",
+          "a": "ball4",
+          "b": "tracks",
+          "at": [
+            153.6,
+            -40,
+            103.28000000000002
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "to": [
+              14,
+              -40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 4 on its track F to Q4"
+        },
+        {
+          "id": "b5a",
+          "type": "pin-in-slot",
+          "a": "ball5",
+          "b": "tracks",
+          "at": [
+            63.597099581761086,
+            -40,
+            91.78464387924643
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "to": [
+              14,
+              -40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 5 on its track F to Q4"
+        },
+        {
+          "id": "b6a",
+          "type": "pin-in-slot",
+          "a": "ball6",
+          "b": "tracks",
+          "at": [
+            51.197824686320814,
+            -40,
+            90.20098290943483
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "to": [
+              14,
+              -40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 6 on its track F to Q4"
+        },
+        {
+          "id": "b7a",
+          "type": "pin-in-slot",
+          "a": "ball7",
+          "b": "tracks",
+          "at": [
+            38.79854979088054,
+            -40,
+            88.61732193962321
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "to": [
+              14,
+              -40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 7 on its track F to Q4"
+        },
+        {
+          "id": "b8a",
+          "type": "pin-in-slot",
+          "a": "ball8",
+          "b": "tracks",
+          "at": [
+            26.39927489544027,
+            -40,
+            87.0336609698116
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "to": [
+              14,
+              -40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 8 on its track F to Q4"
+        },
+        {
+          "id": "b9a",
+          "type": "pin-in-slot",
+          "a": "ball9",
+          "b": "tracks",
+          "at": [
+            14,
+            -40,
+            85.45
+          ],
+          "slot": {
+            "from": [
+              153.6,
+              -40,
+              103.28000000000002
+            ],
+            "to": [
+              14,
+              -40,
+              85.45
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 280
+          },
+          "note": "ball 9 on its track F to Q4"
+        },
+        {
+          "id": "b9b",
+          "type": "pin-in-slot",
+          "a": "ball9",
+          "b": "tracks",
+          "at": [
+            14,
+            -40,
+            85.45
+          ],
+          "slot": {
+            "from": [
+              0,
+              -40,
+              79.95
+            ],
+            "to": [
+              0,
+              -12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 330,
+            "hi": 359.5
+          },
+          "note": "ball 9 on its track Q3 to Q1"
+        },
+        {
+          "id": "b10a",
+          "type": "pin-in-slot",
+          "a": "ball10",
+          "b": "tracks",
+          "at": [
+            0,
+            -40,
+            79.95
+          ],
+          "slot": {
+            "from": [
+              0,
+              -40,
+              79.95
+            ],
+            "to": [
+              0,
+              -12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 10 on its track Q3 to Q1"
+        },
+        {
+          "id": "b11a",
+          "type": "pin-in-slot",
+          "a": "ball11",
+          "b": "tracks",
+          "at": [
+            0,
+            -25,
+            77.25
+          ],
+          "slot": {
+            "from": [
+              0,
+              -40,
+              79.95
+            ],
+            "to": [
+              0,
+              -12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 359.5
+          },
+          "note": "ball 11 on its track Q3 to Q1"
+        },
+        {
+          "id": "b12a",
+          "type": "pin-in-slot",
+          "a": "ball12",
+          "b": "tracks",
+          "at": [
+            0,
+            -12.5,
+            75
+          ],
+          "slot": {
+            "from": [
+              0,
+              -40,
+              79.95
+            ],
+            "to": [
+              0,
+              -12.5,
+              75
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 0.5,
+            "hi": 250
+          },
+          "note": "ball 12 on its track Q3 to Q1"
+        },
+        {
+          "id": "b12b",
+          "type": "pin-in-slot",
+          "a": "ball12",
+          "b": "tracks",
+          "at": [
+            0,
+            -12.5,
+            75
+          ],
+          "slot": {
+            "from": [
+              0,
+              -10,
+              70
+            ],
+            "to": [
+              0,
+              10,
+              70
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 330,
+            "hi": 359.5
+          },
+          "note": "ball 12 in its notch at S0"
+        }
+      ],
+      "params": [
+        {
+          "id": "r",
+          "value": 20,
+          "unit": "mm",
+          "min": 20,
+          "max": 20,
+          "note": "crank radius, both cranks"
+        },
+        {
+          "id": "pitch",
+          "value": 38.4,
+          "unit": "mm",
+          "min": 38.4,
+          "max": 38.4,
+          "note": "station pitch along x: 2 r cos a"
+        },
+        {
+          "id": "rise",
+          "value": 11.2,
+          "unit": "mm",
+          "min": 11.2,
+          "max": 11.2,
+          "note": "rise per station: 2 r sin a, sin a = 0.28"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "O1",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0
+        }
+      ],
+      "solve": [
+        {
+          "block": "parallel-cranks",
+          "id": "cranks",
+          "joints": [
+            "O2",
+            "A1",
+            "A2"
+          ],
+          "in": {
+            "input": "input",
+            "discs": [
+              {
+                "body": "crank1",
+                "center": "O1",
+                "axis": [
+                  0,
+                  1,
+                  0
+                ]
+              },
+              {
+                "body": "crank2",
+                "center": "O2",
+                "axis": [
+                  0,
+                  1,
+                  0
+                ]
+              }
+            ],
+            "links": [
+              {
+                "body": "beam",
+                "pin": "A1",
+                "disc": "crank1"
+              }
+            ]
+          },
+          "out": {
+            "turn": "crank-turn"
+          }
+        },
+        {
+          "block": "walking-beam",
+          "id": "transfer",
+          "joints": [
+            "D1",
+            "D2",
+            "b0a",
+            "b0b",
+            "b1a",
+            "b1b",
+            "b2a",
+            "b2b",
+            "b3a",
+            "b3b",
+            "b3c",
+            "b4a",
+            "b5a",
+            "b6a",
+            "b7a",
+            "b8a",
+            "b9a",
+            "b9b",
+            "b10a",
+            "b11a",
+            "b12a",
+            "b12b"
+          ],
+          "in": {
+            "input": "input",
+            "crank": {
+              "center": "O1",
+              "pin": "A1",
+              "axis": [
+                0,
+                1,
+                0
+              ]
+            },
+            "beam": "beam",
+            "datum": "seats",
+            "parts": [
+              "ball0",
+              "ball1",
+              "ball2",
+              "ball3",
+              "ball4",
+              "ball5",
+              "ball6",
+              "ball7",
+              "ball8",
+              "ball9",
+              "ball10",
+              "ball11",
+              "ball12"
+            ],
+            "track": 1,
+            "slots": [
+              {
+                "from": "S0",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "S1",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "S2",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "S3",
+                "legs": [
+                  {
+                    "carry": "beam",
+                    "window": [
+                      0,
+                      180
+                    ]
+                  },
+                  {
+                    "to": "C1",
+                    "window": [
+                      180,
+                      210
+                    ]
+                  },
+                  {
+                    "to": "C2",
+                    "window": [
+                      210,
+                      250
+                    ]
+                  },
+                  {
+                    "to": "G",
+                    "window": [
+                      300,
+                      330
+                    ]
+                  },
+                  {
+                    "to": "F",
+                    "window": [
+                      330,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "F",
+                "legs": [
+                  {
+                    "to": "Q8",
+                    "window": [
+                      250,
+                      355
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q8",
+                "legs": [
+                  {
+                    "to": "Q7",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q7",
+                "legs": [
+                  {
+                    "to": "Q6",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q6",
+                "legs": [
+                  {
+                    "to": "Q5",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q5",
+                "legs": [
+                  {
+                    "to": "Q4",
+                    "window": [
+                      255,
+                      350
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q4",
+                "legs": [
+                  {
+                    "to": "E",
+                    "window": [
+                      240,
+                      280
+                    ]
+                  },
+                  {
+                    "to": "Q3",
+                    "window": [
+                      280,
+                      330
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q3",
+                "legs": [
+                  {
+                    "to": "Q2",
+                    "window": [
+                      200,
+                      345
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q2",
+                "legs": [
+                  {
+                    "to": "Q1",
+                    "window": [
+                      200,
+                      345
+                    ]
+                  }
+                ]
+              },
+              {
+                "from": "Q1",
+                "legs": [
+                  {
+                    "to": "K",
+                    "window": [
+                      190,
+                      250
+                    ]
+                  },
+                  {
+                    "to": "S0",
+                    "window": [
+                      250,
+                      330
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "out": {
+            "advance": "advance",
+            "rise": "step-rise",
+            "carried": "carried"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "S0",
+          "body": "tracks",
+          "local": [
+            0,
+            0,
+            70
+          ]
+        },
+        {
+          "id": "S1",
+          "body": "tracks",
+          "local": [
+            38.4,
+            0,
+            81.2
+          ]
+        },
+        {
+          "id": "S2",
+          "body": "tracks",
+          "local": [
+            76.8,
+            0,
+            92.4
+          ]
+        },
+        {
+          "id": "S3",
+          "body": "tracks",
+          "local": [
+            115.19999999999999,
+            0,
+            103.6
+          ]
+        },
+        {
+          "id": "S4",
+          "body": "tracks",
+          "local": [
+            153.6,
+            0,
+            114.80000000000001
+          ]
+        },
+        {
+          "id": "C1",
+          "body": "tracks",
+          "local": [
+            153.6,
+            -12,
+            111.80000000000001
+          ]
+        },
+        {
+          "id": "C2",
+          "body": "tracks",
+          "local": [
+            153.6,
+            -26,
+            109.28000000000002
+          ]
+        },
+        {
+          "id": "G",
+          "body": "tracks",
+          "local": [
+            153.6,
+            -38,
+            108.28000000000002
+          ]
+        },
+        {
+          "id": "F",
+          "body": "tracks",
+          "local": [
+            153.6,
+            -40,
+            103.28000000000002
+          ]
+        },
+        {
+          "id": "E",
+          "body": "tracks",
+          "local": [
+            7.5,
+            -40,
+            84.61980659025788
+          ]
+        },
+        {
+          "id": "K",
+          "body": "tracks",
+          "local": [
+            0,
+            -6.5,
+            73.92
+          ]
+        },
+        {
+          "id": "Q1",
+          "body": "tracks",
+          "local": [
+            0,
+            -12.5,
+            75
+          ]
+        },
+        {
+          "id": "Q2",
+          "body": "tracks",
+          "local": [
+            0,
+            -25,
+            77.25
+          ]
+        },
+        {
+          "id": "Q3",
+          "body": "tracks",
+          "local": [
+            0,
+            -40,
+            79.95
+          ]
+        },
+        {
+          "id": "Q4",
+          "body": "tracks",
+          "local": [
+            14,
+            -40,
+            85.45
+          ]
+        },
+        {
+          "id": "Q5",
+          "body": "tracks",
+          "local": [
+            26.39927489544027,
+            -40,
+            87.0336609698116
+          ]
+        },
+        {
+          "id": "Q6",
+          "body": "tracks",
+          "local": [
+            38.79854979088054,
+            -40,
+            88.61732193962321
+          ]
+        },
+        {
+          "id": "Q7",
+          "body": "tracks",
+          "local": [
+            51.197824686320814,
+            -40,
+            90.20098290943483
+          ]
+        },
+        {
+          "id": "Q8",
+          "body": "tracks",
+          "local": [
+            63.597099581761086,
+            -40,
+            91.78464387924643
+          ]
+        },
+        {
+          "id": "seat",
+          "body": "beam",
+          "local": [
+            76.8,
+            -92.4,
+            0
+          ]
+        },
+        {
+          "id": "pin1",
+          "body": "crank1",
+          "local": [
+            20,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "advance",
+          "of": "advance",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "step-rise",
+          "of": "step-rise",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "beam-x",
+          "of": "seat",
+          "kind": "position",
+          "unit": "mm",
+          "axis": "x",
+          "datum": 76.8
+        },
+        {
+          "id": "seat-path",
+          "of": "seat",
+          "kind": "path",
+          "unit": "mm"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "keep",
+        "date": "2026-10-27",
+        "note": "T2 review 2026-10-27, six phases drawn from the solved motion at 0, 60, 120, 180, 240 and 300 degrees in VIEW -25 30: keep. Drive: two equal cranks (circular translation) rather than a lift-and-carry drive: one rotary input with the standard motor and belt (section 8), and the beam's whole motion is one closed curve to trace; the flat carry and square hand-over of a lift-and-carry drive are named in the limits. The notch line rises (sin a = 0.28) so the hand-overs lie at the ends of the circle's diameter: the seats meet the notches 16.3 degrees from square, inside the 45 degree flank of the V, so nothing slides, and the beam lifts each ball 11.2 mm per station, the height the gravity return gives back. Closed circuit: the return under the transfer was set aside, since a ball returning under the beam must climb back past the beam's depth and its fall below the rails, more than one seat can lift. The return runs beside the transfer: the out-track rolls the ball from the top notch across onto the return lane, a packed queue rolls down the lane and back across on the in-track, and the front ball rolls into the first notch while the beam is down. Every slot advances one per turn, so after one turn each ball stands where the next one stood (kin.bodies next, K2) and the loop shows no jump. Balls rather than pins: they roll across onto the cross tracks and round the corners, which a pin cannot. Trace: the seat at S2 draws the beam's 40 mm circle with 30 degree ticks; overlays: the notch line, the station (2r) and the crank radius; plot: a ball's advance (a step) against the beam's travel (a sine), the stepwise advance against the continuous motion. Solve checks: advance 38.4 mm and rise 11.2 mm per turn, circle 40 mm, dwell 180 degrees, all within tolerance. The parallelogram's change points fall at the hand-overs: held on the parallel branch as in the parallelogram linkage; a chain or gear tie between the cranks is an open question."
+      },
+      "principle": [
+        {
+          "body": "beam"
+        },
+        {
+          "body": "crank1"
+        },
+        {
+          "body": "crank2"
+        },
+        {
+          "body": "ball0"
+        },
+        {
+          "body": "ball1"
+        },
+        {
+          "body": "ball2"
+        },
+        {
+          "body": "ball3"
+        },
+        {
+          "body": "ball4"
+        },
+        {
+          "body": "ball5"
+        },
+        {
+          "body": "ball6"
+        },
+        {
+          "body": "ball7"
+        },
+        {
+          "body": "ball8"
+        },
+        {
+          "body": "ball9"
+        },
+        {
+          "body": "ball10"
+        },
+        {
+          "body": "ball11"
+        },
+        {
+          "body": "ball12"
+        },
+        {
+          "point": "seat"
+        }
+      ],
+      "traces": [
+        {
+          "id": "seat-circle",
+          "point": "seat",
+          "comet": true,
+          "ticks": {
+            "every": 30
+          }
+        }
+      ],
+      "overlays": [
+        {
+          "id": "notch-line",
+          "kind": "line",
+          "from": "S0",
+          "to": "S4",
+          "label": "NOTCH LINE"
+        },
+        {
+          "id": "pitch",
+          "kind": "dimension",
+          "from": "S1",
+          "to": "S2",
+          "label": "STATION 2r"
+        },
+        {
+          "id": "crank-r",
+          "kind": "dimension",
+          "from": "O1",
+          "to": "A1",
+          "label": "r"
+        }
+      ],
+      "view": "VIEW -25 30",
+      "views": [
+        {
+          "id": "hand-over",
+          "kind": "detail",
+          "center": [
+            38.4,
+            0,
+            81.2
+          ],
+          "scale": 2.2,
+          "highlight": [
+            "beam",
+            "rail-front"
+          ],
+          "note": "a ball between notch and seat at the hand-over"
+        }
+      ],
+      "controls": [
+        {
+          "id": "crank",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "plot": [
+        {
+          "x": "input",
+          "y": "advance",
+          "label": "BALL ADVANCE"
+        },
+        {
+          "x": "input",
+          "y": "beam-x",
+          "label": "BEAM TRAVEL"
+        }
+      ],
+      "claims": [
+        {
+          "text": "each turn carries every ball one station on, 38.4 mm along",
+          "output": "advance",
+          "stat": "at",
+          "input": 359,
+          "value": 38.4,
+          "tol": 0.01
+        },
+        {
+          "text": "and 11.2 mm up",
+          "output": "step-rise",
+          "stat": "at",
+          "input": 359,
+          "value": 11.2,
+          "tol": 0.01
+        },
+        {
+          "text": "the beam translates round a 40 mm circle",
+          "output": "seat-path",
+          "stat": "range",
+          "value": 40,
+          "tol": 0.05
+        },
+        {
+          "text": "each ball stands still in its notch for half of every turn",
+          "output": "advance",
+          "stat": "dwell",
+          "value": 180,
+          "tol": 1
+        }
+      ],
+      "exceptions": []
+    },
+    "examples": [
+      {
+        "use": "Reheating furnace",
+        "detail": "Slabs and billets are stepped through a walking beam furnace on moving beams that rise between fixed skids."
+      },
+      {
+        "use": "Rolling-mill cooling bed",
+        "detail": "A moving rake lifts the hot bars out of the notches of fixed rakes and sets them down one notch on, so they cool evenly while they cross the bed."
+      },
+      {
+        "use": "Press-line transfer",
+        "detail": "A walking-beam transfer lifts the blanks out of each press die and carries them to the next press in one stroke."
+      },
+      {
+        "use": "Assembly automation",
+        "detail": "Lift-and-carry conveyors move parts station to station and hold each one located in a nest while it is worked."
+      }
+    ],
+    "references": [
+      {
+        "title": "Conveyor system: walking beam (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Conveyor_system",
+        "kind": "wikipedia"
+      },
+      {
+        "title": "US 805,041: Heating-furnace (C. P. Turner, 1905)",
+        "url": "https://patents.google.com/patent/US805041A/en",
+        "kind": "patent"
+      },
+      {
+        "title": "US 2,235,771: Continuous heating furnace (G. R. McDermott, 1941)",
+        "url": "https://patents.google.com/patent/US2235771",
+        "kind": "patent"
+      },
+      {
+        "title": "US 1,441,042: Cooling bed (G. E. Thackray, 1923)",
+        "url": "https://patents.google.com/patent/US1441042",
+        "kind": "patent"
+      },
+      {
+        "title": "Rolling Mill Cooling Bed (IspatGuru)",
+        "url": "https://www.ispatguru.com/rolling-mill-cooling-bed/",
+        "kind": "engineering-guide"
+      }
+    ],
+    "media": [
+      {
+        "title": "Walking Beam Furnace for Slabs (Tenova)",
+        "url": "https://tenova.com/technologies/walking-beam-furnace-slabs",
+        "kind": "photos"
+      },
+      {
+        "title": "Walking Beams (Wirco)",
+        "url": "https://wirco.com/resources/industries/steel-mill/walking-beams",
+        "kind": "photos"
+      },
+      {
+        "title": "The STELRON CWB (Conveyor Walking Beam)",
+        "url": "https://www.youtube.com/watch?v=MLoRV4ApIlM",
+        "kind": "video"
+      },
+      {
+        "title": "Pneumatic walking beam mechanism",
+        "url": "https://www.youtube.com/watch?v=LK-_KQUYHdE",
+        "kind": "video"
+      }
+    ],
+    "real_world": [
+      {
+        "product": "Nine-press walking-beam transfer line",
+        "maker": "Great Lakes Metal Stamping",
+        "use": "A walking-beam transfer lifts the blanks out of each die and carries them on to the next of nine presses in one stroke.",
+        "url": "https://www.youtube.com/watch?v=PxJqQnekJV4"
+      },
+      {
+        "product": "Twin channel automatic rake type cooling bed",
+        "maker": "Newfield",
+        "use": "Moving rakes lift the bars out of the fixed rakes' notches and set them down one notch on across the bed.",
+        "url": "https://www.youtube.com/watch?v=ZtfUE3rM3qo"
+      }
+    ],
+    "related": [
+      "parallelogram-linkage",
+      "locomotive-drive",
+      "double-crank"
+    ]
+  },
+{
+    "record_version": 3,
     "id": "wobble-box",
     "name": "Wobble box",
     "aka": ["wobble drive", "wobble shaft drive", "knife drive gearbox", "oblique crank", "spherical crank-rocker"],

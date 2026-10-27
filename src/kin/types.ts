@@ -32,6 +32,12 @@ export interface KinBody {
   drops?: boolean;
   /** Bodies this one lies above in its stack (a rod pinned down onto blocks that run in a plate's grooves): a placement hint. */
   above?: string[];
+  /**
+   * The body that this one stands in for at the end of the cycle (like parts handed on one station per cycle round a
+   * closed circuit): at u = 2π the body stands where `next` stood at u = 0, so the picture repeats though no single
+   * part comes back (K2).
+   */
+  next?: string;
 }
 
 export type JointType =

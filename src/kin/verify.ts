@@ -117,6 +117,12 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const F = setup.bodyFrame.get(b);
       const jr = g ?? (F ? { at: F.t, axis: [F.R[2], F.R[5], F.R[8]] as Vec3 } : all[0]);
       const ax = jr?.axis;
+      // a part handed on round a closed circuit comes back where the next one started: its own frame onto the next one's
+      const Fn = body?.next ? setup.bodyFrame.get(body.next) : undefined;
+      if (body?.next) {
+        periodicity = Math.max(periodicity, F && Fn ? poseDiff(Y, xf.mul(xf.mul(Fn, xf.inv(F)), X)) : Infinity);
+        continue;
+      }
       // a sheave half is a body of revolution: it may come back turned by any angle about its axis
       if (body?.shape?.sheave !== undefined && ax) {
         const rel = xf.mul(Y, xf.inv(X));
