@@ -47,7 +47,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T7 | PASS | DATA · ISOMETRIC: all four axes and the ring's nod read at once, no support in front of the meeting point (the far input block stands clear at x 48); DIMETRIC likewise; PLAN shows the journal angle true at the start |
 | T8 | PASS | DATA · section A-A through the input and journal axes shows the inclined journal, one piece with the hub, on its double-row bearing inside the ring |
 | T9 | PASS | AUTO / DATA · claim table: 4 ok, 0 off, 0 uncheckable of 4 |
-| T10 | PASS | AUTO · 7 solids drawn see-through: S1-pb-b1-foot, S1-pb-b1, S1-pb-b1-brg, S1-pb-b1-brg-balls, S1-pb-b1-brg-cage, S1-pb-b1-sc1, S1-pb-b1-dw1 · filled by the generator: a rule built solids for it |
+| T10 | PASS | AUTO · 6 solids drawn see-through: S1-pb-b1-foot, S1-pb-b1, S1-pb-b1-brg, S1-pb-b1-brg-balls, S1-pb-b1-brg-cage, S1-pb-b1-sc1 · filled by the generator: a rule built solids for it |
 | T11 | PASS | AUTO · 2 supports routed, 1 moved off a sweep · filled by the generator: a rule built solids for it |
 | T12 | PASS | HAND · 15 support solids; dropped by the polish: none |
 | T13 | N/A | DATA · nothing goes by in a blink: a smooth near-sinusoidal swing |
@@ -55,7 +55,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two like parts of one role to tell apart |
 | T17 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
-| D1 | PASS | HAND · fired: wheels (no solids) · ring as one solid, a housing bored for its bearing with two trunnions on boss pads; the hub one solid, a shank faced square to the journal as the bearing's shoulder (turned to a boss behind it, ending 3.8 mm clear of the ring's flank) with the journal machined on it at α; yoke as the universal joint's (hub, bar, arms bored for cups) |
+| D1 | PASS | HAND · fired: wheels (no solids) · ring as one solid, a housing bored for its bearing with two trunnions on boss pads; the hub one solid turned on the journal's axis at α: a Ø30 boss keyed on the shaft (2.2 mm clear of the ring's flank), a Ø24 shoulder step the inner race stands on, the Ø20 journal, bored obliquely for the shaft; every face square to the journal; yoke as the universal joint's (hub, bar, arms bored for cups) |
 | D2 | PASS | HAND · material round the bearing bore and the trunnion roots; bosses round the cup bores |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · filled by the generator: a rule built solids for it |
@@ -64,7 +64,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; the hub (shank, journal and collar added, the shaft's bore cut) and the ring (pads and trunnions added) are each one boolean solid (a mesh); no layers |
 | D9 | N/A | AUTO / HAND · fired: j12-cvt (no solids) · no member changes shape |
 | D10 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
-| D11 | PASS | AUTO · SOLID: 0 of 116 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 114 solids unsound |
 | D7 | PASS | HAND · ring, yoke and arm plain; richness in the bearings, circlips, cups and stacks |
 | A1 | PASS | AUTO · S1 J10, S2 J10, T cross-pin, J oblique-journal, drive drive · filled by the generator: the pipeline holds it for every built mechanism |
 | A2 | PASS | AUTO · S1 J10, S2 J10, T cross-pin, J oblique-journal, drive drive · filled by the generator: the pipeline holds it for every built mechanism |
@@ -82,7 +82,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | A14 | PASS | AUTO / HAND · fired: support router · supports routed against the sweeps (least gap 1.5 mm); details checked by A15 |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 1 named, 0 unnecessary |
 | A16 | PASS | HAND · 5 joint notes; no note: none; no badge: none · a note and a badge per joint; build rules: the axes meet at one centre, the journal is machined on the keyed hub, the ring's double-row bearing takes the trunnion loads, the arm keyed on the output shaft |
-| A17 | PASS | HAND · assembles in the explode order: the bearing into the ring and its circlips, the spacer onto the journal, the ring onto it and the journal's circlip, the hub onto the shaft, the cups over the trunnions; every screw reachable |
+| A17 | PASS | HAND · assembles in the explode order: the bearing into the ring and its circlips, the ring onto the journal against the hub's shoulder step and the journal's circlip, the hub onto the shaft, the cups over the trunnions; every screw reachable |
 | A18 | PASS | AUTO · placement: 2 slabs in the tallest stack (80.0 mm), 0 clevises; stack per joint in the Joints table · filled by the generator: the pipeline holds it for every built mechanism |
 | A19 | PASS | AUTO · 2 supports routed (2 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: S1-pb, S2-pb · both pairs of blocks routed off the sweeps; the input's far block drawn see-through where it covers the ring |
 | A20 | PASS | AUTO · support per joint: S1 pillow, S2 pillow · pillow blocks chosen for both shafts in plan |
@@ -100,7 +100,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | E10 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | J1 | N/A | AUTO · fired: trunnion (no solids), hub (no solids), j1-dead-axle (no solids) · filled by the generator: no joint of this type |
 | J2 | N/A | AUTO · fired: j2-live-shaft (no solids) · filled by the generator: no joint of this type |
-| J3 | PASS | AUTO · fired: j3-moving-pin (no solids), cross-bearings (8 solids), oblique-journal (8 solids), eccentric-bearing (no solids), spider-pin (no solids), ball-socket (no solids), ring-hub (no solids), eccentric (no solids) · filled by the generator: a rule built its kit |
+| J3 | PASS | AUTO · fired: j3-moving-pin (no solids), cross-bearings (7 solids), oblique-journal (7 solids), eccentric-bearing (no solids), spider-pin (no solids), ball-socket (no solids), ring-hub (no solids), eccentric (no solids) · filled by the generator: a rule built its kit |
 | J4 | N/A | AUTO · fired: pin-hole (no solids), j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids), die (no solids) · filled by the generator: no joint of this type |
 | J5 | N/A | AUTO · fired: tongue-slot (no solids), integrator-carriage (no solids), piston-bore (no solids), j5-slide (no solids), leg-bore (no solids) · filled by the generator: no joint of this type |
 | J6 | N/A | AUTO · fired: j6-mesh (no solids), friction-contact (no solids), ring-carrier (no solids), pin-ring (no solids), ring-rollers (no solids) · filled by the generator: no joint of this type |
@@ -112,13 +112,13 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · filled by the generator: no joint of this type |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · filled by the generator: no joint of this type |
 | F1 | PASS | AUTO · served at S1, S2; fired: posts (no solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
-| F2 | PASS | AUTO · served at S1, S2, T, J; fired: wheels (no solids), j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), cross-bearings (8 solids), oblique-journal (8 solids), trunnion (no solids), ring-carrier (no solids), eccentric-bearing (no solids), pin-ring (no solids), spider-pin (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), leg-bore (no solids), ring-rollers (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
+| F2 | PASS | AUTO · served at S1, S2, T, J; fired: wheels (no solids), j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), cross-bearings (7 solids), oblique-journal (7 solids), trunnion (no solids), ring-carrier (no solids), eccentric-bearing (no solids), pin-ring (no solids), spider-pin (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), leg-bore (no solids), ring-rollers (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F3 | PASS | AUTO · served at S1, S2; fired: j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), j11-screw (no solids) · filled by the generator: a rule built solids for it |
 | F4 | PASS | AUTO / HAND · served at S1, S2; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), trunnion (no solids), spider-pin (no solids), j11-screw (no solids) · shaft collars locate both live shafts in their blocks; the ring's bearings are held both ways by circlips |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: integrator-carriage (no solids), j5-slide (no solids), pawl-tooth (no solids), j11-screw (no solids), j13-compliant (no solids), stops (no solids) · the output's swing is bounded by the linkage itself (±α at every input angle), so it cannot over-travel with the drive off |
 | F6 | N/A | AUTO / HAND · served at no joint; fired: friction-contact (no solids), j12-flexible (no solids), j12-cvt (no solids), trunnion (no solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · no rest position to hold: the drive positions every part |
 | F7 | N/A | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), friction-contact (no solids), j9-crossed-mesh (no solids), j12-flexible (no solids), j12-cvt (no solids), j5-slide (no solids), j12-other (no solids), adjustable-length (no solids), covers (no solids) · no adjustable length: the axes meet by the turned parts and the located blocks; a shim at the output's located block is an open question for the owner |
-| F8 | PASS | AUTO · served at T; fired: tongue-slot (no solids), j12-flexible (no solids), cross-bearings (8 solids), ball-socket (no solids), eccentric (no solids), leg-bore (no solids), j11-screw (no solids), lubrication (no solids) · filled by the generator: a rule built solids for it |
+| F8 | PASS | AUTO · served at no joint; fired: tongue-slot (no solids), j12-flexible (no solids), cross-bearings (7 solids), ball-socket (no solids), eccentric (no solids), leg-bore (no solids), j11-screw (no solids), lubrication (no solids) · filled by the generator: a rule built solids for it |
 | F9 | PASS | AUTO / HAND · served at no joint; fired: j6-mesh (no solids), j9-crossed-mesh (no solids), timing-marks (1 solid) · zero line on the input and on the base (timing marks) |
 | F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (30 solids) · home flag and fork sensor on the input (drive) |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face chamfers by part kind (primitives) |
@@ -154,7 +154,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | R1 | PASS | HAND · the yoke and cups reuse the universal joint's shapes and the cross-pin kit; bearings, circlips and stacks from the primitives |
 | R2 | PASS | HAND · shafts Ø10 (input and output), bearings 3804 (double-row table), 6801, 6800 from the tables, M5 and M4 screws |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies: pillow blocks, drive, sensor |
-| R4 | PASS | AUTO · package v2 26.4 KB · filled by the generator: the pipeline holds it for every built mechanism |
+| R4 | PASS | AUTO · package v2 25.8 KB · filled by the generator: the pipeline holds it for every built mechanism |
 | R5 | PASS | HAND · no polish |
 | R6 | PASS | FLAG · FLAG: bench run on the desktop with three heavy jobs on the machine, numbers indicative: frames 1.2 to 2.2 ms (under 8 ms); setup 83.8 ms over the 20 ms target, 79 ms of it the GPU first frame under load; the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -179,10 +179,10 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 ## Joints
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| S1 | J10 | spherical-four-bar | pillow | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 25 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
+| S1 | J10 | spherical-four-bar | pillow | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 5.5 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
 | S2 | J10 | spherical-four-bar | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 13 (DIN 6885); Feather key 3 x 3 x 7 (DIN 6885) | Inner-race spacer 10.2x13; 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
-| T | cross-pin | spherical-four-bar | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
-| J | oblique-journal | spherical-four-bar | – | – | none | 2 x Internal circlip DIN 472, Ø32; External circlip DIN 471, Ø20; Inner-race spacer 20x24x3.5, from the hub's shoulder to the bearing | none | none | none | none | none | none | none | none |
+| T | cross-pin | spherical-four-bar | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | – the cups are sealed, greased for life | none | none |
+| J | oblique-journal | spherical-four-bar | – | – | none | 2 x Internal circlip DIN 472, Ø32; External circlip DIN 471, Ø20 | none | none | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -194,8 +194,8 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
 |---|---|---|---|
-| input | a plain shaft body | the wobble hub, one solid: a Ø22 shank keyed on the Ø10 live shaft, faced square to the journal 3.5 mm behind the seat (an inner-race spacer between), with the journal machined on it at α (record: `shape.journal`), its planned length spanning the shaft's run on to the far block | the stack sizes the shaft from the shank (A3), keys it (F3) and straddles the hub; the shank is cut off at the shoulder plane by the shape and the key trimmed to the solid shank by the oblique-journal kit |
-| ring nipple | on the rim toward the yoke | on the rim away from the yoke | it stood alone between the yoke's arms, out of a grease gun's reach |
+| input | a plain shaft body | the wobble hub, one solid turned on the journal's axis: boss, shoulder step and journal (record: `shape.journal`), bored obliquely for the Ø10 live shaft; its planned straight shank (Ø22, the shaft's run to both blocks) is not drawn | the stack sizes the shaft from the planned shank (A3), keys it (F3) and straddles the hub; the oblique-journal kit moves the key into the boss; every face square to the journal, so nothing meets the ring at a grazing angle (owner's video review) |
+| ring's trunnion cups | a grease nipple on the ring's rim (F8) | sealed needle cups, greased for life, no nipple | the nipple read as a loose nut beside the rim and on the shaft line; F8 asks nothing of a sealed bearing |
 | arm | a link on the output shaft, running free | keyed on the output shaft (record: `shape.keyed`) | the arm must turn with the output to give the stroke |
 | J | two deep-groove bearings | one double-row angular-contact bearing 3804-2RS | owner's review: fewer see-through layers at the centre; it also carries the thrust along the journal both ways |
 
@@ -205,12 +205,12 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-A | 11 | 0 | 1.74 |
 | DL-B | 0 | 272 | 1.85 |
 | DL-C | 0 | 0 | 1.77 |
-| DL-D | 10 | 0 | 2.08 |
-| DL-E | 9 | 0 | 2.03 |
+| DL-D | 9 | 0 | 2.08 |
+| DL-E | 8 | 0 | 2.03 |
 | DL-F | 0 | 0 | 2.19 |
 | DL-G | 0 | 0 | 1.76 |
 | DL-H | 13 | 0 | 2.13 |
-| never | 73 | 151 | 1.99 (full) |
+| never | 73 | 150 | 1.99 (full) |
 
 ## Promotion candidates
 Promoted in this pass: the `spherical-four-bar` block (closed form, any link angles; the Hooke joint is its 90 degree case,
@@ -221,5 +221,5 @@ Candidates: a shim pack at a located pillow block where axes must meet (F7, the 
 a shank length of its own for a hub whose shaft runs on past it, in the stack builder instead of the kit's trim.
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.4 KB
+check: clean · K1 residual: 1.4e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.8 KB
 screenshots: .local/n1-shots/wobble-box/rework (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets; centre crops at 2x) · bench: frame times of the first build (desktop under load from parallel passes, numbers indicative); setup 83.8 ms flagged over the 20 ms target (GPU first frame 79 ms)

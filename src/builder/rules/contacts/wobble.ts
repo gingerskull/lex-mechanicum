@@ -1,12 +1,12 @@
 // The oblique-journal kit: a wobble drive's trunnion ring on the inclined journal of its input hub. One double-row
 // angular-contact bearing on the journal, in the ring's bore, which carries the trunnion loads and the thrust along the
 // journal both ways; its outer race held in the ring by an internal circlip each side (F2), its inner race on the
-// journal's collar and held by an external circlip at the journal's end (F2). The journal is machined on the hub, which
+// hub's shoulder step and held by an external circlip at the journal's end (F2). The journal is machined on the hub, which
 // the stack keys on the input shaft (F3). The hub and the ring are the bodies' own parts (src/builder/shapes/wobble.ts);
 // this rule adds what sits between them.
 import { BEARINGS, BEARINGS_DOUBLE_ROW } from "../../../hardware/tables";
 import { H } from "../../../hardware/primitives";
-import type { Vec3 } from "../../../kin/math";
+import { type Vec3, v3 } from "../../../kin/math";
 import type { BuildCtx } from "../../ctx";
 import { canon, frameAlong } from "../../frames";
 import { Local, titleOf } from "../../lib";
@@ -47,30 +47,33 @@ const obliqueJournal: Rule = {
       L.add(H.circlip(`${j.id}-cli1`, D, { internal: true, body: ringId, z0: s0 - 1.2, z1: s0, name: "", qty: 0 }));
       L.add(H.circlip(`${j.id}-cle`, dj, { body: hubId, z0: end }));
       f2.push(`${j.id}-cli0`, `${j.id}-cli1`, `${j.id}-cle`);
-      // the inner race stands on a spacer on the journal where the hub's shoulder stands back from the seat (so the
-      // shank ends clear of the ring's flank)
-      const sp = num(jrn.spacer, 0);
-      if (sp > 0) {
-        L.add(H.spacer(`${j.id}-sp`, dj, dj + 4, { body: hubId, z0: s0 - sp, z1: s0, name: `Inner-race spacer ${dj}x${dj + 4}x${sp}, from the hub's shoulder to the bearing` }));
-        f2.push(`${j.id}-sp`);
-      }
       ctx.add(L.out());
-      // the hub's key runs in the straight shank only (the stack keys the whole planned length, which spans the shaft's
-      // run on through the journal to the far pillow block)
-      const shank = num(jrn.shank, NaN);
-      if (Number.isFinite(shank))
+      // the hub's key runs where the shaft passes through the hub's boss (the stack keys the whole planned length, which
+      // spans the shaft's run to both pillow blocks): along the shaft, from where its surface enters the boss's back face
+      // to where it leaves the boss's front, with a millimetre to spare each end
+      const boss = Array.isArray(jrn.boss) ? (jrn.boss as number[]) : undefined;
+      const g = ctx.joints.find((q) => (q.a === hubId || q.b === hubId) && (q.a === "ground" || q.b === "ground"));
+      if (boss && g) {
+        const a1 = canon(g.axis);
+        const ca = Math.abs(v3.dot(a1, z));
+        const sa = Math.sqrt(Math.max(0, 1 - ca * ca));
+        const rk = num(jrn.bore, 10) / 2 + 1;
+        const t0 = (boss[1]! + rk * sa) / ca + 1;
+        const t1 = (boss[2]! - rk * sa) / ca - 1;
         for (const k of ctx.solids.filter((s) => s.body === hubId && s.kind === "key" && s.op.op === "extrude")) {
-          const h = (k.op as { h: number }).h;
-          const kl = Math.min(h, shank - 1);
-          if (kl < h) Object.assign(k, { op: { ...k.op, h: kl }, name: k.name.replace(/ x [\d.]+ \(DIN 6885\)/, ` x ${kl} (DIN 6885)`) });
+          const kz = v3.unit(k.frame.z);
+          const from = v3.add(j.at as Vec3, v3.mul(a1, v3.dot(kz, a1) > 0 ? t0 : t1));
+          const kl = Math.round((t1 - t0) * 2) / 2;
+          Object.assign(k, { frame: { ...k.frame, o: v3.add(k.frame.o, v3.mul(kz, v3.dot(v3.sub(from, k.frame.o), kz))) }, op: { ...k.op, h: kl }, name: k.name.replace(/ x [\d.]+ \(DIN 6885\)/, ` x ${kl} (DIN 6885)`) });
         }
+      }
       const what = wide ? `one double-row angular-contact bearing ${b.name}-2RS, which takes the trunnion loads and the thrust along the journal both ways` : `${n} sealed bearings ${b.name}-2RS side by side`;
       ctx.note({
         id: j.id,
         kit: "oblique-journal",
         at: j.at,
         title: `oblique-journal · ${titleOf(j.id)}`,
-        note: `${titleOf(j.id)}: the ${ringId} turns on the inclined Ø${dj} journal on ${what}; the outer race held in the ring's bore by internal circlips, the inner race on the journal's collar and held by an external circlip; the journal is machined on the ${hubId} hub, keyed on the input shaft. The trunnion loads go ring to bearing to journal to the input shaft and its pillow blocks.`,
+        note: `${titleOf(j.id)}: the ${ringId} turns on the inclined Ø${dj} journal on ${what}; the outer race held in the ring's bore by internal circlips, the inner race against the hub's shoulder step and held by an external circlip; the journal is turned on the ${hubId} hub, one piece with its boss and shoulder, keyed on the input shaft in the boss. The trunnion loads go ring to bearing to journal to the input shaft and its pillow blocks.`,
         badge: ["both ends held", "ok"],
         serves: { F2: f2 },
       });
