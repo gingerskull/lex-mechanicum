@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.44.0, Gryphonne — 2026-10-27
 
 - Six new mechanisms, each built from its record at standard 3.11:
   - Self-reversing screw: one-way rotation drives a carriage back and forth along crossing right- and left-hand
