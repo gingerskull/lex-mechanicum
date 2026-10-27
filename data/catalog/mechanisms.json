@@ -5823,7 +5823,8 @@
         "four-bar",
         "locomotive-drive",
         "whitworth",
-        "crank-shaper"
+        "crank-shaper",
+        "rack-stroke-doubler"
       ],
       "added": "2026-10-18",
       "origin": {
@@ -27144,7 +27145,8 @@
         "lead-screw",
         "ackermann-steering",
         "scotch-yoke",
-        "slider-crank"
+        "slider-crank",
+        "rack-stroke-doubler"
       ],
       "added": "2026-10-18",
       "origin": {
@@ -31160,6 +31162,671 @@
         ],
         "exceptions": []
       }
+    },
+    {
+      "record_version": 3,
+      "id": "rack-stroke-doubler",
+      "name": "Rack-and-pinion stroke doubler",
+      "aka": [
+        "stroke doubler",
+        "stroke multiplier",
+        "double rack and pinion",
+        "floating rack",
+        "ejector accelerator",
+        "accelerated ejector"
+      ],
+      "in_site": false,
+      "family": "Gears",
+      "level": "Intermediate",
+      "summary": "A pinion carried on a slide rolls on a fixed rack and drives a free rack on its far side twice as far as the slide moves.",
+      "motion": {
+        "input": "Linear",
+        "output": "Linear",
+        "label": "Linear → Linear",
+        "output_character": [
+          "Reciprocating"
+        ],
+        "axes": "Offset parallel",
+        "plane": "Planar"
+      },
+      "ratio": {
+        "kind": "Stroke",
+        "class": "Low (<5:1)",
+        "typical": "output stroke = 2 x carrier stroke for any pinion; 160 mm for an 80 mm carrier stroke"
+      },
+      "dof": 1,
+      "topology": {
+        "links": 4,
+        "revolute": 1,
+        "prismatic": 2,
+        "higher_pairs": 2,
+        "notes": "ground with the fixed rack, carrier (prismatic on the ground), pinion (revolute on the carrier), free rack (prismatic on the ground); two gear meshes, the pinion with each rack"
+      },
+      "backdrivable": "Yes",
+      "tags": {
+        "function": [
+          "Speed increase",
+          "Scaling & copying",
+          "Positioning"
+        ],
+        "property": [
+          "Exact",
+          "Positive drive",
+          "Backdrivable",
+          "Compact",
+          "Few parts"
+        ],
+        "application": [
+          "Machine tools",
+          "Packaging & automation",
+          "Robotics"
+        ],
+        "keywords": [
+          "stroke doubler",
+          "instant centre",
+          "rolling pinion",
+          "fixed rack",
+          "floating rack",
+          "Brown No. 118",
+          "ejector accelerator"
+        ]
+      },
+      "explain": {
+        "motion": "A carrier slides back and forth with a pinion turning on its axle. The pinion meshes a fixed rack on one side and a free rack on the other. As the carrier moves, the pinion rolls along the fixed rack, so its contact there stands still for an instant: it is the instant centre. The far side of the pitch circle is twice as far from that point as the axle, so it moves twice as fast: the free rack moves 160 mm while the carrier moves 80 mm, the same way, whatever the pinion's size.",
+        "forces": "The free rack's load comes back through the pinion on both sides: the carrier pushes with twice the output force, half of it taken by the fixed rack, so the stroke doubles and the force halves. The pressure angle of each mesh pushes the racks away from the pinion, and their guides take it.",
+        "benefits": "Doubles a short stroke in a narrow space with an exact, positive drive, and the 2:1 holds for any pinion, since only the rolling sets it.",
+        "limits": "The backlash of two meshes adds up at the output, and the racks must stay parallel over the whole stroke or the pinion binds. The carrier needs twice the output force, and the ratio cannot be changed."
+      },
+      "build": {
+        "ground": "base with the fixed rack screwed and dowelled to it, a slide for the carrier and a slide for the free rack, all along x",
+        "defining_relations": "The pinion (module 3, 16 teeth, pitch radius r = 24 mm) rolls on the fixed rack's pitch line: for a carrier travel x it turns θ = -x / r. The free rack meshes it on the opposite side, 2r from the fixed pitch line, and moves x - r θ = 2x, whatever r is. Carrier stroke 80 mm (±40), free rack stroke 160 mm (±80), pinion turn 191° over the stroke (80 / 24 rad).",
+        "notes": "Seen in plan: the fixed rack below the pinion's centre, teeth up, the free rack above, teeth down. Relative to the carrier each rack moves ±40 mm, so 16 teeth (150.8 mm) keep both in mesh over the stroke. The carrier is the driven slide; the free rack rides its own slide from its back, its toothed side open for the pinion."
+      },
+      "kin": {
+        "bodies": [
+          {
+            "id": "ground",
+            "role": "ground",
+            "shape": {
+              "type": "plate",
+              "rect": [
+                340,
+                150
+              ]
+            },
+            "at": {
+              "frame": {
+                "origin": [
+                  0,
+                  0,
+                  -8
+                ]
+              }
+            }
+          },
+          {
+            "id": "carrier",
+            "role": "driver",
+            "shape": {
+              "type": "slider",
+              "length": 84,
+              "width": 24
+            },
+            "at": {
+              "joint": "P"
+            }
+          },
+          {
+            "id": "pinion",
+            "role": "gear",
+            "shape": {
+              "type": "gear",
+              "z": 16,
+              "module": 3,
+              "face": 12,
+              "bore": 10
+            },
+            "at": {
+              "joint": "P"
+            }
+          },
+          {
+            "id": "fixed-rack",
+            "role": "frame",
+            "fixed": true,
+            "shape": {
+              "type": "rack",
+              "module": 3,
+              "teeth": 16,
+              "length": 150.796,
+              "face": 12,
+              "height": 16,
+              "pitchLine": 0
+            },
+            "frame": {
+              "origin": [
+                0,
+                -24,
+                0
+              ]
+            }
+          },
+          {
+            "id": "free-rack",
+            "role": "output",
+            "shape": {
+              "type": "rack",
+              "module": 3,
+              "teeth": 16,
+              "length": 150.796,
+              "face": 12,
+              "height": 16,
+              "pitchLine": 0
+            },
+            "at": {
+              "joint": "R"
+            },
+            "frame": {
+              "origin": [
+                0,
+                24,
+                0
+              ],
+              "rot": [
+                0,
+                0,
+                180
+              ]
+            }
+          }
+        ],
+        "joints": [
+          {
+            "id": "C",
+            "type": "prismatic",
+            "a": "ground",
+            "b": "carrier",
+            "at": [
+              0,
+              0,
+              0
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "limits": [
+              -40,
+              40
+            ]
+          },
+          {
+            "id": "P",
+            "type": "revolute",
+            "a": "carrier",
+            "b": "pinion",
+            "at": [
+              0,
+              0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "id": "R",
+            "type": "prismatic",
+            "a": "ground",
+            "b": "free-rack",
+            "at": [
+              0,
+              24,
+              0
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "limits": [
+              -80,
+              80
+            ]
+          },
+          {
+            "id": "M1",
+            "type": "gear-mesh",
+            "a": "pinion",
+            "b": "fixed-rack",
+            "at": [
+              0,
+              -24,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              1,
+              0,
+              0
+            ],
+            "radiusA": 24,
+            "za": 16,
+            "carrier": "carrier",
+            "note": "the pinion rolls on the fixed rack: relative to the carrier the rack moves r per radian of the pinion's turn"
+          },
+          {
+            "id": "M2",
+            "type": "gear-mesh",
+            "a": "pinion",
+            "b": "free-rack",
+            "at": [
+              0,
+              24,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "axis2": [
+              -1,
+              0,
+              0
+            ],
+            "radiusA": 24,
+            "za": 16,
+            "carrier": "carrier",
+            "note": "the free rack on the pinion's far side: relative to the carrier it moves the carrier's travel again"
+          }
+        ],
+        "params": [
+          {
+            "id": "m",
+            "value": 3,
+            "unit": "mm",
+            "min": 2,
+            "max": 4,
+            "note": "module of the pinion and both racks"
+          },
+          {
+            "id": "r",
+            "value": 24,
+            "unit": "mm",
+            "min": 16,
+            "max": 32,
+            "note": "pinion pitch radius, m z / 2: half the distance between the racks' pitch lines"
+          }
+        ],
+        "design": [],
+        "drivers": [
+          {
+            "id": "input",
+            "joint": "C",
+            "kind": "linear",
+            "range": [
+              -40,
+              40
+            ],
+            "default": 0,
+            "lo": -40,
+            "hi": 40
+          }
+        ],
+        "solve": [
+          {
+            "block": "gear-mesh",
+            "id": "roll",
+            "joints": [
+              "P",
+              "M1"
+            ],
+            "in": {
+              "joint": "M1",
+              "rolls": "P",
+              "parent": "carrier"
+            },
+            "out": {
+              "angle": "pinion-turn",
+              "travel": "axle-travel"
+            }
+          },
+          {
+            "block": "gear-mesh",
+            "id": "drive",
+            "joints": [
+              "R",
+              "M2"
+            ],
+            "in": {
+              "joint": "M2",
+              "input": "pinion-turn",
+              "parent": "carrier"
+            },
+            "out": {
+              "travel": "rack-on-carrier"
+            }
+          }
+        ],
+        "points": [
+          {
+            "id": "axle",
+            "body": "carrier",
+            "local": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "contact-fixed",
+            "body": "carrier",
+            "local": [
+              0,
+              -24,
+              0
+            ]
+          },
+          {
+            "id": "contact-free",
+            "body": "carrier",
+            "local": [
+              0,
+              24,
+              0
+            ]
+          },
+          {
+            "id": "rack-mark",
+            "body": "free-rack",
+            "local": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "fixed-left",
+            "body": "fixed-rack",
+            "local": [
+              -75.398,
+              0,
+              0
+            ]
+          },
+          {
+            "id": "fixed-right",
+            "body": "fixed-rack",
+            "local": [
+              75.398,
+              0,
+              0
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "id": "carrier-x",
+            "of": "axle",
+            "kind": "position",
+            "axis": "x",
+            "unit": "mm"
+          },
+          {
+            "id": "rack-x",
+            "of": "rack-mark",
+            "kind": "position",
+            "axis": "x",
+            "unit": "mm"
+          },
+          {
+            "id": "pinion-angle",
+            "of": "pinion",
+            "kind": "angle",
+            "unit": "deg"
+          },
+          {
+            "id": "rack-speed",
+            "of": "rack-mark",
+            "kind": "speed-ratio",
+            "unit": "mm/mm"
+          }
+        ],
+        "fallback": null
+      },
+      "teaching": {
+        "review": {
+          "verdict": "keep",
+          "date": "2026-10-27",
+          "note": "New record (#257), reviewed against its kinematics before the build and again on the six phases of the finished build. Six phases (every 60 degrees of the cycle): the carrier at -40, -20, +20, +40, +20, -20 mm and the free rack at -80, -40, +40, +80, +40, -40 mm, always twice the carrier and the same way; the pinion turns back as it rolls forward, +95.5 to -95.5 degrees (191 over the stroke, 80 / 24 rad); its contact with the fixed rack stays on the fixed pitch line under the axle. Decided: the carrier is driven by the linear drive along its own slide (standard section 8), not by Brown's crank and rod, so the lesson is the two straight strokes alone with no second mechanism in front of it; module 3, 16 teeth (pitch radius 24), a carrier stroke of 80 mm and a free rack stroke of 160 mm; both racks 16 teeth, enough to stay in mesh over the stroke; the carrier 84 mm long, so it shows past the pinion at both ends; the fixed rack drawn as frame (role frame) and the free rack as the output, so which rack moves reads at a glance. Default view PLAN (opened at 28 degrees), where the pitch circle, both pitch lines and both strokes show true. Traces: a mark on the free rack's pitch line (the comet) and the axle, both ticked every 30 degrees of the cycle, so at every tick the rack's step is twice the carrier's; overlays: the fixed pitch line, a circle at the instant centre, the line from it through the axle to the far contact (speeds 0, v, 2v), and the two stroke dimensions between the posed ends. Plot of the free rack against the carrier (a straight line of slope 2). Controls: the input only; the pinion size is not offered (the parts are built for one pinion), and the claim that the ratio holds for any pinion is the law, checked by the block's test at three radii. No section or detail view: the principle lies in plain view. No time map."
+        },
+        "principle": [
+          {
+            "body": "carrier"
+          },
+          {
+            "body": "pinion"
+          },
+          {
+            "body": "fixed-rack"
+          },
+          {
+            "body": "free-rack"
+          },
+          {
+            "point": "contact-fixed"
+          }
+        ],
+        "traces": [
+          {
+            "id": "free-rack",
+            "point": "rack-mark",
+            "ticks": {
+              "every": 30
+            },
+            "comet": true
+          },
+          {
+            "id": "axle",
+            "point": "axle",
+            "ticks": {
+              "every": 30
+            }
+          }
+        ],
+        "overlays": [
+          {
+            "id": "fixed-pitch-line",
+            "kind": "line",
+            "from": "fixed-left",
+            "to": "fixed-right",
+            "label": "FIXED PITCH LINE"
+          },
+          {
+            "id": "instant-centre",
+            "kind": "circle",
+            "center": "contact-fixed",
+            "radius": 3,
+            "label": "INSTANT CENTRE"
+          },
+          {
+            "id": "speeds",
+            "kind": "line",
+            "from": "contact-fixed",
+            "to": "contact-free",
+            "label": "SPEED 0, v, 2v"
+          },
+          {
+            "id": "carrier-stroke",
+            "kind": "dimension",
+            "from": "axle",
+            "to": "axle",
+            "fromPose": {
+              "output": "carrier-x",
+              "stat": "min"
+            },
+            "toPose": {
+              "output": "carrier-x",
+              "stat": "max"
+            },
+            "label": "CARRIER STROKE"
+          },
+          {
+            "id": "rack-stroke",
+            "kind": "dimension",
+            "from": "rack-mark",
+            "to": "rack-mark",
+            "fromPose": {
+              "output": "rack-x",
+              "stat": "min"
+            },
+            "toPose": {
+              "output": "rack-x",
+              "stat": "max"
+            },
+            "label": "FREE RACK STROKE, TWICE"
+          }
+        ],
+        "view": "PLAN",
+        "views": [],
+        "controls": [
+          {
+            "id": "input",
+            "kind": "driver",
+            "driver": "input"
+          }
+        ],
+        "plot": {
+          "x": "input",
+          "y": "rack-x",
+          "label": "FREE RACK AGAINST CARRIER"
+        },
+        "claims": [
+          {
+            "text": "the free rack moves 160 mm",
+            "output": "rack-x",
+            "stat": "range",
+            "value": 160,
+            "tol": 0.05
+          },
+          {
+            "text": "while the carrier moves 80 mm",
+            "output": "carrier-x",
+            "stat": "range",
+            "value": 80,
+            "tol": 0.05
+          },
+          {
+            "text": "output stroke = 2 x carrier stroke, the same way: the 2:1 holds for any pinion",
+            "output": "rack-x",
+            "stat": "ratio",
+            "value": 2,
+            "tol": 0.001
+          },
+          {
+            "text": "it moves twice as fast (2 mm per mm of carrier, at every point of the stroke)",
+            "output": "rack-speed",
+            "stat": "min",
+            "value": 2,
+            "tol": 0.01
+          },
+          {
+            "text": "it moves twice as fast (2 mm per mm of carrier, at every point of the stroke)",
+            "output": "rack-speed",
+            "stat": "max",
+            "value": 2,
+            "tol": 0.01
+          },
+          {
+            "text": "pinion turn 191° over the stroke (80 / 24 rad)",
+            "output": "pinion-angle",
+            "stat": "range",
+            "value": 190.99,
+            "tol": 0.05
+          }
+        ],
+        "exceptions": []
+      },
+      "examples": [
+        {
+          "use": "Accelerated ejectors in moulds",
+          "detail": "A pinion on the ejector plate rolls on a rack held by the mould plate and drives a second rack, with its ejector pin, ahead at twice the plate's speed."
+        },
+        {
+          "use": "Moulded part removal robots",
+          "detail": "A pinion on the first telescoping tube rolls on a rack in the housing and runs a rack on the inner tube out at double the tube's speed."
+        },
+        {
+          "use": "Vise carriages",
+          "detail": "A pinion on the end of a cylinder's piston rod meshes a frame rack and a carriage rack, so the carriage travels twice the piston stroke."
+        },
+        {
+          "use": "Blow moulding tools",
+          "detail": "A pinion carried by the ejector between a fixed and a moving rack gives the ejection carriage twice the ejector's stroke."
+        }
+      ],
+      "references": [
+        {
+          "title": "Epicyclic gearing: kinematic equations (the rack and pinion model), Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Epicyclic_gearing",
+          "kind": "wikipedia"
+        },
+        {
+          "title": "Instant centre of rotation (a rolling wheel's top moves at twice its centre), Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Instant_centre_of_rotation",
+          "kind": "wikipedia"
+        },
+        {
+          "title": "Brown, 507 Mechanical Movements (1868), No. 118: doubling the stroke with a fixed and a moving rack",
+          "url": "https://507movements.com/mm_118.html",
+          "kind": "textbook"
+        },
+        {
+          "title": "US patent 3893644, Ejector accelerator for molding apparatus (Drazick, 1975)",
+          "url": "https://patents.google.com/patent/US3893644A/en",
+          "kind": "patent"
+        },
+        {
+          "title": "US patent 5125789, Molded parts removal and transfer robot (Peerless Automation, 1992)",
+          "url": "https://patents.google.com/patent/US5125789",
+          "kind": "patent"
+        }
+      ],
+      "media": [
+        {
+          "title": "Accelerated ejectors, DME Mold Components catalogue (unit photos, pinion and racks labelled)",
+          "url": "https://online.flippingbook.com/view/562699730/197/",
+          "kind": "photos"
+        },
+        {
+          "title": "507 Mechanical Movements No. 118 to 126, 3D animation (YouTube)",
+          "url": "https://www.youtube.com/watch?v=HFDfu_BOpa0",
+          "kind": "animation"
+        }
+      ],
+      "real_world": [],
+      "related": [
+        "rack-pinion",
+        "slider-crank",
+        "planetary"
+      ],
+      "added": "2026-10-27",
+      "origin": {
+        "date": "1868-10-16",
+        "precision": "year",
+        "note": "Best guess: the earliest dated description found is No. 118 of Henry T. Brown's 507 Mechanical Movements (first published 1868): a pinion on the connecting rod meshes a fixed rack and a sliding rack above it, which moves twice as far. No earlier description or patent was found; the first patent found is US 3893644 (1975). Source: https://507movements.com/mm_118.html"
+      },
+      "waive": [
+        "media"
+      ]
     },
     {
       "id": "sun-and-planet",
@@ -38058,7 +38725,8 @@
         "ravigneaux",
         "sun-and-planet",
         "harmonic-drive",
-        "cycloidal-drive"
+        "cycloidal-drive",
+        "rack-stroke-doubler"
       ],
       "added": "2026-10-18",
       "origin": {

@@ -481,7 +481,8 @@
    "four-bar",
    "locomotive-drive",
    "whitworth",
-   "crank-shaper"
+   "crank-shaper",
+   "rack-stroke-doubler"
   ]
  },
  {
