@@ -23,7 +23,7 @@
 }
 
 /* Wide: the stage and its controls across the layout, at a glance (two thirds) and the plot side by side below
-   it, the facts in rows of cells */
+   it (at a glance across the whole width where a sheet has no plot), the facts in rows of cells */
 @media (min-width: 1001px) {
   :root[data-view="wide"] .dlayout {
     grid-template-columns: minmax(0, 1fr);
@@ -40,6 +40,9 @@
   :root[data-view="wide"] .side {
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     align-items: stretch;
+  }
+  :root[data-view="wide"] .side > .panel:only-child {
+    grid-column: 1 / -1;
   }
   :root[data-view="wide"] .side .plot {
     display: flex;

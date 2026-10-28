@@ -3,7 +3,7 @@
 // what the library's orders read: its sheet number, and its added date and date of origin once the record has them; the
 // added date also shows the Recovered badge for the sheet's first days (islands/recovered.ts). A seasonal mechanism's card
 // (P14) wears the Seasonal folklore tag instead, and is built hidden with its listing windows: the library's filters show
-// it in its window and take it off the page out of it.
+// it in its window and take it off the page out of it. The featured slot (SS16) reads what it shows from the cards.
 import { FACETS, sortableOf, type Sheet } from "../data";
 import { url } from "../url";
 interface Props {
@@ -14,9 +14,11 @@ const r = sheet.rec;
 const data = Object.fromEntries(FACETS.map((f) => [`data-${f.key}`, f.of(r).join("|")]));
 const k = sortableOf(sheet);
 const seasonal = sheet.season !== undefined;
+// the first uses of its examples, for the featured slot's title block (SS16)
+const uses = (r.examples ?? []).slice(0, 3).map((e) => e.use).join("|");
 const text = [sheet.no, r.name, ...(r.aka ?? []), r.summary, r.family, r.motion.label, ...r.tags.function, ...r.tags.property, ...r.tags.application, ...(r.tags.keywords ?? []), ...(seasonal ? ["Seasonal folklore", r.season!.occasion] : [])].join(" ").toLowerCase();
 ---
-<a class="card" href={url(`/mechanisms/${sheet.id}/`)} data-id={sheet.id} data-text={text} data-no={k.no} data-added={k.added} data-origin={k.origin} data-season={sheet.season} hidden={seasonal} {...data}>
+<a class="card" href={url(`/mechanisms/${sheet.id}/`)} data-id={sheet.id} data-text={text} data-no={k.no} data-added={k.added} data-origin={k.origin} data-season={sheet.season} data-occasion={r.season?.occasion} data-uses={uses || undefined} hidden={seasonal} {...data}>
   <div class="thumb">
     <img class="t-dark" src={url(`/thumbs/${sheet.id}-dark.webp`)} alt={`${r.name}, drawing`} width="320" height="240" loading="lazy" decoding="async" />
     <img class="t-light" src={url(`/thumbs/${sheet.id}-light.webp`)} alt="" width="320" height="240" loading="lazy" decoding="async" />

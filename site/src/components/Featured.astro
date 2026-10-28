@@ -1,0 +1,11 @@
+---
+// The featured slot of the library (SS16): one sheet shown large above the cards, its title block filling the left of
+// the frame and its drawing fitted in the right, as the stage draws it. What it shows is picked in the browser for the
+// day (site/src/featured.ts, islands/featured.ts) from the cards' own data, so the slot ships empty; its frame holds the
+// height from the start, so filling it never moves the cards. Without scripting it stays off the page.
+---
+<section class="featured" id="featured" aria-label="Featured mechanism">
+  <div class="fview" id="fview"></div>
+  <div class="fdots" id="fdots" hidden></div>
+</section>
+<noscript><style>.featured { display: none; }</style></noscript>

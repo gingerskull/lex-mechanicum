@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.10
-date: 2026-10-27
+version: 3.11
+date: 2026-10-28
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -201,13 +201,14 @@ instruments' labels, not app widgets. Square corners, hairline rules, condensed 
 | SS6 | **Panels:** paper fill, hairline frame, a mono uppercase header strip with a rule under it; fact lists as label/value rows with dashed separators. |
 | SS7 | **Theme switch** is one square button with one icon, a cog with a half-filled disc in its bore in the sheet's ink: as drawn (filled half to the right) on Drafting, turned 180° (filled half to the left) on Blueprint, so switching sheets turns it without animation; its name and tooltip say the sheet it switches to ("Switch to Blueprint", "Switch to Drafting"). Once the hidden Forge sheet is unlocked (SS14) the switch steps through three sheets, Blueprint, Drafting, Forge, and shows the cog a quarter turn (filled half down) on Forge. The choice is remembered per visitor (local storage, wrapped in try/catch), defaulting to the visitor's light/dark preference. Switching redraws every visible canvas and the page in one step. |
 | SS8 | **Real pages:** one static page per mechanism at `/mechanisms/<id>/`, prev and next from the catalogue order, the library at `/`, and a 404 page (sheet ST-404, with the way to the library) for any other address. The engine loads only on the mechanism page or on card hover. |
-| SS9 | **Responsive:** works at phone width with a 16 px side gutter (respecting safe areas) and no horizontal scroll; the mechanism layout drops to one column under 1000 px; the set title block hides under 640 px. The stage has three view modes: standard; Wide (above 1000 px only, remembered: the stage across the layout, at a glance (two thirds) and the plot side by side below it, the facts in a wrapping row where a short fact never wraps and a long one is sized to run to about two lines); full screen, where a short landscape screen puts the same controls in a rail beside the drawing with upright sliders (top is more) inside the safe areas. |
+| SS9 | **Responsive:** works at phone width with a 16 px side gutter (respecting safe areas) and no horizontal scroll; the mechanism layout drops to one column under 1000 px; the set title block hides under 640 px. The stage has three view modes: standard; Wide (above 1000 px only, remembered: the stage across the layout, at a glance (two thirds) and the plot side by side below it, at a glance across the whole width on a sheet with no plot, the facts in a wrapping row where a short fact never wraps and a long one is sized to run to about two lines); full screen, where a short landscape screen puts the same controls in a rail beside the drawing with upright sliders (top is more) inside the safe areas. |
 | SS10 | **Accessibility:** visible focus (dashed accent outline, 3 px offset); all controls are buttons with `aria-pressed` / `aria-expanded`; `prefers-reduced-motion` stops transitions and autoplay; contrast per SF5. The drawing itself takes focus and the keys: Space plays or pauses, the arrows step the cycle, Shift with the arrows orbits, 1 to 5 are the named views and 0 the record's own. |
 | SS11 | **Motion on the page is minimal:** short colour and border transitions (≤ .2 s). The only continuous motion is the mechanisms themselves. |
 | SS12 | **No colour or font literals in CSS** outside the generated tokens block. Component CSS uses `var(--…)` and `color-mix()` of tokens. The version shows in the footer, and under it, centred, the set's mark faded in the sheet's ink (`--mark`). The favicon is the same mark in the ink of the sheet that matches the browser's scheme. |
 | SS14 | **Forge, the hidden third sheet.** Oxide-red paper, bone ink, brass accent (the `forge` theme of the tokens), so the drawings recolour with the page. It is unlocked by holding the sheet switch: after a second the cog, ring and half-disc, fills with brass in one sweep over two seconds, and at full the unlock moment plays (a shorter press is a plain switch; letting go during the fill does nothing; a mouse, a finger with no long-press menu, or Space or Enter held all work). Clicking the Rev cell of the library's title block 16 times, once per law, also unlocks it. The unlock is remembered per visitor; from then on the switch has three sheets. The hints: the cog glints brass once on a visitor's third visit; the developer console says the forge sleeps; a search that is a word of its lore (`site/src/lore.ts`: Mechanicus terms, places, people, the forge-world release names) shows a sealed state in place of the cards, and the 404 page a line, each with a faint hint phrase picked at random. The unlock moment (1.5 s) flickers twice, tears bands of the page sideways, splits red from blue and bursts into noise that settles on the Forge sheet, lit by the furnace. A click or a key skips it; under reduced motion it is a plain fade. While Forge is the sheet the page lives, subtly, in fixed layers that never take a click: fine grain, scanlines split warm and cool and drifting down, a soft band rolling down the screen, text fringed warm and cool, a slow shallow dimming, the furnace glow breathing at the edges, a blip every few seconds (a strip that dims or brightens, or a thin line), and a glitch pulse every 20 to 40 s (bands shift colour, the fringe widens). On the drawing a post-process adds grain and a red and blue split that swells down the rows, and tears bands at a blip or a pulse. It goes with the paper grain (rung A), so it is the first thing dropped when the device cannot keep up, and cards never draw it. Nothing flashes more than 3 times a second; under reduced motion nothing moves. Forge has no thumbnails or stills of its own: the Blueprint images are recoloured into its paper and ink. The public sheets, their thumbnails and their snapshots never change for it. This is the one exception to SS11. The knobs are in `src/style/forge.ts` (Part VI). |
 | SS15 | **Gestures on the drawing.** A sideways drag scrubs the cycle and pauses, a tap plays or pauses, an up or down drag is the page's. A mouse orbits with the right button, or Shift and the left, and the stage's menu stays shut after an orbit; a finger drags sideways to scrub, and two fingers orbit. An orbit that ends near a named view lands on it; a plan turned in its plane stays as turned. |
 | SS13 | **No engine mark.** One engine draws every page and card, so neither the title block nor a library card marks the engine that drew it. The 3D stamp of the transition left with the 2.5D engine at cut-over. |
+| SS16 | **Featured sheet:** on the library, under the sticky bar and over the status line, one sheet shown large in a card's frame, linking to its page. While seasonal mechanisms are listed (P14) they are the featured ones, in the order of their holidays, and several share the slot: square dots in a corner of the drawing, a swipe, the arrow keys, and a short cross-fade to the next every 8 s that waits while the slot is hovered, focused or touched and never runs under reduced motion. Otherwise it is one sheet of the library, picked at random for three days counted in UTC from a fixed epoch, the same for every visitor, never the previous period's. The frame holds the sheet's title block on the left (38 %) and its drawing on the right (62 %, 16:10), fitted whole as the stage opens it: the record's own view (T7) with no sheet and no construction labels. The stage's still shows until the slot is in view, then the drawing animates from its phase and margin (one sharp frame under reduced motion; the still stays without WebGL2). The title block, in cells on hairlines: a "Featured" stamp, or the Seasonal folklore one with the occasion; the name with the sheet number; family · motion · level; the summary; "Found in", the first three uses of the record's examples; the function tags; "Open the sheet" at its foot. Under 1000 px it keeps the stamp, name, meta, summary and the way in; under 640 px it sits under the drawing at a set height, with the stamp, name, summary and the way in. The slot holds its height before it fills, steps aside while a search or a filter is on and comes back when they are cleared. |
 
 ---
 
@@ -296,8 +297,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.grid.majorWidth` | 0.8 | px |
 | `draft.card.detail` | `C` | detail dial position of a card drawing (DL): sharp, without wall shading or the deep layers |
 | `draft.card.refW` | 320 | px, width of the canvas the card thumbnails are drawn on; a live card scales its margin to it |
-| `draft.card.plateTopFactor` | 0.7 | factor on lines.plateTop on a card |
-| `draft.card.baseTopFactor` | 0.7 | factor on lines.baseTop on a card |
+| `draft.card.lines` | 0.8 | factor on every line's width on a card, so its weights read in proportion to the mechanism page's |
+| `draft.card.plateTopFactor` | 0.6 | factor on lines.plateTop on a card |
+| `draft.card.baseTopFactor` | 0.6 | factor on lines.baseTop on a card |
 | `draft.lines.plateTop` | 1.7 | px, bold top outline of plates |
 | `draft.lines.otherTop` | 1.1 | px, top outline of everything else |
 | `draft.lines.baseTop` | 1.5 | px, top outline of the base plate |
@@ -710,6 +712,7 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 | `tokens.size.bpPhone` | 640 | px, phone layout below this |
 | `tokens.size.focusOffset` | 3 | px, focus outline offset (SS10) |
 | `tokens.size.mark` | 44 | px, side of the faded mark at the foot of every page |
+| `tokens.size.featureBlock` | 186 | px, height of the featured slot's title block under its drawing on a phone (SS16) |
 | `tokens.size.transition` | 0.2 | s, colour and border transitions (SS11) |
 | `tokens.size.stage` | `16 / 10` | aspect ratio of the stage |
 | `tokens.size.stagePhone` | `4 / 3` | stage under bpPhone, and the card drawing field |
@@ -803,6 +806,9 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 
 ## Changelog
 
+- **3.11 (2026-10-28).** The library's featured sheet (SS16): its title block beside its drawing, fitted whole. Card
+  drawings thin every line in proportion (`draft.card.lines`) and their bold outlines more (SS1). In the wide view, at a
+  glance runs across the whole width on a sheet with no plot (SS9).
 - **3.10 (2026-10-27).** SQ2, the look match against the hand-off proposal, is retired: our own snapshot baselines
   (SQ9) hold the look.
 - **3.9 (2026-10-25).** A turning round part carries rulings registered to it, a ball and a crowned roller too (SD29),

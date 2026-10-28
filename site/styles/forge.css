@@ -10,7 +10,8 @@
 
 /* Forge has no images of its own: the Blueprint thumbnails and stills are recoloured into its paper and ink */
 :root[data-theme="forge"] .thumb .t-dark,
-:root[data-theme="forge"] .stage .t-dark {
+:root[data-theme="forge"] .stage .t-dark,
+:root[data-theme="forge"] .fslide img {
   filter: url(#forge-tone);
 }
 

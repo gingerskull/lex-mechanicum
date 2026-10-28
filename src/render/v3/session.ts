@@ -52,6 +52,9 @@ export interface DrawView3 {
   now?: number;
   /** The picked label's end pulses (the stage, unless reduced motion asks for stillness). */
   pulse?: boolean;
+  /** The width (CSS px) of the still this drawing takes over from (the featured slot's, SS16): its margin scales to it, so
+   * the swap does not jump. A card's is DRAFT.card.refW. */
+  refW?: number;
 }
 
 /**
@@ -212,7 +215,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
         if (LD.mark(k) && (k !== "chamfer" || C.s > DRAFT.lines.chamferMinScale)) markMask |= 1 << (i + 1);
       });
       geo.draw(
-        { card, cam: C, cw: card.cw, ch: card.ch, dpr: card.dpr, T, layers: LD.effect("deepLayers") ? DRAFT.peel.layers : DRAFT.peel.layersLow, hidden: LD.effect("hiddenLines"), patterns: LD.effect("rolePatterns"), shade: LD.effect("wallShade"), clip, markMask, ring: view.ring ?? 1 },
+        { card, cam: C, cw: card.cw, ch: card.ch, dpr: card.dpr, T, layers: LD.effect("deepLayers") ? DRAFT.peel.layers : DRAFT.peel.layersLow, hidden: LD.effect("hiddenLines"), patterns: LD.effect("rolePatterns"), shade: LD.effect("wallShade"), clip, markMask, ring: view.ring ?? 1, lineK: view.card ? DRAFT.card.lines : 1 },
         table,
       );
       const gl = gpu3(card).canvas;
@@ -391,7 +394,8 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     // the dimension lines of the detail stage run along the bottom and the right of the drawing: keep room for them
     const room = view.sheet && view.dims && !view.card ? DRAFT.dims.offset + DRAFT.dims.ext + DRAFT.dims.labelH / 2 : 0;
     // a card's margin is the thumbnail's, scaled to the card: the live drawing takes over from the image without a jump
-    const pad = view.card ? (DRAFT.camera.pad * card.w) / DRAFT.card.refW : DRAFT.camera.pad;
+    const ref = view.refW ?? (view.card ? DRAFT.card.refW : 0);
+    const pad = ref ? (DRAFT.camera.pad * card.w) / ref : DRAFT.camera.pad;
     // the record's own frame holds for its default view, assembled; a detail window or an explode keeps the plain fit
     const frame = view.state.frame && !win && !view.state.section && explode === 0 ? { frame: view.state.frame } : {};
     return fit(B, card.w, card.h, box, { pad, ...(win ? { window: win } : {}), ...(room ? { inset: { right: room, bottom: room } } : {}), ...frame });

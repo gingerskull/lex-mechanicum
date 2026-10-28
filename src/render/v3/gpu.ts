@@ -259,6 +259,8 @@ export interface PassInput {
   markMask: number;
   /** The input ring's strength, 0..1 (it breathes while the drawing is paused); 1 when absent. */
   ring?: number;
+  /** A factor on every line's width (a library card's, DRAFT.card.lines); 1 when absent. */
+  lineK?: number;
 }
 
 const unit = (c: readonly number[]) => [c[0]! / 255, c[1]! / 255, c[2]! / 255];
@@ -455,6 +457,7 @@ export class Geometry {
     gl.uniform1f(ul.uEps!, DRAFT.peel.edgeEps * perMm);
     gl.uniform1f(ul.uEpsOwn!, (DRAFT.peel.ownPx / p.cam.s + DRAFT.peel.ownEps) * perMm);
     gl.uniform1f(ul.uDpr!, p.dpr);
+    gl.uniform1f(ul.uLineK!, p.lineK ?? 1);
     gl.uniform1f(ul.uHidden!, p.hidden ? 1 : 0);
     gl.uniform1i(ul.uMarkMask!, p.markMask);
     gl.uniform1f(ul.uRing!, p.ring ?? 1);

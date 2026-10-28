@@ -13,6 +13,7 @@ import { recordById } from "../../src/catalog";
 import { allIds } from "../../src/mechanisms";
 import { HINTS, LORE_WORDS } from "../../site/src/lore";
 import { addDays, longDate, windowsOf } from "../../site/src/season";
+import { periodOf, rotationPick } from "../../site/src/featured";
 import { sortBy, type Order, type Sortable } from "../../site/src/sort";
 
 const OUT = join("dist", "site");
@@ -578,5 +579,148 @@ describe.skipIf(!seasonal.length)("a seasonal mechanism's listing", () => {
       expect(await page.locator(`[data-seasonlinks] a[href$="/mechanisms/${id}/"]`).isVisible(), day).toBe(listed);
       await ctx.close();
     }
+  });
+});
+
+// The featured slot (SS16): one sheet large above the cards, its title block beside its fitted drawing, picked for the
+// day in the browser (the clock is set): the
+// rotation's sheet, or the seasonal ones while they are listed, sliding with dots when there are several; its height is
+// held before it fills; it steps aside while a search is on and comes back when it is cleared.
+describe("the featured slot", () => {
+  const library = allIds().filter((id) => !recordById(id)?.season);
+  /** A context with its clock at noon, local time, on `day`. */
+  const at = async (day: string, make: () => Promise<BrowserContext> = desktop) => {
+    const ctx = await make();
+    const [y, m, d] = day.split("-").map(Number);
+    await ctx.clock.setFixedTime(new Date(y!, m! - 1, d!, 12));
+    return ctx;
+  };
+  /** The slot's slides as the page shows them: id from the link, label, name, and whether each is the one shown. */
+  const slides = (page: Page) =>
+    page.$$eval(".fslide", (ss) =>
+      ss.map((s) => ({ href: (s as HTMLAnchorElement).getAttribute("href") ?? "", label: s.querySelector(".flabel, .folklore")?.textContent ?? "", name: s.querySelector("h2")?.textContent ?? "", on: s.classList.contains("on") })),
+    );
+
+  it("features the rotation's sheet outside any seasonal window, the same all three days of its period", async () => {
+    const day = "2026-10-10";
+    const want = rotationPick(library, periodOf(new Date(Date.UTC(2026, 9, 10, 12))));
+    for (const d of [day, addDays(day, 1)]) {
+      const ctx = await at(d);
+      const { page, errors } = await open(ctx, "/");
+      await page.waitForSelector(".fslide.on");
+      const s = await slides(page);
+      expect(s, d).toHaveLength(1);
+      expect(s[0]!.href.endsWith(`/mechanisms/${want}/`), d).toBe(true);
+      expect(s[0]!.label).toBe("Featured");
+      expect(s[0]!.name).toBe(recordById(want!)!.name);
+      expect(await page.locator("#fdots").isHidden()).toBe(true);
+      // the stage's still until the engine draws, and the first uses of the record's examples in the title block
+      expect(await page.locator(".fslide img").getAttribute("src")).toMatch(new RegExp(`/thumbs/${want}-dark-still\\.webp$`));
+      expect(await page.locator(".fslide .fuses li").allTextContents()).toEqual((recordById(want!)!.examples ?? []).slice(0, 3).map((e) => e.use));
+      expect(errors).toEqual([]);
+      await ctx.close();
+    }
+  });
+
+  it("holds its height before it fills, on a desktop and a phone", async () => {
+    for (const make of [desktop, phone]) {
+      const ctx = await at("2026-10-10", make);
+      const { page } = await open(ctx, "/");
+      await page.waitForSelector(".fslide.on");
+      const [filled, empty] = await page.evaluate(() => {
+        const v = document.getElementById("fview")!;
+        const top = () => document.getElementById("grid")!.getBoundingClientRect().top;
+        const a = top();
+        const kids = [...v.children];
+        v.replaceChildren();
+        const b = top();
+        v.replaceChildren(...kids);
+        return [a, b];
+      });
+      expect(Math.abs(filled - empty)).toBeLessThan(1);
+      await ctx.close();
+    }
+  });
+
+  it("starts the drawing once in view, and switches its still with the sheet", async () => {
+    const ctx = await at("2026-10-10");
+    const { page, errors } = await open(ctx, "/");
+    await page.waitForSelector(".fslide.live", { timeout: 30_000 });
+    await page.locator(".bar [data-theme-toggle]").first().click();
+    await page.waitForTimeout(200);
+    expect(await page.locator(".fslide img").getAttribute("src")).toMatch(/-light-still\.webp$/);
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it("steps aside while a search is on and comes back when it is cleared", async () => {
+    for (const make of [desktop, phone]) {
+      const ctx = await at("2026-10-10", make);
+      const { page } = await open(ctx, "/");
+      await page.waitForSelector(".fslide.on");
+      expect(await page.locator("#featured").isVisible()).toBe(true);
+      await page.locator("#q").fill("gear");
+      expect(await page.locator("#featured").isVisible()).toBe(false);
+      await page.locator("#q").fill("");
+      expect(await page.locator("#featured").isVisible()).toBe(true);
+      await ctx.close();
+    }
+  });
+
+  const seasonal = allIds().filter((id) => recordById(id)?.season);
+  const id = seasonal[0] ?? "";
+  const rec = recordById(id);
+  const first = windowsOf(rec?.season?.dates ?? [])[0] ?? { from: "2000-01-04", until: "2000-01-04" };
+
+  it.skipIf(!seasonal.length)("features a listed seasonal mechanism instead, with its occasion", async () => {
+    const ctx = await at(first.from);
+    const { page, errors } = await open(ctx, "/");
+    await page.waitForSelector(".fslide.on");
+    const s = await slides(page);
+    expect(s).toHaveLength(1);
+    expect(s[0]!.href.endsWith(`/mechanisms/${id}/`)).toBe(true);
+    expect(s[0]!.label).toBe(`Seasonal folklore · ${rec!.season!.occasion}`);
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it.skipIf(!seasonal.length)("slides between several listed at once: dots, arrow keys, and a turn every 8 s", async () => {
+    // a library sheet dressed as a second seasonal mechanism, listed from the day after the first's window opens
+    const other = library[0]!;
+    const ctx = await desktop();
+    const [y, m, d] = first.from.split("-").map(Number);
+    await ctx.clock.install({ time: new Date(y!, m! - 1, d!, 12) });
+    await ctx.addInitScript(
+      ([oid, from, until]) => {
+        new MutationObserver((_, mo) => {
+          const c = document.querySelector<HTMLElement>(`.card[data-id="${oid}"]`);
+          if (!c) return;
+          c.dataset.season = `${from}/${until}`;
+          c.dataset.occasion = "Test day";
+          mo.disconnect();
+        }).observe(document, { childList: true, subtree: true });
+      },
+      [other, addDays(first.from, -1), first.until] as const,
+    );
+    const { page, errors } = await open(ctx, "/");
+    await page.waitForSelector(".fslide.on");
+    // the dressed sheet's window opened a day earlier: it comes first
+    let s = await slides(page);
+    expect(s.map((x) => x.href.split("/").at(-2))).toEqual([other, id]);
+    expect(s.map((x) => x.on)).toEqual([true, false]);
+    expect(await page.locator("#fdots button").count()).toBe(2);
+    await page.locator("#fdots button").nth(1).click();
+    s = await slides(page);
+    expect(s.map((x) => x.on)).toEqual([false, true]);
+    expect(await page.locator("#fdots button").nth(1).getAttribute("aria-current")).toBe("true");
+    await page.keyboard.press("ArrowRight");
+    expect((await slides(page)).map((x) => x.on)).toEqual([true, false]);
+    // the turns wait while the slot has the focus; away from it, one comes after 8 s
+    await page.locator("#q").focus();
+    await page.mouse.move(5, 5);
+    await page.clock.runFor(8_100);
+    expect((await slides(page)).map((x) => x.on)).toEqual([false, true]);
+    expect(errors).toEqual([]);
+    await ctx.close();
   });
 });

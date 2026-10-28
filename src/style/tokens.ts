@@ -137,6 +137,7 @@ export const TOKENS = {
     bpPhone: 640, // px, phone layout below this
     focusOffset: 3, // px, focus outline offset (SS10)
     mark: 44, // px, side of the faded mark at the foot of every page
+    featureBlock: 186, // px, height of the featured slot's title block under its drawing on a phone (SS16)
     transition: 0.2, // s, colour and border transitions (SS11)
   },
 
