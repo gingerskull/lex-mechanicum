@@ -1,7 +1,7 @@
 ---
 // One page per registered mechanism (SS5, SS8): crumbs, header, stage, side panels, explanation, links. The catalogue
 // supplies every word; the drawing comes from the package and the record's kinematics. A fictional seasonal mechanism
-// (P14) wears the Seasonal folklore tag and a note, shows its generated images and its related mechanisms in place of
+// (P14) wears the Seasonal folklore tag, shows its generated images and its related mechanisms in place of
 // the links, and out of its listing window a placard with the day it comes back in place of the stage (islands/season.ts);
 // a library page links back to the seasonal mechanisms that name it as related while each is listed.
 import Sheet from "../../layouts/Sheet.astro";
@@ -95,7 +95,6 @@ const ld = mechanismLd({ name: r.name, description: r.summary, url: absolute(Ast
       <div class="meta"><b>{sheet.no}</b>{season ? <span class="folklore">Seasonal folklore</span> : added && <span class="recovered" data-recovered={added} hidden>Recovered</span>} · {r.family} · {r.motion.label}</div>
       <div class="hrow"><h1>{r.name}</h1><ThemeToggle /></div>
       <p>{r.summary}</p>
-      {season && <p class="seasonnote">A real mechanism in fancy dress. The story and the uses are made up, the motion is not. It only comes out for {season.occasion}.</p>}
     </div>
     <script is:inline>
       // the remembered view mode, set before the layout paints (the stage island wires the toggle)

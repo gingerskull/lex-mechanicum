@@ -157,7 +157,7 @@ describe("site build", () => {
     for (const id of seasonalIds()) expect(read(join("mechanisms", id, "index.html")), id).not.toContain('class="recovered"');
   });
 
-  it("builds a seasonal mechanism (P14) hidden on the library with its windows, and its page with the tag, the note, the placard and no links", () => {
+  it("builds a seasonal mechanism (P14) hidden on the library with its windows, and its page with the tag, the placard and no links", () => {
     const lib = read("index.html");
     const cardOf = (id: string) => new RegExp(`<a class="card"[^>]*data-id="${id}"[^>]*>[\\s\\S]*?</a>`).exec(lib)?.[0] ?? "";
     // nothing seasonal on a library without seasonal mechanisms
@@ -173,7 +173,7 @@ describe("site build", () => {
       expect(card, id).toContain('<span class="folklore">Seasonal folklore</span>');
       const page = read(join("mechanisms", id, "index.html"));
       expect(page, id).toMatch(/<div class="meta"><b>ST-\d{2}<\/b><span class="folklore">Seasonal folklore<\/span>/);
-      expect(page, id).toContain(`It only comes out for ${rec.season!.occasion}.`);
+      expect(page, id).not.toContain('class="seasonnote"');
       expect(page, id).toMatch(/<div class="placard" id="placard" hidden>/);
       expect(page, id).toMatch(new RegExp(`<div class="stagebox"[^>]*data-season="${windows}"`));
       expect(page, id).not.toMatch(/<h2>(References|Photos and video|Animations|In the real world)<\/h2>/);
