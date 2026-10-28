@@ -46082,7 +46082,14 @@
             "label": "SLAM 106.3°"
           }
         ],
-        "view": "VIEW 330 20",
+        "view": "VIEW 304 21",
+        "frame": {
+          "zoom": 1.08,
+          "pan": [
+            0.005,
+            -0.042
+          ]
+        },
         "views": [
           {
             "id": "cam",

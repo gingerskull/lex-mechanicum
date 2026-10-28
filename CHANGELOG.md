@@ -13,8 +13,8 @@
   face you. Listed for Halloween, 28 October to 2 November.
 - Engine: a cam with a swinging roller follower; decoration pieces (turned, carved and quilted, with fill patterns, on
   the first detail rung so they drop first); a shaft held from either side by a named plate; an overhung shaft; the
-  clash check no longer compares parts that move together. Every existing mechanism's package and thumbnail is
-  unchanged.
+  clash check no longer compares parts that move together; a record may frame its own default view (`teaching.frame`,
+  a zoom and a pan). Every existing mechanism's package and thumbnail is unchanged.
 
 ## 0.44.0, Gryphonne — 2026-10-28
 
