@@ -21,6 +21,12 @@ export const FORM = {
   thread: {
     pitch: (d: number): number => ISO_COARSE.find(([n]) => d <= n + 0.25)?.[1] ?? 2.5, // mm, ISO coarse pitch for Ø d mm
   },
+  // Fill patterns the builder lays on a seasonal mechanism's decorated scenery as marks (src/builder/decor.ts): quilting
+  // tufted on a diamond grid, hatching ruled at an angle. Spacing in mm on the part, never finer than the drawing's floor.
+  decor: {
+    quilt: { pitch: 8, angle: 45 }, // mm between stitch lines, degrees each way from the part's x
+    hatch: { pitch: 2, angle: 35 }, // mm between lines, degrees from the part's x
+  },
   explode: {
     gap: 11, // mm per explode level at full explode
     // the gap a unit leaves to every unit it clears at full explode: this share of its own length along its explode axis,

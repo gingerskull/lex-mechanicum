@@ -22,8 +22,8 @@ export interface Rung {
 export const DETAIL: Rung[] = [
   {
     id: "A",
-    name: "Paper grain, bearing balls and cages, motor internals",
-    drops: { kinds: ["bearingBalls", "bearingCage", "motorInternal"], effects: ["grain"] },
+    name: "Paper grain, bearing balls and cages, motor internals, scenery decoration",
+    drops: { kinds: ["bearingBalls", "bearingCage", "motorInternal", "ornament"], marks: ["carve", "quilt"], effects: ["grain"] },
   },
   {
     id: "B",

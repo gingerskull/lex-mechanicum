@@ -13,6 +13,10 @@ export const KIN_VOCAB = {
     "elbow",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
+  // a shape's further pieces: plates (the default), turned pieces, the marks on their top faces and their fill patterns
+  pieceOp: ["extrude", "revolve"],
+  pieceMark: ["carve", "quilt"],
+  piecePattern: ["quilt", "hatch"],
   joint: [
     "revolute", "prismatic", "cylindrical", "screw", "pin-in-slot", "gear-mesh", "cam-contact", "belt", "rolling",
     "spherical", "universal", "planar", "flexure",
@@ -33,6 +37,8 @@ export const KIN_VOCAB = {
     "elbow-rods",
     // a member anchored at one end round a sprocket on a moving member (a stroke doubler's chain)
     "strand",
+    // a plate cam's swinging roller follower (a rocker on a pivot)
+    "cam-rocker",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;
@@ -137,6 +143,8 @@ export interface Teaching {
   traces: { id: string; point: string; ticks?: { every: number }; ghosts?: { control: string; value: unknown }[]; comet?: boolean; /** Drawn in this body's frame (a cam's pitch curve turns with the cam). */ frame?: string }[];
   overlays: { id: string; kind: (typeof TEACHING_VOCAB.overlay)[number]; label?: string; [k: string]: unknown }[];
   view: string;
+  /** A manual frame of the default view (T7): a factor on the fitted scale and a shift in fractions of the stage, x right, y down. */
+  frame?: { zoom: number; pan: [number, number] };
   views?: { id: string; kind: (typeof TEACHING_VOCAB.viewKind)[number]; highlight?: string[]; [k: string]: unknown }[];
   controls: { id: string; kind: (typeof TEACHING_VOCAB.control)[number]; [k: string]: unknown }[];
   timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: [number, number][] };

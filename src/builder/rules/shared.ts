@@ -137,6 +137,8 @@ export const stops: Rule = {
  * (covers, below). */
 const isFixedPlate = (ctx: BuildCtx, id: string): boolean =>
   id !== "ground" &&
+  // a body the record stands on posts of its own (rules/lugs.ts posts) takes no standoffs
+  !Array.isArray((ctx.kin.bodies.find((b) => b.id === id)?.shape as { posts?: unknown } | undefined)?.posts) &&
   ctx.parts.has(id) &&
   !ctx.kin.joints.some((j) => j.a === id || j.b === id) &&
   ctx.geoms.get(id)?.level?.part !== "above" &&

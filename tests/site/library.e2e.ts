@@ -9,7 +9,10 @@ import { createServer, type Server } from "node:http";
 import { extname, join } from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { recordById } from "../../src/catalog";
+import { allIds } from "../../src/mechanisms";
 import { HINTS, LORE_WORDS } from "../../site/src/lore";
+import { addDays, longDate, windowsOf } from "../../site/src/season";
 import { sortBy, type Order, type Sortable } from "../../site/src/sort";
 
 const OUT = join("dist", "site");
@@ -515,3 +518,65 @@ describe("finding the Forge sheet (SS14)", () => {
   });
 });
 
+// A seasonal mechanism (P14) in and out of its listing window, by the visitor's local date (the browser's clock is set):
+// on the library, counted, or gone; on its page, the stage, or the placard with the day it comes back; on a library page it
+// names as related, the link back, or none. Runs once a seasonal mechanism is registered.
+const seasonal = allIds().filter((id) => recordById(id)?.season);
+describe.skipIf(!seasonal.length)("a seasonal mechanism's listing", () => {
+  // the body is collected even when skipped: nothing here may assume a seasonal mechanism exists
+  const id = seasonal[0] ?? "";
+  const rec = recordById(id);
+  const first = windowsOf(rec?.season?.dates ?? [])[0] ?? { from: "2000-01-04", until: "2000-01-04" };
+  const occasion = rec?.season?.occasion ?? "";
+  const related = rec?.related.find((x) => allIds().includes(x) && !recordById(x)?.season);
+  /** A desktop with its clock at noon, local time, on `day`. */
+  const on = async (day: string) => {
+    const ctx = await desktop();
+    const [y, m, d] = day.split("-").map(Number);
+    await ctx.clock.setFixedTime(new Date(y!, m! - 1, d!, 12));
+    return ctx;
+  };
+
+  it("lists it on the library and counts it in its window, and leaves it out the day before", async () => {
+    for (const [day, listed] of [[first.from, true], [addDays(first.from, -1), false]] as const) {
+      const ctx = await on(day);
+      const { page, errors } = await open(ctx, "/");
+      const card = page.locator(`.grid .card[data-id="${id}"]`);
+      expect(await card.count(), day).toBe(listed ? 1 : 0);
+      if (listed) expect(await card.locator(".folklore").textContent()).toBe("Seasonal folklore");
+      const n = await page.locator(".grid .card").count();
+      expect(await page.locator("header.top h1 span").textContent(), day).toBe(String(n));
+      expect(await page.locator("#shown").textContent(), day).toBe(`${n} sheets`);
+      expect(errors).toEqual([]);
+      await ctx.close();
+    }
+  });
+
+  it("draws it on its page in its window, and out of it shows the placard with the day it comes back", async () => {
+    let ctx = await on(first.from);
+    let { page, errors } = await open(ctx, `/mechanisms/${id}/`);
+    await page.waitForSelector('.stagebox[data-ready="1"]', { timeout: 30_000 });
+    expect(await page.locator("#placard").isVisible()).toBe(false);
+    expect(errors).toEqual([]);
+    await ctx.close();
+    ctx = await on(addDays(first.from, -1));
+    ({ page, errors } = await open(ctx, `/mechanisms/${id}/`));
+    await page.waitForTimeout(500);
+    expect(await page.locator("#placard").isVisible()).toBe(true);
+    expect(await page.locator(".stagebox").isVisible()).toBe(false);
+    expect(await page.locator(".stagebox").getAttribute("data-ready")).toBeNull();
+    expect(await page.locator("#placard p").textContent()).toBe(`Packed away with the decorations. It comes back for ${occasion} on ${longDate(first.from)}.`);
+    expect(errors).toEqual([]);
+    await ctx.close();
+  });
+
+  it.skipIf(!related)("links back to it from a library page it names, only in its window", async () => {
+    for (const [day, listed] of [[first.from, true], [addDays(first.from, -1), false]] as const) {
+      const ctx = await on(day);
+      const { page } = await open(ctx, `/mechanisms/${related}/`);
+      await page.waitForTimeout(300);
+      expect(await page.locator(`[data-seasonlinks] a[href$="/mechanisms/${id}/"]`).isVisible(), day).toBe(listed);
+      await ctx.close();
+    }
+  });
+});

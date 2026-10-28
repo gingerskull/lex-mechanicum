@@ -5,7 +5,7 @@ export interface SourceFile {
   json: unknown;
 }
 
-const BATCH = /^[bn]\d+\.json$/;
+const BATCH = /^[bns]\d+\.json$/;
 const PATCH = /^(gap|rw|v3|origin|added).*\.json$/;
 const V3_PATCH = /^v3.*\.json$/;
 const PATCH_KEYS = ["media", "references", "real_world"] as const;
@@ -14,8 +14,8 @@ const byName = (a: SourceFile, b: SourceFile) => a.name.localeCompare(b.name, "e
 const isObject = (x: unknown): x is Record<string, unknown> => typeof x === "object" && x !== null && !Array.isArray(x);
 
 /**
- * Merges the catalogue sources into one record list. Batch files (`b*.json` and the later waves' `n*.json`, arrays of
- * records) are concatenated in name order; patch files (`gap*.json`, `rw*.json`, `origin*.json`, `added*.json`, objects keyed by id) add `media`,
+ * Merges the catalogue sources into one record list. Batch files (`b*.json`, the later waves' `n*.json` and the
+ * seasonal `s*.json`, arrays of records) are concatenated in name order; patch files (`gap*.json`, `rw*.json`, `origin*.json`, `added*.json`, objects keyed by id) add `media`,
  * `references` and `real_world` entries whose URL the record does not have yet, may `waive` minimum counts research could
  * not meet, and set the `origin` date and the `added` date. `related` keeps known ids only and `motion.label` is derived.
  * Problems are reported, never thrown. Shapes inside records are checked by `validate`.
@@ -95,6 +95,9 @@ export function mergeSources(files: SourceFile[]): { records: CatalogRecord[]; p
   for (const r of records) {
     if (isObject(r.motion)) r.motion.label = `${r.motion.input} → ${r.motion.output}`;
     r.related = (r.related ?? []).filter((x) => x !== r.id && ids.has(x));
+    // a seasonal record has no links (its images take their place); every record carries the lists all the same
+    r.references ??= [];
+    r.media ??= [];
   }
   return { records, problems };
 }

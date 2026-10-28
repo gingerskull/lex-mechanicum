@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.45.0, Voss — 2026-10-28
+
+- Seasonal mechanisms: fictional mechanisms dressed for a holiday, listed from three days before it to two days after
+  (by the visitor's own date) with a "Seasonal folklore" tag; out of season the page shows when it comes back, and
+  library pages list the seasonal mechanisms that name them while those are in season. Standard 3.12 adds P14, which
+  lifts the real-world context, the links and the rules against decoration for them, never the kinematics or the
+  checks. A seasonal record carries a `season` block and generated-image prompts in place of links; the seasonal
+  catalogue is `data/catalog/holiday-catalogue.md`.
+- Nosferatu crypt-lid quick-return, the first: a crank and slotted lever ease a carved coffin's lid open over 254° of
+  crank and slam it in 106°, while a cam on the same crank, through a rocker and a link, sits a vampire figurine up to
+  face you. Listed for Halloween, 28 October to 2 November.
+- Engine: a cam with a swinging roller follower; decoration pieces (turned, carved and quilted, with fill patterns, on
+  the first detail rung so they drop first); a shaft held from either side by a named plate; an overhung shaft; the
+  clash check no longer compares parts that move together; a record may frame its own default view (`teaching.frame`,
+  a zoom and a pan). Every existing mechanism's package and thumbnail is unchanged.
+
 ## 0.44.0, Gryphonne — 2026-10-28
 
 - Six new mechanisms, each built from its record at standard 3.11:

@@ -118,6 +118,7 @@ function entry(r: CatalogRecord, byId: Map<string, CatalogRecord>): string[] {
     `| Keywords | ${(r.tags.keywords ?? []).join(", ")} |`,
     `| Origin | ${r.origin ? `${r.origin.date} (${r.origin.precision}): ${r.origin.note}` : "?"} |`,
     `| Added | ${r.added ?? "not drawn yet"} |`,
+    ...(r.season ? [`| Season | Seasonal folklore: ${r.season.occasion} (${r.season.date_rule}), ${r.season.duty}; ${r.season.dates.map((d) => (d.start === d.end ? d.start : `${d.start} to ${d.end}`)).join(", ")} |`] : []),
     "",
   );
   const e = r.explain;
@@ -148,6 +149,11 @@ function entry(r: CatalogRecord, byId: Map<string, CatalogRecord>): string[] {
   if (b.notes) L.push(`- Animator notes: ${b.notes}`);
   L.push("");
 
+  if (r.images?.length) {
+    L.push("**Generated images**", "");
+    for (const x of r.images) L.push(`- ${x.alt}${x.file ? ` (\`${x.file}\`)` : " (not made yet)"}: "${x.prompt}"`);
+    L.push("");
+  }
   if (r.references.length) L.push(`**References**: ${r.references.map(link).join(" · ")}`, "");
   const real = r.media.filter((x) => x.kind === "photos" || x.kind === "video");
   const demos = r.media.filter((x) => !(x.kind === "photos" || x.kind === "video"));

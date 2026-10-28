@@ -4,13 +4,22 @@
 // search and order live in the page's URL as they change, and the state is kept for the tab when the page is left, so a
 // mechanism page's "Back to library" brings the library back as it was and its Previous and Next follow what it shows.
 // A search that is a word of the Forge sheet's lore (site/src/lore.ts) opens a sealed state in place of the cards, with a
-// faint hint (SS14).
+// faint hint (SS14). A seasonal mechanism's card (P14) is built hidden and joins the library, shown and counted, only in
+// its listing window, by the visitor's local date; out of it, the card leaves the page.
 import { forgeUnlocked } from "../forge";
 import { readLibrary, saveLibrary, takeReturn } from "../library";
 import { isLore, pickHint } from "../lore";
+import { inSeason } from "../season";
 import { DEFAULT_ORDER, orderFrom, sortBy, type Order, type Sortable } from "../sort";
 import { sortMenu } from "./sortmenu";
 
+// a seasonal mechanism's card, built hidden, joins the library in its listing window and leaves the page out of it, so
+// it is neither shown, counted, sorted nor searched
+const seasonal = [...document.querySelectorAll<HTMLAnchorElement>(".card[data-season]")];
+for (const c of seasonal) {
+  if (inSeason(c.dataset.season)) c.hidden = false;
+  else c.remove();
+}
 const cards = [...document.querySelectorAll<HTMLAnchorElement>(".card")];
 const q = document.getElementById("q") as HTMLInputElement | null;
 const qclear = document.getElementById("qclear");
@@ -26,6 +35,11 @@ const chips = [...document.querySelectorAll<HTMLButtonElement>("#facets .chip")]
 const grid = document.getElementById("grid");
 const main = document.getElementById("library");
 const libbar = document.getElementById("libbar");
+
+if (seasonal.some((c) => c.isConnected)) {
+  for (const el of document.querySelectorAll<HTMLElement>("[data-sheets]")) el.textContent = String(cards.length);
+  if (shown) shown.textContent = `${cards.length} sheets`;
+}
 
 // what the orders read from each card; the page comes in the default order
 const keys = new Map<HTMLElement, Sortable>(

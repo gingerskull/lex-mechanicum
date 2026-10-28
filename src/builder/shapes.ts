@@ -9,7 +9,7 @@ import { hullOf } from "../hardware/primitives";
 import type { Kin, KinBody } from "../kin/types";
 import { bodyFrameOf, type Setup } from "../kin/compose";
 import { type Vec3, m3, v3 } from "../kin/math";
-import type { LoftSection, MeshData, Op, Profile } from "../solids/types";
+import type { LoftSection, Mark, MeshData, Op, Profile } from "../solids/types";
 import type { Bevel3 } from "./bevel3";
 import { inside } from "../core/poly";
 import { nutGeom, screwGeom } from "./screws";
@@ -30,6 +30,9 @@ import { TIMED_OUTLINES, crown, vergeStaff } from "./shapes/timed";
 import { SPATIAL_OUTLINES, ballProfile, spatialLink, spherical, universal } from "./shapes/spatial";
 import { wobble } from "./shapes/wobble";
 import { elbowGeom } from "./shapes/elbow";
+import { patternMarks } from "./decor";
+import { SOLID_KINDS } from "../style/kinds";
+import { swingCam } from "./shapes/swingcam";
 
 export { spider } from "./shapes/plain";
 export { levelId, meshLevel } from "./shapes/meshing";
@@ -77,7 +80,7 @@ export interface BodyGeom {
    */
   exact?: { offset: number };
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
-  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; revolve?: boolean; op?: Op; features?: import("../solids/types").Feature[] }[];
+  pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; revolve?: boolean; op?: Op; features?: import("../solids/types").Feature[]; marks?: import("../solids/types").Mark[]; kind?: import("../style/kinds").SolidKind }[];
   /** The own part is a solid of revolution about the frame's z (a ball, a cage), its profile in (r, z). */
   revolve?: boolean;
   /** The body's own part when it is not an extrusion of `profile` (a screw's core, revolved): its profile and operation. */
@@ -201,6 +204,7 @@ function outlineOf0(shape: Record<string, unknown>, role: string, pins: Vec2[]):
 const GEOMS: GeomFn[] = [
   universal,
   (_kin, _S, b, g) => cylinder(b, g),
+  swingCam,
   plateCam,
   (_kin, _S, _b, g) => ringWheel(g),
   crown,
@@ -295,18 +299,41 @@ export function bodyGeoms(kin: Kin, S: Setup): Map<string, BodyGeom> {
 /**
  * Plates of a body beyond its own part, declared in its shape (`pieces`: { id, outline, origin, rot, thick, fillet }, the
  * frame in world reference coordinates, the outline filleted as drawn): an upright on a slide that carries a roller's stud.
+ * The frame may instead give its axes, `x` and `z`. A piece may be turned (`op: "revolve"`, its `profile` the half
+ * section [r, z] about the frame's z: a turned leg), carry marks on its top face (`marks`: [{ kind, pts }], carved
+ * lines and features) and a fill pattern there (`pattern`: "quilt" or "hatch", or { kind, angle, pitch, inset }, laid
+ * by src/builder/decor.ts), and be `ornament: true` (decoration on themed scenery, the first rung of the detail ladder)
+ * or name a solid `kind` of its own (a rubber bump stop).
  */
 function withPieces(b: KinBody, g: BodyGeom): BodyGeom {
   const list = g.shape.pieces;
   if (!Array.isArray(list) || !list.length) return g;
   const pieces = [...(g.pieces ?? [])];
   list.forEach((pc: Record<string, unknown>, k) => {
-    const pts = (pc.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]);
     const o = (pc.origin as number[] | undefined) ?? [0, 0, 0];
     const R = m3.eulerDeg(((pc.rot as number[] | undefined) ?? [0, 0, 0]) as Vec3);
-    const frame = { o: [o[0]!, o[1]!, o[2] ?? 0] as Vec3, x: [R[0], R[3], R[6]] as Vec3, z: [R[2], R[5], R[8]] as Vec3 };
+    const axis = (v: unknown): Vec3 | null => (Array.isArray(v) && v.length >= 3 ? v3.unit([Number(v[0]), Number(v[1]), Number(v[2])]) : null);
+    const z = axis(pc.z) ?? ([R[2], R[5], R[8]] as Vec3);
+    const x0 = axis(pc.x) ?? ([R[0], R[3], R[6]] as Vec3);
+    // axes the record gives are made square; a rotation's are square already
+    const frame = { o: [o[0]!, o[1]!, o[2] ?? 0] as Vec3, x: pc.x || pc.z ? v3.unit(v3.sub(x0, v3.mul(z, v3.dot(x0, z)))) : x0, z };
+    const id = `${b.id}-${String(pc.id ?? `piece${k}`)}`;
+    // decoration takes the ornament kind; a piece that is a part of a kind of its own (a rubber bump stop) names it
+    const named = SOLID_KINDS.find((k) => k === pc.kind);
+    const kind = pc.ornament === true ? ({ kind: "ornament" } as const) : named ? { kind: named } : {};
+    if (pc.op === "revolve") {
+      const half = (pc.profile as number[][]).map((q): Vec2 => [Math.max(0, q[0]!), q[1]!]);
+      pieces.push({ id, name: String(pc.name ?? ""), frame, profile: { outer: half, holes: [] }, h: 0, revolve: true, ...kind });
+      return;
+    }
+    const pts = (pc.outline as number[][]).map((q): Vec2 => [q[0]!, q[1]!]);
     const holes = Array.isArray(pc.holes) ? (pc.holes as number[][][]).map((h) => { const r = h.map((q): Vec2 => [q[0]!, q[1]!]); return area(r) > 0 ? r.reverse() : r; }) : [];
-    pieces.push({ id: `${b.id}-${String(pc.id ?? `piece${k}`)}`, name: "", frame, profile: { outer: filletPoly(area(pts) < 0 ? pts.slice().reverse() : pts, num(pc.fillet, 1.5)), holes }, h: num(pc.thick, 8) });
+    const profile = { outer: filletPoly(area(pts) < 0 ? pts.slice().reverse() : pts, num(pc.fillet, 1.5)), holes };
+    const marks: Mark[] = Array.isArray(pc.marks) ? (pc.marks as { kind?: string; pts: number[][] }[]).map((m) => ({ kind: m.kind === "quilt" ? "quilt" : "carve", pts: m.pts.map((q): Vec2 => [q[0]!, q[1]!]) })) : [];
+    const pat = pc.pattern as string | { kind?: string; angle?: number; pitch?: number; inset?: number } | undefined;
+    const pk = typeof pat === "string" ? pat : pat?.kind;
+    if (pk === "quilt" || pk === "hatch") marks.push(...patternMarks(profile, pk, typeof pat === "object" ? pat : {}));
+    pieces.push({ id, name: String(pc.name ?? ""), frame, profile, h: num(pc.thick, 8), ...(marks.length ? { marks } : {}), ...kind });
   });
   return { ...g, pieces };
 }

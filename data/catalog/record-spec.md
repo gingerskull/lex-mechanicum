@@ -90,6 +90,9 @@ manufacturer engineering guide). media 2 to 4: at least one VIDEO of the real th
 least one page with PHOTOS of a real one (Wikimedia Commons category, museum page, manufacturer page). Animations
 (e.g. Wikimedia gif pages, 507movements, Purdue, firgelliauto) are welcome but do not replace the real-use video.
 
+A seasonal record (a fictional mechanism for a holiday) adds a `season` block and an `images` list and has no
+`references`, `media` or `real_world`: see "Seasonal records" below.
+
 ## Record v3: the `kin` and `teaching` blocks
 
 Record v3 (`"record_version": 3`) adds two blocks to the record and retires two fields. The catalogue is what the app
@@ -247,8 +250,9 @@ record names on the ground lies on the base.
 - *Shape features:* `lugs: [{ joint, span: [w0, w1], r }]`, a hinge lug on the joint's axis joined by a web to a part
   whose plane is not square to the hinge (a plate's edge hinge, a spindle head), its span along the hinge overlapping
   the part there (the web runs within the span: a lug beyond the part, with the mate's part between, would stand in
-  the air); `posts: [{ at: [x, y], top, r }]`,
-  columns from the base into a fixed body; `bars: [{ from, to, width, z: [z0, z1] }]`, straight bars on a part's face
+  the air); `posts: [{ at: [x, y], top, r, turned? }]`,
+  columns from the base into a fixed body (`turned: true`: a turned leg, its largest radius r; a body on posts takes no
+  standoffs); `bars: [{ from, to, width, z: [z0, z1] }]`, straight bars on a part's face
   (slot jaws, tongues; the slotted body names its `slot: { width, length }`); `ring: { inner, spokes, hub }` on a `disc`
   (a rim, spoked to a hub or bare); `indexMark: { at: [x, y] }`, a raised arrow that stays opaque on a see-through part;
   `ball: { diameter }` on a `link` (at its far end) or a `shaft` (at its start: a plunger's ball end); `plunger: true` on
@@ -292,6 +296,11 @@ that setting of one of the teaching controls (a die position).
   at its shoe; `indexer` has `internal: true` (internal Geneva), `mode: "mutilated"` (window, ratio) and `mode: "cam"`
   (law, index, step); `star`, `ratchet`, `one-way`, `escape` (planar: anchor, lever with a `fork`) and `verge` are the
   timed blocks, each documented over its code in `src/kin/registry.ts`.
+- `cam-rocker` swings a roller follower on a rocker (in: `joint`, the cam-contact joint with its `ca`; `input`; `cam`, the
+  cam body it turns; `pivot`, the rocker's ground revolute; `follower`, the rocker and its roller): the roller centre
+  stands at the pitch radius rb + s from the cam's centre on the arc of the rocker's arm, the joint's `at` being the
+  roller centre at the reference; out { s, angle, pressure }. Its cam is a `cam` with `form: "rocker"`, the roller's
+  envelope on that path.
 - A joint with `active` (a driver window) is checked by K1 only while engaged, its motion relation too. A body with
   `drops: true` moves by instant drops (an escape wheel): its points are not checked for jumps.
 - An output whose id a block wrote as a value is that value (a pressure angle, an advance).
@@ -301,10 +310,16 @@ face's envelope; `form: face-groove`, `barrel`, `lobes` (conjugate lobes from sh
 rollers' poses)), `genevaWheel`, `genevaCrank`, `intermittentDriver`, `intermittentDriven`, `star`, `ratchetWheel`,
 `escapeWheel` (pointed teeth or a `tooth` polygon; `tip0` the simulated phase at the reference), `crownWheel`, `verge`.
 Any shape may carry `place` (its part starts there along its frame's z, where the joints put it), `pieces` (more
-plates of the body, each with `origin`, `rot`, `thick`, `outline`, `holes`) and, on a plate, `exact` (its outline as
+plates of the body, each with `origin`, `rot` or the axes `x` and `z`, `thick`, `outline`, `holes`; or a turned piece,
+`op: "revolve"` with its half section `profile` [r, z] about the frame's z; any of them with `marks` on its top face
+([{ kind: "carve" | "quilt", pts }]), a fill `pattern` there ("quilt", "hatch", or { kind, angle, pitch, inset }), and
+`ornament: true` for decoration on a seasonal mechanism's scenery, or a solid `kind` of its own) and, on a plate, `exact` (its outline as
 drawn), `windows` (polygon holes) and `guide` ([s0, s1] along a slide's axis: the length its rails hold). A disc may
 carry `rollers` (a turret's radial rollers). A ground joint may ask for its `support` (`stub`, `hung`, ...) and a shaft
-in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 against).
+in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 against), and with `overhung: true` the shaft runs on
+past the blocks to the parts it carries there (a crank overhung on its shaft's end), a washer and a screw holding them. A fixed joint with
+`heldBy` (a fixed body's plate square to its axis, a side frame) is held by that plate instead of a support of its own: a
+dead axle stands in it on its shoulder, a live shaft runs in a housing cartridge on its other side, the parts on one side.
 
 ### `teaching`
 
@@ -331,6 +346,7 @@ in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 agains
 | `traces` | Teaching traces: a named `point`, optional `ticks` (equal time, every n degrees of the cycle: 360/n ticks per cycle, so a driver run past 360° spaces them by its own range), `ghosts` for settings not selected (`control` and `value`), and `comet: true` on the first. A trace can be a point on a moving body (a point on a planet). |
 | `overlays` | Construction overlays: `kind` is `line` (through two named points), `arc`, `circle`, `chord`, `dimension` (a moment arm, a length), `axis-line`, `workspace` (an outline traced by a named point over a range) or `bend` (a flexure's state). Each names its points and a short mechanics-only `label`. A posed overlay is drawn where an output reaches an extreme: `pose: { output, stat: "max" \| "min" }` for all its points, `fromPose` / `toPose` for each end (a dead-centre line, a stroke dimension); an `arc` with both runs on its point's own circle (`sweep: "cw"` or counter-clockwise: a cut or return arc). A `dimension` may measure one `component` (`x`, `y`, `z`: an offset) and reads the kinematic points' true distance. A `line` with `pose: { driver, value }` is drawn with that driver held at the value (a toggle, an aim line at neutral). A `dimension` with `line: [P, Q]` runs from its point square to that line (a moment arm) and reads in plan. An `arc` with `radius` and `range` (degrees) spans those angles, carried by the body `frame` if it names one. An `axis-line` with `from` and `through` is a line through two points, carried on to where it meets the line `extend` names or to a circle's meeting point; a `circle` with `meet: [line, line]` stands where those lines cross (a turning centre). A `workspace` with `frame: <body>` is the point's path seen from that body, carried by it (a rolling centrode, drawn as a ghost); with `over: [driver, driver]` it is the outline a five-bar's tip reaches over both drivers' ranges. |
 | `view` | The default named view (T7): `PLAN`, `FRONT`, `SIDE`, `ISOMETRIC`, `DIMETRIC`, `AUX <joint-id>`, or `VIEW az el` in degrees. |
+| `frame` | Optional: `{ "zoom": z, "pan": [x, y] }`, a manual frame of the default view (T7) where the plain fit leaves it small or low. `zoom` (0.5 to 2) multiplies the fitted scale; `pan` shifts the drawing by fractions of the stage (x right, y down, each within 0.25). It holds only in the record's own view, assembled (the opening view, Reset view, stills, thumbnails, cards); other views, an orbit, an explode and a detail keep the plain fit, and a zoom never widens the drawing past the room across a narrow stage. |
 | `views` | Section and detail views (T8): `kind` `section` (a cut `plane` of origin and normal) or `detail` (a window `center` and `scale`); `highlight` names bodies or points to draw with the highlight. |
 | `controls` | The controls the page shows (T14): `kind` `driver`, `param`, `design` or `selector`, and the id it maps to. A mechanism's controls are only these. |
 | `timeMap` | A playback rate near a feature (T13): the `span` of input degrees and the `slow` factor. It never changes `solve`. |
@@ -383,6 +399,42 @@ The sheets drawn before the field existed have the day they first reached main, 
 Pages release, 2026-10-18, for the ones that were on main before it). The site reads it for the library's New order
 and the Recovered badge a sheet wears for its first 7 days.
 
+## Seasonal records
+
+A seasonal record is a fictional mechanism for a holiday or special day (mechanism standard P14, which says what it may
+do that other records may not): a record v3 like any other, with true kinematics, plus a `season` block and an
+`images` list. The seasonal records themselves, their prose, design and image prompts, and what a duty class means
+are in the seasonal catalogue (`data/catalog/holiday-catalogue.md`); their batch files are `sources/s*.json`.
+
+```json
+"season": {
+  "occasion": "Halloween",
+  "date_rule": "fixed, 31 October",
+  "duty": "Commercial",
+  "dates": [ { "start": "2026-10-31", "end": "2026-10-31" }, { "start": "2027-10-31", "end": "2027-10-31" } ]
+},
+"images": [
+  { "prompt": "Behind-the-scenes photo in a haunted house attraction workshop, ...", "alt": "A coffin with its lid half open on a steel lever in a workshop", "file": "" }
+]
+```
+
+| Field | Content |
+|---|---|
+| `season.occasion` | The holiday or special day the mechanism was made for. |
+| `season.date_rule` | Prose: how the date is found each year (fixed date, "fourth Thursday in November", lunar or lunisolar). |
+| `season.duty` | ONE value from DUTY. |
+| `season.dates` | Each year's occurrence, `{ "start", "end" }` as `YYYY-MM-DD` (the same day for a one-day holiday), in order, written a few years ahead. A test fails once none starts within the next 13 months: add the next years then. |
+| `images` | 2 to 4 generated images of the mechanism at work in its invented setting, never a drawing of it (the stage draws it): `prompt` (what the image is made from), `alt` (one plain sentence for the page), `file` (the WebP's name in `site/seasonal/`, `<id>-<n>.webp`; empty until the image is made and reviewed). |
+
+The page shows the images that have a `file`, in place of references, photos and video and "In the real world". The
+site lists a seasonal mechanism from 3 days before each occurrence's start to the end of the 2nd day after its end, by
+the visitor's local date; out of its window the mechanism's page stays reachable and says when it comes back.
+
+The validator checks the `season` block (an occasion and a date rule, the duty from DUTY, every date a real day, each
+end on or after its start, the occurrences in order) and the images (2 to 4, each with a prompt and an alt, a `file`
+that is a `.webp` name), and skips the minimum counts of `references`, `media` and `real_world`: a seasonal record
+has none of them. `images` belong to a seasonal record only.
+
 ## LINKS MUST BE REAL
 
 Every URL must come from a WebSearch result or a page you successfully fetched with WebFetch in this session.
@@ -433,6 +485,8 @@ APPLICATION (1-4): Automotive, Machine tools, Robotics, Clocks & watches, Packag
   Consumer products, Construction & lifting, Marine, Instruments, Energy, Education
 
 PRECISION (origin.precision): day, year, period
+
+DUTY (season.duty, seasonal records only): Domestic, Community, Commercial, Municipal
 
 ## Master list (ids, for "related")
 

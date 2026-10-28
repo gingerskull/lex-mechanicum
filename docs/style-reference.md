@@ -314,6 +314,10 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.capFade` | 0.12 | cos of a cap toward the viewer below which its bold top outline blends into the far cap's style (no pop as it turns edge-on) |
 | `draft.lines.marks` | 0.6 | px, engraved marks |
 | `draft.lines.marksAlpha` | 0.55 | 0..1 |
+| `draft.lines.carve` | 0.55 | px, carved lines and features on decorated scenery |
+| `draft.lines.carveAlpha` | 0.6 | 0..1 |
+| `draft.lines.quilt` | 0.45 | px, fill patterns on scenery (quilting, hatching) |
+| `draft.lines.quiltAlpha` | 0.35 | 0..1 |
 | `draft.lines.thread` | 0.5 | px, thread helices |
 | `draft.lines.threadAlpha` | 0.45 | 0..1 |
 | `draft.lines.baseChamferGain` | 0.7 | factor on chamferAlpha for the base plate |
@@ -657,6 +661,10 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `form.chamfer.button` | 0.6 | mm |
 | `form.chamfer.csk` | 0 | mm, countersunk heads get none |
 | `form.thread.pitch` | function (see source) | mm, ISO coarse pitch for Ø d mm |
+| `form.decor.quilt.pitch` | 8 | mm between stitch lines, degrees each way from the part's x |
+| `form.decor.quilt.angle` | 45 | mm between stitch lines, degrees each way from the part's x |
+| `form.decor.hatch.pitch` | 2 | mm between lines, degrees from the part's x |
+| `form.decor.hatch.angle` | 35 | mm between lines, degrees from the part's x |
 | `form.explode.gap` | 11 | mm per explode level at full explode |
 | `form.explode.clear.k` | 0.6 | factor, mm, mm |
 | `form.explode.clear.min` | 12 | factor, mm, mm |
@@ -671,7 +679,7 @@ The order of the rungs is the one in standard 9b; re-ranking a rung is a change 
 <!-- style-ladder:start (generated, do not edit) -->
 | Rung | What stops being drawn | Selectors | Exceptions |
 |---|---|---|---|
-| A | Paper grain, bearing balls and cages, motor internals | kinds: bearingBalls, bearingCage, motorInternal; effects: grain |  |
+| A | Paper grain, bearing balls and cages, motor internals, scenery decoration | kinds: bearingBalls, bearingCage, motorInternal, ornament; marks: carve, quilt; effects: grain |  |
 | B | Manufacturing marks | marks: chamfer, boreEntry, headFlute, hexSocket, knurl, keyway, thread | atSide: skip |
 | C | Wall shading, deep depth layers | effects: wallShade, deepLayers |  |
 | D | Stack hardware inside a joint | kinds: spacer, washer, thrustWasher, waveWasher, sleeve, shim, circlipInternal | whenExplode: draw |

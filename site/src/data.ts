@@ -5,6 +5,7 @@ import pkg from "../../package.json";
 import { loadCatalog, recordById, type CatalogRecord } from "../../src/catalog";
 import type { Kin, Teaching } from "../../src/catalog/kin";
 import { workIds } from "../../src/mechanisms";
+import { encodeWindows, windowsOf } from "./season";
 import { originKey, type Sortable } from "./sort";
 
 /** The app's name: the library's heading, the footer and the site name in every page's head. */
@@ -17,16 +18,49 @@ export interface Sheet {
   /** The sheet number as a number: 1 for ST-01. */
   n: number;
   rec: CatalogRecord;
+  /** A fictional seasonal mechanism's listing windows, as its page and card carry them (season.ts); none for the library. */
+  season?: string;
 }
 
-/** Registered mechanisms in catalogue order (family, level, name), numbered ST-01, ST-02 ... (only LM_IDS in a local
+/**
+ * The sheets of these records, in their order: the library's first, numbered ST-01, ST-02 ..., then the seasonal
+ * mechanisms (P14), which are listed only around their holidays, so the library's numbers run on without a gap the rest
+ * of the year.
+ */
+export function sheetsOf(records: CatalogRecord[]): Sheet[] {
+  const ordered = [...records.filter((r) => !r.season), ...records.filter((r) => r.season)];
+  return ordered.map((rec, i) => ({ id: rec.id, no: `ST-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec, ...(rec.season ? { season: encodeWindows(windowsOf(rec.season.dates)) } : {}) }));
+}
+
+/** Registered mechanisms in catalogue order (family, level, name), the seasonal ones last (only LM_IDS in a local
  * working loop, src/mechanisms) */
 const KNOWN = new Set(workIds());
-export const SHEETS: Sheet[] = loadCatalog()
-  .mechanisms.filter((r) => KNOWN.has(r.id))
-  .map((rec, i) => ({ id: rec.id, no: `ST-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec }));
+export const SHEETS: Sheet[] = sheetsOf(loadCatalog().mechanisms.filter((r) => KNOWN.has(r.id)));
+/** The sheets always listed: every one but the seasonal mechanisms. The library's counts and filter chips are theirs. */
+export const LIBRARY: Sheet[] = SHEETS.filter((s) => !s.season);
 
 export const sheetOf = (id: string) => SHEETS.find((s) => s.id === id)!;
+
+/**
+ * A page's Previous and Next when the library was not opened in the tab: the neighbours round the library's sheets, so a
+ * seasonal mechanism is never one out of its window; a seasonal page sits after the last of them.
+ */
+export function neighbours(sheet: Sheet, sheets = SHEETS): [prev: Sheet, next: Sheet] {
+  const lib = sheets.filter((s) => !s.season);
+  const ring = lib.length ? lib : sheets;
+  const i = ring.indexOf(sheet);
+  if (i < 0) return [ring[ring.length - 1]!, ring[0]!];
+  return [ring[(i - 1 + ring.length) % ring.length]!, ring[(i + 1) % ring.length]!];
+}
+
+/** The sheets a seasonal mechanism's `related` names, in its order. */
+export const relatedOf = (sheet: Sheet, sheets = SHEETS): Sheet[] => sheet.rec.related.map((id) => sheets.find((s) => s.id === id)).filter((s): s is Sheet => s !== undefined);
+
+/** The seasonal mechanisms whose `related` names this sheet: its page links back to each while it is listed (P14). */
+export const seasonalFor = (sheet: Sheet, sheets = SHEETS): Sheet[] => (sheet.season ? [] : sheets.filter((s) => s.season && s.rec.related.includes(sheet.id)));
+
+/** A seasonal record's images that have been made and reviewed: the ones its page shows. */
+export const imagesShown = (rec: CatalogRecord) => (rec.images ?? []).filter((m) => !!m.file);
 
 /** The day a record's sheet went live (its `added` date, YYYY-MM-DD), when the record has one. */
 function addedOf(r: CatalogRecord): string | undefined {

@@ -1,12 +1,16 @@
 ---
 // One page per registered mechanism (SS5, SS8): crumbs, header, stage, side panels, explanation, links. The catalogue
-// supplies every word; the drawing comes from the package and the record's kinematics.
+// supplies every word; the drawing comes from the package and the record's kinematics. A fictional seasonal mechanism
+// (P14) wears the Seasonal folklore tag, shows its generated images and its related mechanisms in place of
+// the links, and out of its listing window a placard with the day it comes back in place of the stage (islands/season.ts);
+// a library page links back to the seasonal mechanisms that name it as related while each is listed.
 import Sheet from "../../layouts/Sheet.astro";
 import "../../../styles/views.css";
 import Bar from "../../components/Bar.astro";
 import ThemeToggle from "../../components/ThemeToggle.astro";
 import Stage3 from "../../components/Stage3.astro";
-import { APP, SHEETS, controlsOf, driveOf, sortableOf, viewButtons, type Sheet as SheetInfo } from "../../data";
+import type { ImageMetadata } from "astro";
+import { APP, SHEETS, controlsOf, driveOf, imagesShown, neighbours, relatedOf, seasonalFor, sortableOf, viewButtons, type Sheet as SheetInfo } from "../../data";
 import { absolute, mechanismLd } from "../../seo";
 import { url } from "../../url";
 
@@ -15,9 +19,7 @@ export function getStaticPaths() {
 }
 const { sheet } = Astro.props as { sheet: SheetInfo };
 const r = sheet.rec;
-const i = SHEETS.indexOf(sheet);
-const prev = SHEETS[(i - 1 + SHEETS.length) % SHEETS.length]!;
-const next = SHEETS[(i + 1) % SHEETS.length]!;
+const [prev, next] = neighbours(sheet);
 const drive = driveOf(sheet.id);
 // the construction labels in the record's order: the key a narrow stage shows under its numbered markers (SD22)
 function labelsOf(rec: SheetInfo["rec"]): string[] {
@@ -59,6 +61,17 @@ const tagsets = (
   ] as [string, [string, string][]][]
 ).filter(([, v]) => v.length > 0);
 const added = sortableOf(sheet).added;
+// a seasonal mechanism (P14): its images that have a file (site/seasonal, WebP), its related mechanisms; a library page's
+// seasonal mechanisms that name it as related
+const season = r.season;
+const files = import.meta.glob<{ default: ImageMetadata }>("../../../seasonal/*.webp", { eager: true });
+const images = imagesShown(r).map((m) => {
+  const img = files[`../../../seasonal/${m.file}`]?.default;
+  if (!img) throw new Error(`${sheet.id}: image ${m.file} is not in site/seasonal`);
+  return { ...m, img };
+});
+const related = season ? relatedOf(sheet) : [];
+const inSeason = seasonalFor(sheet);
 const media = r.media.filter((m) => m.kind === "video" || m.kind === "photos");
 const demos = r.media.filter((m) => m.kind !== "video" && m.kind !== "photos");
 // the page's social card (tools/cards.ts) and its structured data
@@ -79,7 +92,7 @@ const ld = mechanismLd({ name: r.name, description: r.summary, url: absolute(Ast
       )}
     </nav>
     <div class="dhead">
-      <div class="meta"><b>{sheet.no}</b>{added && <span class="recovered" data-recovered={added} hidden>Recovered</span>} · {r.family} · {r.motion.label}</div>
+      <div class="meta"><b>{sheet.no}</b>{season ? <span class="folklore">Seasonal folklore</span> : added && <span class="recovered" data-recovered={added} hidden>Recovered</span>} · {r.family} · {r.motion.label}</div>
       <div class="hrow"><h1>{r.name}</h1><ThemeToggle /></div>
       <p>{r.summary}</p>
     </div>
@@ -90,7 +103,13 @@ const ld = mechanismLd({ name: r.name, description: r.summary, url: absolute(Ast
       } catch {}
     </script>
     <div class="dlayout">
-      <Stage3 id={sheet.id} no={sheet.no} title={r.name} controls={controlsOf(r)} views={viewButtons(r)} timeMap={Boolean((r as any).teaching?.timeMap)} labels={labelsOf(r)} />
+      {season && (
+        <div class="placard" id="placard" hidden>
+          <h2>Out of season</h2>
+          <p>Packed away with the decorations. It comes back for {season.occasion}<span id="returns"></span>.</p>
+        </div>
+      )}
+      <Stage3 id={sheet.id} no={sheet.no} title={r.name} controls={controlsOf(r)} views={viewButtons(r)} timeMap={Boolean((r as any).teaching?.timeMap)} labels={labelsOf(r)} season={sheet.season} />
       <aside class="side">
         <section class="panel">
           <h2>At a glance</h2>
@@ -118,19 +137,34 @@ const ld = mechanismLd({ name: r.name, description: r.summary, url: absolute(Ast
           <ul class="uses">{r.examples!.map((x) => <li><b>{x.use}</b><span>{x.detail}</span></li>)}</ul>
         </section>
       )}
-      {(r.real_world?.length ?? 0) > 0 && (
+      {!season && (r.real_world?.length ?? 0) > 0 && (
         <section class="wide"><span class="k">06</span><h2>In the real world</h2>
           <ul class="uses">{r.real_world!.map((x) => <li><b><a href={x.url} rel="noopener">{x.product}</a></b><span>{x.use}</span></li>)}</ul>
         </section>
       )}
+      {season && images.length > 0 && (
+        <section class="wide"><span class="k">06</span><h2>In the wild</h2>
+          <div class="shots">{images.map((m) => <img src={m.img.src} width={m.img.width} height={m.img.height} alt={m.alt} loading="lazy" decoding="async" />)}</div>
+        </section>
+      )}
     </div>
-    <div class="reflist">
-      <section><h2>References</h2><ul class="refs">{r.references.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>
-      {media.length > 0 && <section><h2>Photos and video</h2><ul class="refs">{media.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>}
-      {demos.length > 0 && <section><h2>Animations</h2><ul class="refs">{demos.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>}
-    </div>
+    {season ? (
+      related.length > 0 && (
+        <div class="reflist">
+          <section data-seasonlinks><h2>Related</h2><ul class="refs">{related.map((t) => <li data-season={t.season} hidden={t.season !== undefined}><span class="lbl">{t.season ? t.rec.season!.occasion : t.rec.family}</span><a href={url(`/mechanisms/${t.id}/`)}>{t.rec.name}</a></li>)}</ul></section>
+        </div>
+      )
+    ) : (
+      <div class="reflist">
+        <section><h2>References</h2><ul class="refs">{r.references.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>
+        {media.length > 0 && <section><h2>Photos and video</h2><ul class="refs">{media.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>}
+        {demos.length > 0 && <section><h2>Animations</h2><ul class="refs">{demos.map((x) => <li><span class="lbl">{x.kind}</span><a href={x.url} rel="noopener">{x.title}</a></li>)}</ul></section>}
+        {inSeason.length > 0 && <section data-seasonlinks hidden><h2>In season</h2><ul class="refs">{inSeason.map((t) => <li data-season={t.season} hidden><span class="lbl">{t.rec.season!.occasion}</span><a href={url(`/mechanisms/${t.id}/`)}>{t.rec.name}</a></li>)}</ul></section>}
+      </div>
+    )}
   </main>
   <script>
     import "../../islands/sheetnav";
+    import "../../islands/season";
   </script>
 </Sheet>

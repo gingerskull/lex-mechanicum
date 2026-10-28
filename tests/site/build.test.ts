@@ -5,7 +5,9 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
+import { recordById } from "../../src/catalog";
 import { allIds } from "../../src/mechanisms";
+import { encodeWindows, windowsOf } from "../../site/src/season";
 import { DEFAULT_ORDER, sortBy } from "../../site/src/sort";
 
 const OUT = join("dist", "site");
@@ -26,6 +28,11 @@ function closure(file: string, seen = new Set<string>()): Set<string> {
 
 /** Every mechanism page in the build. */
 const pages = (): string[] => readdirSync(join(OUT, "mechanisms"));
+/** The registered fictional seasonal mechanisms (P14), listed only in their windows, and the library, always listed. */
+const seasonalIds = () => allIds().filter((id) => recordById(id)?.season);
+const libraryIds = () => allIds().filter((id) => !recordById(id)?.season);
+/** A count the filters island may change once there is a seasonal mechanism (data-sheets). */
+const count = (n: number) => `<span(?: data-sheets)?>${n}</span>`;
 
 describe("site build", () => {
   it("has the library and a page for every registered mechanism", () => {
@@ -71,7 +78,7 @@ describe("site build", () => {
     const html = read("index.html");
     expect(html).toMatch(/<button[^>]*id="qclear"[^>]*hidden/);
     expect(html).toMatch(/id="libbar"/);
-    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library <span>${allIds().length}</span>`));
+    expect(html).toMatch(new RegExp(`class="settitle"[^>]*>Mechanism Library ${count(libraryIds().length)}`));
   });
 
   it("puts Sort beside Filters, a menu of the orders with New checked, and the cards in the New order (SS3)", () => {
@@ -121,7 +128,7 @@ describe("site build", () => {
   it("names the app, Lex Mechanicum, in the library's heading under the Mechanism Library kicker, the footer and every page's head", () => {
     const lib = read("index.html");
     expect(lib).toContain('<p class="kicker">Mechanism Library</p>');
-    expect(lib).toMatch(new RegExp(`<h1>Lex Mechanicum <span>${allIds().length}</span></h1>`));
+    expect(lib).toMatch(new RegExp(`<h1>Lex Mechanicum ${count(libraryIds().length)}</h1>`));
     for (const f of ["index.html", "404.html", join("mechanisms", allIds()[0]!, "index.html")]) {
       const html = read(f);
       expect(html, f).toContain('<meta name="application-name" content="Lex Mechanicum">');
@@ -142,11 +149,38 @@ describe("site build", () => {
     expect(page).toMatch(/<div class="meta"><b>ST-\d{2}<\/b>/);
   });
 
-  it("builds every Recovered badge hidden, with the sheet's added date for the browser to decide on", () => {
+  it("builds every Recovered badge hidden, with the sheet's added date for the browser to decide on; none on a seasonal sheet", () => {
     const lib = read("index.html");
     const badges = [...lib.matchAll(/<span class="recovered" data-recovered="(\d{4}-\d{2}-\d{2})" hidden>Recovered<\/span>/g)];
-    expect(badges).toHaveLength(allIds().length);
-    for (const id of allIds()) expect(read(join("mechanisms", id, "index.html")), id).toMatch(/<span class="recovered" data-recovered="\d{4}-\d{2}-\d{2}" hidden>Recovered<\/span>/);
+    expect(badges).toHaveLength(libraryIds().length);
+    for (const id of libraryIds()) expect(read(join("mechanisms", id, "index.html")), id).toMatch(/<span class="recovered" data-recovered="\d{4}-\d{2}-\d{2}" hidden>Recovered<\/span>/);
+    for (const id of seasonalIds()) expect(read(join("mechanisms", id, "index.html")), id).not.toContain('class="recovered"');
+  });
+
+  it("builds a seasonal mechanism (P14) hidden on the library with its windows, and its page with the tag, the placard and no links", () => {
+    const lib = read("index.html");
+    const cardOf = (id: string) => new RegExp(`<a class="card"[^>]*data-id="${id}"[^>]*>[\\s\\S]*?</a>`).exec(lib)?.[0] ?? "";
+    // nothing seasonal on a library without seasonal mechanisms
+    if (!seasonalIds().length) {
+      expect(lib).not.toMatch(/data-season|class="folklore"|data-sheets/);
+      for (const id of allIds()) expect(read(join("mechanisms", id, "index.html")), id).not.toMatch(/data-season|class="folklore"|id="placard"/);
+    }
+    for (const id of seasonalIds()) {
+      const rec = recordById(id)!;
+      const windows = encodeWindows(windowsOf(rec.season!.dates));
+      const card = cardOf(id);
+      expect(card, id).toMatch(new RegExp(`^<a class="card"[^>]*data-season="${windows}"[^>]*hidden`));
+      expect(card, id).toContain('<span class="folklore">Seasonal folklore</span>');
+      const page = read(join("mechanisms", id, "index.html"));
+      expect(page, id).toMatch(/<div class="meta"><b>ST-\d{2}<\/b><span class="folklore">Seasonal folklore<\/span>/);
+      expect(page, id).not.toContain('class="seasonnote"');
+      expect(page, id).toMatch(/<div class="placard" id="placard" hidden>/);
+      expect(page, id).toMatch(new RegExp(`<div class="stagebox"[^>]*data-season="${windows}"`));
+      expect(page, id).not.toMatch(/<h2>(References|Photos and video|Animations|In the real world)<\/h2>/);
+      // a library page it names links back while it is listed
+      for (const other of rec.related.filter((x) => libraryIds().includes(x)))
+        expect(read(join("mechanisms", other, "index.html")), `${other} to ${id}`).toMatch(new RegExp(`<section data-seasonlinks hidden>[\\s\\S]*<li data-season="${windows}" hidden>[\\s\\S]*?href="[^"]*/mechanisms/${id}/"`));
+    }
   });
 
   it("ships each mechanism's origin as an Imperial date for the title block", () => {

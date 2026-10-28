@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mergeSources } from "../../src/catalog/merge";
-import { record } from "./fixtures";
+import { record, seasonal, withoutLinks } from "./fixtures";
 
 const p3 = { product: "p3", use: "u", url: "https://www.youtube.com/shorts/aaaaaaaaaa3" };
 
@@ -27,6 +27,14 @@ describe("mergeSources", () => {
     const { records } = mergeSources(files);
     expect(records[2]!.motion.label).toBe("Rotary → Oscillating");
     expect(records[2]!.related).toEqual(["a"]);
+  });
+
+  it("accepts the seasonal batch files and gives a record without links empty lists", () => {
+    const { records, problems } = mergeSources([...files, { name: "s1.json", json: [withoutLinks(seasonal("s"))] }]);
+    expect(problems).toEqual([]);
+    const s = records.find((r) => r.id === "s")!;
+    expect([s.references, s.media, s.real_world]).toEqual([[], [], undefined]);
+    expect(s.season?.occasion).toBe("Halloween");
   });
 
   it("reports an unknown patch id instead of throwing", () => {

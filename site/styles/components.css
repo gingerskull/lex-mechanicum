@@ -393,8 +393,10 @@
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
-/* the Recovered badge (LM-17): a stamp in title-block lettering for a sheet's first days, shown by islands/recovered.ts */
-.recovered {
+/* the Recovered badge (LM-17): a stamp in title-block lettering for a sheet's first days, shown by islands/recovered.ts;
+   the Seasonal folklore tag (P14) is the same stamp on a seasonal mechanism's card and page */
+.recovered,
+.folklore {
   font: 600 9px / 1 var(--font-mono);
   letter-spacing: var(--tracking-mono-wide);
   text-transform: uppercase;
@@ -406,12 +408,14 @@
 .recovered[hidden] {
   display: none;
 }
-.thumb .recovered {
+.thumb .recovered,
+.thumb .folklore {
   position: absolute;
   top: 6px;
   left: 6px;
 }
-.dhead .meta .recovered {
+.dhead .meta .recovered,
+.dhead .meta .folklore {
   margin-left: 10px;
   vertical-align: 1px;
 }
@@ -888,12 +892,55 @@
 .refs a:hover {
   text-decoration-color: var(--accent);
 }
+/* a seasonal mechanism (P14): its generated images, in a row that wraps */
+.shots {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: 14px;
+  margin-top: 6px;
+}
+.shots img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-2);
+}
+/* out of its listing window: the placard in the stage's place, as the stage is drawn (paper, rule, ratio) */
+.placard {
+  aspect-ratio: var(--ratio-stage);
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+}
+.placard h2 {
+  font: 700 26px / 1.1 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: underline solid var(--accent);
+  margin: 0;
+}
+.placard p {
+  margin: 0;
+  max-width: 44ch;
+}
 @media (max-width: 640px) {
   .explain {
     grid-template-columns: minmax(0, 1fr);
   }
-  .uses {
+  .uses,
+  .shots {
     grid-column: 1 / -1;
+  }
+  .placard {
+    aspect-ratio: var(--ratio-stage-phone);
   }
   .stage {
     aspect-ratio: var(--ratio-stage-phone);

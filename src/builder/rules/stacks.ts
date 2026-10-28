@@ -178,7 +178,39 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   // both pillow blocks on one side of what the shaft carries (`side` on its joint: +1 along the axis, −1 against it)
   const side = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { side?: number } | undefined)?.side).find((v) => v === 1 || v === -1);
   if (side) spec.side = side as 1 | -1;
+  // the shaft runs on to parts overhung past its blocks (`overhung: true`): a crank overhung past the blocks of its shaft
+  if (site.joints.some((j) => (ctx.kin.joints.find((q) => q.id === j) as { overhung?: unknown } | undefined)?.overhung === true)) spec.overhung = true;
+  // a fixed shaft held by a plate the record names (`heldBy` on its joint: a side frame beside the parts, square to the
+  // axis): the plate stands for the base along the axis, so a live shaft runs in a housing cartridge behind it and a dead
+  // axle stands on its shoulder in it, threaded through; the parts stand on the plate's other side
+  const heldBy = site.fixed ? site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { heldBy?: unknown } | undefined)?.heldBy).find((v): v is string => typeof v === "string") : undefined;
+  const plate = heldBy ? ctx.parts.get(heldBy) : undefined;
+  if (heldBy && !plate) ctx.issues.push(`site ${site.id}: heldBy ${heldBy} is not a built part`);
+  if (plate && plate.op.op === "extrude") {
+    const dz = plate.frame.z[0] * frame.z[0] + plate.frame.z[1] * frame.z[1] + plate.frame.z[2] * frame.z[2];
+    const w0 = (plate.frame.o[0] - frame.o[0]) * frame.z[0] + (plate.frame.o[1] - frame.o[1]) * frame.z[1] + (plate.frame.o[2] - frame.o[2]) * frame.z[2];
+    const w1 = w0 + dz * plate.op.h;
+    const top = Math.max(w0, w1);
+    const bottom = Math.min(w0, w1);
+    // the parts on the plate's far side along the axis: the stack is built the other way round, the plate under them
+    const under = members.every((m) => m.w1 <= bottom + 1e-6);
+    if (Math.abs(Math.abs(dz) - 1) > 1e-6) ctx.issues.push(`site ${site.id}: ${heldBy} is not square to the axis`);
+    else if (!under && members.some((m) => m.w0 < top - 1e-6)) ctx.issues.push(`site ${site.id}: parts stand on both sides of ${heldBy}; it holds the shaft from one side only`);
+    else {
+      if (under) {
+        spec.frame = { o: frame.o, x: frame.x, z: [-frame.z[0], -frame.z[1], -frame.z[2]] as Frame["z"] };
+        spec.members = members.map((m) => ({ ...m, w0: -m.w1, w1: -m.w0 })).sort((a, b) => a.w0 - b.w0);
+      }
+      spec.base = under ? { top: -bottom, bottom: -top } : { top, bottom };
+      spec.support = site.live ? "housing" : "stub";
+      spec.held = "base";
+      spec.onto = titleOf(heldBy!).toLowerCase();
+      delete spec.side;
+      delete spec.overhung;
+    }
+  }
   const r = axialStack(ctx, spec);
+  if (plate && spec.base) cutBore(ctx, plate.id, site.at, site.live ? r.d / 2 + 1.5 : r.d / 2 + 0.3);
   ctx.add(r.solids);
   ctx.stacks.set(site.id, r);
   const world = site.at;

@@ -95,6 +95,34 @@ export interface RealWorld {
   note?: string;
 }
 
+/** The festive duty class of a seasonal record (record-spec.md, DUTY; what each means is in the seasonal catalogue). */
+export const DUTIES = ["Domestic", "Community", "Commercial", "Municipal"] as const;
+export type Duty = (typeof DUTIES)[number];
+
+/** One year's occurrence of a holiday, YYYY-MM-DD, both days included (the same day for a one-day holiday). */
+export interface Occurrence {
+  start: string;
+  end: string;
+}
+
+/** What makes a record a fictional seasonal mechanism (standard P14; record-spec.md, "Seasonal records"). */
+export interface Season {
+  occasion: string;
+  /** Prose: how the date is found each year. */
+  date_rule: string;
+  duty: Duty;
+  /** Each year's occurrence, in order, written a few years ahead. */
+  dates: Occurrence[];
+}
+
+/** A generated image of a seasonal mechanism at work in its invented setting, shown on its page once it has a file. */
+export interface SeasonImage {
+  prompt: string;
+  alt: string;
+  /** The WebP's name in site/seasonal/, empty until the image is made and reviewed. */
+  file?: string;
+}
+
 export interface BuildSpec {
   ground: string;
   input: string;
@@ -157,6 +185,10 @@ export interface CatalogRecord {
   added?: string;
   /** Minimum counts this record is exempt from, set in a patch file where research found no more. */
   waive?: Waivable[];
+  /** A fictional seasonal mechanism (standard P14): its occasion and dates; it has no references, media or real_world. */
+  season?: Season;
+  /** A seasonal record's 2 to 4 generated images, in place of its links. */
+  images?: SeasonImage[];
 }
 
 export const WAIVABLE = ["media", "references"] as const;

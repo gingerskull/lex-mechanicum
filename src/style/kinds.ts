@@ -26,6 +26,8 @@ export const SOLID_KINDS = [
   // retention and adjustment
   "circlipExternal", "retainerPlate", "nut", "setScrew", "collar", "eccentric", "gib", "stop", "bumper", "spring",
   "wearStrip", "dowel", "spigot",
+  // decoration on the themed scenery of a seasonal mechanism (mouldings, rosettes, beads, a carved bat)
+  "ornament",
 ] as const;
 export type SolidKind = (typeof SOLID_KINDS)[number];
 
@@ -37,6 +39,8 @@ export const MARK_KINDS = [
   "oilSink", "timing",
   // form: engraved paths, the base scale, boss rings, base circles, index lines
   "engrave", "scale", "boss", "index",
+  // decoration on a seasonal mechanism's scenery: carved lines and features, and fill patterns (quilting, hatching)
+  "carve", "quilt",
 ] as const;
 export type MarkKind = (typeof MARK_KINDS)[number];
 
