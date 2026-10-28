@@ -95,6 +95,9 @@ export function mergeSources(files: SourceFile[]): { records: CatalogRecord[]; p
   for (const r of records) {
     if (isObject(r.motion)) r.motion.label = `${r.motion.input} → ${r.motion.output}`;
     r.related = (r.related ?? []).filter((x) => x !== r.id && ids.has(x));
+    // a seasonal record has no links (its images take their place); every record carries the lists all the same
+    r.references ??= [];
+    r.media ??= [];
   }
   return { records, problems };
 }

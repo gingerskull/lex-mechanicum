@@ -90,6 +90,9 @@ manufacturer engineering guide). media 2 to 4: at least one VIDEO of the real th
 least one page with PHOTOS of a real one (Wikimedia Commons category, museum page, manufacturer page). Animations
 (e.g. Wikimedia gif pages, 507movements, Purdue, firgelliauto) are welcome but do not replace the real-use video.
 
+A seasonal record (a fictional mechanism for a holiday) adds a `season` block and an `images` list and has no
+`references`, `media` or `real_world`: see "Seasonal records" below.
+
 ## Record v3: the `kin` and `teaching` blocks
 
 Record v3 (`"record_version": 3`) adds two blocks to the record and retires two fields. The catalogue is what the app
@@ -383,6 +386,42 @@ The sheets drawn before the field existed have the day they first reached main, 
 Pages release, 2026-10-18, for the ones that were on main before it). The site reads it for the library's New order
 and the Recovered badge a sheet wears for its first 7 days.
 
+## Seasonal records
+
+A seasonal record is a fictional mechanism for a holiday or special day (mechanism standard P14, which says what it may
+do that other records may not): a record v3 like any other, with true kinematics, plus a `season` block and an
+`images` list. The seasonal records themselves, their prose, design and image prompts, and what a duty class means
+are in the seasonal catalogue (`data/catalog/holiday-catalogue.md`); their batch files are `sources/s*.json`.
+
+```json
+"season": {
+  "occasion": "Halloween",
+  "date_rule": "fixed, 31 October",
+  "duty": "Commercial",
+  "dates": [ { "start": "2026-10-31", "end": "2026-10-31" }, { "start": "2027-10-31", "end": "2027-10-31" } ]
+},
+"images": [
+  { "prompt": "Behind-the-scenes photo in a haunted house attraction workshop, ...", "alt": "A coffin with its lid half open on a steel lever in a workshop", "file": "" }
+]
+```
+
+| Field | Content |
+|---|---|
+| `season.occasion` | The holiday or special day the mechanism was made for. |
+| `season.date_rule` | Prose: how the date is found each year (fixed date, "fourth Thursday in November", lunar or lunisolar). |
+| `season.duty` | ONE value from DUTY. |
+| `season.dates` | Each year's occurrence, `{ "start", "end" }` as `YYYY-MM-DD` (the same day for a one-day holiday), in order, written a few years ahead. A test fails once none starts within the next 13 months: add the next years then. |
+| `images` | 2 to 4 generated images of the mechanism at work in its invented setting, never a drawing of it (the stage draws it): `prompt` (what the image is made from), `alt` (one plain sentence for the page), `file` (the WebP's name in `site/seasonal/`, `<id>-<n>.webp`; empty until the image is made and reviewed). |
+
+The page shows the images that have a `file`, in place of references, photos and video and "In the real world". The
+site lists a seasonal mechanism from 3 days before each occurrence's start to the end of the 2nd day after its end, by
+the visitor's local date; out of its window the mechanism's page stays reachable and says when it comes back.
+
+The validator checks the `season` block (an occasion and a date rule, the duty from DUTY, every date a real day, each
+end on or after its start, the occurrences in order) and the images (2 to 4, each with a prompt and an alt, a `file`
+that is a `.webp` name), and skips the minimum counts of `references`, `media` and `real_world`: a seasonal record
+has none of them. `images` belong to a seasonal record only.
+
 ## LINKS MUST BE REAL
 
 Every URL must come from a WebSearch result or a page you successfully fetched with WebFetch in this session.
@@ -433,6 +472,8 @@ APPLICATION (1-4): Automotive, Machine tools, Robotics, Clocks & watches, Packag
   Consumer products, Construction & lifting, Marine, Instruments, Energy, Education
 
 PRECISION (origin.precision): day, year, period
+
+DUTY (season.duty, seasonal records only): Domestic, Community, Commercial, Municipal
 
 ## Master list (ids, for "related")
 

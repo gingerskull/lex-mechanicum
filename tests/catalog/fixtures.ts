@@ -29,3 +29,35 @@ export function record(id: string, over: Partial<CatalogRecord> = {}): CatalogRe
     ...over,
   };
 }
+
+/** A minimal seasonal record (standard P14) that passes validation: a season block, two images, no links. */
+export function seasonal(id: string, over: Partial<CatalogRecord> = {}): CatalogRecord {
+  return record(id, {
+    references: [],
+    media: [],
+    real_world: [],
+    season: {
+      occasion: "Halloween",
+      date_rule: "fixed, 31 October",
+      duty: "Commercial",
+      dates: [
+        { start: "2026-10-31", end: "2026-10-31" },
+        { start: "2027-10-31", end: "2027-10-31" },
+      ],
+    },
+    images: [
+      { prompt: "p1", alt: "a1", file: `${id}-1.webp` },
+      { prompt: "p2", alt: "a2", file: "" },
+    ],
+    ...over,
+  });
+}
+
+/** A record as a seasonal source file writes it: no references, media or real_world keys at all. */
+export function withoutLinks(r: CatalogRecord): CatalogRecord {
+  const out: Partial<CatalogRecord> = { ...r };
+  delete out.references;
+  delete out.media;
+  delete out.real_world;
+  return out as CatalogRecord;
+}
