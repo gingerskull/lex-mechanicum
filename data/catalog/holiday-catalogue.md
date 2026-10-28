@@ -129,7 +129,7 @@ The Maccabee indexer joins `walking-beam` as the only mechanisms with an Intermi
 
 *Also called: Stoker motion, creak-and-slam drive, coffin-lid slotted lever, Transylvanian quick-return*
 
-A crank and slotted lever that eases a coffin lid open over two-thirds of a turn, then slams it shut in the remaining third, while a cam on the same crank sits the vampire up to face you.
+A crank and slotted lever ease a coffin lid open over two-thirds of a turn and slam it in the last third, while a cam on the crank sits the vampire up.
 
 | | |
 |---|---|
