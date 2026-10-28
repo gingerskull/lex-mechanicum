@@ -45,7 +45,7 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | T4 | PASS | DATA · fired: trace-marks (no solids) · the lid tip carries the comet and 15° ticks, spread on the opening and bunched on the slam; the crank pin and the crown traced |
 | T5 | PASS | DATA · the lever's two extreme lines from O (β 53.1°) and the opening and slam arcs of the crank pin |
 | T6 | PASS | HAND / DATA · a 73.7° lid swing at a 2.39:1 time ratio and a 72° sit-up read at the default size |
-| T7 | PASS | DATA · VIEW 300 24: from the foot end with the drive on the right, the occupant facing the viewer as he sits up; the opening phase shows the lid high and him up |
+| T7 | PASS | DATA · VIEW 330 20: from the drive side toward the foot end, the drive on the right and nearly face on, so every arm reads to its pin, the occupant seen as he sits up; the opening phase shows the lid high and him up |
 | T8 | PASS | DATA · section cam, cut between the rocker and the crank: the cam, its roller and the swinging rocker in elevation, highlighted; drawn in both sheets |
 | T9 | PASS | AUTO / DATA · claim table: 8 ok, 0 off, 0 uncheckable of 8 |
 | T10 | PASS | AUTO · 64 solids drawn see-through: coffin-wall0, coffin-panel0, coffin-column0, coffin-lining0, coffin-wall1, coffin-panel1, coffin-column1, coffin-lining1 · filled by the generator: a rule built solids for it |
@@ -60,31 +60,31 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | D2 | PASS | HAND · bosses round every pin; the lever's arm and bar carry the lid's weight to the lever's hub |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · filled by the generator: a rule built solids for it |
-| D5 | PASS | AUTO / HAND · one side frame against the coffin's drive-side wall carries the lid hinge, the crank shaft and the rocker's axle (heldBy), a small bracket outboard the hip axle; both on short posts from the base; the coffin on four turned legs |
+| D5 | PASS | AUTO / HAND · one side frame against the coffin's drive-side wall carries the lid hinge, the crank shaft and the rocker's axle (heldBy), a small bracket outboard the hip axle; the side frame on short posts from the base, the bracket hung on two standoffs from the side frame; the coffin on four turned legs |
 | D6 | PASS | HAND / STYLE · the decoration sits on the scenery only (coffin, lid, figurine) as the seasonal waiver asks, and drops first on the detail ladder; the drive stays plain and in front |
 | D8 | PASS | AUTO / HAND · every part a profile, an operation and a frame: plates and links extruded across y, the legs, columns and roller turned, the walls, panels and linings extruded along their own normals |
 | D9 | N/A | AUTO / HAND · fired: j12-cvt (no solids) · no stretched, conveyed or deforming member |
 | D10 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
-| D11 | PASS | AUTO · SOLID: 0 of 234 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 227 solids unsound |
 | D7 | PASS | HAND · the mechanism's parts carry only load shape; the carved decoration is on the scenery, as P14 allows |
 | A1 | PASS | AUTO · R J3, E J3, F J3, G J10, C J10, O J10, H J10, A J4, K J7, drive drive · filled by the generator: the pipeline holds it for every built mechanism |
 | A2 | PASS | AUTO · R J3, E J3, F J3, G J10, C J10, O J10, H J10, A J4, K J7, drive drive · filled by the generator: the pipeline holds it for every built mechanism |
 | A3 | PASS | AUTO · fired: classify (10 solids), axial stack builder · filled by the generator: a rule built solids for it |
 | A4 | PASS | AUTO · stepped shafts: the dead lid and rocker axles and the hip axle shouldered in their plates, threaded through; the live crank shaft keyed in its housing on the side frame's coffin side; retaining clips on the ends |
 | A5 | PASS | AUTO · fired: j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), axial stack builder · filled by the generator: a rule built solids for it |
-| A6 | PASS | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · no standoffs: the coffin stands on its four turned legs, each screwed up through the base (posts) |
-| A7 | PASS | AUTO · fired: base (3 solids), posts (24 solids), feet (4 solids) · filled by the generator: a rule built solids for it |
-| A8 | PASS | AUTO · fired: fasteners (17 solids) · filled by the generator: a rule built solids for it |
+| A6 | PASS | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · no routed standoffs: the coffin stands on its four turned legs, each screwed up through the base (posts); the hip bracket's two standoffs to the side frame are the record's own pieces |
+| A7 | PASS | AUTO · fired: base (3 solids), posts (18 solids), feet (4 solids) · filled by the generator: a rule built solids for it |
+| A8 | PASS | AUTO · fired: fasteners (15 solids) · filled by the generator: a rule built solids for it |
 | A9 | PASS | AUTO / HAND · single shear throughout, by the layout the concept asks for: one side frame beside the drive holds three shafts from one side (the lever sweeps over the crank and the rocker's axle, so nothing can stand outboard of them), the hip axle stands in its bracket outboard; the crank shaft in two bearings far apart in its cartridge |
 | A10 | PASS | HAND · four slabs, coffin outward: rocker, cam and roller with the link, crank, lever and hip arm outermost; parts whose sweeps never meet share a slab |
-| A11 | PASS | AUTO / HAND · lid: lid, cheek, bar, lever, its bearing, the dead axle, the side frame, its posts, base; crank: shaft, two bearings, housing, side frame; occupant: figure, hip tube, hip arm, its bearing, the hip axle, the bracket, its posts, base; coffin: legs to base |
+| A11 | PASS | AUTO / HAND · lid: lid, cheek, bar, lever, its bearing, the dead axle, the side frame, its posts, base; crank: shaft, two bearings, housing, side frame; occupant: figure, hip tube, hip arm, its bearing, the hip axle, the bracket, its standoffs, the side frame, its posts, base; coffin: legs to base |
 | A12 | PASS | AUTO · clamp check clean |
 | A13 | PASS | AUTO / HAND · 273 solids, 174 unnamed (further items of a listed set) · named hardware: bearings, shoulder bolts Ø3 to Ø5, M3 to M5 screws, Ø5 to Ø12 shafts, feather keys, collars; unnamed rows are further items of a named set |
 | A14 | PASS | AUTO / HAND · fired: support router · router least gap 1.5 mm; clearance 0 over 72 phases |
 | A15 | PASS | AUTO · clearance in 3D over 72 phases: 0 clashes; hand allow: 1 named, 0 unnecessary |
 | A16 | PASS | HAND · joint notes with badges; build rules: the side frame against the coffin carries the drive, the lever sweeps over C so the crank overhangs its housing, the lid hangs on the lever by an arm and a cheek, the hip tube carries the figure through the side frame and the coffin wall, the cam's base circle sized against undercut and the rocker's axle |
 | A17 | PASS | HAND · lid off the lever, figure off its tube, coffin off its legs, then the drive's parts off their shaft ends, the axles out of the side frame and the bracket, the housing off the side frame; every screw reachable |
-| A18 | PASS | AUTO · placement: 4 slabs in the tallest stack (43.0 mm), 1 clevis; stack per joint in the Joints table · filled by the generator: the pipeline holds it for every built mechanism |
+| A18 | PASS | AUTO · placement: 4 slabs in the tallest stack (47.0 mm), 0 clevises; stack per joint in the Joints table · filled by the generator: the pipeline holds it for every built mechanism |
 | A19 | PASS | AUTO · no routed supports: the side frame and the hip bracket are the record's own plates; where they cover principle parts in the default view they are drawn see-through |
 | A20 | PASS | AUTO · support per joint from the record (heldBy): lid hinge and rocker axle stand in the side frame, the crank shaft in a housing cartridge on it, the hip axle in its bracket |
 | A21 | PASS | AUTO · kit per joint: R J3, E J3, F J3, G J10, C J10, O J10, H J10, A J4, K J7, drive drive |
@@ -92,7 +92,7 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | E1 | PASS | AUTO · every solid has one explode level; levels 0 to 25.91 · filled by the generator: the pipeline holds it for every built mechanism |
 | E2 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | E3 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
-| E4 | PASS | HAND · the props come off first (lid, figurine, coffin), then the overhung parts off their axles, the axles and the housing, the side frame and the bracket off their posts |
+| E4 | PASS | HAND · the props come off first (lid, figurine, coffin), then the overhung parts off their axles, the axles and the housing, the bracket off its standoffs, the side frame off its posts |
 | E5 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | E6 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | E7 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
@@ -101,7 +101,7 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | E10 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | J1 | N/A | AUTO · fired: trunnion (no solids), hub (no solids), j1-dead-axle (no solids) · filled by the generator: no joint of this type |
 | J2 | N/A | AUTO · fired: j2-live-shaft (no solids) · filled by the generator: no joint of this type |
-| J3 | PASS | AUTO · fired: j3-moving-pin (29 solids), cross-bearings (no solids), oblique-journal (no solids), eccentric-bearing (no solids), spider-pin (no solids), ball-socket (no solids), ring-hub (no solids), eccentric (no solids) · filled by the generator: a rule built its kit |
+| J3 | PASS | AUTO · fired: j3-moving-pin (27 solids), cross-bearings (no solids), oblique-journal (no solids), eccentric-bearing (no solids), spider-pin (no solids), ball-socket (no solids), ring-hub (no solids), eccentric (no solids) · filled by the generator: a rule built its kit |
 | J4 | PASS | AUTO · fired: pin-hole (no solids), j4-slot-roller (6 solids), pin-lobe (no solids), fork-pin (no solids), die (no solids) · filled by the generator: a rule built its kit |
 | J5 | N/A | AUTO · fired: tongue-slot (no solids), integrator-carriage (no solids), piston-bore (no solids), j5-slide (no solids), leg-bore (no solids) · filled by the generator: no joint of this type |
 | J6 | N/A | AUTO · fired: j6-mesh (no solids), friction-contact (no solids), ring-carrier (no solids), pin-ring (no solids), ring-rollers (no solids) · filled by the generator: no joint of this type |
@@ -112,7 +112,7 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | J12 | N/A | AUTO · fired: j12-flexible (no solids), j12-cvt (no solids), j12-other (no solids), strap-sheave (no solids) · filled by the generator: no joint of this type |
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · filled by the generator: no joint of this type |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · filled by the generator: no joint of this type |
-| F1 | PASS | AUTO · served at G, C, O, H; fired: posts (24 solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
+| F1 | PASS | AUTO · served at G, C, O, H; fired: posts (18 solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F2 | PASS | AUTO · served at R, E, F, G, C, O, H; fired: wheels (no solids), j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), cross-bearings (no solids), oblique-journal (no solids), trunnion (no solids), ring-carrier (no solids), eccentric-bearing (no solids), pin-ring (no solids), spider-pin (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), leg-bore (no solids), ring-rollers (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F3 | PASS | AUTO · served at R, E, F, C; fired: j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (63 solids), j11-screw (no solids) · filled by the generator: a rule built solids for it |
 | F4 | PASS | AUTO / HAND · thrust washers under the parts on the dead axles; the crank shaft located in its cartridge by its circlips and wave washer |
@@ -124,7 +124,7 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | F10 | PASS | AUTO / HAND · served at drive; fired: j12-flexible (no solids), drive (30 solids) · home flag on the drive pulley and a fork sensor on the motor bracket |
 | M1 | PASS | AUTO · fired: hardware primitives · top-face edges chamfered by the primitives |
 | M2 | PASS | HAND · bosses round every loaded hole; no wheel that starts and stops needs arms |
-| M3 | PASS | AUTO · fired: j3-moving-pin (29 solids), hardware primitives · filled by the generator: a rule built solids for it |
+| M3 | PASS | AUTO · fired: j3-moving-pin (27 solids), hardware primitives · filled by the generator: a rule built solids for it |
 | M4 | PASS | AUTO / HAND · fired: base (3 solids), fasteners (61 solids) · counterbores and countersinks for the heads; countersunk end screws on the overhung shafts |
 | M5 | PASS | AUTO / HAND · fired: hardware primitives · the slot full-radius ended; outlines filleted |
 | M6 | PASS | AUTO · edge distance and walls clean |
@@ -155,7 +155,7 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | R1 | PASS | HAND · parts from the builder's kits and primitives; the decoration through the shared pieces, patterns and turned posts |
 | R2 | PASS | HAND · a few bearing sizes, M3 to M5 screws, Ø4 to Ø12 shafts, GT2 32:16 |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies from the rules |
-| R4 | PASS | AUTO · package v2 41.7 KB · filled by the generator: the pipeline holds it for every built mechanism |
+| R4 | PASS | AUTO · package v2 40.9 KB · filled by the generator: the pipeline holds it for every built mechanism |
 | R5 | PASS | HAND · the polish states materials and explode groups only, no sampling |
 | R6 | PASS | FLAG · FLAG: bench on the desktop: frames 1.3 to 1.5 ms (under 8 ms), 1.8 to 2.3 ms across the dial; setup 69.2 ms over the 20 ms target, 59.6 ms of it the GPU's first frame, as for the other recent mechanisms; the phone is measured by the owner |
 | R7 | PASS | HAND / FLAG · polish 16 lines (1.8 KB); 0 solids added, 132 overrides by the polish |
@@ -181,8 +181,8 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | R | J3 | – | – | – | none | Shoulder bolt Ø3 x 12, M2.5 (ISO 7379) | Shoulder bolt Ø3 x 12, M2.5 (ISO 7379) | none | none | none | none | none | none | none |
-| E | J3 | dyad | – | – | none | Shoulder bolt Ø5 x 40, M4 (ISO 7379) | Shoulder bolt Ø5 x 40, M4 (ISO 7379) | Inner-race spacer 5.2x8.9 | none | none | none | none | none | none |
-| F | J3 | – | – | – | none | Shoulder bolt Ø5 x 30, M4 (ISO 7379) | Shoulder bolt Ø5 x 30, M4 (ISO 7379) | Inner-race spacer 5.2x7.1 | none | none | none | none | none | none |
+| E | J3 | dyad | – | – | none | Shoulder bolt Ø5 x 30, M4 (ISO 7379) | Shoulder bolt Ø5 x 30, M4 (ISO 7379) | Inner-race spacer 5.2x8.9 | none | none | none | none | none | none |
+| F | J3 | – | – | – | none | Shoulder bolt Ø5 x 16, M4 (ISO 7379) | Shoulder bolt Ø5 x 16, M4 (ISO 7379) | Inner-race spacer 5.2x7.1 | none | none | none | none | none | none |
 | G | J10 | cam-rocker | – | – | Dead axle Ø5, shouldered, M4 end | External circlip DIN 471, Ø5 | none | Thrust washer 5.2x13, bronze | none | none | none | none | none | none |
 | C | J10 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to side frame | 2 x Internal circlip DIN 472, Ø19; End washer 5.4x18, holds the crank on the shaft end; Countersunk M5 x 12 (ISO 10642) | Feather key 3 x 3 x 7 (DIN 6885); Feather key 3 x 3 x 5 (DIN 6885) | Inner-race spacer 10.2x13; Thrust washer 10.2x18, bronze; Wave washer 14.5x18.8, spring steel | none | none | none | none | none | none |
 | O | J10 | slider-dyad | – | – | Dead axle Ø12, shouldered, M10 end | External circlip DIN 471, Ø12 | none | Thrust washer 12.2x20, bronze | none | none | none | none | none | none |
@@ -206,14 +206,14 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
 | DL-A | 53 | 716 | 2 |
-| DL-B | 0 | 417 | 2.27 |
+| DL-B | 0 | 367 | 2.27 |
 | DL-C | 0 | 0 | 2.26 |
-| DL-D | 21 | 0 | 2.17 |
+| DL-D | 19 | 0 | 2.17 |
 | DL-E | 9 | 1 | 1.75 |
 | DL-F | 0 | 0 | 1.74 |
 | DL-G | 0 | 0 | 1.75 |
 | DL-H | 8 | 0 | 2.07 |
-| never | 143 | 193 | 1.82 |
+| never | 138 | 195 | 1.82 |
 
 ## Promotion candidates
 None from a hand fix. Engine work of this pass, in the library: the cam-rocker block (src/kin/steps/camrocker.ts: a plate
@@ -225,7 +225,7 @@ names (`heldBy`: a side frame, a dead axle standing in it or a live shaft in a c
 check's rigid inverse made a true inverse. Polish exceptions (R7): materials of the scenery and the props' explode groups (above).
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 41.7 KB
+check: clean · K1 residual: 4.3e-14 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 40.9 KB
 screenshots: the shot set in both sheets (record view VIEW 300 24, PLAN, FRONT, SIDE, ISOMETRIC, section cam, full explode),
 a close-up of the drive on its side frame, and the six phases at 0 to 300 degrees, looked at by eye against the concept sheet (out of the repository, in the pass's PR) ·
 bench: desktop, frames at 28 deg 1.8 ms paced, explode 1.5 ms, setup 69.2 ms (over the 20 ms target, a flag; 59.6 ms of it the

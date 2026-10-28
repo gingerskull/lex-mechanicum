@@ -78,7 +78,7 @@
     "build": {
       "ground": "the coffin on its turned legs, the base, the side frame and the hip bracket; the lid hinge O level with the coffin's rim beyond its head end, the crank centre C 50 mm below it, the rocker pivot G and the hip shaft H",
       "defining_relations": "Lever extremes where the crank is square to the slot: cos β = r/d, β = 53.13° with r = 30 and d = 50. Slam stroke 2β = 106.3° of crank, opening stroke 360° − 2β = 253.7°, time ratio 2.39:1. Lever swing 2 asin(r/d) = 73.74°. Peak lever speed per unit crank speed r/(d − r) = 1.5 on the slam, r/(d + r) = 0.375 on the opening, a factor of 4. Cam, in crank degrees from shut: cycloidal rise from 140° to 212°, dwell to 240°, cycloidal return by 262°. The roller centre stands at the pitch radius rb + s from C (base circle 28 mm, roller 5 mm, lift 12.7 mm) on the arc of the rocker's 32 mm arm about G, so the rocker turns where the two circles meet; the cam's outline is the roller's envelope on that path. The four-bar G, E, F, H (rocker output arm 52 mm at 150° to the roller arm, link 35.4 mm, hip arm 16 mm) turns the swing into 72° at the hip, its transmission angle never under 61°.",
-      "notes": "The input counts from 159° of crank past shut, so the drawing opens with the lid high and the occupant up; the lid and occupant angles read from shut and from lying. Range: crank 360° continuous; lid from 0° (shut) to 73.7° open; occupant from 0° (lying) to 72° (up), fully up from 212° to 240° of crank and lying again by 262°. Lever angle = atan2(−d + r sin θ, r cos θ); lid open = −53.13° − lever angle. The crank turns the way that puts the long arc on the opening. The roller is nearest O at mid-slam, so the slot reaches 14 mm from O. The cam and rocker differ from the first concept's (base 14 mm, lift 18.3 mm, arms 28 and 38 mm): that cam's pressure angle reached 69° on the rise and its outline undercut the roller; a 28 mm base circle and longer arms keep it under 22° with no undercut, and keep the cam's lobe clear of the rocker's axle. The hip shaft stands 106 mm from the hinge, 6 mm further than the concept's, so the occupant's collar clears the open lid by 18.5 mm, not 13. The drive sits close against the drive-side wall on a side frame: the lid hinge's and the rocker's axles stand in it and the crank shaft runs in a housing on its coffin side, with the motor beyond the head end; the hip arm turns on an axle in a small bracket outboard, and a tube on it carries the figure through the side frame and the coffin wall."
+      "notes": "The input counts from 159° of crank past shut, so the drawing opens with the lid high and the occupant up; the lid and occupant angles read from shut and from lying. Range: crank 360° continuous; lid from 0° (shut) to 73.7° open; occupant from 0° (lying) to 72° (up), fully up from 212° to 240° of crank and lying again by 262°. Lever angle = atan2(−d + r sin θ, r cos θ); lid open = −53.13° − lever angle. The crank turns the way that puts the long arc on the opening. The roller is nearest O at mid-slam, so the slot reaches 14 mm from O. The cam and rocker differ from the first concept's (base 14 mm, lift 18.3 mm, arms 28 and 38 mm): that cam's pressure angle reached 69° on the rise and its outline undercut the roller; a 28 mm base circle and longer arms keep it under 22° with no undercut, and keep the cam's lobe clear of the rocker's axle. The hip shaft stands 106 mm from the hinge, 6 mm further than the concept's, so the occupant's collar clears the open lid by 18.5 mm, not 13. The drive sits close against the drive-side wall on a side frame: the lid hinge's and the rocker's axles stand in it and the crank shaft runs in a housing on its coffin side, with the motor beyond the head end; the hip arm turns on an axle in a small bracket outboard, hung on two standoffs from the side frame, and a tube on it carries the figure through the side frame and the coffin wall."
     },
     "kin": {
       "bodies": [
@@ -117,7 +117,8 @@
             "joint": "C"
           },
           "above": [
-            "lever"
+            "lever",
+            "occupant"
           ]
         },
         {
@@ -1401,7 +1402,7 @@
                 ],
                 "origin": [
                   4.14,
-                  -83,
+                  -86,
                   129.567
                 ],
                 "z": [
@@ -1414,7 +1415,7 @@
                   0,
                   -0.753
                 ],
-                "thick": 56,
+                "thick": 59,
                 "fillet": 0,
                 "kind": "shaft",
                 "name": "Lid arm, a round bar from the lever to the lid's cheek, pinned at both ends"
@@ -1492,7 +1493,7 @@
               ],
               [
                 -45.033321,
-                26
+                -26
               ]
             ],
             "boss": 7
@@ -3822,7 +3823,7 @@
                 ],
                 "origin": [
                   -106,
-                  -73,
+                  -86,
                   70
                 ],
                 "z": [
@@ -3835,7 +3836,7 @@
                   0,
                   0
                 ],
-                "thick": 61.5,
+                "thick": 74.5,
                 "fillet": 0,
                 "kind": "shaft",
                 "name": "Hip tube, fixed in the hip arm: carries the figurine through the side frame and the coffin wall"
@@ -17291,8 +17292,20 @@
                 96
               ],
               [
-                -128,
+                -130,
                 96
+              ],
+              [
+                -150,
+                84
+              ],
+              [
+                -150,
+                56
+              ],
+              [
+                -128,
+                44
               ]
             ],
             "thickness": 6,
@@ -17349,55 +17362,360 @@
             "exact": true,
             "outline": [
               [
-                -124,
-                46
+                -106,
+                60
               ],
               [
-                -88,
-                46
+                -103.412,
+                60.341
               ],
               [
-                -88,
-                82
+                -101,
+                61.34
               ],
               [
-                -94,
-                88
+                -98.929,
+                62.929
               ],
               [
-                -118,
-                88
+                -97.34,
+                65
               ],
               [
-                -124,
-                82
+                -96.341,
+                67.412
+              ],
+              [
+                -96,
+                70
+              ],
+              [
+                -96.341,
+                72.588
+              ],
+              [
+                -97.34,
+                75
+              ],
+              [
+                -98.929,
+                77.071
+              ],
+              [
+                -101,
+                78.66
+              ],
+              [
+                -103.412,
+                79.659
+              ],
+              [
+                -106,
+                80
+              ],
+              [
+                -140,
+                80
+              ],
+              [
+                -142.588,
+                79.659
+              ],
+              [
+                -145,
+                78.66
+              ],
+              [
+                -147.071,
+                77.071
+              ],
+              [
+                -148.66,
+                75
+              ],
+              [
+                -149.659,
+                72.588
+              ],
+              [
+                -150,
+                70
+              ],
+              [
+                -149.659,
+                67.412
+              ],
+              [
+                -148.66,
+                65
+              ],
+              [
+                -147.071,
+                62.929
+              ],
+              [
+                -145,
+                61.34
+              ],
+              [
+                -142.588,
+                60.341
+              ],
+              [
+                -140,
+                60
               ]
             ],
             "thickness": 6,
-            "fillet": 4,
-            "posts": [
+            "fillet": 0.5,
+            "posts": [],
+            "pieces": [
               {
-                "at": [
-                  -117,
-                  -95
+                "id": "standoff0",
+                "outline": [
+                  [
+                    4,
+                    0
+                  ],
+                  [
+                    3.864,
+                    1.035
+                  ],
+                  [
+                    3.464,
+                    2
+                  ],
+                  [
+                    2.828,
+                    2.828
+                  ],
+                  [
+                    2,
+                    3.464
+                  ],
+                  [
+                    1.035,
+                    3.864
+                  ],
+                  [
+                    0,
+                    4
+                  ],
+                  [
+                    -1.035,
+                    3.864
+                  ],
+                  [
+                    -2,
+                    3.464
+                  ],
+                  [
+                    -2.828,
+                    2.828
+                  ],
+                  [
+                    -3.464,
+                    2
+                  ],
+                  [
+                    -3.864,
+                    1.035
+                  ],
+                  [
+                    -4,
+                    0
+                  ],
+                  [
+                    -3.864,
+                    -1.035
+                  ],
+                  [
+                    -3.464,
+                    -2
+                  ],
+                  [
+                    -2.828,
+                    -2.828
+                  ],
+                  [
+                    -2,
+                    -3.464
+                  ],
+                  [
+                    -1.035,
+                    -3.864
+                  ],
+                  [
+                    0,
+                    -4
+                  ],
+                  [
+                    1.035,
+                    -3.864
+                  ],
+                  [
+                    2,
+                    -3.464
+                  ],
+                  [
+                    2.828,
+                    -2.828
+                  ],
+                  [
+                    3.464,
+                    -2
+                  ],
+                  [
+                    3.864,
+                    -1.035
+                  ]
                 ],
-                "top": 46,
-                "r": 5
+                "origin": [
+                  -124,
+                  -95,
+                  70
+                ],
+                "z": [
+                  0,
+                  1,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 57,
+                "fillet": 0,
+                "kind": "standoff",
+                "name": "Standoff Ø8, hip bracket to side frame, M4 each end"
               },
               {
-                "at": [
-                  -95,
-                  -95
+                "id": "standoff1",
+                "outline": [
+                  [
+                    4,
+                    0
+                  ],
+                  [
+                    3.864,
+                    1.035
+                  ],
+                  [
+                    3.464,
+                    2
+                  ],
+                  [
+                    2.828,
+                    2.828
+                  ],
+                  [
+                    2,
+                    3.464
+                  ],
+                  [
+                    1.035,
+                    3.864
+                  ],
+                  [
+                    0,
+                    4
+                  ],
+                  [
+                    -1.035,
+                    3.864
+                  ],
+                  [
+                    -2,
+                    3.464
+                  ],
+                  [
+                    -2.828,
+                    2.828
+                  ],
+                  [
+                    -3.464,
+                    2
+                  ],
+                  [
+                    -3.864,
+                    1.035
+                  ],
+                  [
+                    -4,
+                    0
+                  ],
+                  [
+                    -3.864,
+                    -1.035
+                  ],
+                  [
+                    -3.464,
+                    -2
+                  ],
+                  [
+                    -2.828,
+                    -2.828
+                  ],
+                  [
+                    -2,
+                    -3.464
+                  ],
+                  [
+                    -1.035,
+                    -3.864
+                  ],
+                  [
+                    0,
+                    -4
+                  ],
+                  [
+                    1.035,
+                    -3.864
+                  ],
+                  [
+                    2,
+                    -3.464
+                  ],
+                  [
+                    2.828,
+                    -2.828
+                  ],
+                  [
+                    3.464,
+                    -2
+                  ],
+                  [
+                    3.864,
+                    -1.035
+                  ]
                 ],
-                "top": 46,
-                "r": 5
+                "origin": [
+                  -140,
+                  -95,
+                  70
+                ],
+                "z": [
+                  0,
+                  1,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 57,
+                "fillet": 0,
+                "kind": "standoff",
+                "name": ""
               }
             ]
           },
           "frame": {
             "origin": [
               0,
-              -92,
+              -95,
               0
             ],
             "z": [
@@ -17421,7 +17739,7 @@
           "b": "rocker",
           "at": [
             -34,
-            -89,
+            -92,
             30
           ],
           "axis": [
@@ -17439,7 +17757,7 @@
           "b": "crank",
           "at": [
             0,
-            -89,
+            -92,
             60
           ],
           "axis": [
@@ -17457,7 +17775,7 @@
           "b": "cam",
           "at": [
             0,
-            -89,
+            -92,
             60
           ],
           "axis": [
@@ -17474,7 +17792,7 @@
           "b": "lever",
           "at": [
             -15.955307144117441,
-            -89,
+            -92,
             34.59472153396317
           ],
           "axis": [
@@ -17485,12 +17803,12 @@
           "slot": {
             "from": [
               -2.8981488456091347,
-              -89,
+              -92,
               96.30325829736523
             ],
             "to": [
               -17.80291433731327,
-              -89,
+              -92,
               25.86287239810069
             ]
           },
@@ -17503,7 +17821,7 @@
           "b": "lever",
           "at": [
             0,
-            -89,
+            -92,
             110
           ],
           "axis": [
@@ -17521,7 +17839,7 @@
           "b": "roller",
           "at": [
             -2.2856782772557818,
-            -89,
+            -92,
             25.733643513924974
           ],
           "axis": [
@@ -17538,7 +17856,7 @@
           "b": "cam",
           "at": [
             -2.2856782772557818,
-            -89,
+            -92,
             25.733643513924974
           ],
           "axis": [
@@ -17548,7 +17866,7 @@
           ],
           "ca": [
             0,
-            -89,
+            -92,
             60
           ],
           "follower": "roller",
@@ -17590,7 +17908,7 @@
           "b": "link",
           "at": [
             -75.16487380305892,
-            -89,
+            -92,
             61.77189268485958
           ],
           "axis": [
@@ -17606,7 +17924,7 @@
           "b": "occupant",
           "at": [
             -109.77097524247804,
-            -89,
+            -92,
             54.45073166606809
           ],
           "axis": [
@@ -17622,7 +17940,7 @@
           "b": "occupant",
           "at": [
             -106,
-            -89,
+            -92,
             70
           ],
           "axis": [
@@ -17631,7 +17949,7 @@
             0
           ],
           "heldBy": "hip-bracket",
-          "note": "the hip axle, standing in a bracket outboard of the hip arm; a tube on the hip arm carries the figure through the side frame and the coffin wall"
+          "note": "the hip axle, standing in a bracket outboard of the hip arm, hung on two standoffs from the side frame; a tube on the hip arm carries the figure through the side frame and the coffin wall"
         }
       ],
       "params": [
@@ -17776,7 +18094,7 @@
           "local": [
             -96.4,
             127.7,
-            89
+            92
           ]
         },
         {
@@ -17785,7 +18103,7 @@
           "local": [
             -25.650648,
             -67.550772,
-            89
+            92
           ]
         }
       ],
@@ -17937,7 +18255,7 @@
           "label": "SLAM 106.3°"
         }
       ],
-      "view": "VIEW 300 24",
+      "view": "VIEW 330 20",
       "views": [
         {
           "id": "cam",
