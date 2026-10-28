@@ -1,8 +1,8 @@
 # Mechanism standard
 
 ```
-version: 3.11
-date: 2026-10-25
+version: 3.12
+date: 2026-10-28
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
 
@@ -81,7 +81,7 @@ citing their ids. Every requirement id falls under exactly one law, so a new req
 | Law | Rule | Sections | Requirements |
 |---|---|---|---|
 | I | **One procedure.** Every mechanism is made and kept by the conformance pass; the standard is versioned and each audit sheet records its pass. | 0, 1, 11 | S1 to S6 |
-| II | **The record is the source.** Facts, prose, tags and links come from the catalogue record v3, and the page reads them by id. | 2 | P1 to P13 |
+| II | **The record is the source.** Facts, prose, tags and links come from the catalogue record v3, and the page reads them by id. | 2 | P1 to P14 |
 | III | **The kinematics are the truth.** Declared in `kin`, solved by the blocks, verified by the loop closure, and never changed by what is built round them. | 3 | K1 to K12 |
 | IV | **It teaches its principle.** Mechanics first: traces, overlays, views, controls and the time map chosen so the lesson reads, and the text matches the motion. | 3a | T1 to T9, T13 to T15 |
 | V | **The principle stays in sight.** What covers it is drawn see-through, supports move aside and are never removed, same-role parts differ by pattern, and depth order holds. | 3a | T10 to T12, T16, T17 |
@@ -159,8 +159,8 @@ from the catalogue entry with the same id.
 | P2 | Facets use the controlled vocabularies of the record spec, exact spelling. | DATA | catalogue validator |
 | P3 | **At a glance:** ratio (kind, class, typical), axis relation, output character, backdrivable, other names, plus family, motion, level, dof, and the drive (motorised or hand operated, section 8). | DATA / SITE | page |
 | P4 | **Tags grouped** into Function, Property and Application, keywords underneath. | DATA | page |
-| P5 | **Explanation:** how it moves, forces, benefits, limits; then where you'll find it: 2 to 4 real-world uses, each with one line. | DATA | page |
-| P6 | **Links:** references (Wikipedia plus at least one hard source) and photos and video (at least one video of the real thing, one photo page). In the real world: YouTube videos of real products or machines at work, never animations or renders; none rather than a wrong one. Only URLs that were actually found. | DATA | page |
+| P5 | **Explanation:** how it moves, forces, benefits, limits; then where you'll find it: 2 to 4 real-world uses, each with one line. A fictional mechanism's uses may be invented (P14). | DATA | page |
+| P6 | **Links:** references (Wikipedia plus at least one hard source) and photos and video (at least one video of the real thing, one photo page). In the real world: YouTube videos of real products or machines at work, never animations or renders; none rather than a wrong one. Only URLs that were actually found. A fictional mechanism has generated images instead (P14). | DATA | page |
 | P7 | The page reads the catalogue by id at build time. No prose in `polish.ts`; the page's prose and the teaching labels come from the record. | SITE / HAND | lint: no text fields in polishes |
 | P8 | **Not on the page:** no parts list, no "how it is built" section, no joint sections. | SITE | page |
 | P9 | Explanation text matches what the code does (dwell, ratio, swing, stroke). The numbers it states are `teaching.claims`, checked by T9. | AUTO check / HAND | claim table; read `explain` against `solve()` and the plot |
@@ -168,6 +168,7 @@ from the catalogue entry with the same id.
 | P11 | Prose: plain language, short sentences, no em dashes, mm and degrees. | DATA | read |
 | P12 | **Record v3 validates.** The `kin` block (bodies, joints with 3D axes, drivers, branch, points, outputs, design, ranges) and the `teaching` block (principle, traces, overlays, views, controls, time map, claims, exceptions) pass the schema and the cross-checks of the record spec: every joint's bodies exist, every point a trace or overlay names exists, every control maps to a driver or a design parameter. | DATA / AUTO (validator) | catalogue validator |
 | P13 | **The unbuilt and the late get the teaching review first.** A mechanism not yet built, and one that landed after the original review, passes the review of T2 against its record, with its decisions written into the record, before it is built or rebuilt. | HAND | `teaching:` line of the audit |
+| P14 | **Fictional mechanisms.** A record with a `season` block is a fictional seasonal mechanism (record spec, "Seasonal records"; the seasonal catalogue `data/catalog/holiday-catalogue.md`): a real principle with true kinematics, dressed for a holiday, and listed on the site only around it. For it the teaching test's rule of no real-world context (T1) and T15 are lifted, so its scenery (a coffin, a row of candles) and its teaching strings may be themed; its uses (P5) may be invented; its links (P6) are replaced by 2 to 4 generated images of the mechanism in its invented setting; and festive decoration is welcome on its scenery and themed parts, which lifts D6, D7 and the list excluded on sight in section 6.0. Nothing else is waived: the kinematics, the checks and the rest of the conformance pass hold as for any mechanism, and decoration never hides a principle part (T3, T10). | DATA / HAND | catalogue validator; review |
 
 Joint notes, badges and build rules (A16) are still written, as part of the polish's reasons or the audit: they are the
 engineering record the audit reads and they explain the build to whoever works on it next. They are not shown on the page.
@@ -220,7 +221,7 @@ recorded in the record's `teaching` block so the text, the parameters and the dr
 
 | Id | Requirement | Tier | Verify |
 |---|---|---|---|
-| T1 | **The teaching test.** The motion and the mechanism must be easy to understand and good for teaching the principle: mechanics first, with no real-world usage context (the Walschaerts gear without the locomotive). How textbooks, 507 Mechanisms and common animations show it is a reference to compare against, **not a requirement**: artistic interpretation is welcome when the principle reads at least as well. It is a review judgement, never a hard check. | HAND | the review of T2 |
+| T1 | **The teaching test.** The motion and the mechanism must be easy to understand and good for teaching the principle: mechanics first, with no real-world usage context (the Walschaerts gear without the locomotive). How textbooks, 507 Mechanisms and common animations show it is a reference to compare against, **not a requirement**: artistic interpretation is welcome when the principle reads at least as well. It is a review judgement, never a hard check. A fictional mechanism: P14. | HAND | the review of T2 |
 | T2 | **A teaching review runs in every conformance pass**, before the build and again on the finished drawing, with a verdict of keep, tweak or rethink and every decision written into the record. The method: six phases drawn from the solved motion, the solve checks (strokes, ratios, dwell, straightness), and the text read against the motion (T9). Mechanisms that landed after the original review, and every later one, get the same method. | HAND | `teaching:` line of the audit |
 | T3 | **Principle parts are declared.** The record's `teaching.principle` lists the bodies and points that carry the principle. They are drawn on top, whole and in depth order, whatever hardware surrounds them (T10 to T12). | DATA | validator |
 | T4 | **Teaching traces** show the phenomenon: the point whose path is the principle (the cycloid of a planet point, both ends of a coupler, both crank circles, the full figure eight), with ticks at equal time where the speed variation is the lesson, and ghost paths for settings the viewer does not have selected. The first trace gets the comet. A wrong point traced is a teaching defect. | DATA | review |
@@ -234,7 +235,7 @@ recorded in the record's `teaching` block so the text, the parameters and the dr
 | T12 | **Posts and plates are never removed** to uncover the principle. A different construction (a fork end, a part drawn underneath) is allowed only in rare, individual cases, decided in that mechanism's issue and recorded in `teaching.exceptions` with its reason. | HAND | audit: solid count of support parts unchanged |
 | T13 | **A time map** re-parametrises playback near a feature that would otherwise go by in a blink (an escapement's engagement, a snap). It changes the speed of the animation only, never the kinematics (K1) or the swing, and the plot's horizontal axis stays the true input. | DATA | `teaching.timeMap`, shots |
 | T14 | **Controls.** Every driver, selector and design parameter the lesson turns on is a declared control with range and default (a die position, a gear selector, a bend angle, the offset). A control never sweeps by itself: at fixed controls the cycle repeats (K2). Ghost traces show the settings that are not selected. | DATA / HAND | `teaching.controls` |
-| T15 | **Mechanics first.** The record's teaching strings (labels, trace names, overlay captions) state the mechanism, never its use. Real-world context lives only in `examples` and `real_world`. | HAND | read |
+| T15 | **Mechanics first.** The record's teaching strings (labels, trace names, overlay captions) state the mechanism, never its use. Real-world context lives only in `examples` and `real_world`. A fictional mechanism: P14. | HAND | read |
 | T16 | **Same-role parts are told apart by pattern and stacking, never by hue** (the Schmidt coupling's two link sets): a role pattern variant or an index mark, not a colour. | STYLE / HAND | theme switch |
 | T17 | **Principle parts are never drawn out of depth order.** No effect that favours them may break the depth buffer (SD1 of the style reference): visibility comes from T10 to T12, never from a depth bias. | AUTO | renderer test |
 
@@ -252,12 +253,12 @@ forms, reused everywhere.
 | D3 | Roles told apart by surface pattern and tone, never hue. | STYLE | theme switch |
 | D4 | Consistent radii: base-plate corners from the form style; feet and corner standoffs concentric with the corner arcs. | AUTO | screenshot |
 | D5 | **Solid, designed mounts** over scattered standoffs: one bracket, bridge or post pair, shaped as a part. | HAND (shape) / AUTO (`H.bridge`) | review |
-| D6 | **Nothing cosmetic distracts.** Supporting elements read quieter than the mechanism but stay clearly visible. | HAND + STYLE | screenshots |
+| D6 | **Nothing cosmetic distracts.** Supporting elements read quieter than the mechanism but stay clearly visible. A fictional mechanism's festive decoration: P14. | HAND + STYLE | screenshots |
 | D8 | **A part is a profile, an operation and a 3D frame.** Its outline (the profile, with its holes) is swept by one operation: **extrude** (a plate, a link, a rail), **revolve** (a shaft, a disc on edge, a cone), **sweep** (a helix, a thread, a rope groove, a chain path), or **loft** (a bevel or hypoid tooth, a tapered form), with a taper or twist where the operation allows. The 3D frame places the part: its origin and axes in the base's coordinates, fixed, or posed each phase by a solved body or frame. A part on an x or y axis, or on none (a universal joint's cross, a swash plate, a Rzeppa cage), is simply a part whose frame says so; no axis flag, no plane. Holes and grooves are subtractions; the solid is built by Manifold in Node at build time, watertight, with hole walls tagged. Layers, `dz` and `twin` do not exist. | AUTO (the builders, `tools/check` reports `SOLID`) / HAND (which operation a part needs) | `tools/check` |
 | D9 | **Members that change shape**, cheapest first: a **stretched** solid between two solved points, its profile given at unit length (a rope span, a spring); **conveyed** small rigid solids carried along a fixed closed path by a solved travel (chain rollers and links, belt teeth); a **deforming** profile regenerated each frame from the solved state, with the same point count per ring and its holes deforming with it (a flexspline, a CVT's V-belt band), extruded or revolved only, never boolean, for a few solids only. A flexure's neck is drawn rigid; its bend and stress zone are a `bend` overlay of the flexure block. | AUTO (the placements; the bench counts deforming solids) / HAND (which a mechanism needs) | screenshot, bench |
 | D10 | **Geometry is shipped by operation.** Package v2 carries the **profile and operation** for a plain extrusion or revolution (the browser turns it into triangles) and a **mesh** only for a boolean result (a bored gear, a grooved cylinder), quantised to 1/64 mm. A part that could be a profile is never shipped as a mesh. | AUTO | `tools/package`: sizes per kind |
 | D11 | **Solids are sound.** Every solid is a closed manifold of non-zero volume, every hole wall belongs to its hole, no part is a zero-thickness sheet. | AUTO check | `tools/check`: `SOLID` |
-| D7 | **The big parts stay plain.** Bars, plates, wheels, brackets and the base carry only load-driven shape (D2) and manufacturing evidence (section 7). All richness is in what makes the mechanism move and hold: shafts, bearings, clips, spacers, keys, screws, nuts, springs, stops, adjusters, oilers, marks, sensors. | HAND | review |
+| D7 | **The big parts stay plain.** Bars, plates, wheels, brackets and the base carry only load-driven shape (D2) and manufacturing evidence (section 7). All richness is in what makes the mechanism move and hold: shafts, bearings, clips, spacers, keys, screws, nuts, springs, stops, adjusters, oilers, marks, sensors. A fictional mechanism's festive decoration: P14. | HAND | review |
 
 ---
 
@@ -451,7 +452,8 @@ physical consequence; (2) kinematics untouched (K1); (3) zero clashes (A15); (4)
 about 1 mm on screen with no outline of its own becomes one mark or nothing.
 
 **Excluded on sight**, even though watches have them: Côtes de Genève, perlage, decorative anglage, blued screws as
-colour, sunburst finishes, engraved names or logos, skeletonising for looks.
+colour, sunburst finishes, engraved names or logos, skeletonising for looks. A fictional mechanism's scenery and themed
+parts: P14.
 
 Every admitted solid carries a **detail level** (section 9b) so the drawing can be scaled on slow devices without
 changing what the mechanism is.
@@ -919,6 +921,12 @@ these decisions started from is kept in `docs/teaching-review.md`.
 
 ## Changelog
 
+- **3.12 (2026-10-28).** Fictional mechanisms: a record with a `season` block is a fictional seasonal mechanism, a
+  real principle dressed for a holiday. For it the teaching test's rule of no real-world context and the mechanics-first
+  strings are lifted, its uses may be invented, generated images take the place of its links, and festive decoration is
+  welcome on its scenery and themed parts; nothing else is waived. T1, T15, P5, P6, D6, D7 and section 6.0 point to it
+  [P14, T1, T15, P5, P6, D6, D7, DATA]. The site lists a seasonal mechanism only around its holiday, in the visitor's
+  local date, with the Seasonal folklore tag and its images in place of the links [P14, SITE].
 - **3.11 (2026-10-25).** Bevel and hypoid teeth stand on the back cone in three dimensions, set so a tooth meets a gap
   where the spiral crosses the mesh point, the pitch cone through the mesh point, a flat gear's back behind its roots,
   in Gleason proportions [J9, AUTO]. A construction body is kinematics only, and a driver on its joint is worked by hand at a knob on the body it

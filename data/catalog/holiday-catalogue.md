@@ -29,16 +29,12 @@ standard (`docs/mechanism-standard.md`, section 1), to the current standard. Thi
 step gives: the prose, the facets and the design. The build pass writes the `kin` and `teaching` blocks from it. Only
 the differences are listed here.
 
-- **Fictional, on purpose.** The names, stories and uses are invented; the mechanics are real. Seasonal mechanisms
-  carry the waiver for fictional mechanisms: the text keeps its jokes and invented uses, and the model may show its
-  themed scenery (a coffin, a soldier, a row of candles) and its decoration, which the teaching test (standard T1,
-  T15), the page's real-world content (P5, P6) and the rules against decoration otherwise rule out. Nothing else is
-  waived: the kinematics, the checks and the rest of the conformance pass hold as for any mechanism.
-- **Festive decoration, unlike the library.** Where a library mechanism is plain, a seasonal one is decorated:
+- **Fictional, on purpose.** The names, stories and uses are invented; the mechanics are real. A seasonal mechanism is
+  a fictional mechanism under the standard's P14, which says what that lifts and what still holds: here, the text
+  keeps its jokes and invented uses, and the model shows its themed scenery (a coffin, a soldier, a row of candles).
+- **Festive decoration, unlike the library.** Where a library mechanism is plain, a seasonal one is decorated (P14):
   seasonally appropriate, festive and intricate, on its scenery and themed parts. Carved panels, mouldings, handles,
   turned legs and linings; figures made like a detailed wooden or moulded figurine, with real features and costume.
-  For these mechanisms this lifts D6, D7 and the list excluded on sight in section 6.0 of the standard. The motion
-  still reads first: decoration never hides a principle part (T3, T10).
 - **Room for interpretation.** Each record's *Interpretation and hand-crafted parts* lists what is particular to it:
   the themed scenery and its decoration, the hand-crafted components no rule makes (a floating sun, a stop short of
   dead centre, a bistable release) and the marks. They are suggestions for the pass, not a fixed design. Everything else comes from
@@ -46,8 +42,8 @@ the differences are listed here.
 - **Generated images instead of links.** There is nothing real to link to, so a seasonal record has no `references`,
   `media` or `real_world`. In their place it carries 2 to 4 generated images of the mechanism in real life, made from
   the record's prompts: the mechanism at work in its invented setting. The stage draws the mechanism itself, so a
-  prompt never asks for a drawing of it.
-- **Three extra facets**, in a `season` block:
+  prompt never asks for a drawing of it. The fields are in the record spec ("Seasonal records").
+- **Three extra facets**, in a `season` block, beside the dates of each year's occurrence (record spec):
 
 | Facet | Field | Values |
 |---|---|---|
