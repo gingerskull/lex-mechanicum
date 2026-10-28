@@ -2,6 +2,9 @@
 // - M10: the themed scenery of a seasonal mechanism (P14) is made as a carved wooden toy, not as machine parts: the
 //   coffin, its turned legs and the lid in walnut, the linings and the mattress in quilted satin, the figurine in
 //   carved and painted lime wood, the lid's bump stop in neoprene. The rules' defaults name steel and aluminium.
+// - E2, E9: the carved pieces are glued to the part they decorate, so each prop comes off as one: the coffin with its
+//   walls, panels, linings and mattress (its legs and their screws stay the rules'), the lid with its panel, bat, lining,
+//   cheek and arm, and the figurine on its hub. Each piece would otherwise explode as a part of its own.
 import type { Polish } from "../../builder";
 
 export const polish: Polish = (A) => {
@@ -14,4 +17,8 @@ export const polish: Polish = (A) => {
   mat(/^lever-lid(-panel|-bat)?$/, "Walnut, carved and oiled");
   mat(/^lever-lid-lining$/, "Satin over horsehair, quilted");
   mat(/^figure-/, "Lime wood, carved and painted");
+  const group = (f: RegExp, g: string) => A.find(f).forEach((s) => A.set(s.id, { group: g }));
+  group(/^coffin(-(?!post).*)?$/, "coffin-prop");
+  group(/^lever-lid/, "lid-prop");
+  group(/^figure(-.*)?$/, "figure-prop");
 };

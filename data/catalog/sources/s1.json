@@ -78,7 +78,7 @@
     "build": {
       "ground": "the coffin on its turned legs, the base and the drive's pillow blocks; the lid hinge O level with the coffin's rim beyond its head end, the crank centre C 50 mm below it, the rocker pivot G and the hip shaft H",
       "defining_relations": "Lever extremes where the crank is square to the slot: cos β = r/d, β = 53.13° with r = 30 and d = 50. Slam stroke 2β = 106.3° of crank, opening stroke 360° − 2β = 253.7°, time ratio 2.39:1. Lever swing 2 asin(r/d) = 73.74°. Peak lever speed per unit crank speed r/(d − r) = 1.5 on the slam, r/(d + r) = 0.375 on the opening, a factor of 4. Cam, in crank degrees from shut: cycloidal rise from 140° to 212°, dwell to 240°, cycloidal return by 262°. The roller centre stands at the pitch radius rb + s from C (base circle 28 mm, roller 5 mm, lift 12.7 mm) on the arc of the rocker's 32 mm arm about G, so the rocker turns where the two circles meet; the cam's outline is the roller's envelope on that path. The four-bar G, E, F, H (rocker output arm 52 mm at 150° to the roller arm, link 35.4 mm, hip arm 16 mm) turns the swing into 72° at the hip, its transmission angle never under 61°.",
-      "notes": "Range: crank 360° continuous; lid from 0° (shut) to 73.7° open; occupant from 0° (lying) to 72° (up), fully up from 212° to 240° of crank and lying again by 262°. Lever angle = atan2(−d + r sin θ, r cos θ); lid open = −53.13° − lever angle. The crank turns the way that puts the long arc on the opening. The roller is nearest O at mid-slam, so the slot reaches 14 mm from O. The cam and rocker differ from the first concept's (base 14 mm, lift 18.3 mm, arms 28 and 38 mm): that cam's pressure angle reached 69° on the rise and its outline undercut the roller; a 28 mm base circle and longer arms keep it under 22° with no undercut, and keep the cam's lobe clear of the rocker's axle. The hip shaft stands 106 mm from the hinge, 6 mm further than the concept's, so the occupant's collar clears the open lid by 18 mm, not 13. The drive sits outboard of the drive-side wall; the hip shaft passes through it to the figure's hip."
+      "notes": "The input counts from 159° of crank past shut, so the drawing opens with the lid high and the occupant up; the lid and occupant angles read from shut and from lying. Range: crank 360° continuous; lid from 0° (shut) to 73.7° open; occupant from 0° (lying) to 72° (up), fully up from 212° to 240° of crank and lying again by 262°. Lever angle = atan2(−d + r sin θ, r cos θ); lid open = −53.13° − lever angle. The crank turns the way that puts the long arc on the opening. The roller is nearest O at mid-slam, so the slot reaches 14 mm from O. The cam and rocker differ from the first concept's (base 14 mm, lift 18.3 mm, arms 28 and 38 mm): that cam's pressure angle reached 69° on the rise and its outline undercut the roller; a 28 mm base circle and longer arms keep it under 22° with no undercut, and keep the cam's lobe clear of the rocker's axle. The hip shaft stands 106 mm from the hinge, 6 mm further than the concept's, so the occupant's collar clears the open lid by 18.5 mm, not 13. The drive sits outboard of the drive-side wall; the hip shaft passes through it to the figure's hip."
     },
     "kin": {
       "bodies": [
@@ -182,19 +182,19 @@
                   ]
                 ],
                 "origin": [
+                  1.129,
                   0,
-                  0,
-                  111.5
+                  110.988
                 ],
                 "z": [
+                  0.753,
                   0,
-                  0,
-                  1
+                  0.658
                 ],
                 "x": [
-                  1,
+                  0.658,
                   0,
-                  0
+                  -0.753
                 ],
                 "thick": 5,
                 "fillet": 1.5,
@@ -264,19 +264,19 @@
                   ]
                 ],
                 "origin": [
+                  1.129,
                   0,
-                  0,
-                  111.5
+                  110.988
                 ],
                 "z": [
+                  -0.753,
                   0,
-                  0,
-                  -1
+                  -0.658
                 ],
                 "x": [
-                  1,
+                  0.658,
                   0,
-                  0
+                  -0.753
                 ],
                 "thick": 1,
                 "fillet": 1,
@@ -314,19 +314,19 @@
                   ]
                 ],
                 "origin": [
+                  4.892,
                   0,
-                  0,
-                  116.5
+                  114.28
                 ],
                 "z": [
+                  0.753,
                   0,
-                  0,
-                  1
+                  0.658
                 ],
                 "x": [
-                  1,
+                  0.658,
                   0,
-                  0
+                  -0.753
                 ],
                 "thick": 2.5,
                 "fillet": 1,
@@ -1120,19 +1120,19 @@
                   ]
                 ],
                 "origin": [
+                  6.774,
                   0,
-                  0,
-                  119
+                  115.926
                 ],
                 "z": [
+                  0.753,
                   0,
-                  0,
-                  1
+                  0.658
                 ],
                 "x": [
-                  1,
+                  0.658,
                   0,
-                  0
+                  -0.753
                 ],
                 "thick": 1.8,
                 "fillet": 0.2,
@@ -1401,9 +1401,9 @@
                   ]
                 ],
                 "origin": [
-                  -12,
+                  4.14,
                   -80,
-                  126
+                  129.567
                 ],
                 "z": [
                   0,
@@ -1411,9 +1411,9 @@
                   0
                 ],
                 "x": [
-                  1,
+                  0.658,
                   0,
-                  0
+                  -0.753
                 ],
                 "thick": 53,
                 "fillet": 0,
@@ -1453,9 +1453,9 @@
                   ]
                 ],
                 "origin": [
-                  0,
+                  -82.787,
                   -23,
-                  0
+                  37.569
                 ],
                 "z": [
                   0,
@@ -1463,9 +1463,9 @@
                   0
                 ],
                 "x": [
-                  1,
+                  0.658,
                   0,
-                  0
+                  -0.753
                 ],
                 "thick": 4,
                 "fillet": 1.5,
@@ -1659,19 +1659,19 @@
                   ]
                 ],
                 "origin": [
+                  0.677,
                   0,
-                  0,
-                  58
+                  69.831
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 6,
                 "fillet": 0.3,
@@ -1808,19 +1808,19 @@
                   ]
                 ],
                 "origin": [
+                  0.011,
                   0,
-                  0,
-                  64
+                  75.794
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 1,
                 "fillet": 0.3,
@@ -1859,19 +1859,19 @@
                   ]
                 ],
                 "origin": [
+                  0.011,
                   0,
-                  0,
-                  64
+                  75.794
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 1,
                 "fillet": 0.3,
@@ -1954,19 +1954,19 @@
                   ]
                 ],
                 "origin": [
+                  0.011,
                   0,
-                  0,
-                  64
+                  75.794
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 12,
                 "fillet": 0.3,
@@ -2283,19 +2283,19 @@
                   ]
                 ],
                 "origin": [
+                  -0.044,
                   0,
-                  0,
-                  64.5
+                  76.291
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 13,
                 "fillet": 0.3,
@@ -2816,19 +2816,19 @@
                   ]
                 ],
                 "origin": [
+                  -1.319,
                   0,
-                  0,
-                  76
+                  87.72
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 3,
                 "fillet": 0.3
@@ -2926,19 +2926,19 @@
                   ]
                 ],
                 "origin": [
+                  -1.319,
                   0,
-                  0,
-                  76
+                  87.72
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 3,
                 "fillet": 0.3
@@ -3036,19 +3036,19 @@
                   ]
                 ],
                 "origin": [
+                  -1.652,
                   0,
-                  0,
-                  79
+                  90.701
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 3,
                 "fillet": 0.3,
@@ -3174,19 +3174,19 @@
                   ]
                 ],
                 "origin": [
+                  -1.708,
                   0,
-                  0,
-                  79.5
+                  91.198
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 3,
                 "fillet": 0.3,
@@ -3316,19 +3316,19 @@
                   ]
                 ],
                 "origin": [
+                  -1.985,
                   0,
-                  0,
-                  82
+                  93.683
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 1.6,
                 "fillet": 0.3,
@@ -3431,19 +3431,19 @@
                   ]
                 ],
                 "origin": [
+                  -2.04,
                   0,
-                  0,
-                  82.5
+                  94.18
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 1.5,
                 "fillet": 0.3,
@@ -3526,19 +3526,19 @@
                   ]
                 ],
                 "origin": [
+                  -1.319,
                   0,
-                  0,
-                  76
+                  87.72
                 ],
                 "z": [
+                  -0.111,
                   0,
-                  0,
-                  1
+                  0.994
                 ],
                 "x": [
-                  1,
+                  0.994,
                   0,
-                  0
+                  0.111
                 ],
                 "thick": 3.5,
                 "fillet": 0.3,
@@ -17053,9 +17053,9 @@
           "a": "crank",
           "b": "lever",
           "at": [
-            24.000000000000004,
+            -15.955307144117441,
             -86,
-            78
+            34.59472153396317
           ],
           "axis": [
             0,
@@ -17064,14 +17064,14 @@
           ],
           "slot": {
             "from": [
-              8.400000000000002,
+              -2.8981488456091347,
               -86,
-              98.8
+              96.30325829736523
             ],
             "to": [
-              51.60000000000001,
+              -17.80291433731327,
               -86,
-              41.2
+              25.86287239810069
             ]
           },
           "note": "the crank pin's track roller in the lever's slot"
@@ -17101,9 +17101,9 @@
           "a": "rocker",
           "b": "roller",
           "at": [
-            -2.1345037664283133,
+            -2.2856782772557818,
             -86,
-            27.06910426861876
+            25.733643513924974
           ],
           "axis": [
             0,
@@ -17118,9 +17118,9 @@
           "a": "roller",
           "b": "cam",
           "at": [
-            -2.1345037664283133,
+            -2.2856782772557818,
             -86,
-            27.06910426861876
+            25.733643513924974
           ],
           "axis": [
             0,
@@ -17160,7 +17160,7 @@
             ],
             "lift": 12.744526,
             "rb": 33,
-            "theta0": 0
+            "theta0": 159
           },
           "note": "at is the roller centre on the prime circle (base 14 + roller 5); the rocker swings it out along its arc as the pitch radius grows"
         },
@@ -17170,9 +17170,9 @@
           "a": "rocker",
           "b": "link",
           "at": [
-            -76.46268223726719,
+            -75.16487380305892,
             -86,
-            60.015339698508726
+            61.77189268485958
           ],
           "axis": [
             0,
@@ -17186,9 +17186,9 @@
           "a": "link",
           "b": "occupant",
           "at": [
-            -111.4723222932107,
+            -109.77097524247804,
             -86,
-            54.964918067425465
+            54.45073166606809
           ],
           "axis": [
             0,
@@ -17396,8 +17396,8 @@
           "id": "crown",
           "body": "figure",
           "local": [
-            1,
-            72.25,
+            9.007283,
+            71.693315,
             86
           ]
         }
@@ -17407,13 +17407,15 @@
           "id": "lid-angle",
           "of": "lever",
           "kind": "angle",
-          "unit": "deg"
+          "unit": "deg",
+          "datum": -48.81712255240286
         },
         {
           "id": "occupant-angle",
           "of": "occupant",
           "kind": "angle",
-          "unit": "deg"
+          "unit": "deg",
+          "datum": -6.367939226033769
         },
         {
           "id": "pressure-angle",
@@ -17552,19 +17554,25 @@
       "views": [
         {
           "id": "cam",
-          "kind": "detail",
-          "center": [
-            0,
-            -38,
-            60
-          ],
-          "scale": 2.4,
+          "kind": "section",
+          "plane": {
+            "origin": [
+              0,
+              -60,
+              0
+            ],
+            "normal": [
+              0,
+              -1,
+              0
+            ]
+          },
           "highlight": [
             "cam",
             "roller",
             "rocker"
           ],
-          "note": "the cam and its roller on the swinging rocker"
+          "note": "cut between the rocker and the crank: the cam, its roller and the swinging rocker"
         }
       ],
       "controls": [
@@ -17649,8 +17657,8 @@
           "output": "pressure-angle",
           "stat": "max",
           "span": [
-            140,
-            212
+            341,
+            413
           ],
           "value": 21.2,
           "tol": 0.6

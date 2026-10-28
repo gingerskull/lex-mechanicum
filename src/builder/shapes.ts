@@ -315,7 +315,8 @@ function withPieces(b: KinBody, g: BodyGeom): BodyGeom {
     const axis = (v: unknown): Vec3 | null => (Array.isArray(v) && v.length >= 3 ? v3.unit([Number(v[0]), Number(v[1]), Number(v[2])]) : null);
     const z = axis(pc.z) ?? ([R[2], R[5], R[8]] as Vec3);
     const x0 = axis(pc.x) ?? ([R[0], R[3], R[6]] as Vec3);
-    const frame = { o: [o[0]!, o[1]!, o[2] ?? 0] as Vec3, x: v3.unit(v3.sub(x0, v3.mul(z, v3.dot(x0, z)))), z };
+    // axes the record gives are made square; a rotation's are square already
+    const frame = { o: [o[0]!, o[1]!, o[2] ?? 0] as Vec3, x: pc.x || pc.z ? v3.unit(v3.sub(x0, v3.mul(z, v3.dot(x0, z)))) : x0, z };
     const id = `${b.id}-${String(pc.id ?? `piece${k}`)}`;
     // decoration takes the ornament kind; a piece that is a part of a kind of its own (a rubber bump stop) names it
     const named = SOLID_KINDS.find((k) => k === pc.kind);
