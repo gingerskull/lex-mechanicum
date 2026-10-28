@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.46.0, Mantle — 2026-10-28
+
+- The library opens on a featured sheet, shown large above the cards: while seasonal mechanisms are listed they are
+  the featured ones (several slide, with dots), otherwise one sheet picked for three days, the same for everyone. Its
+  title block fills the left of the frame (name, summary, where it is found, what it does) and its drawing, whole as
+  the stage opens it, the right; the stage's still shows first, then it moves. It steps aside while you search or
+  filter.
+- Library cards draw every line thinner in proportion to the mechanism page, the bold outlines most.
+- In the wide view, a sheet with no output plot runs its At a glance box across the whole width.
+
 ## 0.45.0, Voss — 2026-10-28
 
 - Seasonal mechanisms: fictional mechanisms dressed for a holiday, listed from three days before it to two days after

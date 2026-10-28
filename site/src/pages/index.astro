@@ -2,11 +2,13 @@
 // The library (SS1 to SS3): every drawn mechanism as a sheet of the set, built in the default order (New); the filters
 // island sorts the cards again when the visitor picks another order. The counts are the library's; a seasonal mechanism's
 // card (P14) is built hidden, and the filters island shows and counts it in its listing window only (the counts that
-// change carry data-sheets, once there is a seasonal mechanism).
+// change carry data-sheets, once there is a seasonal mechanism). Above the cards the featured slot (SS16) shows one sheet
+// large, picked in the browser for the day.
 import Sheet from "../layouts/Sheet.astro";
 import Bar from "../components/Bar.astro";
 import Facets from "../components/Facets.astro";
 import Card from "../components/Card.astro";
+import Featured from "../components/Featured.astro";
 import { APP, LIBRARY, SHEETS, VERSION, sortableOf } from "../data";
 import { DEFAULT_ORDER, sortBy } from "../sort";
 import { HINTS } from "../lore";
@@ -33,6 +35,7 @@ const live = SHEETS.length > count ? "" : undefined;
   </header>
   <Bar library set={{ name: "Mechanism Library", count, live: live !== undefined }}><Facets /></Bar>
   <main class="wrap" id="library">
+    <Featured />
     <div class="status"><span id="shown">{count} sheets</span><button id="clear" type="button" hidden>Clear filters</button></div>
     <div class="grid" id="grid">
       {sortBy(SHEETS, DEFAULT_ORDER, sortableOf).map((s) => <Card sheet={s} />)}
@@ -49,6 +52,7 @@ const live = SHEETS.length > count ? "" : undefined;
   </main>
   <script>
     import "../islands/filters";
+    import "../islands/featured";
     import "../islands/card";
   </script>
 </Sheet>

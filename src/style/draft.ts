@@ -54,8 +54,9 @@ export const DRAFT = {
   card: {
     detail: "C" as const, // detail dial position of a card drawing (DL): sharp, without wall shading or the deep layers
     refW: 320, // px, width of the canvas the card thumbnails are drawn on; a live card scales its margin to it
-    plateTopFactor: 0.7, // factor on lines.plateTop on a card
-    baseTopFactor: 0.7, // factor on lines.baseTop on a card
+    lines: 0.8, // factor on every line's width on a card, so its weights read in proportion to the mechanism page's
+    plateTopFactor: 0.6, // factor on lines.plateTop on a card
+    baseTopFactor: 0.6, // factor on lines.baseTop on a card
   },
 
   // Line hierarchy, thick to thin (SF10). Colour is ink unless a key says otherwise.

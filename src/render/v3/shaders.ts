@@ -275,6 +275,7 @@ const markKinds = 16;
 
 export const LINE_VERT = COMMON + /* glsl */ `
 uniform float uDpr;
+uniform float uLineK;           // factor on every line's width (a library card's, SD16)
 uniform int uMarkMask;
 uniform vec2 uMark[${markKinds}]; // width px, alpha per mark kind
 uniform vec2 uBaseGain;           // marks and chamfer alpha factors on the base plate
@@ -327,6 +328,8 @@ void main() {
   } else if (kind == 3) {
     if (f1 > 1e-4 && ((uMarkMask >> mark) & 1) == 1) { bw = uMark[mark].x; ba = uMark[mark].y * (base ? (mark == 1 ? uBaseGain.y : uBaseGain.x) : 1.0); }
   }
+  bw *= uLineK;
+  hw *= uLineK;
   vStyle = vec4(bw * uDpr, ba * fa, hw * uDpr, ha * fa);
   if (ba <= 0.0) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vCap = vec2(0.0); vDist = 0.0; vWl = vec3(0.0); vSeg = vec2(0.0); return; }
   vec3 A = screen(toWorld(i, aA.xyz)) * vec3(uDpr, uDpr, 1.0);

@@ -47,12 +47,14 @@ const keys = new Map<HTMLElement, Sortable>(
 );
 let order: Order = DEFAULT_ORDER;
 let sorted = cards;
-// a new order starts from the top of the list: a page scrolled further down goes back to it
+// a new order starts from the top of the list (the status line over the cards, below the featured slot): a page
+// scrolled further down goes back to it
+const list = main?.querySelector<HTMLElement>(".status") ?? main;
 const menu = sortMenu((next) => {
   arrange(next);
   apply();
-  if (!main) return;
-  const top = main.getBoundingClientRect().top + scrollY - (libbar?.offsetHeight ?? 0);
+  if (!list) return;
+  const top = list.getBoundingClientRect().top + scrollY - (libbar?.offsetHeight ?? 0);
   if (scrollY > top) scrollTo({ top });
 });
 
@@ -89,6 +91,8 @@ function apply() {
     badge.textContent = String(on.length);
   }
   if (clear) clear.hidden = on.length === 0 && words.length === 0;
+  // the featured slot (SS16) steps aside while a search or a filter is on, so the results start at the top
+  main?.classList.toggle("filtering", on.length > 0 || words.length > 0 || lore);
   if (fclear) fclear.disabled = on.length === 0 && words.length === 0;
   if (empty) empty.hidden = n > 0 || lore;
   if (sealed) {
