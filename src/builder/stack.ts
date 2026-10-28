@@ -58,6 +58,8 @@ export interface StackSpec {
    * joint of the site): the shaft runs on to them and a washer and a screw hold them on its end.
    */
   overhung?: boolean;
+  /** What the stack stands on when it is not the base (a side frame the record names): its name, for the parts' names. */
+  onto?: string;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
   /**
@@ -368,7 +370,7 @@ function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
     // a live shaft hung from its bridge (named so by the record) turns in the bridge's bushing, no housing in the base,
     // unless it is the input: the drive under the base takes its low end through the housing (an internal Geneva's crank)
     if (support === "housing" || (live && spec.base && (support !== "hung" || spec.input))) {
-      const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints });
+      const h = liveHousing(L, { id, d, bb, eccentric: spec.eccentric ?? false, joints: spec.joints, ...(spec.onto ? { onto: spec.onto } : {}) });
       shaftSpec.z0 = h.bottom - 18;
       if (spec.hold) {
         // a split clamp collar under the housing, its thumb screw holding the shaft where the setting puts it (F6)

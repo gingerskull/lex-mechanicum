@@ -20,7 +20,7 @@ import { worldManifold } from "./sweeps";
 const ECC = 3;
 
 /** The live shaft's cartridge behind the base, in the shaft's own frame (A9, F1, F2, F4). Returns the housing's lowest face. */
-export function liveHousing(L: Local, o: { id: string; d: number; bb: number; eccentric?: boolean; joints: string[] }): { bottom: number; bearing: ReturnType<typeof housingBearing> } {
+export function liveHousing(L: Local, o: { id: string; d: number; bb: number; eccentric?: boolean; joints: string[]; onto?: string }): { bottom: number; bearing: ReturnType<typeof housingBearing> } {
   const b = housingBearing(o.d);
   const top = o.eccentric ? o.bb - ECC : o.bb;
   const len = Math.max(22, 2 * b.B + 12);
@@ -34,13 +34,13 @@ export function liveHousing(L: Local, o: { id: string; d: number; bb: number; ec
   const id = o.id;
   L.add(
     H.plate(`${id}-housing`, H.disc(Rh), {
-      name: `Bearing housing Ø${2 * Rh} x ${len}, screwed and dowelled to the base`,
+      name: `Bearing housing Ø${2 * Rh} x ${len}, screwed and dowelled to the ${o.onto ?? "base"}`,
       kind: "housing",
       z0,
       z1: top,
       holes: [H.disc(b.D / 2 + 0.15), ...screwsAt.map((p) => H.disc(1.7, ...p)), ...dowelsAt.map((p) => H.disc(1.5, ...p))],
       marks: marks("boreEntry", ...screwsAt.map((p) => H.disc(head.dk / 2 + 0.3, ...p))),
-      why: "carries the live shaft in two bearings far apart, behind the base",
+      why: `carries the live shaft in two bearings far apart, behind the ${o.onto ?? "base"}`,
     }),
   );
   const lower: [number, number] = [z0 + 1, z0 + 1 + b.B];
@@ -56,7 +56,7 @@ export function liveHousing(L: Local, o: { id: string; d: number; bb: number; ec
   screwsAt.forEach((p, k) =>
     L.add(H.screw(`${id}-hsc${k}`, "socket", 3, o.bb - seat + 4.5, { at: [p[0], p[1], 0], face: seat, dir: 1, ...(k ? { name: "", qty: 0 } : { qty: 3 }) })),
   );
-  dowelsAt.forEach((p, k) => L.add(H.dowel(`${id}-hdw${k}`, 3, { at: [p[0], p[1], 0], z0: top - 6, z1: o.bb + 4, ...(k ? { name: "", qty: 0 } : { name: "Dowel pin Ø3 x 10 h6, housing to base", qty: 2 }) })));
+  dowelsAt.forEach((p, k) => L.add(H.dowel(`${id}-hdw${k}`, 3, { at: [p[0], p[1], 0], z0: top - 6, z1: o.bb + 4, ...(k ? { name: "", qty: 0 } : { name: `Dowel pin Ø3 x 10 h6, housing to ${o.onto ?? "base"}`, qty: 2 }) })));
   if (o.eccentric) {
     L.add(H.eccentric(`${id}-ecc`, o.d + 2, 2 * Rh - 10, 0.3, { z0: top, z1: o.bb, slots: sAng, slotR: Rs, why: "turned to set the mesh backlash, then clamped by the housing screws (F7)" }));
   }

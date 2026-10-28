@@ -317,7 +317,9 @@ plates of the body, each with `origin`, `rot` or the axes `x` and `z`, `thick`, 
 drawn), `windows` (polygon holes) and `guide` ([s0, s1] along a slide's axis: the length its rails hold). A disc may
 carry `rollers` (a turret's radial rollers). A ground joint may ask for its `support` (`stub`, `hung`, ...) and a shaft
 in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 against), and with `overhung: true` the shaft runs on
-past the blocks to the parts it carries there (a crank overhung on its shaft's end), a washer and a screw holding them.
+past the blocks to the parts it carries there (a crank overhung on its shaft's end), a washer and a screw holding them. A fixed joint with
+`heldBy` (a fixed body's plate square to its axis, a side frame) is held by that plate instead of a support of its own: a
+dead axle stands in it on its shoulder, a live shaft runs in a housing cartridge on its other side, the parts on one side.
 
 ### `teaching`
 

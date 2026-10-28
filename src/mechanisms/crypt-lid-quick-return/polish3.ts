@@ -4,7 +4,7 @@
 //   carved and painted lime wood, the lid's bump stop in neoprene. The rules' defaults name steel and aluminium.
 // - E2, E9: the carved pieces are glued to the part they decorate, so each prop comes off as one: the coffin with its
 //   walls, panels, linings and mattress (its legs and their screws stay the rules'), the lid with its panel, bat, lining,
-//   cheek and arm, and the figurine on its hub. Each piece would otherwise explode as a part of its own.
+//   cheek and arm, and the figurine with its pieces. Each piece would otherwise explode as a part of its own.
 import type { Polish } from "../../builder";
 
 export const polish: Polish = (A) => {
@@ -16,9 +16,9 @@ export const polish: Polish = (A) => {
   mat(/^coffin-bump$/, "Neoprene 60 Shore A");
   mat(/^lever-lid(-panel|-bat)?$/, "Walnut, carved and oiled");
   mat(/^lever-lid-lining$/, "Satin over horsehair, quilted");
-  mat(/^figure-/, "Lime wood, carved and painted");
+  mat(/^occupant-(cape|collar|body|head|arm|fore|hand|medallion)/, "Lime wood, carved and painted");
   const group = (f: RegExp, g: string) => A.find(f).forEach((s) => A.set(s.id, { group: g }));
   group(/^coffin(-(?!post).*)?$/, "coffin-prop");
   group(/^lever-lid/, "lid-prop");
-  group(/^figure(-.*)?$/, "figure-prop");
+  group(/^occupant-(cape|collar|body|head|arm|fore|hand|medallion)/, "figure-prop");
 };
