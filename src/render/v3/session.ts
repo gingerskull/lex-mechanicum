@@ -192,7 +192,7 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
         }
       }
       seeThrough(rt, boxes, C, see, seeA);
-      rows(rt, mats, { see: seeA, ladder: LD, card: !!view.card, patterns: LD.effect("rolePatterns") }, table);
+      rows(rt, mats, { see: seeA, ladder: LD, card: !!view.card, patterns: LD.effect("rolePatterns"), u }, table);
       const A: Ann = { ctx: card.ctx, w: card.w, h: card.h, C, T, rt, mats, u, explode: e, LD, cache: cache.ann };
       const ctx = card.ctx;
       ctx.setTransform(card.dpr, 0, 0, card.dpr, 0, 0);

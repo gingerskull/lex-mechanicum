@@ -6,12 +6,12 @@ import type { Package2 } from "../../package/format2";
 import { hasFlag3 } from "../../package/format2";
 import type { EdgeSet } from "../../solids/edges";
 import { mat4, type Mat4 } from "../../solids/frame";
-import { stretchMatrix } from "../../solids/convey";
+import { pathLength, stretchMatrix } from "../../solids/convey";
 import type { MeshData, Vec3 } from "../../solids/types";
 import { DRAFT, type RoleSurface, type SurfaceKey } from "../../style/draft";
 import { FORM } from "../../style/form";
 import type { Ladder } from "../detail";
-import { bake, BAKE, type Baked } from "./bake";
+import { bake, BAKE, loopLength, type Baked } from "./bake";
 import type { Item3 } from "./annotate";
 import type { Poser } from "./poser";
 
@@ -60,6 +60,11 @@ export interface Runtime {
   fixed: Uint8Array;
   /** The radius (mm) of a round solid that turns over the cycle (SD29), else 0. */
   spin: Float32Array;
+  /**
+   * The running belts' marks (SD29): per marked solid, marks per mm along it and their phase at u (in marks); for an
+   * element of a conveyed belt, `el` is the elements' spacing (mm) and the phase is where its middle is against the marks.
+   */
+  runs: { i: number; perMm: number; phase(u: number): number; el?: number }[];
   /** The role surface per solid and its pattern layer (-1 for none). */
   surface: RoleSurface[];
   pattern: Int8Array;
@@ -105,6 +110,7 @@ export function runtime(scene: Scene): Runtime {
   const rest = new Float32Array(n * 16);
   const bodies = new Set((scene.teaching?.principle ?? []).map((p) => p.body).filter((b): b is string => !!b));
   const phases = [0, 1, 2, 3.5];
+  const turning = new Uint8Array(n);
   pkg.solids.forEach((s, i) => {
     isBase[i] = hasFlag3(s, "isBase") ? 1 : 0;
     isPlate[i] = PLATE.has(s.kind) && s.role !== "trace" ? 1 : 0;
@@ -124,14 +130,92 @@ export function runtime(scene: Scene): Runtime {
     for (const u of phases) {
       const q = poser.place(s, u);
       for (let k = 0; k < 16; k++) if (Math.abs(q[k]! - M0[k]!) > 1e-6) still = 0;
-      // turning: the local x swings round (a part that only slides keeps it)
+      // turning: the local x or z swings round (a part that only slides keeps both; a ball rolling about its own x
+      // keeps x)
       const w = mulMat(q, mat4(s.fr));
       if (Math.abs(w[0]! - m[0]!) + Math.abs(w[1]! - m[1]!) + Math.abs(w[2]! - m[2]!) > 1e-3) turns = true;
+      if (Math.abs(w[8]! - m[8]!) + Math.abs(w[9]! - m[9]!) + Math.abs(w[10]! - m[10]!) > 1e-3) turns = true;
     }
     fixed[i] = still;
-    spin[i] = turns && !s.stretch ? (roundR[s.shape] ?? 0) : 0;
+    turning[i] = turns ? 1 : 0;
   });
-  return { scene, n, baked, box: baked.box, isBase, isPlate, principle, fixed, spin, surface, pattern, axis, rest };
+  // like parts handed on round a circuit (a body's `next`) are one part at as many places: they all turn if one does,
+  // since each turns only where it is on the circuit, which the few phases sampled may miss
+  const handed = new Set<string>();
+  const turned = new Set(pkg.solids.filter((_, i) => turning[i]).map((s) => s.body));
+  for (const s of pkg.solids) {
+    const ring: string[] = [];
+    for (let b: string | undefined = s.body; b && !ring.includes(b); b = poser.next?.(b)) ring.push(b);
+    if (ring.length > 1 && ring.some((b) => turned.has(b))) for (const b of ring) handed.add(b);
+  }
+  pkg.solids.forEach((s, i) => {
+    spin[i] = (turning[i] || handed.has(s.body)) && !s.stretch ? (roundR[s.shape] ?? 0) : 0;
+  });
+  return { scene, n, baked, box: baked.box, isBase, isPlate, principle, fixed, spin, runs: beltRuns(scene), surface, pattern, axis, rest };
+}
+
+/**
+ * How many marks go round a running belt L mm long that travels T mm over a cycle, and the factor on its travel that
+ * brings them back in step after the cycle (SD29): a whole number round it, spaced within `range` (`draft.spin.belt`),
+ * the count whose cycle's travel comes nearest a whole number of marks (nearest the middle of the range on a tie). The
+ * marks slip on the belt by that much, a percent or so; a belt that comes back where it started needs none.
+ */
+export function runMarks(L: number, T: number, range: readonly [number, number] = DRAFT.spin.belt): { n: number; k: number } {
+  const [p0, p1] = range;
+  const mid = (p0 + p1) / 2;
+  const near = Math.max(1, Math.round(L / mid));
+  if (Math.abs(T) < 1e-6) return { n: near, k: 1 };
+  let best = { n: near, k: Math.max(1, Math.round((T * near) / L)) / ((T * near) / L), e: Infinity };
+  for (let n = Math.max(1, Math.ceil(L / p1)); n <= Math.floor(L / p0); n++) {
+    const m = (T * n) / L;
+    const r = Math.round(m);
+    if (!r) continue;
+    const e = Math.abs(m - r) / Math.abs(m) + Math.abs(L / n - mid) * 1e-9;
+    if (e < best.e) best = { n, k: r / m, e };
+  }
+  return { n: best.n, k: best.k };
+}
+
+/** The marks of every running belt (Solid3.run): its band's, or each element's of a conveyed belt. */
+function beltRuns(scene: Scene): Runtime["runs"] {
+  const { pkg, poser } = scene;
+  const TAU = 2 * Math.PI;
+  const out: Runtime["runs"] = [];
+  // the elements of each conveyed belt, by its path
+  const count = new Map<number, number>();
+  for (const s of pkg.solids) if (s.run && !s.run.path && s.cv) count.set(s.cv.p, (count.get(s.cv.p) ?? 0) + 1);
+  pkg.solids.forEach((s, i) => {
+    if (!s.run) return;
+    const tr = s.run.tr;
+    const key = s.run.key ?? s.cv?.path?.key;
+    // its travel (mm) at phase u, counted on through whole cycles
+    let travel: (u: number) => number;
+    if (tr && tr.length > 1) {
+      const N = tr.length - 1;
+      const T = tr[N]! - tr[0]!;
+      travel = (u) => {
+        const c = Math.floor(u / TAU);
+        const x = ((u - c * TAU) / TAU) * N;
+        const k = Math.min(N - 1, Math.floor(x));
+        return tr[k]! + (tr[k + 1]! - tr[k]!) * (x - k) + c * T;
+      };
+    } else if (key && poser.value) travel = (u) => poser.value!(u, key) ?? 0;
+    else return;
+    const L = s.run.path ? loopLength(s.run.path) : s.cv?.path ? pathLength(s.cv.path) : 0;
+    if (L <= 0) return;
+    const t0 = travel(0);
+    // a band stands still and its marks move; an element moves with the belt, and the marks over it are where its middle
+    // (at s0 on the path, carried on by the travel) stands against them
+    const s0 = s.cv && !s.run.path ? s.cv.s0 : null;
+    const { n, k } = runMarks(L, travel(TAU) - t0, s0 === null ? DRAFT.spin.belt : DRAFT.spin.elementPitch);
+    const perMm = n / L;
+    const phase = (u: number) => {
+      const t = travel(u);
+      return (t - t0) * k * perMm - (s0 === null ? 0 : (s0 + t) * perMm);
+    };
+    out.push(s0 === null ? { i, perMm, phase } : { i, perMm, phase, el: L / (count.get(s.cv!.p) ?? 1) });
+  });
+  return out;
 }
 
 /**
@@ -228,6 +312,8 @@ export interface RowState {
   card: boolean;
   /** The role patterns are drawn (rung F not dropped). */
   patterns: boolean;
+  /** The phase (radians), for the marks on a running belt; 0 when omitted. */
+  u?: number;
 }
 
 /** The solid table's rows (ST * 4 floats per solid): model rows 0 to 2, then face, pattern, flags, widths. */
@@ -262,4 +348,16 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     const count = sr ? Math.max(c0, Math.min(c1, 4 * Math.round((2 * Math.PI * sr) / DRAFT.spin.pitch / 4))) : 0;
     table.set([sr, count, sr ? DRAFT.spin.alpha : 0, Math.min(DRAFT.spin.bandMax, DRAFT.spin.band * sr)], o + 28);
   });
+  // a running belt's marks (SD29), drawn wherever the role patterns are: on a band, lines across it (marks per mm along
+  // it and their phase); on a conveyed belt, a tint on the element under each mark, shared with the next as it passes
+  if (st.patterns)
+    for (const r of rt.runs) {
+      const ph = r.phase(st.u ?? 0);
+      if (r.el === undefined) table.set([0, r.perMm, DRAFT.spin.alpha, ph - Math.floor(ph)], r.i * ST * 4 + 28);
+      else {
+        const off = Math.abs(ph - Math.round(ph)) / r.perMm;
+        const o = r.i * ST * 4 + 16;
+        table[o] = table[o]! + Math.max(0, 1 - off / r.el) * DRAFT.spin.element;
+      }
+    }
 }

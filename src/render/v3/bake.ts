@@ -3,14 +3,15 @@
 // whole assembly is drawn in one call per peeled layer and one call for the lines. Identical hardware shares a shape; its
 // expanded rows are made once and copied per solid, so setup is a copy, not a recomputation. Pure and DOM-free: the
 // buffers are what the GPU gets, and Node tests read them.
-import type { Package2, Shape2 } from "../../package/format2";
+import type { Package2, PackedSolid3, Shape2 } from "../../package/format2";
+import type { Vec2 } from "../../core/geom";
 import { EF, type EdgeSet } from "../../solids/edges";
 import type { MeshData } from "../../solids/types";
 import { DRAFT } from "../../style/draft";
 import { MARK_KINDS } from "../../style/kinds";
 
-/** Floats per vertex: position (3), normal (3), solid index, tag. */
-export const VF = 8;
+/** Floats per vertex: position (3), normal (3), solid index, tag, place along a running belt (mm; SD29). */
+export const VF = 9;
 /** Floats per edge: a (3) and cumulative length, b (3) and cumulative length, n1 (3) and kind, n2 (3) and flags, solid, mark. */
 export const EF2 = 18;
 
@@ -35,6 +36,49 @@ export function expandMesh(m: MeshData): Float32Array {
     }
   }
   return out;
+}
+
+/** How far round a closed path (mm, from its first point, the way it runs) the point of it nearest (x, y) is. */
+export function pathPlace(path: readonly Vec2[], x: number, y: number): number {
+  let best = Infinity;
+  let at = 0;
+  let s = 0;
+  for (let i = 0; i < path.length; i++) {
+    const p = path[i]!;
+    const q = path[(i + 1) % path.length]!;
+    const dx = q[0] - p[0], dy = q[1] - p[1];
+    const L = Math.hypot(dx, dy);
+    const t = L > 0 ? Math.max(0, Math.min(1, ((x - p[0]) * dx + (y - p[1]) * dy) / (L * L))) : 0;
+    const e = Math.hypot(p[0] + t * dx - x, p[1] + t * dy - y);
+    if (e < best) {
+      best = e;
+      at = s + t * L;
+    }
+    s += L;
+  }
+  return at;
+}
+
+/** The length of a closed path (mm). */
+export const loopLength = (path: readonly Vec2[]): number => path.reduce((a, p, i) => a + Math.hypot(path[(i + 1) % path.length]![0] - p[0], path[(i + 1) % path.length]![1] - p[1]), 0);
+
+/**
+ * Each vertex's place along a running belt (SD29), written into the expanded vertices `v` from `o` to `end`: on a belt's
+ * band its place round the pitch path, a triangle across the path's start counted on past its length so the place runs
+ * on smoothly within it; on a conveyed element its own z (it runs along its path's way).
+ */
+function runPlaces(s: PackedSolid3, v: Float32Array, o: number, end: number): void {
+  const path = s.run?.path;
+  if (!path) {
+    for (let k = o; k < end; k += VF) v[k + 8] = v[k + 2]!;
+    return;
+  }
+  const L = loopLength(path);
+  for (let t = o; t < end; t += 3 * VF) {
+    const a = [0, 1, 2].map((j) => pathPlace(path, v[t + j * VF]!, v[t + j * VF + 1]!));
+    const wrap = Math.max(...a) - Math.min(...a) > L / 2;
+    a.forEach((x, j) => (v[t + j * VF + 8] = wrap && x < L / 2 ? x + L : x));
+  }
 }
 
 /** The local bounding box of a mesh: x0, y0, z0, x1, y1, z1. */
@@ -124,6 +168,7 @@ export function bake(pkg: Package2, meshes: readonly MeshData[], edges: readonly
     vrange[2 * i] = vo / VF;
     verts.set(x, vo);
     for (let k = 6; k < x.length; k += VF) verts[vo + k] = i;
+    if (s.run) runPlaces(s, verts, vo, vo + x.length);
     vo += x.length;
     vrange[2 * i + 1] = vo / VF;
     const e = le[s.shape]!;

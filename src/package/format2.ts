@@ -15,7 +15,7 @@ import type { DriveMotion } from "../solids/drive";
 import type { RungId } from "../style/detail";
 import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 import { MESH_GRID } from "../solids/quantise";
-import type { Frame, LoftSection, MeshData, Op, Profile, Vec3 } from "../solids/types";
+import type { Frame, LoftSection, MeshData, Op, Profile, Run, Vec3 } from "../solids/types";
 import type { ConveyPath } from "../solids/convey";
 
 export const FORMAT2 = 2;
@@ -103,6 +103,8 @@ export interface PackedSolid3 {
   cv?: { p: number; s0: number; s1?: number; path?: ConveyPath };
   /** A drive part turning with the cycle (Solid3.spin). */
   spin?: { at: Vec3; axis: Vec3; u0: number };
+  /** A running belt's marks (Solid3.run). */
+  run?: Run;
   flags: number;
 }
 

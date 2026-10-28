@@ -14722,6 +14722,7 @@
                 "ball12"
               ],
               "track": 1,
+              "radius": 6,
               "slots": [
                 {
                   "from": "S0",
