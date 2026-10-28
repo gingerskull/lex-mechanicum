@@ -17692,6 +17692,51 @@
       "whitworth",
       "four-bar",
       "cam-follower"
+    ],
+    "season": {
+      "occasion": "Halloween",
+      "date_rule": "fixed, 31 October",
+      "duty": "Commercial",
+      "dates": [
+        {
+          "start": "2026-10-31",
+          "end": "2026-10-31"
+        },
+        {
+          "start": "2027-10-31",
+          "end": "2027-10-31"
+        },
+        {
+          "start": "2028-10-31",
+          "end": "2028-10-31"
+        },
+        {
+          "start": "2029-10-31",
+          "end": "2029-10-31"
+        },
+        {
+          "start": "2030-10-31",
+          "end": "2030-10-31"
+        },
+        {
+          "start": "2031-10-31",
+          "end": "2031-10-31"
+        }
+      ]
+    },
+    "images": [
+      {
+        "prompt": "Behind-the-scenes photo in a haunted house attraction workshop, a coffin with its lid half open on a steel lever, gearmotor and timing belt visible underneath, cobwebs, work lights, technician with a torque wrench, realistic, shallow depth of field.",
+        "alt": "A coffin prop half open on a steel lever in a haunted-house workshop, its gearmotor and belt underneath."
+      },
+      {
+        "prompt": "Exploded view of a precision coffin-lid drive like a premium consumer product, anodised dark grey plates, polished shoulder bolts, bearings floating in line, soft studio light on white, premium product photography.",
+        "alt": "An exploded coffin-lid drive with dark anodised plates, shoulder bolts and bearings on white."
+      },
+      {
+        "prompt": "A richly carved wooden coffin automaton in a museum display case, the lid swinging open behind a painted wooden vampire figurine sitting up with arms crossed, high-collared cape, fangs and widow's peak, brass handles, quilted satin lining, the crank and lever drive visible on one side, warm spotlight, realistic photograph.",
+        "alt": "A carved wooden coffin automaton in a display case, a vampire figurine sitting up as the lid swings open."
+      }
     ]
   }
 ]

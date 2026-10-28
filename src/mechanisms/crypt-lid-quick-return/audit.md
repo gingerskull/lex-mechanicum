@@ -1,15 +1,15 @@
 # Audit: Nosferatu crypt-lid quick-return (crypt-lid-quick-return)
-standard: 3.11 · date: 2026-10-28 · result: pass · detail: full · pass: build
+standard: 3.12 · date: 2026-10-28 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 155 · FAIL 0 · N/A 12 · open: none
+PASS 156 · FAIL 0 · N/A 12 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
 |---|---|---|
-| S1 | PASS | DATA · standard 3.11 carries its version header and changelog; the seasonal waiver P14 lands with the format step (#263) |
-| S2 | PASS | HAND · header standard 3.11, date, result, detail and the teaching line written by this pass |
+| S1 | PASS | DATA · standard 3.12 carries its version header and changelog, P14 included |
+| S2 | PASS | HAND · header standard 3.12, date, result, detail and the teaching line written by this pass |
 | S3 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
 | S4 | PASS | SITE · issue #266 holds only this mechanism's decisions and open items; the plan's decisions are in #263 |
 | S5 | PASS | SITE · no engine mark on the page or card |
@@ -18,8 +18,8 @@ PASS 155 · FAIL 0 · N/A 12 · open: none
 | P2 | PASS | DATA · facets from the controlled vocabularies; the catalogue validates |
 | P3 | PASS | DATA / SITE · ratio Stroke (lid swing 73.7°, 2.39:1, occupant 72°), axes Offset parallel, character Quick-return, Reciprocating and Non-uniform, backdrivable Partly, four other names, family, level, dof, motorised |
 | P4 | PASS | DATA · tags grouped as function, property and application, ten keywords underneath |
-| P5 | PASS | DATA · explain motion, forces, benefits, limits; four invented uses with one line each, as a seasonal record allows (catalogue, How a seasonal record differs; P14 with the format step) |
-| P6 | PASS | DATA · a seasonal mechanism has nothing real to link: references and media waived in rw-s1.json, no real_world; its generated images take their place with the format step (#263) |
+| P5 | PASS | DATA · explain motion, forces, benefits, limits; four invented uses with one line each, as P14 allows |
+| P6 | PASS | DATA · a seasonal mechanism links nothing (P14): no references, media or real_world; three generated-image prompts take their place, shown once each image is made and reviewed |
 | P7 | PASS | HAND / SITE · the polish names materials and explode groups only; all prose and teaching labels from the record |
 | P8 | PASS | SITE · no parts list, build section or joint sections on the page |
 | P9 | PASS | AUTO / HAND · every number in explain is a claim: 73.7°, 253.7°, 106.3°, 2.39:1, 72°, 20 mm, 35°, 22°; the uses' 2.1 s and 0.9 s at 20 rpm agree with the strokes |
@@ -27,6 +27,7 @@ PASS 155 · FAIL 0 · N/A 12 · open: none
 | P11 | PASS | DATA · plain language, short sentences, no em dashes, mm and degrees |
 | P12 | PASS | AUTO / DATA · record v3 validates: catalogue and kin-check clean |
 | P13 | PASS | HAND · teaching review T2 run on the record before the build and recorded in teaching.review (tweak) |
+| P14 | PASS | HAND / DATA · a seasonal record (season: Halloween, 31 October; duty Commercial): invented uses, themed scenery and labels, festive decoration on the coffin, lid and figurine; no links, three generated-image prompts; the kinematics and every check hold |
 | K1 | PASS | AUTO · K1 residual 4.3e-14 (tolerance 1e-9) over 360 samples, reference 5.1e-14 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 4 blocks (slider-dyad, cam-rocker, dyad, follow); no numeric fallback · slider-dyad for the lever, cam-rocker (new, src/kin/steps/camrocker.ts, with a fixture) for the cam and rocker, dyad for the hip four-bar, follow for the figure keyed on the hip shaft; closed form, no numeric fallback |
@@ -65,7 +66,7 @@ PASS 155 · FAIL 0 · N/A 12 · open: none
 | D9 | N/A | AUTO / HAND · fired: j12-cvt (no solids) · no stretched, conveyed or deforming member |
 | D10 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
 | D11 | PASS | AUTO · SOLID: 0 of 273 solids unsound |
-| D7 | PASS | HAND · the mechanism's parts carry only load shape; the carved decoration is on the scenery, which the seasonal waiver allows (catalogue, How a seasonal record differs; P14) |
+| D7 | PASS | HAND · the mechanism's parts carry only load shape; the carved decoration is on the scenery, as P14 allows |
 | A1 | PASS | AUTO · R J3, E J3, F J3, G J10, C J10, O J10, H J10, A J4, K J7, drive drive · filled by the generator: the pipeline holds it for every built mechanism |
 | A2 | PASS | AUTO · R J3, E J3, F J3, G J10, C J10, O J10, H J10, A J4, K J7, drive drive · filled by the generator: the pipeline holds it for every built mechanism |
 | A3 | PASS | AUTO · fired: classify (11 solids), axial stack builder · filled by the generator: a rule built solids for it |
@@ -173,7 +174,7 @@ PASS 155 · FAIL 0 · N/A 12 · open: none
 | Q4 | PASS | local: tools/shot · shot set drawn in both sheets: record view, PLAN, FRONT, SIDE, ISOMETRIC, the cam section, full explode; looked at by eye and against the concept; the six phases |
 | Q5 | PASS | local: tools/bench · bench run; flags in R6 |
 | Q6 | PASS | every requirement judged |
-| Q7 | PASS | at standard 3.11 |
+| Q7 | PASS | at standard 3.12 |
 | Q8 | PASS | teaching review: tweak (2026-10-28); the six phases of the finished build are looked at by eye · teaching review tweak recorded in the record and on the teaching line; the six phases of the finished build looked at again |
 
 ## Joints

@@ -120,8 +120,9 @@ const RECORD_FIELDS = ["name", "aka", "family", "level", "summary", "motion", "r
 function recordMissing(r: CatalogRecord): string[] {
   const x = r as unknown as Record<string, unknown>;
   const empty = (v: unknown) => v === undefined || v === null || v === "" || (Array.isArray(v) && v.length === 0);
-  // a list the record waives (merge.ts: research found none, or a seasonal record has nothing real to link) may be empty
+  // a list the record waives (merge.ts: research found none) may be empty, and a seasonal record links nothing (P14)
   const waived = new Set(Array.isArray(x.waive) ? (x.waive as string[]) : []);
+  if (r.season) for (const k of ["references", "media"]) waived.add(k);
   const out = RECORD_FIELDS.filter((k) => empty(x[k]) && !waived.has(k));
   const ex = x.explain as Record<string, unknown> | undefined;
   if (ex) for (const k of ["motion", "forces", "benefits", "limits"]) if (empty(ex[k])) out.push(`explain.${k}`);
