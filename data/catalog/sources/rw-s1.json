@@ -1,0 +1,6 @@
+{
+  "crypt-lid-quick-return": {
+    "waive": ["media", "references"],
+    "note": "A seasonal mechanism, fictional on purpose: there is nothing real to link to, so it has no references, media or real_world. Its generated images take their place once the seasonal format carries them."
+  }
+}

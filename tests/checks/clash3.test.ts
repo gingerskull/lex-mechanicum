@@ -79,3 +79,17 @@ describe("the injected-clash coupler (spike #197)", () => {
     expect(crank.depth).toBeGreaterThan(2);
   }, 60_000);
 });
+
+describe("rigid transforms", () => {
+  it("inverts a rigid matrix turned about any axis", async () => {
+    const { rigidInverse, matMul } = await import("../../src/checks/clash3");
+    const { mat4 } = await import("../../src/solids/frame");
+    const c = Math.cos(0.7);
+    const s = Math.sin(0.7);
+    for (const f of [{ o: [1, 2, 3], x: [c, s, 0], z: [0, 0, 1] }, { o: [-4, 2, 9], x: [c, 0, s], z: [0, 1, 0] }, { o: [0, 5, 1], x: [0, c, s], z: [1, 0, 0] }]) {
+      const M = mat4(f as never);
+      const I = matMul(rigidInverse(M), M);
+      I.forEach((v, i) => expect(v).toBeCloseTo(i % 5 === 0 ? 1 : 0, 12));
+    }
+  });
+});

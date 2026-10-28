@@ -11,9 +11,9 @@ describe("the real catalogue", () => {
   const generated = (JSON.parse(committed) as { generated: string }).generated;
   const { catalog, problems } = buildCatalog(readSources(), generated);
 
-  it("merges 95 valid records", () => {
+  it("merges 96 valid records", () => {
     expect(problems).toEqual([]);
-    expect(catalog.mechanisms).toHaveLength(95);
+    expect(catalog.mechanisms).toHaveLength(96);
   });
 
   it("gives every record a kin and a teaching block that validate as record v3 (the retired build fields wait for the cut-over)", () => {
@@ -42,7 +42,7 @@ describe("the real catalogue", () => {
   });
 
   it("is what loadCatalog and recordById serve", () => {
-    expect(loadCatalog().mechanisms).toHaveLength(95);
+    expect(loadCatalog().mechanisms).toHaveLength(96);
     expect(recordById("four-bar")?.motion.label).toBe("Rotary → Oscillating");
     expect(recordById("nope")).toBeUndefined();
   });

@@ -460,7 +460,7 @@ export class Geometry {
     gl.uniform1f(ul.uRing!, p.ring ?? 1);
     const mk = new Float32Array(32);
     MARK_KINDS.forEach((kind, i) => {
-      const [w, a] = kind === "chamfer" ? [L.chamfer, L.chamferAlpha] : kind === "thread" ? [L.thread, L.threadAlpha] : [L.marks, L.marksAlpha];
+      const [w, a] = kind === "chamfer" ? [L.chamfer, L.chamferAlpha] : kind === "thread" ? [L.thread, L.threadAlpha] : kind === "carve" ? [L.carve, L.carveAlpha] : kind === "quilt" ? [L.quilt, L.quiltAlpha] : [L.marks, L.marksAlpha];
       mk[(i + 1) * 2] = w;
       mk[(i + 1) * 2 + 1] = a;
     });

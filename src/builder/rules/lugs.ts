@@ -5,7 +5,8 @@
 // member of the hinge's stack, so the pin, bores and bearings are the stack builder's as for any part.
 import { circle, roundedPoly, type Vec2 } from "../../core/geom";
 import type { Feature, Solid3 } from "../../solids/types";
-import { extrudeOp } from "../../solids/tessellate";
+import { extrudeOp, revolveOp } from "../../solids/tessellate";
+import { turnedLeg } from "../decor";
 import { type Vec3, v3 } from "../../kin/math";
 import type { BuildCtx } from "../ctx";
 import { canon, fromPlane, frameAlong, planeCoords } from "../frames";
@@ -128,7 +129,9 @@ export const lugs: Rule = {
 /**
  * Posts under a fixed body that has joints of its own (a swash plate's cylinder block, which no stack holds): the record
  * names them in its shape, `posts: [{ at: [x, y], top, r? }]` in world reference coordinates, each a round column from
- * the base's top up into the body, screwed through the base (F1).
+ * the base's top up into the body, screwed through the base (F1). A post with `turned: true` is a turned leg (a
+ * seasonal mechanism's coffin on its legs): the same column turned to a leg's profile (src/builder/decor.ts), its
+ * largest radius r. A body standing on posts takes no standoffs.
  */
 export const posts: Rule = {
   id: "posts",
@@ -141,14 +144,22 @@ export const posts: Rule = {
     for (const b of ctx.kin.bodies) {
       const raw = (b.shape as { posts?: unknown } | undefined)?.posts;
       // a `posts` in prose (a record's note on its frame) is not a list of posts
-      const list = (Array.isArray(raw) ? raw : []) as { at: [number, number]; top: number; r?: number }[];
+      const list = (Array.isArray(raw) ? raw : []) as { at: [number, number]; top: number; r?: number; turned?: boolean }[];
       list.forEach((p, k) => {
         const r = p.r ?? 8;
         const f = frameAlong([p.at[0], p.at[1], ctx.base!.top], [0, 0, 1]);
         const L = new Local(f, { joints: [] });
         L.add(H.solid(`${b.id}-post${k}`, { name: k ? "" : `Post Ø${2 * r}, carries the ${titleOf(b.id).toLowerCase()}`, qty: k ? 0 : list.length, kind: "standoff", role: "ground", mat: "Steel C45, ground", outer: circle(r, 0, 0, 32), z0: 0, z1: p.top - ctx.base!.top, body: "ground" }));
         L.add(H.screw(`${b.id}-post${k}-sc`, "socket", 6, 16, { face: ctx.base!.bottom - ctx.base!.top, dir: 1, body: "ground", ...(k ? { name: "", qty: 0 } : {}) }));
-        ctx.add(L.out());
+        const out = L.out();
+        if (p.turned) {
+          const post = out.find((s) => s.id === `${b.id}-post${k}`)!;
+          post.profile = { outer: turnedLeg(p.top - ctx.base!.top, r), holes: [] };
+          post.op = revolveOp(post.profile);
+          post.marks = [];
+          if (!k) post.name = `Turned leg Ø${2 * r}, carries the ${titleOf(b.id).toLowerCase()}`;
+        }
+        ctx.add(out);
       });
     }
   },

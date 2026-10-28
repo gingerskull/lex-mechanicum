@@ -76,6 +76,10 @@ export const DRAFT = {
     capFade: 0.12, // cos of a cap toward the viewer below which its bold top outline blends into the far cap's style (no pop as it turns edge-on)
     marks: 0.6, // px, engraved marks
     marksAlpha: 0.55, // 0..1
+    carve: 0.55, // px, carved lines and features on decorated scenery
+    carveAlpha: 0.6, // 0..1
+    quilt: 0.45, // px, fill patterns on scenery (quilting, hatching)
+    quiltAlpha: 0.35, // 0..1
     thread: 0.5, // px, thread helices
     threadAlpha: 0.45, // 0..1
     baseChamferGain: 0.7, // factor on chamferAlpha for the base plate

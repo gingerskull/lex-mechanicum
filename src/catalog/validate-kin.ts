@@ -88,6 +88,17 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
       if (!KIN_VOCAB.customOp.includes(b.shape.op as never)) say(`body ${b.id}: custom shape needs op in ${KIN_VOCAB.customOp.join("/")}`);
       if (b.shape.profile === undefined) say(`body ${b.id}: custom shape needs a profile`);
     }
+    // the shape's further pieces: a plate (an outline) or a turned piece (a half section), and their decoration
+    const pieces = isObj(b.shape) && Array.isArray(b.shape.pieces) ? (b.shape.pieces as unknown[]) : [];
+    pieces.forEach((pc, k) => {
+      const at = `body ${b.id}: piece ${isObj(pc) && isStr(pc.id) ? pc.id : k}`;
+      if (!isObj(pc)) return say(`${at} is not an object`);
+      if (pc.op !== undefined && !KIN_VOCAB.pieceOp.includes(pc.op as never)) say(`${at}: op "${String(pc.op)}" not in ${KIN_VOCAB.pieceOp.join("/")}`);
+      if (pc.op === "revolve" ? !Array.isArray(pc.profile) : !Array.isArray(pc.outline)) say(`${at}: needs ${pc.op === "revolve" ? "a profile" : "an outline"}`);
+      for (const m of Array.isArray(pc.marks) ? (pc.marks as unknown[]) : []) if (!isObj(m) || !KIN_VOCAB.pieceMark.includes(m.kind as never) || !Array.isArray(m.pts)) say(`${at}: a mark needs kind in ${KIN_VOCAB.pieceMark.join("/")} and pts`);
+      const pat = isObj(pc.pattern) ? pc.pattern.kind : pc.pattern;
+      if (pat !== undefined && !KIN_VOCAB.piecePattern.includes(pat as never)) say(`${at}: pattern "${String(pat)}" not in ${KIN_VOCAB.piecePattern.join("/")}`);
+    });
     if (b.at?.joint !== undefined && !joints.has(b.at.joint)) say(`body ${b.id}: at.joint ${b.at.joint} is not a joint`);
     if (b.at?.point !== undefined && !points.has(b.at.point)) say(`body ${b.id}: at.point ${b.at.point} is not a point`);
   }

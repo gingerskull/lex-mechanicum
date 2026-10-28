@@ -149,7 +149,7 @@ export const placement: Rule = {
         ctx.add({ ...shared, id: `${id}-cheek`, name: `${titleOf(id)}, ${g.upper.name ?? "upper plate"}`, frame: { ...frame, o: v3.add(o, v3.mul(frame.z, lift)) }, profile: { outer: [...g.upper.profile.outer], holes: g.upper.profile.holes.map((h) => [...h]) }, op: extrudeOp(g.upper.h), marks: [], joints: [...part.joints] });
       }
       for (const pc of g.pieces ?? [])
-        ctx.add({ ...shared, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? (pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h)), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: [], joints: [...part.joints] });
+        ctx.add({ ...shared, id: pc.id, name: pc.name, frame: pc.frame, profile: { outer: [...pc.profile.outer], holes: pc.profile.holes.map((h) => [...h]) }, op: pc.op ?? (pc.revolve ? revolveOp(pc.profile) : extrudeOp(pc.h)), ...(pc.features?.length ? { features: pc.features } : { features: [] }), marks: pc.marks ? pc.marks.map((m) => ({ kind: m.kind, pts: [...m.pts] })) : [], joints: [...part.joints], ...(pc.kind ? { kind: pc.kind, detail: rungOf({ kind: pc.kind, role: shared.role }).id } : {}) });
     }
     for (const c of ctx.placement.clevis) {
       const part = ctx.parts.get(c.twin);
