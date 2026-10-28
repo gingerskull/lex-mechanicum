@@ -81,11 +81,14 @@ src/mechanisms/<id>/polish3.ts   the true exceptions to the builder (polish API 
 src/mechanisms/<id>/audit.md     conformance record
 site/                            Astro: layout, pages (library, one page per mechanism, 404), components (the stage is
                                  Stage3.astro), islands (theme, filters and the sort menu, card, stage3, the engine chunk
-                                 engine3, load3, views, the Recovered badge, the Forge sheet), the library's orders
-                                 (sort.ts), CSS on the generated tokens.css
+                                 engine3, load3, views, the Recovered badge, the Forge sheet, the season window), the
+                                 library's orders (sort.ts), a seasonal mechanism's listing window (season.ts, from the
+                                 visitor's local date), CSS on the generated tokens.css
 tools/                           command-line tools (below)
 site/thumbs/                     the committed card thumbnails and stage stills (WebP) and their fingerprint manifest
 site/cards/                      the committed social cards (JPEG, each mechanism page's og:image) and their manifest
+site/seasonal/                   the reviewed generated images of seasonal mechanisms (WebP, `<id>-<n>.webp`), named by
+                                 each record's `images`
 tests/                           unit and fixture tests, the record and 3D checks, site build test, visual snapshots;
                                  fixture scenes of the 3D renderer (tests/fixtures/scene3.ts, ids "fx3-...")
 ```
