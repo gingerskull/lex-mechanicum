@@ -6,6 +6,7 @@
 // note; the plot and the rest of the page work.
 import { AUTO, autoLast, autoSettle, autoState, autoStep, isDesktop } from "../autodial";
 import { hasWebGL2 } from "../gl";
+import { inSeason } from "../season";
 import { url } from "../url";
 import type { StageControl } from "../data";
 import { fetchAll, load3, poserFor, type Loaded } from "./load3";
@@ -779,7 +780,8 @@ async function main(box: HTMLElement) {
   requestAnimationFrame(tick);
 }
 
-if (box) {
+// a seasonal mechanism out of its listing window (P14) shows a placard in the stage's place and starts nothing
+if (box && (box.dataset.season === undefined || inSeason(box.dataset.season))) {
   views(box);
   void (hasWebGL2() ? main(box) : still(box));
 }

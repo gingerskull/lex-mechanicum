@@ -1,8 +1,9 @@
 ---
-import { FACETS, SHEETS } from "../data";
+// the chips and their counts are the library's: a seasonal mechanism (P14) is listed only in its window
+import { FACETS, LIBRARY } from "../data";
 const rows = FACETS.map((f) => {
   const counts = new Map<string, number>();
-  for (const s of SHEETS) for (const v of f.of(s.rec)) counts.set(v, (counts.get(v) ?? 0) + 1);
+  for (const s of LIBRARY) for (const v of f.of(s.rec)) counts.set(v, (counts.get(v) ?? 0) + 1);
   return { ...f, values: [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])) };
 });
 ---

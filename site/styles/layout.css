@@ -206,6 +206,12 @@ header.top {
   max-width: 70ch;
   font-size: 16px;
 }
+/* a seasonal mechanism's one-line note under the summary (P14) */
+.dhead p.seasonnote {
+  margin-top: 6px;
+  font: 400 12px / 1.5 var(--font-mono);
+  letter-spacing: 0.02em;
+}
 .dlayout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--size-side);

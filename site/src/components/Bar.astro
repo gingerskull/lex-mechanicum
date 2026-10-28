@@ -8,8 +8,9 @@ import { SHEETS, sortableOf } from "../data";
 import { DEFAULT_ORDER, ORDERS, offeredOrders } from "../sort";
 interface Props {
   library?: boolean;
-  /** The library's name and sheet count, shown in the library bar once it sticks. */
-  set?: { name: string; count: number };
+  /** The library's name and sheet count, shown in the library bar once it sticks; `live` when the filters island may
+   * change the count (a seasonal mechanism in its window, P14). */
+  set?: { name: string; count: number; live?: boolean };
   /** A mechanism page's name: the bar becomes the compact page bar. */
   title?: string;
 }
@@ -22,7 +23,7 @@ const current = ORDERS.find((o) => o.key === DEFAULT_ORDER)!;
   <div class="wrap row">
     {library && (
       <>
-        {set && <span class="settitle" aria-hidden="true">{set.name} <span>{set.count}</span></span>}
+        {set && <span class="settitle" aria-hidden="true">{set.name} <span data-sheets={set.live ? "" : undefined}>{set.count}</span></span>}
         <div class="search">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5" /><path d="M11 11l3.5 3.5" /></svg>
           <input id="q" type="search" placeholder="Search" aria-label="Search mechanisms" autocomplete="off" />

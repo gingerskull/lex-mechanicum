@@ -1,7 +1,9 @@
 ---
 // A library card (SS1): the pre-rendered drawing for each sheet, animated live on hover by the card island. It carries
 // what the library's orders read: its sheet number, and its added date and date of origin once the record has them; the
-// added date also shows the Recovered badge for the sheet's first days (islands/recovered.ts).
+// added date also shows the Recovered badge for the sheet's first days (islands/recovered.ts). A seasonal mechanism's card
+// (P14) wears the Seasonal folklore tag instead, and is built hidden with its listing windows: the library's filters show
+// it in its window and take it off the page out of it.
 import { FACETS, sortableOf, type Sheet } from "../data";
 import { url } from "../url";
 interface Props {
@@ -11,14 +13,15 @@ const { sheet } = Astro.props;
 const r = sheet.rec;
 const data = Object.fromEntries(FACETS.map((f) => [`data-${f.key}`, f.of(r).join("|")]));
 const k = sortableOf(sheet);
-const text = [sheet.no, r.name, ...(r.aka ?? []), r.summary, r.family, r.motion.label, ...r.tags.function, ...r.tags.property, ...r.tags.application, ...(r.tags.keywords ?? [])].join(" ").toLowerCase();
+const seasonal = sheet.season !== undefined;
+const text = [sheet.no, r.name, ...(r.aka ?? []), r.summary, r.family, r.motion.label, ...r.tags.function, ...r.tags.property, ...r.tags.application, ...(r.tags.keywords ?? []), ...(seasonal ? ["Seasonal folklore", r.season!.occasion] : [])].join(" ").toLowerCase();
 ---
-<a class="card" href={url(`/mechanisms/${sheet.id}/`)} data-id={sheet.id} data-text={text} data-no={k.no} data-added={k.added} data-origin={k.origin} {...data}>
+<a class="card" href={url(`/mechanisms/${sheet.id}/`)} data-id={sheet.id} data-text={text} data-no={k.no} data-added={k.added} data-origin={k.origin} data-season={sheet.season} hidden={seasonal} {...data}>
   <div class="thumb">
     <img class="t-dark" src={url(`/thumbs/${sheet.id}-dark.webp`)} alt={`${r.name}, drawing`} width="320" height="240" loading="lazy" decoding="async" />
     <img class="t-light" src={url(`/thumbs/${sheet.id}-light.webp`)} alt="" width="320" height="240" loading="lazy" decoding="async" />
     <canvas aria-hidden="true"></canvas>
-    {k.added && <span class="recovered" data-recovered={k.added} hidden>Recovered</span>}
+    {seasonal ? <span class="folklore">Seasonal folklore</span> : k.added && <span class="recovered" data-recovered={k.added} hidden>Recovered</span>}
   </div>
   <div class="body">
     <h2>{r.name}</h2>
