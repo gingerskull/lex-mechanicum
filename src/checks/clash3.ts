@@ -171,7 +171,8 @@ export function obbMeet(A: Obb, B: Obb, tol: number): boolean {
 
 /** The inverse of a rigid column-major matrix (orthonormal columns). */
 export function rigidInverse(m: Mat4): Mat4 {
-  const r = [m[0]!, m[4]!, m[8]!, m[1]!, m[5]!, m[9]!, m[2]!, m[6]!, m[10]!];
+  // the transpose of the rotation, row by row: row i of Rᵀ is column i of R (m[4i], m[4i + 1], m[4i + 2])
+  const r = [m[0]!, m[1]!, m[2]!, m[4]!, m[5]!, m[6]!, m[8]!, m[9]!, m[10]!];
   const t = [-(r[0]! * m[12]! + r[1]! * m[13]! + r[2]! * m[14]!), -(r[3]! * m[12]! + r[4]! * m[13]! + r[5]! * m[14]!), -(r[6]! * m[12]! + r[7]! * m[13]! + r[8]! * m[14]!)];
   return [r[0]!, r[3]!, r[6]!, 0, r[1]!, r[4]!, r[7]!, 0, r[2]!, r[5]!, r[8]!, 0, t[0]!, t[1]!, t[2]!, 1];
 }

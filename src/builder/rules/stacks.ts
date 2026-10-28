@@ -178,6 +178,8 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   // both pillow blocks on one side of what the shaft carries (`side` on its joint: +1 along the axis, −1 against it)
   const side = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { side?: number } | undefined)?.side).find((v) => v === 1 || v === -1);
   if (side) spec.side = side as 1 | -1;
+  // the shaft runs on to parts overhung past its blocks (`overhung: true`): a crank overhung past the blocks of its shaft
+  if (site.joints.some((j) => (ctx.kin.joints.find((q) => q.id === j) as { overhung?: unknown } | undefined)?.overhung === true)) spec.overhung = true;
   const r = axialStack(ctx, spec);
   ctx.add(r.solids);
   ctx.stacks.set(site.id, r);

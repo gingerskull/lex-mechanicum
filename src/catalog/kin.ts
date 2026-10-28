@@ -13,6 +13,10 @@ export const KIN_VOCAB = {
     "elbow",
   ],
   customOp: ["extrude", "revolve", "sweep", "loft"],
+  // a shape's further pieces: plates (the default), turned pieces, the marks on their top faces and their fill patterns
+  pieceOp: ["extrude", "revolve"],
+  pieceMark: ["carve", "quilt"],
+  piecePattern: ["quilt", "hatch"],
   joint: [
     "revolute", "prismatic", "cylindrical", "screw", "pin-in-slot", "gear-mesh", "cam-contact", "belt", "rolling",
     "spherical", "universal", "planar", "flexure",
@@ -33,6 +37,8 @@ export const KIN_VOCAB = {
     "elbow-rods",
     // a member anchored at one end round a sprocket on a moving member (a stroke doubler's chain)
     "strand",
+    // a plate cam's swinging roller follower (a rocker on a pivot)
+    "cam-rocker",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

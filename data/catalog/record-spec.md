@@ -247,8 +247,9 @@ record names on the ground lies on the base.
 - *Shape features:* `lugs: [{ joint, span: [w0, w1], r }]`, a hinge lug on the joint's axis joined by a web to a part
   whose plane is not square to the hinge (a plate's edge hinge, a spindle head), its span along the hinge overlapping
   the part there (the web runs within the span: a lug beyond the part, with the mate's part between, would stand in
-  the air); `posts: [{ at: [x, y], top, r }]`,
-  columns from the base into a fixed body; `bars: [{ from, to, width, z: [z0, z1] }]`, straight bars on a part's face
+  the air); `posts: [{ at: [x, y], top, r, turned? }]`,
+  columns from the base into a fixed body (`turned: true`: a turned leg, its largest radius r; a body on posts takes no
+  standoffs); `bars: [{ from, to, width, z: [z0, z1] }]`, straight bars on a part's face
   (slot jaws, tongues; the slotted body names its `slot: { width, length }`); `ring: { inner, spokes, hub }` on a `disc`
   (a rim, spoked to a hub or bare); `indexMark: { at: [x, y] }`, a raised arrow that stays opaque on a see-through part;
   `ball: { diameter }` on a `link` (at its far end) or a `shaft` (at its start: a plunger's ball end); `plunger: true` on
@@ -292,6 +293,11 @@ that setting of one of the teaching controls (a die position).
   at its shoe; `indexer` has `internal: true` (internal Geneva), `mode: "mutilated"` (window, ratio) and `mode: "cam"`
   (law, index, step); `star`, `ratchet`, `one-way`, `escape` (planar: anchor, lever with a `fork`) and `verge` are the
   timed blocks, each documented over its code in `src/kin/registry.ts`.
+- `cam-rocker` swings a roller follower on a rocker (in: `joint`, the cam-contact joint with its `ca`; `input`; `cam`, the
+  cam body it turns; `pivot`, the rocker's ground revolute; `follower`, the rocker and its roller): the roller centre
+  stands at the pitch radius rb + s from the cam's centre on the arc of the rocker's arm, the joint's `at` being the
+  roller centre at the reference; out { s, angle, pressure }. Its cam is a `cam` with `form: "rocker"`, the roller's
+  envelope on that path.
 - A joint with `active` (a driver window) is checked by K1 only while engaged, its motion relation too. A body with
   `drops: true` moves by instant drops (an escape wheel): its points are not checked for jumps.
 - An output whose id a block wrote as a value is that value (a pressure angle, an advance).
@@ -301,10 +307,14 @@ face's envelope; `form: face-groove`, `barrel`, `lobes` (conjugate lobes from sh
 rollers' poses)), `genevaWheel`, `genevaCrank`, `intermittentDriver`, `intermittentDriven`, `star`, `ratchetWheel`,
 `escapeWheel` (pointed teeth or a `tooth` polygon; `tip0` the simulated phase at the reference), `crownWheel`, `verge`.
 Any shape may carry `place` (its part starts there along its frame's z, where the joints put it), `pieces` (more
-plates of the body, each with `origin`, `rot`, `thick`, `outline`, `holes`) and, on a plate, `exact` (its outline as
+plates of the body, each with `origin`, `rot` or the axes `x` and `z`, `thick`, `outline`, `holes`; or a turned piece,
+`op: "revolve"` with its half section `profile` [r, z] about the frame's z; any of them with `marks` on its top face
+([{ kind: "carve" | "quilt", pts }]), a fill `pattern` there ("quilt", "hatch", or { kind, angle, pitch, inset }), and
+`ornament: true` for decoration on a seasonal mechanism's scenery, or a solid `kind` of its own) and, on a plate, `exact` (its outline as
 drawn), `windows` (polygon holes) and `guide` ([s0, s1] along a slide's axis: the length its rails hold). A disc may
 carry `rollers` (a turret's radial rollers). A ground joint may ask for its `support` (`stub`, `hung`, ...) and a shaft
-in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 against).
+in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 against), and with `overhung: true` the shaft runs on
+past the blocks to the parts it carries there (a crank overhung on its shaft's end), a washer and a screw holding them.
 
 ### `teaching`
 

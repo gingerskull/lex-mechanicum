@@ -53,6 +53,11 @@ export interface StackSpec {
   reach?: [number, number];
   /** A shaft in plan held from one side only (both pillow blocks): +1 along the axis, −1 against it. */
   side?: 1 | -1;
+  /**
+   * The record's parts stand past the blocks on the side away from where the shaft would stop (`overhung: true` on a
+   * joint of the site): the shaft runs on to them and a washer and a screw hold them on its end.
+   */
+  overhung?: boolean;
   /** Top of a pin's column in world z, for the base level (set by the caller when it needs it). */
   baseTopWorld?: number;
   /**
@@ -281,6 +286,8 @@ function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
   let name: string;
   let bridge: StackResult["bridge"];
   let farStub = 0;
+  // the free end a drive takes when the shaft's low end carries a part (src/builder/rules/drive.ts onFreeEnd)
+  let freeEnd: StackResult["end"];
   const fromBase = support !== "hung" && support !== "pillow" && spec.base !== null;
 
   if (support === "pillow") {
@@ -307,6 +314,29 @@ function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
       serve("F2", `${id}-ew`, `${id}-es`);
       shaftSpec.z1 = top.w1;
       farStub = 0;
+    }
+    // the same past both blocks the other way (the blocks stand above what the shaft carries, `side: 1`), and a dead
+    // shaft's overhung part either way: the shaft runs on to the part, which a washer and a screw hold on its end (F2)
+    const bottom = members[0]!;
+    const endHold = (at: "top" | "bottom") => {
+      const M = d >= 10 ? 5 : d >= 8 ? 4 : 3;
+      const wh = 1.5;
+      const m = at === "top" ? top : bottom;
+      // on a dead shaft the washer stands just clear of the part that turns on it (A12)
+      const g = live ? 0 : 0.3;
+      const z0 = at === "top" ? m.w1 + g : m.w0 - wh - g;
+      L.add(H.washer(`${id}-ew${at === "top" ? "" : "0"}`, M + 0.4, d + 8, { body: turn, z0, z1: z0 + wh, name: `End washer ${M + 0.4}x${d + 8}, holds the ${m.name.toLowerCase()} on the shaft end` }));
+      L.add(H.screw(`${id}-es${at === "top" ? "" : "0"}`, "csk", M, 2 * M + wh, at === "top" ? { body: turn, face: z0 + wh, dir: -1 } : { body: turn, face: z0, dir: 1 }));
+      serve("F2", `${id}-ew${at === "top" ? "" : "0"}`, `${id}-es${at === "top" ? "" : "0"}`);
+    };
+    if (spec.overhung && !live && Math.max(...p.w) < top.w0) {
+      endHold("top");
+      shaftSpec.z1 = top.w1 + 0.3;
+    }
+    if (spec.overhung && Math.min(...p.w) > bottom.w1) {
+      endHold("bottom");
+      shaftSpec.z0 = bottom.w0 - (live ? 0 : 0.3);
+      if (live && spec.input) freeEnd = { at: v3.add(spec.frame.o, v3.mul(spec.frame.z, shaftSpec.z1)), out: spec.frame.z, body: turn };
     }
     ctx.routes.push({ support: `${id}-pb`, site: id, kind: "pillow", tried: p.tried, moved: p.moved, covers: p.covers, gap: p.gap });
     for (const [f, ids] of Object.entries(p.serves)) serve(f, ...ids);
@@ -416,7 +446,8 @@ function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
   L.add(sh);
   if (live && spec.input) sh[sh.length - 1]!.accent = true;
   if (!live) serve("F1", shaftId);
-  return done(L, support, undefined, extra, bridge, farStub);
+  const r = done(L, support, undefined, extra, bridge, farStub);
+  return freeEnd ? { ...r, end: freeEnd } : r;
 
   function done(Lc: Local, sup: SupportKind, top?: number, more: Solid3[] = [], br?: StackResult["bridge"], stub = 0): StackResult {
     for (const x of Lc.list) if (!x.joints.length) x.joints = [...spec.joints];
