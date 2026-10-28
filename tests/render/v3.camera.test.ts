@@ -96,6 +96,27 @@ describe("camera", () => {
     expect(x).toBeCloseTo(200);
     expect(y).toBeCloseTo(150);
   });
+
+  it("frames a record's view on top of the fit: a zoom about the stage centre and a pan in fractions of it", () => {
+    const B = basisOfOrient(namedOrient("PLAN"));
+    // a square box in a wide canvas: the height binds (s 2.6), with room across up to 3.6 / 2.6
+    const box: Box = [0, 0, 0, 100, 100, 10];
+    const plain = fit(B, 400, 300, box, { pad: 20 });
+    expect(plain.s).toBeCloseTo(2.6);
+    const C = fit(B, 400, 300, box, { pad: 20, frame: { zoom: 1.2, pan: [0.05, -0.1] } });
+    expect(C.s).toBeCloseTo(3.12);
+    const [x, y] = project(C, [50, 50, 0]);
+    expect(x).toBeCloseTo(220); // 200 + 0.05 * 400
+    expect(y).toBeCloseTo(120); // 150 - 0.1 * 300, the pan's y runs down
+    // a zoom past the room across is held to it, and the pan eases off in the same proportion
+    const wide = fit(B, 400, 300, box, { pad: 20, frame: { zoom: 2, pan: [0.1, 0] } });
+    expect(wide.s).toBeCloseTo(3.6);
+    expect(project(wide, [50, 50, 0])[0]).toBeCloseTo(200 + ((3.6 / 2.6 - 1) / (2 - 1)) * 0.1 * 400);
+    // where the width already binds the frame leaves the fit as it is; a zoom below 1 always applies
+    const flat: Box = [0, 0, 0, 100, 50, 10];
+    expect(fit(B, 400, 300, flat, { pad: 20, frame: { zoom: 1.2, pan: [0.05, -0.1] } })).toEqual(fit(B, 400, 300, flat, { pad: 20 }));
+    expect(fit(B, 400, 300, flat, { pad: 20, frame: { zoom: 0.5, pan: [0, 0] } }).s).toBeCloseTo(1.8);
+  });
 });
 
 describe("views", () => {
@@ -113,6 +134,13 @@ describe("views", () => {
     expect(defaultView({ view: "PLAN" }).orient).toEqual({ yaw: 0, tilt: 28 });
     expect(defaultView({ view: "FRONT" }).orient).toEqual(parseView("FRONT")!.orient);
     expect(defaultView({ view: "VIEW 30 40" }).orient).toEqual({ yaw: 30, tilt: 50 });
+    // a record's frame rides on its own view only: never on the isometric fallback, never on a detail view
+    const frame = { zoom: 1.1, pan: [0, -0.05] as [number, number] };
+    expect(defaultView({ view: "VIEW 30 40", frame }).frame).toEqual(frame);
+    expect(defaultView({ view: "VIEW 30 40" }).frame).toBeUndefined();
+    expect(defaultView({ view: "NOT A VIEW", frame }).frame).toBeUndefined();
+    const det = viewsOf({ view: "VIEW 30 40", frame, views: [{ id: "z", kind: "detail", center: [0, 0, 0], scale: 3 }] } as never)[0]!;
+    expect(det.state.frame).toBeUndefined();
   });
 
   it("every record opens in a view that parses", () => {

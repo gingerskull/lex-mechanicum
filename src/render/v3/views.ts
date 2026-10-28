@@ -4,7 +4,7 @@
 import { DRAFT } from "../../style/draft";
 import type { Teaching } from "../../catalog/kin";
 import type { Vec3 } from "../../solids/types";
-import { namedOrient, NAMED_VIEWS, snapped, type NamedView, type Orient } from "./camera";
+import { namedOrient, NAMED_VIEWS, snapped, type Frame, type NamedView, type Orient } from "./camera";
 
 /** A cut: the half space the normal points into is removed; the cut faces are hatched. */
 export interface SectionSpec {
@@ -35,6 +35,8 @@ export interface ViewState {
   detail?: DetailSpec;
   /** 0 (assembled) to 1 (full explode). */
   explode: number;
+  /** The record's own framing (`teaching.frame`): only on its default view, assembled; any other view keeps the plain fit. */
+  frame?: Frame;
 }
 
 export const ISO: ViewState = { orient: namedOrient("ISOMETRIC"), explode: 0 };
@@ -64,10 +66,12 @@ export function parseView(text: string, axisOf: (joint: string) => Vec3 | null =
  * record that declares one opens tilted to the 28 degree view, its layout kept and its depth shown (T7); any other view
  * it declares (a front elevation, a view down an axis) is kept as it is.
  */
-export function defaultView(t: Pick<Teaching, "view"> | null | undefined, axisOf?: (joint: string) => Vec3 | null): ViewState {
+export function defaultView(t: Pick<Teaching, "view" | "frame"> | null | undefined, axisOf?: (joint: string) => Vec3 | null): ViewState {
   const p = t ? parseView(t.view, axisOf) : null;
-  if (p && !p.orient.aux && p.orient.tilt === 0) return { orient: { yaw: p.orient.yaw, tilt: DRAFT.camera.planOpens }, explode: 0 };
-  return p ? { orient: p.orient, ...(p.auxName ? { auxName: p.auxName } : {}), explode: 0 } : ISO;
+  // a record's own frame belongs to the view it declares, never to the isometric it falls back to
+  const frame = p && t?.frame ? { frame: { zoom: t.frame.zoom, pan: [t.frame.pan[0], t.frame.pan[1]] as [number, number] } } : {};
+  if (p && !p.orient.aux && p.orient.tilt === 0) return { orient: { yaw: p.orient.yaw, tilt: DRAFT.camera.planOpens }, explode: 0, ...frame };
+  return p ? { orient: p.orient, ...(p.auxName ? { auxName: p.auxName } : {}), explode: 0, ...frame } : ISO;
 }
 
 const vec3 = (v: unknown): Vec3 | null => (Array.isArray(v) && v.length >= 2 && v.every((x) => typeof x === "number") ? [v[0] as number, v[1] as number, (v[2] as number | undefined) ?? 0] : null);
@@ -80,7 +84,8 @@ const label = (id: string): string => id.toUpperCase();
  */
 export function viewsOf(t: Pick<Teaching, "view" | "views"> | null | undefined, axisOf?: (joint: string) => Vec3 | null): { id: string; state: ViewState }[] {
   if (!t?.views) return [];
-  const base = defaultView(t, axisOf);
+  // a detail keeps the orientation, not the record's frame (that is the default view's alone)
+  const base = defaultView({ view: t.view }, axisOf);
   const out: { id: string; state: ViewState }[] = [];
   for (const v of t.views) {
     if (v.kind === "section") {

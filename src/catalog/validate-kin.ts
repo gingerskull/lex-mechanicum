@@ -295,6 +295,14 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     say(`teaching.view "${v}" is not PLAN/FRONT/SIDE/ISOMETRIC/DIMETRIC, "AUX <joint>" or "VIEW az el"`);
   }
 
+  if (t.frame !== undefined) {
+    const f = t.frame;
+    const pan = isObj(f) ? f.pan : undefined;
+    if (!isObj(f) || !isNum(f.zoom) || f.zoom < 0.5 || f.zoom > 2 || !(Array.isArray(pan) && pan.length === 2 && pan.every((x) => isNum(x) && Math.abs(x) <= 0.25))) {
+      say("teaching.frame needs zoom 0.5 to 2 and pan [x, y], each within 0.25 of the stage (T7)");
+    }
+  }
+
   ids("teaching.views", arr(t.views));
   for (const w of arr(t.views) as Obj[]) {
     if (!TEACHING_VOCAB.viewKind.includes(w.kind as never)) say(`view ${String(w.id)}: kind "${String(w.kind)}" not section or detail`);

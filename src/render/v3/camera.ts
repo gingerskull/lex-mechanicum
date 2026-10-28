@@ -119,6 +119,17 @@ export interface FitOptions {
   window?: { centre: Vec3; scale: number };
   /** Space kept clear on each side, CSS px (the title block, a panel). */
   inset?: { left?: number; right?: number; top?: number; bottom?: number };
+  /** A record's own framing of its default view (record spec, `teaching.frame`): applied on top of the fit. */
+  frame?: Frame;
+}
+
+/**
+ * A manual frame on top of the fit: a factor on the fitted scale, and a shift in fractions of the canvas (x right, y down).
+ * A zoom above 1 is held to the room across the canvas, and the shift eases off with it.
+ */
+export interface Frame {
+  zoom: number;
+  pan: [number, number];
 }
 
 const corners = (b: Box): Vec3[] => {
@@ -156,8 +167,19 @@ export function fit(B: Basis, w: number, h: number, box: Box, o: FitOptions = {}
     cx = dot(o.window.centre, B.right);
     cy = dot(o.window.centre, B.up);
   }
-  const px = pad + il + aw / 2;
-  const py = pad + it + ah / 2;
+  let px = pad + il + aw / 2;
+  let py = pad + it + ah / 2;
+  if (o.frame) {
+    // a zoom never makes the swept box wider than the room across: where the width already binds (a narrow stage) the
+    // frame eases off, its pan with it, so the drawing keeps inside the sheet at every phase
+    const z0 = o.frame.zoom;
+    const room = aw / (e.x[1] - e.x[0] || 1) / s;
+    const z = z0 > 1 ? Math.max(1, Math.min(z0, room)) : z0;
+    const k = z0 === 1 ? 1 : (z - 1) / (z0 - 1);
+    s *= z;
+    px += k * o.frame.pan[0] * w;
+    py += k * o.frame.pan[1] * h;
+  }
   const m = Math.max(1, (e.d[1] - e.d[0]) * 0.05);
   return { ...B, s, ox: px - s * cx, oy: py + s * cy, d0: e.d[0] - m, d1: e.d[1] + m };
 }

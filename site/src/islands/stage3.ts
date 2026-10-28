@@ -209,7 +209,10 @@ async function main(box: HTMLElement) {
   const ctl: Ctl = { params: {}, design: {}, select: {}, drivers: {} };
   let good: Ctl = JSON.parse(JSON.stringify(ctl));
 
-  const state = (): ViewState => ({ orient: s.orient, ...(s.auxName ? { auxName: s.auxName } : {}), ...(s.section ? { section: s.section } : {}), ...(s.detail ? { detail: s.detail } : {}), explode: s.explode });
+  /** The record's own view: its orientation, no section or detail (the Reset view button's state). */
+  const atRecordView = () => !s.section && !s.detail && JSON.stringify(s.orient) === JSON.stringify(base.orient);
+  // the record's frame (teaching.frame) holds only in its own view: any other view or an orbit keeps the plain fit
+  const state = (): ViewState => ({ orient: s.orient, ...(s.auxName ? { auxName: s.auxName } : {}), ...(s.section ? { section: s.section } : {}), ...(s.detail ? { detail: s.detail } : {}), explode: s.explode, ...(base.frame && atRecordView() ? { frame: base.frame } : {}) });
   const view = (): DrawView3 =>
     E.recordDrawView(L.scene, {
       state: state(),
@@ -254,7 +257,7 @@ async function main(box: HTMLElement) {
     const named = E.snappedName(s.orient);
     for (const b of document.querySelectorAll<HTMLButtonElement>("#presets button")) b.setAttribute("aria-pressed", String(!s.section && !s.detail && b.dataset.view === named));
     for (const b of document.querySelectorAll<HTMLButtonElement>("#vviews button")) b.setAttribute("aria-pressed", String(b.dataset.rview === s.rview));
-    $("record-view").setAttribute("aria-pressed", String(!s.section && !s.detail && JSON.stringify(s.orient) === JSON.stringify(base.orient)));
+    $("record-view").setAttribute("aria-pressed", String(atRecordView()));
     const o = turntable(s.orient);
     box.dataset.tilt = String(Math.round(o.tilt));
     box.dataset.view = s.orient.aux ? "AUX" : (named ?? `VIEW ${Math.round(o.yaw)}/${Math.round(90 - o.tilt)}`);

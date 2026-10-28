@@ -392,7 +392,9 @@ export function createSession3(canvas: CanvasLike, scene0: Scene, o: SessionOpti
     const room = view.sheet && view.dims && !view.card ? DRAFT.dims.offset + DRAFT.dims.ext + DRAFT.dims.labelH / 2 : 0;
     // a card's margin is the thumbnail's, scaled to the card: the live drawing takes over from the image without a jump
     const pad = view.card ? (DRAFT.camera.pad * card.w) / DRAFT.card.refW : DRAFT.camera.pad;
-    return fit(B, card.w, card.h, box, { pad, ...(win ? { window: win } : {}), ...(room ? { inset: { right: room, bottom: room } } : {}) });
+    // the record's own frame holds for its default view, assembled; a detail window or an explode keeps the plain fit
+    const frame = view.state.frame && !win && !view.state.section && explode === 0 ? { frame: view.state.frame } : {};
+    return fit(B, card.w, card.h, box, { pad, ...(win ? { window: win } : {}), ...(room ? { inset: { right: room, bottom: room } } : {}), ...frame });
   }
 
   /** Outlines the windows of detail views in this view (SD20). */

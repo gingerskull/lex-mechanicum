@@ -45,7 +45,7 @@ PASS 156 · FAIL 0 · N/A 12 · open: none
 | T4 | PASS | DATA · fired: trace-marks (no solids) · the lid tip carries the comet and 15° ticks, spread on the opening and bunched on the slam; the crank pin and the crown traced |
 | T5 | PASS | DATA · the lever's two extreme lines from O (β 53.1°) and the opening and slam arcs of the crank pin |
 | T6 | PASS | HAND / DATA · a 73.7° lid swing at a 2.39:1 time ratio and a 72° sit-up read at the default size |
-| T7 | PASS | DATA · VIEW 330 20: from the drive side toward the foot end, the drive on the right and nearly face on, so every arm reads to its pin, the occupant seen as he sits up; the opening phase shows the lid high and him up |
+| T7 | PASS | DATA · VIEW 304 21 with its own frame (zoom 1.08, pan [0.005, -0.042]): from the drive side toward the foot end, low, the drive on the right, so the arms read to their pins and the lid stands tall above the box; the frame lifts and enlarges the drawing so, with the lid fully open, the margins above and below are equal and nothing leaves the sheet at any phase |
 | T8 | PASS | DATA · section cam, cut between the rocker and the crank: the cam, its roller and the swinging rocker in elevation, highlighted; drawn in both sheets |
 | T9 | PASS | AUTO / DATA · claim table: 8 ok, 0 off, 0 uncheckable of 8 |
 | T10 | PASS | AUTO · 64 solids drawn see-through: coffin-wall0, coffin-panel0, coffin-column0, coffin-lining0, coffin-wall1, coffin-panel1, coffin-column1, coffin-lining1 · filled by the generator: a rule built solids for it |

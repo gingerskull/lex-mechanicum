@@ -143,6 +143,8 @@ export interface Teaching {
   traces: { id: string; point: string; ticks?: { every: number }; ghosts?: { control: string; value: unknown }[]; comet?: boolean; /** Drawn in this body's frame (a cam's pitch curve turns with the cam). */ frame?: string }[];
   overlays: { id: string; kind: (typeof TEACHING_VOCAB.overlay)[number]; label?: string; [k: string]: unknown }[];
   view: string;
+  /** A manual frame of the default view (T7): a factor on the fitted scale and a shift in fractions of the stage, x right, y down. */
+  frame?: { zoom: number; pan: [number, number] };
   views?: { id: string; kind: (typeof TEACHING_VOCAB.viewKind)[number]; highlight?: string[]; [k: string]: unknown }[];
   controls: { id: string; kind: (typeof TEACHING_VOCAB.control)[number]; [k: string]: unknown }[];
   timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: [number, number][] };
