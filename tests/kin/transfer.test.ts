@@ -57,6 +57,8 @@ describe("transfer blocks", () => {
     expect(r.failures).toEqual([]);
     expect(r.maxResidual).toBeLessThan(1e-9);
     expect(r.periodicity).toBeLessThan(1e-6);
+    // the balls part-way round the lane start the cycle turned about their centres: the same geometry
+    expect(r.referenceAgreement).toBeLessThan(1e-9);
     // a turn and a half on: the balls go on round the circuit with no jump between the turns
     const ids = rec!.kin.bodies.filter((b) => b.next).map((b) => b.id);
     const P = k.pose(2 * Math.PI);

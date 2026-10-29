@@ -11,7 +11,7 @@ import type { MeshData, Vec3 } from "../../solids/types";
 import { DRAFT, type RoleSurface, type SurfaceKey } from "../../style/draft";
 import { FORM } from "../../style/form";
 import type { Ladder } from "../detail";
-import { bake, BAKE, loopLength, type Baked } from "./bake";
+import { bake, BAKE, loopLength, meshBox, type Baked } from "./bake";
 import type { Item3 } from "./annotate";
 import type { Poser } from "./poser";
 
@@ -101,6 +101,13 @@ export function runtime(scene: Scene): Runtime {
   const fixed = new Uint8Array(n);
   const spin = new Float32Array(n);
   const roundR = scene.meshes.map(roundRadius);
+  // a ball: round about its z and as tall as it is wide, so it is round about every axis
+  const ball = scene.meshes.map((m, k) => {
+    const R = roundR[k] ?? 0;
+    if (!m || !R) return false;
+    const b = meshBox(m);
+    return Math.abs(b[5] - b[2] - 2 * R) < 0.05 * R;
+  });
   const pattern = new Int8Array(n);
   const surface: RoleSurface[] = [];
   const axis = new Float32Array(n * 3);
@@ -127,11 +134,12 @@ export function runtime(scene: Scene): Runtime {
     for (const u of phases) {
       const q = poser.place(s, u);
       for (let k = 0; k < 16; k++) if (Math.abs(q[k]! - M0[k]!) > 1e-6) still = 0;
-      // turning: the local x or z swings round (a part that only slides keeps both; a ball rolling about its own x
-      // keeps x)
+      // turning: the local x swings round (a part that only slides keeps it); a ball turns about any axis, so its z
+      // swinging counts too (one rolling about its own x keeps x), while a round part that only swings across its axis
+      // (a steered wheel, a rocking cylinder) does not turn
       const w = mulMat(q, mat4(s.fr));
       if (Math.abs(w[0]! - m[0]!) + Math.abs(w[1]! - m[1]!) + Math.abs(w[2]! - m[2]!) > 1e-3) turns = true;
-      if (Math.abs(w[8]! - m[8]!) + Math.abs(w[9]! - m[9]!) + Math.abs(w[10]! - m[10]!) > 1e-3) turns = true;
+      if (ball[s.shape] && Math.abs(w[8]! - m[8]!) + Math.abs(w[9]! - m[9]!) + Math.abs(w[10]! - m[10]!) > 1e-3) turns = true;
     }
     fixed[i] = still;
     turning[i] = turns ? 1 : 0;

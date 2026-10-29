@@ -1,12 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.47.0, Mars — 2026-10-29
 
 - Belts show that they run: faint marks across every motor drive belt and a timing belt's back are carried round with
   the belt and come back in step after each cycle.
 - The walking-beam transfer's balls roll where they move on their own (along the return lane and across the cross
   tracks, not while the beam carries them) and carry their rotation lines; like parts handed on round a circuit turn
-  as one, and a part rolling across its own axis now shows its lines (style reference 3.12, SD29).
+  as one, and a ball rolling across its own axis now shows its lines (style reference 3.12, SD29).
 - A support that moves with a control (the bend of the universal, double Cardan and Rzeppa joints, an offset) stands
   in slots in the base along the path its bolts take, clamped by nuts under the base, so it follows the control and
   stays on the plate across the whole range. The double Cardan joint keeps its input and its drive in place as it

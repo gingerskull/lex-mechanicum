@@ -74,7 +74,10 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
   let referenceAgreement = 0;
   try {
     const ref = k.poseAt({}, controls);
-    for (const X of ref.bodies.values()) referenceAgreement = Math.max(referenceAgreement, poseDiff(X, xf.id()));
+    // a ball turned about its own centre is the same geometry (a rolling part that starts the cycle part-way round)
+    const ball = (b: string) => (k.kin.bodies.find((q) => q.id === b)?.shape as { type?: unknown } | undefined)?.type === "ball";
+    const centre = (b: string): Vec3 => setup.bodyFrame.get(b)?.t ?? [0, 0, 0];
+    for (const [b, X] of ref.bodies) referenceAgreement = Math.max(referenceAgreement, ball(b) ? v3.dist(xf.apply(X, centre(b)), centre(b)) : poseDiff(X, xf.id()));
   } catch (e) {
     failures.push({ u: 0, error: `reference pose: ${(e as Error).message}` });
   }
