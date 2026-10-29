@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { slotAlong } from "../../src/builder/rules/bend";
+import { buildPackage } from "../../src/package/build";
 
 describe("slots along a path (F7)", () => {
   it("are round at both ends: every outline point lies r from the path, and the ends reach r past it", () => {
@@ -23,4 +24,13 @@ describe("slots along a path (F7)", () => {
     const area = ring.reduce((a, p, i) => a + p[0] * ring[(i + 1) % ring.length]![1] - ring[(i + 1) % ring.length]![0] * p[1], 0);
     expect(area).toBeGreaterThan(0);
   });
+
+  it("carry a support's parts that name only the support: the Schmidt coupling's bridge posts follow its output shaft", async () => {
+    const b = await buildPackage("schmidt-coupling");
+    const posts = b.pkg.solids.filter((s) => s.id.startsWith("O3-bridge-post"));
+    expect(posts.length).toBeGreaterThan(4);
+    for (const s of posts) expect(s.joints).toContain("O3");
+    // the screws up from under the base into the posts clamp it already: no nut is added under their heads
+    expect(b.pkg.solids.some((s) => s.kind === "nut" && s.id.startsWith("O3-bridge-post"))).toBe(false);
+  }, 120_000);
 });

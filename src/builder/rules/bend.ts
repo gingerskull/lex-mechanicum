@@ -88,7 +88,13 @@ export const bendSlots: Rule = {
     const base = ctx.base;
     if (!base) return;
     const moved = followers(ctx);
+    const kinJoints = new Set([...ctx.kin.joints.map((j) => j.id), "drive"]);
     for (const [jid, { control, D }] of moved) {
+      // a support's parts that name only the support (a bridge's posts, spigots and screws name the bridge's posts, not
+      // the joint) follow the joint with it: they take its id, so they are moved and slotted with the rest
+      const own = new Set<string>();
+      for (const s of ctx.solids) if (s.body === "ground" && s.joints.includes(jid)) for (const t of s.joints) if (!kinJoints.has(t)) own.add(t);
+      for (const s of ctx.solids) if (s.body === "ground" && !s.joints.includes(jid) && s.joints.some((t) => own.has(t))) s.joints = [...s.joints, jid];
       const pins: string[] = [];
       const nuts: string[] = [];
       const bolts: string[] = [];
@@ -122,6 +128,12 @@ export const bendSlots: Rule = {
         if (runOf(path) < 0.05) continue;
         const M = s.thread?.m ?? Math.round(s.d ?? 5);
         ctx.baseHoles.push({ at: [at[0], at[1]], r: 0, joint: jid, ring: slotAlong(path, (s.d ?? M) / 2 + CLEAR) });
+        const head = ctx.solids.find((q) => q.group === s.group && q.kind === "head");
+        // a screw up from under the base (into a post) already clamps the support where it is set: its slot is enough
+        if (head && head.frame.o[2] < base.bottom - 0.05) {
+          bolts.push(head.id);
+          continue;
+        }
         // the bolt runs on through the base to a washer and a nut under it
         const w = WASHERS[M] ?? WASHERS[5]!;
         const nut = NUTS[M] ?? NUTS[5]!;
@@ -131,7 +143,6 @@ export const bendSlots: Rule = {
         s.frame = { ...s.frame, o: [at[0], at[1], top - L] };
         s.op = { ...s.op, h: L };
         if (s.thread) s.thread = { ...s.thread, z0: 0, z1: L };
-        const head = ctx.solids.find((q) => q.group === s.group && q.kind === "head");
         if (head?.name) head.name = head.name.replace(/ x \d+(\.\d+)? \(/, ` x ${L} (`);
         if (head) bolts.push(head.id);
         const own = { body: "ground", joints: [...s.joints], ...(s.group ? { group: s.group } : {}) };
