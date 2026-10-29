@@ -6,7 +6,7 @@ import type { Package2 } from "../../package/format2";
 import { hasFlag3 } from "../../package/format2";
 import type { EdgeSet } from "../../solids/edges";
 import { mat4, type Mat4 } from "../../solids/frame";
-import { pathLength, stretchMatrix } from "../../solids/convey";
+import { stretchMatrix } from "../../solids/convey";
 import type { MeshData, Vec3 } from "../../solids/types";
 import { DRAFT, type RoleSurface, type SurfaceKey } from "../../style/draft";
 import { FORM } from "../../style/form";
@@ -60,11 +60,8 @@ export interface Runtime {
   fixed: Uint8Array;
   /** The radius (mm) of a round solid that turns over the cycle (SD29), else 0. */
   spin: Float32Array;
-  /**
-   * The running belts' marks (SD29): per marked solid, marks per mm along it and their phase at u (in marks); for an
-   * element of a conveyed belt, `el` is the elements' spacing (mm) and the phase is where its middle is against the marks.
-   */
-  runs: { i: number; perMm: number; phase(u: number): number; el?: number }[];
+  /** The running belts' marks (SD29): per marked solid, marks per mm along it and their phase at u (in marks). */
+  runs: { i: number; perMm: number; phase(u: number): number }[];
   /** The role surface per solid and its pattern layer (-1 for none). */
   surface: RoleSurface[];
   pattern: Int8Array;
@@ -156,38 +153,33 @@ export function runtime(scene: Scene): Runtime {
 
 /**
  * How many marks go round a running belt L mm long that travels T mm over a cycle, and the factor on its travel that
- * brings them back in step after the cycle (SD29): a whole number round it, spaced within `range` (`draft.spin.belt`),
- * the count whose cycle's travel comes nearest a whole number of marks (nearest the middle of the range on a tie). The
- * marks slip on the belt by that much, a percent or so; a belt that comes back where it started needs none.
+ * brings them back in step after the cycle (SD29): a whole number round it, spaced within `draft.spin.belt`, the count
+ * whose cycle's travel comes nearest a whole number of marks (nearest `spin.pitch` apart on a tie). The marks slip on
+ * the belt by that much, a percent or so; a belt that comes back where it started needs none.
  */
-export function runMarks(L: number, T: number, range: readonly [number, number] = DRAFT.spin.belt): { n: number; k: number } {
-  const [p0, p1] = range;
-  const mid = (p0 + p1) / 2;
-  const near = Math.max(1, Math.round(L / mid));
+export function runMarks(L: number, T: number): { n: number; k: number } {
+  const [p0, p1] = DRAFT.spin.belt;
+  const near = Math.max(1, Math.round(L / DRAFT.spin.pitch));
   if (Math.abs(T) < 1e-6) return { n: near, k: 1 };
   let best = { n: near, k: Math.max(1, Math.round((T * near) / L)) / ((T * near) / L), e: Infinity };
   for (let n = Math.max(1, Math.ceil(L / p1)); n <= Math.floor(L / p0); n++) {
     const m = (T * n) / L;
     const r = Math.round(m);
     if (!r) continue;
-    const e = Math.abs(m - r) / Math.abs(m) + Math.abs(L / n - mid) * 1e-9;
+    const e = Math.abs(m - r) / Math.abs(m) + Math.abs(L / n - DRAFT.spin.pitch) * 1e-9;
     if (e < best.e) best = { n, k: r / m, e };
   }
   return { n: best.n, k: best.k };
 }
 
-/** The marks of every running belt (Solid3.run): its band's, or each element's of a conveyed belt. */
+/** The marks of every running belt (Solid3.run): its band stands still and the marks move round its pitch path. */
 function beltRuns(scene: Scene): Runtime["runs"] {
   const { pkg, poser } = scene;
   const TAU = 2 * Math.PI;
   const out: Runtime["runs"] = [];
-  // the elements of each conveyed belt, by its path
-  const count = new Map<number, number>();
-  for (const s of pkg.solids) if (s.run && !s.run.path && s.cv) count.set(s.cv.p, (count.get(s.cv.p) ?? 0) + 1);
   pkg.solids.forEach((s, i) => {
     if (!s.run) return;
-    const tr = s.run.tr;
-    const key = s.run.key ?? s.cv?.path?.key;
+    const { tr, key } = s.run;
     // its travel (mm) at phase u, counted on through whole cycles
     let travel: (u: number) => number;
     if (tr && tr.length > 1) {
@@ -201,19 +193,12 @@ function beltRuns(scene: Scene): Runtime["runs"] {
       };
     } else if (key && poser.value) travel = (u) => poser.value!(u, key) ?? 0;
     else return;
-    const L = s.run.path ? loopLength(s.run.path) : s.cv?.path ? pathLength(s.cv.path) : 0;
+    const L = loopLength(s.run.path);
     if (L <= 0) return;
     const t0 = travel(0);
-    // a band stands still and its marks move; an element moves with the belt, and the marks over it are where its middle
-    // (at s0 on the path, carried on by the travel) stands against them
-    const s0 = s.cv && !s.run.path ? s.cv.s0 : null;
-    const { n, k } = runMarks(L, travel(TAU) - t0, s0 === null ? DRAFT.spin.belt : DRAFT.spin.elementPitch);
+    const { n, k } = runMarks(L, travel(TAU) - t0);
     const perMm = n / L;
-    const phase = (u: number) => {
-      const t = travel(u);
-      return (t - t0) * k * perMm - (s0 === null ? 0 : (s0 + t) * perMm);
-    };
-    out.push(s0 === null ? { i, perMm, phase } : { i, perMm, phase, el: L / (count.get(s.cv!.p) ?? 1) });
+    out.push({ i, perMm, phase: (u) => (travel(u) - t0) * k * perMm });
   });
   return out;
 }
@@ -348,16 +333,10 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     const count = sr ? Math.max(c0, Math.min(c1, 4 * Math.round((2 * Math.PI * sr) / DRAFT.spin.pitch / 4))) : 0;
     table.set([sr, count, sr ? DRAFT.spin.alpha : 0, Math.min(DRAFT.spin.bandMax, DRAFT.spin.band * sr)], o + 28);
   });
-  // a running belt's marks (SD29), drawn wherever the role patterns are: on a band, lines across it (marks per mm along
-  // it and their phase); on a conveyed belt, a tint on the element under each mark, shared with the next as it passes
+  // a running belt's marks (SD29), drawn wherever the role patterns are: marks per mm along it and their phase
   if (st.patterns)
     for (const r of rt.runs) {
       const ph = r.phase(st.u ?? 0);
-      if (r.el === undefined) table.set([0, r.perMm, DRAFT.spin.alpha, ph - Math.floor(ph)], r.i * ST * 4 + 28);
-      else {
-        const off = Math.abs(ph - Math.round(ph)) / r.perMm;
-        const o = r.i * ST * 4 + 16;
-        table[o] = table[o]! + Math.max(0, 1 - off / r.el) * DRAFT.spin.element;
-      }
+      table.set([0, r.perMm, DRAFT.spin.alpha, ph - Math.floor(ph)], r.i * ST * 4 + 28);
     }
 }

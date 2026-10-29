@@ -3,7 +3,7 @@
 // whole assembly is drawn in one call per peeled layer and one call for the lines. Identical hardware shares a shape; its
 // expanded rows are made once and copied per solid, so setup is a copy, not a recomputation. Pure and DOM-free: the
 // buffers are what the GPU gets, and Node tests read them.
-import type { Package2, PackedSolid3, Shape2 } from "../../package/format2";
+import type { Package2, Shape2 } from "../../package/format2";
 import type { Vec2 } from "../../core/geom";
 import { EF, type EdgeSet } from "../../solids/edges";
 import type { MeshData } from "../../solids/types";
@@ -63,16 +63,10 @@ export function pathPlace(path: readonly Vec2[], x: number, y: number): number {
 export const loopLength = (path: readonly Vec2[]): number => path.reduce((a, p, i) => a + Math.hypot(path[(i + 1) % path.length]![0] - p[0], path[(i + 1) % path.length]![1] - p[1]), 0);
 
 /**
- * Each vertex's place along a running belt (SD29), written into the expanded vertices `v` from `o` to `end`: on a belt's
- * band its place round the pitch path, a triangle across the path's start counted on past its length so the place runs
- * on smoothly within it; on a conveyed element its own z (it runs along its path's way).
+ * Each vertex's place round a running belt's pitch path (SD29), written into the expanded vertices `v` from `o` to `end`;
+ * a triangle across the path's start is counted on past its length, so the place runs on smoothly within it.
  */
-function runPlaces(s: PackedSolid3, v: Float32Array, o: number, end: number): void {
-  const path = s.run?.path;
-  if (!path) {
-    for (let k = o; k < end; k += VF) v[k + 8] = v[k + 2]!;
-    return;
-  }
+function runPlaces(path: readonly Vec2[], v: Float32Array, o: number, end: number): void {
   const L = loopLength(path);
   for (let t = o; t < end; t += 3 * VF) {
     const a = [0, 1, 2].map((j) => pathPlace(path, v[t + j * VF]!, v[t + j * VF + 1]!));
@@ -168,7 +162,7 @@ export function bake(pkg: Package2, meshes: readonly MeshData[], edges: readonly
     vrange[2 * i] = vo / VF;
     verts.set(x, vo);
     for (let k = 6; k < x.length; k += VF) verts[vo + k] = i;
-    if (s.run) runPlaces(s, verts, vo, vo + x.length);
+    if (s.run) runPlaces(s.run.path, verts, vo, vo + x.length);
     vo += x.length;
     vrange[2 * i + 1] = vo / VF;
     const e = le[s.shape]!;

@@ -367,7 +367,7 @@ function buildElements(ctx: BuildCtx, j: KinJoint, W: { wheels: Wheel[]; alpha: 
     const q = along(path, s0);
     let nr = v3.unit(v3.cross(q.t, axis));
     if (v3.dot(nr, v3.sub(q.o, mid)) < 0) nr = v3.mul(nr, -1);
-    out.push({ id: `${j.id}-el${k}`, name: k ? "" : `Belt element, steel, flanks at ${(W.alpha / D2R).toFixed(0)}°: ${N} in the belt, pushed round in compression`, role: "hw", kind: "plate", body: "ground", frame: { o: v3.sub(q.o, v3.mul(q.t, th / 2)), x: nr, z: q.t }, profile: { outer: prof, holes: [] }, op: { op: "extrude", h: th, steps: 1 }, marks: [], ex: 0, joints: [j.id], detail: "never", flags: {}, mat: "Steel, hardened", convey: { path, s0 }, group: `${j.id}-belt`, run: {} });
+    out.push({ id: `${j.id}-el${k}`, name: k ? "" : `Belt element, steel, flanks at ${(W.alpha / D2R).toFixed(0)}°: ${N} in the belt, pushed round in compression`, role: "hw", kind: "plate", body: "ground", frame: { o: v3.sub(q.o, v3.mul(q.t, th / 2)), x: nr, z: q.t }, profile: { outer: prof, holes: [] }, op: { op: "extrude", h: th, steps: 1 }, marks: [], ex: 0, joints: [j.id], detail: "never", flags: {}, mat: "Steel, hardened", convey: { path, s0 }, group: `${j.id}-belt` });
   }
   ctx.add(out);
 }

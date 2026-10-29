@@ -165,8 +165,6 @@ export const DRAFT = {
     gap: 30, // degrees, a round part's widest ring has no gap wider than this round the axis (a polygon's corners do)
     round: [0.85, 0.97] as const, // factors on the radius: a part with no outline point between them is round (a gear's teeth fill the band)
     belt: [5, 9] as const, // mm, a running belt's mark spacing, least and most: a whole number round it, the count whose cycle's travel is nearest a whole number of marks
-    element: 0.35, // 0..1, the ink tint on the element of a conveyed belt (a push belt's) under a mark, shared with the next as it passes
-    elementPitch: [12, 20] as const, // mm, the marks' spacing on a conveyed belt, least and most: sparser, as each tints a whole element
   },
 
   // Loose touches, the complete list (SD9).

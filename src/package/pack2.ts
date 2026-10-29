@@ -150,7 +150,7 @@ export function pack2(a: Pack2Input, sampled: Sampled, meshOf: (s: Solid3) => Me
     if (s.spin) p.spin = { at: [...s.spin.at], axis: [...s.spin.axis], u0: s.spin.u0 };
     // (rounded, and -0 written as 0, which is what the JSON keeps)
     const r3 = (v: number) => +v.toFixed(3) || 0;
-    if (s.run) p.run = { ...(s.run.path ? { path: s.run.path.map((q): Vec2 => [r3(q[0]), r3(q[1])]) } : {}), ...(s.run.key ? { key: s.run.key } : {}), ...(s.run.tr ? { tr: s.run.tr.map(r3) } : {}) };
+    if (s.run) p.run = { path: s.run.path.map((q): Vec2 => [r3(q[0]), r3(q[1])]), ...(s.run.key ? { key: s.run.key } : {}), ...(s.run.tr ? { tr: s.run.tr.map(r3) } : {}) };
     if (s.convey) {
       let k = conveys.indexOf(s.convey.path);
       if (k < 0) k = conveys.push(s.convey.path) - 1;

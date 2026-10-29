@@ -3,7 +3,7 @@
 ## Unreleased
 
 - Belts show that they run: faint marks across every motor drive belt and a timing belt's back are carried round with
-  the belt, and a push belt marks an element every so often; the marks come back in step after each cycle.
+  the belt and come back in step after each cycle.
 - The walking-beam transfer's balls roll where they move on their own (along the return lane and across the cross
   tracks, not while the beam carries them) and carry their rotation lines; like parts handed on round a circuit turn
   as one, and a part rolling across its own axis now shows its lines (style reference 3.12, SD29).
