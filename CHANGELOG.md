@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.47.1, Mars — 2026-10-29
+
+- The Schmidt coupling's output support moves with the offset as one: its bridge, its two posts and their screws,
+  the posts' screws in slots in the base. In 0.47.0 the posts stayed where they were built, so the bridge left them
+  as the offset changed and the offset had been stopped at 52 mm; it runs its whole range again, 20 to 100 mm, with
+  the ghost trace back at 90 mm. A support's parts that name only the support now follow its joint.
+
 ## 0.47.0, Mars — 2026-10-29
 
 - Belts show that they run: faint marks across every motor drive belt and a timing belt's back are carried round with
