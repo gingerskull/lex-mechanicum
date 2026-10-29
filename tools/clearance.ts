@@ -11,7 +11,7 @@
 // (tools/pool.ts).
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { allIds, isBuilt, isKnown, clashLines, check3d, sourceOf, unnecessaryLines, type CheckSource } from "../src/checks";
+import { allIds, isBuilt, isKnown, clashLines, check3d, rangeEnds, sourceOf, unnecessaryLines, type CheckSource } from "../src/checks";
 import { builtMechanism } from "../src/package/built";
 import { runPool } from "./pool";
 
@@ -22,7 +22,7 @@ export interface Report {
 }
 
 /** The 3D check of a source. */
-export async function report3(id: string, src: CheckSource, o: { profile: "ci" | "full"; cache: boolean; inject?: [string, number] }): Promise<Report> {
+export async function report3(id: string, src: CheckSource, o: { profile: "ci" | "full"; cache: boolean; inject?: [string, number]; allows?: boolean }): Promise<Report> {
   if (o.inject) {
     const [sid, dz] = o.inject;
     const s = src.solids.find((x) => x.id === sid);
@@ -32,12 +32,13 @@ export async function report3(id: string, src: CheckSource, o: { profile: "ci" |
   }
   const r = await check3d(src, o.profile, { cache: o.cache && !o.inject });
   const clashes = clashLines(r);
-  const unnecessary = unnecessaryLines(r);
+  // the hand allow is audited at the record's own setting only
+  const unnecessary = o.allows === false ? [] : unnecessaryLines(r);
   const lines = [
     `${id}: ${r.clash.stats.solids} solids, ${r.clash.stats.pairs} moving pairs, ${r.clash.stats.intersections} intersections over ${r.clash.stats.phases} phases, ${r.clash.stats.ms.toFixed(0)} ms${r.cached ? " (cached)" : ""} (${r.profile})`,
     `clearance (3D): ${clashes.length} clash${clashes.length === 1 ? "" : "es"}`,
     ...r.clash.clashes.slice(0, 30).map((c) => `  ${c.a} x ${c.b}: ${c.depth.toFixed(2)} mm (${c.volume.toFixed(1)} mm³) at u ${c.u.toFixed(2)}`),
-    r.profile === "full" ? `hand allow: ${r.clash.allows.length} named, ${unnecessary.length} unnecessary` : "hand allow: not audited at the ci profile",
+    ...(o.allows === false ? [] : [r.profile === "full" ? `hand allow: ${r.clash.allows.length} named, ${unnecessary.length} unnecessary` : "hand allow: not audited at the ci profile"]),
     ...unnecessary.slice(0, 12).map((s) => `  unnecessary: ${s}`),
     `clamp (3D): ${r.clamp.length ? r.clamp.length + " fault(s)" : "clean"}`,
     ...r.clamp.map((s) => `  ${s}`),
@@ -54,11 +55,21 @@ interface Job {
   inject?: [string, number];
 }
 
-/** The 3D check of one mechanism, built once (a pool task). */
+/**
+ * The 3D check of one mechanism, built once (a pool task): at its own setting, and at both ends of a control that moves
+ * its supports (a bend), where they are posed as the control sets them.
+ */
 export async function clearanceOne(j: Job): Promise<Report> {
   // --no-cache builds again as well
   const b = await builtMechanism(j.id, { cache: j.cache });
-  return report3(j.id, sourceOf(b.record, b.assembly), { profile: j.profile, cache: j.cache, ...(j.inject ? { inject: j.inject } : {}) });
+  const out = await report3(j.id, sourceOf(b.record, b.assembly), { profile: j.profile, cache: j.cache, ...(j.inject ? { inject: j.inject } : {}) });
+  for (const e of j.inject ? [] : rangeEnds(b.record)) {
+    const r = await report3(`${j.id} at ${e.label}`, sourceOf(b.record, b.assembly, { controls: e.controls }), { profile: j.profile, cache: j.cache, allows: false });
+    out.lines.push(...r.lines);
+    out.clashes += r.clashes;
+    out.faults += r.faults;
+  }
+  return out;
 }
 
 /** The mechanisms a push changes: see the header. */

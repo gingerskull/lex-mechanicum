@@ -3,20 +3,8 @@
 // library of a record's `kin` block (src/kin). A controls object overrides settings for a ghost trace (SD23).
 import { Kinematics, anchorAt, handStroke } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
-import { m3, v3, xf, type Xf } from "../../kin/math";
+import { jointFrame, moves as moved, v3, xf, type Xf } from "../../kin/math";
 import { fiveBarFK } from "../../kin/blocks/linkage";
-
-/** A joint's frame: at its point, z along its axis, x the world up (or x) made square to it. */
-function jointFrame(at: Vec3, axis: Vec3): Xf {
-  const z = v3.unit(axis);
-  const h: Vec3 = Math.abs(z[2]) > 0.9 ? [1, 0, 0] : [0, 0, 1];
-  const x = v3.unit(v3.sub(h, v3.mul(z, v3.dot(h, z))));
-  const y = v3.cross(z, x);
-  return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: at };
-}
-
-const moved = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
-void m3;
 import { driveXf } from "../../solids/drive";
 import { IDENTITY, mat4, type Mat4 } from "../../solids/frame";
 import { conveyMatrix, mul4, turnMatrix } from "../../solids/convey";

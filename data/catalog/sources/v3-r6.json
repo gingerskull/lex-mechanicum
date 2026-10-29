@@ -1886,6 +1886,46 @@
           "stat": "min",
           "value": -4.12,
           "tol": 0.05
+        },
+        {
+          "text": "with the shafts in line the output turns at input speed",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.0001,
+          "setting": {
+            "beta": 0
+          }
+        },
+        {
+          "text": "with the shafts in line the output turns at input speed",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001,
+          "setting": {
+            "beta": 0
+          }
+        },
+        {
+          "text": "at 45° the output speed swings between cos 45° and 1 / cos 45° of the input's",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 0.7071,
+          "tol": 0.001,
+          "setting": {
+            "beta": 45
+          }
+        },
+        {
+          "text": "at 45° the output speed swings between cos 45° and 1 / cos 45° of the input's",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1.4142,
+          "tol": 0.001,
+          "setting": {
+            "beta": 45
+          }
         }
       ],
       "exceptions": []
@@ -1936,13 +1976,13 @@
           },
           "frame": {
             "o": [
-              "-Lc/2-Ls*cos(beta)",
-              "Ls*sin(beta)",
+              "-Lc/2-Ls",
+              0,
               "H"
             ],
             "z": [
-              "cos(beta)",
-              "-sin(beta)",
+              1,
+              0,
               0
             ],
             "x": [
@@ -1970,8 +2010,8 @@
               "H"
             ],
             "z": [
-              "sin(beta)",
-              "cos(beta)",
+              0,
+              1,
               0
             ],
             "x": [
@@ -1995,13 +2035,13 @@
           },
           "frame": {
             "o": [
-              0,
-              0,
+              "-Lc/2+Lc/2*cos(beta)",
+              "Lc/2*sin(beta)",
               "H"
             ],
             "z": [
-              1,
-              0,
+              "cos(beta)",
+              "sin(beta)",
               0
             ],
             "x": [
@@ -2025,18 +2065,18 @@
           },
           "frame": {
             "o": [
-              0,
-              0,
+              "-Lc/2+Lc/2*cos(beta)",
+              "Lc/2*sin(beta)",
               "H"
             ],
             "z": [
-              1,
-              0,
+              "cos(beta)",
+              "sin(beta)",
               0
             ],
             "x": [
-              0,
-              "-sin(phase)",
+              "sin(phase)*sin(beta)",
+              "-sin(phase)*cos(beta)",
               "cos(phase)"
             ]
           }
@@ -2054,18 +2094,18 @@
           },
           "frame": {
             "o": [
-              "Lc/2",
-              0,
+              "-Lc/2+Lc*cos(beta)",
+              "Lc*sin(beta)",
               "H"
             ],
             "z": [
-              0,
-              "-sin(phase)",
+              "sin(phase)*sin(beta)",
+              "-sin(phase)*cos(beta)",
               "cos(phase)"
             ],
             "x": [
-              "-cos(phase)*sin(beta)",
-              "cos(phase)*cos(beta)",
+              "-cos(phase)*sin(2*beta)",
+              "cos(phase)*cos(2*beta)",
               "sin(phase)*cos(beta)"
             ]
           }
@@ -2087,18 +2127,18 @@
           },
           "frame": {
             "o": [
-              "Lc/2+Ls*cos(beta)",
-              "Ls*sin(beta)",
+              "-Lc/2+Lc*cos(beta)+Ls*cos(2*beta)",
+              "Lc*sin(beta)+Ls*sin(2*beta)",
               "H"
             ],
             "z": [
-              "cos(beta)",
-              "sin(beta)",
+              "cos(2*beta)",
+              "sin(2*beta)",
               0
             ],
             "x": [
-              "-cos(phase)*sin(beta)",
-              "cos(phase)*cos(beta)",
+              "-cos(phase)*sin(2*beta)",
+              "cos(phase)*cos(2*beta)",
               "sin(phase)*cos(beta)"
             ]
           }
@@ -2111,13 +2151,13 @@
           "a": "ground",
           "b": "yoke-in",
           "at": [
-            "-Lc/2-Ls*cos(beta)",
-            "Ls*sin(beta)",
+            "-Lc/2-Ls",
+            0,
             "H"
           ],
           "axis": [
-            "cos(beta)",
-            "-sin(beta)",
+            1,
+            0,
             0
           ]
         },
@@ -2132,8 +2172,8 @@
             "H"
           ],
           "axis": [
-            "sin(beta)",
-            "cos(beta)",
+            0,
+            1,
             0
           ]
         },
@@ -2159,13 +2199,13 @@
           "a": "centre-fork",
           "b": "cross-2",
           "at": [
-            "Lc/2",
-            0,
+            "-Lc/2+Lc*cos(beta)",
+            "Lc*sin(beta)",
             "H"
           ],
           "axis": [
-            0,
-            "-sin(phase)",
+            "sin(phase)*sin(beta)",
+            "-sin(phase)*cos(beta)",
             "cos(phase)"
           ]
         },
@@ -2175,13 +2215,13 @@
           "a": "cross-2",
           "b": "yoke-out",
           "at": [
-            "Lc/2",
-            0,
+            "-Lc/2+Lc*cos(beta)",
+            "Lc*sin(beta)",
             "H"
           ],
           "axis": [
-            "-cos(phase)*sin(beta)",
-            "cos(phase)*cos(beta)",
+            "-cos(phase)*sin(2*beta)",
+            "cos(phase)*cos(2*beta)",
             "sin(phase)*cos(beta)"
           ]
         },
@@ -2191,13 +2231,13 @@
           "a": "ground",
           "b": "yoke-out",
           "at": [
-            "Lc/2+Ls*cos(beta)",
-            "Ls*sin(beta)",
+            "-Lc/2+Lc*cos(beta)+Ls*cos(2*beta)",
+            "Lc*sin(beta)+Ls*sin(2*beta)",
             "H"
           ],
           "axis": [
-            "cos(beta)",
-            "sin(beta)",
+            "cos(2*beta)",
+            "sin(2*beta)",
             0
           ]
         }
@@ -2285,8 +2325,8 @@
               "out": {
                 "body": "centre",
                 "axis": [
-                  1,
-                  0,
+                  "cos(beta)",
+                  "sin(beta)",
                   0
                 ]
               }
@@ -2320,8 +2360,8 @@
               "in": {
                 "body": "centre-fork",
                 "axis": [
-                  1,
-                  0,
+                  "cos(beta)",
+                  "sin(beta)",
                   0
                 ]
               }
@@ -2590,13 +2630,63 @@
           "stat": "max",
           "value": 1.064,
           "tol": 0.002
+        },
+        {
+          "text": "with all three shafts in line the centre yoke turns at input speed",
+          "output": "centre-speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001,
+          "setting": {
+            "beta": 0
+          }
+        },
+        {
+          "text": "at 30° per joint the output still turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.0001,
+          "setting": {
+            "beta": 30
+          }
+        },
+        {
+          "text": "at 30° per joint the output still turns at exactly input speed",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001,
+          "setting": {
+            "beta": 30
+          }
+        },
+        {
+          "text": "at 30° per joint the centre yoke swings between cos 30° and 1 / cos 30° of input speed",
+          "output": "centre-speed-ratio",
+          "stat": "min",
+          "value": 0.866,
+          "tol": 0.002,
+          "setting": {
+            "beta": 30
+          }
+        },
+        {
+          "text": "at 30° per joint the centre yoke swings between cos 30° and 1 / cos 30° of input speed",
+          "output": "centre-speed-ratio",
+          "stat": "max",
+          "value": 1.1547,
+          "tol": 0.002,
+          "setting": {
+            "beta": 30
+          }
         }
       ],
       "exceptions": []
     },
     "edit": {
       "topology.notes": "ground, input yoke, cross 1, centre yoke, cross 2, output yoke; 2 shaft bearings plus 2 cross bearings per joint. Overconstrained in the joint count: Kutzbach gives 0 because it ignores that the axes at each cross meet at its centre (two spherical chains); the true mobility is 1, solved in closed form by two Hooke blocks. A ball-and-socket centring device (spherical pair, not counted) keeps the two joint angles equal.",
-      "build.ground": "input and output bearings whose axes meet on the perpendicular bisector of the centre yoke, Lc/2 tan(beta) off it, total angle 2 beta",
+      "build.ground": "the input bearing fixed on its axis; the centre yoke turned by beta about the first cross and the output by 2 beta, so the input and output axes meet on the perpendicular bisector of the centre yoke, Lc/2 tan(beta) off it, total angle 2 beta",
       "build.range": "input 360° continuous; output 360° exactly in phase; centre yoke leads and lags by up to about 1.8° at beta = 20° (speed ratio 0.940 to 1.064)",
       "build.notes": "A phase control (0° to 90°) turns the centre yoke's second fork: at 90° the two fluctuations add instead of cancelling and the output speed ratio swings 0.883 to 1.133 at beta = 20°. Keep the centre yoke on the bisector of the total angle. Reuse the single universal-joint solver twice, the second reversed."
     }
@@ -3398,6 +3488,46 @@
           "stat": "range",
           "value": 12.94,
           "tol": 0.05
+        },
+        {
+          "text": "with the shafts in line the cage stands square to them",
+          "output": "cage-tilt",
+          "stat": "mean",
+          "value": 0,
+          "tol": 0.01,
+          "setting": {
+            "beta": 0
+          }
+        },
+        {
+          "text": "at 45° the two shafts still turn at exactly the same speed",
+          "output": "speed-ratio",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.0001,
+          "setting": {
+            "beta": 45
+          }
+        },
+        {
+          "text": "at 45° the two shafts still turn at exactly the same speed",
+          "output": "speed-ratio",
+          "stat": "max",
+          "value": 1,
+          "tol": 0.0001,
+          "setting": {
+            "beta": 45
+          }
+        },
+        {
+          "text": "at 45° the cage tilts by half the angle, 22.5°",
+          "output": "cage-tilt",
+          "stat": "mean",
+          "value": 22.5,
+          "tol": 0.01,
+          "setting": {
+            "beta": 45
+          }
         }
       ],
       "exceptions": [],
