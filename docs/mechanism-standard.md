@@ -296,6 +296,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `classify` | A1, A2, A3 |
 | `placement` | A10, A18 |
 | `lugs` | A1, A2 |
+| `bend-slots` | F7, F1 |
 | `base` | A7, D4, M4 |
 | `posts` | A7, F1 |
 | `wheels` | D1, F2 |

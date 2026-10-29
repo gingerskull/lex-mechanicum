@@ -11,6 +11,13 @@ import type { DriveMotion } from "./drive";
 import type { RungId } from "../style/detail";
 import type { MarkKind, SolidKind, SolidRole } from "../style/kinds";
 
+/** A running belt's marks (Solid3.run): the path they ride and where the travel comes from. */
+export interface Run {
+  path: Vec2[];
+  key?: string;
+  tr?: number[];
+}
+
 export type { Vec3 };
 
 /**
@@ -134,6 +141,11 @@ export interface Solid3 {
    * axis through `at` by u − u0, u0 the cycle phase of the reference configuration it was built in.
    */
   spin?: { at: Vec3; axis: Vec3; u0: number };
+  /**
+   * A belt that runs (SD29): marks ride on it along `path` (closed, in its profile's coordinates, the way the belt runs)
+   * by its travel: the kin value `key` (mm), else `tr`, its travel (mm) at N + 1 even phases from 0 to 2π.
+   */
+  run?: Run;
   /** A stretched member's two solved points: its unit-length profile spans them. */
   stretch?: [string, string];
   /**

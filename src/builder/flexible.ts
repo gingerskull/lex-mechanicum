@@ -96,10 +96,11 @@ function buildTimingBelt(ctx: BuildCtx, j: KinJoint): void {
     const f = along(path, s0);
     out.push({ id: `${j.id}-tooth${k}`, name: k ? "" : `Belt tooth HTD ${p}M, ${N} round the loop`, role: "hw", kind: "belt", body: "ground", frame: { o: f.o, x: f.t, z: UP }, profile: { outer: tooth, holes: [] }, op: { op: "extrude", h: width, steps: 1 }, marks: [], ex: 0, joints: [j.id], detail: "never", flags: {}, mat: "Neoprene, glass-fibre cords", convey: { path, s0 }, group: `${j.id}-belt` });
   }
-  // the band of the belt's back, fixed round the pitch path: from just outside the teeth's roots to the back
+  // the band of the belt's back, fixed round the pitch path: from just outside the teeth's roots to the back; its marks
+  // run round the pitch path with the teeth (SD29)
   const back = P.hs - P.ht - P.pld;
   const ring = (off: number): Vec2[] => beltPath(w1.c, w1.r + off, w2.c, w2.r + off, Math.PI / 96);
-  out.push({ id: `${j.id}-band`, name: `Timing belt HTD ${p}M, ${N} teeth, ${(N * p).toFixed(0)} mm pitch length, ${width.toFixed(0)} mm wide`, role: "hw", kind: "belt", body: "ground", frame: { o: [0, 0, z0], x: [1, 0, 0], z: UP }, profile: { outer: ring(back), holes: [ring(-0.35).reverse()] }, op: { op: "extrude", h: width, steps: 1 }, marks: [], ex: 0, joints: [j.id], detail: "never", flags: {}, mat: "Neoprene, glass-fibre cords", group: `${j.id}-belt` });
+  out.push({ id: `${j.id}-band`, name: `Timing belt HTD ${p}M, ${N} teeth, ${(N * p).toFixed(0)} mm pitch length, ${width.toFixed(0)} mm wide`, role: "hw", kind: "belt", body: "ground", frame: { o: [0, 0, z0], x: [1, 0, 0], z: UP }, profile: { outer: ring(back), holes: [ring(-0.35).reverse()] }, op: { op: "extrude", h: width, steps: 1 }, marks: [], ex: 0, joints: [j.id], detail: "never", flags: {}, mat: "Neoprene, glass-fibre cords", group: `${j.id}-belt`, run: { path: pitch, key } });
   // the pulleys' grooves, phased to the teeth: a groove where a tooth stands on each wheel's arc
   const a = Math.atan2(w2.c[1] - w1.c[1], w2.c[0] - w1.c[0]);
   const b = Math.asin((w2.r - w1.r) / Math.hypot(w2.c[0] - w1.c[0], w2.c[1] - w1.c[1]));

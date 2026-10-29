@@ -1,9 +1,9 @@
 # Audit: Schmidt coupling (schmidt-coupling)
 standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
-teaching: rethink · decisions in the record
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 146 · FAIL 0 · N/A 21 · open: none
+PASS 146 · FAIL 0 · N/A 22 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build (E2, #204) and again on six phases of the finished build (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 4.3e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (parallel-cranks); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -224,5 +225,5 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 Promoted in this pass: ring discs (`ring: { inner, spokes, hub }`), engraved index marks (`indexMark`), a second link set's own pattern (`set: "B"` drawn as link2), the `parallel-cranks` block.
 
 ## Verification
-check: clean · K1 residual: 4.3e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.0 KB
+check: clean · K1 residual: 4.3e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 27.0 KB
 screenshots: dist/shots3/schmidt-coupling (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

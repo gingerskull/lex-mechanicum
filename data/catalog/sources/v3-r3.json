@@ -562,9 +562,9 @@
     },
     "teaching": {
       "review": {
-        "verdict": "tweak",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (tweak) and issue #214: e 40, l 90, r 30 raise the time ratio from 1.09 to 1.28, so the slow and quick strokes look different. The two dead-centre lines through O and the arcs of crank turn between them show why: the crank and rod line up at crank angles 202.3 degrees apart one way and 157.7 the other. Equal-time ticks on B show the slow and quick strokes. The offset is a control."
+        "verdict": "keep",
+        "date": "2026-10-29",
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214: e 40, l 90, r 30 raise the time ratio from 1.09 to 1.28, so the slow and quick strokes look different. The two dead-centre lines through O and the arcs of crank turn between them show why: the crank and rod line up at crank angles 202.3 degrees apart one way and 157.7 the other. Equal-time ticks on B show the slow and quick strokes. The offset is a control. 29 Oct 2026 (#242): the slide's supports, carried with the slide line as the offset changes, stand in slots in the base along their path over the offset's range, clamped by nuts under the base; the clearance check runs at both ends of the offset (0 and 45 mm) and is clean. Re-checked on the rebuilt drawing at both ends: keep."
       },
       "principle": [
         {

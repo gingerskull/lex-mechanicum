@@ -1,9 +1,9 @@
 # Audit: Double Cardan joint (double-cardan)
 standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
-teaching: tweak · decisions in the record
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 145 · FAIL 0 · N/A 22 · open: none
+PASS 145 · FAIL 0 · N/A 23 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,7 +27,8 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build (E2, #204) and again on six phases of the finished build (teaching: line) |
-| K1 | PASS | AUTO · K1 residual 2.8e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
+| K1 | PASS | AUTO · K1 residual 4.3e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 2 blocks (hooke); no numeric fallback · composed from the block library; no fallback, no one-off model |
 | K4 | PASS | HAND · input yoke driver with the accent, output yoke output; crosses, centre yoke and its second fork links |
@@ -46,7 +47,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | T6 | PASS | HAND / DATA · 20 deg per joint: the centre yoke's speed swings 0.940 to 1.064 while the output stays flat |
 | T7 | PASS | DATA · ISOMETRIC, where the crosses turn out of plane |
 | T8 | N/A | DATA · the principle lies in plain view, no section needed |
-| T9 | PASS | AUTO / DATA · claim table: 6 ok, 0 off, 0 uncheckable of 6 |
+| T9 | PASS | AUTO / DATA · claim table: 11 ok, 0 off, 0 uncheckable of 11 |
 | T10 | PASS | AUTO · 13 solids drawn see-through: B2-pb-b0, B2-pb-b0-brg, B2-pb-b0-brg-balls, B2-pb-b0-brg-cage, B2-pb-b0-cl0, B2-pb-b0-cl1, B2-pb-b0-col0, B2-pb-b0-col1 · the input blocks drawn see-through where they cover the yoke |
 | T11 | PASS | AUTO · 2 supports routed, 2 moved off a sweep · both pairs of pillow blocks routed off the yokes' sweeps |
 | T12 | PASS | HAND · 19 support solids; dropped by the polish: none |
@@ -64,7 +65,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 143 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 147 solids unsound |
 | D7 | PASS | HAND · yokes and crosses plain; richness in the cups and stacks |
 | A1 | PASS | AUTO · B1 J10, B2 J10, C1a cross-pin, C1b cross-pin, C2a cross-pin, C2b cross-pin, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · B1 J10, B2 J10, C1a cross-pin, C1b cross-pin, C2a cross-pin, C2b cross-pin, drive drive · two live shafts in plan (J10); the yoke pins in the crosses by the cross-pin kit |
@@ -180,7 +181,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | B1 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x18, holds the yoke in on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
-| B2 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
+| B2 | J10 | hooke | pillow (moved) | – | 4 x Socket head M5 x 25 (ISO 4762) | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | 4 x Nyloc nut M5 (DIN 985) under the base, clamping the support where the bend control sets it | none | none | none |
 | C1a | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
 | C1b | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
 | C2a | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | cross-2-nip | none | none |
@@ -190,8 +191,8 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
 |---|---|---|---|---|---|---|
-| B1-pb | B1 | pillow | moved | 1.5 | yoke-in, cross-1, centre | – |
-| B2-pb | B2 | pillow | moved | 1.5 | yoke-out | – |
+| B1-pb | B1 | pillow | moved | 1.5 | yoke-in | – |
+| B2-pb | B2 | pillow | moved | 1.5 | – | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -204,16 +205,16 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | DL-A | 9 | 0 | 1.81 |
 | DL-B | 0 | 273 | 2.03 |
 | DL-C | 0 | 0 | 1.92 |
-| DL-D | 13 | 0 | 1.87 |
+| DL-D | 17 | 0 | 1.87 |
 | DL-E | 9 | 0 | 2.19 |
 | DL-F | 0 | 0 | 1.85 |
 | DL-G | 0 | 0 | 1.83 |
 | DL-H | 12 | 0 | 1.77 |
-| never | 100 | 181 | 1.99 |
+| never | 100 | 182 | 1.99 |
 
 ## Promotion candidates
 Promoted in this pass: the Hooke block with a shaft that has no ground joint (`shafts`), body frames given by axes (`frame: { z, x }`) so a control can turn them.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.9 KB
+check: clean · K1 residual: 4.3e-14 · claims: 11 of 11 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.0 KB
 screenshots: dist/shots3/double-cardan (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

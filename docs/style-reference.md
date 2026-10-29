@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.11
-date: 2026-10-28
+version: 3.12
+date: 2026-10-29
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -181,7 +181,7 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | SD26 | **Highlights.** The part a view or a setting makes the point of (the open port, the loaded rocker, the load-carrying groove wall) is drawn with the accent ring or the highlight callout (SD5), the one accent use added by the teaching block. |
 | SD27 | **Time map.** Playback slows near a declared feature; the drawing and the plot do not change, only the rate at which u advances; the scrubber shows the true input. |
 | SD28 | **No pop-ins.** Nothing the drawing shows switches in one frame while the view turns or the cycle plays: a solid eases in and out of see-through over a small range of overlap and depth (T10); a pattern fades out over a range of angles as its face turns edge-on; a cap's bold top outline blends into the far cap's style as its face turns edge-on; a smooth surface's outline is shared by the tessellation edges either side of it, so it glides as the surface turns; a pattern finer than a few pixels on screen is sampled several times per pixel, so it does not shimmer; and the Auto dial moves only on a sustained cost (DL4 of the standard). A face that really turns from one side to the other, edge-on, is an event of the geometry and stays. |
-| SD29 | **A turning round part shows that it turns.** A part that turns over the cycle and is round about its own axis (a shaft, a roller, a plain disc or sheave; not a gear, whose teeth show it) carries faint rulings registered to it: lines along its round walls and short ticks round the rim of its faces, at about one per `spin.pitch` of its largest radius, the same count on every step of a shaft. They are ink at `spin.alpha`, drawn at every dial position that draws the role patterns, and fade out where they crowd on screen (toward the outline, where the wall turns away), so they never shimmer or pop. A boss ring is engraved round a pin a part carries (a revolute, spherical or universal joint), as large as a hub round the pin's bore and no larger, never round a slide, a contact or a mesh. |
+| SD29 | **A turning round part shows that it turns.** A part that turns over the cycle and is round about its own axis (a shaft, a roller, a plain disc or sheave; not a gear, whose teeth show it) carries faint rulings registered to it: lines along its round walls and short ticks round the rim of its faces, at about one per `spin.pitch` of its largest radius, the same count on every step of a shaft. They are ink at `spin.alpha`, drawn at every dial position that draws the role patterns, and fade out where they crowd on screen (toward the outline, where the wall turns away), so they never shimmer or pop. A ball turns whether it turns about its own axis or across it (rolling sideways); a round part that only swings across its axis (a steered wheel, a rocking cylinder) does not turn. Like parts handed on round a circuit (a body's `next`) turn as one. A running belt shows that it runs the same way: lines across its back and faces, carried round its pitch path with its travel, a whole number round it at a spacing within `spin.belt`, the number whose travel over a cycle is nearest a whole number of marks, so they come back in step after it (they slip on the belt by that much, a percent or so). A belt of conveyed parts (a chain, a push belt) shows its run by its moving parts and carries no marks. A boss ring is engraved round a pin a part carries (a revolute, spherical or universal joint), as large as a hub round the pin's bore and no larger, never round a slide, a contact or a mesh. |
 
 ---
 
@@ -406,6 +406,7 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.spin.bandMax` | 5 | mm, the ticks' longest length |
 | `draft.spin.gap` | 30 | degrees, a round part's widest ring has no gap wider than this round the axis (a polygon's corners do) |
 | `draft.spin.round` | [0.85, 0.97] | factors on the radius: a part with no outline point between them is round (a gear's teeth fill the band) |
+| `draft.spin.belt` | [5, 9] | mm, a running belt's mark spacing, least and most: a whole number round it, the count whose cycle's travel is nearest a whole number of marks |
 | `draft.sketch.overshoot` | 14 | px, construction lines run this far past the base plate's corners |
 | `draft.sketch.alpha` | 0.32 | 0..1 |
 | `draft.sketch.width` | 0.55 | px |
@@ -806,6 +807,9 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 
 ## Changelog
 
+- **3.12 (2026-10-29).** A running belt carries marks carried round with it (SD29, `spin.belt`); a belt of conveyed
+  parts shows its run by them. A ball that turns across its own axis (rolling sideways) carries its rulings, and like
+  parts handed on round a circuit turn as one.
 - **3.11 (2026-10-28).** The library's featured sheet (SS16): its title block beside its drawing, fitted whole. Card
   drawings thin every line in proportion (`draft.card.lines`) and their bold outlines more (SS1). In the wide view, at a
   glance runs across the whole width on a sheet with no plot (SS9).

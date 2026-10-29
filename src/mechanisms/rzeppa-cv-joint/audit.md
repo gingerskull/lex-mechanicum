@@ -1,9 +1,9 @@
 # Audit: Rzeppa CV joint (rzeppa-cv-joint)
 standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
-teaching: tweak · decisions in the record
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 148 · FAIL 0 · N/A 19 · open: none
+PASS 148 · FAIL 0 · N/A 20 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build (E2, #204) and again on six phases of the finished build (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 2.1e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (rzeppa); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -46,7 +47,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | T6 | PASS | HAND / DATA · 30 deg shaft angle: the cage tilts 15 deg, each ball runs 13 mm along its groove |
 | T7 | PASS | DATA · ISOMETRIC, with the bell see-through |
 | T8 | PASS | DATA · section through the plane of the shafts: the bell, the inner race, the cage tilted half-way and balls 1 and 4 in their grooves and windows |
-| T9 | PASS | AUTO / DATA · claim table: 4 ok, 0 off, 0 uncheckable of 4 |
+| T9 | PASS | AUTO / DATA · claim table: 8 ok, 0 off, 0 uncheckable of 8 |
 | T10 | PASS | AUTO · 8 solids drawn see-through: outer-bell, B2-0-brg, B2-0-brg-balls, B2-0-brg-cage, B2-0-cl, B2-axle, B2-pb-b0, outer · the bell drawn see-through by the record (it encloses the principle); the blocks see-through where they cover it |
 | T11 | PASS | AUTO · 2 supports routed, 2 moved off a sweep · both pairs of blocks routed off the sweeps |
 | T12 | PASS | HAND · 19 support solids; dropped by the polish: none |
@@ -64,7 +65,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 102 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 106 solids unsound |
 | D7 | PASS | HAND · races, cage and balls plain; richness in the grooves and stacks |
 | A1 | PASS | AUTO · B1 J10, B2 J10, F1 sphere-fit, F2 sphere-fit, W1 slipper, W2 slipper, W3 slipper, W4 slipper, W5 slipper, W6 slipper, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · B1 J10, B2 J10, F1 sphere-fit, F2 sphere-fit, W1 slipper, W2 slipper, W3 slipper, W4 slipper, W5 slipper, W6 slipper, drive drive · two live shafts in plan (J10); the cage's spherical fits and the balls in its windows noted by their kits |
@@ -180,7 +181,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | B1 | J10 | rzeppa | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x20, holds the inner on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 4 x 4 x 13 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
-| B2 | J10 | rzeppa | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base; Dead shaft Ø12, clamped in two pillow blocks | Internal circlip DIN 472, Ø24; 2 x Set screw M4 on a flat, clamps the dead shaft (F2, F3) | none | none | none | none | none | none | none | none |
+| B2 | J10 | rzeppa | pillow (moved) | – | Dead shaft Ø12, clamped in two pillow blocks; 4 x Socket head M5 x 25 (ISO 4762) | Internal circlip DIN 472, Ø24; 2 x Set screw M4 on a flat, clamps the dead shaft (F2, F3) | none | none | none | none | 4 x Nyloc nut M5 (DIN 985) under the base, clamping the support where the bend control sets it | none | none | none |
 | F1 | sphere-fit | rzeppa | – | – | none | none | none | none | none | none | none | none | none | none |
 | F2 | sphere-fit | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | W1 | slipper | – | – | – | none | none | none | none | none | none | none | none | none | none |
@@ -208,16 +209,16 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-A | 7 | 0 | 1.62 |
 | DL-B | 0 | 274 | 1.62 |
 | DL-C | 0 | 0 | 1.56 |
-| DL-D | 4 | 0 | 1.56 |
+| DL-D | 8 | 0 | 1.56 |
 | DL-E | 8 | 0 | 1.6 |
 | DL-F | 0 | 0 | 1.58 |
 | DL-G | 0 | 0 | 1.7 |
 | DL-H | 12 | 0 | 1.64 |
-| never | 71 | 104 | 1.7 |
+| never | 71 | 108 | 1.7 |
 
 ## Promotion candidates
 Promoted in this pass: the `ball`, `race`, `bell` and `cage` shapes (revolves with swept grooves and cut windows), the sphere-fit kit, the `rzeppa` block.
 
 ## Verification
-check: clean · K1 residual: 2.1e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 70.0 KB
+check: clean · K1 residual: 2.1e-14 · claims: 8 of 8 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 72.6 KB
 screenshots: dist/shots3/rzeppa-cv-joint (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

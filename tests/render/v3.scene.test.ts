@@ -5,10 +5,10 @@ import { Kinematics } from "../../src/kin/compose";
 import type { Kin } from "../../src/kin/types";
 import { buildPackage } from "../../src/package/build";
 import { newCache, controlFor, extremes, locusOf, pathOf, type Ann } from "../../src/render/v3/annotate";
-import { bake, EDGE_RING, EF2, VF } from "../../src/render/v3/bake";
+import { bake, EDGE_RING, EF2, loopLength, pathPlace, VF } from "../../src/render/v3/bake";
 import { basisOfOrient, fit, namedOrient } from "../../src/render/v3/camera";
 import { kinPoser } from "../../src/render/v3/poser";
-import { place, rows, runtime, ST, worldBox } from "../../src/render/v3/scene";
+import { place, rows, runMarks, runtime, ST, worldBox } from "../../src/render/v3/scene";
 import { seeThrough, swept } from "../../src/render/v3/visibility";
 import { ladder } from "../../src/render/detail";
 import { setupInline } from "../../src/solids/setup";
@@ -278,5 +278,84 @@ describe("posers", () => {
     expect(rt.baked.nVerts).toBeGreaterThan(10_000);
     expect(rt.fixed.some((f) => f === 0)).toBe(true);
     expect(rt.fixed.some((f) => f === 1)).toBe(true);
+  }, 60_000);
+});
+
+describe("running belts (SD29)", () => {
+  it("puts a whole number of marks round a belt, spaced within draft.spin.belt, that come back in step after a cycle", () => {
+    for (const [L, T] of [[140, 64], [696, 192], [430.7, -188.5], [12, 64]] as const) {
+      const { n, k } = runMarks(L, T);
+      expect(Number.isInteger(n)).toBe(true);
+      if (L / DRAFT.spin.belt[1] >= 1) expect(L / n).toBeGreaterThanOrEqual(DRAFT.spin.belt[0] - 1e-9);
+      // the marks' travel over a cycle is a whole number of marks, a percent or so off the belt's
+      const m = (k * T * n) / L;
+      expect(Math.abs(m - Math.round(m))).toBeLessThan(1e-9);
+      if (L > 100) expect(Math.abs(k - 1)).toBeLessThan(0.02);
+    }
+    // a belt that comes back where it started (a linear input's) needs no slip
+    expect(runMarks(300, 0).k).toBe(1);
+  });
+
+  it("measures a point's place round a closed path the way it runs", () => {
+    const sq: [number, number][] = [[0, 0], [10, 0], [10, 10], [0, 10]];
+    expect(loopLength(sq)).toBe(40);
+    expect(pathPlace(sq, 4, -1)).toBeCloseTo(4, 12);
+    expect(pathPlace(sq, 11, 3)).toBeCloseTo(13, 12);
+    expect(pathPlace(sq, -1, 2)).toBeCloseTo(38, 12);
+  });
+
+  it("the four-bar's motor belt runs a turn of its 32-tooth pulley a cycle, and its marks are baked along it", async () => {
+    const b = await fourBar();
+    const belt = b.pkg.solids.find((s) => s.id === "drive-belt")!;
+    const tr = belt.run!.tr!;
+    expect(belt.run!.path!.length).toBeGreaterThan(16);
+    // a GT2 pulley of 32 teeth carries 64 mm of belt a turn
+    expect(Math.abs(tr[tr.length - 1]! - tr[0]!)).toBeCloseTo(64, 1);
+    const s = await setupInline(await encode2(b.pkg));
+    const rec = recordById("four-bar") as unknown as { kin: Kin };
+    const rt = runtime({ ...scene3([], {}), pkg: b.pkg, meshes: s.meshes, edges: s.edges, baked: s.baked, poser: kinPoser(new Kinematics(rec.kin), undefined, b.pkg.lifts) } as never);
+    const i = b.pkg.solids.indexOf(belt);
+    const run = rt.runs.find((r) => r.i === i)!;
+    expect(run.perMm).toBeGreaterThan(1 / DRAFT.spin.belt[1] - 1e-9);
+    // its vertices carry their place along the belt, from 0 to about its length
+    const L = loopLength(belt.run!.path!);
+    const places = [...Array(rt.baked.vrange[2 * i + 1]! - rt.baked.vrange[2 * i]!).keys()].map((k) => rt.baked.verts[(rt.baked.vrange[2 * i]! + k) * VF + 8]!);
+    expect(Math.min(...places)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...places)).toBeGreaterThan(L * 0.9);
+    expect(Math.max(...places)).toBeLessThan(L * 1.5);
+    // the phase moves on with the cycle and is back in step after it
+    expect(Math.abs(run.phase(1) - run.phase(0))).toBeGreaterThan(0.1);
+    const d = run.phase(2 * Math.PI) - run.phase(0);
+    expect(Math.abs(d - Math.round(d))).toBeLessThan(1e-6);
+    // the belt runs the way its pulley's rim goes: on the arc where the path wraps the shaft's (bigger) pulley, a point
+    // the pulley carries moves along the path's way as the travel grows
+    const pul = b.pkg.solids.find((x) => x.id === "drive-pulley-shaft")!;
+    const fr = belt.fr;
+    const y = [fr.z[1] * fr.x[2] - fr.z[2] * fr.x[1], fr.z[2] * fr.x[0] - fr.z[0] * fr.x[2], fr.z[0] * fr.x[1] - fr.z[1] * fr.x[0]];
+    const world = (q: readonly number[]) => [0, 1, 2].map((k) => fr.o[k]! + fr.x[k]! * q[0]! + y[k]! * q[1]!);
+    const path = belt.run!.path!;
+    // the radius of the circle through a path point and its neighbours: the bigger arc's points have the bigger radius
+    const radius = (k: number) => {
+      const [a, q, c] = [path[(k + path.length - 1) % path.length]!, path[k]!, path[(k + 1) % path.length]!];
+      const ab = Math.hypot(q[0] - a[0], q[1] - a[1]), bc = Math.hypot(c[0] - q[0], c[1] - q[1]), ca = Math.hypot(a[0] - c[0], a[1] - c[1]);
+      const area = Math.abs((q[0] - a[0]) * (c[1] - a[1]) - (q[1] - a[1]) * (c[0] - a[0])) / 2;
+      return area > 1e-9 ? (ab * bc * ca) / (4 * area) : Infinity;
+    };
+    const rs = path.map((_, k) => radius(k));
+    // (an arc's radius comes up at every point inside it; a point where an arc meets a span gives a stray one)
+    const big = Math.max(...rs.filter((r) => rs.filter((q) => Math.abs(q - r) < 0.2).length >= 5));
+    expect(Math.abs(big - 32 / Math.PI)).toBeLessThan(0.3);
+    const k0 = rs.findIndex((r) => r === big);
+    const on = world(path[k0]!);
+    const way = world(path[(k0 + 1) % path.length]!).map((v, k) => v - on[k]!);
+    const P = kinPoser(new Kinematics(rec.kin), undefined, b.pkg.lifts);
+    const m0 = P.place(pul, 0);
+    const m1 = P.place(pul, 1e-3);
+    const local = [0, 1, 2].map((r) => [0, 1, 2].reduce((a, k) => a + m0[r * 4 + k]! * (on[k]! - m0[12 + k]!), 0));
+    const moved = [0, 1, 2].map((r) => m1[12 + r]! + [0, 1, 2].reduce((a, k) => a + m1[k * 4 + r]! * local[k]!, 0) - on[r]!);
+    expect(Math.hypot(...moved)).toBeGreaterThan(1e-4);
+    const dot = moved.reduce((a, v, k) => a + v * way[k]!, 0);
+    const tr0 = belt.run!.tr!;
+    expect(Math.sign(dot)).toBe(Math.sign(tr0[1]! - tr0[0]!));
   }, 60_000);
 });

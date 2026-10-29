@@ -3,20 +3,8 @@
 // library of a record's `kin` block (src/kin). A controls object overrides settings for a ghost trace (SD23).
 import { Kinematics, anchorAt, handStroke } from "../../kin/compose";
 import type { Controls } from "../../kin/types";
-import { m3, v3, xf, type Xf } from "../../kin/math";
+import { jointFrame, moves as moved, v3, xf, type Xf } from "../../kin/math";
 import { fiveBarFK } from "../../kin/blocks/linkage";
-
-/** A joint's frame: at its point, z along its axis, x the world up (or x) made square to it. */
-function jointFrame(at: Vec3, axis: Vec3): Xf {
-  const z = v3.unit(axis);
-  const h: Vec3 = Math.abs(z[2]) > 0.9 ? [1, 0, 0] : [0, 0, 1];
-  const x = v3.unit(v3.sub(h, v3.mul(z, v3.dot(h, z))));
-  const y = v3.cross(z, x);
-  return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: at };
-}
-
-const moved = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
-void m3;
 import { driveXf } from "../../solids/drive";
 import { IDENTITY, mat4, type Mat4 } from "../../solids/frame";
 import { conveyMatrix, mul4, turnMatrix } from "../../solids/convey";
@@ -59,6 +47,8 @@ export interface Poser {
   rawPoint?(u: number, id: string): Vec3 | null;
   /** A body's pose at phase u (reference configuration to now) as a matrix: a trace or arc drawn in a moving body's frame. */
   body?(u: number, id: string, ctl?: Controls): Mat4 | null;
+  /** The body that a body stands in for at the end of the cycle (its `next`: like parts handed on round a circuit). */
+  next?(body: string): string | undefined;
 }
 
 export const ID4: Mat4 = mat4(IDENTITY);
@@ -142,6 +132,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
   // a record solved numerically would otherwise take seconds to set up on a phone (R9)
   // (a ghost trace's setting too: two traces with the same ghosts share their solves)
   const cache = new Map<string, ReturnType<Kinematics["pose"]>>();
+  const nextOf = new Map(k.kin.bodies.filter((b) => b.next).map((b) => [b.id, b.next!]));
   const phases = new Map<string, number | null>();
   const pose = (u: number, ctl?: Controls) => {
     const key = ctl ? `${u}|${JSON.stringify(ctl)}` : String(u);
@@ -173,6 +164,7 @@ export function kinPoser(k: Kinematics, controls?: Controls, lifts?: Record<stri
     },
     point: (u, id, ctl) => lifted(pose(u, ctl), id, ctl),
     rawPoint: (u, id) => pose(u).points.get(id) ?? null,
+    next: (b) => nextOf.get(b),
     value: (u, name, ctl) => pose(u, ctl).values[name] ?? null,
     body: (u, id, ctl) => {
       const X = id === "ground" ? xf.id() : pose(u, ctl).bodies.get(id);

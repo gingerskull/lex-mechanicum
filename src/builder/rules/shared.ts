@@ -19,6 +19,7 @@ import { inside } from "../../core/poly";
 import type { Rule } from "./types";
 import type { Site } from "../sites";
 import { linearDrive, manualDrive, onFreeEnd, oscillatingDrive } from "./drive";
+import { turnTravel } from "../belt-run";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const polar = (c: Vec2, r: number, a: number): Vec2 => [c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)];
@@ -331,7 +332,10 @@ function driveInPlanAt(ctx: BuildCtx, site: Site, far: boolean): void {
   pulley("drive-pulley-motor", Mc, small, mot.shaft, "ground");
   const ring = H.hullOf([[0, 0, big.pd / 2 + 0.7], [Mc[0], Mc[1], small.pd / 2 + 0.7]]);
   const inner = H.hullOf([[0, 0, big.pd / 2 - 0.7], [Mc[0], Mc[1], small.pd / 2 - 0.7]]);
-  ctx.add(place(PF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: -3, z1: 3, joints: j })));
+  // its marks run round the pitch path as the shaft's pulley turns (SD29)
+  const pitch = H.hullOf([[0, 0, big.pd / 2], [Mc[0], Mc[1], small.pd / 2]]);
+  const run = { path: pitch, tr: turnTravel(ctx, shaftBody, out, big.pd / 2, pitch) };
+  ctx.add(place(PF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: -3, z1: 3, joints: j }), { run }));
   // the angle bracket: an upright past the shaft's end, which the motor's face is screwed to, on a foot on the base
   const w0 = 11;
   const w1 = w0 + 4;
@@ -513,7 +517,10 @@ export const drive: Rule = {
     const rB = big.pd / 2;
     const ring = H.hullOf([[M[0], M[1], rb + 0.7], [S[0], S[1], rB + 0.7]]);
     const inner = H.hullOf([[M[0], M[1], rb - 0.7], [S[0], S[1], rB - 0.7]]);
-    ctx.add(place(UPF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: pz - 3, z1: pz + 3, joints: j })));
+    // its marks run round the pitch path as the shaft's pulley turns (SD29)
+    const pitch = H.hullOf([[M[0], M[1], rb], [S[0], S[1], rB]]);
+    const run = { path: pitch, tr: turnTravel(ctx, shaftBody, UPF.z as Vec3, rB, pitch) };
+    ctx.add(place(UPF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: pz - 3, z1: pz + 3, joints: j }), { run }));
     // the home flag on the big pulley and a fork sensor on a post under the base (V6, F10)
     const dir = Math.atan2(M[1] - S[1], M[0] - S[0]) + Math.PI / 2;
     // the vane lies on the top flange and reaches past it into the fork, whose mouth stands 1 mm clear of the flange

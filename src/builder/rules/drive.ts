@@ -24,6 +24,7 @@ import { clearance } from "../router";
 import { UP } from "../sites";
 import { worldManifold, worldPoints } from "../sweeps";
 import { cutBore } from "./stacks";
+import { slideTravel } from "../belt-run";
 
 const UPF: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
 const J = ["drive"];
@@ -929,7 +930,10 @@ export function linearDrive(ctx: BuildCtx, drv: KinDriver): void {
   pulley("drive-idler", I, 5, `GT2 idler pulley ${pm.T}T on a bearing, on the tensioner`);
   const ring = H.hullOf([[Mm[0], Mm[1], rp + 0.7], [I[0], I[1], rp + 0.7]]);
   const inner = H.hullOf([[Mm[0], Mm[1], rp - 0.7], [I[0], I[1], rp - 0.7]]);
-  ctx.add(place(UPF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: zp[0], z1: zp[1], joints: J })));
+  // its marks run round the pitch path as the carriage, clamped to the span on the input's axis, slides (SD29)
+  const pitch = H.hullOf([[Mm[0], Mm[1], rp], [I[0], I[1], rp]]);
+  const run = { path: pitch, tr: slideTravel(ctx, slider, { x: UPF.x as Vec3, z: UPF.z as Vec3 }, pitch, line((tA + tB) / 2)) };
+  ctx.add(place(UPF, H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: ring, holes: [inner.slice().reverse()], z0: zp[0], z1: zp[1], joints: J }), { run }));
   // the tensioner: a plate under the base, slotted along the axis for two screws up into the base, the idler on a
   // shoulder screw into it (F7)
   const out: Vec2 = [-end * ax[0], -end * ax[1]];

@@ -97,6 +97,18 @@ export const xf = {
 };
 
 /** Orthonormal frame (columns e1 e2 e3) from three non-collinear points. Null when they are collinear. */
+/** A joint's frame: at its point, z along its axis, x the world up (or x) made square to it. */
+export function jointFrame(at: Vec3, axis: Vec3): Xf {
+  const z = v3.unit(axis);
+  const h: Vec3 = Math.abs(z[2]) > 0.9 ? [1, 0, 0] : [0, 0, 1];
+  const x = v3.unit(v3.sub(h, v3.mul(z, v3.dot(h, z))));
+  const y = v3.cross(z, x);
+  return { R: [x[0], y[0], z[0], x[1], y[1], z[1], x[2], y[2], z[2]], t: at };
+}
+
+/** A transform that moves something: off the identity by more than rounding. */
+export const moves = (D: Xf): boolean => Math.hypot(...D.t) > 1e-6 || D.R.some((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) > 1e-9);
+
 export function frameFrom3(p0: Vec3, p1: Vec3, p2: Vec3): Mat3 | null {
   const e1 = v3.unit(v3.sub(p1, p0));
   const n = v3.cross(e1, v3.sub(p2, p0));

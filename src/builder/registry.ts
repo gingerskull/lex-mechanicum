@@ -3,6 +3,7 @@
 import type { BuildCtx } from "./ctx";
 import { contactRules } from "./rules/contacts";
 import { base, classify, placement } from "./rules/core";
+import { bendSlots } from "./rules/bend";
 import { adjustableLength, cableClip } from "./rules/fixes";
 import { covers, drive, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
 import { explode } from "./rules/explode";
@@ -35,6 +36,8 @@ export const rules: Rule[] = [
   classify,
   placement,
   lugs,
+  // before the base: its slots are holes the base outline grows over
+  bendSlots,
   base,
   posts,
   wheels,

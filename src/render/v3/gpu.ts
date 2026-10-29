@@ -291,7 +291,7 @@ export class Geometry {
     this.buffers.push(vb);
     gl.bindBuffer(gl.ARRAY_BUFFER, vb);
     gl.bufferData(gl.ARRAY_BUFFER, baked.verts.subarray(0, baked.nVerts * VF), gl.STATIC_DRAW);
-    for (const [name, size, off] of [["aPos", 3, 0], ["aNrm", 3, 12], ["aMeta", 2, 24]] as const) {
+    for (const [name, size, off] of [["aPos", 3, 0], ["aNrm", 3, 12], ["aMeta", 3, 24]] as const) {
       const loc = gl.getAttribLocation(g.peel, name);
       gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, size, gl.FLOAT, false, VF * 4, off);

@@ -8,9 +8,9 @@ import { driveXf } from "../solids/drive";
 import { conveyMatrix, mul4, stretchMatrix, turnMatrix } from "../solids/convey";
 import type { Solid3 } from "../solids/types";
 import type { RecordLike } from "../builder/ctx";
-import type { Kin } from "../kin/types";
+import type { Controls, Kin } from "../kin/types";
 import type { Vec3, Xf } from "../kin/math";
-import { xf } from "../kin/math";
+import { jointFrame, moves, xf } from "../kin/math";
 import { anchorAt } from "../kin/compose";
 import type { Placer } from "./clash3";
 
@@ -53,6 +53,25 @@ export function sourceOf(rec: RecordLike, assembly3: Assembly3, opts: { controls
   };
   const posed = (u: number) => poseAt(u).bodies;
   const refPose = K.referencePose();
+  // at a setting that changes the geometry (a bend, an offset) each body is carried from the frame it was built in to the
+  // setting's, and a moved joint's ground hardware with its joint, as the renderer poses them (src/render/v3/poser)
+  const bodyShift = new Map<string, Xf>();
+  const jointShift = new Map<string, Xf>();
+  if (opts.controls) {
+    const built = K.setup(undefined);
+    const now = K.setup(opts.controls);
+    for (const [id, F1] of now.bodyFrame) {
+      const D = xf.mul(F1, xf.inv(built.bodyFrame.get(id) ?? xf.id()));
+      if (moves(D)) bodyShift.set(id, D);
+    }
+    for (const [id, r1] of now.joints) {
+      const r0 = built.joints.get(id);
+      if (!r0) continue;
+      const D = xf.mul(jointFrame(r1.at, r1.axis), xf.inv(jointFrame(r0.at, r0.axis)));
+      if (moves(D)) jointShift.set(id, D);
+    }
+  }
+  const shiftOf = (s: Solid3): Xf | undefined => (s.body !== "ground" ? bodyShift.get(s.body) : s.joints.map((j) => jointShift.get(j)).find((D) => D));
   // a stretched member's end: a named kin point, or a kit's body anchor (@body:x:y:z)
   const endOf = (P: { points: Map<string, Vec3>; bodies: Map<string, Xf> }, n: string) => P.points.get(n) ?? anchorAt(n, P.bodies);
   const placer: Placer = {
@@ -70,14 +89,16 @@ export function sourceOf(rec: RecordLike, assembly3: Assembly3, opts: { controls
         // the member's whole matrix, its length included (stretch() then gives 1)
         if (a && b && a0 && b0) return stretchMatrix(a, b, a0, b0, mat4(s.frame)) as Mat4;
       }
-      const X = s.body === "ground" ? xf.id() : (posed(u).get(s.body) ?? xf.id());
+      const X0 = s.body === "ground" ? xf.id() : (posed(u).get(s.body) ?? xf.id());
+      const D = shiftOf(s);
+      const X = D ? xf.mul(X0, D) : X0;
       const B = xfMat(X);
       const C = s.spin ? (mul4(B, turnMatrix(s.spin.at, s.spin.axis, u - s.spin.u0)) as Mat4) : s.convey ? (mul4(B, conveyMatrix(s.convey.path, s.convey.s0, poseAt(u).values[s.convey.path.key] ?? 0, s.convey.s1, poseAt(u).values)) as Mat4) : B;
       return mul(C, mat4(s.frame));
     },
 
-    // a conveyed solid moves along its path, not with its carrier
-    key: (s) => (s.drive ? `drive:${s.drive.part}` : s.convey ? `cv:${s.id}` : s.spin ? `spin:${s.spin.at.join(",")}` : s.body),
+    // a conveyed solid moves along its path, not with its carrier; a moved joint's ground hardware moves with its joint
+    key: (s) => (s.drive ? `drive:${s.drive.part}` : s.convey ? `cv:${s.id}` : s.spin ? `spin:${s.spin.at.join(",")}` : s.body === "ground" && shiftOf(s) ? `shift:${s.joints.find((j) => jointShift.has(j))}` : s.body),
   };
   const kin = src.kin;
   // a slide held by springs touches by design (a pseudo-rigid beam's two halves, a roller between springs in a window)
@@ -86,4 +107,32 @@ export function sourceOf(rec: RecordLike, assembly3: Assembly3, opts: { controls
   const fixedGears = kin.bodies.filter((b) => b.id !== "ground" && /gear|rack/i.test(String(b.shape?.type ?? "")) && !kin.joints.some((j) => j.a === b.id || j.b === b.id)).map((b) => b.id);
   for (const j of kin.joints) if (j.type === "gear-mesh" && (j.a === "ground" || j.b === "ground")) for (const g of fixedGears) contact.push([g, j.a === "ground" ? j.b : j.a]);
   return { id: rec.id, solids: assembly3.solids, placer, contact, assembly3, kin };
+}
+
+/**
+ * The settings at both ends of each param control that moves a ground joint (a bend, an offset), with a label: the
+ * clearance and clamp checks run there as well as at the record's own setting (A19), since the supports move with it.
+ */
+export function rangeEnds(rec: RecordLike): { label: string; controls: Controls }[] {
+  const kin = rec.kin as Kin | undefined;
+  const controls = (rec.teaching as { controls?: { kind: string; param?: string }[] } | undefined)?.controls ?? [];
+  if (!kin) return [];
+  const K = makePoseSource(kin).K;
+  const built = K.setup(undefined);
+  const out: { label: string; controls: Controls }[] = [];
+  for (const c of controls) {
+    const p = c.kind === "param" && c.param ? kin.params?.find((q) => q.id === c.param) : undefined;
+    if (!p || p.min === undefined || p.max === undefined || !(p.max > p.min)) continue;
+    for (const v of [p.min, p.max]) {
+      const ctl: Controls = { params: { [p.id]: v } };
+      const now = K.setup(ctl);
+      const moved = kin.joints.some((j) => {
+        const r0 = built.joints.get(j.id);
+        const r1 = now.joints.get(j.id);
+        return (j.a === "ground" || j.b === "ground") && r0 && r1 && moves(xf.mul(jointFrame(r1.at, r1.axis), xf.inv(jointFrame(r0.at, r0.axis))));
+      });
+      if (moved) out.push({ label: `${p.id} ${v}`, controls: ctl });
+    }
+  }
+  return out;
 }
