@@ -7,6 +7,11 @@
 - The walking-beam transfer's balls roll where they move on their own (along the return lane and across the cross
   tracks, not while the beam carries them) and carry their rotation lines; like parts handed on round a circuit turn
   as one, and a part rolling across its own axis now shows its lines (style reference 3.12, SD29).
+- A support that moves with a control (the bend of the universal, double Cardan and Rzeppa joints, an offset) stands
+  in slots in the base along the path its bolts take, clamped by nuts under the base, so it follows the control and
+  stays on the plate across the whole range. The double Cardan joint keeps its input and its drive in place as it
+  bends: the centre yoke turns by the joint angle and the output by twice it. The Rzeppa joint bends up to 38°. The
+  clearance check runs at both ends of every such control, and the three joints' claims hold there.
 
 ## 0.46.0, Mantle — 2026-10-28
 

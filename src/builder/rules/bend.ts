@@ -90,6 +90,8 @@ export const bendSlots: Rule = {
     const moved = followers(ctx);
     for (const [jid, { control, D }] of moved) {
       const pins: string[] = [];
+      const nuts: string[] = [];
+      const bolts: string[] = [];
       const along = (at: readonly number[]): Vec2[] =>
         D.map((X): Vec2 => {
           const q = xf.apply(X, [at[0]!, at[1]!, at[2] ?? base.top]);
@@ -131,8 +133,10 @@ export const bendSlots: Rule = {
         if (s.thread) s.thread = { ...s.thread, z0: 0, z1: L };
         const head = ctx.solids.find((q) => q.group === s.group && q.kind === "head");
         if (head?.name) head.name = head.name.replace(/ x \d+(\.\d+)? \(/, ` x ${L} (`);
+        if (head) bolts.push(head.id);
         const own = { body: "ground", joints: [...s.joints], ...(s.group ? { group: s.group } : {}) };
-        const first = !ctx.solids.some((q) => q.kind === "nut" && q.joints.includes(jid));
+        const first = !nuts.length;
+        nuts.push(`${s.id}-nut`);
         ctx.add(
           place(UPF, H.plainWasher(`${s.id}-wsh`, M, { at: [at[0], at[1], 0], z0: base.bottom - w.h, ...own, ...(first ? {} : { name: "" }) })),
           place(UPF, H.nut(`${s.id}-nut`, M, { at: [at[0], at[1], 0], z0: base.bottom - w.h - nut.m, z1: base.bottom - w.h, ...own, ...(first ? { name: `Nyloc nut M${M} (DIN 985) under the base, clamping the support where the ${control} control sets it` } : { name: "" }) })),
@@ -143,6 +147,8 @@ export const bendSlots: Rule = {
       for (const nt of ctx.notes) {
         if (nt.id !== jid) continue;
         for (const f of Object.keys(nt.serves ?? {}) as (keyof NonNullable<typeof nt.serves>)[]) nt.serves![f] = nt.serves![f]!.filter((x) => !pins.includes(x));
+        // the bolts through the slots fix the support (F1), their nuts clamp it where the control sets it (F7)
+        if (nuts.length) nt.serves = { ...nt.serves, F1: [...(nt.serves?.F1 ?? []), ...bolts], F7: [...(nt.serves?.F7 ?? []), ...nuts] };
         nt.note += ` Its supports follow the ${control} control: each is bolted through slots in the base that run along the path its bolts take over the control's range, clamped by a nut under the base where the control sets it, and not dowelled (F7).`;
       }
       (ctx.fired["bend-slots"] ??= []).push(`${titleOf(jid)}: slots for ${pins.length ? `${pins.length} dowels dropped, ` : ""}its bolts`);

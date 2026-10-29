@@ -74087,8 +74087,8 @@
       "teaching": {
         "review": {
           "verdict": "keep",
-          "date": "2026-10-20",
-          "note": "Review against the record (not in the 2026-10-19 review). The record's plan reads: a bend of 30 degrees makes the speed swing of 0.866 to 1.155 large enough to see. Decided: the bend angle is a control (0 to 45 degrees); the output yoke arm end is traced with ticks every 15 degrees of input, so its uneven spacing shows the speed-up and slow-down twice per turn, next to the even ticks of the input arm end; both shaft axes and the bend arc are drawn; the plot shows the speed ratio and the lead and lag."
+          "date": "2026-10-29",
+          "note": "Review against the record (not in the 2026-10-19 review). The record's plan reads: a bend of 30 degrees makes the speed swing of 0.866 to 1.155 large enough to see. Decided: the bend angle is a control (0 to 45 degrees); the output yoke arm end is traced with ticks every 15 degrees of input, so its uneven spacing shows the speed-up and slow-down twice per turn, next to the even ticks of the input arm end; both shaft axes and the bend arc are drawn; the plot shows the speed ratio and the lead and lag. 29 Oct 2026 (#242): re-checked on the rebuilt drawing (six phases in the record view, and both ends of the bend in the record view and exploded): keep. The output's pillow blocks stand in arc slots in the base, centred on the cross, bolted and clamped by nuts under the base, so they follow the bend from 0 to 45 degrees; the speed claims hold at both ends (1 in line, cos 45 to 1 / cos 45 at 45)."
         },
         "principle": [
           {
@@ -75056,9 +75056,9 @@
       },
       "teaching": {
         "review": {
-          "verdict": "tweak",
-          "date": "2026-10-20",
-          "note": "Review against the record (not in the 2026-10-19 review). At 15 degrees per joint the centre yoke's wobble (speed ratio 0.966 to 1.035) is too small to see next to the flat output, so the default angle per joint is 20 degrees (total 40): the centre yoke's speed ratio runs 0.940 to 1.064 and it leads and lags by 1.8 degrees, while the output stays exactly in phase. The phase between the centre yoke's forks is a control (0 to 90 degrees): at 90 the two fluctuations add instead of cancelling. The centre yoke arm end is traced with ticks every 15 degrees of input (uneven), the output arm end likewise (even); the plot shows both speed ratios. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The centre yoke's second fork is a collar clamped on its tube at the phase angle, so the phase control turns it as built, and at 90 degrees the output's fluctuation shows; the centre yoke is 134 mm long, the two forks back to back."
+          "verdict": "keep",
+          "date": "2026-10-29",
+          "note": "Review against the record (not in the 2026-10-19 review). At 15 degrees per joint the centre yoke's wobble (speed ratio 0.966 to 1.035) is too small to see next to the flat output, so the default angle per joint is 20 degrees (total 40): the centre yoke's speed ratio runs 0.940 to 1.064 and it leads and lags by 1.8 degrees, while the output stays exactly in phase. The phase between the centre yoke's forks is a control (0 to 90 degrees): at 90 the two fluctuations add instead of cancelling. The centre yoke arm end is traced with ticks every 15 degrees of input (uneven), the output arm end likewise (even); the plot shows both speed ratios. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The centre yoke's second fork is a collar clamped on its tube at the phase angle, so the phase control turns it as built, and at 90 degrees the output's fluctuation shows; the centre yoke is 134 mm long, the two forks back to back. 29 Oct 2026 (#242): re-checked on the rebuilt drawing (six phases in the record view, and both ends of the bend in the record view and exploded): keep. The input now stays on its axis beside its drive: the centre yoke turns by beta about the first cross and the output by 2 beta. The output's pillow blocks stand in slots along their path over 0 to 30 degrees per joint; the output stays at input speed at both ends and the centre yoke swings between cos 30 and 1 / cos 30 at 30. The base grows to carry the output's support across the range, so the joint draws a little smaller on the sheet."
         },
         "principle": [
           {
@@ -75957,7 +75957,7 @@
             "value": 30,
             "unit": "deg",
             "min": 0,
-            "max": 45,
+            "max": 38,
             "note": "joint angle between the two shafts"
           },
           {
@@ -76168,9 +76168,9 @@
       },
       "teaching": {
         "review": {
-          "verdict": "tweak",
-          "date": "2026-10-20",
-          "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 45 degrees); the plot shows output minus input (flat) and the ball's run along its groove. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The bell is see-through; the cage with its six windows, the balls and the grooved races show, and the section through the plane of the shafts shows balls 1 and 4 in their grooves with the cage tilted half the shaft angle."
+          "verdict": "keep",
+          "date": "2026-10-29",
+          "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 38 degrees since 29 Oct 2026); the plot shows output minus input (flat) and the ball's run along its groove. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The bell is see-through; the cage with its six windows, the balls and the grooved races show, and the section through the plane of the shafts shows balls 1 and 4 in their grooves with the cage tilted half the shaft angle. 29 Oct 2026 (#242): re-checked on the rebuilt drawing (six phases in the record view, and both ends of the bend in the record view and exploded): keep. The output's pillow blocks stand in arc slots in the base and follow the bend. The bend is capped at 38 degrees: the joint as built binds from 40 (the inner race on the bell) and the bell reaches the input's block from 42. At 38 the shafts still turn at one speed and the cage tilts 19 degrees."
         },
         "principle": [
           {
@@ -76342,33 +76342,33 @@
             }
           },
           {
-            "text": "at 45° the two shafts still turn at exactly the same speed",
+            "text": "at 38° the two shafts still turn at exactly the same speed",
             "output": "speed-ratio",
             "stat": "min",
             "value": 1,
             "tol": 0.0001,
             "setting": {
-              "beta": 45
+              "beta": 38
             }
           },
           {
-            "text": "at 45° the two shafts still turn at exactly the same speed",
+            "text": "at 38° the two shafts still turn at exactly the same speed",
             "output": "speed-ratio",
             "stat": "max",
             "value": 1,
             "tol": 0.0001,
             "setting": {
-              "beta": 45
+              "beta": 38
             }
           },
           {
-            "text": "at 45° the cage tilts by half the angle, 22.5°",
+            "text": "at 38° the cage tilts by half the angle, 19°",
             "output": "cage-tilt",
             "stat": "mean",
-            "value": 22.5,
+            "value": 19,
             "tol": 0.01,
             "setting": {
-              "beta": 45
+              "beta": 38
             }
           }
         ],

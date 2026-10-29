@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 145 · FAIL 0 · N/A 22 · open: none
+PASS 145 · FAIL 0 · N/A 23 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 2.1e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (hooke); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -46,7 +47,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | T6 | PASS | HAND / DATA · 30-degree bend: +-15 % speed swing, +-4.1 deg lead and lag, readable |
 | T7 | PASS | DATA · ISOMETRIC, where the cross turns out of plane |
 | T8 | N/A | DATA · the principle lies in plain view, no section needed |
-| T9 | PASS | AUTO / DATA · claim table: 5 ok, 0 off, 0 uncheckable of 5 |
+| T9 | PASS | AUTO / DATA · claim table: 9 ok, 0 off, 0 uncheckable of 9 |
 | T10 | PASS | AUTO · 12 solids drawn see-through: B2-pb-b0, B2-pb-b0-brg, B2-pb-b0-brg-balls, B2-pb-b0-brg-cage, B2-pb-b0-cl0, B2-pb-b0-cl1, B2-pb-b0-col0, B2-pb-b0-col1 · the input blocks drawn see-through where they cover the yoke |
 | T11 | PASS | AUTO · 2 supports routed, 2 moved off a sweep · both pairs of pillow blocks routed off the yokes' sweeps |
 | T12 | PASS | HAND · 19 support solids; dropped by the polish: none |
@@ -64,7 +65,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 120 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 124 solids unsound |
 | D7 | PASS | HAND · yokes and cross plain; richness in the cups and stacks |
 | A1 | PASS | AUTO · B1 J10, B2 J10, C1 cross-pin, C2 cross-pin, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · B1 J10, B2 J10, C1 cross-pin, C2 cross-pin, drive drive · two live shafts in plan (J10); the yoke pins in the cross by the cross-pin kit |
@@ -180,7 +181,7 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | B1 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x18, holds the yoke in on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
-| B2 | J10 | hooke | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
+| B2 | J10 | hooke | pillow (moved) | – | 4 x Socket head M5 x 25 (ISO 4762) | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 13 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | 4 x Nyloc nut M5 (DIN 985) under the base, clamping the support where the bend control sets it | none | none | none |
 | C1 | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
 | C2 | cross-pin | hooke | – | – | none | 2 x Internal circlip DIN 472, Ø14 | none | none | none | none | none | Grease nipple M6 (DIN 71412) | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
@@ -202,16 +203,16 @@ PASS 145 · FAIL 0 · N/A 22 · open: none
 | DL-A | 9 | 0 | 1.5 |
 | DL-B | 0 | 273 | 1.48 |
 | DL-C | 0 | 0 | 1.5 |
-| DL-D | 9 | 0 | 1.47 |
+| DL-D | 13 | 0 | 1.47 |
 | DL-E | 9 | 0 | 1.5 |
 | DL-F | 0 | 0 | 1.48 |
 | DL-G | 0 | 0 | 1.51 |
 | DL-H | 12 | 0 | 1.44 |
-| never | 81 | 140 | 1.51 |
+| never | 81 | 144 | 1.51 |
 
 ## Promotion candidates
 None left: the yoke and cross shapes, the Hooke block with the cross as a body and the cross-pin kit are in the library.
 
 ## Verification
-check: clean · K1 residual: 2.1e-14 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 15.4 KB
+check: clean · K1 residual: 2.1e-14 · claims: 9 of 9 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 18.4 KB
 screenshots: dist/shots3/universal-joint (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)
