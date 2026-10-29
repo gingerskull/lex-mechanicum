@@ -1,9 +1,9 @@
 # Audit: Offset slider-crank (offset-slider-crank)
 standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
-teaching: tweak · decisions in the record
+teaching: keep · decisions in the record
 
 ## Summary
-PASS 147 · FAIL 0 · N/A 20 · open: none
+PASS 147 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run on the record (E2, #204) and again on the six phases of the finished build (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 2.8e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (slider-dyad); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -64,7 +65,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | D8 | PASS | AUTO / HAND · every solid a profile, an operation and a frame; built by Manifold; no layers, dz or twin |
 | D9 | N/A | AUTO / HAND · no member changes shape |
 | D10 | PASS | AUTO · profiles shipped for plain extrusions, meshes only for booleans (package v2) |
-| D11 | PASS | AUTO · SOLID: 0 of 95 solids unsound |
+| D11 | PASS | AUTO · SOLID: 0 of 101 solids unsound |
 | D7 | PASS | HAND · plain links; richness in the ways and stacks |
 | A1 | PASS | AUTO · A J3, B J3, O J2, guide J5, drive drive · every joint read from the record and built by its kit |
 | A2 | PASS | AUTO · A J3, B J3, O J2, guide J5, drive drive · pins and shafts by kit and stack; slides by J5; the kits listed |
@@ -182,7 +183,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | A | J3 | slider-dyad | – | – | none | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | Shoulder bolt Ø6 x 16, M5 (ISO 7379) | none | none | none | none | none | none | none |
 | B | J3 | – | – | – | none | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | Shoulder bolt Ø6 x 30, M5 (ISO 7379) | none | none | none | none | none | none | none |
 | O | J2 | driver | – | – | 2 x Dowel pin Ø3 x 10 h6, housing to base | 2 x Internal circlip DIN 472, Ø16; End washer 4.4x16, holds the crank on the shaft end; Countersunk M4 x 10 (ISO 10642) | none | Thrust washer 8.2x16, bronze; Wave washer 12x15.8, spring steel | none | none | none | none | none | none |
-| guide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 104.4, bronze | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
+| guide | J5 | – | – | – | 2 x Dowel pin Ø3 h6, reference rail to base; 3 x Countersunk M3 x 25 (ISO 10642) | Keeper plate, laps the slider | none | none | none | none | Gib strip 3 x 6 x 104.4, bronze; 3 x Nyloc nut M3 (DIN 985) under the base, clamping the support where the offset control sets it | 2 x Felt wiper in a steel clip; Grease nipple M6 (DIN 71412) | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
@@ -200,16 +201,16 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-A | 9 | 0 | 1.74 |
 | DL-B | 0 | 161 | 1.55 |
 | DL-C | 0 | 0 | 1.63 |
-| DL-D | 10 | 0 | 1.6 |
+| DL-D | 13 | 0 | 1.6 |
 | DL-E | 11 | 0 | 1.72 |
 | DL-F | 0 | 0 | 1.68 |
 | DL-G | 0 | 0 | 1.67 |
-| DL-H | 5 | 0 | 1.6 |
-| never | 60 | 108 | 1.57 |
+| DL-H | 8 | 0 | 1.6 |
+| never | 60 | 111 | 1.57 |
 
 ## Promotion candidates
 None left (see slider-crank).
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 17.1 KB
+check: clean · K1 residual: 2.8e-14 · claims: 7 of 7 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.2 KB
 screenshots: dist/shots3/offset-slider-crank (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)

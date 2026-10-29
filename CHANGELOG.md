@@ -10,8 +10,9 @@
 - A support that moves with a control (the bend of the universal, double Cardan and Rzeppa joints, an offset) stands
   in slots in the base along the path its bolts take, clamped by nuts under the base, so it follows the control and
   stays on the plate across the whole range. The double Cardan joint keeps its input and its drive in place as it
-  bends: the centre yoke turns by the joint angle and the output by twice it. The Rzeppa joint bends up to 38°. The
-  clearance check runs at both ends of every such control, and the three joints' claims hold there.
+  bends: the centre yoke turns by the joint angle and the output by twice it. The Rzeppa joint bends up to 38° and
+  the Schmidt coupling's offset stops at 52 mm, where their parts still run clear. The clearance check runs at both
+  ends of every such control, and the three joints' claims hold there.
 
 ## 0.46.0, Mantle — 2026-10-28
 

@@ -1066,7 +1066,7 @@
           "value": 50,
           "unit": "mm",
           "min": 20,
-          "max": 100,
+          "max": 52,
           "note": "shaft offset O1 to O3 (0 < e < 2L; collinear links at 2L)"
         },
         {
@@ -1315,9 +1315,9 @@
     },
     "teaching": {
       "review": {
-        "verdict": "rethink",
-        "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #217. Three opaque discs overlapped and the output disc hid link set B, so neither point showed: the parallel links of each set, and all three discs keeping one orientation. The discs become see-through rings with one bold index mark each, so three parallel marks turn together. The two link sets are told apart by role pattern and stacking, not colour, and drawn on top. The midpoint of link A1 is traced: it draws a circle of radius r = 44 mm while the link never turns. The offset e is a control (20 to 100 mm) with ghost traces at 30 and 90 mm; the middle disc centre moves along the bisector of O1 O3 and the output stays in phase. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. The three discs are see-through rings, each with an engraved index arrow, and the arrows stay parallel; set A is dotted, set B cross-hatched, each on its own level; the midpoint trace draws its circle while the link never turns. The index arrows are thin at card size."
+        "verdict": "keep",
+        "date": "2026-10-29",
+        "note": "Applies the 2026-10-19 review and #217. Three opaque discs overlapped and the output disc hid link set B, so neither point showed: the parallel links of each set, and all three discs keeping one orientation. The discs become see-through rings with one bold index mark each, so three parallel marks turn together. The two link sets are told apart by role pattern and stacking, not colour, and drawn on top. The midpoint of link A1 is traced: it draws a circle of radius r = 44 mm while the link never turns. The offset e is a control (20 to 52 mm since 29 Oct 2026) with ghost traces at 30 and 40 mm; the middle disc centre moves along the bisector of O1 O3 and the output stays in phase. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. The three discs are see-through rings, each with an engraved index arrow, and the arrows stay parallel; set A is dotted, set B cross-hatched, each on its own level; the midpoint trace draws its circle while the link never turns. The index arrows are thin at card size. 29 Oct 2026 (#242): the offset control now stops at 52 mm. Past 54 the output's support, carried with its shaft, meets the output disc and the B links (the clearance check now runs at both ends of the control); the output's support stands in slots in the base along the offset, clamped by nuts under the base. Re-checked on the rebuilt drawing at both ends: keep."
       },
       "principle": [
         {
@@ -1375,7 +1375,7 @@
             },
             {
               "control": "offset",
-              "value": 90
+              "value": 40
             }
           ]
         }
