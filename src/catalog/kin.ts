@@ -153,4 +153,6 @@ export interface Teaching {
   exceptions: { reason: string; [k: string]: unknown }[];
   /** Principle bodies drawn see-through on purpose (T10): a part that would hide the principle behind it. */
   seeThrough?: string[];
+  /** The part to watch (T18): a principle body's own part, or the solids of one kind on it, tinted in the accent. */
+  focus?: { body: string; kind?: string }[];
 }

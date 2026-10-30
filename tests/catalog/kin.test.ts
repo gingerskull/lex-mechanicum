@@ -131,6 +131,14 @@ describe("kin and teaching validation", () => {
     expect(has(validate([withBlocks((b) => (b.teaching.timeMap = { feature: "f", slow: 0, span: [1, 2] }))]), "timeMap")).toBe(true);
     expect(has(validate([withBlocks((b) => (b.teaching.views = [{ id: "s", kind: "section", highlight: ["rocker.port"] }]))]), "a section needs plane")).toBe(true);
   });
+
+  it("checks the part to watch: principle bodies and solid kinds (T18)", () => {
+    expect(validate([withBlocks((b) => (b.teaching.focus = [{ body: "crank" }, { body: "crank", kind: "roller" }]))])).toEqual([]);
+    expect(has(validate([withBlocks((b) => (b.teaching.focus = [{ body: "nope" }]))]), 'body "nope" is not a body')).toBe(true);
+    expect(has(validate([withBlocks((b) => (b.teaching.focus = [{ body: "coupler" }]))]), "is not a principle body")).toBe(true);
+    expect(has(validate([withBlocks((b) => (b.teaching.focus = [{ body: "crank", kind: "gizmo" }]))]), 'kind "gizmo"')).toBe(true);
+    expect(has(validate([withBlocks((b) => (b.teaching.focus = []))]), "non-empty list")).toBe(true);
+  });
 });
 
 describe("v3 patch files", () => {
