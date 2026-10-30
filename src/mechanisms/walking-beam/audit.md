@@ -3,7 +3,7 @@ standard: 3.11 · date: 2026-10-27 · result: pass · detail: full · pass: buil
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 147 · FAIL 0 · N/A 20 · open: none
+PASS 148 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,7 +27,8 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | P11 | PASS | DATA · plain language, short sentences, no em dashes, mm and degrees |
 | P12 | PASS | AUTO / DATA · record v3 validates: catalogue and kin-check clean |
 | P13 | PASS | HAND · teaching review T2 run on the record before the build and recorded in teaching.review |
-| K1 | PASS | AUTO · K1 residual 8.5e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
+| K1 | PASS | AUTO · K1 residual 8.5e-14 (tolerance 1e-9) over 360 samples, reference 1.4e-14 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 2 blocks (parallel-cranks, walking-beam); no numeric fallback · parallel-cranks for the beam, the new walking-beam block (src/kin/steps/transfer.ts) for the balls; closed form, no numeric fallback |
 | K4 | PASS | HAND · roles: crank1 driver with the accent, crank2 link, beam and balls output, rails and tracks frame, ground |
@@ -55,6 +56,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels NOTCH LINE, STATION 2r, r, BALL ADVANCE, BEAM TRAVEL: mechanics only |
 | T16 | PASS | HAND / STYLE · like balls share one role and pattern; told apart by place, not hue |
 | T17 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
+| T18 | PASS | HAND / DATA · fired: focus (13 solids) · teaching.focus: the thirteen balls the beam carries; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · fired: wheels (no solids) · cranks are tapered links with bosses; beam and rails are plates with V notches; tracks are V-groove bars |
 | D2 | PASS | HAND · material round both beam pins and along the seats; the beam's depth carries the row between the pins |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone |
@@ -111,7 +113,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | J12 | N/A | AUTO · fired: j12-flexible (no solids), j12-cvt (no solids), j12-other (no solids), strap-sheave (no solids) · filled by the generator: no joint of this type |
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · filled by the generator: no joint of this type |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · filled by the generator: no joint of this type |
-| F1 | PASS | AUTO · served at O1, O2; fired: posts (39 solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (52 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
+| F1 | PASS | AUTO · served at O1, O2; fired: bend-slots (no solids), posts (39 solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (52 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F2 | PASS | AUTO · served at A1, A2, O1, O2; fired: wheels (no solids), j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (52 solids), cross-bearings (no solids), oblique-journal (no solids), trunnion (no solids), ring-carrier (no solids), eccentric-bearing (no solids), pin-ring (no solids), spider-pin (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), leg-bore (no solids), ring-rollers (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F3 | PASS | AUTO · served at A1, A2; fired: j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (52 solids), j11-screw (no solids) · filled by the generator: a rule built solids for it |
 | F4 | PASS | AUTO / HAND · served at O1; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (49 solids), trunnion (no solids), spider-pin (no solids), j11-screw (no solids) · shaft collars locate the live shaft; the dead shaft is clamped |
@@ -154,7 +156,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | R1 | PASS | HAND · no polish; every part from the kits, primitives and the record's plates |
 | R2 | PASS | HAND · two bearings, two screw sizes, Ø8 shafts, Ø10 posts, GT2 32:16 |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies: pillow blocks, drive, sensor |
-| R4 | PASS | AUTO · package v2 19.2 KB · filled by the generator: the pipeline holds it for every built mechanism |
+| R4 | PASS | AUTO · package v2 19.8 KB · filled by the generator: the pipeline holds it for every built mechanism |
 | R5 | N/A | HAND · no polish |
 | R6 | PASS | FLAG · FLAG: bench run, numbers in the verification section (indicative: three workers on one machine) |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -217,5 +219,5 @@ and the notches and tracks), so K1 checks every ball where it touches and no kit
 exceptions (R7): none.
 
 ## Verification
-check: clean · K1 residual: 8.5e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.2 KB
+check: clean · K1 residual: 8.5e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.8 KB
 screenshots: .local/n1-shots/walking-beam/turned (record view VIEW 32 31, PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, detail hand-over, full explode; both sheets; loop-u0 and loop-u2pi the same picture; the six phases of the first build in t2) · bench: desktop, frames at 28 deg 1.92 ms paced, setup 50.9 ms (over the 20 ms target, a flag), indicative only: three workers ran heavy checks on the machine at once

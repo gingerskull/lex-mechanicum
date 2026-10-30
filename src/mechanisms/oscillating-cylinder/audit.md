@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 150 · FAIL 0 · N/A 17 · open: none
+PASS 151 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 1.2e-13 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (slider-dyad); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the piston inside the cylinder; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · cylinder a tube on a port pad, piston on a rod with an eye, the standard a disc with its ports |
 | D2 | PASS | HAND · material round the trunnion and the ports |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -207,11 +209,11 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | 1.61 |
 | DL-G | 0 | 0 | 1.65 |
 | DL-H | 6 | 0 | 1.59 |
-| never | 64 | 111 | 1.6 |
+| never | 64 | 110 | 1.6 |
 
 ## Promotion candidates
 None left: the cylinder and piston shapes and the trunnion and piston-bore kits are in the builder; the interval dwell claim is in the claim checker.
 
 ## Verification
-check: clean · K1 residual: 1.2e-13 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.2 KB
+check: clean · K1 residual: 1.2e-13 · claims: 3 of 3 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 20.4 KB
 screenshots: dist/shots3/oscillating-cylinder (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

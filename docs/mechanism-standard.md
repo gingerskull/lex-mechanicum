@@ -356,6 +356,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `fasteners` | A8, M4 |
 | `headroom` | A13 |
 | `see-through` | L5, T10, T11, T12 |
+| `focus` | T18 |
 | `explode` | E1, E2, E3, E5, E6, E7, E8, E10 |
 | `axial stack builder` | A20, A12, A3, A4, A5 |
 | `support router` | A14, A19, T11, T12 |

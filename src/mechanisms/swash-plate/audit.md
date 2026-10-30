@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 150 · FAIL 0 · N/A 17 · open: none
+PASS 151 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build (E2, #204) and again on six phases of the finished build (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 1.9e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (plane-slide); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (5 solids) · teaching.focus: the five pistons where they enter the block; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · fired: wheels (no solids) · cylinder block bored on the pitch circle; plungers with ball ends; slippers with swaged sockets; the plate a disc on the shaft at its tilt |
 | D2 | PASS | HAND · block wall round every bore; socket lips round the balls |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -219,11 +221,11 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | 2.06 |
 | DL-G | 0 | 0 | 1.71 |
 | DL-H | 6 | 0 | 1.81 |
-| never | 77 | 133 | 1.76 |
+| never | 77 | 113 | 1.76 |
 
 ## Promotion candidates
 Promoted in this pass: the `plane-slide` block (the tilt frame), plunger pistons in lined bores (piston-bore), the ball-socket and slipper kits, posts under a fixed body.
 
 ## Verification
-check: clean · K1 residual: 1.9e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.7 KB
+check: clean · K1 residual: 1.9e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 16.5 KB
 screenshots: dist/shots3/swash-plate (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

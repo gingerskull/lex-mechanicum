@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 148 · FAIL 0 · N/A 20 · open: none
+PASS 149 · FAIL 0 · N/A 20 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -56,6 +56,7 @@ PASS 148 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (7 solids) · teaching.focus: the cage and its six balls inside the bell; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · fired: wheels (no solids) · inner race a spherical band with six swept meridian grooves on a keyed hub; bell a cup with a spherical cavity and six grooves; cage a spherical band with six windows; balls true spheres |
 | D2 | PASS | HAND · race band and bell wall round the grooves; cage rims round the windows |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |

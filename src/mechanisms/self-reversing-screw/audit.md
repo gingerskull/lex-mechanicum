@@ -3,7 +3,7 @@ standard: 3.11 · date: 2026-10-27 · result: pass · detail: full · pass: buil
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 150 · FAIL 0 · N/A 17 · open: none
+PASS 151 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | P11 | PASS | DATA · DATA · plain language, short sentences, mm and degrees, no em dashes |
 | P12 | PASS | AUTO / DATA · AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · HAND · teaching review against the record before the build, again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 9.2e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (cam); no numeric fallback · AUTO / HAND · one cam block: the barrel law over 6 turns (the joint's turns), the carriage translated and the shoe swivelled by the block's shoe input; no fallback, no one-off model |
@@ -47,7 +48,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | T7 | PASS | DATA · DATA · DIMETRIC: the screw's length, the diamonds of the crossing grooves and the shoe in its groove read together with the carriage and the drive in depth; FRONT keeps the grooves at true size |
 | T8 | PASS | DATA · DATA · detail CROSSING at 4:1 where the shoe bridges a crossing at the stage's opening phase, the shoe highlighted |
 | T9 | PASS | AUTO / DATA · claim table: 6 ok, 0 off, 0 uncheckable of 6 |
-| T10 | PASS | AUTO · 22 solids drawn see-through: carriage-upright, O-pb-b0, O-pb-b0-brg, O-pb-b0-brg-balls, O-pb-b0-brg-cage, O-pb-b0-col0, O-pb-b0-col1, O-pb-b1 · filled by the generator: a rule built solids for it |
+| T10 | PASS | AUTO · 11 solids drawn see-through: carriage-upright, O-pb-b1, O-pb-b1-brg, O-pb-b1-brg-balls, O-pb-b1-brg-cage, C-oil, G-rail0, G-riser0 · filled by the generator: a rule built solids for it |
 | T11 | PASS | AUTO · 1 support routed, 0 moved off a sweep · filled by the generator: a rule built solids for it |
 | T12 | PASS | HAND · 16 support solids; dropped by the polish: none |
 | T13 | N/A | DATA · DATA · the turn-round takes a sixth of the cycle (1 s at 1x); nothing goes by in a blink |
@@ -55,6 +56,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | T15 | PASS | HAND · HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the shoe, small in its groove; tinted in the accent, reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · fired: wheels (no solids) · HAND · a plain screw with its track cut by the law; the shoe a boat-shaped blade under a round boss on a pivot bolt; the carriage plate and tapered upright |
 | D2 | PASS | HAND · HAND · the upright tapers from its foot to a boss at the pivot; the blade is full width where the load is, narrowing to its points |
 | D3 | PASS | STYLE · STYLE · roles by pattern and tone (both sheets) |
@@ -100,9 +102,9 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | E10 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | J1 | N/A | AUTO · fired: trunnion (no solids), hub (no solids), j1-dead-axle (no solids) · filled by the generator: no joint of this type |
 | J2 | N/A | AUTO · fired: j2-live-shaft (no solids) · filled by the generator: no joint of this type |
-| J3 | PASS | AUTO · fired: j3-moving-pin (5 solids), cross-bearings (no solids), eccentric-bearing (no solids), spider-pin (no solids), ball-socket (no solids), ring-hub (no solids), eccentric (no solids) · filled by the generator: a rule built its kit |
+| J3 | PASS | AUTO · fired: j3-moving-pin (5 solids), cross-bearings (no solids), oblique-journal (no solids), eccentric-bearing (no solids), spider-pin (no solids), ball-socket (no solids), ring-hub (no solids), eccentric (no solids) · filled by the generator: a rule built its kit |
 | J4 | N/A | AUTO · fired: pin-hole (no solids), j4-slot-roller (no solids), pin-lobe (no solids), fork-pin (no solids), die (no solids) · filled by the generator: no joint of this type |
-| J5 | PASS | AUTO · fired: tongue-slot (no solids), integrator-carriage (no solids), piston-bore (no solids), j5-slide (18 solids) · filled by the generator: a rule built its kit |
+| J5 | PASS | AUTO · fired: tongue-slot (no solids), integrator-carriage (no solids), piston-bore (no solids), j5-slide (18 solids), leg-bore (no solids) · filled by the generator: a rule built its kit |
 | J6 | N/A | AUTO · fired: j6-mesh (no solids), friction-contact (no solids), ring-carrier (no solids), pin-ring (no solids), ring-rollers (no solids) · filled by the generator: no joint of this type |
 | J7 | PASS | AUTO · fired: ball-socket (no solids), groove-cam (2 solids), j7-cam (no solids), pallet-contact (no solids), pawl-tooth (no solids) · filled by the generator: a rule built its kit |
 | J8 | N/A | AUTO · fired: j12-flexible (no solids), j8-belt (no solids) · filled by the generator: no joint of this type |
@@ -111,8 +113,8 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | J12 | N/A | AUTO · fired: j12-flexible (no solids), j12-cvt (no solids), j12-other (no solids), strap-sheave (no solids) · filled by the generator: no joint of this type |
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · filled by the generator: no joint of this type |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · filled by the generator: no joint of this type |
-| F1 | PASS | AUTO · served at O, G; fired: posts (no solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (28 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
-| F2 | PASS | AUTO · served at F, O, G; fired: wheels (no solids), j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (28 solids), cross-bearings (no solids), trunnion (no solids), ring-carrier (no solids), eccentric-bearing (no solids), pin-ring (no solids), spider-pin (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), ring-rollers (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
+| F1 | PASS | AUTO · served at O, G; fired: bend-slots (no solids), posts (no solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (28 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
+| F2 | PASS | AUTO · served at F, O, G; fired: wheels (no solids), j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (28 solids), cross-bearings (no solids), oblique-journal (no solids), trunnion (no solids), ring-carrier (no solids), eccentric-bearing (no solids), pin-ring (no solids), spider-pin (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), leg-bore (no solids), ring-rollers (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F3 | PASS | AUTO · served at F, O; fired: j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (28 solids), j11-screw (no solids) · filled by the generator: a rule built solids for it |
 | F4 | PASS | AUTO / HAND · served at O; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (28 solids), trunnion (no solids), spider-pin (no solids), j11-screw (no solids) · AUTO / HAND · served at O: two shaft collars locate the screw against the near block's inner race, the far one floats; the groove's thrust goes to the located block |
 | F5 | N/A | AUTO / HAND · served at no joint; fired: integrator-carriage (no solids), j5-slide (18 solids), pawl-tooth (no solids), j11-screw (no solids), j13-compliant (no solids), stops (no solids) · AUTO / HAND · the groove drives the carriage both ways and turns it round at each end, so it can never run past the travel, with the drive on or off; the slide rule finds no room for end blocks and keeps none, as for a slider its rod drives |
@@ -154,7 +156,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | R1 | PASS | HAND · HAND · no polish; every part from the kits and the shapes |
 | R2 | PASS | HAND · HAND · shaft Ø12, bearings 6801-2RS, screws M2.5, M3, M4, M5, GT2 16T and 32T |
 | R3 | PASS | AUTO · fired: hardware primitives · AUTO · pillow block, slide, drive and sensor are the shared subassemblies |
-| R4 | PASS | AUTO · package v2 103.9 KB · filled by the generator: the pipeline holds it for every built mechanism |
+| R4 | PASS | AUTO · package v2 104.5 KB · filled by the generator: the pipeline holds it for every built mechanism |
 | R5 | N/A | HAND · HAND · no polish |
 | R6 | PASS | FLAG · FLAG · bench (indicative: three workers ran heavy checks on the machine at once): 103.9 KB, setup 53.1 ms (over the 20 ms target, flagged: 37 ms GPU, 12.8 ms edges of the two meshes), frames 1.1 to 1.3 ms paced in every view |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -188,7 +190,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
 |---|---|---|---|---|---|---|
-| O-pb | O | pillow | first choice | 1.5 | – | – |
+| O-pb | O | pillow | first choice | 1.5 | screw, carriage | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -214,5 +216,5 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 Polish exceptions: none (no polish).
 
 ## Verification
-check: clean · K1 residual: 9.2e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 103.9 KB
+check: clean · K1 residual: 9.2e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 104.5 KB
 screenshots: record, PLAN, FRONT, SIDE, ISOMETRIC, detail CROSSING, explode, both sheets, and frames at the crossing (u 0) and the turn-round (u 1.57) · bench: setup 53.1 ms flagged over 20 ms, frames 1.1 to 1.6 ms; indicative only, three workers ran heavy checks on the machine at once

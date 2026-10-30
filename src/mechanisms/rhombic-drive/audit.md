@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 148 · FAIL 0 · N/A 19 · open: none
+PASS 149 · FAIL 0 · N/A 20 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run on the record (E2, #204) and again on the six phases of the finished build (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 2.8e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 3 blocks (gear-mesh, dyad); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart by hue |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the displacer inside the cylinder; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · two spur gears with crank pins, four plain rods, two yoke blocks on outboard ways |
 | D2 | PASS | HAND · bosses round every pin |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -210,11 +212,11 @@ PASS 148 · FAIL 0 · N/A 19 · open: none
 | DL-F | 0 | 0 | 1.78 |
 | DL-G | 0 | 0 | 1.82 |
 | DL-H | 11 | 0 | 1.83 |
-| never | 100 | 245 | 1.87 |
+| never | 100 | 242 | 1.87 |
 
 ## Promotion candidates
 None left.
 
 ## Verification
-check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.8 KB
+check: clean · K1 residual: 2.8e-14 · claims: 6 of 6 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 27.2 KB
 screenshots: dist/shots3/rhombic-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v3.json (tools/bench3) (desktop; frame times paced at 28° in the ladder above; phone by David)
