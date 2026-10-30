@@ -159,7 +159,7 @@ export interface Solid3 {
   deform?: boolean;
   /** A posed part whose end reaches a world point each frame. */
   reach?: { to: Vec3; end: 0 | 1 };
-  flags: { inset?: boolean; accent?: boolean; faint?: boolean; isBase?: boolean; headTop?: boolean; seeThrough?: boolean };
+  flags: { inset?: boolean; accent?: boolean; faint?: boolean; isBase?: boolean; headTop?: boolean; seeThrough?: boolean; floor?: boolean };
   /**
    * Lifted hardware primitives only (src/solids/lift.ts): the plane convention of a primitive made on an x, y or posed
    * axis (src/core/axis.ts). A solid the builders make natively has none; its frame says everything.

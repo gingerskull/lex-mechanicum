@@ -37,7 +37,7 @@ export interface Pack2Input {
   lifts?: Record<string, [number, number, number, number]>;
 }
 
-const FIELD_FLAGS = ["inset", "accent", "faint", "isBase", "headTop", "seeThrough"] as const satisfies readonly Flag3[];
+const FIELD_FLAGS = ["inset", "accent", "faint", "isBase", "headTop", "seeThrough", "floor"] as const satisfies readonly Flag3[];
 
 const coords = (op: Op): number[] => (op.op === "sweep" ? op.path.flat() : op.op === "loft" ? op.sections.flatMap((s) => [s.outer, ...s.holes].flat(2)) : []);
 

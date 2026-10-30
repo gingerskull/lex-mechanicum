@@ -4114,8 +4114,8 @@
             360
           ],
           "default": 0,
-          "phase": 120,
-          "note": "the cycle starts at the index; the reference is mid-dwell"
+          "phase": 297,
+          "note": "the stage opens (at 63 degrees of the cycle) two seconds of dwell before the index, which runs from 183 to 303 degrees; the reference is mid-dwell"
         }
       ],
       "solve": [

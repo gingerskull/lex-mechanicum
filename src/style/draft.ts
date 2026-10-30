@@ -103,6 +103,9 @@ export const DRAFT = {
 
   // Surfaces: paper opacity per kind, 0..1 (SD2), and how much each erases the lines layer (SD3).
   fill: {
+    // a floor under a piece of the same body (an internal Geneva wheel's web, seen through its ring's slots): its role
+    // pattern at this share and an ink tint, so a cut through the piece reads as a cut, not as more of the piece
+    floor: { pattern: 0, tint: 0 },
     plate: 0.9,
     other: 0.95,
     base: 0.96, // laid once, on the top face (the parts under it read only through `occlude.base`)

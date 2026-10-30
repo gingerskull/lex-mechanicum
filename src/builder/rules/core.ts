@@ -126,7 +126,7 @@ export const placement: Rule = {
         ex: 0,
         joints: g.pins.map((p) => p.joint),
         detail: rungOf({ kind: "part", role }).id,
-        flags: { ...(ctx.principle.has(id) ? {} : {}) },
+        flags: { ...(g.floor ? { floor: true } : {}) },
       };
       ctx.parts.set(id, part);
       (ctx.fired.placement ??= []).push(id);
@@ -141,8 +141,11 @@ export const placement: Rule = {
         ctx.levels.set(id, [...(ctx.levels.get(id) ?? []), lv]);
         (ctx.fired.placement ??= []).push(lv.id);
       });
-      // the body's further solids share the part's settings but not its own geometry (a bevel gear's mesh)
-      const shared = settingsOf(part);
+      // the body's further solids share the part's settings but not its own geometry (a bevel gear's mesh), nor its being
+      // the floor under them
+      const { floor: _floor, ...flags } = part.flags;
+      void _floor;
+      const shared = { ...settingsOf(part), flags };
       // a slotted upper cheek on the solid lower one
       if (g.upper) {
         const lift = g.upper.lift ?? g.thick - g.upper.h;

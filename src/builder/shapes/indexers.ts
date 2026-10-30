@@ -28,7 +28,8 @@ export function ringWheel(g: BodyGeom): BodyGeom | null {
   const rOut = num((g.shape.internal as Record<string, unknown>).rimOut, 88);
   const F = g.frame;
   const ring = { id: `${g.id}-ring`, name: "", frame: { o: v3.add(F.o, v3.mul(F.z, place)), x: F.x, z: F.z }, profile: g.profile, h: g.thick, ...(g.features ? { features: g.features } : {}) };
-  return { ...g, profile: { outer: circle(rOut, 0, 0, 144), holes: [] }, thick: web, features: [], exact: { offset: place - web - 1 }, pieces: [...(g.pieces ?? []), ring] };
+  // the web is the cup's floor, seen through the ring's slots and arcs: drawn as a floor, not as the ring's surface
+  return { ...g, profile: { outer: circle(rOut, 0, 0, 144), holes: [] }, thick: web, features: [], exact: { offset: place - web - 1 }, pieces: [...(g.pieces ?? []), ring], floor: true };
 }
 
 /** A turret's radial rollers (`rollers` { n, pitchRadius, diameter, length, firstAt }) in its mid-plane, as pieces. */
