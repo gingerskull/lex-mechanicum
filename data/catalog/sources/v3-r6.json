@@ -440,7 +440,7 @@
       "review": {
         "verdict": "rethink",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and #217. The output hub covered the floating disc and both tongues, the whole principle. It is drawn see-through so the disc, both tongues and both slots show at once; a slotted yoke hub only if that still reads badly. The disc centre C is traced and its orbit drawn as a full circle of diameter e = 28 mm midway between the shafts; ticks every 15 degrees of input land 30 degrees apart on it, so C goes round twice per shaft turn. A right-angle arc at C shows why: C always sees O1 and O2 at 90 degrees. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. Slim hubs carry slot jaws, the disc is smaller with a tongue on each face, and the output hub is drawn see-through, so both slots, both tongues and the disc show at once; the disc centre's orbit reads twice per turn. A slotted yoke hub was not needed. The output hub's shaft hangs from a bridge, see-through where it covers."
+        "note": "Applies the 2026-10-19 review and #217. The output hub covered the floating disc and both tongues, the whole principle. It is drawn see-through so the disc, both tongues and both slots show at once; a slotted yoke hub only if that still reads badly. The disc centre C is traced and its orbit drawn as a full circle of diameter e = 28 mm midway between the shafts; ticks every 15 degrees of input land 30 degrees apart on it, so C goes round twice per shaft turn. A right-angle arc at C shows why: C always sees O1 and O2 at 90 degrees. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. Slim hubs carry slot jaws, the disc is smaller with a tongue on each face, and the output hub is drawn see-through, so both slots, both tongues and the disc show at once; the disc centre's orbit reads twice per turn. A slotted yoke hub was not needed. The output hub's shaft hangs from a bridge, see-through where it covers. 30 Oct 2026 (#273): the part to watch is the floating disc under the output hub, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -567,6 +567,11 @@
           "stat": "range",
           "value": 56,
           "tol": 0.1
+        }
+      ],
+      "focus": [
+        {
+          "body": "disc"
         }
       ],
       "exceptions": [],
@@ -3328,7 +3333,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-29",
-        "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 38 degrees since 29 Oct 2026); the plot shows output minus input (flat) and the ball's run along its groove. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The bell is see-through; the cage with its six windows, the balls and the grooved races show, and the section through the plane of the shafts shows balls 1 and 4 in their grooves with the cage tilted half the shaft angle. 29 Oct 2026 (#242): re-checked on the rebuilt drawing (six phases in the record view, and both ends of the bend in the record view and exploded): keep. The output's pillow blocks stand in arc slots in the base and follow the bend. The bend is capped at 38 degrees: the joint as built binds from 40 (the inner race on the bell) and the bell reaches the input's block from 42. At 38 the shafts still turn at one speed and the cage tilts 19 degrees."
+        "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 38 degrees since 29 Oct 2026); the plot shows output minus input (flat) and the ball's run along its groove. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The bell is see-through; the cage with its six windows, the balls and the grooved races show, and the section through the plane of the shafts shows balls 1 and 4 in their grooves with the cage tilted half the shaft angle. 29 Oct 2026 (#242): re-checked on the rebuilt drawing (six phases in the record view, and both ends of the bend in the record view and exploded): keep. The output's pillow blocks stand in arc slots in the base and follow the bend. The bend is capped at 38 degrees: the joint as built binds from 40 (the inner race on the bell) and the bell reaches the input's block from 42. At 38 the shafts still turn at one speed and the cage tilts 19 degrees. 30 Oct 2026 (#273): the part to watch is the cage and its balls inside the bell, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -3528,6 +3533,29 @@
           "setting": {
             "beta": 38
           }
+        }
+      ],
+      "focus": [
+        {
+          "body": "cage"
+        },
+        {
+          "body": "ball-1"
+        },
+        {
+          "body": "ball-2"
+        },
+        {
+          "body": "ball-3"
+        },
+        {
+          "body": "ball-4"
+        },
+        {
+          "body": "ball-5"
+        },
+        {
+          "body": "ball-6"
         }
       ],
       "exceptions": [],
@@ -4544,7 +4572,7 @@
       "review": {
         "verdict": "keep",
         "date": "2026-10-20",
-        "note": "Review against the record (not in the 2026-10-19 review). A 15 degree plate on a 40 mm pitch radius gives a 21.4 mm stroke, large enough to read. Decided: the swash angle is a control (0 to 18 degrees) with a ghost trace at 8 degrees; piston 1's head is traced with ticks every 15 degrees of shaft angle, bunched at the stroke ends, which shows the simple harmonic motion; the swash angle is drawn as an arc between the plate and the plane square to the shaft; a section through the shaft axis and piston 1 shows the plate face and the slipper; the plot shows all five pistons, 72 degrees apart. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): keep. The plate is pinned to the shaft at the tilt, so the swash angle control turns it; five plungers run in a bored block on posts, slippers swivel on ball ends; section A-A shows piston 1's slipper on the face."
+        "note": "Review against the record (not in the 2026-10-19 review). A 15 degree plate on a 40 mm pitch radius gives a 21.4 mm stroke, large enough to read. Decided: the swash angle is a control (0 to 18 degrees) with a ghost trace at 8 degrees; piston 1's head is traced with ticks every 15 degrees of shaft angle, bunched at the stroke ends, which shows the simple harmonic motion; the swash angle is drawn as an arc between the plate and the plane square to the shaft; a section through the shaft axis and piston 1 shows the plate face and the slipper; the plot shows all five pistons, 72 degrees apart. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): keep. The plate is pinned to the shaft at the tilt, so the swash angle control turns it; five plungers run in a bored block on posts, slippers swivel on ball ends; section A-A shows piston 1's slipper on the face. 30 Oct 2026 (#273): the part to watch is the pistons where they enter the block, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -4684,6 +4712,23 @@
           "value": 72,
           "tol": 0.5,
           "of": "min"
+        }
+      ],
+      "focus": [
+        {
+          "body": "piston-1"
+        },
+        {
+          "body": "piston-2"
+        },
+        {
+          "body": "piston-3"
+        },
+        {
+          "body": "piston-4"
+        },
+        {
+          "body": "piston-5"
         }
       ],
       "exceptions": []

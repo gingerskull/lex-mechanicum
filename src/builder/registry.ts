@@ -7,6 +7,7 @@ import { bendSlots } from "./rules/bend";
 import { adjustableLength, cableClip } from "./rules/fixes";
 import { covers, drive, fasteners, feet, headroom, locking, lubrication, materials, seeThrough, standoffs, stops, timingMarks, traceMarks } from "./rules/shared";
 import { explode } from "./rules/explode";
+import { focus } from "./rules/focus";
 import { j1, j10, j2, j3 } from "./rules/stacks";
 import { crossBearings } from "./rules/cross";
 import { lugs, posts } from "./rules/lugs";
@@ -98,6 +99,7 @@ export const rules: Rule[] = [
   fasteners,
   headroom,
   seeThrough,
+  focus,
   explode,
 ];
 

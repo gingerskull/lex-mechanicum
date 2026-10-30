@@ -5937,7 +5937,7 @@
       "review": {
         "verdict": "rethink",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and issue #216. Fewer, larger sprags: 8 figure-of-eight sprags in a 14 mm gap between races of radius 30 and 44. Each sprag's contact arcs (radius 6, centres 2.16 apart) give a grip angle of 4.0° at the inner race and 2.7° at the outer, below the friction angle of 5.7° for mu = 0.1, so it locks by the text's own rule. Lock and overrun are timed phases: the inner race turns 90° forward with the outer race locked to it, then turns back while the outer race stays and the sprags slide on the inner race. The spider goes see-through or is moved; a detail view shows one sector with the line of thrust and the grip angle; the plot is outer speed against inner speed. Rebuild R5 (#216): built on v3. A new library block `one-way` (shared with any freewheel): the outer race follows the inner 1:1 while it turns forward and stays while it turns back; the sprag set turns with the outer race. Eight figure-eight sprags whose contact arcs are the record's (radius 6, centres 2.16 apart, grip angle 4.0 at the inner race), a garter spring through their waists, the outer race on a spider above with four windows over the sprags, so the sprags show (moved, not hidden)."
+        "note": "Applies the 2026-10-19 review and issue #216. Fewer, larger sprags: 8 figure-of-eight sprags in a 14 mm gap between races of radius 30 and 44. Each sprag's contact arcs (radius 6, centres 2.16 apart) give a grip angle of 4.0° at the inner race and 2.7° at the outer, below the friction angle of 5.7° for mu = 0.1, so it locks by the text's own rule. Lock and overrun are timed phases: the inner race turns 90° forward with the outer race locked to it, then turns back while the outer race stays and the sprags slide on the inner race. The spider goes see-through or is moved; a detail view shows one sector with the line of thrust and the grip angle; the plot is outer speed against inner speed. Rebuild R5 (#216): built on v3. A new library block `one-way` (shared with any freewheel): the outer race follows the inner 1:1 while it turns forward and stays while it turns back; the sprag set turns with the outer race. Eight figure-eight sprags whose contact arcs are the record's (radius 6, centres 2.16 apart, grip angle 4.0 at the inner race), a garter spring through their waists, the outer race on a spider above with four windows over the sprags, so the sprags show (moved, not hidden). 30 Oct 2026 (#273): the part to watch is the sprags between the races, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -6070,6 +6070,11 @@
           "stat": "mean",
           "value": 4,
           "tol": 0.05
+        }
+      ],
+      "focus": [
+        {
+          "body": "sprags"
         }
       ],
       "exceptions": []

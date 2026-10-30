@@ -383,6 +383,8 @@ export class Geometry {
     const up = g.up;
     gl.uniform3fv(up.uInk!, unit(p.T.ink));
     gl.uniform3fv(up.uPaper!, unit(p.T.paper));
+    // the accent, for the part to watch (SD30)
+    gl.uniform3fv(up.uAccent!, unit(p.T[DRAFT.lines.accentRing.color]));
     gl.uniform1f(up.uSteps!, WS.steps);
     gl.uniform1f(up.uShade!, p.shade ? WS.shade : 0);
     gl.uniform1f(up.uPatGain!, p.patterns ? p.T.patternGain : 0);

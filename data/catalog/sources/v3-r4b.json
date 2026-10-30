@@ -720,7 +720,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail. Rebuild R4 (#215): built on v3 from this record: a true cycloidal disc on a needle ring round the eccentric, ten ring pins (rollers on pins in a ring housing, a cover ring over their tops, see-through), six output pins pressed into the flange running round the disc's holes, the flange under the disc on bearings on the input shaft. Record fixes: the disc's bore 30 (the needle ring round the 24 mm eccentric), the disc's own frame at E, the output flange's ground joint on the input's axis (one shaft), the disc-pins mesh as a gear-mesh carried by the eccentric (ratio 10/9 relative to it), the flange following the disc (follow block) instead of a dyad that could flip at the parallelogram's straight positions, the output pin's hole given as a round hole. The eccentricity and pin-count controls are not offered (they change the built parts). The six phases and the detail read as decided."
+        "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail. Rebuild R4 (#215): built on v3 from this record: a true cycloidal disc on a needle ring round the eccentric, ten ring pins (rollers on pins in a ring housing, a cover ring over their tops, see-through), six output pins pressed into the flange running round the disc's holes, the flange under the disc on bearings on the input shaft. Record fixes: the disc's bore 30 (the needle ring round the 24 mm eccentric), the disc's own frame at E, the output flange's ground joint on the input's axis (one shaft), the disc-pins mesh as a gear-mesh carried by the eccentric (ratio 10/9 relative to it), the flange following the disc (follow block) instead of a dyad that could flip at the parallelogram's straight positions, the output pin's hole given as a round hole. The eccentricity and pin-count controls are not offered (they change the built parts). The six phases and the detail read as decided. 30 Oct 2026 (#273): the part to watch is the eccentric inside the lobed disc, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -824,6 +824,11 @@
           "stat": "mean",
           "value": -0.1111,
           "tol": 0.0005
+        }
+      ],
+      "focus": [
+        {
+          "body": "eccentric"
         }
       ],
       "exceptions": []
@@ -3847,7 +3852,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option. Rebuild R4 (#215): built on v3 from this record (first build): the flexspline is its cup bottom on the input shaft plus 30 rigid segments (a tooth, its piece of rim and its wall strip each) carried round the oval by a wave block (radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself, which keeps the teeth in phase); the rigid spline a fixed body on two posts; addendum 0.7 m on both and the flexspline's teeth thinned 8%, so the teeth clear everywhere (checked tooth by tooth over the cycle); one cycle is one flexspline turn (15 input turns). The tooth-count choice is not offered (it changes the built teeth). The six phases of the finished build read as decided."
+        "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option. Rebuild R4 (#215): built on v3 from this record (first build): the flexspline is its cup bottom on the input shaft plus 30 rigid segments (a tooth, its piece of rim and its wall strip each) carried round the oval by a wave block (radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself, which keeps the teeth in phase); the rigid spline a fixed body on two posts; addendum 0.7 m on both and the flexspline's teeth thinned 8%, so the teeth clear everywhere (checked tooth by tooth over the cycle); one cycle is one flexspline turn (15 input turns). The tooth-count choice is not offered (it changes the built teeth). The six phases of the finished build read as decided. 30 Oct 2026 (#273): the part to watch is the wave generator inside the flexspline, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -4014,6 +4019,11 @@
           "stat": "mean",
           "value": -0.06667,
           "tol": 0.0001
+        }
+      ],
+      "focus": [
+        {
+          "body": "wave_gen"
         }
       ],
       "exceptions": []

@@ -12,7 +12,7 @@ import { place, rows, runMarks, runtime, ST, worldBox } from "../../src/render/v
 import { seeThrough, swept } from "../../src/render/v3/visibility";
 import { ladder } from "../../src/render/detail";
 import { setupInline } from "../../src/solids/setup";
-import { encode2 } from "../../src/package/format2";
+import { encode2, FLAG3 } from "../../src/package/format2";
 import { theme } from "../../src/style/theme";
 import { FLAGS, scene3, turning, type Fx } from "../fixtures/scene3";
 
@@ -358,4 +358,37 @@ describe("running belts (SD29)", () => {
     const tr0 = belt.run!.tr!;
     expect(Math.sign(dot)).toBe(Math.sign(tr0[1]! - tr0[0]!));
   }, 60_000);
+});
+
+describe("the part to watch (SD30)", () => {
+  it("marks a focus solid in the table and keeps its opacity; a cover goes lighter; nothing else changes", () => {
+    const solids: Fx[] = [
+      { id: "base", body: "ground", rect: [-80, -80, 80, 80], z0: 0, z1: 4, role: "ground", kind: "base", flags: FLAGS.isBase },
+      { id: "ring", body: "arm", rect: [0, -5, 50, 5], z0: 10, z1: 16, role: "link" },
+      { id: "shell", body: "arm", rect: [20, -2, 30, 2], z0: 30, z1: 34, role: "link" },
+    ];
+    const table = (flags: number[]) => {
+      const sc = scene3(solids, { poser: turning("arm", 0, 0), teaching });
+      sc.pkg.solids.forEach((s, i) => (s.flags |= flags[i] ?? 0));
+      const rt = runtime(sc);
+      const m = new Float32Array(rt.n * 16);
+      place(rt, 0, 0, m);
+      const t = new Float32Array(rt.n * ST * 4);
+      rows(rt, m, { see: new Uint8Array(rt.n), ladder: ladder("full", { tilt: 0, explode: 0 }), card: false, patterns: true }, t);
+      return t;
+    };
+    const plain = table([]);
+    const marked = table([0, FLAG3.focus, FLAG3.cover]);
+    const o = ST * 4;
+    // the ring: the focus mark in texel 6 w, its opacity and occlusion untouched
+    expect(marked[o + 27]).toBe(1);
+    expect(plain[o + 27]).toBe(0);
+    expect(Array.from(marked.slice(o + 12, o + 16))).toEqual(Array.from(plain.slice(o + 12, o + 16)));
+    // the shell over it: lighter than a see-through part would be
+    const c = 2 * ST * 4;
+    expect(marked[c + 12]!).toBeLessThan(plain[c + 12]! * DRAFT.fill.seeThrough.opacity + 1e-6);
+    expect(marked[c + 23]).toBe(1);
+    // the base: the same table either way
+    expect(Array.from(marked.slice(0, ST * 4))).toEqual(Array.from(plain.slice(0, ST * 4)));
+  });
 });

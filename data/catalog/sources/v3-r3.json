@@ -3274,7 +3274,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Pilot. Applies the 2026-10-19 review (tweak) and issue #214: the ports are the principle (the swing is the valve), so a section at the port face shows the cylinder's port sweeping over the standard's inlet and exhaust, with the open one highlighted. The port circle is raised from 13 to 30 mm and the holes sized so the inlet is open for 170 degrees of the power stroke and both ports are shut at the dead centres. The slimmer trunnion strap is a hardware decision."
+        "note": "Pilot. Applies the 2026-10-19 review (tweak) and issue #214: the ports are the principle (the swing is the valve), so a section at the port face shows the cylinder's port sweeping over the standard's inlet and exhaust, with the open one highlighted. The port circle is raised from 13 to 30 mm and the holes sized so the inlet is open for 170 degrees of the power stroke and both ports are shut at the dead centres. The slimmer trunnion strap is a hardware decision. 30 Oct 2026 (#273): the part to watch is the piston inside the cylinder, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -3390,6 +3390,11 @@
           ],
           "value": 170.1,
           "tol": 0.5
+        }
+      ],
+      "focus": [
+        {
+          "body": "piston"
         }
       ],
       "exceptions": []
@@ -3941,7 +3946,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review (tweak) and issue #214. The rhombus is the principle, so the guides go outboard or underneath or are drawn see-through (a hardware decision). The text now gives the measured lag: the displacer leads the piston by 64 degrees (first harmonic; the peaks are 71 degrees apart). Both crank pins and both yokes are traced, the yokes with equal-time ticks, and both positions are plotted together so the lag reads."
+        "note": "Applies the 2026-10-19 review (tweak) and issue #214. The rhombus is the principle, so the guides go outboard or underneath or are drawn see-through (a hardware decision). The text now gives the measured lag: the displacer leads the piston by 64 degrees (first harmonic; the peaks are 71 degrees apart). Both crank pins and both yokes are traced, the yokes with equal-time ticks, and both positions are plotted together so the lag reads. 30 Oct 2026 (#273): the part to watch is the displacer inside the cylinder, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -4073,6 +4078,11 @@
           "stat": "min",
           "value": 66.33,
           "tol": 0.5
+        }
+      ],
+      "focus": [
+        {
+          "body": "displacer"
         }
       ],
       "exceptions": []
