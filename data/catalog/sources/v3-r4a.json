@@ -4124,7 +4124,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms. Rebuild R4 (#215): built on v3 from this record (first build): the pinion turns the case through the ring gear, a bevel-diff block turns the side gears plus and minus the difference relative to the case and spins the spiders on the cage's cross-pin; the second driver's speed follows the split param (claims at split 0 and -1 checked at those settings). Record fixes: the meshes in the block's form (signed ratios, axes, the case as carrier of the spider meshes), the pinion moved to the other side of the case (its shaft's free end away from the case takes the drive, and the case then turns +10/41 as claimed), bevels facing down where their apex lies below their frame, the side gears' revolutes at the case's centre (they run on its shaft), the ring's face 18 (it clears the right side gear along the shaft), the axis overlays as lines. The six phases and the section read as decided."
+        "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms. Rebuild R4 (#215): built on v3 from this record (first build): the pinion turns the case through the ring gear, a bevel-diff block turns the side gears plus and minus the difference relative to the case and spins the spiders on the cage's cross-pin; the second driver's speed follows the split param (claims at split 0 and -1 checked at those settings). Record fixes: the meshes in the block's form (signed ratios, axes, the case as carrier of the spider meshes), the pinion moved to the other side of the case (its shaft's free end away from the case takes the drive, and the case then turns +10/41 as claimed), bevels facing down where their apex lies below their frame, the side gears' revolutes at the case's centre (they run on its shaft), the ring's face 18 (it clears the right side gear along the shaft), the axis overlays as lines. The six phases and the section read as decided. 30 Oct 2026 (#273): the part to watch is the spider gears inside the case, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -4283,6 +4283,14 @@
           "setting": {
             "split": -1
           }
+        }
+      ],
+      "focus": [
+        {
+          "body": "spider0"
+        },
+        {
+          "body": "spider1"
         }
       ],
       "exceptions": []

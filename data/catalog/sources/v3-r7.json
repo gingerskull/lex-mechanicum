@@ -3442,7 +3442,7 @@
    "review": {
     "verdict": "tweak",
     "date": "2026-10-20",
-    "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice. Rebuild (R7): the return type is not offered as a control, because it changes the built nut; the tube return is built."
+    "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice. Rebuild (R7): the return type is not offered as a control, because it changes the built nut; the tube return is built. 30 Oct 2026 (#273): the part to watch is the balls in the nut, the rest of the nut drawn lighter over them so they show, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
    },
    "principle": [
     {
@@ -3524,6 +3524,12 @@
      "value": 30,
      "tol": 0.01
     }
+   ],
+   "focus": [
+     {
+       "body": "nut",
+       "kind": "roller"
+     }
    ],
    "exceptions": []
   },
@@ -4832,7 +4838,7 @@
    "review": {
     "verdict": "tweak",
     "date": "2026-10-20",
-    "note": "Unbuilt; reviewed against the record. The output speed is x / rc times the disc's, so with a fixed carriage it is only a variable-ratio drive; the integral shows only when x changes while the disc turns. Decided (issue): two drivers, the disc and the carriage; by default the carriage follows x = 40 sin(disc angle), so the output winds up to 305.6° and back once per disc turn, plotted together with x (the integrand and its integral); output speed up to 2.67 x, reversing as the ball crosses the centre; the cylinder sits 45° up and across from the ball so the ball and both contacts stay visible from above; x is drawn as a dimension from the disc axis."
+    "note": "Unbuilt; reviewed against the record. The output speed is x / rc times the disc's, so with a fixed carriage it is only a variable-ratio drive; the integral shows only when x changes while the disc turns. Decided (issue): two drivers, the disc and the carriage; by default the carriage follows x = 40 sin(disc angle), so the output winds up to 305.6° and back once per disc turn, plotted together with x (the integrand and its integral); output speed up to 2.67 x, reversing as the ball crosses the centre; the cylinder sits 45° up and across from the ball so the ball and both contacts stay visible from above; x is drawn as a dimension from the disc axis. 30 Oct 2026 (#273): the part to watch is the ball between the disc and the cylinder, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
    },
    "principle": [
     {
@@ -4942,6 +4948,11 @@
      "value": -2.667,
      "tol": 0.005
     }
+   ],
+   "focus": [
+     {
+       "body": "ball"
+     }
    ],
    "exceptions": []
   },

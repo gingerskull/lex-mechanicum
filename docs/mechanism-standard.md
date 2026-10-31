@@ -1,8 +1,8 @@
 # Mechanism standard
 
 ```
-version: 3.12
-date: 2026-10-28
+version: 3.13
+date: 2026-10-30
 supersedes: 2.14 (the 2.5D engine; 1.0 was the hand-off standard of 2026-10-16)
 ```
 
@@ -84,7 +84,7 @@ citing their ids. Every requirement id falls under exactly one law, so a new req
 | II | **The record is the source.** Facts, prose, tags and links come from the catalogue record v3, and the page reads them by id. | 2 | P1 to P14 |
 | III | **The kinematics are the truth.** Declared in `kin`, solved by the blocks, verified by the loop closure, and never changed by what is built round them. | 3 | K1 to K12 |
 | IV | **It teaches its principle.** Mechanics first: traces, overlays, views, controls and the time map chosen so the lesson reads, and the text matches the motion. | 3a | T1 to T9, T13 to T15 |
-| V | **The principle stays in sight.** What covers it is drawn see-through, supports move aside and are never removed, same-role parts differ by pattern, and depth order holds. | 3a | T10 to T12, T16, T17 |
+| V | **The principle stays in sight.** What covers it is drawn see-through, supports move aside and are never removed, same-role parts differ by pattern, depth order holds, and a small or hidden part to watch is picked out. | 3a | T10 to T12, T16 to T18 |
 | VI | **One form language.** One element, one form, everywhere: shapes follow load, mounts are designed, the big parts stay plain. | 4 | D1 to D7 |
 | VII | **Parts are true solids.** A profile, an operation and a 3D frame; sound, and shipped by operation. | 4 | D8 to D11 |
 | VIII | **Built by the rules.** Every joint is built from its declared type by its kit; supports are routed and every axial position is set by the solver. | 5, 5.1, 5.2, 5b | A1 to A8, A18 to A22, J1 to J13 |
@@ -227,7 +227,7 @@ recorded in the record's `teaching` block so the text, the parameters and the dr
 | T4 | **Teaching traces** show the phenomenon: the point whose path is the principle (the cycloid of a planet point, both ends of a coupler, both crank circles, the full figure eight), with ticks at equal time where the speed variation is the lesson, and ghost paths for settings the viewer does not have selected. The first trace gets the comet. A wrong point traced is a teaching defect. | DATA | review |
 | T5 | **Construction overlays** carry the geometry a textbook figure draws as construction: dead-centre lines, tangent lines, axis lines meeting at a turning centre, moment-arm dimensions, the chord that splits cut and return, a workspace outline, the line O–E of an eccentric. Each is a labelled element of `teaching.overlays` with the points it joins, drawn by the overlay rules (SD22 of the style reference). | DATA | review |
 | T6 | **The effect is large enough to see.** Parameters are chosen so the lesson is visible at the default size (a time ratio that differs from the plain slider-crank, a cam with real dwells, lobes deep enough that the wobble reads). Where the review changes a parameter, the change is made in the record and noted there. | DATA / HAND | six phases |
-| T7 | **A default named view** is declared for each mechanism (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ a joint, or VIEW az/el) and it is the one the principle reads in (a valve gear in front elevation, a worm down its axis). The site opens in it and its Reset view button returns to it; the shot set always includes it. A declared PLAN reads flat, so the site, the card and the still open it tilted to the 28° view (the plan's layout kept, its depth shown); the PLAN button still gives the true plan. | DATA | `tools/shot` |
+| T7 | **A default named view** is declared for each mechanism (PLAN, FRONT, SIDE, ISOMETRIC, DIMETRIC, AUX ⟂ a joint, or VIEW az/el) and it is the one the principle reads in (a valve gear in front elevation, an Oldham coupling in plan). The site opens in it and its Reset view button returns to it; the shot set always includes it. A declared PLAN reads flat, so the site, the card and the still open it tilted to the 28° view (the plan's layout kept, its depth shown); the PLAN button still gives the true plan. | DATA | `tools/shot` |
 | T8 | **Section and detail views** are declared where a principle lives inside a part or between small parts: a section through a port face or a nut, a detail of a sector. Each is a named entry of `teaching.views`, with its cut plane or window, and highlights the part that matters (the open port, the loaded rocker, the load-carrying groove wall). | DATA | `tools/shot` |
 | T9 | **The text matches the motion.** Every number the explanation states (stroke, ratio, swing, time ratio, dwell, tip-speed variation, phase lag, range) is listed in `teaching.claims` with the output it comes from and a tolerance, and checked against `solve()` at build time. | AUTO check / DATA | `tools/check`: claim table |
 | T10 | **Principle visibility, first: transparency.** Any static solid that covers a principle part in the current view is drawn see-through, automatically, at the view being drawn: not only for a mesh's pitch point or a slot's run (L5) but for every principle part. Only covering parts (plates, bridges, housings, brackets) go see-through; small hardware (a standoff, a spacer, a fastener) keeps its paper, so nothing flickers as the view turns. | AUTO | audit lists solids drawn see-through per view |
@@ -238,6 +238,7 @@ recorded in the record's `teaching` block so the text, the parameters and the dr
 | T15 | **Mechanics first.** The record's teaching strings (labels, trace names, overlay captions) state the mechanism, never its use. Real-world context lives only in `examples` and `real_world`. A fictional mechanism: P14. | HAND | read |
 | T16 | **Same-role parts are told apart by pattern and stacking, never by hue** (the Schmidt coupling's two link sets): a role pattern variant or an index mark, not a colour. | STYLE / HAND | theme switch |
 | T17 | **Principle parts are never drawn out of depth order.** No effect that favours them may break the depth buffer (SD1 of the style reference): visibility comes from T10 to T12, never from a depth bias. | AUTO | renderer test |
+| T18 | **The part to watch.** A critical part that is small, or internal or partly internal and so hard to follow, is named in `teaching.focus`: a body's own part (never the hardware or bearings on it), or the solids of one kind on its body; one kind of part per sheet, all of its like parts. It is tinted in the accent keeping its own see-through (SD30 of the style reference). Most sheets name none: a big part the sheet is about is understood without it. | DATA / HAND | validator, screenshot |
 
 ---
 
@@ -355,6 +356,7 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `fasteners` | A8, M4 |
 | `headroom` | A13 |
 | `see-through` | L5, T10, T11, T12 |
+| `focus` | T18 |
 | `explode` | E1, E2, E3, E5, E6, E7, E8, E10 |
 | `axial stack builder` | A20, A12, A3, A4, A5 |
 | `support router` | A14, A19, T11, T12 |
@@ -922,6 +924,9 @@ these decisions started from is kept in `docs/teaching-review.md`.
 
 ## Changelog
 
+- **3.13 (2026-10-30).** The part to watch: a record may name in `teaching.focus` a critical part that is small, or
+  internal or partly internal, and the drawing tints it in the accent, keeping its see-through [T18, DATA]. A claim's
+  dwell runs on across the end of the cycle, carrying an output's advance over the cycle [T9, AUTO].
 - **3.12 (2026-10-28).** Fictional mechanisms: a record with a `season` block is a fictional seasonal mechanism, a
   real principle dressed for a holiday. For it the teaching test's rule of no real-world context and the mechanics-first
   strings are lifted, its uses may be invented, generated images take the place of its links, and festive decoration is

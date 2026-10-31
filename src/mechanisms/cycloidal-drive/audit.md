@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 150 · FAIL 0 · N/A 17 · open: none
+PASS 151 · FAIL 0 · N/A 18 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 1.2e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 2 blocks (gear-mesh, follow); no numeric fallback · composed from the block library (gear-mesh with the disc carried by the eccentric round ring pins held still; follow for the output flange, which turns exactly with the disc); no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the eccentric inside the lobed disc; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · a true cycloidal disc (the curtate epitrochoid offset by the pin radius, 0.1 mm running clearance), its bore on a needle ring round the eccentric, six round holes for the output pins |
 | D2 | PASS | HAND · material where the lobes and pins carry; the flange plain |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -207,11 +209,11 @@ PASS 150 · FAIL 0 · N/A 17 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.38 |
 | DL-H | 22 | 0 | – |
-| never | 87 | 106 | 0.93 (full) |
+| never | 87 | 103 | 0.93 (full) |
 
 ## Promotion candidates
 None left: the cycloidal disc profile, the pin-ring, eccentric-bearing and pin-hole kits and the follow block are in the library.
 
 ## Verification
-check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.0 KB
+check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 24.1 KB
 screenshots: dist/shots3/cycloidal-drive (record view VIEW 30 70, PLAN, FRONT, SIDE, ISOMETRIC, detail B, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.93 ms full, 1.34 at C, 1.38 at G; phone by David)

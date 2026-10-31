@@ -56,7 +56,7 @@ export function gridFor(max: number): number {
 }
 
 /** Bits of `PackedSolid3.flags`. */
-export const FLAG3 = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32, deform: 256 } as const;
+export const FLAG3 = { inset: 1, accent: 2, faint: 4, isBase: 8, headTop: 16, seeThrough: 32, floor: 64, focus: 128, deform: 256, cover: 512 } as const;
 export type Flag3 = keyof typeof FLAG3;
 
 /** One shared piece of geometry: a profile with its operation, or a mesh. */

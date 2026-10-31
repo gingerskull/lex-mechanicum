@@ -103,6 +103,12 @@ export const DRAFT = {
 
   // Surfaces: paper opacity per kind, 0..1 (SD2), and how much each erases the lines layer (SD3).
   fill: {
+    // a floor under a piece of the same body (an internal Geneva wheel's web, seen through its ring's slots), so a cut
+    // through the piece reads as a cut, not as more of the piece (SD4)
+    floor: {
+      pattern: 0, // 0..1, share of its role pattern
+      tint: 0, // 0..1, ink tint on its faces
+    },
     plate: 0.9,
     other: 0.95,
     base: 0.96, // laid once, on the top face (the parts under it read only through `occlude.base`)
@@ -149,6 +155,13 @@ export const DRAFT = {
     dotMid: [0.55, 0.8] as const, // gradient stop position and its alpha, soft dot falloff
     lineWidth: 2.2, // tile px, hatch, cross and dash strokes
     dashes: [[3, 10, 6], [15, 22, 18]] as const, // tile px, dash segments as [x0, x1, y]
+  },
+
+  // The part to watch (SD30): a small or internal critical part a record names in teaching.focus, tinted in the accent.
+  focus: {
+    accent: 0.55, // 0..1, the tint toward the accent on its faces, walls and cut faces; its own opacity is kept
+    edge: 1.25, // factor on its edges' width, which stay ink
+    cover: 0.25, // factor on a see-through part's opacity for the rest of a body whose pieces are the part (a nut round its balls)
   },
 
   // Rulings on a turning round part (SD29): faint lines along its round walls and short ticks round the rim of its faces,

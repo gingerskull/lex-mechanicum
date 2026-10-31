@@ -320,9 +320,11 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     for (let r = 0; r < 3; r++) table.set([mats[b + r]!, mats[b + 4 + r]!, mats[b + 8 + r]!, mats[b + 12 + r]!], o + r * 4);
     const base = rt.isBase[i] === 1;
     const plate = rt.isPlate[i] === 1;
-    const a = hasFlag3(s, "seeThrough") ? 1 : Math.max(0, Math.min(1, st.see[i] ?? 0));
-    const f = 1 + (F.seeThrough.opacity - 1) * a;
-    const occ = (base ? F.occlude.base : plate ? F.occlude.plate : F.occlude.other) * (1 + (F.seeThrough.occlude - 1) * a);
+    // the cover over a part to watch (a nut round its balls) is see-through, and lighter still (SD30)
+    const cover = hasFlag3(s, "cover");
+    const a = hasFlag3(s, "seeThrough") || cover ? 1 : Math.max(0, Math.min(1, st.see[i] ?? 0));
+    const f = (1 + (F.seeThrough.opacity - 1) * a) * (cover ? DRAFT.focus.cover : 1);
+    const occ = (base ? F.occlude.base : plate ? F.occlude.plate : F.occlude.other) * (1 + (F.seeThrough.occlude - 1) * a) * (cover ? DRAFT.focus.cover : 1);
     const face = (base ? F.base : plate ? F.plate : F.other) * f;
     const wallA = F.wall * (base ? F.baseWallGain : 1) * f;
     const R = rt.surface[i]!;
@@ -330,11 +332,14 @@ export function rows(rt: Runtime, mats: Float32Array, st: RowState, table: Float
     const kx = s.stretch ? Math.hypot(mats[b]!, mats[b + 1]!, mats[b + 2]!) || 1 : 1;
     // the walls take the same see-through share as the faces: a part reads as one solid at one opacity
     table.set([face, wallA, Math.min(1, occ), Math.min(1, occ * F.wallOcclude)], o + 12);
-    const tint = (R.tint ?? 0) + Math.max(0, F.seeThrough.tint - (R.tint ?? 0)) * a;
-    table.set([tint, st.patterns && pat >= 0 ? (R.alpha ?? 0) : 0, Math.max(0, pat), R.step ?? 1], o + 16);
+    // a floor under a piece of its own body takes its own surface, so a cut through the piece reads (DRAFT.fill.floor)
+    const floor = hasFlag3(s, "floor");
+    const tint = (floor ? Math.max(R.tint ?? 0, F.floor.tint) : (R.tint ?? 0)) + Math.max(0, F.seeThrough.tint - (R.tint ?? 0)) * a;
+    table.set([tint, st.patterns && pat >= 0 ? (R.alpha ?? 0) * (floor ? F.floor.pattern : 1) : 0, Math.max(0, pat), R.step ?? 1], o + 16);
     table.set([hasFlag3(s, "faint") ? 0.5 : 1, base ? 1 : 0, plate ? 1 : 0, a], o + 20);
     const top = base ? L.baseTop * cardK.base : plate ? L.plateTop * cardK.plate : L.otherTop;
-    table.set([top, st.ladder.solid(s.detail) ? 0 : 1, kx, 0], o + 24);
+    // the part to watch (SD30): tinted in the accent, its edges heavier, at every dial position
+    table.set([top, st.ladder.solid(s.detail) ? 0 : 1, kx, hasFlag3(s, "focus") ? 1 : 0], o + 24);
     // rulings on a turning round part (SD29): its radius, the count round it, their alpha
     const sr = st.patterns ? rt.spin[i]! : 0;
     const [c0, c1] = DRAFT.spin.count;

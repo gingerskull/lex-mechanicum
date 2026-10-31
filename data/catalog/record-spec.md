@@ -277,7 +277,9 @@ record names on the ground lies on the base.
   body `b` leaves along (list a loop's joints round it); an output may read a block's value. A claim with `over` a
   driver takes its statistic over that driver's range; a `path`'s `range` is its extent (an orbit's diameter).
 - *Teaching:* `seeThrough: [bodies]` draws those principle parts see-through on purpose (a hub that would hide the
-  disc and slots, a bell round a cage). Selector `options` are a list of `{ id, params, drivers }` with a `default`.
+  disc and slots, a bell round a cage). `focus: [{ body }, { body, kind }]` names the part to watch (T18): a body's
+  own part, or the solids of one kind on it (a ball screw's balls, `{ "body": "nut", "kind": "roller" }`). Selector
+  `options` are a list of `{ id, params, drivers }` with a `default`.
 
 **Claims.** `span: [a, b]` takes the statistic over the input values in that window (a rotary input's degrees, which may
 wrap past 360); `abs: true` takes it on the absolute value. A `dwell` with `band: [lo, hi]` is the longest stretch of the cycle with the output inside that range (a port
@@ -353,6 +355,7 @@ dead axle stands in it on its shoulder, a live shaft runs in a housing cartridge
 | `plot` | What the side panel plots: `x`, `y` (output ids) and a label, or a list: the first is the plot, `ghosts` on it draw the same output at other control settings (a family of curves), and a further entry in the same unit and range is drawn with it. |
 | `claims` | Every number the explanation states, with the `output` and `stat` (`range`, `max`, `min`, `mean`, `ratio`, `time-ratio`, `phase`, `dwell`, `at`) it comes from, the stated `value` and a tolerance (standard T9). `text` is the sentence it supports. |
 | `seeThrough` | Principle bodies drawn see-through on purpose (T10, transparency first): a part that would hide the principle behind it. |
+| `focus` | The part to watch (T18): entries `{ body }` (that principle body's own part, never the hardware or bearings on it) or `{ body, kind }` (the solids of that kind on the body); one kind of part per sheet, all of its like parts. Most records have none. |
 | `exceptions` | The rare individual cases where a different construction is used instead of seeing through or moving a support (T12), each with its reason; the decision is made in the mechanism's issue. |
 
 Teaching strings (labels, trace names, captions) state the mechanism, never its use (T15). Real-world context belongs

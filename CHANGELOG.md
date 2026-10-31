@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.48.0, Mezoa — 2026-10-31
+
+- The part to watch: on 14 sheets a critical part that is small, or inside another, is tinted in the accent, keeping
+  its own see-through, so the eye finds it first while what is in or behind it still shows: the self-reversing
+  screw's shoe, the walking beam's balls, the sprags, the wobble box's ring, the Rzeppa joint's cage and balls, the
+  integrator's ball, the differential's spider gears, the oscillating cylinder's piston, the rhombic drive's
+  displacer, the harmonic drive's wave generator, the cycloidal drive's eccentric, the ball screw's balls (the nut
+  drawn lighter over them), the swash plate's pistons and the Oldham coupling's floating disc. A record names it in
+  `teaching.focus` (standard 3.13, T18; style reference 3.13, SD30).
+- The roller gear indexer opens on two seconds of dwell before the turret turns, and a dwell claim counts a dwell
+  across the end of the cycle whole.
+- The worm drive and the bevel gear pair open in the isometric view.
+- The internal Geneva drive's cup floor is drawn plain under the hatched slotted ring, so its slots read as cuts.
+
 ## 0.47.1, Mars — 2026-10-29
 
 - The Schmidt coupling's output support moves with the offset as one: its bridge, its two posts and their screws,

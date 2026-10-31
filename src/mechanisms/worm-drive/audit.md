@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 149 · FAIL 0 · N/A 18 · open: none
+PASS 149 · FAIL 0 · N/A 20 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 7.1e-15 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (gear-mesh); no numeric fallback · composed from the block library (gear-mesh, crossed); no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | N/A | HAND / DATA · fired: focus (no solids) · no part to watch: the parts the sheet is about read without it (#273) |
 | D1 | PASS | HAND · an Archimedean worm (straight 20 deg flanks in its axial section, its square section turned along its lead: a loft) and a throated wheel (teeth at the lead angle, tips reaching round the worm: a loft) |
 | D2 | PASS | HAND · material where the teeth carry; plain gear discs on keyed hubs |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -180,14 +182,14 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M | J9 | gear-mesh | – | – | none | none | none | worm-tw, wheel-tw | none | none | worm-shim, wheel-shim | none | Worm; Wheel | none |
-| O2 | J2 | – | bridge | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 19 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | J2 | – | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 19 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | O1 | J10 | driver | pillow | – | 4 x Dowel pin Ø4 x 14 h6, block to base | 2 x Internal circlip DIN 472, Ø19 | Feather key 3 x 3 x 55.5 (DIN 6885) | 2 x Shaft collar 10x18, set screw | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
 |---|---|---|---|---|---|---|
-| O2-bridge | O2 | bridge | first choice | 1.5 | – | see-through |
+| O2-bridge | O2 | bridge | moved | 1.5 | wheel | – |
 | O1-pb | O1 | pillow | first choice | 1.5 | worm, wheel | – |
 
 ## Variants and overrides
@@ -206,11 +208,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | – |
 | DL-G | 0 | 0 | 1.07 |
 | DL-H | 11 | 0 | – |
-| never | 71 | 119 | 0.98 (full) |
+| never | 71 | 118 | 0.98 (full) |
 
 ## Promotion candidates
 None left: the worm and the throated worm wheel are shapes of the builder (lofts). Open: the lock icon when the wheel is driven (record note); the lofted thread draws dark in front view where many transparent layers overlap (renderer).
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 72.3 KB
+check: clean · K1 residual: 7.1e-15 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 72.9 KB
 screenshots: dist/shots3/worm-drive (record view AUX O1, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.98 ms full, 1.18 at C, 1.07 at G; 75.6k triangles; phone by David)

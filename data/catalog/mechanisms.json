@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-10-29",
+  "generated": "2026-10-30",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -11100,7 +11100,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Pilot. Applies the 2026-10-19 review (tweak) and issue #214: the ports are the principle (the swing is the valve), so a section at the port face shows the cylinder's port sweeping over the standard's inlet and exhaust, with the open one highlighted. The port circle is raised from 13 to 30 mm and the holes sized so the inlet is open for 170 degrees of the power stroke and both ports are shut at the dead centres. The slimmer trunnion strap is a hardware decision."
+          "note": "Pilot. Applies the 2026-10-19 review (tweak) and issue #214: the ports are the principle (the swing is the valve), so a section at the port face shows the cylinder's port sweeping over the standard's inlet and exhaust, with the open one highlighted. The port circle is raised from 13 to 30 mm and the holes sized so the inlet is open for 170 degrees of the power stroke and both ports are shut at the dead centres. The slimmer trunnion strap is a hardware decision. 30 Oct 2026 (#273): the part to watch is the piston inside the cylinder, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -11216,6 +11216,11 @@
             ],
             "value": 170.1,
             "tol": 0.5
+          }
+        ],
+        "focus": [
+          {
+            "body": "piston"
           }
         ],
         "exceptions": []
@@ -15156,7 +15161,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-27",
-          "note": "T2 review 2026-10-27, six phases drawn from the solved motion at 0, 60, 120, 180, 240 and 300 degrees in VIEW -25 30: keep. Drive: two equal cranks (circular translation) rather than a lift-and-carry drive: one rotary input with the standard motor and belt (section 8), and the beam's whole motion is one closed curve to trace; the flat carry and square hand-over of a lift-and-carry drive are named in the limits. The notch line rises (sin a = 0.28) so the hand-overs lie at the ends of the circle's diameter: the seats meet the notches 16.3 degrees from square, inside the 45 degree flank of the V, so nothing slides, and the beam lifts each ball 11.2 mm per station, the height the gravity return gives back. Closed circuit: the return under the transfer was set aside, since a ball returning under the beam must climb back past the beam's depth and its fall below the rails, more than one seat can lift. The return runs beside the transfer: the out-track rolls the ball from the top notch across onto the return lane, a packed queue rolls down the lane and back across on the in-track, and the front ball rolls into the first notch while the beam is down. Every slot advances one per turn, so after one turn each ball stands where the next one stood (kin.bodies next, K2) and the loop shows no jump. Balls rather than pins: they roll across onto the cross tracks and round the corners, which a pin cannot. Trace: the seat at S2 draws the beam's 40 mm circle with 30 degree ticks; overlays: the notch line, the station (2r) and the crank radius; plot: a ball's advance (a step) against the beam's travel (a sine), the stepwise advance against the continuous motion. Solve checks: advance 38.4 mm and rise 11.2 mm per turn, circle 40 mm, dwell 180 degrees, all within tolerance. The parallelogram's change points fall at the hand-overs: held on the parallel branch as in the parallelogram linkage; a chain or gear tie between the cranks is an open question. Owner's review (#254): the model is turned 180 degrees about the vertical so the walking plate and its cranks face the standard views; it opens at VIEW 32 31, the owner's stage view, and ISOMETRIC and DIMETRIC look at the same side. Sizes, drive, circuit and claims unchanged."
+          "note": "T2 review 2026-10-27, six phases drawn from the solved motion at 0, 60, 120, 180, 240 and 300 degrees in VIEW -25 30: keep. Drive: two equal cranks (circular translation) rather than a lift-and-carry drive: one rotary input with the standard motor and belt (section 8), and the beam's whole motion is one closed curve to trace; the flat carry and square hand-over of a lift-and-carry drive are named in the limits. The notch line rises (sin a = 0.28) so the hand-overs lie at the ends of the circle's diameter: the seats meet the notches 16.3 degrees from square, inside the 45 degree flank of the V, so nothing slides, and the beam lifts each ball 11.2 mm per station, the height the gravity return gives back. Closed circuit: the return under the transfer was set aside, since a ball returning under the beam must climb back past the beam's depth and its fall below the rails, more than one seat can lift. The return runs beside the transfer: the out-track rolls the ball from the top notch across onto the return lane, a packed queue rolls down the lane and back across on the in-track, and the front ball rolls into the first notch while the beam is down. Every slot advances one per turn, so after one turn each ball stands where the next one stood (kin.bodies next, K2) and the loop shows no jump. Balls rather than pins: they roll across onto the cross tracks and round the corners, which a pin cannot. Trace: the seat at S2 draws the beam's 40 mm circle with 30 degree ticks; overlays: the notch line, the station (2r) and the crank radius; plot: a ball's advance (a step) against the beam's travel (a sine), the stepwise advance against the continuous motion. Solve checks: advance 38.4 mm and rise 11.2 mm per turn, circle 40 mm, dwell 180 degrees, all within tolerance. The parallelogram's change points fall at the hand-overs: held on the parallel branch as in the parallelogram linkage; a chain or gear tie between the cranks is an open question. Owner's review (#254): the model is turned 180 degrees about the vertical so the walking plate and its cranks face the standard views; it opens at VIEW 32 31, the owner's stage view, and ISOMETRIC and DIMETRIC look at the same side. Sizes, drive, circuit and claims unchanged. 30 Oct 2026 (#273): the part to watch is the balls the beam carries, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -15311,6 +15316,47 @@
             "stat": "dwell",
             "value": 180,
             "tol": 1
+          }
+        ],
+        "focus": [
+          {
+            "body": "ball0"
+          },
+          {
+            "body": "ball1"
+          },
+          {
+            "body": "ball2"
+          },
+          {
+            "body": "ball3"
+          },
+          {
+            "body": "ball4"
+          },
+          {
+            "body": "ball5"
+          },
+          {
+            "body": "ball6"
+          },
+          {
+            "body": "ball7"
+          },
+          {
+            "body": "ball8"
+          },
+          {
+            "body": "ball9"
+          },
+          {
+            "body": "ball10"
+          },
+          {
+            "body": "ball11"
+          },
+          {
+            "body": "ball12"
           }
         ],
         "exceptions": []
@@ -18955,7 +19001,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review (tweak) and issue #214. The rhombus is the principle, so the guides go outboard or underneath or are drawn see-through (a hardware decision). The text now gives the measured lag: the displacer leads the piston by 64 degrees (first harmonic; the peaks are 71 degrees apart). Both crank pins and both yokes are traced, the yokes with equal-time ticks, and both positions are plotted together so the lag reads."
+          "note": "Applies the 2026-10-19 review (tweak) and issue #214. The rhombus is the principle, so the guides go outboard or underneath or are drawn see-through (a hardware decision). The text now gives the measured lag: the displacer leads the piston by 64 degrees (first harmonic; the peaks are 71 degrees apart). Both crank pins and both yokes are traced, the yokes with equal-time ticks, and both positions are plotted together so the lag reads. 30 Oct 2026 (#273): the part to watch is the displacer inside the cylinder, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -19087,6 +19133,11 @@
             "stat": "min",
             "value": 66.33,
             "tol": 0.5
+          }
+        ],
+        "focus": [
+          {
+            "body": "displacer"
           }
         ],
         "exceptions": []
@@ -49681,7 +49732,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn."
+          "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. 30 Oct 2026 (#277): the default view is ISOMETRIC (owner's review), where both gears and their cones read in one picture; the front elevation, where the pitch cones are triangles, is a press of FRONT away."
         },
         "principle": [
           {
@@ -49765,7 +49816,7 @@
             "label": "GEAR CONE ANGLE"
           }
         ],
-        "view": "FRONT",
+        "view": "ISOMETRIC",
         "controls": [
           {
             "id": "input",
@@ -54136,7 +54187,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Review of the 0.36.0 build (six phases, wheel 12° per worm turn, ratio 1/30 exact, lead angle 5.71°, centre distance 60): the motion is right, but the text's self-locking did not follow from its own numbers (lead angle 5.71° is above the 3.65° friction angle of mu 0.06); it holds at rest, where mu is about 0.12 (7.28°), and the text now says so and why the lock fails under vibration. Decided (issue #215): open in the auxiliary view down the worm's axis, where the worm is end-on, the wheel's axis a line 60 mm away and the throated rim wraps the worm, so the crossing without meeting reads; a section on the wheel's mid-plane, where the thread works on the teeth like a rack; a pitch point traced on the worm (seen whole in the default view) and one on the wheel, ticked every 90° of worm, so one worm turn moves the wheel one tooth. A design control gives two starts: 15:1 and no lock. Rebuild R4 (#215): built on v3 from this record: an Archimedean worm (its square section turned along the lead, a loft) and a throated wheel (teeth at the lead angle reaching round the worm, a loft), the worm's axis on the wheel's mid-plane; the mesh joint in the block's form (axis, axis2, ratio -1/30); the wheel's point in its own frame; the claim of one tooth per worm turn read as the wheel's range over a turn. The starts control is not offered (it changes the built worm and wheel). The six phases and the section read as decided."
+          "note": "Review of the 0.36.0 build (six phases, wheel 12° per worm turn, ratio 1/30 exact, lead angle 5.71°, centre distance 60): the motion is right, but the text's self-locking did not follow from its own numbers (lead angle 5.71° is above the 3.65° friction angle of mu 0.06); it holds at rest, where mu is about 0.12 (7.28°), and the text now says so and why the lock fails under vibration. Decided (issue #215): open in the auxiliary view down the worm's axis, where the worm is end-on, the wheel's axis a line 60 mm away and the throated rim wraps the worm, so the crossing without meeting reads; a section on the wheel's mid-plane, where the thread works on the teeth like a rack; a pitch point traced on the worm (seen whole in the default view) and one on the wheel, ticked every 90° of worm, so one worm turn moves the wheel one tooth. A design control gives two starts: 15:1 and no lock. Rebuild R4 (#215): built on v3 from this record: an Archimedean worm (its square section turned along the lead, a loft) and a throated wheel (teeth at the lead angle reaching round the worm, a loft), the worm's axis on the wheel's mid-plane; the mesh joint in the block's form (axis, axis2, ratio -1/30); the wheel's point in its own frame; the claim of one tooth per worm turn read as the wheel's range over a turn. The starts control is not offered (it changes the built worm and wheel). The six phases and the section read as decided. 30 Oct 2026 (#277): the default view is ISOMETRIC (owner's review), where the worm, the throated wheel and the crossing of their axes read in one picture; the section stays."
         },
         "principle": [
           {
@@ -54187,7 +54238,7 @@
             "label": "CENTRE DISTANCE, AXES CROSS WITHOUT MEETING"
           }
         ],
-        "view": "AUX O1",
+        "view": "ISOMETRIC",
         "views": [
           {
             "id": "A-A",
@@ -55410,7 +55461,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail. Rebuild R4 (#215): built on v3 from this record: a true cycloidal disc on a needle ring round the eccentric, ten ring pins (rollers on pins in a ring housing, a cover ring over their tops, see-through), six output pins pressed into the flange running round the disc's holes, the flange under the disc on bearings on the input shaft. Record fixes: the disc's bore 30 (the needle ring round the 24 mm eccentric), the disc's own frame at E, the output flange's ground joint on the input's axis (one shaft), the disc-pins mesh as a gear-mesh carried by the eccentric (ratio 10/9 relative to it), the flange following the disc (follow block) instead of a dyad that could flip at the parallelogram's straight positions, the output pin's hole given as a round hole. The eccentricity and pin-count controls are not offered (they change the built parts). The six phases and the detail read as decided."
+          "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail. Rebuild R4 (#215): built on v3 from this record: a true cycloidal disc on a needle ring round the eccentric, ten ring pins (rollers on pins in a ring housing, a cover ring over their tops, see-through), six output pins pressed into the flange running round the disc's holes, the flange under the disc on bearings on the input shaft. Record fixes: the disc's bore 30 (the needle ring round the 24 mm eccentric), the disc's own frame at E, the output flange's ground joint on the input's axis (one shaft), the disc-pins mesh as a gear-mesh carried by the eccentric (ratio 10/9 relative to it), the flange following the disc (follow block) instead of a dyad that could flip at the parallelogram's straight positions, the output pin's hole given as a round hole. The eccentricity and pin-count controls are not offered (they change the built parts). The six phases and the detail read as decided. 30 Oct 2026 (#273): the part to watch is the eccentric inside the lobed disc, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -55514,6 +55565,11 @@
             "stat": "mean",
             "value": -0.1111,
             "tol": 0.0005
+          }
+        ],
+        "focus": [
+          {
+            "body": "eccentric"
           }
         ],
         "exceptions": []
@@ -56485,7 +56541,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms. Rebuild R4 (#215): built on v3 from this record (first build): the pinion turns the case through the ring gear, a bevel-diff block turns the side gears plus and minus the difference relative to the case and spins the spiders on the cage's cross-pin; the second driver's speed follows the split param (claims at split 0 and -1 checked at those settings). Record fixes: the meshes in the block's form (signed ratios, axes, the case as carrier of the spider meshes), the pinion moved to the other side of the case (its shaft's free end away from the case takes the drive, and the case then turns +10/41 as claimed), bevels facing down where their apex lies below their frame, the side gears' revolutes at the case's centre (they run on its shaft), the ring's face 18 (it clears the right side gear along the shaft), the axis overlays as lines. The six phases and the section read as decided."
+          "note": "New review against the record (issue #215: two drivers, Willis). Two inputs: the pinion drives the case at 10/41, and a second driver sets the side gears' difference, split times the case angle. The default split is 0.5, so the left side gear runs at 1.5 and the right at 0.5 of the case and the spiders visibly spin (at 0 they stand still on their pin, which hides the principle). A section through the cross-pin shows the spiders meshing both side gears; marks on the side gears, ticked every 180 degrees of input, show one running three times as far as the other. The explanation is rewritten in mechanism terms. Rebuild R4 (#215): built on v3 from this record (first build): the pinion turns the case through the ring gear, a bevel-diff block turns the side gears plus and minus the difference relative to the case and spins the spiders on the cage's cross-pin; the second driver's speed follows the split param (claims at split 0 and -1 checked at those settings). Record fixes: the meshes in the block's form (signed ratios, axes, the case as carrier of the spider meshes), the pinion moved to the other side of the case (its shaft's free end away from the case takes the drive, and the case then turns +10/41 as claimed), bevels facing down where their apex lies below their frame, the side gears' revolutes at the case's centre (they run on its shaft), the ring's face 18 (it clears the right side gear along the shaft), the axis overlays as lines. The six phases and the section read as decided. 30 Oct 2026 (#273): the part to watch is the spider gears inside the case, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -56644,6 +56700,14 @@
             "setting": {
               "split": -1
             }
+          }
+        ],
+        "focus": [
+          {
+            "body": "spider0"
+          },
+          {
+            "body": "spider1"
           }
         ],
         "exceptions": []
@@ -58128,7 +58192,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option. Rebuild R4 (#215): built on v3 from this record (first build): the flexspline is its cup bottom on the input shaft plus 30 rigid segments (a tooth, its piece of rim and its wall strip each) carried round the oval by a wave block (radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself, which keeps the teeth in phase); the rigid spline a fixed body on two posts; addendum 0.7 m on both and the flexspline's teeth thinned 8%, so the teeth clear everywhere (checked tooth by tooth over the cycle); one cycle is one flexspline turn (15 input turns). The tooth-count choice is not offered (it changes the built teeth). The six phases of the finished build read as decided."
+          "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option. Rebuild R4 (#215): built on v3 from this record (first build): the flexspline is its cup bottom on the input shaft plus 30 rigid segments (a tooth, its piece of rim and its wall strip each) carried round the oval by a wave block (radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself, which keeps the teeth in phase); the rigid spline a fixed body on two posts; addendum 0.7 m on both and the flexspline's teeth thinned 8%, so the teeth clear everywhere (checked tooth by tooth over the cycle); one cycle is one flexspline turn (15 input turns). The tooth-count choice is not offered (it changes the built teeth). The six phases of the finished build read as decided. 30 Oct 2026 (#273): the part to watch is the wave generator inside the flexspline, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -58295,6 +58359,11 @@
             "stat": "mean",
             "value": -0.06667,
             "tol": 0.0001
+          }
+        ],
+        "focus": [
+          {
+            "body": "wave_gen"
           }
         ],
         "exceptions": []
@@ -66612,8 +66681,8 @@
               360
             ],
             "default": 0,
-            "phase": 120,
-            "note": "the cycle starts at the index; the reference is mid-dwell"
+            "phase": 297,
+            "note": "the stage opens (at 63 degrees of the cycle) two seconds of dwell before the index, which runs from 183 to 303 degrees; the reference is mid-dwell"
           }
         ],
         "solve": [
@@ -73428,7 +73497,7 @@
         "review": {
           "verdict": "rethink",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and #217. The output hub covered the floating disc and both tongues, the whole principle. It is drawn see-through so the disc, both tongues and both slots show at once; a slotted yoke hub only if that still reads badly. The disc centre C is traced and its orbit drawn as a full circle of diameter e = 28 mm midway between the shafts; ticks every 15 degrees of input land 30 degrees apart on it, so C goes round twice per shaft turn. A right-angle arc at C shows why: C always sees O1 and O2 at 90 degrees. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. Slim hubs carry slot jaws, the disc is smaller with a tongue on each face, and the output hub is drawn see-through, so both slots, both tongues and the disc show at once; the disc centre's orbit reads twice per turn. A slotted yoke hub was not needed. The output hub's shaft hangs from a bridge, see-through where it covers."
+          "note": "Applies the 2026-10-19 review and #217. The output hub covered the floating disc and both tongues, the whole principle. It is drawn see-through so the disc, both tongues and both slots show at once; a slotted yoke hub only if that still reads badly. The disc centre C is traced and its orbit drawn as a full circle of diameter e = 28 mm midway between the shafts; ticks every 15 degrees of input land 30 degrees apart on it, so C goes round twice per shaft turn. A right-angle arc at C shows why: C always sees O1 and O2 at 90 degrees. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): rethink carried out. Slim hubs carry slot jaws, the disc is smaller with a tongue on each face, and the output hub is drawn see-through, so both slots, both tongues and the disc show at once; the disc centre's orbit reads twice per turn. A slotted yoke hub was not needed. The output hub's shaft hangs from a bridge, see-through where it covers. 30 Oct 2026 (#273): the part to watch is the floating disc under the output hub, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -73555,6 +73624,11 @@
             "stat": "range",
             "value": 56,
             "tol": 0.1
+          }
+        ],
+        "focus": [
+          {
+            "body": "disc"
           }
         ],
         "exceptions": [],
@@ -76170,7 +76244,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-29",
-          "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 38 degrees since 29 Oct 2026); the plot shows output minus input (flat) and the ball's run along its groove. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The bell is see-through; the cage with its six windows, the balls and the grooved races show, and the section through the plane of the shafts shows balls 1 and 4 in their grooves with the cage tilted half the shaft angle. 29 Oct 2026 (#242): re-checked on the rebuilt drawing (six phases in the record view, and both ends of the bend in the record view and exploded): keep. The output's pillow blocks stand in arc slots in the base and follow the bend. The bend is capped at 38 degrees: the joint as built binds from 40 (the inner race on the bell) and the bell reaches the input's block from 42. At 38 the shafts still turn at one speed and the cage tilts 19 degrees."
+          "note": "Review against the record (not in the 2026-10-19 review). The principle is that the balls, and so the cage, stay in the plane bisecting the shaft angle. At 20 degrees the cage tilts only 10 degrees, so the default joint angle is 30 degrees: the cage tilts 15 degrees and each ball runs ±6.5 mm along its inner groove per turn. A section through the cage in the plane of the two shafts shows two balls in their grooves and windows with the cage tilted half-way; it highlights the cage and those balls. Ball 1's centre is traced: a circle that lies in the bisecting plane. The joint angle is a control (0 to 38 degrees since 29 Oct 2026); the plot shows output minus input (flat) and the ball's run along its groove. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): tweak carried out. The bell is see-through; the cage with its six windows, the balls and the grooved races show, and the section through the plane of the shafts shows balls 1 and 4 in their grooves with the cage tilted half the shaft angle. 29 Oct 2026 (#242): re-checked on the rebuilt drawing (six phases in the record view, and both ends of the bend in the record view and exploded): keep. The output's pillow blocks stand in arc slots in the base and follow the bend. The bend is capped at 38 degrees: the joint as built binds from 40 (the inner race on the bell) and the bell reaches the input's block from 42. At 38 the shafts still turn at one speed and the cage tilts 19 degrees. 30 Oct 2026 (#273): the part to watch is the cage and its balls inside the bell, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -76370,6 +76444,29 @@
             "setting": {
               "beta": 38
             }
+          }
+        ],
+        "focus": [
+          {
+            "body": "cage"
+          },
+          {
+            "body": "ball-1"
+          },
+          {
+            "body": "ball-2"
+          },
+          {
+            "body": "ball-3"
+          },
+          {
+            "body": "ball-4"
+          },
+          {
+            "body": "ball-5"
+          },
+          {
+            "body": "ball-6"
           }
         ],
         "exceptions": [],
@@ -78733,7 +78830,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice. Rebuild (R7): the return type is not offered as a control, because it changes the built nut; the tube return is built."
+          "note": "Unbuilt; reviewed against the record. A turn moves the nut one 5 mm lead; the record's 300 mm in 60 turns cannot show in one repeating cycle. The principle, balls rolling between the grooves and recirculating, lives inside the nut. Decided: the screw turns 6 turns out and back (nut 30 mm, a tick per turn); a section through the nut on the screw axis is the teaching view, with the loaded balls, the groove walls and the return path highlighted; the balls circulate at 0.43 of the screw's turn relative to the nut (rolling between a turning and a still groove), which the text's 'about half' now states exactly; the return type is a design choice. Rebuild (R7): the return type is not offered as a control, because it changes the built nut; the tube return is built. 30 Oct 2026 (#273): the part to watch is the balls in the nut, the rest of the nut drawn lighter over them so they show, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -78814,6 +78911,12 @@
             "stat": "range",
             "value": 30,
             "tol": 0.01
+          }
+        ],
+        "focus": [
+          {
+            "body": "nut",
+            "kind": "roller"
           }
         ],
         "exceptions": []
@@ -79881,7 +79984,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-27",
-          "note": "New record, reviewed against its kinematics before the build (#255). Six phases of the solved cycle (every 60 degrees of the cycle, one turn of the screw): the shoe at mid-stroke on a crossing, 48 mm further, at the far end turning round (swivel through 0 to -57.2), and back the same way; the shoe's travel against the screw's turn is an exact triangle wave with rounded tips, 24 mm per half turn in the steady runs. Decided: 3 turns per traverse and a turn-round of half a turn either side of each end, so the cycle is 6 turns, the shoe runs steady for 2 of every 3 turns and the turn-round is a sixth of the cycle, long enough to watch with no time map; lead 48 on a 32 mm screw, a lead angle of 28.6 degrees at the 14 mm pitch radius, so a crossing is 8.3 mm long and an 18 mm shoe bridges it with 4.8 mm in the groove at each end; the reference at mid-stroke, where both grooves cross under the shoe, so the opening drawing shows the shoe bridging a crossing. Default view DIMETRIC (owner's review): the screw's length, the diamonds of the crossing grooves and the shoe in its groove read together with the depth of the carriage and drive; FRONT keeps the grooves at true size. One tick per screw turn on the shoe's trace, a fixed one-lead dimension above it and the stroke dimension between the posed ends, so a turn reads as one lead; plot of the shoe's position against the screw's turn (the triangle wave over 6 turns); a detail view at the crossing under the shoe at the reference. The carriage is drawn see-through on purpose (teaching.seeThrough): its upright stands in front of the shoe in FRONT. Controls: the screw's turn only; the lead, turns and turn-round are built into the screw, so they are not offered."
+          "note": "New record, reviewed against its kinematics before the build (#255). Six phases of the solved cycle (every 60 degrees of the cycle, one turn of the screw): the shoe at mid-stroke on a crossing, 48 mm further, at the far end turning round (swivel through 0 to -57.2), and back the same way; the shoe's travel against the screw's turn is an exact triangle wave with rounded tips, 24 mm per half turn in the steady runs. Decided: 3 turns per traverse and a turn-round of half a turn either side of each end, so the cycle is 6 turns, the shoe runs steady for 2 of every 3 turns and the turn-round is a sixth of the cycle, long enough to watch with no time map; lead 48 on a 32 mm screw, a lead angle of 28.6 degrees at the 14 mm pitch radius, so a crossing is 8.3 mm long and an 18 mm shoe bridges it with 4.8 mm in the groove at each end; the reference at mid-stroke, where both grooves cross under the shoe, so the opening drawing shows the shoe bridging a crossing. Default view DIMETRIC (owner's review): the screw's length, the diamonds of the crossing grooves and the shoe in its groove read together with the depth of the carriage and drive; FRONT keeps the grooves at true size. One tick per screw turn on the shoe's trace, a fixed one-lead dimension above it and the stroke dimension between the posed ends, so a turn reads as one lead; plot of the shoe's position against the screw's turn (the triangle wave over 6 turns); a detail view at the crossing under the shoe at the reference. The carriage is drawn see-through on purpose (teaching.seeThrough): its upright stands in front of the shoe in FRONT. Controls: the screw's turn only; the lead, turns and turn-round are built into the screw, so they are not offered. 30 Oct 2026 (#273): the part to watch is the shoe, small in its groove under the carriage, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -80022,6 +80125,11 @@
             "stat": "range",
             "value": 57.24,
             "tol": 0.1
+          }
+        ],
+        "focus": [
+          {
+            "body": "shoe"
           }
         ],
         "exceptions": []
@@ -85072,7 +85180,7 @@
         "review": {
           "verdict": "tweak",
           "date": "2026-10-20",
-          "note": "Unbuilt; reviewed against the record. The output speed is x / rc times the disc's, so with a fixed carriage it is only a variable-ratio drive; the integral shows only when x changes while the disc turns. Decided (issue): two drivers, the disc and the carriage; by default the carriage follows x = 40 sin(disc angle), so the output winds up to 305.6° and back once per disc turn, plotted together with x (the integrand and its integral); output speed up to 2.67 x, reversing as the ball crosses the centre; the cylinder sits 45° up and across from the ball so the ball and both contacts stay visible from above; x is drawn as a dimension from the disc axis."
+          "note": "Unbuilt; reviewed against the record. The output speed is x / rc times the disc's, so with a fixed carriage it is only a variable-ratio drive; the integral shows only when x changes while the disc turns. Decided (issue): two drivers, the disc and the carriage; by default the carriage follows x = 40 sin(disc angle), so the output winds up to 305.6° and back once per disc turn, plotted together with x (the integrand and its integral); output speed up to 2.67 x, reversing as the ball crosses the centre; the cylinder sits 45° up and across from the ball so the ball and both contacts stay visible from above; x is drawn as a dimension from the disc axis. 30 Oct 2026 (#273): the part to watch is the ball between the disc and the cylinder, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -85181,6 +85289,11 @@
             "stat": "min",
             "value": -2.667,
             "tol": 0.005
+          }
+        ],
+        "focus": [
+          {
+            "body": "ball"
           }
         ],
         "exceptions": []
@@ -94695,7 +94808,7 @@
         "review": {
           "verdict": "rethink",
           "date": "2026-10-20",
-          "note": "Applies the 2026-10-19 review and issue #216. Fewer, larger sprags: 8 figure-of-eight sprags in a 14 mm gap between races of radius 30 and 44. Each sprag's contact arcs (radius 6, centres 2.16 apart) give a grip angle of 4.0° at the inner race and 2.7° at the outer, below the friction angle of 5.7° for mu = 0.1, so it locks by the text's own rule. Lock and overrun are timed phases: the inner race turns 90° forward with the outer race locked to it, then turns back while the outer race stays and the sprags slide on the inner race. The spider goes see-through or is moved; a detail view shows one sector with the line of thrust and the grip angle; the plot is outer speed against inner speed. Rebuild R5 (#216): built on v3. A new library block `one-way` (shared with any freewheel): the outer race follows the inner 1:1 while it turns forward and stays while it turns back; the sprag set turns with the outer race. Eight figure-eight sprags whose contact arcs are the record's (radius 6, centres 2.16 apart, grip angle 4.0 at the inner race), a garter spring through their waists, the outer race on a spider above with four windows over the sprags, so the sprags show (moved, not hidden)."
+          "note": "Applies the 2026-10-19 review and issue #216. Fewer, larger sprags: 8 figure-of-eight sprags in a 14 mm gap between races of radius 30 and 44. Each sprag's contact arcs (radius 6, centres 2.16 apart) give a grip angle of 4.0° at the inner race and 2.7° at the outer, below the friction angle of 5.7° for mu = 0.1, so it locks by the text's own rule. Lock and overrun are timed phases: the inner race turns 90° forward with the outer race locked to it, then turns back while the outer race stays and the sprags slide on the inner race. The spider goes see-through or is moved; a detail view shows one sector with the line of thrust and the grip angle; the plot is outer speed against inner speed. Rebuild R5 (#216): built on v3. A new library block `one-way` (shared with any freewheel): the outer race follows the inner 1:1 while it turns forward and stays while it turns back; the sprag set turns with the outer race. Eight figure-eight sprags whose contact arcs are the record's (radius 6, centres 2.16 apart, grip angle 4.0 at the inner race), a garter spring through their waists, the outer race on a spider above with four windows over the sprags, so the sprags show (moved, not hidden). 30 Oct 2026 (#273): the part to watch is the sprags between the races, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -94828,6 +94941,11 @@
             "stat": "mean",
             "value": 4,
             "tol": 0.05
+          }
+        ],
+        "focus": [
+          {
+            "body": "sprags"
           }
         ],
         "exceptions": []
@@ -96869,7 +96987,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-20",
-          "note": "Review against the record (not in the 2026-10-19 review). A 15 degree plate on a 40 mm pitch radius gives a 21.4 mm stroke, large enough to read. Decided: the swash angle is a control (0 to 18 degrees) with a ghost trace at 8 degrees; piston 1's head is traced with ticks every 15 degrees of shaft angle, bunched at the stroke ends, which shows the simple harmonic motion; the swash angle is drawn as an arc between the plate and the plane square to the shaft; a section through the shaft axis and piston 1 shows the plate face and the slipper; the plot shows all five pistons, 72 degrees apart. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): keep. The plate is pinned to the shaft at the tilt, so the swash angle control turns it; five plungers run in a bored block on posts, slippers swivel on ball ends; section A-A shows piston 1's slipper on the face."
+          "note": "Review against the record (not in the 2026-10-19 review). A 15 degree plate on a 40 mm pitch radius gives a 21.4 mm stroke, large enough to read. Decided: the swash angle is a control (0 to 18 degrees) with a ghost trace at 8 degrees; piston 1's head is traced with ticks every 15 degrees of shaft angle, bunched at the stroke ends, which shows the simple harmonic motion; the swash angle is drawn as an arc between the plate and the plane square to the shaft; a section through the shaft axis and piston 1 shows the plate face and the slipper; the plot shows all five pistons, 72 degrees apart. R6, 2026-10-22: reviewed again on the finished v3 build (six phases, the record view and ISOMETRIC): keep. The plate is pinned to the shaft at the tilt, so the swash angle control turns it; five plungers run in a bored block on posts, slippers swivel on ball ends; section A-A shows piston 1's slipper on the face. 30 Oct 2026 (#273): the part to watch is the pistons where they enter the block, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -97009,6 +97127,23 @@
             "value": 72,
             "tol": 0.5,
             "of": "min"
+          }
+        ],
+        "focus": [
+          {
+            "body": "piston-1"
+          },
+          {
+            "body": "piston-2"
+          },
+          {
+            "body": "piston-3"
+          },
+          {
+            "body": "piston-4"
+          },
+          {
+            "body": "piston-5"
           }
         ],
         "exceptions": []
@@ -97470,7 +97605,7 @@
         "review": {
           "verdict": "keep",
           "date": "2026-10-27",
-          "note": "T2 before the build, from the solved kinematics: six phases at 60 degrees of input give swings of 0, -17.5, -17.5, 0, +17.5, +17.5 degrees, so the yoke and the arm visibly rock while the shaft turns; the solve matches psi = atan(tan(alpha) sin(theta)) to 2e-14 (tests at 5, 15 and 25 degrees), amplitude exactly alpha, within 0.32 degrees of a pure sine at 20; the arm tip sweeps 41.0 mm; the output's speed ratio peaks at tan(alpha) = 0.36 at mid-swing; no dwell. Decided: the output shaft lies in plan square to the input, as the universal joint's does, so the two relatives read side by side; the reference pose is mid-swing (journal leaning in the plane of the two shafts, trunnions upright, yoke and arm upright), so the journal angle reads true in PLAN at the start; the arm's tip is traced with equal-time ticks every 15 degrees (bunched at the ends of the stroke, near harmonic) and a rim point of the ring is traced to show its nod; construction: the four axes as centrelines and a circle at the common centre, the journal angle arc, the stroke dimension; default view ISOMETRIC; section A-A through the input and journal axes at the start shows the inclined journal inside the ring on its bearing, the one part of the principle a housing hides; no use context in the drawing. Owner's review (#253): the centre did not read, so the journal is machined on the input hub as one solid at a fixed angle (alpha is no longer a control), alpha is 20 degrees (was 15) so the nod and the swing read at a glance, the ring runs on one double-row bearing instead of two with seals, both input pillow blocks stand on the drive side so no support is in front of the meeting point in ISOMETRIC and DIMETRIC, and only two labels remain: JOURNAL ANGLE and ALL FOUR AXES MEET HERE."
+          "note": "T2 before the build, from the solved kinematics: six phases at 60 degrees of input give swings of 0, -17.5, -17.5, 0, +17.5, +17.5 degrees, so the yoke and the arm visibly rock while the shaft turns; the solve matches psi = atan(tan(alpha) sin(theta)) to 2e-14 (tests at 5, 15 and 25 degrees), amplitude exactly alpha, within 0.32 degrees of a pure sine at 20; the arm tip sweeps 41.0 mm; the output's speed ratio peaks at tan(alpha) = 0.36 at mid-swing; no dwell. Decided: the output shaft lies in plan square to the input, as the universal joint's does, so the two relatives read side by side; the reference pose is mid-swing (journal leaning in the plane of the two shafts, trunnions upright, yoke and arm upright), so the journal angle reads true in PLAN at the start; the arm's tip is traced with equal-time ticks every 15 degrees (bunched at the ends of the stroke, near harmonic) and a rim point of the ring is traced to show its nod; construction: the four axes as centrelines and a circle at the common centre, the journal angle arc, the stroke dimension; default view ISOMETRIC; section A-A through the input and journal axes at the start shows the inclined journal inside the ring on its bearing, the one part of the principle a housing hides; no use context in the drawing. Owner's review (#253): the centre did not read, so the journal is machined on the input hub as one solid at a fixed angle (alpha is no longer a control), alpha is 20 degrees (was 15) so the nod and the swing read at a glance, the ring runs on one double-row bearing instead of two with seals, both input pillow blocks stand on the drive side so no support is in front of the meeting point in ISOMETRIC and DIMETRIC, and only two labels remain: JOURNAL ANGLE and ALL FOUR AXES MEET HERE. 30 Oct 2026 (#273): the part to watch is the ring that nods on the inclined journal, alone, against the plain input shaft, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
         },
         "principle": [
           {
@@ -97634,6 +97769,11 @@
             "abs": true,
             "value": 0.364,
             "tol": 0.002
+          }
+        ],
+        "focus": [
+          {
+            "body": "ring"
           }
         ],
         "exceptions": []

@@ -92,4 +92,15 @@ describe("the claim table (T9)", () => {
     const [over] = run([claim("max", 1, { over: "speed" })]);
     expect(over!.status).toBe("uncheckable");
   });
+
+  it("counts a dwell across the end of the cycle whole, for an output that steps on each cycle", async () => {
+    // the roller gear indexer opens two seconds before its index: the 240 degree dwell runs over the cycle's end
+    const { recordById } = await import("../../src/catalog");
+    const rec = recordById("roller-gear-indexer") as unknown as { kin: Kin; teaching: { claims: Claim[] } };
+    const K = new Kinematics(rec.kin);
+    const dwell = rec.teaching.claims.find((c) => c.stat === "dwell")!;
+    const [r] = checkClaims(K, [dwell], rec.kin.outputs as never);
+    expect(r!.status).toBe("ok");
+    expect(Math.abs((r as { got?: number }).got! - 240)).toBeLessThan(1);
+  });
 });

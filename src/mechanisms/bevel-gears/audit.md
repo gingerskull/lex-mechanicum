@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 147 · FAIL 0 · N/A 20 · open: none
+PASS 147 · FAIL 0 · N/A 22 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 7.1e-15 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (gear-mesh); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | N/A | HAND / DATA · fired: focus (no solids) · no part to watch: the parts the sheet is about read without it (#273) |
 | D1 | PASS | HAND · Tredgold back-cone teeth on frustums, true to the pitch cones |
 | D2 | PASS | HAND · material where the teeth carry |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -180,15 +182,15 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | Joint | Kit | Block | Support | Stack | F1 locate | F2 retain | F3 torque | F4 thrust | F5 limit | F6 hold | F7 adjust | F8 lube | F9 timing | F10 protect |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | M | J9 | gear-mesh | – | – | none | none | none | pinion-tw, gear-tw | none | none | pinion-shim, gear-shim | none | Pinion; Gear | none |
-| O2 | J2 | – | bridge | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7.9 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
+| O2 | J2 | – | bridge (moved) | – | 2 x Dowel pin Ø3 x 10 h6, housing to base; Bridge over the pivot, on two spigoted posts | 2 x Internal circlip DIN 472, Ø21; External circlip DIN 471, Ø12 | Feather key 4 x 4 x 7.9 (DIN 6885) | Thrust washer 12.2x20, bronze; Wave washer 16.5x20.8, spring steel | none | none | none | none | none | none |
 | O1 | J10 | driver | pillow (moved) | – | 4 x Dowel pin Ø4 x 14 h6, block to base | End washer 5.4x20, holds the pinion on the shaft end; Countersunk M5 x 12 (ISO 10642); 2 x circlipInternal | Feather key 4 x 4 x 16.9 (DIN 6885) | 2 x Shaft collar 12x20, set screw | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | Home flag, 1 mm steel vane; Fork sensor, slotted optical, 5 mm gap |
 
 ## Supports
 | Support | Joint | Kind | Route | Least gap mm | Covers | T10 |
 |---|---|---|---|---|---|---|
-| O2-bridge | O2 | bridge | first choice | 1.5 | – | – |
-| O1-pb | O1 | pillow | moved | 1.5 | – | – |
+| O2-bridge | O2 | bridge | moved | 1.5 | gear | – |
+| O1-pb | O1 | pillow | moved | 1.5 | pinion, gear | – |
 
 ## Variants and overrides
 | Joint or part | Rule result | Chosen | Why |
@@ -207,11 +209,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.37 |
 | DL-G | 0 | 0 | 1.38 |
 | DL-H | 11 | 0 | 1.4 |
-| never | 73 | 136 | 1.43 |
+| never | 73 | 135 | 1.43 |
 
 ## Promotion candidates
 None left: the bevel frustum, mesh phasing, back-face shims, the overhung pinion's end retainer and the motor beside a shaft in plan are rules of the builder.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 47.1 KB
+check: clean · K1 residual: 7.1e-15 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 47.8 KB
 screenshots: dist/shots3/bevel-gears (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

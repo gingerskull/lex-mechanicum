@@ -1,5 +1,6 @@
 import { scheduleOf } from "../kin/blocks/cam";
 import { evalExpr } from "../kin/expr";
+import { SOLID_KINDS } from "../style/kinds";
 import { KIN_VOCAB, TEACHING_VOCAB, type Kin, type Teaching } from "./kin";
 import type { CatalogRecord } from "./schema";
 
@@ -344,6 +345,16 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     if (!isNum(c.tol) || c.tol < 0) say(`claim "${String(c.text)}": tol must be a number >= 0`);
   }
   if (t.seeThrough !== undefined) for (const b of arr(t.seeThrough)) if (!bodies.has(String(b))) say(`teaching.seeThrough: "${String(b)}" is not a body`);
+  // the part to watch (T18): principle bodies, an optional solid kind
+  if (t.focus !== undefined) {
+    if (!Array.isArray(t.focus) || !t.focus.length) say("teaching.focus must be a non-empty list of { body, kind? } (T18)");
+    const principle = new Set((arr(t.principle) as Obj[]).map((p) => p.body).filter(isStr));
+    for (const f of arr(t.focus) as Obj[]) {
+      if (!isStr(f.body) || !bodies.has(f.body)) say(`teaching.focus: body "${String(f.body)}" is not a body`);
+      else if (!principle.has(f.body)) say(`teaching.focus: "${f.body}" is not a principle body (T3, T18)`);
+      if (f.kind !== undefined && !SOLID_KINDS.includes(f.kind as never)) say(`teaching.focus: kind "${String(f.kind)}" is not a solid kind`);
+    }
+  }
   if (!Array.isArray(t.exceptions)) say("teaching.exceptions must be an array");
   for (const e of arr(t.exceptions) as Obj[]) if (!isStr(e.reason)) say("an exception needs a reason (T12)");
 

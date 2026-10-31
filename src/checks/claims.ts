@@ -72,10 +72,16 @@ interface Series {
   y: number[];
 }
 
-/** The longest cyclic window in which the series stays within `band`; its start, length (samples). */
+/**
+ * The longest cyclic window in which the series stays within `band`; its start, length (samples). The next cycle goes on
+ * from where this one ends: an output that advances every cycle (an indexer's turret, a step on) carries on from its
+ * last value, by its advance over the cycle (extrapolated from the last two samples), so a dwell across the end of the
+ * cycle counts whole.
+ */
 function longestDwell(y: number[], band: number): { start: number; len: number } {
   const n = y.length;
-  const d = y.concat(y);
+  const adv = n > 1 ? 2 * y[n - 1]! - y[n - 2]! - y[0]! : 0;
+  const d = y.concat(y.map((v) => v + adv));
   let best = { start: 0, len: 0 };
   // monotonic deques for the window's max and min
   const mx: number[] = [];

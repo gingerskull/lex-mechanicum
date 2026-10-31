@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-21 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 146 · FAIL 0 · N/A 21 · open: none
+PASS 146 · FAIL 0 · N/A 23 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 3.6e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (indexer); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | N/A | HAND / DATA · fired: focus (no solids) · no part to watch: the parts the sheet is about read without it (#273) |
 | D1 | PASS | HAND · a slotted ring on its web, concave locking arcs at the slots' mouths; the crank's locking sector; the arm above; a track roller on the pin |
 | D2 | PASS | HAND · the ring wide where the slots carry; the web joins it to the shaft below |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -205,11 +207,11 @@ PASS 146 · FAIL 0 · N/A 21 · open: none
 | DL-F | 0 | 0 | 1.51 |
 | DL-G | 0 | 0 | 1.54 |
 | DL-H | 6 | 0 | 1.46 |
-| never | 64 | 116 | 1.47 |
+| never | 64 | 113 | 1.47 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 3.6e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.1 KB
+check: clean · K1 residual: 3.6e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.2 KB
 screenshots: dist/shots3/internal-geneva (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

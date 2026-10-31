@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 149 · FAIL 0 · N/A 18 · open: none
+PASS 150 · FAIL 0 · N/A 19 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record in E2 (#204) before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 7.1e-15 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (integrator); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the ball between disc and cylinder; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · a sphere in a cage ring open below and toward the cylinder; the cylinder its own shaft with turned journals; the carriage's arm, block, cheeks and rail with stops and pads |
 | D2 | PASS | HAND · material where the load runs, bosses round every pin |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -208,11 +210,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | 1.96 |
 | DL-G | 0 | 0 | 2.1 |
 | DL-H | 14 | 0 | 2.11 |
-| never | 102 | 122 | 2.18 |
+| never | 102 | 120 | 2.18 |
 
 ## Promotion candidates
 None left: the integral is a kin block (closed form for the standard driver laws, quadrature otherwise); the ball in its cage, the carriage on its rail and a body that is its own shaft are the integrator rule and the ball-cage kit; the Scotch yoke takes a driver's phase and side.
 
 ## Verification
-check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 21.4 KB
+check: clean · K1 residual: 7.1e-15 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.2 KB
 screenshots: dist/shots3/ball-disc-integrator (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; phone by David)

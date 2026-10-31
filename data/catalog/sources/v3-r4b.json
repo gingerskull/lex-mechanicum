@@ -720,7 +720,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail. Rebuild R4 (#215): built on v3 from this record: a true cycloidal disc on a needle ring round the eccentric, ten ring pins (rollers on pins in a ring housing, a cover ring over their tops, see-through), six output pins pressed into the flange running round the disc's holes, the flange under the disc on bearings on the input shaft. Record fixes: the disc's bore 30 (the needle ring round the 24 mm eccentric), the disc's own frame at E, the output flange's ground joint on the input's axis (one shaft), the disc-pins mesh as a gear-mesh carried by the eccentric (ratio 10/9 relative to it), the flange following the disc (follow block) instead of a dyad that could flip at the parallelogram's straight positions, the output pin's hole given as a round hole. The eccentricity and pin-count controls are not offered (they change the built parts). The six phases and the detail read as decided."
+        "note": "Applies the 2026-10-19 review and issue #215: 10 ring pins and a 9-lobe disc at e 4 (eN/R 0.8), so the lobes are 8 mm deep and the wobble reads; e 4 fits with the 5 mm pins (no undercut, no interference, checked over the cycle), so the review's 3.6 is not needed. The disc on top of the pins, the output flange underneath, the cover ring and housing see-through. The eccentric is drawn with its crank line O-E, and the two rolling circles (the disc's, radius e n = 36, inside the pins', radius e N = 40) show why it walks back one lobe per turn. A point on the disc's rolling circle is traced, ticked once per input turn: nine ticks per output turn, one lobe each. The output pins in their oversized holes are in full view, in a detail. Rebuild R4 (#215): built on v3 from this record: a true cycloidal disc on a needle ring round the eccentric, ten ring pins (rollers on pins in a ring housing, a cover ring over their tops, see-through), six output pins pressed into the flange running round the disc's holes, the flange under the disc on bearings on the input shaft. Record fixes: the disc's bore 30 (the needle ring round the 24 mm eccentric), the disc's own frame at E, the output flange's ground joint on the input's axis (one shaft), the disc-pins mesh as a gear-mesh carried by the eccentric (ratio 10/9 relative to it), the flange following the disc (follow block) instead of a dyad that could flip at the parallelogram's straight positions, the output pin's hole given as a round hole. The eccentricity and pin-count controls are not offered (they change the built parts). The six phases and the detail read as decided. 30 Oct 2026 (#273): the part to watch is the eccentric inside the lobed disc, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -824,6 +824,11 @@
           "stat": "mean",
           "value": -0.1111,
           "tol": 0.0005
+        }
+      ],
+      "focus": [
+        {
+          "body": "eccentric"
         }
       ],
       "exceptions": []
@@ -1103,7 +1108,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn."
+        "note": "Review of the 0.36.0 build (six phases, ratio 0.5 exact, cone angles 26.57° and 63.43°, Re 71.55): the motion and text are right, but it is drawn in plan, where the pinion's cone is edge-on and the common apex, the whole principle, cannot be seen. Decided: open in front elevation, where both pitch cones show as triangles meeting at the apex P on the two axis lines; the cone outlines, the common cone line through the mesh and both cone angles as construction overlays; a pitch point traced on each gear with ticks every 30° of input, so twelve ticks on the pinion's circle meet twelve on half the gear's. A design control swaps 16/32 for the 16/16 mitre pair, so the cone angles visibly follow the tooth ratio. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. Pilot (P): the 16/16 control is not offered, because the gear solids are built at build time and a control cannot change tooth counts; the 16/32 pair is drawn. 30 Oct 2026 (#277): the default view is ISOMETRIC (owner's review), where both gears and their cones read in one picture; the front elevation, where the pitch cones are triangles, is a press of FRONT away."
       },
       "principle": [
         {
@@ -1187,7 +1192,7 @@
           "label": "GEAR CONE ANGLE"
         }
       ],
-      "view": "FRONT",
+      "view": "ISOMETRIC",
       "controls": [
         {
           "id": "input",
@@ -2177,7 +2182,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review of the 0.36.0 build (six phases, wheel 12° per worm turn, ratio 1/30 exact, lead angle 5.71°, centre distance 60): the motion is right, but the text's self-locking did not follow from its own numbers (lead angle 5.71° is above the 3.65° friction angle of mu 0.06); it holds at rest, where mu is about 0.12 (7.28°), and the text now says so and why the lock fails under vibration. Decided (issue #215): open in the auxiliary view down the worm's axis, where the worm is end-on, the wheel's axis a line 60 mm away and the throated rim wraps the worm, so the crossing without meeting reads; a section on the wheel's mid-plane, where the thread works on the teeth like a rack; a pitch point traced on the worm (seen whole in the default view) and one on the wheel, ticked every 90° of worm, so one worm turn moves the wheel one tooth. A design control gives two starts: 15:1 and no lock. Rebuild R4 (#215): built on v3 from this record: an Archimedean worm (its square section turned along the lead, a loft) and a throated wheel (teeth at the lead angle reaching round the worm, a loft), the worm's axis on the wheel's mid-plane; the mesh joint in the block's form (axis, axis2, ratio -1/30); the wheel's point in its own frame; the claim of one tooth per worm turn read as the wheel's range over a turn. The starts control is not offered (it changes the built worm and wheel). The six phases and the section read as decided."
+        "note": "Review of the 0.36.0 build (six phases, wheel 12° per worm turn, ratio 1/30 exact, lead angle 5.71°, centre distance 60): the motion is right, but the text's self-locking did not follow from its own numbers (lead angle 5.71° is above the 3.65° friction angle of mu 0.06); it holds at rest, where mu is about 0.12 (7.28°), and the text now says so and why the lock fails under vibration. Decided (issue #215): open in the auxiliary view down the worm's axis, where the worm is end-on, the wheel's axis a line 60 mm away and the throated rim wraps the worm, so the crossing without meeting reads; a section on the wheel's mid-plane, where the thread works on the teeth like a rack; a pitch point traced on the worm (seen whole in the default view) and one on the wheel, ticked every 90° of worm, so one worm turn moves the wheel one tooth. A design control gives two starts: 15:1 and no lock. Rebuild R4 (#215): built on v3 from this record: an Archimedean worm (its square section turned along the lead, a loft) and a throated wheel (teeth at the lead angle reaching round the worm, a loft), the worm's axis on the wheel's mid-plane; the mesh joint in the block's form (axis, axis2, ratio -1/30); the wheel's point in its own frame; the claim of one tooth per worm turn read as the wheel's range over a turn. The starts control is not offered (it changes the built worm and wheel). The six phases and the section read as decided. 30 Oct 2026 (#277): the default view is ISOMETRIC (owner's review), where the worm, the throated wheel and the crossing of their axes read in one picture; the section stays."
       },
       "principle": [
         {
@@ -2228,7 +2233,7 @@
           "label": "CENTRE DISTANCE, AXES CROSS WITHOUT MEETING"
         }
       ],
-      "view": "AUX O1",
+      "view": "ISOMETRIC",
       "views": [
         {
           "id": "A-A",
@@ -3847,7 +3852,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-10-20",
-        "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option. Rebuild R4 (#215): built on v3 from this record (first build): the flexspline is its cup bottom on the input shaft plus 30 rigid segments (a tooth, its piece of rim and its wall strip each) carried round the oval by a wave block (radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself, which keeps the teeth in phase); the rigid spline a fixed body on two posts; addendum 0.7 m on both and the flexspline's teeth thinned 8%, so the teeth clear everywhere (checked tooth by tooth over the cycle); one cycle is one flexspline turn (15 input turns). The tooth-count choice is not offered (it changes the built teeth). The six phases of the finished build read as decided."
+        "note": "Review against the record (unbuilt): the record's 100 and 102 teeth of module 0.5 bend the flexspline by 0.5 mm on a 25 mm radius, too small to see, as its own note says. Decided: 30 and 32 teeth of module 2 (15:1), the flexspline's pitch radius 30, bent by w0 = 2 mm, so its pitch curve reaches the rigid spline's (radius 32) at both ends of the long axis and the teeth fully engage there; short teeth (addendum 0.8 m) clear tip to tip at the short axis by 0.8 mm. The flexure block bends the rim. Construction: both pitch circles (the flexspline's at rest and the rigid spline's) and the wave generator's long axis. An index mark on the flexspline is traced with ticks every 30°: it creeps back two teeth per input turn and its radius swings as the long axis passes. 100/102 stays as a design option. Rebuild R4 (#215): built on v3 from this record (first build): the flexspline is its cup bottom on the input shaft plus 30 rigid segments (a tooth, its piece of rim and its wall strip each) carried round the oval by a wave block (radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself, which keeps the teeth in phase); the rigid spline a fixed body on two posts; addendum 0.7 m on both and the flexspline's teeth thinned 8%, so the teeth clear everywhere (checked tooth by tooth over the cycle); one cycle is one flexspline turn (15 input turns). The tooth-count choice is not offered (it changes the built teeth). The six phases of the finished build read as decided. 30 Oct 2026 (#273): the part to watch is the wave generator inside the flexspline, tinted in the accent keeping its see-through (T18); reviewed by the owner on the stage: keep."
       },
       "principle": [
         {
@@ -4014,6 +4019,11 @@
           "stat": "mean",
           "value": -0.06667,
           "tol": 0.0001
+        }
+      ],
+      "focus": [
+        {
+          "body": "wave_gen"
         }
       ],
       "exceptions": []

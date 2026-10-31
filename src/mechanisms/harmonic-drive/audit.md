@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 147 · FAIL 0 · N/A 20 · open: none
+PASS 148 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 1.2e-14 (tolerance 1e-9) over 360 samples, reference 9.9e-16 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 2 blocks (gear-mesh, wave); no numeric fallback · composed from the block library (gear-mesh carried by the wave generator against the fixed spline; the wave block bends the flexspline's 30 segments round the oval: radial w0 cos 2(phi - theta) and the inextensible rim's slide along itself); no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the wave generator inside the flexspline; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · the rigid spline an internal spline of short teeth; the flexspline a thin cup whose toothed rim is 30 segments (one tooth, its rim and its wall strip each), teeth thinned 8% for running clearance; the wave generator an elliptical cam |
 | D2 | PASS | HAND · the flexspline thin where it bends, the rigid spline a full ring |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -209,5 +211,5 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 None left: the wave block, the flexTooth segment shape, an elliptical cam outline and a ring gear's short teeth are in the library. Open: a deforming solid in the v3 renderer would draw the rim as one bending part.
 
 ## Verification
-check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.2 KB
+check: clean · K1 residual: 1.2e-14 · claims: 2 of 2 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 22.8 KB
 screenshots: dist/shots3/harmonic-drive (record view, PLAN, FRONT, SIDE, ISOMETRIC, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 2.16 ms full, 1.75 at C, 1.73 at G; phone by David)

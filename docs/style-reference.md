@@ -1,8 +1,8 @@
 # Style reference (blueprint / drafting)
 
 ```
-version: 3.12
-date: 2026-10-29
+version: 3.13
+date: 2026-10-30
 supersedes: 2.4 (the 2.5D renderer; 1.0 was the hand-off style reference of 2026-10-16)
 ```
 
@@ -45,7 +45,7 @@ where it means something.
 | Id | Principle |
 |---|---|
 | SP1 | **The mechanism is the subject.** Every style choice is judged by whether the motion reads more clearly. Supporting things (motor, bracket, base furniture, sheet frame, grid, site chrome) are quieter than the mechanism but stay clearly visible. Nothing cosmetic distracts. |
-| SP2 | **Monochrome ink on paper, one accent.** One ink colour per sheet does all the work, at different strengths. One accent marks the input, the traced path, the forces and the few interactive highlights. Roles are told apart by surface pattern and line weight, never by hue. |
+| SP2 | **Monochrome ink on paper, one accent.** One ink colour per sheet does all the work, at different strengths. One accent marks the input, the traced path, the forces, the part to watch (SD30) and the few interactive highlights. Roles are told apart by surface pattern and line weight, never by hue. |
 | SP3 | **Bold and crisp first, loose sparingly.** Visible edges are bold, clean lines. Loose, hand-drafted touches are limited to the named list in SD9 and stay faint. |
 | SP4 | **Transparency keeps the mechanism legible.** Surfaces are semi-transparent paper. An edge covered by a part becomes a dashed hidden line, so bearings, shanks and parts behind parts stay readable. |
 | SP5 | **Drafting conventions, used honestly.** Hidden lines, chain centrelines, dimensions, title blocks, hatching and zone marks mean what they mean on a real drawing. Nothing that is not a drafting convention dresses up as one. |
@@ -156,8 +156,8 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | SD1 | **Depth order is sacred.** The depth buffer decides what is in front; there is no slicing and no painter's order, and no effect uses a depth bias. A new effect is inserted into the peeled composite or drawn as an annotation (steps 5 to 11), never layered over the finished frame in a way that reorders what it covers. |
 | SD2 | **Surfaces are paper.** Every solid is filled with the paper colour at a set opacity (plates, others, base, walls). Plates hide more than small hardware. The base plate is the most transparent so the underside (motor, housings, cabling) still reads, and it lets a twelfth of the lines under it through. Side walls take a stepped ink shade by facing (`fill.wallShade`), so a plate, a bracket or a block reads as a body on both sheets and never as outlines with nothing between them; mounts (the ground role) take a faint ink tint on their faces. A solid drawn see-through (it covers a working zone or a principle part, standard L5 and T10) keeps most of its paper and occlusion on every face in view (`fill.seeThrough`), so what lies behind reads through it faintly without the support turning into outlines, and a flat ink wash, so it reads as a deliberate pane, clearly apart from an ordinary plate. |
 | SD3 | **Visible and hidden edges by depth.** Every edge is classified by what covers it in the depth layers. An edge seen directly is bold and solid; the same edge seen through a part is thin and dashed, with the bold line at what the occluders let through (fractional occlusion, each occluder at its opacity). Only the share the occluders hide turns into dashes, so an edge seen through a see-through solid never stacks its bold and dashed copies into a line as strong as an uncovered one. Fine detail (chamfers, threads, engraving) lives only in the visible class, so it disappears behind parts instead of turning into dashes. Edges are the cap outlines, the creases and the smooth-surface silhouettes of each solid, shipped or extracted once at setup; an extrusion or a loft (a worm's turned section) takes them from its profile and sections, so a twisted wall never draws its tessellation's diagonals. |
-| SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's own coordinates (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns go on the cap and primary faces within a set angle of the view, never on walls or faces turned edge-on (a turning round part's rulings are SD29). |
-| SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout. A second accent use needs a reason written here. While the drawing is paused, the input ring breathes slowly between full strength and a part of it (`lines.accentRing.breathe`); nothing else moves, the ring holds still while the drawing plays, and it never breathes under reduced motion. |
+| SD4 | **Roles by surface, not colour.** Each role has a pattern registered to the part's own coordinates (it moves, rotates and foreshortens with the part): driver fine stipple, link sparse soft dots, output hatching, ground soft dashes, base a faint dot grid, bearing cross-hatch, hardware plain with a light tint, trace in the accent. Patterns go on the cap and primary faces within a set angle of the view, never on walls or faces turned edge-on (a turning round part's rulings are SD29). A floor under a piece of its own body (an internal Geneva wheel's web under its slotted ring) carries no role pattern (`fill.floor`), so a cut through the piece reads as a cut, not as more of the piece. |
+| SD5 | **One accent in the drawing:** the ring round the input shaft, the traced paths and comet, force arrows, the highlight callout, and the part to watch (SD30), the one use on a part's surface, because a critical part that is small or internal is otherwise missed. A second accent use needs a reason written here. While the drawing is paused, the input ring breathes slowly between full strength and a part of it (`lines.accentRing.breathe`); nothing else moves, the ring holds still while the drawing plays, and it never breathes under reduced motion. |
 | SD6 | **Centrelines along joint axes** (long dash, short dash) through every joint head and along its axis, overshooting a little; hidden for an axis within a set angle of the view direction (it would foreshorten to a point) and when the drawing is too small to read them. |
 | SD7 | **Traced paths** are a fine dotted accent line at the trace height; the first path gets the comet (tapering trail, open circle at the current point). The live trace is the only drawing of the path: nothing is engraved on the base plate for it (a path in a plane that is not the base's would project to a stray line, and one under parts shows through them). The path is the point's whole path: a point whose path does not close in one cycle (a gear's mark turned on 240 degrees a cycle) is followed over as many cycles as it takes to close, or to go all round once if it never closes, drawn open then. The drawing plays on from cycle to cycle without a jump (the phase runs on; a part turned on less than a whole turn per cycle carries on round), and the comet is where the point was over the last stretch of time, so it never jumps where a cycle ends. |
 | SD8 | **Dimensions:** overall base-plate width and depth in mm, with extension lines, gaps and filled arrowheads, labels on a paper knock-out. Detail stage only, in the named views where the base reads true (PLAN, FRONT, SIDE) and when it is not near edge-on. A dimension is labelled true size even when foreshortened. |
@@ -182,6 +182,7 @@ A record supplies geometry, `role`, `kind`, `marks`, `accent`, detail rungs; the
 | SD27 | **Time map.** Playback slows near a declared feature; the drawing and the plot do not change, only the rate at which u advances; the scrubber shows the true input. |
 | SD28 | **No pop-ins.** Nothing the drawing shows switches in one frame while the view turns or the cycle plays: a solid eases in and out of see-through over a small range of overlap and depth (T10); a pattern fades out over a range of angles as its face turns edge-on; a cap's bold top outline blends into the far cap's style as its face turns edge-on; a smooth surface's outline is shared by the tessellation edges either side of it, so it glides as the surface turns; a pattern finer than a few pixels on screen is sampled several times per pixel, so it does not shimmer; and the Auto dial moves only on a sustained cost (DL4 of the standard). A face that really turns from one side to the other, edge-on, is an event of the geometry and stays. |
 | SD29 | **A turning round part shows that it turns.** A part that turns over the cycle and is round about its own axis (a shaft, a roller, a plain disc or sheave; not a gear, whose teeth show it) carries faint rulings registered to it: lines along its round walls and short ticks round the rim of its faces, at about one per `spin.pitch` of its largest radius, the same count on every step of a shaft. They are ink at `spin.alpha`, drawn at every dial position that draws the role patterns, and fade out where they crowd on screen (toward the outline, where the wall turns away), so they never shimmer or pop. A ball turns whether it turns about its own axis or across it (rolling sideways); a round part that only swings across its axis (a steered wheel, a rocking cylinder) does not turn. Like parts handed on round a circuit (a body's `next`) turn as one. A running belt shows that it runs the same way: lines across its back and faces, carried round its pitch path with its travel, a whole number round it at a spacing within `spin.belt`, the number whose travel over a cycle is nearest a whole number of marks, so they come back in step after it (they slip on the belt by that much, a percent or so). A belt of conveyed parts (a chain, a push belt) shows its run by its moving parts and carries no marks. A boss ring is engraved round a pin a part carries (a revolute, spherical or universal joint), as large as a hub round the pin's bore and no larger, never round a slide, a contact or a mesh. |
+| SD30 | **The part to watch.** A part a record names in `teaching.focus` (T18 of the standard) is tinted toward the accent on its faces, walls and cut faces by `focus.accent`, its own opacity and see-through kept, so what is inside or behind it still shows; its edges stay ink, a little heavier (`focus.edge`). Where it lies inside a piece of its own body (a ball screw's balls in the nut), the rest of that body is drawn see-through at `focus.cover` of a see-through part's opacity, so the part shows through. A trace on it is drawn over the tint, and it is teaching content: drawn at every dial position (DL6 of the standard). |
 
 ---
 
@@ -336,6 +337,8 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.lines.accentRing.breathe.period` | 5 | s, 0..1, count per s |
 | `draft.lines.accentRing.breathe.low` | 0.35 | s, 0..1, count per s |
 | `draft.lines.accentRing.breathe.fps` | 15 | s, 0..1, count per s |
+| `draft.fill.floor.pattern` | 0 | 0..1, share of its role pattern |
+| `draft.fill.floor.tint` | 0 | 0..1, ink tint on its faces |
 | `draft.fill.plate` | 0.9 |  |
 | `draft.fill.other` | 0.95 |  |
 | `draft.fill.base` | 0.96 | laid once, on the top face (the parts under it read only through `occlude.base`) |
@@ -397,6 +400,9 @@ Derived page tiers: alpha of ink (the grid tiers: alpha of `grid`), turned into 
 | `draft.pattern.dotMid` | [0.55, 0.8] | gradient stop position and its alpha, soft dot falloff |
 | `draft.pattern.lineWidth` | 2.2 | tile px, hatch, cross and dash strokes |
 | `draft.pattern.dashes` | [[3, 10, 6], [15, 22, 18]] | tile px, dash segments as [x0, x1, y] |
+| `draft.focus.accent` | 0.55 | 0..1, the tint toward the accent on its faces, walls and cut faces; its own opacity is kept |
+| `draft.focus.edge` | 1.25 | factor on its edges' width, which stay ink |
+| `draft.focus.cover` | 0.25 | factor on a see-through part's opacity for the rest of a body whose pieces are the part (a nut round its balls) |
 | `draft.spin.pitch` | 7 | mm, ruling spacing round the part's largest radius (the count is the same on every step of a shaft) |
 | `draft.spin.count` | [8, 48] | rulings round the part, least and most (a multiple of four) |
 | `draft.spin.width` | 0.6 | px |
@@ -807,6 +813,9 @@ The unlock, the moment and the living effects of SS14; the colours are the `forg
 
 ## Changelog
 
+- **3.13 (2026-10-30).** The part to watch: a small or internal critical part a record names is tinted in the accent,
+  keeping its see-through, its edges heavier in ink (SD30, `focus.accent`, `focus.edge`, `focus.cover`); the accent's
+  uses grow by this one (SP2, SD5). A floor under a piece of its own body carries no role pattern (SD4, `fill.floor`).
 - **3.12 (2026-10-29).** A running belt carries marks carried round with it (SD29, `spin.belt`); a belt of conveyed
   parts shows its run by them. A ball that turns across its own axis (rolling sideways) carries its rulings, and like
   parts handed on round a circuit turn as one.

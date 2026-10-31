@@ -3,7 +3,7 @@ standard: 3.11 · date: 2026-10-27 · result: pass · detail: full · pass: buil
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 147 · FAIL 0 · N/A 20 · open: none
+PASS 148 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees, no em dashes |
 | P12 | PASS | AUTO / DATA · validate clean; every point, control and claim maps to kin |
 | P13 | PASS | HAND · teaching review run on the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 1.4e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (spherical-four-bar); no numeric fallback · composed from the new spherical-four-bar block (closed form, src/kin/steps/spherical.ts); no numeric fallback |
@@ -55,6 +56,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two like parts of one role to tell apart |
 | T17 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the ring alone, not the input's shaft; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · fired: wheels (no solids) · ring as one solid, a housing bored for its bearing with two trunnions on boss pads; the hub one solid turned on the journal's axis at α: a Ø30 boss keyed on the shaft (2.2 mm clear of the ring's flank), a Ø24 shoulder step the inner race stands on, the Ø20 journal, bored obliquely for the shaft; every face square to the journal; yoke as the universal joint's (hub, bar, arms bored for cups) |
 | D2 | PASS | HAND · material round the bearing bore and the trunnion roots; bosses round the cup bores |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -111,7 +113,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | J12 | N/A | AUTO · fired: j12-flexible (no solids), j12-cvt (no solids), j12-other (no solids), strap-sheave (no solids) · filled by the generator: no joint of this type |
 | J13 | N/A | AUTO · fired: j13-compliant (no solids) · filled by the generator: no joint of this type |
 | J11 | N/A | AUTO · fired: j11-screw (no solids) · filled by the generator: no joint of this type |
-| F1 | PASS | AUTO · served at S1, S2; fired: posts (no solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
+| F1 | PASS | AUTO · served at S1, S2; fired: bend-slots (no solids), posts (no solids), integrator-carriage (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), ring-carrier (no solids), pin-ring (no solids), hub (no solids), strap-sheave (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F2 | PASS | AUTO · served at S1, S2, T, J; fired: wheels (no solids), j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), cross-bearings (7 solids), oblique-journal (7 solids), trunnion (no solids), ring-carrier (no solids), eccentric-bearing (no solids), pin-ring (no solids), spider-pin (no solids), fork-pin (no solids), ring-hub (no solids), eccentric (no solids), hub (no solids), leg-bore (no solids), ring-rollers (no solids), strap-sheave (no solids), j11-screw (no solids), j13-compliant (no solids), covers (no solids) · filled by the generator: a rule built solids for it |
 | F3 | PASS | AUTO · served at S1, S2; fired: j12-flexible (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), j11-screw (no solids) · filled by the generator: a rule built solids for it |
 | F4 | PASS | AUTO / HAND · served at S1, S2; fired: j9-crossed-mesh (no solids), j2-live-shaft (no solids), j10-shaft-in-plan (58 solids), trunnion (no solids), spider-pin (no solids), j11-screw (no solids) · shaft collars locate both live shafts in their blocks; the ring's bearings are held both ways by circlips |
@@ -154,7 +156,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | R1 | PASS | HAND · the yoke and cups reuse the universal joint's shapes and the cross-pin kit; bearings, circlips and stacks from the primitives |
 | R2 | PASS | HAND · shafts Ø10 (input and output), bearings 3804 (double-row table), 6801, 6800 from the tables, M5 and M4 screws |
 | R3 | PASS | AUTO · fired: hardware primitives · shared subassemblies: pillow blocks, drive, sensor |
-| R4 | PASS | AUTO · package v2 25.8 KB · filled by the generator: the pipeline holds it for every built mechanism |
+| R4 | PASS | AUTO · package v2 26.4 KB · filled by the generator: the pipeline holds it for every built mechanism |
 | R5 | PASS | HAND · no polish |
 | R6 | PASS | FLAG · FLAG: bench run on the desktop with three heavy jobs on the machine, numbers indicative: frames 1.2 to 2.2 ms (under 8 ms); setup 83.8 ms over the 20 ms target, 79 ms of it the GPU first frame under load; the phone is measured by David |
 | R7 | PASS | HAND / FLAG · polish none; 0 solids added, 0 overrides by the polish |
@@ -221,5 +223,5 @@ Candidates: a shim pack at a located pillow block where axes must meet (F7, the 
 a shank length of its own for a hub whose shaft runs on past it, in the stack builder instead of the kit's trim.
 
 ## Verification
-check: clean · K1 residual: 1.4e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 25.8 KB
+check: clean · K1 residual: 1.4e-14 · claims: 4 of 4 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 26.4 KB
 screenshots: .local/n1-shots/wobble-box/rework (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets; centre crops at 2x) · bench: frame times of the first build (desktop under load from parallel passes, numbers indicative); setup 83.8 ms flagged over the 20 ms target (GPU first frame 79 ms)

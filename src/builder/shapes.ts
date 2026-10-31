@@ -79,6 +79,8 @@ export interface BodyGeom {
    * universal joint's yoke and cross on their centre); its own part starts `offset` along the frame's z.
    */
   exact?: { offset: number };
+  /** The own part is the floor under a piece of the same body (an internal Geneva wheel's web under its slotted ring). */
+  floor?: boolean;
   /** Further solids of the body's own (a yoke's bar and arms, a cross's second trunnion), in world reference frames. */
   pieces?: { id: string; name: string; frame: Frame; profile: Profile; h: number; revolve?: boolean; op?: Op; features?: import("../solids/types").Feature[]; marks?: import("../solids/types").Mark[]; kind?: import("../style/kinds").SolidKind }[];
   /** The own part is a solid of revolution about the frame's z (a ball, a cage), its profile in (r, z). */

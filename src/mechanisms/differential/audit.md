@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 149 · FAIL 0 · N/A 18 · open: none
+PASS 150 · FAIL 0 · N/A 19 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 6.3e-16 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 2 blocks (gear-mesh, bevel-diff); no numeric fallback · composed from the block library (gear-mesh for the pinion and the ring; bevel-diff for the spider train on the case: the side gears turn plus and minus the difference relative to the case, the spiders spin on the cross-pin); no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (2 solids) · teaching.focus: the two spider gears inside the case; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · Tredgold bevel teeth on every gear (the pinion and ring 10/41, the spiders and side gears 10/16, apexes at the case's centre; gears facing down where their apex lies below their frame); the ring bolted to the case's cage |
 | D2 | PASS | HAND · material where the teeth carry; the cage a flat frame round the spiders |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -220,5 +222,5 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 None left: the bevel-diff block, the cage on a gear, bevels facing down, the spider-pin kit, a driver speed from a param and claims at a setting are in the library. Open: the second input's hand control is not built as hardware (the side gears' shafts are the case's; real half-shafts would carry the outputs).
 
 ## Verification
-check: clean · K1 residual: 6.3e-16 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 80.2 KB
+check: clean · K1 residual: 6.3e-16 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 80.8 KB
 screenshots: dist/shots3/differential (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: tools/bench3 (desktop; 28 deg paced 0.80 ms full, 1.12 at C, 1.03 at G; phone by David)

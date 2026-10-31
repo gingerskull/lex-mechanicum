@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: rethink · decisions in the record
 
 ## Summary
-PASS 147 · FAIL 0 · N/A 20 · open: none
+PASS 148 · FAIL 0 · N/A 21 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 0.0e+0 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (one-way); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | PASS | HAND / STYLE · eight sprags of one role, one body; told apart by place only |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the sprags between the races; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · figure-eight sprags with the record's contact arcs, a garter spring through their waists, an inner race disc, an outer race ring on a windowed spider |
 | D2 | PASS | HAND · the spider's arms between the windows carry the outer race to its hub |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -203,11 +205,11 @@ PASS 147 · FAIL 0 · N/A 20 · open: none
 | DL-F | 0 | 0 | 1.65 |
 | DL-G | 0 | 0 | 1.46 |
 | DL-H | 9 | 0 | 1.45 |
-| never | 49 | 102 | 1.5 |
+| never | 49 | 101 | 1.5 |
 
 ## Promotion candidates
 None yet.
 
 ## Verification
-check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.6 KB
+check: clean · K1 residual: 0.0e+0 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 19.4 KB
 screenshots: dist/shots3/sprag-clutch (record view, PLAN, FRONT, SIDE, ISOMETRIC, declared views, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)

@@ -83,7 +83,7 @@ precision highp sampler2DArray;
 uniform sampler2D uPrev;
 uniform int uLayer;
 uniform sampler2DArray uPat;
-uniform vec3 uInk, uPaper;
+uniform vec3 uInk, uPaper, uAccent;
 uniform float uSteps, uShade, uPatGain, uMinStep, uPatOff, uHatch, uHatchW, uCapA, uHatchA;
 in vec2 vLocal;
 in vec3 vN;
@@ -139,6 +139,8 @@ void main() {
     float al = uCapA;
     col = uInk * h + col * (1.0 - h);
     al = h + al * (1.0 - h);
+    // the part to watch is tinted in the accent where it is cut too (SD30)
+    if (solidT(vSolid, 6).w > 0.5) col = mix(col, uAccent * al, ${fl(DRAFT.focus.accent)});
     oC = vec4(col, al);
     oM = vec4(1.0, al, float(vSolid & 255) / 255.0, float((vSolid >> 8) | 128) / 255.0);
     return;
@@ -207,6 +209,8 @@ void main() {
     }
     occ = hole ? 0.0 : a.w;
   }
+  // the part to watch (SD30): faces and walls tinted toward the accent, its own opacity kept
+  if (solidT(vSolid, 6).w > 0.5) col = mix(col, uAccent * al, ${fl(DRAFT.focus.accent)});
   oC = vec4(col, al);
   oM = vec4(occ, al, float(vSolid & 255) / 255.0, float(vSolid >> 8) / 255.0);
 }
@@ -350,6 +354,8 @@ void main() {
   } else if (kind == 3) {
     if (f1 > 1e-4 && ((uMarkMask >> mark) & 1) == 1) { bw = uMark[mark].x; ba = uMark[mark].y * (base ? (mark == 1 ? uBaseGain.y : uBaseGain.x) : 1.0); }
   }
+  // the part to watch's edges stay ink, a little heavier (SD30)
+  if (w.w > 0.5) { bw *= ${fl(DRAFT.focus.edge)}; hw *= ${fl(DRAFT.focus.edge)}; }
   bw *= uLineK;
   hw *= uLineK;
   vStyle = vec4(bw * uDpr, ba * fa, hw * uDpr, ha * fa);

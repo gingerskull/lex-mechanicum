@@ -3,7 +3,7 @@ standard: 3.0 · date: 2026-10-22 · result: pass · detail: full · pass: build
 teaching: tweak · decisions in the record
 
 ## Summary
-PASS 149 · FAIL 0 · N/A 18 · open: none
+PASS 150 · FAIL 0 · N/A 19 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -27,6 +27,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | P11 | PASS | DATA · plain language, mm and degrees |
 | P12 | PASS | AUTO / DATA · validate(records, asVersion 3) clean for this record |
 | P13 | PASS | HAND · teaching review run against the record in E2 (#204) before the build and again on the finished drawing (teaching: line) |
+| P14 | N/A | HAND / DATA · not a fictional mechanism: no season block |
 | K1 | PASS | AUTO · K1 residual 2.6e-14 (tolerance 1e-9) over 360 samples, reference 0.0e+0 |
 | K2 | PASS | AUTO · check: finite, continuous, periodic over 360 samples |
 | K3 | PASS | AUTO / HAND · 1 block (screw); no numeric fallback · composed from the block library; no fallback, no one-off model |
@@ -55,6 +56,7 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | T15 | PASS | HAND · labels state the mechanism, never its use |
 | T16 | N/A | HAND / STYLE · no two parts of one role to tell apart |
 | T17 | PASS | AUTO · depth peeling, no depth bias (renderer test) |
+| T18 | PASS | HAND / DATA · fired: focus (1 solid) · teaching.focus: the balls in the nut (nut, roller), the rest of the nut drawn lighter over them; reviewed by the owner on the stage (#273) |
 | D1 | PASS | HAND · screw: turned core with its ball groove's lands swept on the helix; ball nut in three rings, its lands, the balls, the return tube; carriage, flag with a fork |
 | D2 | PASS | HAND · material where the load runs, bosses round every pin |
 | D3 | PASS | STYLE · STYLE: roles by pattern and tone (both sheets) |
@@ -204,11 +206,11 @@ PASS 149 · FAIL 0 · N/A 18 · open: none
 | DL-F | 0 | 0 | 1.73 |
 | DL-G | 0 | 0 | 1.71 |
 | DL-H | 12 | 0 | 1.58 |
-| never | 132 | 96 | 2.01 |
+| never | 132 | 94 | 2.01 |
 
 ## Promotion candidates
 None left: the ball circuit (balls conveyed round the grooves and a return tube) is part of the screw kit (J11); conveyed solids are a feature of the package and the renderer.
 
 ## Verification
-check: clean · K1 residual: 2.6e-14 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 47.6 KB
+check: clean · K1 residual: 2.6e-14 · claims: 1 of 1 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 48.1 KB
 screenshots: dist/shots3/ball-screw (record view, PLAN, FRONT, SIDE, ISOMETRIC, section A-A, explode; both sheets) · bench: dist/bench/report-v2.md (desktop; frame times paced at 28 deg in the ladder above; phone by David)
