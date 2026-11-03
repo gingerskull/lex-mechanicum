@@ -26,6 +26,19 @@ function travelOf(ctx: BuildCtx, body: string, axis: Vec3): [number, number] {
   return [lo, hi];
 }
 
+/** A round bore of radius r with a keyway out to x = k, half-width w, on +x (counter-clockwise). */
+function keyedBore(r: number, k: number, w: number): [number, number][] {
+  const a0 = Math.asin(w / r);
+  const n = 40;
+  const ring: [number, number][] = [];
+  for (let i = 0; i <= n; i++) {
+    const a = a0 + ((2 * Math.PI - 2 * a0) * i) / n;
+    ring.push([r * Math.cos(a), r * Math.sin(a)]);
+  }
+  ring.push([k, -w], [k, w]);
+  return ring;
+}
+
 export const column: Rule = {
   id: "column-slide",
   tier: "AUTO",
@@ -47,7 +60,7 @@ export const column: Rule = {
         H.solid(`${ji.id}-flange`, { name: `Column flange Ø${2 * R + 16}, four M4 screws into the base`, kind: "collar", role: "ground", mat: "Steel C45", outer: circle(R + 8, 0, 0, 40), holes: [circle(R, 0, 0, 40).reverse()], z0: base, z1: base + 5, body: "ground" }),
         H.solid(`${ji.id}-key`, { name: "Key strip along the column's flat: the sleeve slides and does not turn", kind: "key", role: "ground", mat: "Steel C45, bright", outer: roundRect(R - 1, -1.5, R + 1.5, 1.5, 0.4), z0: ji.at[2] - sleeve / 2 + t0 - 2, z1: top, body: "ground" }),
         H.solid(`${ji.id}-sleeve`, { name: `Sleeve, bronze-bushed, ${sleeve} mm long, keyed on the column`, kind: "housing", role: "link", mat: "Aluminium 6061-T6", outer: circle(R + 6, 0, 0, 40), holes: [circle(R + 2.05, 0, 0, 40).reverse()], z0: ji.at[2] - sleeve / 2, z1: ji.at[2] + sleeve / 2, body }),
-        H.bushing(`${ji.id}-bush`, 2 * R + 0.1, 2 * R + 4, { body, z0: ji.at[2] - sleeve / 2, z1: ji.at[2] + sleeve / 2, name: `Bronze bushing ${2 * R}x${2 * R + 4}x${sleeve}`, mat: "Bronze CuSn8, oil-impregnated" }),
+        H.bushing(`${ji.id}-bush`, 2 * R + 0.1, 2 * R + 4, { body, z0: ji.at[2] - sleeve / 2, z1: ji.at[2] + sleeve / 2, name: `Bronze bushing ${2 * R}x${2 * R + 4}x${sleeve}, a keyway for the strip`, mat: "Bronze CuSn8, oil-impregnated", holes: [keyedBore(R + 0.05, R + 1.6, 1.65)] }),
         H.collar(`${ji.id}-stop`, 2 * R, 2 * R + 8, { body: "ground", z0: top - 1, z1: top + 5, name: `Stop collar Ø${2 * R + 8} on the column's top, set screw` }),
       ];
       ctx.add(place(f, out, { joints: [ji.id] }));
@@ -89,7 +102,7 @@ export const flatBelt: Rule = {
       const run = { path: pitch, tr: turnTravel(ctx, ji.a, z, R, pitch) };
       // centred on the drums' middle along the axis
       const pa = ctx.parts.get(ji.a);
-      const mid = pa && pa.op.op === "extrude" ? v3.dot(v3.sub(pa.frame.o, ga.at), z) * (v3.dot(pa.frame.z, z) > 0 ? 1 : -1) + (v3.dot(pa.frame.z, z) > 0 ? pa.op.h / 2 : -pa.op.h / 2) : 0;
+      const mid = pa && pa.op.op === "extrude" ? v3.dot(v3.sub(pa.frame.o, ga.at), z) + (v3.dot(pa.frame.z, z) > 0 ? pa.op.h / 2 : -pa.op.h / 2) : 0;
       ctx.add(place(f, [H.solid(`${ji.id}-band`, { name: `Flat belt ${w} mm wide, ${t} mm thick, endless, rubber on polyester`, kind: "belt", role: "hw", mat: "Rubber on polyester carcass", outer, holes: [inner.slice().reverse()], z0: mid - w / 2, z1: mid + w / 2, body: "ground" })], { joints: [ji.id], run }));
       ctx.note({ id: ji.id, kit: "flat-belt", at: ji.at, title: `flat-belt · ${titleOf(ji.id)}`, note: `${titleOf(ji.id)}: an endless flat belt ${w} mm wide round both drums, ${t} mm thick, its middle on the drums' ${R.toFixed(2)} mm radius; nothing turns the drums but the belt, and the belt is driven only by what stands on its top run. Its marks run with the drums' turn. Dry: no lubrication.`, serves: {}, badge: ["flat belt built", "ok"] });
       (ctx.fired["flat-belt"] ??= []).push(ji.id);
