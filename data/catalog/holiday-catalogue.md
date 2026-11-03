@@ -5,7 +5,7 @@ the record spec (`data/catalog/record-spec.md`) so they can be filtered, compare
 alongside the library. Each one is a real mechanism, with true kinematics, dressed for its occasion: an invented
 name, story, uses and scenery.
 
-Edition: autumn 2026, revised 28 October 2026. The year runs from 15 October 2026 to 14 October 2027. Six records are
+Edition: autumn 2026, revised 3 November 2026. The year runs from 15 October 2026 to 14 October 2027. Six records are
 complete in this edition; the rest are scheduled and listed with their working names.
 
 ## Contents
@@ -16,7 +16,7 @@ complete in this edition; the rest are scheduled and listed with their working n
 4. [Find by motion](#find-by-motion)
 5. [Mechanisms](#mechanisms)
    - [Nosferatu crypt-lid quick-return](#nosferatu-crypt-lid-quick-return) · Halloween
-   - [Plymouth straight-cut carving linkage](#plymouth-straight-cut-carving-linkage) · Thanksgiving
+   - [Turkey trot walker](#turkey-trot-walker) · Thanksgiving
    - [Maccabee eight-night indexer](#maccabee-eight-night-indexer) · Hanukkah
    - [Drosselmeyer toggle jaw](#drosselmeyer-toggle-jaw) · Christmas
    - [Nguzo Saba seven-gear planetary](#nguzo-saba-seven-gear-planetary) · Kwanzaa
@@ -71,7 +71,7 @@ with local sighting or custom.
 | 1 to 2 Nov | Día de los Muertos | Major | Ofrenda tiered scissor lift | Three-stage scissor lift raising the altar tiers in sequence, marigold garland kept taut by a constant-length cable | Scheduled |
 | 5 Nov | Bonfire Night | Special day | Catherine-wheel escapement | A verge-type escapement that lets a pinwheel advance in measured bursts rather than all at once | Scheduled |
 | 8 Nov | Diwali | Major | Rangoli hypotrochoid drawing engine | Planetary pen carrier that lays down rangoli rosettes in coloured powder, ratio sets the petal count | Scheduled |
-| 26 Nov | Thanksgiving (US) | Major | [Plymouth straight-cut carving linkage](#plymouth-straight-cut-carving-linkage) | Twin Hoekens linkages give a level knife a straight saw stroke and a lift-out return | **Complete** |
+| 26 Nov | Thanksgiving (US) | Major | [Turkey trot walker](#turkey-trot-walker) | Two Klann legs trot a turkey on a treadmill its own feet drive, while the belt works the carving knife behind it | **Complete** |
 | 27 Nov | Black Friday | Special day | Doorbuster turnstile | Bistable over-centre gate that admits exactly one shopper per half-turn, regardless of pressure | Scheduled |
 | 4 to 12 Dec | Hanukkah | Major | [Maccabee eight-night indexer](#maccabee-eight-night-indexer) | Eight-slot Geneva driving a rack: one candle station per night, right to left | **Complete** |
 | 21 Dec | Winter solstice | Special day | Solstice sun-sight cam | Barrel cam that tracks the noon sun's height through the year; the follower dwells at the solstices | Scheduled |
@@ -108,7 +108,7 @@ Complete records only. Families and columns match the master catalogue.
 | Mechanism | Family | Level | Motion | Ratio | Occasion |
 |---|---|---|---|---|---|
 | [Nosferatu crypt-lid quick-return](#nosferatu-crypt-lid-quick-return) | Quick-return | Intermediate | Rotary → Oscillating | Stroke | Halloween |
-| [Plymouth straight-cut carving linkage](#plymouth-straight-cut-carving-linkage) | Straight-line linkage | Advanced | Rotary → Straight line | Stroke | Thanksgiving |
+| [Turkey trot walker](#turkey-trot-walker) | Linkage | Advanced | Rotary → Path | Stroke | Thanksgiving |
 | [Maccabee eight-night indexer](#maccabee-eight-night-indexer) | Intermittent | Intermediate | Rotary → Intermittent linear | Index step | Hanukkah |
 | [Drosselmeyer toggle jaw](#drosselmeyer-toggle-jaw) | Linkage | Basic | Oscillating → Linear | Force amplification | Christmas |
 | [Nguzo Saba seven-gear planetary](#nguzo-saba-seven-gear-planetary) | Gears | Intermediate | Rotary → Rotary | Low (<5:1) | Kwanzaa |
@@ -116,9 +116,9 @@ Complete records only. Families and columns match the master catalogue.
 
 ## Find by motion
 
-| Input \ Output | Rotary | Oscillating | Linear | Intermittent rotary | Intermittent linear | Straight line |
+| Input \ Output | Rotary | Oscillating | Linear | Intermittent rotary | Intermittent linear | Path |
 |---|---|---|---|---|---|---|
-| **Rotary** | [Nguzo Saba planetary](#nguzo-saba-seven-gear-planetary) | [Crypt-lid quick-return](#nosferatu-crypt-lid-quick-return) |  |  | [Maccabee indexer](#maccabee-eight-night-indexer) | [Plymouth carving linkage](#plymouth-straight-cut-carving-linkage) |
+| **Rotary** | [Nguzo Saba planetary](#nguzo-saba-seven-gear-planetary) | [Crypt-lid quick-return](#nosferatu-crypt-lid-quick-return) |  |  | [Maccabee indexer](#maccabee-eight-night-indexer) | [Turkey trot walker](#turkey-trot-walker) |
 | **Oscillating** |  |  | [Drosselmeyer toggle jaw](#drosselmeyer-toggle-jaw) | [Resolution ratchet](#resolution-ratchet-with-mid-january-release) |  |  |
 
 The Maccabee indexer joins `walking-beam` as the only mechanisms with an Intermittent linear output.
@@ -195,71 +195,76 @@ A crank and slotted lever ease a coffin lid open over two-thirds of a turn and s
 
 ---
 
-### Plymouth straight-cut carving linkage
+### Turkey trot walker
 
-*Also called: Rockwell carver, twin Hoekens slicer, level-knife carving linkage, the drumstick-safe linkage*
+*Also called: Plymouth trotter, treadmill turkey, perpetual escape, carver's pacemaker*
 
-Two identical Hoekens linkages, belted in step, carry a level knife along a straight saw stroke and lift it clear of the bird on the way back.
+Two Klann legs half a turn apart trot a turkey on a free treadmill that its own feet drive; the belt works a carving knife and fork behind it, and the turkey never gets any further away.
 
 | | |
 |---|---|
-| id | `plymouth-carving-linkage` |
-| Occasion · Date rule · Duty | Thanksgiving (US) · fourth Thursday in November · Domestic (Commercial variant for carveries) |
-| Family · Level | Straight-line linkage · Advanced |
-| Motion | Rotary → Straight line (Reciprocating, Constant velocity, Quick-return) |
-| Axes · Plane | Rotary-to-in-plane · Planar |
-| Ratio | Stroke, n/a: 108 mm straight stroke from a 25 mm crank, 4.3 x the crank diameter |
-| DOF · Topology | 1 · 8 links, 10 R, 0 P, 1 higher (ground, two cranks, two couplers, two rockers, knife bar; one timing belt phasing the cranks) |
+| id | `turkey-trot-walker` |
+| Occasion · Date rule · Duty | Thanksgiving (US) · fourth Thursday in November · Commercial (Domestic variant for the sideboard) |
+| Family · Level | Linkage · Advanced |
+| Motion | Rotary → Path (Continuous, Non-uniform) |
+| Axes · Plane | n/a · Planar (the fan turns in the cross plane) |
+| Ratio | Stroke, n/a: 94.7 mm stride and 42.5 mm step from a 25 mm crank; the belt runs 188.4 mm back per crank turn |
+| DOF · Topology | 1 · 43 links in four groups: the walker (body on a vertical slide, crank shaft, two Klann legs of four links each, toes on ankle pins), the treadmill (belt, two rollers), the fan (follower lever, spreading plate, 21 feathers), the cutlery (two rods, two carriages, driven by two cranks on the rear roller). The body's height and the belt follow whichever foot is lower. |
 | Backdrivable | Partly |
-| Function | Straight-line generation, Motion conversion, Path generation |
-| Property | Approximate, Balanced, Singular positions, Positive drive |
-| Application | Consumer products, Packaging & automation, Agriculture, Machine tools |
-| Keywords | hoekens, chebyshev lambda, carving, turkey, slicer, saw stroke, carvery, coupler curve |
+| Function | Walking, Path generation, Motion conversion |
+| Property | Approximate, Shock at engagement |
+| Application | Toys & kinetic art, Robotics, Consumer products |
+| Keywords | klann, walker, biped, turkey, treadmill, thanksgiving, carving knife, tail fan, cam, slider-crank |
 
-**How it moves.** Each half is a Hoekens four-bar: crank 25, ground 50, coupler 62.5, rocker 62.5, with the coupler extended to a point P 125 mm from the crank pin. Over 200° of crank, P runs along a straight line, at nearly constant speed through the middle of it; over the remaining 160° it swings up in an arch and comes back faster. A second, identical linkage 140 mm along is driven in phase by a 1:1 timing belt behind the back plate, so its point P' moves exactly like P. The knife bar is pinned to both points and therefore translates without rotating: the blade stays level through the whole stroke and lifts out of the meat on the return.
+**How it moves.** A crank shaft through the turkey's body turns two Klann legs, one on each flank, half a turn apart. Each foot runs back along a low, nearly flat stance and lifts 42.5 mm on the way forward. The body hangs on a vertical slide and rests on whichever foot is lower, so it dips up to 4 mm at each change of feet: the trot. The foot on the floor pushes a free belt back under the turkey, which therefore walks steadily and goes nowhere. The belt turns the rear roller exactly twice per crank turn, once per step, and two cranks on that roller send the knife and then the fork lunging forward on a slide behind the treadmill. A two-lobe cam on the crank shaft spreads the tail fan once every step.
 
-**Forces.** Cutting resistance acts along the stroke at P, a long way out on the coupler, and returns through the rocker and crank in roughly equal shares. The two halves share the cut, and the phasing belt only has to carry the difference between them, which is small while the build is accurate. The rockers come near their stationary positions at the ends of the straight stroke, where crank torque per unit of cutting force rises.
+**Forces.** The body's weight rests on the lower foot and returns through the leg and its two rockers to the crank shaft. The belt is driven only by friction under that foot, so everything behind it, the rollers, the cutlery cranks and the carriages, is driven by the turkey's stride, and their drag comes back through the leg to the crank. At each change of feet the body's vertical motion reverses, a small footfall the slide absorbs.
 
-**Why use it.** A carving stroke wants a straight line at constant speed with a level blade and a clean lift at the end; a single Hoekens gives the first two, and twinning it gives the third without a slide or guide that would collect gravy. The 1.25:1 time ratio returns the blade a little faster than it cut, which carvers find encouraging.
+**Why use it.** One motor works the whole scene. The turkey's walk turns the belt, the belt works the cutlery, and the crank that moves its legs also spreads its fan. No sensor tells the knife where the turkey is, because the turkey is always in the same place.
 
-**Limits.** The straight segment is approximate, deviating ±0.12 mm over 108 mm, which is finer than any turkey can detect but rules the linkage out for prosciutto. The speed is even only through the middle of the stroke and falls away toward its ends, where the rockers slow. Twinned linkages are overconstrained (Gruebler gives 0); they run because the halves are identical, so pin centre errors above about 0.1 mm show up as binding at the ends of the stroke. Slice thickness is set by moving the platter by hand, a deliberate concession to tradition.
+**Limits.** A Klann foot does not run perfectly flat; two legs half a turn apart leave a 4 mm gap at each change of feet, which the sliding body takes up as the trot. The belt moves unevenly, up to 0.82 mm per crank degree, and runs forward 0.54 mm at each change of feet, when both feet are moving forward together; the knife and fork share every surge. The toes are kept level by a spring on the ankle pin, which allows the turkey dignity but not speed.
 
 **In industry**
 
-- **Carveries and hotel buffets**: Commercial variant at 30 rpm gives a 97 mm/s saw stroke, inside the range professional carvers use, without the forearm.
-- **Poultry processing**: twinned straight-line linkages are used where a blade must stay level on a conveyor; the Thanksgiving pattern is the domestic adaptation, scaled for one bird and one family argument.
-- **Bakery slicing**: the same level-knife linkage slices pies and sheet cakes, where the arched return is valued because it clears the meringue.
-- **Consumer appliances**: countertop carving stands, typically with a folding knife bar and a guard that the user removes within the first year.
+- **Retail windows**: the Commercial variant trots in department-store windows from Thanksgiving to the end of the season, at 30 rpm, one step a second, day and night, covering about 285 km of belt in five weeks without leaving the window.
+- **Turkey Trot fun runs**: a large Municipal adaptation paces the start line from a flatbed, so runners can see what they are running from.
+- **Holiday tables**: the Domestic variant stands on the sideboard as a centrepiece; the cutlery is blunted, by regulation and by family request.
+- **Training rigs**: the same self-driven treadmill tests walking linkages, where the belt shows the stance speed directly and a foot that slips leaves a mark.
 
 **Build**
 
-- Ground: crank pivots O2 at (0, 0) and O2' at (140, 0); rocker pivots O4 at (50, 0) and O4' at (190, 0); a back plate standing behind the platter.
-- Input: crank, continuous rotation about O2 (crank' follows through the phasing belt, same direction, 1:1).
-- Output: knife bar, translating; P and P' trace identical coupler curves.
-- Members: `crank` (driver) O2→A, a = 25; `coupler` A→B, 62.5, extended to P, AP = 125; `rocker` O4→B, 62.5; the same three primed at +140 in x; `knife` (output) bar P→P', 140, carrying the blade 30 mm below; `pulley1`, `pulley2` 24-tooth pulleys keyed to each crank shaft behind the back plate; `belt` (belt) 1:1 phasing belt between them.
-- Joints: O2, O4, A, B revolute (and the same four primed); P revolute (coupler–knife); P' revolute (coupler'–knife); belt pulley1–pulley2.
-- Default parameters: a = 25 mm (crank); b = 50 mm (ground); c = 62.5 mm (coupler A to B); d = 62.5 mm (rocker); AP = 125 mm (coupler point); s = 140 mm (twin spacing); crank speed 30 rpm.
-- Defining relations: Hoekens proportions a : b : c : d : AP = 1 : 2 : 2.5 : 2.5 : 5; Grashof crank-rocker (25 + 62.5 ≤ 50 + 62.5). The twins stay in phase because both pulleys have 24 teeth and an open belt turns them the same way. Knife bar length must equal s exactly, or the parallelogram fights the belt.
-- Range: crank 360°; straight stroke y between 100 and 100.24 mm for crank 80° to 280°, x from 104 to −4 mm (108 mm), its speed within 4% for crank 120° to 240°; return arch rises to 122.5 mm, lifting the blade 22.5 mm; coupler rocks from 37° to 101°, which the knife bar does not see.
-- Notes: B closes the dyad on A and O4 on the branch above the ground line; P = A + 2 (B − A). The second half is the first shifted by s. The twins are overconstrained, which `topology.notes` says (K11).
+- Ground: the treadmill frame, with a column behind it carrying the body's vertical slide and a slide block for the cutlery. Body frame: x forward (the turkey faces +x), y up, z toward the near side; crank axis O at (0, 0), upper rocker pivot A at (−22.2, 52.5), lower rocker pivot B at (−55.4, −17.4), fan pivot P at (−150, 45) with its axis along x. With the body at rest, the belt's top run lies at y = −71.0, the lowest point of the foot path; rollers at x = −255 and x = 45, radius 15.0, axes along z.
+- Input: the crank shaft, continuous rotation about O (θ increasing counter-clockwise seen from the near side, so the stance foot moves −x).
+- Output: the near foot F, path traced; the body's height; the belt; the knife and fork carriages; the fan's spread.
+- Members: `crank` (driver) crank shaft with the near crank O→C, r = 25, the far crank at 180°, and a two-lobe cam for the fan; for each leg, `connector` rigid triangle C, E, K: CE 55.9, K at (98.4, −6.3) in the frame C→E (CK 98.6, EK 43.0); `lowerRocker` B→E, 32.7; `upperRocker` A→H, 43.8; `leg` (output) rigid triangle H, K, F: HK 77.4, F at (148.4, 42.4) in the frame H→K (HF 154.3, KF 82.7); `toes` on the ankle pin at F; `body` (link) carrying O, A, B and P, on the vertical slide; `belt` (belt) on `rollerR` and `rollerF`; `rollerR` carries two cranks of 12 mm, 180° apart; `knifeRod` 44 and `forkRod` 70 to `knife` and `fork` carriages sliding along x at the roller axis height; `follower` lever on the cam, `spreader` plate sliding up and down in the rump, feathers `f1` to `f21` on P (11 in the back row, 10 in front), each with a pin in its own slot of the spreader.
+- Joints: O revolute (body–crank); for each leg C revolute (crank–connector), E revolute (connector–lowerRocker), B revolute (body–lowerRocker), K revolute (connector–leg), H revolute (leg–upperRocker), A revolute (body–upperRocker), F revolute (leg–toes); prismatic (ground–body, vertical); foot contact (lower foot–belt, no slip); belt (belt–rollers); two revolutes (ground–rollers); slider-cranks rollerR–knifeRod–knife and rollerR–forkRod–fork, the carriages prismatic on the ground; cam contact (cam–follower); pin-in-slot (follower–spreader); prismatic (body–spreader); 21 revolutes (body–feather at P) and 21 pin-in-slot (feather–spreader).
+- Default parameters: r = 25 mm; A (−22.2, 52.5); B (−55.4, −17.4); CE 55.9, BE 32.7, AH 43.8, HK 77.4 mm; K (98.4, −6.3) in C→E; F (148.4, 42.4) in H→K; roller radius 15.0 mm; cutlery cranks 12 mm, rods 44 and 70 mm; feather spacing 12° closed to 16.5° spread; crank speed 30 rpm.
+- Defining relations: the leg is a Klann chain retuned for two legs from the library record's proportions (scaled by 1.25 and adjusted), so the lower of two feet half a turn apart stays within 4.0 mm of the floor; least transmission angle 32°. The body's height is its rest height less the lower foot's height above its lowest point, between 0 and −4.0 mm. The belt moves with the lower foot, 188.4 mm back per crank turn. The roller radius is the belt travel per turn over 4π, so the rear roller turns exactly twice per crank turn and the scene repeats every turn. Each carriage is a slider-crank on the rear roller, stroke 24 mm, the knife and the fork half a roller turn apart. Fan spread s = (1 + cos 2(θ − 333°)) / 2, feather spacing 12° + 4.5° s, fully spread when either foot is at the middle of its stance.
+- Range: crank 360° continuous, two steps; near foot in the body from x −148.5 to −53.7 and y −71.0 to −28.5 (stride 94.7, lift 42.5); body 0 to 4.0 mm down; belt 188.4 mm per turn; each carriage 24 mm, twice per turn; fan from 120° to 165° across the outer feathers.
+- Notes: crank angle 0 when C points toward −x (as in the library record); the near foot is lowest at 333°, the far foot at 153°, and the feet change at 179.5° and 359.5°, where both move forward at 0.10 mm per crank degree, so the support passes without scuffing. E = circleX(C, CE, B, BE, −1), H = circleX(K, HK, A, AH, +1), the branches of the library record. The body's height and the belt follow a contact that changes sides at each step, which `topology.notes` says (K11).
 
-**Teaching suggestions.** Trace P with ticks at equal time, so the even spacing along the straight run shows the constant speed and the arch shows the faster return. Show the coupler's rock as an angle, since the knife bar hides it. Plot knife x and knife height against crank angle, showing the flat 200° stroke.
+**Teaching suggestions.** Trace the near foot with the comet, in the treadmill's frame, where its stance lies flat on the belt because the body bobs; the far foot's path dashed. Mark the change of feet. Plot both feet's heights in the body against crank angle, with the lower one picked out as the body's bob, and belt travel as a second line: a staircase of surges, two steps per turn. Velocity at the stance foot, which is the belt's speed.
 
 **Interpretation and hand-crafted parts**
 
-- Scenery, optional: a platter under the stroke. The first edition left the bird out because it would be the only part without a bearing; the build may keep that ruling.
-- The blade as a separate plate on the knife bar, screwed on with three countersunk screws, so it reads as replaceable.
-- The cut enters at P and P': the knife bar forks round each coupler tip.
-- The phasing belt behind the back plate, out of the gravy, with an eccentric tensioner.
-- Locating dowels at both rocker pivots, since twin linkages live or die by their pivot spacing.
-- Marks: a straight scale under the stroke from 0 to 108 mm in 10 mm divisions, "CUT" under the straight run and "LIFT" under the arch.
+- Layout: the turkey faces +x, the legs outboard on its flanks over the wing, the treadmill under it; behind it a column with a sliding sleeve whose arm enters the rump under the fan; the cutlery on a slide block beside the rear roller on the near side, the knife and fork standing blade-up.
+- The body, decorated: layered plates rounding toward the flanks, carved with rows of feather scallops and an engraved wing; feathered drumstick thighs and scaly shanks; the head with eye, beak, snood, wattle and caruncles down the neck.
+- The fan: 21 feathers in two rows on one pivot, each with a quill line, chevron bars and a hatched band near the tip; a boss over the pivot.
+- The treadmill: rails carved with oak leaves and acorns, turned legs, the belt with chevrons so its motion reads.
+- The cutlery: a carving knife with bolster and riveted handle, a two-tined carving fork, each on its own carriage.
+- The bob: the body's weight keeps the lower foot on the belt; a sleeve on the column and the arm into the rump give the slide.
+- The belt is free and driven only by the stance foot; a felt pad under the deck stops it coasting between steps.
+- The toes on an ankle pin, held level by a light spring and stops, flat on the belt in stance.
+- The fan's drive hidden in the body: the follower lever runs from the cam at the crank shaft back to the spreader in the rump; the slots are shaped so the feathers spread evenly.
+- Marks: a stride scale on the near rail under the stance, 0 to 95 mm; "CARVE" on the slide block with the stroke ends.
 
 **Generated images**
 
-1. *Mid-century advertisement.* "1950s magazine advertisement in the style of a household appliance ad, family at a Thanksgiving table admiring a chrome carving machine with visible linkages slicing a roast turkey, cheerful painted illustration, headline space left blank."
-2. *Commercial kitchen.* "Hotel carvery station photographed for a trade catalogue, stainless steel linkage carving machine slicing a roast turkey under heat lamps, chef in whites supervising, warm light, realistic."
+1. *Shop window.* "Department store Thanksgiving window at dusk, a richly carved wooden mechanical turkey with a fanned tail trotting on a small treadmill, brass linkage legs, a carving knife and fork lunging on a slide behind it, shoppers with shopping bags watching through the glass, warm light, realistic photograph."
+2. *Fun run.* "Start line of a small-town Turkey Trot fun run on a cold November morning, a giant mechanical turkey on a treadmill mounted on a flatbed truck, an enormous carving knife and fork behind it, runners in costumes laughing, realistic photograph."
+3. *Workshop.* "Automaton maker's workshop bench, a half-finished wooden turkey automaton on a treadmill with its body plate off showing the crank shaft, cam and linkage legs, feathers laid out on the bench, tools and sawdust, warm lamp light, realistic photograph."
 
-**Related**: `hoekens-linkage`, `chebyshev-linkage`, `parallelogram-linkage`, `locomotive-drive`, `belt-drive`
+**Related**: `klann-linkage`, `jansen-linkage`, `slider-crank`, `cam-follower`, `belt-drive`
 
 ---
 
