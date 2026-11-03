@@ -7,4 +7,5 @@ export const polishes3: Record<string, () => Promise<{ polish: Polish }>> = {
   "elliptic-trammel": () => import("./elliptic-trammel/polish3"),
   "toggle-clamp": () => import("./toggle-clamp/polish3"),
   "crypt-lid-quick-return": () => import("./crypt-lid-quick-return/polish3"),
+  "turkey-trot-walker": () => import("./turkey-trot-walker/polish3"),
 };

@@ -86,6 +86,9 @@ describe("joint kits", () => {
     "spider-pin": "differential",
     "oblique-journal": "wobble-box",
     "leg-bore": "hobsons-joint",
+    column: "turkey-trot-walker",
+    "flat-belt": "turkey-trot-walker",
+    sole: "turkey-trot-walker",
   };
   for (const id of KIT_IDS) {
     it(`${id}: builds its joint, with an axis, a zone and a note`, async () => {

@@ -16,6 +16,8 @@ export const KIT_IDS = [
   "ball-socket", "slipper", "sphere-fit", "eccentric", "die", "hub", "ball-cage",
   "oblique-journal",
   "leg-bore",
+  // a walker's: a body on a column slide, a flat belt on drums in the base plane, a foot's sole on that belt
+  "column", "flat-belt", "sole",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -118,6 +120,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
       if (kin.joints.some((q) => q.type === "screw" && (q.b === j.a || q.b === j.b) && q.b !== "ground" && isScrew(body(q.a)?.shape as Record<string, unknown> | undefined))) return "J11";
       // a slide held by springs (a pseudo-rigid beam's give, a roller between springs in a window): the compliant kit
       if (rec.spring !== undefined) return "J13";
+      // a body on a sleeve that slides up a column from the base (a walker's body)
+      if (rec.guide === "column") return "column";
       return /tongue/i.test(text(rec.note)) ? "tongue-slot" : "J5";
     case "pin-in-slot": {
       // pins on a circle running in round holes larger by the eccentricity (a cycloidal drive's output)
@@ -141,6 +145,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
     }
     case "belt": {
       const kind = String(rec.flexible ?? "belt");
+      // a free flat belt on drums whose axes lie in the base plane (a treadmill)
+      if (kind === "belt" && rec.kind === "flat") return "flat-belt";
       if (kind === "rope" && (j.a === "ground" || j.b === "ground")) return "strap-sheave";
       if (kind === "strap") return "strap-sheave";
       // a plain belt is J8; a declared toothed belt, chain, rope or CVT is J12 (recorded as J8 for the belt)
@@ -153,6 +159,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
     case "flexure":
       return "J13";
     case "planar":
+      // a foot standing on a belt it drives (a walker's toes)
+      if (rec.drum !== undefined) return "sole";
       // a slipper's flat face on a plate
       return "slipper";
     default:
