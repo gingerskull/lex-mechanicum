@@ -117,7 +117,8 @@ export function solvePlacement(kin: Kin, geoms: Map<string, BodyGeom>, sampled: 
     f.o = fromPlane(f, [0, 0], lo);
   });
 
-  twinnable = (id: string) => !["pulley", "sprocket", "disc", "gear"].includes(String(geoms.get(id)?.shape.type));
+  // a wheel is one part; a part the record places (`place`) keeps its one position, so it is never doubled either
+  twinnable = (id: string) => !["pulley", "sprocket", "disc", "gear"].includes(String(geoms.get(id)?.shape.type)) && typeof geoms.get(id)?.shape.place !== "number";
   const placement: Placement = { families: [], slab: new Map(), clevis: [], passes: [], height: 0, stackMm: 0, held: new Map(), conflicts: [], relaxed: [] };
   const sampleIdx = sampled.us.map((_, i) => i);
 
