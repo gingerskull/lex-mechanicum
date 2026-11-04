@@ -586,7 +586,7 @@ function buildLoadRod(ctx: BuildCtx, j: KinJoint): void {
 }
 
 /** The flexible members this rule builds: a timing belt or a roller chain between two wheels. */
-export const builds = (j: KinJoint): boolean => j.type === "belt" && ["belt", "chain"].includes(String((j as unknown as Record<string, unknown>).flexible)) && j.a !== "ground" && j.b !== "ground" && !(j as unknown as Record<string, unknown>).strand;
+export const builds = (j: KinJoint): boolean => j.type === "belt" && ["belt", "chain"].includes(String((j as unknown as Record<string, unknown>).flexible)) && j.a !== "ground" && j.b !== "ground" && !(j as unknown as Record<string, unknown>).strand && (j as unknown as Record<string, unknown>).kind !== "flat";
 
 /** A strand of a member anchored at one end round a sprocket on a moving carrier (a stroke doubler): src/builder/strand.ts. */
 const isStrand = (j: KinJoint): boolean => j.type === "belt" && !!(j as unknown as Record<string, unknown>).strand;

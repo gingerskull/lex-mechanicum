@@ -92,6 +92,8 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
       break;
     }
     case "planar": {
+      // a contact made only in a window of a driver (a foot on a belt while it is the lower) holds only then
+      if (!wrapped(j, driverValue)) break;
       out.push(v3.dot(v3.sub(pa, pb), ax));
       push(v3.cross(ax, bx));
       break;
@@ -255,6 +257,12 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const rb = n(j.radiusB ?? j.radiusA);
     const sign = j.type === "belt" ? (j.crossed ? -1 : 1) : -1;
     return wrapPi(turn(s.b0, s.b1, ax2) - sign * (ra / rb) * dA);
+  }
+  if (j.type === "planar" && jr.drum !== undefined && j.radiusA !== undefined && r.axis2 && s.c0 && s.c1) {
+    // a foot on a belt (its drum the carrier slot): a carries the point along axis2 by the drum's radius times its turn, the
+    // drum turning about normal × axis2, the way that carries its top along axis2
+    const trav = v3.dot(v3.sub(xf.apply(s.a1, r.at), xf.apply(s.a0, r.at)), r.axis2);
+    return trav - n(j.radiusA) * turn(s.c0, s.c1, v3.cross(ax, r.axis2));
   }
   if (j.type === "screw") {
     const p0 = xf.apply(s.b0, r.at);

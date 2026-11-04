@@ -25,12 +25,17 @@ export interface Sheet {
 /**
  * The sheets of these records, in their order: the library's first, numbered ST-01, ST-02 ..., then the seasonal
  * mechanisms (P14), which are listed only around their holidays, so the library's numbers run on without a gap the rest
- * of the year.
+ * of the year. `open` lists them on every day, for previewing a seasonal mechanism out of its window: a local build or
+ * dev server run with `LM_SEASON=open` (never the published site).
  */
-export function sheetsOf(records: CatalogRecord[]): Sheet[] {
+export function sheetsOf(records: CatalogRecord[], open = process.env.LM_SEASON === "open"): Sheet[] {
   const ordered = [...records.filter((r) => !r.season), ...records.filter((r) => r.season)];
-  return ordered.map((rec, i) => ({ id: rec.id, no: `ST-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec, ...(rec.season ? { season: encodeWindows(windowsOf(rec.season.dates)) } : {}) }));
+  const windows = (rec: CatalogRecord) => encodeWindows(open ? [ALWAYS] : windowsOf(rec.season!.dates));
+  return ordered.map((rec, i) => ({ id: rec.id, no: `ST-${String(i + 1).padStart(2, "0")}`, n: i + 1, rec, ...(rec.season ? { season: windows(rec) } : {}) }));
 }
+
+/** The one listing window of a preview build: every day. */
+const ALWAYS = { from: "0001-01-01", until: "9999-12-31" };
 
 /** Registered mechanisms in catalogue order (family, level, name), the seasonal ones last (only LM_IDS in a local
  * working loop, src/mechanisms) */

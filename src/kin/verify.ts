@@ -96,7 +96,8 @@ export function verifyK1(k: Kinematics, opts: K1Options = {}): K1Report {
       const Q = poses[i + 1];
       // a joint engaged only in a window of a driver (a mutilated gear's mesh) is checked only across steps inside it
       if (Q && wrapped(r.joint, dv) && wrapped(r.joint, (id) => Q.values[id])) {
-        const car = r.joint.carrier;
+        // a carrier subtracts its turn; a drum is what a contact on its belt runs with
+        const car = r.joint.carrier ?? (r.joint as { drum?: string }).drum;
         const s = stepResidual(r, { a0: Xa, a1: Q.bodies.get(r.joint.a)!, b0: Xb, b1: Q.bodies.get(r.joint.b)!, c0: car ? P.bodies.get(car) : undefined, c1: car ? Q.bodies.get(car) : undefined });
         if (s !== null) note(r.joint.id, P.u, s);
         const n = ncgResidual(r, Xa, Q.bodies.get(r.joint.a)!, Xb, Q.bodies.get(r.joint.b)!);

@@ -1,0 +1,713 @@
+// Turkey trot walker on engine v3: the exceptions to the builder (standard 5.2, R7).
+// - M10: the themed scenery of a seasonal mechanism (P14) is made as a carved wooden toy, not as machine parts: the
+//   body's shells, head and neck in carved and painted lime wood, the treadmill's rails and turned legs in walnut, the
+//   feathers in painted lime wood, the knife and fork in steel with rosewood handles. The rules' defaults name steel and
+//   aluminium.
+// - E2, E9, A17: the carved pieces are glued to the part they carry, so each comes off as one: the body with its band,
+//   head, neck and arm, each flank's shells as one cover screwed through its rim into the band so the inside can be
+//   reached (covers), each leg with its carved skin, the treadmill frame with its far rail, deck, ties and legs, each carriage
+//   with its knife or fork.
+// - P14, L8: each feather carries its quill, chevron bars and a hatched band near its tip, engraved on its face toward the
+//   body (the feathers' plates are the kinematic bodies themselves, so their marks go on their own parts).
+// - F5, F7: the toes stay level on a light torsion spring round each ankle pin's head, one tail on the toe plate and one
+//   up the shank and pressed onto the leg's skin: no rule builds a sprung joint between two moving parts.
+// - A5, J2: the crank shaft turns in a moving frame, so the rules build its pins as shoulder bolts on bearings; it is a
+//   live shaft with the cranks and the cam keyed on it, in a bearing seated in the outer layers of either shell.
+// - J10, T12: the carved rails are the drums' bearing housings (as in the concept): each drum's shaft runs in a bearing in
+//   either rail, so the rules' pillow blocks under the rear drum and the cartridge housing on the near rail are not built
+//   (named in the record's `teaching.exceptions`); the rear shaft runs on past the near rail and ends in the knife's
+//   crank disc, held by a set screw in its rim instead of an end washer.
+// - A9, J3, J5: the fork's crank is a return crank clamped on the knife's crank pin (owner's decision, 4 Nov), so no shaft
+//   runs through the knife rod's plane; the knife slide's front end stands back 5 mm, clear of the pin (returnCrank).
+// - L2: the toes' hinge lugs end at the toe plate's sole, not under it in the belt.
+// - J4: the spreader's rod runs straight in each feather's own slot (Q1 to Q21): the kit's stud, track roller, wear
+//   strips and felt are not built, nor its wider cut for the roller, which is wider than a feather's tail and would cut
+//   away all the tail's material round the slot (fanSlots). The rod ends 2 mm past the last feather, a DIN 471 circlip
+//   in a groove behind it holding the stack; the record's rod runs on 8 mm past the stack (rodEnd).
+// - J5: the spreader rises and falls on a guide rod pressed into the body's arm, through a bushed boss on its web: the
+//   kit builds no guide for a rod carried crosswise between two moving bodies.
+// - J3: the feathers turn on a Ø6 stud pressed into a walnut post glued into the rump's web, each in a bushing, held by a
+//   washer and a circlip behind the last: the rules thread a shoulder bolt into the first feather, as the body has no
+//   solid at the pivot, which leaves the fan hanging behind the rump (fanPivot).
+// - V1 to V3: the motor is in the body, not under the base: the crank shaft turns in the moving body, so the drive
+//   rule finds no fixed live shaft. A pancake motor on three standoffs on the web's far face, in the far cavity, belted
+//   16T to 32T to the crank shaft; the far shells are pocketed round it. The home flag is a vane on the crank shaft's
+//   pulley, read by a fork sensor on a block screwed to the web (homeSensor, owner's decision, 4 Nov), where the rule
+//   puts both on the motor's bracket.
+// - V6: the motor's lead runs along the web, joined by the sensor's, through the arm and out of its underside short of
+//   the sleeve, where a slack loop hanging down the column's side takes up the body's 4 mm bob (owner's decision, 4 Nov);
+//   two ties hold it to the column, it passes through the base by the column's flange to a terminal block on the base's
+//   rear edge, a P-clip under the base (motorLead). The rules' leads and block are laid for a motor under the base.
+// - J5, T12: the knife's and the fork's inner risers lap 1.5 mm, so they are one ground block under both inner rails
+//   (owner's decision, 4 Nov), the fork's riser named in the record's `teaching.exceptions` (riserBlock).
+// - F6: the fan's weight holds the cam roller up on the cam except within about 10° of each lobe's tip, where the outer
+//   feathers' weight pulls it off by a few grams; a light torsion spring round the lever's pivot keeps it on, anchored
+//   on a pin pressed into the web (leverSpring). The J7 kit builds no spring for a follower held by its own linkage.
+// - F7, V4: the motor's screws run in slots in the web along the line of the pulleys, and the front drum's bearings sit
+//   in flanged eccentric bushings in the carved rails, so both belts can be tensioned (tensioning): the rules' slotted
+//   bracket and housings are not built here (V1 to V3, J10).
+// - A16: the notes of Q, Q1 to Q21 and K describe what is built there (fanNotes), not the kits' rollers and felt.
+// - L8, P14: "CARVE" and the knife's and the fork's stroke ends engraved on the keepers of the slide block.
+import type { Polish } from "../../builder";
+import { patternMarks } from "../../builder/decor";
+import type { Frame } from "../../builder/frames";
+import type { Local } from "../../builder/lib";
+import { stroke } from "../../hardware/primitives";
+import { BEARINGS, MOTORS, PULLEYS, SENSOR, circlipExt } from "../../hardware/tables";
+import type { Vec3 } from "../../kin/math";
+
+export const polish: Polish = (A, h) => {
+  const mat = (f: RegExp, m: string) => A.find(f).forEach((s) => A.set(s.id, { mat: m }));
+  mat(/^body(-(band[NF]|shell[NF]\d+|neckN|head|beak|wattle|snood))?$/, "Lime wood, carved and painted");
+  mat(/^body-arm$/, "Walnut, oiled");
+  mat(/^leg(F)?-skin$/, "Lime wood, carved and painted");
+  mat(/^treadmill(-(railF|railN-carving|tie[RF]))?$/, "Walnut, carved and oiled");
+  mat(/^treadmill-leg[RF][NF]$/, "Walnut, turned and oiled");
+  mat(/^treadmill-deck$/, "Birch plywood");
+  mat(/^f\d+$/, "Lime wood, painted");
+  mat(/^(knife|fork)-(blade|tines|bolster)$/, "Stainless steel, blunted");
+  mat(/^(knife|fork)-handle$/, "Rosewood, brass rivets");
+  const group = (f: RegExp, g: string) => A.find(f).forEach((s) => A.set(s.id, { group: g }));
+  group(/^body-/, "body-prop");
+  group(/^leg-skin$/, "leg-prop");
+  group(/^legF-skin$/, "legF-prop");
+  group(/^treadmill-/, "treadmill-prop");
+  group(/^knife-(handle|bolster|blade)$/, "knife-prop");
+  group(/^fork-(handle|tines)$/, "fork-prop");
+  // the feathers' quills, chevrons and banded tips
+  for (const s of A.find(/^f\d+$/)) {
+    const pts = s.profile.outer;
+    const top = Math.max(...pts.map((q) => q[1]));
+    const w = Math.max(...pts.filter((q) => q[1] > top - 40).map((q) => Math.abs(q[0])));
+    const marks = [...s.marks, { kind: "carve" as const, pts: [[0, 12], [0, top - 6]] as [number, number][] }];
+    for (const f of [0.55, 0.62, 0.69]) {
+      const y = top * f;
+      marks.push({ kind: "carve" as const, pts: [[-w * 0.55, y - 3], [0, y + 1], [w * 0.55, y - 3]] });
+    }
+    const band = { outer: pts.filter((q) => q[1] > top * 0.8 && q[1] < top * 0.88), holes: [] };
+    if (band.outer.length >= 3) marks.push(...patternMarks({ outer: [[-w, top * 0.8], [w, top * 0.8], [w, top * 0.88], [-w, top * 0.88]], holes: [] }, "hatch", { angle: 60 }));
+    A.set(s.id, { marks });
+  }
+  // the spreader: the rod itself runs in the feathers' slots, and the lever's pin carries a roller in the hanger's slot
+  A.drop(/^Q\d*-(stud|roller|wear\d|felt|shaft|pin)/);
+  // the rod is plain: no pin of the slots is bored into it
+  const rod = A.get("spreader");
+  if (rod) A.set("spreader", { profile: { outer: rod.profile.outer, holes: [] } });
+  fanSlots(A);
+  rodEnd(A);
+  const q = A.local("lever", A.ctx.S.joints.get("Q")!.at);
+  A.build(A.frame("lever", q), (L, H) => {
+    L.add(H.dowel("Q-stud", 4, { body: "lever", z0: -2, z1: 7.6, name: "Stud Ø4, pressed into the lever" }));
+    L.add(H.roller("Q-roller", 4, 5, { body: "lever", z0: 3.2, z1: 6.8, name: "Roller Ø5 in the hanger's slot" }));
+  }, { joints: ["Q"] });
+
+  // live shafts across the walker (world Y), built as stacks: a shaft keyed to the parts it turns, a bearing in each
+  // housing, inner-race spacers between, an end washer and a countersunk screw into each end (A12, F2)
+  const B688 = BEARINGS.find((b) => b.name === "688")!;
+  // `disc0`: the near end ends in a disc keyed on it and held by a set screw in the disc's rim, with no end washer, so
+  // nothing stands proud of the disc where a rod sweeps by
+  const live = (id: string, joint: string, turn: string, name: string, ends: [number, number], brg: [number, string][], spacers: [number, number][], disc0?: { body: string; r: number }) => {
+    const at = A.ctx.S.joints.get(joint)!.at;
+    const o = A.local(turn, at);
+    const y = A.local(turn, [at[0], at[1] + 1, at[2]]);
+    A.build(A.frame(turn, o, [y[0] - o[0], y[1] - o[1], y[2] - o[2]]), (L, H) => {
+      L.add(H.shaft(`${id}-shaft`, { d: 8, z0: ends[0], z1: ends[1], flat: true }, { body: turn, name }));
+      brg.forEach(([z, host], k) => L.add(H.bearing(`${id}-brg${k}`, B688, { body: host, z0: z, z1: z + B688.B, closure: "seal" })));
+      spacers.forEach(([z0, z1], k) => L.add(H.spacer(`${id}-sp${k}`, 8.2, 10.8, { body: turn, z0, z1, ...(k ? { name: "" } : {}) })));
+      // the end washer bears on the inner race alone where the end stands at a bearing
+      ([[ends[0], -1], [ends[1], 1]] as const).forEach(([z, s], k) => {
+        if (k === 0 && disc0) return;
+        L.add(H.washer(`${id}-ew${k}`, 3.2, 9.5, { body: turn, z0: s > 0 ? z : z - 1.5, z1: s > 0 ? z + 1.5 : z, name: k && !disc0 ? "" : "End washer 3.2x9.5 x 1.5" }));
+        L.add(H.screw(`${id}-es${k}`, "csk", 3, 10, { body: turn, face: z + s * 1.5, dir: s > 0 ? -1 : 1, ...(k && !disc0 ? { name: "" } : {}) }));
+      });
+    }, { joints: [joint] });
+    if (disc0) {
+      const d = A.get(disc0.body)!;
+      const h0 = d.op.op === "extrude" ? d.op.h : 4;
+      const yd = d.frame.o[1] + (d.frame.z[1] * h0) / 2;
+      A.build({ o: [at[0], yd, at[2]], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+        L.add(H.setScrew(`${id}-ss0`, 3, { body: disc0.body, z0: 4.1, z1: disc0.r - 0.2, name: "Set screw M3 (DIN 916), threadlocked: the disc on the shaft's flat, holding the stack at that end" }));
+      }, { joints: [joint] });
+    }
+    // its note replaces the rules' one (A16)
+    const old = A.ctx.notes.findIndex((n) => n.id === joint);
+    if (old >= 0) A.ctx.notes.splice(old, 1);
+    const held = brg[0]![1] === "ground" ? "each carved rail" : "each shell";
+    const clamp = disc0 ? "by the disc's set screw at its near end and an end washer and a countersunk screw at the other" : "by an end washer and a countersunk screw at each end";
+    A.note({ id: joint, kit: "J2", at, title: `J2 · ${joint}`, note: `${name}, in two sealed 688 bearings, one in ${held}, ${Math.abs(brg[1]![0] - brg[0]![0]).toFixed(0)} mm apart; clamped through inner-race spacers ${clamp}.`, badge: ["double shear", "ok"], d: 8, serves: { F2: disc0 ? [`${id}-ss0`, `${id}-ew1`] : [`${id}-ew0`, `${id}-ew1`], F3: [`${id}-shaft`] } });
+  };
+  // the crank shaft: the cranks and the cam keyed on it, a bearing seated in the outer layers of either shell
+  A.drop(/^O-/);
+  live("O", "O", "crank", "Crank shaft Ø8, live, D-flat: the cranks and the cam keyed on it", [-65, 65], [[-34, "body"], [29, "body"]], [[-60, -34], [-29, -16], [-10, 29], [34, 60]]);
+  // the drums: each shaft in a bearing in either carved rail; the rear one runs on to the knife's crank disc and ends in it
+  A.drop(/^R[RF]-/);
+  const kd = A.ctx.kin.bodies.find((b) => b.id === "crankK")!.shape as { place: number; thickness: number };
+  const fd = A.ctx.kin.bodies.find((b) => b.id === "crankFk")!.shape as { place: number; thickness: number };
+  const disc = (s: { place: number; thickness: number }): [number, number] => [s.place, s.place + s.thickness];
+  const [k0, k1] = disc(kd), [f0, f1] = disc(fd);
+  live("RR", "RR", "rollerR", "Rear drum's shaft Ø8, live, D-flat: the drum and the knife's crank disc keyed on it", [k0, 79], [[-79, "ground"], [74, "ground"]], [[k1, -79], [-74, -66], [66, 74]], { body: "crankK", r: 14.5 });
+  live("RF", "RF", "rollerF", "Front drum's shaft Ø8, live, D-flat", [-79, 79], [[-79, "ground"], [74, "ground"]], [[-74, -66], [66, 74]]);
+  returnCrank(A, h, { k0, k1, f0, f1 });
+  // the toes' hinge lugs end at the toe plate's sole: the lugs rule rounds the web past the plate's mid-plane by its boss
+  // radius, which on a plate thinner than the boss runs out under the sole and into the belt (L2)
+  for (const t of ["toes", "toesF"]) {
+    const plate = A.get(t)!;
+    for (const lug of A.find(new RegExp(`^${t}-lug-`))) {
+      const ly: Vec3 = [lug.frame.z[1] * lug.frame.x[2] - lug.frame.z[2] * lug.frame.x[1], lug.frame.z[2] * lug.frame.x[0] - lug.frame.z[0] * lug.frame.x[2], lug.frame.z[0] * lug.frame.x[1] - lug.frame.z[1] * lug.frame.x[0]];
+      if (Math.abs(ly[2] - 1) > 1e-9) continue;
+      const sole = plate.frame.o[2] - lug.frame.o[2];
+      A.set(lug.id, { profile: { outer: clipBelow(lug.profile.outer as [number, number][], sole), holes: lug.profile.holes } });
+    }
+  }
+  ankleSprings(A);
+  leverSpring(A);
+  fanNotes(A);
+  spreaderGuide(A, h);
+  fanPivot(A, h);
+  motor(A, h);
+  homeSensor(A, h);
+  motorLead(A, h);
+  riserBlock(A, h);
+  tensioning(A, h);
+  covers(A);
+  carveMarks(A);
+};
+
+/**
+ * The body's covers (A17, M12): each flank's carved shells, glued to one another, come off as one cover, screwed through
+ * the outer shell's rim into the band, so the fan drive, the crank shaft's inner parts and the motor can be reached.
+ */
+function covers(A: Parameters<Polish>[0]): void {
+  // screw sites where the outer shell's rim laps the band, round the body (world X, Z)
+  const at: [number, number][] = [[-145, 64], [-105, 82], [28, 32], [5, -40], [-121, -49]];
+  for (const [S, y, dir] of [["N", -1, 1], ["F", 1, -1]] as const) {
+    const shell = A.get(`body-shell${S}21`)!;
+    const ys = [shell.frame.o[1], shell.frame.o[1] + shell.frame.z[1] * (shell.op.op === "extrude" ? shell.op.h : 0)];
+    const face = y < 0 ? Math.min(...ys) : Math.max(...ys);
+    A.build(acrossY([0, 0, 0]), (L, H) => {
+      at.forEach(([X, Z], k) => L.add(H.screw(`body-cover${S}-sc${k}`, "csk", 3, 16, { at: [-X, Z, 0], face, dir, body: "body", ...(k ? { name: "", qty: 0 } : { name: "Countersunk M3 x 16 (ISO 10642) into a brass insert in the band: holds the cover", qty: at.length }) })));
+    }, { joints: ["S"] });
+    for (const s of A.find(new RegExp(`^body-(shell${S}\\d+|cover${S}-sc\\d+(-sh)?)$`))) A.set(s.id, { group: `body-cover${S}` });
+  }
+}
+
+/** A world point in a solid's plane coordinates. */
+function toPlane(f: Frame, p: Vec3): [number, number] {
+  const y: Vec3 = [f.z[1] * f.x[2] - f.z[2] * f.x[1], f.z[2] * f.x[0] - f.z[0] * f.x[2], f.z[0] * f.x[1] - f.z[1] * f.x[0]];
+  const d = [p[0] - f.o[0], p[1] - f.o[1], p[2] - f.o[2]];
+  return [d[0]! * f.x[0] + d[1]! * f.x[1] + d[2]! * f.x[2], d[0]! * y[0] + d[1]! * y[1] + d[2]! * y[2]];
+}
+
+/**
+ * The belts' tension (F7, V4): the motor's three screws run in slots in the web along the line of the pulleys' centres;
+ * the front drum's bearings sit in flanged eccentric bushings in the carved rails, turned to tension the treadmill's belt
+ * and clamped by two screws each into the rail.
+ */
+function tensioning(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  // the motor's screws in slots along the line from the motor to the crank shaft
+  const O = A.ctx.S.joints.get("O")!.at, body = A.get("body")!;
+  const slots = A.find(/^drive-sc\d-sh$/).map((s) => {
+    const c = toPlane(body.frame, s.frame.o), o = toPlane(body.frame, O), m = toPlane(body.frame, [-62, 0, 20]);
+    const l = Math.hypot(o[0] - m[0], o[1] - m[1]), u: [number, number] = [(o[0] - m[0]) / l, (o[1] - m[1]) / l];
+    return h.window([[c[0] - 1.5 * u[0], c[1] - 1.5 * u[1]], [c[0] + 1.5 * u[0], c[1] + 1.5 * u[1]]], 1.7).reverse();
+  });
+  A.set("body", { profile: { outer: body.profile.outer, holes: [...body.profile.holes, ...slots] } });
+  // the front drum's bearings in eccentric bushings
+  const RF = A.ctx.S.joints.get("RF")!.at;
+  const e = 1, d = 16, D = 20;
+  for (const [rail, k] of [["treadmill", 0], ["treadmill-railF", 1]] as const) {
+    const s = A.get(rail)!;
+    const h0 = s.op.op === "extrude" ? s.op.h : 6;
+    const c = toPlane(s.frame, RF);
+    // the bushing's body round the bearing, its bore offset toward the drive end (local x of the frame below)
+    const keep = s.profile.holes.filter((q) => Math.hypot((Math.min(...q.map((p) => p[0]!)) + Math.max(...q.map((p) => p[0]!))) / 2 - c[0], (Math.min(...q.map((p) => p[1]!)) + Math.max(...q.map((p) => p[1]!))) / 2 - c[1]) > 1);
+    const sx = Math.sign(s.frame.x[0]);
+    A.set(rail, { profile: { outer: s.profile.outer, holes: [...keep, h.disc(D / 2 + 0.05, c[0] - sx * e, c[1]).reverse()] } });
+    // its frame: z out of the rail's outer face, x along world +X, the bore at (e, 0) on the drum's axis
+    const out = s.frame.z[1] > 0 ? 1 : -1;
+    const y0 = s.frame.o[1];
+    const F: Frame = { o: [RF[0] - e, y0, RF[2]], x: [1, 0, 0], z: [0, out, 0] };
+    A.build(F, (L, H) => {
+      L.add(H.solid(`RF-ecc${k}-body`, { name: k ? "" : `Eccentric bushing body Ø${D}, in the rail`, kind: "eccentric", role: "hw", mat: "Bronze CuSn8", body: "ground", outer: h.disc(D / 2), holes: [h.disc(d / 2 + 0.05, e, 0).reverse()], z0: 0, z1: h0 }));
+      L.add(H.eccentric(`RF-ecc${k}`, d, D, e, { body: "ground", z0: h0 + (rail === "treadmill" ? 1 : 0), z1: h0 + (rail === "treadmill" ? 3 : 2), slots: [0, Math.PI], why: "turned to tension the treadmill's belt, then clamped by its two screws (F7)", ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+      for (const [j, a] of [[0, 0], [1, Math.PI]] as const) {
+        const at: Vec3 = [((D + 10) / 2 - 2.6) * Math.cos(a), ((D + 10) / 2 - 2.6) * Math.sin(a), 0];
+        L.add(H.screw(`RF-ecc${k}-sc${j}`, "button", 3, 8, { at, face: h0 + (rail === "treadmill" ? 3 : 2), dir: -1, body: "ground", ...(k || j ? { name: "", qty: 0 } : { qty: 4 }) }));
+      }
+    }, { joints: ["RF"] });
+  }
+  const add = (id: string, text: string, f7: string[]) => {
+    const n = A.ctx.notes.find((q) => q.id === id);
+    if (n) Object.assign(n, { note: `${n.note} ${text}`, serves: { ...n.serves, F7: f7 } });
+  };
+  add("RF", "Each bearing sits in a flanged eccentric bushing in its rail, turned to tension the belt and clamped by two screws.", ["RF-ecc0", "RF-ecc1"]);
+  add("drive", "The motor's screws run in slots in the web along the line of the pulleys, for the belt's tension.", ["drive-sc0"]);
+}
+
+/** A frame at a world point, z along world +Y (local z is world Y less the point's), x along world -X (local y is Z up). */
+const acrossY = (p: Vec3): Frame => ({ o: [p[0], 0, p[2]], x: [-1, 0, 0], z: [0, 1, 0] });
+
+/** The ankle springs: a torsion coil round the ankle pin's head, between the toe plate and the leg (F5, F7). */
+function ankleSprings(A: Parameters<Polish>[0]): void {
+  for (const [s, toes, leg] of [["n", "toes", "leg"], ["f", "toesF", "legF"]] as const) {
+    const F = A.ctx.S.joints.get(`F${s}`)!.at, K = A.ctx.S.joints.get(`K${s}`)!.at;
+    const spanY = (id: string): number[] => {
+      const q = A.get(id);
+      return q ? [q.frame.o[1], q.frame.o[1] + q.frame.z[1] * (q.op.op === "extrude" ? q.op.h : 0)] : [];
+    };
+    // the coil round the pin's head and washer, from the head's end to 0.5 mm off the leg's (or its skin's) face
+    const hy = [...spanY(`F${s}-bolt-head`), ...spanY(`F${s}-bolt-wsh`)];
+    const ly = [...spanY(leg), ...spanY(`${leg}-skin`)];
+    const below = Math.max(...hy) < Math.max(...ly);
+    const [z0, z1] = below ? [Math.min(...hy) + 0.1, Math.min(...ly) - 0.5] : [Math.max(...ly) + 0.5, Math.max(...hy) - 0.1];
+    const D = 9, wire = 0.6;
+    const toW = (p: Vec3): [number, number] => [-(p[0] - F[0]), p[2] - F[2]];
+    const k = toW(K), kl = Math.hypot(k[0], k[1]), up: [number, number] = [k[0] / kl, k[1] / kl];
+    const sole = A.get(toes)!.frame.o[2] + (A.get(toes)!.op.op === "extrude" ? (A.get(toes)!.op as { h: number }).h : 0) - F[2];
+    A.build(acrossY(F), (L, H) => {
+      L.add(H.spring(`F${s}-spring`, "torsion", { D, wire, body: toes, z0, z1, name: `Torsion spring Ø${D}, wire ${wire}: keeps the toes level in the swing` }));
+      // its tails: one down on the toe plate, one up the shank
+      const zt = below ? z0 : z1 - wire;
+      L.add(H.solid(`F${s}-spring-toe`, { name: "", kind: "spring", mat: "Spring steel EN 10270", body: toes, outer: stroke([[D / 2 - wire / 2, 0], [D / 2 - wire / 2, sole + wire / 2], [D / 2 + 5, sole + wire / 2]], wire / 2), z0: zt, z1: zt + wire }));
+      // (from just outside the coil: the coil turns with the toes, the tail with the leg)
+      const r = D / 2 + wire / 2 + 0.1, a = Math.atan2(up[1], up[0]) + Math.PI / 2;
+      // (pressed onto the leg's skin, 0.05 mm into it)
+      const zs = below ? z1 + 0.55 - wire : z0 - 0.55;
+      L.add(H.solid(`F${s}-spring-leg`, { name: "", kind: "spring", mat: "Spring steel EN 10270", body: leg, outer: stroke([[r * Math.cos(a), r * Math.sin(a)], [r * Math.cos(a) + up[0] * 10, r * Math.sin(a) + up[1] * 10]], wire / 2), z0: zs, z1: zs + wire }));
+    }, { joints: [`F${s}`] });
+  }
+}
+
+/** The fan's joint notes, for what the polish builds there instead of the kits' rollers (A16). */
+function fanNotes(A: Parameters<Polish>[0]): void {
+  const put = (id: string, kit: string, note: string, badge: [string, "ok" | "warn"], serves: Record<string, string[]> = {}) => {
+    const old = A.ctx.notes.findIndex((n) => n.id === id);
+    if (old >= 0) A.ctx.notes.splice(old, 1);
+    A.note({ id, kit, at: A.ctx.S.joints.get(id)!.at, title: `${kit} · ${id}`, note, badge, serves });
+  };
+  put("Q", "J4", "Q: the lever's Ø4 stud, pressed into it, carries a Ø5 roller in the slot of the spreader's hanger.", ["roller in the slot", "ok"]);
+  for (let i = 1; i <= 21; i++) put(`Q${i}`, "J4", `Q${i}: the spreader's Ø4 rod runs straight in the slot of the feather's tail, offset from the pivot; steel on lime wood, dry.`, ["rod in the slot", "ok"]);
+  put("K", "J7", "K: the roller, on a sealed bearing on the lever's pin R, runs under the two-lobe cam; the fan's weight and a torsion spring round the lever's pivot hold it up on the cam; zero line on the cam.", ["held by a spring", "ok"], { F6: ["G-spring"], F9: ["cam"] });
+}
+
+/**
+ * The fan's return spring (F6): the fan's own weight holds the cam roller up on the cam except near each lobe's tip,
+ * where the outer feathers' weight pulls it off by a few grams; a light torsion spring round the lever's pivot bolt, one
+ * tail on a pin pressed into the web and one along the lever toward the roller, keeps it on.
+ */
+function leverSpring(A: Parameters<Polish>[0]): void {
+  const G = A.ctx.S.joints.get("G")!.at, R = A.ctx.S.joints.get("R")!.at;
+  const spanY = (id: string): number[] => {
+    const q = A.get(id)!;
+    return [q.frame.o[1], q.frame.o[1] + q.frame.z[1] * (q.op.op === "extrude" ? q.op.h : 0)];
+  };
+  // the coil round the bolt's head and washer, from the head's end to 0.5 mm off the lever's face
+  const head = [...spanY("G-bolt-head"), ...spanY("G-bolt-wsh")], lever = spanY("lever");
+  const outboard = Math.min(...head) < Math.min(...lever);
+  const [z0, z1] = outboard ? [Math.min(...head) + 0.1, Math.min(...lever) - 0.5] : [Math.max(...lever) + 0.5, Math.max(...head) - 0.1];
+  const web = spanY("body");
+  const D = 10, wire = 0.6, pinAt: [number, number] = [0, -12];
+  const toW = (p: Vec3): [number, number] => [-(p[0] - G[0]), p[2] - G[2]];
+  const r = toW(R), rl = Math.hypot(r[0], r[1]), dir: [number, number] = [r[0] / rl, r[1] / rl];
+  const ro = D / 2 + wire / 2 + 0.1;
+  A.build(acrossY(G), (L, H) => {
+    L.add(H.spring("G-spring", "torsion", { D, wire, body: "body", z0, z1, name: `Torsion spring Ø${D}, wire ${wire}: holds the cam roller up on the cam` }));
+    // its anchor: a pin pressed into the web under the pivot
+    const [w0, w1] = outboard ? [z0 - 0.3, Math.min(...web) + 3] : [Math.max(...web) - 3, z1 + 0.3];
+    L.add(H.dowel("G-anchor", 2, { body: "body", at: [pinAt[0], pinAt[1], 0], z0: Math.min(w0, w1), z1: Math.max(w0, w1), name: "Dowel pin Ø2 h6, pressed into the web: the spring's anchor" }));
+    // its tails: one down against the pin, one along the lever, pressed onto its face
+    const zt = outboard ? z0 : z1 - wire;
+    L.add(H.solid("G-spring-pin", { name: "", kind: "spring", mat: "Spring steel EN 10270", body: "body", outer: stroke([[1 + wire / 2, -D / 2 + wire], [1 + wire / 2, pinAt[1] - 1.5]], wire / 2), z0: zt, z1: zt + wire }));
+    const zs = outboard ? z1 + 0.55 - wire : z0 - 0.55;
+    L.add(H.solid("G-spring-lever", { name: "", kind: "spring", mat: "Spring steel EN 10270", body: "lever", outer: stroke([[dir[0] * ro, dir[1] * ro], [dir[0] * (ro + 10), dir[1] * (ro + 10)]], wire / 2), z0: zs, z1: zs + wire }));
+  }, { joints: ["G"] });
+}
+
+/** The spreader's guide: a rod pressed into the body's arm, through a bushed boss on the spreader's web (J5). */
+function spreaderGuide(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const g: Vec3 = [-180.5, -4, 0];
+  const web = A.get("spreader-web")!, arm = A.get("body-arm")!;
+  const z0 = Math.min(...worldZ(web)), z1 = Math.max(...worldZ(web));
+  const armTop = Math.max(...worldZ(arm));
+  A.build({ o: g, x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.solid("SS-boss", { name: "Guide boss on the spreader's web", kind: "plate", role: "link", mat: "Brass", body: "spreader", outer: h.disc(4.5), holes: [h.disc(3).reverse()], z0, z1 }));
+    L.add(H.bushing("SS-bush", 4, 6, { body: "spreader", z0, z1 }));
+    L.add(H.shaft("SS-rod", { d: 4, z0: armTop - 9, z1: z1 + 4.5 }, { body: "body", name: "Guide rod Ø4 h6, pressed into the body's arm: the spreader rises and falls on it" }));
+  }, { joints: ["SS"] });
+}
+
+/**
+ * The feathers' own slots (J4): the rod runs straight in the slot each feather's record shape gives it, so the kit's
+ * wider cut for its track roller (dropped with the roller) is not made either. The kit's cut is the hole that encloses
+ * one of the record's own windows with room to spare all round.
+ */
+function fanSlots(A: Parameters<Polish>[0]): void {
+  type P2 = readonly number[];
+  const inPoly = (p: P2, poly: readonly P2[]) => {
+    let c = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const a = poly[i]!, b = poly[j]!;
+      if (a[1]! > p[1]! !== b[1]! > p[1]! && p[0]! < ((b[0]! - a[0]!) * (p[1]! - a[1]!)) / (b[1]! - a[1]!) + a[0]!) c = !c;
+    }
+    return c;
+  };
+  const box = (q: readonly P2[]) => [Math.min(...q.map((p) => p[0]!)), Math.max(...q.map((p) => p[0]!)), Math.min(...q.map((p) => p[1]!)), Math.max(...q.map((p) => p[1]!))] as const;
+  for (const s of A.find(/^f\d+$/)) {
+    const own = A.ctx.geoms.get(s.body)?.profile.holes ?? [];
+    const kits = (hl: readonly P2[]) => {
+      const b = box(hl);
+      return own.some((w) => {
+        const o = box(w);
+        return inPoly([(o[0] + o[1]) / 2, (o[2] + o[3]) / 2], hl) && b[0] < o[0] - 0.5 && b[1] > o[1] + 0.5 && b[2] < o[2] - 0.5 && b[3] > o[3] + 0.5;
+      });
+    };
+    const holes = s.profile.holes.filter((hl) => !kits(hl));
+    if (holes.length !== s.profile.holes.length) A.set(s.id, { profile: { outer: s.profile.outer, holes } });
+  }
+}
+
+/**
+ * The rod's end (J4): it stops 2 mm past the last feather, a DIN 471 circlip in a groove just behind it holding the
+ * stack against the spreader's web.
+ */
+function rodEnd(A: Parameters<Polish>[0]): void {
+  const rod = A.get("spreader")!;
+  const f21 = A.get("f21")!;
+  // depth along the rod's own z (it runs back along -X from the web) of the last feather's back face
+  const zs = [0, f21.op.op === "extrude" ? f21.op.h : 0].map((t) => (f21.frame.o[0] + f21.frame.z[0] * t - rod.frame.o[0]) * rod.frame.z[0]);
+  const back = Math.max(...zs);
+  const g = back + 0.2, end = back + 2;
+  if (rod.op.op === "extrude") A.set("spreader", { op: { ...rod.op, h: g } });
+  A.build({ o: rod.frame.o, x: rod.frame.x, z: rod.frame.z }, (L, H) => {
+    L.add(H.shaft("spreader-end", { d: 4, z0: g, z1: end, grooves: [g] }, { body: "spreader", name: "", ...(rod.mat ? { mat: rod.mat } : {}) }));
+    L.add(H.circlip("spreader-cl", 4, { body: "spreader", z0: g + 0.05 }));
+  }, { joints: Array.from({ length: 21 }, (_, i) => `Q${i + 1}`) });
+}
+
+/**
+ * The fan's pivot on the body (J3): a walnut post glued into the rump's web carries a steel stud on which every feather
+ * turns in its own bushing, held by a washer and a circlip behind the last one. The rules thread a shoulder bolt into the
+ * first feather, as the body has no solid at P, so the stack would hang free of the rump.
+ */
+function fanPivot(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const P = A.ctx.S.joints.get("P1")!.at;
+  const joints = Array.from({ length: 21 }, (_, i) => `P${i + 1}`);
+  A.drop(/^P1-bolt/);
+  // the first feather turns in a bushing like the others (the rules tapped it for the bolt)
+  const f1 = A.get("f1")!, f2 = A.get("f2")!;
+  const centre = (q: number[][]) => [q.reduce((s, p) => s + p[0]!, 0) / q.length, q.reduce((s, p) => s + p[1]!, 0) / q.length];
+  const near0 = (q: number[][]) => Math.hypot(centre(q)[0]!, centre(q)[1]!) < 0.5;
+  const bore = f2.profile.holes.find(near0)!;
+  A.set("f1", { profile: { outer: f1.profile.outer, holes: f1.profile.holes.map((q) => (near0(q) ? bore : q)) } });
+  // local z runs back along -X from P: the depth behind P of a feather's two faces
+  const depth = (id: string): [number, number] => {
+    const s = A.get(id)!;
+    const hh = s.op.op === "extrude" ? s.op.h : 0;
+    const zs = [s.frame.o[0], s.frame.o[0] + s.frame.z[0] * hh].map((x) => P[0] - x);
+    return [Math.min(...zs), Math.max(...zs)];
+  };
+  const front = depth("f1")[0], zEnd = depth("f21")[1];
+  const rump = -172; // the post's foot (world X), where the rump's face meets the post's underside
+  const c = circlipExt(6);
+  const zw = zEnd + 0.3, zg = zw + 1;
+  A.build({ o: P, x: [0, 1, 0], z: [-1, 0, 0] }, (L, H) => {
+    L.add(H.bushing("P1-0-bush", 6, 9, { body: "f1", z0: front, z1: depth("f1")[1] }));
+    L.add(H.solid("P-post", { name: "Fan post, walnut, glued into the rump's web", kind: "plate", role: "link", mat: "Walnut, oiled", outer: h.disc(7), holes: [h.disc(3).reverse()], z0: P[0] - rump, z1: front - 0.5, body: "body" }));
+    L.add(H.shaft("P-stud", { d: 6, z0: P[0] - rump + 4, z1: zg + c.s + 1.2, grooves: [zg] }, { body: "body", name: "Fan stud Ø6 h6, pressed into the post: every feather turns on it in its bushing" }));
+    L.add(H.washer("P-wsh", 6.4, 12, { body: "body", z0: zw, z1: zg, name: "Washer 6.4x12 x 1, behind the last feather" }));
+    L.add(H.circlip("P-cl", 6, { body: "body", z0: zg + 0.05 }));
+  }, { joints });
+  // the post's tongue, in the plane of the web and glued into it
+  A.build({ o: [P[0], 0, P[2]], x: [-1, 0, 0], z: [0, 1, 0] }, (L, H) => {
+    L.add(H.solid("P-tongue", { name: "", kind: "plate", role: "link", mat: "Walnut, oiled", outer: h.hullOf([[P[0] + 178, 0, 7], [P[0] + 158, 0, 7]]), z0: -3, z1: 3, body: "body" }));
+  }, { joints });
+  const old = A.ctx.notes.findIndex((n) => n.id === "P1");
+  if (old >= 0) A.ctx.notes.splice(old, 1);
+  A.note({ id: "P1", kit: "J3", at: P, title: "J3 · P1", note: "P1 to P21: the feathers' common pivot, a Ø6 stud pressed into a walnut post that stands out of the rump's web; each feather turns on it in a bronze bushing, the stack held by a washer and a circlip behind the last feather.", badge: ["post on the rump", "ok"], d: 6, serves: { F2: ["P-cl"], F3: ["P-stud"] } });
+}
+
+/** The world Z of a solid's profile at its two faces. */
+function worldZ(s: { frame: Frame; profile: { outer: number[][] }; op: { op: string; h?: number } }): number[] {
+  const f = s.frame, y = [f.z[1] * f.x[2] - f.z[2] * f.x[1], f.z[2] * f.x[0] - f.z[0] * f.x[2], f.z[0] * f.x[1] - f.z[1] * f.x[0]];
+  const hh = s.op.op === "extrude" ? (s.op.h ?? 0) : 0;
+  return s.profile.outer.flatMap(([u, v]) => [0, hh].map((w) => f.o[2] + f.x[2] * u! + y[2]! * v! + f.z[2] * w));
+}
+
+/** The motor in the body's far cavity, belted to the crank shaft (V1 to V3). */
+function motor(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const O = A.ctx.S.joints.get("O")!.at;
+  const M: Vec3 = [-62, 0, 20];
+  const mot = MOTORS.pancake;
+  const web1 = 3; // the web's far face
+  const belt: [number, number] = [web1 + 1, web1 + 9]; // the pulleys' span, flanges included
+  const m0 = belt[1] + 0.5, m1 = m0 + mot.H;
+  const P16 = PULLEYS[16], P32 = PULLEYS[32];
+  const F = acrossY(O);
+  const loc = (p: Vec3): [number, number] => [-(p[0] - O[0]), p[2] - O[2]];
+  const m = loc(M);
+  const pulley = (L: Local, H: Parameters<Polish>[1],id: string, c: [number, number], p: typeof P16, bore: number, body: string) => {
+    const hole = () => [h.disc(bore / 2 + 0.05, c[0], c[1]).reverse()];
+    L.add(H.solid(id, { name: `GT2 timing pulley ${p.T}T`, kind: "pulley", role: "hw", mat: "Aluminium 6061-T6", outer: h.disc(p.od / 2, c[0], c[1]), holes: hole(), z0: belt[0]! + 1, z1: belt[1]! - 1, body }));
+    L.add(H.solid(`${id}-fl0`, { name: "", kind: "pulley", role: "hw", outer: h.disc(p.fd / 2, c[0], c[1]), holes: hole(), z0: belt[0]!, z1: belt[0]! + 1, body }));
+    L.add(H.solid(`${id}-fl1`, { name: "", kind: "pulley", role: "hw", outer: h.disc(p.fd / 2, c[0], c[1]), holes: hole(), z0: belt[1]! - 1, z1: belt[1]!, body }));
+  };
+  A.build(F, (L, H) => {
+    L.add(H.solid("drive-motor", { name: mot.name, kind: "motor", role: "hw", mat: "Aluminium housing, neodymium rotor", outer: h.disc(mot.R, m[0], m[1]), z0: m0, z1: m1, body: "body" }));
+    L.add(H.solid("drive-motor-core", { name: "", kind: "motorInternal", role: "hw", outer: h.disc(mot.R - 4, m[0], m[1]), z0: m0 + 3, z1: m1 - 3, faint: true, inset: true, body: "body" }));
+    L.add(H.shaft("drive-shaft", { d: mot.shaft, z0: belt[0]! + 0.5, z1: m0 }, { name: `Motor shaft Ø${mot.shaft}`, at: [m[0], m[1], 0], body: "body" }));
+    pulley(L, H, "drive-pulley-motor", m, P16, mot.shaft, "body");
+    pulley(L, H, "drive-pulley-shaft", [0, 0], P32, 8, "crank");
+    const rb = P16.pd / 2, rB = P32.pd / 2;
+    L.add(H.solid("drive-belt", { name: "GT2 belt 6 mm, closed loop", kind: "belt", role: "hw", mat: "Neoprene, glass-fibre cords", outer: h.hullOf([[m[0], m[1], rb + 0.7], [0, 0, rB + 0.7]]), holes: [h.hullOf([[m[0], m[1], rb - 0.7], [0, 0, rB - 0.7]]).reverse()], z0: belt[0]! + 1.5, z1: belt[1]! - 1.5, body: "body" }));
+    // three standoffs from the web to the motor's face, away from the belt; a countersunk screw from the web's near face
+    const toO = Math.atan2(-m[1], -m[0]);
+    [1, 3, 5].forEach((k, i) => {
+      const a = toO + (k * Math.PI) / 3;
+      const at: Vec3 = [m[0] + 19 * Math.cos(a), m[1] + 19 * Math.sin(a), 0];
+      L.add(H.standoff(`drive-so${i}`, { at, z0: web1, z1: m0, body: "body", name: i ? "" : "Standoff Ø10, M3: the motor's face screwed to it", ...(i ? { qty: 0 } : { qty: 3 }) }));
+      L.add(H.screw(`drive-sc${i}`, "csk", 3, 8, { at, face: -web1, dir: 1, body: "body", ...(i ? { name: "", qty: 0 } : { qty: 3 }) }));
+    });
+  }, { joints: ["drive"] });
+  // the crank shaft's spacer splits round its pulley
+  const sp = A.get("O-sp2")!;
+  const spz = [sp.frame.o[1], sp.frame.o[1] + sp.frame.z[1] * (sp.op.op === "extrude" ? sp.op.h : 0)].sort((a, b) => a - b);
+  A.drop("O-sp2");
+  A.build(F, (L, H) => {
+    L.add(H.spacer("O-sp2", 8.2, 10.8, { body: "crank", z0: spz[0]!, z1: belt[0]!, name: "" }));
+    L.add(H.spacer("O-sp4", 8.2, 10.8, { body: "crank", z0: belt[1]!, z1: spz[1]!, name: "" }));
+  }, { joints: ["O"] });
+  // the far shells pocketed round the motor
+  for (const s of A.find(/^body-shellF\d+$/)) {
+    const zz = [s.frame.o[1], s.frame.o[1] + s.frame.z[1] * (s.op.op === "extrude" ? s.op.h : 0)];
+    if (Math.max(...zz) <= m0 || Math.min(...zz) >= m1) continue;
+    const c: Vec3 = [M[0], s.frame.o[1], M[2]];
+    const f = s.frame, yy: Vec3 = [f.z[1] * f.x[2] - f.z[2] * f.x[1], f.z[2] * f.x[0] - f.z[0] * f.x[2], f.z[0] * f.x[1] - f.z[1] * f.x[0]];
+    const d: Vec3 = [c[0] - f.o[0], c[1] - f.o[1], c[2] - f.o[2]];
+    const u = d[0] * f.x[0] + d[1] * f.x[1] + d[2] * f.x[2], v = d[0] * yy[0] + d[1] * yy[1] + d[2] * yy[2];
+    A.set(s.id, { profile: { outer: s.profile.outer, holes: [...s.profile.holes, h.disc(mot.R + 1, u, v).reverse()] } });
+  }
+  A.note({ id: "drive", kit: "drive", at: M, title: "Drive", note: "Brushless pancake motor in the body's far cavity, its face on three standoffs screwed to the web; GT2 16T to 32T belt to a pulley keyed on the crank shaft between the web and the motor; the far shells pocketed round it.", badge: ["motor driven", "ok"] });
+}
+
+/**
+ * The home flag and its sensor (F10, V6): a 1 mm vane on the crank shaft pulley's outer flange, read by a fork sensor on
+ * an aluminium block screwed to the web's far face, its slot round the vane's path, up and toward the breast and clear
+ * of the belt; the sensor's lead drops to the web and runs along it to the motor's, above the belt's lower pulley.
+ */
+function homeSensor(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const O = A.ctx.S.joints.get("O")!.at;
+  const P32 = PULLEYS[32];
+  const a = Math.PI / 3, c = Math.cos(a), s = Math.sin(a); // up and toward +X from the crank shaft (world X, Z)
+  const mouth = P32.fd / 2 + 1, vz = 12; // the vane on the outer flange's face (world Y 12)
+  const gap0 = vz + SENSOR.vane / 2 - SENSOR.slot / 2, gap1 = gap0 + SENSOR.slot;
+  // x radial, z along world +Y: local (u, v) is world X = O + c u + s v, Z = O + s u - c v
+  const F: Frame = { o: [O[0], 0, O[2]], x: [c, 0, s], z: [0, 1, 0] };
+  const box = (r0: number, r1: number): [number, number][] => [[r0, -SENSOR.w / 2], [r1, -SENSOR.w / 2], [r1, SENSOR.w / 2], [r0, SENSOR.w / 2]];
+  const fork = { kind: "sensor" as const, role: "hw" as const, body: "body", group: "drive-sensor" };
+  A.build(F, (L, H) => {
+    L.add(H.flag("drive-flag", P32.pd / 2, mouth + SENSOR.depth - 1.5, 0, { body: "crank", z0: vz, z1: vz + SENSOR.vane }));
+    L.add(H.solid("drive-sensor-mount", { name: "Sensor block, aluminium, screwed to the web", kind: "bracket", role: "link", mat: "Aluminium 6061-T6, anodised", outer: h.filletPoly(box(mouth, mouth + SENSOR.l), 1), z0: 3, z1: gap0 - 3, body: "body" }));
+    L.add(H.solid("drive-sensor", { ...fork, name: `Fork sensor, slotted optical, ${SENSOR.slot} mm gap`, mat: "PBT housing", outer: box(mouth, mouth + SENSOR.l), z0: gap0 - 3, z1: gap0 }));
+    L.add(H.solid("drive-sensor-back", { ...fork, name: "", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: gap0, z1: gap1 }));
+    L.add(H.solid("drive-sensor-jaw", { ...fork, name: "", outer: box(mouth, mouth + SENSOR.l), z0: gap1, z1: gap1 + 3 }));
+    // two countersunk screws from the web's near face into the block
+    [mouth + 7, mouth + SENSOR.l - 6].forEach((u, i) => L.add(H.screw(`drive-sensor-sc${i}`, "csk", 3, 8, { at: [u, 0, 0], face: -3, dir: 1, body: "body", ...(i ? { name: "", qty: 0 } : { qty: 2 }) })));
+  }, { joints: ["drive"] });
+  // the sensor's lead: out of its side by the web, down to the web, along it to the motor's lead
+  const u = mouth + 4, v = -(SENSOR.w / 2 + 1);
+  const X = O[0] + c * u + s * v, Z = O[2] + s * u - c * v;
+  A.build({ o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.lead("drive-sensor-lead", [[X, gap0 - 1.5], [X, 3.45]], { body: "body", z0: Z - 0.5, z1: Z + 0.5, name: "Sensor lead, silicone insulated: along the web to the motor's" }));
+  }, { joints: ["drive"] });
+  A.build(acrossY([0, 0, 0]), (L, H) => {
+    L.add(H.lead("drive-sensor-lead-web", [[-X, Z], [20, 10], [74, 8.5], [77, 6]], { body: "body", z0: 3, z1: 4, name: "" }));
+  }, { joints: ["drive"] });
+  const n = A.ctx.notes.find((q) => q.id === "drive");
+  if (n) Object.assign(n, { note: `${n.note} A home flag on the crank shaft's pulley is read by a fork sensor on a block screwed to the web; its lead joins the motor's.`, serves: { ...n.serves, F10: ["drive-flag", "drive-sensor"] } });
+}
+
+/**
+ * The motor's lead (V6, F10): out of the motor's face to the web, along it into the rump and through a channel drilled
+ * along the arm, out of the arm's underside short of the sleeve; there it laps a slack loop that hangs from the column
+ * and takes up the body's bob, down the column's side in two ties, over the flange, through the base and under it to a
+ * terminal block on the base's rear edge, a P-clip under the base on the way.
+ */
+function motorLead(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const col = A.get("S-column")!;
+  const cx = col.frame.o[0], cy = col.frame.o[1];
+  const rc = 8; // the column's radius
+  const yb = 3, yg = 4.1; // the body's lead on the web's far face; the hanging loop just outside it
+  const yl = yg + 0.5; // the loop's mid-plane (world Y)
+  const xc = cx + Math.sqrt(rc * rc - yg * yg) + 1; // down the column's side, its edge 0.1 mm off it
+  const x0 = -266, x1 = (x0 + xc) / 2, r = (x0 - x1) / 2; // the loop's two bends between the arm's drop and the column
+  const xh = -271.5; // through the base, outboard of the flange
+  const flangeTop = Math.max(...worldZ(A.get("S-flange")!)), bb = A.get("base")!.frame.o[2];
+  // a half turn of the loop round the centre c (world X, Z), in the lead's local frame (-X, Z)
+  const arc = (c: [number, number], a0: number, a1: number): [number, number][] =>
+    Array.from({ length: 7 }, (_, i) => a0 + ((a1 - a0) * i) / 6).map((a): [number, number] => [-(c[0] + r * Math.cos(a)), c[1] + r * Math.sin(a)]);
+  const W = (pts: [number, number][]): [number, number][] => pts.map(([x, z]) => [-x, z]);
+  // the body's part: from the motor's face to the web, along the web and through the arm, out of its underside
+  A.build({ o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.lead("drive-lead", [[-78, 13], [-78, yb + 0.45]], { body: "body", z0: 3.5, z1: 4.5, name: "Motor lead, silicone insulated: joined by the sensor's on the web, through the arm and down the column to the terminal block" }));
+  }, { joints: ["drive"] });
+  A.build(acrossY([0, 0, 0]), (L, H) => {
+    L.add(H.lead("drive-lead-arm", W([[-78, 4], [-95, -18], [x0, -18], [x0, -46]]), { body: "body", z0: yb, z1: yb + 1, name: "" }));
+  }, { joints: ["drive"] });
+  // the ground's part: the slack loop, hanging from the column over the arm's drop, which slides along its first leg
+  const z0 = -40, zb = -64, zt = -54;
+  const loop: [number, number][] = [[-x0, z0], [-x0, zb], ...arc([x0 - r, zb], 0, -Math.PI).slice(1, -1), [-x1, zb], [-x1, zt], ...arc([x1 - r, zt], 0, Math.PI).slice(1, -1), [-xc, zt], [-xc, flangeTop + 1.7], [-xh, flangeTop + 1.7], [-xh, bb - 0.5]];
+  A.build(acrossY([0, 0, 0]), (L, H) => {
+    L.add(H.lead("drive-lead-loop", loop, { body: "ground", z0: yg, z1: yg + 1, name: "" }));
+  }, { joints: ["drive"] });
+  // two nylon ties hold it to the column
+  for (const [k, z] of [[0, -80], [1, -128]] as const) {
+    A.build({ o: [0, 0, z], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+      L.add(H.solid(`drive-tie${k}`, { name: k ? "" : "Cable tie, nylon: the lead to the column", kind: "cableClip", role: "hw", mat: "Polyamide 6.6", qty: k ? 0 : 2, body: "ground", outer: h.hullOf([[cx, cy, rc + 0.8], [xc, yl, 1.9]]), holes: [h.hullOf([[cx, cy, rc], [xc, yl, 1.1]]).reverse()], z0: 0, z1: 2.5 }));
+    }, { joints: ["drive"] });
+  }
+  // through the base and under it to the block on its rear edge
+  const base = A.get("base")!;
+  A.set("base", { profile: { outer: base.profile.outer, holes: [...base.profile.holes, h.disc(2, xh - base.frame.o[0], yl - base.frame.o[1]).reverse()] } });
+  const xb = Math.min(...base.profile.outer.map((p) => p[0]!)) + base.frame.o[0];
+  const tb: Vec3 = [xb + 4, yl + 20, 0];
+  A.build({ o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.lead("drive-lead-base", [[xh, yl], [xh, tb[1] - 7.5], [tb[0] + 3, tb[1] - 7.5]], { body: "ground", z0: bb - 1, z1: bb, name: "" }));
+  }, { joints: ["drive"] });
+  A.build({ o: [tb[0], tb[1], 0], x: [0, 1, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.terminalBlock("drive-terminals", 4, { body: "ground", z0: bb - 6, z1: bb }));
+  }, { joints: ["drive"] });
+  A.build({ o: [(xh + tb[0]) / 2, tb[1] - 7.5, 0], x: [0, 1, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.cableClip("drive-clip", { body: "ground", z0: bb - 2, z1: bb, qty: 1 }));
+  }, { joints: ["drive"] });
+}
+
+/**
+ * The two slides' inner risers lap 1.5 mm across (owner's decision, 4 Nov): one ground block under both inner rails,
+ * the union of the two, its screw and dowel holes kept; the fork slide's riser is named in `teaching.exceptions`.
+ */
+function riserBlock(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const a = A.get("KS-riser1"), b = A.get("FS-riser1");
+  if (!a || !b) return;
+  const cross = (f: Frame): Vec3 => [f.z[1] * f.x[2] - f.z[2] * f.x[1], f.z[2] * f.x[0] - f.z[0] * f.x[2], f.z[0] * f.x[1] - f.z[1] * f.x[0]];
+  const fa = a.frame, ya = cross(fa), fb = b.frame, yy = cross(fb);
+  // b's outline points into a's frame (both lie in the base's plane)
+  const toA = ([u, v]: readonly number[]): [number, number] => {
+    const w = [0, 1, 2].map((k) => fb.o[k]! + fb.x[k]! * u! + yy[k]! * v! - fa.o[k]!);
+    return [w[0]! * fa.x[0] + w[1]! * fa.x[1] + w[2]! * fa.x[2], w[0]! * ya[0] + w[1]! * ya[1] + w[2]! * ya[2]];
+  };
+  const box = (q: readonly (readonly number[])[]) => [Math.min(...q.map((p) => p[0]!)), Math.max(...q.map((p) => p[0]!)), Math.min(...q.map((p) => p[1]!)), Math.max(...q.map((p) => p[1]!))] as const;
+  const A1 = box(a.profile.outer), B1 = box(b.profile.outer.map(toA));
+  // a stepped outline round both rectangles, the upper one standing further along x, its corners rounded as the
+  // rules' risers are
+  const [lo, hi] = A1[2] < B1[2] ? [A1, B1] : [B1, A1];
+  if (!(hi[0] > lo[0] && hi[1] > lo[1] && hi[2] < lo[3])) throw new Error("riserBlock: the risers no longer lap as expected");
+  const P: [number, number][] = [[lo[0], lo[2]], [lo[1], lo[2]], [lo[1], hi[2]], [hi[1], hi[2]], [hi[1], hi[3]], [hi[0], hi[3]], [hi[0], lo[3]], [lo[0], lo[3]]];
+  A.set(a.id, { name: "Ground steel riser block, under both slides' inner rails", profile: { outer: h.filletPoly(P, 1), holes: [...a.profile.holes, ...b.profile.holes.map((q) => q.map(toA))] } });
+  A.drop(b.id);
+  // the fork's carriage slides on the block where it slid on its own riser
+  for (const s of A.find((q) => q.slides?.includes(b.id) ?? false)) A.set(s.id, { slides: s.slides!.map((i) => (i === b.id ? a.id : i)) });
+}
+
+/** "CARVE" and the carriages' stroke ends, engraved on the keepers' tops (L8). */
+function carveMarks(A: Parameters<Polish>[0]): void {
+  const G: Record<string, [number, number][][]> = {
+    C: [[[3.5, 4.2], [2.8, 5], [0.7, 5], [0, 4.2], [0, 0.8], [0.7, 0], [2.8, 0], [3.5, 0.8]]],
+    A: [[[0, 0], [1.75, 5], [3.5, 0]], [[0.6, 1.8], [2.9, 1.8]]],
+    R: [[[0, 0], [0, 5], [2.6, 5], [3.4, 4.3], [3.4, 3.2], [2.6, 2.5], [0, 2.5]], [[1.6, 2.5], [3.5, 0]]],
+    V: [[[0, 5], [1.75, 0], [3.5, 5]]],
+    E: [[[3.5, 5], [0, 5], [0, 0], [3.5, 0]], [[0, 2.5], [2.6, 2.5]]],
+  };
+  for (const [slide, carriage, text] of [["KS", "knife", "CARVE"], ["FS", "fork", ""]] as const) {
+    const k = A.get(`${slide}-keeper`)!;
+    if (Math.abs(k.frame.x[0] - 1) > 1e-9 || Math.abs(k.frame.z[2] - 1) > 1e-9) continue;
+    const c = A.get(carriage)!;
+    const cx = c.profile.outer.map((p) => p[0]!), back = Math.min(...cx);
+    // the carriage's rear edge at either end of its stroke, in the keeper's frame: an in-line slider-crank, its pin on the
+    // slide's line at the reference, so the carriage stands at one end there and twice the crank from it at the other
+    const pin = A.ctx.S.joints.get(slide === "KS" ? "KA" : "FA")!.at, axis = A.ctx.S.joints.get("RR")!.at;
+    const dx = pin[0] - axis[0];
+    const run: [number, number] = dx > 0 ? [-2 * dx, 0] : [0, -2 * dx];
+    const ends = run.map((s) => c.frame.o[0] + back + s - k.frame.o[0]);
+    const ky = k.profile.outer.map((p) => p[1]!), y0 = Math.min(...ky), y1 = Math.max(...ky);
+    const yb = y0 + 2, yt = yb + 2.5;
+    const marks = [...k.marks, { kind: "carve" as const, pts: [[ends[0]!, yb], [ends[1]!, yb]] as [number, number][] }];
+    for (const x of ends) marks.push({ kind: "carve" as const, pts: [[x, yb - 1], [x, yt]] });
+    if (text) {
+      const w = text.length * 3.5 + (text.length - 1) * 1.2;
+      let x = (ends[0]! + ends[1]!) / 2 - w / 2;
+      const base = yt + 1;
+      if (base + 5 < y1 - 1) for (const ch of text) {
+        for (const pl of G[ch]!) marks.push({ kind: "carve" as const, pts: pl.map(([u, v]): [number, number] => [x + u, base + v]) });
+        x += 4.7;
+      }
+    }
+    A.set(k.id, { marks });
+  }
+}
+
+/** A polygon cut by the line v = c, keeping v ≥ c. */
+function clipBelow(p: [number, number][], c: number): [number, number][] {
+  const out: [number, number][] = [];
+  for (let i = 0; i < p.length; i++) {
+    const a = p[i]!, b = p[(i + 1) % p.length]!;
+    const ia = a[1] >= c, ib = b[1] >= c;
+    if (ia) out.push(a);
+    if (ia !== ib) out.push([a[0] + ((b[0] - a[0]) * (c - a[1])) / (b[1] - a[1]), c]);
+  }
+  return out;
+}
+
+/**
+ * The fork's crank is a return crank clamped on the knife's crank pin (A9, J3): the rear shaft ends in the knife's disc,
+ * so the knife's rod never sweeps over it, and a stepped pin screwed into the disc carries the rod's bearing and runs on
+ * past the knife's slide to the return crank, whose boss a set screw clamps on it. The return crank turns with the disc
+ * about the shaft's axis, so the kinematics (crankFk on RRf) are as before; no part stands on that axis outboard of the
+ * disc. The knife slide's gibbed rail, its riser, the keeper and the keeper's front screw end 5 mm shorter at the front,
+ * clear of the pin's sweep (the J5 kit shortens a rail only for the sweeps it sees, and the pin is the polish's).
+ */
+function returnCrank(A: Parameters<Polish>[0], h: Parameters<Polish>[1], y: { k0: number; k1: number; f0: number; f1: number }): void {
+  const ka = A.ctx.S.joints.get("KA")!.at, fa = A.ctx.S.joints.get("FA")!.at;
+  const rr = A.ctx.S.joints.get("RR")!.at;
+  const on = (body: string, p: Vec3): Frame => {
+    const o = A.local(body, [p[0], 0, p[2]]);
+    const u = A.local(body, [p[0], 1, p[2]]);
+    return A.frame(body, o, [u[0] - o[0], u[1] - o[1], u[2] - o[2]]);
+  };
+  const rod = A.ctx.kin.bodies.find((b) => b.id === "knifeRod")!.shape as { place: number; thickness: number };
+  const r0 = ka[1] + rod.place; // the knife rod's outer face (world Y)
+  const B693 = BEARINGS.find((b) => b.name === "693")!;
+  A.drop(/^KA-/);
+  A.build(on("crankK", ka), (L, H) => {
+    L.add(H.shaft("KA-pin", { d: 5, z0: y.f0, z1: r0 }, { body: "crankK", name: "Knife's crank pin Ø5/Ø3, stepped, screwed into the knife's disc; the fork's return crank clamped on its outer end" }));
+    L.add(H.shaft("KA-pin-s1", { d: 3, z0: r0, z1: y.k1 - 0.5, thread: { M: 3, z0: y.k0, z1: y.k1 - 0.5 } }, { body: "crankK", name: "" }));
+    L.add(H.spacer("KA-shim", 3.2, 4.7, { body: "crankK", z0: r0, z1: r0 + 0.5, name: "Shim 3.2x4.7 x 0.5, the bearing's inner race off the pin's shoulder" }));
+    L.add(H.bearing("KA-brg", B693, { body: "knifeRod", z0: r0 + 0.5, z1: r0 + 0.5 + B693.B }));
+    L.add(H.spacer("KA-sp", 3.2, 4.7, { body: "crankK", z0: r0 + 0.5 + B693.B, z1: y.k0 }));
+  }, { joints: ["KA"] });
+  // the return crank: an arm from the knife's crank pin to the fork's, through the shaft's axis, bored only at its ends
+  const fk = A.get("crankFk")!;
+  const pk = A.local("crankFk", [ka[0], fk.frame.o[1], ka[2]]), pf = A.local("crankFk", [fa[0], fk.frame.o[1], fa[2]]);
+  const centre = (q: [number, number][]) => [q.reduce((s, p) => s + p[0], 0) / q.length, q.reduce((s, p) => s + p[1], 0) / q.length];
+  const faHole = fk.profile.holes.find((q) => Math.hypot(centre(q)[0]! - pf[0], centre(q)[1]! - pf[1]) < 1);
+  const bore = h.disc(2.55, pk[0], pk[1]).reverse();
+  A.set("crankFk", { profile: { outer: h.hullOf([[pk[0], pk[1], 6.5], [pf[0], pf[1], 6]]), holes: [bore, ...(faHole ? [faHole] : [])] } });
+  // its boss's set screw bears on the pin, radially outward from the axis
+  const out: Vec3 = [Math.sign(ka[0] - rr[0]), 0, 0];
+  A.build({ o: [ka[0], (y.f0 + y.f1) / 2, ka[2]], x: [0, 0, 1], z: out }, (L, H) => {
+    L.add(H.setScrew("FA-ss", 3, { body: "crankFk", z0: 2.6, z1: 6.4, name: "Set screw M3 (DIN 916), threadlocked: clamps the return crank on the knife's crank pin" }));
+  }, { joints: ["FA"] });
+  const old = A.ctx.notes.findIndex((n) => n.id === "KA");
+  if (old >= 0) A.ctx.notes.splice(old, 1);
+  A.note({ id: "KA", kit: "J3", at: ka, title: "J3 · KA", note: `KA: the knife's crank pin, stepped Ø5/Ø3 and screwed into the knife's disc, carries the rod's 693 bearing between a shim and an inner-race spacer and runs on ${(r0 - y.f0).toFixed(0)} mm to the fork's return crank, clamped on it by a set screw; the shaft ends in the disc, clear of the rod.`, badge: ["single shear", "warn"], d: 3, serves: { F2: ["KA-pin-s1", "FA-ss"], F3: ["KA-pin", "FA-ss"] } });
+  // the knife slide's front end, 5 mm back, clear of the pin
+  const front = Math.max(...["KS-rail1"].map((id) => Math.max(...A.get(id)!.profile.outer.map((p) => A.get(id)!.frame.o[0] + p[0]))));
+  const cut = front - 12;
+  const back = (id: string) => {
+    const s = A.get(id);
+    if (!s || Math.abs(s.frame.x[0] - 1) > 1e-9) return;
+    const mv = (q: [number, number][]) => q.map(([u, v]): [number, number] => [s.frame.o[0] + u > cut ? u - 5 : u, v]);
+    A.set(id, { profile: { outer: mv(s.profile.outer as [number, number][]), holes: s.profile.holes.map((q) => mv(q as [number, number][])) } });
+  };
+  ["KS-rail1", "KS-riser1", "KS-keeper"].forEach(back);
+  for (const s of A.find(/^KS-sc1(-sh)?$/)) A.set(s.id, { frame: { ...s.frame, o: [s.frame.o[0] - 5, s.frame.o[1], s.frame.o[2]] } });
+}

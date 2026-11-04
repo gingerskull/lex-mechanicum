@@ -91,6 +91,9 @@ export const KITS: Record<KitId, Kit> = {
   "groove-cam": mk("groove-cam", "Groove cam", ["J7"], ["cam"], "groove-cam", ["roller", "shaft", "wearStrip", "felt"], normalOf, runZone("the roller in the groove")),
   "oblique-journal": mk("oblique-journal", "Ring on an inclined journal", ["J3"], ["spherical-four-bar"], "oblique-journal", ["bearing", "circlipInternal", "circlipExternal", "dowel"], own, pinZone("the journal")),
   "leg-bore": mk("leg-bore", "Bent rod's leg in a disc's bore", ["J5"], ["elbow-rods"], "leg-bore", ["bushing"], own, pinZone("the leg in its bore")),
+  column: mk("column", "Body on a column slide", ["J5"], ["walker"], "column-slide", ["shaft", "collar", "key", "housing", "bushing"], own, runZone("the sleeve's travel")),
+  "flat-belt": mk("flat-belt", "Flat belt on drums", ["J8", "J12"], ["walker"], "flat-belt", ["belt"], normalOf, pinZone("the belt's top run")),
+  sole: mk("sole", "Foot on a belt", ["J7"], ["walker"], "sole-pad", ["wearStrip"], normalOf, pinZone("the sole on the belt")),
 };
 
 /** The detail ladder rungs a kit's hardware sits on, from the kinds it builds (DL1). */

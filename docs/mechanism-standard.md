@@ -338,6 +338,9 @@ generated from `autoTable()` by `tools/standard-table.ts`:
 | `j8-belt` | J8, V4 |
 | `j12-other` | J12, F7 |
 | `strap-sheave` | J12, F1, F2, A11 |
+| `column-slide` | J5, A9, F3, F8 |
+| `flat-belt` | J8, J12 |
+| `sole-pad` | J7, M14 |
 | `j11-screw` | J11, J10, F2, F3, F4, F5, F8 |
 | `j13-compliant` | J13, A6, F1, F2, F5 |
 | `j1-dead-axle` | J1, A4, A11, M8, M9, M11 |

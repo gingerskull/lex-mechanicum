@@ -8,6 +8,9 @@ import { imagesShown, neighbours, relatedOf, seasonalFor, sheetsOf } from "../..
 import { addDays, decodeWindows, encodeWindows, inSeason, listedOn, localDay, longDate, returnsOn, windowsOf } from "../../site/src/season";
 import { record, seasonal } from "../catalog/fixtures";
 
+// a local preview flag (LM_SEASON=open) in the shell must not change what these tests see
+delete process.env.LM_SEASON;
+
 const day = (d: string) => ({ start: d, end: d });
 
 describe("the listing windows", () => {
@@ -84,6 +87,14 @@ describe("the sheets with seasonal mechanisms", () => {
     expect(sheets.map((x) => `${x.no} ${x.id}`)).toEqual(["ST-01 a", "ST-02 b", "ST-03 c", "ST-04 s", "ST-05 t"]);
     expect(of("a").season).toBeUndefined();
     expect(of("s").season).toBe("2026-10-28/2026-11-02 2027-10-28/2027-11-02");
+  });
+
+  it("list every seasonal mechanism on every day in a preview build (LM_SEASON=open), and the library as before", () => {
+    const open = sheetsOf(recs, true);
+    expect(open.map((x) => `${x.no} ${x.id}`)).toEqual(sheets.map((x) => `${x.no} ${x.id}`));
+    expect(open.find((x) => x.id === "a")!.season).toBeUndefined();
+    for (const id of ["s", "t"]) for (const d of ["2026-03-01", "2026-11-23", "2031-07-04"]) expect(inSeason(open.find((x) => x.id === id)!.season, new Date(`${d}T12:00:00`))).toBe(true);
+    expect(inSeason(of("s").season, new Date("2026-03-01T12:00:00"))).toBe(false);
   });
 
   it("change nothing for a library without seasonal mechanisms", () => {

@@ -39,6 +39,10 @@ export const KIN_VOCAB = {
     "strand",
     // a plate cam's swinging roller follower (a rocker on a pivot)
     "cam-rocker",
+    // a walker riding on its lower foot over a belt it drives, and parts carried in a moving body's frame
+    "walker", "carry",
+    // a rocker turned by a pin in a slot that does not run through its pivot (a fan's feather on a spreading rod)
+    "slot-swing",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

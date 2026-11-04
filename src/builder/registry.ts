@@ -81,6 +81,8 @@ export const rules: Rule[] = [
   byId("j8-belt"),
   byId("j12-other"),
   byId("strap-sheave"),
+  // a walker's: the body's column slide, the flat belt under its feet, the soles on it
+  byId("column-slide"), byId("flat-belt"), byId("sole-pad"),
   j11,
   j13,
   j1,

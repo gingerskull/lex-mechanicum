@@ -151,7 +151,14 @@ const j5 = contactRule({
       const sh = ctx.kin.bodies.find((q) => q.id === b)?.shape as Record<string, unknown> | undefined;
       return sh?.type === "fork" || (sh?.type === "slider" && !!sh.cage);
     });
-    return !!r.rod || !!r.spline || fork;
+    // a rod carried crosswise between two moving bodies (a fan's spreader rod lifted in a walker's body): no slide of this
+    // kit fits it (not a collar on the rod, nor a stem along it), so its guide is the mechanism's own
+    const ax = Array.isArray(r.axis) ? (r.axis as number[]) : null;
+    const crosswise = ji.a !== "ground" && ji.b !== "ground" && !!ax && [ji.a, ji.b].some((b) => {
+      const g = ctx.geoms.get(b);
+      return String(g?.shape.type) === "shaft" && Math.abs(g!.frame.z[0] * ax[0]! + g!.frame.z[1] * ax[1]! + g!.frame.z[2] * ax[2]!) < 1e-6;
+    });
+    return !!r.rod || !!r.spline || fork || crosswise;
   },
   build(ctx, c, L) {
     const id = c.id;

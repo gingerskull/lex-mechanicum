@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.49.0, Accatran — 2026-11-04
+
+- Thanksgiving's seasonal mechanism, the Turkey trot walker: two Klann legs half a turn apart trot a turkey on a free
+  treadmill that its own feet drive. The body rides on whichever foot is lower and bobs 4 mm at each change of feet, a
+  two-lobe cam spreads the tail fan of 21 feathers every step, and the treadmill's rear roller works a carving knife
+  and fork on two slider-cranks behind it. Listed from 23 to 28 November (P14); in the seasonal catalogue it replaces
+  the carving linkage.
+- A walker block: a body that rides on the lower of two feet and a belt that runs with the foot on it; a contact made
+  only in a window of the driver, checked with no slip against its drum (K1); a rocker turned by a pin in a slot that
+  does not run through its pivot. Kits for a body on a column slide, a flat belt on drums and a foot's sole on a belt.
+- A part the record places keeps its one position: the placer no longer doubles it, and one placed on its joint's frame
+  or by its own axes spans the right way along its stack. A rod carried crosswise between two moving bodies takes no
+  slide. No other mechanism's build changes.
+- `LM_SEASON=open` lists the seasonal mechanisms on every day in a local build or dev server, to preview one out of its
+  window; the published site never sets it.
+- R7 is decided by the tools only while a polish is under 30 lines and judged by hand above that, as the standard lists
+  it: a longer polish is a promotion candidate (A22).
+
 ## 0.48.0, Mezoa — 2026-10-31
 
 - The part to watch: on 14 sheets a critical part that is small, or inside another, is tinted in the accent, keeping
