@@ -2,7 +2,7 @@
 // record's checks, the Supports section, and the same sections as the template.
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
-import { AUTO_FILLED, autoFill, generateAudit3 } from "../../src/audit/generate3";
+import { AUTO_FILLED, autoFill, generateAudit3, keepsJudged } from "../../src/audit/generate3";
 import { parseHeader, readStandard, requirements, section, tableRows, type Requirement } from "../../src/audit/sheet";
 
 const opts = { existing: null, date: "2026-10-21", profile: "ci" } as const;
@@ -59,6 +59,21 @@ describe("generateAudit3 on the four-bar record", () => {
     expect(autoFill(q("L8", "8", ["AUTO"]), false)).toBeNull();
     expect(autoFill(q("A9", "5.2", ["AUTO", "HAND"]), true)).toBeNull();
     expect(autoFill(q("S6", "2", ["AUTO"]), undefined)).toMatchObject({ status: "PASS" });
+  });
+
+  it("decides R7 while the polish is under 30 lines, and keeps only a judgement with its note above that", () => {
+    expect(rowsOf(sheet, "Requirements").get("R7")![1]).toBe("PASS");
+    const gen = "HAND / FLAG · polish 559 lines (49.7 KB); 141 solids added, 189 overrides by the polish";
+    const judged = ["R7", "PASS", `${gen} · promotion candidates listed (A22), a follow-up plan`];
+    // a short polish: the tools decide, a judgement from an earlier sheet gives way
+    expect(keepsJudged("R7", judged, "PASS")).toBe(false);
+    // a long polish: a judgement is kept, a pass the tools gave a shorter polish is not
+    expect(keepsJudged("R7", judged, "?")).toBe(true);
+    expect(keepsJudged("R7", ["R7", "PASS", "HAND / FLAG · polish 16 lines (1.8 KB); 0 solids added, 132 overrides by the polish"], "?")).toBe(false);
+    expect(keepsJudged("R7", ["R7", "?", gen], "?")).toBe(false);
+    // other rows as before
+    expect(keepsJudged("K1", ["K1", "PASS", "x"], "PASS")).toBe(false);
+    expect(keepsJudged("A9", ["A9", "PASS", "clevis pair"], undefined)).toBe(true);
   });
 
   it("lists the kit and the block of every joint, and the supports", () => {

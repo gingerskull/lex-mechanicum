@@ -45,7 +45,18 @@ const FN_TITLES = ["locate", "retain", "torque", "thrust", "limit", "hold", "adj
  * Rows whose status a tool decides outright: always regenerated, never kept from an earlier sheet (standard 11). K5 is
  * retired in 3.0 and has no row; K1, K11, T9 and D11 are decided from the record v3 and its solids.
  */
-export const TOOL_DECIDED = new Set(["P1", "K1", "K2", "K11", "T9", "D11", "A12", "A15", "M6", "R7", "Q1", "Q2"]);
+export const TOOL_DECIDED = new Set(["P1", "K1", "K2", "K11", "T9", "D11", "A12", "A15", "M6", "Q1", "Q2"]);
+
+/**
+ * Whether a row of an earlier sheet is kept on regeneration, given the status the tools give it now. R7 (HAND / FLAG) is
+ * the tools' while a polish is under the plan's 30 lines; a longer polish is a promotion candidate judged by hand, and
+ * only a judgement with its note after the generated evidence is kept, never a pass the tools gave a shorter polish.
+ */
+export function keepsJudged(id: string, kept: string[] | undefined, tool: string | undefined): boolean {
+  if (!kept || !kept[1] || kept[1] === "?" || TOOL_DECIDED.has(id) || kept[2]?.includes(AUTO_FILLED)) return false;
+  if (id === "R7") return tool !== "PASS" && /by the polish · ./.test(kept[2] ?? "");
+  return true;
+}
 
 /**
  * AUTO rows the pipeline holds for every mechanism it builds (classification, placement, packaging, the renderer, the
@@ -280,8 +291,8 @@ export function auditSheet3(inp: AuditInput3, standard: string, existing: string
   for (const c of tableRows(existing ? section(existing, "Requirements") ?? "" : "")) if (c[0]) oldRows.set(c[0], c);
   const rows = reqs.map((q) => {
     const kept = oldRows.get(q.id);
-    if (kept && kept[1] && kept[1] !== "?" && !TOOL_DECIDED.has(q.id) && !kept[2]?.includes(AUTO_FILLED)) return [q.id, kept[1], kept[2] ?? ""];
     const e = ev[q.id];
+    if (keepsJudged(q.id, kept, e?.status)) return [q.id, kept![1]!, kept![2] ?? ""];
     const fill = (e?.status ?? "?") === "?" ? autoFill(q, built[q.id]) : null;
     const text = [q.tiers.join(" / "), e?.evidence, fill && `${AUTO_FILLED}: ${fill.why}`].filter(Boolean).join(" · ");
     return [q.id, fill?.status ?? e?.status ?? "?", escapeCell(text)];
