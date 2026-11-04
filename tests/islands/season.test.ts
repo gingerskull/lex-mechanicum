@@ -86,6 +86,14 @@ describe("the sheets with seasonal mechanisms", () => {
     expect(of("s").season).toBe("2026-10-28/2026-11-02 2027-10-28/2027-11-02");
   });
 
+  it("list every seasonal mechanism on every day in a preview build (LM_SEASON=open), and the library as before", () => {
+    const open = sheetsOf(recs, true);
+    expect(open.map((x) => `${x.no} ${x.id}`)).toEqual(sheets.map((x) => `${x.no} ${x.id}`));
+    expect(open.find((x) => x.id === "a")!.season).toBeUndefined();
+    for (const id of ["s", "t"]) for (const d of ["2026-03-01", "2026-11-23", "2031-07-04"]) expect(inSeason(open.find((x) => x.id === id)!.season, new Date(`${d}T12:00:00`))).toBe(true);
+    expect(inSeason(of("s").season, new Date("2026-03-01T12:00:00"))).toBe(false);
+  });
+
   it("change nothing for a library without seasonal mechanisms", () => {
     const lib = loadCatalog().mechanisms.slice(0, 5);
     expect(sheetsOf(lib).map((x) => [x.id, x.no, x.season])).toEqual(lib.map((r, i) => [r.id, `ST-0${i + 1}`, undefined]));
