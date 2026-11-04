@@ -38,6 +38,10 @@
 //   P-clip under the base (motorLead). The rules' leads and block are laid for a motor under the base.
 // - J5, T12: the knife's and the fork's inner risers lap 1.5 mm, so they are one ground block under both inner rails
 //   (owner's decision, 4 Nov), the fork's riser named in the record's `teaching.exceptions` (riserBlock).
+// - F6: the fan's weight holds the cam roller up on the cam except within about 10° of each lobe's tip, where the outer
+//   feathers' weight pulls it off by a few grams; a light torsion spring round the lever's pivot keeps it on, anchored
+//   on a pin pressed into the web (leverSpring). The J7 kit builds no spring for a follower held by its own linkage.
+// - A16: the notes of Q, Q1 to Q21 and K describe what is built there (fanNotes), not the kits' rollers and felt.
 // - L8, P14: "CARVE" and the knife's and the fork's stroke ends engraved on the keepers of the slide block.
 import type { Polish } from "../../builder";
 import { patternMarks } from "../../builder/decor";
@@ -151,6 +155,8 @@ export const polish: Polish = (A, h) => {
     }
   }
   ankleSprings(A);
+  leverSpring(A);
+  fanNotes(A);
   spreaderGuide(A, h);
   fanPivot(A, h);
   motor(A, h);
@@ -191,6 +197,51 @@ function ankleSprings(A: Parameters<Polish>[0]): void {
       L.add(H.solid(`F${s}-spring-leg`, { name: "", kind: "spring", mat: "Spring steel EN 10270", body: leg, outer: stroke([[r * Math.cos(a), r * Math.sin(a)], [r * Math.cos(a) + up[0] * 10, r * Math.sin(a) + up[1] * 10]], wire / 2), z0: zs, z1: zs + wire }));
     }, { joints: [`F${s}`] });
   }
+}
+
+/** The fan's joint notes, for what the polish builds there instead of the kits' rollers (A16). */
+function fanNotes(A: Parameters<Polish>[0]): void {
+  const put = (id: string, kit: string, note: string, badge: [string, "ok" | "warn"], serves: Record<string, string[]> = {}) => {
+    const old = A.ctx.notes.findIndex((n) => n.id === id);
+    if (old >= 0) A.ctx.notes.splice(old, 1);
+    A.note({ id, kit, at: A.ctx.S.joints.get(id)!.at, title: `${kit} · ${id}`, note, badge, serves });
+  };
+  put("Q", "J4", "Q: the lever's Ø4 stud, pressed into it, carries a Ø5 roller in the slot of the spreader's hanger.", ["roller in the slot", "ok"]);
+  for (let i = 1; i <= 21; i++) put(`Q${i}`, "J4", `Q${i}: the spreader's Ø4 rod runs straight in the slot of the feather's tail, offset from the pivot; steel on lime wood, dry.`, ["rod in the slot", "ok"]);
+  put("K", "J7", "K: the roller, on a sealed bearing on the lever's pin R, runs under the two-lobe cam; the fan's weight and a torsion spring round the lever's pivot hold it up on the cam; zero line on the cam.", ["held by a spring", "ok"], { F6: ["G-spring"], F9: ["cam"] });
+}
+
+/**
+ * The fan's return spring (F6): the fan's own weight holds the cam roller up on the cam except near each lobe's tip,
+ * where the outer feathers' weight pulls it off by a few grams; a light torsion spring round the lever's pivot bolt, one
+ * tail on a pin pressed into the web and one along the lever toward the roller, keeps it on.
+ */
+function leverSpring(A: Parameters<Polish>[0]): void {
+  const G = A.ctx.S.joints.get("G")!.at, R = A.ctx.S.joints.get("R")!.at;
+  const spanY = (id: string): number[] => {
+    const q = A.get(id)!;
+    return [q.frame.o[1], q.frame.o[1] + q.frame.z[1] * (q.op.op === "extrude" ? q.op.h : 0)];
+  };
+  // the coil round the bolt's head and washer, from the head's end to 0.5 mm off the lever's face
+  const head = [...spanY("G-bolt-head"), ...spanY("G-bolt-wsh")], lever = spanY("lever");
+  const outboard = Math.min(...head) < Math.min(...lever);
+  const [z0, z1] = outboard ? [Math.min(...head) + 0.1, Math.min(...lever) - 0.5] : [Math.max(...lever) + 0.5, Math.max(...head) - 0.1];
+  const web = spanY("body");
+  const D = 10, wire = 0.6, pinAt: [number, number] = [0, -12];
+  const toW = (p: Vec3): [number, number] => [-(p[0] - G[0]), p[2] - G[2]];
+  const r = toW(R), rl = Math.hypot(r[0], r[1]), dir: [number, number] = [r[0] / rl, r[1] / rl];
+  const ro = D / 2 + wire / 2 + 0.1;
+  A.build(acrossY(G), (L, H) => {
+    L.add(H.spring("G-spring", "torsion", { D, wire, body: "body", z0, z1, name: `Torsion spring Ø${D}, wire ${wire}: holds the cam roller up on the cam` }));
+    // its anchor: a pin pressed into the web under the pivot
+    const [w0, w1] = outboard ? [z0 - 0.3, Math.min(...web) + 3] : [Math.max(...web) - 3, z1 + 0.3];
+    L.add(H.dowel("G-anchor", 2, { body: "body", at: [pinAt[0], pinAt[1], 0], z0: Math.min(w0, w1), z1: Math.max(w0, w1), name: "Dowel pin Ø2 h6, pressed into the web: the spring's anchor" }));
+    // its tails: one down against the pin, one along the lever, pressed onto its face
+    const zt = outboard ? z0 : z1 - wire;
+    L.add(H.solid("G-spring-pin", { name: "", kind: "spring", mat: "Spring steel EN 10270", body: "body", outer: stroke([[1 + wire / 2, -D / 2 + wire], [1 + wire / 2, pinAt[1] - 1.5]], wire / 2), z0: zt, z1: zt + wire }));
+    const zs = outboard ? z1 + 0.55 - wire : z0 - 0.55;
+    L.add(H.solid("G-spring-lever", { name: "", kind: "spring", mat: "Spring steel EN 10270", body: "lever", outer: stroke([[dir[0] * ro, dir[1] * ro], [dir[0] * (ro + 10), dir[1] * (ro + 10)]], wire / 2), z0: zs, z1: zs + wire }));
+  }, { joints: ["G"] });
 }
 
 /** The spreader's guide: a rod pressed into the body's arm, through a bushed boss on the spreader's web (J5). */
