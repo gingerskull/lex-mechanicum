@@ -199,7 +199,7 @@ A crank and slotted lever ease a coffin lid open over two-thirds of a turn and s
 
 *Also called: Plymouth trotter, treadmill turkey, perpetual escape, carver's pacemaker*
 
-Two Klann legs half a turn apart trot a turkey on a free treadmill that its own feet drive; the belt works a carving knife and fork behind it, and the turkey never gets any further away.
+Two Klann legs trot a turkey on a treadmill its own feet drive; the belt works the carving knife and fork behind it, and the turkey gets no further away.
 
 | | |
 |---|---|

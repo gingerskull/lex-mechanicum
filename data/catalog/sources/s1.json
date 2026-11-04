@@ -18464,7 +18464,7 @@
     "in_site": false,
     "family": "Linkage",
     "level": "Advanced",
-    "summary": "Two Klann legs half a turn apart trot a turkey on a free treadmill that its own feet drive; the belt works a carving knife and fork behind it, and the turkey never gets any further away.",
+    "summary": "Two Klann legs trot a turkey on a treadmill its own feet drive; the belt works the carving knife and fork behind it, and the turkey gets no further away.",
     "motion": {
       "input": "Rotary",
       "output": "Path",
