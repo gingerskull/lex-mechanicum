@@ -166,8 +166,27 @@ export const polish: Polish = (A, h) => {
   motorLead(A, h);
   riserBlock(A, h);
   tensioning(A, h);
+  covers(A);
   carveMarks(A);
 };
+
+/**
+ * The body's covers (A17, M12): each flank's carved shells, glued to one another, come off as one cover, screwed through
+ * the outer shell's rim into the band, so the fan drive, the crank shaft's inner parts and the motor can be reached.
+ */
+function covers(A: Parameters<Polish>[0]): void {
+  // screw sites where the outer shell's rim laps the band, round the body (world X, Z)
+  const at: [number, number][] = [[-145, 64], [-105, 82], [28, 32], [5, -40], [-121, -49]];
+  for (const [S, y, dir] of [["N", -1, 1], ["F", 1, -1]] as const) {
+    const shell = A.get(`body-shell${S}21`)!;
+    const ys = [shell.frame.o[1], shell.frame.o[1] + shell.frame.z[1] * (shell.op.op === "extrude" ? shell.op.h : 0)];
+    const face = y < 0 ? Math.min(...ys) : Math.max(...ys);
+    A.build(acrossY([0, 0, 0]), (L, H) => {
+      at.forEach(([X, Z], k) => L.add(H.screw(`body-cover${S}-sc${k}`, "csk", 3, 16, { at: [-X, Z, 0], face, dir, body: "body", ...(k ? { name: "", qty: 0 } : { name: "Countersunk M3 x 16 (ISO 10642) into a brass insert in the band: holds the cover", qty: at.length }) })));
+    }, { joints: ["S"] });
+    for (const s of A.find(new RegExp(`^body-(shell${S}\\d+|cover${S}-sc\\d+(-sh)?)$`))) A.set(s.id, { group: `body-cover${S}` });
+  }
+}
 
 /** A world point in a solid's plane coordinates. */
 function toPlane(f: Frame, p: Vec3): [number, number] {
