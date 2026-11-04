@@ -29,14 +29,15 @@
 // - J3: the feathers turn on a Ø6 stud pressed into a walnut post glued into the rump's web, each in a bushing, held by a
 //   washer and a circlip behind the last: the rules thread a shoulder bolt into the first feather, as the body has no
 //   solid at the pivot, which leaves the fan hanging behind the rump (fanPivot).
-// - V1 to V3, F10: the motor is in the body, not under the base: the crank shaft turns in the moving body, so the drive
+// - V1 to V3: the motor is in the body, not under the base: the crank shaft turns in the moving body, so the drive
 //   rule finds no fixed live shaft. A pancake motor on three standoffs on the web's far face, in the far cavity, belted
-//   16T to 32T to the crank shaft; the far shells are pocketed round it. No home flag or sensor is built: the input
-//   turns in the moving body, where the rule's sensor on a post off the base cannot reach it.
-// - V6, F10: the motor's lead runs along the web, through the arm and out of its underside short of the sleeve, where a
-//   slack loop hanging down the column's side takes up the body's 4 mm bob (owner's decision, 4 Nov); two ties hold it
-//   to the column, it passes through the base by the column's flange to a terminal block on the base's rear edge, a
-//   P-clip under the base (motorLead). The rules' leads and block are laid for a motor under the base.
+//   16T to 32T to the crank shaft; the far shells are pocketed round it. The home flag is a vane on the crank shaft's
+//   pulley, read by a fork sensor on a block screwed to the web (homeSensor, owner's decision, 4 Nov), where the rule
+//   puts both on the motor's bracket.
+// - V6: the motor's lead runs along the web, joined by the sensor's, through the arm and out of its underside short of
+//   the sleeve, where a slack loop hanging down the column's side takes up the body's 4 mm bob (owner's decision, 4 Nov);
+//   two ties hold it to the column, it passes through the base by the column's flange to a terminal block on the base's
+//   rear edge, a P-clip under the base (motorLead). The rules' leads and block are laid for a motor under the base.
 // - J5, T12: the knife's and the fork's inner risers lap 1.5 mm, so they are one ground block under both inner rails
 //   (owner's decision, 4 Nov), the fork's riser named in the record's `teaching.exceptions` (riserBlock).
 // - F6: the fan's weight holds the cam roller up on the cam except within about 10° of each lobe's tip, where the outer
@@ -52,7 +53,7 @@ import { patternMarks } from "../../builder/decor";
 import type { Frame } from "../../builder/frames";
 import type { Local } from "../../builder/lib";
 import { stroke } from "../../hardware/primitives";
-import { BEARINGS, MOTORS, PULLEYS, circlipExt } from "../../hardware/tables";
+import { BEARINGS, MOTORS, PULLEYS, SENSOR, circlipExt } from "../../hardware/tables";
 import type { Vec3 } from "../../kin/math";
 
 export const polish: Polish = (A, h) => {
@@ -164,6 +165,7 @@ export const polish: Polish = (A, h) => {
   spreaderGuide(A, h);
   fanPivot(A, h);
   motor(A, h);
+  homeSensor(A, h);
   motorLead(A, h);
   riserBlock(A, h);
   tensioning(A, h);
@@ -488,6 +490,43 @@ function motor(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
 }
 
 /**
+ * The home flag and its sensor (F10, V6): a 1 mm vane on the crank shaft pulley's outer flange, read by a fork sensor on
+ * an aluminium block screwed to the web's far face, its slot round the vane's path, up and toward the breast and clear
+ * of the belt; the sensor's lead drops to the web and runs along it to the motor's, above the belt's lower pulley.
+ */
+function homeSensor(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const O = A.ctx.S.joints.get("O")!.at;
+  const P32 = PULLEYS[32];
+  const a = Math.PI / 3, c = Math.cos(a), s = Math.sin(a); // up and toward +X from the crank shaft (world X, Z)
+  const mouth = P32.fd / 2 + 1, vz = 12; // the vane on the outer flange's face (world Y 12)
+  const gap0 = vz + SENSOR.vane / 2 - SENSOR.slot / 2, gap1 = gap0 + SENSOR.slot;
+  // x radial, z along world +Y: local (u, v) is world X = O + c u + s v, Z = O + s u - c v
+  const F: Frame = { o: [O[0], 0, O[2]], x: [c, 0, s], z: [0, 1, 0] };
+  const box = (r0: number, r1: number): [number, number][] => [[r0, -SENSOR.w / 2], [r1, -SENSOR.w / 2], [r1, SENSOR.w / 2], [r0, SENSOR.w / 2]];
+  const fork = { kind: "sensor" as const, role: "hw" as const, body: "body", group: "drive-sensor" };
+  A.build(F, (L, H) => {
+    L.add(H.flag("drive-flag", P32.pd / 2, mouth + SENSOR.depth - 1.5, 0, { body: "crank", z0: vz, z1: vz + SENSOR.vane }));
+    L.add(H.solid("drive-sensor-mount", { name: "Sensor block, aluminium, screwed to the web", kind: "bracket", role: "link", mat: "Aluminium 6061-T6, anodised", outer: h.filletPoly(box(mouth, mouth + SENSOR.l), 1), z0: 3, z1: gap0 - 3, body: "body" }));
+    L.add(H.solid("drive-sensor", { ...fork, name: `Fork sensor, slotted optical, ${SENSOR.slot} mm gap`, mat: "PBT housing", outer: box(mouth, mouth + SENSOR.l), z0: gap0 - 3, z1: gap0 }));
+    L.add(H.solid("drive-sensor-back", { ...fork, name: "", outer: box(mouth + SENSOR.depth, mouth + SENSOR.l), z0: gap0, z1: gap1 }));
+    L.add(H.solid("drive-sensor-jaw", { ...fork, name: "", outer: box(mouth, mouth + SENSOR.l), z0: gap1, z1: gap1 + 3 }));
+    // two countersunk screws from the web's near face into the block
+    [mouth + 7, mouth + SENSOR.l - 6].forEach((u, i) => L.add(H.screw(`drive-sensor-sc${i}`, "csk", 3, 8, { at: [u, 0, 0], face: -3, dir: 1, body: "body", ...(i ? { name: "", qty: 0 } : { qty: 2 }) })));
+  }, { joints: ["drive"] });
+  // the sensor's lead: out of its side by the web, down to the web, along it to the motor's lead
+  const u = mouth + 4, v = -(SENSOR.w / 2 + 1);
+  const X = O[0] + c * u + s * v, Z = O[2] + s * u - c * v;
+  A.build({ o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.lead("drive-sensor-lead", [[X, gap0 - 1.5], [X, 3.45]], { body: "body", z0: Z - 0.5, z1: Z + 0.5, name: "Sensor lead, silicone insulated: along the web to the motor's" }));
+  }, { joints: ["drive"] });
+  A.build(acrossY([0, 0, 0]), (L, H) => {
+    L.add(H.lead("drive-sensor-lead-web", [[-X, Z], [20, 10], [74, 8.5], [77, 6]], { body: "body", z0: 3, z1: 4, name: "" }));
+  }, { joints: ["drive"] });
+  const n = A.ctx.notes.find((q) => q.id === "drive");
+  if (n) Object.assign(n, { note: `${n.note} A home flag on the crank shaft's pulley is read by a fork sensor on a block screwed to the web; its lead joins the motor's.`, serves: { ...n.serves, F10: ["drive-flag", "drive-sensor"] } });
+}
+
+/**
  * The motor's lead (V6, F10): out of the motor's face to the web, along it into the rump and through a channel drilled
  * along the arm, out of the arm's underside short of the sleeve; there it laps a slack loop that hangs from the column
  * and takes up the body's bob, down the column's side in two ties, over the flange, through the base and under it to a
@@ -509,7 +548,7 @@ function motorLead(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
   const W = (pts: [number, number][]): [number, number][] => pts.map(([x, z]) => [-x, z]);
   // the body's part: from the motor's face to the web, along the web and through the arm, out of its underside
   A.build({ o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
-    L.add(H.lead("drive-lead", [[-78, 13], [-78, yb + 0.45]], { body: "body", z0: 3.5, z1: 4.5, name: "Motor lead, silicone insulated: through the arm and down the column to the terminal block" }));
+    L.add(H.lead("drive-lead", [[-78, 13], [-78, yb + 0.45]], { body: "body", z0: 3.5, z1: 4.5, name: "Motor lead, silicone insulated: joined by the sensor's on the web, through the arm and down the column to the terminal block" }));
   }, { joints: ["drive"] });
   A.build(acrossY([0, 0, 0]), (L, H) => {
     L.add(H.lead("drive-lead-arm", W([[-78, 4], [-95, -18], [x0, -18], [x0, -46]]), { body: "body", z0: yb, z1: yb + 1, name: "" }));
