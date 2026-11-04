@@ -8,6 +8,9 @@ import { imagesShown, neighbours, relatedOf, seasonalFor, sheetsOf } from "../..
 import { addDays, decodeWindows, encodeWindows, inSeason, listedOn, localDay, longDate, returnsOn, windowsOf } from "../../site/src/season";
 import { record, seasonal } from "../catalog/fixtures";
 
+// a local preview flag (LM_SEASON=open) in the shell must not change what these tests see
+delete process.env.LM_SEASON;
+
 const day = (d: string) => ({ start: d, end: d });
 
 describe("the listing windows", () => {
