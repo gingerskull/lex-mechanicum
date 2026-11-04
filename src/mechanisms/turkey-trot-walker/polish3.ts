@@ -41,6 +41,9 @@
 // - F6: the fan's weight holds the cam roller up on the cam except within about 10° of each lobe's tip, where the outer
 //   feathers' weight pulls it off by a few grams; a light torsion spring round the lever's pivot keeps it on, anchored
 //   on a pin pressed into the web (leverSpring). The J7 kit builds no spring for a follower held by its own linkage.
+// - F7, V4: the motor's screws run in slots in the web along the line of the pulleys, and the front drum's bearings sit
+//   in flanged eccentric bushings in the carved rails, so both belts can be tensioned (tensioning): the rules' slotted
+//   bracket and housings are not built here (V1 to V3, J10).
 // - A16: the notes of Q, Q1 to Q21 and K describe what is built there (fanNotes), not the kits' rollers and felt.
 // - L8, P14: "CARVE" and the knife's and the fork's stroke ends engraved on the keepers of the slide block.
 import type { Polish } from "../../builder";
@@ -129,7 +132,7 @@ export const polish: Polish = (A, h) => {
     if (old >= 0) A.ctx.notes.splice(old, 1);
     const held = brg[0]![1] === "ground" ? "each carved rail" : "each shell";
     const clamp = disc0 ? "by the disc's set screw at its near end and an end washer and a countersunk screw at the other" : "by an end washer and a countersunk screw at each end";
-    A.note({ id: joint, kit: "J2", at, title: `J2 · ${joint}`, note: `${name}, in two sealed 688 bearings, one in ${held},${Math.abs(brg[1]![0] - brg[0]![0]).toFixed(0)} mm apart; clamped through inner-race spacers ${clamp}.`, badge: ["double shear", "ok"], d: 8, serves: { F2: disc0 ? [`${id}-ss0`, `${id}-ew1`] : [`${id}-ew0`, `${id}-ew1`], F3: [`${id}-shaft`] } });
+    A.note({ id: joint, kit: "J2", at, title: `J2 · ${joint}`, note: `${name}, in two sealed 688 bearings, one in ${held}, ${Math.abs(brg[1]![0] - brg[0]![0]).toFixed(0)} mm apart; clamped through inner-race spacers ${clamp}.`, badge: ["double shear", "ok"], d: 8, serves: { F2: disc0 ? [`${id}-ss0`, `${id}-ew1`] : [`${id}-ew0`, `${id}-ew1`], F3: [`${id}-shaft`] } });
   };
   // the crank shaft: the cranks and the cam keyed on it, a bearing seated in the outer layers of either shell
   A.drop(/^O-/);
@@ -162,8 +165,62 @@ export const polish: Polish = (A, h) => {
   motor(A, h);
   motorLead(A, h);
   riserBlock(A, h);
+  tensioning(A, h);
   carveMarks(A);
 };
+
+/** A world point in a solid's plane coordinates. */
+function toPlane(f: Frame, p: Vec3): [number, number] {
+  const y: Vec3 = [f.z[1] * f.x[2] - f.z[2] * f.x[1], f.z[2] * f.x[0] - f.z[0] * f.x[2], f.z[0] * f.x[1] - f.z[1] * f.x[0]];
+  const d = [p[0] - f.o[0], p[1] - f.o[1], p[2] - f.o[2]];
+  return [d[0]! * f.x[0] + d[1]! * f.x[1] + d[2]! * f.x[2], d[0]! * y[0] + d[1]! * y[1] + d[2]! * y[2]];
+}
+
+/**
+ * The belts' tension (F7, V4): the motor's three screws run in slots in the web along the line of the pulleys' centres;
+ * the front drum's bearings sit in flanged eccentric bushings in the carved rails, turned to tension the treadmill's belt
+ * and clamped by two screws each into the rail.
+ */
+function tensioning(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  // the motor's screws in slots along the line from the motor to the crank shaft
+  const O = A.ctx.S.joints.get("O")!.at, body = A.get("body")!;
+  const slots = A.find(/^drive-sc\d-sh$/).map((s) => {
+    const c = toPlane(body.frame, s.frame.o), o = toPlane(body.frame, O), m = toPlane(body.frame, [-62, 0, 20]);
+    const l = Math.hypot(o[0] - m[0], o[1] - m[1]), u: [number, number] = [(o[0] - m[0]) / l, (o[1] - m[1]) / l];
+    return h.window([[c[0] - 1.5 * u[0], c[1] - 1.5 * u[1]], [c[0] + 1.5 * u[0], c[1] + 1.5 * u[1]]], 1.7).reverse();
+  });
+  A.set("body", { profile: { outer: body.profile.outer, holes: [...body.profile.holes, ...slots] } });
+  // the front drum's bearings in eccentric bushings
+  const RF = A.ctx.S.joints.get("RF")!.at;
+  const e = 1, d = 16, D = 20;
+  for (const [rail, k] of [["treadmill", 0], ["treadmill-railF", 1]] as const) {
+    const s = A.get(rail)!;
+    const h0 = s.op.op === "extrude" ? s.op.h : 6;
+    const c = toPlane(s.frame, RF);
+    // the bushing's body round the bearing, its bore offset toward the drive end (local x of the frame below)
+    const keep = s.profile.holes.filter((q) => Math.hypot((Math.min(...q.map((p) => p[0]!)) + Math.max(...q.map((p) => p[0]!))) / 2 - c[0], (Math.min(...q.map((p) => p[1]!)) + Math.max(...q.map((p) => p[1]!))) / 2 - c[1]) > 1);
+    const sx = Math.sign(s.frame.x[0]);
+    A.set(rail, { profile: { outer: s.profile.outer, holes: [...keep, h.disc(D / 2 + 0.05, c[0] - sx * e, c[1]).reverse()] } });
+    // its frame: z out of the rail's outer face, x along world +X, the bore at (e, 0) on the drum's axis
+    const out = s.frame.z[1] > 0 ? 1 : -1;
+    const y0 = s.frame.o[1];
+    const F: Frame = { o: [RF[0] - e, y0, RF[2]], x: [1, 0, 0], z: [0, out, 0] };
+    A.build(F, (L, H) => {
+      L.add(H.solid(`RF-ecc${k}-body`, { name: k ? "" : `Eccentric bushing body Ø${D}, in the rail`, kind: "eccentric", role: "hw", mat: "Bronze CuSn8", body: "ground", outer: h.disc(D / 2), holes: [h.disc(d / 2 + 0.05, e, 0).reverse()], z0: 0, z1: h0 }));
+      L.add(H.eccentric(`RF-ecc${k}`, d, D, e, { body: "ground", z0: h0 + (rail === "treadmill" ? 1 : 0), z1: h0 + (rail === "treadmill" ? 3 : 2), slots: [0, Math.PI], why: "turned to tension the treadmill's belt, then clamped by its two screws (F7)", ...(k ? { name: "", qty: 0 } : { qty: 2 }) }));
+      for (const [j, a] of [[0, 0], [1, Math.PI]] as const) {
+        const at: Vec3 = [((D + 10) / 2 - 2.6) * Math.cos(a), ((D + 10) / 2 - 2.6) * Math.sin(a), 0];
+        L.add(H.screw(`RF-ecc${k}-sc${j}`, "button", 3, 8, { at, face: h0 + (rail === "treadmill" ? 3 : 2), dir: -1, body: "ground", ...(k || j ? { name: "", qty: 0 } : { qty: 4 }) }));
+      }
+    }, { joints: ["RF"] });
+  }
+  const add = (id: string, text: string, f7: string[]) => {
+    const n = A.ctx.notes.find((q) => q.id === id);
+    if (n) Object.assign(n, { note: `${n.note} ${text}`, serves: { ...n.serves, F7: f7 } });
+  };
+  add("RF", "Each bearing sits in a flanged eccentric bushing in its rail, turned to tension the belt and clamped by two screws.", ["RF-ecc0", "RF-ecc1"]);
+  add("drive", "The motor's screws run in slots in the web along the line of the pulleys, for the belt's tension.", ["drive-sc0"]);
+}
 
 /** A frame at a world point, z along world +Y (local z is world Y less the point's), x along world -X (local y is Z up). */
 const acrossY = (p: Vec3): Frame => ({ o: [p[0], 0, p[2]], x: [-1, 0, 0], z: [0, 1, 0] });
