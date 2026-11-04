@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-11-03",
+  "generated": "2026-11-04",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -79646,11 +79646,11 @@
                   -8
                 ],
                 [
-                  12,
+                  9,
                   -8
                 ],
                 [
-                  12,
+                  9,
                   8
                 ],
                 [
@@ -80071,11 +80071,11 @@
                   -8
                 ],
                 [
-                  12,
+                  9,
                   -8
                 ],
                 [
-                  12,
+                  9,
                   8
                 ],
                 [
@@ -85649,7 +85649,7 @@
               -1,
               0
             ],
-            "note": "the fork's crank disc, keyed on the rear drum's shaft end half a turn from the knife's"
+            "note": "the fork's return crank, clamped on the knife's crank pin: it turns with the knife's disc about the rear drum's shaft"
           },
           {
             "id": "KA",
@@ -85683,7 +85683,7 @@
               -1,
               0
             ],
-            "note": "the fork's crank pin, half a turn from the knife's"
+            "note": "the fork's crank pin, on the return crank half a turn from the knife's"
           },
           {
             "id": "KB",
