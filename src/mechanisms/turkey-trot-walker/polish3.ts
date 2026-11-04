@@ -19,6 +19,10 @@
 // - A9, J3, J5: the fork's crank is a return crank clamped on the knife's crank pin (owner's decision, 4 Nov), so no shaft
 //   runs through the knife rod's plane; the knife slide's front end stands back 5 mm, clear of the pin (returnCrank).
 // - L2: the toes' hinge lugs end at the toe plate's sole, not under it in the belt.
+// - J4: the spreader's rod runs straight in each feather's own slot (Q1 to Q21): the kit's stud, track roller, wear
+//   strips and felt are not built, nor its wider cut for the roller, which is wider than a feather's tail and would cut
+//   away all the tail's material round the slot (fanSlots). The rod ends 2 mm past the last feather, a DIN 471 circlip
+//   in a groove behind it holding the stack; the record's rod runs on 8 mm past the stack (rodEnd).
 // - J5: the spreader rises and falls on a guide rod pressed into the body's arm, through a bushed boss on its web: the
 //   kit builds no guide for a rod carried crosswise between two moving bodies.
 // - J3: the feathers turn on a Ø6 stud pressed into a walnut post glued into the rump's web, each in a bushing, held by a
@@ -73,6 +77,8 @@ export const polish: Polish = (A, h) => {
   // the rod is plain: no pin of the slots is bored into it
   const rod = A.get("spreader");
   if (rod) A.set("spreader", { profile: { outer: rod.profile.outer, holes: [] } });
+  fanSlots(A);
+  rodEnd(A);
   const q = A.local("lever", A.ctx.S.joints.get("Q")!.at);
   A.build(A.frame("lever", q), (L, H) => {
     L.add(H.dowel("Q-stud", 4, { body: "lever", z0: -2, z1: 7.6, name: "Stud Ø4, pressed into the lever" }));
@@ -188,6 +194,54 @@ function spreaderGuide(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void
     L.add(H.bushing("SS-bush", 4, 6, { body: "spreader", z0, z1 }));
     L.add(H.shaft("SS-rod", { d: 4, z0: armTop - 9, z1: z1 + 4.5 }, { body: "body", name: "Guide rod Ø4 h6, pressed into the body's arm: the spreader rises and falls on it" }));
   }, { joints: ["SS"] });
+}
+
+/**
+ * The feathers' own slots (J4): the rod runs straight in the slot each feather's record shape gives it, so the kit's
+ * wider cut for its track roller (dropped with the roller) is not made either. The kit's cut is the hole that encloses
+ * one of the record's own windows with room to spare all round.
+ */
+function fanSlots(A: Parameters<Polish>[0]): void {
+  type P2 = readonly number[];
+  const inPoly = (p: P2, poly: readonly P2[]) => {
+    let c = false;
+    for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      const a = poly[i]!, b = poly[j]!;
+      if (a[1]! > p[1]! !== b[1]! > p[1]! && p[0]! < ((b[0]! - a[0]!) * (p[1]! - a[1]!)) / (b[1]! - a[1]!) + a[0]!) c = !c;
+    }
+    return c;
+  };
+  const box = (q: readonly P2[]) => [Math.min(...q.map((p) => p[0]!)), Math.max(...q.map((p) => p[0]!)), Math.min(...q.map((p) => p[1]!)), Math.max(...q.map((p) => p[1]!))] as const;
+  for (const s of A.find(/^f\d+$/)) {
+    const own = A.ctx.geoms.get(s.body)?.profile.holes ?? [];
+    const kits = (hl: readonly P2[]) => {
+      const b = box(hl);
+      return own.some((w) => {
+        const o = box(w);
+        return inPoly([(o[0] + o[1]) / 2, (o[2] + o[3]) / 2], hl) && b[0] < o[0] - 0.5 && b[1] > o[1] + 0.5 && b[2] < o[2] - 0.5 && b[3] > o[3] + 0.5;
+      });
+    };
+    const holes = s.profile.holes.filter((hl) => !kits(hl));
+    if (holes.length !== s.profile.holes.length) A.set(s.id, { profile: { outer: s.profile.outer, holes } });
+  }
+}
+
+/**
+ * The rod's end (J4): it stops 2 mm past the last feather, a DIN 471 circlip in a groove just behind it holding the
+ * stack against the spreader's web.
+ */
+function rodEnd(A: Parameters<Polish>[0]): void {
+  const rod = A.get("spreader")!;
+  const f21 = A.get("f21")!;
+  // depth along the rod's own z (it runs back along -X from the web) of the last feather's back face
+  const zs = [0, f21.op.op === "extrude" ? f21.op.h : 0].map((t) => (f21.frame.o[0] + f21.frame.z[0] * t - rod.frame.o[0]) * rod.frame.z[0]);
+  const back = Math.max(...zs);
+  const g = back + 0.2, end = back + 2;
+  if (rod.op.op === "extrude") A.set("spreader", { op: { ...rod.op, h: g } });
+  A.build({ o: rod.frame.o, x: rod.frame.x, z: rod.frame.z }, (L, H) => {
+    L.add(H.shaft("spreader-end", { d: 4, z0: g, z1: end, grooves: [g] }, { body: "spreader", name: "", ...(rod.mat ? { mat: rod.mat } : {}) }));
+    L.add(H.circlip("spreader-cl", 4, { body: "spreader", z0: g + 0.05 }));
+  }, { joints: Array.from({ length: 21 }, (_, i) => `Q${i + 1}`) });
 }
 
 /**
