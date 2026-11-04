@@ -21,6 +21,9 @@
 // - L2: the toes' hinge lugs end at the toe plate's sole, not under it in the belt.
 // - J5: the spreader rises and falls on a guide rod pressed into the body's arm, through a bushed boss on its web: the
 //   kit builds no guide for a rod carried crosswise between two moving bodies.
+// - J3: the feathers turn on a Ø6 stud pressed into a walnut post glued into the rump's web, each in a bushing, held by a
+//   washer and a circlip behind the last: the rules thread a shoulder bolt into the first feather, as the body has no
+//   solid at the pivot, which leaves the fan hanging behind the rump (fanPivot).
 // - V1 to V3, F10: the motor is in the body, not under the base: the crank shaft turns in the moving body, so the drive
 //   rule finds no fixed live shaft. A pancake motor on three standoffs on the web's far face, in the far cavity, belted
 //   16T to 32T to the crank shaft; the far shells are pocketed round it. No home flag or sensor is built.
@@ -30,7 +33,7 @@ import { patternMarks } from "../../builder/decor";
 import type { Frame } from "../../builder/frames";
 import type { Local } from "../../builder/lib";
 import { stroke } from "../../hardware/primitives";
-import { BEARINGS, MOTORS, PULLEYS } from "../../hardware/tables";
+import { BEARINGS, MOTORS, PULLEYS, circlipExt } from "../../hardware/tables";
 import type { Vec3 } from "../../kin/math";
 
 export const polish: Polish = (A, h) => {
@@ -136,6 +139,7 @@ export const polish: Polish = (A, h) => {
   }
   ankleSprings(A);
   spreaderGuide(A, h);
+  fanPivot(A, h);
   motor(A, h);
   carveMarks(A);
 };
@@ -184,6 +188,48 @@ function spreaderGuide(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void
     L.add(H.bushing("SS-bush", 4, 6, { body: "spreader", z0, z1 }));
     L.add(H.shaft("SS-rod", { d: 4, z0: armTop - 9, z1: z1 + 4.5 }, { body: "body", name: "Guide rod Ø4 h6, pressed into the body's arm: the spreader rises and falls on it" }));
   }, { joints: ["SS"] });
+}
+
+/**
+ * The fan's pivot on the body (J3): a walnut post glued into the rump's web carries a steel stud on which every feather
+ * turns in its own bushing, held by a washer and a circlip behind the last one. The rules thread a shoulder bolt into the
+ * first feather, as the body has no solid at P, so the stack would hang free of the rump.
+ */
+function fanPivot(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const P = A.ctx.S.joints.get("P1")!.at;
+  const joints = Array.from({ length: 21 }, (_, i) => `P${i + 1}`);
+  A.drop(/^P1-bolt/);
+  // the first feather turns in a bushing like the others (the rules tapped it for the bolt)
+  const f1 = A.get("f1")!, f2 = A.get("f2")!;
+  const centre = (q: number[][]) => [q.reduce((s, p) => s + p[0]!, 0) / q.length, q.reduce((s, p) => s + p[1]!, 0) / q.length];
+  const near0 = (q: number[][]) => Math.hypot(centre(q)[0]!, centre(q)[1]!) < 0.5;
+  const bore = f2.profile.holes.find(near0)!;
+  A.set("f1", { profile: { outer: f1.profile.outer, holes: f1.profile.holes.map((q) => (near0(q) ? bore : q)) } });
+  // local z runs back along -X from P: the depth behind P of a feather's two faces
+  const depth = (id: string): [number, number] => {
+    const s = A.get(id)!;
+    const hh = s.op.op === "extrude" ? s.op.h : 0;
+    const zs = [s.frame.o[0], s.frame.o[0] + s.frame.z[0] * hh].map((x) => P[0] - x);
+    return [Math.min(...zs), Math.max(...zs)];
+  };
+  const front = depth("f1")[0], zEnd = depth("f21")[1];
+  const rump = -172; // the post's foot (world X), where the rump's face meets the post's underside
+  const c = circlipExt(6);
+  const zw = zEnd + 0.3, zg = zw + 1;
+  A.build({ o: P, x: [0, 1, 0], z: [-1, 0, 0] }, (L, H) => {
+    L.add(H.bushing("P1-0-bush", 6, 9, { body: "f1", z0: front, z1: depth("f1")[1] }));
+    L.add(H.solid("P-post", { name: "Fan post, walnut, glued into the rump's web", kind: "plate", role: "link", mat: "Walnut, oiled", outer: h.disc(7), holes: [h.disc(3).reverse()], z0: P[0] - rump, z1: front - 0.5, body: "body" }));
+    L.add(H.shaft("P-stud", { d: 6, z0: P[0] - rump + 4, z1: zg + c.s + 1.2, grooves: [zg] }, { body: "body", name: "Fan stud Ø6 h6, pressed into the post: every feather turns on it in its bushing" }));
+    L.add(H.washer("P-wsh", 6.4, 12, { body: "body", z0: zw, z1: zg, name: "Washer 6.4x12 x 1, behind the last feather" }));
+    L.add(H.circlip("P-cl", 6, { body: "body", z0: zg + 0.05 }));
+  }, { joints });
+  // the post's tongue, in the plane of the web and glued into it
+  A.build({ o: [P[0], 0, P[2]], x: [-1, 0, 0], z: [0, 1, 0] }, (L, H) => {
+    L.add(H.solid("P-tongue", { name: "", kind: "plate", role: "link", mat: "Walnut, oiled", outer: h.hullOf([[P[0] + 178, 0, 7], [P[0] + 158, 0, 7]]), z0: -3, z1: 3, body: "body" }));
+  }, { joints });
+  const old = A.ctx.notes.findIndex((n) => n.id === "P1");
+  if (old >= 0) A.ctx.notes.splice(old, 1);
+  A.note({ id: "P1", kit: "J3", at: P, title: "J3 · P1", note: "P1 to P21: the feathers' common pivot, a Ø6 stud pressed into a walnut post that stands out of the rump's web; each feather turns on it in a bronze bushing, the stack held by a washer and a circlip behind the last feather.", badge: ["post on the rump", "ok"], d: 6, serves: { F2: ["P-cl"], F3: ["P-stud"] } });
 }
 
 /** The world Z of a solid's profile at its two faces. */
