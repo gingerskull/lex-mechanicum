@@ -3,8 +3,9 @@
 //   body's shells, head and neck in carved and painted lime wood, the treadmill's rails and turned legs in walnut, the
 //   feathers in painted lime wood, the knife and fork in steel with rosewood handles. The rules' defaults name steel and
 //   aluminium.
-// - E2, E9: the carved pieces are glued to the part they carry, so each comes off as one: the body with its shells, head,
-//   neck and arm, each leg with its carved skin, the treadmill frame with its far rail, deck, ties and legs, each carriage
+// - E2, E9, A17: the carved pieces are glued to the part they carry, so each comes off as one: the body with its band,
+//   head, neck and arm, each flank's shells as one cover screwed through its rim into the band so the inside can be
+//   reached (covers), each leg with its carved skin, the treadmill frame with its far rail, deck, ties and legs, each carriage
 //   with its knife or fork.
 // - P14, L8: each feather carries its quill, chevron bars and a hatched band near its tip, engraved on its face toward the
 //   body (the feathers' plates are the kinematic bodies themselves, so their marks go on their own parts).
@@ -262,7 +263,7 @@ function ankleSprings(A: Parameters<Polish>[0]): void {
     const k = toW(K), kl = Math.hypot(k[0], k[1]), up: [number, number] = [k[0] / kl, k[1] / kl];
     const sole = A.get(toes)!.frame.o[2] + (A.get(toes)!.op.op === "extrude" ? (A.get(toes)!.op as { h: number }).h : 0) - F[2];
     A.build(acrossY(F), (L, H) => {
-      L.add(H.spring(`F${s}-spring`, "torsion", { D, wire, body: toes, z0, z1, name: `Torsion spring Ø${D}, wire ${wire}: holds the toes level against their stops` }));
+      L.add(H.spring(`F${s}-spring`, "torsion", { D, wire, body: toes, z0, z1, name: `Torsion spring Ø${D}, wire ${wire}: keeps the toes level in the swing` }));
       // its tails: one down on the toe plate, one up the shank
       const zt = below ? z0 : z1 - wire;
       L.add(H.solid(`F${s}-spring-toe`, { name: "", kind: "spring", mat: "Spring steel EN 10270", body: toes, outer: stroke([[D / 2 - wire / 2, 0], [D / 2 - wire / 2, sole + wire / 2], [D / 2 + 5, sole + wire / 2]], wire / 2), z0: zt, z1: zt + wire }));

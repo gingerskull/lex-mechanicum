@@ -53,7 +53,7 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
       const thick = part.op.op === "extrude" ? part.op.h : part.op.op === "loft" ? Math.max(...part.op.sections.map((x) => x.z)) : 6;
       // a part the record places (`place`) on its joint's frame or on a frame it gives by its axes, its z running against
       // the stack's, spans back from its origin; every other part keeps the extent the placement gave it (a frame given
-      // by `rot` among them: the wider question is #280)
+      // by `rot` among them: the wider question is issue 280)
       const kb = ctx.kin.bodies.find((q) => q.id === b);
       const placed = typeof kb?.shape?.place === "number" && (!!kb.at?.joint || !!kb.frame?.z);
       const back = placed && part.frame.z[0] * frame.z[0] + part.frame.z[1] * frame.z[1] + part.frame.z[2] * frame.z[2] < 0;
