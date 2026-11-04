@@ -9,7 +9,7 @@
 // - P14, L8: each feather carries its quill, chevron bars and a hatched band near its tip, engraved on its face toward the
 //   body (the feathers' plates are the kinematic bodies themselves, so their marks go on their own parts).
 // - F5, F7: the toes stay level on a light torsion spring round each ankle pin's head, one tail on the toe plate and one
-//   up the shank: no rule builds a sprung joint between two moving parts.
+//   up the shank and pressed onto the leg's skin: no rule builds a sprung joint between two moving parts.
 // - A5, J2: the crank shaft turns in a moving frame, so the rules build its pins as shoulder bolts on bearings; it is a
 //   live shaft with the cranks and the cam keyed on it, in a bearing seated in the outer layers of either shell.
 // - J10, T12: the carved rails are the drums' bearing housings (as in the concept): each drum's shaft runs in a bearing in
@@ -30,7 +30,14 @@
 //   solid at the pivot, which leaves the fan hanging behind the rump (fanPivot).
 // - V1 to V3, F10: the motor is in the body, not under the base: the crank shaft turns in the moving body, so the drive
 //   rule finds no fixed live shaft. A pancake motor on three standoffs on the web's far face, in the far cavity, belted
-//   16T to 32T to the crank shaft; the far shells are pocketed round it. No home flag or sensor is built.
+//   16T to 32T to the crank shaft; the far shells are pocketed round it. No home flag or sensor is built: the input
+//   turns in the moving body, where the rule's sensor on a post off the base cannot reach it.
+// - V6, F10: the motor's lead runs along the web, through the arm and out of its underside short of the sleeve, where a
+//   slack loop hanging down the column's side takes up the body's 4 mm bob (owner's decision, 4 Nov); two ties hold it
+//   to the column, it passes through the base by the column's flange to a terminal block on the base's rear edge, a
+//   P-clip under the base (motorLead). The rules' leads and block are laid for a motor under the base.
+// - J5, T12: the knife's and the fork's inner risers lap 1.5 mm, so they are one ground block under both inner rails
+//   (owner's decision, 4 Nov), the fork's riser named in the record's `teaching.exceptions` (riserBlock).
 // - L8, P14: "CARVE" and the knife's and the fork's stroke ends engraved on the keepers of the slide block.
 import type { Polish } from "../../builder";
 import { patternMarks } from "../../builder/decor";
@@ -147,6 +154,8 @@ export const polish: Polish = (A, h) => {
   spreaderGuide(A, h);
   fanPivot(A, h);
   motor(A, h);
+  motorLead(A, h);
+  riserBlock(A, h);
   carveMarks(A);
 };
 
@@ -177,7 +186,8 @@ function ankleSprings(A: Parameters<Polish>[0]): void {
       L.add(H.solid(`F${s}-spring-toe`, { name: "", kind: "spring", mat: "Spring steel EN 10270", body: toes, outer: stroke([[D / 2 - wire / 2, 0], [D / 2 - wire / 2, sole + wire / 2], [D / 2 + 5, sole + wire / 2]], wire / 2), z0: zt, z1: zt + wire }));
       // (from just outside the coil: the coil turns with the toes, the tail with the leg)
       const r = D / 2 + wire / 2 + 0.1, a = Math.atan2(up[1], up[0]) + Math.PI / 2;
-      const zs = below ? z1 - wire : z0;
+      // (pressed onto the leg's skin, 0.05 mm into it)
+      const zs = below ? z1 + 0.55 - wire : z0 - 0.55;
       L.add(H.solid(`F${s}-spring-leg`, { name: "", kind: "spring", mat: "Spring steel EN 10270", body: leg, outer: stroke([[r * Math.cos(a), r * Math.sin(a)], [r * Math.cos(a) + up[0] * 10, r * Math.sin(a) + up[1] * 10]], wire / 2), z0: zs, z1: zs + wire }));
     }, { joints: [`F${s}`] });
   }
@@ -347,6 +357,88 @@ function motor(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
     A.set(s.id, { profile: { outer: s.profile.outer, holes: [...s.profile.holes, h.disc(mot.R + 1, u, v).reverse()] } });
   }
   A.note({ id: "drive", kit: "drive", at: M, title: "Drive", note: "Brushless pancake motor in the body's far cavity, its face on three standoffs screwed to the web; GT2 16T to 32T belt to a pulley keyed on the crank shaft between the web and the motor; the far shells pocketed round it.", badge: ["motor driven", "ok"] });
+}
+
+/**
+ * The motor's lead (V6, F10): out of the motor's face to the web, along it into the rump and through a channel drilled
+ * along the arm, out of the arm's underside short of the sleeve; there it laps a slack loop that hangs from the column
+ * and takes up the body's bob, down the column's side in two ties, over the flange, through the base and under it to a
+ * terminal block on the base's rear edge, a P-clip under the base on the way.
+ */
+function motorLead(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const col = A.get("S-column")!;
+  const cx = col.frame.o[0], cy = col.frame.o[1];
+  const rc = 8; // the column's radius
+  const yb = 3, yg = 4.1; // the body's lead on the web's far face; the hanging loop just outside it
+  const yl = yg + 0.5; // the loop's mid-plane (world Y)
+  const xc = cx + Math.sqrt(rc * rc - yg * yg) + 1; // down the column's side, its edge 0.1 mm off it
+  const x0 = -266, x1 = (x0 + xc) / 2, r = (x0 - x1) / 2; // the loop's two bends between the arm's drop and the column
+  const xh = -271.5; // through the base, outboard of the flange
+  const flangeTop = Math.max(...worldZ(A.get("S-flange")!)), bb = A.get("base")!.frame.o[2];
+  // a half turn of the loop round the centre c (world X, Z), in the lead's local frame (-X, Z)
+  const arc = (c: [number, number], a0: number, a1: number): [number, number][] =>
+    Array.from({ length: 7 }, (_, i) => a0 + ((a1 - a0) * i) / 6).map((a): [number, number] => [-(c[0] + r * Math.cos(a)), c[1] + r * Math.sin(a)]);
+  const W = (pts: [number, number][]): [number, number][] => pts.map(([x, z]) => [-x, z]);
+  // the body's part: from the motor's face to the web, along the web and through the arm, out of its underside
+  A.build({ o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.lead("drive-lead", [[-78, 13], [-78, yb + 0.45]], { body: "body", z0: 3.5, z1: 4.5, name: "Motor lead, silicone insulated: through the arm and down the column to the terminal block" }));
+  }, { joints: ["drive"] });
+  A.build(acrossY([0, 0, 0]), (L, H) => {
+    L.add(H.lead("drive-lead-arm", W([[-78, 4], [-95, -18], [x0, -18], [x0, -46]]), { body: "body", z0: yb, z1: yb + 1, name: "" }));
+  }, { joints: ["drive"] });
+  // the ground's part: the slack loop, hanging from the column over the arm's drop, which slides along its first leg
+  const z0 = -40, zb = -64, zt = -54;
+  const loop: [number, number][] = [[-x0, z0], [-x0, zb], ...arc([x0 - r, zb], 0, -Math.PI).slice(1, -1), [-x1, zb], [-x1, zt], ...arc([x1 - r, zt], 0, Math.PI).slice(1, -1), [-xc, zt], [-xc, flangeTop + 1.7], [-xh, flangeTop + 1.7], [-xh, bb - 0.5]];
+  A.build(acrossY([0, 0, 0]), (L, H) => {
+    L.add(H.lead("drive-lead-loop", loop, { body: "ground", z0: yg, z1: yg + 1, name: "" }));
+  }, { joints: ["drive"] });
+  // two nylon ties hold it to the column
+  for (const [k, z] of [[0, -80], [1, -128]] as const) {
+    A.build({ o: [0, 0, z], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+      L.add(H.solid(`drive-tie${k}`, { name: k ? "" : "Cable tie, nylon: the lead to the column", kind: "cableClip", role: "hw", mat: "Polyamide 6.6", qty: k ? 0 : 2, body: "ground", outer: h.hullOf([[cx, cy, rc + 0.8], [xc, yl, 1.9]]), holes: [h.hullOf([[cx, cy, rc], [xc, yl, 1.1]]).reverse()], z0: 0, z1: 2.5 }));
+    }, { joints: ["drive"] });
+  }
+  // through the base and under it to the block on its rear edge
+  const base = A.get("base")!;
+  A.set("base", { profile: { outer: base.profile.outer, holes: [...base.profile.holes, h.disc(2, xh - base.frame.o[0], yl - base.frame.o[1]).reverse()] } });
+  const xb = Math.min(...base.profile.outer.map((p) => p[0]!)) + base.frame.o[0];
+  const tb: Vec3 = [xb + 4, yl + 20, 0];
+  A.build({ o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.lead("drive-lead-base", [[xh, yl], [xh, tb[1] - 7.5], [tb[0] + 3, tb[1] - 7.5]], { body: "ground", z0: bb - 1, z1: bb, name: "" }));
+  }, { joints: ["drive"] });
+  A.build({ o: [tb[0], tb[1], 0], x: [0, 1, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.terminalBlock("drive-terminals", 4, { body: "ground", z0: bb - 6, z1: bb }));
+  }, { joints: ["drive"] });
+  A.build({ o: [(xh + tb[0]) / 2, tb[1] - 7.5, 0], x: [0, 1, 0], z: [0, 0, 1] }, (L, H) => {
+    L.add(H.cableClip("drive-clip", { body: "ground", z0: bb - 2, z1: bb, qty: 1 }));
+  }, { joints: ["drive"] });
+}
+
+/**
+ * The two slides' inner risers lap 1.5 mm across (owner's decision, 4 Nov): one ground block under both inner rails,
+ * the union of the two, its screw and dowel holes kept; the fork slide's riser is named in `teaching.exceptions`.
+ */
+function riserBlock(A: Parameters<Polish>[0], h: Parameters<Polish>[1]): void {
+  const a = A.get("KS-riser1"), b = A.get("FS-riser1");
+  if (!a || !b) return;
+  const cross = (f: Frame): Vec3 => [f.z[1] * f.x[2] - f.z[2] * f.x[1], f.z[2] * f.x[0] - f.z[0] * f.x[2], f.z[0] * f.x[1] - f.z[1] * f.x[0]];
+  const fa = a.frame, ya = cross(fa), fb = b.frame, yy = cross(fb);
+  // b's outline points into a's frame (both lie in the base's plane)
+  const toA = ([u, v]: readonly number[]): [number, number] => {
+    const w = [0, 1, 2].map((k) => fb.o[k]! + fb.x[k]! * u! + yy[k]! * v! - fa.o[k]!);
+    return [w[0]! * fa.x[0] + w[1]! * fa.x[1] + w[2]! * fa.x[2], w[0]! * ya[0] + w[1]! * ya[1] + w[2]! * ya[2]];
+  };
+  const box = (q: readonly (readonly number[])[]) => [Math.min(...q.map((p) => p[0]!)), Math.max(...q.map((p) => p[0]!)), Math.min(...q.map((p) => p[1]!)), Math.max(...q.map((p) => p[1]!))] as const;
+  const A1 = box(a.profile.outer), B1 = box(b.profile.outer.map(toA));
+  // a stepped outline round both rectangles, the upper one standing further along x, its corners rounded as the
+  // rules' risers are
+  const [lo, hi] = A1[2] < B1[2] ? [A1, B1] : [B1, A1];
+  if (!(hi[0] > lo[0] && hi[1] > lo[1] && hi[2] < lo[3])) throw new Error("riserBlock: the risers no longer lap as expected");
+  const P: [number, number][] = [[lo[0], lo[2]], [lo[1], lo[2]], [lo[1], hi[2]], [hi[1], hi[2]], [hi[1], hi[3]], [hi[0], hi[3]], [hi[0], lo[3]], [lo[0], lo[3]]];
+  A.set(a.id, { name: "Ground steel riser block, under both slides' inner rails", profile: { outer: h.filletPoly(P, 1), holes: [...a.profile.holes, ...b.profile.holes.map((q) => q.map(toA))] } });
+  A.drop(b.id);
+  // the fork's carriage slides on the block where it slid on its own riser
+  for (const s of A.find((q) => q.slides?.includes(b.id) ?? false)) A.set(s.id, { slides: s.slides!.map((i) => (i === b.id ? a.id : i)) });
 }
 
 /** "CARVE" and the carriages' stroke ends, engraved on the keepers' tops (L8). */
