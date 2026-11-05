@@ -324,6 +324,9 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
       say("teaching.timeMap needs feature, slow > 0 and span [from, to] (or spans, a list of them)");
     }
   }
+  if (t.cycleTime !== undefined && !(isNum(t.cycleTime) && t.cycleTime >= 2 && t.cycleTime <= 60)) {
+    say(`teaching.cycleTime ${String(t.cycleTime)} is not a number of seconds from 2 to 60`);
+  }
 
   const plots = Array.isArray(t.plot) ? t.plot : [t.plot];
   if (!plots.length || !plots.every(isObj)) say("teaching.plot missing (P10)");

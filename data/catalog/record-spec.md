@@ -357,6 +357,7 @@ dead axle stands in it on its shoulder, a live shaft runs in a housing cartridge
 | `views` | Section and detail views (T8): `kind` `section` (a cut `plane` of origin and normal) or `detail` (a window `center` and `scale`); `highlight` names bodies or points to draw with the highlight. |
 | `controls` | The controls the page shows (T14): `kind` `driver`, `param`, `design` or `selector`, and the id it maps to. A mechanism's controls are only these. |
 | `timeMap` | A playback rate near a feature (T13): the `span` of input degrees and the `slow` factor. It never changes `solve`. |
+| `cycleTime` | Optional: the seconds the stage takes to play one cycle at 1x (2 to 60; 6 when absent), so a long program (eight nights, a year) plays slowly enough to read. The time map shares it out within the cycle; it never changes `solve`. |
 | `plot` | What the side panel plots: `x`, `y` (output ids) and a label, or a list: the first is the plot, `ghosts` on it draw the same output at other control settings (a family of curves), and a further entry in the same unit and range is drawn with it. |
 | `claims` | Every number the explanation states, with the `output` and `stat` (`range`, `max`, `min`, `mean`, `ratio`, `time-ratio`, `phase`, `dwell`, `at`) it comes from, the stated `value` and a tolerance (standard T9). `text` is the sentence it supports. |
 | `seeThrough` | Principle bodies drawn see-through on purpose (T10, transparency first): a part that would hide the principle behind it. |

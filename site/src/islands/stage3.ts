@@ -15,8 +15,6 @@ import type { Dial, DrawView3, Orient, ViewState } from "./engine3";
 type Engine = typeof import("./engine3");
 
 const TAU = Math.PI * 2;
-/** Seconds per cycle at 1x. */
-const CYCLE = 6;
 /** Degrees of orbit per CSS pixel of drag. */
 const ORBIT = 0.4;
 const DRAG_PX = 8;
@@ -169,6 +167,8 @@ async function main(box: HTMLElement) {
   const axisOf = (j: string): Vec3 | null => L.scene.axes?.[j] ?? null;
   const base: ViewState = E.defaultView(teaching, axisOf);
   const rviews = E.viewsOf(teaching, axisOf);
+  /** Seconds per cycle at 1x: the record's own `cycleTime`, or 6. */
+  const CYCLE = E.cycleSeconds(teaching);
   const tm = E.timeMap(teaching?.timeMap ? { ...(teaching.timeMap.span ? { span: teaching.timeMap.span } : {}), ...(teaching.timeMap.spans ? { spans: teaching.timeMap.spans } : {}), slow: teaching.timeMap.slow } : undefined);
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const LADDER: Dial[] = ["full", ...E.DETAIL.map((r) => r.id).filter((x) => x !== "H")];

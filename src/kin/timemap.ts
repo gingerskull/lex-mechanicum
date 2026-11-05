@@ -62,3 +62,12 @@ export function timeMap(spec: TimeMapSpec | undefined): { uOf: (t: number) => nu
     },
   };
 }
+
+/** Seconds the stage takes to play one cycle at 1x, unless the record's teaching names its own `cycleTime`. */
+export const CYCLE_SECONDS = 6;
+
+/** The seconds one cycle plays in at 1x: the record's `teaching.cycleTime` (a long program played slowly enough to read), or 6. */
+export function cycleSeconds(teaching: { cycleTime?: number } | null | undefined): number {
+  const c = teaching?.cycleTime;
+  return typeof c === "number" && Number.isFinite(c) && c > 0 ? c : CYCLE_SECONDS;
+}
