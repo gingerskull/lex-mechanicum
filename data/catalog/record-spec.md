@@ -303,8 +303,13 @@ that setting of one of the teaching controls (a die position).
   stands at the pitch radius rb + s from the cam's centre on the arc of the rocker's arm, the joint's `at` being the
   roller centre at the reference; out { s, angle, pressure }. Its cam is a `cam` with `form: "rocker"`, the roller's
   envelope on that path.
-- A joint with `active` (a driver window) is checked by K1 only while engaged, its motion relation too. A body with
-  `drops: true` moves by instant drops (an escape wheel): its points are not checked for jumps.
+- A joint with `active` (a driver window) is checked by K1 only while engaged, its motion relation too; `period` (driver
+  degrees, default 360) repeats the window over a driver run several turns a cycle (a rack out of mesh on one turn of
+  eight). A body with `drops: true` moves by instant drops (an escape wheel): its points are not checked for jumps.
+- `rack-release` (a rack stepped by an indexer and carried back out of mesh on the cycle's last index) and `trip` (a flap
+  tipped over by a passing finger and held, folded by a reset tab on the way back) are documented over their code in
+  `src/kin/steps/trip.ts`. A rotary driver with a whole `speed` above 1 counts a claim's `dwell` and `span` in its own
+  degrees.
 - An output whose id a block wrote as a value is that value (a pressure angle, an advance).
 
 **Shapes the builder makes from a joint's law or the record's numbers.** `cam` (a plate cam: the roller's or the
