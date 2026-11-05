@@ -34,8 +34,9 @@ export function wrapped(joint: KinJoint, driverValue: (id: string) => number | u
   if (!a) return true;
   const v = driverValue(a.driver);
   if (v === undefined) return true;
-  const span = (((a.hi - a.lo) % 360) + 360) % 360;
-  const off = ((((v - a.lo) % 360) + 360) % 360);
+  const p = a.period ?? 360;
+  const span = (((a.hi - a.lo) % p) + p) % p;
+  const off = ((((v - a.lo) % p) + p) % p);
   return off <= span;
 }
 

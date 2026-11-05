@@ -43,6 +43,8 @@ export const KIN_VOCAB = {
     "walker", "carry",
     // a rocker turned by a pin in a slot that does not run through its pivot (a fan's feather on a spreading rod)
     "slot-swing",
+    // a rack stepped by an indexer and carried back out of mesh once a cycle; a flap tipped by a passing finger and held
+    "rack-release", "trip",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;

@@ -87248,5 +87248,5386 @@
         "alt": "A half-finished turkey automaton on a workbench, its body open on the crank shaft and legs, feathers laid beside it."
       }
     ]
+  },
+  {
+    "record_version": 3,
+    "id": "eight-night-indexer",
+    "name": "Maccabee eight-night indexer",
+    "aka": [
+      "menorah Geneva",
+      "shamash carriage drive",
+      "octal Geneva rack",
+      "eight-night stepper"
+    ],
+    "in_site": false,
+    "family": "Intermittent",
+    "level": "Intermediate",
+    "summary": "An eight-slot Geneva steps a rack carriage once a night, carrying the shamash along eight fixed candles; each flame flips up as the shamash reaches it.",
+    "motion": {
+      "input": "Rotary",
+      "output": "Intermittent linear",
+      "label": "Rotary → Intermittent linear",
+      "output_character": [
+        "Intermittent",
+        "Dwell",
+        "Non-uniform"
+      ],
+      "axes": "Rotary-to-in-plane",
+      "plane": "Planar"
+    },
+    "ratio": {
+      "kind": "Index step",
+      "class": "n/a",
+      "typical": "45° of wheel and 20.03 mm of carriage per driver turn; 140.2 mm from the first night to the eighth"
+    },
+    "dof": 1,
+    "topology": {
+      "links": 13,
+      "revolute": 11,
+      "prismatic": 1,
+      "higher_pairs": 11,
+      "notes": "ground with the menorah and the back plate, the driver with its locking disc and pin, the Geneva wheel and its pinion keyed on one shaft, the carriage with its rack, post, arm and the shamash, and eight flames, each on a hinge at its candle's wick. The pin in the wheel's slots and the locking disc in its arcs alternate; the pinion meshes the rack; the finger on the shamash's drop meets each flame's lever (a trip contact), and a toggle spring holds each flame up or folded. The mobility counted from kin is not the true one: the pinion is a body of its own keyed on the wheel's shaft, the contacts each count only while engaged, and each flame rests on its toggle spring between trips; the true mobility is 1."
+    },
+    "backdrivable": "No",
+    "tags": {
+      "function": [
+        "Indexing",
+        "Dwell",
+        "Positioning",
+        "Locking"
+      ],
+      "property": [
+        "Exact",
+        "Positive drive",
+        "Shock at engagement",
+        "Precision"
+      ],
+      "application": [
+        "Packaging & automation",
+        "Clocks & watches",
+        "Film & optics",
+        "Consumer products"
+      ],
+      "keywords": [
+        "geneva",
+        "maltese cross",
+        "menorah",
+        "hanukkiah",
+        "shamash",
+        "eight slots",
+        "index",
+        "dwell",
+        "rack",
+        "bistable flame"
+      ]
+    },
+    "explain": {
+      "motion": "A driver turning once per day carries a pin that enters one of the wheel's eight radial slots, turns the wheel 45° and leaves. For the rest of the turn a locking disc on the driver sits in a concave arc on the wheel and holds it still. A 34-tooth pinion on the wheel shaft drives a rack under the menorah, and the rack's carriage carries the shamash on a post above the row of eight fixed candles: every index moves it 20.03 mm, one candle to the left. As the shamash arrives, a finger on its arm tips that candle's flame up from where it lies folded back, and a toggle spring holds it up. Night by night the menorah fills from right to left, in keeping with the custom of placing candles from the right.",
+      "forces": "Load passes from pin to slot flank, and the wheel is accelerated from rest at entry and stopped at exit, with the peak wheel speed at mid-index (0.62 times driver speed for eight slots). At one turn per day these inertial effects are negligible: the carriage averages 0.62 µm/s while indexing, about 130 times the speed of beard growth, which is the comparison clients ask for. The flame's trip takes a few grams at the finger and comes in the last part of the index, when the carriage is slowing. In the dwell the locking arc carries any load on the carriage straight to ground, so pushing the shamash does nothing, by design.",
+      "benefits": "Exact, repeatable steps with a positive lock between them and no controller, from one motor running continuously. The index is phased away from the evening, so the shamash is always at rest when the candles are lit, and the flames keep the count of the nights without being asked.",
+      "limits": "Each index occupies 135° of the driver, nine hours at one turn per day, and must be phased to fall between 01:00 and 10:00. After the eighth night the drive is switched off and the carriage returned by lifting the rack out of mesh, a once-a-year operation; a reset tab on the carriage folds the flames down as it passes them on the way back. Candle pitch is fixed at 20.03 mm by the pinion; standard candles fit, but the spacing is not adjustable without changing the pinion, and the Municipal variant uses a 1:12 rack lever to reach street-scale spacing."
+    },
+    "build": {
+      "ground": "the base, the carved plinth with the see-through back plate standing on it, the rails under the wheel, and the menorah: two stems, the bar, eight turned cups and their candles",
+      "defining_relations": "r = c sin(π/n) = 22.96 mm and R = c cos(π/n) = 55.43 mm with n = 8 and c = 60 mm; the pin enters each slot radially, so there is no impact along the slot. Index angle 2π/n = 45°; drive angle during index π − 2π/n = 135°, dwell 225°. Carriage step = (2π/n) × m z / 2 = 20.03 mm with z = 34 and m = 1.5 mm. Peak wheel to driver speed ratio r/(c − r) = 0.62. Flame k turns up as the carriage reaches station k: the finger meets its lever in the last 6 mm of the index and tips it past centre, and the toggle spring holds it.",
+      "notes": "Wheel centre W at the origin, driver centre D 60 mm to its right; the rack's pitch line 25.5 mm under the wheel, the carriage on two rails; the cups' tops 92 mm above W, station k at x = 62 − 20.03 (k − 1), night 1 at the right. The stage cycle is eight driver turns, the eight nights, from the first night's evening: the driver's 0 is mid-dwell with the pin pointing away from the wheel, and each index falls in the middle of a turn (112.5° to 247.5°). Seven indexes move the carriage in mesh; the eighth is the yearly return, compressed into the cycle: the rack out of mesh, the carriage carried back 140.2 mm to the first station in step with that index, and a reset tab on the carriage, 10 mm ahead of the shamash, folding flames 8 to 2 as it passes them. The first flame stays up. The shamash's post rises behind the see-through back plate, through a slot in it, and its arm crosses over the row above the flames to a drop in front of it, with the shamash on a bracket 12 mm above the candles and set forward of the row. Each flame's lever stands 4.5 mm beside its candle, under the finger's ramp. Range: driver 360° a night; wheel 45° a night; carriage 7 steps, 140.2 mm; flames 0 to 90°, one more each night."
+    },
+    "kin": {
+      "bodies": [
+        {
+          "id": "ground",
+          "role": "ground",
+          "shape": {
+            "type": "plate",
+            "rect": [
+              380,
+              120
+            ]
+          },
+          "at": {
+            "frame": {
+              "origin": [
+                0,
+                4,
+                -104
+              ]
+            }
+          }
+        },
+        {
+          "id": "driver",
+          "role": "driver",
+          "accent": true,
+          "shape": {
+            "type": "genevaCrank",
+            "lock": 16,
+            "relief": 58.433,
+            "c": 60,
+            "place": -5,
+            "thickness": 5,
+            "pieces": [
+              {
+                "id": "arm",
+                "outline": [
+                  [
+                    82.961,
+                    -8
+                  ],
+                  [
+                    85.032,
+                    -7.727
+                  ],
+                  [
+                    86.961,
+                    -6.928
+                  ],
+                  [
+                    88.618,
+                    -5.657
+                  ],
+                  [
+                    89.889,
+                    -4
+                  ],
+                  [
+                    90.688,
+                    -2.071
+                  ],
+                  [
+                    90.961,
+                    0
+                  ],
+                  [
+                    90.688,
+                    2.071
+                  ],
+                  [
+                    89.889,
+                    4
+                  ],
+                  [
+                    88.618,
+                    5.657
+                  ],
+                  [
+                    86.961,
+                    6.928
+                  ],
+                  [
+                    85.032,
+                    7.727
+                  ],
+                  [
+                    82.961,
+                    8
+                  ],
+                  [
+                    60,
+                    8
+                  ],
+                  [
+                    57.929,
+                    7.727
+                  ],
+                  [
+                    56,
+                    6.928
+                  ],
+                  [
+                    54.343,
+                    5.657
+                  ],
+                  [
+                    53.072,
+                    4
+                  ],
+                  [
+                    52.273,
+                    2.071
+                  ],
+                  [
+                    52,
+                    0
+                  ],
+                  [
+                    52.273,
+                    -2.071
+                  ],
+                  [
+                    53.072,
+                    -4
+                  ],
+                  [
+                    54.343,
+                    -5.657
+                  ],
+                  [
+                    56,
+                    -6.928
+                  ],
+                  [
+                    57.929,
+                    -7.727
+                  ],
+                  [
+                    60,
+                    -8
+                  ]
+                ],
+                "origin": [
+                  0,
+                  -6.5,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 4,
+                "name": "Arm"
+              }
+            ]
+          },
+          "at": {
+            "joint": "D"
+          }
+        },
+        {
+          "id": "wheel",
+          "role": "output",
+          "symmetry": 8,
+          "shape": {
+            "type": "genevaWheel",
+            "n": 8,
+            "c": 60,
+            "hw": 4.1,
+            "tip": 55.433,
+            "slotEnd": 32.5,
+            "lock": 16,
+            "clear": 1,
+            "place": -5,
+            "thickness": 5,
+            "bore": 10,
+            "pieces": []
+          },
+          "at": {
+            "joint": "W"
+          }
+        },
+        {
+          "id": "pinion",
+          "role": "gear",
+          "shape": {
+            "type": "gear",
+            "z": 34,
+            "module": 1.5,
+            "place": 8,
+            "thickness": 6,
+            "face": 6,
+            "bore": 10
+          },
+          "at": {
+            "joint": "Wp"
+          }
+        },
+        {
+          "id": "carriage",
+          "role": "slider",
+          "shape": {
+            "type": "rack",
+            "module": 1.5,
+            "teeth": 36,
+            "length": 169.646,
+            "face": 6,
+            "height": 14,
+            "pitchLine": 0,
+            "place": 8,
+            "thickness": 6,
+            "pieces": [
+              {
+                "id": "lug",
+                "outline": [
+                  [
+                    -21,
+                    -39.5
+                  ],
+                  [
+                    -15,
+                    -39.5
+                  ],
+                  [
+                    -15,
+                    -30
+                  ],
+                  [
+                    -21,
+                    -30
+                  ]
+                ],
+                "origin": [
+                  0,
+                  15,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 1,
+                "name": "Post lug"
+              },
+              {
+                "id": "post",
+                "outline": [
+                  [
+                    -19,
+                    -39.5
+                  ],
+                  [
+                    -15,
+                    -39.5
+                  ],
+                  [
+                    -15,
+                    152
+                  ],
+                  [
+                    -19,
+                    152
+                  ]
+                ],
+                "origin": [
+                  0,
+                  20,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 5,
+                "name": "Post"
+              },
+              {
+                "id": "beam",
+                "outline": [
+                  [
+                    -19,
+                    20
+                  ],
+                  [
+                    -15,
+                    20
+                  ],
+                  [
+                    -15,
+                    -34
+                  ],
+                  [
+                    74,
+                    -34
+                  ],
+                  [
+                    74,
+                    -42
+                  ],
+                  [
+                    -19,
+                    -42
+                  ]
+                ],
+                "origin": [
+                  0,
+                  0,
+                  146
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 6,
+                "name": "Arm over the row"
+              },
+              {
+                "id": "drop",
+                "outline": [
+                  [
+                    70,
+                    90
+                  ],
+                  [
+                    74,
+                    90
+                  ],
+                  [
+                    74,
+                    146
+                  ],
+                  [
+                    70,
+                    146
+                  ]
+                ],
+                "origin": [
+                  0,
+                  -34,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 8,
+                "name": "Drop"
+              },
+              {
+                "id": "bracket",
+                "outline": [
+                  [
+                    55,
+                    -44
+                  ],
+                  [
+                    74,
+                    -44
+                  ],
+                  [
+                    74,
+                    -34
+                  ],
+                  [
+                    55,
+                    -34
+                  ]
+                ],
+                "origin": [
+                  0,
+                  0,
+                  90
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 4,
+                "name": "Shamash bracket"
+              },
+              {
+                "id": "shCup",
+                "op": "revolve",
+                "origin": [
+                  62,
+                  -38,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    94
+                  ],
+                  [
+                    6,
+                    94
+                  ],
+                  [
+                    6,
+                    97
+                  ],
+                  [
+                    4.5,
+                    97
+                  ],
+                  [
+                    4.5,
+                    101
+                  ],
+                  [
+                    6.5,
+                    101
+                  ],
+                  [
+                    6.5,
+                    104
+                  ],
+                  [
+                    0,
+                    104
+                  ]
+                ],
+                "name": "Shamash cup, turned"
+              },
+              {
+                "id": "shCandle",
+                "op": "revolve",
+                "origin": [
+                  62,
+                  -38,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    104
+                  ],
+                  [
+                    3.4,
+                    104
+                  ],
+                  [
+                    3.4,
+                    132
+                  ],
+                  [
+                    0,
+                    132
+                  ]
+                ],
+                "name": "Shamash candle"
+              },
+              {
+                "id": "shFlame",
+                "outline": [
+                  [
+                    64.25,
+                    134
+                  ],
+                  [
+                    64.6,
+                    135.4
+                  ],
+                  [
+                    65,
+                    138.2
+                  ],
+                  [
+                    64.6,
+                    141.2
+                  ],
+                  [
+                    63.6,
+                    144
+                  ],
+                  [
+                    62,
+                    147
+                  ],
+                  [
+                    60.4,
+                    144
+                  ],
+                  [
+                    59.4,
+                    141.2
+                  ],
+                  [
+                    59,
+                    138.2
+                  ],
+                  [
+                    59.4,
+                    135.4
+                  ],
+                  [
+                    59.75,
+                    134
+                  ]
+                ],
+                "origin": [
+                  0,
+                  -37.25,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 1.5,
+                "name": "Shamash flame",
+                "marks": [
+                  {
+                    "kind": "carve",
+                    "pts": [
+                      [
+                        63.013,
+                        135.95
+                      ],
+                      [
+                        63.17,
+                        136.72
+                      ],
+                      [
+                        63.35,
+                        138.26
+                      ],
+                      [
+                        63.17,
+                        139.91
+                      ],
+                      [
+                        62.72,
+                        141.45
+                      ],
+                      [
+                        62,
+                        143.1
+                      ],
+                      [
+                        61.28,
+                        141.45
+                      ],
+                      [
+                        60.83,
+                        139.91
+                      ],
+                      [
+                        60.65,
+                        138.26
+                      ],
+                      [
+                        60.83,
+                        136.72
+                      ],
+                      [
+                        60.988,
+                        135.95
+                      ]
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "hand",
+                "outline": [
+                  [
+                    46,
+                    -34
+                  ],
+                  [
+                    74,
+                    -34
+                  ],
+                  [
+                    74,
+                    -23
+                  ],
+                  [
+                    65,
+                    -23
+                  ],
+                  [
+                    65,
+                    -30
+                  ],
+                  [
+                    55,
+                    -30
+                  ],
+                  [
+                    55,
+                    -22
+                  ],
+                  [
+                    49,
+                    -4
+                  ],
+                  [
+                    46,
+                    -4
+                  ]
+                ],
+                "origin": [
+                  0,
+                  0,
+                  126
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 3,
+                "name": "Hand with the reset tab"
+              },
+              {
+                "id": "finger",
+                "outline": [
+                  [
+                    58,
+                    123.65
+                  ],
+                  [
+                    58.5,
+                    123.65
+                  ],
+                  [
+                    59,
+                    123.65
+                  ],
+                  [
+                    59.5,
+                    123.65
+                  ],
+                  [
+                    60,
+                    123.65
+                  ],
+                  [
+                    60.5,
+                    123.65
+                  ],
+                  [
+                    61,
+                    123.65
+                  ],
+                  [
+                    61.5,
+                    123.65
+                  ],
+                  [
+                    62,
+                    123.65
+                  ],
+                  [
+                    62.5,
+                    123.65
+                  ],
+                  [
+                    63,
+                    123.65
+                  ],
+                  [
+                    63.5,
+                    123.65
+                  ],
+                  [
+                    64,
+                    123.65
+                  ],
+                  [
+                    64.5,
+                    123.65
+                  ],
+                  [
+                    65,
+                    123.65
+                  ],
+                  [
+                    65.5,
+                    123.65
+                  ],
+                  [
+                    66,
+                    123.65
+                  ],
+                  [
+                    66.5,
+                    123.65
+                  ],
+                  [
+                    67,
+                    123.65
+                  ],
+                  [
+                    67.5,
+                    123.65
+                  ],
+                  [
+                    68,
+                    123.65
+                  ],
+                  [
+                    68.5,
+                    123.65
+                  ],
+                  [
+                    69,
+                    123.65
+                  ],
+                  [
+                    69.5,
+                    123.65
+                  ],
+                  [
+                    70,
+                    123.65
+                  ],
+                  [
+                    70.5,
+                    123.65
+                  ],
+                  [
+                    71,
+                    123.65
+                  ],
+                  [
+                    71.5,
+                    123.65
+                  ],
+                  [
+                    72,
+                    123.65
+                  ],
+                  [
+                    72,
+                    129
+                  ],
+                  [
+                    58,
+                    129
+                  ]
+                ],
+                "origin": [
+                  0,
+                  -23,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 4,
+                "name": "Trip finger"
+              }
+            ]
+          },
+          "at": {
+            "joint": "Sc"
+          },
+          "frame": {
+            "origin": [
+              65.177,
+              0,
+              -25.5
+            ],
+            "x": [
+              -1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "f1",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  59.75,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  62,
+                  -18.25,
+                  122.6
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  62,
+                  -18.25,
+                  122.6
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              62,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "f2",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  39.722,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  41.972,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  41.972,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              41.972,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "f3",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  19.695,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  21.945,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  21.945,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              21.945,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "f4",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  -0.333,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  1.917,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  1.917,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              1.917,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "f5",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  -20.361,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  -18.111,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  -18.111,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -18.111,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "f6",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  -40.388,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  -38.138,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  -38.138,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -38.138,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "f7",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  -60.416,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  -58.166,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  -58.166,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -58.166,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "f8",
+          "role": "link",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                2.25,
+                1
+              ],
+              [
+                2.6,
+                2.4
+              ],
+              [
+                3,
+                5.2
+              ],
+              [
+                2.6,
+                8.2
+              ],
+              [
+                1.6,
+                11
+              ],
+              [
+                0,
+                14
+              ],
+              [
+                -1.6,
+                11
+              ],
+              [
+                -2.6,
+                8.2
+              ],
+              [
+                -3,
+                5.2
+              ],
+              [
+                -2.6,
+                2.4
+              ],
+              [
+                -2.25,
+                1
+              ]
+            ],
+            "place": -0.75,
+            "thickness": 1.5,
+            "pieces": [
+              {
+                "id": "knuckle",
+                "op": "revolve",
+                "origin": [
+                  -80.444,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0.75,
+                    0
+                  ],
+                  [
+                    1.4,
+                    0
+                  ],
+                  [
+                    1.4,
+                    7.5
+                  ],
+                  [
+                    0.75,
+                    7.5
+                  ]
+                ],
+                "name": "Knuckle on the wick pin"
+              },
+              {
+                "id": "lever",
+                "outline": [
+                  [
+                    3.75,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -6
+                  ],
+                  [
+                    5.25,
+                    -1
+                  ],
+                  [
+                    3.75,
+                    -1
+                  ]
+                ],
+                "origin": [
+                  -78.194,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Trip lever"
+              },
+              {
+                "id": "bridge",
+                "outline": [
+                  [
+                    0.5,
+                    1
+                  ],
+                  [
+                    5.25,
+                    1
+                  ],
+                  [
+                    5.25,
+                    2.3
+                  ],
+                  [
+                    0.5,
+                    2.3
+                  ]
+                ],
+                "origin": [
+                  -78.194,
+                  -19,
+                  121.85
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 1.5,
+                "name": "Lever's bridge"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              -78.194,
+              -19,
+              122.6
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              0,
+              1
+            ]
+          }
+        },
+        {
+          "id": "backplate",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -165,
+                -66
+              ],
+              [
+                158,
+                -66
+              ],
+              [
+                158,
+                48
+              ],
+              [
+                -165,
+                48
+              ]
+            ],
+            "windows": [],
+            "place": 0,
+            "thickness": 3,
+            "posts": [
+              {
+                "at": [
+                  -150,
+                  25
+                ],
+                "top": -67,
+                "r": 5
+              },
+              {
+                "at": [
+                  -50,
+                  25
+                ],
+                "top": -67,
+                "r": 5
+              },
+              {
+                "at": [
+                  50,
+                  25
+                ],
+                "top": -67,
+                "r": 5
+              },
+              {
+                "at": [
+                  145,
+                  25
+                ],
+                "top": -67,
+                "r": 5
+              }
+            ],
+            "pieces": [
+              {
+                "id": "foot",
+                "outline": [
+                  [
+                    -165,
+                    16
+                  ],
+                  [
+                    158,
+                    16
+                  ],
+                  [
+                    158,
+                    34
+                  ],
+                  [
+                    -165,
+                    34
+                  ]
+                ],
+                "origin": [
+                  0,
+                  0,
+                  -70
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 4,
+                "name": "Back plate's foot"
+              },
+              {
+                "id": "way",
+                "outline": [
+                  [
+                    -165,
+                    5
+                  ],
+                  [
+                    158,
+                    5
+                  ],
+                  [
+                    158,
+                    23
+                  ],
+                  [
+                    -165,
+                    23
+                  ]
+                ],
+                "origin": [
+                  0,
+                  0,
+                  -46
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "thick": 5.7,
+                "name": "Way under the rack"
+              },
+              {
+                "id": "lip",
+                "outline": [
+                  [
+                    -165,
+                    -40.3
+                  ],
+                  [
+                    158,
+                    -40.3
+                  ],
+                  [
+                    158,
+                    -36
+                  ],
+                  [
+                    -165,
+                    -36
+                  ]
+                ],
+                "origin": [
+                  0,
+                  7.5,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  -1,
+                  0
+                ],
+                "thick": 2.5,
+                "name": "Keeper lip before the rack"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              26,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "menorah",
+          "role": "frame",
+          "shape": {
+            "type": "plate",
+            "exact": true,
+            "outline": [
+              [
+                -90.194,
+                74
+              ],
+              [
+                74,
+                74
+              ],
+              [
+                77,
+                78
+              ],
+              [
+                74,
+                82
+              ],
+              [
+                -90.194,
+                82
+              ],
+              [
+                -93.194,
+                78
+              ]
+            ],
+            "place": 0,
+            "thickness": 10,
+            "posts": [
+              {
+                "at": [
+                  -84.194,
+                  -19
+                ],
+                "top": 78,
+                "r": 4.5,
+                "turned": true
+              },
+              {
+                "at": [
+                  68,
+                  -19
+                ],
+                "top": 78,
+                "r": 4.5,
+                "turned": true
+              }
+            ],
+            "pieces": [
+              {
+                "id": "cup1",
+                "op": "revolve",
+                "origin": [
+                  62,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle1",
+                "op": "revolve",
+                "origin": [
+                  62,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick1",
+                "op": "revolve",
+                "origin": [
+                  58.6,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek1",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  58.6,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              },
+              {
+                "id": "cup2",
+                "op": "revolve",
+                "origin": [
+                  41.972,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle2",
+                "op": "revolve",
+                "origin": [
+                  41.972,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick2",
+                "op": "revolve",
+                "origin": [
+                  38.572,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek2",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  38.572,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              },
+              {
+                "id": "cup3",
+                "op": "revolve",
+                "origin": [
+                  21.945,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle3",
+                "op": "revolve",
+                "origin": [
+                  21.945,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick3",
+                "op": "revolve",
+                "origin": [
+                  18.545,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek3",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  18.545,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              },
+              {
+                "id": "cup4",
+                "op": "revolve",
+                "origin": [
+                  1.917,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle4",
+                "op": "revolve",
+                "origin": [
+                  1.917,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick4",
+                "op": "revolve",
+                "origin": [
+                  -1.483,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek4",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  -1.483,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              },
+              {
+                "id": "cup5",
+                "op": "revolve",
+                "origin": [
+                  -18.111,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle5",
+                "op": "revolve",
+                "origin": [
+                  -18.111,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick5",
+                "op": "revolve",
+                "origin": [
+                  -21.511,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek5",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  -21.511,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              },
+              {
+                "id": "cup6",
+                "op": "revolve",
+                "origin": [
+                  -38.138,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle6",
+                "op": "revolve",
+                "origin": [
+                  -38.138,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick6",
+                "op": "revolve",
+                "origin": [
+                  -41.538,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek6",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  -41.538,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              },
+              {
+                "id": "cup7",
+                "op": "revolve",
+                "origin": [
+                  -58.166,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle7",
+                "op": "revolve",
+                "origin": [
+                  -58.166,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick7",
+                "op": "revolve",
+                "origin": [
+                  -61.566,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek7",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  -61.566,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              },
+              {
+                "id": "cup8",
+                "op": "revolve",
+                "origin": [
+                  -78.194,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    82
+                  ],
+                  [
+                    5.5,
+                    82
+                  ],
+                  [
+                    5.5,
+                    85
+                  ],
+                  [
+                    4,
+                    85
+                  ],
+                  [
+                    4,
+                    89
+                  ],
+                  [
+                    6,
+                    89
+                  ],
+                  [
+                    6,
+                    92
+                  ],
+                  [
+                    0,
+                    92
+                  ]
+                ],
+                "name": "Cup, turned"
+              },
+              {
+                "id": "candle8",
+                "op": "revolve",
+                "origin": [
+                  -78.194,
+                  -19,
+                  0
+                ],
+                "x": [
+                  1,
+                  0,
+                  0
+                ],
+                "z": [
+                  0,
+                  0,
+                  1
+                ],
+                "profile": [
+                  [
+                    0,
+                    92
+                  ],
+                  [
+                    3.2,
+                    92
+                  ],
+                  [
+                    3.2,
+                    120
+                  ],
+                  [
+                    0,
+                    120
+                  ]
+                ],
+                "name": "Candle"
+              },
+              {
+                "id": "wick8",
+                "op": "revolve",
+                "origin": [
+                  -81.594,
+                  -19,
+                  122.6
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "profile": [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    0.6,
+                    0
+                  ],
+                  [
+                    0.6,
+                    10.3
+                  ],
+                  [
+                    0,
+                    10.3
+                  ]
+                ],
+                "name": "Wick pin"
+              },
+              {
+                "id": "cheek8",
+                "outline": [
+                  [
+                    -20.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    119
+                  ],
+                  [
+                    -17.5,
+                    122.6
+                  ],
+                  [
+                    -17.614,
+                    123.174
+                  ],
+                  [
+                    -17.939,
+                    123.661
+                  ],
+                  [
+                    -18.426,
+                    123.986
+                  ],
+                  [
+                    -19,
+                    124.1
+                  ],
+                  [
+                    -19.574,
+                    123.986
+                  ],
+                  [
+                    -20.061,
+                    123.661
+                  ],
+                  [
+                    -20.386,
+                    123.174
+                  ],
+                  [
+                    -20.5,
+                    122.6
+                  ]
+                ],
+                "origin": [
+                  -81.594,
+                  0,
+                  0
+                ],
+                "x": [
+                  0,
+                  1,
+                  0
+                ],
+                "z": [
+                  1,
+                  0,
+                  0
+                ],
+                "thick": 0.8,
+                "name": "Wick cheek"
+              }
+            ]
+          },
+          "frame": {
+            "origin": [
+              0,
+              -14,
+              0
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ],
+            "z": [
+              0,
+              -1,
+              0
+            ]
+          }
+        }
+      ],
+      "joints": [
+        {
+          "id": "D",
+          "type": "revolute",
+          "a": "ground",
+          "b": "driver",
+          "at": [
+            60,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "heldBy": "backplate",
+          "note": "the driver's shaft, the input: one turn a night"
+        },
+        {
+          "id": "W",
+          "type": "revolute",
+          "a": "ground",
+          "b": "wheel",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "heldBy": "backplate",
+          "note": "the wheel's shaft, the pinion keyed on it behind the wheel"
+        },
+        {
+          "id": "S",
+          "type": "pin-in-slot",
+          "a": "driver",
+          "b": "wheel",
+          "at": [
+            82.96100594190538,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "slot": {
+            "from": [
+              0,
+              0,
+              0
+            ],
+            "to": [
+              51.21320343559643,
+              0,
+              21.213203435596427
+            ],
+            "repeat": 8,
+            "center": [
+              0,
+              0,
+              0
+            ]
+          },
+          "active": {
+            "driver": "input",
+            "lo": 112.5,
+            "hi": 247.5
+          },
+          "note": "the pin drives in a slot while the driver is within 67.5 degrees of the line of centres"
+        },
+        {
+          "id": "L",
+          "type": "cam-contact",
+          "a": "driver",
+          "b": "wheel",
+          "at": [
+            44,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "follower": "locking arc",
+          "note": "the locking disc in the wheel's concave arc holds it between indexes"
+        },
+        {
+          "id": "Wp",
+          "type": "revolute",
+          "a": "ground",
+          "b": "pinion",
+          "at": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "heldBy": "backplate",
+          "note": "the pinion, keyed on the wheel's shaft"
+        },
+        {
+          "id": "Sc",
+          "type": "prismatic",
+          "a": "ground",
+          "b": "carriage",
+          "at": [
+            65.177,
+            11,
+            -32.5
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "limits": [
+            -141.194,
+            1
+          ],
+          "note": "the carriage on its two rails, one station a night to the left"
+        },
+        {
+          "id": "M",
+          "type": "gear-mesh",
+          "a": "pinion",
+          "b": "carriage",
+          "at": [
+            0,
+            11,
+            -25.5
+          ],
+          "axis": [
+            0,
+            -1,
+            0
+          ],
+          "axis2": [
+            1,
+            0,
+            0
+          ],
+          "radiusA": 25.5,
+          "za": 34,
+          "active": {
+            "driver": "input",
+            "lo": 2767.5,
+            "hi": 2632.5,
+            "period": 2880
+          },
+          "note": "rack: the carriage moves the pinion's pitch radius (25.5 mm) per radian, 20.03 mm a night; lifted out of mesh for the yearly return"
+        },
+        {
+          "id": "F1",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f1",
+          "at": [
+            62,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 1's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T1",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f1",
+          "at": [
+            66.5,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 1's lever: it tips the flame over centre as the carriage reaches station 1"
+        },
+        {
+          "id": "F2",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f2",
+          "at": [
+            41.972,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 2's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T2",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f2",
+          "at": [
+            46.472,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 2's lever: it tips the flame over centre as the carriage reaches station 2"
+        },
+        {
+          "id": "F3",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f3",
+          "at": [
+            21.945,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 3's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T3",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f3",
+          "at": [
+            26.445,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 3's lever: it tips the flame over centre as the carriage reaches station 3"
+        },
+        {
+          "id": "F4",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f4",
+          "at": [
+            1.917,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 4's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T4",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f4",
+          "at": [
+            6.417,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 4's lever: it tips the flame over centre as the carriage reaches station 4"
+        },
+        {
+          "id": "F5",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f5",
+          "at": [
+            -18.111,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 5's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T5",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f5",
+          "at": [
+            -13.611,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 5's lever: it tips the flame over centre as the carriage reaches station 5"
+        },
+        {
+          "id": "F6",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f6",
+          "at": [
+            -38.138,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 6's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T6",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f6",
+          "at": [
+            -33.638,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 6's lever: it tips the flame over centre as the carriage reaches station 6"
+        },
+        {
+          "id": "F7",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f7",
+          "at": [
+            -58.166,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 7's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T7",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f7",
+          "at": [
+            -53.666,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 7's lever: it tips the flame over centre as the carriage reaches station 7"
+        },
+        {
+          "id": "F8",
+          "type": "revolute",
+          "a": "ground",
+          "b": "f8",
+          "at": [
+            -78.194,
+            -19,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "note": "flame 8's hinge at its wick: folded back flat, or up"
+        },
+        {
+          "id": "T8",
+          "type": "cam-contact",
+          "a": "carriage",
+          "b": "f8",
+          "at": [
+            -73.694,
+            -25,
+            122.6
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "follower": "trip finger",
+          "note": "the shamash's finger on flame 8's lever: it tips the flame over centre as the carriage reaches station 8"
+        }
+      ],
+      "params": [
+        {
+          "id": "c",
+          "value": 60,
+          "unit": "mm",
+          "min": 60,
+          "max": 60,
+          "note": "centre distance; pin radius r = c sin(pi/n) = 22.96, wheel radius R = c cos(pi/n) = 55.43"
+        },
+        {
+          "id": "rp",
+          "value": 25.5,
+          "unit": "mm",
+          "min": 25.5,
+          "max": 25.5,
+          "note": "the pinion's pitch radius, 34 teeth of module 1.5: 20.03 mm of carriage per 45 degree index"
+        }
+      ],
+      "design": [],
+      "drivers": [
+        {
+          "id": "input",
+          "joint": "D",
+          "kind": "rotary",
+          "range": [
+            0,
+            360
+          ],
+          "default": 0,
+          "speed": 8,
+          "note": "the driver's angle, one turn a night, eight turns a cycle: 0 is the first night's evening, mid-dwell, the pin pointing away from the wheel; the driver turns counter-clockwise seen from the front"
+        }
+      ],
+      "solve": [
+        {
+          "block": "indexer",
+          "id": "index",
+          "joints": [
+            "W",
+            "S",
+            "L"
+          ],
+          "in": {
+            "n": 8,
+            "input": "input",
+            "phi0": -180,
+            "wheel": "wheel",
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "axis": [
+              0,
+              -1,
+              0
+            ]
+          },
+          "out": {
+            "angle": "wheel-turn"
+          }
+        },
+        {
+          "block": "follow",
+          "id": "keyed",
+          "joints": [
+            "Wp"
+          ],
+          "in": {
+            "body": "pinion",
+            "joint": "Wp",
+            "of": "wheel"
+          },
+          "out": {
+            "angle": "pinion-turn"
+          }
+        },
+        {
+          "block": "rack-release",
+          "id": "rack",
+          "joints": [
+            "Sc",
+            "M"
+          ],
+          "in": {
+            "joint": "M",
+            "input": "wheel-turn",
+            "step": 45,
+            "steps": 7
+          },
+          "out": {
+            "travel": "carriage-x",
+            "back": "year-back",
+            "reach": "carriage-reach"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip1",
+          "joints": [
+            "F1",
+            "T1"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": 0,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f1",
+            "joint": "F1"
+          },
+          "out": {
+            "angle": "f1-turn",
+            "state": "f1-up",
+            "count": "lit1"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip2",
+          "joints": [
+            "F2",
+            "T2"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": -20.02765316663493,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f2",
+            "joint": "F2",
+            "add": "lit1"
+          },
+          "out": {
+            "angle": "f2-turn",
+            "state": "f2-up",
+            "count": "lit2"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip3",
+          "joints": [
+            "F3",
+            "T3"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": -40.05530633326986,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f3",
+            "joint": "F3",
+            "add": "lit2"
+          },
+          "out": {
+            "angle": "f3-turn",
+            "state": "f3-up",
+            "count": "lit3"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip4",
+          "joints": [
+            "F4",
+            "T4"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": -60.08295949990479,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f4",
+            "joint": "F4",
+            "add": "lit3"
+          },
+          "out": {
+            "angle": "f4-turn",
+            "state": "f4-up",
+            "count": "lit4"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip5",
+          "joints": [
+            "F5",
+            "T5"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": -80.11061266653972,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f5",
+            "joint": "F5",
+            "add": "lit4"
+          },
+          "out": {
+            "angle": "f5-turn",
+            "state": "f5-up",
+            "count": "lit5"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip6",
+          "joints": [
+            "F6",
+            "T6"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": -100.13826583317466,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f6",
+            "joint": "F6",
+            "add": "lit5"
+          },
+          "out": {
+            "angle": "f6-turn",
+            "state": "f6-up",
+            "count": "lit6"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip7",
+          "joints": [
+            "F7",
+            "T7"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": -120.16591899980958,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f7",
+            "joint": "F7",
+            "add": "lit6"
+          },
+          "out": {
+            "angle": "f7-turn",
+            "state": "f7-up",
+            "count": "lit7"
+          }
+        },
+        {
+          "block": "trip",
+          "id": "trip8",
+          "joints": [
+            "F8",
+            "T8"
+          ],
+          "in": {
+            "travel": "carriage-x",
+            "reach": "carriage-reach",
+            "at": -140.1935721664445,
+            "lead": 6,
+            "back": "year-back",
+            "fold": {
+              "at": 10,
+              "lead": 6
+            },
+            "turn": 90,
+            "body": "f8",
+            "joint": "F8",
+            "add": "lit7"
+          },
+          "out": {
+            "angle": "f8-turn",
+            "state": "f8-up",
+            "count": "flames-lit"
+          }
+        }
+      ],
+      "points": [
+        {
+          "id": "R",
+          "body": "driver",
+          "local": [
+            22.961005941905388,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Sh",
+          "body": "carriage",
+          "local": [
+            3.177,
+            172.5,
+            -38
+          ]
+        },
+        {
+          "id": "Wc",
+          "body": "ground",
+          "local": [
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "id": "Dc",
+          "body": "ground",
+          "local": [
+            60,
+            0,
+            0
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "id": "wheel-angle",
+          "of": "wheel",
+          "kind": "angle",
+          "unit": "deg"
+        },
+        {
+          "id": "wheel-speed",
+          "of": "wheel",
+          "kind": "speed-ratio"
+        },
+        {
+          "id": "carriage",
+          "of": "Sc",
+          "kind": "position",
+          "unit": "mm"
+        },
+        {
+          "id": "flames-lit",
+          "of": "flames-lit",
+          "kind": "position",
+          "unit": ""
+        },
+        {
+          "id": "pin-path",
+          "of": "R",
+          "kind": "path",
+          "unit": "mm"
+        }
+      ],
+      "fallback": null
+    },
+    "teaching": {
+      "review": {
+        "verdict": "tweak",
+        "date": "2026-11-05",
+        "note": "T2 review 2026-11-05 on the record, from the solved motion at the first night's evening, mid-index, the end of the first index, the fourth night, the eighth night and the yearly return: tweak. The principle is the eight-slot Geneva and the rack it steps: the pin is traced with the comet, the line of centres and the slot line are drawn, and the 135 degree drive window is marked on the pin's circle; the plot gives the carriage's travel against the driver over the eight nights, a staircase of seven steps with long flats, with the flames up as a second line. Decisions: the stage cycle is eight driver turns, the eight nights, opening on the first night's evening with the shamash over the first candle and its flame up. Seven indexes move the carriage in mesh, one station a night to the left, and the finger on the shamash's drop tips each flame over centre in the last 6 mm of its index. The eighth index closes the cycle as the yearly return, compressed into it: the rack is out of mesh, the carriage is carried back 140.2 mm to the first station in step with that index, and a reset tab on the carriage, ahead of the shamash, folds flames 8 to 2 as it passes them going back; the first flame, where the carriage stops, stays up. In the real menorah the drive is off for the return and it is made by hand. The reset is a tab on the carriage rather than a separate reset bar under the bar: it needs no motion of its own and folds each flame as the carriage passes it, and it never meets a flame on the way out, since the flames up all lie behind the carriage. A time map slows each index four times, so the step and the trip can be followed. The shamash's post rises behind the back plate, through a slot in it, and its arm crosses over the row above the flames. Solve checks: wheel 45 degrees per driver turn, resting 225 degrees; peak wheel speed 0.62 times the driver's; carriage 20.03 mm a night and 140.2 mm from the first night to the eighth; one more flame up each night, 1 to 8."
+      },
+      "principle": [
+        {
+          "body": "driver"
+        },
+        {
+          "body": "wheel"
+        },
+        {
+          "body": "pinion"
+        },
+        {
+          "body": "carriage"
+        },
+        {
+          "point": "R"
+        }
+      ],
+      "traces": [
+        {
+          "id": "pin",
+          "point": "R",
+          "ticks": {
+            "every": 15
+          },
+          "comet": true
+        },
+        {
+          "id": "shamash",
+          "point": "Sh"
+        }
+      ],
+      "overlays": [
+        {
+          "id": "centres",
+          "kind": "line",
+          "from": "Dc",
+          "to": "Wc",
+          "label": "LINE OF CENTRES"
+        },
+        {
+          "id": "entry",
+          "kind": "line",
+          "from": "Wc",
+          "to": "R",
+          "label": "SLOT LINE"
+        }
+      ],
+      "view": "VIEW 330 20",
+      "controls": [
+        {
+          "id": "driver",
+          "kind": "driver",
+          "driver": "input"
+        }
+      ],
+      "timeMap": {
+        "feature": "each night's index",
+        "slow": 4,
+        "spans": [
+          [
+            14.063,
+            30.938
+          ],
+          [
+            59.063,
+            75.938
+          ],
+          [
+            104.063,
+            120.938
+          ],
+          [
+            149.063,
+            165.938
+          ],
+          [
+            194.063,
+            210.938
+          ],
+          [
+            239.063,
+            255.938
+          ],
+          [
+            284.063,
+            300.938
+          ],
+          [
+            329.063,
+            345.938
+          ]
+        ]
+      },
+      "plot": [
+        {
+          "x": "input",
+          "y": "carriage",
+          "label": "CARRIAGE TRAVEL"
+        },
+        {
+          "x": "input",
+          "y": "flames-lit",
+          "label": "FLAMES UP"
+        }
+      ],
+      "claims": [
+        {
+          "text": "turns the wheel's eight radial slots 45°",
+          "output": "wheel-angle",
+          "stat": "range",
+          "span": [
+            0,
+            360
+          ],
+          "value": 45,
+          "tol": 0.01
+        },
+        {
+          "text": "For the rest of the turn a locking disc on the driver sits in a concave arc on the wheel and holds it still",
+          "output": "wheel-angle",
+          "stat": "dwell",
+          "value": 225,
+          "tol": 4,
+          "band": 1e-9
+        },
+        {
+          "text": "every index moves it 20.03 mm, one candle to the left",
+          "output": "carriage",
+          "stat": "range",
+          "span": [
+            0,
+            360
+          ],
+          "value": 20.028,
+          "tol": 0.01
+        },
+        {
+          "text": "carriage 7 steps, 140.2 mm, from night 1 to night 8",
+          "output": "carriage",
+          "stat": "range",
+          "value": 140.2,
+          "tol": 0.05
+        },
+        {
+          "text": "the peak wheel speed at mid-index (0.62 times driver speed for eight slots)",
+          "output": "wheel-speed",
+          "stat": "min",
+          "value": -0.62,
+          "tol": 0.01
+        },
+        {
+          "text": "Night by night the menorah fills from right to left",
+          "output": "flames-lit",
+          "stat": "max",
+          "value": 8,
+          "tol": 0.001
+        },
+        {
+          "text": "the first candle's flame stays up",
+          "output": "flames-lit",
+          "stat": "min",
+          "value": 1,
+          "tol": 0.001
+        }
+      ],
+      "exceptions": [
+        {
+          "reason": "The carriage slides on a way and a keeper lip on the see-through back plate, held into mesh by the pinion, as the catalogue entry's build has it; the slide rule's rails stand on risers from the base, which for a rack in an upright plane would stand in front of the works and through the menorah's stems, so they are not built (polish).",
+          "solids": [
+            "Sc-rail1",
+            "Sc-riser1",
+            "Sc-way",
+            "Sc-keeper"
+          ]
+        }
+      ]
+    },
+    "examples": [
+      {
+        "use": "Public menorahs",
+        "detail": "Municipal variant drives an illuminated shamash along a large outdoor menorah in civic squares, sealed bearings, stainless fasteners, with a lockable hand crank for the annual return."
+      },
+      {
+        "use": "Synagogues, schools and community centres",
+        "detail": "Community variant on a tabletop menorah, showing at a glance which night it is to anyone who arrives late."
+      },
+      {
+        "use": "Bakery lines",
+        "detail": "The same eight-station Geneva and rack, run at 60 rpm instead of one turn per day, indexes trays through filling and glazing stations on doughnut lines during the season's peak demand."
+      },
+      {
+        "use": "Projection and display",
+        "detail": "Geneva steppers are the traditional drive for film and slide advance; seasonal shop-window displays use this one to advance a scene one panel per day."
+      }
+    ],
+    "references": [],
+    "media": [],
+    "real_world": [],
+    "related": [
+      "geneva",
+      "internal-geneva",
+      "rack-pinion",
+      "intermittent-gear",
+      "star-wheel",
+      "bistable-compliant"
+    ],
+    "season": {
+      "occasion": "Hanukkah",
+      "date_rule": "lunisolar: 25 Kislev, for eight nights from the evening before",
+      "duty": "Community",
+      "dates": [
+        {
+          "start": "2026-12-04",
+          "end": "2026-12-12"
+        },
+        {
+          "start": "2027-12-24",
+          "end": "2028-01-01"
+        },
+        {
+          "start": "2028-12-12",
+          "end": "2028-12-20"
+        },
+        {
+          "start": "2029-12-01",
+          "end": "2029-12-09"
+        },
+        {
+          "start": "2030-12-20",
+          "end": "2030-12-28"
+        },
+        {
+          "start": "2031-12-09",
+          "end": "2031-12-17"
+        }
+      ]
+    },
+    "images": [
+      {
+        "prompt": "Large stainless steel public menorah in a city square at dusk, a shamash carried along the row of candles by a visible precision rack-and-Geneva mechanism in a glass housing at its base, five candles lit, people gathered, warm candlelight and cool blue evening sky, realistic photograph.",
+        "alt": "A large public menorah in a city square at dusk, its Geneva and rack in a glass housing at the base, five candles lit."
+      },
+      {
+        "prompt": "Tabletop menorah built as a premium mechanical object, brushed aluminium and dark anodised parts, an eight-slot Geneva wheel visible through a clear back panel, the shamash on a carriage above eight candles, soft studio light, premium product photography, white background.",
+        "alt": "A tabletop mechanical menorah in brushed aluminium, its eight-slot Geneva wheel seen through a clear back panel."
+      },
+      {
+        "prompt": "A family's window sill on the third night of Hanukkah, a carved wooden mechanical menorah with three flames up and the shamash standing over the third candle, a Geneva wheel and rack in brass below, dreidels and chocolate coins, snowy street outside, warm light, realistic photograph.",
+        "alt": "A carved wooden mechanical menorah on a window sill on the third night, three flames up, dreidels beside it."
+      }
+    ]
   }
 ]

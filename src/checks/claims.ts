@@ -14,6 +14,8 @@
 //   dwell                  the longest span of the cycle, degrees, in which the output stays within `band` (default
 //                          one thousandth of its range).
 // A path's `range` is its extent, the longest chord between two of its points.
+// A rotary driver run several whole turns a cycle (`speed` 8: one turn a night, eight nights) counts a dwell in its own
+// degrees and a `span` against its value over the whole cycle, so a window can pick one of its turns.
 // A claim `over` a driver (a speed control) takes its statistic over that driver's range instead of the cycle.
 // A claim with `when` ({ control, value }) holds at that setting of one of the record's controls (a die position).
 // Outputs the library does not compute are reported as uncheckable, never as a mismatch.
@@ -167,9 +169,10 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   if (span) {
     // only the samples whose input value lies in the window: for a rotary input in degrees, which may wrap past 360
     const [a, b] = span;
+    const period = 360 * turnsOf(drv);
     const inside = (d: number) => {
       if (drv.kind !== "rotary") return d >= a - 1e-9 && d <= b + 1e-9;
-      const t = (((d - a) % 360) + 360) % 360;
+      const t = (((d - a) % period) + period) % period;
       return t <= b - a + 1e-9;
     };
     const keep = x.map(inside);
@@ -178,9 +181,15 @@ function seriesOf(K: Kinematics, claim: Claim, outputs: { id: string; of: string
   return { u, x, y };
 }
 
+/** Whole turns of a rotary driver per cycle (1 unless its `speed` is a whole number of turns above one). */
+const turnsOf = (d: { kind: string; speed?: number; rate?: string } | undefined): number => {
+  const s = Math.abs(d?.speed ?? 1);
+  return d?.kind === "rotary" && d.rate === undefined && Number.isInteger(s) && s > 1 ? s : 1;
+};
+
 const angleOf = (p: Pose, id: string): number | undefined => (typeof p.outputs[id] === "number" ? (p.outputs[id] as number) : p.values[id]);
 
-function evaluate(S: Series, c: Claim, rotary: boolean, other?: number[]): number | string {
+function evaluate(S: Series, c: Claim, rotary: boolean, other?: number[], turns = 1): number | string {
   const { y, u, x } = S;
   const n = y.length;
   const lo = Math.min(...y);
@@ -275,17 +284,17 @@ function evaluate(S: Series, c: Claim, rotary: boolean, other?: number[]): numbe
       if (Array.isArray(bv) && bv.length === 2) {
         const [b0, b1] = [Math.min(bv[0] as number, bv[1] as number), Math.max(bv[0] as number, bv[1] as number)];
         const inside = y.map((v) => v >= b0 && v <= b1);
-        if (inside.every(Boolean)) return 360;
+        if (inside.every(Boolean)) return 360 * turns;
         let best = 0;
         let run = 0;
         for (let i = 0; i < 2 * n; i++) {
           run = inside[i % n] ? run + 1 : 0;
           best = Math.max(best, Math.min(run, n));
         }
-        return (best * 360) / n;
+        return (best * 360 * turns) / n;
       }
       const band: number = typeof bv === "number" ? bv : (hi - lo) * 1e-3;
-      return (longestDwell(y, band).len * 360) / n;
+      return (longestDwell(y, band).len * 360 * turns) / n;
     }
     default:
       return `unknown stat ${c.stat}`;
@@ -318,7 +327,8 @@ export function checkClaims(
     }
     return hit;
   };
-  const rotary = K.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual")?.kind === "rotary";
+  const primary = K.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "oscillating" || d.kind === "linear" || d.kind === "manual");
+  const rotary = primary?.kind === "rotary";
   // a claim that holds at a setting of the params (`setting: { split: 0 }`) or of a selector (`setting: { gear: "2nd" }`)
   // is checked on the motion at that setting
   const settingOf = (claim: Claim): { params: Record<string, number>; select: Record<string, string> } | undefined => {
@@ -373,7 +383,7 @@ export function checkClaims(
       if (typeof O === "string") return { claim, status: "uncheckable", why: O };
       other = O.y;
     }
-    const v = evaluate(S, claim, rotary, other);
+    const v = evaluate(S, claim, rotary, other, claim.over ? 1 : turnsOf(primary));
     if (typeof v === "string") return { claim, status: "uncheckable", why: v };
     return { claim, status: Math.abs(v - claim.value) <= claim.tol ? "ok" : "off", got: v };
   });
