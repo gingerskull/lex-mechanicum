@@ -5,7 +5,7 @@ the record spec (`data/catalog/record-spec.md`) so they can be filtered, compare
 alongside the library. Each one is a real mechanism, with true kinematics, dressed for its occasion: an invented
 name, story, uses and scenery.
 
-Edition: autumn 2026, revised 3 November 2026. The year runs from 15 October 2026 to 14 October 2027. Six records are
+Edition: autumn 2026, revised 5 November 2026. The year runs from 15 October 2026 to 14 October 2027. Six records are
 complete in this edition; the rest are scheduled and listed with their working names.
 
 ## Contents
@@ -73,7 +73,7 @@ with local sighting or custom.
 | 8 Nov | Diwali | Major | Rangoli hypotrochoid drawing engine | Planetary pen carrier that lays down rangoli rosettes in coloured powder, ratio sets the petal count | Scheduled |
 | 26 Nov | Thanksgiving (US) | Major | [Turkey trot walker](#turkey-trot-walker) | Two Klann legs trot a turkey on a treadmill its own feet drive, while the belt works the carving knife behind it | **Complete** |
 | 27 Nov | Black Friday | Special day | Doorbuster turnstile | Bistable over-centre gate that admits exactly one shopper per half-turn, regardless of pressure | Scheduled |
-| 4 to 12 Dec | Hanukkah | Major | [Maccabee eight-night indexer](#maccabee-eight-night-indexer) | Eight-slot Geneva driving a rack: one candle station per night, right to left | **Complete** |
+| 4 to 12 Dec | Hanukkah | Major | [Maccabee eight-night indexer](#maccabee-eight-night-indexer) | Eight-slot Geneva stepping the shamash along eight fixed candles, one per night, right to left; each flame flips up as it arrives | **Complete** |
 | 21 Dec | Winter solstice | Special day | Solstice sun-sight cam | Barrel cam that tracks the noon sun's height through the year; the follower dwells at the solstices | Scheduled |
 | 25 Dec | Christmas | Major | [Drosselmeyer toggle jaw](#drosselmeyer-toggle-jaw) | Nutcracker whose coat-tail lever drives the jaw through a toggle, force rising toward dead centre | **Complete** |
 | 26 Dec to 1 Jan | Kwanzaa | Major | [Nguzo Saba seven-gear planetary](#nguzo-saba-seven-gear-planetary) | Sun and six planets, seven gears in all, sharing the load equally on a carrier called the kinara | **Complete** |
@@ -272,7 +272,7 @@ Two Klann legs trot a turkey on a treadmill its own feet drive; the belt works t
 
 *Also called: menorah Geneva, shamash carriage drive, octal Geneva rack, eight-night stepper*
 
-An eight-slot Geneva drive turning a pinion on a rack, so a candle carriage advances exactly one station per night and holds perfectly still in between.
+An eight-slot Geneva steps a rack carriage once a night, carrying the shamash along eight fixed candles; each flame flips up as the shamash reaches it.
 
 | | |
 |---|---|
@@ -280,57 +280,60 @@ An eight-slot Geneva drive turning a pinion on a rack, so a candle carriage adva
 | Occasion · Date rule · Duty | Hanukkah · lunisolar, 25 Kislev for eight nights (from the evening of 4 December 2026) · Community (Municipal variant for public menorahs) |
 | Family · Level | Intermittent · Intermediate |
 | Motion | Rotary → Intermittent linear (Intermittent, Dwell, Non-uniform) |
-| Axes · Plane | Rotary-to-in-plane · Planar |
+| Axes · Plane | Rotary-to-in-plane · Planar (the flames turn about axes along the row) |
 | Ratio | Index step, n/a: 45° of wheel, 20.03 mm of carriage per drive turn |
-| DOF · Topology | 1 · 4 links, 2 R, 1 P, 3 higher (ground, driver with locking disc, Geneva wheel with pinion, rack carriage; pin-in-slot, locking arc, gear mesh) |
+| DOF · Topology | 1 · 12 links, 10 R, 1 P, 11 higher (ground with the menorah, driver with locking disc, Geneva wheel with pinion, carriage with rack and shamash, eight flames; pin-in-slot, locking arc, gear mesh, eight trip contacts) plus a toggle spring on each flame |
 | Backdrivable | No (self-locking) |
 | Function | Indexing, Dwell, Positioning, Locking |
 | Property | Exact, Positive drive, Shock at engagement, Precision |
 | Application | Packaging & automation, Clocks & watches, Film & optics, Consumer products |
-| Keywords | geneva, maltese cross, menorah, hanukkiah, shamash, eight slots, index, dwell, rack |
+| Keywords | geneva, maltese cross, menorah, hanukkiah, shamash, eight slots, index, dwell, rack, bistable flame |
 
-**How it moves.** A driver turning once per day carries a pin that enters one of the wheel's eight radial slots, turns the wheel 45° and leaves. For the rest of the turn a locking disc on the driver sits in a concave arc on the wheel and holds it still. A 34-tooth pinion on the wheel shaft drives a rack, so every 45° index moves the carriage 20.03 mm, one candle station. The rack is mounted to run right to left, in keeping with the custom of placing candles from the right, which makes it the only mirrored rack in either catalogue.
+**How it moves.** A driver turning once per day carries a pin that enters one of the wheel's eight radial slots, turns the wheel 45° and leaves. For the rest of the turn a locking disc on the driver sits in a concave arc on the wheel and holds it still. A 34-tooth pinion on the wheel shaft drives a rack under the menorah, and the rack's carriage carries the shamash on a post above the row of eight fixed candles: every index moves it 20.03 mm, one candle to the left. As the shamash arrives, a finger on its arm tips that candle's flame up from where it lies folded back, and a toggle spring holds it up. Night by night the menorah fills from right to left, in keeping with the custom of placing candles from the right.
 
-**Forces.** Load passes from pin to slot flank, and the wheel is accelerated from rest at entry and stopped at exit, with the peak wheel speed at mid-index (0.62 times driver speed for eight slots). At one turn per day these inertial effects are negligible: the carriage averages 0.62 µm/s while indexing, about 130 times the speed of beard growth, which is the comparison clients ask for. In the dwell the locking arc carries any load on the carriage straight to ground, so pushing the carriage does nothing, by design.
+**Forces.** Load passes from pin to slot flank, and the wheel is accelerated from rest at entry and stopped at exit, with the peak wheel speed at mid-index (0.62 times driver speed for eight slots). At one turn per day these inertial effects are negligible: the carriage averages 0.62 µm/s while indexing, about 130 times the speed of beard growth, which is the comparison clients ask for. The flame's trip takes a few grams at the finger and comes in the last part of the index, when the carriage is slowing. In the dwell the locking arc carries any load on the carriage straight to ground, so pushing the shamash does nothing, by design.
 
-**Why use it.** Exact, repeatable steps with a positive lock between them and no controller, from one motor running continuously. The index is phased away from the evening, so the carriage is always at rest when the candles are lit.
+**Why use it.** Exact, repeatable steps with a positive lock between them and no controller, from one motor running continuously. The index is phased away from the evening, so the shamash is always at rest when the candles are lit, and the flames keep the count of the nights without being asked.
 
-**Limits.** Each index occupies 135° of the driver, nine hours at one turn per day, and must be phased to fall between 01:00 and 10:00. After the eighth night the drive is switched off and the carriage returned by lifting the rack out of mesh, a once-a-year operation. Candle pitch is fixed at 20.03 mm by the pinion; standard candles fit, but the holder spacing is not adjustable without changing the pinion, and the Municipal variant uses a 1:12 rack lever to reach street-scale spacing.
+**Limits.** Each index occupies 135° of the driver, nine hours at one turn per day, and must be phased to fall between 01:00 and 10:00. After the eighth night the drive is switched off, the carriage returned by lifting the rack out of mesh and the flames folded down by a reset bar under the menorah, a once-a-year operation. Candle pitch is fixed at 20.03 mm by the pinion; standard candles fit, but the spacing is not adjustable without changing the pinion, and the Municipal variant uses a 1:12 rack lever to reach street-scale spacing.
 
 **In industry**
 
-- **Public menorahs**: Municipal variant drives an illuminated carriage along a large outdoor menorah in civic squares, sealed bearings, stainless fasteners, with a lockable hand crank for the annual return.
+- **Public menorahs**: Municipal variant drives an illuminated shamash along a large outdoor menorah in civic squares, sealed bearings, stainless fasteners, with a lockable hand crank for the annual return.
 - **Synagogues, schools and community centres**: Community variant on a tabletop menorah, showing at a glance which night it is to anyone who arrives late.
 - **Bakery lines**: the same eight-station Geneva and rack, run at 60 rpm instead of one turn per day, indexes trays through filling and glazing stations on doughnut lines during the season's peak demand.
 - **Projection and display**: Geneva steppers are the traditional drive for film and slide advance; seasonal shop-window displays use this one to advance a scene one panel per day.
 
 **Build**
 
-- Ground: driver centre D at (0, 0), wheel centre W at (60, 0); rack guide along y = −25.5 below W; a base frame.
+- Ground: the menorah and the frame. Wheel centre W at (0, 0), driver centre D at (60, 0) to its right; the rack's pitch line along y = −25.5 under the wheel, the carriage on two rails; the menorah's bar of eight cups above the works, the cups' tops at y = 92, station k at x = 62 − 20.03 (k − 1), night 1 at the right; x to the right, y up, z toward the viewer.
 - Input: driver, continuous rotation about D (one turn per day; demonstration speed 10 rpm).
-- Output: rack carriage position x; the wheel angle is the intermediate output.
-- Members: `driver` (driver) disc at D with drive pin at radius r = 22.96 and a locking disc radius 16, cut away round the pin; `wheel` (gear) eight-slot Geneva wheel at W, outer radius R = 55.43, slots 8.2 wide to radius 33, concave locking arcs radius 17 between slots; `pinion` (gear) 34 teeth module 1.5 (pitch radius 25.5) fixed to the wheel; `rack` (slider) module 1.5 rack on the carriage, 9 candle holders at 20.03 mm pitch with the shamash raised at the left end.
-- Joints: D revolute (ground–driver); W revolute (ground–wheel); pin-in-slot (driver pin–wheel slot); the locking disc in the wheel's arcs; gear mesh (pinion–rack); prismatic (ground–rack).
-- Default parameters: n = 8 slots; c = 60 mm (centre distance); r = 22.96 mm (pin radius, c sin(π/n)); R = 55.43 mm (wheel radius, c cos(π/n)); z = 34 teeth, m = 1.5 mm (pinion); pitch = 20.03 mm (carriage step).
-- Defining relations: r = c sin(π/n), R = c cos(π/n); the pin enters each slot radially, so there is no impact along the slot. Index angle 2π/n = 45°; drive angle during index π − 2π/n = 135°, dwell 225°. Carriage step = (2π/n) × m z / 2 = 20.03 mm. Peak wheel to driver speed ratio r/(c − r) = 0.62.
-- Range: driver 360° per night; wheel 45° per night; carriage 7 steps, 140.2 mm, from night 1 to night 8.
-- Notes: the locking arc is in contact for |driver angle| > 67.5° from the line of centres. The pin enters the slot tangentially; if it hits the wheel tip, r or c is wrong.
+- Output: carriage position x, carrying the shamash; the wheel angle is the intermediate output; the flames.
+- Members: `driver` (driver) disc at D with drive pin at radius r = 22.96 and a locking disc radius 16, cut away round the pin; `wheel` (gear) eight-slot Geneva wheel at W, outer radius R = 55.43, slots 8.2 wide to radius 18, concave locking arcs radius 17 between slots; `pinion` (gear) 34 teeth module 1.5 (pitch radius 25.5) fixed to the wheel; `carriage` (slider) module 1.5 rack, a post rising behind the works to an arm over the row, the shamash on the arm 12 mm above the candles and set forward, and a trip finger; `f1` to `f8` (link) flames, each a thin plate on a hinge at its candle's wick, axis along x, folded back 90° while unlit; `menorah` (ground) base, two stems, the bar, eight cups and candles.
+- Joints: D revolute (ground–driver); W revolute (ground–wheel); pin-in-slot (driver pin–wheel slot); the locking disc in the wheel's arcs; gear mesh (pinion–rack); prismatic (ground–carriage); eight revolutes (ground–flame, at the wicks); eight trip contacts (finger–flame).
+- Default parameters: n = 8 slots; c = 60 mm (centre distance); r = 22.96 mm (pin radius, c sin(π/n)); R = 55.43 mm (wheel radius, c cos(π/n)); z = 34 teeth, m = 1.5 mm (pinion); pitch = 20.03 mm (carriage step); flame turn 90°.
+- Defining relations: r = c sin(π/n), R = c cos(π/n); the pin enters each slot radially, so there is no impact along the slot. Index angle 2π/n = 45°; drive angle during index π − 2π/n = 135°, dwell 225°. Carriage step = (2π/n) × m z / 2 = 20.03 mm. Peak wheel to driver speed ratio r/(c − r) = 0.62. Flame k turns up as the carriage reaches station k: the finger meets its lever in the last part of the index and tips it past centre, and the toggle spring finishes the turn.
+- Range: driver 360° per night; wheel 45° per night; carriage 7 steps, 140.2 mm, from night 1 to night 8; flames 0 to 90°, one more each night.
+- Notes: the locking arc is in contact for |driver angle| > 67.5° from the line of centres. The pin enters the slot tangentially; if it hits the wheel tip, r or c is wrong. A stage cycle of eight driver turns shows the eight nights; the yearly return (carriage back, flames folded) closes it as a reset, which the teaching review decides.
 
-**Teaching suggestions.** One driver turn is one night. Trace the drive pin; mark the 45° index and the 135° drive window. Plot carriage position against driver angle: a smooth S-step and a long flat. Showing all eight nights in one cycle takes a driver range of eight turns; the teaching review decides.
+**Teaching suggestions.** One driver turn is one night, and a cycle of eight turns shows all eight. Trace the drive pin; mark the 45° index and the 135° drive window. Plot carriage position against driver angle over the eight nights, a staircase of seven steps with long flats, and the number of flames lit as a second line. A time map slowing each index, so the shamash's step and the flame's trip can be seen.
 
 **Interpretation and hand-crafted parts**
 
-- Scenery: nine candle holders on the carriage, the shamash raised 12 mm at the left end and set slightly forward of the row, as is customary.
-- The roller is the only part that ever pushes the wheel: a thin cover disc on the driver holds its pin on both sides of the wheel.
-- The rack must stay in mesh for 140 mm and lift out of mesh once a year: two rails and a light leaf spring pressing it into mesh do both. Stop pins at both rack ends.
-- Marks: night numbers 1 to 8 under each carriage station, right to left; index marks on the wheel face every 45°.
+- Layout: the menorah's bar of eight cups on two stems over the works; the works behind a see-through back plate on the base; the Geneva wheel in front at the middle, the driver to its right; the rack's carriage under the wheel on two rails; the shamash's post rising behind the works and its arm forward over the row, the shamash raised and set forward of the row, as is customary.
+- Decoration (P14): the base carved with a Star of David and olive sprigs, the bar with olive sprigs, turned cups, candles with drips, flames with an inner flame; a Star of David on the driver's face.
+- The flames: each a thin plate hinged at its wick, folded back flat while unlit; a light toggle spring makes it bistable; the carriage's finger tips it over centre in the last degrees of the index; a reset bar under the bar folds all eight at the yearly return.
+- The pin is the only part that ever pushes the wheel: a thin cover disc on the driver holds it on both sides of the wheel.
+- The rack must stay in mesh for 140 mm and lift out of mesh once a year: two rails and a light leaf spring pressing it into mesh do both. Stop pins at both ends of the carriage's travel.
+- Marks: night numbers 1 to 8 under the stations, right to left; index marks on the wheel face every 45°.
 
 **Generated images**
 
-1. *Civic installation.* "Large stainless steel public menorah in a city square at dusk with a visible precision rack-and-Geneva mechanism in a glass housing at its base, people gathered, warm candlelight and cool blue evening sky, realistic photograph."
-2. *Product shot.* "Tabletop menorah built as a premium mechanical object, brushed aluminium and dark anodised parts, an eight-slot Geneva wheel visible through a clear side panel, soft studio light, premium product photography, white background."
+1. *Civic installation.* "Large stainless steel public menorah in a city square at dusk, a shamash carried along the row of candles by a visible precision rack-and-Geneva mechanism in a glass housing at its base, five candles lit, people gathered, warm candlelight and cool blue evening sky, realistic photograph."
+2. *Product shot.* "Tabletop menorah built as a premium mechanical object, brushed aluminium and dark anodised parts, an eight-slot Geneva wheel visible through a clear back panel, the shamash on a carriage above eight candles, soft studio light, premium product photography, white background."
+3. *Family table.* "A family's window sill on the third night of Hanukkah, a carved wooden mechanical menorah with three flames up and the shamash standing over the third candle, a Geneva wheel and rack in brass below, dreidels and chocolate coins, snowy street outside, warm light, realistic photograph."
 
-**Related**: `geneva`, `internal-geneva`, `rack-pinion`, `intermittent-gear`, `star-wheel`
+**Related**: `geneva`, `internal-geneva`, `rack-pinion`, `intermittent-gear`, `star-wheel`, `bistable-compliant`
 
 ---
 
