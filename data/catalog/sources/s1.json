@@ -87286,7 +87286,7 @@
       "revolute": 17,
       "prismatic": 2,
       "higher_pairs": 19,
-      "notes": "ground with the menorah and the back plate, the driver with its locking disc and pin, the Geneva wheel and its pinion keyed on one shaft, the carriage with its rack and lug, the shamash's slider on the menorah's rail, the six pulleys of the steel tape that joins them, and eight flames, each on a hinge at its candle's wick. The pin in the wheel's slots and the locking disc in its arcs alternate; the pinion meshes the rack; the tape's eight runs tie the slider to the carriage through the pulleys; the finger on the shamash's slider meets each flame's lever (a trip contact), and a toggle spring holds each flame up or folded. The mobility counted from kin is not the true one: the pinion is a body of its own keyed on the wheel's shaft, the contacts each count only while engaged, and each flame rests on its toggle spring between trips; the true mobility is 1."
+      "notes": "ground with the menorah and the back plate, the driver with its locking disc and pin, the Geneva wheel and its pinion keyed on one shaft, the carriage with its rack and lug, the shamash's slider on the menorah's rail, the six pulleys of the steel tape that joins them, and eight flames, each on a hinge at its candle's wick. The pin in the wheel's slots and the locking disc in its arcs alternate; the pinion meshes the rack; the tape's eight runs tie the slider to the carriage through the pulleys; the finger on the shamash's slider meets each flame's lever (a trip contact), and a toggle spring holds each flame up or folded. The mobility counted from kin is not the true one: the tape is a closed loop, so the run that closes it (from the right stem's foot back to the left turnaround) ties the slider to the carriage a second time, a redundant constraint the count takes away; the pinion is a body of its own keyed on the wheel's shaft, the contacts each count only while engaged, and each flame rests on its toggle spring between trips. The count reads 0; the true mobility is 1."
     },
     "backdrivable": "No",
     "tags": {
@@ -91371,7 +91371,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",
@@ -91911,7 +91911,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",
@@ -92451,7 +92451,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",
@@ -92991,7 +92991,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",
@@ -93531,7 +93531,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",
@@ -94071,7 +94071,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",
@@ -94611,7 +94611,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",
@@ -95151,7 +95151,7 @@
                     7.5
                   ]
                 ],
-                "name": "Knuckle on the wick pin"
+                "name": "Knuckle on the wick pin, its toggle spring (wire Ø0.15, below the drawing's floor) holds the flame up or folded"
               },
               {
                 "id": "lever",

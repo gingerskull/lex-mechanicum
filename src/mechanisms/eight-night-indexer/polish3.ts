@@ -18,9 +18,9 @@ export const polish: Polish = (A) => {
   mat(/^plinth(-(?!dreidel|gelt|pin).*)?$/, "Walnut, carved and oiled");
   mat(/^plinth-dreidel/, "Boxwood, turned and carved");
   mat(/^plinth-gelt/, "Brass, gilt, struck");
-  const notes: [string, string, Record<string, string[]>][] = [
-    ["Sc", "the carriage's rack rides on the back plate's way, a keeper lip before it, and the pinion holds its teeth down into mesh; it lifts out over the lip for the yearly return.", { F1: ["backplate-way", "backplate-lip"], F7: ["backplate-lip"] }],
-    ["Ss", "the shamash's slider rides the rail under the bar's front, its lip under the rail and its tongue over it into the bar's channel, clamped to the tape.", { F1: ["menorah-rail"], F7: ["slider", "slider-tongue"] }],
+  const notes: [string, string, string, Record<string, string[]>][] = [
+    ["Sc", "the carriage's rack rides on the back plate's way, a keeper lip before it, and the pinion holds its teeth down into mesh; it lifts out over the lip for the yearly return.", "held into mesh by the pinion", { F1: ["backplate-way", "backplate-lip"], F7: ["backplate-lip"] }],
+    ["Ss", "the shamash's slider rides the rail under the bar's front, its lip under the rail and its tongue over it into the bar's channel, clamped to the tape.", "guided on the menorah's rail", { F1: ["menorah-rail"], F7: ["slider", "slider-tongue"] }],
   ];
-  for (const [id, note, serves] of notes) A.note({ id, kit: "J5", at: A.ctx.S.joints.get(id)!.at, title: `J5 · ${id}`, note: `${id}: ${note}`, serves });
+  for (const [id, note, badge, serves] of notes) A.note({ id, kit: "J5", at: A.ctx.S.joints.get(id)!.at, title: `J5 · ${id}`, note: `${id}: ${note}`, badge: [badge, "ok"], serves });
 };
