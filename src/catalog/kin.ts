@@ -153,7 +153,7 @@ export interface Teaching {
   frame?: { zoom: number; pan: [number, number] };
   views?: { id: string; kind: (typeof TEACHING_VOCAB.viewKind)[number]; highlight?: string[]; [k: string]: unknown }[];
   controls: { id: string; kind: (typeof TEACHING_VOCAB.control)[number]; [k: string]: unknown }[];
-  timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: [number, number][] };
+  timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: ([number, number] | [number, number, number])[] };
   /** Seconds the stage plays one cycle in at 1x (default 6): a long program played slowly enough to read. */
   cycleTime?: number;
   plot: { x: string; y: string; label: string } | { x: string; y: string; label: string }[];

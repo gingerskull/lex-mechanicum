@@ -455,6 +455,14 @@ describe("time map and expressions", () => {
     expect(a).toBeCloseTo(b, 9);
     expect(a / (m.tOf(8 * D) - m.tOf(0))).toBeCloseTo(4, 9);
   });
+  it("gives a span its own slow factor (a yearly return slowed more than the nights)", () => {
+    const m = timeMap({ spans: [[100, 110], [300, 310, 10]], slow: 4 });
+    for (const t of [0, 0.2, 0.45, 0.6, 0.95]) expect(m.tOf(m.uOf(t))).toBeCloseTo(t, 9);
+    const night = m.tOf(110 * D) - m.tOf(100 * D);
+    const year = m.tOf(310 * D) - m.tOf(300 * D);
+    expect(year / night).toBeCloseTo(10 / 4, 9);
+    expect(night / (m.tOf(10 * D) - m.tOf(0))).toBeCloseTo(4, 9);
+  });
   it("handles a span that wraps past 360", () => {
     const m = timeMap({ span: [340, 20], slow: 2 });
     for (const t of [0, 0.2, 0.6, 0.95]) expect(m.tOf(m.uOf(t))).toBeCloseTo(t, 9);

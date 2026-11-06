@@ -176951,7 +176951,7 @@
       "review": {
         "verdict": "tweak",
         "date": "2026-11-05",
-        "note": "T2 review 2026-11-05 on the record, from the solved motion at the first night's evening, mid-index, the end of the first index, the fourth night, the eighth night and the yearly return: tweak. The principle is the eight-slot Geneva and the rack it steps: the pin is traced with the comet, the line of centres and the slot line are drawn, and the 135 degree drive window is marked on the pin's circle; the plot gives the carriage's travel against the driver over the eight nights, a staircase of seven steps with long flats, with the flames up as a second line. Decisions: the stage cycle is eight driver turns, the eight nights, opening on the first night's evening with the shamash over the first candle and its flame up. Seven indexes move the carriage in mesh, one station a night to the left, and the finger on the shamash's slider tips each flame over centre in the last 6 mm of its index. The eighth index closes the cycle as the yearly return, compressed into it: the rack is out of mesh, the carriage is carried back 140.2 mm to the first station in step with that index, and a reset tab on the shamash's slider, ahead of the shamash, folds flames 8 to 2 as it passes them going back; the first flame, where the shamash stops, stays up. In the real menorah the drive is off for the return and it is made by hand. The reset is a tab on the slider rather than a separate reset bar under the bar: it needs no motion of its own and folds each flame as the shamash passes it, and it never meets a flame on the way out, since the flames up all lie behind the shamash. A time map slows each index four times, so the step and the trip can be followed. The shamash rides the menorah itself, on a slider on a rail under the bar's front, raised above the row and set forward of it; nothing of the drive crosses over the candles. A closed steel tape, as a drafting machine's cable loop, runs it exactly with the carriage, both ways: from the carriage's lug in the plinth round two turnarounds, up the hollow left stem, over a pulley in the bar's end, along the bar's channel past the slider, down the right stem and back. A plain loop would run its top against its bottom; the two turnarounds make the top run go the carriage's way. The tape is mostly hidden (an exception): slots in the stems and along the bar's foot show it. Solve checks: wheel 45 degrees per driver turn, resting 225 degrees; peak wheel speed 0.62 times the driver's; carriage 20.03 mm a night and 140.2 mm from the first night to the eighth; one more flame up each night, 1 to 8."
+        "note": "T2 review 2026-11-05 on the record, from the solved motion at the first night's evening, mid-index, the end of the first index, the fourth night, the eighth night and the yearly return: tweak. The principle is the eight-slot Geneva and the rack it steps: the pin is traced with the comet, the line of centres and the slot line are drawn, and the 135 degree drive window is marked on the pin's circle; the plot gives the carriage's travel against the driver over the eight nights, a staircase of seven steps with long flats, with the flames up as a second line. Decisions: the stage cycle is eight driver turns, the eight nights, opening on the first night's evening with the shamash over the first candle and its flame up. Seven indexes move the carriage in mesh, one station a night to the left, and the finger on the shamash's slider tips each flame over centre in the last 6 mm of its index. The eighth index closes the cycle as the yearly return, compressed into it: the rack is out of mesh, the carriage is carried back 140.2 mm to the first station in step with that index, and a reset tab on the shamash's slider, ahead of the shamash, folds flames 8 to 2 as it passes them going back; the first flame, where the shamash stops, stays up. In the real menorah the drive is off for the return and it is made by hand. The reset is a tab on the slider rather than a separate reset bar under the bar: it needs no motion of its own and folds each flame as the shamash passes it, and it never meets a flame on the way out, since the flames up all lie behind the shamash. A time map slows each index four times, so the step and the trip can be followed, and the yearly return ten times, so the shamash is seen sliding home and folding the flames one by one. The shamash rides the menorah itself, on a slider on a rail under the bar's front, raised above the row and set forward of it; nothing of the drive crosses over the candles. A closed steel tape, as a drafting machine's cable loop, runs it exactly with the carriage, both ways: from the carriage's lug in the plinth round two turnarounds, up the hollow left stem, over a pulley in the bar's end, along the bar's channel past the slider, down the right stem and back. A plain loop would run its top against its bottom; the two turnarounds make the top run go the carriage's way. The tape is mostly hidden (an exception): slots in the stems and along the bar's foot show it. Solve checks: wheel 45 degrees per driver turn, resting 225 degrees; peak wheel speed 0.62 times the driver's; carriage 20.03 mm a night and 140.2 mm from the first night to the eighth; one more flame up each night, 1 to 8."
       },
       "principle": [
         {
@@ -177037,7 +177037,7 @@
         }
       ],
       "timeMap": {
-        "feature": "each night's index",
+        "feature": "each night's index and the yearly return",
         "slow": 4,
         "spans": [
           [
@@ -177070,11 +177070,12 @@
           ],
           [
             329.063,
-            345.938
+            345.938,
+            10
           ]
         ]
       },
-      "cycleTime": 16,
+      "cycleTime": 18,
       "plot": [
         {
           "x": "input",
