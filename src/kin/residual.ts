@@ -225,7 +225,11 @@ export function stepResidual(r: ResolvedJoint, s: StepInput): number | null {
     const i1 = xf.inv(s.c1);
     const a0 = xf.mul(i0, s.a0), a1 = xf.mul(i1, s.a1), b0 = xf.mul(i0, s.b0), b1 = xf.mul(i1, s.b1);
     const trav = v3.dot(v3.sub(xf.apply(b1, r.at), xf.apply(b0, r.at)), ax2);
-    return trav - n(j.radiusA) * turn(a0, a1, ax);
+    // a sprocket's pose is the same a whole turn on, so the strand is checked modulo its circumference: a small pulley
+    // that turns more than half a turn between samples (a tape loop's fast return) is read as it is
+    const d = trav - n(j.radiusA) * turn(a0, a1, ax);
+    const C = 2 * Math.PI * n(j.radiusA);
+    return d - C * Math.round(d / C);
   }
   if (j.type === "belt" && jr.flexible === "chain" && j.za !== undefined && jr.pitch !== undefined) {
     // a chain on its pitch polygons: the advance the driver gives equals the advance the driven takes (chordal action)
