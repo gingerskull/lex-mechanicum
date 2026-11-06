@@ -319,10 +319,15 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
   if (t.timeMap !== undefined) {
     const tm = t.timeMap;
     const pair = (v: unknown) => Array.isArray(v) && v.length === 2 && v.every(isNum);
+    // a span in a list may carry its own slow factor, [from, to, slow]
+    const own = (v: unknown) => pair(v) || (Array.isArray(v) && v.length === 3 && v.every(isNum) && (v[2] as number) > 0);
     const spans = (tm as { spans?: unknown }).spans;
-    if (!isStr(tm.feature) || !isNum(tm.slow) || tm.slow <= 0 || !(pair(tm.span) || (Array.isArray(spans) && spans.length > 0 && spans.every(pair)))) {
-      say("teaching.timeMap needs feature, slow > 0 and span [from, to] (or spans, a list of them)");
+    if (!isStr(tm.feature) || !isNum(tm.slow) || tm.slow <= 0 || !(pair(tm.span) || (Array.isArray(spans) && spans.length > 0 && spans.every(own)))) {
+      say("teaching.timeMap needs feature, slow > 0 and span [from, to] (or spans, a list of them, each may add its own slow)");
     }
+  }
+  if (t.cycleTime !== undefined && !(isNum(t.cycleTime) && t.cycleTime >= 2 && t.cycleTime <= 60)) {
+    say(`teaching.cycleTime ${String(t.cycleTime)} is not a number of seconds from 2 to 60`);
   }
 
   const plots = Array.isArray(t.plot) ? t.plot : [t.plot];

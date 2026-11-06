@@ -3,6 +3,7 @@ import type { Kin, Teaching } from "../../src/catalog/kin";
 import { mergeSources } from "../../src/catalog/merge";
 import { validate } from "../../src/catalog/validate";
 import { mobility } from "../../src/catalog/validate-kin";
+import { CYCLE_SECONDS, cycleSeconds } from "../../src/kin/timemap";
 import { record } from "./fixtures";
 
 /** A crank-rocker, small and complete: every check of the record spec passes on it. */
@@ -130,6 +131,15 @@ describe("kin and teaching validation", () => {
     expect(has(validate([withBlocks((b) => (b.teaching.traces[0]!.ghosts = [{ control: "b", value: 500 }]))]), "outside the range of b")).toBe(true);
     expect(has(validate([withBlocks((b) => (b.teaching.timeMap = { feature: "f", slow: 0, span: [1, 2] }))]), "timeMap")).toBe(true);
     expect(has(validate([withBlocks((b) => (b.teaching.views = [{ id: "s", kind: "section", highlight: ["rocker.port"] }]))]), "a section needs plane")).toBe(true);
+  });
+
+  it("checks a record's cycle length, and the stage plays 6 s a cycle without one", () => {
+    expect(validate([withBlocks((b) => (b.teaching.cycleTime = 16))])).toEqual([]);
+    expect(has(validate([withBlocks((b) => (b.teaching.cycleTime = 0.5))]), "cycleTime")).toBe(true);
+    expect(has(validate([withBlocks((b) => ((b.teaching as unknown as { cycleTime: unknown }).cycleTime = "16"))]), "cycleTime")).toBe(true);
+    expect(cycleSeconds({ cycleTime: 16 })).toBe(16);
+    expect(cycleSeconds({})).toBe(CYCLE_SECONDS);
+    expect(cycleSeconds(null)).toBe(6);
   });
 
   it("checks the part to watch: principle bodies and solid kinds (T18)", () => {

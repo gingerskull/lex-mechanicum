@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.50.0, Anvillus — 2026-11-06
+
+- Hanukkah's seasonal mechanism, the Maccabee eight-night indexer: an eight-slot Geneva steps a rack carriage one
+  candle to the left each night, a steel tape looped through the menorah's hollow stems carries the shamash along a
+  rail on its bar, and each flame tips up on its hinge as the shamash arrives. A brass menorah with almond-blossom
+  cups, fluted wax candles, a pierced crest, a carved walnut plinth with dreidels and gelt. The cycle plays the eight
+  nights and the yearly return, slowed so the shamash is seen going home. Listed from 1 to 14 December (P14).
+- Blocks for a rack carried back out of mesh once a cycle and for flaps tipped by a passing finger and held; a joint's
+  active window can repeat over several driver turns, and claims over a cycle of several turns count in the driver's
+  own degrees.
+- A record can set its own cycle length on the stage (`teaching.cycleTime`, 6 s by default), and a span of its time
+  map its own slow factor.
+- The Geneva law no longer gains or loses an index at the middle of a dwell after whole crank turns, and a tape on a
+  small pulley is checked within one turn of it.
+
 ## 0.49.0, Accatran — 2026-11-04
 
 - Thanksgiving's seasonal mechanism, the Turkey trot walker: two Klann legs half a turn apart trot a turkey on a free

@@ -113,8 +113,11 @@ export interface KinJoint {
     /** Turns of the cam before the schedule repeats (default 1; the spans then sum to 360 times this): a self-reversing screw's track. */
     turns?: Num;
   };
-  /** The joint is engaged only while this driver is inside [lo, hi] degrees (mod 360): a Geneva pin in its slot. */
-  active?: { driver: string; lo: number; hi: number };
+  /**
+   * The joint is engaged only while this driver is inside [lo, hi] degrees (mod 360): a Geneva pin in its slot. `period`
+   * (degrees, default 360) is the window's repeat for a driver run several turns a cycle (a rack out of mesh on one turn of eight).
+   */
+  active?: { driver: string; lo: number; hi: number; period?: number };
 }
 
 export interface KinParam {

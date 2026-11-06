@@ -1,7 +1,7 @@
 // The engine as the browser gets it: the 3D renderer, the record's kinematics and the package v2 setup. The stage imports
 // it; a card imports it on first hover, so the library page loads no engine until then (R8, SS8).
 export { Kinematics } from "../../../src/kin/compose";
-export { timeMap } from "../../../src/kin/timemap";
+export { cycleSeconds, timeMap } from "../../../src/kin/timemap";
 export type { Controls, Kin } from "../../../src/kin/types";
 export { browserFactory, makeCard, sizeCard } from "../../../src/render/canvas";
 export { drawPlot } from "../../../src/render/plot";

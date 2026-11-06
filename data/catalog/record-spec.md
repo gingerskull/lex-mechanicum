@@ -303,8 +303,13 @@ that setting of one of the teaching controls (a die position).
   stands at the pitch radius rb + s from the cam's centre on the arc of the rocker's arm, the joint's `at` being the
   roller centre at the reference; out { s, angle, pressure }. Its cam is a `cam` with `form: "rocker"`, the roller's
   envelope on that path.
-- A joint with `active` (a driver window) is checked by K1 only while engaged, its motion relation too. A body with
-  `drops: true` moves by instant drops (an escape wheel): its points are not checked for jumps.
+- A joint with `active` (a driver window) is checked by K1 only while engaged, its motion relation too; `period` (driver
+  degrees, default 360) repeats the window over a driver run several turns a cycle (a rack out of mesh on one turn of
+  eight). A body with `drops: true` moves by instant drops (an escape wheel): its points are not checked for jumps.
+- `rack-release` (a rack stepped by an indexer and carried back out of mesh on the cycle's last index) and `trip` (a flap
+  tipped over by a passing finger and held, folded by a reset tab on the way back) are documented over their code in
+  `src/kin/steps/trip.ts`. A rotary driver with a whole `speed` above 1 counts a claim's `dwell` and `span` in its own
+  degrees.
 - An output whose id a block wrote as a value is that value (a pressure angle, an advance).
 
 **Shapes the builder makes from a joint's law or the record's numbers.** `cam` (a plate cam: the roller's or the
@@ -351,7 +356,8 @@ dead axle stands in it on its shoulder, a live shaft runs in a housing cartridge
 | `frame` | Optional: `{ "zoom": z, "pan": [x, y] }`, a manual frame of the default view (T7) where the plain fit leaves it small or low. `zoom` (0.5 to 2) multiplies the fitted scale; `pan` shifts the drawing by fractions of the stage (x right, y down, each within 0.25). It holds only in the record's own view, assembled (the opening view, Reset view, stills, thumbnails, cards); other views, an orbit, an explode and a detail keep the plain fit, and a zoom never widens the drawing past the room across a narrow stage. |
 | `views` | Section and detail views (T8): `kind` `section` (a cut `plane` of origin and normal) or `detail` (a window `center` and `scale`); `highlight` names bodies or points to draw with the highlight. |
 | `controls` | The controls the page shows (T14): `kind` `driver`, `param`, `design` or `selector`, and the id it maps to. A mechanism's controls are only these. |
-| `timeMap` | A playback rate near a feature (T13): the `span` of input degrees and the `slow` factor. It never changes `solve`. |
+| `timeMap` | A playback rate near a feature (T13): the `span` of input degrees and the `slow` factor, or `spans`, a list of them; a span in the list may give its own factor as a third entry, `[from, to, slow]`. It never changes `solve`. |
+| `cycleTime` | Optional: the seconds the stage takes to play one cycle at 1x (2 to 60; 6 when absent), so a long program (eight nights, a year) plays slowly enough to read. The time map shares it out within the cycle; it never changes `solve`. |
 | `plot` | What the side panel plots: `x`, `y` (output ids) and a label, or a list: the first is the plot, `ghosts` on it draw the same output at other control settings (a family of curves), and a further entry in the same unit and range is drawn with it. |
 | `claims` | Every number the explanation states, with the `output` and `stat` (`range`, `max`, `min`, `mean`, `ratio`, `time-ratio`, `phase`, `dwell`, `at`) it comes from, the stated `value` and a tolerance (standard T9). `text` is the sentence it supports. |
 | `seeThrough` | Principle bodies drawn see-through on purpose (T10, transparency first): a part that would hide the principle behind it. |

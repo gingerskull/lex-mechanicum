@@ -24,8 +24,15 @@ export function genevaIndex(n: number, phi: number): { angle: number; engaged: b
 export function genevaAngle(n: number, phi: number): number {
   const turns = Math.round(phi / TAU);
   const local = phi - turns * TAU;
-  return turns * (TAU / n) + genevaIndex(n, local).angle;
+  return turns * (TAU / n) + held(genevaIndex(n, local), n, local);
 }
+
+/**
+ * The wheel angle within this turn's index; while the pin is out, the side of the dwell by `local` itself, not by the
+ * index's own wrap of it, which at mid-dwell (local = ±π, where a running crank lands after whole turns) can fall on the
+ * other side and lose or gain an index.
+ */
+const held = (g: { angle: number; engaged: boolean }, n: number, local: number): number => (g.engaged ? g.angle : local < 0 ? 0 : TAU / n);
 
 /**
  * Internal Geneva wheel with n slots, crank radius a = c sin(π/n) on a centre c from the wheel's. The crank angle φ is
@@ -46,7 +53,8 @@ export function genevaInternalIndex(n: number, phi: number): { angle: number; en
 /** Total wheel angle of an internal Geneva for a continuously turning crank (see genevaInternalIndex). */
 export function genevaInternalAngle(n: number, phi: number): number {
   const turns = Math.round(phi / TAU);
-  return turns * (TAU / n) + genevaInternalIndex(n, phi - turns * TAU).angle;
+  const local = phi - turns * TAU;
+  return turns * (TAU / n) + held(genevaInternalIndex(n, local), n, local);
 }
 
 /** Crank angle at which the pin enters the slot (and leaves it): ±(π/2 − π/n). */

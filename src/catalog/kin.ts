@@ -43,6 +43,8 @@ export const KIN_VOCAB = {
     "walker", "carry",
     // a rocker turned by a pin in a slot that does not run through its pivot (a fan's feather on a spreading rod)
     "slot-swing",
+    // a rack stepped by an indexer and carried back out of mesh once a cycle; a flap tipped by a passing finger and held
+    "rack-release", "trip",
   ],
   output: ["angle", "position", "speed-ratio", "path"],
 } as const;
@@ -151,7 +153,9 @@ export interface Teaching {
   frame?: { zoom: number; pan: [number, number] };
   views?: { id: string; kind: (typeof TEACHING_VOCAB.viewKind)[number]; highlight?: string[]; [k: string]: unknown }[];
   controls: { id: string; kind: (typeof TEACHING_VOCAB.control)[number]; [k: string]: unknown }[];
-  timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: [number, number][] };
+  timeMap?: { feature: string; slow: number; span?: [number, number]; spans?: ([number, number] | [number, number, number])[] };
+  /** Seconds the stage plays one cycle in at 1x (default 6): a long program played slowly enough to read. */
+  cycleTime?: number;
   plot: { x: string; y: string; label: string } | { x: string; y: string; label: string }[];
   claims: { text: string; output: string; stat: (typeof TEACHING_VOCAB.stat)[number]; value: number; tol: number }[];
   exceptions: { reason: string; [k: string]: unknown }[];
