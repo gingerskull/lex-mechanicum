@@ -13,7 +13,8 @@ const ease = (s: number): number => s - Math.sin(2 * Math.PI * s) / (2 * Math.PI
  * angle), step (deg of pinion per index), steps (the indexes made in mesh each cycle). The cycle holds steps + 1 indexes:
  * the rack follows the pinion through the first `steps`, then on the last one it is out of mesh and is carried back to
  * its start in step with that index (the pinion's own law), so the cycle closes. The joint's `active` window leaves the
- * last index out of the mesh's K1 check. out { travel (mm along axis2), back (0 in mesh, 0 to 1 over the return), reach
+ * last index out of the mesh's K1 check. The count is taken within the cycle, so the next cycle plays as the first
+ * while the stage's clock runs on. out { travel (mm along axis2), back (0 in mesh, 0 to 1 over the return), reach
  * (the farthest travel of this cycle so far: the travel in mesh, the far end over the return) }.
  */
 const rackRelease: BlockFn = (c, s) => {
@@ -26,9 +27,12 @@ const rackRelease: BlockFn = (c, s) => {
   const dA = c.delta("in", c.rad(i.input));
   const step = Math.abs(c.num(i.step)) * D2R;
   const steps = c.num(i.steps);
-  const w = Math.abs(dA) / step; // indexes made since the reference, 0 to steps + 1
+  // indexes made since the reference (the cycle's start, the carriage home): the indexer's angle runs on while the stage
+  // plays past one cycle, so the count is taken within this cycle, 0 to steps + 1
+  const n = Math.abs(dA) / step;
+  const w = n % (steps + 1);
   const sg = dA < 0 ? -1 : 1;
-  let t = r * dA;
+  let t = r * sg * w * step;
   let back = 0;
   let reach = t;
   if (w > steps) {

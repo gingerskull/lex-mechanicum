@@ -22,6 +22,7 @@ import {
   genevaAngle,
   genevaEngagement,
   genevaIndex,
+  genevaInternalAngle,
   hookeAngle,
   hookeSpeedRatio,
   lawRise,
@@ -387,6 +388,17 @@ describe("Geneva and star wheel", () => {
     const h = 1e-6;
     const num = (genevaIndex(n, 0.3 + h).angle - genevaIndex(n, 0.3 - h).angle) / (2 * h);
     expect(genevaIndex(n, 0.3).ratio).toBeCloseTo(num, 6);
+  });
+  it("mid-dwell after whole crank turns holds the indexes made, on either side of the seam", () => {
+    for (const n of [4, 8]) {
+      for (let k = 1; k <= 40; k++) {
+        // the crank at mid-dwell after k turns, as a running crank reaches it
+        for (const phi of [-Math.PI + k * TAU, Math.PI * (2 * k - 1), ((k * 360 - 180) * Math.PI) / 180]) {
+          expect(genevaAngle(n, phi) - genevaAngle(n, -Math.PI)).toBeCloseTo((k * TAU) / n, 9);
+          expect(genevaInternalAngle(n, phi) - genevaInternalAngle(n, -Math.PI)).toBeCloseTo((k * TAU) / n, 9);
+        }
+      }
+    }
   });
   it("star wheel follows the same law", () => {
     expect(starWheelAngle(5, 0.2)).toBe(genevaAngle(5, 0.2));

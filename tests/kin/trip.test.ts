@@ -28,6 +28,17 @@ describe("rack-release and trip blocks", () => {
     expect(k.pose(at(7 * 360 + 300)).values["carriage-x"]!).toBeCloseTo(0, 6);
   });
 
+  it("play the next cycle as the first: the stage's clock runs on past one cycle", () => {
+    const k = new Kinematics(kin());
+    for (const cycle of [1, 2]) {
+      for (let n = 0; n < 8; n++) {
+        const first = k.pose(at(n * 360 + 30)).values, again = k.pose(at((cycle * 8 + n) * 360 + 30)).values;
+        expect(again["carriage-x"]!).toBeCloseTo(first["carriage-x"]!, 6);
+        expect(again["flames-lit"]!).toBeCloseTo(first["flames-lit"]!, 6);
+      }
+    }
+  });
+
   it("put one more flame up each night and fold all but the first on the return", () => {
     const k = new Kinematics(kin());
     for (let n = 0; n < 8; n++) expect(k.pose(at(n * 360 + 30)).values["flames-lit"]!).toBeCloseTo(n + 1, 6);
