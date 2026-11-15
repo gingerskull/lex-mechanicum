@@ -38,6 +38,7 @@ export { spider } from "./shapes/plain";
 export { levelId, meshLevel } from "./shapes/meshing";
 export { cycloidalDisc, flexTooth, flexWall } from "./shapes/drives";
 export { ballProfile } from "./shapes/spatial";
+export { TRACK_FOLLOWER, trackLevels, trackPlate } from "./shapes/track";
 
 /**
  * A further level of a body, in a slab of its own: a compound gear's next gear (a `gear` with `cluster`), a gear fixed

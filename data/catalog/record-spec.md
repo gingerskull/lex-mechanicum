@@ -196,8 +196,25 @@ from, to, width, wall } and `foot`), `rotor` with `internalGear` (a rotary engin
 (its epitrochoid housing).
 
 **Joints.** A revolute with a journal `radius` (over 12) is an eccentric between two moving parts (the sheave in its
-strap) or, to the ground, a fixed hub the part turns on. A `pin-in-slot` slot is `from`/`to` (straight) or `arc` ({ center,
-radius }: a curved slot, the die kit).
+strap) or, to the ground, a fixed hub the part turns on. A `pin-in-slot` slot is `from`/`to` (straight), `arc` ({ center,
+radius }: a curved slot, the die kit), `path: "circle"` with `center` and `radius` (a round hole), or `track`: a composite
+track of tangent arcs and lines, exact per segment and smooth (G1) where they meet by construction. A track is
+`{ start, dir, segments }`: `start` the centre line's first point, `dir` its direction there (a vector, or degrees about
+the joint's axis from world x), and `segments` in order, each following on from the last one's end and direction: a
+line is `{ length }`, an arc `{ radius, length }` or `{ radius, angle }` (degrees turned), `radius` signed, + turning
+left (counter-clockwise seen from the axis), or `curvature` (1/mm) for `radius`. The track lies in the plane through
+the joint's `at` square to its `axis` (default +z); `at` is the pin's place on the track in the reference
+configuration, and the validator checks that it lies on it. Numbers may be parameter expressions. Example, an S of two
+arcs and a line, the pin at its start:
+
+```json
+{ "id": "F", "type": "pin-in-slot", "a": "guide-arm", "b": "ground", "at": [60, -30, 0], "axis": [0, 0, 1],
+  "slot": { "track": { "start": [60, -30], "dir": 90,
+    "segments": [{ "radius": 40, "angle": 45 }, { "length": 20 }, { "radius": -40, "angle": 45 }] } } }
+```
+
+The builder makes a track on the ground a roller on a hardened stud in the pin's body, running in a groove cut along
+the track in a plate on the base (the track kit).
 
 **Shapes the builder places where the joints put them** (not on a slab): a bevel `gear` (with `cone`, its pitch cone
 half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a universal joint's yoke) and a `cross`
@@ -228,7 +245,19 @@ optional `sum`) makes the point where two lines cross; where they run together i
 distances to `a1` and `b1` add up to `sum` (an antiparallelogram's change points). `target-path` (`shape`
 `rounded-square` with `cx`, `cy`, `side`, `corner`, or `flower` with `cx`, `cy`, `r0`, `lobe`, `lobes`) moves a point
 once round a closed curve per cycle, from the cycle phase; the linkage follows it by inverse kinematics (`five-bar` with
-`mode: "ik"`, dyads). A driver with `cycle: { from }` is set by the cycle through such a block: it is not applied as a
+`mode: "ik"`, dyads). With `shape: "track"` and `joint` (a pin-in-slot with a `track`) it moves that joint's pin along
+the joint's own track, so the track is written once: from where the pin's `at` lies on it to the travel `to` (mm from
+the track's start; default the far end), there and back once a cycle (`mode: "oscillate"`, the default, travel
+s0 + (to − s0)(1 − cos u)/2, as a hand stroke runs) or there once over the cycle (`mode: "once"`); `travel` (a driver,
+value or expression, mm) sets the travel itself instead. Its `out` is the point (name it as the joint, so the pin's
+body is posed by it) or `{ point, travel }`. The block solves the joint (`joints: [<pin>]`); a manual driver on the
+linkage's input with `cycle: { from: <block id> }` reads the input's turn back off the pose:
+
+```json
+{ "block": "target-path", "id": "run", "joints": ["F"], "in": { "shape": "track", "joint": "F" }, "out": { "point": "F", "travel": "door-travel" } }
+```
+
+A driver with `cycle: { from }` is set by the cycle through such a block: it is not applied as a
 joint motion, its value is read back off the pose, and it needs no control. Block inputs may be parameter expressions.
 A body's `shape` may carry a `wheel` ({ diameter, width, stub }): a wheel on a stub axle along the line from its pivot to
 the body's point at the stub's distance (a steering knuckle). A `slider` may start at `from` along its x. Every point the

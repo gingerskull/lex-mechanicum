@@ -47,6 +47,8 @@ const MAKERS: Record<string, Maker> = {
   ringHub: () => rec("ringHub", withBody(withJoint(F.crankRocker(), "B", { type: "spherical" }), "coupler", { shape: { type: "cage" } })),
   ringRollers: () => rec("ringRollers", withJoint(withBody(F.gearPair(), "g2", { role: "sprags" }), "M", { type: "rolling" })),
   // a plate no joint reaches, standing off the base
+  // a pin in a fixed S track on the ground (the track kit)
+  trackFollower: () => rec("trackFollower", F.trackFollower()),
   fixedPlate: () => rec("fixedPlate", { ...F.crankRocker(), bodies: [...F.crankRocker().bodies, { id: "frame", role: "frame", shape: { type: "plate", outline: [[0, 0], [60, 0], [60, 30]], boss: 6 }, frame: { o: [-80, -60, 14] } }] }),
   fourBarHung: () => rec("fourBarHung", F.crankRocker(), { principle: [{ body: "crank" }, { body: "coupler" }, { body: "rocker" }], view: "PLAN", traces: [] }),
   adjustableLink: () => {

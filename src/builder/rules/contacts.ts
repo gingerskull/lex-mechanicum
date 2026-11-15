@@ -20,6 +20,7 @@ import { FLEXIBLE_KITS } from "./contacts/flexible";
 import { WOBBLE_KITS } from "./contacts/wobble";
 import { ELBOW_KITS } from "./contacts/elbow";
 import { WALKER_KITS } from "./contacts/walker";
+import { TRACK_KITS } from "./contacts/track";
 
 export const contactRules: Rule[] = [
   ...ECCENTRIC_KITS,
@@ -37,4 +38,5 @@ export const contactRules: Rule[] = [
   ...WOBBLE_KITS,
   ...ELBOW_KITS,
   ...WALKER_KITS,
+  ...TRACK_KITS,
 ];

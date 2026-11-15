@@ -18,6 +18,8 @@ export const KIT_IDS = [
   "leg-bore",
   // a walker's: a body on a column slide, a flat belt on drums in the base plane, a foot's sole on that belt
   "column", "flat-belt", "sole",
+  // a follower in a fixed track of tangent arcs and lines
+  "track",
 ] as const;
 export type KitId = (typeof KIT_IDS)[number];
 
@@ -126,6 +128,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
     case "pin-in-slot": {
       // pins on a circle running in round holes larger by the eccentricity (a cycloidal drive's output)
       if ((j.slot as { path?: unknown } | undefined)?.path === "circle") return "pin-hole";
+      // a roller in a groove along a composite track (src/kin/blocks/track.ts)
+      if (j.slot?.track) return "track";
       const s = text(j.slot) + text(rec.slot);
       if (/fork/i.test(s) || /fork/i.test(text(rec.note))) return "fork-pin";
       if (/groove/i.test(s)) return "groove-cam";

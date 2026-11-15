@@ -75,6 +75,7 @@ export const rules: Rule[] = [
   byId("ring-hub"),
   byId("eccentric"),
   byId("die"),
+  byId("track-follower"),
   byId("hub"),
   byId("leg-bore"),
   byId("ring-rollers"),

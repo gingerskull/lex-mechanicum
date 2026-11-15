@@ -1,5 +1,6 @@
 import { scheduleOf } from "../kin/blocks/cam";
 import { evalExpr } from "../kin/expr";
+import { trackProblems } from "../kin/blocks/track";
 import { SOLID_KINDS } from "../style/kinds";
 import { KIN_VOCAB, TEACHING_VOCAB, type Kin, type Teaching } from "./kin";
 import type { CatalogRecord } from "./schema";
@@ -124,6 +125,22 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
         say(`joint ${j.id}: ${(e as Error).message}`);
       }
     }
+    // a composite track (src/kin/blocks/track.ts) at the params' values, with the pin on it
+    const slot = j.slot as Obj | undefined;
+    if (j.type === "pin-in-slot" && isObj(slot) && slot.track !== undefined) {
+      const pv = new Map(kin.params.map((p) => [p.id, p.value]));
+      const val = (v: unknown) => (isNum(v) ? v : evalExpr(String(v), (n) => pv.get(n)));
+      const vec = (v: unknown): [number, number, number] => {
+        const a = Array.isArray(v) ? v : [];
+        return [val(a[0] ?? 0), val(a[1] ?? 0), val(a[2] ?? 0)];
+      };
+      try {
+        const at = Array.isArray(j.at) ? vec(j.at) : undefined;
+        for (const p of trackProblems(slot.track, val, vec, at, Array.isArray(j.axis) ? vec(j.axis) : [0, 0, 1])) say(`joint ${j.id}: ${p}`);
+      } catch (e) {
+        say(`joint ${j.id}: track: ${(e as Error).message}`);
+      }
+    }
   }
 
   for (const p of kin.params) {
@@ -188,6 +205,12 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     }
     if (!isObj(s.in)) say(`solve ${by}: in must be an object`);
     else for (const [k, v] of Object.entries(s.in)) resolveIn(v, by, k);
+    // a point along a composite track reads the track from its pin-in-slot joint
+    if (s.block === "target-path" && isObj(s.in) && s.in.shape === "track") {
+      const tj = kin.joints.find((q) => q.id === s.in.joint);
+      if (!tj || tj.type !== "pin-in-slot" || !isObj(tj.slot) || tj.slot.track === undefined) say(`solve ${by}: in.joint "${String(s.in.joint)}" is not a pin-in-slot joint with a track`);
+      if (s.in.mode !== undefined && s.in.mode !== "oscillate" && s.in.mode !== "once") say(`solve ${by}: in.mode "${String(s.in.mode)}" is not oscillate or once`);
+    }
     // a name, a list of names, or the block's keyed outputs ({ angle: "gear-turn" }, as src/kin/steps read them)
     const outs = typeof s.out === "string" ? [s.out] : isObj(s.out) && !Array.isArray(s.out) ? Object.values(s.out) : arr(s.out);
     if (!outs.length || !outs.every(isStr)) say(`solve ${by}: out must name what the block produces`);

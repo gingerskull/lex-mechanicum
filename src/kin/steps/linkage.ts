@@ -1,9 +1,11 @@
 // Planar linkage blocks: the RRR and slider dyads, the class-III triad, the five-bar (both ways), and the points a
 // linkage closes on: a point along a line, two lines' crossing, a target path from the cycle phase.
-import { type BlockFn, KinError } from "../ctx";
+import { type BlockCtx, type BlockFn, KinError } from "../ctx";
+import type { SolveStep } from "../types";
 import { R2D, TAU, type Vec3, v3, xf } from "../math";
 import { dyadRPR, dyadRRP, dyadRRR, fiveBarFK, fiveBarIK } from "../blocks/linkage";
 import { outName, outPoint, outVal, spin, str } from "./shared";
+import { fromPlane, resolveTrack, toPlane, trackAt, trackNearest } from "../blocks/track";
 
 /**
  * dyad (RRR). in: a, b (points), ra, rb (lengths: the link from a, the link from b), n (plane normal, default +z),
@@ -228,9 +230,15 @@ const lineCrossing: BlockFn = (c, s) => {
  * stylus follows, the linkage closing on it by inverse kinematics. in.shape "rounded-square": cx, cy (centre), side,
  * corner (radius), at constant speed along the outline, counter-clockwise from the middle of the right side; "flower":
  * cx, cy, r0, lobe, lobes (default 5): r = r0 + lobe cos(lobes u) at the polar angle u. n (plane normal) is +z.
+ * "track": the pin of the pin-in-slot `joint` along that joint's composite track (src/kin/blocks/track.ts), from where
+ * its `at` lies on the track to the travel `to` (mm from the track's start; default the far end): `mode` "oscillate"
+ * (the default) runs there and back once a cycle, s = s0 + (to − s0)(1 − cos u)/2, as a hand stroke does; "once"
+ * runs there over the cycle, s = s0 + (to − s0) u/2π. `travel` (a driver, value or expression, mm) sets the travel
+ * itself instead. out: the point (a name, or `{ point, travel }` with the travel in mm).
  */
 const targetPath: BlockFn = (c, s) => {
   const i = s.in ?? {};
+  if (i.shape === "track") return trackPath(c, s);
   const cx = c.num(i.cx), cy = c.num(i.cy);
   const u = ((c.u % TAU) + TAU) % TAU;
   if (i.shape === "flower") {
@@ -241,6 +249,30 @@ const targetPath: BlockFn = (c, s) => {
   if (i.shape !== "rounded-square") throw new KinError(`target-path ${s.id}: unknown shape ${String(i.shape)}`);
   outPoint(c, s, roundedSquareAt(cx, cy, c.num(i.side), c.num(i.corner), u / TAU));
 };
+
+/** The `target-path` block's track shape: the joint's pin at a travel along its composite track. */
+function trackPath(c: BlockCtx, s: SolveStep): void {
+  const i = s.in ?? {};
+  const id = str(i.joint, `target-path ${s.id}: joint`);
+  const j = c.joint(id);
+  if (j.type !== "pin-in-slot" || !j.slot?.track) throw new KinError(`target-path ${s.id}: joint ${id} is not a pin in a composite track (slot.track)`);
+  const T = resolveTrack(j.slot.track, (v) => c.num(v), (v) => c.vec(v), c.jointAt(id), c.jointAxis(id));
+  const L = T.t.length;
+  const s0 = trackNearest(T.t, toPlane(T, c.jointAt(id)).uv).s;
+  let at: number;
+  if (i.travel !== undefined) at = c.num(i.travel);
+  else {
+    const to = i.to !== undefined ? c.num(i.to) : s0 < L / 2 ? L : 0;
+    const mode = (i.mode as string | undefined) ?? "oscillate";
+    if (mode !== "oscillate" && mode !== "once") throw new KinError(`target-path ${s.id}: mode ${mode} is not oscillate or once`);
+    const f = mode === "once" ? Math.min(1, Math.max(0, c.u / TAU)) : (1 - Math.cos(c.u)) / 2;
+    at = s0 + (to - s0) * f;
+  }
+  if (at < -1e-9 || at > L + 1e-9) throw new KinError(`target-path ${s.id}: travel ${at.toFixed(3)} is off the track (0 to ${L.toFixed(3)})`);
+  // the track's plane runs through the pin's `at`
+  outPoint(c, s, fromPlane(T, trackAt(T.t, at).p), typeof s.out === "string" ? "" : "point");
+  outVal(c, s, at, "travel");
+}
 
 /** A point at the fraction f of the way round a rounded square, counter-clockwise from the middle of its right side. */
 export function roundedSquareAt(cx: number, cy: number, side: number, corner: number, f: number): Vec3 {

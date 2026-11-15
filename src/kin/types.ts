@@ -98,6 +98,13 @@ export interface KinJoint {
     body?: string;
     /** A curved slot instead: an arc about `center` (reference world) of `radius` (an expansion link). */
     arc?: { center: Vec; radius: Num; from?: Num; to?: Num };
+    /**
+     * A composite track instead (a fixed S-shaped groove): tangent arcs and lines from `start` along `dir` (a vector, or
+     * degrees about the axis from world x), each segment a `length` (or an arc's `angle`, degrees) with a signed
+     * `radius` (+ turns left about the axis) or `curvature`, a line with neither. In the plane through `at` square to
+     * the axis; src/kin/blocks/track.ts.
+     */
+    track?: { start: Vec; dir: Vec | Num; segments: { length?: Num; radius?: Num; curvature?: Num; angle?: Num }[] };
   };
   // cam-contact: the pitch radius of the cam as a function of its angle, and the follower kind
   follower?: "roller" | "flat" | "knife";

@@ -30,10 +30,11 @@ src/core/                        geometry, involute and flexible-member profiles
                                  sprockets), polygon queries (poly.ts), bevel, worm, helical and screw geometry
                                  (spatial.ts), the axis type of a hardware primitive (axis.ts)
 src/kin/                         the kinematic library: closed-form blocks (blocks/: linkages, gears, cams, couplings,
-                                 spatial, timed, members), the `solve` blocks that use them, one file per family
-                                 (steps/, registered in registry.ts with one line each), the composition of a record's
-                                 kin block (compose.ts: drivers, solve list, bodies, numeric fallback, controls), the K1
-                                 verifier (verify.ts, the loop-closure residual) and the time map (timemap.ts)
+                                 spatial, timed, members, the composite track's geometry), the `solve` blocks that use
+                                 them, one file per family (steps/, registered in registry.ts with one line each), the
+                                 composition of a record's kin block (compose.ts: drivers, solve list, bodies, numeric
+                                 fallback, controls), the K1 verifier (verify.ts, the loop-closure residual) and the time
+                                 map (timemap.ts)
 src/hardware/                    tables (bearings, screws, circlips, keys, pulleys, springs, motors) as data; the
                                  primitive Solid type (an outline with an extent along its axis); primitives H.*; the
                                  housing bearing and the pillow block's sizes (sub/)
@@ -50,7 +51,8 @@ src/builder/                     the hardware builder: poses (the record's compo
                                  (a bevel gear on its cone, a universal joint's yokes and cross, a swinging cylinder and
                                  its piston, a fixed port face) are placed where the joints put them, not on a slab; their
                                  kits are cross-pin, trunnion and piston-bore beside J1 to J13, with eccentric (a sheave in
-                                 its strap), hub (a part on a fixed hub), die (a die in a curved link) and the covers rule;
+                                 its strap), hub (a part on a fixed hub), die (a die in a curved link), track (a roller in a
+                                 groove cut along a composite track in a plate on the base) and the covers rule;
                                  arms.ts makes an outboard arm (a return crank on a crank pin's end) a body of its own for
                                  the build. A slider on the ground is placed lowest, clear of its rails' zone; a body's
                                  `shape.wheel` is built by the wheels rule (wheel, stub axle, upright tube). Body outlines

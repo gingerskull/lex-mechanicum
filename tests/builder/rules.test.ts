@@ -89,6 +89,7 @@ describe("joint kits", () => {
     column: "turkey-trot-walker",
     "flat-belt": "turkey-trot-walker",
     sole: "turkey-trot-walker",
+    track: "kin:trackFollower",
   };
   for (const id of KIT_IDS) {
     it(`${id}: builds its joint, with an axis, a zone and a note`, async () => {

@@ -8,6 +8,8 @@ import { extrudeOp, revolveOp } from "../../solids/tessellate";
 import type { Solid3 } from "../../solids/types";
 import { type BuildCtx } from "../ctx";
 import { BASE_GAP, BASE_T, BOSS } from "../constants";
+import { trackLevels } from "../shapes/track";
+import { trackPlateTop } from "./contacts/track";
 
 /** Room under a ring gear's rim for its carrier rollers' lower flanges and posts (ring-carrier), mm. */
 const RING_ROOM = 9;
@@ -207,6 +209,11 @@ export const base: Rule = {
       if (j.kit !== "ring-carrier") continue;
       const ring = ctx.parts.get(j.a === "ground" ? j.b : j.a);
       if (ring) top = Math.min(top, ring.frame.o[2] - RING_ROOM);
+    }
+    // a follower's track plate stands on the base, under the arm that carries the roller (rules/contacts/track.ts)
+    for (const j of ctx.joints) {
+      const t = j.kit === "track" ? trackPlateTop(ctx, j) : null;
+      if (t !== null) top = Math.min(top, trackLevels(t).bottom);
     }
     ctx.base = { top, bottom: top - BASE_T, outline: [] };
     (ctx.fired.base ??= []).push(`level ${top.toFixed(1)}`);
