@@ -1,9 +1,9 @@
 # Audit: Plug-door hinge (plug-door-hinge)
-standard: 3.13 · date: 2026-11-15 · result: open · detail: full · pass: build
+standard: 3.13 · date: 2026-11-16 · result: pass · detail: full · pass: build
 teaching: keep · decisions in the record
 
 ## Summary
-PASS 143 · FAIL 0 · N/A 17 · open: 9 unjudged
+PASS 152 · FAIL 0 · N/A 17 · open: none
 
 ## Requirements
 | Id | Status | Evidence / action |
@@ -61,7 +61,7 @@ PASS 143 · FAIL 0 · N/A 17 · open: 9 unjudged
 | D2 | PASS | HAND · bosses round every pin, the door bracket a 12 mm block carrying N and D, a raised boss on the crank at K; the hooks follow the clearance, not ornament |
 | D3 | PASS | STYLE · roles by pattern and tone from the style |
 | D4 | PASS | AUTO · fired: base (3 solids), feet (4 solids) · filled by the generator: a rule built solids for it |
-| D5 | PASS | AUTO / HAND · the track plate screwed and dowelled to the base, the bridge on spigoted posts, the wall on four posts screwed from under the base, the bumper on a threaded stud, the handle's posts screwed through the door |
+| D5 | PASS | AUTO / HAND · the track plate screwed and dowelled to the base, the bridge bar on spigoted posts, the wall on four posts screwed from under the base, the bumper on a threaded stud, the handle's posts screwed through the door |
 | D6 | PASS | HAND / STYLE · nothing cosmetic: every added part locates, holds, carries, limits or is the hand's grip |
 | D8 | PASS | AUTO / HAND · every part a profile, an operation and a frame (extrusions and revolves) |
 | D9 | N/A | AUTO / HAND · fired: j12-cvt (no solids) · no member changes shape |
@@ -73,7 +73,7 @@ PASS 143 · FAIL 0 · N/A 17 · open: 9 unjudged
 | A3 | PASS | AUTO · fired: classify (6 solids), axial stack builder · filled by the generator: a rule built solids for it |
 | A4 | PASS | AUTO · fired: j1-dead-axle (27 solids), axial stack builder · filled by the generator: a rule built solids for it |
 | A5 | N/A | AUTO · fired: j2-live-shaft (no solids), j10-shaft-in-plan (no solids), axial stack builder · no keyed shaft: H is a dead axle, every other pin a shoulder bolt |
-| A6 | PASS | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · the wall stands on four posts (two under the wall, two under the jamb piece) clear of the track plate; the bridge on two spigoted standoffs |
+| A6 | PASS | AUTO · fired: j5-slide (no solids), j13-compliant (no solids), standoffs (no solids) · the wall stands on four posts (two under the wall, two under the jamb piece) clear of the track plate; the bridge bar on two spigoted standoffs |
 | A7 | PASS | AUTO · fired: base (3 solids), posts (12 solids), feet (4 solids) · filled by the generator: a rule built solids for it |
 | A8 | PASS | AUTO · fired: fasteners (8 solids) · filled by the generator: a rule built solids for it |
 | A9 | PASS | AUTO / HAND · fired: column-slide (no solids), placement solver · H in double shear (dead axle from the base to the bridge); N in double shear between the door bracket and its ear over the goose-neck (the door's tipping load); K, G and D single shear because the goose-neck sweeps over G and D and the crank has no path to a fork over K past the bridge: each with a 1 to 2 mm overhang (a raised crank boss at K) and the bolt clamped through its part · H in double shear (dead axle from the base to the bridge); N in double shear between the door bracket and its ear over the goose-neck, for the door's tipping load; K, G and D single shear, as the goose-neck sweeps over G and D and the crank has no way to a fork over K past the bridge: overhangs 1 mm at K (the crank's raised boss) and 2 mm at G and D, one 684ZZ in each 6 mm plate as the J3 kit builds it |
@@ -86,19 +86,19 @@ PASS 143 · FAIL 0 · N/A 17 · open: 9 unjudged
 | A16 | PASS | HAND · 8 joint notes; no note: none; no badge: none · 8 notes with badges (6 joints, drive, door stops). Build rules: one hinge level, the guide arm lowest over the track plate; the door bracket shares the crank's plane, the ear over the goose-neck takes N's tipping load; the goose-neck stands over G's head, the crank's boss raised to it at K; D's pin turned head down; the door stops on its lips closed and on the wall's bumper open |
 | A17 | PASS | HAND · order: base and feet; track plate screwed and dowelled; wall on its posts; H's axle, the crank on it, the bridge; the guide arm with its roller dropped in the groove, G; the goose-neck on K; the door hung on N (bolt down through the ear) and D (bolt up from under the guide arm); the handle and the bumper last. Every head reachable with a key, nothing trapped |
 | A18 | PASS | AUTO · placement: 3 slabs in the tallest stack (41.0 mm), 0 clevises; stack per joint in the Joints table · filled by the generator: the pipeline holds it for every built mechanism |
-| A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: H-bridge · the bridge over H moved off the sweeps, least gap 1.5 mm; it covers the crank, goose-neck and guide arm and is drawn see-through |
+| A19 | PASS | AUTO · 1 support routed (1 moved), least gap 1.5 mm; still covering a principle part, drawn see-through: H-bridge · the bridge over H moved off the sweeps, least gap 1.5 mm; shaped as a narrow bar from each post to a boss at H (owner, 2026-11-16), it still crosses the crank, goose-neck and guide arm and is drawn see-through |
 | A20 | PASS | AUTO · support per joint: H bridge · H a bridge over a dead axle (nothing sweeps over it); the moving pins shoulder bolts on bearings |
 | A21 | PASS | AUTO · kit per joint: K J3, N J3, G J3, D J3, F track, H J1, drive drive |
 | A22 | PASS | AUTO · fired: stops (no solids), adjustable-length (no solids), cable-clip (no solids) · the stops rule serves levers on their pivots and skips the exact crank; the door's stops are its lips and one bumper, in the polish (F5) |
 | E1 | PASS | AUTO · every solid has one explode level; levels 0 to 29.73 · filled by the generator: the pipeline holds it for every built mechanism |
 | E2 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | E3 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
-| E4 | ? | HAND |
+| E4 | PASS | HAND · the bolts at N and D and the door's ear come off first, then the goose-neck, the crank with the bridge bar on its posts above it, the door and the wall pieces off their posts, the guide arm with its roller lifted out of the groove, H's axle and its spacers up out of the base, the track plate off its dowels; the bumper and its stud leave along their own axis, off the wall's outer face |
 | E5 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | E6 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | E7 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | E8 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
-| E9 | ? | HAND |
+| E9 | PASS | HAND · full explode readable in both sheets: the levels leave upward in order along the pin axes, the follower roller (the accent) clear above its groove, nothing inside another part, nothing leaves the frame |
 | E10 | PASS | AUTO · fired: explode (1 solid) · filled by the generator: a rule built solids for it |
 | J1 | PASS | AUTO · fired: trunnion (no solids), hub (no solids), j1-dead-axle (27 solids) · filled by the generator: a rule built its kit |
 | J2 | N/A | AUTO · fired: j2-live-shaft (no solids) · filled by the generator: no joint of this type |
@@ -156,26 +156,26 @@ PASS 143 · FAIL 0 · N/A 17 · open: 9 unjudged
 | R1 | PASS | HAND · every joint from its kit; the composite track from the kit of #287; the hand grip and the fork ear from the rules |
 | R2 | PASS | HAND · standard sizes: M3 and M4, 684ZZ, Ø16 x 7 track roller, Ø6 stud |
 | R3 | PASS | AUTO · fired: hardware primitives · hardware primitives shared |
-| R4 | PASS | AUTO · package v2 29.3 KB · filled by the generator: the pipeline holds it for every built mechanism |
+| R4 | PASS | AUTO · package v2 29.5 KB · filled by the generator: the pipeline holds it for every built mechanism |
 | R5 | PASS | HAND · the polish adds the open bumper and its note only |
-| R6 | ? | FLAG |
+| R6 | PASS | FLAG · FLAG: bench on the desktop: frames 1.05 to 1.1 ms paced (under 8 ms), 1.42 to 1.52 ms at 28° over the dial; the GPU 1.2 to 2.5 ms and 8.41 ms in the full explode (over the 8 ms target, a flag); setup 47.3 ms on the bench page, 38.6 ms of it the GPU's first frame, over the 20 ms target; the phone is measured by the owner |
 | R7 | PASS | HAND / FLAG · polish 12 lines (1.6 KB); 2 solids added, 0 overrides by the polish |
 | R8 | PASS | AUTO / SITE · the renderer draws what is seen (site) |
 | R9 | PASS | AUTO / SITE · the shared setup (site) |
-| R10 | ? | FLAG |
+| R10 | PASS | FLAG · FLAG: the phone bench page is the owner's to run |
 | DL1 | PASS | AUTO / HAND · 33 of 119 solids on a dropping rung · every solid on a rung by kind and role; nothing moved on the ladder |
 | DL2 | PASS | HAND · default dial full |
 | DL3 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
 | DL4 | PASS | SITE · the adaptive dial is the site's |
 | DL6 | PASS | AUTO · filled by the generator: the pipeline holds it for every built mechanism |
-| DL5 | ? | FLAG |
+| DL5 | PASS | FLAG · FLAG: rungs and frame times in the bench report and the Detail ladder table |
 | Q1 | PASS | check, clamp and edge distance clean |
 | Q2 | PASS | 0 clashes, 0 unnecessary allows |
 | Q3 | PASS | package v2 written, 29.3 KB; site build not checked here · package v2 written, 29.3 KB; the site build runs at PR time |
-| Q4 | ? | local: tools/shot |
-| Q5 | ? | local: tools/bench |
-| Q6 | ? |  |
-| Q7 | ? |  |
+| Q4 | PASS | local: tools/shot · shot set drawn in both sheets (record view, PLAN, FRONT, SIDE, ISOMETRIC, the follower section, full explode) and the default view at the end of the dwell, mid swing and open, looked at by eye |
+| Q5 | PASS | local: tools/bench · bench run; flags in R6 |
+| Q6 | PASS | regenerated, every hand row judged; R7 decided by the tools, the polish 12 lines, under the plan's 30 |
+| Q7 | PASS | whole-library conformance run at standard 3.13 with this pass |
 | Q8 | PASS | teaching review: keep (2026-11-15); the six phases of the finished build are looked at by eye · teaching review keep recorded in the record and on the teaching line; the six phases of the finished build looked at again |
 
 ## Joints
@@ -186,7 +186,7 @@ PASS 143 · FAIL 0 · N/A 17 · open: 9 unjudged
 | G | J3 | – | – | – | none | Shoulder bolt Ø4 x 10, M3 (ISO 7379) | Shoulder bolt Ø4 x 10, M3 (ISO 7379) | none | none | none | none | none | none | none |
 | D | J3 | dyad | – | – | none | Shoulder bolt Ø4 x 10, M3 (ISO 7379) | Shoulder bolt Ø4 x 10, M3 (ISO 7379) | none | none | none | none | none | none | none |
 | F | track | target-path | – | – | 2 x Dowel pin Ø3 h6, through the plate into the base | External circlip DIN 471, Ø6 | none | Thrust washer 6x10, bronze | none | none | none | Felt oiler in the groove's relieved end, oil-soaked wool felt | none | none |
-| H | J1 | dyad | bridge (moved) | – | Bridge over the pivot, on two spigoted posts; Dead axle Ø4, shouldered, M3 end | External circlip DIN 471, Ø4 | none | Thrust washer 4.2x12, bronze | none | none | none | none | none | none |
+| H | J1 | dyad | bridge (moved) | – | Bridge bar over the pivot, bossed at the pivot, on two spigoted posts; Dead axle Ø4, shouldered, M3 end | External circlip DIN 471, Ø4 | none | Thrust washer 4.2x12, bronze | none | none | none | none | none | none |
 | drive | drive | – | – | – | none | none | none | none | none | none | none | none | none | none |
 | door-stops | stops | – | – | – | none | none | none | none | Stop bumper, neoprene Ø12, bonded to a steel stud: the door lands on it open; Door panel, its stop lips on the inner face | none | none | none | none | none |
 
@@ -200,25 +200,27 @@ PASS 143 · FAIL 0 · N/A 17 · open: 9 unjudged
 |---|---|---|---|
 | door stops (F5) | the stops rule's pins beside a swinging lever (it skips the exact crank and the door, which has no pivot of its own) | closed on the door's stop lips seated on the jambs; open on a neoprene bumper on the wall's outer face, 0.2 mm off the door at the end of the run | F5, V5: the door lands on the wall, not against a pin beside a pivot (polish) |
 | D (guide arm to door) | the shoulder bolt's head on top of the door bracket | turned head down (`head: "-"`), under the guide arm | A14: the goose-neck sweeps over D; nothing passes under the guide arm there (record) |
+| H's bridge | the router's plate over the pin and both posts, crossing over the crank | a narrow bar from each post to a boss at H (`bridge: "bar"` on the joint); the posts, spigots, screws and bushing as the router builds them | owner, 2026-11-16: the plate read heavy over the crank; A9 double shear and T12 posts kept (record) |
 | N, K (pieces joined to a pin) | one member per body at a pin | the door's ear over the goose-neck and the crank's boss at K are members of their pins' stacks (`joints` on the piece) | A9: N in double shear for the door's tipping load; K's overhang 1 mm (record) |
 
 ## Detail ladder
 | Rung | Solids | Marks | Frame ms at this dial position |
 |---|---|---|---|
-| DL-A | 10 | 0 | ? |
-| DL-B | 0 | 241 | ? |
-| DL-C | 0 | 0 | ? |
-| DL-D | 13 | 0 | ? |
-| DL-E | 1 | 1 | ? |
-| DL-F | 0 | 0 | ? |
-| DL-G | 0 | 0 | ? |
-| DL-H | 9 | 0 | ? |
-| never | 86 | 133 | ? |
+| DL-A | 10 | 0 | 1.46 |
+| DL-B | 0 | 241 | 1.42 |
+| DL-C | 0 | 0 | 1.52 |
+| DL-D | 13 | 0 | 1.46 |
+| DL-E | 1 | 1 | 1.42 |
+| DL-F | 0 | 0 | 1.47 |
+| DL-G | 0 | 0 | 1.49 |
+| DL-H | 9 | 0 | 1.44 |
+| never | 86 | 133 | 1.45 |
 
 ## Promotion candidates
-Made in this pass, gated so every other build is byte-identical (the solids, notes and issues of all 98 other mechanisms hashed with and without the change): a manual driver's `hand` point on another body (a pull handle on that body's face; the joint a plain pivot); a plate piece with `joints` as a member of those pins' stacks; the track kit reads a placed arm's own faces. Each is used once, here.
+Made in this pass, gated so every other build is byte-identical (the solids, notes and issues of all 98 other mechanisms hashed with and without the change): a manual driver's `hand` point on another body (a pull handle on that body's face; the joint a plain pivot); a plate piece with `joints` as a member of those pins' stacks; the track kit reads a placed arm's own faces; a fixed pin's bridge as a narrow bar from each post to a boss at the pin (`bridge: "bar"`, round 3, hashed the same way). Each is used once, here.
 For the builder, its own change: `ctx.extent` returns the placement solver's slab even for a body the record places (`place`), so the headroom check reports a false head here (D's, turned under the guide arm, against the goose-neck far above) and a turned pin on a placed body spans wrong unless the body's frame gives its axes (`frame.z`, set here on the guide arm and the door). Fixing it reaches walking-beam, hobsons-joint, wobble-box, turkey-trot-walker and eight-night-indexer.
 
 ## Verification
-check: clean · K1 residual: 4.5e-13 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 29.3 KB
-screenshots: ? · bench: ?
+check: clean · K1 residual: 4.5e-13 · claims: 5 of 5 ok · clearance: 0 clashes · clamp: clean · edge distance: clean · package: 29.5 KB
+screenshots: the shot set in both sheets (record view, PLAN, FRONT, SIDE, ISOMETRIC, section follower, full explode) in dist/shots3/plug-door-hinge, and the default view at the end of the dwell, mid swing and open, looked at by eye (out of the repository, in the pass's PR) ·
+bench: desktop, frames at 28 deg 1.05 ms paced, explode 1.1 ms (GPU 8.41 ms, a flag), setup 47.3 ms on the bench page (over the 20 ms target, a flag; 38.6 ms of it the GPU's first frame)

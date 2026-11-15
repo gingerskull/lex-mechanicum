@@ -187,6 +187,8 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   // Oldham coupling's output hub, whose shaft cannot come up through the input side, hangs from a bridge)
   const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: SupportKind } | undefined)?.support).find(Boolean);
   if (asked) spec.support = asked;
+  // a bridge shaped as a narrow bar from each post to a boss at the pivot (`bridge: "bar"`), not a plate over all three
+  if (site.joints.some((j) => (ctx.kin.joints.find((q) => q.id === j) as { bridge?: unknown } | undefined)?.bridge === "bar")) spec.bar = true;
   // both pillow blocks on one side of what the shaft carries (`side` on its joint: +1 along the axis, −1 against it)
   const side = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { side?: number } | undefined)?.side).find((v) => v === 1 || v === -1);
   if (side) spec.side = side as 1 | -1;

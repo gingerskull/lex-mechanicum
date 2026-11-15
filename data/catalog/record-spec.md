@@ -292,7 +292,8 @@ record names on the ground lies on the base.
   `bell` (as the race, with `outer`, `mouth`, `back`); `cage` (`inner`, `outer`, `width`, `window`; a window at each ball
   joined to it by a `planar` joint).
 - *Joints:* `support` (`hung`, `bridge`, `stub`, `housing`, `pillow`) names a fixed site's support where the selector
-  would choose one that cannot be built (an output shaft that cannot come up through the input side); `head: "-"`
+  would choose one that cannot be built (an output shaft that cannot come up through the input side); `bridge: "bar"`
+  shapes a fixed pin's bridge as a narrow bar from each post to a boss at the pin, not a plate over all three; `head: "-"`
   turns a moving pin end for end. A body with `set: "B"` (a second set of like links) is drawn in a pattern of its own.
 - *Blocks:* `bennett` with only `joints` [j1..j4] (round the loop, j1 the driven ground joint) reads its lengths, twists
   and reference angle from them; `hooke` takes `shafts: { in | out: { body, axis } }` for a shaft with no ground joint (a
