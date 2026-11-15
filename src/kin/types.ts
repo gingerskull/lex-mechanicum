@@ -173,6 +173,11 @@ export interface KinDriver {
    * only the input degrees after which the motion repeats (a planetary's carrier turn), noted in the record.
    */
   cycle?: { from?: string; note?: string } | number;
+  /**
+   * A manual driver worked by a hand on another body than its joint's: the named point is the grip (a handle on a door
+   * whose hinge tube is the driver's joint). The builder puts the grip there and builds the joint as a plain pivot.
+   */
+  hand?: string;
 }
 
 export interface SelectorOptionSpec {

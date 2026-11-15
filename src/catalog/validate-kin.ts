@@ -171,6 +171,8 @@ export function validateKinTeaching(r: CatalogRecord, opts: { required: boolean 
     else driverJoints.add(d.joint);
     if (!(Array.isArray(d.range) && d.range.length === 2 && d.range.every(isNum) && d.range[0] < d.range[1])) say(`driver ${d.id}: range must be [lo, hi]`);
     else if (isNum(d.default) && (d.default < d.range[0] || d.default > d.range[1])) say(`driver ${d.id}: default ${d.default} outside its range`);
+    const hand = (d as { hand?: unknown }).hand;
+    if (hand !== undefined && (d.kind !== "manual" || !isStr(hand) || !(kin.points ?? []).some((q) => q.id === hand))) say(`driver ${d.id}: hand "${String(hand)}" must name a point, on a manual driver`);
     if (d.kind === "oscillating" && !(isNum(d.lo) && isNum(d.hi) && d.lo < d.hi)) say(`driver ${d.id}: an oscillating driver gives lo and hi`);
   }
   if (!kin.drivers.length) say("kin.drivers is empty");

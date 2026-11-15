@@ -16,6 +16,21 @@ import type { Rule } from "../types";
 import { bodyOf, contactRule } from "./kit";
 
 /**
+ * The axial range of the arm that carries the follower, along the stack's normal: its slab's, or for a part the record
+ * places itself (`place` on its shape, where the placement solver's slab does not hold it) the built part's own faces.
+ */
+function armRange(ctx: BuildCtx, body: string): { frame: Frame; w0: number; w1: number } | null {
+  const e = ctx.extent(body);
+  const g = ctx.geoms.get(body);
+  const part = ctx.parts.get(body);
+  if (!e || typeof g?.shape.place !== "number" || !part || part.op.op !== "extrude" || !parallel(part.frame.z, e.frame.z)) return e;
+  const k = v3.dot(part.frame.z, e.frame.z) > 0 ? 1 : -1;
+  const a = v3.dot(v3.sub(part.frame.o, e.frame.o), e.frame.z);
+  const b = a + k * part.op.h;
+  return { frame: e.frame, w0: Math.min(a, b), w1: Math.max(a, b) };
+}
+
+/**
  * The world height of a track plate's top (z-up stacks only): right under the arm that carries the follower where no
  * other moving part sweeps over the plate, else under every moving part, as the base is. Decided once per build, when
  * the base rule asks (the base drops under the plate), so the kit builds at the level the base made room for.
@@ -26,7 +41,7 @@ export function trackPlateTop(ctx: BuildCtx, ji: JointInfo): number | null {
   tops.set(ctx, memo);
   if (memo.has(ji.id)) return memo.get(ji.id)!;
   const T = ji.r.slot?.track;
-  const e = ctx.extent(ji.a);
+  const e = armRange(ctx, ji.a);
   const plate = T ? trackPlate(T.t) : null;
   let top: number | null = null;
   if (T && e && plate && ji.b === "ground" && parallel(e.frame.z, UP) && parallel(T.n, UP)) {
@@ -74,7 +89,9 @@ const trackFollower = contactRule({
     };
     if (!T) return fail("no track");
     if (c.b !== "ground") return fail("its track is on a moving body, and only a track on the ground is built");
-    if (!c.za || !ctx.base || !parallel(T.n, c.frame.z) || !parallel(c.frame.z, UP)) return fail("its track does not lie in the plane of the arm's stack over the base");
+    const arm = armRange(ctx, c.a);
+    const za: [number, number] | null = arm && c.za ? [arm.w0, arm.w1] : c.za;
+    if (!za || !ctx.base || !parallel(T.n, c.frame.z) || !parallel(c.frame.z, UP)) return fail("its track does not lie in the plane of the arm's stack over the base");
     const plate = trackPlate(T.t);
     if (!plate) return fail(`an arc of its track is tighter than the groove (Ø${TRACK_FOLLOWER.D} roller)`);
     const top = trackPlateTop(ctx, c.ji);
@@ -113,11 +130,11 @@ const trackFollower = contactRule({
     const [r0, r1] = lv.roller;
     const s = circlipExt(F.d).s;
     const g = r0 - s - 0.15;
-    L.add(H.shaft(`${id}-stud`, { d: F.d, z0: g - 0.6, z1: c.za[1] - 0.3, grooves: [g] }, { body: carrier, at, name: `Track roller stud Ø${F.d}, hardened, pressed into the arm` }));
+    L.add(H.shaft(`${id}-stud`, { d: F.d, z0: g - 0.6, z1: za[1] - 0.3, grooves: [g] }, { body: carrier, at, name: `Track roller stud Ø${F.d}, hardened, pressed into the arm` }));
     L.add(H.roller(`${id}-roller`, F.d, F.D, { body: carrier, at, z0: r0, z1: r1, name: `Track roller Ø${F.D} x ${F.B}, stud type, sealed: runs in the groove` }));
     L.add(H.thrustWasher(`${id}-tw`, F.d, 10, { body: carrier, at, z0: lv.washer[0], z1: lv.washer[1] }));
     // where the plate lies below other parts, a sleeve on the stud holds the roller down at the groove
-    if (c.za[0] - lv.washer[1] > 0.05) L.add(H.tube(`${id}-sleeve`, F.d, 10, { body: carrier, at, z0: lv.washer[1], z1: c.za[0], name: `Spacer sleeve ${F.d}x10 on the stud, between the washer and the arm` }));
+    if (za[0] - lv.washer[1] > 0.05) L.add(H.tube(`${id}-sleeve`, F.d, 10, { body: carrier, at, z0: lv.washer[1], z1: za[0], name: `Spacer sleeve ${F.d}x10 on the stud, between the washer and the arm` }));
     L.add(H.circlip(`${id}-cl`, F.d, { body: carrier, at, z0: g + 0.05 }));
     const solids = L.out();
     const part = solids.find((q) => q.id === `${id}-plate`)!;

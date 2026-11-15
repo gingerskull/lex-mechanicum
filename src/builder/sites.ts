@@ -173,7 +173,8 @@ function kitOf(j: KinJoint, kin: Kin, axis: Vec3): KitId {
 }
 
 export function classifyJoints(kin: Kin, S: Setup): { joints: JointInfo[]; sites: Site[] } {
-  const driven = new Set(kin.drivers.map((d) => d.joint).filter((x): x is string => !!x));
+  // a joint worked by a hand on another body (`hand` on a manual driver) is a plain pivot, not an input shaft
+  const driven = new Set(kin.drivers.filter((d) => !(d.kind === "manual" && d.hand)).map((d) => d.joint).filter((x): x is string => !!x));
   const joints: JointInfo[] = kin.joints.map((j) => {
     const r = S.joints.get(j.id)!;
     return { id: j.id, joint: j, r, kit: kitOf(j, kin, r.axis), a: j.a, b: j.b, at: r.at, axis: canon(r.axis) };
