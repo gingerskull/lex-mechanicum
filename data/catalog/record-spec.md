@@ -533,7 +533,7 @@ antiparallelogram, bell-crank, toggle-clamp, scissor-lift, pantograph, watt-six-
 klann-linkage, jansen-linkage, ackermann-steering, rhombic-drive, elliptic-trammel,
 watt-linkage, chebyshev-linkage, hoekens-linkage, roberts-linkage, evans-grasshopper, scott-russell, peaucellier-lipkin,
 hart-inversor, sarrus-linkage, tusi-couple, crank-shaper, whitworth, drag-link-quick-return, offset-slider-crank,
-walschaerts-valve-gear, bennett-linkage, wobble-box, walking-beam,
+walschaerts-valve-gear, bennett-linkage, wobble-box, walking-beam, plug-door-hinge,
 spur-gears, gear-train, internal-gear-pair, helical-gears, herringbone-gears, bevel-gears, hypoid-gears, worm-drive,
 crossed-helical-gears, rack-pinion, rack-stroke-doubler, planetary, differential, harmonic-drive, cycloidal-drive,
 non-circular-gears, sun-and-planet, wankel, ravigneaux,
