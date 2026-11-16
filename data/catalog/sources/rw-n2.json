@@ -1,6 +1,20 @@
 {
   "plug-door-hinge": {
-    "waive": ["media"],
-    "note": "No video was found that shows this hinge at work and is documented as using it: searches for footage of a passenger door that pulls in and then swings out flat on a goose-neck gave only articles and forum posts, so none is listed. Media holds the Wikimedia Commons category of aircraft doors."
+    "real_world": [
+      {
+        "product": "Boeing 737 forward entry door",
+        "maker": "Boeing",
+        "use": "Opened from inside, the plug door is drawn in out of its frame, turned edgewise through the opening and swung out on its hinge arms until it lies flat against the outside of the fuselage.",
+        "url": "https://www.youtube.com/watch?v=A00EhdN5X80",
+        "note": "The hinge arms are hidden behind the door's lining; what shows is the door's path."
+      }
+    ],
+    "media": [
+      {
+        "title": "B737 door operation, outside and inside (The Cabin Crew Briefing Room)",
+        "url": "https://www.youtube.com/watch?v=A00EhdN5X80",
+        "kind": "video"
+      }
+    ]
   }
 }

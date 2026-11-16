@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-11-15",
+  "generated": "2026-11-16",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -20780,6 +20780,11 @@
           "title": "Category:Aircraft doors, Wikimedia Commons",
           "url": "https://commons.wikimedia.org/wiki/Category:Aircraft_doors",
           "kind": "photos"
+        },
+        {
+          "title": "B737 door operation, outside and inside (The Cabin Crew Briefing Room)",
+          "url": "https://www.youtube.com/watch?v=A00EhdN5X80",
+          "kind": "video"
         }
       ],
       "related": [
@@ -20788,16 +20793,21 @@
         "crank-shaper",
         "cam-follower"
       ],
-      "real_world": [],
+      "real_world": [
+        {
+          "product": "Boeing 737 forward entry door",
+          "maker": "Boeing",
+          "use": "Opened from inside, the plug door is drawn in out of its frame, turned edgewise through the opening and swung out on its hinge arms until it lies flat against the outside of the fuselage.",
+          "url": "https://www.youtube.com/watch?v=A00EhdN5X80",
+          "note": "The hinge arms are hidden behind the door's lining; what shows is the door's path."
+        }
+      ],
       "added": "2026-11-15",
       "origin": {
         "date": "1987-11-20",
         "precision": "day",
         "note": "Boeing files US application 123599 (Maraghe and Puncoch), granted as US 4,854,010 and the priority of EP 0 317 037: the goose-neck hinge steered by an S-shaped track. Source: https://patents.google.com/patent/US4854010"
-      },
-      "waive": [
-        "media"
-      ]
+      }
     },
     {
       "id": "rhombic-drive",

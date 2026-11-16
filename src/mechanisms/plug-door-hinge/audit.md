@@ -19,7 +19,7 @@ PASS 152 · FAIL 0 · N/A 17 · open: none
 | P3 | PASS | DATA / SITE · the page reads ratio, axes, character (Non-uniform; the dwell is the hinge tube's, so it stays in the prose and the claims), backdrivable, aka, family, motion, level, dof and the hand drive from the record |
 | P4 | PASS | DATA · tags grouped Function, Property, Application, keywords |
 | P5 | PASS | DATA · explanation in four parts and two examples from the record; the aircraft use only in examples |
-| P6 | PASS | DATA · Wikipedia, EP 0 317 037 A2 and US 4,854,010, the Commons photo page; no real footage found, the video slot waived with its note (rw-n2.json) |
+| P6 | PASS | DATA · Wikipedia, EP 0 317 037 A2 and US 4,854,010, the Commons photo page; a video of a Boeing 737 entry door opened from inside and outside, in media and in real_world (its oEmbed answers; the hinge arms are hidden, the door's path shows) |
 | P7 | PASS | HAND / SITE · no prose in the polish; labels come from the record |
 | P8 | PASS | SITE · the page has no parts list or joint sections (site) |
 | P9 | PASS | AUTO / HAND · every number the explanation states is a claim and agrees (T9): 26 mm dwell, about 10 degrees, 157 and 180 degrees |
