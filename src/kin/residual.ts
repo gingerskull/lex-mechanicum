@@ -7,6 +7,7 @@ import { ellipticalAngle, meshRatio } from "./blocks/gears";
 import { camMotion, camTurns, scheduleOf, type CamLaw } from "./blocks/cam";
 import { chainAdvance, screwAdvance, variatorR2 } from "./blocks/members";
 import { reflection, bisectorNormal } from "./blocks/spatial";
+import { resolveTrack, trackMiss, type Track3 } from "./blocks/track";
 
 /** A joint with its numbers and vectors evaluated (parameters bound) and its reference geometry in world coordinates. */
 export interface ResolvedJoint {
@@ -16,7 +17,7 @@ export interface ResolvedJoint {
   axis2?: Vec3;
   pinA?: Vec3;
   pinB?: Vec3;
-  slot?: { from: Vec3; to: Vec3; repeat?: number; center?: Vec3; circle?: number; arc?: { center: Vec3; radius: number } };
+  slot?: { from: Vec3; to: Vec3; repeat?: number; center?: Vec3; circle?: number; arc?: { center: Vec3; radius: number }; track?: Track3 };
   ca?: Vec3;
   cb?: Vec3;
   num: (v: unknown) => number;
@@ -111,6 +112,11 @@ export function jointResidual(r: ResolvedJoint, Xa: Xf, Xb: Xf, driverValue: (id
         // a curved slot: the pin stays at the arc's radius from its centre, in the plane of the joint's axis
         const c = xf.apply(Xb, r.slot.arc.center);
         out.push(v3.len(v3.perp(v3.sub(pin, c), bx)) - r.slot.arc.radius);
+        break;
+      }
+      if (r.slot.track) {
+        // a composite track: the pin's distance from the track's centre line, in its plane, in the slot body's frame
+        out.push(trackMiss(r.slot.track, xf.apply(xf.inv(Xb), pin)));
         break;
       }
       let best: Vec3 | null = null;
@@ -310,6 +316,8 @@ export function resolveJoint(j: KinJoint, num: (v: unknown) => number, vec: (v: 
         ? { from: [0, 0, 0], to: [0, 0, 0], center: j.slot.center ? vec(j.slot.center) : undefined, circle: num(j.slot.radius) }
         : j.slot.arc
           ? { from: vec(j.slot.arc.center), to: vec(j.slot.arc.center), arc: { center: vec(j.slot.arc.center), radius: num(j.slot.arc.radius) } }
+        : j.slot.track
+          ? ((T) => ({ from: T.o, to: T.o, track: T }))(resolveTrack(j.slot.track, num, vec, vec(j.at), unit(j.axis ? vec(j.axis) : [0, 0, 1])))
         : { from: vec(j.slot.from), to: vec(j.slot.to), repeat: j.slot.repeat, center: j.slot.center ? vec(j.slot.center) : undefined }
       : undefined,
     ca: j.ca ? vec(j.ca) : undefined,

@@ -172,3 +172,43 @@ export function bennett(s: BennettSpec = { a: 60, alphaDeg: 40, betaDeg: 70, the
     fallback: null,
   };
 }
+
+/**
+ * A pin in a fixed S track (two arcs and a line) on the ground: a crank on the ground and an arm pinned to it, the
+ * arm's far pin F running in the track. The cycle runs F from the track's start to its end and back (target-path,
+ * shape "track"), and the crank and the arm close on it as a dyad, the way the pantograph's linkage follows its stylus.
+ */
+export function trackFollower(): Kin {
+  const F: Vec3 = [60, -30, 0];
+  const A = dyadRRR([0, 0, 0], F, 45, 55).roots[0];
+  return {
+    bodies: [
+      { id: "ground", role: "ground" },
+      { id: "crank", role: "driver", shape: { type: "link", length: 45 }, at: { joint: "O" } },
+      { id: "arm", role: "output", shape: { type: "link", length: 55 }, at: { joint: "A" } },
+    ],
+    joints: [
+      { id: "O", type: "revolute", a: "ground", b: "crank", at: [0, 0, 0], axis: [0, 0, 1] },
+      { id: "A", type: "revolute", a: "crank", b: "arm", at: A, axis: [0, 0, 1] },
+      {
+        id: "F",
+        type: "pin-in-slot",
+        a: "arm",
+        b: "ground",
+        at: F,
+        axis: [0, 0, 1],
+        slot: { track: { start: [60, -30], dir: 90, segments: [{ radius: 40, angle: 45 }, { length: 20 }, { radius: -40, angle: 45 }] } },
+      },
+    ],
+    params: [],
+    design: [{ id: "elbow", options: ["left", "right"], value: "left" }],
+    drivers: [{ id: "hand", joint: "O", kind: "manual", range: [-180, 180], default: 0, cycle: { from: "run", note: "the cycle runs the pin along the track and back" } }],
+    solve: [
+      { block: "target-path", id: "run", in: { shape: "track", joint: "F" }, out: { point: "F", travel: "travel" } },
+      { block: "dyad", id: "close", in: { a: "O", b: "F", ra: 45, rb: 55 }, branch: "elbow", out: "A" },
+    ],
+    points: [{ id: "pin", body: "arm", local: [55, 0, 0] }],
+    outputs: [{ id: "crank-angle", of: "crank", kind: "angle", unit: "deg" }],
+    fallback: null,
+  };
+}

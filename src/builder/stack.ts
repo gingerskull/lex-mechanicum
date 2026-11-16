@@ -67,6 +67,8 @@ export interface StackSpec {
    * sweeps over or under): a live shaft keyed to both plates turns in a bushing in a bridge that runs in the gap.
    */
   between?: boolean;
+  /** The bridge as a narrow bar from each post to a boss at the pivot (`bridge: "bar"` on a joint of the site). */
+  bar?: boolean;
 }
 
 export interface StackResult {
@@ -386,7 +388,7 @@ function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
     // a bridge over the stack, where a pair of posts clears the sweeps; a live shaft in its housing does without one
     // when none does (the parts round it sweep the whole plan), and says so
     const o = spec.frame.o;
-    const route = support === "bridge" || support === "hung" ? routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom: o[2] + zTop + BEAM_GAP, baseTop: spec.baseTopWorld ?? o[2] + bt }) : null;
+    const route = support === "bridge" || support === "hung" ? routeBridge(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], rB: 10.5, minBottom: o[2] + zTop + BEAM_GAP, baseTop: spec.baseTopWorld ?? o[2] + bt, ...(spec.bar ? { bar: true } : {}) }) : null;
     if ((support === "bridge" || support === "hung") && !route) {
       if (!(live && spec.base)) throw new Error(`${id}: no pair of posts clears the sweeps for a bridge`);
       notes.push("no pair of posts clears the sweeps for a bridge: the shaft is held in its housing alone");
@@ -397,7 +399,7 @@ function stackAlong(ctx: BuildCtx, spec: StackSpec): StackResult {
       const beamBot = route.bottom - o[2];
       const beamTop = route.top - o[2];
       const hole = (circleBushing(d) / 2) + 0.05;
-      const bs = bridgeSolids(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], route, hole, baseTop: baseTopW, baseBottom: baseBotW, joints: spec.joints });
+      const bs = bridgeSolids(ctx, { id: `${id}-bridge`, over: [o[0], o[1]], route, hole, baseTop: baseTopW, baseBottom: baseBotW, joints: spec.joints, ...(spec.bar ? { bar: true } : {}) });
       extra.push(...bs);
       bridge = { id: `${id}-bridge`, route };
       ctx.routes.push({ support: `${id}-bridge`, site: id, kind: support, tried: route.tried, moved: route.moved, covers: route.covers, gap: route.gap });

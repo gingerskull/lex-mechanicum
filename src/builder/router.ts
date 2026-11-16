@@ -76,7 +76,7 @@ const prism = (M: Wasm, poly: readonly Vec2[], z0: number, z1: number): Mf => {
  * Routes a bridge over the pivot `over`: two posts on the base outside every sweep, a beam above everything that passes
  * under its footprint. Returns null only when no post pair exists within the search radius.
  */
-export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: number; minBottom: number; baseTop: number; below?: number }): BridgeRoute | null {
+export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: number; minBottom: number; baseTop: number; below?: number; bar?: boolean }): BridgeRoute | null {
   const M = ctx.M;
   const zAll = ctx.sweeps.bounds()?.[5] ?? o.minBottom;
   const zTall = Math.max(zAll, o.minBottom) + 4;
@@ -132,7 +132,7 @@ export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: numb
   }
   const evals: Eval[] = [];
   for (const pair of best) {
-    const footprint = hullPoly([[o.over[0], o.over[1], o.rB], [pair.A.p[0], pair.A.p[1], POST_R + 1.5], [pair.B.p[0], pair.B.p[1], POST_R + 1.5]]);
+    const footprint = o.bar ? barOutline(M, o.over, o.rB, [pair.A.p, pair.B.p]) : hullPoly([[o.over[0], o.over[1], o.rB], [pair.A.p[0], pair.A.p[1], POST_R + 1.5], [pair.B.p[0], pair.B.p[1], POST_R + 1.5]]);
     // what the beam covers is read at its lowest height; the underside is worked out for the pair taken
     const beam = prism(M, footprint, o.minBottom, o.minBottom + BEAM_T);
     const fp = projectAlong(beam, viewDir);
@@ -190,8 +190,29 @@ export function routeBridge(ctx: BuildCtx, o: { id: string; over: Vec2; rB: numb
   };
 }
 
+/**
+ * A bridge as a narrow bar (`bridge: "bar"` on the pivot's joint): a bar of the posts' pad width from each post to the
+ * pivot, and a boss there for the bushing, instead of the plate over all three. For a pivot well off the line between
+ * its posts, where the plate would cover what turns under it.
+ */
+function barOutline(M: Wasm, over: Vec2, rB: number, posts: [Vec2, Vec2]): Vec2[] {
+  const w = POST_R + 1.5;
+  const parts = [
+    hullPoly([[over[0], over[1], w], [posts[0][0], posts[0][1], w]]),
+    hullPoly([[over[0], over[1], w], [posts[1][0], posts[1][1], w]]),
+    circle(rB, over[0], over[1], 48),
+  ].map((r) => new M.CrossSection([r], "NonZero"));
+  const u = M.CrossSection.union(parts);
+  const rings = u.toPolygons() as Vec2[][];
+  parts.forEach((c) => c.delete());
+  u.delete();
+  return rings.reduce((a, b) => (Math.abs(area(b)) > Math.abs(area(a)) ? b : a));
+}
+
+const area = (r: readonly Vec2[]): number => r.reduce((s, p, i) => s + p[0] * r[(i + 1) % r.length]![1] - r[(i + 1) % r.length]![0] * p[1], 0) / 2;
+
 /** The solids of a routed bridge: beam on two spigoted posts, M5 button heads from both sides (F1, A11). */
-export function bridgeSolids(ctx: BuildCtx, o: { id: string; over: Vec2; route: BridgeRoute; hole: number; baseTop: number; baseBottom: number; joints: string[]; boreSolid?: string }): Solid3[] {
+export function bridgeSolids(ctx: BuildCtx, o: { id: string; over: Vec2; route: BridgeRoute; hole: number; baseTop: number; baseBottom: number; joints: string[]; boreSolid?: string; bar?: boolean }): Solid3[] {
   const { route: r } = o;
   const up: Frame = { o: [0, 0, 0], x: [1, 0, 0], z: [0, 0, 1] };
   const [P0, P1] = r.posts;
@@ -203,7 +224,7 @@ export function bridgeSolids(ctx: BuildCtx, o: { id: string; over: Vec2; route: 
     slotRing([P1[0] - u[0], P1[1] - u[1]], [P1[0] + u[0], P1[1] + u[1]], STANDOFF.spigotD / 2),
   ];
   const beam = place(up, H.plate(o.id, r.footprint, {
-    name: "Bridge over the pivot, on two spigoted posts",
+    name: o.bar ? "Bridge bar over the pivot, bossed at the pivot, on two spigoted posts" : "Bridge over the pivot, on two spigoted posts",
     kind: "bridge",
     z0: r.bottom,
     z1: r.top,

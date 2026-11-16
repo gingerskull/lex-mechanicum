@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-11-06",
+  "generated": "2026-11-16",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -2351,7 +2351,8 @@
         "slider-crank",
         "hoekens-linkage",
         "watt-six-bar",
-        "wobble-box"
+        "wobble-box",
+        "plug-door-hinge"
       ],
       "added": "2026-10-18",
       "origin": {
@@ -18117,6 +18118,2695 @@
           }
         ],
         "exceptions": []
+      }
+    },
+    {
+      "record_version": 3,
+      "id": "plug-door-hinge",
+      "name": "Plug-door hinge",
+      "aka": [
+        "S-track door hinge",
+        "goose-neck hinge",
+        "track-guided hinge"
+      ],
+      "in_site": false,
+      "family": "Linkage",
+      "level": "Advanced",
+      "summary": "A door that plugs its opening from inside is pulled in, tipped out and swung flat outside by a goose-neck hinge steered by an S-shaped track.",
+      "motion": {
+        "input": "Oscillating",
+        "output": "Path",
+        "output_character": [
+          "Non-uniform"
+        ],
+        "axes": "Parallel",
+        "plane": "Planar",
+        "label": "Oscillating → Path"
+      },
+      "ratio": {
+        "kind": "Variable",
+        "class": "Variable",
+        "typical": "door turns 180° for 157° of hinge tube; about 10° of it while the tube is held"
+      },
+      "dof": 1,
+      "topology": {
+        "links": 5,
+        "revolute": 5,
+        "prismatic": 0,
+        "higher_pairs": 1,
+        "notes": "ground (wall, hinge post, track), crank, goose-neck, guide arm and door; the higher pair is the follower in its track: 3 x 4 - 2 x 5 - 1 = 1; count includes ground"
+      },
+      "backdrivable": "Yes",
+      "tags": {
+        "function": [
+          "Path generation",
+          "Positioning",
+          "Dwell"
+        ],
+        "property": [
+          "Exact",
+          "Positive drive"
+        ],
+        "application": [
+          "Aerospace"
+        ],
+        "keywords": [
+          "plug door",
+          "goose-neck hinge",
+          "S-shaped track",
+          "idler crank",
+          "guide arm",
+          "track follower",
+          "Boeing"
+        ]
+      },
+      "explain": {
+        "motion": "The hand on the door moves the whole linkage, and the follower on the guide arm runs along the fixed S-shaped track. The first arc of the track is centred on the crank's pin to the guide arm, so for the first 26 mm of travel the hinge tube stands still: the door moves as the coupler of a four-bar, pulls in out of its seat and turns about 10°. The track then bends the other way, the hinge tube turns 157° and the goose-neck carries the door out through the opening and round until it lies flat outside the wall, turned 180°. Closing runs the same path back.",
+        "forces": "The track takes the linkage's spare freedom, so the groove sets the door's whole path and the hand only supplies the effort along it. The roller bears on one wall of the groove or the other, hardest where the track bends tightly. Closed, the stop lips sit on the inside of the jambs, so a push on the door from inside presses it into its seat instead of out.",
+        "benefits": "The door needs no hinge cut in the wall or in its own face, and it ends folded flat against the outside, clear of the opening. One hand moves it through the whole compound motion.",
+        "limits": "The track and the long bent guide arm take room inside beside the opening, and the tight bend of the track needs a hard roller and liners. The geometry is sensitive: a small change to a link or to the track brings a dead point or a clash."
+      },
+      "build": {
+        "ground": "the wall with its opening, the fixed post the hinge tube turns on, and the plate with the S-shaped groove",
+        "defining_relations": "Mobility 3 x 4 - 2 x 5 - 1 = 1. The follower F at travel s on the track and the hinge tube H fix the crank's pin G as a dyad (HG = 40.6, GF = 76.6); the crank then places K, and the door's pins N and D close as a dyad on K (goose-neck KN = 74.5) and D (ND = 21.1 on the door). The first track arc has radius GF and is centred on G in the closed pose, so while F runs on it the crank holds still and the door moves as the coupler of the four-bar K-N-D-G.",
+        "notes": "Range: follower travel 0 to 167.45 mm and back each cycle (the open stop 0.05 mm short of the end of the 167.5 mm track, so the door stops just short of 180°), hinge tube 0° to -157.4°, door 0° to -180° (clockwise in plan). Plan frame: x along the wall, y > 0 inside, wall from y = 0 to 10, opening from x = 0 to 100. The patent's numbers: H is the hinge tube 16, K 26, N 32, D 40, G 66, F the follower 48 in the track 44. Both dyads keep their side over the motion: least transmission angle 41° at G (H-G-F) and 45° at N (K-N-D), so no dead point. The track: arc 1 R 76.6 about G for 26.2 mm (the dwell), arc 2 R 12.9 the same way for 30.8 mm, arc 3 R 70.6 the other way for 110.5 mm, tangent at the joins. The goose-neck and the guide arm's arm to D are hooked: straight bars would strike the jamb and the door's edge."
+      },
+      "kin": {
+        "bodies": [
+          {
+            "id": "ground",
+            "role": "ground",
+            "shape": {
+              "type": "plate",
+              "rect": [
+                250,
+                135
+              ]
+            },
+            "at": {
+              "frame": {
+                "origin": [
+                  -7.5,
+                  35,
+                  -8
+                ]
+              }
+            }
+          },
+          {
+            "id": "wall",
+            "role": "frame",
+            "shape": {
+              "type": "plate",
+              "exact": true,
+              "outline": [
+                [
+                  -100,
+                  0
+                ],
+                [
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  10
+                ],
+                [
+                  -100,
+                  10
+                ]
+              ],
+              "place": 0,
+              "thickness": 34,
+              "fillet": 0.5,
+              "pieces": [
+                {
+                  "id": "jamb",
+                  "name": "Wall plate, beyond the opening",
+                  "outline": [
+                    [
+                      100,
+                      0
+                    ],
+                    [
+                      125,
+                      0
+                    ],
+                    [
+                      125,
+                      10
+                    ],
+                    [
+                      100,
+                      10
+                    ]
+                  ],
+                  "origin": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "thick": 34,
+                  "fillet": 0.5
+                }
+              ],
+              "note": "the wall plate on posts over the base, the opening 100 wide in it, as high as the door",
+              "posts": [
+                {
+                  "at": [
+                    -62,
+                    5
+                  ],
+                  "top": 0,
+                  "r": 4.5
+                },
+                {
+                  "at": [
+                    -22,
+                    5
+                  ],
+                  "top": 0,
+                  "r": 4.5
+                },
+                {
+                  "at": [
+                    106,
+                    5
+                  ],
+                  "top": 0,
+                  "r": 4.5
+                },
+                {
+                  "at": [
+                    119,
+                    5
+                  ],
+                  "top": 0,
+                  "r": 4.5
+                }
+              ]
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "id": "crank",
+            "role": "driver",
+            "accent": true,
+            "shape": {
+              "type": "plate",
+              "exact": true,
+              "outline": [
+                [
+                  -15.79,
+                  29.7
+                ],
+                [
+                  -14.95,
+                  29.86
+                ],
+                [
+                  -14.15,
+                  30.14
+                ],
+                [
+                  -13.38,
+                  30.51
+                ],
+                [
+                  -12.68,
+                  30.99
+                ],
+                [
+                  -12.04,
+                  31.55
+                ],
+                [
+                  -11.48,
+                  32.19
+                ],
+                [
+                  -11,
+                  32.89
+                ],
+                [
+                  -10.63,
+                  33.66
+                ],
+                [
+                  -10.36,
+                  34.46
+                ],
+                [
+                  -10.19,
+                  35.29
+                ],
+                [
+                  -10.13,
+                  36.14
+                ],
+                [
+                  -10.19,
+                  36.99
+                ],
+                [
+                  -10.36,
+                  37.83
+                ],
+                [
+                  -10.63,
+                  38.63
+                ],
+                [
+                  -11,
+                  39.39
+                ],
+                [
+                  -11.48,
+                  40.1
+                ],
+                [
+                  -12.04,
+                  40.74
+                ],
+                [
+                  -12.68,
+                  41.3
+                ],
+                [
+                  -13.38,
+                  41.77
+                ],
+                [
+                  -14.15,
+                  42.15
+                ],
+                [
+                  -14.95,
+                  42.42
+                ],
+                [
+                  -15.95,
+                  42.6
+                ],
+                [
+                  -35.09,
+                  67.28
+                ],
+                [
+                  -35.02,
+                  68.23
+                ],
+                [
+                  -35.07,
+                  69.07
+                ],
+                [
+                  -35.24,
+                  69.91
+                ],
+                [
+                  -35.51,
+                  70.71
+                ],
+                [
+                  -35.89,
+                  71.48
+                ],
+                [
+                  -36.36,
+                  72.18
+                ],
+                [
+                  -36.92,
+                  72.82
+                ],
+                [
+                  -37.56,
+                  73.38
+                ],
+                [
+                  -38.27,
+                  73.86
+                ],
+                [
+                  -39.03,
+                  74.23
+                ],
+                [
+                  -39.83,
+                  74.5
+                ],
+                [
+                  -40.67,
+                  74.67
+                ],
+                [
+                  -41.52,
+                  74.73
+                ],
+                [
+                  -42.36,
+                  74.67
+                ],
+                [
+                  -43.2,
+                  74.5
+                ],
+                [
+                  -44,
+                  74.23
+                ],
+                [
+                  -44.77,
+                  73.86
+                ],
+                [
+                  -45.47,
+                  73.38
+                ],
+                [
+                  -46.11,
+                  72.82
+                ],
+                [
+                  -46.67,
+                  72.18
+                ],
+                [
+                  -47.15,
+                  71.48
+                ],
+                [
+                  -47.52,
+                  70.71
+                ],
+                [
+                  -47.79,
+                  69.91
+                ],
+                [
+                  -47.96,
+                  69.07
+                ],
+                [
+                  -48.02,
+                  68.23
+                ],
+                [
+                  -47.96,
+                  67.38
+                ],
+                [
+                  -47.79,
+                  66.54
+                ],
+                [
+                  -47.52,
+                  65.74
+                ],
+                [
+                  -47.15,
+                  64.98
+                ],
+                [
+                  -46.67,
+                  64.27
+                ],
+                [
+                  -46.11,
+                  63.63
+                ],
+                [
+                  -45.47,
+                  63.07
+                ],
+                [
+                  -44.77,
+                  62.6
+                ],
+                [
+                  -44,
+                  62.22
+                ],
+                [
+                  -43.2,
+                  61.95
+                ],
+                [
+                  -42.2,
+                  61.77
+                ],
+                [
+                  -27.12,
+                  42.32
+                ],
+                [
+                  -37.14,
+                  43.87
+                ],
+                [
+                  -37.29,
+                  44.1
+                ],
+                [
+                  -37.85,
+                  44.74
+                ],
+                [
+                  -38.49,
+                  45.3
+                ],
+                [
+                  -39.2,
+                  45.77
+                ],
+                [
+                  -39.96,
+                  46.14
+                ],
+                [
+                  -40.77,
+                  46.42
+                ],
+                [
+                  -41.6,
+                  46.58
+                ],
+                [
+                  -42.45,
+                  46.64
+                ],
+                [
+                  -43.3,
+                  46.58
+                ],
+                [
+                  -44.13,
+                  46.42
+                ],
+                [
+                  -44.93,
+                  46.14
+                ],
+                [
+                  -45.7,
+                  45.77
+                ],
+                [
+                  -46.4,
+                  45.3
+                ],
+                [
+                  -47.04,
+                  44.74
+                ],
+                [
+                  -47.6,
+                  44.1
+                ],
+                [
+                  -48.08,
+                  43.39
+                ],
+                [
+                  -48.45,
+                  42.63
+                ],
+                [
+                  -48.73,
+                  41.82
+                ],
+                [
+                  -48.89,
+                  40.99
+                ],
+                [
+                  -48.95,
+                  40.14
+                ],
+                [
+                  -48.89,
+                  39.29
+                ],
+                [
+                  -48.73,
+                  38.46
+                ],
+                [
+                  -48.45,
+                  37.65
+                ],
+                [
+                  -48.08,
+                  36.89
+                ],
+                [
+                  -47.6,
+                  36.18
+                ],
+                [
+                  -47.04,
+                  35.54
+                ],
+                [
+                  -46.4,
+                  34.98
+                ],
+                [
+                  -45.7,
+                  34.51
+                ],
+                [
+                  -44.93,
+                  34.13
+                ],
+                [
+                  -44.13,
+                  33.86
+                ],
+                [
+                  -43.3,
+                  33.7
+                ],
+                [
+                  -42.45,
+                  33.64
+                ],
+                [
+                  -41.6,
+                  33.7
+                ],
+                [
+                  -40.77,
+                  33.86
+                ],
+                [
+                  -39.96,
+                  34.13
+                ],
+                [
+                  -39.2,
+                  34.51
+                ],
+                [
+                  -38.5,
+                  34.98
+                ],
+                [
+                  -21.94,
+                  32.41
+                ],
+                [
+                  -21.79,
+                  32.19
+                ],
+                [
+                  -21.23,
+                  31.55
+                ],
+                [
+                  -20.59,
+                  30.99
+                ],
+                [
+                  -19.88,
+                  30.51
+                ],
+                [
+                  -19.12,
+                  30.14
+                ],
+                [
+                  -18.32,
+                  29.86
+                ],
+                [
+                  -17.48,
+                  29.7
+                ],
+                [
+                  -16.63,
+                  29.64
+                ]
+              ],
+              "place": 8,
+              "thickness": 6,
+              "note": "the idler crank: one plate on the hinge tube, its arms H to K and H to G",
+              "pieces": [
+                {
+                  "id": "boss",
+                  "name": "Crank boss at K, raised to the goose-neck",
+                  "outline": [
+                    [
+                      -35.947,
+                      40.139
+                    ],
+                    [
+                      -36.003,
+                      40.988
+                    ],
+                    [
+                      -36.169,
+                      41.822
+                    ],
+                    [
+                      -36.442,
+                      42.627
+                    ],
+                    [
+                      -36.818,
+                      43.389
+                    ],
+                    [
+                      -37.291,
+                      44.096
+                    ],
+                    [
+                      -37.851,
+                      44.736
+                    ],
+                    [
+                      -38.49,
+                      45.296
+                    ],
+                    [
+                      -39.197,
+                      45.769
+                    ],
+                    [
+                      -39.96,
+                      46.145
+                    ],
+                    [
+                      -40.765,
+                      46.418
+                    ],
+                    [
+                      -41.599,
+                      46.584
+                    ],
+                    [
+                      -42.447,
+                      46.639
+                    ],
+                    [
+                      -43.296,
+                      46.584
+                    ],
+                    [
+                      -44.13,
+                      46.418
+                    ],
+                    [
+                      -44.935,
+                      46.145
+                    ],
+                    [
+                      -45.697,
+                      45.769
+                    ],
+                    [
+                      -46.404,
+                      45.296
+                    ],
+                    [
+                      -47.044,
+                      44.736
+                    ],
+                    [
+                      -47.604,
+                      44.096
+                    ],
+                    [
+                      -48.077,
+                      43.389
+                    ],
+                    [
+                      -48.453,
+                      42.627
+                    ],
+                    [
+                      -48.726,
+                      41.822
+                    ],
+                    [
+                      -48.892,
+                      40.988
+                    ],
+                    [
+                      -48.947,
+                      40.139
+                    ],
+                    [
+                      -48.892,
+                      39.291
+                    ],
+                    [
+                      -48.726,
+                      38.457
+                    ],
+                    [
+                      -48.453,
+                      37.652
+                    ],
+                    [
+                      -48.077,
+                      36.889
+                    ],
+                    [
+                      -47.604,
+                      36.183
+                    ],
+                    [
+                      -47.044,
+                      35.543
+                    ],
+                    [
+                      -46.404,
+                      34.983
+                    ],
+                    [
+                      -45.697,
+                      34.51
+                    ],
+                    [
+                      -44.935,
+                      34.134
+                    ],
+                    [
+                      -44.13,
+                      33.861
+                    ],
+                    [
+                      -43.296,
+                      33.695
+                    ],
+                    [
+                      -42.447,
+                      33.639
+                    ],
+                    [
+                      -41.599,
+                      33.695
+                    ],
+                    [
+                      -40.765,
+                      33.861
+                    ],
+                    [
+                      -39.96,
+                      34.134
+                    ],
+                    [
+                      -39.197,
+                      34.51
+                    ],
+                    [
+                      -38.49,
+                      34.983
+                    ],
+                    [
+                      -37.851,
+                      35.543
+                    ],
+                    [
+                      -37.291,
+                      36.183
+                    ],
+                    [
+                      -36.818,
+                      36.889
+                    ],
+                    [
+                      -36.442,
+                      37.652
+                    ],
+                    [
+                      -36.169,
+                      38.457
+                    ],
+                    [
+                      -36.003,
+                      39.291
+                    ]
+                  ],
+                  "origin": [
+                    0,
+                    0,
+                    14
+                  ],
+                  "thick": 6,
+                  "joints": [
+                    "K"
+                  ]
+                }
+              ]
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "id": "goose-neck",
+            "role": "link",
+            "shape": {
+              "type": "plate",
+              "exact": true,
+              "outline": [
+                [
+                  30.24,
+                  13.95
+                ],
+                [
+                  31.08,
+                  14.11
+                ],
+                [
+                  31.88,
+                  14.39
+                ],
+                [
+                  32.65,
+                  14.76
+                ],
+                [
+                  33.35,
+                  15.23
+                ],
+                [
+                  33.99,
+                  15.79
+                ],
+                [
+                  34.55,
+                  16.43
+                ],
+                [
+                  35.02,
+                  17.14
+                ],
+                [
+                  35.4,
+                  17.9
+                ],
+                [
+                  35.67,
+                  18.71
+                ],
+                [
+                  35.84,
+                  19.54
+                ],
+                [
+                  35.9,
+                  20.39
+                ],
+                [
+                  35.84,
+                  21.24
+                ],
+                [
+                  35.67,
+                  22.07
+                ],
+                [
+                  35.4,
+                  22.88
+                ],
+                [
+                  34.99,
+                  23.69
+                ],
+                [
+                  40.32,
+                  42.7
+                ],
+                [
+                  40.43,
+                  43.27
+                ],
+                [
+                  40.47,
+                  43.86
+                ],
+                [
+                  40.43,
+                  44.45
+                ],
+                [
+                  40.32,
+                  45.02
+                ],
+                [
+                  40.13,
+                  45.58
+                ],
+                [
+                  39.87,
+                  46.11
+                ],
+                [
+                  29.38,
+                  64.55
+                ],
+                [
+                  29.05,
+                  65.04
+                ],
+                [
+                  28.66,
+                  65.48
+                ],
+                [
+                  28.22,
+                  65.87
+                ],
+                [
+                  27.73,
+                  66.2
+                ],
+                [
+                  27.2,
+                  66.46
+                ],
+                [
+                  26.64,
+                  66.65
+                ],
+                [
+                  7.12,
+                  72.02
+                ],
+                [
+                  6.55,
+                  72.13
+                ],
+                [
+                  5.96,
+                  72.17
+                ],
+                [
+                  5.37,
+                  72.13
+                ],
+                [
+                  4.8,
+                  72.02
+                ],
+                [
+                  4.24,
+                  71.83
+                ],
+                [
+                  3.71,
+                  71.57
+                ],
+                [
+                  -40.61,
+                  46.36
+                ],
+                [
+                  -41.6,
+                  46.58
+                ],
+                [
+                  -42.45,
+                  46.64
+                ],
+                [
+                  -43.3,
+                  46.58
+                ],
+                [
+                  -44.13,
+                  46.42
+                ],
+                [
+                  -44.93,
+                  46.14
+                ],
+                [
+                  -45.7,
+                  45.77
+                ],
+                [
+                  -46.4,
+                  45.3
+                ],
+                [
+                  -47.04,
+                  44.74
+                ],
+                [
+                  -47.6,
+                  44.1
+                ],
+                [
+                  -48.08,
+                  43.39
+                ],
+                [
+                  -48.45,
+                  42.63
+                ],
+                [
+                  -48.73,
+                  41.82
+                ],
+                [
+                  -48.89,
+                  40.99
+                ],
+                [
+                  -48.95,
+                  40.14
+                ],
+                [
+                  -48.89,
+                  39.29
+                ],
+                [
+                  -48.73,
+                  38.46
+                ],
+                [
+                  -48.45,
+                  37.65
+                ],
+                [
+                  -48.08,
+                  36.89
+                ],
+                [
+                  -47.6,
+                  36.18
+                ],
+                [
+                  -47.04,
+                  35.54
+                ],
+                [
+                  -46.4,
+                  34.98
+                ],
+                [
+                  -45.7,
+                  34.51
+                ],
+                [
+                  -44.93,
+                  34.13
+                ],
+                [
+                  -44.13,
+                  33.86
+                ],
+                [
+                  -43.3,
+                  33.7
+                ],
+                [
+                  -42.45,
+                  33.64
+                ],
+                [
+                  -41.6,
+                  33.7
+                ],
+                [
+                  -40.77,
+                  33.86
+                ],
+                [
+                  -39.96,
+                  34.13
+                ],
+                [
+                  -39.2,
+                  34.51
+                ],
+                [
+                  -38.49,
+                  34.98
+                ],
+                [
+                  -37.85,
+                  35.54
+                ],
+                [
+                  -37.29,
+                  36.18
+                ],
+                [
+                  -36.82,
+                  36.89
+                ],
+                [
+                  -36.44,
+                  37.65
+                ],
+                [
+                  -36.15,
+                  38.54
+                ],
+                [
+                  6.56,
+                  62.84
+                ],
+                [
+                  22.49,
+                  58.46
+                ],
+                [
+                  31.13,
+                  43.27
+                ],
+                [
+                  26.32,
+                  26.11
+                ],
+                [
+                  26.15,
+                  26.02
+                ],
+                [
+                  25.44,
+                  25.55
+                ],
+                [
+                  24.8,
+                  24.99
+                ],
+                [
+                  24.24,
+                  24.35
+                ],
+                [
+                  23.77,
+                  23.64
+                ],
+                [
+                  23.39,
+                  22.88
+                ],
+                [
+                  23.12,
+                  22.07
+                ],
+                [
+                  22.95,
+                  21.24
+                ],
+                [
+                  22.9,
+                  20.39
+                ],
+                [
+                  22.95,
+                  19.54
+                ],
+                [
+                  23.12,
+                  18.71
+                ],
+                [
+                  23.39,
+                  17.9
+                ],
+                [
+                  23.77,
+                  17.14
+                ],
+                [
+                  24.24,
+                  16.43
+                ],
+                [
+                  24.8,
+                  15.79
+                ],
+                [
+                  25.44,
+                  15.23
+                ],
+                [
+                  26.15,
+                  14.76
+                ],
+                [
+                  26.91,
+                  14.39
+                ],
+                [
+                  27.71,
+                  14.11
+                ],
+                [
+                  28.55,
+                  13.95
+                ],
+                [
+                  29.4,
+                  13.89
+                ]
+              ],
+              "place": 20,
+              "thickness": 6,
+              "note": "hooked round the jamb and the door's edge, K to N"
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ]
+            }
+          },
+          {
+            "id": "guide-arm",
+            "role": "link",
+            "shape": {
+              "type": "plate",
+              "exact": true,
+              "outline": [
+                [
+                  20.93,
+                  32.87
+                ],
+                [
+                  21.76,
+                  33.04
+                ],
+                [
+                  22.57,
+                  33.31
+                ],
+                [
+                  23.33,
+                  33.69
+                ],
+                [
+                  24.04,
+                  34.16
+                ],
+                [
+                  24.67,
+                  34.72
+                ],
+                [
+                  25.24,
+                  35.36
+                ],
+                [
+                  25.71,
+                  36.07
+                ],
+                [
+                  26.08,
+                  36.83
+                ],
+                [
+                  26.36,
+                  37.63
+                ],
+                [
+                  26.52,
+                  38.47
+                ],
+                [
+                  26.58,
+                  39.32
+                ],
+                [
+                  26.52,
+                  40.17
+                ],
+                [
+                  26.36,
+                  41
+                ],
+                [
+                  26.08,
+                  41.8
+                ],
+                [
+                  25.71,
+                  42.57
+                ],
+                [
+                  25.24,
+                  43.27
+                ],
+                [
+                  24.67,
+                  43.91
+                ],
+                [
+                  24.04,
+                  44.47
+                ],
+                [
+                  23.33,
+                  44.95
+                ],
+                [
+                  22.64,
+                  45.29
+                ],
+                [
+                  12.64,
+                  71.83
+                ],
+                [
+                  12.38,
+                  72.36
+                ],
+                [
+                  12.05,
+                  72.85
+                ],
+                [
+                  11.66,
+                  73.29
+                ],
+                [
+                  11.22,
+                  73.68
+                ],
+                [
+                  10.73,
+                  74.01
+                ],
+                [
+                  -8.81,
+                  83.19
+                ],
+                [
+                  -9.37,
+                  83.38
+                ],
+                [
+                  -9.94,
+                  83.49
+                ],
+                [
+                  -10.53,
+                  83.53
+                ],
+                [
+                  -11.12,
+                  83.49
+                ],
+                [
+                  -11.69,
+                  83.38
+                ],
+                [
+                  -38.58,
+                  74.01
+                ],
+                [
+                  -39.03,
+                  74.23
+                ],
+                [
+                  -39.83,
+                  74.5
+                ],
+                [
+                  -40.67,
+                  74.67
+                ],
+                [
+                  -41.52,
+                  74.73
+                ],
+                [
+                  -42.36,
+                  74.67
+                ],
+                [
+                  -43.2,
+                  74.5
+                ],
+                [
+                  -44.07,
+                  74.2
+                ],
+                [
+                  -47.21,
+                  75.53
+                ],
+                [
+                  -47.77,
+                  75.72
+                ],
+                [
+                  -48.34,
+                  75.83
+                ],
+                [
+                  -48.93,
+                  75.87
+                ],
+                [
+                  -49.52,
+                  75.83
+                ],
+                [
+                  -50.09,
+                  75.72
+                ],
+                [
+                  -112.4,
+                  53.22
+                ],
+                [
+                  -112.78,
+                  53.41
+                ],
+                [
+                  -113.58,
+                  53.69
+                ],
+                [
+                  -114.42,
+                  53.85
+                ],
+                [
+                  -115.27,
+                  53.91
+                ],
+                [
+                  -116.11,
+                  53.85
+                ],
+                [
+                  -116.95,
+                  53.69
+                ],
+                [
+                  -117.75,
+                  53.41
+                ],
+                [
+                  -118.52,
+                  53.04
+                ],
+                [
+                  -119.22,
+                  52.56
+                ],
+                [
+                  -119.86,
+                  52
+                ],
+                [
+                  -120.42,
+                  51.36
+                ],
+                [
+                  -120.89,
+                  50.66
+                ],
+                [
+                  -121.27,
+                  49.9
+                ],
+                [
+                  -121.54,
+                  49.09
+                ],
+                [
+                  -121.71,
+                  48.26
+                ],
+                [
+                  -121.77,
+                  47.41
+                ],
+                [
+                  -121.71,
+                  46.56
+                ],
+                [
+                  -121.54,
+                  45.73
+                ],
+                [
+                  -121.27,
+                  44.92
+                ],
+                [
+                  -120.89,
+                  44.16
+                ],
+                [
+                  -120.42,
+                  43.45
+                ],
+                [
+                  -119.86,
+                  42.81
+                ],
+                [
+                  -119.22,
+                  42.25
+                ],
+                [
+                  -118.52,
+                  41.78
+                ],
+                [
+                  -117.75,
+                  41.4
+                ],
+                [
+                  -116.95,
+                  41.13
+                ],
+                [
+                  -116.11,
+                  40.96
+                ],
+                [
+                  -115.27,
+                  40.91
+                ],
+                [
+                  -114.42,
+                  40.96
+                ],
+                [
+                  -113.58,
+                  41.13
+                ],
+                [
+                  -112.78,
+                  41.4
+                ],
+                [
+                  -112.02,
+                  41.78
+                ],
+                [
+                  -111.31,
+                  42.25
+                ],
+                [
+                  -110.67,
+                  42.81
+                ],
+                [
+                  -110.11,
+                  43.45
+                ],
+                [
+                  -109.64,
+                  44.16
+                ],
+                [
+                  -109.33,
+                  44.77
+                ],
+                [
+                  -49.07,
+                  66.54
+                ],
+                [
+                  -47.58,
+                  65.91
+                ],
+                [
+                  -47.15,
+                  64.98
+                ],
+                [
+                  -46.67,
+                  64.27
+                ],
+                [
+                  -46.11,
+                  63.63
+                ],
+                [
+                  -45.47,
+                  63.07
+                ],
+                [
+                  -44.77,
+                  62.6
+                ],
+                [
+                  -44,
+                  62.22
+                ],
+                [
+                  -43.2,
+                  61.95
+                ],
+                [
+                  -42.36,
+                  61.78
+                ],
+                [
+                  -41.52,
+                  61.73
+                ],
+                [
+                  -40.67,
+                  61.78
+                ],
+                [
+                  -39.83,
+                  61.95
+                ],
+                [
+                  -39.03,
+                  62.22
+                ],
+                [
+                  -38.27,
+                  62.6
+                ],
+                [
+                  -37.56,
+                  63.07
+                ],
+                [
+                  -36.92,
+                  63.63
+                ],
+                [
+                  -36.36,
+                  64.27
+                ],
+                [
+                  -35.89,
+                  64.98
+                ],
+                [
+                  -35.62,
+                  65.53
+                ],
+                [
+                  -10.78,
+                  74.18
+                ],
+                [
+                  4.91,
+                  66.82
+                ],
+                [
+                  14.22,
+                  42.11
+                ],
+                [
+                  14.07,
+                  41.8
+                ],
+                [
+                  13.8,
+                  41
+                ],
+                [
+                  13.63,
+                  40.17
+                ],
+                [
+                  13.58,
+                  39.32
+                ],
+                [
+                  13.63,
+                  38.47
+                ],
+                [
+                  13.8,
+                  37.63
+                ],
+                [
+                  14.07,
+                  36.83
+                ],
+                [
+                  14.45,
+                  36.07
+                ],
+                [
+                  14.92,
+                  35.36
+                ],
+                [
+                  15.48,
+                  34.72
+                ],
+                [
+                  16.12,
+                  34.16
+                ],
+                [
+                  16.83,
+                  33.69
+                ],
+                [
+                  17.59,
+                  33.31
+                ],
+                [
+                  18.4,
+                  33.04
+                ],
+                [
+                  19.23,
+                  32.87
+                ],
+                [
+                  20.08,
+                  32.82
+                ]
+              ],
+              "place": 0,
+              "thickness": 6,
+              "note": "a bent lever: G to D hooked round the door's edge, G to the follower F"
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ]
+            }
+          },
+          {
+            "id": "door",
+            "role": "output",
+            "shape": {
+              "type": "plate",
+              "exact": true,
+              "outline": [
+                [
+                  36,
+                  12
+                ],
+                [
+                  35.12,
+                  12
+                ],
+                [
+                  34.51,
+                  16.39
+                ],
+                [
+                  35.02,
+                  17.14
+                ],
+                [
+                  35.4,
+                  17.9
+                ],
+                [
+                  35.67,
+                  18.71
+                ],
+                [
+                  35.84,
+                  19.54
+                ],
+                [
+                  35.9,
+                  20.39
+                ],
+                [
+                  35.84,
+                  21.24
+                ],
+                [
+                  35.67,
+                  22.07
+                ],
+                [
+                  35.4,
+                  22.88
+                ],
+                [
+                  35.02,
+                  23.64
+                ],
+                [
+                  34.55,
+                  24.35
+                ],
+                [
+                  33.99,
+                  24.99
+                ],
+                [
+                  33.35,
+                  25.55
+                ],
+                [
+                  32.58,
+                  26.05
+                ],
+                [
+                  26.51,
+                  38.39
+                ],
+                [
+                  26.58,
+                  39.32
+                ],
+                [
+                  26.52,
+                  40.17
+                ],
+                [
+                  26.36,
+                  41
+                ],
+                [
+                  26.08,
+                  41.8
+                ],
+                [
+                  25.71,
+                  42.57
+                ],
+                [
+                  25.24,
+                  43.27
+                ],
+                [
+                  24.67,
+                  43.91
+                ],
+                [
+                  24.04,
+                  44.47
+                ],
+                [
+                  23.33,
+                  44.95
+                ],
+                [
+                  22.57,
+                  45.32
+                ],
+                [
+                  21.76,
+                  45.6
+                ],
+                [
+                  20.93,
+                  45.76
+                ],
+                [
+                  20.08,
+                  45.82
+                ],
+                [
+                  19.23,
+                  45.76
+                ],
+                [
+                  18.4,
+                  45.6
+                ],
+                [
+                  17.59,
+                  45.32
+                ],
+                [
+                  16.83,
+                  44.95
+                ],
+                [
+                  16.12,
+                  44.47
+                ],
+                [
+                  15.48,
+                  43.91
+                ],
+                [
+                  14.92,
+                  43.27
+                ],
+                [
+                  14.45,
+                  42.57
+                ],
+                [
+                  14.07,
+                  41.8
+                ],
+                [
+                  13.8,
+                  41
+                ],
+                [
+                  13.63,
+                  40.17
+                ],
+                [
+                  13.58,
+                  39.32
+                ],
+                [
+                  13.63,
+                  38.47
+                ],
+                [
+                  13.8,
+                  37.63
+                ],
+                [
+                  14.07,
+                  36.83
+                ],
+                [
+                  14.45,
+                  36.07
+                ],
+                [
+                  14.92,
+                  35.36
+                ],
+                [
+                  15.56,
+                  34.65
+                ],
+                [
+                  14.2,
+                  12
+                ],
+                [
+                  14,
+                  12
+                ],
+                [
+                  14,
+                  8
+                ],
+                [
+                  36,
+                  8
+                ]
+              ],
+              "place": 8,
+              "thickness": 12,
+              "pieces": [
+                {
+                  "id": "panel",
+                  "name": "Door panel, its stop lips on the inner face",
+                  "outline": [
+                    [
+                      2,
+                      0
+                    ],
+                    [
+                      98,
+                      0
+                    ],
+                    [
+                      98,
+                      10.2
+                    ],
+                    [
+                      106,
+                      10.2
+                    ],
+                    [
+                      106,
+                      14
+                    ],
+                    [
+                      94,
+                      14
+                    ],
+                    [
+                      94,
+                      10.2
+                    ],
+                    [
+                      6,
+                      10.2
+                    ],
+                    [
+                      6,
+                      14
+                    ],
+                    [
+                      -6,
+                      14
+                    ],
+                    [
+                      -6,
+                      10.2
+                    ],
+                    [
+                      2,
+                      10.2
+                    ]
+                  ],
+                  "origin": [
+                    0,
+                    0,
+                    0
+                  ],
+                  "thick": 34,
+                  "fillet": 0.5
+                },
+                {
+                  "id": "ear",
+                  "name": "Door bracket, fork ear over the goose-neck: N in double shear",
+                  "outline": [
+                    [
+                      21,
+                      8
+                    ],
+                    [
+                      37,
+                      8
+                    ],
+                    [
+                      37,
+                      11
+                    ],
+                    [
+                      35.84,
+                      21.24
+                    ],
+                    [
+                      35.67,
+                      22.07
+                    ],
+                    [
+                      35.4,
+                      22.88
+                    ],
+                    [
+                      35.02,
+                      23.64
+                    ],
+                    [
+                      34.55,
+                      24.35
+                    ],
+                    [
+                      33.99,
+                      24.99
+                    ],
+                    [
+                      33.35,
+                      25.55
+                    ],
+                    [
+                      32.65,
+                      26.02
+                    ],
+                    [
+                      31.88,
+                      26.4
+                    ],
+                    [
+                      31.08,
+                      26.67
+                    ],
+                    [
+                      30.24,
+                      26.84
+                    ],
+                    [
+                      29.4,
+                      26.89
+                    ],
+                    [
+                      28.55,
+                      26.84
+                    ],
+                    [
+                      27.71,
+                      26.67
+                    ],
+                    [
+                      26.91,
+                      26.4
+                    ],
+                    [
+                      26.15,
+                      26.02
+                    ],
+                    [
+                      25.44,
+                      25.55
+                    ],
+                    [
+                      24.8,
+                      24.99
+                    ],
+                    [
+                      24.24,
+                      24.35
+                    ],
+                    [
+                      23.77,
+                      23.64
+                    ],
+                    [
+                      23.39,
+                      22.88
+                    ],
+                    [
+                      23.12,
+                      22.07
+                    ],
+                    [
+                      22.95,
+                      21.24
+                    ],
+                    [
+                      21,
+                      11
+                    ]
+                  ],
+                  "origin": [
+                    0,
+                    0,
+                    27.5
+                  ],
+                  "thick": 6,
+                  "joints": [
+                    "N"
+                  ]
+                }
+              ],
+              "note": "the door panel 96 wide and 10 thick in the 100 opening, its stop lips on the inner face overlapping the jambs by 6; a bracket on its inner face carries N and D, and an ear over the goose-neck holds N from above"
+            },
+            "frame": {
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "x": [
+                1,
+                0,
+                0
+              ],
+              "z": [
+                0,
+                0,
+                1
+              ]
+            }
+          }
+        ],
+        "joints": [
+          {
+            "id": "H",
+            "type": "revolute",
+            "a": "ground",
+            "b": "crank",
+            "at": [
+              -16.6338,
+              36.1432,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "limits": [
+              -157.4,
+              0
+            ],
+            "note": "the hinge tube on its fixed post (the patent's 16)",
+            "bridge": "bar"
+          },
+          {
+            "id": "K",
+            "type": "revolute",
+            "a": "crank",
+            "b": "goose-neck",
+            "at": [
+              -42.4474,
+              40.1395,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "note": "crank to goose-neck (26)"
+          },
+          {
+            "id": "N",
+            "type": "revolute",
+            "a": "goose-neck",
+            "b": "door",
+            "at": [
+              29.3957,
+              20.3909,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "note": "goose-neck to door (32)"
+          },
+          {
+            "id": "G",
+            "type": "revolute",
+            "a": "crank",
+            "b": "guide-arm",
+            "at": [
+              -41.5161,
+              68.2261,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "note": "crank to guide arm (66)"
+          },
+          {
+            "id": "D",
+            "type": "revolute",
+            "a": "guide-arm",
+            "b": "door",
+            "at": [
+              20.0783,
+              39.3169,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "note": "guide arm to door (40), nearer the hinge edge than N",
+            "head": "-"
+          },
+          {
+            "id": "F",
+            "type": "pin-in-slot",
+            "a": "guide-arm",
+            "b": "ground",
+            "at": [
+              -115.2655,
+              47.4079,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "slot": {
+              "track": {
+                "start": [
+                  -115.2655,
+                  47.4079
+                ],
+                "dir": -74.236475581,
+                "segments": [
+                  {
+                    "radius": 76.631399906305,
+                    "length": 26.215993764
+                  },
+                  {
+                    "radius": 12.874113546,
+                    "length": 30.753462399
+                  },
+                  {
+                    "radius": -70.550917737,
+                    "length": 110.530638861
+                  }
+                ]
+              }
+            },
+            "note": "the follower (48) in the S-shaped track (44): a dwell arc about G, a tight arc the same way, a long arc the other way"
+          }
+        ],
+        "params": [],
+        "design": [],
+        "drivers": [
+          {
+            "id": "hand",
+            "joint": "H",
+            "kind": "manual",
+            "range": [
+              -157.4,
+              0
+            ],
+            "default": 0,
+            "cycle": {
+              "from": "run",
+              "note": "the hand on the door runs the follower along the track, closed to open and back; the hinge tube's turn is read off the pose"
+            },
+            "hand": "handle"
+          }
+        ],
+        "solve": [
+          {
+            "block": "target-path",
+            "id": "run",
+            "joints": [
+              "F"
+            ],
+            "in": {
+              "shape": "track",
+              "joint": "F",
+              "to": 167.45
+            },
+            "out": {
+              "point": "F",
+              "travel": "follower-travel"
+            }
+          },
+          {
+            "block": "dyad",
+            "id": "crank",
+            "joints": [
+              "G"
+            ],
+            "in": {
+              "a": "H",
+              "b": "F",
+              "ra": 40.601001535676,
+              "rb": 76.631399906305
+            },
+            "branch": "right",
+            "out": "G"
+          },
+          {
+            "block": "dyad",
+            "id": "goose",
+            "joints": [
+              "K",
+              "N",
+              "D"
+            ],
+            "in": {
+              "a": "K",
+              "b": "D",
+              "ra": 74.507974201222,
+              "rb": 21.095198950472
+            },
+            "branch": "right",
+            "out": "N"
+          }
+        ],
+        "points": [
+          {
+            "id": "free-corner",
+            "body": "door",
+            "local": [
+              98,
+              0,
+              34
+            ]
+          },
+          {
+            "id": "hinge-corner",
+            "body": "door",
+            "local": [
+              2,
+              0,
+              34
+            ]
+          },
+          {
+            "id": "handle",
+            "body": "door",
+            "local": [
+              62,
+              10.2,
+              17
+            ]
+          }
+        ],
+        "outputs": [
+          {
+            "id": "door-angle",
+            "of": "door",
+            "kind": "angle",
+            "unit": "deg"
+          },
+          {
+            "id": "hinge-tube-angle",
+            "of": "crank",
+            "kind": "angle",
+            "unit": "deg"
+          },
+          {
+            "id": "follower-travel",
+            "of": "follower-travel",
+            "kind": "position",
+            "unit": "mm"
+          },
+          {
+            "id": "free-corner-path",
+            "of": "free-corner",
+            "kind": "path"
+          },
+          {
+            "id": "hinge-corner-path",
+            "of": "hinge-corner",
+            "kind": "path"
+          },
+          {
+            "id": "free-corner-depth",
+            "of": "free-corner",
+            "kind": "position",
+            "unit": "mm",
+            "axis": "y"
+          }
+        ],
+        "fallback": null
+      },
+      "teaching": {
+        "review": {
+          "verdict": "keep",
+          "date": "2026-11-15",
+          "note": "T2 review of the record, 2026-11-15 (#288), on the chosen design of #286 unchanged: keep. Six phases from the solved motion (travel, hinge tube, door): 1 closed, lips on the jambs (0 mm, 0°, 0°); 2 pulled in out of the seat (9.9 mm, 0°, -4.6°); 3 end of the dwell arc (26.2 mm, 0°, -10.1°); 4 free edge out through the opening (47.8 mm, -19.2°, -37.4°); 5 swinging round (85.6 mm, -68.2°, -90°); 6 open, flat outside (167.45 mm, -157.4°, -180°). Solve checks: the hinge tube holds still (within 1e-9°) over the first 26.2 mm, while the door turns 10.1° as the coupler of the four-bar K-N-D-G, because the first arc of the track is centred on G; then the tube turns 157.4° and the door 180°; least transmission angle 41.5° at G and 44.7° at N, so neither dyad nears a dead point; poses at cycles 2 and 3 equal cycle 1. The text was read against the motion; its numbers are the claims. Decisions: hand operated (V5 manual) with the follower run along the track closed to open and back (target-path track, oscillate), the hand driver on the hinge tube read back off the pose; the open stop 0.05 mm short of the track end so the door stops just short of 180° (the turn output would wrap at 180°); traces the free-edge corner (comet, equal-time ticks), the hinge-edge corner and the follower; plot door angle against hinge-tube angle, where the dwell reads as the vertical run at 0°; PLAN view (opens tilted); no overlays and no focus yet, both judged again on the finished build. Teaching strings name the mechanism only: a wall with an opening and a door with stop lips, no aircraft parts. Judged on the finished build (2026-11-16): the follower roller in its groove is the part to watch (focus) and gets a section view across the track; no overlays, the traces and the plot carry the lesson."
+        },
+        "principle": [
+          {
+            "body": "crank"
+          },
+          {
+            "body": "goose-neck"
+          },
+          {
+            "body": "guide-arm"
+          },
+          {
+            "body": "door"
+          },
+          {
+            "point": "F"
+          },
+          {
+            "point": "free-corner"
+          }
+        ],
+        "traces": [
+          {
+            "id": "free-edge",
+            "point": "free-corner",
+            "comet": true,
+            "ticks": {
+              "every": 10
+            }
+          },
+          {
+            "id": "hinge-edge",
+            "point": "hinge-corner"
+          },
+          {
+            "id": "follower",
+            "point": "F"
+          }
+        ],
+        "overlays": [],
+        "view": "PLAN",
+        "controls": [],
+        "cycleTime": 8,
+        "plot": {
+          "x": "hinge-tube-angle",
+          "y": "door-angle",
+          "label": "DOOR ANGLE AGAINST HINGE-TUBE ANGLE"
+        },
+        "claims": [
+          {
+            "text": "for the first 26 mm of travel the hinge tube stands still",
+            "output": "follower-travel",
+            "stat": "range",
+            "span": [
+              -0.01,
+              0.01
+            ],
+            "value": 26.2,
+            "tol": 0.5
+          },
+          {
+            "text": "pulls in out of its seat and turns about 10°",
+            "output": "door-angle",
+            "stat": "range",
+            "span": [
+              -0.01,
+              0.01
+            ],
+            "value": 10.15,
+            "tol": 0.3
+          },
+          {
+            "text": "the hinge tube turns 157°",
+            "output": "hinge-tube-angle",
+            "stat": "range",
+            "value": 157.4,
+            "tol": 0.3
+          },
+          {
+            "text": "lies flat outside the wall, turned 180°",
+            "output": "door-angle",
+            "stat": "range",
+            "value": 180,
+            "tol": 0.3
+          },
+          {
+            "text": "follower travel 0 to 167.45 mm and back each cycle",
+            "output": "follower-travel",
+            "stat": "max",
+            "value": 167.45,
+            "tol": 0.02
+          }
+        ],
+        "exceptions": [],
+        "focus": [
+          {
+            "body": "guide-arm",
+            "kind": "roller"
+          }
+        ],
+        "views": [
+          {
+            "id": "follower",
+            "kind": "section",
+            "plane": {
+              "origin": [
+                -115.2655,
+                47.4079,
+                -4
+              ],
+              "normal": [
+                0.272,
+                -0.9623,
+                0
+              ]
+            },
+            "center": [
+              -115.2655,
+              47.4079,
+              -4
+            ],
+            "scale": 3,
+            "highlight": [
+              "guide-arm"
+            ],
+            "note": "the roller on the guide arm, held both ways in the groove: the track takes the linkage's spare freedom"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "use": "Passenger doors of pressurised airliners",
+          "detail": "A plug door seated from inside is drawn in, turned edgewise and swung flat against the outside of the fuselage on goose-neck hinge arms."
+        },
+        {
+          "use": "Doors that must seal from the inside",
+          "detail": "A door whose stops bear on the inside of its frame needs a hinge that first draws it inward before it can swing out."
+        }
+      ],
+      "references": [
+        {
+          "title": "Plug door, Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Plug_door",
+          "kind": "wikipedia"
+        },
+        {
+          "title": "EP 0 317 037 A2, Hinge mechanism for aircraft door (Boeing, 1989)",
+          "url": "https://data.epo.org/publication-server/rest/v1.0/publication-dates/19890524/patents/EP0317037NWA2/document.html",
+          "kind": "patent"
+        },
+        {
+          "title": "US 4,854,010, Hinge mechanism for aircraft door (Maraghe and Puncoch, 1989)",
+          "url": "https://patents.google.com/patent/US4854010",
+          "kind": "patent"
+        }
+      ],
+      "media": [
+        {
+          "title": "Category:Aircraft doors, Wikimedia Commons",
+          "url": "https://commons.wikimedia.org/wiki/Category:Aircraft_doors",
+          "kind": "photos"
+        },
+        {
+          "title": "B737 door operation, outside and inside (The Cabin Crew Briefing Room)",
+          "url": "https://www.youtube.com/watch?v=A00EhdN5X80",
+          "kind": "video"
+        }
+      ],
+      "related": [
+        "four-bar",
+        "walschaerts-valve-gear",
+        "crank-shaper",
+        "cam-follower"
+      ],
+      "real_world": [
+        {
+          "product": "Boeing 737 forward entry door",
+          "maker": "Boeing",
+          "use": "Opened from inside, the plug door is drawn in out of its frame, turned edgewise through the opening and swung out on its hinge arms until it lies flat against the outside of the fuselage.",
+          "url": "https://www.youtube.com/watch?v=A00EhdN5X80",
+          "note": "The hinge arms are hidden behind the door's lining; what shows is the door's path."
+        }
+      ],
+      "added": "2026-11-16",
+      "origin": {
+        "date": "1987-11-20",
+        "precision": "day",
+        "note": "Boeing files US application 123599 (Maraghe and Puncoch), granted as US 4,854,010 and the priority of EP 0 317 037: the goose-neck hinge steered by an S-shaped track. Source: https://patents.google.com/patent/US4854010"
       }
     },
     {
@@ -88311,7 +91001,8 @@
         "slider-crank",
         "eccentric-sheave",
         "four-bar",
-        "watt-six-bar"
+        "watt-six-bar",
+        "plug-door-hinge"
       ],
       "added": "2026-10-19",
       "origin": {
@@ -96167,7 +98858,8 @@
         "drag-link-quick-return",
         "offset-slider-crank",
         "slider-crank",
-        "oscillating-cylinder"
+        "oscillating-cylinder",
+        "plug-door-hinge"
       ],
       "added": "2026-10-18",
       "origin": {
@@ -226682,7 +229374,8 @@
         "face-groove-cam",
         "desmodromic-cam",
         "slider-crank",
-        "scotch-yoke"
+        "scotch-yoke",
+        "plug-door-hinge"
       ],
       "added": "2026-10-18",
       "origin": {

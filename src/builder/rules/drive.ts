@@ -989,6 +989,8 @@ export function linearDrive(ctx: BuildCtx, drv: KinDriver): void {
 export function manualDrive(ctx: BuildCtx): void {
   const manual = ctx.kin.drivers.filter((d) => d.kind === "manual" && d.joint);
   manual.forEach((drv, n) => {
+    // a hand on another body than the joint's (`hand`: a handle on a door whose hinge tube is the joint)
+    if (drv.hand) return handGrip(ctx, drv, manual.length > 1 ? `drive-grip${n}` : "drive-grip");
     const jt = ctx.joints.find((q) => q.id === drv.joint);
     if (!jt) return;
     // an input that turns about its own axis and has its knob from its kit (a screw's knurled knob on its end, J11)
@@ -1028,7 +1030,70 @@ export function manualDrive(ctx: BuildCtx): void {
     });
     if (!placed) ctx.issues.push(`drive: no place for a knob on the hand-worked input ${drv.id} clears the other parts`);
   });
-  ctx.note({ id: "drive", kit: "drive", at: manual[0] ? (ctx.joints.find((q) => q.id === manual[0]!.joint)?.at ?? [0, 0, 0]) : [0, 0, 0], title: "Drive · hand operated", note: "Hand operated: no motor; a knob on a shoulder screw on each hand-worked input, its range limited by the stops at the ends of its swing where it has ends.", serves: {}, badge: ["hand operated", "ok"] });
+  const hands = manual.filter((d) => d.hand);
+  const note = hands.length === manual.length
+    ? `Hand operated: no motor; a pull handle on ${hands.map((d) => ctx.kin.points?.find((q) => q.id === d.hand)?.body ?? "?").join(" and ")}, square to its face at the record's hand point, two posts screwed through from the far face; the joint the cycle reads is a plain pivot, the range limited by the stops at the ends of the motion.`
+    : "Hand operated: no motor; a knob on a shoulder screw on each hand-worked input, its range limited by the stops at the ends of its swing where it has ends.";
+  ctx.note({ id: "drive", kit: "drive", at: manual[0] ? (ctx.joints.find((q) => q.id === manual[0]!.joint)?.at ?? [0, 0, 0]) : [0, 0, 0], title: "Drive · hand operated", note, serves: {}, badge: ["hand operated", "ok"] });
+}
+
+/** Pull handle sizes: the posts' spacing, diameter and standoff from the face, the bar's diameter, mm. */
+const GRIP = { span: 28, post: 8, stand: 14, bar: 9, M: 4 } as const;
+
+/**
+ * A pull handle where a manual driver names its hand point (`hand`) on a built body: square to the part's edge nearest
+ * the point (its face there), two posts screwed through from the far face and a round bar across them, along the face.
+ */
+function handGrip(ctx: BuildCtx, drv: KinDriver, id: string): void {
+  const pt = ctx.kin.points?.find((q) => q.id === drv.hand);
+  const P = pt ? ctx.S.refPts.get(pt.id) : undefined;
+  // of the body's plates (its part and its pieces), the one whose outline edge passes nearest the point, and that edge
+  // with its outward normal (an outline runs counter-clockwise)
+  let best = { d: Infinity, n: [0, 0] as Vec2, t: [1, 0] as Vec2, part: undefined as Solid3 | undefined, q: [0, 0] as Vec2 };
+  const plates = pt && P ? ctx.solids.filter((s) => s.body === pt.body && s.op.op === "extrude" && (s.kind === "part" || s.kind === "plate" || s.kind === undefined) && s.profile.outer.length > 2) : [];
+  for (const part of [...(pt ? [ctx.parts.get(pt.body)] : []), ...plates]) {
+    if (!part || part.op.op !== "extrude") continue;
+    const pl = planeCoords(part.frame, P!);
+    if (pl.w < -1e-6 || pl.w > part.op.h + 1e-6) continue;
+    const q = pl.uv;
+    const ring = part.profile.outer;
+    ring.forEach((a, i) => {
+      const b = ring[(i + 1) % ring.length]!;
+      const L = d2(a, b);
+      if (L < 1e-9) return;
+      const t: Vec2 = [(b[0] - a[0]) / L, (b[1] - a[1]) / L];
+      const s = Math.max(0, Math.min(L, (q[0] - a[0]) * t[0] + (q[1] - a[1]) * t[1]));
+      const d = d2(q, add2(a, t, s));
+      if (d < best.d) best = { d, n: [t[1], -t[0]], t, part, q };
+    });
+  }
+  const part = best.part;
+  if (!pt || !P || !part || part.op.op !== "extrude" || best.d > 2) {
+    ctx.issues.push(`drive: the hand point ${String(drv.hand)} of ${drv.id} is not on the face of a built plate`);
+    return;
+  }
+  const q = best.q;
+  const ring = part.profile.outer;
+  const world = (v: Vec2): Vec3 => v3.unit(v3.add(v3.mul(part.frame.x, v[0]), v3.mul(v3.cross(part.frame.z, part.frame.x), v[1])));
+  const n = world(best.n);
+  const t = world(best.t);
+  // the part's depth behind the point along the normal (to the far face), for the screws
+  let depth = 0;
+  while (depth < 200 && pointDist(ring, q[0] - best.n[0] * (depth + 0.5), q[1] - best.n[1] * (depth + 0.5)) === 0) depth += 0.5;
+  const o = v3.add(P, v3.mul(n, -best.d));
+  const G: Frame = { o, x: t, z: n };
+  const B: Frame = { o: v3.add(o, v3.mul(n, GRIP.stand)), x: n, z: t };
+  const body = pt.body;
+  const joints = [...J, ...(drv.joint ? [drv.joint] : [])];
+  const half = GRIP.span / 2;
+  const out: Solid3[] = [];
+  [-half, half].forEach((x, k) => {
+    out.push(...place(G, H.solid(`${id}-post${k}`, { body, name: k ? "" : `Handle post Ø${GRIP.post} x ${GRIP.stand}, tapped M${GRIP.M}`, qty: k ? 0 : 2, kind: "standoff", role: "hw", mat: "Stainless steel A2", outer: circle(GRIP.post / 2, x, 0, 24), z0: 0, z1: GRIP.stand, joints })));
+    out.push(...place(G, H.screw(`${id}-sc${k}`, "csk", GRIP.M, depth + 8, { body, at: [x, 0, 0], face: -depth, dir: 1, joints, ...(k ? { name: "", qty: 0 } : { qty: 2 }) })));
+  });
+  out.push(...place(B, H.solid(`${id}-bar`, { body, name: `Pull handle bar Ø${GRIP.bar}, phenolic, black`, kind: "part", role: "hw", mat: "Phenolic, black", outer: circle(GRIP.bar / 2, 0, 0, 32), z0: -half - GRIP.post / 2, z1: half + GRIP.post / 2, joints })));
+  // it rides a moving part, so a swept volume says nothing of it: the clash check (A15) judges it phase by phase
+  ctx.add(out);
 }
 
 /**

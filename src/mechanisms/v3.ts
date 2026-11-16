@@ -9,4 +9,5 @@ export const polishes3: Record<string, () => Promise<{ polish: Polish }>> = {
   "crypt-lid-quick-return": () => import("./crypt-lid-quick-return/polish3"),
   "turkey-trot-walker": () => import("./turkey-trot-walker/polish3"),
   "eight-night-indexer": () => import("./eight-night-indexer/polish3"),
+  "plug-door-hinge": () => import("./plug-door-hinge/polish3"),
 };

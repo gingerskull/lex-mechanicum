@@ -139,7 +139,7 @@ in degrees, applied x then y then z, default none); points and axes given "in a 
 | `joints` | Declared, with a 3D origin and axis: `id`, `type`, `a`, `b` (bodies), `at` (point or position), `axis`, `limits` `[lo, hi]` where it has them. **Types:** `revolute`, `prismatic`, `cylindrical`, `screw` (`lead`, `hand`, `ball`), `pin-in-slot` (the slot's body and path), `gear-mesh` (`ratio` or the two bodies' tooth counts; `crossed` axes angle, `offset` for hypoid), `cam-contact` (follower kind: roller, flat, knife), `belt` (a `flexible` member: `belt`, `chain`, `rope`, `cvt`), `rolling`, `spherical`, `universal`, `planar`, `flexure` (neck, width, length, thickness). Every joint belongs to exactly one block of `solve`, or to `fallback`. |
 | `params` | Named dimensions: `id`, `value`, `unit`, `min`, `max` (the **ranges** used by controls and by the validator), `note`. |
 | `design` | Discrete **design choices** that change the build but not the motion law: tooth counts, which arrangement, which side a part is on. `options` and the chosen `value`. |
-| `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`; a `manual` driver that gives them is a hand stroke, worked through that range by the cycle and built with no motor. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params; in the record form an option is `{ id, set, cycle }`: `set` gives design choices (the input member, the held member) and `cycle` the input degrees after which the motion repeats at that option (it replaces the rotary driver's range). The selector's `default` is an option's id. |
+| `drivers` | The inputs. One or several (differential, ball-disc integrator): `id`, the `joint` driven, `kind` (`rotary`, `oscillating`, `linear`, `manual`), `range` (degrees or mm), `default`. An oscillating driver also gives `lo`, `hi`; a `manual` driver that gives them is a hand stroke, worked through that range by the cycle and built with no motor. A `manual` driver may name `hand`, a point on another body than its joint's: the hand works it there (a pull handle on a door whose hinge tube is the driver's joint), and the joint is built as a plain pivot. A **selector** is a driver of `kind: "select"` with named `options` (`"1st"`, `"reverse"`), each setting the values of other drivers or params; in the record form an option is `{ id, set, cycle }`: `set` gives design choices (the input member, the held member) and `cycle` the input degrees after which the motion repeats at that option (it replaces the rotary driver's range). The selector's `default` is an option's id. |
 | `solve` | The composition: a list of block instances in solve order. A **block** is one of `dyad`, `slider-dyad`, `five-bar`, `gear-mesh`, `willis`, `hooke`, `homokinetic`, `bennett`, `cam`, `screw`, `convey`, `flexure`, `escapement`, `lerp`, `line-crossing`, `target-path`, `ravigneaux`; `in` names the bodies, points and params it reads; `out` names the points and angles it produces; `branch` names the design choice that picks its root. Block inputs and outputs are the only names later blocks may read. |
 | `points` | Named points: a body and a local position. Every point a trace, overlay, dimension or plot uses is here (standard K12). |
 | `outputs` | Quantities read off: `id`, `of` (a body or point), `kind` (`angle`, `position`, `speed-ratio`, `path`), `unit`. Plots and claims read these. |
@@ -196,8 +196,25 @@ from, to, width, wall } and `foot`), `rotor` with `internalGear` (a rotary engin
 (its epitrochoid housing).
 
 **Joints.** A revolute with a journal `radius` (over 12) is an eccentric between two moving parts (the sheave in its
-strap) or, to the ground, a fixed hub the part turns on. A `pin-in-slot` slot is `from`/`to` (straight) or `arc` ({ center,
-radius }: a curved slot, the die kit).
+strap) or, to the ground, a fixed hub the part turns on. A `pin-in-slot` slot is `from`/`to` (straight), `arc` ({ center,
+radius }: a curved slot, the die kit), `path: "circle"` with `center` and `radius` (a round hole), or `track`: a composite
+track of tangent arcs and lines, exact per segment and smooth (G1) where they meet by construction. A track is
+`{ start, dir, segments }`: `start` the centre line's first point, `dir` its direction there (a vector, or degrees about
+the joint's axis from world x), and `segments` in order, each following on from the last one's end and direction: a
+line is `{ length }`, an arc `{ radius, length }` or `{ radius, angle }` (degrees turned), `radius` signed, + turning
+left (counter-clockwise seen from the axis), or `curvature` (1/mm) for `radius`. The track lies in the plane through
+the joint's `at` square to its `axis` (default +z); `at` is the pin's place on the track in the reference
+configuration, and the validator checks that it lies on it. Numbers may be parameter expressions. Example, an S of two
+arcs and a line, the pin at its start:
+
+```json
+{ "id": "F", "type": "pin-in-slot", "a": "guide-arm", "b": "ground", "at": [60, -30, 0], "axis": [0, 0, 1],
+  "slot": { "track": { "start": [60, -30], "dir": 90,
+    "segments": [{ "radius": 40, "angle": 45 }, { "length": 20 }, { "radius": -40, "angle": 45 }] } } }
+```
+
+The builder makes a track on the ground a roller on a hardened stud in the pin's body, running in a groove cut along
+the track in a plate on the base (the track kit).
 
 **Shapes the builder places where the joints put them** (not on a slab): a bevel `gear` (with `cone`, its pitch cone
 half-angle) on its pitch cone; a `shaft` with a `yoke` ({ radius, arm }, a universal joint's yoke) and a `cross`
@@ -228,7 +245,19 @@ optional `sum`) makes the point where two lines cross; where they run together i
 distances to `a1` and `b1` add up to `sum` (an antiparallelogram's change points). `target-path` (`shape`
 `rounded-square` with `cx`, `cy`, `side`, `corner`, or `flower` with `cx`, `cy`, `r0`, `lobe`, `lobes`) moves a point
 once round a closed curve per cycle, from the cycle phase; the linkage follows it by inverse kinematics (`five-bar` with
-`mode: "ik"`, dyads). A driver with `cycle: { from }` is set by the cycle through such a block: it is not applied as a
+`mode: "ik"`, dyads). With `shape: "track"` and `joint` (a pin-in-slot with a `track`) it moves that joint's pin along
+the joint's own track, so the track is written once: from where the pin's `at` lies on it to the travel `to` (mm from
+the track's start; default the far end), there and back once a cycle (`mode: "oscillate"`, the default, travel
+s0 + (to − s0)(1 − cos u)/2, as a hand stroke runs) or there once over the cycle (`mode: "once"`); `travel` (a driver,
+value or expression, mm) sets the travel itself instead. Its `out` is the point (name it as the joint, so the pin's
+body is posed by it) or `{ point, travel }`. The block solves the joint (`joints: [<pin>]`); a manual driver on the
+linkage's input with `cycle: { from: <block id> }` reads the input's turn back off the pose:
+
+```json
+{ "block": "target-path", "id": "run", "joints": ["F"], "in": { "shape": "track", "joint": "F" }, "out": { "point": "F", "travel": "door-travel" } }
+```
+
+A driver with `cycle: { from }` is set by the cycle through such a block: it is not applied as a
 joint motion, its value is read back off the pose, and it needs no control. Block inputs may be parameter expressions.
 A body's `shape` may carry a `wheel` ({ diameter, width, stub }): a wheel on a stub axle along the line from its pivot to
 the body's point at the stub's distance (a steering knuckle). A `slider` may start at `from` along its x. Every point the
@@ -263,7 +292,8 @@ record names on the ground lies on the base.
   `bell` (as the race, with `outer`, `mouth`, `back`); `cage` (`inner`, `outer`, `width`, `window`; a window at each ball
   joined to it by a `planar` joint).
 - *Joints:* `support` (`hung`, `bridge`, `stub`, `housing`, `pillow`) names a fixed site's support where the selector
-  would choose one that cannot be built (an output shaft that cannot come up through the input side); `head: "-"`
+  would choose one that cannot be built (an output shaft that cannot come up through the input side); `bridge: "bar"`
+  shapes a fixed pin's bridge as a narrow bar from each post to a boss at the pin, not a plate over all three; `head: "-"`
   turns a moving pin end for end. A body with `set: "B"` (a second set of like links) is drawn in a pattern of its own.
 - *Blocks:* `bennett` with only `joints` [j1..j4] (round the loop, j1 the driven ground joint) reads its lengths, twists
   and reference angle from them; `hooke` takes `shafts: { in | out: { body, axis } }` for a shaft with no ground joint (a
@@ -320,7 +350,7 @@ Any shape may carry `place` (its part starts there along its frame's z, where th
 plates of the body, each with `origin`, `rot` or the axes `x` and `z`, `thick`, `outline`, `holes`; or a turned piece,
 `op: "revolve"` with its half section `profile` [r, z] about the frame's z; any of them with `marks` on its top face
 ([{ kind: "carve" | "quilt", pts }]), a fill `pattern` there ("quilt", "hatch", or { kind, angle, pitch, inset }), and
-`ornament: true` for decoration on a seasonal mechanism's scenery, or a solid `kind` of its own) and, on a plate, `exact` (its outline as
+`ornament: true` for decoration on a seasonal mechanism's scenery, or a solid `kind` of its own; a plate piece with `joints` (joint ids) is a member of those joints' stacks, a fork ear that puts a pin in double shear) and, on a plate, `exact` (its outline as
 drawn), `windows` (polygon holes) and `guide` ([s0, s1] along a slide's axis: the length its rails hold). A disc may
 carry `rollers` (a turret's radial rollers). A ground joint may ask for its `support` (`stub`, `hung`, ...) and a shaft
 in plan for one `side` (both pillow blocks on it: +1 along the axis, −1 against), and with `overhung: true` the shaft runs on
@@ -504,7 +534,7 @@ antiparallelogram, bell-crank, toggle-clamp, scissor-lift, pantograph, watt-six-
 klann-linkage, jansen-linkage, ackermann-steering, rhombic-drive, elliptic-trammel,
 watt-linkage, chebyshev-linkage, hoekens-linkage, roberts-linkage, evans-grasshopper, scott-russell, peaucellier-lipkin,
 hart-inversor, sarrus-linkage, tusi-couple, crank-shaper, whitworth, drag-link-quick-return, offset-slider-crank,
-walschaerts-valve-gear, bennett-linkage, wobble-box, walking-beam,
+walschaerts-valve-gear, bennett-linkage, wobble-box, walking-beam, plug-door-hinge,
 spur-gears, gear-train, internal-gear-pair, helical-gears, herringbone-gears, bevel-gears, hypoid-gears, worm-drive,
 crossed-helical-gears, rack-pinion, rack-stroke-doubler, planetary, differential, harmonic-drive, cycloidal-drive,
 non-circular-gears, sun-and-planet, wankel, ravigneaux,

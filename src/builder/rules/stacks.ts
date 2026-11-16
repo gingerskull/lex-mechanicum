@@ -39,6 +39,11 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
     const upper = ctx.solids.find((s) => s.id === `${b}-cheek` && s.body === b);
     const lv = ctx.levels.get(b) ?? [];
     const parts: [Solid3 | undefined, string, boolean][] = [[ctx.parts.get(b), b, false], [ctx.twins.get(b), b, false], [upper, b, false], ...lv.map((p, k): [Solid3, string, boolean] => [p, `${b}#${k + 1}`, true])];
+    // a piece the record joins to the pin (`joints` on a piece of the shape: a fork ear over a link's end, the pin in
+    // double shear) is a member of its stack as well
+    const kb0 = ctx.kin.bodies.find((q) => q.id === b);
+    const joined = ((kb0?.shape as { pieces?: { id?: string; joints?: unknown }[] } | undefined)?.pieces ?? []).filter((pc) => Array.isArray(pc.joints) && site.joints.some((j) => (pc.joints as unknown[]).includes(j)));
+    for (const pc of joined) parts.push([ctx.solids.find((q) => q.id === `${b}-${String(pc.id)}` && q.body === b), b, false]);
     for (const [part, key, level] of parts) {
       if (!part) continue;
       const uv = planeCoords(part.frame, site.at).uv;
@@ -139,7 +144,8 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   if (!members.length) return null;
   const alongUp = parallel(frame.z, UP);
   const base = alongUp && ctx.base ? { top: ctx.base.top - frame.o[2], bottom: ctx.base.bottom - frame.o[2] } : null;
-  const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || d.kind === "manual" || d.kind === "oscillating");
+  // (a manual driver worked by a hand on another body, `hand`, leaves its joint a plain pivot)
+  const driver = ctx.kin.drivers.find((d) => d.kind === "rotary" || (d.kind === "manual" && !d.hand) || d.kind === "oscillating");
   // a fixed pin under a grooved link (an expansion link's trunnion) stands on the base only: its axle ends in the solid
   // lower cheek, under the groove the die runs in
   const grooved = site.fixed && site.bodies.some((b) => ctx.geoms.get(b)?.upper);
@@ -181,6 +187,8 @@ export function buildSite(ctx: BuildCtx, site: Site): StackResult | null {
   // Oldham coupling's output hub, whose shaft cannot come up through the input side, hangs from a bridge)
   const asked = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { support?: SupportKind } | undefined)?.support).find(Boolean);
   if (asked) spec.support = asked;
+  // a bridge shaped as a narrow bar from each post to a boss at the pivot (`bridge: "bar"`), not a plate over all three
+  if (site.joints.some((j) => (ctx.kin.joints.find((q) => q.id === j) as { bridge?: unknown } | undefined)?.bridge === "bar")) spec.bar = true;
   // both pillow blocks on one side of what the shaft carries (`side` on its joint: +1 along the axis, −1 against it)
   const side = site.joints.map((j) => (ctx.kin.joints.find((q) => q.id === j) as { side?: number } | undefined)?.side).find((v) => v === 1 || v === -1);
   if (side) spec.side = side as 1 | -1;
