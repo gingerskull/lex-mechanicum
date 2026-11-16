@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.51.0, Tigrus — 2026-11-16
+
+- A new mechanism, the plug-door hinge: a door seated in its opening as a plug is drawn in, tipped out through the
+  opening and folded flat against the outside of the wall, turned 180°, by a goose-neck hinge on a crank whose guide
+  arm carries a follower in a fixed S-shaped track. The track's first arc is centred on the crank's pin to the guide
+  arm, so the hinge tube holds still while the door leaves its seat; then the track bends the other way and the tube
+  turns 157°. Hand operated, by a pull handle on the door, after EP 0 317 037 (1987).
+- A composite track: a pin in a fixed slot of tangent arcs and lines, exact per segment and checked by the loop
+  closure; `target-path` runs a point along it, there and back or one way; its kit builds a grooved plate with hardened
+  liners, a felt oiler and a stud-type track roller.
+- A hand drive may grip a body other than its joint's (a pull handle on a door); a plate piece can join the stacks of
+  the pins it carries; a bridge over a fixed pin can be a bar between its posts. No other mechanism's build changes.
+
 ## 0.50.0, Anvillus — 2026-11-06
 
 - Hanukkah's seasonal mechanism, the Maccabee eight-night indexer: an eight-slot Geneva steps a rack carriage one
