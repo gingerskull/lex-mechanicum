@@ -12,6 +12,8 @@
   liners, a felt oiler and a stud-type track roller.
 - A hand drive may grip a body other than its joint's (a pull handle on a door); a plate piece can join the stacks of
   the pins it carries; a bridge over a fixed pin can be a bar between its posts. No other mechanism's build changes.
+- A mechanism page may load up to 115 KB of JavaScript gzipped (was 110 KB): every page carries the whole kinematic
+  library, now about 110 KB with the track.
 
 ## 0.50.0, Anvillus — 2026-11-06
 
