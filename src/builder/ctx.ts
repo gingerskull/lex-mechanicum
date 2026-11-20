@@ -12,7 +12,7 @@ import type { Kinematics } from "../kin/compose";
 import type { Setup } from "../kin/compose";
 import type { Kin } from "../kin/types";
 import type { Vec3, Xf } from "../kin/math";
-import { xf } from "../kin/math";
+import { v3, xf } from "../kin/math";
 import { cutConjugates } from "./conjugate";
 import { manifold } from "../solids/manifold";
 import type { Solid3 } from "../solids/types";
@@ -122,7 +122,10 @@ export interface BuildCtx {
   add(...s: (Solid3 | Solid3[])[]): Solid3[];
   get(id: string): Solid3 | undefined;
   note(n: JointNote): void;
-  /** World axial range of a body along its family normal, with the frame of the family. */
+  /**
+   * World axial range of a body along its family normal, with the frame of the family: its slab's, or for a part the
+   * record places itself (`place`), the part's own faces whichever way its frame faces.
+   */
   extent(body: string): { frame: Frame; w0: number; w1: number } | null;
   xfOf(body: string, i: number): Xf;
   /** The direction the default view looks along. */
@@ -215,7 +218,9 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
     },
     extent(body) {
       const r = slabRange(this.placement, body);
-      return r ? { frame: r.fam.frame, w0: r.w0, w1: r.w1 } : null;
+      if (!r) return null;
+      const own = placedSpan(this, body, r.fam.frame);
+      return { frame: r.fam.frame, w0: own?.[0] ?? r.w0, w1: own?.[1] ?? r.w1 };
     },
     xfOf(body, i) {
       return this.sampled.xfs.get(body)?.[i] ?? UNIT;
@@ -230,6 +235,55 @@ export async function createCtx(rec: RecordLike, opts: BuildOpts = {}): Promise<
   ctx.sweeps = new Sweeps(ctx);
   for (const f of placement.relaxed) ctx.issues.push(`parts pass on both sides of a pin among ${f.join(", ")}: decided in the mechanism's issue (T12)`);
   return ctx;
+}
+
+/**
+ * A solid's own span along its frame's z, from its frame origin: an extrusion's height (a part made as a mesh keeps the
+ * extrusion it stands for), a loft's sections, a turned part's profile; null for a sweep.
+ */
+export function localSpan(s: Pick<Solid3, "op" | "profile">): [number, number] | null {
+  const op = s.op;
+  if (op.op === "extrude") return [0, op.h];
+  if (op.op === "loft") return [Math.min(...op.sections.map((x) => x.z)), Math.max(...op.sections.map((x) => x.z))];
+  if (op.op === "revolve") {
+    const ys = s.profile.outer.map((p) => p[1]);
+    return ys.length ? [Math.min(...ys), Math.max(...ys)] : null;
+  }
+  return null;
+}
+
+/**
+ * The range a part takes along a frame's z (from the frame's origin), read from its own faces and its own facing: a part
+ * whose z runs against the frame's spans back from its origin. Null when the part is not square to the frame or its op
+ * gives no span.
+ */
+export function spanAlong(s: Pick<Solid3, "op" | "profile" | "frame">, f: Frame, fallback?: [number, number]): [number, number] | null {
+  const k = s.frame.z[0] * f.z[0] + s.frame.z[1] * f.z[1] + s.frame.z[2] * f.z[2];
+  if (Math.abs(Math.abs(k) - 1) > 1e-6) return null;
+  const loc = localSpan(s) ?? fallback;
+  if (!loc) return null;
+  const w = (s.frame.o[0] - f.o[0]) * f.z[0] + (s.frame.o[1] - f.o[1]) * f.z[1] + (s.frame.o[2] - f.o[2]) * f.z[2];
+  const a = w + k * loc[0];
+  const b = w + k * loc[1];
+  return [Math.min(a, b), Math.max(a, b)];
+}
+
+/**
+ * The own span of a part the record places (`place` on its shape: where its joints put it, not on a slab) along a
+ * family frame, whichever way its frame faces: from `place` along its frame's z, as thick as the record makes it
+ * (`thickness`, else its built part's height, else its geometry's). Where a shape builds its working plate as a piece
+ * beside its own part (an internal Geneva wheel's slotted ring over its web), the record's `place` and `thickness` are
+ * the working plate's. Null for any other body, which keeps its slab.
+ */
+function placedSpan(ctx: BuildCtx, body: string, f: Frame): [number, number] | null {
+  const g = ctx.geoms.get(body);
+  const at = g?.shape.place;
+  if (!g || typeof at !== "number") return null;
+  const part = ctx.parts.get(body);
+  const own = part ? localSpan(part) : null;
+  const h = typeof g.shape.thickness === "number" ? g.shape.thickness : own ? own[1] - own[0] : g.thick;
+  const o = v3.add(g.frame.o, v3.mul(g.frame.z, at));
+  return spanAlong({ frame: { o, x: g.frame.x, z: g.frame.z }, op: { op: "extrude", h, steps: 1 }, profile: g.profile }, f);
 }
 
 /** A solid's frame in world coordinates after `X` (used for the pose of a body at a sample). */

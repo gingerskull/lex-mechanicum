@@ -4,7 +4,7 @@
 import { circle } from "../../core/geom";
 import { inside } from "../../core/poly";
 import type { Solid3 } from "../../solids/types";
-import { ownParts, type BuildCtx } from "../ctx";
+import { ownParts, spanAlong, type BuildCtx } from "../ctx";
 import { canon, fromPlane, parallel, planeCoords, type Frame } from "../frames";
 import { type Member, titleOf } from "../lib";
 import { bossRadius } from "./core";
@@ -53,16 +53,11 @@ export function membersOf(ctx: BuildCtx, site: Site, frame: Frame, keyedIds: Set
       if (!level && upper && (!inside(part.profile.outer, uv) || part.profile.holes.some((h) => inside(h, uv)))) continue;
       const slab = ctx.extent(key);
       if (!slab || !parallel(slab.frame.z, frame.z)) continue;
-      // the twin's second half sits in its own slab
-      const w = (part.frame.o[0] - frame.o[0]) * frame.z[0] + (part.frame.o[1] - frame.o[1]) * frame.z[1] + (part.frame.o[2] - frame.o[2]) * frame.z[2];
-      const thick = part.op.op === "extrude" ? part.op.h : part.op.op === "loft" ? Math.max(...part.op.sections.map((x) => x.z)) : 6;
-      // a part the record places (`place`) on its joint's frame or on a frame it gives by its axes, its z running against
-      // the stack's, spans back from its origin; every other part keeps the extent the placement gave it (a frame given
-      // by `rot` among them: the wider question is issue 280)
-      const kb = ctx.kin.bodies.find((q) => q.id === b);
-      const placed = typeof kb?.shape?.place === "number" && (!!kb.at?.joint || !!kb.frame?.z);
-      const back = placed && part.frame.z[0] * frame.z[0] + part.frame.z[1] * frame.z[1] + part.frame.z[2] * frame.z[2] < 0;
-      out.push({ solid: part.id, body: b, w0: back ? w - thick : w, w1: back ? w : w + thick, R, keyed: keyedIds.has(b), shim: ctx.shim.get(b) ?? 0, name: part.name });
+      // each member spans its own faces along the stack (the twin's second half its own slab), whichever way its frame
+      // faces: a part whose z runs against the stack's (a placed part, a pin turned head down) spans back from its origin
+      const span = spanAlong(part, frame, [0, 6]);
+      if (!span) continue;
+      out.push({ solid: part.id, body: b, w0: span[0], w1: span[1], R, keyed: keyedIds.has(b), shim: ctx.shim.get(b) ?? 0, name: part.name });
     }
   }
   // hinge lugs of bodies whose plane is not square to the axis (rules/lugs)

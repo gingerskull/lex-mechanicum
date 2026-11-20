@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+- A part the record places along its frame is now measured by its own faces and its own facing everywhere the builder
+  reads it: the stacks of its pins, the slides, the contacts, the track kit and the headroom check, which now measures
+  along each pin's axis and judges the finished build. Fixed with it: the desmodromic cam's rocker bearings sit in
+  their rockers and the closing rocker's axle runs between two pillow blocks either side of it (36 mm, now 129.5 mm);
+  the face groove cam's slide rails stand level with its follower; the lever escapement's impulse pin and guard pin
+  stand in the lever's fork; the Hanukkah indexer's Geneva roller sits in the middle of the wheel.
+- The Turkey trot walker's base is 34 mm narrower: a roller built at the wrong level, and then taken off, had widened
+  it. False headroom notes are gone from seven mechanisms; two real ones show: a head 1 mm under the plug-door hinge's
+  goose-neck and one 0.5 mm under the turkey's near leg.
+- The plug-door hinge's guide arm and door no longer need their frame axes set by hand.
+
 ## 0.51.0, Tigrus — 2026-11-16
 
 - A new mechanism, the plug-door hinge: a door seated in its opening as a plug is drawn in, tipped out through the
