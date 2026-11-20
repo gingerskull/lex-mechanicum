@@ -102,14 +102,14 @@ describe("stack members span their own faces (symptom 1)", () => {
 describe("ctx.extent of a placed part (symptom 3)", () => {
   it("plug-door-hinge: the guide arm and the door span their own faces, so no false headroom report at D", async () => {
     const ctx = await build("plug-door-hinge");
-    for (const [b, w] of [["guide-arm", [0, 6]], ["door", [8, 20]], ["goose-neck", [20, 26]]] as const) {
+    for (const [b, w] of [["guide-arm", [0, 6]], ["door", [8, 20]], ["goose-neck", [20.5, 26.5]]] as const) {
       const e = ctx.extent(b)!;
       const k = e.frame.z[2] > 0 ? 1 : -1;
       const z = [e.frame.o[2] + k * e.w0, e.frame.o[2] + k * e.w1].sort((p, q) => p - q);
       expect(z[0], b).toBeCloseTo(w[0], 6);
       expect(z[1], b).toBeCloseTo(w[1], 6);
     }
-    expect(ctx.issues.some((s) => s.includes("D-bolt-head"))).toBe(false);
+    expect(ctx.issues.filter((s) => s.startsWith("headroom"))).toEqual([]);
     // the pin turned head down (D) spans the guide arm and the door with no hand-set frame axes on either: its head under
     // the arm
     expect(box(ctx, "D-bolt-head").max[2]).toBeLessThanOrEqual(0 + 1e-6);

@@ -18962,7 +18962,7 @@
                     0,
                     14
                   ],
-                  "thick": 6,
+                  "thick": 6.5,
                   "joints": [
                     "K"
                   ]
@@ -19381,7 +19381,7 @@
                   13.89
                 ]
               ],
-              "place": 20,
+              "place": 20.5,
               "thickness": 6,
               "note": "hooked round the jamb and the door's edge, K to N"
             },
@@ -20305,7 +20305,7 @@
                   "origin": [
                     0,
                     0,
-                    27.5
+                    28
                   ],
                   "thick": 6,
                   "joints": [
@@ -74885,7 +74885,7 @@
                 ]
               ],
               "boss": 6,
-              "place": 52,
+              "place": 53,
               "thickness": 5,
               "pieces": [
                 {
