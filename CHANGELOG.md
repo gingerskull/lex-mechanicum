@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.51.1, Tigrus — 2026-11-20
 
 - A part the record places along its frame is now measured by its own faces and its own facing everywhere the builder
   reads it: the stacks of its pins, the slides, the contacts, the track kit and the headroom check, which now measures
