@@ -79,7 +79,8 @@ describe("changelog headings", () => {
 
   it("parse every release heading of CHANGELOG.md, the older ones without a codename", () => {
     const log = readFileSync("CHANGELOG.md", "utf8");
-    expect(headings(log).length).toBe(log.split("\n").filter((l) => l.startsWith("## ")).length);
+    // (lines written under `## Unreleased` wait for the release step, which gives them their heading)
+    expect(headings(log).length).toBe(log.split("\n").filter((l) => l.startsWith("## ") && l.trim() !== "## Unreleased").length);
     expect(headings(log).length).toBeGreaterThan(30);
   });
 

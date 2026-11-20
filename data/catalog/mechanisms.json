@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-11-16",
+  "generated": "2026-11-20",
   "vocabularies": {
     "family": [
       "Linkage",
@@ -18962,7 +18962,7 @@
                     0,
                     14
                   ],
-                  "thick": 6,
+                  "thick": 6.5,
                   "joints": [
                     "K"
                   ]
@@ -19381,7 +19381,7 @@
                   13.89
                 ]
               ],
-              "place": 20,
+              "place": 20.5,
               "thickness": 6,
               "note": "hooked round the jamb and the door's edge, K to N"
             },
@@ -19906,16 +19906,6 @@
                 0,
                 0,
                 0
-              ],
-              "x": [
-                1,
-                0,
-                0
-              ],
-              "z": [
-                0,
-                0,
-                1
               ]
             }
           },
@@ -20315,7 +20305,7 @@
                   "origin": [
                     0,
                     0,
-                    27.5
+                    28
                   ],
                   "thick": 6,
                   "joints": [
@@ -20330,16 +20320,6 @@
                 0,
                 0,
                 0
-              ],
-              "x": [
-                1,
-                0,
-                0
-              ],
-              "z": [
-                0,
-                0,
-                1
               ]
             }
           }
@@ -74905,7 +74885,7 @@
                 ]
               ],
               "boss": 6,
-              "place": 52,
+              "place": 53,
               "thickness": 5,
               "pieces": [
                 {

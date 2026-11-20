@@ -772,15 +772,19 @@ export const headroom: Rule = {
   fixture: "four-bar",
   applies: (ctx) => ctx.sites.some((s) => !s.fixed),
   apply() {},
-  after(ctx) {
+  // judged on the complete build, after the polish (a head the polish takes away with its pin is not there to judge)
+  last(ctx) {
     // a bolt head under a plate that passes over it needs headroom; the placer opened the gap, this checks it held. The
     // head rides its part, so it is judged with the other parts at the same phase, in plan, where their heights meet.
+    // Heights run along the head's own axis, out from its part (down for a pin turned head down), each part measured by
+    // its extent along the same axis whichever way its family's frame faces.
     for (const s of ctx.sites.filter((q) => !q.fixed)) {
       const head = ctx.get(`${s.id}-bolt-head`);
       if (!head || head.op.op !== "extrude") continue;
       const r = (head.D ?? 12) / 2;
-      const w0 = head.frame.o[2];
-      const w1 = w0 + head.op.h;
+      const ax = head.frame;
+      const w0 = 0;
+      const w1 = head.op.h;
       const carrier = head.body;
       let worst = Infinity;
       let who = "";
@@ -788,9 +792,11 @@ export const headroom: Rule = {
         if (s.bodies.includes(b)) continue;
         const e = ctx.extent(b);
         const g = ctx.geoms.get(b);
-        if (!e || !g) continue;
-        const z0 = e.frame.o[2] + e.w0;
-        const z1 = e.frame.o[2] + e.w1;
+        if (!e || !g || !parallel(e.frame.z, ax.z)) continue;
+        const k = v3.dot(e.frame.z, ax.z) > 0 ? 1 : -1;
+        const o = v3.dot(v3.sub(e.frame.o, ax.o), ax.z);
+        const z0 = o + Math.min(k * e.w0, k * e.w1);
+        const z1 = o + Math.max(k * e.w0, k * e.w1);
         if (z1 <= w0 - 0.01 || z0 >= w1 + MIN_GAP) continue;
         ctx.sampled.us.forEach((_, i) => {
           const c = planeCoords(e.frame, xf.apply(ctx.xfOf(carrier, i), s.at)).uv;

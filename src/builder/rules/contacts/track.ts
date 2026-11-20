@@ -16,21 +16,6 @@ import type { Rule } from "../types";
 import { bodyOf, contactRule } from "./kit";
 
 /**
- * The axial range of the arm that carries the follower, along the stack's normal: its slab's, or for a part the record
- * places itself (`place` on its shape, where the placement solver's slab does not hold it) the built part's own faces.
- */
-function armRange(ctx: BuildCtx, body: string): { frame: Frame; w0: number; w1: number } | null {
-  const e = ctx.extent(body);
-  const g = ctx.geoms.get(body);
-  const part = ctx.parts.get(body);
-  if (!e || typeof g?.shape.place !== "number" || !part || part.op.op !== "extrude" || !parallel(part.frame.z, e.frame.z)) return e;
-  const k = v3.dot(part.frame.z, e.frame.z) > 0 ? 1 : -1;
-  const a = v3.dot(v3.sub(part.frame.o, e.frame.o), e.frame.z);
-  const b = a + k * part.op.h;
-  return { frame: e.frame, w0: Math.min(a, b), w1: Math.max(a, b) };
-}
-
-/**
  * The world height of a track plate's top (z-up stacks only): right under the arm that carries the follower where no
  * other moving part sweeps over the plate, else under every moving part, as the base is. Decided once per build, when
  * the base rule asks (the base drops under the plate), so the kit builds at the level the base made room for.
@@ -41,7 +26,7 @@ export function trackPlateTop(ctx: BuildCtx, ji: JointInfo): number | null {
   tops.set(ctx, memo);
   if (memo.has(ji.id)) return memo.get(ji.id)!;
   const T = ji.r.slot?.track;
-  const e = armRange(ctx, ji.a);
+  const e = ctx.extent(ji.a);
   const plate = T ? trackPlate(T.t) : null;
   let top: number | null = null;
   if (T && e && plate && ji.b === "ground" && parallel(e.frame.z, UP) && parallel(T.n, UP)) {
@@ -89,8 +74,8 @@ const trackFollower = contactRule({
     };
     if (!T) return fail("no track");
     if (c.b !== "ground") return fail("its track is on a moving body, and only a track on the ground is built");
-    const arm = armRange(ctx, c.a);
-    const za: [number, number] | null = arm && c.za ? [arm.w0, arm.w1] : c.za;
+    // (the arm's own faces when the record places it: the contact reads them, src/builder/ctx.ts extent)
+    const za = c.za;
     if (!za || !ctx.base || !parallel(T.n, c.frame.z) || !parallel(c.frame.z, UP)) return fail("its track does not lie in the plane of the arm's stack over the base");
     const plate = trackPlate(T.t);
     if (!plate) return fail(`an arc of its track is tighter than the groove (Ø${TRACK_FOLLOWER.D} roller)`);
